@@ -1509,13 +1509,13 @@ ROM_START( crusnwld20 ) /* Version 2.0, Tue Mar 18 1997 - 12:32:57 */
 	ROM_LOAD32_BYTE( "cwld.u24",     0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "cwld.u25",     0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
 	
-	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
-	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) /* TIBPAL20L8-10CNT */
-	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
-	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+/*	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669-1.u38",  0x0000, 0x02dd, NO_DUMP ) // TIBPAL22V10-15BCNT
+	ROM_LOAD("a-21164.u43",  0x0000, 0x0144, NO_DUMP ) // TIBPAL20L8-10CNT
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) // GAL20V8B
+	ROM_LOAD("a-21611.u54",  0x0000, 0x02dd, NO_DUMP ) // TIBPAL22V10-15BCNT
+	ROM_LOAD("a-21167.u111", 0x0000, 0x02dd, NO_DUMP ) // TIBPAL22V10-15BCNT
+	ROM_LOAD("a-19672-1.u114", 0x0000, 0x0001, NO_DUMP ) // TIBPAL22V10-15BCNT */
 ROM_END
 
 
@@ -2014,7 +2014,7 @@ GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crus
 GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
 GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
-GAMEL( 1996, crusnwld25, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5, Kit version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld25, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa ) //Conversion kit for Hyperdrive that removes manual transmission
 GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
