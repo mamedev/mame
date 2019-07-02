@@ -3727,6 +3727,7 @@ files {
 	MAME_DIR .. "src/mame/includes/crvision.h",
 	MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
 	MAME_DIR .. "src/mame/drivers/geniusiq.cpp",
+	MAME_DIR .. "src/mame/drivers/geniusjr.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_unk1.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_unk2.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_eu3a12.cpp",

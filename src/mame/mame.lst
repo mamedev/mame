@@ -14199,6 +14199,14 @@ iq128_fr                        // 1997 Genius PC (France)
 iqtv512                         // IQ TV512 (Germany)
 itunlim                         // 199? IT Unlimited
 
+@source:geniusjr.cpp
+gj4000                          // Genius Junior 4000 (Germany)
+gj5000                          // Genius Junior 5000 (Germany)
+gjmovie                         // Genius Junior Movie (Germany)
+gjrstar                         // Genius Junior Redstar (Germany)
+gjrstar2                        // Genius Junior Redstar 2 (Germany)
+gjrstar3                        // Genius Junior Redstar 3 (Germany)
+
 @source:genpc.cpp
 pc                              // 1987 PC with CGA
 pcega                           // 1987 PC with EGA
@@ -32994,12 +33002,6 @@ prehisleb                       // bootleg
 
 @source:prestige.cpp
 cars2lap                        // CARS 2 Laptop (Germany)
-gj4000                          // Genius Junior 4000 (Germany)
-gj5000                          // Genius Junior 5000 (Germany)
-gjmovie                         // Genius Junior Movie (Germany)
-gjrstar                         // Genius Junior Redstar(Germany)
-gjrstar2                        // Genius Junior Redstar 2 (Germany)
-gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gkidabc                         // Genius KID ABC Fan (Germany)
 gl6000sl                        // Genius Leader 6000SL (Germany)
 gl7007sl                        // Genius Leader 7007SL (Germany)
