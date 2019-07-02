@@ -2914,3 +2914,20 @@ if (CPUS["BCP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.h")
 end
+
+--------------------------------------------------
+-- Fujitsu F2MC-16 series
+--@src/devices/cpu/f2mc16/f2mc16.h,CPUS["F2MC16"] = true
+--------------------------------------------------
+
+if (CPUS["F2MC16"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.h",
+	}
+end
+
+if (CPUS["F2MC16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.h")
+end

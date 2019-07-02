@@ -144,6 +144,7 @@ CPUS["MEG"] = true
 CPUS["DSPV"] = true
 CPUS["RII"] = true
 CPUS["BCP"] = true
+CPUS["F2MC16"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are

@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "screen.h"
 #include "speaker.h"
+#include "cpu/f2mc16/f2mc16.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -20,6 +21,7 @@ public:
 		driver_device(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_screen(*this, "screen")
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void tomy_princ(machine_config &config);
@@ -29,6 +31,9 @@ protected:
 private:
 	required_device<generic_slot_device> m_cart;
 	required_device<screen_device> m_screen;
+	required_device<f2mc16_device> m_maincpu;
+
+	void princ_map(address_map &map);
 
 	uint32_t screen_update_tomy_princ(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -39,12 +44,19 @@ uint32_t tomy_princ_state::screen_update_tomy_princ(screen_device &screen, bitma
 	return 0;
 }
 
+void tomy_princ_state::princ_map(address_map &map)
+{
+	map(0xf00000, 0xffffff).rom().region("maincpu", 0x00000);
+}
+
 static INPUT_PORTS_START( tomy_princ )
 INPUT_PORTS_END
 
 void tomy_princ_state::tomy_princ(machine_config &config)
 {
 	// F2MC-16L based CPU
+	F2MC16(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tomy_princ_state::princ_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
