@@ -184,9 +184,9 @@ void vcc_state::machine_start()
 void vcc_state::update_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
-	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
+	u8 outdata = (m_7seg_data_xxx & 0x7f) | (m_led_select_xxx << 7 & 0x80);
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
+	display_matrix(8, 4, outdata, m_led_select_xxx >> 2 & 0xf);
 }
 
 READ8_MEMBER(vcc_state::speech_r)
@@ -200,7 +200,7 @@ READ8_MEMBER(vcc_state::speech_r)
 WRITE8_MEMBER(vcc_state::ppi_porta_w)
 {
 	// d0-d6: digit segment data, bits are xABCDEFG
-	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
+	m_7seg_data_xxx = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 
 	// d0-d5: TSI C0-C5
@@ -227,7 +227,7 @@ WRITE8_MEMBER(vcc_state::ppi_portb_w)
 {
 	// d0,d2-d5: digit/led select
 	// _d6: enable language switches
-	m_led_select = data;
+	m_led_select_xxx = data;
 	update_display();
 }
 
@@ -236,14 +236,14 @@ READ8_MEMBER(vcc_state::ppi_portc_r)
 	// d0-d3: multiplexed inputs (active low)
 	// also language switches, hardwired with 4 jumpers
 	// 0(none wired): English, 1: German, 2: French, 4: Spanish, 8:Special(unused)
-	u8 lan = (~m_led_select & 0x40) ? *m_language : 0;
+	u8 lan = (~m_led_select_xxx & 0x40) ? *m_language : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
 
 WRITE8_MEMBER(vcc_state::ppi_portc_w)
 {
 	// d4-d7: input mux (inverted)
-	m_inp_mux = ~data >> 4 & 0xf;
+	m_inp_mux_xxx = ~data >> 4 & 0xf;
 }
 
 

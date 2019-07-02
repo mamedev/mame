@@ -108,20 +108,20 @@ WRITE8_MEMBER(chesster_state::control_w)
 {
 	// a0-a2,d7: 74259(1)
 	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
+	m_led_select_xxx = (m_led_select_xxx & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// 74259 Q4-Q7: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
+	u16 sel = 1 << (m_led_select_xxx >> 4 & 0xf) & 0x3ff;
+	m_inp_mux_xxx = sel & 0x1ff;
 
 	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3);
+	display_matrix(9, 2, m_inp_mux_xxx, ~m_led_select_xxx & 3);
 
 	// 74259 Q2,Q3: speechrom A14,A15
 	// a0-a2,d0: 74259(2) Q3,Q2,Q0 to A16,A17,A18
 	m_speech_bank = (m_speech_bank & ~mask) | ((data & 1) ? mask : 0);
-	u8 bank = (m_led_select >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
+	u8 bank = (m_led_select_xxx >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
 	m_rombank->set_entry(bank & (m_numbanks - 1));
 }
 

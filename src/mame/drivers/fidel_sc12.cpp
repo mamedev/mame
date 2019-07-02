@@ -126,7 +126,7 @@ WRITE8_MEMBER(sc12_state::control_w)
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
 	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
+	m_inp_mux_xxx = sel & 0x1ff;
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));

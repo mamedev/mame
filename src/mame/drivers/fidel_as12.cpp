@@ -92,7 +92,7 @@ DEVICE_IMAGE_LOAD_MEMBER(as12_state::cart_load)
 void as12_state::update_display()
 {
 	// 8*8(+1) chessboard leds
-	display_matrix(8, 9, m_led_data, m_inp_mux);
+	display_matrix(8, 9, m_led_data_xxx, m_inp_mux_xxx);
 }
 
 WRITE8_MEMBER(as12_state::control_w)
@@ -100,7 +100,7 @@ WRITE8_MEMBER(as12_state::control_w)
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
 	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux = bitswap<9>(sel,5,8,7,6,4,3,1,0,2);
+	m_inp_mux_xxx = bitswap<9>(sel,5,8,7,6,4,3,1,0,2);
 	update_display();
 
 	// 74245 Q9: speaker out
@@ -113,7 +113,7 @@ WRITE8_MEMBER(as12_state::control_w)
 WRITE8_MEMBER(as12_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
-	m_led_data = (data & 1) << offset;
+	m_led_data_xxx = (data & 1) << offset;
 	update_display();
 }
 

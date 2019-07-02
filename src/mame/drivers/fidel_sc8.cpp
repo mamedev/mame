@@ -64,13 +64,13 @@ WRITE8_MEMBER(scc_state::control_w)
 {
 	// a0-a2,d7: led data
 	u8 mask = 1 << (offset & 7);
-	m_led_data = (m_led_data & ~mask) | ((data & 0x80) ? mask : 0);
+	m_led_data_xxx = (m_led_data_xxx & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// d0-d3: led select, input mux (row 9 is speaker out)
 	// d4: corner led(direct)
-	m_inp_mux = 1 << (data & 0xf);
-	m_dac->write(BIT(m_inp_mux, 9));
-	display_matrix(8, 9, m_led_data, (m_inp_mux & 0xff) | (data << 4 & 0x100));
+	m_inp_mux_xxx = 1 << (data & 0xf);
+	m_dac->write(BIT(m_inp_mux_xxx, 9));
+	display_matrix(8, 9, m_led_data_xxx, (m_inp_mux_xxx & 0xff) | (data << 4 & 0x100));
 }
 
 READ8_MEMBER(scc_state::input_r)

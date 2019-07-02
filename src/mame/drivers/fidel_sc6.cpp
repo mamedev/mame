@@ -103,7 +103,7 @@ void sc6_state::update_display()
 {
 	// 2 7seg leds
 	set_display_segmask(3, 0x7f);
-	display_matrix(7, 2, m_7seg_data, m_led_select);
+	display_matrix(7, 2, m_7seg_data_xxx, m_led_select_xxx);
 }
 
 WRITE8_MEMBER(sc6_state::mux_w)
@@ -112,8 +112,8 @@ WRITE8_MEMBER(sc6_state::mux_w)
 	u16 sel = 1 << (data >> 4 & 0xf) & 0x3ff;
 
 	// 7442 0-8: input mux, 7seg data
-	m_inp_mux = sel & 0x1ff;
-	m_7seg_data = sel & 0x7f;
+	m_inp_mux_xxx = sel & 0x1ff;
+	m_7seg_data_xxx = sel & 0x7f;
 	update_display();
 
 	// 7442 9: speaker out
@@ -123,7 +123,7 @@ WRITE8_MEMBER(sc6_state::mux_w)
 WRITE8_MEMBER(sc6_state::select_w)
 {
 	// P16,P17: digit select
-	m_led_select = ~data >> 6 & 3;
+	m_led_select_xxx = ~data >> 6 & 3;
 	update_display();
 }
 

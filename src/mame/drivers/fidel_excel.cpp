@@ -240,23 +240,23 @@ WRITE8_MEMBER(excel_state::ttl_w)
 {
 	// a0-a2,d0: 74259(1)
 	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
+	m_led_select_xxx = (m_led_select_xxx & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
+	u16 sel = 1 << (m_led_select_xxx & 0xf) & 0x3ff;
 	u8 led_data = sel & 0xff;
-	m_inp_mux = sel & 0x1ff;
+	m_inp_mux_xxx = sel & 0x1ff;
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
-	u8 led_sel = ~bitswap<8>(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
+	u8 led_sel = ~bitswap<8>(m_led_select_xxx,0,3,1,2,7,6,5,4) & 0x3f;
 
 	// a0-a2,d1: digit segment data (model 6093)
-	m_7seg_data = (m_7seg_data & ~mask) | ((data & 2) ? mask : 0);
-	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
+	m_7seg_data_xxx = (m_7seg_data_xxx & ~mask) | ((data & 2) ? mask : 0);
+	u8 seg_data = bitswap<8>(m_7seg_data_xxx,0,1,3,2,7,5,6,4);
 
 	// update display: 4 7seg leds, 2*8 chessboard leds
 	for (int i = 0; i < 6; i++)
@@ -288,7 +288,7 @@ READ8_MEMBER(excel_state::ttl_r)
 	u8 d7 = 0x80;
 
 	// 74259(1) Q7 + 74251 I0: battery status
-	if (m_inp_matrix[10] != nullptr && m_inp_mux == 1 && ~m_led_select & 0x80)
+	if (m_inp_matrix[10] != nullptr && m_inp_mux_xxx == 1 && ~m_led_select_xxx & 0x80)
 		d7 = m_inp_matrix[10]->read() & 0x80;
 
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC

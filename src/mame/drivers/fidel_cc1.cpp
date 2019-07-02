@@ -98,7 +98,7 @@ void cc1_state::update_display()
 {
 	// 4 7segs + 2 leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 6, m_7seg_data, m_led_select);
+	display_matrix(7, 6, m_7seg_data_xxx, m_led_select_xxx);
 }
 
 
@@ -120,19 +120,19 @@ READ8_MEMBER(cc1_state::ppi_porta_r)
 WRITE8_MEMBER(cc1_state::ppi_portb_w)
 {
 	// d0-d6: digit segment data
-	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
+	m_7seg_data_xxx = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
 WRITE8_MEMBER(cc1_state::ppi_portc_w)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
-	if (~data & m_led_select & 0x40 && !m_delay->enabled())
+	if (~data & m_led_select_xxx & 0x40 && !m_delay->enabled())
 		m_delay->adjust(attotime::from_msec(17));
 
 	// d0-d3: digit select
 	// d4: check led, d5: lose led
-	m_led_select = data;
+	m_led_select_xxx = data;
 	update_display();
 }
 

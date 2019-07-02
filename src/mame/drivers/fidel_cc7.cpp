@@ -96,17 +96,17 @@ WRITE8_MEMBER(bcc_state::control_w)
 {
 	// a0-a2,d7: digit segment data via NE591
 	u8 mask = 1 << (offset & 7);
-	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
+	m_7seg_data_xxx = (m_7seg_data_xxx & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// BCC: NE591 Q7 is speaker out
 	if (m_dac != nullptr)
-		m_dac->write(BIT(m_7seg_data, 7));
+		m_dac->write(BIT(m_7seg_data_xxx, 7));
 
 	// d0-d3: led select, input mux
 	// d4,d5: upper leds(direct)
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 6, m_7seg_data, data & 0x3f);
-	m_inp_mux = data & 0xf;
+	display_matrix(8, 6, m_7seg_data_xxx, data & 0x3f);
+	m_inp_mux_xxx = data & 0xf;
 }
 
 READ8_MEMBER(bcc_state::input_r)

@@ -241,7 +241,7 @@ void vsc_state::update_display()
 {
 	// 4 7seg leds+H, 8*8 chessboard leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(16, 8, m_led_data << 8 | m_7seg_data, m_led_select);
+	display_matrix(16, 8, m_led_data_xxx << 8 | m_7seg_data_xxx, m_led_select_xxx);
 }
 
 READ8_MEMBER(vsc_state::speech_r)
@@ -258,14 +258,14 @@ WRITE8_MEMBER(vsc_state::ppi_porta_w)
 	m_speech->data_w(space, 0, data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
-	m_7seg_data = bitswap<8>(data,7,6,2,1,0,5,4,3);
+	m_7seg_data_xxx = bitswap<8>(data,7,6,2,1,0,5,4,3);
 	update_display();
 }
 
 WRITE8_MEMBER(vsc_state::ppi_portb_w)
 {
 	// d0-d7: led row data
-	m_led_data = data;
+	m_led_data_xxx = data;
 	update_display();
 }
 
@@ -273,8 +273,8 @@ WRITE8_MEMBER(vsc_state::ppi_portc_w)
 {
 	// d0-d3: select digits
 	// d0-d7: select leds, input mux low bits
-	m_inp_mux = (m_inp_mux & ~0xff) | data;
-	m_led_select = data;
+	m_inp_mux_xxx = (m_inp_mux_xxx & ~0xff) | data;
+	m_led_select_xxx = data;
 	update_display();
 }
 
@@ -285,7 +285,7 @@ READ8_MEMBER(vsc_state::pio_porta_r)
 {
 	// d0-d7: multiplexed inputs
 	// also language switches(hardwired with 2 diodes)
-	u8 lan = (m_inp_mux & 0x400) ? *m_language : 0;
+	u8 lan = (m_inp_mux_xxx & 0x400) ? *m_language : 0;
 	return read_inputs(10) | lan;
 }
 
@@ -303,7 +303,7 @@ WRITE8_MEMBER(vsc_state::pio_portb_w)
 {
 	// d0,d1: input mux highest bits
 	// d5: enable language switch
-	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300) | (data << 5 & 0x400);
+	m_inp_mux_xxx = (m_inp_mux_xxx & 0xff) | (data << 8 & 0x300) | (data << 5 & 0x400);
 
 	// d7: TSI ROM A12
 	m_speech->force_update(); // update stream to now

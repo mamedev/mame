@@ -149,7 +149,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sc9_state::cart_load)
 void sc9_state::update_display()
 {
 	// 8*8 chessboard leds + 1 corner led
-	display_matrix(8, 9, m_led_data, m_inp_mux);
+	display_matrix(8, 9, m_led_data_xxx, m_inp_mux_xxx);
 }
 
 WRITE8_MEMBER(sc9_state::control_w)
@@ -157,7 +157,7 @@ WRITE8_MEMBER(sc9_state::control_w)
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
 	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
+	m_inp_mux_xxx = sel & 0x1ff;
 	update_display();
 
 	// 74245 Q9: speaker out
@@ -170,7 +170,7 @@ WRITE8_MEMBER(sc9_state::control_w)
 WRITE8_MEMBER(sc9_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
-	m_led_data = (data & 1) << offset;
+	m_led_data_xxx = (data & 1) << offset;
 	update_display();
 }
 

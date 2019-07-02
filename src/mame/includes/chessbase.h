@@ -36,11 +36,11 @@ protected:
 	output_finder<0x20> m_out_digit;
 
 	// misc common
-	u16 m_inp_mux;                  // multiplexed keypad/leds mask
-	u16 m_led_select;
-	u16 m_led_data;
-	u16 m_led_latch;
-	u32 m_7seg_data;                // data for seg leds
+	u16 m_inp_mux_xxx;                  // multiplexed keypad/leds mask
+	u16 m_led_select_xxx;
+	u16 m_led_data_xxx;
+	u16 m_led_latch_xxx;
+	u32 m_7seg_data_xxx;                // data for seg leds
 
 	u16 read_inputs(int columns);
 

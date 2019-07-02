@@ -74,14 +74,14 @@ void dsc_state::update_display()
 {
 	// 4 7seg leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, m_7seg_data, m_led_select);
+	display_matrix(8, 4, m_7seg_data_xxx, m_led_select_xxx);
 }
 
 WRITE8_MEMBER(dsc_state::control_w)
 {
 	// d0-d7: input mux, 7seg data
-	m_inp_mux = ~data;
-	m_7seg_data = data;
+	m_inp_mux_xxx = ~data;
+	m_7seg_data_xxx = data;
 	update_display();
 }
 
@@ -91,7 +91,7 @@ WRITE8_MEMBER(dsc_state::select_w)
 	m_dac->write(BIT(~data, 4));
 
 	// d0-d3: digit select
-	m_led_select = data & 0xf;
+	m_led_select_xxx = data & 0xf;
 	update_display();
 }
 

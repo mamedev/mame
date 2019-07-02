@@ -304,23 +304,23 @@ void eag_state::update_display()
 {
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
-	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
+	u8 seg_data = bitswap<8>(m_7seg_data_xxx,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
+	display_matrix(16, 9, m_led_data_xxx << 8 | seg_data, m_inp_mux_xxx);
 }
 
 WRITE8_MEMBER(eag_state::mux_w)
 {
 	// a1-a3,d0: 74259
 	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
+	m_led_select_xxx = (m_led_select_xxx & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
-	u16 sel = 1 << (m_led_select & 0xf);
+	u16 sel = 1 << (m_led_select_xxx & 0xf);
 	m_dac->write(BIT(sel, 9));
-	m_inp_mux = sel & 0x1ff;
+	m_inp_mux_xxx = sel & 0x1ff;
 	update_display();
 }
 
@@ -339,14 +339,14 @@ READ8_MEMBER(eag_state::input2_r)
 WRITE8_MEMBER(eag_state::leds_w)
 {
 	// a1-a3,d0: led data
-	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
+	m_led_data_xxx = (m_led_data_xxx & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
 WRITE8_MEMBER(eag_state::digit_w)
 {
 	// a1-a3,d0(d8): digit segment data
-	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
+	m_7seg_data_xxx = (m_7seg_data_xxx & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 

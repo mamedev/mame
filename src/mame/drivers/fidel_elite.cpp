@@ -173,7 +173,7 @@ void elite_state::update_display()
 {
 	// 4/8 7seg leds+H, 8*8(+1) chessboard leds
 	set_display_segmask(0x1ef, 0x7f);
-	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_led_select);
+	display_matrix(16, 9, m_led_data_xxx << 8 | m_7seg_data_xxx, m_led_select_xxx);
 }
 
 READ8_MEMBER(elite_state::speech_r)
@@ -184,15 +184,15 @@ READ8_MEMBER(elite_state::speech_r)
 WRITE8_MEMBER(elite_state::segment_w)
 {
 	// a0-a2,d7: digit segment
-	m_7seg_data = (data & 0x80) >> offset;
-	m_7seg_data = bitswap<8>(m_7seg_data,7,6,4,5,0,2,1,3);
+	m_7seg_data_xxx = (data & 0x80) >> offset;
+	m_7seg_data_xxx = bitswap<8>(m_7seg_data_xxx,7,6,4,5,0,2,1,3);
 	update_display();
 }
 
 WRITE8_MEMBER(elite_state::led_w)
 {
 	// a0-a2,d0: led data
-	m_led_data = (data & 1) << offset;
+	m_led_data_xxx = (data & 1) << offset;
 	update_display();
 }
 
@@ -219,12 +219,12 @@ WRITE8_MEMBER(elite_state::ppi_portc_w)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led select, input mux
-	m_led_select = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux = m_led_select & 0x1ff;
+	m_led_select_xxx = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux_xxx = m_led_select_xxx & 0x1ff;
 	update_display();
 
 	// 7442 9: speaker out
-	m_dac->write(BIT(m_led_select, 9));
+	m_dac->write(BIT(m_led_select_xxx, 9));
 
 	// d4: speech ROM A12
 	m_speech->force_update(); // update stream to now

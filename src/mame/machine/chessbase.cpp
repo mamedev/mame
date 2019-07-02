@@ -34,11 +34,11 @@ void chessbase_state::machine_start()
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
-	m_inp_mux = 0;
-	m_led_select = 0;
-	m_led_data = 0;
-	m_led_latch = 0;
-	m_7seg_data = 0;
+	m_inp_mux_xxx = 0;
+	m_led_select_xxx = 0;
+	m_led_data_xxx = 0;
+	m_led_latch_xxx = 0;
+	m_7seg_data_xxx = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -49,11 +49,11 @@ void chessbase_state::machine_start()
 	save_item(NAME(m_display_decay));
 	save_item(NAME(m_display_segmask));
 
-	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_select));
-	save_item(NAME(m_led_data));
-	save_item(NAME(m_led_latch));
-	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_inp_mux_xxx));
+	save_item(NAME(m_led_select_xxx));
+	save_item(NAME(m_led_data_xxx));
+	save_item(NAME(m_led_latch_xxx));
+	save_item(NAME(m_7seg_data_xxx));
 }
 
 void chessbase_state::machine_reset()
@@ -147,7 +147,7 @@ u16 chessbase_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
+		if (m_inp_mux_xxx >> i & 1)
 			ret |= m_inp_matrix[i]->read();
 
 	return ret;

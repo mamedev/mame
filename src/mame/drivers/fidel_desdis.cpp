@@ -149,32 +149,32 @@ void desmas_state::init_fdes2265()
 
 WRITE8_MEMBER(desdis_state::control_w)
 {
-	u8 q3_old = m_led_select & 8;
+	u8 q3_old = m_led_select_xxx & 8;
 
 	// a0-a2,d7: 74259
 	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
+	m_led_select_xxx = (m_led_select_xxx & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// 74259 Q4-Q7: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
+	u16 sel = 1 << (m_led_select_xxx >> 4 & 0xf) & 0x3ff;
+	m_inp_mux_xxx = sel & 0x1ff;
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
+	display_matrix(9, 2, m_inp_mux_xxx, ~m_led_select_xxx & 3, false);
 
 	// 74259 Q2: book rom A14
 	if (m_rombank != nullptr)
-		m_rombank->set_entry(~m_led_select >> 2 & 1);
+		m_rombank->set_entry(~m_led_select_xxx >> 2 & 1);
 
 	// 74259 Q3: lcd common, update on rising edge
-	if (~q3_old & m_led_select & 8)
+	if (~q3_old & m_led_select_xxx & 8)
 	{
 		for (int i = 0; i < 4; i++)
-			m_display_state[i+2] = m_7seg_data >> (8*i) & 0xff;
+			m_display_state[i+2] = m_7seg_data_xxx >> (8*i) & 0xff;
 	}
 
 	m_display_maxy += 4;
@@ -188,7 +188,7 @@ WRITE8_MEMBER(desdis_state::lcd_w)
 	u32 mask = bitswap<8>(1 << offset,3,7,6,0,1,2,4,5);
 	for (int i = 0; i < 4; i++)
 	{
-		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? 0 : mask);
+		m_7seg_data_xxx = (m_7seg_data_xxx & ~mask) | ((data >> i & 1) ? 0 : mask);
 		mask <<= 8;
 	}
 }

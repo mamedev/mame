@@ -322,14 +322,14 @@ void su9_state::su9_set_cpu_freq()
 void csc_state::update_display()
 {
 	// 7442 0-8: led select, input mux
-	m_inp_mux = 1 << m_led_select & 0x3ff;
+	m_inp_mux_xxx = 1 << m_led_select_xxx & 0x3ff;
 
 	// 7442 9: speaker out
-	m_dac->write(BIT(m_inp_mux, 9));
+	m_dac->write(BIT(m_inp_mux_xxx, 9));
 
 	// 7seg leds+H (not on all models), 8*8(+1) chessboard leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_inp_mux);
+	display_matrix(16, 9, m_led_data_xxx << 8 | m_7seg_data_xxx, m_inp_mux_xxx);
 }
 
 READ8_MEMBER(csc_state::speech_r)
@@ -349,14 +349,14 @@ READ8_MEMBER(csc_state::pia0_pa_r)
 WRITE8_MEMBER(csc_state::pia0_pa_w)
 {
 	// d6,d7: 7442 A0,A1
-	m_led_select = (m_led_select & ~3) | (data >> 6 & 3);
+	m_led_select_xxx = (m_led_select_xxx & ~3) | (data >> 6 & 3);
 	update_display();
 }
 
 WRITE8_MEMBER(csc_state::pia0_pb_w)
 {
 	// d0-d7: led row data
-	m_led_data = data;
+	m_led_data_xxx = data;
 	update_display();
 }
 
@@ -375,14 +375,14 @@ READ_LINE_MEMBER(csc_state::pia0_cb1_r)
 WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
 {
 	// 7442 A2
-	m_led_select = (m_led_select & ~4) | (state ? 4 : 0);
+	m_led_select_xxx = (m_led_select_xxx & ~4) | (state ? 4 : 0);
 	update_display();
 }
 
 WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
 {
 	// 7442 A3
-	m_led_select = (m_led_select & ~8) | (state ? 8 : 0);
+	m_led_select_xxx = (m_led_select_xxx & ~8) | (state ? 8 : 0);
 	update_display();
 }
 
@@ -395,7 +395,7 @@ WRITE8_MEMBER(csc_state::pia1_pa_w)
 	m_speech->data_w(space, 0, data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
-	m_7seg_data = bitswap<8>(data,0,1,5,6,7,2,3,4);
+	m_7seg_data_xxx = bitswap<8>(data,0,1,5,6,7,2,3,4);
 	update_display();
 }
 
