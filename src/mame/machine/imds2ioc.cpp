@@ -595,6 +595,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	// assumption that CCLK is fixed at BCLK / 14)
 	I8275(config, m_ioccrtc, 22853600 / 14);
 	m_ioccrtc->set_character_width(14);
+	m_ioccrtc->set_refresh_hack(true);
 	m_ioccrtc->set_display_callback(FUNC(imds2ioc_device::crtc_display_pixels), this);
 	m_ioccrtc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq2_w));
 	m_ioccrtc->irq_wr_callback().set_inputline(m_ioccpu, I8085_INTR_LINE);

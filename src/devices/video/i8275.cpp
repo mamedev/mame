@@ -106,6 +106,7 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_write_hrtc(*this),
 	m_write_vrtc(*this),
 	m_write_lc(*this),
+	m_refresh_hack(false),
 	m_status(0),
 	m_param_idx(0),
 	m_param_end(0),
@@ -725,15 +726,14 @@ void i8275_device::recompute_parameters()
 
 	int horiz_pix_total = (CHARACTERS_PER_ROW + HRTC_COUNT) * m_hpixels_per_column;
 	int vert_pix_total = (CHARACTER_ROWS_PER_FRAME + VRTC_ROW_COUNT) * SCANLINES_PER_ROW;
-	attoseconds_t refresh = screen().frame_period().attoseconds();
+	attotime refresh = clocks_to_attotime((CHARACTERS_PER_ROW + HRTC_COUNT) * vert_pix_total);
 	int max_visible_x = (CHARACTERS_PER_ROW * m_hpixels_per_column) - 1;
 	int max_visible_y = (CHARACTER_ROWS_PER_FRAME * SCANLINES_PER_ROW) - 1;
 
-	LOG("width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	LOG("width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, refresh.as_hz());
 
-	rectangle visarea;
-	visarea.set(0, max_visible_x, 0, max_visible_y);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	rectangle visarea(0, max_visible_x, 0, max_visible_y);
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, (m_refresh_hack ? screen().frame_period() : refresh).as_attoseconds());
 
 	int hrtc_on_pos = CHARACTERS_PER_ROW * m_hpixels_per_column;
 	m_hrtc_on_timer->adjust(screen().time_until_pos(y, hrtc_on_pos), 0, screen().scan_period());
