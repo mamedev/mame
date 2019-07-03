@@ -750,8 +750,8 @@ OPHANDLER( jc )             { execute_jcc((m_psw & C_FLAG) != 0); return 2; }
 OPHANDLER( jf0 )            { execute_jcc((m_psw & F_FLAG) != 0); return 2; }
 OPHANDLER( jf1 )            { execute_jcc((m_sts & STS_F1) != 0); return 2; }
 OPHANDLER( jnc )            { execute_jcc((m_psw & C_FLAG) == 0); return 2; }
-OPHANDLER( jni )            { execute_jcc(m_irq_state != 0); return 2; }
-OPHANDLER( jnibf )          { execute_jcc((m_sts & STS_IBF) == 0); return 2; }
+OPHANDLER( jni )            { m_irq_polled = (m_irq_state == 0); execute_jcc(m_irq_state != 0); return 2; }
+OPHANDLER( jnibf )          { m_irq_polled = (m_sts & STS_IBF) != 0; execute_jcc((m_sts & STS_IBF) == 0); return 2; }
 OPHANDLER( jnt_0 )          { execute_jcc(test_r(0) == 0); return 2; }
 OPHANDLER( jnt_1 )          { execute_jcc(test_r(1) == 0); return 2; }
 OPHANDLER( jnz )            { execute_jcc(m_a != 0); return 2; }
@@ -1103,7 +1103,7 @@ void mcs48_cpu_device::device_start()
 	m_dbbi = 0;
 	m_dbbo = 0;
 	m_irq_state = 0;
-	m_pending_irq_state = 0;
+	m_irq_polled = 0;
 
 	/* FIXME: Current implementation suboptimal */
 	m_ea = (m_int_rom_size ? 0 : 1);
@@ -1175,6 +1175,7 @@ void mcs48_cpu_device::device_start()
 	save_item(NAME(m_dbbo));
 
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_polled));
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_timer_overflow));
 	save_item(NAME(m_timer_flag));
@@ -1228,16 +1229,18 @@ void mcs48_cpu_device::device_reset()
 
 int mcs48_cpu_device::check_irqs()
 {
-	bool pending_irq = std::exchange(m_pending_irq_state, m_irq_state);
-
 	/* if something is in progress, we do nothing */
 	if (m_irq_in_progress)
 		return 0;
 
 	/* external interrupts take priority */
-	if ((pending_irq || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
+	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
 		m_irq_in_progress = true;
+
+		// force JNI to be taken (hack)
+		if (m_irq_polled)
+			m_pc = ((m_pc - 1) & 0xf00) | m_cache->read_byte(m_pc - 1);
 
 		/* transfer to location 0x03 */
 		push_pc_psw();
@@ -1332,6 +1335,7 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
+		m_irq_polled = false;
 		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 
