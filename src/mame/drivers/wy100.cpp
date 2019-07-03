@@ -52,10 +52,8 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
 	DECLARE_WRITE_LINE_MEMBER(brdy_w);
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
 	DECLARE_WRITE_LINE_MEMBER(txd_w);
 	void p2_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(t1_r);
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
 
@@ -73,7 +71,6 @@ private:
 	required_region_ptr<u8> m_chargen;
 
 	bool m_brdy;
-	bool m_rxrdy;
 	bool m_bs_enable;
 	bool m_txd;
 	bool m_printer_select;
@@ -82,13 +79,11 @@ private:
 void wy100_state::machine_start()
 {
 	m_brdy = false;
-	m_rxrdy = false;
 	m_bs_enable = false;
 	m_txd = true;
 	m_printer_select = false;
 
 	save_item(NAME(m_brdy));
-	save_item(NAME(m_rxrdy));
 	save_item(NAME(m_bs_enable));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_printer_select));
@@ -97,11 +92,6 @@ void wy100_state::machine_start()
 WRITE_LINE_MEMBER(wy100_state::brdy_w)
 {
 	m_brdy = state;
-}
-
-WRITE_LINE_MEMBER(wy100_state::rxrdy_w)
-{
-	m_rxrdy = state;
 }
 
 I8275_DRAW_CHARACTER_MEMBER(wy100_state::draw_character)
@@ -151,11 +141,6 @@ void wy100_state::p2_w(u8 data)
 		m_modem->write_txd(m_txd);
 		m_printer->write_txd(1);
 	}
-}
-
-READ_LINE_MEMBER(wy100_state::t1_r)
-{
-	return !m_rxrdy;
 }
 
 u8 wy100_state::memory_r(offs_t offset)
@@ -229,7 +214,7 @@ void wy100_state::wy100(machine_config &config)
 	m_maincpu->p1_out_cb().append("spkrgate", FUNC(input_merger_device::in_w<0>)).bit(7);
 	m_maincpu->p2_out_cb().set(FUNC(wy100_state::p2_w));
 	m_maincpu->t0_in_cb().set("keyboard", FUNC(wy100_keyboard_device::sense_r)).invert();
-	m_maincpu->t1_in_cb().set(FUNC(wy100_state::t1_r));
+	m_maincpu->t1_in_cb().set(m_pci, FUNC(mc2661_device::rxrdy_r)).invert();
 
 	WY100_KEYBOARD(config, "keyboard");
 
@@ -240,7 +225,6 @@ void wy100_state::wy100(machine_config &config)
 	m_rambank->set_stride(0x100);
 
 	MC2661(config, m_pci, 10.1376_MHz_XTAL / 2); // INS2651N
-	m_pci->rxrdy_handler().set(FUNC(wy100_state::rxrdy_w));
 	m_pci->rts_handler().set(m_modem, FUNC(rs232_port_device::write_rts));
 	m_pci->dtr_handler().set(m_modem, FUNC(rs232_port_device::write_dtr));
 	m_pci->txd_handler().set(FUNC(wy100_state::txd_w));
