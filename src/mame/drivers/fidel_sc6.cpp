@@ -46,17 +46,22 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void sc6(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<9> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -67,10 +72,29 @@ private:
 	void update_display();
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(select_w);
+
+	u8 read_inputs();
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ_LINE_MEMBER(input6_r);
 	DECLARE_READ_LINE_MEMBER(input7_r);
+
+	u8 m_led_select;
+	u8 m_inp_mux;
 };
+
+void sc6_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_led_select = 0;
+	m_inp_mux = 0;
+
+	// register for savestates
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_inp_mux));
+}
+
 
 
 /******************************************************************************
@@ -103,46 +127,58 @@ void sc6_state::update_display()
 {
 	// 2 7seg leds
 	set_display_segmask(3, 0x7f);
-	display_matrix(7, 2, m_7seg_data_xxx, m_led_select_xxx);
+	display_matrix(7, 2, 1 << m_inp_mux, m_led_select);
 }
 
 WRITE8_MEMBER(sc6_state::mux_w)
 {
 	// P24-P27: 7442 A-D
-	u16 sel = 1 << (data >> 4 & 0xf) & 0x3ff;
-
 	// 7442 0-8: input mux, 7seg data
-	m_inp_mux_xxx = sel & 0x1ff;
-	m_7seg_data_xxx = sel & 0x7f;
+	m_inp_mux = data >> 4 & 0xf;
 	update_display();
 
 	// 7442 9: speaker out
-	m_dac->write(BIT(sel, 9));
+	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
 WRITE8_MEMBER(sc6_state::select_w)
 {
 	// P16,P17: digit select
-	m_led_select_xxx = ~data >> 6 & 3;
+	m_led_select = ~data >> 6 & 3;
 	update_display();
+}
+
+u8 sc6_state::read_inputs()
+{
+	u8 data = 0;
+
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_inputs[m_inp_mux]->read();
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs[8]->read();
+
+	return ~data;
 }
 
 READ8_MEMBER(sc6_state::input_r)
 {
 	// P10-P15: multiplexed inputs low
-	return (~read_inputs(9) & 0x3f) | 0xc0;
+	return (read_inputs() & 0x3f) | 0xc0;
 }
 
 READ_LINE_MEMBER(sc6_state::input6_r)
 {
 	// T0: multiplexed inputs bit 6
-	return ~read_inputs(9) >> 6 & 1;
+	return read_inputs() >> 6 & 1;
 }
 
 READ_LINE_MEMBER(sc6_state::input7_r)
 {
 	// T1: multiplexed inputs bit 7
-	return ~read_inputs(9) >> 7 & 1;
+	return read_inputs() >> 7 & 1;
 }
 
 

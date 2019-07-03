@@ -224,7 +224,8 @@ public:
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
-		m_language(*this, "language")
+		m_language(*this, "language"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
@@ -243,6 +244,7 @@ protected:
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
 	optional_region_ptr<u8> m_language;
+	optional_ioport_array<9> m_inputs;
 
 	// address maps
 	void csc_map(address_map &map);
@@ -254,8 +256,11 @@ protected:
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
+	u16 read_inputs();
 	void update_display();
+	void update_sound();
 	DECLARE_READ8_MEMBER(speech_r);
+
 	DECLARE_WRITE8_MEMBER(pia0_pa_w);
 	DECLARE_WRITE8_MEMBER(pia0_pb_w);
 	DECLARE_READ8_MEMBER(pia0_pa_r);
@@ -268,6 +273,9 @@ protected:
 	DECLARE_READ8_MEMBER(pia1_pb_r);
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
 
+	u8 m_led_data;
+	u8 m_7seg_data;
+	u8 m_inp_mux;
 	u8 m_speech_bank;
 };
 
@@ -276,9 +284,15 @@ void csc_state::machine_start()
 	fidelbase_state::machine_start();
 
 	// zerofill
+	m_led_data = 0;
+	m_7seg_data = 0;
+	m_inp_mux = 0;
 	m_speech_bank = 0;
 
 	// register for savestates
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_speech_bank));
 }
 
@@ -319,17 +333,33 @@ void su9_state::su9_set_cpu_freq()
 
 // misc handlers
 
+u16 csc_state::read_inputs()
+{
+	u16 data = 0;
+
+	// read (chess)board sensors
+	if (m_inp_mux < 8)
+		data = m_inputs[m_inp_mux]->read();
+
+	// read other buttons
+	if (m_inp_mux < 9)
+		data |= m_inputs[m_inp_mux].read_safe(0);
+
+	return ~data;
+}
+
 void csc_state::update_display()
 {
-	// 7442 0-8: led select, input mux
-	m_inp_mux_xxx = 1 << m_led_select_xxx & 0x3ff;
-
-	// 7442 9: speaker out
-	m_dac->write(BIT(m_inp_mux_xxx, 9));
-
+	// 7442 0-8: led select (also input mux)
 	// 7seg leds+H (not on all models), 8*8(+1) chessboard leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(16, 9, m_led_data_xxx << 8 | m_7seg_data_xxx, m_inp_mux_xxx);
+	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, 1 << m_inp_mux);
+}
+
+void csc_state::update_sound()
+{
+	// 7442 9: speaker out
+	m_dac->write(BIT(1 << m_inp_mux, 9));
 }
 
 READ8_MEMBER(csc_state::speech_r)
@@ -342,48 +372,51 @@ READ8_MEMBER(csc_state::speech_r)
 
 READ8_MEMBER(csc_state::pia0_pa_r)
 {
-	// d0-d5: button row 0-5 (active low)
-	return (read_inputs(9) & 0x3f) ^ 0xff;
+	// d0-d5: button row 0-5
+	return (read_inputs() & 0x3f) | 0xc0;
 }
 
 WRITE8_MEMBER(csc_state::pia0_pa_w)
 {
 	// d6,d7: 7442 A0,A1
-	m_led_select_xxx = (m_led_select_xxx & ~3) | (data >> 6 & 3);
+	m_inp_mux = (m_inp_mux & ~3) | (data >> 6 & 3);
 	update_display();
+	update_sound();
 }
 
 WRITE8_MEMBER(csc_state::pia0_pb_w)
 {
 	// d0-d7: led row data
-	m_led_data_xxx = data;
+	m_led_data = data;
 	update_display();
 }
 
 READ_LINE_MEMBER(csc_state::pia0_ca1_r)
 {
-	// button row 6 (active low)
-	return ~read_inputs(9) >> 6 & 1;
+	// button row 6
+	return read_inputs() >> 6 & 1;
 }
 
 READ_LINE_MEMBER(csc_state::pia0_cb1_r)
 {
-	// button row 7 (active low)
-	return ~read_inputs(9) >> 7 & 1;
+	// button row 7
+	return read_inputs() >> 7 & 1;
 }
 
 WRITE_LINE_MEMBER(csc_state::pia0_cb2_w)
 {
 	// 7442 A2
-	m_led_select_xxx = (m_led_select_xxx & ~4) | (state ? 4 : 0);
+	m_inp_mux = (m_inp_mux & ~4) | (state ? 4 : 0);
 	update_display();
+	update_sound();
 }
 
 WRITE_LINE_MEMBER(csc_state::pia0_ca2_w)
 {
 	// 7442 A3
-	m_led_select_xxx = (m_led_select_xxx & ~8) | (state ? 8 : 0);
+	m_inp_mux = (m_inp_mux & ~8) | (state ? 8 : 0);
 	update_display();
+	update_sound();
 }
 
 
@@ -395,7 +428,7 @@ WRITE8_MEMBER(csc_state::pia1_pa_w)
 	m_speech->data_w(space, 0, data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are ABFGHCDE (H is extra led)
-	m_7seg_data_xxx = bitswap<8>(data,0,1,5,6,7,2,3,4);
+	m_7seg_data = bitswap<8>(data,0,1,5,6,7,2,3,4);
 	update_display();
 }
 
@@ -421,11 +454,11 @@ READ8_MEMBER(csc_state::pia1_pb_r)
 	if (m_speech->busy_r())
 		data |= 0x08;
 
-	// d5: button row 8 (active low)
-	// d6,d7: language switches(hardwired with 2 resistors/jumpers)
-	data |= (~read_inputs(9) >> 3 & 0x20) | (*m_language << 6 & 0xc0);
+	// d5: button row 8
+	data |= (read_inputs() >> 3 & 0x20);
 
-	return data;
+	// d6,d7: language switches(hardwired with 2 resistors/jumpers)
+	return data | (*m_language << 6 & 0xc0);
 }
 
 WRITE_LINE_MEMBER(csc_state::pia1_ca2_w)

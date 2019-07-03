@@ -64,16 +64,21 @@ class bcc_state : public fidelbase_state
 public:
 	bcc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void bcc(machine_config &config);
 	void bkc(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	optional_device<dac_bit_interface> m_dac;
+	required_ioport_array<4> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -82,7 +87,23 @@ private:
 	// I/O handlers
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(control_w);
+
+	u8 m_inp_mux;
+	u8 m_7seg_data;
 };
+
+void bcc_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_inp_mux = 0;
+	m_7seg_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_7seg_data));
+}
 
 
 
@@ -96,23 +117,29 @@ WRITE8_MEMBER(bcc_state::control_w)
 {
 	// a0-a2,d7: digit segment data via NE591
 	u8 mask = 1 << (offset & 7);
-	m_7seg_data_xxx = (m_7seg_data_xxx & ~mask) | ((data & 0x80) ? mask : 0);
+	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// BCC: NE591 Q7 is speaker out
 	if (m_dac != nullptr)
-		m_dac->write(BIT(m_7seg_data_xxx, 7));
+		m_dac->write(BIT(m_7seg_data, 7));
 
 	// d0-d3: led select, input mux
 	// d4,d5: upper leds(direct)
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 6, m_7seg_data_xxx, data & 0x3f);
-	m_inp_mux_xxx = data & 0xf;
+	display_matrix(8, 6, m_7seg_data, data & 0x3f);
+	m_inp_mux = data & 0xf;
 }
 
 READ8_MEMBER(bcc_state::input_r)
 {
+	u8 data = 0;
+
 	// d0-d3: multiplexed inputs
-	return read_inputs(4);
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
+	return data;
 }
 
 

@@ -65,7 +65,8 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
@@ -75,10 +76,13 @@ public:
 	void playmatic(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<9> m_inputs;
 
 	// address maps
 	void sc9_map(address_map &map);
@@ -96,7 +100,23 @@ protected:
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(input_d7_r);
+
+	u8 m_inp_mux;
+	u8 m_led_data;
 };
+
+void sc9_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_inp_mux = 0;
+	m_led_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_data));
+}
 
 // SC9C
 
@@ -149,19 +169,18 @@ DEVICE_IMAGE_LOAD_MEMBER(sc9_state::cart_load)
 void sc9_state::update_display()
 {
 	// 8*8 chessboard leds + 1 corner led
-	display_matrix(8, 9, m_led_data_xxx, m_inp_mux_xxx);
+	display_matrix(8, 9, m_led_data, 1 << m_inp_mux);
 }
 
 WRITE8_MEMBER(sc9_state::control_w)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
-	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux_xxx = sel & 0x1ff;
+	m_inp_mux = data & 0xf;
 	update_display();
 
 	// 74245 Q9: speaker out
-	m_dac->write(BIT(sel, 9));
+	m_dac->write(BIT(1 << m_inp_mux, 9));
 
 	// d4,d5: ?
 	// d6,d7: N/C
@@ -170,20 +189,30 @@ WRITE8_MEMBER(sc9_state::control_w)
 WRITE8_MEMBER(sc9_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
-	m_led_data_xxx = (data & 1) << offset;
+	m_led_data = (data & 1) << offset;
 	update_display();
 }
 
 READ8_MEMBER(sc9_state::input_r)
 {
-	// multiplexed inputs (active low)
-	return read_inputs(9) ^ 0xff;
+	u8 data = 0;
+
+	// d0-d7: multiplexed inputs (active low)
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_inputs[m_inp_mux]->read();
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs[8]->read();
+
+	return ~data;
 }
 
 READ8_MEMBER(sc9_state::input_d7_r)
 {
-	// a0-a2,d7: multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+	// a0-a2,d7: multiplexed inputs
+	return (input_r(space, 0) >> offset & 1) ? 0x80 : 0;
 }
 
 
@@ -457,7 +486,7 @@ void sc9_state::playmatic(machine_config &config)
 	sc9b(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(3100000); // approximation
+	m_maincpu->set_clock(1500000 * 2); // advertised as double the speed of SC9
 	config.set_default_layout(layout_fidel_playmatic);
 }
 

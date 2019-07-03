@@ -42,17 +42,22 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void as12(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<9> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -68,7 +73,24 @@ private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	u16 m_inp_mux;
+	u8 m_led_data;
 };
+
+void as12_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_inp_mux = 0;
+	m_led_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_data));
+}
+
 
 
 /******************************************************************************
@@ -92,7 +114,7 @@ DEVICE_IMAGE_LOAD_MEMBER(as12_state::cart_load)
 void as12_state::update_display()
 {
 	// 8*8(+1) chessboard leds
-	display_matrix(8, 9, m_led_data_xxx, m_inp_mux_xxx);
+	display_matrix(8, 9, m_led_data, m_inp_mux);
 }
 
 WRITE8_MEMBER(as12_state::control_w)
@@ -100,7 +122,7 @@ WRITE8_MEMBER(as12_state::control_w)
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
 	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux_xxx = bitswap<9>(sel,5,8,7,6,4,3,1,0,2);
+	m_inp_mux = bitswap<9>(sel,5,8,7,6,4,3,1,0,2);
 	update_display();
 
 	// 74245 Q9: speaker out
@@ -113,15 +135,26 @@ WRITE8_MEMBER(as12_state::control_w)
 WRITE8_MEMBER(as12_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
-	m_led_data_xxx = (data & 1) << offset;
+	m_led_data = (data & 1) << offset;
 	update_display();
 }
 
 READ8_MEMBER(as12_state::input_r)
 {
+	u8 data = 0;
+
 	// a0-a2,d7: multiplexed inputs (active low)
-	u8 inp = bitswap<8>(read_inputs(9),4,3,2,1,0,5,6,7);
-	return (inp >> offset & 1) ? 0 : 0x80;
+	// read chessboard sensors
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
+	// read sidepanel buttons
+	if (m_inp_mux & 0x100)
+		data |= m_inputs[8]->read();
+
+	data = bitswap<8>(data,4,3,2,1,0,5,6,7);
+	return (data >> offset & 1) ? 0 : 0x80;
 }
 
 

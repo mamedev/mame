@@ -46,7 +46,8 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_beeper_off(*this, "beeper_off"),
-		m_beeper(*this, "beeper")
+		m_beeper(*this, "beeper"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// RE button is tied to Z80 RESET pin
@@ -56,11 +57,15 @@ public:
 	void acr(machine_config &config);
 	void ccx(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
+	required_ioport_array<4> m_inputs;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 
@@ -79,36 +84,53 @@ private:
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_READ8_MEMBER(ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	u8 m_inp_mux;
+	u8 m_led_select;
+	u8 m_7seg_data;
 };
+
+void ccx_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_inp_mux = 0;
+	m_led_select = 0;
+	m_7seg_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_7seg_data));
+}
+
 
 
 /******************************************************************************
     Devices, I/O
 ******************************************************************************/
 
-// misc handlers
+// I8255 PPI
 
 void ccx_state::update_display()
 {
 	// 4 7segs + 2 leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 6, m_7seg_data_xxx, m_led_select_xxx);
+	display_matrix(8, 6, m_7seg_data, m_led_select);
 }
-
-
-// I8255 PPI
 
 WRITE8_MEMBER(ccx_state::ppi_porta_w)
 {
 	// d7: enable beeper on falling edge (556 monostable) (unpopulated on ACR)
-	if (m_beeper != nullptr && ~data & m_7seg_data_xxx & 0x80 && !m_beeper_off->enabled())
+	if (m_beeper != nullptr && ~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
 	{
 		m_beeper->set_state(1);
 		m_beeper_off->adjust(attotime::from_msec(80)); // duration is approximate
 	}
 
 	// d0-d6: digit segment data
-	m_7seg_data_xxx = bitswap<8>(data,7,0,1,2,3,4,5,6);
+	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 }
 
@@ -116,20 +138,26 @@ WRITE8_MEMBER(ccx_state::ppi_portb_w)
 {
 	// d0: lose led, d1: check(win) led
 	// d2-d5: digit select
-	m_led_select_xxx = bitswap<6>(data,0,1,5,4,3,2);
+	m_led_select = bitswap<6>(data,0,1,5,4,3,2);
 	update_display();
 }
 
 READ8_MEMBER(ccx_state::ppi_portc_r)
 {
+	u8 data = 0;
+
 	// d0-d3: multiplexed inputs (active low)
-	return ~read_inputs(4) & 0xf;
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
+	return ~data & 0xf;
 }
 
 WRITE8_MEMBER(ccx_state::ppi_portc_w)
 {
 	// d4-d7: input mux (inverted)
-	m_inp_mux_xxx = ~data >> 4 & 0xf;
+	m_inp_mux = ~data >> 4 & 0xf;
 }
 
 

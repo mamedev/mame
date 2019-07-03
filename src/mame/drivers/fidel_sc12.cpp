@@ -74,18 +74,23 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<9> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -99,7 +104,18 @@ private:
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	u8 m_inp_mux;
 };
+
+void sc12_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill/register for savestates
+	m_inp_mux = 0;
+	save_item(NAME(m_inp_mux));
+}
 
 
 
@@ -125,8 +141,8 @@ WRITE8_MEMBER(sc12_state::control_w)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux_xxx = sel & 0x1ff;
+	m_inp_mux = data & 0xf;
+	u16 sel = 1 << m_inp_mux & 0x3ff;
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
@@ -140,8 +156,18 @@ WRITE8_MEMBER(sc12_state::control_w)
 
 READ8_MEMBER(sc12_state::input_r)
 {
+	u8 data = 0;
+
 	// a0-a2,d7: multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_inputs[m_inp_mux]->read();
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs[8]->read();
+
+	return (data >> offset & 1) ? 0 : 0x80;
 }
 
 

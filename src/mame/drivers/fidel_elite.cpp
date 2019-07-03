@@ -82,7 +82,8 @@ public:
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
@@ -107,6 +108,7 @@ private:
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<10> m_inputs;
 
 	// address maps
 	void eas_map(address_map &map);
@@ -130,6 +132,9 @@ private:
 	DECLARE_READ8_MEMBER(ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 
+	u8 m_led_data;
+	u8 m_7seg_data;
+	u8 m_inp_mux;
 	u8 m_speech_bank;
 };
 
@@ -143,9 +148,15 @@ void elite_state::machine_start()
 	fidelbase_state::machine_start();
 
 	// zerofill
+	m_led_data = 0;
+	m_7seg_data = 0;
+	m_inp_mux = 0;
 	m_speech_bank = 0;
 
 	// register for savestates
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_speech_bank));
 }
 
@@ -173,7 +184,7 @@ void elite_state::update_display()
 {
 	// 4/8 7seg leds+H, 8*8(+1) chessboard leds
 	set_display_segmask(0x1ef, 0x7f);
-	display_matrix(16, 9, m_led_data_xxx << 8 | m_7seg_data_xxx, m_led_select_xxx);
+	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, 1 << m_inp_mux);
 }
 
 READ8_MEMBER(elite_state::speech_r)
@@ -184,22 +195,32 @@ READ8_MEMBER(elite_state::speech_r)
 WRITE8_MEMBER(elite_state::segment_w)
 {
 	// a0-a2,d7: digit segment
-	m_7seg_data_xxx = (data & 0x80) >> offset;
-	m_7seg_data_xxx = bitswap<8>(m_7seg_data_xxx,7,6,4,5,0,2,1,3);
+	m_7seg_data = (data & 0x80) >> offset;
+	m_7seg_data = bitswap<8>(m_7seg_data,7,6,4,5,0,2,1,3);
 	update_display();
 }
 
 WRITE8_MEMBER(elite_state::led_w)
 {
 	// a0-a2,d0: led data
-	m_led_data_xxx = (data & 1) << offset;
+	m_led_data = (data & 1) << offset;
 	update_display();
 }
 
 READ8_MEMBER(elite_state::input_r)
 {
+	u8 data = 0;
+
 	// multiplexed inputs (active low)
-	return read_inputs(9) ^ 0xff;
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_inputs[m_inp_mux]->read();
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs[8]->read();
+
+	return ~data;
 }
 
 
@@ -219,12 +240,11 @@ WRITE8_MEMBER(elite_state::ppi_portc_w)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led select, input mux
-	m_led_select_xxx = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux_xxx = m_led_select_xxx & 0x1ff;
+	m_inp_mux = data & 0xf;
 	update_display();
 
 	// 7442 9: speaker out
-	m_dac->write(BIT(m_led_select_xxx, 9));
+	m_dac->write(BIT(1 << m_inp_mux, 9));
 
 	// d4: speech ROM A12
 	m_speech->force_update(); // update stream to now
@@ -249,8 +269,8 @@ READ8_MEMBER(elite_state::ppi_portb_r)
 	// d2,d3: language switches(hardwired)
 	data |= *m_language << 2 & 0x0c;
 
-	// d5: multiplexed inputs highest bit
-	data |= (read_inputs(9) & 0x100) ? 0 : 0x20;
+	// d5: 3 more buttons
+	data |= (BIT(m_inputs[9]->read(), m_inp_mux)) ? 0 : 0x20;
 
 	// other: ?
 	return data | 0xd0;
@@ -401,15 +421,6 @@ static INPUT_PORTS_START( eas )
 	PORT_INCLUDE( fidel_cpu_div_4 )
 	PORT_INCLUDE( generic_cb_magnets )
 
-	PORT_MODIFY("IN.0")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
-
-	PORT_MODIFY("IN.1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-
-	PORT_MODIFY("IN.2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
-
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control") // labeled RESET on the Prestige, but led display still says - G C -
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
@@ -419,20 +430,16 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("ST / Bishop")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("TB / Knight")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("LV / Pawn")
+
+	PORT_START("IN.9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eag )
 	PORT_INCLUDE( fidel_cpu_div_4 )
 	PORT_INCLUDE( generic_cb_magnets )
-
-	PORT_MODIFY("IN.0")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-
-	PORT_MODIFY("IN.1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
-
-	PORT_MODIFY("IN.2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
@@ -443,6 +450,11 @@ static INPUT_PORTS_START( eag )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("TM / Rook")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
+
+	PORT_START("IN.9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 

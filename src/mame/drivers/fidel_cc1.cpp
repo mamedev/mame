@@ -61,7 +61,8 @@ public:
 	cc1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
-		m_delay(*this, "delay")
+		m_delay(*this, "delay"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// RE button is tied to 8224 RESIN pin
@@ -71,10 +72,14 @@ public:
 	void cc1(machine_config &config);
 	void cc3(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
 	optional_device<timer_device> m_delay;
+	required_ioport_array<2> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -85,7 +90,24 @@ private:
 	DECLARE_READ8_MEMBER(ppi_porta_r);
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	u8 m_led_select;
+	u8 m_7seg_data;
 };
+
+void cc1_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_led_select = 0;
+	m_7seg_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_7seg_data));
+}
+
 
 
 /******************************************************************************
@@ -98,7 +120,7 @@ void cc1_state::update_display()
 {
 	// 4 7segs + 2 leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 6, m_7seg_data_xxx, m_led_select_xxx);
+	display_matrix(7, 6, m_7seg_data, m_led_select);
 }
 
 
@@ -108,10 +130,10 @@ READ8_MEMBER(cc1_state::ppi_porta_r)
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
-	u8 data = count_leading_zeros(m_inp_matrix[0]->read()) - 24;
+	u8 data = count_leading_zeros(m_inputs[0]->read()) - 24;
 
 	// d5-d7: more inputs (direct)
-	data |= ~m_inp_matrix[1]->read() << 5 & 0xe0;
+	data |= ~m_inputs[1]->read() << 5 & 0xe0;
 
 	// d4: 555 Q
 	return data | ((m_delay->enabled()) ? 0x10 : 0);
@@ -120,19 +142,19 @@ READ8_MEMBER(cc1_state::ppi_porta_r)
 WRITE8_MEMBER(cc1_state::ppi_portb_w)
 {
 	// d0-d6: digit segment data
-	m_7seg_data_xxx = bitswap<7>(data,0,1,2,3,4,5,6);
+	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
 WRITE8_MEMBER(cc1_state::ppi_portc_w)
 {
 	// d6: trigger monostable 555 (R=15K, C=1uF)
-	if (~data & m_led_select_xxx & 0x40 && !m_delay->enabled())
+	if (~data & m_led_select & 0x40 && !m_delay->enabled())
 		m_delay->adjust(attotime::from_msec(17));
 
 	// d0-d3: digit select
 	// d4: check led, d5: lose led
-	m_led_select_xxx = data;
+	m_led_select = data;
 	update_display();
 }
 

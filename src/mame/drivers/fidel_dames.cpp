@@ -38,16 +38,21 @@ public:
 	dsc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void dsc(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	required_device<dac_bit_interface> m_dac;
+	required_ioport_array<8> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -61,7 +66,24 @@ private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(select_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	u8 m_inp_mux;
+	u8 m_led_select;
 };
+
+void dsc_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_inp_mux = 0;
+	m_led_select = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_select));
+}
+
 
 
 /******************************************************************************
@@ -74,14 +96,13 @@ void dsc_state::update_display()
 {
 	// 4 7seg leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, m_7seg_data_xxx, m_led_select_xxx);
+	display_matrix(8, 4, m_inp_mux, m_led_select);
 }
 
 WRITE8_MEMBER(dsc_state::control_w)
 {
 	// d0-d7: input mux, 7seg data
-	m_inp_mux_xxx = ~data;
-	m_7seg_data_xxx = data;
+	m_inp_mux = data;
 	update_display();
 }
 
@@ -91,14 +112,21 @@ WRITE8_MEMBER(dsc_state::select_w)
 	m_dac->write(BIT(~data, 4));
 
 	// d0-d3: digit select
-	m_led_select_xxx = data & 0xf;
+	m_led_select = data & 0xf;
 	update_display();
 }
 
 READ8_MEMBER(dsc_state::input_r)
 {
+	u8 data = 0;
+
 	// d0-d7: multiplexed inputs (active low)
-	return ~read_inputs(8);
+	// read checkerboard
+	for (int i = 0; i < 8; i++)
+		if (BIT(~m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
+	return ~data;
 }
 
 

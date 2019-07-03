@@ -45,7 +45,7 @@ public:
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
-		m_keypad(*this, "IN.0")
+		m_inputs(*this, "IN.0")
 	{ }
 
 	// machine drivers
@@ -60,7 +60,7 @@ protected:
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	optional_device<dac_bit_interface> m_dac;
-	required_ioport m_keypad;
+	required_ioport m_inputs;
 
 	// I/O handlers
 	void update_display();
@@ -159,7 +159,7 @@ READ8_MEMBER(presto_state::input_r)
 
 	// read sidepanel keypad
 	if (m_kp_select)
-		data |= m_keypad->read();
+		data |= m_inputs->read();
 
 	return ~data;
 }

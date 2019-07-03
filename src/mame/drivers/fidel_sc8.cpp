@@ -34,15 +34,20 @@ class scc_state : public fidelbase_state
 public:
 	scc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
-		m_dac(*this, "dac")
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void scc(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<dac_bit_interface> m_dac;
+	required_ioport_array<9> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -51,7 +56,24 @@ private:
 	// I/O handlers
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(control_w);
+
+	u8 m_inp_mux;
+	u8 m_led_data;
 };
+
+void scc_state::machine_start()
+{
+	fidelbase_state::machine_start();
+
+	// zerofill
+	m_inp_mux = 0;
+	m_led_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_data));
+}
+
 
 
 /******************************************************************************
@@ -64,19 +86,30 @@ WRITE8_MEMBER(scc_state::control_w)
 {
 	// a0-a2,d7: led data
 	u8 mask = 1 << (offset & 7);
-	m_led_data_xxx = (m_led_data_xxx & ~mask) | ((data & 0x80) ? mask : 0);
+	m_led_data = (m_led_data & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// d0-d3: led select, input mux (row 9 is speaker out)
 	// d4: corner led(direct)
-	m_inp_mux_xxx = 1 << (data & 0xf);
-	m_dac->write(BIT(m_inp_mux_xxx, 9));
-	display_matrix(8, 9, m_led_data_xxx, (m_inp_mux_xxx & 0xff) | (data << 4 & 0x100));
+	m_inp_mux = data & 0xf;
+	u16 sel = 1 << m_inp_mux;
+	m_dac->write(BIT(sel, 9));
+	display_matrix(8, 9, m_led_data, (sel & 0xff) | (data << 4 & 0x100));
 }
 
 READ8_MEMBER(scc_state::input_r)
 {
+	u8 data = 0;
+
 	// d0-d7: multiplexed inputs (active low)
-	return ~read_inputs(9);
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_inputs[m_inp_mux]->read();
+
+	// read button panel
+	else if (m_inp_mux == 8)
+		data = m_inputs[8]->read();
+
+	return ~data;
 }
 
 

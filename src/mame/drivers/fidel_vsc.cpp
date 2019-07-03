@@ -177,7 +177,8 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
-		m_language(*this, "language")
+		m_language(*this, "language"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
@@ -194,6 +195,7 @@ private:
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
+	required_ioport_array<10> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -215,6 +217,11 @@ private:
 	DECLARE_READ8_MEMBER(pio_portb_r);
 	DECLARE_WRITE8_MEMBER(pio_portb_w);
 
+	u8 m_led_data;
+	u8 m_7seg_data;
+	u8 m_cb_mux;
+	u8 m_kp_mux;
+	bool m_lan_switch;
 	u8 m_speech_bank;
 };
 
@@ -223,9 +230,19 @@ void vsc_state::machine_start()
 	fidelbase_state::machine_start();
 
 	// zerofill
+	m_led_data = 0;
+	m_7seg_data = 0;
+	m_cb_mux = 0;
+	m_kp_mux = 0;
 	m_speech_bank = 0;
+	m_lan_switch = false;
 
 	// register for savestates
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_cb_mux));
+	save_item(NAME(m_kp_mux));
+	save_item(NAME(m_lan_switch));
 	save_item(NAME(m_speech_bank));
 }
 
@@ -241,7 +258,7 @@ void vsc_state::update_display()
 {
 	// 4 7seg leds+H, 8*8 chessboard leds
 	set_display_segmask(0xf, 0x7f);
-	display_matrix(16, 8, m_led_data_xxx << 8 | m_7seg_data_xxx, m_led_select_xxx);
+	display_matrix(16, 8, m_led_data << 8 | m_7seg_data, m_cb_mux);
 }
 
 READ8_MEMBER(vsc_state::speech_r)
@@ -258,23 +275,22 @@ WRITE8_MEMBER(vsc_state::ppi_porta_w)
 	m_speech->data_w(space, 0, data & 0x3f);
 
 	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
-	m_7seg_data_xxx = bitswap<8>(data,7,6,2,1,0,5,4,3);
+	m_7seg_data = bitswap<8>(data,7,6,2,1,0,5,4,3);
 	update_display();
 }
 
 WRITE8_MEMBER(vsc_state::ppi_portb_w)
 {
 	// d0-d7: led row data
-	m_led_data_xxx = data;
+	m_led_data = data;
 	update_display();
 }
 
 WRITE8_MEMBER(vsc_state::ppi_portc_w)
 {
 	// d0-d3: select digits
-	// d0-d7: select leds, input mux low bits
-	m_inp_mux_xxx = (m_inp_mux_xxx & ~0xff) | data;
-	m_led_select_xxx = data;
+	// d0-d7: select leds, chessboard input mux
+	m_cb_mux = data;
 	update_display();
 }
 
@@ -283,10 +299,24 @@ WRITE8_MEMBER(vsc_state::ppi_portc_w)
 
 READ8_MEMBER(vsc_state::pio_porta_r)
 {
+	u8 data = 0;
+
 	// d0-d7: multiplexed inputs
+	// read chessboard sensors
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_cb_mux, i))
+			data |= m_inputs[i]->read();
+
+	// read other buttons
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_kp_mux, i))
+			data |= m_inputs[i+8]->read();
+
 	// also language switches(hardwired with 2 diodes)
-	u8 lan = (m_inp_mux_xxx & 0x400) ? *m_language : 0;
-	return read_inputs(10) | lan;
+	if (m_lan_switch)
+		data |= *m_language;
+
+	return data;
 }
 
 READ8_MEMBER(vsc_state::pio_portb_r)
@@ -301,9 +331,10 @@ READ8_MEMBER(vsc_state::pio_portb_r)
 
 WRITE8_MEMBER(vsc_state::pio_portb_w)
 {
-	// d0,d1: input mux highest bits
+	// d0,d1: keypad input mux
 	// d5: enable language switch
-	m_inp_mux_xxx = (m_inp_mux_xxx & 0xff) | (data << 8 & 0x300) | (data << 5 & 0x400);
+	m_kp_mux = data & 3;
+	m_lan_switch = bool(data & 0x20);
 
 	// d7: TSI ROM A12
 	m_speech->force_update(); // update stream to now

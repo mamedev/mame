@@ -19,7 +19,6 @@ class chessbase_state : public driver_device
 public:
 	chessbase_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
 		m_out_a(*this, "%u.a", 0U),
 		m_out_digit(*this, "digit%u", 0U),
@@ -30,19 +29,9 @@ public:
 
 protected:
 	// devices/pointers
-	optional_ioport_array<16> m_inp_matrix; // max 16
 	output_finder<0x20, 0x20> m_out_x;
 	output_finder<0x20> m_out_a;
 	output_finder<0x20> m_out_digit;
-
-	// misc common
-	u16 m_inp_mux_xxx;                  // multiplexed keypad/leds mask
-	u16 m_led_select_xxx;
-	u16 m_led_data_xxx;
-	u16 m_led_latch_xxx;
-	u32 m_7seg_data_xxx;                // data for seg leds
-
-	u16 read_inputs(int columns);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -63,8 +52,5 @@ protected:
 	virtual void machine_reset() override;
 };
 
-
-//INPUT_PORTS_EXTERN( generic_cb_buttons );
-//INPUT_PORTS_EXTERN( generic_cb_magnets );
 
 #endif // MAME_INCLUDES_CHESSBASE_H

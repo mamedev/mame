@@ -28,23 +28,27 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(div_changed) { div_refresh(newval); }
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	optional_device<address_map_bank_device> m_mainmap;
 
 	// dynamic cpu divider
+	void div_refresh(ioport_value val = 0xff);
 	void div_trampoline_w(offs_t offset, u8 data);
 	u8 div_trampoline_r(offs_t offset);
-	inline void div_set_cpu_freq(offs_t offset);
+
 	void div_trampoline(address_map &map);
-	void div_refresh(ioport_value val = 0xff);
+
+private:
+	inline void div_set_cpu_freq(offs_t offset);
+
 	u16 m_div_status;
 	ioport_value m_div_config;
 	double m_div_scale;
 	emu_timer *m_div_timer;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
