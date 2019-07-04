@@ -49,6 +49,9 @@
     8749   128   2k   27  (EPROM)
     M58715 128    0       (external ROM)
 
+    8040   256   4k   27  (external ROM)
+    8050   256   4k   27  (ROM)
+
 ****************************************************************************
 
     UPI-41/42 chips are MCS-48 derived, with some opcode changes:
@@ -76,11 +79,13 @@
     ----   ---  ---  ---
     8041A   64   1k       (ROM)
     8041AH 128   1k       (ROM)
+    8641A   64   1k       (OTPROM)
     8741A   64   1k       (EPROM)
     8741AH 128   1k       (EPROM)
 
     8042   128   2k       (ROM)
     8042AH 256   2k       (ROM)
+    8642   128   2k       (OTPROM)
     8742   128   2k       (EPROM)
     8742AH 256   2k       (EPROM)
 
