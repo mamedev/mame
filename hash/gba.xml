@@ -6674,11 +6674,14 @@
 		<description>David Beckham Soccer (Euro)</description>
 		<year>2001</year>
 		<publisher>Rage Software</publisher>
-		<info name="serial" value="AGB-ABQP"/>
+		<info name="serial" value="AGB-ABQP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="david beckham soccer (europe) (en,fr,de,es,it).bin" size="4194304" crc="e9a34f49" sha1="969b0e330adaf91c37707ed41e4fdb00101d8dbe"/>
+				<rom name="agb-abqp-0.u1" size="4194304" crc="e9a34f49" sha1="969b0e330adaf91c37707ed41e4fdb00101d8dbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7846,10 +7849,12 @@
 		<description>Disney's Donald Duck "Adv@nce"!*# (Euro)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-ADKP"/>
+		<info name="serial" value="AGB-ADKP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="donald duck advance (europe) (en,fr,de,es,it).bin" size="8388608" crc="4c086a5e" sha1="25d775890227ebc5ab6fd867ee81c02ba716e50e"/>
+				<rom name="agb-adkp-0.u1" size="8388608" crc="4c086a5e" sha1="25d775890227ebc5ab6fd867ee81c02ba716e50e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7983,7 +7988,7 @@
 		<description>Doom (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-ADME-USA, AGB-ADMP"/>
+		<info name="serial" value="AGB-ADME-USA, AGB-ADMP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-10" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -13374,11 +13379,14 @@
 		<description>Gradius Advance (Euro)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="AGB-AGAP"/>
+		<info name="serial" value="AGB-AGAP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="gradius advance (europe).bin" size="4194304" crc="3722bdfa" sha1="1f28db5ac70ae11b2f3414369d1be73accb36f3b"/>
+				<rom name="agb-agap-0.u1" size="4194304" crc="3722bdfa" sha1="1f28db5ac70ae11b2f3414369d1be73accb36f3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14559,9 +14567,12 @@
 		<info name="release" value="20011019"/>
 		<info name="alt_title" value="ハローキティコレクション ミラクルファッションメーカー"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="hello kitty collection - miracle fashion maker (japan).bin" size="8388608" crc="c8f4d874" sha1="5242170ad6fe8f1169e423f13f77ad18f54d3659"/>
+				<rom name="agb-aktj-0.u1" size="8388608" crc="c8f4d874" sha1="5242170ad6fe8f1169e423f13f77ad18f54d3659"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15578,10 +15589,12 @@
 		<description>International Karate Advanced (Euro)</description>
 		<year>2002</year>
 		<publisher>Studio 3</publisher>
-		<info name="serial" value="AGB-AIKP-EUR"/>
+		<info name="serial" value="AGB-AIKP-EUR, AGB-AIKP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-40" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="international karate advanced (europe).bin" size="4194304" crc="d33a14af" sha1="bb8b12d0a446ed097fb74a9a4496980fb65164ef"/>
+				<rom name="agb-aikp-0.u1" size="4194304" crc="d33a14af" sha1="bb8b12d0a446ed097fb74a9a4496980fb65164ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16022,8 +16035,10 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-AJNE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="jimmy neutron boy genius (usa).bin" size="4194304" crc="d3ee0c51" sha1="31ed7659e2e072d1c00baf95c0ee9c770e949900"/>
+				<rom name="agb-ajne-0.u1" size="4194304" crc="d3ee0c51" sha1="31ed7659e2e072d1c00baf95c0ee9c770e949900"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18338,11 +18353,17 @@
 		<description>LEGO Bionicle (Euro)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-ALBP"/>
+		<info name="serial" value="AGB-ALBP-SCN"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM" />
+			<feature name="u3" value="U3 9803F" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="lego bionicle (europe) (en,fr,de,es,it,nl,sv,da).bin" size="8388608" crc="121ab9c3" sha1="cb2653e31cc80f0671090e31a753a856e65f58d5"/>
+				<rom name="agb-albp-0.u1" size="8388608" crc="121ab9c3" sha1="cb2653e31cc80f0671090e31a753a856e65f58d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19098,7 +19119,7 @@
 		<description>Lucky Luke - Wanted! (Euro)</description>
 		<year>2001</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="AGB-ALLP-EUR"/>
+		<info name="serial" value="AGB-ALLP-EUR, AGB-ALLP-NOE"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-10" />
 			<feature name="u1" value="U1 32M MROM" />
@@ -24838,9 +24859,12 @@
 		<info name="serial" value="AGB-APXP-EUR"/>
 		<info name="alt_title" value="Phalanx (Box)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="phalanx (europe) (en,fr,de,es,it,nl).bin" size="4194304" crc="dfcfe06c" sha1="83067b4574a49ae8d89b79d91e7ce4aad8141e67"/>
+				<rom name="agb-apxp-0.u1" size="4194304" crc="dfcfe06c" sha1="83067b4574a49ae8d89b79d91e7ce4aad8141e67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31647,11 +31671,14 @@
 		<description>Spyro - Season of Ice (Euro)</description>
 		<year>2001</year>
 		<publisher>Universal Interactive</publisher>
-		<info name="serial" value="AGB-ASYP"/>
+		<info name="serial" value="AGB-ASYP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="spyro - season of ice (europe) (en,fr,de,es,it).bin" size="8388608" crc="afd25827" sha1="854e788e5e1316b7d5cdf6b961d0969e5cd62119"/>
+				<rom name="agb-asyp-0.u1" size="8388608" crc="afd25827" sha1="854e788e5e1316b7d5cdf6b961d0969e5cd62119"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32474,10 +32501,12 @@
 		<description>Super Bust-A-Move (Euro)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-ABMP"/>
+		<info name="serial" value="AGB-ABMP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="super bust-a-move (europe) (en,fr,de,es,it).bin" size="4194304" crc="6bfd2915" sha1="e4dd4bb3691444fff595a926b2c06313f2e69751"/>
+				<rom name="agb-abmp-0.u1" size="4194304" crc="6bfd2915" sha1="e4dd4bb3691444fff595a926b2c06313f2e69751"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35059,12 +35088,15 @@
 		<description>Total Soccer (Euro)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-ATUP"/>
-		<info name="alt_title" value="Steven Gerrard's Total Soccer 2002 (UK Box?) / Alexander Zickler Total Soccer 2002 (Ger Box?)"/>
+		<info name="serial" value="AGB-ATUP-EUR"/>
+		<info name="alt_title" value="Steven Gerrard's Total Soccer 2002 (UK Box) / Alexander Zickler Total Soccer 2002 (Ger Box) / Marcel Desailly Football Advance (Fra Box)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="steven gerrard's total soccer 2002 (europe) (en,fr,de,es,it,nl).bin" size="4194304" crc="b94ddc93" sha1="1f37abe2a70ff0027abe714cb4cd93f168925753"/>
+				<rom name="agb-atup-0.u1" size="4194304" crc="b94ddc93" sha1="1f37abe2a70ff0027abe714cb4cd93f168925753"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36372,7 +36404,7 @@
 			<feature name="pcb" value="AGB-Y11-01" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 256K FRAM [MB85R256A]" />
-			<feature name="u3" value="U3 [empty]" />
+			<feature name="u3" value="U3 [B8K]" /> <!-- Uncertain if B8K -->
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-awap-0.u1" size="8388608" crc="d6141609" sha1="b9fe05a8080e124b67bce6a623234ee3b518a2c1"/>
