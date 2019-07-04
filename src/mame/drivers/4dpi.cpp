@@ -34,7 +34,6 @@
  *   - graphics, audio
  *
  * Status:
- *   - eeprom is glitchy/unreliable
  *   - parity and cache diagnostics fail
  *   - boots monitor and fx/sash from cdrom or network
  *   - hangs after booting irix from miniroot
@@ -118,7 +117,9 @@ private:
 	void lio_interrupt(unsigned number, int state);
 	void scsi_drq(int state);
 
-	enum sysid_mask : u8
+	u8 ctl_sid_r();
+
+	enum ctl_sid_mask : u8
 	{
 		SID_SERDATA = 0x01, // serial memory data output state
 		SID_FPPRES  = 0x02, // floating point processor present
@@ -153,11 +154,20 @@ private:
 		MCF_REFDIS   = 0x80, // disable memory refresh
 	};
 
+	enum aux_ctl_mask : u8
+	{
+		AUX_LED = 0x0f, // diagnostic leds
+		AUX_PE  = 0x10, // console led/eeprom program enable
+		AUX_CS  = 0x20, // eeprom chip select
+		AUX_CLK = 0x40, // serial clock
+		AUX_GR  = 0x80, // graphics reset
+	};
+
 	u8 m_mem_cfg;
-	u8 m_ctl_sysid;
+	u8 m_ctl_sid;
 	u8 m_vme_isr;
 	u8 m_vme_imr;
-	u8 m_aux_cpuctrl;
+	u8 m_aux_ctl;
 	u16 m_ctl_cpuctrl;
 	attotime m_refresh_timer;
 
@@ -181,7 +191,7 @@ void ip6_state::map(address_map &map)
 	//map(0x1df00000, 0x1df00003).umask32(0x0000ff00); // VME_IACK: vme interrupt acknowledge
 
 	map(0x1f800000, 0x1f800003).lw8("mem_cfg", [this](u8 data) { m_mem_cfg = data; }).umask32(0xff000000);
-	map(0x1f800000, 0x1f800003).lr8("ctl_sysid", [this]() { return m_ctl_sysid; }).umask32(0x00ff0000);
+	map(0x1f800000, 0x1f800003).r(FUNC(ip6_state::ctl_sid_r)).umask32(0x00ff0000);
 
 	map(0x1f840000, 0x1f840003).lrw8("vme_isr", [this]() { return m_vme_isr; }, [this](u8 data) { m_vme_isr = data; }).umask32(0x000000ff);
 	map(0x1f840008, 0x1f84000b).lrw8("vme_imr", [this]() { return m_vme_imr; }, [this](u8 data) { m_vme_imr = data; }).umask32(0x000000ff);
@@ -206,10 +216,10 @@ void ip6_state::map(address_map &map)
 			m_ctl_cpuctrl = data;
 		}).umask32(0x0000ffff);
 	//map(0x1f8c0000, 0x1f8c0003); // lca readback trigger (b)
-	map(0x1f8e0000, 0x1f8e0003).lrw8("aux_cpuctrl",
+	map(0x1f8e0000, 0x1f8e0003).lrw8("aux_ctl",
 		[this]()
 		{
-			return m_aux_cpuctrl;
+			return m_aux_ctl;
 		},
 		[this](u8 data)
 		{
@@ -224,7 +234,7 @@ void ip6_state::map(address_map &map)
 			m_eeprom->clk_write(BIT(data, 6));
 			//BIT(data, 7); // gfx_reset: reset graphics subsystem
 
-			m_aux_cpuctrl = data;
+			m_aux_ctl = data;
 		}).umask32(0xff000000);
 
 		map(0x1f900000, 0x1f900003).lrw16("scsi_dmalo_addr", [this]() { return m_scsi_dmalo; }, [this](u16 data) { m_scsi_dmalo = data; m_scsi_dmapage = 0; }).umask32(0x0000ffff);
@@ -328,14 +338,6 @@ void ip6_state::configure(machine_config &config)
 	m_ram->set_default_value(0);
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
-	m_eeprom->do_callback().set(
-		[this](int state)
-		{
-			if (state)
-				m_ctl_sysid |= SID_SERDATA;
-			else
-				m_ctl_sysid &= ~SID_SERDATA;
-		});
 
 	DP8573(config, m_rtc); // DP8572AN
 
@@ -394,7 +396,7 @@ void ip6_state::configure(machine_config &config)
 		"mouse"));
 
 	// duart 0 outputs
-	m_duart[0]->irq_cb().set(FUNC(ip6_state::lio_interrupt<LIO_D0>));
+	m_duart[0]->irq_cb().set(FUNC(ip6_state::lio_interrupt<LIO_D0>)).invert();
 	m_duart[0]->a_tx_cb().set(keyboard_port, FUNC(sgi_keyboard_port_device::write_txd));
 	m_duart[0]->b_tx_cb().set(mouse_port, FUNC(rs232_port_device::write_txd));
 
@@ -408,7 +410,7 @@ void ip6_state::configure(machine_config &config)
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 
 	// duart 1 outputs
-	m_duart[1]->irq_cb().set(FUNC(ip6_state::lio_interrupt<LIO_D1>));
+	m_duart[1]->irq_cb().set(FUNC(ip6_state::lio_interrupt<LIO_D1>)).invert();
 	m_duart[1]->a_tx_cb().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_duart[1]->b_tx_cb().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_duart[1]->outport_cb().set(
@@ -437,7 +439,7 @@ void ip6_state::initialize()
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 
-	m_ctl_sysid = SID_FPPRES;
+	m_ctl_sid = SID_FPPRES;
 
 	m_lio_isr = 0x3ff;
 	m_lio_imr = 0;
@@ -486,6 +488,20 @@ void ip6_state::scsi_drq(int state)
 	}
 }
 
+u8 ip6_state::ctl_sid_r()
+{
+	u8 data = m_ctl_sid;
+
+	if (m_eeprom->do_read())
+		data |= SID_SERDATA;
+
+	if (m_aux_ctl & AUX_CLK)
+		data |= SID_SERCLK;
+
+	return data;
+}
+
+// FIXME: boot prom is in fact four 27C512 eproms
 ROM_START(4d20)
 	ROM_REGION32_BE(0x40000, "prom", 0)
 	ROM_LOAD("4d202031.bin", 0x000000, 0x040000, CRC(065a290a) SHA1(6f5738e79643f94901e6efe3612468d14177f65b))
