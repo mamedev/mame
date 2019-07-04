@@ -54,8 +54,8 @@ static const uint8_t* skip_gz_header( const uint8_t *p ) {
 	/* skip initial 1f 8b header */
 	p += 2;
 	/* get method and flags */
-	method = *p; p++;
-	flags = *p; p++;
+	method = *p++;
+	flags = *p++;
 	if ( method != Z_DEFLATED || ( flags & RESERVED ) != 0 ) {
 		return nullptr;
 	}
@@ -184,6 +184,7 @@ static int uef_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 			break;
 		case 0x0104:    /* defined tape format data block */
 			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
+			size += ( chunk_length * 10 ) * 4;
 			break;
 		case 0x0110:    /* carrier tone (previously referred to as 'high tone') */
 			baud_length = ( casdata[pos+1] << 8 ) | casdata[pos];
@@ -222,25 +223,30 @@ cleanup:
 	return -1;
 }
 
-static int16_t* uef_cas_fill_bit( int16_t *buffer, int bit ) {
-	if ( bit ) {
-		*buffer = WAVE_LOW; buffer++;
-		*buffer = WAVE_HIGH; buffer++;
-		*buffer = WAVE_LOW; buffer++;
-		*buffer = WAVE_HIGH; buffer++;
-	} else {
-		*buffer = WAVE_LOW; buffer++;
-		*buffer = WAVE_LOW; buffer++;
-		*buffer = WAVE_HIGH; buffer++;
-		*buffer = WAVE_HIGH; buffer++;
+static int16_t* uef_cas_fill_bit( uint8_t loops, int16_t *buffer, bool bit )
+{
+	for (uint8_t i = 0; i < loops; i++)
+	{
+		if ( bit )
+		{
+			*buffer++ = WAVE_LOW;
+			*buffer++ = WAVE_HIGH;
+			*buffer++ = WAVE_LOW;
+			*buffer++ = WAVE_HIGH;
+		}
+		else
+		{
+			*buffer++ = WAVE_LOW;
+			*buffer++ = WAVE_LOW;
+			*buffer++ = WAVE_HIGH;
+			*buffer++ = WAVE_HIGH;
+		}
 	}
 	return buffer;
 }
 
-static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
-	int pos;
-	int16_t *p = buffer;
-
+static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
+{
 	if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
 		if ( gz_ptr == nullptr ) {
 			return 1;
@@ -248,25 +254,27 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 		bytes = gz_ptr;
 	}
 
-	pos = sizeof(UEF_HEADER) + 2;
+	uint8_t loops = 1;
+	int16_t *p = buffer;
+	uint32_t pos = sizeof(UEF_HEADER) + 2;
 	length = length / 2;
 	while( length > 0 ) {
 		int chunk_type = ( bytes[pos+1] << 8 ) | bytes[pos];
 		int chunk_length = ( bytes[pos+5] << 24 ) | ( bytes[pos+4] << 16 ) | ( bytes[pos+3] << 8 ) | bytes[pos+2];
 
-		int baud_length, i, j;
-		uint8_t *c;
+		uint32_t baud_length, j;
+		uint8_t i, *c;
 		pos += 6;
 		switch( chunk_type ) {
 		case 0x0100:    /* implicit start/stop bit data block */
+		case 0x0104:    // used by atom dumps, looks like normal data
 			for( j = 0; j < chunk_length; j++ ) {
 				uint8_t byte = bytes[pos+j];
-				p = uef_cas_fill_bit( p, 0 );
+				p = uef_cas_fill_bit( loops, p, 0 );
 				for( i = 0; i < 8; i++ ) {
-					p = uef_cas_fill_bit( p, byte & 1 );
-					byte = byte >> 1;
+					p = uef_cas_fill_bit( loops, p, (byte >> i) & 1 );
 				}
-				p = uef_cas_fill_bit( p, 1 );
+				p = uef_cas_fill_bit( loops, p, 1 );
 				length -= ( 10 * 4 );
 			}
 			break;
@@ -280,8 +288,7 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 			while( j ) {
 				uint8_t byte = *c;
 				for( i = 0; i < 8 && i < j; i++ ) {
-					p = uef_cas_fill_bit( p, byte & 1 );
-					byte = byte >> 1;
+					p = uef_cas_fill_bit( loops, p, (byte >> i) & 1 );
 					j--;
 				}
 				c++;
@@ -307,6 +314,20 @@ static int uef_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 				length -= 1;
 			}
 			break;
+		case 0x0117:    /* change baud rate */
+			baud_length = ( bytes[pos+1] << 8 ) | bytes[pos];
+			// These are the only supported numbers
+			if (baud_length == 300)
+				loops = 4;
+			else
+			if (baud_length == 1200)
+				loops = 1;
+			else
+				printf("Unsupported baud rate = %d\n",baud_length);
+			length -= chunk_length;
+			break;
+		default:
+			length -= chunk_length;
 		}
 		pos += chunk_length;
 	}
