@@ -1889,7 +1889,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		endoffset &= ~15;
 		for (offs_t i = offset; i != endoffset; i+=16)
 		{
-			offs_t curaddr = i >> 4;
+			offs_t curaddr = i;
 			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
 				space->read_word(curaddr) : space->unmap();
 			fwrite(&data, 2, 1, f);
@@ -1993,7 +1993,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 		endoffset &= ~15;
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 16); i+=16)
 		{
-			offs_t curaddr = i >> 4;
+			offs_t curaddr = i;
 			u16 data;
 			f.read((char *)&data, 2);
 			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
