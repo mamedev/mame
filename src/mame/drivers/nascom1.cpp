@@ -12,11 +12,14 @@ To Do:
 - Nascom2 has two dipswitch banks, and a memory control header
 - Nascom3 (Gemini), nothing usable found
 
-Cassette:
+Cassette (nascom1):
   It outputs a string of pulses at 1953.125Hz to indicate a 1, and blank tape for 0. This means that
   no tape will present a 0 to the UART instead of the expected 1 (idle). Part of the cassette
   schematic is missing, so a few liberties have been taken. The result is you can save a file and
   load it back. Haven't found wav files on the net to test with.
+
+Cassette (nascom2):
+  Standard Kansas City format, switchable (with a real switch) between 300 and 1200 baud.
 
 *****************************************************************************************************/
 
@@ -31,7 +34,6 @@ Cassette:
 #include "machine/z80pio.h"
 
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "bus/generic/slot.h"
@@ -50,18 +52,18 @@ Cassette:
 class nascom_state : public driver_device
 {
 public:
-	nascom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG),
-		m_hd6402(*this, "hd6402"),
-		m_cass(*this, "cassette"),
-		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram"),
-		m_gfx1_region(*this, "gfx1"),
-		m_keyboard(*this, "KEY.%u", 0)
+	nascom_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_hd6402(*this, "hd6402")
+		, m_cass(*this, "cassette")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_videoram(*this, "videoram")
+		, m_gfx1_region(*this, "gfx1")
+		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	void nascom(machine_config &config);
@@ -79,6 +81,8 @@ protected:
 	DECLARE_READ8_MEMBER(nascom1_port_01_r);
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
+	DECLARE_READ_LINE_MEMBER(hd6402_si);
+	DECLARE_WRITE_LINE_MEMBER(hd6402_so);
 
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 
@@ -91,20 +95,14 @@ protected:
 	required_memory_region m_gfx1_region;
 	required_ioport_array<8> m_keyboard;
 
-private:
 	int m_tape_size;
 	uint8_t *m_tape_image;
 	int m_tape_index;
 	uint8_t m_kb_select;
 	uint8_t m_kb_control;
 	bool m_cassinbit, m_cassoutbit, m_cassold;
-	u16 m_cass_cnt[2];
 	u8 m_port00;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	DECLARE_READ_LINE_MEMBER(nascom1_hd6402_si);
-	DECLARE_WRITE_LINE_MEMBER(nascom1_hd6402_so);
-	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_nascom1_cassette );
 	template<int Dest> DECLARE_SNAPSHOT_LOAD_MEMBER( snapshot_cb );
@@ -113,28 +111,31 @@ private:
 class nascom1_state : public nascom_state
 {
 public:
-	nascom1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		nascom_state(mconfig, type, tag)
+	nascom1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nascom_state(mconfig, type, tag)
 	{ }
 
 	void nascom1(machine_config &config);
-
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	void nascom1_io(address_map &map);
 	void nascom1_mem(address_map &map);
+	TIMER_DEVICE_CALLBACK_MEMBER(nascom1_kansas_r);
+	DECLARE_WRITE_LINE_MEMBER(nascom1_kansas_w);
+	u16 m_cass_cnt[2];
 };
 
 class nascom2_state : public nascom_state
 {
 public:
-	nascom2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		nascom_state(mconfig, type, tag),
-		m_nasbus(*this, NASBUS_TAG),
-		m_socket1(*this, "socket1"),
-		m_socket2(*this, "socket2"),
-		m_lsw1(*this, "lsw1")
+	nascom2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nascom_state(mconfig, type, tag)
+		, m_clock(*this, "uart_clock")
+		, m_nasbus(*this, NASBUS_TAG)
+		, m_socket1(*this, "socket1")
+		, m_socket2(*this, "socket2")
+		, m_lsw1(*this, "lsw1")
 	{ }
 
 	void nascom2(machine_config &config);
@@ -142,7 +143,12 @@ public:
 
 	void init_nascom2c();
 
+	DECLARE_INPUT_CHANGED_MEMBER(cass_speed);
+
 private:
+	TIMER_DEVICE_CALLBACK_MEMBER(nascom2_kansas_r);
+	DECLARE_MACHINE_RESET(nascom2);
+	DECLARE_WRITE_LINE_MEMBER(nascom2_kansas_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -155,12 +161,13 @@ private:
 	void nascom2_mem(address_map &map);
 	void nascom2c_mem(address_map &map);
 
-	virtual void machine_reset() override;
-
+	required_device<clock_device> m_clock;
 	required_device<nasbus_device> m_nasbus;
 	required_device<generic_slot_device> m_socket1;
 	required_device<generic_slot_device> m_socket2;
 	required_ioport m_lsw1;
+	u8 m_cass_data[4];
+	bool m_cass_speed;
 };
 
 
@@ -221,17 +228,17 @@ READ8_MEMBER( nascom_state::nascom1_port_02_r )
 	return data;
 }
 
-READ_LINE_MEMBER( nascom_state::nascom1_hd6402_si )
+READ_LINE_MEMBER( nascom_state::hd6402_si )
 {
 	return m_cassinbit;
 }
 
-WRITE_LINE_MEMBER( nascom_state::nascom1_hd6402_so )
+WRITE_LINE_MEMBER( nascom_state::hd6402_so )
 {
 	m_cassoutbit = state;
 }
 
-WRITE_LINE_MEMBER( nascom_state::kansas_w )
+WRITE_LINE_MEMBER( nascom1_state::nascom1_kansas_w )
 {
 	// incoming 3906.25Hz
 	if (state)
@@ -246,7 +253,7 @@ WRITE_LINE_MEMBER( nascom_state::kansas_w )
 	m_hd6402->write_tcp(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( nascom_state::kansas_r )
+TIMER_DEVICE_CALLBACK_MEMBER( nascom1_state::nascom1_kansas_r )
 {
 	// cassette - pulses = 1; no pulses = 0
 	m_cass_cnt[1]++;
@@ -263,6 +270,45 @@ TIMER_DEVICE_CALLBACK_MEMBER( nascom_state::kansas_r )
 	{
 		m_cass_cnt[1] = 10;
 		m_cassinbit = !cass_ws;
+	}
+}
+
+WRITE_LINE_MEMBER( nascom2_state::nascom2_kansas_w )
+{
+	// incoming @19230Hz
+	u8 twobit = m_cass_data[3] & 3;
+
+	if (state)
+	{
+		if (twobit == 0)
+			m_cassold = m_cassoutbit;
+
+		if (m_cassold)
+			m_cass->output(BIT(m_cass_data[3], 2) ? -1.0 : +1.0); // 2400Hz
+		else
+			m_cass->output(BIT(m_cass_data[3], 3) ? -1.0 : +1.0); // 1200Hz
+
+		m_cass_data[3]++;
+	}
+
+	if (m_cass_speed || !twobit)
+	{
+		m_hd6402->write_tcp(state);
+		m_hd6402->write_rcp(state);
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( nascom2_state::nascom2_kansas_r )
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cassinbit = (m_cass_data[1] < 12) ? 1 : 0;
+		m_cass_data[1] = 0;
 	}
 }
 
@@ -413,6 +459,20 @@ void nascom_state::machine_reset()
 	m_hd6402->write_cs(1);
 }
 
+MACHINE_RESET_MEMBER(nascom2_state, nascom2)
+{
+	machine_reset();
+
+	// nascom2: restore speed at machine start
+	m_cass_speed = ioport("DSW0")->read();
+
+	// base machine reset
+	nascom_state::machine_reset();
+
+	// restart address (on the real system, a12 to a15 are forced to 1 for one memory cycle)
+	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
+}
+
 void nascom_state::init_nascom()
 {
 	// install extra memory
@@ -422,14 +482,6 @@ void nascom_state::init_nascom()
 	}
 }
 
-void nascom2_state::machine_reset()
-{
-	// base machine reset
-	nascom_state::machine_reset();
-
-	// restart address (on the real system, a12 to a15 are forced to 1 for one memory cycle)
-	m_maincpu->set_state_int(Z80_PC, m_lsw1->read() << 12);
-}
 
 // since we don't know for which regions we should disable ram, we just let other devices
 // overwrite the region they need, and re-install our ram when they are disabled
@@ -659,6 +711,11 @@ static INPUT_PORTS_START( nascom2 )
 	PORT_MODIFY("KEY.7")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                            PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(']') PORT_CHAR('_')
 
+	PORT_START("DSW0")
+	PORT_DIPNAME(0x01, 0x00, "Cassette Baud Rate") PORT_CHANGED_MEMBER(DEVICE_SELF, nascom2_state, cass_speed, nullptr)
+	PORT_DIPSETTING(0x00, "300")
+	PORT_DIPSETTING(0x01, "1200")
+
 	// link switch on board
 	PORT_START("lsw1")
 	PORT_DIPNAME(0x0f, 0x00, "Restart address")
@@ -705,6 +762,11 @@ static INPUT_PORTS_START( nascom2c )
 	PORT_DIPSETTING(0x0f, "F000H")
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(nascom2_state::cass_speed)
+{
+	m_cass_speed = newval ? 1 : 0;
+}
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -724,29 +786,24 @@ void nascom_state::nascom(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nascom1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
+	// pio
+	Z80PIO(config, "z80pio", 16_MHz_XTAL / 8);
+
+	// internal extra ram
+	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
+
 	// uart
 	AY31015(config, m_hd6402);
-	m_hd6402->read_si_callback().set(FUNC(nascom_state::nascom1_hd6402_si));
-	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
+	m_hd6402->read_si_callback().set(FUNC(nascom_state::hd6402_si));
+	m_hd6402->write_so_callback().set(FUNC(nascom_state::hd6402_so));
 	m_hd6402->set_auto_rdav(true);
-
-	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
-	uart_clock.signal_handler().set(FUNC(nascom_state::kansas_w));
-	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
 
 	// cassette is connected to the uart
 	CASSETTE(config, m_cass);
 	m_cass->set_interface("nascom_cass");
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, "kansas_r").configure_periodic(FUNC(nascom_state::kansas_r), attotime::from_hz(40000));
-
-	// pio
-	Z80PIO(config, "z80pio", 16_MHz_XTAL / 8);
-
-	// internal extra ram
-	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// devices
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "nas", attotime::from_msec(500)));
@@ -767,6 +824,11 @@ void nascom1_state::nascom1(machine_config &config)
 
 	// software
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM1");
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", (16_MHz_XTAL / 16) / 256));
+	uart_clock.signal_handler().set(FUNC(nascom1_state::nascom1_kansas_w));
+	uart_clock.signal_handler().append(m_hd6402, FUNC(ay31015_device::write_rcp));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(nascom1_state::nascom1_kansas_r), attotime::from_hz(40000));
 }
 
 void nascom2_state::nascom2(machine_config &config)
@@ -776,6 +838,8 @@ void nascom2_state::nascom2(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nascom2_state::nascom2_mem);
 	m_maincpu->set_addrmap(AS_IO, &nascom2_state::nascom2_io);
+
+	MCFG_MACHINE_RESET_OVERRIDE(nascom2_state, nascom2 )
 
 	// video hardware
 	m_screen->set_size(48 * 8, 16 * 14);
@@ -804,6 +868,10 @@ void nascom2_state::nascom2(machine_config &config)
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM2");
 	SOFTWARE_LIST(config, "socket_list").set_original("nascom_socket");
 	SOFTWARE_LIST(config, "floppy_list").set_original("nascom_flop");
+
+	CLOCK(config, m_clock, (16_MHz_XTAL / 32) / 26);
+	m_clock->signal_handler().set(FUNC(nascom2_state::nascom2_kansas_w));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(nascom2_state::nascom2_kansas_r), attotime::from_hz(40000));
 }
 
 void nascom2_state::nascom2c(machine_config &config)
