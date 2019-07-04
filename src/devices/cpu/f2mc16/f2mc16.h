@@ -20,7 +20,19 @@ public:
 		F2MC16_PCB, F2MC16_DTB, F2MC16_USB, F2MC16_SSB, F2MC16_ADB, F2MC16_DPR,
 		F2MC16_RW0, F2MC16_RW1, F2MC16_RW2, F2MC16_RW3,
 		F2MC16_RW4, F2MC16_RW5, F2MC16_RW6, F2MC16_RW7,
-		F2MC16_RL0, F2MC16_RL1, F2MC16_RL2, F2MC16_RL3
+		F2MC16_RL0, F2MC16_RL1, F2MC16_RL2, F2MC16_RL3,
+		F2MC16_R0, F2MC16_R1, F2MC16_R2, F2MC16_R3, F2MC16_R4, F2MC16_R5, F2MC16_R6, F2MC16_R7
+	};
+
+	enum
+	{
+		F_I = 0x40,
+		F_S = 0x20,
+		F_T = 0x10,
+		F_N = 0x08,
+		F_Z = 0x04,
+		F_V = 0x02,
+		F_C = 0x01
 	};
 
 	// construction/destruction
@@ -35,6 +47,7 @@ protected:
 
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
