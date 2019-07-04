@@ -3049,6 +3049,66 @@ ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1
 	ROM_LOAD( "i-4.4",   0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
 ROM_END
 
+ROM_START( loht_ms ) // really similar to lohtb, even if it runs on 'Modular Hardware'
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6_lg_604.ic17", 0x00001, 0x10000, CRC(7e84b6ce) SHA1(a9a54f045917a191b6d6bbe061fc7a3344efb3bb) )
+	ROM_LOAD16_BYTE( "6_lg_604.ic20", 0x10001, 0x10000, CRC(abdcd211) SHA1(6ad79c4ef14d908032e4dbded7696a66fe5d31da) )
+	ROM_LOAD16_BYTE( "6_lg_601.ic8",  0x00000, 0x10000, CRC(7e080cb8) SHA1(598bcd8ecebe1922735b61cc1305e8839d9d054e) )
+	ROM_LOAD16_BYTE( "6_lg_602.ic11", 0x10000, 0x10000, CRC(150d1178) SHA1(71df3c9a49eb74cf40790e9b4cf7c6260fbd07d6) )
+	ROM_LOAD16_BYTE( "6_lg_606.ic26", 0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
+	ROM_RELOAD(                       0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "6_lg_603.ic25", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
+	ROM_RELOAD(                       0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Sound CPU program (Z80) + Samples*/
+	ROM_LOAD( "1_lg_1.ic12",  0x00000, 0x10000, CRC(7aa26b54) SHA1(01df7ea6443bbc775d5592edc32816853c857189) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "5_lg_501.ic5",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
+	ROM_LOAD( "5_lg_503.ic14",  0x20000, 0x10000, CRC(45220b01) SHA1(83715cf155f91c82067d69f14b3b01ed77777b7d) )
+	ROM_LOAD( "5_lg_505.ic20",  0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
+	ROM_LOAD( "5_lg_507.ic26",  0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
+	ROM_LOAD( "5_lg_502.ic6",   0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
+	ROM_LOAD( "5_lg_504.ic15",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4))
+	ROM_LOAD( "5_lg_506.ic21",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
+	ROM_LOAD( "5_lg_508.ic27",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT ) /* tiles #1 */
+	ROM_LOAD( "8_lg_801.ic15",  0x00000, 0x10000, CRC(359f17d4) SHA1(2875ba48395e7faa1a58404475be936dcca45ed1) )
+	ROM_LOAD( "8_lg_803.ic22",  0x10000, 0x10000, CRC(73391e8a) SHA1(53ca89b8a10895f817ecdb9fa5eef462edb94ae6) )
+	ROM_LOAD( "8_lg_805.ic30",  0x20000, 0x10000, CRC(7096d390) SHA1(f4a16bf8aef7a1a65619ab022cbdb67d2f191888) )
+	ROM_LOAD( "8_lg_807.ic37",  0x30000, 0x10000, CRC(1c113901) SHA1(3d4ce2ac6cdad0e1b0a21ffb062f9c92700adcf4) )
+
+	ROM_REGION( 0x040000, "gfx3", ROMREGION_INVERT ) /* tiles #2 */
+	ROM_LOAD( "8_lg_802.ic14",  0x00000, 0x10000, CRC(4d5e9b53) SHA1(3e3977bab7a66ed0171afcd555d181960e338749) )
+	ROM_LOAD( "8_lg_804.ic21",  0x10000, 0x10000, CRC(4f75a26a) SHA1(79c09a1ad3a6f9cfbd07cb527bbd89d2478ce582) )
+	ROM_LOAD( "8_lg_806.ic29",  0x20000, 0x10000, CRC(34854262) SHA1(37436c12579fb41d22a1596b495f065959c14a26) )
+	ROM_LOAD( "8_lg_808.ic36",  0x30000, 0x10000, CRC(f923183c) SHA1(a6b578191864aefa81e0cad3ba12a2ca491c91cf) )
+
+	ROM_REGION( 0x10000, "samples", ROMREGION_ERASEFF ) /* -- no sample roms on bootleg, included with z80 code */
+
+	ROM_REGION( 0x320, "prom", ROMREGION_ERASEFF )
+	ROM_LOAD( "51_502_82s129n.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
+	ROM_LOAD( "21_204_82s129an.ic4",      0x100, 0x100, CRC(74470450) SHA1(40b0e0991090733f8190ad7efcb500bd109c2a7e) )
+	ROM_LOAD( "21_209_82s129an.ic12",     0x200, 0x100, CRC(7922a7ab) SHA1(e7ec2b1fc61bd7d2cf921bfc50d975f91b938e8a) )
+	ROM_LOAD( "1_105_82s123n.ic20",       0x300, 0x020, CRC(14d72781) SHA1(372dc021d8aaf4aa6fd46e69a3d8f1c68113426f) )
+
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "51_p0503_pal16r6.ic46",       0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
+	// these were read protected
+	ROM_LOAD( "5_5136_gal16v8-25lp.ic9",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "5_5236_gal16v8-25lp.ic8",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "6_686_gal16v8.ic13",        0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "6_8638_gal16v8.ic7",        0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "6_subcpu_8600_gal16v8.ic3", 0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7136_gal20v8-25lp.ic7",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7236_gal20v8-25lp.ic54",  0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7336_gal16v8.ic55",       0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7436_gal16v8.ic9",        0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7536_gal16v8.ic59",       0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7636_gal20v8-25lp.ic44",  0x0, 0x1, NO_DUMP )
+ROM_END
+
 ROM_START( xmultiplm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ch3.h3",       0x00001, 0x20000, CRC(20685021) SHA1(92f4216320bf525045223b9454fb5bb224c536d8) )
@@ -4002,3 +4062,4 @@ GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_
 
 /* bootlegs, unique hw */
 GAME( 1989, lohtb,       loht,     m72,          loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht_ms,     loht,     m72,          loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma  (Gaelco bootleg, Modular System)",      MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
