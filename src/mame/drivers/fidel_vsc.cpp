@@ -443,6 +443,7 @@ void vsc_state::vsc(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(250));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 16);

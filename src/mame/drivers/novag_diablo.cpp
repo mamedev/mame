@@ -339,7 +339,9 @@ void diablo_state::scorpio68k(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::scorpio68k_map);
+
 	m_board->set_type(sensorboard_device::BUTTONS);
+	m_board->set_delay(attotime::from_msec(150));
 
 	config.set_default_layout(layout_novag_scorpio68k);
 }

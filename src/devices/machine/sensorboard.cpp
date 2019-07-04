@@ -57,7 +57,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	// set defaults for most common use case (aka chess)
 	set_size(8, 8);
 	set_spawnpoints(12);
-	set_delay(attotime::from_msec(250));
+	set_delay(attotime::from_msec(75));
 }
 
 
