@@ -202,6 +202,7 @@ PCB label 510-1035A01
 #include "sound/s14001a.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -221,6 +222,7 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_pia(*this, "pia%u", 0),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
@@ -240,6 +242,7 @@ protected:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	optional_device_array<pia6821_device, 2> m_pia;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
@@ -352,8 +355,7 @@ void csc_state::update_display()
 {
 	// 7442 0-8: led select (also input mux)
 	// 7seg leds+H (not on all models), 8*8(+1) chessboard leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, 1 << m_inp_mux);
+	m_display->matrix(1 << m_inp_mux, m_led_data << 8 | m_7seg_data);
 }
 
 void csc_state::update_sound()
@@ -685,7 +687,9 @@ void csc_state::csc(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(csc_state::pia1_pb_w));
 	m_pia[1]->ca2_handler().set(FUNC(csc_state::pia1_ca2_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(csc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_csc);
 
 	/* sound hardware */
@@ -736,7 +740,8 @@ void csc_state::rsc(machine_config &config)
 	m_pia[0]->ca2_handler().set(FUNC(csc_state::pia0_ca2_w));
 	m_pia[0]->cb2_handler().set(FUNC(csc_state::pia0_cb2_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(csc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_fidel_rsc_v2);
 
 	/* sound hardware */

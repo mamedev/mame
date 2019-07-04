@@ -33,6 +33,7 @@ the S14001A in the 70s), this time a 65C02 software solution.
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -48,6 +49,7 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
+		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -64,6 +66,7 @@ private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	required_memory_bank m_rombank;
+	required_device<pwm_display_device> m_display;
 	required_ioport_array<9> m_inputs;
 
 	// address maps
@@ -120,7 +123,7 @@ WRITE8_MEMBER(chesster_state::control_w)
 	u16 led_data = 1 << (m_select >> 4 & 0xf) & 0x1ff;
 
 	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, led_data, ~m_select & 3);
+	m_display->matrix(~m_select & 3, led_data);
 
 	// 74259 Q2,Q3: speechrom A14,A15
 	// a0-a2,d0: 74259(2) Q3,Q2,Q0 to A16,A17,A18
@@ -280,7 +283,8 @@ void chesster_state::chesster(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(2600)); // active for 2.6us
 	TIMER(config, "irq_off").configure_periodic(FUNC(chesster_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(chesster_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	config.set_default_layout(layout_fidel_chesster);
 
 	/* sound hardware */

@@ -24,6 +24,7 @@ It's a checkers game for once instead of chess
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -38,6 +39,7 @@ public:
 	dsc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -51,6 +53,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8> m_inputs;
 
@@ -95,8 +98,7 @@ void dsc_state::machine_start()
 void dsc_state::update_display()
 {
 	// 4 7seg leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, m_inp_mux, m_led_select);
+	m_display->matrix(m_led_select, m_inp_mux);
 }
 
 WRITE8_MEMBER(dsc_state::control_w)
@@ -270,7 +272,9 @@ void dsc_state::dsc(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_usec(41)); // active for 41us
 	TIMER(config, "irq_off").configure_periodic(FUNC(dsc_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(dsc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_dsc);
 
 	/* sound hardware */

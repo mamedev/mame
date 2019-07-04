@@ -19,12 +19,12 @@ I/O is similar to supercon
 #include "emu.h"
 
 #include "cpu/m6502/r65c02.h"
-#include "video/pwm.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "video/hlcd0538.h"
 #include "sound/beep.h"
+#include "video/hlcd0538.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork

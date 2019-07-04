@@ -159,6 +159,7 @@ IFP: Impact Printer - also compatible with C64 apparently.
 #include "machine/z80pio.h"
 #include "machine/timer.h"
 #include "sound/s14001a.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -175,6 +176,7 @@ public:
 		m_irq_on(*this, "irq_on"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
+		m_display(*this, "display"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
@@ -192,6 +194,7 @@ private:
 	required_device<timer_device> m_irq_on;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
@@ -257,8 +260,7 @@ void vsc_state::machine_start()
 void vsc_state::update_display()
 {
 	// 4 7seg leds+H, 8*8 chessboard leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(16, 8, m_led_data << 8 | m_7seg_data, m_cb_mux);
+	m_display->matrix(m_cb_mux, m_led_data << 8 | m_7seg_data);
 }
 
 READ8_MEMBER(vsc_state::speech_r)
@@ -526,7 +528,9 @@ void vsc_state::vsc(machine_config &config)
 	m_z80pio->in_pb_callback().set(FUNC(vsc_state::pio_portb_r));
 	m_z80pio->out_pb_callback().set(FUNC(vsc_state::pio_portb_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(vsc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_vsc);
 
 	/* sound hardware */

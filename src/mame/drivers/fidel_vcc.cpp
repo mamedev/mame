@@ -108,6 +108,7 @@ determination and give you a language option on power up or something.
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/s14001a.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -122,6 +123,7 @@ public:
 	vcc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
+		m_display(*this, "display"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
@@ -140,6 +142,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
@@ -196,8 +199,7 @@ void vcc_state::update_display()
 {
 	// 4 7seg leds (note: sel d0 for extra leds)
 	u8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
+	m_display->matrix(m_led_select >> 2 & 0xf, outdata);
 }
 
 READ8_MEMBER(vcc_state::speech_r)
@@ -341,7 +343,9 @@ void vcc_state::vcc(machine_config &config)
 	m_ppi8255->in_pc_callback().set(FUNC(vcc_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(vcc_state::ppi_portc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(vcc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_vcc);
 
 	/* sound hardware */

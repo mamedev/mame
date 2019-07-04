@@ -140,6 +140,7 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 #include "sound/s14001a.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -156,6 +157,7 @@ public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
@@ -181,6 +183,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_speech_rom;
@@ -269,12 +272,8 @@ WRITE8_MEMBER(excel_state::ttl_w)
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 
 	// update display: 4 7seg leds, 2*8 chessboard leds
-	for (int i = 0; i < 6; i++)
-		m_display_state[i] = (led_sel >> i & 1) ? ((i < 2) ? led_data : seg_data) : 0;
-
-	set_display_size(8, 2+4);
-	set_display_segmask(0x3c, 0x7f);
-	display_update();
+	m_display->matrix_partial(0, 2, led_sel, led_data, false);
+	m_display->matrix_partial(2, 4, led_sel >> 2, seg_data); // 6093
 
 	// speech (model 6092)
 	if (m_speech != nullptr)
@@ -487,7 +486,9 @@ void excel_state::fexcel(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(excel_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2+4, 8);
+	m_display->set_segmask(0x3c, 0x7f);
 	config.set_default_layout(layout_fidel_ex);
 
 	/* sound hardware */

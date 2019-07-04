@@ -22,10 +22,10 @@ TODO:
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "video/pwm.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork

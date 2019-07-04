@@ -50,6 +50,7 @@ D0-D3: keypad row
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -64,6 +65,7 @@ class bcc_state : public fidelbase_state
 public:
 	bcc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -77,6 +79,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<pwm_display_device> m_display;
 	optional_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
 
@@ -125,8 +128,7 @@ WRITE8_MEMBER(bcc_state::control_w)
 
 	// d0-d3: led select, input mux
 	// d4,d5: upper leds(direct)
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 6, m_7seg_data, data & 0x3f);
+	m_display->matrix(data & 0x3f, m_7seg_data);
 	m_inp_mux = data & 0xf;
 }
 
@@ -233,7 +235,9 @@ void bcc_state::bkc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bcc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &bcc_state::main_io);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(bcc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_bkc);
 }
 

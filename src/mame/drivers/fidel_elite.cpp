@@ -31,6 +31,9 @@ hardware overview:
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
 
 A condensator keeps RAM contents alive for a few hours when powered off.
+Note that EAS doesn't have a "new game" button, it is done through game options:
+Press GAME CONTROL, then place/lift a piece on D6 to restart, or D8 to reset
+with default settings, then press CL.
 
 Prestige Challenger (PC) hardware is very similar. They stripped the 8255 PPI,
 and added more RAM(7*TMM2016P). Some were released at 3.6MHz instead of 4MHz,
@@ -56,8 +59,10 @@ It was probably only released in Germany.
 #include "sound/s14001a.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -78,6 +83,7 @@ public:
 		m_irq_on(*this, "irq_on"),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
@@ -103,6 +109,7 @@ private:
 	required_device<timer_device> m_irq_on;
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
@@ -183,8 +190,8 @@ DEVICE_IMAGE_LOAD_MEMBER(elite_state::cart_load)
 void elite_state::update_display()
 {
 	// 4/8 7seg leds+H, 8*8(+1) chessboard leds
-	set_display_segmask(0x1ef, 0x7f);
-	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, 1 << m_inp_mux);
+	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
+	m_display->matrix(1 << m_inp_mux, m_led_data << 8 | seg_data);
 }
 
 READ8_MEMBER(elite_state::speech_r)
@@ -195,15 +202,15 @@ READ8_MEMBER(elite_state::speech_r)
 WRITE8_MEMBER(elite_state::segment_w)
 {
 	// a0-a2,d7: digit segment
-	m_7seg_data = (data & 0x80) >> offset;
-	m_7seg_data = bitswap<8>(m_7seg_data,7,6,4,5,0,2,1,3);
+	u8 mask = 1 << offset;
+	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
 	update_display();
 }
 
 WRITE8_MEMBER(elite_state::led_w)
 {
 	// a0-a2,d0: led data
-	m_led_data = (data & 1) << offset;
+	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
@@ -475,7 +482,9 @@ void elite_state::pc(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
 	TIMER(config, "irq_off").configure_periodic(FUNC(elite_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(elite_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_pc);
 
 	/* sound hardware */
@@ -537,6 +546,8 @@ void elite_state::eag(machine_config &config)
 	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram.ic6", nvram_device::DEFAULT_ALL_0);
 
+	/* video hardware */
+	m_display->set_segmask(0x1ef, 0x7f);
 	config.set_default_layout(layout_fidel_eag);
 }
 

@@ -24,8 +24,10 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -41,6 +43,7 @@ public:
 	as12_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
@@ -55,6 +58,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<9> m_inputs;
@@ -114,7 +118,7 @@ DEVICE_IMAGE_LOAD_MEMBER(as12_state::cart_load)
 void as12_state::update_display()
 {
 	// 8*8(+1) chessboard leds
-	display_matrix(8, 9, m_led_data, m_inp_mux);
+	m_display->matrix(m_inp_mux, m_led_data);
 }
 
 WRITE8_MEMBER(as12_state::control_w)
@@ -135,7 +139,7 @@ WRITE8_MEMBER(as12_state::control_w)
 WRITE8_MEMBER(as12_state::led_w)
 {
 	// a0-a2,d0: led data via NE591N
-	m_led_data = (data & 1) << offset;
+	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
@@ -296,7 +300,8 @@ void as12_state::as12(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(as12_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(as12_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_fidel_as12);
 
 	/* sound hardware */

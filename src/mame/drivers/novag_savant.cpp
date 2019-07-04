@@ -27,12 +27,13 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "video/hlcd0538.h"
-#include "video/pwm.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/hlcd0538.h"
+#include "video/pwm.h"
+
 #include "screen.h"
 #include "speaker.h"
 

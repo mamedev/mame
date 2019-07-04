@@ -71,8 +71,8 @@ Fairchild 3850PK CPU @ 2MHz (LC circuit), 3853PK
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/timer.h"
-#include "video/pwm.h"
 #include "sound/beep.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork

@@ -30,6 +30,7 @@ Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gon
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/beep.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -45,6 +46,7 @@ public:
 	ccx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
+		m_display(*this, "display"),
 		m_beeper_off(*this, "beeper_off"),
 		m_beeper(*this, "beeper"),
 		m_inputs(*this, "IN.%u", 0)
@@ -63,6 +65,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
@@ -116,8 +119,7 @@ void ccx_state::machine_start()
 void ccx_state::update_display()
 {
 	// 4 7segs + 2 leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 6, m_7seg_data, m_led_select);
+	m_display->matrix(m_led_select, m_7seg_data);
 }
 
 WRITE8_MEMBER(ccx_state::ppi_porta_w)
@@ -301,7 +303,9 @@ void ccx_state::acr(machine_config &config)
 	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(ccx_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_acr);
 }
 

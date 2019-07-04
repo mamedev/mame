@@ -21,6 +21,7 @@ Fidelity Sensory Chess Challenger 8 overview:
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -34,6 +35,7 @@ class scc_state : public fidelbase_state
 public:
 	scc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -46,6 +48,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<9> m_inputs;
 
@@ -93,7 +96,7 @@ WRITE8_MEMBER(scc_state::control_w)
 	m_inp_mux = data & 0xf;
 	u16 sel = 1 << m_inp_mux;
 	m_dac->write(BIT(sel, 9));
-	display_matrix(8, 9, m_led_data, (sel & 0xff) | (data << 4 & 0x100));
+	m_display->matrix((sel & 0xff) | (data << 4 & 0x100), m_led_data);
 }
 
 READ8_MEMBER(scc_state::input_r)
@@ -245,7 +248,8 @@ void scc_state::scc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &scc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &scc_state::main_io);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(scc_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_fidel_sc8);
 
 	/* sound hardware */

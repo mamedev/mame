@@ -46,6 +46,7 @@ Designer Mach IV Master 2325 (model 6129) overview:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -65,6 +66,7 @@ public:
 		fidelbase_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -81,6 +83,7 @@ protected:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	optional_memory_bank m_rombank;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<9> m_inputs;
 
@@ -184,7 +187,7 @@ WRITE8_MEMBER(desdis_state::control_w)
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, led_data, ~m_select & 3, false);
+	m_display->matrix_partial(0, 2, ~m_select & 3, led_data, false);
 
 	// 74259 Q2: book rom A14
 	if (m_rombank != nullptr)
@@ -194,12 +197,9 @@ WRITE8_MEMBER(desdis_state::control_w)
 	if (~q3_old & m_select & 8)
 	{
 		for (int i = 0; i < 4; i++)
-			m_display_state[i+2] = m_lcd_data >> (8*i) & 0xff;
+			m_display->write_row(i+2, m_lcd_data >> (8*i) & 0xff);
 	}
-
-	m_display_maxy += 4;
-	set_display_segmask(0x3c, 0x7f);
-	display_update();
+	m_display->update();
 }
 
 WRITE8_MEMBER(desdis_state::lcd_w)
@@ -386,7 +386,9 @@ void desdis_state::fdes2100d(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(desdis_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(desdis_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2+4, 9);
+	m_display->set_segmask(0x3c, 0x7f);
 	config.set_default_layout(layout_fidel_desdis);
 
 	/* sound hardware */
@@ -415,7 +417,9 @@ void desmas_state::fdes2265(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(6000)); // active for 6us
 	TIMER(config, "irq_off").configure_periodic(FUNC(desmas_state::irq_off<M68K_IRQ_4>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(desmas_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2+4, 9);
+	m_display->set_segmask(0x3c, 0x7f);
 	config.set_default_layout(layout_fidel_desdis_68kr);
 
 	/* sound hardware */

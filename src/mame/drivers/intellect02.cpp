@@ -41,12 +41,12 @@ keypad legend:
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "video/pwm.h"
 #include "sound/beep.h"
-#include "speaker.h"
+#include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "softlist.h"
+#include "speaker.h"
 
 // internal artwork
 #include "intellect02.lh" // clickable

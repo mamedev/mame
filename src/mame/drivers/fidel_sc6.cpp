@@ -28,8 +28,10 @@ SC6 program is contained in BO6 and CG6.
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -45,6 +47,7 @@ public:
 	sc6_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
@@ -59,6 +62,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<9> m_inputs;
@@ -126,8 +130,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sc6_state::cart_load)
 void sc6_state::update_display()
 {
 	// 2 7seg leds
-	set_display_segmask(3, 0x7f);
-	display_matrix(7, 2, 1 << m_inp_mux, m_led_select);
+	m_display->matrix(m_led_select, 1 << m_inp_mux);
 }
 
 WRITE8_MEMBER(sc6_state::mux_w)
@@ -311,7 +314,9 @@ void sc6_state::sc6(machine_config &config)
 	m_maincpu->t0_in_cb().set(FUNC(sc6_state::input6_r));
 	m_maincpu->t1_in_cb().set(FUNC(sc6_state::input7_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(sc6_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2, 7);
+	m_display->set_segmask(0x3, 0x7f);
 	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */

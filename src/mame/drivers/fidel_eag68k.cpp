@@ -161,8 +161,10 @@ B0000x-xxxxxx: see V7, -800000
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -183,6 +185,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_ram(*this, "ram"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
@@ -207,6 +210,7 @@ protected:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<timer_device> m_irq_on;
 	optional_device<ram_device> m_ram;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	optional_device<generic_slot_device> m_cart;
 	optional_ioport_array<10> m_inputs;
@@ -327,8 +331,7 @@ void eag_state::update_display()
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
-	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(16, 9, m_led_data << 8 | seg_data, 1 << m_select);
+	m_display->matrix(1 << m_select, m_led_data << 8 | seg_data);
 }
 
 WRITE8_MEMBER(eag_state::mux_w)
@@ -718,7 +721,9 @@ void excel68k_state::fex68k(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1528)); // active for 1.525us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(excel68k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_segmask(0x55, 0x7f);
 	config.set_default_layout(layout_fidel_ex_68k);
 
 	/* sound hardware */
@@ -758,7 +763,9 @@ void eag_state::eag_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(eag_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
+	m_display->set_segmask(0x1ef, 0x7f);
 	config.set_default_layout(layout_fidel_eag_68k);
 
 	/* sound hardware */

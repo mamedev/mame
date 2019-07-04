@@ -47,6 +47,7 @@ offered as an upgrade to CC1, or CC3.
 
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "video/pwm.h"
 
 // internal artwork
 #include "fidel_cc1.lh" // clickable
@@ -61,6 +62,7 @@ public:
 	cc1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidelbase_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
+		m_display(*this, "display"),
 		m_delay(*this, "delay"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -78,6 +80,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_delay;
 	required_ioport_array<2> m_inputs;
 
@@ -114,17 +117,13 @@ void cc1_state::machine_start()
     Devices, I/O
 ******************************************************************************/
 
-// misc handlers
+// I8255 PPI
 
 void cc1_state::update_display()
 {
 	// 4 7segs + 2 leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 6, m_7seg_data, m_led_select);
+	m_display->matrix(m_led_select, m_7seg_data);
 }
-
-
-// I8255 PPI
 
 READ8_MEMBER(cc1_state::ppi_porta_r)
 {
@@ -239,7 +238,9 @@ void cc1_state::cc1(machine_config &config)
 
 	TIMER(config, "delay").configure_generic(timer_device::expired_delegate());
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(cc1_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_cc1);
 }
 
