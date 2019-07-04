@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "screen.h"
 #include "speaker.h"
-#include "cpu/f2mc16/f2mc16.h"
+#include "cpu/f2mc16/mb9061x.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -54,8 +54,8 @@ INPUT_PORTS_END
 
 void tomy_princ_state::tomy_princ(machine_config &config)
 {
-	// F2MC-16L based CPU
-	F2MC16(config, m_maincpu, 16_MHz_XTAL);
+	// MB90611A microcontroller, F2MC-16L architecture
+	MB90611A(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tomy_princ_state::princ_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

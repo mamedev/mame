@@ -3,10 +3,14 @@
 /***************************************************************************
 
     Fujitsu Micro F2MC-16 series
+    Emulation by R. Belmont
 
     From 50,000 feet these chips look a lot like a 65C816 with no index
     registers.  As you get closer, you can see the banking includes some
     concepts from 8086 segmentation, and the interrupt handling is 68000-like.
+
+    There are two main branches: F and L.  They appear to be compatible with
+    each other as far as their extentions to the base ISA not conflicting.
 
 ***************************************************************************/
 
@@ -62,8 +66,8 @@ void f2mc16_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_temp).callimport().callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_temp).callimport().callexport().noshow();
 	state_add(F2MC16_PS, "PS", m_ps).formatstr("%04X");
-	state_add(F2MC16_PCB, "DTB", m_dtb).formatstr("%02X");
-	state_add(F2MC16_PCB, "ADB", m_adb).formatstr("%02X");
+	state_add(F2MC16_DTB, "DTB", m_dtb).formatstr("%02X");
+	state_add(F2MC16_ADB, "ADB", m_adb).formatstr("%02X");
 	state_add(F2MC16_ACC, "AL", m_acc).formatstr("%08X");
 	state_add(F2MC16_USB, "USB", m_usb).formatstr("%02X");
 	state_add(F2MC16_USP, "USP", m_usp).formatstr("%04X");
@@ -113,7 +117,6 @@ void f2mc16_device::state_export(const device_state_entry &entry)
 void f2mc16_device::execute_run()
 {
 	debugger_instruction_hook((m_pcb<<16) | m_pc);
-	printf("Debug hook: %06x\n", (m_pcb<<16) | m_pc);
 
 	m_icount = 0;
 }

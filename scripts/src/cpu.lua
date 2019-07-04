@@ -2924,6 +2924,8 @@ if (CPUS["F2MC16"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.cpp",
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.h",
 	}
 end
 
