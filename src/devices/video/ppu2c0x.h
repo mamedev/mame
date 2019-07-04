@@ -92,7 +92,7 @@ public:
 	void update_scanline();
 
 	void spriteram_dma(address_space &space, const uint8_t page);
-	void render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy);
+	void render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	int get_current_scanline() { return m_scanline; }
