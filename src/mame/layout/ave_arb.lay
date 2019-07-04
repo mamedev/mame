@@ -429,33 +429,33 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-14" right="106.5" top="-2" bottom="88" />
+		<bounds left="-13" right="106.5" top="-1.5" bottom="87.5" />
 
-		<bezel element="cblack"><bounds x="-2" y="-2" width="90" height="90" /></bezel>
-		<bezel element="black"><bounds x="2.5" y="2.5" width="81" height="81" /></bezel>
-		<group ref="sb_board"><bounds x="3" y="3" width="80" height="80" /></group>
+		<bezel element="cblack"><bounds x="-1" y="-1.5" width="89" height="89" /></bezel>
+		<bezel element="black"><bounds x="3" y="2.5" width="81" height="81" /></bezel>
+		<group ref="sb_board"><bounds x="3.5" y="3" width="80" height="80" /></group>
 
-		<group ref="sb_ui"><bounds x="-13" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 
 	<!-- chessboard coords -->
 
-		<bezel element="text_8"><bounds x="-0.6" y="7"  width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="-0.6" y="17" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="-0.6" y="27" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="-0.6" y="37" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="-0.6" y="47" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="-0.6" y="57" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="-0.6" y="67" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="-0.6" y="77" width="2" height="2" /></bezel>
+		<bezel element="text_8"><bounds x="0.2" y="7"  width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="0.2" y="17" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="0.2" y="27" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="0.2" y="37" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="0.2" y="47" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="0.2" y="57" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="0.2" y="67" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="0.2" y="77" width="2" height="2" /></bezel>
 
-		<bezel element="text_a"><bounds x="7"  y="84.75" width="2" height="2" /></bezel>
-		<bezel element="text_b"><bounds x="17" y="84.75" width="2" height="2" /></bezel>
-		<bezel element="text_c"><bounds x="27" y="84.75" width="2" height="2" /></bezel>
-		<bezel element="text_d"><bounds x="37" y="84.75" width="2" height="2" /></bezel>
-		<bezel element="text_e"><bounds x="47" y="84.75" width="2" height="2" /></bezel>
-		<bezel element="text_f"><bounds x="57" y="84.75" width="2" height="2" /></bezel>
-		<bezel element="text_g"><bounds x="67" y="84.75" width="2" height="2" /></bezel>
-		<bezel element="text_h"><bounds x="77" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_a"><bounds x="7.5"  y="84.5" width="2" height="2" /></bezel>
+		<bezel element="text_b"><bounds x="17.5" y="84.5" width="2" height="2" /></bezel>
+		<bezel element="text_c"><bounds x="27.5" y="84.5" width="2" height="2" /></bezel>
+		<bezel element="text_d"><bounds x="37.5" y="84.5" width="2" height="2" /></bezel>
+		<bezel element="text_e"><bounds x="47.5" y="84.5" width="2" height="2" /></bezel>
+		<bezel element="text_f"><bounds x="57.5" y="84.5" width="2" height="2" /></bezel>
+		<bezel element="text_g"><bounds x="67.5" y="84.5" width="2" height="2" /></bezel>
+		<bezel element="text_h"><bounds x="77.5" y="84.5" width="2" height="2" /></bezel>
 
 	<!-- right side -->
 
