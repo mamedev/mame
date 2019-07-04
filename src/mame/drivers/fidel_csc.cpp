@@ -203,7 +203,7 @@ PCB label 510-1035A01
 
 // internal artwork
 #include "fidel_csc.lh" // clickable
-#include "fidel_rsc_v2.lh" // clickable
+#include "fidel_rsc.lh" // clickable
 #include "fidel_su9.lh" // clickable
 
 
@@ -738,7 +738,7 @@ void csc_state::rsc(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
-	config.set_default_layout(layout_fidel_rsc_v2);
+	config.set_default_layout(layout_fidel_rsc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
