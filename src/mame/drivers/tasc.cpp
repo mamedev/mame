@@ -11,7 +11,7 @@ on PC, however the prototype Gideon 2.1(internally: Rebel 2.01) is not.
 R30 hardware notes:
 - ARM6 CPU(P60ARM/CG) @ 30MHz
 - 256KB ROM, 512KB program RAM, 128KB permanent RAM
-- Toshiba LCD drivers (4*T7778, T7900)
+- Toshiba LCD drivers (3*T7778A, T7900, T6963C), TC5565AFL-15
 - SB20 or SB30 "Smartboard" chessboard with piece recognition
 
 R40 hardware notes:
