@@ -3,11 +3,9 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-* fidel_sc6.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Sensory Chess Challenger 6 (model SC6)
 
-*******************************************************************************
-
-Fidelity Sensory Chess Challenger 6 (model SC6) overview:
+Hardware notes:
 - PCB label 510-1045B01
 - INS8040N-11 MCU, 11MHz XTAL
 - external 4KB ROM 2332 101-1035A01, in module slot
@@ -23,8 +21,6 @@ SC6 program is contained in BO6 and CG6.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -41,11 +37,11 @@ SC6 program is contained in BO6 and CG6.
 
 namespace {
 
-class sc6_state : public fidelbase_state
+class sc6_state : public driver_device
 {
 public:
 	sc6_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -88,8 +84,6 @@ private:
 
 void sc6_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_led_select = 0;
 	m_inp_mux = 0;

@@ -1,26 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/******************************************************************************
-*
-*  Fidelity Electronics chess computers base driver
-*  implementation is in machine/fidelbase.cpp
-*
-******************************************************************************/
+/*
 
-#ifndef MAME_INCLUDES_FIDELBASE_H
-#define MAME_INCLUDES_FIDELBASE_H
+  Fidelity Electronics 6502 dynamic CPU clock divider
+
+*/
+
+#ifndef MAME_MACHINE_FIDEL_CLOCKDIV_H
+#define MAME_MACHINE_FIDEL_CLOCKDIV_H
 
 #pragma once
 
-#include "includes/chessbase.h"
-
 #include "machine/bankdev.h"
 
-class fidelbase_state : public chessbase_state
+class fidel_clockdiv_state : public driver_device
 {
 public:
-	fidelbase_state(const machine_config &mconfig, device_type type, const char *tag) :
-		chessbase_state(mconfig, type, tag),
+	fidel_clockdiv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainmap(*this, "mainmap")
 	{ }
@@ -52,7 +49,7 @@ private:
 };
 
 
-INPUT_PORTS_EXTERN( fidel_cpu_div_2 );
-INPUT_PORTS_EXTERN( fidel_cpu_div_4 );
+INPUT_PORTS_EXTERN( fidel_clockdiv_2 );
+INPUT_PORTS_EXTERN( fidel_clockdiv_4 );
 
-#endif // MAME_INCLUDES_FIDELBASE_H
+#endif // MAME_MACHINE_FIDEL_CLOCKDIV_H

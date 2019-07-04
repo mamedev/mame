@@ -3,7 +3,7 @@
 // thanks-to:Berger, Sean Riddle
 /******************************************************************************
 
-* fidel_cc10.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity CC10 / Fidelity ACR
 
 TODO:
 - What is cc10 8255 PB.7 for? When set, maximum levels is 3, like in CC3. But
@@ -25,10 +25,10 @@ Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gon
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
 #include "speaker.h"
@@ -40,11 +40,13 @@ Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gon
 
 namespace {
 
-class ccx_state : public fidelbase_state
+class ccx_state : public driver_device
 {
 public:
 	ccx_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mainmap(*this, "mainmap"),
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
 		m_beeper_off(*this, "beeper_off"),
@@ -64,6 +66,8 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_mainmap;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_beeper_off;
@@ -95,8 +99,6 @@ private:
 
 void ccx_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_inp_mux = 0;
 	m_led_select = 0;

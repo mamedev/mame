@@ -2189,10 +2189,8 @@ files {
 
 createMESSProjects(_target, _subtarget, "fidelity")
 files {
-	MAME_DIR .. "src/mame/machine/chessbase.cpp",
-	MAME_DIR .. "src/mame/includes/chessbase.h",
-	MAME_DIR .. "src/mame/machine/fidelbase.cpp",
-	MAME_DIR .. "src/mame/includes/fidelbase.h",
+	MAME_DIR .. "src/mame/machine/fidel_clockdiv.cpp",
+	MAME_DIR .. "src/mame/machine/fidel_clockdiv.h",
 	MAME_DIR .. "src/mame/drivers/fidel_as12.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_card.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_cc1.cpp",

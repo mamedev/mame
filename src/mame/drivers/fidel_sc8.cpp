@@ -3,11 +3,9 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-* fidel_sc8.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Sensory Chess Challenger 8
 
-*******************************************************************************
-
-Fidelity Sensory Chess Challenger 8 overview:
+Hardware notes:
 - Z80A CPU @ 3.9MHz
 - 4KB ROM(MOS 2732), 256 bytes RAM(35391CP)
 - chessboard buttons, 8*8+1 leds
@@ -16,8 +14,6 @@ Fidelity Sensory Chess Challenger 8 overview:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -30,11 +26,12 @@ Fidelity Sensory Chess Challenger 8 overview:
 
 namespace {
 
-class scc_state : public fidelbase_state
+class scc_state : public driver_device
 {
 public:
 	scc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
@@ -48,6 +45,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<9> m_inputs;
@@ -66,8 +64,6 @@ private:
 
 void scc_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_inp_mux = 0;
 	m_led_data = 0;

@@ -3,8 +3,6 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_csc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity CSC(and derived) hardware
 - Champion Sensory Chess Challenger
 - Elite Champion Challenger
@@ -194,8 +192,6 @@ PCB label 510-1035A01
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
@@ -215,11 +211,12 @@ namespace {
 
 // CSC / shared
 
-class csc_state : public fidelbase_state
+class csc_state : public driver_device
 {
 public:
 	csc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_pia(*this, "pia%u", 0),
 		m_display(*this, "display"),
@@ -240,6 +237,7 @@ protected:
 	virtual void machine_start() override;
 
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<pwm_display_device> m_display;
@@ -284,8 +282,6 @@ protected:
 
 void csc_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_led_data = 0;
 	m_7seg_data = 0;

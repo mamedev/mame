@@ -3,8 +3,6 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity Excellence series hardware
 (for Excel 68000, see fidel_eag68k.cpp)
 
@@ -132,8 +130,6 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/timer.h"
@@ -151,11 +147,12 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 
 namespace {
 
-class excel_state : public fidelbase_state
+class excel_state : public driver_device
 {
 public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -182,6 +179,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -210,8 +208,6 @@ private:
 
 void excel_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_select = 0;
 	m_7seg_data = 0;

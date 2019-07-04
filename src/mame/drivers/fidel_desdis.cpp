@@ -3,8 +3,6 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_desdis.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity Designer Display series, 6502 and 68000
 (6502-based displayless Designer is in fidel_excel.cpp)
 
@@ -38,8 +36,6 @@ Designer Mach IV Master 2325 (model 6129) overview:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "cpu/m68000/m68000.h"
@@ -59,11 +55,12 @@ namespace {
 
 // Designer Display / shared
 
-class desdis_state : public fidelbase_state
+class desdis_state : public driver_device
 {
 public:
 	desdis_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
 		m_display(*this, "display"),
@@ -81,6 +78,7 @@ protected:
 	virtual void machine_start() override;
 
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	optional_memory_bank m_rombank;
 	required_device<pwm_display_device> m_display;
@@ -110,8 +108,6 @@ void desdis_state::init_fdes2100d()
 
 void desdis_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_select = 0;
 	m_lcd_data = 0;

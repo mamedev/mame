@@ -2,8 +2,6 @@
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
 
-* fidel_vcc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity Voice Chess Challenger series hardware
 - Voice Chess Challenger (VCC) (version A and B?)
 - Advanced Voice Chess Challenger (UVC)
@@ -103,8 +101,6 @@ determination and give you a language option on power up or something.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/s14001a.h"
@@ -117,11 +113,12 @@ determination and give you a language option on power up or something.
 
 namespace {
 
-class vcc_state : public fidelbase_state
+class vcc_state : public driver_device
 {
 public:
 	vcc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
 		m_speech(*this, "speech"),
@@ -141,6 +138,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
@@ -169,8 +167,6 @@ private:
 
 void vcc_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_led_select = 0;
 	m_7seg_data = 0;

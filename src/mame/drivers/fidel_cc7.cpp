@@ -3,10 +3,6 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* fidel_cc7.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
-*******************************************************************************
-
 Fidelity Chess Challenger 7 (CC7, BCC)
 ------------------------
 It was Fidelity's most sold chess computer. model CC7 is an older version.
@@ -45,8 +41,6 @@ D0-D3: keypad row
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -60,11 +54,12 @@ D0-D3: keypad row
 
 namespace {
 
-class bcc_state : public fidelbase_state
+class bcc_state : public driver_device
 {
 public:
 	bcc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
@@ -79,6 +74,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	optional_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
@@ -97,8 +93,6 @@ private:
 
 void bcc_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_inp_mux = 0;
 	m_7seg_data = 0;

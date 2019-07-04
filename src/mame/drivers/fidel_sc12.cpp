@@ -3,10 +3,6 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_sc12.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
-*******************************************************************************
-
 Fidelity Sensory 12 Chess Challenger (SC12-B, 6086)
 4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
 ---------------------------------
@@ -50,7 +46,7 @@ If control Q4 is set, printer data can be read from I0.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
+#include "machine/fidel_clockdiv.h"
 
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
@@ -69,11 +65,13 @@ If control Q4 is set, printer data can be read from I0.
 
 namespace {
 
-class sc12_state : public fidelbase_state
+// note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
+
+class sc12_state : public fidel_clockdiv_state
 {
 public:
 	sc12_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		fidel_clockdiv_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -114,7 +112,7 @@ private:
 
 void sc12_state::machine_start()
 {
-	fidelbase_state::machine_start();
+	fidel_clockdiv_state::machine_start();
 
 	// zerofill/register for savestates
 	m_inp_mux = 0;
@@ -293,13 +291,13 @@ static INPUT_PORTS_START( sc12_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
-	PORT_INCLUDE( fidel_cpu_div_2 )
+	PORT_INCLUDE( fidel_clockdiv_2 )
 	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
-	PORT_INCLUDE( fidel_cpu_div_4 )
+	PORT_INCLUDE( fidel_clockdiv_4 )
 	PORT_INCLUDE( generic_cb_buttons )
 	PORT_INCLUDE( sc12_sidepanel )
 INPUT_PORTS_END

@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard, Berger
 /******************************************************************************
 
-* fidel_chesster.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Chesster Challenger
 
 These were made after Hegener & Glaser took over Fidelity(design phase started
 before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
@@ -27,8 +27,6 @@ the S14001A in the 70s), this time a 65C02 software solution.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -42,11 +40,12 @@ the S14001A in the 70s), this time a 65C02 software solution.
 
 namespace {
 
-class chesster_state : public fidelbase_state
+class chesster_state : public driver_device
 {
 public:
 	chesster_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
 		m_display(*this, "display"),
@@ -64,6 +63,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	required_memory_bank m_rombank;
 	required_device<pwm_display_device> m_display;
@@ -93,8 +93,6 @@ void chesster_state::init_chesster()
 
 void chesster_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_speech_bank = 0;
 	m_select = 0;

@@ -3,8 +3,6 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* fidel_elite.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
 see fidel_eag68k.cpp for 68000-based EAG hardware
 
@@ -49,7 +47,7 @@ It was probably only released in Germany.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
+#include "machine/fidel_clockdiv.h"
 
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
@@ -75,11 +73,13 @@ It was probably only released in Germany.
 
 namespace {
 
-class elite_state : public fidelbase_state
+// note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
+
+class elite_state : public fidel_clockdiv_state
 {
 public:
 	elite_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		fidel_clockdiv_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
@@ -152,7 +152,7 @@ void elite_state::init_eag2100()
 
 void elite_state::machine_start()
 {
-	fidelbase_state::machine_start();
+	fidel_clockdiv_state::machine_start();
 
 	// zerofill
 	m_led_data = 0;
@@ -425,7 +425,7 @@ INPUT_PORTS_START( generic_cb_magnets )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eas )
-	PORT_INCLUDE( fidel_cpu_div_4 )
+	PORT_INCLUDE( fidel_clockdiv_4 )
 	PORT_INCLUDE( generic_cb_magnets )
 
 	PORT_START("IN.8")
@@ -445,7 +445,7 @@ static INPUT_PORTS_START( eas )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eag )
-	PORT_INCLUDE( fidel_cpu_div_4 )
+	PORT_INCLUDE( fidel_clockdiv_4 )
 	PORT_INCLUDE( generic_cb_magnets )
 
 	PORT_START("IN.8")

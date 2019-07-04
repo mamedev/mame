@@ -3,11 +3,9 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-* fidel_dames.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Dame Sensory Challenger (DSC)
 
-*******************************************************************************
-
-Fidelity Dame Sensory Challenger (DSC) overview:
+Hardware notes:
 - Z80A CPU @ 3.9MHz
 - 8KB ROM(MOS 2364), 1KB RAM(2*TMM314APL)
 - 4-digit 7seg panel, sensory board with 50 buttons
@@ -18,8 +16,6 @@ It's a checkers game for once instead of chess
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -33,11 +29,12 @@ It's a checkers game for once instead of chess
 
 namespace {
 
-class dsc_state : public fidelbase_state
+class dsc_state : public driver_device
 {
 public:
 	dsc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -52,6 +49,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -76,8 +74,6 @@ private:
 
 void dsc_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_inp_mux = 0;
 	m_led_select = 0;

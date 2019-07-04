@@ -3,10 +3,6 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_sc9.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
-*******************************************************************************
-
 Fidelity Sensory Chess Challenger "9" (SC9) overview:
 - 8*(8+1) buttons, 8*8+1 LEDs
 - 36-pin edge connector, assume same as SC12
@@ -38,8 +34,6 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/m6502.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -60,11 +54,12 @@ namespace {
 
 // SC9 / shared
 
-class sc9_state : public fidelbase_state
+class sc9_state : public driver_device
 {
 public:
 	sc9_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -82,6 +77,7 @@ protected:
 	virtual void machine_start() override;
 
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -111,8 +107,6 @@ protected:
 
 void sc9_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_inp_mux = 0;
 	m_led_data = 0;

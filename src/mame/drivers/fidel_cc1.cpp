@@ -3,8 +3,6 @@
 // thanks-to:Berger, Sean Riddle
 /******************************************************************************
 
-* fidel_cc1.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity's 1st generation chess computers:
 - *Chess Challenger
 - Chess Challenger 3
@@ -43,10 +41,9 @@ offered as an upgrade to CC1, or CC3.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "video/pwm.h"
 
 // internal artwork
@@ -56,11 +53,12 @@ offered as an upgrade to CC1, or CC3.
 
 namespace {
 
-class cc1_state : public fidelbase_state
+class cc1_state : public driver_device
 {
 public:
 	cc1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
 		m_delay(*this, "delay"),
@@ -79,6 +77,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_delay;
@@ -100,8 +99,6 @@ private:
 
 void cc1_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_led_select = 0;
 	m_7seg_data = 0;

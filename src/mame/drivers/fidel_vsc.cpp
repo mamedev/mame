@@ -2,10 +2,6 @@
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
 
-* fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
-*******************************************************************************
-
 Fidelity Voice Sensory Chess Challenger (VSC)
 ---------------------------------------------
 RE notes by Kevin Horton
@@ -152,8 +148,6 @@ IFP: Impact Printer - also compatible with C64 apparently.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/z80pio.h"
@@ -168,11 +162,12 @@ IFP: Impact Printer - also compatible with C64 apparently.
 
 namespace {
 
-class vsc_state : public fidelbase_state
+class vsc_state : public driver_device
 {
 public:
 	vsc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
@@ -191,6 +186,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
@@ -230,8 +226,6 @@ private:
 
 void vsc_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_led_data = 0;
 	m_7seg_data = 0;

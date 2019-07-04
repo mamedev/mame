@@ -3,8 +3,6 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_eag68k.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity 68000-based Elite Avant Garde driver
 For 6502-based EAG, see fidel_elite.cpp
 Excel 68000 I/O is very similar to EAG, so it's handled in this driver as well
@@ -152,8 +150,6 @@ B0000x-xxxxxx: see V7, -800000
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "machine/ram.h"
@@ -177,11 +173,11 @@ namespace {
 
 // EAG / shared
 
-class eag_state : public fidelbase_state
+class eag_state : public driver_device
 {
 public:
 	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
 		m_ram(*this, "ram"),
@@ -241,8 +237,6 @@ protected:
 
 void eag_state::machine_start()
 {
-	fidelbase_state::machine_start();
-
 	// zerofill
 	m_select = 0;
 	m_7seg_data = 0;

@@ -3,11 +3,9 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-* fidel_as12.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Elegance Chess Challenger (AS12)
 
-*******************************************************************************
-
-Fidelity Elegance Chess Challenger (AS12) overview:
+Hardware notes:
 - R65C02P4 CPU @ 4MHz
 - 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
 - PCB label 510-1084B01
@@ -18,7 +16,7 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
+#include "machine/fidel_clockdiv.h"
 
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
@@ -37,11 +35,13 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 
 namespace {
 
-class as12_state : public fidelbase_state
+// note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
+
+class as12_state : public fidel_clockdiv_state
 {
 public:
 	as12_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		fidel_clockdiv_state(mconfig, type, tag),
 		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -84,7 +84,7 @@ private:
 
 void as12_state::machine_start()
 {
-	fidelbase_state::machine_start();
+	fidel_clockdiv_state::machine_start();
 
 	// zerofill
 	m_inp_mux = 0;
@@ -268,7 +268,7 @@ INPUT_PORTS_START( generic_cb_magnets )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( as12 )
-	PORT_INCLUDE( fidel_cpu_div_4 )
+	PORT_INCLUDE( fidel_clockdiv_4 )
 	PORT_INCLUDE( generic_cb_magnets )
 
 	PORT_START("IN.8")
