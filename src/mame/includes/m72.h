@@ -80,6 +80,7 @@ public:
 	void m82(machine_config &config);
 	void rtype(machine_config &config);
 	void imgfightb(machine_config &config);
+	void lohtb(machine_config &config);
 
 	void init_dkgenm72();
 	void init_bchopper();
@@ -223,6 +224,8 @@ private:
 	void hharry_map(address_map &map);
 	void hharryu_map(address_map &map);
 	void kengo_map(address_map &map);
+	void lohtb_map(address_map &map);
+	void lohtb_portmap(address_map &map);
 	void m72_cpu1_common_map(address_map &map);
 	void m72_map(address_map &map);
 	void m72_protected_map(address_map &map);

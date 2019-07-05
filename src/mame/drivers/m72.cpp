@@ -955,8 +955,18 @@ void m72_state::m82_map(address_map &map)
 	map(0xffff0, 0xfffff).rom();
 }
 
-
-
+void m72_state::lohtb_map(address_map &map) // all to be checked
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x803ff).ram().share("spriteram");
+	map(0xa0000, 0xa3fff).ram();    /* work RAM */
+	map(0xaa800, 0xaafff).ram();
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xffff0, 0xfffff).rom();
+}
 
 void m72_state::m72_portmap(address_map &map)
 {
@@ -1059,7 +1069,20 @@ void m72_state::m81_portmap(address_map &map)
 	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
-
+void m72_state::lohtb_portmap(address_map &map)
+{
+	map(0x20, 0x21).portr("IN0");
+	map(0x22, 0x23).portr("IN1");
+	map(0x24, 0x25).portr("DSW");
+	//map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	//map(0x02, 0x02).w(FUNC(m72_state::port02_w)); /* coin counters, reset sound cpu, other stuff? */
+	//map(0x04, 0x04).w(FUNC(m72_state::dmaon_w));
+	//map(0x06, 0x07).w(FUNC(m72_state::irq_line_w));
+	//map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	//map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	//map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	//map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
+}
 
 void m72_state::sound_ram_map(address_map &map)
 {
@@ -2184,6 +2207,36 @@ void m72_state::poundfor(machine_config &config)
 	m72_audio_chips(config);
 }
 
+void m72_state::lohtb(machine_config &config) // almost all to be verified
+{
+	/* basic machine hardware */
+	V30(config, m_maincpu, MASTER_CLOCK/2/2);    /* 16 MHz external freq (8MHz internal) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::lohtb_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::lohtb_portmap);
+
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_portmap);
+
+	MCFG_MACHINE_START_OVERRIDE(m72_state,kengo)
+	MCFG_MACHINE_RESET_OVERRIDE(m72_state,kengo)
+
+	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
+	PALETTE(config, m_palette).set_entries(512);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0);
+
+	MCFG_VIDEO_START_OVERRIDE(m72_state,m72)
+
+	m72_audio_chips(config);
+}
 
 /***************************************************************************
 
@@ -4061,5 +4114,5 @@ GAME( 1990, poundforj,   poundfor, poundfor,     poundfor,     m72_state, empty_
 GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
 /* bootlegs, unique hw */
-GAME( 1989, lohtb,       loht,     m72,          loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, loht_ms,     loht,     m72,          loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb,       loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht_ms,     loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
