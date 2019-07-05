@@ -271,7 +271,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE           INIT           COMPANY, FULLNAME, FLAGS
-CONS( 1990, chesster,  0,        0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, chesstera, chesster, 0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishon,    chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishona,   chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, chesster,  0,        0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, chesstera, chesster, 0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishon,    chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishona,   chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
