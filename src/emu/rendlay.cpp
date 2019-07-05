@@ -3368,17 +3368,17 @@ int layout_view::item::state() const
 	else if (!m_input_tag.empty())
 	{
 		// if configured to an input, fetch the input value
-		if (m_input_raw)
+		if (m_input_port)
 		{
-			if (m_input_port)
-				return (m_input_port->read() & m_input_mask) >> m_input_shift;
-		}
-		else
-		{
-			if (m_input_field)
+			if (m_input_raw)
 			{
-				assert(m_input_port);
-				return ((m_input_port->read() ^ m_input_field->defvalue()) & m_input_mask) ? 1 : 0;
+				return (m_input_port->read() & m_input_mask) >> m_input_shift;
+			}
+			else
+			{
+				ioport_field const *const field(m_input_field ? m_input_field : m_input_port->field(m_input_mask));
+				if (field)
+					return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 			}
 		}
 	}
@@ -3397,7 +3397,17 @@ void layout_view::item::resolve_tags()
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
 		if (m_input_port)
-			m_input_field = m_input_port->field(m_input_mask);
+		{
+			for (ioport_field &field : m_input_port->fields())
+			{
+				if (field.mask() & m_input_mask)
+				{
+					if (field.condition().condition() == ioport_condition::ALWAYS)
+						m_input_field = &field;
+					break;
+				}
+			}
+		}
 	}
 }
 
