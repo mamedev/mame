@@ -1100,12 +1100,13 @@ void layout_group::resolve_bounds(
 			else
 				env.set_repeat_parameter(*itemnode, init);
 		}
-		else if (!strcmp(itemnode->get_name(), "backdrop") ||
-			!strcmp(itemnode->get_name(), "screen") ||
-			!strcmp(itemnode->get_name(), "overlay") ||
-			!strcmp(itemnode->get_name(), "bezel") ||
-			!strcmp(itemnode->get_name(), "cpanel") ||
-			!strcmp(itemnode->get_name(), "marquee"))
+		else if (!strcmp(itemnode->get_name(), "element") ||
+				!strcmp(itemnode->get_name(), "backdrop") ||
+				!strcmp(itemnode->get_name(), "screen") ||
+				!strcmp(itemnode->get_name(), "overlay") ||
+				!strcmp(itemnode->get_name(), "bezel") ||
+				!strcmp(itemnode->get_name(), "cpanel") ||
+				!strcmp(itemnode->get_name(), "marquee"))
 		{
 			render_bounds itembounds;
 			env.parse_bounds(itemnode->get_child("bounds"), itembounds);
