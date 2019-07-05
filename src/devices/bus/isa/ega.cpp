@@ -448,21 +448,30 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 
 #include "screen.h"
 
+#define LOG_READ    (1U << 1)
+#define LOG_SETUP   (1U << 2)
+#define LOG_MODE    (1U << 3)
 
-#define VERBOSE_EGA     1
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_MODE)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGR(...)     LOGMASKED(LOG_READ,  __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGMODE(...)  LOGMASKED(LOG_MODE,  __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 #define EGA_SCREEN_NAME "ega_screen"
 #define EGA_CRTC_NAME   "crtc_ega_ega"
 
-
 #define EGA_MODE_GRAPHICS 1
 #define EGA_MODE_TEXT     2
-
-
-/*
-    Prototypes
-*/
-
 
 ROM_START( ega )
 	ROM_REGION(0x4000, "user1", 0)
@@ -776,7 +785,7 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 {
 	uint16_t  *p = &bitmap.pix16(y);
 
-//  logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
+	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
 	if ( m_graphics_controller.data[5] & 0x10 )
 	{
@@ -838,7 +847,7 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 	uint16_t  *p = &bitmap.pix16(y);
 	int i;
 
-//  logerror( "pc_ega_text: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
+	LOG("%s: y = %d, x_count = %d, ma = %d, ra = %d\n", FUNCNAME, y, x_count, ma, ra );
 
 	for ( i = 0; i < x_count; i++ )
 	{
@@ -901,10 +910,7 @@ void isa8_ega_device::change_mode()
 			! ( m_sequencer.data[0x04] & 0x01 ) &&
 			( m_graphics_controller.data[0x06] & 0x01 ) )
 	{
-		if ( VERBOSE_EGA )
-		{
-			logerror("change_mode(): Switch to graphics mode\n");
-		}
+		LOGMODE("%s: Switch to graphics mode\n", FUNCNAME);
 
 		m_video_mode = EGA_MODE_GRAPHICS;
 	}
@@ -914,10 +920,7 @@ void isa8_ega_device::change_mode()
 			( m_sequencer.data[0x04] & 0x01 ) &&
 			! ( m_graphics_controller.data[0x06] & 0x01 ) )
 	{
-		if ( VERBOSE_EGA )
-		{
-			logerror("chnage_mode(): Switching to text mode\n");
-		}
+		LOGMODE("%s: Switching to text mode\n", FUNCNAME);
 
 		m_video_mode = EGA_MODE_TEXT;
 
@@ -1195,10 +1198,7 @@ READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 
 WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 {
-	if ( VERBOSE_EGA )
-	{
-//      logerror("pc_ega_3X0_w: offset = %02x, data = %02x\n", offset, data );
-	}
+	LOGSETUP("%s: offset = %02x, data = %02x\n", FUNCNAME, offset, data );
 
 	switch ( offset )
 	{
@@ -1263,10 +1263,7 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 {
 	int data = 0xff;
 
-	if ( VERBOSE_EGA )
-	{
-//      logerror("pc_ega_3c0_r: offset = %02x\n", offset );
-	}
+	LOGR("%s: offset = %02x\n", FUNCNAME, offset );
 
 	switch ( offset )
 	{
@@ -1322,10 +1319,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 		};
 	int index;
 
-	if ( VERBOSE_EGA )
-	{
-//      logerror("pc_ega_3c0_w: offset = %02x, data = %02x\n", offset, data );
-	}
+	LOGSETUP("%s: offset = %02x, data = %02x\n", FUNCNAME, offset, data );
 
 	switch ( offset )
 	{
@@ -1339,7 +1333,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 		{
 			index = m_attribute.index & 0x1F;
 
-			logerror("AR%02X = 0x%02x\n", index, data );
+			LOGSETUP(" - AR%02X = 0x%02x\n", index, data );
 
 			/* Clear unused bits */
 			m_attribute.data[ index ] = data & ar_reg_mask[ index ];
@@ -1368,7 +1362,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 	case 5:
 		index = m_sequencer.index & 0x07;
 
-		logerror("SR%02X = 0x%02x\n", index & 0x07, data );
+		LOGSETUP(" - SR%02X = 0x%02x\n", index & 0x07, data );
 
 		/* Clear unused bits */
 		m_sequencer.data[ index ] = data & sr_reg_mask[ index ];
@@ -1390,7 +1384,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 	case 15:
 		index = m_graphics_controller.index & 0x0F;
 
-		logerror("GR%02X = 0x%02x\n", index, data );
+		LOGSETUP(" - GR%02X = 0x%02x\n", index, data );
 
 		/* Clear unused bits */
 		m_graphics_controller.data[ index ] = data & gr_reg_mask[ index ];
