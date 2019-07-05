@@ -115,7 +115,7 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		{
 			m_sreg[segment].base = m_sreg[segment].selector << 4;
 			m_sreg[segment].limit = 0xffff;
-			m_sreg[segment].flags = (segment == CS) ? 0x00fb : 0x00f3;
+			m_sreg[segment].flags = 0x00f3;
 			m_sreg[segment].d = 0;
 			m_sreg[segment].valid = true;
 		}
