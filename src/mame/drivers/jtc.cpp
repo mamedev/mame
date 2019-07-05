@@ -24,7 +24,6 @@ To Do:
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "imagedev/snapquik.h"
 #include "emupal.h"
 #include "screen.h"
@@ -818,14 +817,14 @@ void jtc_state::basic(machine_config &config)
 	m_maincpu->p3_in_cb().set(FUNC(jtc_state::p3_r));
 	m_maincpu->p3_out_cb().set(FUNC(jtc_state::p3_w));
 
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

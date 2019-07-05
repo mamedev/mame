@@ -17,7 +17,6 @@
 #include "machine/ram.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "formats/cgen_cas.h"
 #include "bus/rs232/rs232.h"
@@ -462,11 +461,11 @@ void cgenie_state::cgenie(machine_config &config)
 	ay8910.port_b_read_callback().set("par", FUNC(cg_parallel_slot_device::pb_r));
 	ay8910.port_b_write_callback().set("par", FUNC(cg_parallel_slot_device::pb_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cgenie_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("cgenie_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("cgenie_cass");

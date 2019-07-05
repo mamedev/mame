@@ -37,7 +37,6 @@ Cassette considerations
 
 #include "emu.h"
 #include "includes/huebler.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -365,7 +364,6 @@ void amu880_state::amu880(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(10'000'000)/4));
@@ -386,6 +384,7 @@ void amu880_state::amu880(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

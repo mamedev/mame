@@ -54,7 +54,6 @@ TO DO
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -322,7 +321,7 @@ void lola8a_state::lola8a(machine_config &config)
 
 	/* Cassette */
 	CASSETTE(config, m_cass);
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

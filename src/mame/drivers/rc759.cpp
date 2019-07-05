@@ -22,7 +22,6 @@
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/i82730.h"
 
 #include "bus/centronics/ctronics.h"
@@ -572,15 +571,10 @@ void rc759_state::rc759(machine_config &config)
 	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
 	keyb.set_keyboard_callback(FUNC(rc759_state::keyb_put));
 
-	// cassette
-	CASSETTE(config, m_cas);
-	m_cas->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-
 	// sound
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 	SN76489A(config, m_snd, 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "mono", 1.0);
-	WAVE(config, "wave", m_cas).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// internal centronics
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -604,6 +598,11 @@ void rc759_state::rc759(machine_config &config)
 	// floppy drives
 	FLOPPY_CONNECTOR(config, "fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
+
+	// cassette
+	CASSETTE(config, m_cas);
+	m_cas->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cas->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

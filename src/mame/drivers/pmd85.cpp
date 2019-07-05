@@ -180,7 +180,6 @@ I/O ports
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -628,13 +627,13 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(pmd85_cassette_formats);
 	m_cassette->set_create_opts(&pmd85_cassette_options);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("pmd85_cass");
 
 	/* software lists */

@@ -110,7 +110,6 @@ Interrupts:
 #include "includes/primo.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -267,7 +266,6 @@ void primo_state::primoa32(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot/quickload */
@@ -278,6 +276,7 @@ void primo_state::primoa32(machine_config &config)
 	m_cassette->set_formats(primo_ptp_format);
 	m_cassette->set_create_opts(&primo_cassette_options);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* floppy from serial bus */
 	cbm_iec_slot_device::add(config, m_iec, nullptr);

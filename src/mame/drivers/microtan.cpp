@@ -58,7 +58,6 @@
 /* Components */
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6551.h"
-#include "sound/wave.h"
 
 
 #include "emupal.h"
@@ -247,7 +246,6 @@ void microtan_state::microtan(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.05);
 	AY8910(config, m_ay8910[0], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
@@ -259,6 +257,7 @@ void microtan_state::microtan(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	TIMER(config, "read_cassette").configure_periodic(FUNC(microtan_state::read_cassette), attotime::from_hz(20000)); // cass read
 
 	/* acia */

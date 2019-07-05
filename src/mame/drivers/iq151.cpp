@@ -51,7 +51,6 @@ ToDo:
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 // cartridge slot
 #include "bus/iq151/iq151.h"
@@ -412,7 +411,6 @@ void iq151_state::iq151(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
@@ -425,6 +423,7 @@ void iq151_state::iq151(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("iq151_cass");
 
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(iq151_state::cassette_timer), attotime::from_hz(2000));

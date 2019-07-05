@@ -98,7 +98,6 @@ Some bugs left :
 #include "video/mc6845.h"       /* CRTC */
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "machine/mc146818.h"  /* Aleste RTC */
 #include "bus/centronics/ctronics.h"
 
@@ -945,7 +944,6 @@ void amstrad_state::amstrad_base(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	AY8912(config, m_ay, 16_MHz_XTAL / 16);
 	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -960,6 +958,7 @@ void amstrad_state::amstrad_base(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.10);
 	m_cassette->set_interface("cpc_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("cpc_cass");
@@ -1070,7 +1069,6 @@ void amstrad_state::cpcplus(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	AY8912(config, m_ay, 40_MHz_XTAL / 40);
 	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1085,6 +1083,7 @@ void amstrad_state::cpcplus(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.10);
 	m_cassette->set_interface("cpc_cass");
 	SOFTWARE_LIST(config, "cass_list").set_original("cpc_cass");
 

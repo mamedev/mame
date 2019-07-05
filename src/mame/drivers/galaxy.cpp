@@ -32,7 +32,6 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -201,11 +200,11 @@ void galaxy_state::galaxy(machine_config &config)
 	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb), this);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(gtp_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("galaxy_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
@@ -242,11 +241,11 @@ void galaxy_state::galaxyp(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(gtp_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("galaxy_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");

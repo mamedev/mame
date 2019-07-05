@@ -230,7 +230,6 @@ TODO:
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -916,7 +915,6 @@ void spc1500_state::spc1500(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 	AY8910(config, m_sound, XTAL(4'000'000) / 2);
 	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
 	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
@@ -931,8 +929,9 @@ void spc1500_state::spc1500(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	CASSETTE(config, m_cass);
-	m_cass->set_formats(spc1000_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_formats(spc1000_cassette_formats);
 	m_cass->set_interface("spc1500_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spc1500_cass");

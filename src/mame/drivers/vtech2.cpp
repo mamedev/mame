@@ -75,7 +75,6 @@
 #include "emu.h"
 #include "includes/vtech2.h"
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "formats/vt_cas.h"
 #include "screen.h"
 #include "speaker.h"
@@ -512,12 +511,12 @@ void vtech2_state::laser350(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	VTECH_IOEXP_SLOT(config, "io").set_io_space(m_maincpu, AS_IO);
 

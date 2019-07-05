@@ -80,7 +80,6 @@ TODO
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mekd2.lh"
@@ -379,9 +378,9 @@ void mekd2_state::mekd2(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	PIA6821(config, m_pia_s, 0);

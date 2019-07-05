@@ -60,7 +60,6 @@
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -315,11 +314,12 @@ void binbug_state::binbug_base(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dg640);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
+	SPEAKER(config, "mono").front_center();
+
 	/* Cassette */
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void binbug_state::binbug(machine_config &config)

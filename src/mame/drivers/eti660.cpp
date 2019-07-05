@@ -37,7 +37,6 @@
 
 #include "emu.h"
 #include "includes/eti660.h"
-#include "sound/wave.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -331,7 +330,7 @@ void eti660_state::eti660(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("3K");

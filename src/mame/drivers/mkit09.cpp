@@ -35,7 +35,6 @@ Test Paste:
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mkit09.lh"
@@ -209,7 +208,6 @@ void mkit09_state::mkit09(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	PIA6821(config, m_pia, 0);
@@ -221,6 +219,7 @@ void mkit09_state::mkit09(machine_config &config)
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void mkit09_state::mkit09a(machine_config &config)
@@ -234,7 +233,6 @@ void mkit09_state::mkit09a(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	PIA6821(config, m_pia, 0);
@@ -246,6 +244,7 @@ void mkit09_state::mkit09a(machine_config &config)
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

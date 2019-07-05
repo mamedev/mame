@@ -64,7 +64,6 @@ Summary of Monitor commands.
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "machine/ram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -496,13 +495,11 @@ void rx78_state::rx78(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("16K");
 
-	CASSETTE(config, m_cass);
-
 	SPEAKER(config, "mono").front_center();
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-
 	SN76489A(config, "sn1", XTAL(28'636'363)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown divider
+
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("rx78");

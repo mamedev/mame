@@ -60,7 +60,6 @@
 #include "imagedev/printer.h"
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "sound/wave.h"      /* for K7 sound*/
 #include "screen.h"
 #include "softlist.h"
 

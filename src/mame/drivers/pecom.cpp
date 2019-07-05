@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "includes/pecom.h"
 
-#include "sound/wave.h"
 #include "softlist.h"
 #include "speaker.h"
 

@@ -44,7 +44,6 @@
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -509,7 +508,6 @@ void pegasus_state::pegasus(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	PIA6821(config, m_pia_s, 0);
@@ -535,6 +533,7 @@ void pegasus_state::pegasus(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pegasus_cart");

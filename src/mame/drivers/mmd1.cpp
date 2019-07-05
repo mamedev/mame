@@ -153,7 +153,6 @@ ToDo
 #include "cpu/i8085/i8085.h"
 #include "machine/i8279.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "mmd1.lh"
 #include "mmd2.lh"
@@ -567,10 +566,11 @@ void mmd1_state::mmd2(machine_config &config)
 	kbdc.in_shift_callback().set_constant(1);                       // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
 
+	SPEAKER(config, "mono").front_center();
+
 	/* Cassette */
 	CASSETTE(config, m_cass);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

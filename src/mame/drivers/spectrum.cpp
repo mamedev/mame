@@ -279,7 +279,6 @@ SamRam
 #include "includes/spectrum.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "machine/spec_snqk.h"
 
 #include "screen.h"
@@ -706,7 +705,6 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* expansion port */
@@ -721,6 +719,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("spectrum_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");

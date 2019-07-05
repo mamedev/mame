@@ -16,7 +16,6 @@
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "bus/generic/carts.h"
@@ -532,7 +531,6 @@ void svi3x8_state::svi318(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'635) / 6));
 	psg.port_a_read_callback().set_ioport("JOY");
 	psg.port_b_write_callback().set(FUNC(svi3x8_state::bank_w));
@@ -540,8 +538,9 @@ void svi3x8_state::svi318(machine_config &config)
 
 	// cassette
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(svi_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_formats(svi_cassette_formats);
 	m_cassette->set_interface("svi318_cass");
 	SOFTWARE_LIST(config, "cass_list").set_original("svi318_cass");
 

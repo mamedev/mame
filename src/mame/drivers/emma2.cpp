@@ -51,7 +51,6 @@ To Do:
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "emma2.lh"
 
@@ -212,13 +211,13 @@ void emma2_state::emma2(machine_config &config)
 	m_pia->irqa_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pia->irqb_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

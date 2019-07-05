@@ -24,7 +24,6 @@ Test Paste:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "bob85.lh"
 
@@ -213,11 +212,11 @@ void bob85_state::bob85(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_bob85);
 
+	SPEAKER(config, "mono").front_center();
+
 	// devices
 	CASSETTE(config, m_cass).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

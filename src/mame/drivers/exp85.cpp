@@ -35,7 +35,6 @@
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/ram.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 /* Memory Maps */
@@ -202,7 +201,7 @@ void exp85_state::exp85(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RS232_PORT(config, "rs232", default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 

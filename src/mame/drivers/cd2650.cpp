@@ -57,7 +57,6 @@ TODO
 #include "machine/keyboard.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -346,7 +345,6 @@ void cd2650_state::cd2650(machine_config &config)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.15);
 	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
@@ -354,6 +352,7 @@ void cd2650_state::cd2650(machine_config &config)
 	keyboard.set_keyboard_callback(FUNC(cd2650_state::kbd_put));
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(cd2650_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(cd2650_state::kansas_r), attotime::from_hz(40000));
 }

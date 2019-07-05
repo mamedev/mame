@@ -35,7 +35,6 @@ Notes:
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "pmi80.lh"
 
@@ -220,11 +219,12 @@ void pmi80_state::pmi80(machine_config &config)
 
 	I8255A(config, "ppi2");   // User PPI
 
+	SPEAKER(config, "mono").front_center();
+
 	// cassette
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_r").configure_periodic(FUNC(pmi80_state::kansas_r), attotime::from_hz(40000));
 
 	/* video hardware */

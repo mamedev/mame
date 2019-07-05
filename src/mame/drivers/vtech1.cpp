@@ -38,7 +38,6 @@ Todo:
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "softlist.h"
@@ -446,7 +445,6 @@ void vtech1_state::laser110(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker).set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
 
@@ -464,6 +462,7 @@ void vtech1_state::laser110(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("vtech1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("vz_cass");

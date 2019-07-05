@@ -54,7 +54,6 @@
 #include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -404,10 +403,11 @@ void proteus3_state::proteus3(machine_config &config)
 	ACIA6850(config, m_acia1, 0);
 	m_acia1->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(proteus3_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(proteus3_state::kansas_r), attotime::from_hz(40000));
 

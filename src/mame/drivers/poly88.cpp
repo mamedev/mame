@@ -47,7 +47,6 @@ at least some models of the Poly-88 are known to have used.)
 #include "cpu/i8085/i8085.h"
 //#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -223,12 +222,12 @@ void poly88_state::poly88(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_create_opts(&poly88_cassette_options);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* uart */
 	I8251(config, m_usart, 16.5888_MHz_XTAL / 9);

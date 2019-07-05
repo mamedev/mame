@@ -39,7 +39,6 @@ MB7051 - fuse programmed prom.
 #include "sound/dac.h"
 #include "sound/mea8000.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -777,9 +776,9 @@ void homelab_state::homelab(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
-
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+
 	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
 }
 
@@ -811,9 +810,8 @@ void homelab_state::homelab3(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
-
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
 }
 
@@ -845,11 +843,10 @@ void homelab_state::brailab4(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "speaker", 0.05);
-
 	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
 }
 

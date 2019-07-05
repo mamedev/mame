@@ -286,7 +286,6 @@ Timings:
 #include "includes/lviv.h"
 
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -458,7 +457,6 @@ void lviv_state::lviv(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
@@ -467,6 +465,7 @@ void lviv_state::lviv(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(lviv_lvt_format);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("lviv_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("lviv");

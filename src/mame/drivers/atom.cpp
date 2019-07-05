@@ -115,7 +115,6 @@ Hardware:   PPIA 8255
 #include "emu.h"
 #include "includes/atom.h"
 #include "formats/imageutl.h"
-#include "sound/wave.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -725,7 +724,6 @@ void atom_state::atom(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
@@ -755,8 +753,9 @@ void atom_state::atom(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(atom_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_formats(atom_cassette_formats);
 	m_cassette->set_interface("atom_cass");
 
 	QUICKLOAD(config, "quickload", "atm").set_load_callback(FUNC(atom_state::quickload_cb), this);

@@ -280,7 +280,6 @@ Few other notes:
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "bus/m5/rom.h"
@@ -1418,7 +1417,6 @@ void m5_state::m5(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SN76489A(config, SN76489AN_TAG, 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// devices
 	Z80CTC(config, m_ctc, 14.318181_MHz_XTAL / 4);
@@ -1435,6 +1433,7 @@ void m5_state::m5(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(sordm5_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("m5_cass");
 
 	I8255(config, m_ppi);

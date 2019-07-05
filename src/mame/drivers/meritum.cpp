@@ -47,7 +47,6 @@ perhaps III:
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "screen.h"
 #include "speaker.h"
 #include "emupal.h"
@@ -436,10 +435,11 @@ void meritum_state::meritum(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(meritum_state::quickload_cb), this);
 }
 
