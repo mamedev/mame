@@ -11,6 +11,7 @@
       $f0b1 to 1 for now
     - bitmap B/W mode is untested
     - keyboard
+    - check cassette with real software
 
 ****************************************************************************/
 
@@ -23,6 +24,7 @@
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
+#include "imagedev/cassette.h"
 #include "sound/2203intf.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
@@ -40,6 +42,8 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_ppi(*this, "ppi")
 		, m_crtc(*this, "crtc")
+		, m_uart(*this, "uart")
+		, m_cass(*this, "cassette")
 		, m_beeper(*this, "beeper")
 		, m_palette(*this, "palette")
 		, m_aysnd(*this, "aysnd")
@@ -63,10 +67,12 @@ private:
 	DECLARE_READ8_MEMBER(ay8912_0_r);
 	DECLARE_READ8_MEMBER(ay8912_1_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void multi8_io(address_map &map);
-	void multi8_mem(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
 	uint8_t *m_p_vram;
 	uint8_t *m_p_wram;
@@ -80,6 +86,8 @@ private:
 	uint8_t m_pen_clut[8];
 	uint8_t m_bw_mode;
 	uint16_t m_knj_addr;
+	u8 m_cass_data[4];
+	bool m_cassbit, m_cassold;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -87,6 +95,8 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<i8255_device> m_ppi;
 	required_device<mc6845_device> m_crtc;
+	required_device<i8251_device> m_uart;
+	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beeper;
 	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_aysnd;
@@ -291,7 +301,44 @@ WRITE8_MEMBER( multi8_state::kanji_w )
 	m_knj_addr = (offset == 0) ? (m_knj_addr & 0xff00) | (data & 0xff) : (m_knj_addr & 0x00ff) | (data << 8);
 }
 
-void multi8_state::multi8_mem(address_map &map)
+WRITE_LINE_MEMBER( multi8_state::kansas_w )
+{
+	// incoming @19200Hz
+	u8 twobit = m_cass_data[3] & 3;
+
+	if (state)
+	{
+		if (twobit == 0)
+			m_cassold = m_cassbit;
+
+		if (m_cassold)
+			m_cass->output(BIT(m_cass_data[3], 2) ? -1.0 : +1.0); // 2400Hz
+		else
+			m_cass->output(BIT(m_cass_data[3], 3) ? -1.0 : +1.0); // 1200Hz
+
+		m_cass_data[3]++;
+	}
+
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( multi8_state::kansas_r )
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_uart->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
+}
+
+
+void multi8_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
@@ -299,7 +346,7 @@ void multi8_state::multi8_mem(address_map &map)
 	map(0xc000, 0xffff).ram();
 }
 
-void multi8_state::multi8_io(address_map &map)
+void multi8_state::io_map(address_map &map)
 {
 //  ADDRESS_MAP_UNMAP_HIGH
 	map.global_mask(0xff);
@@ -564,14 +611,15 @@ void multi8_state::machine_reset()
 {
 	m_beeper->set_state(0);
 	m_mcu_init = 0;
+	m_uart->write_cts(0);
 }
 
 void multi8_state::multi8(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &multi8_state::multi8_mem);
-	m_maincpu->set_addrmap(AS_IO, &multi8_state::multi8_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &multi8_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &multi8_state::io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -605,11 +653,17 @@ void multi8_state::multi8(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(multi8_state::portb_w));
 	m_ppi->out_pc_callback().set(FUNC(multi8_state::portc_w));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
-	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
-	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
+	uart_clock.signal_handler().set(FUNC(multi8_state::kansas_w));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(multi8_state::kansas_r), attotime::from_hz(40000));
 
-	I8251(config, "uart", 0); // for cassette
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	I8251(config, m_uart, 0); // for cassette
+	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
+
 	PIT8253(config, "pit", 0);
 	PIC8259(config, "pic", 0);
 
