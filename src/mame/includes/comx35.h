@@ -14,7 +14,6 @@
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "sound/cdp1869.h"
-#include "sound/wave.h"
 
 #define SCREEN_TAG          "screen"
 

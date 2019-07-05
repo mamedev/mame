@@ -594,8 +594,8 @@ void vc4000_state::elektor(machine_config &config)
 {
 	vc4000(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::elektor_mem);
-	CASSETTE(config, "cassette");
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

@@ -21,7 +21,6 @@
 #include "machine/6821pia.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
-#include "sound/wave.h"
 #include "video/dl1416.h"
 #include "emupal.h"
 #include "screen.h"

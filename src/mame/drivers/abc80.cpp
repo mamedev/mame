@@ -516,8 +516,6 @@ void abc80_state::abc80(machine_config &config)
 	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
 	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
-
 	// devices
 	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -527,6 +525,7 @@ void abc80_state::abc80(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("abc80_cass");
 
 	ABC80_KEYBOARD(config, m_kb, 0);

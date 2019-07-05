@@ -17,7 +17,6 @@
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "sound/spkrdev.h"
-//#include "sound/wave.h"
 //#include "imagedev/cassette.h"
 #include "emupal.h"
 

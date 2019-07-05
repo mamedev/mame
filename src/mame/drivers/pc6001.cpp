@@ -1509,6 +1509,7 @@ void pc6001_state::pc6001(machine_config &config)
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
 //  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+//  m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	GENERIC_CARTSLOT(config, m_cas_hack, generic_plain_slot, "pc6001_cass", "cas,p6");
 
 	SPEAKER(config, "mono").front_center();
@@ -1516,7 +1517,6 @@ void pc6001_state::pc6001(machine_config &config)
 	ay8910.port_a_read_callback().set_ioport("P1");
 	ay8910.port_b_read_callback().set_ioport("P2");
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
-//  WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* TODO: accurate timing on this */
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));

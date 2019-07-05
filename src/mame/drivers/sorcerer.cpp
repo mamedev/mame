@@ -427,8 +427,6 @@ void sorcerer_state::sorcerer(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
-	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	AY31015(config, m_uart);
 	m_uart->set_auto_rdav(true);
@@ -454,11 +452,13 @@ void sorcerer_state::sorcerer(machine_config &config)
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);
 	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	m_cassette1->set_interface("sorcerer_cass");
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_formats(sorcerer_cassette_formats);
 	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 	m_cassette2->set_interface("sorcerer_cass");
 
 	/* cartridge */

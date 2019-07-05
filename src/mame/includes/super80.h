@@ -18,7 +18,6 @@
 #include "machine/z80pio.h"
 #include "sound/samples.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -44,7 +43,6 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, "wave")
 		, m_samples(*this, "samples")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
@@ -143,7 +141,6 @@ private:
 	optional_region_ptr<u8> m_p_videoram;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
-	required_device<wave_device> m_wave;
 	required_device<samples_device> m_samples;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;

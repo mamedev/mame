@@ -305,9 +305,9 @@ void pk8020_state::pk8020(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	CASSETTE(config, "cassette").set_default_state(CASSETTE_PLAY);
+	//CASSETTE(config, m_cass).set_default_state(CASSETTE_PLAY);
+	//m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_printer, centronics_devices, nullptr);
 	m_printer->busy_handler().set(m_inr, FUNC(pic8259_device::ir6_w)).invert();

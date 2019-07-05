@@ -238,8 +238,6 @@ void aim65_state::aim65(machine_config &config)
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.1);
-	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	/* other devices */
 	MOS6532_NEW(config, m_riot, AIM65_CLOCK);
@@ -269,8 +267,10 @@ void aim65_state::aim65(machine_config &config)
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.1);
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.1);
 
 	// Screen for TTY interface. Index 1.
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");

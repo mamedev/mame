@@ -88,7 +88,6 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_pia_1(*this, PIA1_TAG),
 	m_dac(*this, "dac"),
 	m_sbs(*this, "sbs"),
-	m_wave(*this, "wave"),
 	m_screen(*this, SCREEN_TAG),
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "bus/centronics/ctronics.h"
@@ -52,8 +51,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cassette1(*this, "cassette")
 		, m_cassette2(*this, "cassette2")
-		, m_wave1(*this, "wave")
-		, m_wave2(*this, "wave2")
 		, m_uart(*this, "uart")
 		, m_uart_clock(*this, "uart_clock")
 		, m_rs232(*this, "rs232")
@@ -121,8 +118,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-	required_device<wave_device> m_wave1;
-	required_device<wave_device> m_wave2;
 	required_device<ay31015_device> m_uart;
 	required_device<clock_device> m_uart_clock;
 	required_device<rs232_port_device> m_rs232;

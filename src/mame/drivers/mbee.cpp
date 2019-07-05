@@ -675,7 +675,6 @@ void mbee_state::mbee(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -699,6 +698,7 @@ void mbee_state::mbee(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 
@@ -734,7 +734,6 @@ void mbee_state::mbeeic(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -758,6 +757,7 @@ void mbee_state::mbeeic(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void mbee_state::mbeepc(machine_config &config)

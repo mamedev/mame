@@ -15,7 +15,6 @@
 #include "cpu/s2650/s2650.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 
 #include "bus/vc4000/slot.h"
 #include "bus/vc4000/rom.h"

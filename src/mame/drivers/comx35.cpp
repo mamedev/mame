@@ -633,6 +633,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	QUICKLOAD(config, "quickload", "comx").set_load_callback(FUNC(comx35_state::quickload_cb), this);
 
 	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	//m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion bus
 	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));

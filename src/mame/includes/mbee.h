@@ -26,7 +26,6 @@
 #include "machine/z80pio.h"
 
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "video/mc6845.h"
 
@@ -43,7 +42,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, "wave")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
@@ -185,7 +183,6 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
-	required_device<wave_device> m_wave;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;

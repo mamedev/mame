@@ -334,13 +334,13 @@ void zx_state::zx80(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(zx80_o_format);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("zx80_cass");
-
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* software lists */
 	SOFTWARE_LIST(config, m_softlist).set_original("zx80_cass");

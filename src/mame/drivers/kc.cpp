@@ -135,7 +135,6 @@ void kc_state::kc85_3(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -144,6 +143,7 @@ void kc_state::kc85_3(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(kc_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */
@@ -213,7 +213,6 @@ void kc85_4_state::kc85_4(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -222,6 +221,7 @@ void kc85_4_state::kc85_4(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(kc_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */
