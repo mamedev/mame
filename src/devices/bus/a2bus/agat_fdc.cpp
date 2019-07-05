@@ -45,7 +45,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_AGAT_FDC, a2bus_agat_fdc_device, "agat_fdc", "Agat 840K floppy card")
+DEFINE_DEVICE_TYPE(A2BUS_AGAT_FDC, a2bus_agat_fdc_device, "agat_fdc", "Agat 840K floppy controller card")
 
 #define AGAT_FDC_ROM_REGION     "agat_fdc_rom"
 #define AGAT_FDC_ROM_D6_REGION  "agat_fdc_d6_rom"
