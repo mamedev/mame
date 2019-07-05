@@ -14279,6 +14279,11 @@ glass10                         // (c) 1993 - Ref 931021
 glass10a                        // (c) 1993 - Ref 931021 shows "Break Edition" on a real PCB
 glasskr                         // (c) 1994 - Ref 931021 shows 1994 version, Anime girls, unprotected
 
+@source:glcx.cpp
+bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
+gl6600cx                        // 1999 Genius Leader 6600 CX (Germany)
+gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
+
 @source:globalfr.cpp
 gl_coc                          // Carry On Clubbin' (Global)
 gl_coc29                        //
@@ -39298,11 +39303,6 @@ laser700                        // 1984? Laser 700
 
 @source:vtech_eu3a12.cpp
 vreadere
-
-@source:vtech_unk1.cpp
-bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
-gl6600cx                        // 1999 Genius Leader 6600 CX (Germany)
-gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
 
 @source:vtech_unk2.cpp
 glmmc                           // 199? Genius Master Mega Color

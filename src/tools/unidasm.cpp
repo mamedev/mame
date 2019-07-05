@@ -38,6 +38,7 @@ using util::BIT;
 #include "cpu/cop400/cop444ds.h"
 #include "cpu/cosmac/cosdasm.h"
 #include "cpu/cp1610/1610dasm.h"
+#include "cpu/cr16b/cr16bdasm.h"
 #include "cpu/cubeqcpu/cubedasm.h"
 #include "cpu/dsp16/dsp16dis.h"
 #include "cpu/dsp32/dsp32dis.h"
@@ -338,6 +339,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "cop444",          le,  0, []() -> util::disasm_interface * { return new cop444_disassembler; } },
 	{ "cop424",          le,  0, []() -> util::disasm_interface * { return new cop424_disassembler; } },
 	{ "cp1610",          be, -1, []() -> util::disasm_interface * { return new cp1610_disassembler; } },
+	{ "cr16a",           le,  0, []() -> util::disasm_interface * { return new cr16a_disassembler; } },
+	{ "cr16b",           le,  0, []() -> util::disasm_interface * { return new cr16b_disassembler; } },
 	{ "cquestlin",       be, -3, []() -> util::disasm_interface * { return new cquestlin_disassembler; } },
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },

@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
 
-// Unknown CPU type
-
 // gl6600cx uses a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
 // http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
 
@@ -46,33 +44,45 @@ TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
 */
 
 #include "emu.h"
+#include "cpu/cr16b/cr16b.h"
 #include "screen.h"
 
-class gl8008cx_state : public driver_device
+class glcx_state : public driver_device
 {
 public:
-	gl8008cx_state(const machine_config &mconfig, device_type type, const char *tag)
+	glcx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void gl8008cx(machine_config &config);
+	void glcx(machine_config &config);
 
 private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void mem_map(address_map &map);
+
+	required_device<cr16b_device> m_maincpu;
 };
 
-uint32_t gl8008cx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t glcx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static INPUT_PORTS_START( gl8008cx )
+void glcx_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
+}
+
+static INPUT_PORTS_START( glcx )
 INPUT_PORTS_END
 
-void gl8008cx_state::gl8008cx(machine_config &config)
+void glcx_state::glcx(machine_config &config)
 {
 	/* basic machine hardware */
-	// UNKNOWN(config, "maincpu", unknown); // CPU type is unknown, epoxy blob
+	CR16B(config, m_maincpu, 10000000); // FIXME: determine exact type and clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &glcx_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -80,7 +90,7 @@ void gl8008cx_state::gl8008cx(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(gl8008cx_state::screen_update));
+	screen.set_screen_update(FUNC(glcx_state::screen_update));
 }
 
 ROM_START( gl6600cx )
@@ -105,6 +115,6 @@ ROM_START( bs9009cx )
 ROM_END
 
 
-COMP( 1999, gl6600cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "Genius Leader 6600 CX (Germany)", MACHINE_IS_SKELETON )
-COMP( 1999, gl8008cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
-COMP( 1999, bs9009cx, 0, 0, gl8008cx, gl8008cx, gl8008cx_state, empty_init, "Video Technology", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)
+COMP( 1999, gl6600cx, 0, 0, glcx, glcx, glcx_state, empty_init, "Video Technology", "Genius Leader 6600 CX (Germany)", MACHINE_IS_SKELETON )
+COMP( 1999, gl8008cx, 0, 0, glcx, glcx, glcx_state, empty_init, "Video Technology", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
+COMP( 1999, bs9009cx, 0, 0, glcx, glcx, glcx_state, empty_init, "Video Technology", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)
