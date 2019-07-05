@@ -151,73 +151,73 @@ Intel INTELLEC® 4/MOD 40 layout
 	</element>
 
 	<group name="panel">
-		<cpanel element="background"><bounds left="0" top="0" right="1000" bottom="400" /></cpanel>
+		<element ref="background"><bounds left="0" top="0" right="1000" bottom="400" /></element>
 
-		<cpanel element="label_address"><bounds left="72" top="55" right="506" bottom="63" /></cpanel>
+		<element ref="label_address"><bounds left="72" top="55" right="506" bottom="63" /></element>
 
-		<cpanel element="label_status"><bounds left="540" top="55" right="662" bottom="63" /></cpanel>
-		<cpanel element="label_search"><bounds left="561" top="63" right="610" bottom="70" /></cpanel>
-		<cpanel element="label_complete"><bounds left="561" top="71" right="610" bottom="78" /></cpanel>
-		<cpanel element="label_pointer"><bounds left="623" top="63" right="672" bottom="70" /></cpanel>
-		<cpanel element="label_valid"><bounds left="623" top="71" right="672" bottom="78" /></cpanel>
-		<cpanel element="label_run"><bounds left="611" top="71" right="626" bottom="78" /></cpanel>
+		<element ref="label_status"><bounds left="540" top="55" right="662" bottom="63" /></element>
+		<element ref="label_search"><bounds left="561" top="63" right="610" bottom="70" /></element>
+		<element ref="label_complete"><bounds left="561" top="71" right="610" bottom="78" /></element>
+		<element ref="label_pointer"><bounds left="623" top="63" right="672" bottom="70" /></element>
+		<element ref="label_valid"><bounds left="623" top="71" right="672" bottom="78" /></element>
+		<element ref="label_run"><bounds left="611" top="71" right="626" bottom="78" /></element>
 
-		<cpanel element="label_instruction"><bounds left="72" top="104" right="350" bottom="112" /></cpanel>
+		<element ref="label_instruction"><bounds left="72" top="104" right="350" bottom="112" /></element>
 
-		<cpanel element="label_active_bank"><bounds left="384" top="104" right="506" bottom="112" /></cpanel>
-		<cpanel element="label_cm_ram"><bounds left="393" top="112" right="497" bottom="119" /></cpanel>
-		<cpanel element="label_3"><bounds left="393" top="120" right="404" bottom="127" /></cpanel>
-		<cpanel element="label_2"><bounds left="424" top="120" right="435" bottom="127" /></cpanel>
-		<cpanel element="label_1"><bounds left="455" top="120" right="466" bottom="127" /></cpanel>
-		<cpanel element="label_0"><bounds left="486" top="120" right="497" bottom="127" /></cpanel>
+		<element ref="label_active_bank"><bounds left="384" top="104" right="506" bottom="112" /></element>
+		<element ref="label_cm_ram"><bounds left="393" top="112" right="497" bottom="119" /></element>
+		<element ref="label_3"><bounds left="393" top="120" right="404" bottom="127" /></element>
+		<element ref="label_2"><bounds left="424" top="120" right="435" bottom="127" /></element>
+		<element ref="label_1"><bounds left="455" top="120" right="466" bottom="127" /></element>
+		<element ref="label_0"><bounds left="486" top="120" right="497" bottom="127" /></element>
 
-		<cpanel element="label_mode"><bounds left="540" top="104" right="662" bottom="112" /></cpanel>
-		<cpanel element="label_mon"><bounds left="577" top="120" right="594" bottom="127" /></cpanel>
-		<cpanel element="label_ram"><bounds left="608" top="120" right="625" bottom="127" /></cpanel>
-		<cpanel element="label_prom"><bounds left="639" top="120" right="656" bottom="127" /></cpanel>
+		<element ref="label_mode"><bounds left="540" top="104" right="662" bottom="112" /></element>
+		<element ref="label_mon"><bounds left="577" top="120" right="594" bottom="127" /></element>
+		<element ref="label_ram"><bounds left="608" top="120" right="625" bottom="127" /></element>
+		<element ref="label_prom"><bounds left="639" top="120" right="656" bottom="127" /></element>
 
-		<cpanel element="label_execution"><bounds left="72" top="153" right="350" bottom="161" /></cpanel>
+		<element ref="label_execution"><bounds left="72" top="153" right="350" bottom="161" /></element>
 
-		<cpanel element="label_last_ptr"><bounds left="384" top="153" right="662" bottom="161" /></cpanel>
+		<element ref="label_last_ptr"><bounds left="384" top="153" right="662" bottom="161" /></element>
 
-		<cpanel element="label_addr_data"><bounds left="72" top="214" right="506" bottom="222" /></cpanel>
+		<element ref="label_addr_data"><bounds left="72" top="214" right="506" bottom="222" /></element>
 
-		<cpanel element="label_mode_ctrl"><bounds left="571" top="214" right="662" bottom="222" /></cpanel>
-		<cpanel element="label_mon"><bounds left="573" top="230" right="598" bottom="237" /></cpanel>
-		<cpanel element="label_ram"><bounds left="604" top="230" right="629" bottom="237" /></cpanel>
-		<cpanel element="label_prom"><bounds left="635" top="230" right="660" bottom="237" /></cpanel>
+		<element ref="label_mode_ctrl"><bounds left="571" top="214" right="662" bottom="222" /></element>
+		<element ref="label_mon"><bounds left="573" top="230" right="598" bottom="237" /></element>
+		<element ref="label_ram"><bounds left="604" top="230" right="629" bottom="237" /></element>
+		<element ref="label_prom"><bounds left="635" top="230" right="660" bottom="237" /></element>
 
-		<cpanel element="label_prgm"><bounds left="728" top="214" right="753" bottom="221" /></cpanel>
-		<cpanel element="label_prom"><bounds left="728" top="222" right="753" bottom="229" /></cpanel>
-		<cpanel element="label_pwr"><bounds left="728" top="230" right="753" bottom="237" /></cpanel>
-		<cpanel element="label_on"><bounds left="758" top="239" right="814" bottom="246" /></cpanel>
-		<cpanel element="label_off"><bounds left="758" top="279" right="814" bottom="287" /></cpanel>
+		<element ref="label_prgm"><bounds left="728" top="214" right="753" bottom="221" /></element>
+		<element ref="label_prom"><bounds left="728" top="222" right="753" bottom="229" /></element>
+		<element ref="label_pwr"><bounds left="728" top="230" right="753" bottom="237" /></element>
+		<element ref="label_on"><bounds left="758" top="239" right="814" bottom="246" /></element>
+		<element ref="label_off"><bounds left="758" top="279" right="814" bottom="287" /></element>
 
-		<cpanel element="label_pass_counter"><bounds left="72" top="296" right="194" bottom="304" /></cpanel>
-		<cpanel element="label_passes"><bounds left="74" top="304" right="192" bottom="311" /></cpanel>
+		<element ref="label_pass_counter"><bounds left="72" top="296" right="194" bottom="304" /></element>
+		<element ref="label_passes"><bounds left="74" top="304" right="192" bottom="311" /></element>
 
-		<cpanel element="label_search_ctrl"><bounds left="228" top="296" right="381" bottom="304" /></cpanel>
-		<cpanel element="label_run"><bounds left="230" top="312" right="255" bottom="319" /></cpanel>
-		<cpanel element="label_next"><bounds left="261" top="304" right="286" bottom="311" /></cpanel>
-		<cpanel element="label_inst"><bounds left="261" top="312" right="286" bottom="319" /></cpanel>
-		<cpanel element="label_decr"><bounds left="292" top="312" right="317" bottom="319" /></cpanel>
-		<cpanel element="label_incr"><bounds left="323" top="312" right="348" bottom="319" /></cpanel>
-		<cpanel element="label_load"><bounds left="354" top="312" right="379" bottom="319" /></cpanel>
+		<element ref="label_search_ctrl"><bounds left="228" top="296" right="381" bottom="304" /></element>
+		<element ref="label_run"><bounds left="230" top="312" right="255" bottom="319" /></element>
+		<element ref="label_next"><bounds left="261" top="304" right="286" bottom="311" /></element>
+		<element ref="label_inst"><bounds left="261" top="312" right="286" bottom="319" /></element>
+		<element ref="label_decr"><bounds left="292" top="312" right="317" bottom="319" /></element>
+		<element ref="label_incr"><bounds left="323" top="312" right="348" bottom="319" /></element>
+		<element ref="label_load"><bounds left="354" top="312" right="379" bottom="319" /></element>
 
-		<cpanel element="label_stop"><bounds left="448" top="312" right="473" bottom="319" /></cpanel>
-		<cpanel element="label_single"><bounds left="479" top="304" right="504" bottom="311" /></cpanel>
-		<cpanel element="label_step"><bounds left="479" top="312" right="504" bottom="319" /></cpanel>
+		<element ref="label_stop"><bounds left="448" top="312" right="473" bottom="319" /></element>
+		<element ref="label_single"><bounds left="479" top="304" right="504" bottom="311" /></element>
+		<element ref="label_step"><bounds left="479" top="312" right="504" bottom="319" /></element>
 
-		<cpanel element="label_cma"><bounds left="571" top="296" right="631" bottom="304" /></cpanel>
-		<cpanel element="label_write"><bounds left="604" top="312" right="629" bottom="319" /></cpanel>
-		<cpanel element="label_enable"><bounds left="514" top="321" right="570" bottom="328" /></cpanel>
-		<cpanel element="label_disable"><bounds left="514" top="361" right="570" bottom="368" /></cpanel>
+		<element ref="label_cma"><bounds left="571" top="296" right="631" bottom="304" /></element>
+		<element ref="label_write"><bounds left="604" top="312" right="629" bottom="319" /></element>
+		<element ref="label_enable"><bounds left="514" top="321" right="570" bottom="328" /></element>
+		<element ref="label_disable"><bounds left="514" top="361" right="570" bottom="368" /></element>
 
-		<cpanel element="label_reset_ctrl"><bounds left="664" top="296" right="724" bottom="304" /></cpanel>
-		<cpanel element="label_reset"><bounds left="666" top="312" right="691" bottom="319" /></cpanel>
-		<cpanel element="label_reset_mode"><bounds left="697" top="312" right="722" bottom="319" /></cpanel>
-		<cpanel element="label_system"><bounds left="727" top="321" right="783" bottom="328" /></cpanel>
-		<cpanel element="label_reset_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
+		<element ref="label_reset_ctrl"><bounds left="664" top="296" right="724" bottom="304" /></element>
+		<element ref="label_reset"><bounds left="666" top="312" right="691" bottom="319" /></element>
+		<element ref="label_reset_mode"><bounds left="697" top="312" right="722" bottom="319" /></element>
+		<element ref="label_system"><bounds left="727" top="321" right="783" bottom="328" /></element>
+		<element ref="label_reset_cpu"><bounds left="727" top="361" right="783" bottom="368" /></element>
 
 		<repeat count="3">
 			<param name="groupnum" start="11" increment="-4" />
@@ -225,173 +225,173 @@ Intel INTELLEC® 4/MOD 40 layout
 			<param name="nybble" start="3" increment="-1" />
 			<param name="switchpos" start="74" increment="156" />
 			<param name="groupmask" start="0x0800" rshift="4" />
-			<cpanel element="label_a~nybble~">
+			<element ref="label_a~nybble~">
 				<bounds x="~ledpos~" y="63" width="104" height="7" />
-			</cpanel>
+			</element>
 			<repeat count="4">
 				<param name="labelnum" start="~groupnum~" increment="-1" />
 				<param name="ledpos" start="~ledpos~" increment="31" />
 				<param name="switchpos" start="~switchpos~" increment="31" />
 				<param name="bit" start="3" increment="-1" />
 				<param name="bitmask" start="~groupmask~" rshift="1" />
-				<cpanel element="label_~labelnum~">
+				<element ref="label_~labelnum~">
 					<bounds x="~ledpos~" y="71" width="11" height="7" />
-				</cpanel>
-				<cpanel element="label_~labelnum~">
+				</element>
+				<element ref="label_~labelnum~">
 					<bounds x="~switchpos~" y="230" width="25" height="7" />
-				</cpanel>
-				<cpanel name="led_address_a~nybble~_~bit~" element="led">
+				</element>
+				<element name="led_address_a~nybble~_~bit~" ref="led">
 					<bounds x="~ledpos~" y="79" width="11" height="7" />
-				</cpanel>
-				<cpanel element="switch" inputtag="ADDRDAT" inputmask="~bitmask~">
+				</element>
+				<element ref="switch" inputtag="ADDRDAT" inputmask="~bitmask~">
 					<bounds x="~switchpos~" y="240" width="25" height="46" />
-				</cpanel>
+				</element>
 			</repeat>
 		</repeat>
 
-		<cpanel name="led_status_search" element="led">
+		<element name="led_status_search" ref="led">
 			<bounds left="580" top="79" right="591" bottom="86" />
-		</cpanel>
-		<cpanel name="led_status_run" element="led">
+		</element>
+		<element name="led_status_run" ref="led">
 			<bounds left="611" top="79" right="622" bottom="86" />
-		</cpanel>
-		<cpanel name="led_status_ptr_valid" element="led">
+		</element>
+		<element name="led_status_ptr_valid" ref="led">
 			<bounds left="642" top="79" right="653" bottom="86" />
-		</cpanel>
+		</element>
 
-		<cpanel name="led_active_bank_3" element="led">
+		<element name="led_active_bank_3" ref="led">
 			<bounds left="393" top="128" right="404" bottom="135" />
-		</cpanel>
-		<cpanel name="led_active_bank_2" element="led">
+		</element>
+		<element name="led_active_bank_2" ref="led">
 			<bounds left="424" top="128" right="435" bottom="135" />
-		</cpanel>
-		<cpanel name="led_active_bank_1" element="led">
+		</element>
+		<element name="led_active_bank_1" ref="led">
 			<bounds left="455" top="128" right="466" bottom="135" />
-		</cpanel>
-		<cpanel name="led_active_bank_0" element="led">
+		</element>
+		<element name="led_active_bank_0" ref="led">
 			<bounds left="486" top="128" right="497" bottom="135" />
-		</cpanel>
+		</element>
 
-		<cpanel name="led_mode_mon" element="led">
+		<element name="led_mode_mon" ref="led">
 			<bounds left="580" top="128" right="591" bottom="135" />
-		</cpanel>
-		<cpanel name="led_mode_ram" element="led">
+		</element>
+		<element name="led_mode_ram" ref="led">
 			<bounds left="611" top="128" right="622" bottom="135" />
-		</cpanel>
-		<cpanel name="led_mode_prom" element="led">
+		</element>
+		<element name="led_mode_prom" ref="led">
 			<bounds left="642" top="128" right="653" bottom="135" />
-		</cpanel>
+		</element>
 
 		<repeat count="2">
 			<param name="groupx" start="81" increment="156" />
 			<param name="mnybble" start="1" increment="1" />
 			<param name="xnybble" start="2" increment="1" />
 			<param name="groupbit" start="7" increment="-4" />
-			<cpanel element="label_m~mnybble~">
+			<element ref="label_m~mnybble~">
 				<bounds x="~groupx~" y="112" width="104" height="7" />
-			</cpanel>
-			<cpanel element="label_x~xnybble~">
+			</element>
+			<element ref="label_x~xnybble~">
 				<bounds x="~groupx~" y="161" width="104" height="7" />
-			</cpanel>
+			</element>
 			<repeat count="4">
 				<param name="xpos" start="~groupx~" increment="31" />
 				<param name="mbit" start="~groupbit~" increment="-1" />
 				<param name="bit" start="3" increment="-1" />
-				<cpanel element="label_~mbit~">
+				<element ref="label_~mbit~">
 					<bounds x="~xpos~" y="120" width="11" height="7" />
-				</cpanel>
-				<cpanel element="label_~bit~">
+				</element>
+				<element ref="label_~bit~">
 					<bounds x="~xpos~" y="169" width="11" height="7" />
-				</cpanel>
-				<cpanel name="led_instruction_m~mnybble~_~bit~" element="led">
+				</element>
+				<element name="led_instruction_m~mnybble~_~bit~" ref="led">
 					<bounds x="~xpos~" y="128" width="11" height="7" />
-				</cpanel>
-				<cpanel name="led_execution_x~xnybble~_~bit~" element="led">
+				</element>
+				<element name="led_execution_x~xnybble~_~bit~" ref="led">
 					<bounds x="~xpos~" y="177" width="11" height="7" />
-				</cpanel>
+				</element>
 			</repeat>
 		</repeat>
 
 		<repeat count="2">
 			<param name="groupx" start="393" increment="156" />
 			<param name="nybble" start="2" increment="1" />
-			<cpanel element="label_x~nybble~">
+			<element ref="label_x~nybble~">
 				<bounds x="~groupx~" y="161" width="104" height="7" />
-			</cpanel>
+			</element>
 			<repeat count="4">
 				<param name="xpos" start="~groupx~" increment="31" />
 				<param name="bit" start="3" increment="-1" />
-				<cpanel element="label_~bit~">
+				<element ref="label_~bit~">
 					<bounds x="~xpos~" y="169" width="11" height="7" />
-				</cpanel>
-				<cpanel name="led_last_ptr_x~nybble~_~bit~" element="led">
+				</element>
+				<element name="led_last_ptr_x~nybble~_~bit~" ref="led">
 					<bounds x="~xpos~" y="177" width="11" height="7" />
-				</cpanel>
+				</element>
 			</repeat>
 		</repeat>
 
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0010">
+		<element ref="switch" inputtag="MODE" inputmask="0x0010">
 			<bounds left="573" top="240" right="598" bottom="286" />
-		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0020">
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0020">
 			<bounds left="604" top="240" right="629" bottom="286" />
-		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0040">
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0040">
 			<bounds left="635" top="240" right="660" bottom="286" />
-		</cpanel>
+		</element>
 
-		<cpanel element="switch" inputtag="PROM" inputmask="0x0001">
+		<element ref="switch" inputtag="PROM" inputmask="0x0001">
 			<bounds left="728" top="240" right="753" bottom="286" />
-		</cpanel>
+		</element>
 
 		<repeat count="4">
 			<param name="xpos" start="74" increment="31" />
 			<param name="mask" start="0x08" rshift="1" />
 			<param name="bit" start="3" increment="-1" />
-			<cpanel element="label_~bit~">
+			<element ref="label_~bit~">
 				<bounds x="~xpos~" y="312" width="25" height="7" />
-			</cpanel>
-			<cpanel element="switch" inputtag="PASSES" inputmask="~mask~">
+			</element>
+			<element ref="switch" inputtag="PASSES" inputmask="~mask~">
 				<bounds x="~xpos~" y="322" width="25" height="46" />
-			</cpanel>
+			</element>
 		</repeat>
 
-		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0001">
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0001">
 			<bounds left="230" top="322" right="255" bottom="368" />
-		</cpanel>
-		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0002">
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0002">
 			<bounds left="261" top="322" right="286" bottom="368" />
-		</cpanel>
-		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0004">
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0004">
 			<bounds left="292" top="322" right="317" bottom="368" />
-		</cpanel>
-		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0008">
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0008">
 			<bounds left="323" top="322" right="348" bottom="368" />
-		</cpanel>
-		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0010">
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0010">
 			<bounds left="354" top="322" right="379" bottom="368" />
-		</cpanel>
+		</element>
 
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0001">
+		<element ref="switch" inputtag="MODE" inputmask="0x0001">
 			<bounds left="448" top="322" right="473" bottom="368" />
-		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0002">
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0002">
 			<bounds left="479" top="322" right="504" bottom="368" />
-		</cpanel>
+		</element>
 
-		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0020">
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0020">
 			<bounds left="573" top="322" right="598" bottom="368" />
-		</cpanel>
-		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0040">
+		</element>
+		<element ref="switch" inputtag="CONTROL" inputmask="0x0040">
 			<bounds left="604" top="322" right="629" bottom="368" />
-		</cpanel>
+		</element>
 
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0004">
+		<element ref="switch" inputtag="MODE" inputmask="0x0004">
 			<bounds left="666" top="322" right="691" bottom="368" />
-		</cpanel>
-		<cpanel element="switch" inputtag="MODE" inputmask="0x0008">
+		</element>
+		<element ref="switch" inputtag="MODE" inputmask="0x0008">
 			<bounds left="697" top="322" right="722" bottom="368" />
-		</cpanel>
+		</element>
 	</group>
 
 	<view name="Terminal Below">

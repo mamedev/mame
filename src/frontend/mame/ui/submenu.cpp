@@ -55,11 +55,6 @@ std::vector<submenu::option> const submenu::advanced_options = {
 
 	{ submenu::option_type::HEAD, __("Artwork Options") },
 	{ submenu::option_type::EMU,  __("Artwork Crop"),                            OPTION_ARTWORK_CROP },
-	{ submenu::option_type::EMU,  __("Use Backdrops"),                           OPTION_USE_BACKDROPS },
-	{ submenu::option_type::EMU,  __("Use Overlays"),                            OPTION_USE_OVERLAYS },
-	{ submenu::option_type::EMU,  __("Use Bezels"),                              OPTION_USE_BEZELS },
-	{ submenu::option_type::EMU,  __("Use Control Panels"),                      OPTION_USE_CPANELS },
-	{ submenu::option_type::EMU,  __("Use Marquees"),                            OPTION_USE_MARQUEES },
 
 	{ submenu::option_type::HEAD, __("State/Playback Options") },
 	{ submenu::option_type::EMU,  __("Automatic save/restore"),                  OPTION_AUTOSAVE },

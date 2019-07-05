@@ -33,18 +33,18 @@ enum
 //-------------------------------------------------
 
 ui_input_manager::ui_input_manager(running_machine &machine)
-	: m_machine(machine),
-		m_current_mouse_target(nullptr),
-		m_current_mouse_down(false),
-		m_current_mouse_field(nullptr),
-		m_events_start(0),
-		m_events_end(0)
+	: m_machine(machine)
+	, m_current_mouse_target(nullptr)
+	, m_current_mouse_down(false)
+	, m_current_mouse_field(nullptr)
+	, m_events_start(0)
+	, m_events_end(0)
 {
-	/* create the private data */
+	// create the private data
 	m_current_mouse_x = -1;
 	m_current_mouse_y = -1;
 
-	/* add a frame callback to poll inputs */
+	// add a frame callback to poll inputs
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ui_input_manager::frame_update, this));
 }
 
@@ -95,7 +95,7 @@ void ui_input_manager::frame_update()
 
 bool ui_input_manager::push_event(ui_event evt)
 {
-	/* some pre-processing (this is an icky place to do this stuff!) */
+	// some pre-processing (this is an icky place to do this stuff!)
 	switch (evt.event_type)
 	{
 		case ui_event::MOUSE_MOVE:
@@ -126,7 +126,7 @@ bool ui_input_manager::push_event(ui_event evt)
 			break;
 	}
 
-	/* is the queue filled up? */
+	// is the queue filled up?
 	if ((m_events_end + 1) % ARRAY_LENGTH(m_events) == m_events_start)
 		return false;
 

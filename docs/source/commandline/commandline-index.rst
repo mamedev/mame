@@ -191,11 +191,6 @@ Core Artwork Options
 ~~~~~~~~~~~~~~~~~~~~
 
 | :ref:`[no]artwork_crop <mame-commandline-noartworkcrop>`
-| :ref:`[no]use_backdrops <mame-commandline-nousebackdrops>`
-| :ref:`[no]use_overlays <mame-commandline-nouseoverlays>`
-| :ref:`[no]use_bezels <mame-commandline-nousebezels>`
-| :ref:`[no]use_cpanels <mame-commandline-nousecpanels>`
-| :ref:`[no]use_marquees <mame-commandline-nousemarquees>`
 | :ref:`fallback_artwork <mame-commandline-fallbackartwork>`
 | :ref:`override_artwork <mame-commandline-overrideartwork>`
 

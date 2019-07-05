@@ -2944,6 +2944,9 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 //  LAYOUT VIEW
 //**************************************************************************
 
+struct layout_view::layer_lists { item_list backdrops, screens, overlays, bezels, cpanels, marquees; };
+
+
 //-------------------------------------------------
 //  layout_view - constructor
 //-------------------------------------------------
@@ -2956,11 +2959,41 @@ layout_view::layout_view(
 	: m_name(make_name(env, viewnode))
 	, m_aspect(1.0f)
 	, m_scraspect(1.0f)
+	, m_items()
+	, m_has_art(false)
 {
+	// parse the layout
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	environment local(env);
+	layer_lists layers;
 	local.set_parameter("viewname", std::string(m_name));
-	add_items(local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
+	add_items(layers, local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
+
+	// deal with legacy element groupings
+	if ((layers.backdrops.size() > 1) && layers.overlays.empty())
+	{
+		// multiple backdrop pieces and no overlays (Golly! Ghost! mode):
+		// backdrop (alpha) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
+		m_items.splice(m_items.end(), layers.backdrops);
+		m_items.splice(m_items.end(), layers.screens);
+		m_items.splice(m_items.end(), layers.bezels);
+		m_items.splice(m_items.end(), layers.cpanels);
+		m_items.splice(m_items.end(), layers.marquees);
+	}
+	else
+	{
+		// screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
+		for (item &backdrop : layers.backdrops)
+			backdrop.set_blend_mode(BLENDMODE_ADD);
+		m_items.splice(m_items.end(), layers.screens);
+		m_items.splice(m_items.end(), layers.overlays);
+		m_items.splice(m_items.end(), layers.backdrops);
+		m_items.splice(m_items.end(), layers.bezels);
+		m_items.splice(m_items.end(), layers.cpanels);
+		m_items.splice(m_items.end(), layers.marquees);
+	}
+
+	// calculate metrics
 	recompute(render_layer_config());
 	for (group_map::value_type &group : groupmap)
 		group.second.set_bounds_unresolved();
@@ -2973,25 +3006,6 @@ layout_view::layout_view(
 
 layout_view::~layout_view()
 {
-}
-
-
-//-------------------------------------------------
-//  items - return the appropriate list
-//-------------------------------------------------
-
-layout_view::item_list &layout_view::items(item_layer layer)
-{
-	switch (layer)
-	{
-	case ITEM_LAYER_BACKDROP:   return m_backdrop_list;
-	case ITEM_LAYER_SCREEN:     return m_screen_list;
-	case ITEM_LAYER_OVERLAY:    return m_overlay_list;
-	case ITEM_LAYER_BEZEL:      return m_bezel_list;
-	case ITEM_LAYER_CPANEL:     return m_cpanel_list;
-	case ITEM_LAYER_MARQUEE:    return m_marquee_list;
-	default:                    throw false; // calling this with an invalid layer is bad, m'kay?
-	}
 }
 
 
@@ -3010,43 +3024,27 @@ void layout_view::recompute(render_layer_config layerconfig)
 	// loop over all layers
 	bool first = true;
 	bool scrfirst = true;
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
+	for (item &curitem : m_items)
 	{
-		// determine if this layer should be visible
-		switch (layer)
+		// accumulate bounds
+		if (first)
+			m_bounds = curitem.m_rawbounds;
+		else
+			union_render_bounds(m_bounds, curitem.m_rawbounds);
+		first = false;
+
+		// accumulate screen bounds
+		if (curitem.m_screen)
 		{
-			case ITEM_LAYER_BACKDROP:   m_layenabled[layer] = layerconfig.backdrops_enabled();  break;
-			case ITEM_LAYER_OVERLAY:    m_layenabled[layer] = layerconfig.overlays_enabled();   break;
-			case ITEM_LAYER_BEZEL:      m_layenabled[layer] = layerconfig.bezels_enabled();     break;
-			case ITEM_LAYER_CPANEL:     m_layenabled[layer] = layerconfig.cpanels_enabled();    break;
-			case ITEM_LAYER_MARQUEE:    m_layenabled[layer] = layerconfig.marquees_enabled();   break;
-			default:                    m_layenabled[layer] = true;                             break;
+			if (scrfirst)
+				m_scrbounds = curitem.m_rawbounds;
+			else
+				union_render_bounds(m_scrbounds, curitem.m_rawbounds);
+			scrfirst = false;
+
+			// accumulate the screens in use while we're scanning
+			m_screens.add(*curitem.m_screen);
 		}
-
-		// only do it if requested
-		if (m_layenabled[layer])
-			for (item &curitem : items(layer))
-			{
-				// accumulate bounds
-				if (first)
-					m_bounds = curitem.m_rawbounds;
-				else
-					union_render_bounds(m_bounds, curitem.m_rawbounds);
-				first = false;
-
-				// accumulate screen bounds
-				if (curitem.m_screen)
-				{
-					if (scrfirst)
-						m_scrbounds = curitem.m_rawbounds;
-					else
-						union_render_bounds(m_scrbounds, curitem.m_rawbounds);
-					scrfirst = false;
-
-					// accumulate the screens in use while we're scanning
-					m_screens.add(*curitem.m_screen);
-				}
-			}
 	}
 
 	// if we have an explicit bounds, override it
@@ -3085,14 +3083,13 @@ void layout_view::recompute(render_layer_config layerconfig)
 	float yscale = (target_bounds.y1 - target_bounds.y0) / (m_bounds.y1 - m_bounds.y0);
 
 	// normalize all the item bounds
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
-		for (item &curitem : items(layer))
-		{
-			curitem.m_bounds.x0 = target_bounds.x0 + (curitem.m_rawbounds.x0 - xoffs) * xscale;
-			curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
-			curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
-			curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
-		}
+	for (item &curitem : items())
+	{
+		curitem.m_bounds.x0 = target_bounds.x0 + (curitem.m_rawbounds.x0 - xoffs) * xscale;
+		curitem.m_bounds.x1 = target_bounds.x0 + (curitem.m_rawbounds.x1 - xoffs) * xscale;
+		curitem.m_bounds.y0 = target_bounds.y0 + (curitem.m_rawbounds.y0 - yoffs) * yscale;
+		curitem.m_bounds.y1 = target_bounds.y0 + (curitem.m_rawbounds.y1 - yoffs) * yscale;
+	}
 }
 
 
@@ -3102,13 +3099,8 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 void layout_view::resolve_tags()
 {
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
-	{
-		for (item &curitem : items(layer))
-		{
-			curitem.resolve_tags();
-		}
-	}
+	for (item &curitem : items())
+		curitem.resolve_tags();
 }
 
 
@@ -3117,6 +3109,7 @@ void layout_view::resolve_tags()
 //-------------------------------------------------
 
 void layout_view::add_items(
+		layer_lists &layers,
 		environment &env,
 		util::xml::data_node const &parentnode,
 		element_map &elemmap,
@@ -3154,27 +3147,37 @@ void layout_view::add_items(
 		}
 		else if (!strcmp(itemnode->get_name(), "backdrop"))
 		{
-			m_backdrop_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			layers.backdrops.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "screen"))
 		{
-			m_screen_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+		}
+		else if (!strcmp(itemnode->get_name(), "element"))
+		{
+			layers.screens.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "overlay"))
 		{
-			m_overlay_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			layers.overlays.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "bezel"))
 		{
-			m_bezel_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			layers.bezels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "cpanel"))
 		{
-			m_cpanel_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			layers.cpanels.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "marquee"))
 		{
-			m_marquee_list.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			layers.marquees.emplace_back(env, *itemnode, elemmap, orientation, trans, color);
+			m_has_art = true;
 		}
 		else if (!strcmp(itemnode->get_name(), "group"))
 		{
@@ -3205,6 +3208,7 @@ void layout_view::add_items(
 
 			environment local(env);
 			add_items(
+					layers,
 					local,
 					found->second.get_groupnode(),
 					elemmap,
@@ -3224,7 +3228,7 @@ void layout_view::add_items(
 			environment local(env);
 			for (int i = 0; count > i; ++i)
 			{
-				add_items(local, *itemnode, elemmap, groupmap, orientation, trans, color, false, true, !i);
+				add_items(layers, local, *itemnode, elemmap, groupmap, orientation, trans, color, false, true, !i);
 				local.increment_parameters();
 			}
 		}
@@ -3277,30 +3281,21 @@ layout_view::item::item(
 		int orientation,
 		layout_group::transform const &trans,
 		render_color const &color)
-	: m_element(nullptr)
+	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), env.get_attribute_string(itemnode, "name", ""))
 	, m_have_output(env.get_attribute_string(itemnode, "name", "")[0])
-	, m_input_tag(env.get_attribute_string(itemnode, "inputtag", ""))
+	, m_input_tag(make_input_tag(env, itemnode))
 	, m_input_port(nullptr)
-	, m_input_mask(0)
+	, m_input_field(nullptr)
+	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
 	, m_input_shift(0)
-	, m_input_raw(false)
+	, m_input_raw(0 != env.get_attribute_int(itemnode, "inputraw", 0))
 	, m_screen(nullptr)
 	, m_orientation(orientation_add(env.parse_orientation(itemnode.get_child("orientation")), orientation))
+	, m_rawbounds(make_bounds(env, itemnode, trans))
 	, m_color(render_color_multiply(env.parse_color(itemnode.get_child("color")), color))
+	, m_blend_mode(get_blend_mode(env, itemnode))
 {
-	// find the associated element
-	char const *const name(env.get_attribute_string(itemnode, "element", nullptr));
-	if (name)
-	{
-		// search the list of elements for a match, error if not found
-		element_map::iterator const found(elemmap.find(name));
-		if (elemmap.end() != found)
-			m_element = &found->second;
-		else
-			throw layout_syntax_error(util::string_format("unable to find element %s", name));
-	}
-
 	// outputs need resolving
 	if (m_have_output)
 		m_output.resolve();
@@ -3309,17 +3304,10 @@ layout_view::item::item(
 	int index = env.get_attribute_int(itemnode, "index", -1);
 	if (index != -1)
 		m_screen = screen_device_iterator(env.machine().root_device()).byindex(index);
-	m_input_mask = env.get_attribute_int(itemnode, "inputmask", 0);
-	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1) m_input_shift++;
-	m_input_raw = env.get_attribute_int(itemnode, "inputraw", 0) == 1;
+	for (u32 mask = m_input_mask; (mask != 0) && (~mask & 1); mask >>= 1)
+		m_input_shift++;
 	if (m_have_output && m_element)
 		m_output = m_element->default_state();
-	env.parse_bounds(itemnode.get_child("bounds"), m_rawbounds);
-	render_bounds_transform(m_rawbounds, trans);
-	if (m_rawbounds.x0 > m_rawbounds.x1)
-		std::swap(m_rawbounds.x0, m_rawbounds.x1);
-	if (m_rawbounds.y0 > m_rawbounds.y1)
-		std::swap(m_rawbounds.y0, m_rawbounds.y1);
 
 	// sanity checks
 	if (strcmp(itemnode.get_name(), "screen") == 0)
@@ -3340,9 +3328,6 @@ layout_view::item::item(
 	{
 		throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
 	}
-
-	if (has_input())
-		m_input_port = env.device().ioport(m_input_tag.c_str());
 }
 
 
@@ -3382,17 +3367,17 @@ int layout_view::item::state() const
 	else if (!m_input_tag.empty())
 	{
 		// if configured to an input, fetch the input value
-		if (m_input_port)
+		if (m_input_raw)
 		{
-			if (m_input_raw)
-			{
+			if (m_input_port)
 				return (m_input_port->read() & m_input_mask) >> m_input_shift;
-			}
-			else
+		}
+		else
+		{
+			if (m_input_field)
 			{
-				ioport_field const *const field = m_input_port->field(m_input_mask);
-				if (field)
-					return ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
+				assert(m_input_port);
+				return ((m_input_port->read() ^ m_input_field->defvalue()) & m_input_mask) ? 1 : 0;
 			}
 		}
 	}
@@ -3405,13 +3390,96 @@ int layout_view::item::state() const
 //  resolve_tags - resolve tags, if any are set
 //---------------------------------------------
 
-
 void layout_view::item::resolve_tags()
 {
-	if (has_input())
+	if (!m_input_tag.empty())
 	{
 		m_input_port = m_element->machine().root_device().ioport(m_input_tag.c_str());
+		if (m_input_port)
+			m_input_field = m_input_port->field(m_input_mask);
 	}
+}
+
+
+//---------------------------------------------
+//  find_element - find element definition
+//---------------------------------------------
+
+layout_element *layout_view::item::find_element(environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
+{
+	char const *const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element", nullptr));
+	if (!name)
+		return nullptr;
+
+	// search the list of elements for a match, error if not found
+	element_map::iterator const found(elemmap.find(name));
+	if (elemmap.end() != found)
+		return &found->second;
+	else
+		throw layout_syntax_error(util::string_format("unable to find element %s", name));
+}
+
+
+//---------------------------------------------
+//  make_bounds - get transformed bounds
+//---------------------------------------------
+
+render_bounds layout_view::item::make_bounds(
+		environment &env,
+		util::xml::data_node const &itemnode,
+		layout_group::transform const &trans)
+{
+	render_bounds bounds;
+	env.parse_bounds(itemnode.get_child("bounds"), bounds);
+	render_bounds_transform(bounds, trans);
+	if (bounds.x0 > bounds.x1)
+		std::swap(bounds.x0, bounds.x1);
+	if (bounds.y0 > bounds.y1)
+		std::swap(bounds.y0, bounds.y1);
+	return bounds;
+}
+
+
+//---------------------------------------------
+//  make_input_tag - get absolute input tag
+//---------------------------------------------
+
+std::string layout_view::item::make_input_tag(environment &env, util::xml::data_node const &itemnode)
+{
+	char const *tag(env.get_attribute_string(itemnode, "inputtag", nullptr));
+	return tag ? env.device().subtag(tag) : std::string();
+}
+
+
+//---------------------------------------------
+//  get_blend_mode - explicit or implicit blend
+//---------------------------------------------
+
+int layout_view::item::get_blend_mode(environment &env, util::xml::data_node const &itemnode)
+{
+	// see if there's a blend mode attribute
+	char const *const mode(env.get_attribute_string(itemnode, "blend", nullptr));
+	if (mode)
+	{
+		if (!strcmp(mode, "none"))
+			return BLENDMODE_NONE;
+		else if (!strcmp(mode, "alpha"))
+			return BLENDMODE_ALPHA;
+		else if (!strcmp(mode, "multiply"))
+			return BLENDMODE_RGB_MULTIPLY;
+		else if (!strcmp(mode, "add"))
+			return BLENDMODE_ADD;
+		else
+			throw layout_syntax_error(util::string_format("unknown blend mode %s", mode));
+	}
+
+	// fall back to implicit blend mode based on element type
+	if (!strcmp(itemnode.get_name(), "screen"))
+		return BLENDMODE_ADD;
+	else if (!strcmp(itemnode.get_name(), "overlay"))
+		return BLENDMODE_RGB_MULTIPLY;
+	else
+		return BLENDMODE_ALPHA;
 }
 
 
