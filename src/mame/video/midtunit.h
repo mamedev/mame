@@ -17,6 +17,7 @@
 #include "emupal.h"
 
 #define DEBUG_MIDTUNIT_BLITTER      (0)
+#define MIDTUNIT_LOG_PNG			(0)
 
 class midtunit_video_device : public device_t
 {
@@ -164,6 +165,12 @@ protected:
 	int32_t m_debug_dma_bpp;
 	int32_t m_debug_dma_mode;
 	int32_t m_debug_dma_command;
+#endif
+#if MIDTUNIT_LOG_PNG
+	std::unique_ptr<uint64_t[]> m_logged_rom;
+	bitmap_argb32 m_log_bitmap;
+
+	void log_bitmap(int command, int bpp, bool skip);
 #endif
 };
 
