@@ -370,7 +370,6 @@ void savant_state::savant(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_ui_enable(false); // no chesspieces
-	m_board->set_delay(attotime::never);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

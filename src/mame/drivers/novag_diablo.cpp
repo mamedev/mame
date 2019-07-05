@@ -308,6 +308,7 @@ void diablo_state::diablo68k(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
