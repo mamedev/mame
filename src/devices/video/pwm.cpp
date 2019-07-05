@@ -68,8 +68,6 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 //  device_start/reset
 //-------------------------------------------------
 
-ALLOW_SAVE_TYPE(attotime); // m_acc
-
 void pwm_display_device::device_start()
 {
 	// resolve handlers
@@ -113,8 +111,9 @@ void pwm_display_device::device_start()
 	save_item(NAME(m_rowdata_prev));
 
 	save_item(NAME(m_bri));
-	save_item(NAME(m_acc));
 	save_item(NAME(m_update_time));
+	save_item(NAME(m_acc_attos));
+	save_item(NAME(m_acc_secs));
 }
 
 void pwm_display_device::device_reset()
@@ -124,6 +123,29 @@ void pwm_display_device::device_reset()
 
 	schedule_frame();
 	m_update_time = machine().time();
+}
+
+
+
+//-------------------------------------------------
+//  custom savestate handling (MAME doesn't save array of attotime)
+//-------------------------------------------------
+
+void pwm_display_device::device_pre_save()
+{
+	for (int y = 0; y < ARRAY_LENGTH(m_acc); y++)
+		for (int x = 0; x < ARRAY_LENGTH(m_acc[0]); x++)
+		{
+			m_acc_attos[y][x] = m_acc[y][x].attoseconds();
+			m_acc_secs[y][x] = m_acc[y][x].seconds();
+		}
+}
+
+void pwm_display_device::device_post_load()
+{
+	for (int y = 0; y < ARRAY_LENGTH(m_acc); y++)
+		for (int x = 0; x < ARRAY_LENGTH(m_acc[0]); x++)
+			m_acc[y][x] = attotime(m_acc_secs[y][x], m_acc_attos[y][x]);
 }
 
 
