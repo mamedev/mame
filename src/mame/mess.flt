@@ -723,6 +723,7 @@ shine.cpp
 si5500.cpp
 sitcom.cpp
 sk1.cpp
+sk101bl.cpp
 slc1.cpp
 slc1a.cpp
 slicer.cpp

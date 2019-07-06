@@ -4055,6 +4055,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/scopus.cpp",
 	MAME_DIR .. "src/mame/drivers/shine.cpp",
 	MAME_DIR .. "src/mame/drivers/si5500.cpp",
+	MAME_DIR .. "src/mame/drivers/sk101bl.cpp",
 	MAME_DIR .. "src/mame/drivers/softbox.cpp",
 	MAME_DIR .. "src/mame/includes/softbox.h",
 	MAME_DIR .. "src/mame/drivers/squale.cpp",

@@ -35741,6 +35741,9 @@ sitcomtmr                       //
 @source:sk1.cpp
 sk1                             //
 
+@source:sk101bl.cpp
+sk101bl                         //
+
 @source:skeetsht.cpp
 popshot                         // (c) 1991 (prototype)
 skeetsht                        // (c) 1991
