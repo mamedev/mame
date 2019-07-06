@@ -679,7 +679,6 @@ rd100.cpp
 rd110.cpp
 replicator.cpp
 rex6000.cpp
-risc2500.cpp
 riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
@@ -692,7 +691,11 @@ rz1.cpp
 rzone.cpp
 sacstate.cpp
 sage2.cpp
+saitek_chesstrv.cpp
+saitek_cp2000.cpp
 saitek_delta1.cpp
+saitek_risc2500.cpp
+saitek_stratos.cpp
 samcoupe.cpp
 sansa_fuze.cpp
 sapi1.cpp
@@ -702,8 +705,6 @@ savia84.cpp
 sbc6510.cpp
 sbrain.cpp
 sc2.cpp
-scisys_chesstrv.cpp
-scisys_cp2000.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
@@ -748,7 +749,6 @@ ssem.cpp
 ssystem3.cpp
 st17xx.cpp
 storio.cpp
-stratos.cpp
 studio2.cpp
 sun1.cpp
 sun2.cpp

@@ -33658,10 +33658,6 @@ rex6000                         //
 @source:rgum.cpp
 rgum                            //
 
-@source:risc2500.cpp
-risc                            //
-montreux                        //
-
 @source:riscpc.cpp
 a7000                           // 1995 Acorn Archimedes 7000
 a7000p                          // 1997 Acorn Archimedes 7000+
@@ -34088,8 +34084,21 @@ safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 @source:sage2.cpp
 sage2                           //
 
+@source:saitek_chesstrv.cpp
+chesstrv                        //
+
+@source:saitek_cp2000.cpp
+cp2000                          //
+
 @source:saitek_delta1.cpp
 ccdelta1                        //
+
+@source:saitek_risc2500.cpp
+risc2500                        //
+montreux                        //
+
+@source:saitek_stratos.cpp
+stratos                         // Kasparov Stratos Chess Computer
 
 @source:sam.cpp
 24_130                          //
@@ -34373,12 +34382,6 @@ sbuggera                        // (c) 1981 Game-A-Tron
 @source:sc2.cpp
 sc2                             //
 sc2a                            //
-
-@source:scisys_chesstrv.cpp
-chesstrv                        //
-
-@source:scisys_cp2000.cpp
-cp2000                          //
 
 @source:scm_500.cpp
 scm_500                         //
@@ -36511,9 +36514,6 @@ stlforce                        // (c) 1994 Electronic Devices (Italy) / Ecogame
 twinbrat                        // (c) 1995
 twinbrata                       // (c) 1995
 twinbratb                       // (c) 1995
-
-@source:stratos.cpp
-stratos                         // Kasparov Stratos Chess Computer
 
 @source:strkzn.cpp
 strkzn                          // (c) 1994 Purple Star

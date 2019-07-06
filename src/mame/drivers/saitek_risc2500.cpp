@@ -32,7 +32,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#include "risc2500.lh"
+#include "saitek_risc2500.lh"
 
 
 class risc2500_state : public driver_device
@@ -281,7 +281,7 @@ void risc2500_state::risc2500(machine_config &config)
 	screen.set_screen_update(FUNC(risc2500_state::screen_update));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_risc2500);
+	config.set_default_layout(layout_saitek_risc2500);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -305,7 +305,7 @@ void risc2500_state::risc2500(machine_config &config)
 
 /* ROM definitions */
 
-ROM_START( risc )
+ROM_START( risc2500 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
 	ROM_SYSTEM_BIOS( 0, "v104", "v1.04" )
 	ROMX_LOAD("s2500_v104.bin", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c), ROM_BIOS(0))
@@ -321,5 +321,5 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME              FLAGS */
-CONS( 1992, risc,     0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1992, risc2500, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
 CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener & Glaser

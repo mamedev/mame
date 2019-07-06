@@ -28,7 +28,7 @@ Capturing pieces is also unintuitive, having to press the destination square twi
 #include "speaker.h"
 
 // internal artwork
-#include "scisys_cp2000.lh" // clickable
+#include "saitek_cp2000.lh" // clickable
 
 
 namespace {
@@ -228,7 +228,7 @@ void cp2000_state::cp2000(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_scisys_cp2000);
+	config.set_default_layout(layout_saitek_cp2000);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

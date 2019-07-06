@@ -26,7 +26,7 @@ digit DP lights up).
 #include "machine/sensorboard.h"
 
 // internal artwork
-#include "scisys_chesstrv.lh" // clickable
+#include "saitek_chesstrv.lh" // clickable
 
 
 namespace {
@@ -208,7 +208,7 @@ void chesstrv_state::chesstrv(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_scisys_chesstrv);
+	config.set_default_layout(layout_saitek_chesstrv);
 }
 
 
