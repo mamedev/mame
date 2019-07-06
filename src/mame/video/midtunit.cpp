@@ -14,6 +14,8 @@
 #include "midtview.ipp"
 #include "emuopts.h" // Used by MIDTUNIT_LOG_PNG
 #include "png.h" // Used by MIDTUNIT_LOG_PNG
+#include <rapidjson/prettywriter.h> // Used by MIDTUNIT_LOG_PNG_JSON
+#include <rapidjson/stringbuffer.h> // Used by MIDTUNIT_LOG_PNG_JSON
 
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")
@@ -909,5 +911,70 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	}
 
 	png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
+
+#if MIDTUNIT_LOG_PNG_JSON
+	char hex_buf[11];
+    rapidjson::StringBuffer s;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+    emu_file json(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+
+	snprintf(name_buf, 255, "0x%08x.json", raw_offset);
+	auto const jsonerr = json.open(name_buf);
+	if (jsonerr != osd_file::error::NONE)
+	{
+		return;
+	}
+
+    writer.StartObject();
+    writer.Key("DMAState");
+    writer.StartObject();
+
+    sprintf(hex_buf, "0x%08x", raw_offset);
+    writer.Key("MemoryAddress");
+    writer.String(hex_buf);
+
+    sprintf(hex_buf, "0x%08x", m_dma_state.offset);
+    writer.Key("ROMSourceOffset");
+    writer.String(hex_buf);
+
+    writer.Key("Size");
+    writer.StartArray();
+    writer.Int(m_dma_state.width);
+    writer.Int(m_dma_state.height);
+    writer.EndArray();
+
+    writer.Key("BitsPerPixel");
+    writer.Uint(bpp);
+
+    writer.Key("PaletteBank");
+    writer.Uint(m_dma_state.palette >> 8);
+
+    writer.Key("FGColor");
+    writer.Uint(m_dma_state.color);
+
+    writer.Key("YFlip");
+    writer.Bool(m_dma_state.yflip ? true : false);
+
+    writer.Key("PreSkipScale");
+    writer.Uint(m_dma_state.preskip);
+
+    writer.Key("PostSkipScale");
+    writer.Uint(m_dma_state.postskip);
+
+    writer.Key("RowSkipBits");
+    writer.Int(m_dma_state.rowbits);
+
+    writer.Key("StartPixelsToSkip");
+    writer.Int(m_dma_state.startskip);
+
+    writer.Key("EndPixelsToSkip");
+    writer.Int(m_dma_state.endskip);
+
+    writer.EndObject();
+    writer.EndObject();
+
+    json.puts(s.GetString());
+    json.close();
+#endif
 }
 #endif

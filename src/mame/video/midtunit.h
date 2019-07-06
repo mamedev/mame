@@ -18,6 +18,7 @@
 
 #define DEBUG_MIDTUNIT_BLITTER      (0)
 #define MIDTUNIT_LOG_PNG			(0)
+#define MIDTUNIT_LOG_PNG_JSON		(0)
 
 class midtunit_video_device : public device_t
 {
