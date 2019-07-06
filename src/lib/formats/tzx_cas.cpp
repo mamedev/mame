@@ -894,7 +894,10 @@ static cassette_image::error cdt_cassette_identify( cassette_image *cassette, st
 
 static cassette_image::error tzx_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct(cassette, &tzx_legacy_fill_wave);
+	cassette_image::error err = cassette_legacy_construct(cassette, &tzx_legacy_fill_wave);
+	free(blocks);
+	blocks = nullptr;
+	return err;
 }
 
 static cassette_image::error tap_cassette_load( cassette_image *cassette )
@@ -904,7 +907,10 @@ static cassette_image::error tap_cassette_load( cassette_image *cassette )
 
 static cassette_image::error cdt_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
+	cassette_image::error err = cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
+	free(blocks);
+	blocks = nullptr;
+	return err;
 }
 
 const struct CassetteFormat tzx_cassette_format =
