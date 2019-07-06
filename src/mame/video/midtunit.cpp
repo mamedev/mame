@@ -14,8 +14,8 @@
 #include "midtview.ipp"
 #include "emuopts.h" // Used by MIDTUNIT_LOG_PNG
 #include "png.h" // Used by MIDTUNIT_LOG_PNG
-#include <rapidjson/prettywriter.h> // Used by MIDTUNIT_LOG_PNG_JSON
-#include <rapidjson/stringbuffer.h> // Used by MIDTUNIT_LOG_PNG_JSON
+#include "rapidjson/include/rapidjson/prettywriter.h" // Used by MIDTUNIT_LOG_PNG_JSON
+#include "rapidjson/include/rapidjson/stringbuffer.h" // Used by MIDTUNIT_LOG_PNG_JSON
 
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")
