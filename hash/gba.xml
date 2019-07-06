@@ -3445,11 +3445,14 @@
 		<description>Bomberman Max 2 - Blue Advance (Euro)</description>
 		<year>2002</year>
 		<publisher>Vivendi Universal</publisher>
-		<info name="serial" value="AGB-AMHP"/>
+		<info name="serial" value="AGB-AMHP-EUR (S0026550)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="bomberman max 2 - blue advance (europe) (en,fr,de).bin" size="16777216" crc="09fc4d53" sha1="eb25e28ae1047145fd2cbcc3ecbb63330fbc8fe0"/>
+				<rom name="agb-amhp-0.u1" size="16777216" crc="09fc4d53" sha1="eb25e28ae1047145fd2cbcc3ecbb63330fbc8fe0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3501,11 +3504,14 @@
 		<description>Bomberman Max 2 - Red Advance (Euro)</description>
 		<year>2002</year>
 		<publisher>Vivendi Universal</publisher>
-		<info name="serial" value="AGB-AMVP"/>
+		<info name="serial" value="AGB-AMYP-EUR (S0026558)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="bomberman max 2 - red advance (europe) (en,fr,de).bin" size="16777216" crc="67d2e5b8" sha1="4d514fe19b59d42be9a118c99e2008efee2aedcb"/>
+				<rom name="agb-amyp-0.u1" size="16777216" crc="67d2e5b8" sha1="4d514fe19b59d42be9a118c99e2008efee2aedcb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5772,11 +5778,14 @@
 		<description>Crash Bandicoot 2 - N-Tranced (Euro)</description>
 		<year>2003</year>
 		<publisher>Universal Interactive</publisher>
-		<info name="serial" value="AGB-AC8P"/>
+		<info name="serial" value="AGB-AC8P-EUR (S0027429)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="crash bandicoot 2 - n-tranced (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="0f1d06a0" sha1="ee9234ca15ba2caa71fad7d6af71e27b2030ae0b"/>
+				<rom name="agb-ac8p-0.u1" size="8388608" crc="0f1d06a0" sha1="ee9234ca15ba2caa71fad7d6af71e27b2030ae0b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6796,11 +6805,14 @@
 		<year>2002</year>
 		<publisher>Midway</publisher>
 		<info name="alt_title" value="Defender - For All Mankind (Box)" />
-		<info name="serial" value="AGB-A2FP"/>
+		<info name="serial" value="AGB-A2FP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="defender - for all mankind (europe) (en,fr,de,es,it).bin" size="4194304" crc="3b86fdc4" sha1="4d45e4109aade339514fdd3ad826ce8cd4cfb5e7"/>
+				<rom name="agb-a2fp-0.u1" size="4194304" crc="3b86fdc4" sha1="4d45e4109aade339514fdd3ad826ce8cd4cfb5e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8237,7 +8249,7 @@
 		<description>Dr. Muto (Euro)</description>
 		<year>2002</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="AGB-A6TP"/>
+		<info name="serial" value="AGB-A6TP-EUU"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 MASK ROM" />
@@ -9113,7 +9125,7 @@
 		<description>Earthworm Jim 2 (Euro)</description>
 		<year>2002</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-AJ4P-EUR"/>
+		<info name="serial" value="AGB-AJ4P-EUR (S0026877)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -15635,9 +15647,12 @@
 		<year>2003</year>
 		<publisher>Ignition Entertainment</publisher>
 		<info name="serial" value="AGB-A3KP-EUR"/>
+		<info name="alt_title" value="IK+: The Ultimate Martial Arts Simulation (Box)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="international karate plus (europe).bin" size="4194304" crc="1052a0ea" sha1="844395914641af431c58bbe82ab2513c5f8a60ce"/>
+				<rom name="agb-a3kp-0.u1" size="4194304" crc="1052a0ea" sha1="844395914641af431c58bbe82ab2513c5f8a60ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17312,9 +17327,12 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-A7KE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E11-01" />
+			<feature name="u1" value="U1 MASK ROM AGB" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="kirby - nightmare in dream land (usa).bin" size="8388608" crc="20ef3f64" sha1="37a476567d133c146fee6b5e2eb0b07a215da6b0"/>
+				<rom name="agb-a7ke-0.u1" size="8388608" crc="20ef3f64" sha1="37a476567d133c146fee6b5e2eb0b07a215da6b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19122,7 +19140,7 @@
 		<description>The Lost Vikings (Euro)</description>
 		<year>2003</year>
 		<publisher>Blizzard Entertainment</publisher>
-		<info name="serial" value="AGB-ALVP-EUR"/>
+		<info name="serial" value="AGB-ALVP-EUR (S0027798)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -21697,8 +21715,10 @@
 		<publisher>Atari</publisher>
 		<info name="serial" value="AGB-AXZP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="micro machines (europe) (en,fr,de,es,it).bin" size="4194304" crc="9d102c82" sha1="f74261138c93b872b8f552a145d7d56e9d44d538"/>
+				<rom name="agb-axzp-0.u1" size="4194304" crc="9d102c82" sha1="f74261138c93b872b8f552a145d7d56e9d44d538"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28530,11 +28550,14 @@
 		<description>Samurai Jack - The Amulet of Time (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>BAM! Entertainment</publisher> <!-- by Zoo Digital in Europe -->
-		<info name="serial" value="AGB-AJTE-USA, AGB-AJTP"/>
+		<info name="serial" value="AGB-AJTE-USA, AGB-AJTP-UKV (CRT 52348.01 ENG)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="samurai jack - the amulet of time (usa, europe).bin" size="8388608" crc="b250366c" sha1="27a5604b4aa89d2fec216aeac2b99e76165f531f"/>
+				<rom name="agb-ajtp-0.u1" size="8388608" crc="b250366c" sha1="27a5604b4aa89d2fec216aeac2b99e76165f531f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30810,9 +30833,9 @@
 		<description>Sonic Advance 2 (Euro)</description>
 		<year>2003</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="AGB-A2NP-UKV"/>
+		<info name="serial" value="AGB-A2NP-EUR, AGB-A2NP-UKV, AGB-A2NP-NOE, AGB-A2NP-FAH"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E02-20" />
+			<feature name="pcb" value="AGB-E02-20" /> <!-- Also with AGB-E02-30 -->
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 512K/1M FLASH [39VF512]" />
 			<feature name="slot" value="gba_flash_512" />
@@ -32062,9 +32085,9 @@
 		<description>Star Wars - The New Droid Army (Euro)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-A2WP"/>
+		<info name="serial" value="AGB-A2WP-EUR"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="pcb" value="AGB-E01-20" /> <!-- Also with AGB-E01-10 -->
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-a2wp-0.u1" size="8388608" crc="677854af" sha1="4966ce40938df2b0ffd262c6aa6c4461b9fa8922"/>
@@ -34569,9 +34592,12 @@
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="AGB-ATQP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="toca world touring cars (europe).bin" size="8388608" crc="d8125874" sha1="6e4360b9d123ed9784db40e7b07e7941d3df5401"/>
+				<rom name="agb-atqp-0.u1" size="8388608" crc="d8125874" sha1="6e4360b9d123ed9784db40e7b07e7941d3df5401"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36193,11 +36219,14 @@
 		<description>Virtua Tennis (Euro)</description>
 		<year>2003</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="AGB-AVTP"/>
+		<info name="serial" value="AGB-AVTP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="virtua tennis (europe) (en,fr,de,es,it).bin" size="8388608" crc="e52a3ab8" sha1="d200653b31c7fc150e9e84b53370ce4f40a10d43"/>
+				<rom name="agb-avtp-0.u1" size="8388608" crc="e52a3ab8" sha1="d200653b31c7fc150e9e84b53370ce4f40a10d43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37197,8 +37226,10 @@
 		<publisher>Ignition Entertainment</publisher>
 		<info name="serial" value="AGB-AWCP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="world tennis stars (europe).bin" size="4194304" crc="b5830f5f" sha1="2a93449943e85b7c5d75d0d7a9e1d8ad67c7a706"/>
+				<rom name="agb-awcp-0.u1" size="4194304" crc="b5830f5f" sha1="2a93449943e85b7c5d75d0d7a9e1d8ad67c7a706"/>
 			</dataarea>
 		</part>
 	</software>
