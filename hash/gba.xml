@@ -8766,11 +8766,14 @@
 		<description>Drome Racers (Euro)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-AOEP"/>
+		<info name="serial" value="AGB-AOEX-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="drome racers (europe) (en,fr,de,da).bin" size="8388608" crc="d6101bc0" sha1="de8d38ab95ac072a9d96989ba04d895d46b841ae"/>
+				<rom name="agb-aoex-0.u1" size="8388608" crc="d6101bc0" sha1="de8d38ab95ac072a9d96989ba04d895d46b841ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11153,9 +11156,10 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-AZIE-USA, AGB-AZIP-UKV"/>
 		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E01-30" />
+			<feature name="pcb" value="AGB-E01-30" /> <!-- Also with AGB-E01-20 -->
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
+				<!-- USA ROM has label AGB-AZIE-0 -->
 				<rom name="agb-azip-0.u1" size="8388608" crc="3b098667" sha1="a0c98d05b0854bb724f1ea5df89f19f77e6beb79"/>
 			</dataarea>
 		</part>
@@ -20682,13 +20686,15 @@
 	</software>
 
 	<software name="mhonrund">
-		<description>Medal of Honor - Underground (Ubi Soft) (Euro)</description>
+		<description>Medal of Honor - Underground (Euro, Ubi Soft)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-AUGP"/>
+		<info name="serial" value="AGB-AUGX-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="medal of honor - underground (europe) (en,fr,es,it) (ubi soft).bin" size="8388608" crc="9db145b8" sha1="e43aaba3f925443cfccf9294b870024a9c71a9a9"/>
+				<rom name="agb-augx-0.u1" size="8388608" crc="9db145b8" sha1="e43aaba3f925443cfccf9294b870024a9c71a9a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22743,10 +22749,12 @@
 		<description>Mortal Kombat Advance (Euro)</description>
 		<year>2002</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="AGB-AM5P"/>
+		<info name="serial" value="AGB-AM5P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-10" />
+			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="mortal kombat advance (europe).bin" size="8388608" crc="78b4b5c7" sha1="c7e8e46a4a1f3d2067eca4c850c4b1b89bec168b"/>
+				<rom name="agb-am5p-0.u1" size="8388608" crc="78b4b5c7" sha1="c7e8e46a4a1f3d2067eca4c850c4b1b89bec168b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29111,10 +29119,12 @@
 		<description>Sega Arcade Gallery (Euro)</description>
 		<year>2003</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="AGB-AYPP"/>
+		<info name="serial" value="AGB-AYPP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="sega arcade gallery (europe) (en,fr,de,es,it).bin" size="8388608" crc="f92140c0" sha1="c99fe39973b33be64749f27ce6b454e0c3c15d05"/>
+				<rom name="agb-aypp-0.u1" size="8388608" crc="f92140c0" sha1="c99fe39973b33be64749f27ce6b454e0c3c15d05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29135,11 +29145,14 @@
 		<description>Sega Rally Championship (Euro)</description>
 		<year>2003</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="AGB-AYLP"/>
+		<info name="serial" value="AGB-AYLP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E11-01" />
+			<feature name="u1" value="U1 MASK ROM AGB" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
-				<rom name="sega rally championship (europe).bin" size="8388608" crc="d125a6bb" sha1="bfbf823e2979e122b984ac04a9ea7fa996afae28"/>
+				<rom name="agb-aylp-0.u1" size="8388608" crc="d125a6bb" sha1="bfbf823e2979e122b984ac04a9ea7fa996afae28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33351,10 +33364,12 @@
 		<description>Superman - Countdown to Apokolips (Euro)</description>
 		<year>2003</year>
 		<publisher>Atari</publisher>
-		<info name="serial" value="AGB-ASUP"/>
+		<info name="serial" value="AGB-ASUP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="superman - countdown to apokolips (europe) (en,fr,de,es,it).bin" size="8388608" crc="2bf26a56" sha1="b42cb62f1cf7bf8db3553e02ea448077bf5536ef"/>
+				<rom name="agb-asup-0.u1" size="8388608" crc="2bf26a56" sha1="b42cb62f1cf7bf8db3553e02ea448077bf5536ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37428,11 +37443,15 @@
 		<description>X2 - Wolverine's Revenge (Euro, USA)</description>
 		<year>2003</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-AWVE-USA, AGB-AWVP"/>
+		<info name="serial" value="AGB-AWVE-USA, AGB-AWVP-EUR (80403.133.UK)"/>
+		<info name="alt_title" value="X-Men 2: Wolverine's Revenge"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="x2 - wolverine's revenge (usa, europe).bin" size="8388608" crc="41a92220" sha1="dc2e861013a9b6a65b9bcd122f070c8f55d1471b"/>
+				<rom name="agb-awvp-0.u1" size="8388608" crc="41a92220" sha1="dc2e861013a9b6a65b9bcd122f070c8f55d1471b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40174,6 +40193,21 @@
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
 				<rom name="4 games on one game pak (nicktoons) (usa).bin" size="33554432" crc="cac0c0d8" sha1="c906145594de76a1d03578fb03635de62cce44ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4nickmov">
+		<description>4 Games on One Game Pak (Nickelodeon Movies) (USA)</description>
+		<year>2004</year>
+		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BI6E-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="33554432">
+				<rom name="agb-bi6e-0.u1" size="33554432" crc="e2f8a189" sha1="a4c779a207e4b83d39e99d58796be1a3eec27c0b"/>
 			</dataarea>
 		</part>
 	</software>
