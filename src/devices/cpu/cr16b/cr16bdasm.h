@@ -32,7 +32,8 @@ protected:
 	void format_short_imm(std::ostream &stream, u8 imm);
 	void format_short_imm_unsigned(std::ostream &stream, u8 imm, bool i);
 	void format_short_imm_decimal(std::ostream &stream, u8 imm);
-	void format_medium_imm(std::ostream &stream, u16 imm, bool i);
+	void format_medium_imm(std::ostream &stream, u16 imm);
+	void format_medium_imm_unsigned(std::ostream &stream, u16 imm, bool i);
 	void format_medium_imm_decimal(std::ostream &stream, u16 imm);
 	void format_imm21(std::ostream &stream, u32 imm);
 	void format_disp5(std::ostream &stream, u8 disp);

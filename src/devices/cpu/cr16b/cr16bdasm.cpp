@@ -5,8 +5,8 @@
     National Semiconductor CompactRISC CR16B disassembler
 
     Core architecture versions supported by this disassembler:
-    * CR16A: 17-bit PC
-    * CR16B: 21-bit PC using large memory model, enhanced instruction set
+    * CR16A: 17-bit PC, 18-bit address space
+    * CR16B: 21-bit PC with large memory model, enhanced instruction set
 
     CR16C has a 24-bit PC and expands the instruction set still further.
     Its instruction encoding is entirely different and is therefore not
@@ -156,9 +156,9 @@ void cr16b_disassembler::format_short_imm(std::ostream &stream, u8 imm)
 	if (imm == 0)
 		stream << "$0";
 	else if (imm >= 0x10)
-		util::stream_format(stream, "$-0x%01X", 0x10 - (imm & 0x0f));
+		util::stream_format(stream, "$-0x%X", 0x10 - (imm & 0x0f));
 	else
-		util::stream_format(stream, "$0x%01X", imm);
+		util::stream_format(stream, "$0x%X", imm);
 }
 
 void cr16b_disassembler::format_short_imm_unsigned(std::ostream &stream, u8 imm, bool i)
@@ -179,7 +179,15 @@ void cr16b_disassembler::format_short_imm_decimal(std::ostream &stream, u8 imm)
 		util::stream_format(stream, "$%d", imm);
 }
 
-void cr16b_disassembler::format_medium_imm(std::ostream &stream, u16 imm, bool i)
+void cr16b_disassembler::format_medium_imm(std::ostream &stream, u16 imm)
+{
+	if (imm >= 0x8000)
+		util::stream_format(stream, "$-0x%X", 0x10000 - imm);
+	else
+		util::stream_format(stream, "$0x%X", imm);
+}
+
+void cr16b_disassembler::format_medium_imm_unsigned(std::ostream &stream, u16 imm, bool i)
 {
 	if (i)
 		util::stream_format(stream, "$0x%04X", imm);
@@ -353,7 +361,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "add%c    ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm(stream, opcodes.r16(pc + 2));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -374,7 +382,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 			util::stream_format(stream, "addu%c   ", BIT(opcode, 13) ? 'w' : 'b');
 			if ((opcode & 0x001f) == 0x0011)
 			{
-				format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+				format_medium_imm(stream, opcodes.r16(pc + 2));
 				stream << ", ";
 				format_reg(stream, (opcode & 0x01e0) >> 5);
 				return 4 | SUPPORTED;
@@ -442,7 +450,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "mul%c    ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm(stream, opcodes.r16(pc + 2));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -493,7 +501,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "xor%c    ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm_unsigned(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -510,7 +518,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "cmp%c    ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm(stream, opcodes.r16(pc + 2));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -527,7 +535,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "and%c    ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm_unsigned(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -544,7 +552,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "addc%c   ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm(stream, opcodes.r16(pc + 2));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -620,7 +628,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "mov%c    ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm_unsigned(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -637,7 +645,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "subc%c   ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm(stream, opcodes.r16(pc + 2));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -654,7 +662,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "or%c     ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm_unsigned(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
@@ -671,7 +679,7 @@ offs_t cr16b_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 		util::stream_format(stream, "sub%c    ", BIT(opcode, 13) ? 'w' : 'b');
 		if ((opcode & 0x001f) == 0x0011)
 		{
-			format_medium_imm(stream, opcodes.r16(pc + 2), BIT(opcode, 13));
+			format_medium_imm(stream, opcodes.r16(pc + 2));
 			stream << ", ";
 			format_reg(stream, (opcode & 0x01e0) >> 5);
 			return 4 | SUPPORTED;
