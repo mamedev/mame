@@ -22,8 +22,6 @@
 Known to exist but not dumped:
 	*Cruis'n USA L2.0
 	*Cruis'n USA L1.2
-	*Cruis'n World L2.6 (update to the Hyperdrive kit L2.5)
-	*Cruis'n World L1.0
 	*Off Road Challenge v1.00 (Mon 07-28-97)
 	
 
@@ -1081,11 +1079,6 @@ void midvunit_state::midvcommon(machine_config &config)
 void midvunit_state::midvunit(machine_config &config)
 {
 	midvcommon(config);
-	
-/*	m_maincpu->a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set("maincpu", FUNC(tms32031_device::rx_a_w)); */
 
 	ADC0844(config, m_adc);
 	m_adc->intr_callback().set_inputline("maincpu", 3);
@@ -1363,7 +1356,7 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 ROM_END
 
 
-ROM_START( crusnwld ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
+ROM_START( crusnwld ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 Conversion kit for Hyperdrive that skips the manual transmission*/
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
 	ROM_LOAD16_BYTE( "cwld.u3",  0x200000, 0x80000, CRC(be9a5ff0) SHA1(98d69dbfa6aa8462cdd46772e991ee418b79c653) )
@@ -1375,10 +1368,10 @@ ROM_START( crusnwld ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
 	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "crusnw24.u10", 0x0000000, 0x100000, CRC(551ec903) SHA1(f3d983ca5d9a90b2898fb2c3adf8859ab7b43917) )
-	ROM_LOAD32_BYTE( "crusnw24.u11", 0x0000001, 0x100000, CRC(4c57faf2) SHA1(d5717e6222bb59c5aba782bce04aa52c1d148c49) )
-	ROM_LOAD32_BYTE( "crusnw24.u12", 0x0000002, 0x100000, CRC(3a4d9a30) SHA1(ac944555340502e9324df8360c3efc538315e474) )
-	ROM_LOAD32_BYTE( "crusnw24.u13", 0x0000003, 0x100000, CRC(ca6a0c94) SHA1(217659d2ce1b970265df258e330148fef327c6f1) )
+	ROM_LOAD32_BYTE( "crusnw25.u10", 0x0000000, 0x100000, CRC(fd776872) SHA1(90df230b58b1c60d1ca7545ef177e5df30b4ea9d) ) /* Labeled 2.5 Cruis'n World Automatic U10 */
+	ROM_LOAD32_BYTE( "crusnw25.u11", 0x0000001, 0x100000, CRC(0c99a405) SHA1(14251187f00c198fbaa39817f8c95d1dbec80ec0) ) /* Labeled 2.5 Cruis'n World Automatic U11 */
+	ROM_LOAD32_BYTE( "crusnw25.u12", 0x0000002, 0x100000, CRC(3ba9fad8) SHA1(ac8d0dd4df3c1f1c28d93d615d7e24aed4a4a9b5) ) /* Labeled 2.5 Cruis'n World Automatic U12 */
+	ROM_LOAD32_BYTE( "crusnw25.u13", 0x0000003, 0x100000, CRC(21a79c9a) SHA1(e33f768c2309613e4936416ee5250d3b1690d11d) ) /* Labeled 2.5 Cruis'n World Automatic U13 */
 	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
 	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
 	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
@@ -1402,7 +1395,7 @@ ROM_START( crusnwld ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
 ROM_END
 
 
-ROM_START( crusnwld25 ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 Conversion kit for Hyperdrive that skips the manual transmission*/
+ROM_START( crusnwld24 ) /* Version 2.4, Thu Feb 19 1998 - 13:43:26 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
 	ROM_LOAD16_BYTE( "cwld.u2",  0x000000, 0x80000, CRC(7a233c89) SHA1(ecfad4bc48a69cd3399e3b3266c81574082e0169) )
 	ROM_LOAD16_BYTE( "cwld.u3",  0x200000, 0x80000, CRC(be9a5ff0) SHA1(98d69dbfa6aa8462cdd46772e991ee418b79c653) )
@@ -1414,10 +1407,10 @@ ROM_START( crusnwld25 ) /* Version 2.5, Wed Nov 04 1998 - 15:50:52 Conversion ki
 	ROM_LOAD16_BYTE( "cwld.u9",  0xe00000, 0x80000, CRC(84cdc781) SHA1(62287aa72903698d1890908adde53c39f8bd200c) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "crusnw25.u10", 0x0000000, 0x100000, CRC(fd776872) SHA1(90df230b58b1c60d1ca7545ef177e5df30b4ea9d) ) /* Labeled 2.5 Cruis'n World Automatic U10 */
-	ROM_LOAD32_BYTE( "crusnw25.u11", 0x0000001, 0x100000, CRC(0c99a405) SHA1(14251187f00c198fbaa39817f8c95d1dbec80ec0) ) /* Labeled 2.5 Cruis'n World Automatic U11 */
-	ROM_LOAD32_BYTE( "crusnw25.u12", 0x0000002, 0x100000, CRC(3ba9fad8) SHA1(ac8d0dd4df3c1f1c28d93d615d7e24aed4a4a9b5) ) /* Labeled 2.5 Cruis'n World Automatic U12 */
-	ROM_LOAD32_BYTE( "crusnw25.u13", 0x0000003, 0x100000, CRC(21a79c9a) SHA1(e33f768c2309613e4936416ee5250d3b1690d11d) ) /* Labeled 2.5 Cruis'n World Automatic U13 */
+	ROM_LOAD32_BYTE( "crusnw24.u10", 0x0000000, 0x100000, CRC(551ec903) SHA1(f3d983ca5d9a90b2898fb2c3adf8859ab7b43917) )
+	ROM_LOAD32_BYTE( "crusnw24.u11", 0x0000001, 0x100000, CRC(4c57faf2) SHA1(d5717e6222bb59c5aba782bce04aa52c1d148c49) )
+	ROM_LOAD32_BYTE( "crusnw24.u12", 0x0000002, 0x100000, CRC(3a4d9a30) SHA1(ac944555340502e9324df8360c3efc538315e474) )
+	ROM_LOAD32_BYTE( "crusnw24.u13", 0x0000003, 0x100000, CRC(ca6a0c94) SHA1(217659d2ce1b970265df258e330148fef327c6f1) )
 	ROM_LOAD32_BYTE( "cwld.u14",     0x0400000, 0x100000, CRC(ee815091) SHA1(fb8a99bae07f42966f76a3bb073d7d8280d8efcb) )
 	ROM_LOAD32_BYTE( "cwld.u15",     0x0400001, 0x100000, CRC(e2da7bf1) SHA1(9d9a80055ee62476f47c95e30ec9a989d5d0e25b) )
 	ROM_LOAD32_BYTE( "cwld.u16",     0x0400002, 0x100000, CRC(05a7ad2f) SHA1(4bdfde671379ecefa3f8ceb6fc06e8df5d70fc22) )
@@ -2013,8 +2006,8 @@ GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, init_crus
 GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
-GAMEL( 1996, crusnwld25, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa ) //Conversion kit for Hyperdrive that removes manual transmission
+GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
