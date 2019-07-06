@@ -7,7 +7,6 @@
 **************************************************************************/
 
 #include "audio/dcs.h"
-//#include "bus/rs232/rs232.h"
 #include "machine/adc0844.h"
 #include "machine/ataintf.h"
 #include "machine/midwayic.h"
@@ -72,9 +71,7 @@ public:
 		m_optional_drivers(*this, "lamp%u", 0U),
 		m_in1(*this, "IN1"),
 		m_dsw(*this, "DSW"),
-		m_motion(*this, "MOTION")
-//		m_rs232(*this, "rs232")
-		{ }
+		m_motion(*this, "MOTION") { }
 
 	void midvcommon(machine_config &config);
 	void crusnwld(machine_config &config);
@@ -193,7 +190,6 @@ private:
 	optional_ioport m_in1;
 	optional_ioport m_dsw;
 	optional_ioport m_motion;
-//	optional_device<rs232_port_device>m_rs232;
 	void postload();
 
 	void midvplus_map(address_map &map);
