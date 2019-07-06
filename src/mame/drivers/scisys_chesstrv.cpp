@@ -231,4 +231,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, chesstrv, 0,      0, chesstrv, chesstrv, chesstrv_state, empty_init, "SciSys", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, chesstrv, 0,      0, chesstrv, chesstrv, chesstrv_state, empty_init, "SciSys / Novag", "Chess Traveler", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

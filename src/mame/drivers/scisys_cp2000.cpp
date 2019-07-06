@@ -4,6 +4,7 @@
 /******************************************************************************
 
 SciSys Chess Partner 2000, also sold by Novag with the same name.
+It's probably the last SciSys / Novag collaboration.
 
 - 3850PK CPU at ~2MHz, 3853PK memory interface
 - 4KB ROM, 256 bytes RAM(2*2111N)
@@ -255,4 +256,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, cp2000, 0,      0, cp2000,  cp2000, cp2000_state, empty_init, "SciSys", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, cp2000, 0,      0, cp2000,  cp2000, cp2000_state, empty_init, "SciSys / Novag", "Chess Partner 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

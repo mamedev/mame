@@ -3,8 +3,9 @@
 // thanks-to:Sean Riddle
 /******************************************************************************
 
-Driver file to handle emulation of the Novag/Videomaster Chess Champion MK I
+DCS CompuChess / Novag Chess Champion MK I
 Initial version by PeT mess@utanet.at 2000,2001.
+Driver largely rewritten over the years.
 
 TODO:
 - cncchess sound is wrong, it should be a long dual-tone alarm sound
@@ -176,8 +177,6 @@ void mk1_state::update_reset(ioport_value state)
 /******************************************************************************
     Devices, I/O
 ******************************************************************************/
-
-// I/O handlers
 
 READ8_MEMBER(mk1_state::beeper_r)
 {

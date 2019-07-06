@@ -1,9 +1,24 @@
 // license:GPL-2.0+
-// copyright-holders:Peter Trauner
+// copyright-holders:Peter Trauner, hap
 /******************************************************************************
- PeT mess@utanet.at September 2000
 
-chess champion mk II
+Commodore Chessmate / Novag Chess Champion MK II
+Initial version by PeT mess@utanet.at September 2000.
+Driver mostly rewritten later.
+
+The hardware is pretty similar to KIM-1. In fact, the chess engine is Peter R. Jennings's
+Microchess, originally made for the KIM-1. Jennings went on to co-found Personal Software
+(later named VisiCorp, known for VisiCalc).
+
+Jennings also licensed Chessmate to Novag, and they released it as the MK II. Funnily
+enough, MK I had a stronger program. The hardware is almost identical, and the software
+is the same(identical ROM labels). 2 designs were made, one jukebox shape, and one brick
+shape. The one in MAME came from the jukebox, it's assumed both are the same game.
+
+TODO:
+- XTAL is unknown, result frequency of 1MHz is correct
+
+*******************************************************************************
 
 MOS MPS 6504 2179
 MOS MPS 6530 024 1879
@@ -12,231 +27,246 @@ MOS MPS 6530 024 1879
  0x1380-0x13bf ram
  0x1400-0x17ff rom
 
-2x2111 ram (256x4?)
+2*MPS6111 RAM (256x4)
 MOS MPS 6332 005 2179
-74145 bcd to decimal encoder (10 low active select lines)
-(7400)
+74145 bcd to decimal encoder
 
-4x 7 segment led display (each with dot)
+4x 7 segment led display
 4 single leds
-21 keys
-
-
-83, 84 contains display variables
-
-
-port a
-   0..7 led output
-   0..6 keyboard input
-
-port b
-   0..5 outputs
-   0 speaker out
-   6 as chipselect used!?
-   7 interrupt out?
-
-   c4, c5, keyboard polling
-   c0, c1, c2, c3 led output
-
-Usage:
-
-   under the black keys are operations to be added as first sign
-   black and white box are only changing the player
-
-   for the computer to start as white
-    switch to black (h enter)
-    swap players (g enter)
+19 buttons (11 on brick model)
 
 ******************************************************************************/
 
 #include "emu.h"
-
 #include "cpu/m6502/m6504.h"
 #include "machine/mos6530.h"
 #include "machine/timer.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
-#include "novag_mk2.lh"
+// internal artwork
+#include "novag_mk2.lh" // clickable
 
+
+namespace {
 
 class mk2_state : public driver_device
 {
 public:
-	mk2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_speaker(*this, "speaker")
-		, m_miot(*this, "miot")
-		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 0U)
+	mk2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_miot(*this, "miot"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	// machine configs
 	void mk2(machine_config &config);
 
-private:
-	DECLARE_READ8_MEMBER(mk2_read_a);
-	DECLARE_WRITE8_MEMBER(mk2_write_a);
-	DECLARE_READ8_MEMBER(mk2_read_b);
-	DECLARE_WRITE8_MEMBER(mk2_write_b);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
-	void mk2_mem(address_map &map);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
+protected:
 	virtual void machine_start() override;
 
-	uint8_t m_led_data[5];
+private:
+	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6530_device> m_miot;
-	output_finder<6> m_digits;
-	output_finder<4> m_leds;
+	required_device<pwm_display_device> m_display;
+	required_device<dac_bit_interface> m_dac;
+	optional_ioport_array<4> m_inputs;
+
+	// address maps
+	void main_map(address_map &map);
+
+	// I/O handlers
+	void update_display();
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(input_r);
+
+	u8 m_inp_mux;
+	u8 m_7seg_data;
+	u8 m_led_data;
 };
-
-
-// only lower 12 address bits on bus!
-void mk2_state::mk2_mem(address_map &map)
-{
-	map(0x0000, 0x01ff).ram(); // 2 2111, should be mirrored
-	map(0x0b00, 0x0b0f).rw(m_miot, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
-	map(0x0b80, 0x0bbf).ram(); // rriot ram
-	map(0x0c00, 0x0fff).rom(); // rriot rom
-	map(0x1000, 0x1fff).rom();
-}
-
-static INPUT_PORTS_START( mk2 )
-	PORT_START("EXTRA")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_F3) // seems to be direct wired to reset
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-	PORT_START("BLACK")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black A    Black") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black B    Field") PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black C    Time?") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black D    Time?") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black E    Time off?") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black F    LEVEL") PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black G    Swap") PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Black H    White") PORT_CODE(KEYCODE_H)
-	PORT_START("WHITE")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 1") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 2") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 3") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 4") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 5") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 6") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 7") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("White 8") PORT_CODE(KEYCODE_8)
-INPUT_PORTS_END
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
-{
-	int i;
-
-	for (i=0; i<4; i++)
-		m_digits[i] = m_led_data[i];
-
-	m_leds[0] = BIT(m_led_data[4], 3);
-	m_leds[1] = BIT(m_led_data[4], 5);
-	m_leds[2] = BIT(m_led_data[4], 4);
-	m_leds[3] = BIT(~m_led_data[4], 4);
-
-	m_led_data[0] = m_led_data[1] = m_led_data[2] = m_led_data[3] = m_led_data[4] = 0;
-}
 
 void mk2_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
+	// zerofill
+	m_inp_mux = 0;
+	m_7seg_data = 0;
+	m_led_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_led_data));
 }
 
-READ8_MEMBER( mk2_state::mk2_read_a )
+INPUT_CHANGED_MEMBER(mk2_state::reset_button)
 {
-	int data = 0xff;
-	int help = ioport("BLACK")->read() | ioport("WHITE")->read(); // looks like white and black keys are the same!
+	// assume that NEW GAME button is tied to reset pin(s)
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval)
+		m_miot->reset();
+}
 
-	switch (m_miot->portb_out_get()&0x7)
+
+
+/******************************************************************************
+    Devices, I/O
+******************************************************************************/
+
+// 6530 ports
+
+void mk2_state::update_display()
+{
+	m_display->write_row(4, m_led_data);
+	m_display->matrix_partial(0, 4, 1 << m_inp_mux, m_7seg_data);
+}
+
+WRITE8_MEMBER(mk2_state::control_w)
+{
+	// d0-d2: 74145 to input mux/digit select
+	m_inp_mux = data & 7;
+
+	// 74145 Q7: speaker out
+	m_dac->write(BIT(1 << m_inp_mux, 7));
+
+	// d3-d5: leds (direct)
+	m_led_data = data >> 3 & 7;
+	update_display();
+
+	// d6: chipselect used?
+	// d7: IRQ out
+	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE8_MEMBER(mk2_state::digit_w)
+{
+	m_7seg_data = data;
+	update_display();
+}
+
+READ8_MEMBER(mk2_state::input_r)
+{
+	u8 data = 0;
+
+	// multiplexed inputs (74145 Q4,Q5)
+	if (m_inp_mux == 4 || m_inp_mux == 5)
 	{
-	case 4:
-		if (BIT(help, 5)) data&=~0x1; //F
-		if (BIT(help, 4)) data&=~0x2; //E
-		if (BIT(help, 3)) data&=~0x4; //D
-		if (BIT(help, 2)) data&=~0x8; // C
-		if (BIT(help, 1)) data&=~0x10; // B
-		if (BIT(help, 0)) data&=~0x20; // A
-		break;
-	case 5:
-		if (BIT(ioport("EXTRA")->read(), 2)) data&=~0x8; // Enter
-		if (BIT(ioport("EXTRA")->read(), 1)) data&=~0x10; // Clear
-		if (BIT(help, 7)) data&=~0x20; // H
-		if (BIT(help, 6)) data&=~0x40; // G
-		break;
+		// note that number/letter buttons are electronically the same
+		u8 i = m_inp_mux - 4;
+		data = m_inputs[i]->read() | m_inputs[i | 2]->read();
 	}
-	return data;
+
+	return ~data;
 }
 
-WRITE8_MEMBER( mk2_state::mk2_write_a )
+
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
+
+void mk2_state::main_map(address_map &map)
 {
-	uint8_t temp = m_miot->portb_out_get();
-
-	m_led_data[temp & 3] |= data;
+	map.global_mask(0x1fff);
+	map(0x0000, 0x00ff).mirror(0x100).ram();
+	map(0x0b00, 0x0b0f).rw(m_miot, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x0b80, 0x0bbf).ram(); // 6530 RAM
+	map(0x0c00, 0x0fff).rom(); // 6530 ROM
+	map(0x1000, 0x1fff).rom();
 }
 
 
-READ8_MEMBER( mk2_state::mk2_read_b )
-{
-	return 0xff&~0x40; // chip select mapped to pb6
-}
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
+
+static INPUT_PORTS_START( mk2 )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / Skill Level")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / Stop Clock")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("D / Display Time")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("C / Chess Clock")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("B / Board Verify")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A / White")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / Black")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("G / Game Moves")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, mk2_state, reset_button, nullptr) PORT_NAME("New Game")
+INPUT_PORTS_END
 
 
-WRITE8_MEMBER( mk2_state::mk2_write_b )
-{
-	if ((data & 0x06) == 0x06)
-			m_speaker->level_w(BIT(data, 0));
 
-	m_led_data[4] |= data;
-
-	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
-}
-
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
 
 void mk2_state::mk2(machine_config &config)
 {
 	/* basic machine hardware */
 	M6504(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mk2_state::mk2_mem);
-	config.m_minimum_quantum = attotime::from_hz(60);
-
-	/* video hardware */
-	config.set_default_layout(layout_novag_mk2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk2_state::main_map);
 
 	MOS6530(config, m_miot, 1000000);
-	m_miot->in_pa_callback().set(FUNC(mk2_state::mk2_read_a));
-	m_miot->out_pa_callback().set(FUNC(mk2_state::mk2_write_a));
-	m_miot->in_pb_callback().set(FUNC(mk2_state::mk2_read_b));
-	m_miot->out_pb_callback().set(FUNC(mk2_state::mk2_write_b));
+	m_miot->in_pa_callback().set(FUNC(mk2_state::input_r));
+	m_miot->out_pa_callback().set(FUNC(mk2_state::digit_w));
+	m_miot->out_pb_callback().set(FUNC(mk2_state::control_w));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4+1, 8);
+	m_display->set_segmask(0xf, 0x7f);
+	config.set_default_layout(layout_novag_mk2);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	TIMER(config, "led_timer").configure_periodic(FUNC(mk2_state::update_leds), attotime::from_hz(60));
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
-ROM_START(ccmk2)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("024_1879", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade))
-	ROM_LOAD("005_2179", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812)) // chess mate 7.5
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
+
+ROM_START( ccmk2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("6530_024", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
+	ROM_LOAD("6332_005", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812) )
 ROM_END
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+} // anonymous namespace
 
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                 FLAGS
-CONS( 1979, ccmk2, 0,      0,      mk2,     mk2,   mk2_state, empty_init, "Novag", "Chess Champion: MK II", 0 )
-// second design sold (same computer/program?)
+
+/******************************************************************************
+    Drivers
+******************************************************************************/
+
+//    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ccmk2, 0,      0, mk2,     mk2,   mk2_state, empty_init, "Novag", "Chess Champion: MK II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

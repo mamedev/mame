@@ -17,6 +17,14 @@
 			<color red="0.09375" green="0.0" blue="0.0" />
 		</disk>
 	</element>
+	<element name="ledi" defstate="0">
+		<disk state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.09375" green="0.0" blue="0.0" />
+		</disk>
+	</element>
 
 	<element name="labels">
 		<text string="+">
@@ -51,16 +59,16 @@
 			<bounds x="111" y="0" width="22" height="27" />
 		</bezel>
 
-		<bezel name="led0" element="led">
+		<bezel name="4.0" element="led">
 			<bounds x="0" y="75" width="5" height="5" />
 		</bezel>
-		<bezel name="led1" element="led">
+		<bezel name="4.2" element="led">
 			<bounds x="39" y="75" width="5" height="5" />
 		</bezel>
-		<bezel name="led2" element="led">
+		<bezel name="4.1" element="led">
 			<bounds x="78" y="75" width="5" height="5" />
 		</bezel>
-		<bezel name="led3" element="led">
+		<bezel name="4.1" element="ledi">
 			<bounds x="116" y="75" width="5" height="5" />
 		</bezel>
 	</view>
