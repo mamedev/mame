@@ -882,6 +882,15 @@ ROM_START( glmcolor )
 	ROM_LOAD( "27-5673-00.u6", 0x00000, 0x100000, CRC(c4245392) SHA1(bb651aaf11b75f4155c0a0106de9394018110cc7) )
 ROM_END
 
+ROM_START( glmmc )
+	// FIXME: either ROM loading or banking is wrong here...
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-5889-00.bin", 0x060000, 0x020000, CRC(5e2c6359) SHA1(cc01c7bd5c87224b63dd1044db5a36a5cb7824f1) )
+	ROM_CONTINUE( 0x040000, 0x020000 )
+	ROM_CONTINUE( 0x020000, 0x020000 )
+	ROM_CONTINUE( 0x000000, 0x020000 )
+ROM_END
+
 ROM_START( gkidabc )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD("27-5730-00.bin", 0x00000, 0x20000, CRC(64664708) SHA1(74212c2dec1caa41dbc933b50f857904a8ac623b))
@@ -907,6 +916,7 @@ COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty
 COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 19??, glmmc,    0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Leader Master Mega Color (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // these systems need to be moved into a separate driver

@@ -33013,6 +33013,7 @@ gl6000sl                        // Genius Leader 6000SL (Germany)
 gl7007sl                        // Genius Leader 7007SL (Germany)
 glcolor                         // Genius Leader Color (Germany)
 glmcolor                        // Genius Leader Magic Color (Germany)
+glmmc                           // Genius Leader Master Mega Color (Germany)
 glscolor                        // Genius Leader Super Color (Germany)
 gwnf                            // Genius Winner Notebook Fun (Germany)
 prestige                        // PreComputer Prestige Elite
@@ -39306,9 +39307,6 @@ laser700                        // 1984? Laser 700
 
 @source:vtech_eu3a12.cpp
 vreadere
-
-@source:vtech_unk2.cpp
-glmmc                           // 199? Genius Master Mega Color
 
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)
