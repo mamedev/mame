@@ -58,7 +58,10 @@ public:
 	void set_auto_start(bool auto_start) { m_auto_start = auto_start; }
 
 	// remote interface
-	void ric_w(u8 data);
+	u8 cmd_r();
+	void cmd_w(u8 data);
+	u8 remote_read(offs_t offset);
+	void remote_write(offs_t offset, u8 data);
 
 protected:
 	// device-specific overrides
@@ -111,8 +114,6 @@ private:
 	u8 read_register(unsigned reg);
 	u8 read_accumulator() const;
 	void write_register(unsigned reg, u8 data);
-	void remote_read();
-	void remote_write();
 
 	// address spaces
 	const address_space_config m_inst_config;
@@ -169,6 +170,7 @@ private:
 	// remote interface registers
 	u8 m_ric;
 	bool m_hib;
+	u16 m_latched_instr;
 	bool m_auto_start;
 
 	// input lines

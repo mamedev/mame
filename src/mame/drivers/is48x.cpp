@@ -20,15 +20,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bcp(*this, "bcp")
-		, m_bcpram(*this, "bcpram")
 	{ }
 
 	void is482(machine_config &config);
 
 private:
-	u8 bcpram_r(offs_t offset);
-	void bcpram_w(offs_t offset, u8 data);
-
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void bcp_inst_map(address_map &map);
@@ -36,29 +32,12 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dp8344_device> m_bcp;
-	required_shared_ptr<u16> m_bcpram;
 };
-
-u8 is48x_state::bcpram_r(offs_t offset)
-{
-	if (BIT(offset, 0))
-		return m_bcpram[offset >> 1] >> 8;
-	else
-		return m_bcpram[offset >> 1] & 0x00ff;
-}
-
-void is48x_state::bcpram_w(offs_t offset, u8 data)
-{
-	if (BIT(offset, 0))
-		m_bcpram[offset >> 1] = (m_bcpram[offset >> 1] & 0x00ff) | data << 8;
-	else
-		m_bcpram[offset >> 1] = (m_bcpram[offset >> 1] & 0xff00) | data;
-}
 
 void is48x_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
-	map(0x40000, 0x47fff).rw(FUNC(is48x_state::bcpram_r), FUNC(is48x_state::bcpram_w));
+	map(0x40000, 0x47fff).rw(m_bcp, FUNC(dp8344_device::remote_read), FUNC(dp8344_device::remote_write));
 	map(0x50000, 0x51fff).ram();
 	map(0x54000, 0x55fff).ram();
 	map(0x60022, 0x60022).nopr();
@@ -72,16 +51,17 @@ void is48x_state::io_map(address_map &map)
 	//map(0x8080, 0x8080).w("crtc", FUNC(mc6845_device::address_w));
 	//map(0x8081, 0x8081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x8101, 0x8101).nopr();
-	map(0x8180, 0x8180).ram();
+	map(0x8180, 0x8180).rw(m_bcp, FUNC(dp8344_device::cmd_r), FUNC(dp8344_device::cmd_w));
 }
 
 void is48x_state::bcp_inst_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().share("bcpram");
+	map(0x0000, 0x1fff).ram();
 }
 
 void is48x_state::bcp_data_map(address_map &map)
 {
+	map(0x0000, 0x7fff).ram();
 }
 
 static INPUT_PORTS_START(is482)
