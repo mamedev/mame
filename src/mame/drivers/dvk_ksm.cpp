@@ -351,13 +351,10 @@ uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline
 
 		if ((scanline > 7 && blink) || ((chr < (0x20 << 3)) && !blink)) gfx = 0;
 
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		*p++ = BIT(gfx, 0) ? fg : bg;
+		for (int i = 6; i >= 0; i--)
+		{
+			*p++ = BIT(gfx, i) ? fg : bg;
+		}
 		*p++ = bg;
 		*p++ = bg;
 		*p++ = bg;

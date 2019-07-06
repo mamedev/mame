@@ -394,26 +394,16 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		for (x = 0; x < 1024 / 8; x += 2)
 		{
 			gfx = m_videoram[(x + 1) | (y << 7)];
-
-			*p++ = BIT(gfx, 7);
-			*p++ = BIT(gfx, 6);
-			*p++ = BIT(gfx, 5);
-			*p++ = BIT(gfx, 4);
-			*p++ = BIT(gfx, 3);
-			*p++ = BIT(gfx, 2);
-			*p++ = BIT(gfx, 1);
-			*p++ = BIT(gfx, 0);
+			for (int i = 7; i >= 0; i--)
+			{
+				*p++ = BIT(gfx, i);
+			}
 
 			gfx = m_videoram[x | (y << 7)];
-
-			*p++ = BIT(gfx, 7);
-			*p++ = BIT(gfx, 6);
-			*p++ = BIT(gfx, 5);
-			*p++ = BIT(gfx, 4);
-			*p++ = BIT(gfx, 3);
-			*p++ = BIT(gfx, 2);
-			*p++ = BIT(gfx, 1);
-			*p++ = BIT(gfx, 0);
+			for (int i = 7; i >= 0; i--)
+			{
+				*p++ = BIT(gfx, i);
+			}
 		}
 	}
 	return 0;
