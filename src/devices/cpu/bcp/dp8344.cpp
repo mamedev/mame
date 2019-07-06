@@ -1281,7 +1281,7 @@ void dp8344_device::cmd_w(u8 data)
 		BIT(data, 6) ? "single step" : BIT(data, 2) ? "start" : "stop");
 
 	m_ric = data;
-	set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
+	set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

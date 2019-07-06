@@ -31,6 +31,7 @@ public:
 	// register enumeration
 	enum {
 		BCP_PC,
+		BCP_BA, BCP_BB,
 		BCP_CCR, BCP_NCF, BCP_ICR, BCP_ACR,
 		BCP_DCR, BCP_IBR, BCP_ATR, BCP_FBR,
 		BCP_GP0, BCP_GP1, BCP_GP2, BCP_GP3, BCP_GP4, BCP_GP5, BCP_GP6, BCP_GP7,
@@ -41,8 +42,7 @@ public:
 		BCP_IWLO, BCP_IXLO, BCP_IYLO, BCP_IZLO,
 		BCP_IWHI, BCP_IXHI, BCP_IYHI, BCP_IZHI,
 		BCP_TR,
-		BCP_ASP, BCP_DSP,
-		BCP_BA, BCP_BB
+		BCP_ASP, BCP_DSP
 	};
 
 	// construction/destruction
