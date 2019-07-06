@@ -13,8 +13,8 @@ Elite A/S Challenger (EAS)
 This came out in 1982. 2 program updates were released in 1983 and 1984,
 named Budapest and Glasgow, places where Fidelity won chess computer matches.
 A/S stands for auto sensory, it's the 1st Fidelity board with magnet sensors.
-The magnetic chessboard was licensed from AVE Micro Systems, in fact it's the
-exact same one as in AVE's ARB (ave_arb.cpp driver).
+The magnetic chessboard was licensed from AVE Micro Systems, in fact, the
+PC model board is the same one as in AVE's ARB (ave_arb.cpp driver).
 
 hardware overview:
 - 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
@@ -52,6 +52,7 @@ It was probably only released in Germany.
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/i8255.h"
+#include "machine/sensorboard.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/s14001a.h"
@@ -75,6 +76,8 @@ namespace {
 
 // note: sub-class of fidel_clockdiv_state (see mame/machine/fidel_clockdiv.*)
 
+// EAS / shared
+
 class elite_state : public fidel_clockdiv_state
 {
 public:
@@ -83,44 +86,40 @@ public:
 		m_irq_on(*this, "irq_on"),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
+		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
 		m_speech_rom(*this, "speech"),
 		m_language(*this, "language"),
 		m_cart(*this, "cartslot"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_rotate(false)
 	{ }
 
 	// machine drivers
 	void pc(machine_config &config);
 	void eas(machine_config &config);
 	void eas_priv(machine_config &config);
-	void eag(machine_config &config);
-	void eag2100(machine_config &config);
-
-	void init_eag2100();
 
 protected:
 	virtual void machine_start() override;
 
-private:
 	// devices/pointers
 	required_device<timer_device> m_irq_on;
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
+	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_device<s14001a_device> m_speech;
 	required_region_ptr<u8> m_speech_rom;
 	required_region_ptr<u8> m_language;
 	required_device<generic_slot_device> m_cart;
-	required_ioport_array<10> m_inputs;
+	required_ioport_array<2> m_inputs;
 
 	// address maps
 	void eas_map(address_map &map);
-	void eag_map(address_map &map);
-	void eag2100_map(address_map &map);
 	void pc_map(address_map &map);
 
 	// periodic interrupts
@@ -139,16 +138,12 @@ private:
 	DECLARE_READ8_MEMBER(ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 
+	bool m_rotate;
 	u8 m_led_data;
 	u8 m_7seg_data;
 	u8 m_inp_mux;
 	u8 m_speech_bank;
 };
-
-void elite_state::init_eag2100()
-{
-	m_rombank->configure_entries(0, 4, memregion("rombank")->base(), 0x2000);
-}
 
 void elite_state::machine_start()
 {
@@ -165,6 +160,34 @@ void elite_state::machine_start()
 	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_speech_bank));
+}
+
+// EAG
+
+class eag_state : public elite_state
+{
+public:
+	eag_state(const machine_config &mconfig, device_type type, const char *tag) :
+		elite_state(mconfig, type, tag)
+	{
+		m_rotate = true;
+	}
+
+	// machine drivers
+	void eag(machine_config &config);
+	void eag2100(machine_config &config);
+
+	void init_eag2100();
+
+private:
+	// address maps
+	void eag_map(address_map &map);
+	void eag2100_map(address_map &map);
+};
+
+void eag_state::init_eag2100()
+{
+	m_rombank->configure_entries(0, 4, memregion("rombank")->base(), 0x2000);
 }
 
 
@@ -221,11 +244,17 @@ READ8_MEMBER(elite_state::input_r)
 	// multiplexed inputs (active low)
 	// read chessboard sensors
 	if (m_inp_mux < 8)
-		data = m_inputs[m_inp_mux]->read();
+	{
+		// EAG chessboard is rotated 90 degrees compared to EAS
+		if (m_rotate)
+			data = m_board->read_rank(m_inp_mux);
+		else
+			data = m_board->read_file(m_inp_mux, true);
+	}
 
 	// read button panel
 	else if (m_inp_mux == 8)
-		data = m_inputs[8]->read();
+		data = m_inputs[0]->read();
 
 	return ~data;
 }
@@ -277,7 +306,7 @@ READ8_MEMBER(elite_state::ppi_portb_r)
 	data |= *m_language << 2 & 0x0c;
 
 	// d5: 3 more buttons
-	data |= (BIT(m_inputs[9]->read(), m_inp_mux)) ? 0 : 0x20;
+	data |= (BIT(m_inputs[1]->read(), m_inp_mux)) ? 0 : 0x20;
 
 	// other: ?
 	return data | 0xd0;
@@ -288,38 +317,6 @@ READ8_MEMBER(elite_state::ppi_portb_r)
 /******************************************************************************
     Address Maps
 ******************************************************************************/
-
-void elite_state::eas_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
-	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7020, 0x7027).w(FUNC(elite_state::segment_w)).nopr();
-	map(0x7030, 0x7037).w(FUNC(elite_state::led_w)).nopr();
-	map(0x7050, 0x7050).r(FUNC(elite_state::input_r));
-	map(0x8000, 0x9fff).rom();
-	map(0xc000, 0xffff).rom();
-}
-
-void elite_state::eag_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x1fff).ram().share("nvram.ic8");
-	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
-	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7020, 0x7027).w(FUNC(elite_state::segment_w)).nopr();
-	map(0x7030, 0x7037).w(FUNC(elite_state::led_w)).nopr();
-	map(0x7050, 0x7050).r(FUNC(elite_state::input_r));
-	map(0x8000, 0x9fff).ram().share("nvram.ic6");
-	map(0xa000, 0xffff).rom();
-}
-
-void elite_state::eag2100_map(address_map &map)
-{
-	eag_map(map);
-	map(0xa000, 0xbfff).bankr("rombank");
-}
 
 void elite_state::pc_map(address_map &map)
 {
@@ -336,99 +333,48 @@ void elite_state::pc_map(address_map &map)
 	map(0xb000, 0xffff).rom();
 }
 
+void elite_state::eas_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram().share("nvram");
+	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7020, 0x7027).w(FUNC(elite_state::segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(elite_state::led_w)).nopr();
+	map(0x7050, 0x7050).r(FUNC(elite_state::input_r));
+	map(0x8000, 0x9fff).rom();
+	map(0xc000, 0xffff).rom();
+}
+
+void eag_state::eag_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram().share("nvram.ic8");
+	map(0x2000, 0x5fff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7020, 0x7027).w(FUNC(eag_state::segment_w)).nopr();
+	map(0x7030, 0x7037).w(FUNC(eag_state::led_w)).nopr();
+	map(0x7050, 0x7050).r(FUNC(eag_state::input_r));
+	map(0x8000, 0x9fff).ram().share("nvram.ic6");
+	map(0xa000, 0xffff).rom();
+}
+
+void eag_state::eag2100_map(address_map &map)
+{
+	eag_map(map);
+	map(0xa000, 0xbfff).bankr("rombank");
+}
+
 
 
 /******************************************************************************
     Input Ports
 ******************************************************************************/
 
-INPUT_PORTS_START( generic_cb_magnets )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( eas )
 	PORT_INCLUDE( fidel_clockdiv_4 )
-	PORT_INCLUDE( generic_cb_magnets )
 
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control") // labeled RESET on the Prestige, but led display still says - G C -
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("PB / King")
@@ -438,7 +384,7 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("TB / Knight")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("LV / Pawn")
 
-	PORT_START("IN.9")
+	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
@@ -446,9 +392,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( eag )
 	PORT_INCLUDE( fidel_clockdiv_4 )
-	PORT_INCLUDE( generic_cb_magnets )
 
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Option")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("LV / Pawn")
@@ -458,7 +403,7 @@ static INPUT_PORTS_START( eag )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 
-	PORT_START("IN.9")
+	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
@@ -481,6 +426,10 @@ void elite_state::pc(machine_config &config)
 	TIMER(config, m_irq_on).configure_periodic(FUNC(elite_state::irq_on<M6502_IRQ_LINE>), irq_period);
 	m_irq_on->set_start_delay(irq_period - attotime::from_hz(38.4_kHz_XTAL*2)); // edge!
 	TIMER(config, "irq_off").configure_periodic(FUNC(elite_state::irq_off<M6502_IRQ_LINE>), irq_period);
+
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
@@ -534,13 +483,13 @@ void elite_state::eas_priv(machine_config &config)
 	config.set_default_layout(layout_fidel_eas_priv);
 }
 
-void elite_state::eag(machine_config &config)
+void eag_state::eag(machine_config &config)
 {
 	eas(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
-	m_mainmap->set_addrmap(AS_PROGRAM, &elite_state::eag_map);
+	m_mainmap->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
 
 	config.device_remove("nvram");
 	NVRAM(config, "nvram.ic8", nvram_device::DEFAULT_ALL_0);
@@ -551,12 +500,12 @@ void elite_state::eag(machine_config &config)
 	config.set_default_layout(layout_fidel_eag);
 }
 
-void elite_state::eag2100(machine_config &config)
+void eag_state::eag2100(machine_config &config)
 {
 	eag(config);
 
 	/* basic machine hardware */
-	m_mainmap->set_addrmap(AS_PROGRAM, &elite_state::eag2100_map);
+	m_mainmap->set_addrmap(AS_PROGRAM, &eag_state::eag2100_map);
 }
 
 
@@ -792,12 +741,12 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT  STATE        INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1983, feasbu,   0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasgla,  feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fepriv,   feasbu, 0, eas_priv, eas,   elite_state, empty_init,   "Fidelity Deutschland", "Elite Private Line (red version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, feasbu,   0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasgla,  feasbu, 0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fepriv,   feasbu, 0, eas_priv, eas,   elite_state, empty_init,   "Fidelity Deutschland", "Elite Private Line (red version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 
-CONS( 1982, fpres,    0,      0, pc,       eas,   elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 1983, fpresbu,  fpres,  0, pc,       eas,   elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1982, fpres,    0,      0, pc,       eas,   elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, fpresbu,  fpres,  0, pc,       eas,   elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 
-CONS( 1986, feag,     0,      0, eag,      eag,   elite_state, empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 1986, feag2100, feag,   0, eag2100,  eag,   elite_state, init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1986, feag,     0,      0, eag,      eag,   eag_state,   empty_init,   "Fidelity Electronics", "Elite Avant Garde (model 6081)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1986, feag2100, feag,   0, eag2100,  eag,   eag_state,   init_eag2100, "Fidelity Electronics", "Elite Avant Garde 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
