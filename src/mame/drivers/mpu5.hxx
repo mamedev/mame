@@ -2,6 +2,79 @@
 // copyright-holders:David Haywood
 /* for MPU5 hardware emulation see mpu5hw.c, this just contains the set listing and per machine configs */
 
+/* Example MPU5 game cart layout:
+
+Barcrest Gold Strike V.1.0 game cart for MPU5 (distributed on Spain by Bilso / Servimatic)
+ _________________________________________________
+|                                    ___          |
+|                                    |  |    ____ |
+|                         CPUBUS     |IC|    |SW ||
+|                           __       |1 |    |2__||
+|   __________  __________ | |       |__|     ___ |
+|  | P7      | | P8 EMPTY| | |                |SW||
+|  |_________| |_________| | |                |1 ||
+|   __________ __________  | |                |__||
+|  | C5 EMPTY| | C6 EMPTY| | |  ________     ____ |
+|  |_________| |_________| | |  |__IC3__|    |CON||
+|   __________  __________ | |               | 1 ||
+|  | C3      | | C4      | | |               |___||
+|  |_________| |_________| | |   _______     ____ |
+|   __________ __________  | |  |__IC2__|    |CON||
+|  | C1      | | C2      | | |               | 2 ||
+|  |_________| |_________| | |               |___||
+|   HIGH BYTE   LOW BYTE   |_|                    |
+|                          CBA                    |
+|_________________________________________________|
+
+P7 = ST M48T02-150PC1 NVRAM labeled as BILSO S.A. B-14 GOLD STRIKE V 1.0 CVB-0200A / 11-1562 [may be RAM (P7B) or PROM (P7A)]
+C1 = 27C4001 labeled as BILSO S.A. B-14 P4 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+C2 = 27C4001 labeled as BILSO S.A. B-14 P3 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+C3 = 27C4001 labeled as BILSO S.A. B-14 P1 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+C4 = 27C4001 labeled as BILSO S.A. B-14 P1 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+IC1 = PIC16C54C labeled as 105RGSG (may be PIC or Z8)
+IC2 = GAL16V8 labeled as 105ICI1E
+IC3 = GAL16V8 labeled as 105ICI2A
+SW1 = 8 dipswitches for options
+SW2 = Test switch
+CON1 = Female DB9 for percentage
+CON2 = Male DB9 for stake/jackpot
+
+       CPUBUS
+        __
+  DREC2 | | DONE2
+   IRQ5 | | SER_INT
+   IRQ7 | | TIN1
+ CPUCLK | | INTX
+   BERR | | GND
+  TOUT2 | | 5V
+ DSACK1 | | GND
+  TOUT1 | | GND
+    FC3 | | GND
+    BDS | | GND
+   SIZ1 | | GND
+ EXT_IO | | 5V
+     A1 | | GND
+     A3 | | GND
+     A5 | | GND
+     A7 | | GND
+     A9 | | GND
+    A11 | | 5V
+    A13 | | GND
+    A15 | | 24V
+    A17 | | GND
+    A19 | | -12V
+    A21 | | GND
+    A23 | | 5V
+     D1 | | GND
+     D3 | | GND
+     D5 | | 12V
+     D7 | | 12V
+     D9 | | 12V
+    D11 | | 12V
+    D13 | | 12V
+    D15 |_| 12V
+*/
+
 INPUT_PORTS_EXTERN( mpu5 );
 
 
