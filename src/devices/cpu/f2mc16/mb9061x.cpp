@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(MB90611A, mb90611_device, "mb90611a", "Fujitsu MB90611A")
 //-------------------------------------------------
 mb9061x_device::mb9061x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	f2mc16_device(mconfig, type, tag, owner, clock),
-	m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, internal_map)
+	m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal_map)
 {
 }
 

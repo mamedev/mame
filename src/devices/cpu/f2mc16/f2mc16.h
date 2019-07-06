@@ -63,10 +63,129 @@ private:
 	address_space_config m_program_config;
 	address_space *m_program;
 
-	u16 m_pc, m_usp, m_ssp, m_ps;
-	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr;
-	u32 m_acc, m_temp;
+	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16;
+	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8;
+	u32 m_acc, m_temp, m_tmp32;
 	s32 m_icount;
+
+	inline u8 read_8(u32 addr)
+	{
+		return m_program->read_byte(addr);
+	}
+	inline u16 read_16(u32 addr)
+	{
+		if (addr & 1)
+		{
+			return m_program->read_byte(addr) | (m_program->read_byte(addr+1)<<8);
+		}
+		else
+		{
+			return m_program->read_word(addr);
+		}
+	}
+	inline u32 read_32(u32 addr)
+	{
+		if (addr & 3)
+		{
+			return m_program->read_byte(addr) | (m_program->read_byte(addr+1)<<8) | (m_program->read_byte(addr+2)<<16) | (m_program->read_byte(addr+3)<<24);
+		}
+		else
+		{
+			return m_program->read_dword(addr);
+		}
+	}
+	inline void write_8(u32 addr, u8 data)
+	{
+		m_program->write_byte(addr, data);
+	}
+	inline void write_16(u32 addr, u16 data)
+	{
+		if (addr & 1)
+		{
+			m_program->write_byte(addr, data & 0xff);
+			m_program->write_byte(addr+1, (data>>8) & 0xff);
+		}
+		else
+		{
+			m_program->write_word(addr, data);
+		}
+	}
+	inline void write_32(u32 addr, u32 data)
+	{
+		if (addr & 3)
+		{
+			m_program->write_byte(addr, data & 0xff);
+			m_program->write_byte(addr+1, (data>>8) & 0xff);
+			m_program->write_byte(addr+2, (data>>16) & 0xff);
+			m_program->write_byte(addr+3, (data>>24) & 0xff);
+		}
+		else
+		{
+			m_program->write_dword(addr, data);
+		}
+	}
+	inline u8 read_rX(int reg)
+	{
+		reg &= 7;
+		return m_temp = read_8(reg + 0x188 + (((m_ps>>8)&0x1f)*0x10));
+	}
+	inline u16 read_rwX(int reg)
+	{
+		reg &= 7;
+		return m_temp = read_16((reg<<1) + 0x180 + (((m_ps>>8)&0x1f)*0x10));
+	}
+	inline u32 read_rlX(int reg)
+	{
+		reg &= 3;
+		return m_temp = read_32((reg<<2) + 0x180 + (((m_ps>>8)&0x1f)*0x10));
+	}
+	inline void write_rX(int reg, u8 val)
+	{
+		reg &= 7;
+		write_8(reg + 0x188 + (((m_ps>>8)&0x1f)*0x10), val);
+	}
+	inline void write_rwX(int reg, u16 val)
+	{
+		reg &= 7;
+		write_16((reg<<1) + 0x180 + (((m_ps>>8)&0x1f)*0x10), val);
+	}
+	inline void write_rlX(int reg, u32 val)
+	{
+		reg &= 3;
+		write_16((reg<<2) + 0x180 + (((m_ps>>8)&0x1f)*0x10), val);
+	}
+
+	inline void setNZ_8(u8 uVal) { m_ps &= ~(F_N|F_Z); m_ps |= (uVal == 0) ? F_Z : 0; m_ps |= (uVal & 0x80) ? F_N : 0; }
+	inline void setNZ_16(u16 uVal) { m_ps &= ~(F_N|F_Z); m_ps |= (uVal == 0) ? F_Z : 0; m_ps |= (uVal & 0x8000) ? F_N : 0; }
+
+	// get the full 24 bit address for an @RWx access
+	inline u32 getRWbank(int iReg, u16 uBankAddr)
+	{
+		iReg &= 7;
+		switch (iReg)
+		{
+			case 0:
+			case 1:
+			case 4:
+			case 5:
+				return (m_dtb<<16) | uBankAddr;
+
+			case 2:
+			case 6:
+				return (m_adb<<16) | uBankAddr;
+
+			case 3:
+			case 7:
+				return (m_usb<<16) | uBankAddr;
+		}
+
+		// this can't happen, but GCC insists
+		return (m_dtb<<16) | uBankAddr;
+	}
+
+	void opcodes_str6e(u8 operand);
+	void opcodes_2b6f(u8 operand);
+	void opcodes_ea71(u8 operand);
 };
 
 DECLARE_DEVICE_TYPE(F2MC16, f2mc16_device)
