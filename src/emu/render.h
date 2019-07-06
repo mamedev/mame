@@ -802,7 +802,7 @@ public:
 		int blend_mode() const { return m_blend_mode; }
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const;
-		bool has_input() const { return bool(m_input_field); }
+		bool has_input() const { return bool(m_input_port); }
 		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
 
 		// fetch state based on configured source
