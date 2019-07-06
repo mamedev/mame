@@ -140,6 +140,7 @@ cgc7900.cpp
 cgenie.cpp
 channelf.cpp
 chaos.cpp
+chessmate.cpp
 chessmst.cpp
 cit101.cpp
 cit220.cpp
@@ -155,6 +156,7 @@ codata.cpp
 coleco.cpp
 compc.cpp
 compis.cpp
+compuchess.cpp
 compucolor.cpp
 comquest.cpp
 comx35.cpp
@@ -541,10 +543,7 @@ ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
 novag_cforte.cpp
-novag_delta1.cpp
 novag_diablo.cpp
-novag_mk1.cpp
-novag_mk2.cpp
 novag_presto.cpp
 novag_savant.cpp
 novag_scon.cpp
@@ -693,6 +692,7 @@ rz1.cpp
 rzone.cpp
 sacstate.cpp
 sage2.cpp
+saitek_delta1.cpp
 samcoupe.cpp
 sansa_fuze.cpp
 sapi1.cpp

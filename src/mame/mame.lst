@@ -9836,6 +9836,9 @@ chaos                           //
 @source:cheekyms.cpp
 cheekyms                        // 8004 (c) [1980?]
 
+@source:chessmate.cpp
+ccmk2                           // Chess Champion MK II
+
 @source:chessmst.cpp
 chessmst                        //
 chessmsta                       //
@@ -10162,6 +10165,11 @@ compgolfo                       // (c) 1985 Data East Corporation (Japan)
 @source:compis.cpp
 compis                          // 1985 Telenova Compis
 compis2                         // 1985 Telenova Compis
+
+@source:compuchess.cpp
+ccmk1                           // Chess Champion MK I
+cmpchess
+cncchess
 
 @source:compucolor.cpp
 compclr2                        //
@@ -30964,20 +30972,9 @@ raiders5t                       // UPL-85004 (c) 1985 Taito license
 cfortea                         //
 cforteb                         //
 
-@source:novag_delta1.cpp
-ccdelta1                        //
-
 @source:novag_diablo.cpp
 diablo68                        //
 scorpio68                       //
-
-@source:novag_mk1.cpp
-ccmk1                           // Chess Champion MK I
-cmpchess
-cncchess
-
-@source:novag_mk2.cpp
-ccmk2                           // Chess Champion MK II
 
 @source:novag_presto.cpp
 nocto                           //
@@ -34090,6 +34087,9 @@ safarirj                        // (c) 1979 Shin Nihon Kikaku (SNK)
 
 @source:sage2.cpp
 sage2                           //
+
+@source:saitek_delta1.cpp
+ccdelta1                        //
 
 @source:sam.cpp
 24_130                          //

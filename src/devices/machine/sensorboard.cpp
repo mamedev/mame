@@ -541,9 +541,6 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-#undef PORT_CONDITION
-#define PORT_CONDITION(a, b, c, d) ;
-
 static INPUT_PORTS_START( sensorboard )
 	PORT_START("RANK.1")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("BS_CHECK", 1<<16 | 1<<0, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, sensor, 0x00) PORT_NAME("Sensor A1")

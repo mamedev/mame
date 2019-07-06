@@ -52,10 +52,10 @@ MOS MPS 6332 005 2179
 
 namespace {
 
-class mk2_state : public driver_device
+class chessmate_state : public driver_device
 {
 public:
-	mk2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	chessmate_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_miot(*this, "miot"),
@@ -65,7 +65,7 @@ public:
 	{ }
 
 	// machine configs
-	void mk2(machine_config &config);
+	void chessmate(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
@@ -94,7 +94,7 @@ private:
 	u8 m_led_data;
 };
 
-void mk2_state::machine_start()
+void chessmate_state::machine_start()
 {
 	// zerofill
 	m_inp_mux = 0;
@@ -107,7 +107,7 @@ void mk2_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-INPUT_CHANGED_MEMBER(mk2_state::reset_button)
+INPUT_CHANGED_MEMBER(chessmate_state::reset_button)
 {
 	// assume that NEW GAME button is tied to reset pin(s)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -123,13 +123,13 @@ INPUT_CHANGED_MEMBER(mk2_state::reset_button)
 
 // 6530 ports
 
-void mk2_state::update_display()
+void chessmate_state::update_display()
 {
 	m_display->write_row(4, m_led_data);
 	m_display->matrix_partial(0, 4, 1 << m_inp_mux, m_7seg_data);
 }
 
-WRITE8_MEMBER(mk2_state::control_w)
+WRITE8_MEMBER(chessmate_state::control_w)
 {
 	// d0-d2: 74145 to input mux/digit select
 	m_inp_mux = data & 7;
@@ -146,13 +146,13 @@ WRITE8_MEMBER(mk2_state::control_w)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(mk2_state::digit_w)
+WRITE8_MEMBER(chessmate_state::digit_w)
 {
 	m_7seg_data = data;
 	update_display();
 }
 
-READ8_MEMBER(mk2_state::input_r)
+READ8_MEMBER(chessmate_state::input_r)
 {
 	u8 data = 0;
 
@@ -173,7 +173,7 @@ READ8_MEMBER(mk2_state::input_r)
     Address Maps
 ******************************************************************************/
 
-void mk2_state::main_map(address_map &map)
+void chessmate_state::main_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x00ff).mirror(0x100).ram();
@@ -189,7 +189,7 @@ void mk2_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( mk2 )
+static INPUT_PORTS_START( chessmate )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / Skill Level")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / Stop Clock")
@@ -217,7 +217,7 @@ static INPUT_PORTS_START( mk2 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, mk2_state, reset_button, nullptr) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmate_state, reset_button, nullptr) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -226,16 +226,16 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void mk2_state::mk2(machine_config &config)
+void chessmate_state::chessmate(machine_config &config)
 {
 	/* basic machine hardware */
 	M6504(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mk2_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chessmate_state::main_map);
 
 	MOS6530(config, m_miot, 1000000);
-	m_miot->in_pa_callback().set(FUNC(mk2_state::input_r));
-	m_miot->out_pa_callback().set(FUNC(mk2_state::digit_w));
-	m_miot->out_pb_callback().set(FUNC(mk2_state::control_w));
+	m_miot->in_pa_callback().set(FUNC(chessmate_state::input_r));
+	m_miot->out_pa_callback().set(FUNC(chessmate_state::digit_w));
+	m_miot->out_pb_callback().set(FUNC(chessmate_state::control_w));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4+1, 8);
@@ -268,5 +268,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccmk2, 0,      0, mk2,     mk2,   mk2_state, empty_init, "Novag", "Chess Champion: MK II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME   PARENT CMP MACHINE    INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ccmk2, 0,      0, chessmate, chessmate, chessmate_state, empty_init, "Novag", "Chess Champion: MK II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
