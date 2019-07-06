@@ -10,8 +10,8 @@
 #include "cpu/i86/i186.h"
 #include "cpu/bcp/dp8344.h"
 #include "machine/eeprompar.h"
-//#include "video/mc6845.h"
-//#include "screen.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 class is48x_state : public driver_device
 {
@@ -20,11 +20,14 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bcp(*this, "bcp")
+		, m_crtc(*this, "crtc")
 	{ }
 
 	void is482(machine_config &config);
 
 private:
+	MC6845_UPDATE_ROW(update_row);
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 	void bcp_inst_map(address_map &map);
@@ -32,7 +35,12 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dp8344_device> m_bcp;
+	required_device<mc6845_device> m_crtc;
 };
+
+MC6845_UPDATE_ROW(is48x_state::update_row)
+{
+}
 
 void is48x_state::mem_map(address_map &map)
 {
@@ -47,8 +55,8 @@ void is48x_state::mem_map(address_map &map)
 void is48x_state::io_map(address_map &map)
 {
 	map(0x8005, 0x8005).nopw();
-	//map(0x8080, 0x8080).w("crtc", FUNC(mc6845_device::address_w));
-	//map(0x8081, 0x8081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x8080, 0x8080).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x8081, 0x8081).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x8101, 0x8101).nopr();
 	map(0x8180, 0x8180).rw(m_bcp, FUNC(dp8344_device::cmd_r), FUNC(dp8344_device::cmd_w));
 }
@@ -78,7 +86,15 @@ void is48x_state::is482(machine_config &config)
 
 	EEPROM_28256(config, "eeprom"); // AT28C256
 
-	//HD6845S(config, "crtc", CRTC_CLOCK); // HD46505SP-1
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(60_MHz_XTAL / 2, 770, 0, 560, 532, 0, 475); // FIXME: vertical rate is supposed to be 75 Hz
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+
+	HD6845S(config, m_crtc, 60_MHz_XTAL / 28); // HD46505SP-1
+	m_crtc->set_char_width(14); // guess
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_update_row_callback(FUNC(is48x_state::update_row), this);
 }
 
 ROM_START(is482) // "IS-488-A" on case
