@@ -2470,6 +2470,6 @@ mame_ui_manager *lua_engine::mame_ui()
 {
 	mame_ui_manager *ui = dynamic_cast<mame_ui_manager *>(&machine().ui());
 	if (!ui)
-		luaL_error(m_lua_state, "Functionaliry requires built in MAME UI");
+		luaL_error(m_lua_state, "Functionality requires built in MAME UI");
 	return ui;
 }
