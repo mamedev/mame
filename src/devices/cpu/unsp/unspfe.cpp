@@ -124,6 +124,9 @@ bool unsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			{
 				r1++;
 				desc.regout[0] |= 1 << r1;
+                if (r1 == unsp_device::REG_PC) {
+                    desc.flags |= OPFLAG_END_SEQUENCE | OPFLAG_IS_UNCONDITIONAL_BRANCH;
+                }
 			}
 			return true;
 		}
