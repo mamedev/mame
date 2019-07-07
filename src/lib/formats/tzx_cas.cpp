@@ -230,6 +230,13 @@ static void tzx_output_wave( int16_t **buffer, int length )
 	}
 }
 
+static int pause_one_millisec( int16_t **buffer )
+{
+	int pause_samples = millisec_to_samplecount(1);
+	tzx_output_wave(buffer, pause_samples);
+	return pause_samples;
+}
+
 static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pause, int data_size, int pilot, int pilot_length, int sync1, int sync2, int bit0, int bit1, int bits_in_last_byte )
 {
 	int pilot_samples = tcycles_to_samplecount(pilot);
@@ -282,15 +289,10 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 		}
 	}
 	/* pause */
-	if (data_size > 0)
-	{
-		int start_pause_samples = millisec_to_samplecount(1);
-
-		tzx_output_wave(buffer, start_pause_samples);
-		size += start_pause_samples;
-	}
 	if (pause > 0)
 	{
+		size += pause_one_millisec(buffer);
+
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
 		wave_data = WAVE_LOW;
@@ -324,11 +326,10 @@ static int tzx_handle_direct(int16_t **buffer, const uint8_t *bytes, int pause, 
 	/* pause */
 	if (pause > 0)
 	{
-		int start_pause_samples = millisec_to_samplecount(1);
+		size += pause_one_millisec(buffer);
+
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
-		tzx_output_wave(buffer, start_pause_samples);
-		size += start_pause_samples;
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
@@ -347,11 +348,12 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 	switch (starttype)
 	{
 	case 0x00:
-		toggle_wave_data();
+		// pulse level has already been toggled so don't change
 		break;
 
 	case 0x01:
-		// don't change
+		// pulse level has already been toggled so revert
+		toggle_wave_data();
 		break;
 
 	case 0x02:
@@ -382,9 +384,7 @@ static inline int tzx_handle_symbol(int16_t **buffer, const uint8_t *symtable, u
 		}
 		else
 		{
-			toggle_wave_data();
-			i = maxp;
-			continue;
+			break;
 		}
 	}
 
@@ -424,7 +424,7 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 		const uint8_t *table2 = symtable + (2 * npp + 1)*asp;
 
 		// the Pilot and sync data stream has an RLE encoding
-		for (int i = 0; i < totp; i+=3)
+		for (int i = 0; i < totp*3; i+=3)
 		{
 			uint8_t symbol = table2[i + 0];
 			uint16_t repetitions = table2[i + 1] + (table2[i + 2] << 8);
@@ -468,11 +468,10 @@ static int tzx_handle_generalized(int16_t **buffer, const uint8_t *bytes, int pa
 	/* pause */
 	if (pause > 0)
 	{
-		int start_pause_samples = millisec_to_samplecount(1);
+		size += pause_one_millisec(buffer);
+
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
-		tzx_output_wave(buffer, start_pause_samples);
-		size += start_pause_samples;
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
@@ -742,6 +741,8 @@ static int tzx_cas_do_work( int16_t **buffer )
 
 		}
 	}
+	// Adding 1 ms. pause to ensure that the last edge is properly finished at the end of tape
+	size += pause_one_millisec(buffer);
 	return size;
 }
 
@@ -893,7 +894,10 @@ static cassette_image::error cdt_cassette_identify( cassette_image *cassette, st
 
 static cassette_image::error tzx_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct(cassette, &tzx_legacy_fill_wave);
+	cassette_image::error err = cassette_legacy_construct(cassette, &tzx_legacy_fill_wave);
+	free(blocks);
+	blocks = nullptr;
+	return err;
 }
 
 static cassette_image::error tap_cassette_load( cassette_image *cassette )
@@ -903,7 +907,10 @@ static cassette_image::error tap_cassette_load( cassette_image *cassette )
 
 static cassette_image::error cdt_cassette_load( cassette_image *cassette )
 {
-	return cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
+	cassette_image::error err = cassette_legacy_construct(cassette, &cdt_legacy_fill_wave);
+	free(blocks);
+	blocks = nullptr;
+	return err;
 }
 
 const struct CassetteFormat tzx_cassette_format =

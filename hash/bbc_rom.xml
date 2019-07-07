@@ -160,6 +160,11 @@
 				<rom name="Accelerator-1.06.rom" size="16384" crc="e5435cf5" sha1="86d1adfff0cfc31156aa8e3787b796d33f533dcb"/>
 			</dataarea>
 		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AcceleratorGCode-1.06.rom" size="16384" crc="58d29499" sha1="da830cec257300f6bd11f869dbcff8ae4b25cd91"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="acom">
@@ -269,6 +274,17 @@
 		<part name="rom" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="AdvancedDiscInvestigator-1.20a.rom" size="16384" crc="cb41ec36" sha1="59f6a5e75b6684b14cee56c20452999bb8f1c9c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adi121" cloneof="adi">
+		<description>Advanced Disc Investigator 1.21 S/N:43318</description>
+		<year>1986</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="rom" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AdvancedDiscInvestigator-1.21.rom" size="16384" crc="d2992efa" sha1="fa3b7053b7b0be6f4cd1f6104b65f66cff64d1f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +471,7 @@
 		<publisher>P.R.E.S.</publisher>
 		<part name="rom" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedFileManager-1.09.rom" size="16384" crc="64d7ff45" sha1="5306205a719d95a4bbad6ddee4fdcf37014821a8"/>
+				<rom name="AdvancedFileManager-1.09.rom" size="16384" crc="02f4091c" sha1="d806e9a605f704bb2096ea5ddcfc2c03a1e009e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -466,7 +482,7 @@
 		<publisher>Advanced Computer Products</publisher>
 		<part name="rom" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="AdvancedROMManager-1.00.rom" size="16384" crc="e7e2a294" sha1="e101477ac60f626c195a6b6fc52cd56d9bb26a64"/>
+				<rom name="AdvancedROMManager-1.00.rom" size="16384" crc="3170b016" sha1="a203bc665a4f6e5797bfbbc1c6c4501fd2792ef8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1156,7 +1172,7 @@
 		<publisher>BBC Soft</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="ATS-2.59-Morley.rom" size="16384" crc="bb667bcf" sha1="56bba74be442a4c0d6d92b5b6be2c2e2d6fdeb89"/>
+				<rom name="ATS-2.59-Morley.rom" size="16384" crc="b6a1a3f2" sha1="45658bd369a07c5df3d41636a8f84bdf741ce159"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1317,6 +1333,17 @@
 		</part>
 	</software>
 
+	<software name="beebaid105">
+		<description>BeebAid 1.05</description>
+		<year>1986</year>
+		<publisher>JaySoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="BeebAid-1.05.rom" size="16384" crc="bfb3f2c8" sha1="9a7634239233d39eb19bdaa7d87c0aabee1b8902"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beebase106" cloneof="beebase">
 		<description>BeeBASE-1 1.06</description>
 		<year>1983</year>
@@ -1379,6 +1406,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="BeebCalc-1.2E.rom" size="8192" crc="df656c8e" sha1="3c89d858760630854eb1ac92d03b9d3bb07bebcb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebed">
+		<description>BeebEd 1.04</description>
+		<year>1985</year>
+		<publisher>J&amp;O Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BeebEd-1.04.rom" size="8192" crc="882ae553" sha1="5ba0ad255b59ed53affe20d938c9f7453dff78e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1750,6 +1788,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Chauffeur-3.0.rom" size="16384" crc="edfa89c3" sha1="215531aa2f1d09dba64b6326ac367cfa146aee51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmslink">
+		<description>CMS Link 2.00</description>
+		<year>1986</year>
+		<publisher>CMS Soft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="CMSLink-2.00.rom" size="16384" crc="11747e37" sha1="4f70a6253fd147e9585b59cf0abe59a88afe8720"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3515,12 +3564,8 @@
 		<publisher>Permanent Memory Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<feature name="slot" value="genie" />
-			<!-- Should be single 32K, 8K pages were dumped in-situ so may be corrupt and/or incorrect order. -->
 			<dataarea name="rom" size="32768">
-				<rom name="PMSGenie1-1.01.rom" size="8192" crc="3ee29106" sha1="8b4c14c0657fbb3b19fb85103cc39c06e026f280" offset="0x0000" status="baddump"/>
-				<rom name="PMSGenie2-1.01.rom" size="8192" crc="b828717b" sha1="4f8ff82bd05ace8cee99e6c7c8dbc35d6de3e92d" offset="0x2000" status="baddump"/>
-				<rom name="PMSGenie3-1.01.rom" size="8192" crc="297e99a8" sha1="4b225606cf052f72ef755fbc67d131ab6aa16438" offset="0x4000" status="baddump"/>
-				<rom name="PMSGenie4-1.01.rom" size="8192" crc="3d666c36" sha1="810869aeb66fec7599aaec01641c07b1a8968fdc" offset="0x6000" status="baddump"/>
+				<rom name="PMSGenie-1.01.rom" size="32768" crc="be152c01" sha1="34d8d21c71b1bf1f3648a4dda90fde5d8dc48cd2"/>
 			</dataarea>
 			<dataarea name="nvram" size="32768" />
 			<dataarea name="ram" size="32768" />
@@ -3546,7 +3591,7 @@
 	</software>
 
 	<software name="genieclk">
-		<description>PMS Genie Real Time Clock</description>
+		<description>PMS Genie Real Time Clock 3.02</description>
 		<year>1988</year>
 		<publisher>Permanent Memory Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -3558,7 +3603,7 @@
 	</software>
 
 	<software name="geniejr">
-		<description>PMS Genie Junior</description>
+		<description>PMS Genie Junior 1.01</description>
 		<year>1987</year>
 		<publisher>Permanent Memory Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -3568,8 +3613,30 @@
 		</part>
 	</software>
 
+	<software name="geniejr11u" cloneof="geniejr">
+		<description>PMS Genie Junior 1.1u</description>
+		<year>1987</year>
+		<publisher>Permanent Memory Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PMSGenieJunior-1.1u.rom" size="16384" crc="e635d89e" sha1="9d046c9eaea8aa96b46efaa32e23e06a70e9e1ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genutils322" cloneof="genutils">
+		<description>General Utilities 3.22</description>
+		<year>1984</year>
+		<publisher>Creative Junior Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GeneralUtils-3.22.rom" size="8192" crc="1ed63ae1" sha1="e6f369d7c2c08493ded1acad43fe970368df47ec"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="genutils">
-		<description>General Utilities</description>
+		<description>General Utilities 3.24</description>
 		<year>1984</year>
 		<publisher>Creative Junior Software</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -4009,6 +4076,17 @@
 		</part>
 	</software>
 
+	<software name="instat">
+		<description>Instat C00144</description>
+		<year>1986</year>
+		<publisher>University of Reading</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Instat-C00144.rom" size="16384" crc="e7bb372e" sha1="0aa30974827a86e3133d317518c8d7399a38ff67"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ibase">
 		<description>Inter-Base 2.0A</description>
 		<year>1987</year>
@@ -4379,7 +4457,7 @@
 		<info name="release" value="SBL06" />
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="LOGO1-1.00.rom" size="16384" crc="bc3f0a09" sha1="70e28b584a3f82927ffae05d45ac7c72de7825e5"/>
+				<rom name="LOGO1-1.00.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae"/>
 			</dataarea>
 		</part>
 		<part name="rom2" interface="bbc_rom">
@@ -4579,6 +4657,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Matrix-1.01.rom" size="8192" crc="79beb2e0" sha1="3759f55e9f39b83eb96cb95ea4466ab72baca57f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbinject">
+		<description>Microbrush Injector 1.00</description>
+		<year>1987</year>
+		<publisher>AB Designs</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Microbrush-Injector-1.00.rom" size="16384" crc="c8c3d200" sha1="90e93da3b2b14b0ba4f7040c0f1d10cca15e360a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5711,6 +5800,18 @@
 		</part>
 	</software>
 
+	<software name="prntsrvr09a" cloneof="prntsrvr">
+		<description>Printer Server 0.9A</description>
+		<year>1982</year>
+		<publisher>Acorn</publisher>
+		<info name="release" value="AES22" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="PrinterServer-0.9A.rom" size="8192" crc="8546b988" sha1="ebf59dcada8a2d3d0bccddb2db6c8c6811429c02"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prntsrvr100" cloneof="prntsrvr">
 		<description>Printer Server 1.00</description>
 		<year>1982</year>
@@ -6184,6 +6285,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="SatPic-3.00-Cirkit.rom" size="8192" crc="1488ef0e" sha1="6c77d3cb41d74f72c4169a73dd886f9520e373ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sciways">
+		<description>Sciways 2.03</description>
+		<year>1985</year>
+		<publisher>Mayhew Telonics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Sciways-2.03.rom" size="16384" crc="cab6e14a" sha1="41f2286f68eccd2d9cd56003e7a55670ad74cb6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7220,6 +7332,17 @@
 		</part>
 	</software>
 
+	<software name="style">
+		<description>Style 1.3</description>
+		<year>1991</year>
+		<publisher>SCET</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Style-1.3.rom" size="16384" crc="64f43ef6" sha1="f8f6d2402c347976b13a014edb168b21db301d3f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="supastor15">
 		<description>SupaStore 1.5</description>
 		<year>198?</year>
@@ -7271,6 +7394,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Supervisor-1.00.rom" size="8192" crc="d8a326f5" sha1="a9da6867e780fc72e42f1216c398ef5329fabe4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swift">
+		<description>Swift 2.2</description>
+		<year>1986</year>
+		<publisher>Metamorphosis Developments</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Swift-2.2.rom" size="16384" crc="cc253ed6" sha1="7fcb9192c2163b0525aeef4684600c701cda7a37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7749,6 +7883,17 @@
 		<part name="rom" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Trek-1.07.rom" size="16384" crc="52c59693" sha1="0830ab382c52aa35536976c066224ec011bb6e2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trx">
+		<description>TRXROM 2.00</description>
+		<year>1984</year>
+		<publisher>Vermillion</publisher>
+		<part name="rom" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TRXROM-2.00.rom" size="16384" crc="03273d2d" sha1="1f5c43d139426a4597dd4be97b37496350d35ae0"/>
 			</dataarea>
 		</part>
 	</software>

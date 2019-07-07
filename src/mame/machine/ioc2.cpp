@@ -562,7 +562,7 @@ void ioc2_device::base_map(address_map &map)
 	map(0x07, 0x07).rw(FUNC(ioc2_device::pi1_timer2_r), FUNC(ioc2_device::pi1_timer2_w));
 	map(0x08, 0x08).rw(FUNC(ioc2_device::pi1_timer3_r), FUNC(ioc2_device::pi1_timer3_w));
 	map(0x09, 0x09).rw(FUNC(ioc2_device::pi1_timer4_r), FUNC(ioc2_device::pi1_timer4_w));
-	map(0x0c, 0x0f).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
+	map(0x0c, 0x0f).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 	map(0x10, 0x10).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::data_r), FUNC(ps2_keyboard_controller_device::data_w));
 	map(0x11, 0x11).rw(m_kbdc, FUNC(ps2_keyboard_controller_device::status_r), FUNC(ps2_keyboard_controller_device::command_w));
 	map(0x12, 0x12).rw(FUNC(ioc2_device::gc_select_r), FUNC(ioc2_device::gc_select_w));
@@ -721,7 +721,7 @@ WRITE_LINE_MEMBER(ioc2_device::gio_int2_w)
 
 WRITE_LINE_MEMBER(ioc2_device::hpc_dma_done_w)
 {
-	if (state == ASSERT_LINE)
+	if (state)
 		raise_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
 	else
 		lower_local_irq(1, ioc2_device::INT3_LOCAL1_HPC_DMA);
@@ -734,3 +734,28 @@ WRITE_LINE_MEMBER(ioc2_device::mc_dma_done_w)
 	else
 		lower_local_irq(0, ioc2_device::INT3_LOCAL0_MC_DMA);
 }
+
+WRITE_LINE_MEMBER(ioc2_device::scsi0_int_w)
+{
+	if (state)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::scsi1_int_w)
+{
+	if (state)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::enet_int_w)
+{
+	if (state)
+		raise_local_irq(0, ioc2_device::INT3_LOCAL0_ETHERNET);
+	else
+		lower_local_irq(0, ioc2_device::INT3_LOCAL0_ETHERNET);
+}
+

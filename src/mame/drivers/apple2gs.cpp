@@ -630,14 +630,6 @@ private:
 }
 
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#define JOYSTICK_DELTA          80
-#define JOYSTICK_SENSITIVITY    50
-#define JOYSTICK_AUTOCENTER     80
-
 offs_t apple2gs_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
 	return m_a2common->dasm_override_GS(stream, pc, opcodes, params);
@@ -1802,11 +1794,11 @@ void apple2gs_state::do_io(address_space &space, int offset)
 		switch (offset)
 		{
 			case 0x5e:  // SETDHIRES
-				m_video->m_dhires = true;
+				m_video->dhires_w(0);
 				return;
 
 			case 0x5f:  // CLRDHIRES
-				m_video->m_dhires = false;
+				m_video->dhires_w(1);
 				return;
 		}
 	}
@@ -1832,40 +1824,40 @@ void apple2gs_state::do_io(address_space &space, int offset)
 			break;
 
 		case 0x50:  // graphics mode
-			m_video->m_graphics = true;
+			m_video->txt_w(0);
 			break;
 
 		case 0x51:  // text mode
-			m_video->m_graphics = false;
+			m_video->txt_w(1);
 			break;
 
 		case 0x52:  // no mix
-			m_video->m_mix = false;
+			m_video->mix_w(0);
 			break;
 
 		case 0x53:  // mixed mode
-			m_video->m_mix = true;
+			m_video->mix_w(1);
 			break;
 
 		case 0x54:  // set page 1
 			m_page2 = false;
-			m_video->m_page2 = false;
+			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
 			m_page2 = true;
-			m_video->m_page2 = true;
+			m_video->scr_w(1);
 			auxbank_update();
 			break;
 
 		case 0x56: // select lo-res
-			m_video->m_hires = false;
+			m_video->res_w(0);
 			auxbank_update();
 			break;
 
 		case 0x57: // select hi-res
-			m_video->m_hires = true;
+			m_video->res_w(1);
 			auxbank_update();
 			break;
 
@@ -2059,7 +2051,7 @@ READ8_MEMBER(apple2gs_state::c000_r)
 	}
 
 	slow_cycle();
-	u8 uFloatingBus7 = read_floatingbus();
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{
@@ -4493,8 +4485,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("echoii", A2BUS_ECHOII);    /* Street Electronics Echo II */
 	device.option_add("ap16", A2BUS_IBSAP16);    /* IBS AP16 (German VideoTerm clone) */
 	device.option_add("ap16alt", A2BUS_IBSAP16ALT);    /* IBS AP16 (German VideoTerm clone), alternate revision */
-	device.option_add("vtc1", A2BUS_VTC1);    /* Unknown VideoTerm clone #1 */
-	device.option_add("vtc2", A2BUS_VTC2);    /* Unknown VideoTerm clone #2 */
+	device.option_add("vtc1", A2BUS_VTC1);    /* Unknown VideoTerm clone */
 	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
 	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
 	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
@@ -4506,7 +4497,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("aesms", A2BUS_AESMS);    /* Applied Engineering Super Music Synthesizer */
 	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */
 	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);    /* Videx UltraTerm (enhanced //e) */
-	device.option_add("aevm80", A2BUS_VTC2);    /* Applied Engineering ViewMaster 80 */
+	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
 	device.option_add("parallel", A2BUS_PIC);   /* Apple Parallel Interface Card */
 	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
@@ -4567,7 +4558,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	APPLE2_VIDEO(config, m_video, A2GS_14M);
+	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 
 	APPLE2_COMMON(config, m_a2common, A2GS_14M);
 	m_a2common->set_GS_cputag(m_maincpu);

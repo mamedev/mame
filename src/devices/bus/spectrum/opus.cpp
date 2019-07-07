@@ -285,5 +285,5 @@ WRITE8_MEMBER(spectrum_opus_device::pia_out_b)
 
 WRITE_LINE_MEMBER(spectrum_opus_device::busy_w)
 {
-	m_pia->set_a_input(state << 6, 0xbf);
+	m_pia->set_a_input(state << 6);
 }

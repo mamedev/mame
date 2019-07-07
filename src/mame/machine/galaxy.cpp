@@ -62,7 +62,7 @@ IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
 #define GALAXY_SNAPSHOT_V1_SIZE 8268
 #define GALAXY_SNAPSHOT_V2_SIZE 8244
 
-void galaxy_state::galaxy_setup_snapshot (const uint8_t * data, uint32_t size)
+void galaxy_state::galaxy_setup_snapshot(const uint8_t * data, uint32_t size)
 {
 	switch (size)
 	{
@@ -122,7 +122,7 @@ void galaxy_state::galaxy_setup_snapshot (const uint8_t * data, uint32_t size)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
+SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 {
 	uint8_t* snapshot_data;
 

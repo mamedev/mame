@@ -8,6 +8,9 @@
     - Volume is linear?
     - Make it actually working
     - Implement CDDA Volume
+
+    Related patent:
+    - https://patents.google.com/patent/US5692099
 */
 
 #include "emu.h"

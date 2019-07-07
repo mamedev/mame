@@ -960,7 +960,7 @@ void decocass_state::decocass(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &decocass_state::decocass_sound_map);
 	TIMER(config, "audionmi").configure_scanline(FUNC(decocass_state::decocass_audio_nmi_gen), "screen", 0, 8);
 
-	I8041(config, m_mcu, HCLK);
+	I8041A(config, m_mcu, HCLK);
 	m_mcu->p1_in_cb().set(FUNC(decocass_state::i8041_p1_r));
 	m_mcu->p1_out_cb().set(FUNC(decocass_state::i8041_p1_w));
 	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));

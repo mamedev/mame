@@ -237,7 +237,7 @@ void super80_state::init_super80()
     QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
+QUICKLOAD_LOAD_MEMBER(super80_state::quickload_cb)
 {
 	uint16_t exec_addr, start_addr, end_addr;
 

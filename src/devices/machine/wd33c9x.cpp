@@ -667,7 +667,13 @@ WRITE_LINE_MEMBER(wd33c9x_base_device::reset_w)
 {
 	if (state) {
 		LOGMASKED(LOG_LINES, "Reset via MR line\n");
+		// FIXME: hardware reset is not the same as software reset, and
+		// wd33c93a behaves differently to wd33c93
 		device_reset();
+
+		// hardware reset produces an interrupt
+		m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_INT;
+		m_irq_cb(ASSERT_LINE);
 	}
 }
 

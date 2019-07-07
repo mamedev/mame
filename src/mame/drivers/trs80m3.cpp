@@ -333,7 +333,8 @@ static void trs80_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(trs80m3_state::model3)
+void trs80m3_state::model3(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 20.2752_MHz_XTAL / 10); // FIXME: actual Model III XTAL is 10.1376 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m3_state::m3_mem);
@@ -352,14 +353,14 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_QUICKLOAD_ADD("quickload", trs80m3_state, trs80_cmd, "cmd", attotime::from_seconds(1))
+	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80m3_state::quickload_cb), this);
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80m3_state::intrq_w));
@@ -390,7 +391,7 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
 	m_uart->set_auto_rdav(true);
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
-MACHINE_CONFIG_END
+}
 
 void trs80m3_state::model4(machine_config &config)
 {

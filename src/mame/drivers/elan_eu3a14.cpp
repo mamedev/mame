@@ -30,33 +30,33 @@
     The Basketball camera also uses an ETOMS CU5502.  It’s different from the others (XaviXport + Real Swing Golf) in that the sensor is on a small PCB with
     a 3.58MHz resonator with 16 wires going to another small PCB that has a glob and a 4MHz resonator.  6 wires go from that PCB to the main game PCB.
 
-	To access hidden test mode in Football hold enter and right during power on.
+    To access hidden test mode in Football hold enter and right during power on.
 
-	Football test mode tests X pos, Y pos, Z pos, direction and speed.  This data must all be coming from the camera in the unit as the shinpads are simply
-	reflective objects, they don't contain any electronics.  It could be a useful test case for better understanding these things.
+    Football test mode tests X pos, Y pos, Z pos, direction and speed.  This data must all be coming from the camera in the unit as the shinpads are simply
+    reflective objects, they don't contain any electronics.  It could be a useful test case for better understanding these things.
 
-	To access hidden test mode in Golden Tee Home hold back/backspin and left during power on.
+    To access hidden test mode in Golden Tee Home hold back/backspin and left during power on.
 
-	To access hidden test mode in Basketball hold left and Button 1 during power on.
+    To access hidden test mode in Basketball hold left and Button 1 during power on.
 
-	To access hidden test mode in Real Swing Golf hold left and down during power on.
-	 - test mode check
-	 77B6: lda $5041
-	 77B9: eor #$ed
-	 77BB: beq $77be
+    To access hidden test mode in Real Swing Golf hold left and down during power on.
+     - test mode check
+     77B6: lda $5041
+     77B9: eor #$ed
+     77BB: beq $77be
 
-	To access hidden test mode in Baseball 3 hold down during power on.
-	- test mode check
-	686E: lda $5041
-	6871: eor #$f7
-	6873: bne $68c8
+    To access hidden test mode in Baseball 3 hold down during power on.
+    - test mode check
+    686E: lda $5041
+    6871: eor #$f7
+    6873: bne $68c8
 
-	It is not clear how to access Huntin'3 Test Mode (if possible) there do appear to be tiles for it tho
+    It is not clear how to access Huntin'3 Test Mode (if possible) there do appear to be tiles for it tho
 
-	Huntin'3 makes much more extensive use of the video hardware than the other titles, including
-	 - Table based Rowscroll (most first person views)
-	 - RAM based tiles (status bar in "Target Range", text descriptions on menus etc.)
-	 - Windowing effects (to highlight menu items, timer in "Target Range") NOT YET EMULATED / PROPERLY UNDERSTOOD
+    Huntin'3 makes much more extensive use of the video hardware than the other titles, including
+     - Table based Rowscroll (most first person views)
+     - RAM based tiles (status bar in "Target Range", text descriptions on menus etc.)
+     - Windowing effects (to highlight menu items, timer in "Target Range") NOT YET EMULATED / PROPERLY UNDERSTOOD
 
 */
 
@@ -492,7 +492,7 @@ int radica_eu3a14_state::get_xscroll_for_screenypos(int ydraw)
 
 	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
 
-	if (m_rowscrollcfg[1] == 0x01) // GUESS! could be anything, but this bit is set in Huntin'3 
+	if (m_rowscrollcfg[1] == 0x01) // GUESS! could be anything, but this bit is set in Huntin'3
 	{
 		int split0 = m_rowscrollregs[0] | (m_rowscrollregs[1] << 8);
 		int split1 = m_rowscrollregs[2] | (m_rowscrollregs[3] << 8);
@@ -589,11 +589,11 @@ void radica_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap
 	// this register use is questionable
 	if (m_ramtilecfg[0] & 0x80)
 	{
-		int	rtm_size;;
-		int	rtm_pagewidth;
-		int	rtm_pageheight;
-		int	rtm_yscroll;
-		int	rtm_bpp;
+		int rtm_size;;
+		int rtm_pagewidth;
+		int rtm_pageheight;
+		int rtm_yscroll;
+		int rtm_bpp;
 		int rtm_bytespertile = 2;
 		uint8_t palettepri = m_ramtilecfg[1];
 
@@ -638,7 +638,7 @@ void radica_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap
 		// wrap y
 		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
 		// wrap x+y
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth), (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);	
+		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth), (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
 	}
 }
 
@@ -722,7 +722,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 		ramstart = m_tilerambase + pagesize * 2;
 		ramend = m_tilerambase + pagesize * 3;
-	
+
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                      (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 2), (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                      (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
@@ -730,7 +730,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 		ramstart = m_tilerambase + pagesize * 3;
 		ramend = m_tilerambase + pagesize * 4;
-	
+
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
 		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);// wrap y
@@ -738,7 +738,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	}
 	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
 	{
-	//	popmessage("m_tilecfg[0] & 0x03 multiple layers config %04x", base);
+	//  popmessage("m_tilecfg[0] & 0x03 multiple layers config %04x", base);
 		ramstart = m_tilerambase + pagesize * 0;
 		ramend = m_tilerambase + pagesize * 1;
 
@@ -750,7 +750,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
 		// wrap x+y
 		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
-	
+
 		// RAM based tile layer
 		draw_background_ramlayer(screen, bitmap, cliprect);
 	}
@@ -798,7 +798,7 @@ void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &
 		offset += line * 4;
 		bppdiv = 2;
 		break;
-		
+
 	case 0x2:
 		offset += line * 2;
 		bppdiv = 4;
@@ -853,7 +853,7 @@ void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &
 				if (flipx) { mask = 0x0f; shift = 0; } else { mask = 0xf0; shift = 4; }
 				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
 				realx++;
-				if (flipx) { mask = 0xf0; shift = 4; } else	{ mask = 0x0f; shift = 0; }
+				if (flipx) { mask = 0xf0; shift = 4; } else { mask = 0x0f; shift = 0; }
 				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
 			}
 			else if (bpp == 3)
@@ -1156,7 +1156,7 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// video regs are in the 51xx range
 
 	// huntin'3 seems to use some registers for a windowing / highlight effect on the trophy room names and "Target Range" mode timer??
-	// 5100 - 0x0f when effect is enabled, 0x00 otherwise?   
+	// 5100 - 0x0f when effect is enabled, 0x00 otherwise?
 	// 5101 - 0x0e in both modes
 	// 5102 - 0x86 in both modes
 	// 5103 - 0x0e in tropy room (left?)                                  / 0x2a in "Target Range" mode (left position?)
@@ -1179,9 +1179,9 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5116, 0x5117).ram().share("rowscrollcfg"); // 00 01 in hnt3 (could just be extra tile config bits, purpose guessed)   set to 00 05 in rad_gtg overhead part (no rowscroll)
 	//  0x5118, 0x5119  not used
 	map(0x511a, 0x511e).ram().share("rowscrollsplit"); // hnt3 (60 68 78 90 b8 - rowscroll position list see note below
-	
+
 	// register value notes for 511a-511e and how they relate to screen
-    // 00-6f normal scroll reg
+	// 00-6f normal scroll reg
 	// 60-67 is where the first extra scroll reg (rowscrollregs) is onscreen
 	// 68-77 is the 2nd
 	// 78-8f is the 3rd
@@ -1894,7 +1894,7 @@ ROM_END
 
 ROM_START( rad_hnt3p )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "huntin3.bin", 0x000000, 0x400000, CRC(c8e3e40b) SHA1(81eb16ac5ab6d93525fcfadbc6703b2811d7de7f) )                                      
+	ROM_LOAD( "huntin3.bin", 0x000000, 0x400000, CRC(c8e3e40b) SHA1(81eb16ac5ab6d93525fcfadbc6703b2811d7de7f) )
 ROM_END
 
 ROM_START( rad_bask )

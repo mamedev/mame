@@ -6,12 +6,17 @@
 
     http://fjkraan.home.xs4all.nl/comp/hx20/
 
-    Epson CM6000
+    Epson CM6000 Series
 
-    This is a re-badged HX-20 with revision H motherboard and keyboard overlay.
-    It takes 3x16K ROMs instead of the usual 4x8K + 8K optional. Appears to
+    These are re-badged HX-20 with revision H motherboard and keyboard overlay.
+
+    CM6032: Takes 3x16K ROMs instead of the usual 4x8K + 8K optional. Appears to
     be from a BT phone exchange.
     Label on base states CM6000 Series, CM6032 System, MOH 89/1.
+
+    CM6127: Takes 2x16K ROMs and 32K CMOS RAM. Also has an expansion unit
+    containing 2x16K ROMs and 32K CMOS RAM.
+    Label on base states CM6000 Series, CM6127H System.
 
 ****************************************************************************/
 
@@ -529,6 +534,7 @@ void hx20_state::hx20_mem(address_map &map)
 	map(0x0028, 0x0028).r(FUNC(hx20_state::krtn89_r));
 	map(0x002a, 0x002a).w(FUNC(hx20_state::lcd_data_w));
 	map(0x002c, 0x002c); // mask interruption by using IC 8E in sleep mode
+	map(0x0030, 0x0033); // switch memory banks (expansion unit)
 	map(0x0040, 0x007f).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
 	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x3fff).ram();
@@ -550,13 +556,25 @@ void hx20_state::hx20_sub_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( cm6000_mem )
+//  ADDRESS_MAP( cm6032_mem )
 //-------------------------------------------------
 
-void hx20_state::cm6000_mem(address_map &map)
+void hx20_state::cm6032_mem(address_map &map)
 {
 	hx20_mem(map);
 	map(0x4000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( cm6127_mem )
+//-------------------------------------------------
+
+void hx20_state::cm6127_mem(address_map &map)
+{
+	hx20_mem(map);
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
 }
 
 
@@ -682,7 +700,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_DIPSETTING(    0x04, "England" )
 	PORT_DIPSETTING(    0x05, "Germany" )
 	PORT_DIPSETTING(    0x06, "France" )
-	PORT_DIPSETTING(    0x07, "America" )
+	PORT_DIPSETTING(    0x07, "U.S.A." )
 	PORT_DIPNAME( 0x08, 0x00, "Floppy Drive TF-20" ) PORT_DIPLOCATION("SW6:4")
 	PORT_DIPSETTING(    0x00, "Installed" )
 	PORT_DIPSETTING(    0x08, "Not Installed" )
@@ -710,10 +728,10 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( cm6000 )
+//  INPUT_PORTS( cm6032 )
 //-------------------------------------------------
 
-static INPUT_PORTS_START( cm6000 )
+static INPUT_PORTS_START( cm6032 )
 	PORT_INCLUDE(hx20)
 
 	PORT_MODIFY("KSC0")
@@ -734,6 +752,35 @@ static INPUT_PORTS_START( cm6000 )
 	PORT_MODIFY("KSC7")
 	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ABORT")
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXT FF")
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( cm6127 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( cm6127 )
+	PORT_INCLUDE(hx20)
+
+	PORT_MODIFY("KSC0")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 Checkout") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+
+	PORT_MODIFY("KSC1")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 Enquiry") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+
+	PORT_MODIFY("KSC2")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3 Checkin") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+
+	PORT_MODIFY("KSC3")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 Audit") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+
+	PORT_MODIFY("KSC4")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 T/Date") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+
+	PORT_MODIFY("KSC7")
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Abort")
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Pause")
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ext FF")
 INPUT_PORTS_END
 
 
@@ -782,13 +829,13 @@ uint32_t hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 //  OPTIONAL ROMS
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom_load)
+DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 {
 	uint32_t size = m_optrom->common_get_size("rom");
 
 	if (size != 0x2000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported rom size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 
@@ -836,9 +883,10 @@ void hx20_state::machine_start()
 //  machine_config( hx20 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(hx20_state::hx20)
+void hx20_state::hx20(machine_config &config)
+{
 	// basic machine hardware
-	HD63701(config, m_maincpu, XTAL(2'457'600));
+	HD63701(config, m_maincpu, 2.4576_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_mem);
 	m_maincpu->in_p1_cb().set(FUNC(hx20_state::main_p1_r));
 	m_maincpu->out_p1_cb().set(FUNC(hx20_state::main_p1_w));
@@ -847,7 +895,7 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	// Port 3 = A0-A7, D0-D7
 	// Port 4 = A8-A15
 
-	HD63701(config, m_subcpu, XTAL(2'457'600));
+	HD63701(config, m_subcpu, 2.4576_MHz_XTAL);
 	m_subcpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_sub_mem);
 	m_subcpu->in_p1_cb().set(FUNC(hx20_state::slave_p1_r));
 	m_subcpu->out_p1_cb().set(FUNC(hx20_state::slave_p1_w));
@@ -892,25 +940,24 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// optional rom
-	MCFG_GENERIC_SOCKET_ADD("optrom", generic_plain_slot, "opt_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(hx20_state, optrom_load)
+	GENERIC_SOCKET(config, m_optrom, generic_plain_slot, "opt_rom", "bin,rom");
+	m_optrom->set_device_load(FUNC(hx20_state::optrom_load), this);
 
 	// software lists
 	SOFTWARE_LIST(config, "hx20_opt_list").set_original("hx20_rom");
 	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  machine_config( hx20 )
+//  machine_config( cm6032 )
 //-------------------------------------------------
 
-void hx20_state::cm6000(machine_config &config)
+void hx20_state::cm6032(machine_config &config)
 {
 	hx20(config);
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6000_mem);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6032_mem);
 
 	// optional rom
 	config.device_remove("optrom");
@@ -921,9 +968,17 @@ void hx20_state::cm6000(machine_config &config)
 }
 
 
-//**************************************************************************
-//  ROMS
-//**************************************************************************
+//-------------------------------------------------
+//  machine_config( cm6127 )
+//-------------------------------------------------
+
+void hx20_state::cm6127(machine_config &config)
+{
+	cm6032(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6127_mem);
+}
+
 
 //-------------------------------------------------
 //  ROM( ehx20 )
@@ -933,10 +988,10 @@ ROM_START( ehx20 )
 	ROM_REGION( 0x8000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "v11" )
 	ROM_SYSTEM_BIOS( 0, "v10", "version 1.0" )
-	ROMX_LOAD( "hx20_v10.12e", 0x0000, 0x2000, CRC(ed7482c6) SHA1(8fba63037f2418aee9e933a353b052a5ed816ead), ROM_BIOS(0) )
-	ROMX_LOAD( "hx20_v10.13e", 0x2000, 0x2000, CRC(f5cc8868) SHA1(3248a1ddf0d8df7e9f2fe96955385218d760c4ad), ROM_BIOS(0) )
-	ROMX_LOAD( "hx20_v10.14e", 0x4000, 0x2000, CRC(27d743ed) SHA1(ebae367b0fa5f42ac78424df2534312296fd6fdc), ROM_BIOS(0) )
-	ROMX_LOAD( "hx20_v10.15e", 0x6000, 0x2000, CRC(33fbb1ab) SHA1(292ace94b4dad267aa7786dc64e68ac6f3c98aa7), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.12e", 0x6000, 0x2000, CRC(ed7482c6) SHA1(8fba63037f2418aee9e933a353b052a5ed816ead), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.13e", 0x4000, 0x2000, CRC(f5cc8868) SHA1(3248a1ddf0d8df7e9f2fe96955385218d760c4ad), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.14e", 0x2000, 0x2000, CRC(27d743ed) SHA1(ebae367b0fa5f42ac78424df2534312296fd6fdc), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.15e", 0x0000, 0x2000, CRC(33fbb1ab) SHA1(292ace94b4dad267aa7786dc64e68ac6f3c98aa7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v11", "version 1.1" )
 	ROMX_LOAD( "hx20_v11.12e", 0x0000, 0x2000, CRC(4de0b4b6) SHA1(f15c537824b7effde9d9b9a21e92a081fb089371), ROM_BIOS(1) )
 	ROMX_LOAD( "hx20_v11.13e", 0x2000, 0x2000, CRC(10d6ae76) SHA1(3163954ed9981f70f590ee98bcc8e19e4be6527a), ROM_BIOS(1) )
@@ -965,10 +1020,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( ecm6000 )
+//  ROM( ecm6032 )
 //-------------------------------------------------
 
-ROM_START( ecm6000 )
+ROM_START( ecm6032 )
 	// 1988 MOSU 20120200004 H:::
 	ROM_REGION( 0xc000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cm6032a-1_v43.11e", 0x0000, 0x4000, CRC(124797c2) SHA1(33d3418c99eb2d557151996bc09debf4ca089298) )
@@ -976,7 +1031,24 @@ ROM_START( ecm6000 )
 	ROM_LOAD( "cm6032a-3_v43.15e", 0x8000, 0x4000, CRC(95c34bdc) SHA1(c7022145f37e9fd2f339f8e7ad3adce76a67ca0b) )
 
 	ROM_REGION( 0x1000, HD6301V1_SLAVE_TAG, 0 )
-	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a)) // not verified
+	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( ecm6127 )
+//-------------------------------------------------
+
+ROM_START( ecm6127 )
+	ROM_REGION( 0x8000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "cm6127h-1_v16.13e", 0x0000, 0x4000, CRC(80f08fb8) SHA1(f1a1b38ce0aff25e6915fb7092d9158f13fd4108) )
+	ROM_LOAD( "cm6127h-2_v16.15e", 0x4000, 0x4000, CRC(2c59851e) SHA1(2b031e958497b87601bbdda15f5e974cfd931ed9) )
+	ROM_REGION( 0x8000, "ext", ROMREGION_ERASEFF )
+	ROM_LOAD( "cm6127h-3_v16.13b", 0x0000, 0x4000, CRC(0dbb1f51) SHA1(80aa442a42f04f661de01b8b64a6dde72751c851) ) // Expansion Unit
+	ROM_LOAD( "cm6127h-4_v16.14b", 0x4000, 0x4000, CRC(348cdd4b) SHA1(88c88b40d83e3a7cc93d2db684bc70cf78aaa180) ) // Expansion Unit
+
+	ROM_REGION( 0x1000, HD6301V1_SLAVE_TAG, 0 )
+	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a) )
 ROM_END
 
 
@@ -987,4 +1059,5 @@ ROM_END
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY  FULLNAME                FLAGS
 COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "Epson HX-20",          MACHINE_NOT_WORKING )
 COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "Epson HX-20 (Europe)", MACHINE_NOT_WORKING )
-COMP( 1989, ecm6000, ehx20,  0,      cm6000,  cm6000, hx20_state, empty_init, "Epson", "Epson CM6000",         MACHINE_NOT_WORKING )
+COMP( 1989, ecm6032, ehx20,  0,      cm6032,  cm6032, hx20_state, empty_init, "Epson", "Epson CM6032",         MACHINE_NOT_WORKING )
+COMP( 1993, ecm6127, ehx20,  0,      cm6127,  cm6127, hx20_state, empty_init, "Epson", "Epson CM6127",         MACHINE_NOT_WORKING )

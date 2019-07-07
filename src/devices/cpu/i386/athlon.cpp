@@ -389,6 +389,7 @@ uint16_t athlonxp_device::READ16PL(uint32_t ea, uint8_t privilege)
 	switch (ea & 3)
 	{
 	case 0:
+	default:
 		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
 
@@ -429,6 +430,7 @@ uint32_t athlonxp_device::READ32PL(uint32_t ea, uint8_t privilege)
 	switch (ea & 3)
 	{
 	case 0:
+	default:
 		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
 
@@ -473,6 +475,7 @@ uint64_t athlonxp_device::READ64PL(uint32_t ea, uint8_t privilege)
 	switch (ea & 3)
 	{
 	case 0:
+	default:
 		value = READ32PL(ea, privilege);
 		value |= uint64_t(READ32PL(ea + 2, privilege)) << 32;
 		break;

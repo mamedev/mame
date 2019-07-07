@@ -4,10 +4,6 @@
 
     Sony PocketStation
 
-    05/2009 Skeleton driver written.
-    11/2009 Initial bring-up commenced by Ryan Holtz.
-    11/2009 Playable state achieved by Ryan Holtz.
-
     PocketStation games were dowloaded from PS1 games into flash RAM after
     the unit had been inserted in the memory card slot, and so this should
     be emulated alongside the PS1.  However, as many flash dumps exist, it
@@ -21,22 +17,16 @@
     Infrared communication: Bi-directional and uni-directional comms
     Other: 1 LED indicator
 
-    Info available at:
-      * http://exophase.devzero.co.uk/ps_info.txt
-      * http://members.at.infoseek.co.jp/DrHell/pocket/index.html
-
     Currently, a handful of games run, but some die due to odd hardware
     issues.
 
-To start a game:
-- Wait for the set-date screen to appear
-- Press down arrow
-- set date with arrows (optional)
-- Press Ctrl, wait a sec, press ctrl, press right arrow, game starts
+	To start a game:
+	- Wait for the set-date screen to appear
+	- Press Down
+	- Set date with directional controls (optional)
+	- Press Button 1, wait, press Button 1, press Right, game starts
 
-It doesn't save the date so you have to go through this procedure every time.
-
-If you do nothing for about 20 secs, it turns itself off (screen goes white).
+	If you do nothing for about 20 secs, it turns itself off (screen goes white).
 
 ****************************************************************************/
 
@@ -51,58 +41,20 @@ If you do nothing for about 20 secs, it turns itself off (screen goes white).
 #include "screen.h"
 #include "speaker.h"
 
-#define MAX_PS_TIMERS   3
+#define LOG_UNKNOWN	(1 << 0)
+#define LOG_FTLB	(1 << 1)
+#define LOG_IRQS	(1 << 2)
+#define LOG_INTC	(1 << 3)
+#define LOG_TIMER	(1 << 4)
+#define LOG_CLOCK	(1 << 5)
+#define LOG_RTC		(1 << 6)
+#define LOG_LCD		(1 << 7)
+#define LOG_AUDIO	(1 << 8)
+#define LOG_ALL		(LOG_UNKNOWN | LOG_FTLB | LOG_IRQS | LOG_INTC | LOG_TIMER | LOG_CLOCK | LOG_RTC | LOG_LCD | LOG_AUDIO)
+#define LOG_DEFAULT	LOG_ALL
 
-struct ps_ftlb_regs_t
-{
-	uint32_t control;
-	uint32_t stat;
-	uint32_t valid;
-	uint32_t wait1;
-	uint32_t wait2;
-	uint32_t entry[16];
-	uint32_t serial;
-};
-
-struct ps_intc_regs_t
-{
-	uint32_t hold;
-	uint32_t status;
-	uint32_t enable;
-	uint32_t mask;
-};
-
-struct ps_timer_t
-{
-	uint32_t period;
-	uint32_t count;
-	uint32_t control;
-	emu_timer *timer;
-};
-
-struct ps_timer_regs_t
-{
-	ps_timer_t timer[MAX_PS_TIMERS];
-};
-
-struct ps_clock_regs_t
-{
-	uint32_t mode;
-	uint32_t control;
-};
-
-#define PS_CLOCK_STEADY     0x10
-
-struct ps_rtc_regs_t
-{
-	uint32_t mode;
-	uint32_t control;
-	uint32_t time;
-	uint32_t date;
-	emu_timer *timer;
-};
-
-
+#define VERBOSE		(0)
+#include "logmacro.h"
 
 class pockstat_state : public driver_device
 {
@@ -119,53 +71,122 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 
 private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void mem_map(address_map &map);
+
+	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void set_interrupt_line(uint32_t line, int state);
+	uint32_t get_interrupt_line(uint32_t line);
+
+	void timer_start(int index);
+
 	required_shared_ptr<uint32_t> m_lcd_buffer;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_rom;
 
-	ps_ftlb_regs_t m_ftlb_regs;
-	ps_intc_regs_t m_intc_regs;
-	ps_timer_regs_t m_timer_regs;
-	ps_clock_regs_t m_clock_regs;
-	ps_rtc_regs_t m_rtc_regs;
+	static constexpr uint32_t TIMER_COUNT = 3;
+
+	enum : uint32_t
+	{
+		CLOCK_STEADY = 0x10
+	};
+
+	enum
+	{
+		INT_BTN_ACTION     = 0x00000001, // "Action button"
+		INT_BTN_RIGHT      = 0x00000002, // "Right button"
+		INT_BTN_LEFT       = 0x00000004, // "Left button"
+		INT_BTN_DOWN       = 0x00000008, // "Down button"
+		INT_BTN_UP         = 0x00000010, // "Up button"
+		INT_UNKNOWN        = 0x00000020, // "Unknown"
+		INT_COM            = 0x00000040, // "COM" ???
+		INT_TIMER0         = 0x00000080, // "Timer 0"
+		INT_TIMER1         = 0x00000100, // "Timer 1"
+		INT_RTC            = 0x00000200, // "RTC"
+		INT_BATTERY        = 0x00000400, // "Battery Monitor"
+		INT_IOP            = 0x00000800, // "IOP"
+		INT_IRDA           = 0x00001000, // "IrDA"
+		INT_TIMER2         = 0x00002000, // "Timer 2"
+		INT_IRQ_MASK       = 0x00001fbf,
+		INT_FIQ_MASK       = 0x00002040,
+		INT_STATUS_MASK    = 0x0000021f
+	};
+
+	struct ftlb_regs_t
+	{
+		uint32_t control;
+		uint32_t stat;
+		uint32_t valid;
+		uint32_t wait1;
+		uint32_t wait2;
+		uint32_t entry[16];
+		uint32_t serial;
+	} m_ftlb_regs;
+
+	struct intc_regs_t
+	{
+		uint32_t hold;
+		uint32_t status;
+		uint32_t enable;
+		uint32_t mask;
+	} m_intc_regs;
+
+	struct timer_t
+	{
+		uint32_t period;
+		uint32_t count;
+		uint32_t control;
+		emu_timer *timer;
+	} m_timers[TIMER_COUNT];
+
+	struct clock_regs_t
+	{
+		uint32_t mode;
+		uint32_t control;
+	} m_clock_regs;
+
+	struct rtc_regs_t
+	{
+		uint32_t mode;
+		uint32_t control;
+		uint32_t time;
+		uint32_t date;
+		emu_timer *timer;
+	} m_rtc_regs;
+
 	uint32_t m_lcd_control;
-	int32_t m_ps_flash_write_enable_count;
-	int32_t m_ps_flash_write_count;
-	DECLARE_READ32_MEMBER(ps_ftlb_r);
-	DECLARE_WRITE32_MEMBER(ps_ftlb_w);
-	DECLARE_READ32_MEMBER(ps_intc_r);
-	DECLARE_WRITE32_MEMBER(ps_intc_w);
-	DECLARE_READ32_MEMBER(ps_timer_r);
-	DECLARE_WRITE32_MEMBER(ps_timer_w);
-	DECLARE_READ32_MEMBER(ps_clock_r);
-	DECLARE_WRITE32_MEMBER(ps_clock_w);
-	DECLARE_READ32_MEMBER(ps_rtc_r);
-	DECLARE_WRITE32_MEMBER(ps_rtc_w);
-	DECLARE_READ32_MEMBER(ps_lcd_r);
-	DECLARE_WRITE32_MEMBER(ps_lcd_w);
-	DECLARE_READ32_MEMBER(ps_rombank_r);
-	DECLARE_READ32_MEMBER(ps_flash_r);
-	DECLARE_WRITE32_MEMBER(ps_flash_w);
-	DECLARE_READ32_MEMBER(ps_audio_r);
-	DECLARE_WRITE32_MEMBER(ps_audio_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int32_t m_flash_write_enable_count;
+	int32_t m_flash_write_count;
+
+	DECLARE_READ32_MEMBER(ftlb_r);
+	DECLARE_WRITE32_MEMBER(ftlb_w);
+	DECLARE_READ32_MEMBER(intc_r);
+	DECLARE_WRITE32_MEMBER(intc_w);
+	DECLARE_READ32_MEMBER(timer_r);
+	DECLARE_WRITE32_MEMBER(timer_w);
+	DECLARE_READ32_MEMBER(clock_r);
+	DECLARE_WRITE32_MEMBER(clock_w);
+	DECLARE_READ32_MEMBER(rtc_r);
+	DECLARE_WRITE32_MEMBER(rtc_w);
+	DECLARE_READ32_MEMBER(lcd_r);
+	DECLARE_WRITE32_MEMBER(lcd_w);
+	DECLARE_READ32_MEMBER(rombank_r);
+	DECLARE_READ32_MEMBER(flash_r);
+	DECLARE_WRITE32_MEMBER(flash_w);
+	DECLARE_READ32_MEMBER(audio_r);
+	DECLARE_WRITE32_MEMBER(audio_w);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	uint32_t ps_intc_get_interrupt_line(uint32_t line);
-	void ps_intc_set_interrupt_line(uint32_t line, int state);
-	void ps_timer_start(int index);
-	void pockstat_mem(address_map &map);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(flash_load);
+
+	static const int CPU_FREQ[16];
 };
 
-
-#define DEFAULT_CLOCK   2000000
-
-static const int CPU_FREQ[16] =
+const int pockstat_state::CPU_FREQ[16] =
 {
 	0x00f800,
 	0x01f000,
@@ -185,167 +206,132 @@ static const int CPU_FREQ[16] =
 	0x7a0000
 };
 
-#define VERBOSE_LEVEL       (0)
-
-#define ENABLE_VERBOSE_LOG  (0)
-
-inline void ATTR_PRINTF(3,4) pockstat_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-#if ENABLE_VERBOSE_LOG
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-#endif
-}
-
-#define PS_INT_BTN_ACTION       0x00000001 // "Action button"
-#define PS_INT_BTN_RIGHT        0x00000002 // "Right button"
-#define PS_INT_BTN_LEFT         0x00000004 // "Left button"
-#define PS_INT_BTN_DOWN         0x00000008 // "Down button"
-#define PS_INT_BTN_UP           0x00000010 // "Up button"
-#define PS_INT_UNKNOWN          0x00000020 // "Unknown"
-#define PS_INT_COM              0x00000040 // "COM" ???
-#define PS_INT_TIMER0           0x00000080 // "Timer 0"
-#define PS_INT_TIMER1           0x00000100 // "Timer 1"
-#define PS_INT_RTC              0x00000200 // "RTC"
-#define PS_INT_BATTERY          0x00000400 // "Battery Monitor"
-#define PS_INT_IOP              0x00000800 // "IOP"
-#define PS_INT_IRDA             0x00001000 // "IrDA"
-#define PS_INT_TIMER2           0x00002000 // "Timer 2"
-#define PS_INT_IRQ_MASK         0x00001fbf
-#define PS_INT_FIQ_MASK         0x00002040
-#define PS_INT_STATUS_MASK      0x0000021f
-
-READ32_MEMBER(pockstat_state::ps_ftlb_r)
+READ32_MEMBER(pockstat_state::ftlb_r)
 {
 	switch(offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_ftlb_r: FlashROM TLB Control = %08x & %08x\n", m_ftlb_regs.control, mem_mask );
-			return m_ftlb_regs.control | 1; // ???
-		case 0x0004/4:
-			verboselog(0, "ps_ftlb_r: Unknown (F_STAT) = %08x & %08x\n", m_ftlb_regs.stat, mem_mask );
-			return m_ftlb_regs.stat;
-		case 0x0008/4:
-			verboselog(0, "ps_ftlb_r: FlashROM TLB Valid Tag = %08x & %08x\n", m_ftlb_regs.valid, mem_mask );
-			return m_ftlb_regs.valid;
-		case 0x000c/4:
-			verboselog(0, "ps_ftlb_r: Unknown (F_WAIT1) = %08x & %08x\n", m_ftlb_regs.wait1, mem_mask );
-			return m_ftlb_regs.wait1;
-		case 0x0010/4:
-			verboselog(0, "ps_ftlb_r: Unknown (F_WAIT2) = %08x & %08x\n", m_ftlb_regs.wait2 | 0x04, mem_mask );
-			return m_ftlb_regs.wait2 | 0x04;
-		case 0x0100/4:
-		case 0x0104/4:
-		case 0x0108/4:
-		case 0x010c/4:
-		case 0x0110/4:
-		case 0x0114/4:
-		case 0x0118/4:
-		case 0x011c/4:
-		case 0x0120/4:
-		case 0x0124/4:
-		case 0x0128/4:
-		case 0x012c/4:
-		case 0x0130/4:
-		case 0x0134/4:
-		case 0x0138/4:
-		case 0x013c/4:
-			verboselog(0, "ps_ftlb_r: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, m_ftlb_regs.entry[offset - 0x100/4], mem_mask );
-			return m_ftlb_regs.entry[offset - 0x100/4];
-		case 0x0300/4:
-			verboselog(0, "ps_ftlb_r: Unknown (F_SN) = %08x & %08x\n", m_ftlb_regs.serial, mem_mask );
-			return m_ftlb_regs.serial;
-		default:
-			verboselog(0, "ps_ftlb_r: Unknown Register %08x & %08x\n", 0x06000000 + (offset << 2), mem_mask );
-			break;
+	case 0x0000/4:
+		LOGMASKED(LOG_FTLB, "%s: FlashROM TLB Control = %08x & %08x\n", machine().describe_context(), m_ftlb_regs.control, mem_mask);
+		return m_ftlb_regs.control | 1; // ???
+	case 0x0004/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_STAT) = %08x & %08x\n", machine().describe_context(), m_ftlb_regs.stat, mem_mask);
+		return m_ftlb_regs.stat;
+	case 0x0008/4:
+		LOGMASKED(LOG_FTLB, "%s: FlashROM TLB Valid Tag = %08x & %08x\n", machine().describe_context(), m_ftlb_regs.valid, mem_mask);
+		return m_ftlb_regs.valid;
+	case 0x000c/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_WAIT1) = %08x & %08x\n", machine().describe_context(), m_ftlb_regs.wait1, mem_mask);
+		return m_ftlb_regs.wait1;
+	case 0x0010/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_WAIT2) = %08x & %08x\n", machine().describe_context(), m_ftlb_regs.wait2 | 0x04, mem_mask);
+		return m_ftlb_regs.wait2 | 0x04;
+	case 0x0100/4:
+	case 0x0104/4:
+	case 0x0108/4:
+	case 0x010c/4:
+	case 0x0110/4:
+	case 0x0114/4:
+	case 0x0118/4:
+	case 0x011c/4:
+	case 0x0120/4:
+	case 0x0124/4:
+	case 0x0128/4:
+	case 0x012c/4:
+	case 0x0130/4:
+	case 0x0134/4:
+	case 0x0138/4:
+	case 0x013c/4:
+		LOGMASKED(LOG_FTLB, "%s: FlashROM TLB Entry %d = %08x & %08x\n", machine().describe_context(), offset - 0x100/4, m_ftlb_regs.entry[offset - 0x100/4],
+			mem_mask);
+		return m_ftlb_regs.entry[offset - 0x100/4];
+	case 0x0300/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_SN) = %08x & %08x\n", machine().describe_context(), m_ftlb_regs.serial, mem_mask);
+		return m_ftlb_regs.serial;
+	default:
+		LOGMASKED(LOG_FTLB | LOG_UNKNOWN, "%s: Unknown Register %08x & %08x\n", machine().describe_context(), 0x06000000 + (offset << 2), mem_mask);
+		break;
 	}
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_ftlb_w)
+WRITE32_MEMBER(pockstat_state::ftlb_w)
 {
 	switch(offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_ftlb_w: FlashROM TLB Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_ftlb_regs.control);
-			break;
-		case 0x0004/4:
-			verboselog(0, "ps_ftlb_w: Unknown (F_STAT) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_ftlb_regs.stat);
-			break;
-		case 0x0008/4:
-			verboselog(0, "ps_ftlb_w: FlashROM TLB Valid Tag = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_ftlb_regs.valid);
-			break;
-		case 0x000c/4:
-			verboselog(0, "ps_ftlb_w: Unknown (F_WAIT1) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_ftlb_regs.wait1);
-			break;
-		case 0x0010/4:
-			verboselog(0, "ps_ftlb_w: Unknown (F_WAIT2) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_ftlb_regs.wait2);
-			break;
-		case 0x0100/4:
-		case 0x0104/4:
-		case 0x0108/4:
-		case 0x010c/4:
-		case 0x0110/4:
-		case 0x0114/4:
-		case 0x0118/4:
-		case 0x011c/4:
-		case 0x0120/4:
-		case 0x0124/4:
-		case 0x0128/4:
-		case 0x012c/4:
-		case 0x0130/4:
-		case 0x0134/4:
-		case 0x0138/4:
-		case 0x013c/4:
-			verboselog(0, "ps_ftlb_w: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, data, mem_mask );
-			COMBINE_DATA(&m_ftlb_regs.entry[offset - 0x100/4]);
-			break;
-		case 0x0300/4:
-			verboselog(0, "ps_ftlb_w: Unknown (F_SN) = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_ftlb_regs.serial);
-			break;
-		default:
-			verboselog(0, "ps_ftlb_w: Unknown Register %08x = %08x & %08x\n", 0x06000000 + (offset << 2), data, mem_mask );
-			break;
+	case 0x0000/4:
+		LOGMASKED(LOG_FTLB, "%s: FlashROM TLB Control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ftlb_regs.control);
+		break;
+	case 0x0004/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_STAT) = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ftlb_regs.stat);
+		break;
+	case 0x0008/4:
+		LOGMASKED(LOG_FTLB, "%s: FlashROM TLB Valid Tag = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ftlb_regs.valid);
+		break;
+	case 0x000c/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_WAIT1) = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ftlb_regs.wait1);
+		break;
+	case 0x0010/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_WAIT2) = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ftlb_regs.wait2);
+		break;
+	case 0x0100/4:
+	case 0x0104/4:
+	case 0x0108/4:
+	case 0x010c/4:
+	case 0x0110/4:
+	case 0x0114/4:
+	case 0x0118/4:
+	case 0x011c/4:
+	case 0x0120/4:
+	case 0x0124/4:
+	case 0x0128/4:
+	case 0x012c/4:
+	case 0x0130/4:
+	case 0x0134/4:
+	case 0x0138/4:
+	case 0x013c/4:
+		LOGMASKED(LOG_FTLB, "%s: FlashROM TLB Entry %d = %08x & %08x\n", machine().describe_context(), offset - 0x100/4, data, mem_mask);
+		COMBINE_DATA(&m_ftlb_regs.entry[offset - 0x100/4]);
+		break;
+	case 0x0300/4:
+		LOGMASKED(LOG_FTLB, "%s: Unknown (F_SN) = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_ftlb_regs.serial);
+		break;
+	default:
+		LOGMASKED(LOG_FTLB | LOG_UNKNOWN, "%s: Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x06000000 + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
-uint32_t pockstat_state::ps_intc_get_interrupt_line(uint32_t line)
+uint32_t pockstat_state::get_interrupt_line(uint32_t line)
 {
 	return m_intc_regs.status & line;
 }
 
-void pockstat_state::ps_intc_set_interrupt_line(uint32_t line, int state)
+void pockstat_state::set_interrupt_line(uint32_t line, int state)
 {
-	//printf( "%08x %d %08x %08x %08x\n", line, state, drvm_intc_regs.hold, drvm_intc_regs.status, drvm_intc_regs.enable );
-	if(line)
+	if (line)
 	{
-		if(state)
+		if (state)
 		{
-			m_intc_regs.status |= line & PS_INT_STATUS_MASK;
-			m_intc_regs.hold |= line &~ PS_INT_STATUS_MASK;
-			//printf( " Setting %08x, status = %08x, hold = %08x\n", line, m_intc_regs.status, m_intc_regs.hold );
+			m_intc_regs.status |= line & INT_STATUS_MASK;
+			m_intc_regs.hold |= line &~ INT_STATUS_MASK;
+			LOGMASKED(LOG_IRQS, "Setting IRQ line %08x, status = %08x, hold = %08x\n", line, m_intc_regs.status, m_intc_regs.hold);
 		}
 		else
 		{
 			m_intc_regs.status &= ~line;
 			m_intc_regs.hold &= ~line;
-			//printf( "Clearing %08x, status = %08x, hold = %08x\n", line, m_intc_regs.status, m_intc_regs.hold );
+			LOGMASKED(LOG_IRQS, "Clearing IRQ line %08x, status = %08x, hold = %08x\n", line, m_intc_regs.status, m_intc_regs.hold);
 		}
 	}
-	if(m_intc_regs.hold & m_intc_regs.enable & PS_INT_IRQ_MASK)
+
+	const uint32_t new_irq = m_intc_regs.hold & m_intc_regs.enable & INT_IRQ_MASK;
+	if (new_irq)
 	{
 		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	}
@@ -353,7 +339,9 @@ void pockstat_state::ps_intc_set_interrupt_line(uint32_t line, int state)
 	{
 		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 	}
-	if(m_intc_regs.hold & m_intc_regs.enable & PS_INT_FIQ_MASK)
+
+	const uint32_t new_fiq = m_intc_regs.hold & m_intc_regs.enable & INT_FIQ_MASK;
+	if (new_fiq)
 	{
 		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
@@ -363,242 +351,257 @@ void pockstat_state::ps_intc_set_interrupt_line(uint32_t line, int state)
 	}
 }
 
-READ32_MEMBER(pockstat_state::ps_intc_r)
+READ32_MEMBER(pockstat_state::intc_r)
 {
 	switch(offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_intc_r: Held Interrupt = %08x & %08x\n", m_intc_regs.hold, mem_mask );
-			return m_intc_regs.hold;
-		case 0x0004/4:
-			verboselog(0, "ps_intc_r: Interrupt Status = %08x & %08x\n", m_intc_regs.status, mem_mask );
-			return m_intc_regs.status;
-		case 0x0008/4:
-			verboselog(0, "ps_intc_r: Interrupt Enable = %08x & %08x\n", m_intc_regs.enable, mem_mask );
-			return m_intc_regs.enable;
-		case 0x000c/4:
-			verboselog(0, "ps_intc_r: Interrupt Mask (Invalid Read) = %08x & %08x\n", 0, mem_mask );
-			return 0;
-		case 0x0010/4:
-			verboselog(0, "ps_intc_r: Interrupt Acknowledge (Invalid Read) = %08x & %08x\n", 0, mem_mask );
-			return 0;
-		default:
-			verboselog(0, "ps_intc_r: Unknown Register %08x & %08x\n", 0x0a000000 + (offset << 2), mem_mask );
-			break;
+	case 0x0000/4:
+		LOGMASKED(LOG_INTC, "%s: Held Interrupt Read: %08x & %08x\n", machine().describe_context(), m_intc_regs.hold, mem_mask);
+		return m_intc_regs.hold;
+	case 0x0004/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Status Read: %08x & %08x\n", machine().describe_context(), m_intc_regs.status, mem_mask);
+		return m_intc_regs.status;
+	case 0x0008/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Enable Read: %08x & %08x\n", machine().describe_context(), m_intc_regs.enable, mem_mask);
+		return m_intc_regs.enable;
+	case 0x000c/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Mask Read (Invalid): %08x & %08x\n", machine().describe_context(), 0, mem_mask);
+		return 0;
+	case 0x0010/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Acknowledge Read (Invalid): %08x & %08x\n", machine().describe_context(), 0, mem_mask);
+		return 0;
+	default:
+		LOGMASKED(LOG_INTC | LOG_UNKNOWN, "%s: Unknown Register Read: %08x & %08x\n", machine().describe_context(), 0x0a000000 + (offset << 2), mem_mask);
+		break;
 	}
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_intc_w)
+WRITE32_MEMBER(pockstat_state::intc_w)
 {
 	switch(offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_intc_w: Held Interrupt (Invalid Write) = %08x & %08x\n", data, mem_mask );
-			break;
-		case 0x0004/4:
-			verboselog(0, "ps_intc_w: Interrupt Status (Invalid Write) = %08x & %08x\n", data, mem_mask );
-			break;
-		case 0x0008/4:
-			verboselog(0, "ps_intc_w: Interrupt Enable = %08x & %08x\n", data, mem_mask );
-			m_intc_regs.enable |= data;
-			//COMBINE_DATA(&m_intc_regs.enable);
-			//m_intc_regs.status &= m_intc_regs.enable;
-			//m_intc_regs.hold &= m_intc_regs.enable;
-			ps_intc_set_interrupt_line(0, 0);
-			break;
-		case 0x000c/4:
-			verboselog(0, "ps_intc_w: Interrupt Mask = %08x & %08x\n", data, mem_mask );
-			m_intc_regs.enable &= ~data;
-			COMBINE_DATA(&m_intc_regs.mask);
-			//m_intc_regs.status &= m_intc_regs.enable;
-			//m_intc_regs.hold &= m_intc_regs.enable;
-			ps_intc_set_interrupt_line(0, 0);
-			break;
-		case 0x0010/4:
-			verboselog(0, "ps_intc_w: Interrupt Acknowledge = %08x & %08x\n", data, mem_mask );
-			m_intc_regs.hold &= ~data;
-			m_intc_regs.status &= ~data;
-			ps_intc_set_interrupt_line(0, 0);
-			//COMBINE_DATA(&m_intc_regs.acknowledge);
-			break;
-		default:
-			verboselog(0, "ps_intc_w: Unknown Register %08x = %08x & %08x\n", 0x0a000000 + (offset << 2), data, mem_mask );
-			break;
+	case 0x0000/4:
+		LOGMASKED(LOG_INTC, "%s: Held Interrupt (Invalid Write) = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x0004/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Status (Invalid Write) = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x0008/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Enable = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_intc_regs.enable |= data;
+		//COMBINE_DATA(&m_intc_regs.enable);
+		//m_intc_regs.status &= m_intc_regs.enable;
+		//m_intc_regs.hold &= m_intc_regs.enable;
+		set_interrupt_line(0, 0);
+		break;
+	case 0x000c/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Mask = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_intc_regs.enable &= ~data;
+		COMBINE_DATA(&m_intc_regs.mask);
+		//m_intc_regs.status &= m_intc_regs.enable;
+		//m_intc_regs.hold &= m_intc_regs.enable;
+		set_interrupt_line(0, 0);
+		break;
+	case 0x0010/4:
+		LOGMASKED(LOG_INTC, "%s: Interrupt Acknowledge = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_intc_regs.hold &= ~data;
+		m_intc_regs.status &= ~data;
+		set_interrupt_line(0, 0);
+		//COMBINE_DATA(&m_intc_regs.acknowledge);
+		break;
+	default:
+		LOGMASKED(LOG_INTC | LOG_UNKNOWN, "%s: Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x0a000000 + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(pockstat_state::timer_tick)
 {
-	ps_intc_set_interrupt_line(param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
-	//printf( "Timer %d is calling back\n", param );
-	m_timer_regs.timer[param].count = m_timer_regs.timer[param].period;
-	ps_timer_start(param);
+	set_interrupt_line(param == 2 ? INT_TIMER2 : (param == 1 ? INT_TIMER1 : INT_TIMER0), 1);
+	m_timers[param].count = m_timers[param].period;
+	timer_start(param);
 }
 
-void pockstat_state::ps_timer_start(int index)
+void pockstat_state::timer_start(int index)
 {
 	int divisor = 1;
 	attotime period;
-	switch(m_timer_regs.timer[index].control & 3)
+	switch (m_timers[index].control & 3)
 	{
-		case 0:
-		case 3:
-			divisor = 1;
-			break;
-		case 1:
-			divisor = 16;
-			break;
-		case 2:
-			divisor = 256;
-			break;
+	case 0:
+	case 3:
+		divisor = 1;
+		break;
+	case 1:
+		divisor = 16;
+		break;
+	case 2:
+		divisor = 256;
+		break;
 	}
-	period = attotime::from_hz(CPU_FREQ[m_clock_regs.mode & 0x0f] / 2) * divisor;
-	period = period * m_timer_regs.timer[index].count;
-	m_timer_regs.timer[index].timer->adjust(period, index);
+	period = attotime::from_hz(CPU_FREQ[m_clock_regs.mode & 0x0f] / 2) * divisor * m_timers[index].count;
+	m_timers[index].timer->adjust(period, index);
 }
 
-READ32_MEMBER(pockstat_state::ps_timer_r)
+READ32_MEMBER(pockstat_state::timer_r)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x0000/4:
-		case 0x0010/4:
-		case 0x0020/4:
-			verboselog(0, "ps_timer_r: Timer %d Period = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].period, mem_mask );
-			return m_timer_regs.timer[offset / (0x10/4)].period;
-		case 0x0004/4:
-		case 0x0014/4:
-		case 0x0024/4:
-			verboselog(0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].count, mem_mask );
-			if(m_timer_regs.timer[offset / (0x10/4)].control & 4)
+	case 0x0000/4:
+	case 0x0010/4:
+	case 0x0020/4:
+	{
+		const uint32_t index = offset / (0x10/4);
+		LOGMASKED(LOG_TIMER, "%s: Timer %d Period Read: %08x & %08x\n", machine().describe_context(), index, m_timers[index].period, mem_mask);
+		return m_timers[index].period;
+	}
+	case 0x0004/4:
+	case 0x0014/4:
+	case 0x0024/4:
+	{
+		const uint32_t index = offset / (0x10/4);
+		LOGMASKED(LOG_TIMER, "%s: Timer %d Count Read: %08x & %08x\n", machine().describe_context(), index, m_timers[index].count, mem_mask);
+		if(m_timers[index].control & 4)
+		{
+			m_timers[index].count--;
+			if (m_timers[index].count > m_timers[index].period)
 			{
-				m_timer_regs.timer[offset / (0x10/4)].count--;
-				if(m_timer_regs.timer[offset / (0x10/4)].count > m_timer_regs.timer[offset / (0x10/4)].period)
-				{
-					m_timer_regs.timer[offset / (0x10/4)].count = m_timer_regs.timer[offset / (0x10/4)].period;
-				}
-				return --m_timer_regs.timer[offset / (0x10/4)].count;
+				m_timers[index].count = m_timers[index].period;
 			}
-			return m_timer_regs.timer[offset / (0x10/4)].count;
-		case 0x0008/4:
-		case 0x0018/4:
-		case 0x0028/4:
-			verboselog(0, "ps_timer_r: Timer %d Control = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].control, mem_mask );
-			return m_timer_regs.timer[offset / (0x10/4)].control;
-		default:
-			verboselog(0, "ps_timer_r: Unknown Register %08x & %08x\n", 0x0a800000 + (offset << 2), mem_mask );
-			break;
+			return --m_timers[index].count;
+		}
+		return m_timers[index].count;
+	}
+	case 0x0008/4:
+	case 0x0018/4:
+	case 0x0028/4:
+	{
+		const uint32_t index = offset / (0x10/4);
+		LOGMASKED(LOG_TIMER, "%s: Timer %d Control = %08x & %08x\n", machine().describe_context(), index, m_timers[index].control, mem_mask);
+		return m_timers[index].control;
+	}
+	default:
+		LOGMASKED(LOG_TIMER | LOG_UNKNOWN, "%s: Unknown Register %08x & %08x\n", machine().describe_context(), 0x0a800000 + (offset << 2), mem_mask);
+		break;
 	}
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_timer_w)
+WRITE32_MEMBER(pockstat_state::timer_w)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x0000/4:
-		case 0x0010/4:
-		case 0x0020/4:
-			verboselog(0, "ps_timer_w: Timer %d Period = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
-			COMBINE_DATA(&m_timer_regs.timer[offset / (0x10/4)].period);
-			break;
-		case 0x0004/4:
-		case 0x0014/4:
-		case 0x0024/4:
-			verboselog(0, "ps_timer_w: Timer %d Count = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
-			COMBINE_DATA(&m_timer_regs.timer[offset / (0x10/4)].count);
-			break;
-		case 0x0008/4:
-		case 0x0018/4:
-		case 0x0028/4:
-			verboselog(0, "ps_timer_w: Timer %d Control = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
-			COMBINE_DATA(&m_timer_regs.timer[offset / (0x10/4)].control);
-			if(m_timer_regs.timer[offset / (0x10/4)].control & 4)
-			{
-				ps_timer_start(offset / (0x10/4));
-			}
-			else
-			{
-				m_timer_regs.timer[offset / (0x10/4)].timer->adjust(attotime::never, offset / (0x10/4));
-			}
-			break;
-		default:
-			verboselog(0, "ps_timer_w: Unknown Register %08x = %08x & %08x\n", 0x0a800000 + (offset << 2), data, mem_mask );
-			break;
+	case 0x0000/4:
+	case 0x0010/4:
+	case 0x0020/4:
+	{
+		const uint32_t index = offset / (0x10/4);
+		LOGMASKED(LOG_TIMER, "%s: Timer %d Period = %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
+		COMBINE_DATA(&m_timers[index].period);
+		break;
+	}
+	case 0x0004/4:
+	case 0x0014/4:
+	case 0x0024/4:
+	{
+		const uint32_t index = offset / (0x10/4);
+		LOGMASKED(LOG_TIMER, "%s: Timer %d Count = %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
+		COMBINE_DATA(&m_timers[index].count);
+		break;
+	}
+	case 0x0008/4:
+	case 0x0018/4:
+	case 0x0028/4:
+	{
+		const uint32_t index = offset / (0x10/4);
+		LOGMASKED(LOG_TIMER, "%s: Timer %d Control = %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
+		COMBINE_DATA(&m_timers[index].control);
+		if(m_timers[index].control & 4)
+		{
+			timer_start(index);
+		}
+		else
+		{
+			m_timers[index].timer->adjust(attotime::never, index);
+		}
+		break;
+	}
+	default:
+		LOGMASKED(LOG_TIMER | LOG_UNKNOWN, "%s: Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x0a800000 + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
-READ32_MEMBER(pockstat_state::ps_clock_r)
+READ32_MEMBER(pockstat_state::clock_r)
 {
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(0, "ps_clock_r: Clock Mode = %08x & %08x\n", m_clock_regs.mode | 0x10, mem_mask );
-			return m_clock_regs.mode | PS_CLOCK_STEADY;
+			LOGMASKED(LOG_CLOCK, "%s: Clock Mode Read: %08x & %08x\n", machine().describe_context(), m_clock_regs.mode | 0x10, mem_mask);
+			return m_clock_regs.mode | CLOCK_STEADY;
 		case 0x0004/4:
-			verboselog(0, "ps_clock_r: Clock Control = %08x & %08x\n", m_clock_regs.control, mem_mask );
+			LOGMASKED(LOG_CLOCK, "%s: Clock Control Read: %08x & %08x\n", machine().describe_context(), m_clock_regs.control, mem_mask);
 			return m_clock_regs.control;
 		default:
-			verboselog(0, "ps_clock_r: Unknown Register %08x & %08x\n", 0x0b000000 + (offset << 2), mem_mask );
+			LOGMASKED(LOG_CLOCK | LOG_UNKNOWN, "%s: Unknown Register %08x & %08x\n", machine().describe_context(), 0x0b000000 + (offset << 2), mem_mask);
 			break;
 	}
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_clock_w)
+WRITE32_MEMBER(pockstat_state::clock_w)
 {
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(0, "ps_clock_w: Clock Mode = %08x & %08x\n", data, mem_mask );
+			LOGMASKED(LOG_CLOCK, "%s: Clock Mode = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			COMBINE_DATA(&m_clock_regs.mode);
 			m_maincpu->set_unscaled_clock(CPU_FREQ[m_clock_regs.mode & 0x0f]);
 			break;
 		case 0x0004/4:
-			verboselog(0, "ps_clock_w: Clock Control = %08x & %08x\n", data, mem_mask );
+			LOGMASKED(LOG_CLOCK, "%s: Clock Control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			COMBINE_DATA(&m_clock_regs.control);
 			break;
 		default:
-			verboselog(0, "ps_clock_w: Unknown Register %08x = %08x & %08x\n", 0x0b000000 + (offset << 2), data, mem_mask );
+			LOGMASKED(LOG_CLOCK | LOG_UNKNOWN, "%s: Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x0b000000 + (offset << 2), data, mem_mask);
 			break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
 {
-	//printf( "RTC is calling back\n" );
-	ps_intc_set_interrupt_line(PS_INT_RTC, ps_intc_get_interrupt_line(PS_INT_RTC) ? 0 : 1);
-	if(!(m_rtc_regs.mode & 1))
+	set_interrupt_line(INT_RTC, get_interrupt_line(INT_RTC) ? 0 : 1);
+	if (!(m_rtc_regs.mode & 1))
 	{
 		m_rtc_regs.time++;
-		if((m_rtc_regs.time & 0x0000000f) == 0x0000000a)
+		if ((m_rtc_regs.time & 0x0000000f) == 0x0000000a)
 		{
 			m_rtc_regs.time &= 0xfffffff0;
 			m_rtc_regs.time += 0x00000010;
-			if((m_rtc_regs.time & 0x000000ff) == 0x00000060)
+			if ((m_rtc_regs.time & 0x000000ff) == 0x00000060)
 			{
 				m_rtc_regs.time &= 0xffffff00;
 				m_rtc_regs.time += 0x00000100;
-				if((m_rtc_regs.time & 0x00000f00) == 0x00000a00)
+				if ((m_rtc_regs.time & 0x00000f00) == 0x00000a00)
 				{
 					m_rtc_regs.time &= 0xfffff0ff;
 					m_rtc_regs.time += 0x00001000;
-					if((m_rtc_regs.time & 0x0000ff00) == 0x00006000)
+					if ((m_rtc_regs.time & 0x0000ff00) == 0x00006000)
 					{
 						m_rtc_regs.time &= 0xffff00ff;
 						m_rtc_regs.time += 0x00010000;
-						if((m_rtc_regs.time & 0x00ff0000) == 0x00240000)
+						if ((m_rtc_regs.time & 0x00ff0000) == 0x00240000)
 						{
 							m_rtc_regs.time &= 0xff00ffff;
 							m_rtc_regs.time += 0x01000000;
-							if((m_rtc_regs.time & 0x0f000000) == 0x08000000)
+							if ((m_rtc_regs.time & 0x0f000000) == 0x08000000)
 							{
 								m_rtc_regs.time &= 0xf0ffffff;
 								m_rtc_regs.time |= 0x01000000;
 							}
 						}
-						else if((m_rtc_regs.time & 0x000f0000) == 0x000a0000)
+						else if ((m_rtc_regs.time & 0x000f0000) == 0x000a0000)
 						{
 							m_rtc_regs.time &= 0xfff0ffff;
 							m_rtc_regs.time += 0x00100000;
@@ -611,166 +614,166 @@ TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
 	m_rtc_regs.timer->adjust(attotime::from_hz(1));
 }
 
-READ32_MEMBER(pockstat_state::ps_rtc_r)
+READ32_MEMBER(pockstat_state::rtc_r)
 {
 	switch(offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_rtc_r: RTC Mode = %08x & %08x\n", m_rtc_regs.mode, mem_mask );
-			return m_rtc_regs.mode;
-		case 0x0004/4:
-			verboselog(0, "ps_rtc_r: RTC Control = %08x & %08x\n", m_rtc_regs.control, mem_mask );
-			return m_rtc_regs.control;
-		case 0x0008/4:
-			verboselog(0, "ps_rtc_r: RTC Time = %08x & %08x\n", m_rtc_regs.time, mem_mask );
-			return m_rtc_regs.time;
-		case 0x000c/4:
-			verboselog(0, "ps_rtc_r: RTC Date = %08x & %08x\n", m_rtc_regs.date, mem_mask );
-			return m_rtc_regs.date;
-		default:
-			verboselog(0, "ps_rtc_r: Unknown Register %08x & %08x\n", 0x0b800000 + (offset << 2), mem_mask );
-			break;
+	case 0x0000/4:
+		LOGMASKED(LOG_RTC, "%s: RTC Mode Read: %08x & %08x\n", machine().describe_context(), m_rtc_regs.mode, mem_mask);
+		return m_rtc_regs.mode;
+	case 0x0004/4:
+		LOGMASKED(LOG_RTC, "%s: RTC Control Read: %08x & %08x\n", machine().describe_context(), m_rtc_regs.control, mem_mask);
+		return m_rtc_regs.control;
+	case 0x0008/4:
+		LOGMASKED(LOG_RTC, "%s: RTC Time Read: %08x & %08x\n", machine().describe_context(), m_rtc_regs.time, mem_mask);
+		return m_rtc_regs.time;
+	case 0x000c/4:
+		LOGMASKED(LOG_RTC, "%s: RTC Date Read: %08x & %08x\n", machine().describe_context(), m_rtc_regs.date, mem_mask);
+		return m_rtc_regs.date;
+	default:
+		LOGMASKED(LOG_RTC | LOG_UNKNOWN, "%s: Unknown Register %08x & %08x\n", machine().describe_context(), 0x0b800000 + (offset << 2), mem_mask);
+		break;
 	}
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_rtc_w)
+WRITE32_MEMBER(pockstat_state::rtc_w)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_rtc_w: RTC Mode = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_rtc_regs.mode);
-			break;
-		case 0x0004/4:
-			verboselog(0, "ps_rtc_w: RTC Control = %08x & %08x\n", data, mem_mask );
-			if(m_rtc_regs.control == 1 && data == 1)
+	case 0x0000/4:
+		LOGMASKED(LOG_RTC, "%s: RTC Mode = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_rtc_regs.mode);
+		break;
+	case 0x0004/4:
+		LOGMASKED(LOG_RTC, "%s: RTC Control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		if (m_rtc_regs.control == 1 && data == 1)
+		{
+			switch (m_rtc_regs.mode >> 1)
 			{
-				switch(m_rtc_regs.mode >> 1)
+			case 0: // Seconds
+				m_rtc_regs.time += 0x00000001;
+				if ((m_rtc_regs.time & 0x0000000f) == 0x0000000a)
 				{
-					case 0: // Seconds
-						m_rtc_regs.time += 0x00000001;
-						if((m_rtc_regs.time & 0x0000000f) == 0x0000000a)
-						{
-							m_rtc_regs.time &= 0xfffffff0;
-							m_rtc_regs.time += 0x00000010;
-							if((m_rtc_regs.time & 0x000000ff) == 0x00000060)
-							{
-								m_rtc_regs.time &= 0xffffff00;
-							}
-						}
-						break;
-					case 1: // Minutes
-						m_rtc_regs.time += 0x00000100;
-						if((m_rtc_regs.time & 0x00000f00) == 0x00000a00)
-						{
-							m_rtc_regs.time &= 0xfffff0ff;
-							m_rtc_regs.time += 0x00001000;
-							if((m_rtc_regs.time & 0x0000ff00) == 0x00006000)
-							{
-								m_rtc_regs.time &= 0xffff00ff;
-							}
-						}
-						break;
-					case 2: // Hours
-						m_rtc_regs.time += 0x00010000;
-						if((m_rtc_regs.time & 0x00ff0000) == 0x00240000)
-						{
-							m_rtc_regs.time &= 0xff00ffff;
-						}
-						else if((m_rtc_regs.time & 0x000f0000) == 0x000a0000)
-						{
-							m_rtc_regs.time &= 0xfff0ffff;
-							m_rtc_regs.time += 0x00100000;
-						}
-						break;
-					case 3: // Day of the week
-						m_rtc_regs.time += 0x01000000;
-						if((m_rtc_regs.time & 0x0f000000) == 0x08000000)
-						{
-							m_rtc_regs.time &= 0xf0ffffff;
-							m_rtc_regs.time |= 0x01000000;
-						}
-						break;
-					case 4: // Day
-						m_rtc_regs.date += 0x00000001;
-						if((m_rtc_regs.date & 0x000000ff) == 0x00000032)
-						{
-							m_rtc_regs.date &= 0xffffff00;
-						}
-						else if((m_rtc_regs.date & 0x0000000f) == 0x0000000a)
-						{
-							m_rtc_regs.date &= 0xfffffff0;
-							m_rtc_regs.date += 0x00000010;
-						}
-						break;
-					case 5: // Month
-						m_rtc_regs.date += 0x00000100;
-						if((m_rtc_regs.date & 0x0000ff00) == 0x00001300)
-						{
-							m_rtc_regs.date &= 0xffffff00;
-							m_rtc_regs.date |= 0x00000001;
-						}
-						else if((m_rtc_regs.date & 0x00000f00) == 0x00000a00)
-						{
-							m_rtc_regs.date &= 0xfffff0ff;
-							m_rtc_regs.date += 0x00001000;
-						}
-						break;
-					case 6: // Year (LSB)
-						m_rtc_regs.date += 0x00010000;
-						if((m_rtc_regs.date & 0x000f0000) == 0x000a0000)
-						{
-							m_rtc_regs.date &= 0xfff0ffff;
-							m_rtc_regs.date += 0x00100000;
-							if((m_rtc_regs.date & 0x00f00000) == 0x00a00000)
-							{
-								m_rtc_regs.date &= 0xff00ffff;
-							}
-						}
-						break;
-					case 7: // Year (MSB)
-						break;
+					m_rtc_regs.time &= 0xfffffff0;
+					m_rtc_regs.time += 0x00000010;
+					if ((m_rtc_regs.time & 0x000000ff) == 0x00000060)
+					{
+						m_rtc_regs.time &= 0xffffff00;
+					}
 				}
-				m_rtc_regs.control = 0;
+				break;
+			case 1: // Minutes
+				m_rtc_regs.time += 0x00000100;
+				if ((m_rtc_regs.time & 0x00000f00) == 0x00000a00)
+				{
+					m_rtc_regs.time &= 0xfffff0ff;
+					m_rtc_regs.time += 0x00001000;
+					if ((m_rtc_regs.time & 0x0000ff00) == 0x00006000)
+					{
+						m_rtc_regs.time &= 0xffff00ff;
+					}
+				}
+				break;
+			case 2: // Hours
+				m_rtc_regs.time += 0x00010000;
+				if ((m_rtc_regs.time & 0x00ff0000) == 0x00240000)
+				{
+					m_rtc_regs.time &= 0xff00ffff;
+				}
+				else if ((m_rtc_regs.time & 0x000f0000) == 0x000a0000)
+				{
+					m_rtc_regs.time &= 0xfff0ffff;
+					m_rtc_regs.time += 0x00100000;
+				}
+				break;
+			case 3: // Day of the week
+				m_rtc_regs.time += 0x01000000;
+				if ((m_rtc_regs.time & 0x0f000000) == 0x08000000)
+				{
+					m_rtc_regs.time &= 0xf0ffffff;
+					m_rtc_regs.time |= 0x01000000;
+				}
+				break;
+			case 4: // Day
+				m_rtc_regs.date += 0x00000001;
+				if ((m_rtc_regs.date & 0x000000ff) == 0x00000032)
+				{
+					m_rtc_regs.date &= 0xffffff00;
+				}
+				else if ((m_rtc_regs.date & 0x0000000f) == 0x0000000a)
+				{
+					m_rtc_regs.date &= 0xfffffff0;
+					m_rtc_regs.date += 0x00000010;
+				}
+				break;
+			case 5: // Month
+				m_rtc_regs.date += 0x00000100;
+				if ((m_rtc_regs.date & 0x0000ff00) == 0x00001300)
+				{
+					m_rtc_regs.date &= 0xffffff00;
+					m_rtc_regs.date |= 0x00000001;
+				}
+				else if ((m_rtc_regs.date & 0x00000f00) == 0x00000a00)
+				{
+					m_rtc_regs.date &= 0xfffff0ff;
+					m_rtc_regs.date += 0x00001000;
+				}
+				break;
+			case 6: // Year (LSB)
+				m_rtc_regs.date += 0x00010000;
+				if ((m_rtc_regs.date & 0x000f0000) == 0x000a0000)
+				{
+					m_rtc_regs.date &= 0xfff0ffff;
+					m_rtc_regs.date += 0x00100000;
+					if ((m_rtc_regs.date & 0x00f00000) == 0x00a00000)
+					{
+						m_rtc_regs.date &= 0xff00ffff;
+					}
+				}
+				break;
+			case 7: // Year (MSB)
+				break;
 			}
-			else if(m_rtc_regs.control == 0)
-			{
-				COMBINE_DATA(&m_rtc_regs.control);
-			}
-			break;
-		default:
-			verboselog(0, "ps_rtc_w: Unknown Register %08x = %08x & %08x\n", 0x0b800000 + (offset << 2), data, mem_mask );
-			break;
+			m_rtc_regs.control = 0;
+		}
+		else if(m_rtc_regs.control == 0)
+		{
+			COMBINE_DATA(&m_rtc_regs.control);
+		}
+		break;
+	default:
+		LOGMASKED(LOG_RTC | LOG_UNKNOWN, "%s: Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x0b800000 + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
 
-READ32_MEMBER(pockstat_state::ps_lcd_r)
+READ32_MEMBER(pockstat_state::lcd_r)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_lcd_r: LCD Control = %08x & %08x\n", m_lcd_control | 0x100, mem_mask );
-			return m_lcd_control;
-		default:
-			verboselog(0, "ps_lcd_r: Unknown Register %08x & %08x\n", 0x0d000000 + (offset << 2), mem_mask );
-			break;
+	case 0x0000/4:
+		LOGMASKED(LOG_LCD, "%s: LCD Control Read: %08x & %08x\n", machine().describe_context(), m_lcd_control | 0x100, mem_mask);
+		return m_lcd_control;
+	default:
+		LOGMASKED(LOG_LCD | LOG_UNKNOWN, "%s: Unknown Register %08x & %08x\n", machine().describe_context(), 0x0d000000 + (offset << 2), mem_mask);
+		break;
 	}
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_lcd_w)
+WRITE32_MEMBER(pockstat_state::lcd_w)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x0000/4:
-			verboselog(0, "ps_lcd_w: LCD Control = %08x & %08x\n", data, mem_mask );
-			COMBINE_DATA(&m_lcd_control);
-			break;
-		default:
-			verboselog(0, "ps_lcd_w: Unknown Register %08x = %08x & %08x\n", 0x0d000000 + (offset << 2), data, mem_mask );
-			break;
+	case 0x0000/4:
+		LOGMASKED(LOG_LCD, "%s: LCD Control = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		COMBINE_DATA(&m_lcd_control);
+		break;
+	default:
+		LOGMASKED(LOG_LCD | LOG_UNKNOWN, "%s: Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x0d000000 + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 
@@ -778,14 +781,14 @@ INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 {
 	uint32_t buttons = ioport("BUTTONS")->read();
 
-	ps_intc_set_interrupt_line(PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
-	ps_intc_set_interrupt_line(PS_INT_BTN_RIGHT, (buttons &  2) ? 1 : 0);
-	ps_intc_set_interrupt_line(PS_INT_BTN_LEFT,  (buttons &  4) ? 1 : 0);
-	ps_intc_set_interrupt_line(PS_INT_BTN_DOWN,  (buttons &  8) ? 1 : 0);
-	ps_intc_set_interrupt_line(PS_INT_BTN_UP,    (buttons & 16) ? 1 : 0);
+	set_interrupt_line(INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
+	set_interrupt_line(INT_BTN_RIGHT,  (buttons &  2) ? 1 : 0);
+	set_interrupt_line(INT_BTN_LEFT,   (buttons &  4) ? 1 : 0);
+	set_interrupt_line(INT_BTN_DOWN,   (buttons &  8) ? 1 : 0);
+	set_interrupt_line(INT_BTN_UP,     (buttons & 16) ? 1 : 0);
 }
 
-READ32_MEMBER(pockstat_state::ps_rombank_r)
+READ32_MEMBER(pockstat_state::rombank_r)
 {
 	int32_t bank = (offset >> 11) & 0x0f;
 	for (int index = 0; index < 32; index++)
@@ -794,7 +797,6 @@ READ32_MEMBER(pockstat_state::ps_rombank_r)
 		{
 			if (m_ftlb_regs.entry[index] == bank)
 			{
-				//printf( "Address %08x is assigned to %08x in entry %d\n", 0x02000000 + (offset << 2), index * 0x2000 + ((offset << 2) & 0x1fff), index );
 				return m_cart->read32_rom(index * (0x2000/4) + (offset & (0x1fff/4)), mem_mask);
 			}
 		}
@@ -804,61 +806,61 @@ READ32_MEMBER(pockstat_state::ps_rombank_r)
 
 
 // Horrible hack, probably wrong
-WRITE32_MEMBER(pockstat_state::ps_flash_w)
+WRITE32_MEMBER(pockstat_state::flash_w)
 {
-	if(offset == (0x55a8/4))
+	if (offset == (0x55a8/4))
 	{
-		m_ps_flash_write_enable_count++;
+		m_flash_write_enable_count++;
 		return;
 	}
-	if(offset == (0x2a54/4))
+	if (offset == (0x2a54/4))
 	{
-		m_ps_flash_write_enable_count++;
+		m_flash_write_enable_count++;
 		return;
 	}
-	if(m_ps_flash_write_enable_count == 3)
+	if (m_flash_write_enable_count == 3)
 	{
-		m_ps_flash_write_enable_count = 0;
-		m_ps_flash_write_count = 0x40;
+		m_flash_write_enable_count = 0;
+		m_flash_write_count = 0x40;
 		return;
 	}
-	if(m_ps_flash_write_count)
+	if (m_flash_write_count)
 	{
-		m_ps_flash_write_count--;
+		m_flash_write_count--;
 		COMBINE_DATA(&((uint32_t*)(m_cart_rom->base()))[offset]);
 	}
 }
 
-READ32_MEMBER(pockstat_state::ps_flash_r)
+READ32_MEMBER(pockstat_state::flash_r)
 {
 	return m_cart->read32_rom(offset, mem_mask);
 }
 
-READ32_MEMBER(pockstat_state::ps_audio_r)
+READ32_MEMBER(pockstat_state::audio_r)
 {
-	verboselog(0, "ps_audio_r: Unknown Read: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), 0x10, mem_mask);
+	LOGMASKED(LOG_AUDIO | LOG_UNKNOWN, "%s: Unknown Audio Read: %08x = %08x & %08x\n", machine().describe_context(), 0xd800000 + (offset << 2), 0x10, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_audio_w)
+WRITE32_MEMBER(pockstat_state::audio_w)
 {
-	verboselog(0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
+	LOGMASKED(LOG_AUDIO | LOG_UNKNOWN, "%s: Unknown Audio Write: %08x = %08x & %08x\n", machine().describe_context(), 0xd800000 + (offset << 2), data, mem_mask);
 }
 
-void pockstat_state::pockstat_mem(address_map &map)
+void pockstat_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x000007ff).ram();
-	map(0x02000000, 0x02ffffff).r(FUNC(pockstat_state::ps_rombank_r));
+	map(0x02000000, 0x02ffffff).r(FUNC(pockstat_state::rombank_r));
 	map(0x04000000, 0x04003fff).rom().region("maincpu", 0);
-	map(0x06000000, 0x06000307).rw(FUNC(pockstat_state::ps_ftlb_r), FUNC(pockstat_state::ps_ftlb_w));
-	map(0x08000000, 0x0801ffff).rw(FUNC(pockstat_state::ps_flash_r), FUNC(pockstat_state::ps_flash_w));
-	map(0x0a000000, 0x0a000013).rw(FUNC(pockstat_state::ps_intc_r), FUNC(pockstat_state::ps_intc_w));
-	map(0x0a800000, 0x0a80002b).rw(FUNC(pockstat_state::ps_timer_r), FUNC(pockstat_state::ps_timer_w));
-	map(0x0b000000, 0x0b000007).rw(FUNC(pockstat_state::ps_clock_r), FUNC(pockstat_state::ps_clock_w));
-	map(0x0b800000, 0x0b80000f).rw(FUNC(pockstat_state::ps_rtc_r), FUNC(pockstat_state::ps_rtc_w));
-	map(0x0d000000, 0x0d000003).rw(FUNC(pockstat_state::ps_lcd_r), FUNC(pockstat_state::ps_lcd_w));
+	map(0x06000000, 0x06000307).rw(FUNC(pockstat_state::ftlb_r), FUNC(pockstat_state::ftlb_w));
+	map(0x08000000, 0x0801ffff).rw(FUNC(pockstat_state::flash_r), FUNC(pockstat_state::flash_w));
+	map(0x0a000000, 0x0a000013).rw(FUNC(pockstat_state::intc_r), FUNC(pockstat_state::intc_w));
+	map(0x0a800000, 0x0a80002b).rw(FUNC(pockstat_state::timer_r), FUNC(pockstat_state::timer_w));
+	map(0x0b000000, 0x0b000007).rw(FUNC(pockstat_state::clock_r), FUNC(pockstat_state::clock_w));
+	map(0x0b800000, 0x0b80000f).rw(FUNC(pockstat_state::rtc_r), FUNC(pockstat_state::rtc_w));
+	map(0x0d000000, 0x0d000003).rw(FUNC(pockstat_state::lcd_r), FUNC(pockstat_state::lcd_w));
 	map(0x0d000100, 0x0d00017f).ram().share("lcd_buffer");
-	map(0x0d80000c, 0x0d80000f).rw(FUNC(pockstat_state::ps_audio_r), FUNC(pockstat_state::ps_audio_w));
+	map(0x0d80000c, 0x0d80000f).rw(FUNC(pockstat_state::audio_r), FUNC(pockstat_state::audio_w));
 	map(0x0d800014, 0x0d800015).w("dac", FUNC(dac_word_interface::data_w));
 }
 
@@ -875,18 +877,17 @@ INPUT_PORTS_END
 
 void pockstat_state::machine_start()
 {
-	int index = 0;
-	for (index = 0; index < 3; index++)
+	for (uint32_t index = 0; index < TIMER_COUNT; index++)
 	{
-		m_timer_regs.timer[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::timer_tick),this));
-		m_timer_regs.timer[index].timer->adjust(attotime::never, index);
+		m_timers[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::timer_tick), this));
+		m_timers[index].timer->adjust(attotime::never, index);
 	}
 
 	m_rtc_regs.time = 0x01000000;
 	m_rtc_regs.date = 0x19990101;
 
 	m_rtc_regs.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::rtc_tick),this));
-	m_rtc_regs.timer->adjust(attotime::from_hz(1), index);
+	m_rtc_regs.timer->adjust(attotime::from_hz(1), TIMER_COUNT);
 
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
@@ -903,15 +904,15 @@ void pockstat_state::machine_start()
 	save_item(NAME(m_intc_regs.enable));
 	save_item(NAME(m_intc_regs.mask));
 
-	save_item(NAME(m_timer_regs.timer[0].period));
-	save_item(NAME(m_timer_regs.timer[0].count));
-	save_item(NAME(m_timer_regs.timer[0].control));
-	save_item(NAME(m_timer_regs.timer[1].period));
-	save_item(NAME(m_timer_regs.timer[1].count));
-	save_item(NAME(m_timer_regs.timer[1].control));
-	save_item(NAME(m_timer_regs.timer[2].period));
-	save_item(NAME(m_timer_regs.timer[2].count));
-	save_item(NAME(m_timer_regs.timer[2].control));
+	save_item(NAME(m_timers[0].period));
+	save_item(NAME(m_timers[0].count));
+	save_item(NAME(m_timers[0].control));
+	save_item(NAME(m_timers[1].period));
+	save_item(NAME(m_timers[1].count));
+	save_item(NAME(m_timers[1].control));
+	save_item(NAME(m_timers[2].period));
+	save_item(NAME(m_timers[2].count));
+	save_item(NAME(m_timers[2].control));
 
 	save_item(NAME(m_clock_regs.mode));
 	save_item(NAME(m_clock_regs.control));
@@ -921,8 +922,8 @@ void pockstat_state::machine_start()
 	save_item(NAME(m_rtc_regs.time));
 	save_item(NAME(m_rtc_regs.date));
 
-	save_item(NAME(m_ps_flash_write_enable_count));
-	save_item(NAME(m_ps_flash_write_count));
+	save_item(NAME(m_flash_write_enable_count));
+	save_item(NAME(m_flash_write_count));
 
 	save_item(NAME(m_lcd_control));
 }
@@ -931,8 +932,8 @@ void pockstat_state::machine_reset()
 {
 	m_maincpu->set_state_int(ARM7_R15, 0x4000000);
 
-	m_ps_flash_write_enable_count = 0;
-	m_ps_flash_write_count = 0;
+	m_flash_write_enable_count = 0;
+	m_flash_write_count = 0;
 }
 
 uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -944,7 +945,7 @@ uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rg
 		{
 			if (m_lcd_control != 0) // Hack
 			{
-				if (m_lcd_buffer[y] & (1 << x))
+				if (BIT(m_lcd_buffer[y], x))
 					scanline[x] = 0x00000000;
 				else
 					scanline[x] = 0x00ffffff;
@@ -956,7 +957,7 @@ uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
+DEVICE_IMAGE_LOAD_MEMBER(pockstat_state::flash_load)
 {
 	static const char *gme_id = "123-456-STD";
 	char cart_id[0xf40];
@@ -979,10 +980,13 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(pockstat_state::pockstat)
+void pockstat_state::pockstat(machine_config &config)
+{
+	static constexpr uint32_t DEFAULT_CLOCK = 2000000;
+
 	/* basic machine hardware */
 	ARM7(config, m_maincpu, DEFAULT_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pockstat_state::pockstat_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pockstat_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -1001,12 +1005,11 @@ MACHINE_CONFIG_START(pockstat_state::pockstat)
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockstat_cart")
-	MCFG_GENERIC_EXTENSIONS("gme")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM32_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_LITTLE)
-	MCFG_GENERIC_LOAD(pockstat_state, pockstat_flash)
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pockstat_cart", "gme");
+	m_cart->set_width(GENERIC_ROM32_WIDTH);
+	m_cart->set_endian(ENDIANNESS_LITTLE);
+	m_cart->set_device_load(FUNC(pockstat_state::flash_load), this);
+}
 
 /* ROM definition */
 ROM_START( pockstat )

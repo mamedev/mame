@@ -8,6 +8,9 @@
     - Use NSCSI instead of legacy one!
     - ADPCM Transfer is correct?
 
+    ADPCM related patents:
+    - https://patents.google.com/patent/US5692099
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -571,9 +574,9 @@ void huc6272_device::interrupt_update()
 
 void huc6272_device::cdrom_config(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^cdda_l", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^cdda_r", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^cdda_l", 1.0);
+	cdda->add_route(1, "^^cdda_r", 1.0);
 }
 
 //-------------------------------------------------

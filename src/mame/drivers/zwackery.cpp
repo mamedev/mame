@@ -441,10 +441,7 @@ WRITE_LINE_MEMBER(zwackery_state::pia0_irq_w)
 
 READ8_MEMBER( zwackery_state::pia1_porta_r )
 {
-	uint8_t data = ioport("IN1")->read();
-	m_pia1->set_port_a_z_mask(data);
-
-	return data;
+	return ioport("IN1")->read();
 }
 
 READ8_MEMBER( zwackery_state::pia1_portb_r )
@@ -457,10 +454,7 @@ READ8_MEMBER( zwackery_state::pia1_portb_r )
 
 READ8_MEMBER( zwackery_state::pia2_porta_r )
 {
-	uint8_t data = ioport("IN3")->read();
-	m_pia2->set_port_a_z_mask(data);
-
-	return data;
+	return ioport("IN3")->read();
 }
 
 

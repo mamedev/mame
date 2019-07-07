@@ -41,6 +41,9 @@ Racing Jam                Konami   1998
 Racing Jam : Chapter 2    Konami   1998
 Thrill Drive              Konami   1998
 
+Note: Thrill Drive was released as a conversion kit for Racing Jam. The kit came with a rom swap for CPU and CG boards
+and a different network board containing a SOIC8 serial pic.
+
 PCB Layouts
 -----------
 
@@ -147,15 +150,14 @@ Racing Jam 2 888A01  -    -     888A09  888A10  -       -       676A04  676A05  
 Thrill Drive 713BE01 -    -     713A09  713A10  -       -       713A04  713A05  -       -   713A08
 
 
-Network PCB
+Network PCB (Racing Jam)
 -----------
-GN676-PWB(H)B
+GN676-PWB(H)A
 MADE IN JAPAN
 (C)1998 KONAMI
-sticker - GC713AC
 |------------------------|
 |  CY7C199       N676H1  |
-|                      2G|
+|                        |
 |CN3                     |
 |  HYC2485S              |
 |   XC5204        XC5210 |
@@ -165,16 +167,33 @@ sticker - GC713AC
 Notes:
       CN1      - Connector joining to CPU board CN4
       CN2/3    - RCA jacks for network cable
-      2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on
-                 *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
-                 On Hornet, the chip seems to refresh the data in the Timekeeper RAM when the battery
-                 dies and keeps the game working. It's purpose on the network board is unknown but it may
-                 'upgrade' the data in the NVRAM to the network version of the game for a twin cabinet set-up.
       HYC2485S - Hybrid ceramic module for RS485
       CY7C199  - 32k x8 SRAM
       XC5204   - Xilinx XC5204 FPGA
       XC5210   - Xilink XC5210 FPGA
       N676H1   - PALCE16V8Q-15 stamped 'N676H1'
+
+Network PCB (Racing Jam 2 and Thrill Drive)
+-----------
+GN676-PWB(H)B
+MADE IN JAPAN
+(C)1998 KONAMI
+|------------------------|
+|  CY7C199       N676H1  |
+|                      2G|
+|CN3                     |
+|  HYC2485S              |
+|   XC5204        XC5210 |
+|CN2                     |
+|         CN1            |
+|------------------------|
+This pcb is the same as the A version but with one added chip:
+      2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on
+                 *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
+                 The chip seems to refresh the data in the Timekeeper RAM when the battery dies and keeps
+                 the game working. Because Racing Jam 2 and Thrill Drive came in a conversion kit, the PIC
+                 would format all old timekeeper data on first power on. It's also possible the PIC was
+                 created as a security measure to prevent changing the game and region.
 
 
 Bottom Board (VIDEO PCB)
@@ -766,9 +785,9 @@ static INPUT_PORTS_START( nwktr )
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x80, 0x00, "Test Mode" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Skip Post" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -791,21 +810,20 @@ static INPUT_PORTS_START( nwktr )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("ANALOG1")       // Steering
-	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG3")       // Foot brake pedal
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG3")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG4")       // Hand brake lever
-	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG4")
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG5")       // Clutch pedal
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
+	PORT_START("ANALOG5")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL3 ) PORT_NAME("Clutch Pedal") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 INPUT_PORTS_END
 
 
@@ -878,7 +896,7 @@ void nwktr_state::nwktr(machine_config &config)
 	lscreen.set_visarea(0, 511, 0, 383);
 	lscreen.set_screen_update(FUNC(nwktr_state::screen_update_lscreen));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); //TODO: Remove. These games never ran on a dual screen setup.
 	rscreen.set_refresh_hz(60);
 	rscreen.set_size(512, 384);
 	rscreen.set_visarea(0, 511, 0, 383);
@@ -1048,7 +1066,7 @@ ROM_START(thrilldb)
 	ROM_LOAD( "713jab_m48t58y.35d", 0x000000, 0x002000, CRC(5d8fbcb2) SHA1(74ad91544d2a200cf599a565005476623075e7d6) )
 ROM_END
 
-ROM_START(thrilldae)
+ROM_START(thrilldae) //incorrect version, supposed to be ver xxB and we already have that clone. May delete as games boots as JAB on rtc test.
 	ROM_REGION32_BE(0x200000, "user1", 0)   /* PowerPC program roms */
 	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
 
@@ -1068,14 +1086,14 @@ ROM_START(thrilldae)
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
 	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "713eaa_m48t58y.35d", 0x000000, 0x002000, CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
+	ROM_LOAD( "713eaa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
 ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )

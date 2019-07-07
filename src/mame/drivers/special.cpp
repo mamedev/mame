@@ -389,8 +389,6 @@ void special_state::special(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
-
 	/* Devices */
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
@@ -403,6 +401,7 @@ void special_state::special(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rks_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("special_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("special_cass");
@@ -502,12 +501,11 @@ void special_state::erik(machine_config &config)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
-
 	/* Devices */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rks_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("special_cass");
 
 	I8255(config, m_ppi);

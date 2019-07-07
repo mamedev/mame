@@ -21,7 +21,7 @@ class machine_static_info
 {
 public:
 	// construction
-	machine_static_info(machine_config const &config);
+	machine_static_info(const ui_options &options, machine_config const &config);
 
 	// overall emulation status
 	::machine_flags::type machine_flags() const { return m_flags; }
@@ -43,10 +43,12 @@ public:
 	rgb_t warnings_color() const;
 
 protected:
-	machine_static_info(machine_config const &config, ioport_list const &ports);
+	machine_static_info(const ui_options &options, machine_config const &config, ioport_list const &ports);
 
 private:
-	machine_static_info(machine_config const &config, ioport_list const *ports);
+	machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports);
+
+	const ui_options &		m_options;
 
 	// overall feature status
 	::machine_flags::type   m_flags;

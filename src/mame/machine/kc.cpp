@@ -26,7 +26,7 @@ struct kcc_header
 /* now type name that has appeared! */
 
 /* load snapshot */
-QUICKLOAD_LOAD_MEMBER( kc_state,kc)
+QUICKLOAD_LOAD_MEMBER(kc_state::quickload_cb)
 {
 	struct kcc_header *header;
 	uint16_t addr;

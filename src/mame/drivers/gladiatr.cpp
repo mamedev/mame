@@ -1028,27 +1028,27 @@ void gladiatr_state::gladiatr(machine_config &config)
 	mainlatch.q_out_cb<4>().set_inputline("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
 	mainlatch.q_out_cb<7>().set(FUNC(gladiatr_state::flipscreen_w));
 
-	I8741(config, m_cctl, 12_MHz_XTAL/2); /* verified on pcb */
+	I8741A(config, m_cctl, 12_MHz_XTAL/2); /* verified on pcb */
 	m_cctl->t0_in_cb().set_ioport("COINS").bit(3);
 	m_cctl->t1_in_cb().set_ioport("COINS").bit(2);
 	m_cctl->p1_in_cb().set(FUNC(gladiatr_state::cctl_p1_r));
 	m_cctl->p2_in_cb().set(FUNC(gladiatr_state::cctl_p2_r));
 
-	I8741(config, m_ccpu, 12_MHz_XTAL/2); /* verified on pcb */
+	I8741A(config, m_ccpu, 12_MHz_XTAL/2); /* verified on pcb */
 	m_ccpu->p1_in_cb().set_ioport("IN0");
 	m_ccpu->p2_in_cb().set_ioport("IN1");
 	m_ccpu->p2_out_cb().set(FUNC(gladiatr_state::ccpu_p2_w));
 	m_ccpu->t0_in_cb().set_ioport("COINS").bit(1);
 	m_ccpu->t1_in_cb().set_ioport("COINS").bit(0);
 
-	I8741(config, m_ucpu, 12_MHz_XTAL/2); /* verified on pcb */
+	I8741A(config, m_ucpu, 12_MHz_XTAL/2); /* verified on pcb */
 	m_ucpu->p1_in_cb().set(FUNC(gladiatr_state::ucpu_p1_r));
 	m_ucpu->p1_out_cb().set(FUNC(gladiatr_state::ucpu_p1_w));
 	m_ucpu->p2_in_cb().set(FUNC(gladiatr_state::ucpu_p2_r));
 	m_ucpu->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
 	m_ucpu->t1_in_cb().set(FUNC(gladiatr_state::ucpu_t1_r));
 
-	I8741(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
+	I8741A(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
 	m_csnd->p1_in_cb().set(FUNC(gladiatr_state::csnd_p1_r));
 	m_csnd->p1_out_cb().set(FUNC(gladiatr_state::csnd_p1_w));
 	m_csnd->p2_in_cb().set(FUNC(gladiatr_state::csnd_p2_r));

@@ -1,6 +1,41 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+  _____________________________________________________________________
+  |                    _____________  _______DALLAS____________        |
+  |                    |  ROM U6    | |                        |   __  |
+  |                    |____________| |KM62256BLG-7L    BATT   |   | | |
+  |                        ____       |       DS5002FP         |   |J| |
+  |             ____       |U7 |      |________________________|   |P| |
+  |             356N       |___|   _________      ____________     |6| |
+  |                                74HCT132N|     CXK5814P-35L     |_| |
+  |                      _________ _________                 _________ |
+  |                      74HCT373N||74HC04B1|   _________    74HCT245N |
+  |            ________  _____________          |        |   _________ |
+  | __         |74F112N| | ROM U11    |    TPC1020BFN-084C   74HCT245N |
+  | | |        _____     |____________|         |        |   _________ |
+  | |J|        |XTAL|    _________ _________    |________|   74HCT273E |
+  | |P|        |____|    |SN74F32N||74LS257_|                _________ |
+  | |1|        ______    _________ _________  _____________  74HCT273E |
+  | |_|        | U10 |   |ULN2003A||74LS257_| UM611024AK-20| _________ |
+  |  ______    ______    ______________________    ______    74HCT273E |
+  |  |FUSE_|   |_JP2_|   |_________JP3_________|   |_JP5_|             |
+  |____________________________________________________________________|
+
+ JP1 = Power (9 pins)
+ JP2 = Serial DB9 (unused)
+ JP3 = Darts board (20 pins)
+ JP5 = Video out (6 pins)
+ JP6 = Buttons (15 pins)
+
+ XATL = 32.000 MHz
+
+ U7 = Oki
+ U10 = Unpopulated socket for Max 202
+
+*/
+
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/nvram.h"
@@ -86,7 +121,7 @@ uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind1
 			dstptr_bitmap[x] = data^0xff;
 		}
 	}
-	
+
 	return 0;
 }
 

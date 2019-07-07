@@ -56,49 +56,6 @@ enum laserdisc_field_code
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_GET_DISC(_func) \
-	downcast<laserdisc_device &>(*device).set_get_disc(_func);
-#define MCFG_LASERDISC_AUDIO(_func) \
-	downcast<laserdisc_device &>(*device).set_audio(_func);
-#define MCFG_LASERDISC_SCREEN(_tag) \
-	downcast<laserdisc_device &>(*device).set_screen(_tag);
-#define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
-	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, &_class::_method, #_class "::" #_method);
-#define MCFG_LASERDISC_OVERLAY_DEVICE(_width, _height, _device, _class, _method) \
-	downcast<laserdisc_device &>(*device).set_overlay(_width, _height, _device, &_class::_method, #_class "::" #_method);
-#define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
-	downcast<laserdisc_device &>(*device).set_overlay_clip(_minx, _maxx, _miny, _maxy);
-#define MCFG_LASERDISC_OVERLAY_POSITION(_posx, _posy) \
-	downcast<laserdisc_device &>(*device).set_overlay_position(_posx, _posy);
-#define MCFG_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
-	downcast<laserdisc_device &>(*device).set_overlay_scale(_scalex, _scaley);
-#define MCFG_LASERDISC_OVERLAY_PALETTE(_palette_tag) \
-	downcast<laserdisc_device &>(*device).set_overlay_palette(_palette_tag);
-
-// use these to add laserdisc screens with proper video update parameters
-// TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header
-// TODO: someday we'll kill the pixel clock hack ...
-#define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _ldtag) \
-	MCFG_DEVICE_MODIFY(_ldtag) \
-	downcast<laserdisc_device &>(*device).set_screen(_tag); \
-	MCFG_SCREEN_ADD(_tag, RASTER) \
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524) \
-	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
-
-#define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _ldtag) \
-	MCFG_DEVICE_MODIFY(_ldtag) \
-	downcast<laserdisc_device &>(*device).set_screen(_tag); \
-	MCFG_SCREEN_ADD(_tag, RASTER) \
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)*2, 1135, 0, 768, 625, 48, 624) \
-	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
-
-
-//**************************************************************************
 //  MACROS
 //**************************************************************************
 
@@ -136,13 +93,16 @@ protected:
 
 public:
 	// delegates
-	typedef delegate<chd_file *(laserdisc_device &device)> get_disc_delegate;
-	typedef delegate<void (laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
-
+	typedef device_delegate<chd_file *(void)> get_disc_delegate;
+	typedef device_delegate<void (int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
 
 	laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// reset line control
+	// use these to add laserdisc screens with proper video update parameters
+	// TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header
+	// TODO: someday we'll kill the pixel clock hack ...
+	void add_ntsc_screen(machine_config &config, const char *tag);
+	void add_pal_screen(machine_config &config, const char *tag);
 
 	// core control and status
 	bool video_active() { return (!m_videosquelch && current_frame().m_numfields >= 2); }
@@ -162,8 +122,8 @@ public:
 	void set_overlay_config(const laserdisc_overlay_config &config) { static_cast<laserdisc_overlay_config &>(*this) = config; }
 
 	// configuration helpers
-	void set_get_disc(get_disc_delegate &&callback) { m_getdisc_callback = std::move(callback); }
-	void set_audio(audio_delegate &&callback) { m_audio_callback = std::move(callback); }
+	template <typename... T> void set_get_disc(T &&... args) { m_getdisc_callback = get_disc_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_audio(T &&... args) { m_audio_callback = audio_delegate(std::forward<T>(args)...); }
 	template <class FunctionClass>
 	// FIXME: these should be aware of current device for resolving the tag
 	void set_overlay(uint32_t width, uint32_t height, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)

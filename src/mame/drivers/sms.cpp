@@ -17,7 +17,6 @@
  - SIO interface for Game Gear (needs netplay, I guess)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
    that has homebrew software support
- - Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon
  - On sms1kr (without FM), verify if Rapid uses C-Sync and PSG can be muted like on smsj
  - Accurate GG vertical scaling in SMS mode (h-scaling seems right for subpixel rendering)
  - Software compatibility flags, by region and/or BIOS

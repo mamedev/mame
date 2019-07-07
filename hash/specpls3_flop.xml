@@ -19665,7 +19665,7 @@
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Side A: ZX Spectrum"/>
 			<dataarea name="flop" size="166817">
-				<rom name="Navy Moves (Doble Edición) (side A).dsk" size="166817" crc="718149f4" sha1="5018740f71bc2ae08343f4040590cfa2550333bf" offset="0" />
+				<rom name="Navy Moves (Doble Edicion) (side A).dsk" size="166817" crc="718149f4" sha1="5018740f71bc2ae08343f4040590cfa2550333bf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">

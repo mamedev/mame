@@ -3,14 +3,15 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-* fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity Excellence series hardware
 (for Excel 68000, see fidel_eag68k.cpp)
 
 TODO:
-- granits gives error beeps at start, need to press clear to play
+- granits gives error beeps at start, need to press clear to play.
+  Note that this also happens on a real 6080 PCB with this ROM, granits is a modified SC12 PCB though.
+  The problem goes away if RAM stays powered-on, but PCB has no indication of NVRAM.
 - granits chessboard buttons seem too sensitive (detects input on falling edge if held too long)
+- granits has a module slot, is it usable?
 
 *******************************************************************************
 
@@ -129,11 +130,13 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
+#include "machine/timer.h"
+#include "sound/s14001a.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -144,11 +147,18 @@ Designer 2100 (model 6103): exactly same, but running at 5MHz
 
 namespace {
 
-class excel_state : public fidelbase_state
+class excel_state : public driver_device
 {
 public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_speech(*this, "speech"),
+		m_speech_rom(*this, "speech"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
@@ -164,16 +174,53 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(speech_bankswitch);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
+	required_device<pwm_display_device> m_display;
+	required_device<dac_bit_interface> m_dac;
+	optional_device<s14001a_device> m_speech;
+	optional_region_ptr<u8> m_speech_rom;
+	optional_ioport_array<11> m_inputs;
+
 	// address maps
 	void fexcel_map(address_map &map);
 	void fexcelb_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	DECLARE_READ8_MEMBER(speech_r);
 	DECLARE_WRITE8_MEMBER(ttl_w);
 	DECLARE_READ8_MEMBER(ttl_r);
+
+	u8 m_select;
+	u8 m_7seg_data;
+	u8 m_speech_data;
+	u8 m_speech_bank;
 };
+
+void excel_state::machine_start()
+{
+	// zerofill
+	m_select = 0;
+	m_7seg_data = 0;
+	m_speech_data = 0;
+	m_speech_bank = 0;
+
+	// register for savestates
+	save_item(NAME(m_select));
+	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_speech_data));
+	save_item(NAME(m_speech_bank));
+}
+
 
 
 /******************************************************************************
@@ -203,31 +250,26 @@ WRITE8_MEMBER(excel_state::ttl_w)
 {
 	// a0-a2,d0: 74259(1)
 	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
+	m_select = (m_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select & 0xf) & 0x3ff;
+	u16 sel = 1 << (m_select & 0xf) & 0x3ff;
 	u8 led_data = sel & 0xff;
-	m_inp_mux = sel & 0x1ff;
 
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
-	u8 led_sel = ~bitswap<8>(m_led_select,0,3,1,2,7,6,5,4) & 0x3f;
+	u8 led_sel = ~bitswap<8>(m_select,0,3,1,2,7,6,5,4) & 0x3f;
 
 	// a0-a2,d1: digit segment data (model 6093)
 	m_7seg_data = (m_7seg_data & ~mask) | ((data & 2) ? mask : 0);
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 
 	// update display: 4 7seg leds, 2*8 chessboard leds
-	for (int i = 0; i < 6; i++)
-		m_display_state[i] = (led_sel >> i & 1) ? ((i < 2) ? led_data : seg_data) : 0;
-
-	set_display_size(8, 2+4);
-	set_display_segmask(0x3c, 0x7f);
-	display_update();
+	m_display->matrix_partial(0, 2, led_sel, led_data, false);
+	m_display->matrix_partial(2, 4, led_sel >> 2, seg_data); // 6093
 
 	// speech (model 6092)
 	if (m_speech != nullptr)
@@ -248,17 +290,27 @@ WRITE8_MEMBER(excel_state::ttl_w)
 
 READ8_MEMBER(excel_state::ttl_r)
 {
+	u8 sel = m_select & 0xf;
 	u8 d7 = 0x80;
+	u8 data = 0;
 
 	// 74259(1) Q7 + 74251 I0: battery status
-	if (m_inp_matrix[10] != nullptr && m_inp_mux == 1 && ~m_led_select & 0x80)
-		d7 = m_inp_matrix[10]->read() & 0x80;
+	if (m_inputs[10] != nullptr && sel == 0 && ~m_select & 0x80)
+		d7 = m_inputs[10]->read() & 0x80;
 
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
-	u8 d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
+	u8 d6 = (m_inputs[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
 
 	// a0-a2,d7: multiplexed inputs (active low)
-	return ((read_inputs(9) >> offset & 1) ? 0 : d7) | d6 | 0x3f;
+	// read chessboard sensors
+	if (sel < 8)
+		data = m_inputs[sel]->read();
+
+	// read button panel
+	else if (sel == 8)
+		data = m_inputs[8]->read();
+
+	return ((data >> offset & 1) ? 0 : d7) | d6 | 0x3f;
 }
 
 
@@ -287,6 +339,88 @@ void excel_state::fexcelb_map(address_map &map)
 /******************************************************************************
     Input Ports
 ******************************************************************************/
+
+INPUT_PORTS_START( generic_cb_buttons )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( fexcelb )
 	PORT_INCLUDE( generic_cb_buttons )
@@ -348,7 +482,9 @@ void excel_state::fexcel(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(excel_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2+4, 8);
+	m_display->set_segmask(0x3c, 0x7f);
 	config.set_default_layout(layout_fidel_ex);
 
 	/* sound hardware */
@@ -388,7 +524,7 @@ void excel_state::granits(machine_config &config)
 	fexcelp(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(8_MHz_XTAL/2);
+	m_maincpu->set_clock(8_MHz_XTAL/2); // R65C02P4
 }
 
 void excel_state::fdes2100(machine_config &config)
@@ -485,7 +621,7 @@ ROM_START( fexcelpb ) // model 6083, PCB label 510-1099B01
 	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label, only 1 byte difference, assume bugfix in bookrom
 ROM_END
 
-ROM_START( granits ) // modified SC12 board, overclocked Par Excellence program
+ROM_START( granits ) // modified SC12 board, Par Excellence program
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("granit_s-4", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) )
 ROM_END

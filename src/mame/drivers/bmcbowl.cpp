@@ -66,7 +66,7 @@ Place for 4 8 switch dips
 dips 1 & 3 are all connected via resistors
 dips 2 & 4 are standard 8 switch dips
 
-EEPROM       Label         Use
+EPROM        Label         Use
 ----------------------------------------
 ST M27C1001  bmc_8ex.bin - 68K code 0x00
 ST M27C1001  bmc_7ex.bin - 68K code 0x01

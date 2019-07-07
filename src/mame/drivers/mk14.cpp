@@ -39,7 +39,6 @@ ToDo:
 #include "machine/ins8154.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mk14.lh"
@@ -219,7 +218,6 @@ void mk14_state::mk14(machine_config &config)
 
 	// sound
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.05);
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	ZN425E(config, "dac8", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // Ferranti ZN425E
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
@@ -233,6 +231,8 @@ void mk14_state::mk14(machine_config &config)
 	ic8.out_b().set("dac8", FUNC(dac_byte_interface::data_w));
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 }
 
 /* ROM definition */

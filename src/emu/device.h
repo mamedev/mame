@@ -41,12 +41,6 @@
 //**************************************************************************
 
 // configure devices
-#define MCFG_DEVICE_CLOCK(_clock) \
-	device->set_clock(_clock);
-#define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
-	device->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(_config));
-#define MCFG_DEVICE_BIOS(...) \
-	device->set_default_bios_tag(__VA_ARGS__);
 
 #define DECLARE_READ_LINE_MEMBER(name)      int  name()
 #define READ_LINE_MEMBER(name)              int  name()

@@ -444,7 +444,8 @@ void gamecstl_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-MACHINE_CONFIG_START(gamecstl_state::gamecstl)
+void gamecstl_state::gamecstl(machine_config &config)
+{
 	/* basic machine hardware */
 	PENTIUM3(config, m_maincpu, 200000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamecstl_state::gamecstl_map);
@@ -453,9 +454,11 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, gamecstl_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, gamecstl_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (0, FUNC(gamecstl_state::intel82439tx_pci_r), this);
+	pcibus.set_device_write(0, FUNC(gamecstl_state::intel82439tx_pci_w), this);
+	pcibus.set_device_read (7, FUNC(gamecstl_state::intel82371ab_pci_r), this);
+	pcibus.set_device_write(7, FUNC(gamecstl_state::intel82371ab_pci_w), this);
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -471,7 +474,7 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
 	PALETTE(config, m_palette).set_entries(16);
-MACHINE_CONFIG_END
+}
 
 void gamecstl_state::init_gamecstl()
 {

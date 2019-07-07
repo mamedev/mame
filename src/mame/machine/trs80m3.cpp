@@ -620,7 +620,7 @@ void trs80m3_state::machine_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( trs80m3_state, trs80_cmd )
+QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

@@ -36,7 +36,6 @@ class vsmile_base_state : public driver_device
 public:
 	vsmile_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_spg(*this, "spg")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_bankdev(*this, "bank")
@@ -55,8 +54,7 @@ protected:
 
 	DECLARE_READ16_MEMBER(bank3_r);
 
-	required_device<spg2xx_device> m_spg;
-	required_device<unsp_device> m_maincpu;
+	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<vsmile_cart_slot_device> m_cart;

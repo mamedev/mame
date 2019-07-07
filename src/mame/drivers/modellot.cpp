@@ -36,6 +36,9 @@ Optional ports:
 It's not clear if these are meant to be 3881 PIOs connected to the devices, or for
 the devices themselves. An example shows a i8251 used as the US1 device.
 
+There's a rom missing EC00-EFFF, it is used if you try to save to tape.
+All input must in UPPER case.
+
 ***********************************************************************************/
 
 #include "emu.h"

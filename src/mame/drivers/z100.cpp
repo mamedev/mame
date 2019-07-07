@@ -493,7 +493,7 @@ void z100_state::z100_io(address_map &map)
 	map(0xec, 0xef).rw(m_epci[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw(m_picm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf4, 0xf5).rw("kbdc", FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0xf4, 0xf5).rw("kbdc", FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 //  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)
 	map(0xfb, 0xfb).rw(FUNC(z100_state::tmr_status_r), FUNC(z100_state::tmr_status_w));
 	map(0xfc, 0xfc).w(FUNC(z100_state::memory_ctrl_w));
@@ -763,7 +763,7 @@ void z100_state::z100(machine_config &config)
 
 	I8085A(config, "cpu85", 10_MHz_XTAL).set_disable();
 
-	i8041_device &kbdc(I8041(config, "kbdc", 6_MHz_XTAL));
+	i8041a_device &kbdc(I8041A(config, "kbdc", 6_MHz_XTAL));
 	kbdc.p1_in_cb().set(FUNC(z100_state::kbd_rows_r));
 	kbdc.p2_out_cb().set(FUNC(z100_state::kbd_col_w));
 	kbdc.p2_out_cb().append("keydspyint", FUNC(input_merger_device::in_w<0>)).bit(4);

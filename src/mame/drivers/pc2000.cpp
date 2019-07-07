@@ -63,7 +63,7 @@ protected:
 	DECLARE_READ8_MEMBER( beep_r );
 	DECLARE_WRITE8_MEMBER( beep_w );
 	void pc2000_palette(palette_device &palette) const;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void pc2000_io(address_map &map);
 	void pc2000_mem(address_map &map);
@@ -868,7 +868,7 @@ static GFXDECODE_START( gfx_pc2000 )
 GFXDECODE_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pc2000_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -907,8 +907,7 @@ void pc2000_state::pc2000(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "genius_cart"));
-	cartslot.set_device_load(device_image_load_delegate(&pc2000_state::device_image_load_pc2000_cart, this));
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "genius_cart").set_device_load(FUNC(pc2000_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "pc1000_cart").set_compatible("pc1000");
 }

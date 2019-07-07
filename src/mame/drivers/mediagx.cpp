@@ -880,8 +880,8 @@ void mediagx_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(mediagx_state::mediagx)
-
+void mediagx_state::mediagx(machine_config &config)
+{
 	/* basic machine hardware */
 	MEDIAGX(config, m_maincpu, 166000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mediagx_state::mediagx_map);
@@ -890,8 +890,9 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, mediagx_state, cx5510_pci_r, cx5510_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (18, FUNC(mediagx_state::cx5510_pci_r), this);
+	pcibus.set_device_write(18, FUNC(mediagx_state::cx5510_pci_w), this);
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set(m_pic8259_2, FUNC(pic8259_device::ir6_w));
@@ -919,7 +920,7 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 void mediagx_state::init_mediagx()

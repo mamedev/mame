@@ -316,7 +316,7 @@ void btoads_state::btoads(machine_config &config)
 	Z80(config, m_audiocpu, SOUND_CLOCK/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &btoads_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &btoads_state::sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(btoads_state::irq0_line_assert), attotime::from_ticks(32768, SOUND_CLOCK/4));
+	m_audiocpu->set_periodic_int(FUNC(btoads_state::irq0_line_assert), attotime::from_hz(SOUND_CLOCK/4/32768));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

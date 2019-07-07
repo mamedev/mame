@@ -618,12 +618,14 @@ void ep64_state::ep64(machine_config &config)
 	m_rs232->rxd_handler().set(m_dave, FUNC(dave_device::int2_w));
 
 	CASSETTE(config, m_cassette1);
-	m_cassette1->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette1->set_interface("ep64_cass");
+	m_cassette1->add_route(ALL_OUTPUTS, "lspeaker", 0.05);
 
 	CASSETTE(config, m_cassette2);
-	m_cassette2->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->set_interface("ep64_cass");
+	m_cassette2->add_route(ALL_OUTPUTS, "rspeaker", 0.05);
 
 	// internal RAM
 	RAM(config, m_ram).set_default_size("64K");

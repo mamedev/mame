@@ -95,7 +95,7 @@ Static RAM: 256 Kibit
 
 PSS-62  - SUPER FAMICOM BOX Commercial Optional Cart
 GameData ROM: GROM2-1, 256Kibit
-Lower ROM: New Super 3D Golf Simulation - Waialae No Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
+Lower ROM: New Super 3D Golf Simulation - Waialae no Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
 Lower ROM: Super Mahjong 2 (I'MAX), SHVC-2A-1, 8Mibit
 
 PSS-63  - SUPER FAMICOM BOX Commercial Optional Cart
@@ -589,6 +589,6 @@ ROM_END
 
 GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
 GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae no Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )

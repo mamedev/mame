@@ -23,7 +23,6 @@
 #include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 
@@ -591,7 +590,7 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 	if (interlace)
 	{
 		ra >>= 1;
-		if (y > 0x176) return;
+		if (y > 0x191) return;
 	}
 
 	// redundant initializers to keep compiler happy
@@ -953,16 +952,17 @@ void bml3_state::bml3_common(machine_config &config)
 	m_acia->rts_handler().set(FUNC(bml3_state::acia_rts_w));
 	m_acia->irq_handler().set(FUNC(bml3_state::acia_irq_w));
 
+	/* Audio */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	CASSETTE(config, m_cass);
-
-	/* Audio */
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* slot devices */
 	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));

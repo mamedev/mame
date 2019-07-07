@@ -374,11 +374,7 @@ public:
 	void laser128(machine_config &config);
 	void apple2c_iwm(machine_config &config);
 	void apple2c_mem(machine_config &config);
-	void ceci(machine_config &config);
-	void cece(machine_config &config);
-	void cecg(machine_config &config);
-	void cecm(machine_config &config);
-	void cec2000(machine_config &config);
+	void cec(machine_config &config);
 	void mprof3(machine_config &config);
 	void apple2e(machine_config &config);
 	void apple2ep(machine_config &config);
@@ -493,13 +489,6 @@ private:
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#define JOYSTICK_DELTA          80
-#define JOYSTICK_SENSITIVITY    50
-#define JOYSTICK_AUTOCENTER     80
 
 offs_t apple2e_state::dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
@@ -973,7 +962,7 @@ void apple2e_state::machine_reset()
 	m_page2 = false;
 	m_video->m_page2 = false;
 	m_video->m_monohgr = false;
-	if(m_iscecm)	m_video->m_monohgr = true;
+	if(m_iscecm)    m_video->m_monohgr = true;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -1476,13 +1465,11 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			switch (offset)
 			{
 				case 0x5e:  // SETDHIRES
-					m_screen->update_now();
-					m_video->m_dhires = true;
+					m_video->dhires_w(0);
 					break;
 
 				case 0x5f:  // CLRDHIRES
-					m_screen->update_now();
-					m_video->m_dhires = false;
+					m_video->dhires_w(1);
 					break;
 			}
 		}
@@ -1550,57 +1537,40 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			break;
 
 		case 0x50:  // graphics mode
-			if (m_video->m_graphics == false) // avoid flickering from II+ refresh polling
-			{
-				m_screen->update_now();
-				m_video->m_graphics = true;
-			}
+			m_video->txt_w(0);
 			break;
 
 		case 0x51:  // text mode
-			m_screen->update_now();
-			m_video->m_graphics = false;
+			m_video->txt_w(1);
 			break;
 
 		case 0x52:  // no mix
-			m_screen->update_now();
-			m_video->m_mix = false;
+			m_video->mix_w(0);
 			break;
 
 		case 0x53:  // mixed mode
-			m_screen->update_now();
-			m_video->m_mix = true;
+			m_video->mix_w(1);
 			break;
 
 		case 0x54:  // set page 1
-			if (!m_video->m_80col)
-			{
-				m_screen->update_now();
-			}
 			m_page2 = false;
-			m_video->m_page2 = false;
+			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			if (!m_video->m_80col)
-			{
-				m_screen->update_now();
-			}
 			m_page2 = true;
-			m_video->m_page2 = true;
+			m_video->scr_w(1);
 			auxbank_update();
 			break;
 
 		case 0x56: // select lo-res
-			m_screen->update_now();
-			m_video->m_hires = false;
+			m_video->res_w(0);
 			auxbank_update();
 			break;
 
 		case 0x57: // select hi-res
-			m_screen->update_now();
-			m_video->m_hires = true;
+			m_video->res_w(1);
 			auxbank_update();
 			break;
 
@@ -2376,14 +2346,14 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, uint8_t data)
 		{
 			m_cec_bank = data;
 /*
-			if (data & 0x10)
-			{
-				m_video->m_monohgr = false;
-			}
-			else
-			{
-				m_video->m_monohgr = true;
-			}
+            if (data & 0x10)
+            {
+                m_video->m_monohgr = false;
+            }
+            else
+            {
+                m_video->m_monohgr = true;
+            }
 */
 			auxbank_update();
 			update_slotrom_banks();
@@ -4432,8 +4402,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("echoii", A2BUS_ECHOII);    /* Street Electronics Echo II */
 	device.option_add("ap16", A2BUS_IBSAP16);    /* IBS AP16 (German VideoTerm clone) */
 	device.option_add("ap16alt", A2BUS_IBSAP16ALT);    /* IBS AP16 (German VideoTerm clone), alternate revision */
-	device.option_add("vtc1", A2BUS_VTC1);    /* Unknown VideoTerm clone #1 */
-	device.option_add("vtc2", A2BUS_VTC2);    /* Unknown VideoTerm clone #2 */
+	device.option_add("vtc1", A2BUS_VTC1);    /* Unknown VideoTerm clone */
 	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
 	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
 	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
@@ -4482,7 +4451,7 @@ void apple2e_state::apple2e(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
 	config.m_minimum_quantum = attotime::from_hz(60);
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4881,7 +4850,7 @@ void apple2e_state::laser128ex2(machine_config &config)
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }
 
-void apple2e_state::ceci(machine_config &config)
+void apple2e_state::cec(machine_config &config)
 {
 	apple2e(config);
 	config.device_remove("sl1");
@@ -4894,85 +4863,7 @@ void apple2e_state::ceci(machine_config &config)
 
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	// there is no aux slot, the "aux" side of the //e is used for additional ROM
-	config.device_remove("aux");
-	config.device_remove(A2_AUXSLOT_TAG);
-
-	m_ram->set_default_size("64K");
-}
-
-void apple2e_state::cece(machine_config &config)
-{
-	apple2e(config);
-	config.device_remove("sl1");
-	config.device_remove("sl2");
-	config.device_remove("sl3");
-	config.device_remove("sl4");
-	config.device_remove("sl5");
-	config.device_remove("sl6");
-	config.device_remove("sl7");
-
-	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-
-	// there is no aux slot, the "aux" side of the //e is used for additional ROM
-	config.device_remove("aux");
-	config.device_remove(A2_AUXSLOT_TAG);
-
-	m_ram->set_default_size("64K");
-}
-
-void apple2e_state::cecg(machine_config &config)
-{
-	apple2e(config);
-	config.device_remove("sl1");
-	config.device_remove("sl2");
-	config.device_remove("sl3");
-	config.device_remove("sl4");
-	config.device_remove("sl5");
-	config.device_remove("sl6");
-	config.device_remove("sl7");
-
-	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-
-	// there is no aux slot, the "aux" side of the //e is used for additional ROM
-	config.device_remove("aux");
-	config.device_remove(A2_AUXSLOT_TAG);
-
-	m_ram->set_default_size("64K");
-}
-
-void apple2e_state::cecm(machine_config &config)
-{
-	apple2e(config);
-	config.device_remove("sl1");
-	config.device_remove("sl2");
-	config.device_remove("sl3");
-	config.device_remove("sl4");
-	config.device_remove("sl5");
-	config.device_remove("sl6");
-	config.device_remove("sl7");
-
-	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
-
-	// there is no aux slot, the "aux" side of the //e is used for additional ROM
-	config.device_remove("aux");
-	config.device_remove(A2_AUXSLOT_TAG);
-
-	m_ram->set_default_size("64K");
-}
-
-void apple2e_state::cec2000(machine_config &config)
-{
-	apple2e(config);
-	config.device_remove("sl1");
-	config.device_remove("sl2");
-	config.device_remove("sl3");
-	config.device_remove("sl4");
-	config.device_remove("sl5");
-	config.device_remove("sl6");
-	config.device_remove("sl7");
-
-	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	SOFTWARE_LIST(config, "flop525_cec").set_original("cecflop");
 
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
 	config.device_remove("aux");
@@ -5367,9 +5258,9 @@ COMP( 1988, las128e2,   apple2c, 0,      laser128ex2, apple2e,   apple2e_state, 
 COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c3,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (Original Memory Expansion)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c4,   apple2c, 0,      apple2c_mem, apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c (rev 4)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, ceci,       0,       apple2, ceci,        ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cece,       0,       apple2, cece,        cece,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer E", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cecg,       0,       apple2, cecg,        cecg,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer G", MACHINE_SUPPORTS_SAVE )
-COMP( 1989, cecm,       0,       apple2, cecm,        cecm,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer M", MACHINE_SUPPORTS_SAVE )
-COMP( 1991, cec2000,    0,       apple2, cec2000,     cec2000,   apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, ceci,       0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cece,       0,       apple2, cec,         cece,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer E", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cecg,       0,       apple2, cec,         cecg,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer G", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer M", MACHINE_SUPPORTS_SAVE )
+COMP( 1991, cec2000,    0,       apple2, cec,         cec2000,   apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )

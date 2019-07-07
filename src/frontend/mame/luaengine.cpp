@@ -1925,9 +1925,6 @@ void lua_engine::initialize()
  * target.max_update_rate -
  * target.view - current target layout view
  * target.orientation - current target orientation
- * target.backdrops - enable backdrops
- * target.bezels - enable bezels
- * target.marquees - enable marquees
  * target.screen_overlay - enable overlays
  * target.zoom - enable zoom
  */
@@ -1947,10 +1944,6 @@ void lua_engine::initialize()
 			"max_update_rate", sol::property(&render_target::max_update_rate, &render_target::set_max_update_rate),
 			"view", sol::property(&render_target::view, &render_target::set_view),
 			"orientation", sol::property(&render_target::orientation, &render_target::set_orientation),
-			"backdrops", sol::property(&render_target::backdrops_enabled, &render_target::set_backdrops_enabled),
-			"overlays", sol::property(&render_target::overlays_enabled, &render_target::set_overlays_enabled),
-			"bezels", sol::property(&render_target::bezels_enabled, &render_target::set_bezels_enabled),
-			"marquees", sol::property(&render_target::marquees_enabled, &render_target::set_marquees_enabled),
 			"screen_overlay", sol::property(&render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled),
 			"zoom", sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen));
 
@@ -2067,7 +2060,7 @@ void lua_engine::initialize()
 						luaL_error(m_lua_state, "Error in param 1 to draw_text");
 						return;
 					}
-					rgb_t textcolor = UI_TEXT_COLOR;
+					rgb_t textcolor = mame_machine_manager::instance()->ui().colors().text_color();
 					rgb_t bgcolor = 0;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());

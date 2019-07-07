@@ -66,7 +66,7 @@ public:
 	uint32_t screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	MC6845_UPDATE_ROW(kaypro484_update_row);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void omni2(machine_config &config);
 	void kayproiv(machine_config &config);

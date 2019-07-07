@@ -5,20 +5,20 @@
     Data East IRQ Controller
 
     TODO:
-    - Lightgun support is only used by Locked 'n Loaded. 
-	  irq is likely an h AND v beam trigger, game counts via raster irqs until 
-	  it finds one of these, and where gun trigger x position is the H pixel 
-	  latch. 
+    - Lightgun support is only used by Locked 'n Loaded.
+      irq is likely an h AND v beam trigger, game counts via raster irqs until
+      it finds one of these, and where gun trigger x position is the H pixel
+      latch.
       Two problems here:
-	  1. (assuming being correct) default calibration looks way offset. 
-	  2. We currently give minmax defaults to Y latches to order to avoid 
-	     making the game to crash. These limits doesn't seem very sane, 
-		 for example lower limit is / 3 the full screen height (248 / 3 = 82). 
-      Being an highly timing dependant behaviour ARM core is probably at 
-	  fault here.
+      1. (assuming being correct) default calibration looks way offset.
+      2. We currently give minmax defaults to Y latches to order to avoid
+         making the game to crash. These limits doesn't seem very sane,
+         for example lower limit is / 3 the full screen height (248 / 3 = 82).
+      Being an highly timing dependant behaviour ARM core is probably at
+      fault here.
     - Understand if there's an additional switch for player 1 and player 2
-	  wrt lightgun trigger.
-	  
+      wrt lightgun trigger.
+
 ***************************************************************************/
 
 #include "emu.h"

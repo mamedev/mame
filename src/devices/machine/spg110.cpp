@@ -16,10 +16,9 @@
 
 DEFINE_DEVICE_TYPE(SPG110, spg110_device, "spg110", "SPG110 System-on-a-Chip")
 
-spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+spg110_device::spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal)
+	: unsp_device(mconfig, type, tag, owner, clock, internal)
 	, device_mixer_interface(mconfig, *this, 2)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_spg_io(*this, "spg_io")
 	, m_spg_video(*this, "spg_video")
@@ -37,13 +36,13 @@ spg110_device::spg110_device(const machine_config &mconfig, device_type type, co
 
 
 spg110_device::spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spg110_device(mconfig, SPG110, tag, owner, clock)
+	: spg110_device(mconfig, SPG110, tag, owner, clock, address_map_constructor(FUNC(spg110_device::internal_map), this))
 {
 }
 
 WRITE_LINE_MEMBER(spg110_device::videoirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, state);
+	set_state_unsynced(UNSP_IRQ0_LINE, state);
 }
 
 void spg110_device::configure_spg_io(spg2xx_io_device* io)
@@ -67,22 +66,22 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 
 READ16_MEMBER(spg110_device::space_r)
 {
-	address_space &cpuspace = m_cpu->space(AS_PROGRAM);
+	address_space &cpuspace = this->space(AS_PROGRAM);
 	return cpuspace.read_word(offset);
 }
 
 WRITE_LINE_MEMBER(spg110_device::audioirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_FIQ_LINE, state);
+	set_state_unsynced(UNSP_FIQ_LINE, state);
 }
 
 
 void spg110_device::device_add_mconfig(machine_config &config)
 {
-	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	configure_spg_io(m_spg_io);
 
-	SPG110_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	SPG110_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(spg110_device::videoirq_w));
 
 	SPG110_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
@@ -94,7 +93,7 @@ void spg110_device::device_add_mconfig(machine_config &config)
 
 }
 
-void spg110_device::map(address_map &map)
+void spg110_device::internal_map(address_map &map)
 {
 	map(0x000000, 0x000fff).ram();
 
@@ -160,6 +159,8 @@ void spg110_device::map(address_map &map)
 
 void spg110_device::device_start()
 {
+	unsp_device::device_start();
+
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
 	m_portc_out.resolve_safe();
@@ -169,10 +170,10 @@ void spg110_device::device_start()
 	m_adc_in[0].resolve_safe(0x0fff);
 	m_adc_in[1].resolve_safe(0x0fff);
 	m_chip_sel.resolve_safe();
-
 }
 
 void spg110_device::device_reset()
 {
+	unsp_device::device_reset();
 }
 

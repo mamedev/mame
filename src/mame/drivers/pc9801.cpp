@@ -2282,9 +2282,9 @@ void pc9801_state::pc9801_sasi(machine_config &config)
 
 void pc9801_state::cdrom_headphones(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^lheadphone", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rheadphone", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^lheadphone", 1.0);
+	cdda->add_route(1, "^^rheadphone", 1.0);
 }
 
 void pc9801_state::pc9801_ide(machine_config &config)
@@ -2463,7 +2463,7 @@ void pc9801_state::pc9801ux(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
 	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801_state::a20_286, this));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-//  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
+//  AM9157A(config, "i8237", 10000000); // unknown clock
 }
 
 void pc9801_state::pc9801bx2(machine_config &config)

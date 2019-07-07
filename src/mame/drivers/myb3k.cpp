@@ -928,6 +928,7 @@ static void stepone_isa_cards(device_slot_interface &device)
 	device.option_add("myb3k_com", ISA8_MYB3K_COM);
 	device.option_add("myb3k_fdc4710", ISA8_MYB3K_FDC4710);
 	device.option_add("myb3k_fdc4711", ISA8_MYB3K_FDC4711);
+	device.option_add("myb3k_fdc4712", ISA8_MYB3K_FDC4712);
 }
 
 void myb3k_state::myb3k(machine_config &config)
@@ -1036,6 +1037,9 @@ void myb3k_state::jb3000(machine_config &config)
 	/* Keyboard */
 	JB3000_KEYBOARD(config.replace(), m_kb, 0);
 	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
+
+	/* software lists */
+	SOFTWARE_LIST(config, "flop_list").set_original("jb3000_flop");
 }
 
 void myb3k_state::stepone(machine_config &config)
@@ -1059,7 +1063,7 @@ ROM_END
 ROM_START( jb3000 )
 	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "jb3000chrg-v2.07.bin", 0xc000, 0x2000, CRC(efffe4cb) SHA1(1305d1fb0bc39b6464f4e2f000a584f9e67f784a))
-	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, CRC(c4c46cc5) SHA1(a3e186513fbe9ad0e369b481999393a3506db39e))
+	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, CRC(c4c46cc5) SHA1(a3e186513fbe9ad0e369b481999393a3506db39e)) // Verified to be identical to the original myb3k BIOS
 ROM_END
 
 ROM_START( stepone )

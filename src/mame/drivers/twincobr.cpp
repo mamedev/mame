@@ -730,7 +730,7 @@ void twincobr_state::fsharkbt(machine_config &config)
 {
 	fshark(config);
 
-	I8741(config, "mcu", XTAL(28'000'000)/16).set_disable();  /* Internal program code is not dumped */
+	I8741A(config, "mcu", XTAL(28'000'000)/16).set_disable();  /* Internal program code is not dumped */
 	/* Program Map is internal to the CPU */
 }
 

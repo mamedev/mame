@@ -7,11 +7,12 @@
     driver by Aaron Giles
 
     Games supported:
-        * T-Mek (1994) [2 sets]
+        * T-Mek (1994) [5 sets]
         * Primal Rage (1994) [2 sets]
 
     Known bugs:
-        * protection devices unknown
+        * Protection not fully understood
+        * T-Mek's serial communications hardware is missing. The twin and single cabs seemingly use different link hardware but both link the same.
 
 ****************************************************************************
 
@@ -806,8 +807,8 @@ static const atari_rle_objects_config modesc =
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarigt_state::atarigt)
-
+void atarigt_state::atarigt(machine_config &config)
+{
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, ATARI_CLOCK_50MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarigt_state::main_map);
@@ -821,7 +822,9 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_atarigt);
 	PALETTE(config, m_palette).set_entries(MRAM_ENTRIES);
 
-	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8);
+	m_playfield_tilemap->set_layout(FUNC(atarigt_state::atarigt_playfield_scan), 128,64);
+	m_playfield_tilemap->set_info_callback(FUNC(atarigt_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -839,8 +842,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* sound hardware */
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
-
-MACHINE_CONFIG_END
+}
 
 void atarigt_state::tmek(machine_config &config)
 {
@@ -1350,10 +1352,10 @@ void atarigt_state::init_primrage()
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
 GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )

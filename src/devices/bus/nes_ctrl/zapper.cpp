@@ -82,9 +82,21 @@ void nes_zapper_device::device_reset()
 uint8_t nes_zapper_device::read_bit34()
 {
 	uint8_t ret = m_trigger->read();
+	int x = m_lightx->read();
+	int y = m_lighty->read();
+
+	// update the screen if necessary
+	if (!screen().vblank())
+	{
+		int vpos = screen().vpos();
+		int hpos = screen().hpos();
+
+		if (vpos > y || (vpos == y && hpos >= x))
+			screen().update_now();
+	}
 
 	// get the pixel at the gun position
-	rgb_t pix = screen().pixel(m_lightx->read(), m_lighty->read());
+	rgb_t pix = screen().pixel(x, y);
 
 	// check if the cursor is over a bright pixel
 	// FIXME: still a gross hack

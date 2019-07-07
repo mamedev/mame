@@ -30,6 +30,14 @@ Notes:
 - a Blocken PCB shot shows a 48 MHz xtal, game is definitely too slow at
   8 MHz (noticeable thru colour cycling effects)
 - Confirmed OSC is 48MHz and OKI resonator is 1.056MHz.
+- Hebereke no Popoon has various debug mode switches, the ones found so far:
+  $30878e: bit 0 enable, active low. 
+           If enabled correctly all of the non gameplay screens become 
+	   text stubs;
+  $aff14: a non-zero value enables CPU usage in 2p mode.
+          As a side-effect this also makes winning condition to never 
+	  satisfy, it goes on indefinitely with the selected characters and 
+	  input methods.
 
 ***************************************************************************/
 

@@ -115,7 +115,7 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		{
 			m_sreg[segment].base = m_sreg[segment].selector << 4;
 			m_sreg[segment].limit = 0xffff;
-			m_sreg[segment].flags = (segment == CS) ? 0x00fb : 0x00f3;
+			m_sreg[segment].flags = 0x00f3;
 			m_sreg[segment].d = 0;
 			m_sreg[segment].valid = true;
 		}
@@ -743,7 +743,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			}
 			else
 			{
-				PUSH32(oldflags & 0x00ffffff );
+				PUSH32((oldflags & 0x00ffffff) | (1 << 16) ); //386 faults always have the RF bit set in the saved flags register.
 				PUSH32SEG(m_sreg[CS].selector );
 				if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
 					PUSH32(m_eip );
@@ -906,6 +906,8 @@ void i386_device::i286_task_switch(uint16_t selector, uint8_t nested)
 	CHANGE_PC(m_eip);
 
 	m_CPL = (m_sreg[SS].flags >> 5) & 3;
+
+	m_auto_clear_RF = false;
 //  printf("286 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
@@ -1024,6 +1026,13 @@ void i386_device::i386_task_switch(uint16_t selector, uint8_t nested)
 	CHANGE_PC(m_eip);
 
 	m_CPL = (m_sreg[SS].flags >> 5) & 3;
+
+	int t_bit = READ32(tss+0x64) & 1;
+	if(t_bit) m_dr[6] |= (1 << 15); //If the T bit of the new TSS is set, set the BT bit of DR6.
+
+	m_dr[7] &= ~(0x155); //Clear all of the local enable bits from DR7.
+
+	m_auto_clear_RF = false;
 //  printf("386 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
@@ -2462,3 +2471,70 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	i386_load_segment_descriptor(CS);
 	CHANGE_PC(m_eip);
 }
+
+inline void i386_device::dri_changed()
+{
+	int dr;
+	if(!(m_dr[7] & 0xff)) return;
+	for(dr = 0; dr < 4; dr++)
+	{
+		if(m_dr_breakpoints[dr]) m_dr_breakpoints[dr]->remove();
+		int dr_enabled = (m_dr[7] & (1 << (dr << 1))) || (m_dr[7] & (1 << ((dr << 1) + 1))); // Check both local enable AND global enable bits for this breakpoint.
+		if(dr_enabled)
+		{
+			int breakpoint_type = (m_dr[7] >> ((dr << 2) + 16)) & 3;
+			int breakpoint_length = (m_dr[7] >> ((dr << 2) + 16 + 2)) & 3;
+			uint32_t phys_addr = m_dr[dr];
+			uint32_t error;
+			phys_addr = translate_address(m_CPL, TRANSLATE_READ, &phys_addr, &error);
+			phys_addr &= ~3; // According to CUP386, data breakpoints are only reliable on dword-aligned addresses, so align this to a dword.
+			uint32_t true_mask = 0;
+			switch(breakpoint_length)
+			{
+				case 0: true_mask = 0xff; break;
+				case 1: true_mask = 0xffff; break;
+				// Case 2 is invalid on a real 386.
+				case 3: true_mask = 0xffffffff; break;
+			}
+			if(true_mask == 0)
+			{
+				logerror("i386: Unknown breakpoint length value\n");
+			}
+			else if(breakpoint_type == 1) m_dr_breakpoints[dr] = m_program->install_write_tap(phys_addr, phys_addr + 3, "i386_debug_write_breakpoint",
+			[&, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+			{
+				if(true_mask & mem_mask)
+				{
+					m_dr[6] |= 1 << dr;
+					i386_trap(1,0,0);
+				}
+			}, m_dr_breakpoints[dr]);
+			else if(breakpoint_type == 3) m_dr_breakpoints[dr] = m_program->install_readwrite_tap(phys_addr, phys_addr + 3, "i386_debug_readwrite_breakpoint",
+			[&, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+			{
+				if(true_mask & mem_mask)
+				{
+					m_dr[6] |= 1 << dr;
+					i386_trap(1,0,0);
+				}
+			},
+			[&, dr, true_mask](offs_t offset, u32& data, u32 mem_mask)
+			{
+				if(true_mask & mem_mask)
+				{
+					m_dr[6] |= 1 << dr;
+					i386_trap(1,0,0);
+				}
+			}, m_dr_breakpoints[dr]);
+		}
+	}
+}
+
+inline void i386_device::dr7_changed(uint32_t old_val, uint32_t new_val)
+{
+	//Check that none of the breakpoint types or lengths have changed.
+	int old_breakpoint_info = old_val >> 16;
+	int new_breakpoint_info = new_val >> 16;
+	if(old_breakpoint_info != new_breakpoint_info) dri_changed();
+}
+

@@ -85,7 +85,6 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "bus/centronics/ctronics.h"
@@ -327,11 +326,11 @@ void pencil2_state::pencil2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SN76489A(config, "sn76489a", XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00); // guess
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pencil2_cart");

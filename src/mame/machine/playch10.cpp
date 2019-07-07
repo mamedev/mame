@@ -225,6 +225,16 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
 		/* no sprite hit (yet) */
 		ret |= 0x08;
 
+		// update the screen if necessary
+		if (!m_ppu->screen().vblank())
+		{
+			int vpos = m_ppu->screen().vpos();
+			int hpos = m_ppu->screen().hpos();
+
+			if (vpos > y || (vpos == y && hpos >= x))
+				m_ppu->screen().update_now();
+		}
+
 		/* get the pixel at the gun position */
 		rgb_t pix = m_ppu->screen().pixel(x, y);
 

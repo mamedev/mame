@@ -110,7 +110,7 @@ private:
 	inline void audio_end_state();
 	void audio_process_clock(bool logit);
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
-	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
+	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
 	void gottlieb_map(address_map &map);
 	void reactor_map(address_map &map);

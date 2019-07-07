@@ -61,7 +61,6 @@ Z - more scan lines per row (cursor is bigger)
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -306,10 +305,10 @@ void tavernie_state::cpu09(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.readpa_handler().set(FUNC(tavernie_state::pa_r));

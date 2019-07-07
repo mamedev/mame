@@ -2159,9 +2159,9 @@ void ste_state::ste(machine_config &config)
 	m_ymsnd->add_route(0, "lspeaker", 0.50);
 	m_ymsnd->add_route(0, "rspeaker", 0.50);
 /*
-    MCFG_DEVICE_ADD("custom", CUSTOM, 0) // DAC
-    MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
-    MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
+    custom_device &custom_dac(CUSTOM(config, "custom", 0)); // DAC
+    custom_dac.add_route(0, "rspeaker", 0.50);
+    custom_dac.add_route(1, "lspeaker", 0.50);
 */
 	LMC1992(config, LMC1992_TAG);
 
@@ -2202,7 +2202,7 @@ void stbook_state::stbook(machine_config &config)
 	M68000(config, m_maincpu, U517/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
 
-	//MCFG_DEVICE_ADD(COP888_TAG, COP888, Y700)
+	//COP888(config, COP888_TAG, Y700);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);

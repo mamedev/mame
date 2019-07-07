@@ -54,7 +54,7 @@ public:
 	void sv8000(machine_config &config);
 
 private:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
@@ -202,7 +202,7 @@ void sv8000_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( sv8000_state, cart )
+DEVICE_IMAGE_LOAD_MEMBER( sv8000_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -374,7 +374,8 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	return data;
 }
 
-MACHINE_CONFIG_START(sv8000_state::sv8000)
+void sv8000_state::sv8000(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sv8000_state::sv8000_mem);
@@ -407,13 +408,13 @@ MACHINE_CONFIG_START(sv8000_state::sv8000)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "sv8000_cart")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(sv8000_state, cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "sv8000_cart"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(sv8000_state::cart_load), this);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sv8000");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( sv8000 )

@@ -133,7 +133,7 @@ private:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 
 	void cc40_palette(palette_device &palette) const;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
 
 	void main_map(address_map &map);
@@ -168,7 +168,7 @@ private:
 
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -585,8 +585,8 @@ void cc40_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
-MACHINE_CONFIG_START(cc40_state::cc40)
-
+void cc40_state::cc40(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS70C20(config, m_maincpu, XTAL(5'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cc40_state::main_map);
@@ -615,17 +615,13 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
-	MCFG_GENERIC_LOAD(cc40_state, cc40_cartridge)
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "cc40_cart", "bin,rom,256").set_device_load(FUNC(cc40_state::cart_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("cc40_cart");
-MACHINE_CONFIG_END
+}
 
 
 

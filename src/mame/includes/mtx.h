@@ -109,8 +109,8 @@ private:
 	void bankswitch(uint8_t data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rompak_load);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mtx);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(mtx);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void mtx_io(address_map &map);
 	void mtx_mem(address_map &map);

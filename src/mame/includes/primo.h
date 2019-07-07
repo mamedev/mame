@@ -65,8 +65,8 @@ private:
 	void primo_common_machine_init();
 	void primo_setup_pss(uint8_t* snapshot_data, uint32_t snapshot_size);
 	void primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( primo );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( primo );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void primo32_mem(address_map &map);
 	void primo48_mem(address_map &map);

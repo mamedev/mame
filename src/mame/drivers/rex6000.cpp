@@ -79,7 +79,7 @@ public:
 	void rex6000(machine_config &config);
 
 	void rex6000_palettte(palette_device &palette) const;
-	DECLARE_QUICKLOAD_LOAD_MEMBER(rex6000);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_rex6000);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	DECLARE_WRITE_LINE_MEMBER(serial_irq);
 	DECLARE_WRITE_LINE_MEMBER(alarm_irq);
@@ -157,7 +157,7 @@ public:
 	DECLARE_READ8_MEMBER( kb_data_r );
 	DECLARE_WRITE8_MEMBER( kb_mask_w );
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_on_irq);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(oz750);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_oz750);
 
 	virtual void machine_reset() override;
 	uint32_t screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -728,7 +728,7 @@ void rex6000_state::rex6000_palettte(palette_device &palette) const
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
+QUICKLOAD_LOAD_MEMBER(rex6000_state::quickload_rex6000)
 {
 	static const char magic[] = "ApplicationName:Addin";
 	uint32_t img_start = 0;
@@ -780,7 +780,7 @@ int oz750_state::oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char
 	return img_start;
 }
 
-QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
+QUICKLOAD_LOAD_MEMBER(oz750_state::quickload_oz750)
 {
 	address_space* flash = &m_flash0a->memory().space(0);
 	std::vector<uint8_t> data(image.length());
@@ -895,7 +895,8 @@ static GFXDECODE_START( gfx_rex6000 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(rex6000_state::rex6000)
+void rex6000_state::rex6000(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(4'000'000)); //Toshiba microprocessor Z80 compatible at 4.3MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rex6000_state::rex6000_mem);
@@ -934,7 +935,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	serport.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2")
+	QUICKLOAD(config, "quickload", "rex,ds2").set_load_callback(FUNC(rex6000_state::quickload_rex6000), this);
 
 	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));
@@ -957,9 +958,10 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(oz750_state::oz750)
+void oz750_state::oz750(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(9'830'400)); //Toshiba microprocessor Z80 compatible at 9.8MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &oz750_state::rex6000_mem);
@@ -997,7 +999,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd")
+	QUICKLOAD(config, "quickload", "wzd").set_load_callback(FUNC(oz750_state::quickload_oz750), this);
 
 	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));
@@ -1011,7 +1013,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( rex6000 )

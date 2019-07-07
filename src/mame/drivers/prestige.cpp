@@ -109,9 +109,7 @@ public:
 	{ }
 
 	void prestige_base(machine_config &config);
-	void princ(machine_config &config);
 	void gl6000sl(machine_config &config);
-	void gjmovie(machine_config &config);
 	void snotec(machine_config &config);
 	void glmcolor(machine_config &config);
 	void glcolor(machine_config &config);
@@ -832,21 +830,6 @@ void prestige_state::gl7007sl(machine_config &config)
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
 
-void prestige_state::gjmovie(machine_config &config)
-{
-	prestige_base(config);
-
-	SOFTWARE_LIST(config, "cart_list").set_original("gjmovie");
-}
-
-void prestige_state::princ(machine_config &config)
-{
-	prestige_base(config);
-
-	config.device_remove("cartslot");
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "princ_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("princ");
-}
 
 /* ROM definition */
 ROM_START( gl6000sl )
@@ -899,39 +882,13 @@ ROM_START( glmcolor )
 	ROM_LOAD( "27-5673-00.u6", 0x00000, 0x100000, CRC(c4245392) SHA1(bb651aaf11b75f4155c0a0106de9394018110cc7) )
 ROM_END
 
-ROM_START( gj4000 )
+ROM_START( glmmc )
+	// FIXME: either ROM loading or banking is wrong here...
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-05886-000-000.u4", 0x000000, 0x40000, CRC(5f6db95b) SHA1(fe683154e33a82ea38696096616d11e850e0c7a3))
-ROM_END
-
-ROM_START( gj5000 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-6019-01.u2", 0x000000, 0x80000, CRC(946e5b7d) SHA1(80963d6ad80d49e54c8996bfc77ac135c4935be5))
-ROM_END
-
-ROM_START( gjmovie )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "lh532hlk.bin", 0x000000, 0x40000, CRC(2e64c296) SHA1(604034f902e20851cb9af60964031a508ceef83e))
-ROM_END
-
-ROM_START( gjrstar )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-5740-00.u1", 0x000000, 0x40000, CRC(ff3dc3bb) SHA1(bc16dfc1e12b0008456c700c431c8df6263b671f))
-ROM_END
-
-ROM_START( gjrstar2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-5740-00.u1", 0x000000, 0x40000, CRC(ff3dc3bb) SHA1(bc16dfc1e12b0008456c700c431c8df6263b671f))     // identical to 'Genius Junior Redstar'
-ROM_END
-
-ROM_START( gjrstar3 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "54-06056-000-000.u3", 0x000000, 0x040000, CRC(72522179) SHA1(ede9491713ad018012cf925a519bcafe126f1ad3))
-ROM_END
-
-ROM_START( gl6600cx )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "54-06400-00.u1", 0x000000, 0x200000, CRC(b05cd075) SHA1(b1d9eb02ca56350eb9e89518db89c0a2a845ebd8))
+	ROM_LOAD( "27-5889-00.bin", 0x060000, 0x020000, CRC(5e2c6359) SHA1(cc01c7bd5c87224b63dd1044db5a36a5cb7824f1) )
+	ROM_CONTINUE( 0x040000, 0x020000 )
+	ROM_CONTINUE( 0x020000, 0x020000 )
+	ROM_CONTINUE( 0x000000, 0x020000 )
 ROM_END
 
 ROM_START( gkidabc )
@@ -944,10 +901,6 @@ ROM_START( cars2lap )
 	ROM_LOAD("n25s16.u6", 0x00000, 0x200000, CRC(ec1ba96e) SHA1(51b8844ae77adf20f74f268d380d268c9ce19785))
 ROM_END
 
-ROM_START( princ )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD("29f800t.u4", 0x00000, 0x100000, CRC(30b6b864) SHA1(7ada3af85dd8dd3f95ca8965ad8e642c26445293))
-ROM_END
 
 
 /* Driver */
@@ -963,23 +916,9 @@ COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty
 COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 19??, glmmc,    0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Leader Master Mega Color (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // these systems need to be moved into a separate driver
-COMP( 1996, gj4000,   0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior 4000 (Germany)",         MACHINE_IS_SKELETON )
 COMP( 1996, gkidabc,  0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius KID ABC Fan (Germany)",         MACHINE_IS_SKELETON )
-COMP( 1993, gjmovie,  0,       0,      gjmovie,  prestige, prestige_state, empty_init, "VTech",  "Genius Junior Movie (Germany)",        MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar,  0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar(Germany)",       MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar2, gjrstar, 0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar 2 (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1998, gjrstar3, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1998, gj5000,   0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",         MACHINE_IS_SKELETON )
 COMP( 2012, cars2lap, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "CARS 2 Laptop (Germany)",              MACHINE_IS_SKELETON )
-
-
-// gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
-// http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
-COMP( 1999, gl6600cx, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6600CX (Germany)",       MACHINE_IS_SKELETON )
-
-// TODO: move into a separate driver
-// Prin-C use a Fujitsu MB90611A MCU (F2MC-16L)
-COMP( ????, princ,    0,       0,      princ,    prestige, prestige_state, empty_init, "Tomy",   "Prin-C",                               MACHINE_IS_SKELETON )

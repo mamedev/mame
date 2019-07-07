@@ -812,7 +812,8 @@ void savquest_isa16_cards(device_slot_interface &device)
 	device.option_add("sb16", ISA16_SOUND_BLASTER_16);
 }
 
-MACHINE_CONFIG_START(savquest_state::savquest)
+void savquest_state::savquest(machine_config &config)
+{
 	PENTIUM2(config, m_maincpu, 450000000); // actually Pentium II 450
 	m_maincpu->set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
 	m_maincpu->set_addrmap(AS_IO, &savquest_state::savquest_io);
@@ -821,10 +822,13 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	pcat_common(config);
 	DS12885(config.replace(), "rtc");
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, savquest_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, savquest_state, intel82371ab_pci_r, intel82371ab_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(13, DEVICE_SELF, savquest_state, pci_3dfx_r, pci_3dfx_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read ( 0, FUNC(savquest_state::intel82439tx_pci_r), this);
+	pcibus.set_device_write( 0, FUNC(savquest_state::intel82439tx_pci_w), this);
+	pcibus.set_device_read ( 7, FUNC(savquest_state::intel82371ab_pci_r), this);
+	pcibus.set_device_write( 7, FUNC(savquest_state::intel82371ab_pci_w), this);
+	pcibus.set_device_read (13, FUNC(savquest_state::pci_3dfx_r), this);
+	pcibus.set_device_write(13, FUNC(savquest_state::pci_3dfx_w), this);
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -848,7 +852,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	m_voodoo->set_screen_tag("screen");
 	m_voodoo->set_cpu_tag(m_maincpu);
 	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
-MACHINE_CONFIG_END
+}
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "bios", 0)

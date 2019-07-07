@@ -221,7 +221,6 @@ PRINT FRE(0)
 #include "includes/osi.h"
 
 #include "machine/clock.h"
-#include "sound/wave.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -742,7 +741,6 @@ void sb2m600_state::osi600(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 	DISCRETE(config, m_discrete);
 	m_discrete->set_intf(osi600_discrete_interface);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -757,6 +755,7 @@ void sb2m600_state::osi600(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(sb2m600_state::kansas_w), attotime::from_hz(4800)); // cass write
 	TIMER(config, "kansas_r").configure_periodic(FUNC(sb2m600_state::kansas_r), attotime::from_hz(40000)); // cass read
 
@@ -778,7 +777,6 @@ void uk101_state::uk101(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cassette ACIA */
 	ACIA6850(config, m_acia, 0);
@@ -790,6 +788,7 @@ void uk101_state::uk101(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(uk101_state::kansas_w), attotime::from_hz(4800)); // cass write
 	TIMER(config, "kansas_r").configure_periodic(FUNC(uk101_state::kansas_r), attotime::from_hz(40000)); // cass read
 
@@ -811,7 +810,6 @@ void c1p_state::c1p(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 	DISCRETE(config, m_discrete);
 	m_discrete->set_intf(osi600c_discrete_interface);
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -831,6 +829,7 @@ void c1p_state::c1p(machine_config &config)
 
 	/* cassette */
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_w").configure_periodic(FUNC(c1p_state::kansas_w), attotime::from_hz(4800)); // cass write
 	TIMER(config, "kansas_r").configure_periodic(FUNC(c1p_state::kansas_r), attotime::from_hz(40000)); // cass read
 

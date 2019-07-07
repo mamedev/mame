@@ -100,7 +100,7 @@ void adm31_state::kbd_scan_w(u8 data)
 
 u8 adm31_state::kbd_scan_r()
 {
-	return m_kbd_scan | (BIT(m_keys[(m_kbd_scan & 0x78) >> 3].read_safe(0xff), m_kbd_scan & 0x07) ? 0x00 : 0x80);
+	return BIT(m_keys[(m_kbd_scan & 0x78) >> 3].read_safe(0xff), m_kbd_scan & 0x07) ? 0x7f : 0xff;
 }
 
 void adm31_state::kbd_status_w(u8 data)

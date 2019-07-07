@@ -930,21 +930,21 @@ void gsword_state::gsword(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(18'000'000)/6);    /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu3_map);
 
-	upi41_cpu_device &mcu1(I8041(config, "mcu1", 12'000'000/2));        // clock unknown, using value from gladiatr
+	upi41_cpu_device &mcu1(I8041A(config, "mcu1", 12'000'000/2));        // clock unknown, using value from gladiatr
 	mcu1.p1_in_cb().set([this] () { return ioport("MCU1.P1")->read() | BIT(m_mcu2_p1, 0); });
 	mcu1.p1_out_cb().set([this] (uint8_t data) { m_mcu1_p1 = data; });
 	mcu1.p2_in_cb().set_ioport("DSW2");
 	mcu1.t0_in_cb().set([this] () { return m_tclk_val ? 1 : 0; });      // serial clock
 	mcu1.t1_in_cb().set([this] () { return BIT(m_mcu2_p1, 1); });       // from P11 on other MCU
 
-	upi41_cpu_device &mcu2(I8041(config, "mcu2", 12'000'000/2));        // clock unknown, using value from gladiatr
+	upi41_cpu_device &mcu2(I8041A(config, "mcu2", 12'000'000/2));        // clock unknown, using value from gladiatr
 	mcu2.p1_in_cb().set(FUNC(gsword_state::mcu2_p1_r));
 	mcu2.p1_out_cb().set([this] (uint8_t data) { m_mcu2_p1 = data; });
 	mcu2.p2_in_cb().set_ioport("DSW1");
 	mcu2.t0_in_cb().set([this] () { return m_tclk_val ? 1 : 0; });      // serial clock
 	mcu2.t1_in_cb().set([this] () { return BIT(m_mcu1_p1, 1); });       // from P11 on other MCU
 
-	upi41_cpu_device &mcu3(I8041(config, "mcu3", 12'000'000/2));        // clock unknown, using value from gladiatr
+	upi41_cpu_device &mcu3(I8041A(config, "mcu3", 12'000'000/2));        // clock unknown, using value from gladiatr
 	mcu3.p1_in_cb().set_ioport("IN0");
 	mcu3.p2_in_cb().set_ioport("IN1");
 	mcu3.p2_out_cb().set(FUNC(gsword_state::mcu3_p2_w));
@@ -998,13 +998,13 @@ void josvolly_state::josvolly(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu2_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(josvolly_state::irq0_line_assert));
 
-	upi41_cpu_device &mcu1(I8741(config, "mcu1", 18000000/2)); /* ? */
+	upi41_cpu_device &mcu1(I8741A(config, "mcu1", 18000000/2)); /* ? */
 	mcu1.p1_in_cb().set(FUNC(josvolly_state::mcu1_p1_r));
 	mcu1.p1_out_cb().set(FUNC(josvolly_state::mcu1_p1_w));
 	mcu1.p2_in_cb().set(FUNC(josvolly_state::mcu1_p2_r));
 	mcu1.p2_out_cb().set(FUNC(josvolly_state::mcu1_p2_w));
 
-	upi41_cpu_device &mcu2(I8741(config, "mcu2", 12000000/2)); /* ? */
+	upi41_cpu_device &mcu2(I8741A(config, "mcu2", 12000000/2)); /* ? */
 	mcu2.p1_in_cb().set(FUNC(josvolly_state::mcu2_p1_r));
 	mcu2.p1_out_cb().set(FUNC(josvolly_state::mcu2_p1_w));
 	mcu2.p2_in_cb().set(FUNC(josvolly_state::mcu2_p2_r));

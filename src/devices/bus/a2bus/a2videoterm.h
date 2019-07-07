@@ -4,7 +4,7 @@
 
     a2videoterm.h
 
-    Implementation of the Apple II Memory Expansion Card
+    Implementation of the Videx Videoterm 80-column card
 
 *********************************************************************/
 
@@ -93,15 +93,6 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-class a2bus_vtc2_device : public a2bus_videx80_device
-{
-public:
-	a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-};
-
 class a2bus_aevm80_device : public a2bus_videx80_device
 {
 public:
@@ -116,7 +107,6 @@ DECLARE_DEVICE_TYPE(A2BUS_VIDEOTERM,      a2bus_videoterm_device)
 DECLARE_DEVICE_TYPE(A2BUS_IBSAP16,        a2bus_ap16_device)
 DECLARE_DEVICE_TYPE(A2BUS_IBSAP16ALT,     a2bus_ap16alt_device)
 DECLARE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device)
-DECLARE_DEVICE_TYPE(A2BUS_VTC2,           a2bus_vtc2_device)
 DECLARE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device)
 
 #endif // MAME_BUS_A2BUS_A2VIDEOTERM_H

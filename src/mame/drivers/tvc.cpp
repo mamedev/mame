@@ -110,7 +110,7 @@ private:
 	DECLARE_READ8_MEMBER(exp_id_r);
 	DECLARE_WRITE8_MEMBER(expint_ack_w);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( tvc64);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -742,7 +742,7 @@ WRITE_LINE_MEMBER(tvc_state::centronics_ack)
 		m_centronics_ff = 1;
 }
 
-QUICKLOAD_LOAD_MEMBER( tvc_state, tvc64)
+QUICKLOAD_LOAD_MEMBER(tvc_state::quickload_cb)
 {
 	uint8_t first_byte;
 
@@ -766,7 +766,8 @@ void tvc_exp(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(tvc_state::tvc)
+void tvc_state::tvc(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 3125000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvc_state::tvc_mem);
@@ -824,17 +825,18 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tvc64_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("tvc_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", attotime::from_seconds(6))
+	QUICKLOAD(config, "quickload", "cas", attotime::from_seconds(6)).set_load_callback(FUNC(tvc_state::quickload_cb), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("tvc_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("tvc_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("tvc_flop");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( tvc64 )

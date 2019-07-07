@@ -742,26 +742,28 @@ void dlair_state::dlair_base(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(dlair_state::dlair_pr7820)
+void dlair_state::dlair_pr7820(machine_config &config)
+{
 	dlair_base(config);
 	PIONEER_PR7820(config, m_pr7820, 0);
 	m_pr7820->add_route(0, "lspeaker", 1.0);
 	m_pr7820->add_route(1, "rspeaker", 1.0);
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_pr7820")
-MACHINE_CONFIG_END
+	m_pr7820->add_ntsc_screen(config, "screen");
+}
 
 
-MACHINE_CONFIG_START(dlair_state::dlair_ldv1000)
+void dlair_state::dlair_ldv1000(machine_config &config)
+{
 	dlair_base(config);
 	PIONEER_LDV1000(config, m_ldv1000, 0);
 	m_ldv1000->add_route(0, "lspeaker", 1.0);
 	m_ldv1000->add_route(1, "rspeaker", 1.0);
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_ldv1000")
-MACHINE_CONFIG_END
+	m_ldv1000->add_ntsc_screen(config, "screen");
+}
 
 
-MACHINE_CONFIG_START(dlair_state::dleuro)
-
+void dlair_state::dleuro(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK_EURO/4);
 	m_maincpu->set_daisy_config(dleuro_daisy_chain);
@@ -785,7 +787,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	m_22vp932->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
+	m_22vp932->add_pal_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dlair);
 	PALETTE(config, m_palette, FUNC(dlair_state::dleuro_palette), 16);
@@ -797,7 +799,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
 	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
-MACHINE_CONFIG_END
+}
 
 
 

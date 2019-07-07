@@ -17,6 +17,7 @@
 #include "machine/i8155.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "speaker.h"
 #include "cp1.lh"
 
 class cp1_state : public driver_device
@@ -44,7 +45,7 @@ private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	DECLARE_READ8_MEMBER(i8155_read);
 	DECLARE_WRITE8_MEMBER(i8155_write);
@@ -242,7 +243,7 @@ void cp1_state::machine_reset()
 	m_cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
-QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
+QUICKLOAD_LOAD_MEMBER(cp1_state::quickload_cb)
 {
 	char line[0x10];
 	int addr = 0;
@@ -287,9 +288,13 @@ void cp1_state::cp1(machine_config &config)
 
 	config.set_default_layout(layout_cp1);
 
-	CASSETTE(config, m_cassette);
+	SPEAKER(config, "mono").front_center();
 
-	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cp1_state, quickload), this), "obj", attotime::from_seconds(1));
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	QUICKLOAD(config, "quickload", "obj", attotime::from_seconds(1)).set_load_callback(FUNC(cp1_state::quickload_cb), this);
 }
 
 /* ROM definition */

@@ -211,6 +211,7 @@ champbwl.cpp
 chanbara.cpp
 chance32.cpp
 changela.cpp
+changyu.cpp
 cheekyms.cpp
 chexx.cpp
 chicago.cpp
@@ -1272,6 +1273,7 @@ tnzs.cpp
 toaplan1.cpp
 toaplan2.cpp
 toki.cpp
+toki_ms.cpp
 tomcat.cpp
 tonton.cpp
 toobin.cpp

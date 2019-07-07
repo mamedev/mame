@@ -207,7 +207,7 @@ private:
 	DECLARE_WRITE16_MEMBER(sh7021_w);
 	DECLARE_READ8_MEMBER(bitmap_r);
 	DECLARE_WRITE8_MEMBER(bitmap_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(loopy_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void casloopy_map(address_map &map);
 	void casloopy_sub_map(address_map &map);
@@ -490,7 +490,7 @@ static const gfx_layout casloopy_8bpp_layoutROM =
 #endif
 
 
-DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
+DEVICE_IMAGE_LOAD_MEMBER( casloopy_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	uint8_t *SRC, *DST;
@@ -517,8 +517,8 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(casloopy_state::casloopy)
-
+void casloopy_state::casloopy(machine_config &config)
+{
 	/* basic machine hardware */
 	SH2A(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &casloopy_state::casloopy_map);
@@ -540,19 +540,18 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "loopy_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,ic1")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM32_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_LITTLE)
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(casloopy_state, loopy_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "loopy_cart", "bin,ic1"));
+	cartslot.set_width(GENERIC_ROM32_WIDTH);
+	cartslot.set_endian(ENDIANNESS_LITTLE);
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(casloopy_state::cart_load), this);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("casloopy");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

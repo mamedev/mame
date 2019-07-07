@@ -29,6 +29,18 @@ device_x68k_expansion_card_interface::~device_x68k_expansion_card_interface()
 {
 }
 
+uint8_t device_x68k_expansion_card_interface::iack2()
+{
+	device().logerror("Failed to acknowledge IRQ2\n");
+	return 0x18; // spurious interrupt
+}
+
+uint8_t device_x68k_expansion_card_interface::iack4()
+{
+	device().logerror("Failed to acknowledge IRQ4\n");
+	return 0x18; // spurious interrupt
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************

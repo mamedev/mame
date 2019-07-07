@@ -2415,17 +2415,19 @@ void viper_state::machine_reset()
 	m_ds2430_unk_status = 1;
 }
 
-MACHINE_CONFIG_START(viper_state::viper)
-
+void viper_state::viper(machine_config &config)
+{
 	/* basic machine hardware */
 	MPC8240(config, m_maincpu, 166666666); // Unknown
 	m_maincpu->set_bus_frequency(100000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
 	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, viper_state, mpc8240_pci_r, mpc8240_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(12, DEVICE_SELF, viper_state, voodoo3_pci_r, voodoo3_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read ( 0, FUNC(viper_state::mpc8240_pci_r), this);
+	pcibus.set_device_write( 0, FUNC(viper_state::mpc8240_pci_w), this);
+	pcibus.set_device_read (12, FUNC(viper_state::voodoo3_pci_r), this);
+	pcibus.set_device_write(12, FUNC(viper_state::voodoo3_pci_w), this);
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
@@ -2454,7 +2456,7 @@ MACHINE_CONFIG_START(viper_state::viper)
 	SPEAKER(config, "rspeaker").front_right();
 
 	M48T58(config, "m48t58", 0);
-MACHINE_CONFIG_END
+}
 
 /*****************************************************************************/
 

@@ -47,7 +47,6 @@ at least some models of the Poly-88 are known to have used.)
 #include "cpu/i8085/i8085.h"
 //#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -69,10 +68,10 @@ void poly88_state::poly88_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x04, 0x04).w(FUNC(poly88_state::poly88_baud_rate_w));
-	map(0x08, 0x08).w(FUNC(poly88_state::poly88_intr_w));
-	map(0xf8, 0xf8).r(FUNC(poly88_state::poly88_keyboard_r));
+	map(0x00, 0x01).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x04, 0x04).w(FUNC(poly88_state::baud_rate_w));
+	map(0x08, 0x08).w(FUNC(poly88_state::intr_w));
+	map(0xf8, 0xf8).r(FUNC(poly88_state::keyboard_r));
 }
 
 void poly88_state::poly8813_mem(address_map &map)
@@ -199,9 +198,10 @@ static GFXDECODE_START( gfx_poly88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, poly88_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(poly88_state::poly88)
+void poly88_state::poly88(machine_config &config)
+{
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(16'588'800) / 9); // uses 8224 clock generator
+	I8080A(config, m_maincpu, 16.5888_MHz_XTAL / 9); // uses 8224 clock generator
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly88_state::poly88_mem);
 	m_maincpu->set_addrmap(AS_IO, &poly88_state::poly88_io);
 	m_maincpu->set_vblank_int("screen", FUNC(poly88_state::poly88_interrupt));
@@ -222,21 +222,24 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_create_opts(&poly88_cassette_options);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* uart */
-	I8251(config, m_uart, XTAL(16'588'800) / 9);
-	m_uart->txd_handler().set(FUNC(poly88_state::write_cas_tx));
-	m_uart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
+	I8251(config, m_usart, 16.5888_MHz_XTAL / 9);
+	m_usart->txd_handler().set(FUNC(poly88_state::write_cas_tx));
+	m_usart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
+
+	MM5307AA(config, m_brg, 16.5888_MHz_XTAL / 18);
+	m_brg->output_cb().set(FUNC(poly88_state::cassette_txc_rxc_w));
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", attotime::from_seconds(2))
-MACHINE_CONFIG_END
+	SNAPSHOT(config, "snapshot", "img", attotime::from_seconds(2)).set_load_callback(FUNC(poly88_state::snapshot_cb), this);
+}
 
 void poly88_state::poly8813(machine_config &config)
 {

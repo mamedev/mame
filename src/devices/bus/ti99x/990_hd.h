@@ -18,8 +18,8 @@ public:
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ti990_hd );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_hd );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_hd );
 
 	template <typename T> void set_memory_space(T &&tag, int spacenum) { m_memory_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto int_cb() { return m_interrupt_callback.bind(); }

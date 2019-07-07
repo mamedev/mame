@@ -462,8 +462,8 @@ void deco_ld_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(deco_ld_state::rblaster)
-
+void deco_ld_state::rblaster(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 8000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::rblaster_map);
@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
 
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

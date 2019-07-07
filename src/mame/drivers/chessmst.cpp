@@ -15,6 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "machine/z80pio.h"
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 
@@ -36,13 +37,13 @@ public:
 		m_pio(*this, "z80pio%u", 0),
 		m_speaker(*this, "speaker"),
 		m_beeper(*this, "beeper"),
+		m_board(*this, "board"),
 		m_extra(*this, "EXTRA"),
 		m_buttons(*this, "BUTTONS"),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led_%c%u", unsigned('a'), 1U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_INPUT_CHANGED_MEMBER(view_monitor_button);
 
@@ -74,6 +75,7 @@ private:
 	required_device_array<z80pio_device, 2> m_pio;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<beep_device> m_beeper;
+	required_device<sensorboard_device> m_board;
 	required_ioport m_extra;
 	required_ioport m_buttons;
 	output_finder<4> m_digits;
@@ -81,7 +83,6 @@ private:
 
 	uint16_t m_matrix;
 	uint16_t m_led_sel;
-	uint8_t m_sensor[64];
 	uint8_t m_digit_matrix;
 	int m_digit_dot;
 	uint16_t m_digit;
@@ -141,91 +142,8 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 	}
 }
 
-INPUT_CHANGED_MEMBER(chessmst_state::chessmst_sensor)
-{
-	uint8_t pos = (uint8_t)(uintptr_t)param;
-
-	if (newval)
-	{
-		m_sensor[pos] = !m_sensor[pos];
-	}
-}
-
 /* Input ports */
 static INPUT_PORTS_START( chessmst )
-	PORT_START("COL_A")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  3)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  4)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  5)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  6)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  7)
-	PORT_START("COL_B")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  8)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor,  9)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 10)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 11)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 12)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 13)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 14)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 15)
-	PORT_START("COL_C")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 16)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 17)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 18)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 19)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 20)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 21)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 22)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 23)
-	PORT_START("COL_D")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 24)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 25)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 26)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 27)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 28)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 29)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 30)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 31)
-	PORT_START("COL_E")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 32)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 33)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 34)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 35)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 36)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 37)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 38)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 39)
-	PORT_START("COL_F")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 40)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 41)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 42)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 43)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 44)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 45)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 46)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 47)
-	PORT_START("COL_G")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 48)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 49)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 50)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 51)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 52)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 53)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 54)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 55)
-	PORT_START("COL_H")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 56)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 57)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 58)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 59)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 60)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 61)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 62)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, chessmst_sensor, 63)
-
 	PORT_START("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hint     [7]")    PORT_CODE(KEYCODE_7)    PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Random   [6]")    PORT_CODE(KEYCODE_6)    PORT_CODE(KEYCODE_R)
@@ -242,9 +160,7 @@ static INPUT_PORTS_START( chessmst )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chessmstdm )
-	PORT_INCLUDE(chessmst)
-
-	PORT_MODIFY("BUTTONS")
+	PORT_START("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Move Fore")               PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Move Back")               PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Board")                   PORT_CODE(KEYCODE_B)
@@ -254,7 +170,7 @@ static INPUT_PORTS_START( chessmstdm )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Function / Notation")     PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Enter")                   PORT_CODE(KEYCODE_ENTER)
 
-	PORT_MODIFY("EXTRA")
+	PORT_START("EXTRA")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Monitor")                 PORT_CODE(KEYCODE_F1)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, view_monitor_button, 0)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View")                    PORT_CODE(KEYCODE_F2)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, view_monitor_button, 0)
 INPUT_PORTS_END
@@ -267,7 +183,6 @@ void chessmst_state::machine_start()
 
 	save_item(NAME(m_matrix));
 	save_item(NAME(m_led_sel));
-	save_item(NAME(m_sensor));
 	save_item(NAME(m_digit_matrix));
 	save_item(NAME(m_digit_dot));
 	save_item(NAME(m_digit));
@@ -275,12 +190,6 @@ void chessmst_state::machine_start()
 
 void chessmst_state::machine_reset()
 {
-	//reset all sensors
-	memset(m_sensor, 1, sizeof(m_sensor));
-
-	//positioning the pieces for start next game
-	for (int i=0; i<64; i+=8)
-		m_sensor[i+0] = m_sensor[i+1] = m_sensor[i+6] = m_sensor[i+7] = 0;
 }
 
 void chessmst_state::update_display()
@@ -348,11 +257,10 @@ READ8_MEMBER( chessmst_state::pio2_port_a_r )
 	// The pieces position on the chessboard is identified by 64 Hall
 	// sensors, which are in a 8x8 matrix with the corresponding LEDs.
 	for (int i=0; i<8; i++)
-		for (int j=0; j<8; j++)
-		{
-			if (m_matrix & (1 << j))
-				data |= (m_sensor[j * 8 + i] ? (1 << i) : 0);
-		}
+	{
+		if (m_matrix & (1 << i))
+			data |= ~m_board->read_file(i);
+	}
 
 	if (m_matrix & 0x100)
 		data |= m_buttons->read();
@@ -397,6 +305,11 @@ void chessmst_state::chessmst(machine_config &config)
 
 	config.set_default_layout(layout_chessmst);
 
+	SENSORBOARD(config, m_board);
+	m_board->set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -420,6 +333,11 @@ void chessmst_state::chessmsta(machine_config &config)
 	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmst);
+
+	SENSORBOARD(config, m_board);
+	m_board->set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -445,6 +363,11 @@ void chessmst_state::chessmstdm(machine_config &config)
 	m_pio[1]->out_pb_callback().set(FUNC(chessmst_state::pio2_port_b_w));
 
 	config.set_default_layout(layout_chessmstdm);
+
+	SENSORBOARD(config, m_board);
+	m_board->set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
 
 	clock_device &_555_timer(CLOCK(config, "555_timer", 500)); // from 555 timer
 	_555_timer.signal_handler().set(FUNC(chessmst_state::timer_555_w));
@@ -488,6 +411,6 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY                       FULLNAME                FLAGS
-COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

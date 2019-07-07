@@ -279,7 +279,6 @@ SamRam
 #include "includes/spectrum.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "machine/spec_snqk.h"
 
 #include "screen.h"
@@ -706,7 +705,6 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* expansion port */
@@ -715,14 +713,13 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* devices */
-	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot"));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(spectrum_state, spectrum), this), "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx");
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(spectrum_state, spectrum), this), "raw,scr", attotime::from_seconds(2)); // The delay prevents the screen from being cleared by the RAM test at boot
+	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx").set_load_callback(FUNC(spectrum_state::snapshot_cb), this);
+	QUICKLOAD(config, "quickload", "raw,scr", attotime::from_seconds(2)).set_load_callback(FUNC(spectrum_state::quickload_cb), this); // The delay prevents the screen from being cleared by the RAM test at boot
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("spectrum_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");

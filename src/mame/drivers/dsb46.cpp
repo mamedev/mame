@@ -17,12 +17,10 @@ S - Alter memory
 
 
 The photos show 3 boards:
-- A scsi board (all 74-series TTL)
+- A "SASI Interface" board (all 74-series TTL)
 - CPU board (64k dynamic RAM, Z80A CPU, 2x Z80CTC, 2x Z80SIO/0, MB8877A, Z80DMA, 4x MC1488,
   4x MC1489, XTALS 1.8432MHz and 24MHz)
-- ADES board (Adaptec Inc AIC-100, AIC-250, AIC-300, Intel D8086AH, unknown crystal)
-
-Both roms contain Z80 code.
+- ADES board (Adaptec Inc AIC-100, AIC-250, AIC-300, Intel D8085AH, unknown crystal)
 
 
 ********************************************************************************************************************/

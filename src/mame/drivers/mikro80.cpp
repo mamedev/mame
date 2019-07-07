@@ -14,7 +14,6 @@
 #include "formats/rk_cas.h"
 #include "includes/mikro80.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -190,11 +189,11 @@ void mikro80_state::mikro80(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(rk8_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("mikro80_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mikro80");

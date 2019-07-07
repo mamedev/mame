@@ -229,7 +229,6 @@ private:
 	typedef void (m37710_cpu_device::*opcode_func)();
 	typedef uint32_t (m37710_cpu_device::*get_reg_func)(int regnum);
 	typedef void (m37710_cpu_device::*set_reg_func)(int regnum, uint32_t val);
-	typedef void (m37710_cpu_device::*set_line_func)(int line, int state);
 	typedef int  (m37710_cpu_device::*execute_func)(int cycles);
 
 	static const int m37710_irq_levels[M37710_INTERRUPT_MAX];
@@ -241,7 +240,6 @@ private:
 	static const opcode_func *const m37710i_opcodes3[4];
 	static const get_reg_func m37710i_get_reg[4];
 	static const set_reg_func m37710i_set_reg[4];
-	static const set_line_func m37710i_set_line[4];
 	static const execute_func m37710i_execute[4];
 	static const opcode_func m37710i_opcodes_M0X0[];
 	static const opcode_func m37710i_opcodes_M0X1[];
@@ -261,7 +259,6 @@ private:
 	const opcode_func *m_opcodes89;  /* opcodes with 0x89 prefix */
 	get_reg_func m_get_reg;
 	set_reg_func m_set_reg;
-	set_line_func m_set_line;
 	execute_func m_execute;
 
 	// Implementation
@@ -277,10 +274,6 @@ private:
 	void m37710i_set_reg_M0X1(int regnum, uint32_t val);
 	void m37710i_set_reg_M1X0(int regnum, uint32_t val);
 	void m37710i_set_reg_M1X1(int regnum, uint32_t val);
-	void m37710i_set_line_M0X0(int line, int state);
-	void m37710i_set_line_M0X1(int line, int state);
-	void m37710i_set_line_M1X0(int line, int state);
-	void m37710i_set_line_M1X1(int line, int state);
 	int m37710i_execute_M0X0(int cycles);
 	int m37710i_execute_M0X1(int cycles);
 	int m37710i_execute_M1X0(int cycles);

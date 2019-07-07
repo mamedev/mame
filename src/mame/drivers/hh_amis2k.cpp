@@ -9,14 +9,12 @@
   - were any other handhelds with this MCU released?
   - wildfire sound can be improved, volume decay should be more steep at the start,
     and the pitch sounds wrong too (latter is an MCU emulation problem)
-  - leds are sometimes strobed faster/longer to appear at a different brightness,
-    eg. wildfire bumpers
 
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "cpu/amis2000/amis2000.h"
+#include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -33,23 +31,16 @@ public:
 	hh_amis2k_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u", 0U, 0U),
-		m_out_a(*this, "%u.a", 0U),
-		m_out_digit(*this, "digit%u", 0U),
+		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<amis2000_base_device> m_maincpu;
-	optional_ioport_array<4> m_inp_matrix; // max 4
-	output_finder<0x20, 0x20> m_out_x;
-	output_finder<0x20> m_out_a;
-	output_finder<0x20> m_out_digit;
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
 	u16 m_a;                        // MCU address bus
@@ -58,21 +49,6 @@ public:
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
 	u8 read_inputs(int columns);
-
-	// display common
-	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
-	int m_display_maxy;             // display matrix number of rows
-	int m_display_maxx;             // display matrix number of columns (max 31 for now)
-
-	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
-	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u8 m_display_decay[0x20][0x20]; // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(u32 digits, u32 mask);
-	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -84,30 +60,13 @@ protected:
 
 void hh_amis2k_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-	m_out_a.resolve();
-	m_out_digit.resolve();
-
 	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-
 	m_a = 0;
 	m_d = 0;
 	m_f = 0;
 	m_inp_mux = 0;
 
 	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
 	save_item(NAME(m_a));
 	save_item(NAME(m_d));
 	save_item(NAME(m_f));
@@ -126,80 +85,6 @@ void hh_amis2k_state::machine_reset()
 
 ***************************************************************************/
 
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void hh_amis2k_state::display_update()
-{
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		u32 active_state = 0;
-
-		for (int x = 0; x <= m_display_maxx; x++)
-		{
-			// turn on powered segments
-			if (m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
-
-			// determine active state
-			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state |= (ds << x);
-
-			// output to y.x, or y.a when always-on
-			if (x != m_display_maxx)
-				m_out_x[y][x] = ds;
-			else
-				m_out_a[y] = ds;
-		}
-
-		// output to digity
-		if (m_display_segmask[y] != 0)
-			m_out_digit[y] = active_state & m_display_segmask[y];
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(hh_amis2k_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x <= m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-
-	display_update();
-}
-
-void hh_amis2k_state::set_display_size(int maxx, int maxy)
-{
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-}
-
-void hh_amis2k_state::set_display_segmask(u32 digits, u32 mask)
-{
-	// set a segment mask per selected digit, but leave unselected ones alone
-	for (int i = 0; i < 0x20; i++)
-	{
-		if (digits & 1)
-			m_display_segmask[i] = mask;
-		digits >>= 1;
-	}
-}
-
-void hh_amis2k_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
-{
-	set_display_size(maxx, maxy);
-
-	// update current state
-	u32 mask = (1 << maxx) - 1;
-	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
-
-	if (update)
-		display_update();
-}
-
-
 // generic input handlers
 
 u8 hh_amis2k_state::read_inputs(int columns)
@@ -209,7 +94,7 @@ u8 hh_amis2k_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -260,7 +145,7 @@ public:
 		hh_amis2k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
 	DECLARE_WRITE_LINE_MEMBER(write_f);
@@ -300,25 +185,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
 	m_speaker_volume /= 1.0025;
 }
 
-void wildfire_state::prepare_display()
+void wildfire_state::update_display()
 {
-	// A0-A2 are 7segs
-	set_display_segmask(7, 0x7f);
-	display_matrix(8, 12, m_d, ~m_a);
+	m_display->matrix(~m_a, m_d);
 }
 
 WRITE8_MEMBER(wildfire_state::write_d)
 {
 	// D0-D7: led/7seg data
 	m_d = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(wildfire_state::write_a)
 {
-	// A0-A11: digit/led select
+	// A0-A2: digit select
+	// A3-A11: led select
 	m_a = data;
-	prepare_display();
+	update_display();
 
 	// A12: speaker on
 	speaker_update();
@@ -348,8 +232,6 @@ static const u8 wildfire_7seg_table[0x10] =
 	0x7f, 0x6f, 0x77, 0x73, 0x39, 0x38, 0x79, 0x40  // 8, 9, ?, P, ?, L, ?, -
 };
 
-static s16 wildfire_speaker_levels[0x8000];
-
 void wildfire_state::wildfire(machine_config &config)
 {
 	/* basic machine hardware */
@@ -360,7 +242,10 @@ void wildfire_state::wildfire(machine_config &config)
 	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
 	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_amis2k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(12, 8);
+	m_display->set_segmask(7, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // bumpers are dimmed
 	config.set_default_layout(layout_wildfire);
 
 	/* sound hardware */
@@ -370,9 +255,10 @@ void wildfire_state::wildfire(machine_config &config)
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(wildfire_state::speaker_decay_sim), attotime::from_usec(100));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	static s16 speaker_levels[0x8000];
 	for (int i = 0; i < 0x8000; i++)
-		wildfire_speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, wildfire_speaker_levels);
+		speaker_levels[i] = i;
+	m_speaker->set_levels(0x8000, speaker_levels);
 }
 
 // roms

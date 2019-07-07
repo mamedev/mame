@@ -20,14 +20,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_LDV1000_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PIONEER_LDV1000, 0)
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -47,7 +39,7 @@ class pioneer_ldv1000_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto command_strobe_callback() { return m_command_strobe_cb.bind(); }
 

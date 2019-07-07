@@ -2,30 +2,30 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Intel 8275 Programmable CRT Controller emulation
+    Intel 8275/8276 CRT Controller emulation
 
 **********************************************************************
-                            _____   _____
-                   LC3   1 |*    \_/     | 40  Vcc
-                   LC2   2 |             | 39  LA0
-                   LC1   3 |             | 38  LA1
-                   LC0   4 |             | 37  LTEN
-                   DRQ   5 |             | 36  RVV
-                 _DACK   6 |             | 35  VSP
-                  HRTC   7 |             | 34  GPA1
-                  VRTC   8 |             | 33  GPA0
-                   _RD   9 |             | 32  HLGT
-                   _WR  10 |     8275    | 31  IRQ
-                  LPEN  11 |             | 30  CCLK
-                   DB0  12 |             | 29  CC6
-                   DB1  13 |             | 28  CC5
-                   DB2  14 |             | 27  CC4
-                   DB3  15 |             | 26  CC3
-                   DB4  16 |             | 25  CC2
-                   DB5  17 |             | 24  CC1
-                   DB6  18 |             | 23  CC0
-                   DB7  19 |             | 22  _CS
-                   GND  20 |_____________| 21  A0
+             ____   ____                       ____   ____
+    LC3   1 |*   \_/    | 40  Vcc     LC3   1 |*   \_/    | 40  Vcc
+    LC2   2 |           | 39  LA0     LC2   2 |           | 39  NC
+    LC1   3 |           | 38  LA1     LC1   3 |           | 38  NC
+    LC0   4 |           | 37  LTEN    LC0   4 |           | 37  LTEN
+    DRQ   5 |           | 36  RVV    BRDY   5 |           | 36  RVV
+  _DACK   6 |           | 35  VSP     _BS   6 |           | 35  VSP
+   HRTC   7 |           | 34  GPA1   HRTC   7 |           | 34  GPA1
+   VRTC   8 |           | 33  GPA0   VRTC   8 |           | 33  GPA0
+    _RD   9 |           | 32  HLGT    _RD   9 |           | 32  HLGT
+    _WR  10 |    8275   | 31  IRQ     _WR  10 |    8276   | 31  INT
+   LPEN  11 |           | 30  CCLK     NC  11 |           | 30  CCLK
+    DB0  12 |           | 29  CC6     DB0  12 |           | 29  CC6
+    DB1  13 |           | 28  CC5     DB1  13 |           | 28  CC5
+    DB2  14 |           | 27  CC4     DB2  14 |           | 27  CC4
+    DB3  15 |           | 26  CC3     DB3  15 |           | 26  CC3
+    DB4  16 |           | 25  CC2     DB4  16 |           | 25  CC2
+    DB5  17 |           | 24  CC1     DB5  17 |           | 24  CC1
+    DB6  18 |           | 23  CC0     DB6  18 |           | 23  CC0
+    DB7  19 |           | 22  _CS     DB7  19 |           | 22  _CS
+    GND  20 |___________| 21  A0      GND  20 |___________| 21  C/_P
 
 **********************************************************************/
 
@@ -61,6 +61,7 @@ public:
 	i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_character_width(int value) { m_hpixels_per_column = value; }
+	void set_refresh_hack(bool hack) { m_refresh_hack = hack; }
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = draw_character_delegate(std::forward<T>(args)...); }
 	void set_display_callback(draw_character_delegate callback) { m_display_cb = callback; }
 	template <class FunctionClass> void set_display_callback(const char *devname,
@@ -80,6 +81,7 @@ public:
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto hrtc_wr_callback() { return m_write_hrtc.bind(); }
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
+	auto lc_wr_callback() { return m_write_lc.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -181,9 +183,11 @@ protected:
 	devcb_write_line   m_write_drq;
 	devcb_write_line   m_write_hrtc;
 	devcb_write_line   m_write_vrtc;
+	devcb_write8       m_write_lc;
 
 	draw_character_delegate m_display_cb;
 	int m_hpixels_per_column;
+	bool m_refresh_hack;
 
 	bitmap_rgb32 m_bitmap;
 

@@ -56,7 +56,7 @@ public:
 		, m_ppi(*this, "ppi8255")
 		, m_screen(*this, "screen")
 		, m_upd72065(*this, "upd72065")
-		, m_expansion(*this, "exp")
+		, m_expansion(*this, "exp%u", 1U)
 		, m_adpcm_out(*this, {"adpcm_outl", "adpcm_outr"})
 		, m_options(*this, "options")
 		, m_mouse1(*this, "mouse1")
@@ -91,7 +91,6 @@ protected:
 		TIMER_MD_6BUTTON_PORT1_TIMEOUT,
 		TIMER_MD_6BUTTON_PORT2_TIMEOUT,
 		TIMER_X68K_BUS_ERROR,
-		TIMER_X68K_NET_IRQ,
 		TIMER_X68K_FDC_TC,
 		TIMER_X68K_ADPCM
 	};
@@ -119,7 +118,7 @@ protected:
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
 	required_device<upd72065_device> m_upd72065;
-	required_device<x68k_expansion_slot_device> m_expansion;
+	required_device_array<x68k_expansion_slot_device, 2> m_expansion;
 
 	required_device_array<filter_volume_device, 2> m_adpcm_out;
 
@@ -202,16 +201,17 @@ protected:
 	} m_video;
 	struct
 	{
-		int irqstatus;
-		int fdcvector;
-		int fddvector;
-		int hdcvector;
-		int prnvector;
+		uint8_t irqstatus;
+		uint8_t fdcvector;
+		uint8_t fddvector;
+		uint8_t hdcvector;
+		uint8_t prnvector;
 	} m_ioc;
 	struct
 	{
 		int inputtype;  // determines which input is to be received
-		int irqactive;  // non-zero if IRQ is being serviced
+		bool irqactive;  // true if IRQ is being serviced
+		uint8_t irqvector;
 		char last_mouse_x;  // previous mouse x-axis value
 		char last_mouse_y;  // previous mouse y-axis value
 		int bufferempty;  // non-zero if buffer is empty
@@ -228,15 +228,17 @@ protected:
 		emu_timer* io_timeout2;
 	} m_mdctrl;
 	uint8_t m_ppi_port[3];
-	int m_current_vector[8];
-	//uint8_t m_current_irq_line;
+	bool m_dmac_int;
+	bool m_mfp_int;
+	bool m_exp_irq2[2];
+	bool m_exp_irq4[2];
+	bool m_exp_nmi[2];
+	uint8_t m_current_ipl;
 	int m_led_state;
 	emu_timer* m_mouse_timer;
 	emu_timer* m_led_timer;
-	emu_timer* m_net_timer;
 	unsigned char m_scc_prev;
 	uint16_t m_ppi_prev;
-	int m_mfp_prev;
 	emu_timer* m_fdc_tc;
 	emu_timer* m_adpcm_timer;
 	emu_timer* m_bus_error_timer;
@@ -259,7 +261,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
 	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
 	TIMER_CALLBACK_MEMBER(bus_error);
-	TIMER_CALLBACK_MEMBER(net_irq);
 	DECLARE_READ8_MEMBER(ppi_port_a_r);
 	DECLARE_READ8_MEMBER(ppi_port_b_r);
 	DECLARE_READ8_MEMBER(ppi_port_c_r);
@@ -281,8 +282,9 @@ protected:
 	uint8_t xpd1lr_r(int port);
 
 	DECLARE_WRITE_LINE_MEMBER(fm_irq);
-	DECLARE_WRITE_LINE_MEMBER(irq2_line);
-	DECLARE_WRITE_LINE_MEMBER(irq4_line);
+	template <int N> DECLARE_WRITE_LINE_MEMBER(irq2_line);
+	template <int N> DECLARE_WRITE_LINE_MEMBER(irq4_line);
+	template <int N> DECLARE_WRITE_LINE_MEMBER(nmi_line);
 
 	DECLARE_WRITE16_MEMBER(scc_w);
 	DECLARE_READ16_MEMBER(scc_r);
@@ -317,8 +319,11 @@ protected:
 	DECLARE_READ16_MEMBER(gvram_read);
 	DECLARE_WRITE16_MEMBER(gvram_write);
 
-	template <int Line> uint8_t int_ack();
-	uint8_t mfp_ack();
+	void update_ipl();
+	uint8_t iack1();
+	uint8_t iack2();
+	uint8_t iack4();
+	uint8_t iack5();
 
 	void x68k_base_map(address_map &map);
 	void x68k_map(address_map &map);

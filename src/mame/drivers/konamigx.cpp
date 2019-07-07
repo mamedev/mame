@@ -1634,7 +1634,7 @@ void konamigx_state::konamigx(machine_config &config)
 	/* These parameters are actual value written to the CCU.
 	tbyahhoo attract mode desync is caused by another matter. */
 
-	//MCFG_SCREEN_vblank_time(ATTOSECONDS_IN_USEC(600))
+	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
 	// TODO: WTF, without these most games crashes? Some legacy call in video code???
 	m_screen->set_size(1024, 1024);
 	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
@@ -3932,8 +3932,8 @@ GAME( 1994, konamigx,  0,        konamigx_bios, konamigx, konamigx_state, init_k
 /* needs the ROZ layer to be playable */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
-GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 GAME( 1994, opengolf,  konamigx, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 GAME( 1994, opengolf2, opengolf, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )

@@ -602,8 +602,8 @@ void pinball2k_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(pinball2k_state::mediagx)
-
+void pinball2k_state::mediagx(machine_config &config)
+{
 	/* basic machine hardware */
 	MEDIAGX(config, m_maincpu, 166000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pinball2k_state::mediagx_map);
@@ -612,8 +612,9 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, pinball2k_state, cx5510_pci_r, cx5510_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (18, FUNC(pinball2k_state::cx5510_pci_r), this);
+	pcibus.set_device_write(18, FUNC(pinball2k_state::cx5510_pci_w), this);
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -634,7 +635,7 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 
 void pinball2k_state::init_mediagx()

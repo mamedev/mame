@@ -252,8 +252,8 @@ void mvme147_state::mvme147_mem(address_map &map)
 	map(0xfffe1018, 0xfffe102f).rw(FUNC(mvme147_state::pcc8_r), FUNC(mvme147_state::pcc8_w)); /* PCC 8 bits registers */
 	map(0xfffe2000, 0xfffe201b).rw(FUNC(mvme147_state::vmechip_r), FUNC(mvme147_state::vmechip_w)).umask32(0x00ff00ff); /* VMEchip 8 bits registers on odd adresses */
 
-	map(0xfffe3000, 0xfffe3003).rw(m_sccterm, FUNC(scc85c30_device::ba_cd_inv_r), FUNC(scc85c30_device::ba_cd_inv_w)); /* Port 1&2 - Dual serial port Z80-SCC */
-	map(0xfffe3800, 0xfffe3803).rw(m_sccterm2, FUNC(scc85c30_device::ba_cd_inv_r), FUNC(scc85c30_device::ba_cd_inv_w)); /* Port 3&4 - Dual serial port Z80-SCC */
+	map(0xfffe3000, 0xfffe3003).rw(m_sccterm, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w)); /* Port 1&2 - Dual serial port Z80-SCC */
+	map(0xfffe3800, 0xfffe3803).rw(m_sccterm2, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w)); /* Port 3&4 - Dual serial port Z80-SCC */
 
 	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */

@@ -138,15 +138,15 @@ WRITE32_MEMBER(gizmondo_state::s3c2440_gpio_port_w)
 
 INPUT_CHANGED_MEMBER(gizmondo_state::port_changed)
 {
-	m_s3c2440->s3c2440_request_eint( 4);
-	//m_s3c2440->s3c2440_request_irq( S3C2440_INT_EINT1);
+	m_s3c2440->s3c2440_request_eint(4);
+	//m_s3c2440->s3c2440_request_irq(S3C2440_INT_EINT1);
 }
 
 #if 0
-QUICKLOAD_LOAD_MEMBER( gizmondo_state, gizmondo )
+QUICKLOAD_LOAD_MEMBER(gizmondo_state::quickload_cb)
 {
-	return gizmondo_quickload( image, file_type, quickload_size, 0x3000E000); // eboot
-	//return gizmondo_quickload( image, file_type, quickload_size, 0x30400000); // wince
+	return gizmondo_quickload(image, file_type, quickload_size, 0x3000E000); // eboot
+	//return gizmondo_quickload(image, file_type, quickload_size, 0x30400000); // wince
 }
 #endif
 
@@ -214,7 +214,7 @@ void gizmondo_state::gizmondo(machine_config &config)
 	DISKONCHIP_G3(config, "diskonchip", 64);
 
 #if 0
-	MCFG_QUICKLOAD_ADD("quickload", gizmondo_state, wince, "bin", 0)
+	QUICKLOAD(config, "quickload", "bin", 0).set_load_callback(FUNC(gizmondo_state::quickload_cb), this);
 #endif
 }
 

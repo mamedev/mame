@@ -112,9 +112,9 @@ bool coco3_state::irq_get_line(void)
 //  update_keyboard_input
 //-------------------------------------------------
 
-void coco3_state::update_keyboard_input(uint8_t value, uint8_t z)
+void coco3_state::update_keyboard_input(uint8_t value)
 {
-	coco_state::update_keyboard_input(value, z);
+	coco_state::update_keyboard_input(value);
 	m_gime->set_il1(value == 0xFF);
 }
 

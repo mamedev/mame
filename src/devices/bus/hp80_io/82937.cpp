@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER(hp82937_io_card_device::ieee488_ctrl_w)
 }
 
 static INPUT_PORTS_START(hp82937_port)
-	MCFG_HP80_IO_SC(7)
+	PORT_HP80_IO_SC(7)
 	PORT_START("sw1")
 	PORT_DIPNAME(0x1f , 0x15 , "HPIB address")
 	PORT_DIPLOCATION("S1:7,6,5,4,3")

@@ -631,6 +631,37 @@ void cb3_state::ncb3_map(address_map &map)
 	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 }
 
+void cb3_state::chryangla_map(address_map &map) // most to be verified when the game will show more than test screens only
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
+
+	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf820, 0xf823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xf822, 0xf822).w(FUNC(cb3_state::goldstar_fa00_w)); // hack (connected to ppi output port?, needed for colour banking)
+
+	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
+	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+}
+
+void cb3_state::chryangla_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+	map(0xf800, 0xffff).ram();
+}
+
 void goldstar_state::ncb3_readwriteport(address_map &map)
 {
 	map.global_mask(0xff);
@@ -673,7 +704,6 @@ void goldstar_state::ncb3_readwriteport(address_map &map)
   So, seems that control set 2 was meant for non-stop reels.
 
 */
-
 
 void goldstar_state::wcherry_map(address_map &map)
 {
@@ -817,6 +847,11 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
+void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom().share("decrypted_opcodes");
+	map(0xf800, 0xffff).ram();
+}
 
 void goldstar_state::pkrmast_portmap(address_map &map)
 {
@@ -8695,6 +8730,16 @@ void cb3_state::cb3e(machine_config &config)
 	m_gfxdecode->set_info(gfx_cb3e);
 }
 
+void cb3_state::chryangla(machine_config &config)
+{
+	ncb3(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb3_state::chryangla_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &cb3_state::chryangla_decrypted_opcodes_map);
+
+	m_palette->set_init(FUNC(goldstar_state::lucky8_palette));
+}
+
 void cb3_state::chrygld(machine_config &config)
 {
 	ncb3(config);
@@ -8806,6 +8851,12 @@ void cmaster_state::cmasterc(machine_config &config)
 	m_gfxdecode->set_info(gfx_cmasterc);
 }
 
+void cmaster_state::chryangl(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
+}
 
 void goldstar_state::cmast91(machine_config &config)
 {
@@ -11096,7 +11147,10 @@ ROM_END
 // the program roms on these seem scrambled somehow
 ROM_START( jkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pid-515.u5",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_LOAD( "pid-515.u5",  0x4000, 0x4000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_CONTINUE(0xc000, 0x4000)
+	ROM_CONTINUE(0x8000, 0x4000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
@@ -11113,7 +11167,10 @@ ROM_END
 
 ROM_START( jkrmasta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pid-513.u5",  0x0000, 0x10000, CRC(12fa7ea0) SHA1(71ee141fe01ae2ce9913620b52c54cf445fd0b00) )
+	ROM_LOAD( "pid-513.u5",  0x4000, 0x4000, CRC(12fa7ea0) SHA1(71ee141fe01ae2ce9913620b52c54cf445fd0b00) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_CONTINUE(0xc000, 0x4000)
+	ROM_CONTINUE(0x8000, 0x4000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
@@ -15951,6 +16008,33 @@ void goldstar_state::init_goldstar()
 	}
 }
 
+void goldstar_state::init_jkrmast()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int A = 0; A < 0x8000; A++)
+	{
+		uint8_t x = ROM[A];
+		x = bitswap<8>(x ^ 0x0a, 5, 6, 1, 4, 7, 2, 3, 0);
+		ROM[A] = x;
+	}
+
+	uint8_t buf[0x8000];
+	memcpy(buf, ROM, 0x8000);
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		if ((i & 0x60) == 0x00)
+			ROM[i] = buf[i^0x08];
+		else if ((i & 0x60) == 0x60)
+			ROM[i] = buf[i^0x10];
+		else if ((i & 0x60) == 0x40)
+			ROM[i] = buf[i^0x18];
+		else if ((i & 0x60) == 0x20)
+			ROM[i] = buf[i];
+	}
+}
+
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
 void cb3_state::do_blockswaps(uint8_t* ROM)
@@ -16053,6 +16137,47 @@ void cb3_state::init_cb3()
 	dump_to_file(ROM);
 }
 
+void goldstar_state::init_chryangl()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0xa0, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x82, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x08, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = ROM[i];
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x22, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x2a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x82, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x2a, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0xa8, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x88, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x22, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x88, 1, 6, 7, 4, 5, 2, 3, 0); break;
+		}
+
+		ROM[i] = x;
+	}
+}
 
 void cb3_state::init_chrygld()
 {
@@ -16717,11 +16842,12 @@ GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3, 
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
 GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
 GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
+GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
 
 // looks like a hack of Cherry Bonus 3
-GAME(  199?, chryangl,  ncb3,     cm,       chryangl, cmaster_state,  init_cmv4,      ROT0, "<unknown>",         "Cherry Angel",                                MACHINE_NOT_WORKING )
+GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
@@ -16749,8 +16875,8 @@ GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
-GAME(  199?, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encrypted
-GAME(  199?, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Joker Master (V512)",                         MACHINE_NOT_WORKING ) // encrypted
+GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
+GAME(  1999, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V512)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 
@@ -16776,7 +16902,6 @@ GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
-GAME(  198?, chryangla, ncb3,     lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Cherry Angel (encrypted, W-4 hardware)",                   MACHINE_NOT_WORKING )
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner",                                               0 )
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )

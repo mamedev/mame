@@ -55,6 +55,7 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
+	, m_dr_breakpoints{nullptr, nullptr, nullptr, nullptr}
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
@@ -400,6 +401,7 @@ uint16_t i386_device::READ16PL(uint32_t ea, uint8_t privilege)
 	{
 	case 0:
 	case 2:
+	default:
 		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
 
@@ -432,6 +434,7 @@ uint32_t i386_device::READ32PL(uint32_t ea, uint8_t privilege)
 	switch (ea & 3)
 	{
 	case 0:
+	default:
 		if(!translate_address(privilege,TRANSLATE_READ,&address,&error))
 			PF_THROW(error);
 
@@ -476,6 +479,7 @@ uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 	switch (ea & 3)
 	{
 	case 0:
+	default:
 		value = READ32PL(ea, privilege);
 		value |= uint64_t(READ32PL(ea + 2, privilege)) << 32;
 		break;
@@ -1155,6 +1159,7 @@ uint16_t i386_device::READPORT16(offs_t port)
 	{
 	case 0:
 	case 2:
+	default:
 		check_ioperm(port, 3);
 		value = m_io->read_word(port);
 		break;
@@ -1202,6 +1207,7 @@ uint32_t i386_device::READPORT32(offs_t port)
 	switch (port & 3)
 	{
 	case 0:
+	default:
 		check_ioperm(port, 0xf);
 		value = m_io->read_dword(port);
 		break;
@@ -1997,6 +2003,7 @@ void i386_device::i386_common_init()
 
 	save_item(NAME(m_CPL));
 
+	save_item(NAME(m_auto_clear_RF));
 	save_item(NAME(m_performed_intersegment_jump));
 
 	save_item(NAME(m_cr));
@@ -2037,6 +2044,10 @@ void i386_device::i386_common_init()
 	m_ferr_handler(0);
 
 	set_icountptr(m_cycles);
+	m_notifier = m_program->add_change_notifier([this](read_or_write mode)
+	{
+		dri_changed();
+	});
 }
 
 void i386_device::device_start()
@@ -2483,6 +2494,8 @@ void i386_device::device_reset()
 
 	m_CPL = 0;
 
+	m_auto_clear_RF = true;
+
 	CHANGE_PC(m_eip);
 }
 
@@ -2737,6 +2750,36 @@ void i386_device::execute_run()
 	while( m_cycles > 0 )
 	{
 		i386_check_irq_line();
+
+		// The LE and GE bits of DR7 aren't currently implemented because they could potentially require cycle-accurate emulation.
+		if((m_dr[7] & 0xff) != 0) // If all of the breakpoints are disabled, skip checking for instruction breakpoint hitting entirely.
+		for(int i = 0; i < 4; i++)
+		{
+			bool dri_enabled = (m_dr[7] & (1 << ((i << 1) + 1))) || (m_dr[7] & (1 << (i << 1))); // Check both local AND global enable bits for this breakpoint.
+			if(dri_enabled && !m_RF)
+			{
+				int breakpoint_type = (m_dr[7] >> (i << 2)) & 3;
+				int breakpoint_length = (m_dr[7] >> ((i << 2) + 2)) & 3;
+				if(breakpoint_type == 0)
+				{
+					uint32_t phys_addr = 0;
+					uint32_t error;
+					phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TRANSLATE_FETCH, &m_dr[i], &error) : m_dr[i];
+					if(breakpoint_length != 0) // Not one byte in length? logerror it, I have no idea how this works on real processors.
+					{
+						logerror("i386: Breakpoint length not 1 byte on an instruction breakpoint\n");
+					}
+					if(m_pc == phys_addr)
+					{
+						// The processor never automatically clears bits in DR6. It only sets them.
+						m_dr[6] |= 1 << i;
+						i386_trap(1,0,0);
+						break;
+					}
+				}
+			}
+		}
+
 		m_operand_size = m_sreg[CS].d;
 		m_xmm_operand_size = 0;
 		m_address_size = m_sreg[CS].d;
@@ -2767,6 +2810,7 @@ void i386_device::execute_run()
 			{
 				m_prev_eip = m_eip;
 				m_ext = 1;
+				m_dr[6] |= (1 << 14); //Set BS bit of DR6.
 				i386_trap(1,0,0);
 			}
 			if(m_lock && (m_opcode != 0xf0))
@@ -2777,6 +2821,8 @@ void i386_device::execute_run()
 			m_ext = 1;
 			i386_trap_with_error(e&0xffffffff,0,0,e>>32);
 		}
+		if(m_RF && m_auto_clear_RF) m_RF = 0;
+		if(!m_auto_clear_RF) m_auto_clear_RF = true;
 	}
 	m_tsc += (cycles - m_cycles);
 }

@@ -24,7 +24,7 @@
 #define LOG_XMAP0       (1 << 4)
 #define LOG_XMAP1       (1 << 5)
 #define LOG_REX3        (1 << 6)
-#define LOG_RAMDAC		(1 << 7)
+#define LOG_RAMDAC      (1 << 7)
 #define LOG_COMMANDS    (1 << 8)
 #define LOG_REJECTS     (1 << 9)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP0 | LOG_CMAP1 | LOG_XMAP0 | LOG_XMAP1 | LOG_REX3 | LOG_RAMDAC | LOG_COMMANDS | LOG_REJECTS)
@@ -1843,7 +1843,7 @@ READ64_MEMBER(newport_base_device::rex3_r)
 
 uint32_t newport_base_device::do_endian_swap(uint32_t color)
 {
-    return (color >> 24) | (color << 24) | ((color >> 8) & 0x0000ff00) | ((color << 8) & 0x00ff0000);
+	return (color >> 24) | (color << 24) | ((color >> 8) & 0x0000ff00) | ((color << 8) & 0x00ff0000);
 }
 
 uint32_t newport_base_device::get_host_color()
@@ -1862,47 +1862,47 @@ uint32_t newport_base_device::get_host_color()
 	{
 	default:
 		// No conversion needed
-        break;
+		break;
 	case 1:     // 4bpp -> 8bpp
 		color = convert_4bpp_bgr_to_8bpp((uint8_t)color);
-        break;
+		break;
 	case 2:     // 4bpp -> 12bpp
 		color = convert_4bpp_bgr_to_12bpp((uint8_t)color);
-        break;
+		break;
 	case 3:     // 4bpp -> 24bpp
 		color = convert_4bpp_bgr_to_24bpp((uint8_t)color);
-        break;
+		break;
 	case 4:     // 8bpp -> 4bpp
 		color = convert_8bpp_bgr_to_4bpp((uint8_t)color);
-        break;
+		break;
 	case 6:     // 8bpp -> 12bpp
 		color = convert_8bpp_bgr_to_12bpp((uint8_t)color);
-        break;
+		break;
 	case 7:     // 8bpp -> 24bpp
 		color = convert_8bpp_bgr_to_24bpp((uint8_t)color);
-        break;
+		break;
 	case 8:     // 12bpp -> 4bpp
 		color = convert_12bpp_bgr_to_4bpp((uint16_t)color);
-        break;
+		break;
 	case 9:     // 12bpp -> 8bpp
 		color = convert_12bpp_bgr_to_8bpp((uint16_t)color);
-        break;
+		break;
 	case 11:    // 12bpp -> 24bpp
 		color = convert_12bpp_bgr_to_24bpp((uint16_t)color);
-        break;
+		break;
 	case 12:    // 32bpp -> 4bpp
 		color = convert_24bpp_bgr_to_4bpp(color);
-        break;
+		break;
 	case 13:    // 32bpp -> 8bpp
 		color = convert_24bpp_bgr_to_8bpp(color);
-        break;
+		break;
 	case 14:    // 32bpp -> 12bpp
 		color = convert_24bpp_bgr_to_12bpp(color);
-        break;
+		break;
 	}
 	if (BIT(m_rex3.m_draw_mode1, 11))
-        color = do_endian_swap(color);
-    return color;
+		color = do_endian_swap(color);
+	return color;
 }
 
 void newport_base_device::write_pixel(uint32_t color)
@@ -2024,11 +2024,11 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 	switch (m_rex3.m_plane_depth)
 	{
 	case 0: // 4bpp (not supported)
-        break;
+		break;
 	case 1: // 8bpp
-	    sb = (0xaa * BIT(src, 7)) | (0x55 * BIT(src, 6));
-	    sg = (0x92 * BIT(src, 5)) | (0x49 * BIT(src, 4)) | (0x24 * BIT(src, 3));
-	    sr = (0x92 * BIT(src, 2)) | (0x49 * BIT(src, 1)) | (0x24 * BIT(src, 0));
+		sb = (0xaa * BIT(src, 7)) | (0x55 * BIT(src, 6));
+		sg = (0x92 * BIT(src, 5)) | (0x49 * BIT(src, 4)) | (0x24 * BIT(src, 3));
+		sr = (0x92 * BIT(src, 2)) | (0x49 * BIT(src, 1)) | (0x24 * BIT(src, 0));
 
 		if (BIT(m_rex3.m_draw_mode1, 25))
 		{
@@ -2258,58 +2258,58 @@ uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
 {
 	static const uint8_t s_bayer[4][4] = { { 0, 12, 3, 15 },{ 8, 4, 11, 7 },{ 2, 14, 1, 13 },{ 10, 6, 9, 5 } };
 
-    uint32_t red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
-    uint32_t green = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
-    uint32_t blue = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
-    uint32_t alpha = ((m_rex3.m_curr_color_alpha >> 11) & 0x1ff);
+	uint32_t red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
+	uint32_t green = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
+	uint32_t blue = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
+	uint32_t alpha = ((m_rex3.m_curr_color_alpha >> 11) & 0x1ff);
 
-    if (red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
-    {
-        red = 0;
+	if (red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
+	{
+		red = 0;
 	}
-    else if (red > 0xff)
-    {
-        red = 0xff;
-	}
-
-    if (green >= 0x180 || BIT(m_rex3.m_curr_color_green, 31))
-    {
-        green = 0;
-	}
-    else if (green > 0xff)
-    {
-        green = 0xff;
+	else if (red > 0xff)
+	{
+		red = 0xff;
 	}
 
-    if (blue >= 0x180 || BIT(m_rex3.m_curr_color_blue, 31))
-    {
-        blue = 0;
+	if (green >= 0x180 || BIT(m_rex3.m_curr_color_green, 31))
+	{
+		green = 0;
 	}
-    else if (blue > 0xff)
-    {
-        blue = 0xff;
+	else if (green > 0xff)
+	{
+		green = 0xff;
 	}
 
-    if (alpha >= 0x180 || BIT(m_rex3.m_curr_color_alpha, 31))
-    {
-        alpha = 0;
+	if (blue >= 0x180 || BIT(m_rex3.m_curr_color_blue, 31))
+	{
+		blue = 0;
 	}
-    else if (alpha > 0xff)
-    {
-        alpha = 0xff;
+	else if (blue > 0xff)
+	{
+		blue = 0xff;
 	}
-    alpha <<= 24;
+
+	if (alpha >= 0x180 || BIT(m_rex3.m_curr_color_alpha, 31))
+	{
+		alpha = 0;
+	}
+	else if (alpha > 0xff)
+	{
+		alpha = 0xff;
+	}
+	alpha <<= 24;
 
 	if (!BIT(m_rex3.m_draw_mode1, 15)) // RGB
 	{
 		switch (m_rex3.m_plane_depth)
 		{
 		case 0: // 4bpp
-            return (m_rex3.m_curr_color_red >> 11) & 0x0000000f;
+			return (m_rex3.m_curr_color_red >> 11) & 0x0000000f;
 		case 1: // 8bpp
-            return (m_rex3.m_curr_color_red >> 11) & 0x000000ff;
+			return (m_rex3.m_curr_color_red >> 11) & 0x000000ff;
 		case 2: // 12bpp
-            return (m_rex3.m_curr_color_red >> 9) & 0x00000fff;
+			return (m_rex3.m_curr_color_red >> 9) & 0x00000fff;
 		case 3: // 24bpp
 			// Not supported
 			return 0;
@@ -2915,66 +2915,66 @@ uint64_t newport_base_device::do_pixel_word_read()
 
 void newport_base_device::iterate_shade()
 {
-    if (m_rex3.m_slope_red & 0x7fffff)
-        m_rex3.m_curr_color_red += (m_rex3.m_slope_red << 8) >> 8;
-    if (m_rex3.m_slope_green & 0x7ffff)
-        m_rex3.m_curr_color_green += (m_rex3.m_slope_green << 12) >> 12;
-    if (m_rex3.m_slope_blue & 0x7ffff)
-        m_rex3.m_curr_color_blue += (m_rex3.m_slope_blue << 12) >> 12;
-    if (m_rex3.m_slope_alpha & 0x7ffff)
-        m_rex3.m_curr_color_alpha += (m_rex3.m_slope_alpha << 12) >> 12;
+	if (m_rex3.m_slope_red & 0x7fffff)
+		m_rex3.m_curr_color_red += (m_rex3.m_slope_red << 8) >> 8;
+	if (m_rex3.m_slope_green & 0x7ffff)
+		m_rex3.m_curr_color_green += (m_rex3.m_slope_green << 12) >> 12;
+	if (m_rex3.m_slope_blue & 0x7ffff)
+		m_rex3.m_curr_color_blue += (m_rex3.m_slope_blue << 12) >> 12;
+	if (m_rex3.m_slope_alpha & 0x7ffff)
+		m_rex3.m_curr_color_alpha += (m_rex3.m_slope_alpha << 12) >> 12;
 
-    if (BIT(m_rex3.m_draw_mode0, 21)) // CIClamp
-    {
-        if (BIT(m_rex3.m_draw_mode1, 15)) // RGBMode
-        {
-            const uint32_t val_red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
-            const uint32_t val_grn = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
-            const uint32_t val_blu = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
-            const uint32_t val_alpha = ((m_rex3.m_curr_color_alpha >> 11) & 0x1ff);
+	if (BIT(m_rex3.m_draw_mode0, 21)) // CIClamp
+	{
+		if (BIT(m_rex3.m_draw_mode1, 15)) // RGBMode
+		{
+			const uint32_t val_red = ((m_rex3.m_curr_color_red >> 11) & 0x1ff);
+			const uint32_t val_grn = ((m_rex3.m_curr_color_green >> 11) & 0x1ff);
+			const uint32_t val_blu = ((m_rex3.m_curr_color_blue >> 11) & 0x1ff);
+			const uint32_t val_alpha = ((m_rex3.m_curr_color_alpha >> 11) & 0x1ff);
 
-            if (val_red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
-                m_rex3.m_curr_color_red = 0;
-            else if (val_red > 0xff)
-                m_rex3.m_curr_color_red = 0x7ffff;
+			if (val_red >= 0x180 || BIT(m_rex3.m_curr_color_red, 31))
+				m_rex3.m_curr_color_red = 0;
+			else if (val_red > 0xff)
+				m_rex3.m_curr_color_red = 0x7ffff;
 
-            if (val_grn >= 0x180 || BIT(m_rex3.m_curr_color_green, 31))
-                m_rex3.m_curr_color_green = 0;
-            else if (val_grn > 0xff)
-                m_rex3.m_curr_color_green = 0x7ffff;
+			if (val_grn >= 0x180 || BIT(m_rex3.m_curr_color_green, 31))
+				m_rex3.m_curr_color_green = 0;
+			else if (val_grn > 0xff)
+				m_rex3.m_curr_color_green = 0x7ffff;
 
-            if (val_blu >= 0x180 || BIT(m_rex3.m_curr_color_blue, 31))
-                m_rex3.m_curr_color_blue = 0;
-            else if (val_blu > 0xff)
-                m_rex3.m_curr_color_blue = 0x7ffff;
+			if (val_blu >= 0x180 || BIT(m_rex3.m_curr_color_blue, 31))
+				m_rex3.m_curr_color_blue = 0;
+			else if (val_blu > 0xff)
+				m_rex3.m_curr_color_blue = 0x7ffff;
 
-            if (val_alpha >= 0x180 || BIT(m_rex3.m_curr_color_alpha, 31))
-                m_rex3.m_curr_color_alpha = 0;
-            else if (val_alpha > 0xff)
-                m_rex3.m_curr_color_alpha = 0x7ffff;
-        }
-        else
-        {
-            switch ((m_rex3.m_draw_mode1 >> 3) & 3)
-            {
-            case 0: // 4bpp
-                if (BIT(m_rex3.m_color_red, 15))
-                    m_rex3.m_color_red = 0x00007fff;
-                break;
-            case 1: // 8bpp
-                if (BIT(m_rex3.m_color_red, 19))
-                    m_rex3.m_color_red = 0x0007ffff;
-                break;
-            case 2: // 12bpp
-                if (BIT(m_rex3.m_color_red, 21))
-                    m_rex3.m_color_red = 0x001fffff;
-                break;
-            case 3: // 24bpp
-                    // No clamping on CI
-                break;
-            }
-        }
-    }
+			if (val_alpha >= 0x180 || BIT(m_rex3.m_curr_color_alpha, 31))
+				m_rex3.m_curr_color_alpha = 0;
+			else if (val_alpha > 0xff)
+				m_rex3.m_curr_color_alpha = 0x7ffff;
+		}
+		else
+		{
+			switch ((m_rex3.m_draw_mode1 >> 3) & 3)
+			{
+			case 0: // 4bpp
+				if (BIT(m_rex3.m_color_red, 15))
+					m_rex3.m_color_red = 0x00007fff;
+				break;
+			case 1: // 8bpp
+				if (BIT(m_rex3.m_color_red, 19))
+					m_rex3.m_color_red = 0x0007ffff;
+				break;
+			case 2: // 12bpp
+				if (BIT(m_rex3.m_color_red, 21))
+					m_rex3.m_color_red = 0x001fffff;
+				break;
+			case 3: // 24bpp
+					// No clamping on CI
+				break;
+			}
+		}
+	}
 }
 
 void newport_base_device::do_rex3_command()
@@ -3197,10 +3197,10 @@ void newport_base_device::do_rex3_command()
 
 						if ((dx > 0 && start_x >= end_x) || (dx < 0 && start_x <= end_x) || lr_abort)
 						{
-                            m_rex3.m_curr_color_red = m_rex3.m_color_red;
-                            m_rex3.m_curr_color_alpha = m_rex3.m_color_alpha;
-                            m_rex3.m_curr_color_green = m_rex3.m_color_green;
-                            m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
+							m_rex3.m_curr_color_red = m_rex3.m_color_red;
+							m_rex3.m_curr_color_alpha = m_rex3.m_color_alpha;
+							m_rex3.m_curr_color_green = m_rex3.m_color_green;
+							m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
 							start_x = m_rex3.m_x_save;
 							start_y += dy;
 						}
@@ -3519,48 +3519,48 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			}
 			m_rex3.m_draw_mode1 = data32;
 
-            static const uint32_t s_store_shift[8][4][2] = {
-                {   { 0,  0 }, // None, 4bpp, Buffer 0/1
-                    { 0,  0 }, // None, 8bpp, Buffer 0/1
-                    { 0,  0 }, // None, 12bpp, Buffer 0/1
-                    { 0,  0 }, // None, 24bpp, Buffer 0/1 (not valid)
-                },
-                {   { 0,  0 }, // RGB/CI, 4bpp, Buffer 0/1
-                    { 0,  8 }, // RGB/CI, 8bpp, Buffer 0/1
-                    { 0, 12 }, // RGB/CI, 12bpp, Buffer 0/1
-                    { 0,  0 }, // RGB/CI, 24bpp, Buffer 0/1 (not valid)
-                },
-                {   { 0,  0 }, // RGBA, 4bpp, Buffer 0/1
-                    { 0,  8 }, // RGBA, 8bpp, Buffer 0/1
-                    { 0, 12 }, // RGBA, 12bpp, Buffer 0/1
-                    { 0,  0 }, // RGBA, 24bpp, Buffer 0/1 (not valid)
-                },
-                {   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
-                    { 0,  0 }, // Invalid, 8bpp, Buffer 0/1
-                    { 0,  0 }, // Invalid, 12bpp, Buffer 0/1
-                    { 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
-                },
-                {   { 8, 16 }, // Overlay, 4bpp, Buffer 0/1
-                    { 8, 16 }, // Overlay, 8bpp, Buffer 0/1
-                    { 8, 16 }, // Overlay, 12bpp, Buffer 0/1
-                    { 8, 16 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
-                },
-                {   { 0,  0 }, // Popup, 4bpp, Buffer 0/1
-                    { 0,  8 }, // Popup, 8bpp, Buffer 0/1
-                    { 0, 12 }, // Popup, 12bpp, Buffer 0/1
-                    { 0,  0 }, // Popup, 24bpp, Buffer 0/1 (not valid)
-                },
-                {   { 0,  0 }, // CID, 4bpp, Buffer 0/1
-                    { 0,  8 }, // CID, 8bpp, Buffer 0/1
-                    { 0, 12 }, // CID, 12bpp, Buffer 0/1
-                    { 0,  0 }, // CID, 24bpp, Buffer 0/1 (not valid)
-                },
-                {   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
-                    { 0,  0 }, // Invalid, 8bpp, Buffer 0/1
-                    { 0,  0 }, // Invalid, 12bpp, Buffer 0/1
-                    { 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
-                },
-            };
+			static const uint32_t s_store_shift[8][4][2] = {
+				{   { 0,  0 }, // None, 4bpp, Buffer 0/1
+					{ 0,  0 }, // None, 8bpp, Buffer 0/1
+					{ 0,  0 }, // None, 12bpp, Buffer 0/1
+					{ 0,  0 }, // None, 24bpp, Buffer 0/1 (not valid)
+				},
+				{   { 0,  0 }, // RGB/CI, 4bpp, Buffer 0/1
+					{ 0,  8 }, // RGB/CI, 8bpp, Buffer 0/1
+					{ 0, 12 }, // RGB/CI, 12bpp, Buffer 0/1
+					{ 0,  0 }, // RGB/CI, 24bpp, Buffer 0/1 (not valid)
+				},
+				{   { 0,  0 }, // RGBA, 4bpp, Buffer 0/1
+					{ 0,  8 }, // RGBA, 8bpp, Buffer 0/1
+					{ 0, 12 }, // RGBA, 12bpp, Buffer 0/1
+					{ 0,  0 }, // RGBA, 24bpp, Buffer 0/1 (not valid)
+				},
+				{   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
+					{ 0,  0 }, // Invalid, 8bpp, Buffer 0/1
+					{ 0,  0 }, // Invalid, 12bpp, Buffer 0/1
+					{ 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
+				},
+				{   { 8, 16 }, // Overlay, 4bpp, Buffer 0/1
+					{ 8, 16 }, // Overlay, 8bpp, Buffer 0/1
+					{ 8, 16 }, // Overlay, 12bpp, Buffer 0/1
+					{ 8, 16 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
+				},
+				{   { 0,  0 }, // Popup, 4bpp, Buffer 0/1
+					{ 0,  8 }, // Popup, 8bpp, Buffer 0/1
+					{ 0, 12 }, // Popup, 12bpp, Buffer 0/1
+					{ 0,  0 }, // Popup, 24bpp, Buffer 0/1 (not valid)
+				},
+				{   { 0,  0 }, // CID, 4bpp, Buffer 0/1
+					{ 0,  8 }, // CID, 8bpp, Buffer 0/1
+					{ 0, 12 }, // CID, 12bpp, Buffer 0/1
+					{ 0,  0 }, // CID, 24bpp, Buffer 0/1 (not valid)
+				},
+				{   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
+					{ 0,  0 }, // Invalid, 8bpp, Buffer 0/1
+					{ 0,  0 }, // Invalid, 12bpp, Buffer 0/1
+					{ 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
+				},
+			};
 
 			m_rex3.m_plane_enable = m_rex3.m_draw_mode1 & 7;
 			m_rex3.m_plane_depth = (m_rex3.m_draw_mode1 >> 3) & 3;
@@ -3879,30 +3879,30 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			LOGMASKED(LOG_REX3, "REX3 Red/CI Full State Write: %08x\n", (uint32_t)(data >> 32));
 			m_rex3.m_color_red = (int32_t)((data >> 32) & 0xffffff);
 			m_rex3.m_curr_color_red = m_rex3.m_color_red;
-            if (!BIT(m_rex3.m_draw_mode1, 15))
-            {
-                switch (m_rex3.m_plane_depth)
-                {
-                case 0: // 4bpp
-                    m_rex3.m_color_i = (uint32_t)((data >> 43) & 0xf);
-                    break;
-                case 1: // 8bpp
-                    m_rex3.m_color_i = (uint32_t)((data >> 43) & 0xff);
-                    break;
-                case 2: // 12bpp
-                    m_rex3.m_color_i = (uint32_t)((data >> 41) & 0xfff);
-                    break;
-                case 3: // 32bpp
-                    // Invalid for CI mode
-                    break;
-                }
-            }
+			if (!BIT(m_rex3.m_draw_mode1, 15))
+			{
+				switch (m_rex3.m_plane_depth)
+				{
+				case 0: // 4bpp
+					m_rex3.m_color_i = (uint32_t)((data >> 43) & 0xf);
+					break;
+				case 1: // 8bpp
+					m_rex3.m_color_i = (uint32_t)((data >> 43) & 0xff);
+					break;
+				case 2: // 12bpp
+					m_rex3.m_color_i = (uint32_t)((data >> 41) & 0xfff);
+					break;
+				case 3: // 32bpp
+					// Invalid for CI mode
+					break;
+				}
+			}
 		}
 		if (ACCESSING_BITS_0_31)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Alpha Full State Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_alpha = (int32_t)(data & 0xfffff);
-            m_rex3.m_curr_color_alpha = m_rex3.m_color_alpha;
+			m_rex3.m_curr_color_alpha = m_rex3.m_color_alpha;
 		}
 		break;
 	case 0x0208/8:
@@ -3910,13 +3910,13 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Green Full State Write: %08x\n", (uint32_t)(data >> 32));
 			m_rex3.m_color_green = (int32_t)((data >> 32) & 0xfffff);
-            m_rex3.m_curr_color_green = m_rex3.m_color_green;
+			m_rex3.m_curr_color_green = m_rex3.m_color_green;
 		}
 		if (ACCESSING_BITS_0_31)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Blue Full State Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_blue = (int32_t)(data & 0xfffff);
-            m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
+			m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
 		}
 		break;
 	case 0x0210/8:
@@ -4004,16 +4004,16 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 		{
 			LOGMASKED(LOG_REX3, "REX3 Packed Color Write: %08x\n", (uint32_t)data);
 			m_rex3.m_color_i = (uint32_t)data;
-            if (BIT(m_rex3.m_draw_mode1, 15))
-            {
+			if (BIT(m_rex3.m_draw_mode1, 15))
+			{
 				m_rex3.m_color_red = (data & 0xff) << 11;
 				m_rex3.m_color_green = (data & 0xff00) << 3;
 				m_rex3.m_color_blue = (data & 0xff0000) >> 5;
 
-            	m_rex3.m_curr_color_red = m_rex3.m_color_red;
-            	m_rex3.m_curr_color_green = m_rex3.m_color_green;
-            	m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
-            }
+				m_rex3.m_curr_color_red = m_rex3.m_color_red;
+				m_rex3.m_curr_color_green = m_rex3.m_color_green;
+				m_rex3.m_curr_color_blue = m_rex3.m_color_blue;
+			}
 		}
 		break;
 	case 0x0228/8:

@@ -1465,9 +1465,9 @@ void bbcm_state::bbcm(machine_config &config)
 
 	/* cartridge slots */
 	GENERIC_CARTSLOT(config, m_cart[0], generic_linear_slot, "bbcm_cart", "bin,rom");
-	m_cart[0]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_cart1, this));
+	m_cart[0]->set_device_load(FUNC(bbc_state::cart1_load), this);
 	GENERIC_CARTSLOT(config, m_cart[1], generic_linear_slot, "bbcm_cart", "bin,rom");
-	m_cart[1]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_cart2, this));
+	m_cart[1]->set_device_load(FUNC(bbc_state::cart2_load), this);
 
 	/* eprom sockets */
 	BBC_ROMSLOT16(config, m_rom[0x08], bbc_rom_devices, nullptr); /* ic27 */

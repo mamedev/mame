@@ -27,7 +27,6 @@ Then press W to save. To load, press L. If it says r at the end, it indicates a 
 #include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 
 #include "speaker.h"
 
@@ -184,13 +183,14 @@ void pro80_state::pro80(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_pro80);
 
+	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	/* Devices */
+	// Cassette
 	CASSETTE(config, m_cass);
-	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "kansas_r").configure_periodic(FUNC(pro80_state::kansas_r), attotime::from_hz(40000)); // cass read
 }
 

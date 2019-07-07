@@ -18,13 +18,14 @@ DEFINE_DEVICE_TYPE(SPG24X, spg24x_device, "spg24x", "SPG240-series System-on-a-C
 DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-Chip")
 
 
-spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
+spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal)
+	: unsp_device(mconfig, type, tag, owner, clock, internal)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_spg_audio(*this, "spgaudio")
 	, m_spg_io(*this, "spgio")
 	, m_spg_sysdma(*this, "spgsysdma")
 	, m_spg_video(*this, "spgvideo")
+	, m_sprite_limit(sprite_limit)
 	, m_rowscrolloffset(15)
 	, m_porta_out(*this)
 	, m_portb_out(*this)
@@ -37,22 +38,21 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_eeprom_r(*this)
 	, m_uart_tx(*this)
 	, m_chip_sel(*this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 {
 }
 
 spg24x_device::spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spg2xx_device(mconfig, SPG24X, tag, owner, clock, 256)
+	: spg2xx_device(mconfig, SPG24X, tag, owner, clock, 256, address_map_constructor(FUNC(spg24x_device::internal_map), this))
 {
 }
 
 spg28x_device::spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spg2xx_device(mconfig, SPG28X, tag, owner, clock, 64)
+	: spg2xx_device(mconfig, SPG28X, tag, owner, clock, 64, address_map_constructor(FUNC(spg28x_device::internal_map), this))
 {
 }
 
-void spg2xx_device::map(address_map &map)
+void spg2xx_device::internal_map(address_map &map)
 {
 	map(0x000000, 0x0027ff).ram();
 	map(0x002800, 0x0028ff).rw(m_spg_video, FUNC(spg2xx_video_device::video_r), FUNC(spg2xx_video_device::video_w));
@@ -69,6 +69,8 @@ void spg2xx_device::map(address_map &map)
 
 void spg2xx_device::device_start()
 {
+	unsp_device::device_start();
+
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
 	m_portc_out.resolve_safe();
@@ -88,48 +90,49 @@ void spg2xx_device::device_start()
 
 void spg2xx_device::device_reset()
 {
+	unsp_device::device_reset();
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::videoirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, state);
+	set_state_unsynced(UNSP_IRQ0_LINE, state);
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::timerirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ2_LINE, state);
+	set_state_unsynced(UNSP_IRQ2_LINE, state);
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::uartirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ3_LINE, state);
+	set_state_unsynced(UNSP_IRQ3_LINE, state);
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::audioirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ4_LINE, state);
+	set_state_unsynced(UNSP_IRQ4_LINE, state);
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::extirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, state);
+	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::ffreq1_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, state);
+	set_state_unsynced(UNSP_IRQ6_LINE, state);
 }
 
 WRITE_LINE_MEMBER(spg2xx_device::ffreq2_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ7_LINE, state);
+	set_state_unsynced(UNSP_IRQ7_LINE, state);
 }
 
 
 
 READ16_MEMBER(spg2xx_device::space_r)
 {
-	address_space &cpuspace = m_cpu->space(AS_PROGRAM);
+	address_space &cpuspace = this->space(AS_PROGRAM);
 	return cpuspace.read_word(offset);
 }
 
@@ -164,12 +167,12 @@ void spg24x_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
-	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	configure_spg_io(m_spg_io);
 
-	SPG2XX_SYSDMA(config, m_spg_sysdma, DERIVED_CLOCK(1, 1), m_cpu);
+	SPG2XX_SYSDMA(config, m_spg_sysdma, DERIVED_CLOCK(1, 1), DEVICE_SELF);
 
-	SPG24X_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	SPG24X_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->sprlimit_read_callback().set(FUNC(spg24x_device::get_sprlimit));
 	m_spg_video->rowscrolloffset_read_callback().set(FUNC(spg24x_device::get_rowscrolloffset));
 	m_spg_video->write_video_irq_callback().set(FUNC(spg24x_device::videoirq_w));
@@ -184,12 +187,12 @@ void spg28x_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
-	SPG28X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	SPG28X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	configure_spg_io(m_spg_io);
 
-	SPG2XX_SYSDMA(config, m_spg_sysdma, DERIVED_CLOCK(1, 1), m_cpu);
+	SPG2XX_SYSDMA(config, m_spg_sysdma, DERIVED_CLOCK(1, 1), DEVICE_SELF);
 
-	SPG24X_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	SPG24X_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->sprlimit_read_callback().set(FUNC(spg28x_device::get_sprlimit));
 	m_spg_video->rowscrolloffset_read_callback().set(FUNC(spg28x_device::get_rowscrolloffset));
 	m_spg_video->write_video_irq_callback().set(FUNC(spg28x_device::videoirq_w));

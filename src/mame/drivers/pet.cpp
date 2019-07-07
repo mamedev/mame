@@ -262,7 +262,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER( sync_tick );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_pet);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -464,7 +464,7 @@ static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress
 	space.write_byte(0x2b, hiaddress >> 8);
 }
 
-QUICKLOAD_LOAD_MEMBER( pet_state, cbm_pet )
+QUICKLOAD_LOAD_MEMBER(pet_state::quickload_pet)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
 }
@@ -1713,8 +1713,8 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_user->pl_handler().set(m_via, FUNC(via6522_device::write_pa7));
 	m_user->pm_handler().set(m_via, FUNC(via6522_device::write_cb2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(pet_state::quickload_pet), this);
 	quickload.set_interface("cbm_quik");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");

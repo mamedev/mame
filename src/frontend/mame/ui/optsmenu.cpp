@@ -77,8 +77,8 @@ void menu_simple_game_options::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save Configuration"), "", 0, (void *)(uintptr_t)SAVE_CONFIG);
 
-	custombottom = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -141,9 +141,9 @@ void menu_simple_game_options::custom_render(void *selectedref, float top, float
 	char const *const toptext[] = { _("Settings") };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 

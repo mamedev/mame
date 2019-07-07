@@ -344,7 +344,7 @@ READ8_MEMBER(sorcerer_state::port_fe_r)
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
+SNAPSHOT_LOAD_MEMBER(sorcerer_state::snapshot_cb)
 {
 	uint8_t *RAM = memregion(m_maincpu->tag())->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -474,7 +474,7 @@ void sorcerer_state::machine_reset()
     QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
+QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 {
 	uint16_t execute_address, start_address, end_address;
 	int autorun;

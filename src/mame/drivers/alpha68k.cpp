@@ -2316,7 +2316,7 @@ ROM_END
 
 
 /*
-Kyros No Yakata
+Kyros no Yakata
 Alpha Denshi, 1986
 
 PCB Layout:
@@ -3352,7 +3352,7 @@ void alpha68k_state::init_tnextspc()
 GAME( 1986, sstingry,  0,        sstingry,       sstingry,  alpha68k_state, init_sstingry,  ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 1987, kyros,     0,        kyros,          kyros,     alpha68k_state, init_kyros,     ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kyrosj,    kyros,    kyros,          kyros,     alpha68k_state, init_kyros,     ROT90, "Alpha Denshi Co.",                                  "Kyros No Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kyrosj,    kyros,    kyros,          kyros,     alpha68k_state, init_kyros,     ROT90, "Alpha Denshi Co.",                                  "Kyros no Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, jongbou,   0,        jongbou,        jongbou,   alpha68k_state, init_jongbou,   ROT90, "SNK",                                               "Mahjong Block Jongbou (Japan)", MACHINE_SUPPORTS_SAVE )
 

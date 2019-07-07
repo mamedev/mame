@@ -86,11 +86,14 @@ DECLARE_DEVICE_TYPE(I8040, i8040_device)    /* external ROM,        256 bytes in
 DECLARE_DEVICE_TYPE(I8050, i8050_device)    /* 4k internal ROM,     256 bytes internal RAM */
 
 /* Official Intel UPI-41 parts */
-DECLARE_DEVICE_TYPE(I8041, i8041_device)    /* 1k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741, i8741_device)    /* 1k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042, i8042_device)    /* 2k internal ROM,     256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8242, i8242_device)    /* 2k internal ROM,     256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742, i8742_device)    /* 2k internal EEPROM,  256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   /* 1k internal ROM,      64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   /* 1k internal EEPROM,   64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  /* 1k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  /* 1k internal EEPROM,  128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8042,   i8042_device)    /* 2k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8742,   i8742_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  /* 2k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  /* 2k internal EEPROM,  256 bytes internal RAM */
 
 /* Clones */
 DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  /* 8035 clone */
@@ -204,7 +207,8 @@ protected:
 	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
 	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
 
-	bool          m_irq_state;          /* true if an IRQ is pending */
+	bool          m_irq_state;          /* true if the IRQ line is active */
+	bool          m_irq_polled;         /* true if last instruction was JNI (and not taken) */
 	bool          m_irq_in_progress;    /* true if an IRQ is in progress */
 	bool          m_timer_overflow;     /* true on a timer overflow; cleared by taking interrupt */
 	bool          m_timer_flag;         /* true on a timer overflow; cleared on JTF */
@@ -635,18 +639,32 @@ protected:
 	TIMER_CALLBACK_MEMBER( master_callback );
 };
 
-class i8041_device : public upi41_cpu_device
+class i8041a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class i8741_device : public upi41_cpu_device
+class i8741a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8041ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8741ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8042_device : public upi41_cpu_device
@@ -656,18 +674,25 @@ public:
 	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class i8242_device : public upi41_cpu_device
-{
-public:
-	// construction/destruction
-	i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
 class i8742_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
 	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8042ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8742ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

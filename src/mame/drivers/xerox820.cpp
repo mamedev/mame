@@ -405,7 +405,7 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
+QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -601,7 +601,8 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(xerox820_state::xerox820)
+void xerox820_state::xerox820(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 20_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820_state::xerox820_mem);
@@ -666,8 +667,8 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820");
-	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb), this);
+}
 
 void bigboard_state::bigboard(machine_config &config)
 {
@@ -677,7 +678,8 @@ void bigboard_state::bigboard(machine_config &config)
 	BEEP(config, m_beeper, 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* bigboard only */
 }
 
-MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
+void xerox820ii_state::xerox820ii(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xerox820ii_state::xerox820ii_mem);
@@ -769,8 +771,8 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
-	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", attotime::from_seconds(3))
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb), this);
+}
 
 void xerox820ii_state::xerox168(machine_config &config)
 {

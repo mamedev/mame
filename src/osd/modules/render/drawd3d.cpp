@@ -177,7 +177,11 @@ render_primitive_list *renderer_d3d9::get_primitives()
 	if (win == nullptr)
 		return nullptr;
 
-	GetClientRectExceptMenu(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client, win->fullscreen());
+	HWND hWnd = std::static_pointer_cast<win_window_info>(win)->platform_window();
+	if (IsIconic(hWnd))
+		return nullptr;
+
+	GetClientRectExceptMenu(hWnd, &client, win->fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
 		win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());

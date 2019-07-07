@@ -29,7 +29,6 @@ ETA-3400 Memory I/O Accessory
 #include "machine/6821pia.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "et3400.lh"
@@ -240,7 +239,6 @@ void et3400_state::et3400(machine_config &config)
 	for (std::size_t i = 0; i < 6; i++)
 		LS259(config, m_displatch[i]);
 
-
 	m_displatch[0]->parallel_out_cb().set(FUNC(et3400_state::led_w<1>));
 	m_displatch[1]->parallel_out_cb().set(FUNC(et3400_state::led_w<2>));
 	m_displatch[2]->parallel_out_cb().set(FUNC(et3400_state::led_w<3>));
@@ -248,10 +246,11 @@ void et3400_state::et3400(machine_config &config)
 	m_displatch[4]->parallel_out_cb().set(FUNC(et3400_state::led_w<5>));
 	m_displatch[5]->parallel_out_cb().set(FUNC(et3400_state::led_w<6>));
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 /* ROM definition */

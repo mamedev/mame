@@ -52,7 +52,6 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "machine/74145.h"
 #include "machine/timer.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "acrnsys1.lh"
@@ -274,7 +273,6 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	ins8154_device &b1(INS8154(config, "b1"));
@@ -285,6 +283,8 @@ void acrnsys1_state::acrnsys1(machine_config &config)
 	TTL74145(config, m_ttl74145, 0);
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	TIMER(config, "kansas_w").configure_periodic(FUNC(acrnsys1_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(acrnsys1_state::kansas_r), attotime::from_hz(40000));

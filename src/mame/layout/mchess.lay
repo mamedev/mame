@@ -10,6 +10,7 @@
 	<element name="red"><rect><color red="0.75" green="0.15" blue="0.2" /></rect></element>
 	<element name="blue"><rect><color red="0.15" green="0.2" blue="0.75" /></rect></element>
 	<element name="blueb"><rect><color red="0.07" green="0.01" blue="0.25" /></rect></element>
+	<element name="blueb2"><rect><color red="0.12" green="0.03" blue="0.4" /></rect></element>
 
 	<element name="redd">
 		<rect><color red="0.5" green="0.1" blue="0.15" /></rect>
@@ -33,8 +34,9 @@
 	</element>
 
 	<element name="text_switch" defstate="0">
-		<text string="POWER SWITCH: ON" align="1" state="0"><color red="0.3" green="0.3" blue="0.3" /></text>
-		<text string="POWER SWITCH: SAVE" align="1" state="1"><color red="0.3" green="0.3" blue="0.3" /></text>
+		<rect><color red="0.12" green="0.03" blue="0.4" /></rect>
+		<text string="POWER SWITCH: ON" align="1" state="0"><color red="0.4" green="0.4" blue="0.55" /></text>
+		<text string="POWER SWITCH: SAVE" align="1" state="1"><color red="0.4" green="0.4" blue="0.55" /></text>
 	</element>
 
 	<element name="text_l0"><text string="MOVE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -142,19 +144,20 @@
 
 <!-- build screen -->
 
-	<view name="Internal Layout (Screen)">
+	<view name="Internal Layout (Full)">
+		<bounds left="-1" right="182.5" top="-1" bottom="96" />
 		<group ref="display"><bounds x="0" y="0" width="86" height="94.434" /></group>
+
+		<bezel element="blueb2"><bounds x="88" y="0" width="95" height="53" /></bezel>
+		<bezel element="blueb"><bounds x="88" y="44" width="95" height="53" /></bezel>
+		<bezel element="blackb"><bounds x="91" y="47" width="95" height="53" /></bezel>
+		<group ref="buttons"><bounds x="93" y="48.634" width="87.8" height="45.8" /></group>
+
+		<bezel element="text_switch" inputtag="IN.3" inputmask="0x01"><bounds x="91" y="2" width="24" height="2.7" /></bezel>
 	</view>
 
-	<view name="Internal Layout (Full)">
-		<bounds left="-1" right="185" top="-1" bottom="96" />
+	<view name="Internal Layout (Screen)">
 		<group ref="display"><bounds x="0" y="0" width="86" height="94.434" /></group>
-
-		<bezel element="blueb"><bounds x="89" y="43" width="97" height="53" /></bezel>
-		<bezel element="blackb"><bounds x="92" y="46" width="97" height="53" /></bezel>
-		<group ref="buttons"><bounds x="95" y="48.634" width="87.8" height="45.8" /></group>
-
-		<bezel element="text_switch" inputtag="IN.3" inputmask="0x01"><bounds x="95" y="38" width="24" height="2.7" /></bezel>
 	</view>
 
 </mamelayout>

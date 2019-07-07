@@ -267,12 +267,20 @@ protected:
 
 	uint8_t m_CPL;  // current privilege level
 
+	bool m_auto_clear_RF;
 	uint8_t m_performed_intersegment_jump;
 	uint8_t m_delayed_interrupt_enable;
 
 	uint32_t m_cr[5];       // Control registers
 	uint32_t m_dr[8];       // Debug registers
 	uint32_t m_tr[8];       // Test registers
+
+	memory_passthrough_handler* m_dr_breakpoints[4];
+	int m_notifier;
+
+	//386 Debug Register change handlers.
+	inline void dri_changed();
+	inline void dr7_changed(uint32_t old_val, uint32_t new_val);
 
 	I386_SYS_TABLE m_gdtr;    // Global Descriptor Table Register
 	I386_SYS_TABLE m_idtr;    // Interrupt Descriptor Table Register

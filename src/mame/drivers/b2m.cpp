@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"

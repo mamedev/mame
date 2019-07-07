@@ -60,7 +60,6 @@
 #include "imagedev/printer.h"
 #include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "sound/wave.h"      /* for K7 sound*/
 #include "screen.h"
 #include "softlist.h"
 
@@ -154,7 +153,7 @@ void interact_state::interact(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("interact_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("interact");
@@ -190,7 +189,7 @@ void interact_state::hector1(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(hector_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("interact_cass");
 
 	/* printer */

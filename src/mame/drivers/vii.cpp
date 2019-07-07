@@ -151,7 +151,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_spg(*this, "spg")
 		, m_bank(*this, "cartbank")
 		, m_io_p1(*this, "P1")
 		, m_io_p2(*this, "P2")
@@ -200,9 +199,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(jakks_porta_w);
 	DECLARE_WRITE16_MEMBER(jakks_portb_w);
 
-	required_device<unsp_device> m_maincpu;
+	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<spg2xx_device> m_spg;
 	optional_memory_bank m_bank;
 
 	DECLARE_READ16_MEMBER(walle_portc_r);
@@ -262,7 +260,7 @@ private:
 	DECLARE_READ16_MEMBER(jakks_porta_key_io_r);
 	bool m_porta_key_mode;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gamekey_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_gamekey);
 
 	required_device<jakks_gamekey_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -292,7 +290,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(vii_portb_w);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_vii);
 
 	virtual void poll_controls();
 
@@ -324,7 +322,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(icanguit_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_icanguit);
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -360,7 +358,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tvgogo_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_tvgogo);
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -574,19 +572,16 @@ READ16_MEMBER(spg2xx_game_state::rad_portc_r)
 void spg2xx_game_state::mem_map_4m(address_map &map)
 {
 	map(0x000000, 0x3fffff).bankr("cartbank");
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 void spg2xx_game_state::mem_map_2m(address_map &map)
 {
 	map(0x000000, 0x1fffff).mirror(0x200000).bankr("cartbank");
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 void spg2xx_game_state::mem_map_1m(address_map &map)
 {
 	map(0x000000, 0x0fffff).mirror(0x300000).bankr("cartbank");
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 static INPUT_PORTS_START( vii )
@@ -1745,7 +1740,7 @@ void icanguit_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(icanguit_state, icanguit_cart)
+DEVICE_IMAGE_LOAD_MEMBER(icanguit_state::cart_load_icanguit)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1781,7 +1776,7 @@ void tvgogo_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state, tvgogo_cart)
+DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1877,11 +1872,11 @@ void vii_state::poll_controls()
 	if (memcmp(old_input, m_controller_input, 8))
 	{
 		for(int i = 0; i < 8; i++)
-			m_spg->uart_rx(m_controller_input[i]);
+			m_maincpu->uart_rx(m_controller_input[i]);
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(vii_state, vii_cart)
+DEVICE_IMAGE_LOAD_MEMBER(vii_state::cart_load_vii)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1899,25 +1894,23 @@ DEVICE_IMAGE_LOAD_MEMBER(vii_state, vii_cart)
 
 void spg2xx_game_state::spg2xx_base(machine_config &config)
 {
-	UNSP(config, m_maincpu, XTAL(27'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
-	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
 void spg2xx_game_state::non_spg_base(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
 
 	spg2xx_base(config);
 }
@@ -1932,40 +1925,42 @@ void spg2xx_game_state::spg2xx_basep(machine_config &config)
 
 void vii_state::vii(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vii_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_spg->portb_out().set(FUNC(vii_state::vii_portb_w));
-	m_spg->eeprom_w().set(FUNC(vii_state::eeprom_w));
-	m_spg->eeprom_r().set(FUNC(vii_state::eeprom_r));
+	m_maincpu->portb_out().set(FUNC(vii_state::vii_portb_w));
+	m_maincpu->eeprom_w().set(FUNC(vii_state::eeprom_w));
+	m_maincpu->eeprom_r().set(FUNC(vii_state::eeprom_r));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&vii_state::device_image_load_vii_cart, this));
+	m_cart->set_device_load(FUNC(vii_state::cart_load_vii), this);
 
 	SOFTWARE_LIST(config, "vii_cart").set_original("vii");
 }
 
 void icanguit_state::icanguit(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &icanguit_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_spg->porta_in().set(FUNC(icanguit_state::porta_r));
-	m_spg->portb_in().set(FUNC(icanguit_state::portb_r));
-	m_spg->portc_in().set(FUNC(icanguit_state::portc_r));
-	m_spg->porta_out().set(FUNC(icanguit_state::guit_porta_w));
-	m_spg->portb_out().set(FUNC(icanguit_state::portb_w));
-	m_spg->portc_out().set(FUNC(icanguit_state::portc_w));
+	m_maincpu->porta_in().set(FUNC(icanguit_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(icanguit_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(icanguit_state::portc_r));
+	m_maincpu->porta_out().set(FUNC(icanguit_state::guit_porta_w));
+	m_maincpu->portb_out().set(FUNC(icanguit_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(icanguit_state::portc_w));
 
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanguit_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&icanguit_state::device_image_load_icanguit_cart, this));
+	m_cart->set_device_load(FUNC(icanguit_state::cart_load_icanguit), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanguit_cart").set_original("icanguit");
@@ -1973,20 +1968,21 @@ void icanguit_state::icanguit(machine_config &config)
 
 void icanguit_state::icanpian(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &icanguit_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_spg->porta_in().set(FUNC(icanguit_state::porta_r));
-	m_spg->portb_in().set(FUNC(icanguit_state::portb_r));
-	m_spg->portc_in().set(FUNC(icanguit_state::portc_r));
-	m_spg->porta_out().set(FUNC(icanguit_state::porta_w));
-	m_spg->portb_out().set(FUNC(icanguit_state::portb_w));
-	m_spg->portc_out().set(FUNC(icanguit_state::portc_w));
+	m_maincpu->porta_in().set(FUNC(icanguit_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(icanguit_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(icanguit_state::portc_r));
+	m_maincpu->porta_out().set(FUNC(icanguit_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(icanguit_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(icanguit_state::portc_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanpian_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&icanguit_state::device_image_load_icanguit_cart, this));
+	m_cart->set_device_load(FUNC(icanguit_state::cart_load_icanguit), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
@@ -1994,17 +1990,18 @@ void icanguit_state::icanpian(machine_config &config)
 
 void tvgogo_state::tvgogo(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvgogo_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set_ioport("P2");
-	m_spg->portc_in().set_ioport("P3");
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tvgogo_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&tvgogo_state::device_image_load_tvgogo_cart, this));
+	m_cart->set_device_load(FUNC(tvgogo_state::cart_load_tvgogo), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "tvgogo_cart").set_original("tvgogo");
@@ -2013,22 +2010,26 @@ void tvgogo_state::tvgogo(machine_config &config)
 
 void spg2xx_game_state::wireless60(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
-	m_spg->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
-	m_spg->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
-	m_spg->porta_in().set(FUNC(spg2xx_game_state::wireless60_porta_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::wireless60_porta_r));
 }
 
 void spg2xx_game_state::jakks(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
-	m_spg->porta_in().set(FUNC(spg2xx_game_state::jakks_porta_r));
-	m_spg->porta_out().set(FUNC(spg2xx_game_state::jakks_porta_w));
-	m_spg->portb_out().set(FUNC(spg2xx_game_state::jakks_portb_w));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::jakks_porta_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::jakks_porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::jakks_portb_w));
 }
 
 void spg2xx_game_state::jakks_i2c(machine_config &config)
@@ -2051,7 +2052,7 @@ void jakks_gkr_state::machine_start()
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state, gamekey_cart)
+DEVICE_IMAGE_LOAD_MEMBER(jakks_gkr_state::cart_load_gamekey)
 {
 	return m_cart->call_load();
 }
@@ -2060,12 +2061,12 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 {
 	jakks(config);
 
-	m_spg->porta_in().set(FUNC(jakks_gkr_state::jakks_porta_key_io_r));
-	m_spg->porta_out().set(FUNC(jakks_gkr_state::jakks_porta_key_io_w));
-	m_spg->portc_in().set_ioport("P3");
-	m_spg->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
+	m_maincpu->porta_in().set(FUNC(jakks_gkr_state::jakks_porta_key_io_r));
+	m_maincpu->porta_out().set(FUNC(jakks_gkr_state::jakks_porta_key_io_w));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
 
-	m_spg->set_rowscroll_offset(0);
+	m_maincpu->set_rowscroll_offset(0);
 
 	JAKKS_GAMEKEY_SLOT(config, m_cart, 0, jakks_gamekey, nullptr);
 }
@@ -2136,8 +2137,8 @@ void jakks_gkr_state::jakks_gkr_sw_i2c(machine_config &config)
 {
 	jakks_gkr_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
-	m_spg->adc_in<0>().set_ioport("JOYX");
-	m_spg->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<0>().set_ioport("JOYX");
+	m_maincpu->adc_in<1>().set_ioport("JOYY");
 	SOFTWARE_LIST(config, "jakks_gamekey_sw").set_original("jakks_gamekey_sw");
 }
 
@@ -2145,8 +2146,8 @@ void jakks_gkr_state::jakks_gkr_wp(machine_config &config)
 {
 	jakks_gkr(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
-	m_spg->adc_in<0>().set_ioport("JOYX");
-	m_spg->adc_in<1>().set_ioport("JOYY");
+	m_maincpu->adc_in<0>().set_ioport("JOYX");
+	m_maincpu->adc_in<1>().set_ioport("JOYY");
 	//SOFTWARE_LIST(config, "jakks_gamekey_wp").set_original("jakks_gamekey_wp"); // NO KEYS RELEASED
 }
 
@@ -2154,7 +2155,7 @@ void jakks_gkr_state::jakks_gkr_nm_i2c(machine_config &config)
 {
 	jakks_gkr_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
-	m_spg->adc_in<0>().set_ioport("DIALX");
+	m_maincpu->adc_in<0>().set_ioport("DIALX");
 	SOFTWARE_LIST(config, "jakks_gamekey_nm").set_original("jakks_gamekey_nm");
 }
 
@@ -2162,8 +2163,8 @@ void jakks_gkr_state::jakks_gkr_wf_i2c(machine_config &config)
 {
 	jakks_gkr_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
-	//m_spg->adc_in<0>().set_ioport("DIALX"); // wheel does not seem to map here
-	//m_spg->adc_in<1>().set_ioport("DIALY");
+	//m_maincpu->adc_in<0>().set_ioport("DIALX"); // wheel does not seem to map here
+	//m_maincpu->adc_in<1>().set_ioport("DIALY");
 	//SOFTWARE_LIST(config, "jakks_gamekey_wf").set_original("jakks_gamekey_wf"); // no game keys were released
 }
 
@@ -2172,74 +2173,82 @@ void spg2xx_game_state::lexizeus(machine_config &config)
 {
 	non_spg_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set_ioport("P2");
-	m_spg->portc_in().set_ioport("P3");
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
 }
 
 void spg2xx_game_state::walle(machine_config &config)
 {
 	jakks_i2c(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_2m);
-	m_spg->portc_in().set_ioport("P3");
-	m_spg->portc_out().set(FUNC(spg2xx_game_state::walle_portc_w));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(spg2xx_game_state::walle_portc_w));
 }
 
 void spg2xx_game_state::rad_skat(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set_ioport("P2");
-	m_spg->portc_in().set_ioport("P3");
-	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
-	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
+	m_maincpu->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 void dreamlif_state::dreamlif(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dreamlif_state::mem_map_4m);
+
 	spg2xx_base(config);
 
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set(FUNC(dreamlif_state::portb_r));
-	m_spg->portb_out().set(FUNC(dreamlif_state::portb_w));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set(FUNC(dreamlif_state::portb_r));
+	m_maincpu->portb_out().set(FUNC(dreamlif_state::portb_w));
 
 }
 
 void spg2xx_game_state::rad_skatp(machine_config &config)
 {
 	rad_skat(config);
-	m_spg->set_pal(true);
+	m_maincpu->set_pal(true);
 }
 
 void spg2xx_game_state::rad_sktv(machine_config &config)
 {
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
-	m_spg->porta_in().set(FUNC(spg2xx_game_state::rad_porta_r));
-	m_spg->portb_in().set(FUNC(spg2xx_game_state::rad_portb_r));
-	m_spg->portc_in().set(FUNC(spg2xx_game_state::rad_portc_r));
-	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
-	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::rad_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_state::rad_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::rad_portc_r));
+	m_maincpu->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
+	m_maincpu->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 void spg2xx_game_state::rad_crik(machine_config &config)
 {
-	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+
 	spg2xx_base(config);
 
-	m_spg->porta_in().set_ioport("P1");
-	m_spg->portb_in().set_ioport("P2");
-	m_spg->portc_in().set_ioport("P3");
-	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
-	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
+	m_maincpu->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }

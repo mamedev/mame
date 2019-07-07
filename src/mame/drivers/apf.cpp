@@ -78,7 +78,6 @@ ToDo:
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "bus/apf/slot.h"
@@ -563,8 +562,6 @@ void apf_state::apfimag(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
 
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(apf_state::pia1_porta_r));
 	m_pia1->readpb_handler().set(FUNC(apf_state::pia1_portb_r));
@@ -573,6 +570,7 @@ void apf_state::apfimag(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(apf_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
 	m_cass->set_interface("apf_cass");
 
 	FD1771(config, m_fdc, 1000000); // guess

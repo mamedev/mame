@@ -546,7 +546,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_video_attributes(0)
-	, m_svg_region(nullptr)
+	, m_svg_region(tag)
 	, m_container(nullptr)
 	, m_width(100)
 	, m_height(100)
@@ -608,10 +608,6 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
 			osd_printf_error("Missing SCREEN_UPDATE function\n");
 	}
-
-	// check for svg region
-	if (m_type == SCREEN_TYPE_SVG && !m_svg_region)
-		osd_printf_error("Missing SVG region information\n");
 
 	// check for zero frame rate
 	if (m_refresh == 0)

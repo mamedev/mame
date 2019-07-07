@@ -17,7 +17,6 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -235,7 +234,7 @@ void apogee_state::apogee(machine_config &config)
 	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
 	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
-	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	//I8255(config, "ppi8255_2");
 
 	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	i8275.set_character_width(6);
@@ -253,7 +252,6 @@ void apogee_state::apogee(machine_config &config)
 	PALETTE(config, m_palette, FUNC(apogee_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
@@ -266,8 +264,9 @@ void apogee_state::apogee(machine_config &config)
 	m_dma8257->set_reverse_rw_mode(1);
 
 	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_formats(rka_cassette_formats);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
 	m_cassette->set_interface("apogee_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apogee");

@@ -256,22 +256,10 @@ uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind
 		{
 			gfx = m_videoram[x];
 
-			*p++ = BIT(gfx, 15);
-			*p++ = BIT(gfx, 14);
-			*p++ = BIT(gfx, 13);
-			*p++ = BIT(gfx, 12);
-			*p++ = BIT(gfx, 11);
-			*p++ = BIT(gfx, 10);
-			*p++ = BIT(gfx, 9);
-			*p++ = BIT(gfx, 8);
-			*p++ = BIT(gfx, 7);
-			*p++ = BIT(gfx, 6);
-			*p++ = BIT(gfx, 5);
-			*p++ = BIT(gfx, 4);
-			*p++ = BIT(gfx, 3);
-			*p++ = BIT(gfx, 2);
-			*p++ = BIT(gfx, 1);
-			*p++ = BIT(gfx, 0);
+			for (int i = 15; i >= 0; i--)
+			{
+				*p++ = BIT(gfx, i);
+			}
 		}
 	}
 
