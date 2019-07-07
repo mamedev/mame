@@ -40193,6 +40193,7 @@ wy85                            // WY-85
 
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
+wyvernf0a                       // A39 (c) 1985 Taito Corporation (Japan)
 
 @source:x07.cpp
 x07                             //
