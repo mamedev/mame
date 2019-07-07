@@ -15,7 +15,7 @@
  * CPU: 8088 @ 4.77MHz
  * RAM: 256K
  * Bus: 6x ISA
- * Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 (CGA?) grahics modes
+ * Video: Monchrome or Color 80x25 character mode. 320x200 and 640x400 grahics modes
  * Display: Orange Gas Plasma (GP) display
  * Mass storage: 2 x 5.25" 360K or 1 20Mb HDD
  * On board ports: Beeper,
@@ -24,6 +24,14 @@
  * Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
  *
  * TODO:
+ * - Add keyboard, first HLE as in pc.cpp and then LLE when the keyboard controller is dumped
+ * - Add the on-board FDC and boot DOS 1.xx
+ * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes inclusing 640x400 (aka HR)
+ * - Add the Ericsson 1065 HDC and boot from a hard drive
+ *
+ * Credits: The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has 
+ *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
+ *          A dead pcb was donated by rfka01 and rom dumps by ZnaxQue@sweclockers.com 
  *
  ************************************************************************************************************/
 /*
@@ -53,7 +61,7 @@
 #define LOG_DMA     (1U << 5)
 #define LOG_IRQ     (1U << 6)
 
-#define VERBOSE (LOG_PPI|LOG_KBD|LOG_PIT|LOG_PIC|LOG_DMA|LOG_IRQ)
+#define VERBOSE (LOG_PPI|LOG_KBD|LOG_PIT|LOG_DMA|LOG_IRQ)
 #define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -75,6 +83,7 @@ public:
 		, m_isabus(*this, "isabus")
 		, m_dma8237a(*this, "dma8237")
 		, m_ppi8255(*this, "ppi8255")
+		, m_io_dsw(*this, "DSW")
 		, m_kbd8251(*this, "kbd8251")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8253(*this, "pit8253")
@@ -112,6 +121,10 @@ private:
 
 	// PPI
 	required_device<i8255_device> m_ppi8255;
+	DECLARE_WRITE8_MEMBER(ppi_portb_w);
+	DECLARE_READ8_MEMBER(ppi_portc_r);
+	uint8_t m_ppi_portb;
+	required_ioport m_io_dsw;
 
 	// Keyboard Controller/USART
 	required_device<i8251_device> m_kbd8251;
@@ -255,11 +268,13 @@ void epc_state::machine_start()
 	save_item(NAME(m_dma_segment));
 	save_item(NAME(m_dma_active));
 	save_item(NAME(m_tc));
+	save_item(NAME(m_ppi_portb));
 	save_item(NAME(m_dreq0_ck));
 }
 
 void epc_state::machine_reset()
 {
+	m_ppi_portb = 0;
 }
 
 template <int Channel>
@@ -402,6 +417,35 @@ void epc_state::update_speaker()
  *
  **********************************************************/
 
+READ8_MEMBER( epc_state::ppi_portc_r )
+{
+	uint8_t data;
+
+	// Read 4 configurations dip switches depending on PB3
+	data = (m_io_dsw->read() >> ((m_ppi_portb & 0x08) ? 4 : 0) & 0x0f);
+
+	// TODO: verify what PC4-PC7 is used for, if anything
+
+	LOGPPI("PPI Port C read: %02x\n", data);
+
+	return data;
+}
+
+WRITE8_MEMBER( epc_state::ppi_portb_w )
+{
+	LOGPPI("PPI Port B write: %02x\n", data);
+	LOGPPI(" PB0 - Enable beeper             : %d\n", (data & 0x01)  ? 1 : 0);
+	LOGPPI(" PB1 - Beeper data               : %d\n", (data & 0x02)  ? 1 : 0);
+	LOGPPI(" PB2 - Unused                    : %d\n", (data & 0x04)  ? 1 : 0);
+	LOGPPI(" PB3 - Port C dip switch select  : %d\n", (data & 0x08)  ? 1 : 0);
+	LOGPPI(" PB4 - RAM parity enable         : %d\n", (data & 0x10)  ? 1 : 0);
+	LOGPPI(" PB5 - ISA error checking enable : %d\n", (data & 0x20)  ? 1 : 0);
+	LOGPPI(" PB6 - Reset keyboard            : %d\n", (data & 0x40)  ? 1 : 0);
+	LOGPPI(" PB7 - Reset keyboard interrupt  : %d\n", (data & 0x80)  ? 1 : 0);
+
+	m_ppi_portb = data;
+}
+
 WRITE_LINE_MEMBER(epc_state::int_w)
 {
 	m_maincpu->set_input_line(0, state);
@@ -447,9 +491,9 @@ void epc_state::epc(machine_config &config)
 
 	// Parallel port
 	I8255A(config, m_ppi8255);
-	//m_ppi8255->out_pa_callback().set... Port A us not used
-	//m_ppi8255->in_pb_callback().set(FUNC(epc_state::ppi_portb_r));
-	//m_ppi8255->out_pc_callback().set(FUNC(epc_state::ppi_portc_w));
+	m_ppi8255->out_pa_callback().set([this] (uint8_t data) { LOGPPI("PPI: write %02x to unused Port A\n", data); } ); // Port A us not used
+	m_ppi8255->out_pb_callback().set(FUNC(epc_state::ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(epc_state::ppi_portc_r));
 
 	// Timer
 	PIT8253(config, m_pit8253);
@@ -530,7 +574,7 @@ WRITE8_MEMBER( epc_state::epc_dma_write_byte )
 
 
 static INPUT_PORTS_START( epc_ports )
-	PORT_START("SW")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Not used")
 	PORT_DIPSETTING(    0x00, "ON - Don't use")
 	PORT_DIPSETTING(    0x01, "OFF - Factory Setting")
