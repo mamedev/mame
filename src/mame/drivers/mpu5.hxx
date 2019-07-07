@@ -14,30 +14,31 @@ Barcrest Gold Strike V.1.0 game cart for MPU5 (distributed on Spain by Bilso / S
 |  | P7      | | P8 EMPTY| | |                |SW||
 |  |_________| |_________| | |                |1 ||
 |   __________ __________  | |                |__||
-|  | C5 EMPTY| | C6 EMPTY| | |  ________     ____ |
+|  | P5 EMPTY| | P6 EMPTY| | |  ________     ____ |
 |  |_________| |_________| | |  |__IC3__|    |CON||
 |   __________  __________ | |               | 1 ||
-|  | C3      | | C4      | | |               |___||
+|  | P3      | | P4      | | |               |___||
 |  |_________| |_________| | |   _______     ____ |
 |   __________ __________  | |  |__IC2__|    |CON||
-|  | C1      | | C2      | | |               | 2 ||
+|  | P1      | | P2      | | |               | 2 ||
 |  |_________| |_________| | |               |___||
 |   HIGH BYTE   LOW BYTE   |_|                    |
 |                          CBA                    |
 |_________________________________________________|
 
 P7 = ST M48T02-150PC1 NVRAM labeled as BILSO S.A. B-14 GOLD STRIKE V 1.0 CVB-0200A / 11-1562 [may be RAM (P7B) or PROM (P7A)]
-C1 = 27C4001 labeled as BILSO S.A. B-14 P4 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
-C2 = 27C4001 labeled as BILSO S.A. B-14 P3 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
-C3 = 27C4001 labeled as BILSO S.A. B-14 P1 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
-C4 = 27C4001 labeled as BILSO S.A. B-14 P1 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+P1 = 27C4001 labeled as BILSO S.A. B-14 P1 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+P2 = 27C4001 labeled as BILSO S.A. B-14 P2 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+P3 = 27C4001 labeled as BILSO S.A. B-14 P3 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+P4 = 27C4001 labeled as BILSO S.A. B-14 P4 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
 IC1 = PIC16C54C labeled as 105RGSG (may be PIC or Z8)
-IC2 = GAL16V8 labeled as 105ICI1E
-IC3 = GAL16V8 labeled as 105ICI2A
+IC2 = GAL16V8B labeled as 105ICIIE
+IC3 = GAL16V8B labeled as 105ICI2A
 SW1 = 8 dipswitches for options
 SW2 = Test switch
 CON1 = Female DB9 for percentage
 CON2 = Male DB9 for stake/jackpot
+
 
        CPUBUS
         __
@@ -2532,6 +2533,24 @@ ROM_START( m5gstrik )
 	ROM_LOAD16_BYTE( "gost03r.p1", 0x000000, 0x080000, CRC(92cb81aa) SHA1(8ebb1654bcac8c971e6d73829c139696911bbe5c) )
 	ROM_LOAD16_BYTE( "gost03s.p1", 0x000000, 0x080000, CRC(c5aedb76) SHA1(b4ee6ebc54262b0081b1a118cd1e7eae4223affd) )
 	ROM_LOAD16_BYTE( "gost03y.p1", 0x000000, 0x080000, CRC(00d3c696) SHA1(f350a56df5c4f9c937d3b815428e8332fdf855f9) )
+ROM_END
+
+ROM_START( m5gstriks )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bilso_b-14_gold_strike_v1.00_cvb_0200a_11-1562.p1", 0x000000, 0x080000, CRC(3ff69415) SHA1(ff01a2e688f66cc0e6b52e070cd2c558e54b69dc) ) // 27C4001 labeled as BILSO S.A. B-14 P1 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+	ROM_LOAD16_BYTE( "bilso_b-14_gold_strike_v1.00_cvb_0200a_11-1562.p2", 0x000001, 0x080000, CRC(dd72a7a0) SHA1(d1d2a20ac9fea8bb46b0925ce941df2b58d37677) ) // 27C4001 labeled as BILSO S.A. B-14 P2 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+	ROM_LOAD16_BYTE( "bilso_b-14_gold_strike_v1.00_cvb_0200a_11-1562.p3", 0x100000, 0x080000, CRC(d918a4dc) SHA1(501a9ee07bd5f7acfea42bb2d6559582a8dcba7e) ) // 27C4001 labeled as BILSO S.A. B-14 P3 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+	ROM_LOAD16_BYTE( "bilso_b-14_gold_strike_v1.00_cvb_0200a_11-1562.p4", 0x100001, 0x080000, CRC(8bfa7a54) SHA1(18a7d88903696202a3981cd96381eb82703ade06) ) // 27C4001 labeled as BILSO S.A. B-14 P4 GOLD STRIKE V 1.0 CVB-0200A / 11-1562
+
+	ROM_REGION( 0x00022e, "plds", 0 ) // All unprotected
+	ROM_LOAD( "105_iciie_gal16v8b.ic2", 0x000000, 0x000117, CRC(c068d560) SHA1(76182850567adf92fc45767439d87184d8b09dac) )
+	ROM_LOAD( "105_ici2a_gal16v8b.ic3", 0x000117, 0x000117, CRC(6e0c3f98) SHA1(634fb1894b217bfe620cd38bae2f17d4df475bad) )
+
+	ROM_REGION( 0x000800, "nvram", 0 ) // RTC
+	ROM_LOAD( "bilso_b-14_gold_strike_v1.00_cvb_0200a_11-1562.p7a", 0x000000, 0x000800, CRC(8942fba8) SHA1(e9264a386bd2f3fbb3c53434b94314d29c32b6f9) ) // ST M48T02-150PC1 dumped as DS1642
+
+	ROM_REGION( 0x200, "pic", 0 ) // Protected
+	ROM_LOAD( "105_rgsg_pic16c54c.ic1", 0x000000, 0x200, NO_DUMP )
 ROM_END
 
 ROM_START( m5gstrik11 )
@@ -7433,12 +7452,13 @@ GAME(  199?, m5grusst,    0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "B
 GAME(  199?, m5grusst04,  m5grusst, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  199?, m5grusst03,  m5grusst, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Rush Stampede (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAMEL( 199?, m5gstrik,    0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
-GAMEL( 199?, m5gstrik11,  m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
-GAMEL( 199?, m5gstrik02,  m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 3)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
-GAMEL( 199?, m5gstrik01,  m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 4)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
-GAMEL( 199?, m5gstrik01a, m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 5)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
-GAMEL( 199?, m5gstrika,   m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 6)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
+GAMEL( 199?, m5gstrik,    0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 1)",                      MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
+GAMEL( 199?, m5gstriks,   m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (V1.00, Spanish, Bilso S.A.)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
+GAMEL( 199?, m5gstrik11,  m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 2)",                      MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
+GAMEL( 199?, m5gstrik02,  m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 3)",                      MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
+GAMEL( 199?, m5gstrik01,  m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 4)",                      MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
+GAMEL( 199?, m5gstrik01a, m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 5)",                      MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
+GAMEL( 199?, m5gstrika,   m5gstrik, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Strike (Barcrest) (MPU5) (set 6)",                      MACHINE_IS_SKELETON_MECHANICAL, layout_m5gstrik )
 
 GAMEL( 199?, m5gsstrk,    0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Super Streak (Barcrest) (MPU5) (set 1)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gsstrk07 )
 GAMEL( 199?, m5gsstrk07,  m5gsstrk, mpu5, mpu5, mpu5_state, empty_init, ROT0, "Barcrest","Gold Super Streak (Barcrest) (MPU5) (set 2)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5gsstrk07 )
@@ -8193,5 +8213,4 @@ GAME(  199?, m5roundl,      m5round,  mpu5, mpu5, mpu5_state, empty_init, ROT0, 
 GAME(  199?, m5scfinl,      0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Lowen","Super Cup Final (Lowen) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL )
 
 /* Others / Uncertain */
-
 GAMEL( 199?, m5ppussy,      0,        mpu5, mpu5, mpu5_state, empty_init, ROT0, "Mdm","Pink Pussy (Mdm) (MPU5)", MACHINE_IS_SKELETON_MECHANICAL, layout_m5ppussy )
