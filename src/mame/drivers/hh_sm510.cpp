@@ -26,7 +26,6 @@ TODO:
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: gnw_bfight, gnw_bjack, gnw_climber, gnw_dkjrp,
   gnw_gcliff, gnw_zelda
-- identify lcd segments for tgaiden
 
 ****************************************************************************
 
@@ -4641,9 +4640,10 @@ public:
 		inp_fixed_last();
 	}
 
+	// R2 connects to a single LED behind the screen
+	DECLARE_WRITE8_MEMBER(led_w) { m_led_out = data >> 1 & 1; }
 	output_finder<> m_led_out;
 
-	DECLARE_WRITE8_MEMBER(write_r);
 	void tgaiden(machine_config &config);
 
 protected:
@@ -4653,20 +4653,7 @@ protected:
 void tgaiden_state::machine_start()
 {
 	hh_sm510_state::machine_start();
-
-	// resolve handlers
 	m_led_out.resolve();
-}
-
-// handlers
-
-WRITE8_MEMBER(tgaiden_state::write_r)
-{
-	// R1: speaker out
-	piezo_r1_w(space, 0, data & 1);
-
-	// R2: led
-	m_led_out = data >> 1 & 1;
 }
 
 // config
@@ -4716,14 +4703,15 @@ void tgaiden_state::tgaiden(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
 	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(tgaiden_state::write_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->write_r().append(FUNC(tgaiden_state::led_w));
 	m_maincpu->read_ba().set_ioport("BA");
 	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920, 1080);
+	screen.set_size(1476, 1080);
 	screen.set_visarea_full();
 
 	/* sound hardware */
@@ -4738,8 +4726,8 @@ ROM_START( tgaiden )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m82", 0x0000, 0x1000, CRC(278eafb0) SHA1(14396a0010bade0fde705969151200ed432321e7) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "tgaiden.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 588818, "screen", 0)
+	ROM_LOAD( "tgaiden.svg", 0, 588818, CRC(f2b94ded) SHA1(45ba57e16921849cf27e14a81a04b3cdce753726) )
 ROM_END
 
 
@@ -9491,7 +9479,7 @@ CONS( 1991, trobhood,    tgaunt,     0, trobhood,    trobhood,    tgaunt_state, 
 CONS( 1989, tddragon,    0,          0, tddragon,    tddragon,    tddragon_state,    empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tkarnov,     0,          0, tkarnov,     tkarnov,     tkarnov_state,     empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tvindictr,   0,          0, tvindictr,   tvindictr,   tvindictr_state,   empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tbatman,     0,          0, tbatman,     tbatman,     tbatman_state,     empty_init, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, tsharr2,     0,          0, tsharr2,     tsharr2,     tsharr2_state,     empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, tstrider,    0,          0, tstrider,    tstrider,    tstrider_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (handheld)", MACHINE_SUPPORTS_SAVE )
