@@ -822,7 +822,7 @@ void xbox_base_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("xbox", CMDFLAG_NONE, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("xbox", CMDFLAG_CUSTOM_HELP, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
 	}
 	subdevice<xbox_eeprom_device>("pci:01.1:154")->hack_eeprom =
 		[&](void)
