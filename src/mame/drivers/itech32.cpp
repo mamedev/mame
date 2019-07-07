@@ -1038,7 +1038,7 @@ void itech32_state::sound_map(address_map &map)
 	map(0x0800, 0x083f).mirror(0x80).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
 	map(0x0c00, 0x0c00).w(FUNC(itech32_state::sound_bank_w));
 	map(0x1000, 0x1000).nopw();    /* noisy */
-	map(0x1400, 0x140f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1400, 0x140f).m("via6522_0", FUNC(via6522_device::map));
 	map(0x2000, 0x3fff).ram();
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();

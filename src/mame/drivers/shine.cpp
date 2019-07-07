@@ -80,8 +80,8 @@ void shine_state::shine_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x67ff).ram();
 	map(0x6800, 0x7fff).ram().share(m_video_ram);
-	map(0x9400, 0x940f).rw(m_via[0], FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x9800, 0x980f).rw(m_via[1], FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x9400, 0x940f).m(m_via[0], FUNC(via6522_device::map));
+	map(0x9800, 0x980f).m(m_via[1], FUNC(via6522_device::map));
 	map(0x9c00, 0x9c03).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
 	map(0x9d00, 0x9d00).w(FUNC(shine_state::floppy_w));
 	map(0xb000, 0xffff).rom();

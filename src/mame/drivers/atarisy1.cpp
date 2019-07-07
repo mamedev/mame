@@ -463,7 +463,7 @@ void atarisy1_state::main_map(address_map &map)
 void atarisy1_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x100f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1000, 0x100f).m("via6522_0", FUNC(via6522_device::map));
 	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1810, 0x1810).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r), FUNC(atari_sound_comm_device::sound_response_w));
 	map(0x1820, 0x1820).r(FUNC(atarisy1_state::switch_6502_r));

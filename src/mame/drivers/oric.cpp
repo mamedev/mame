@@ -199,7 +199,7 @@ protected:
 void oric_state::oric_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).mirror(0xf0);
+	map(0x0300, 0x030f).m(m_via, FUNC(via6522_device::map)).mirror(0xf0);
 	map(0xc000, 0xdfff).bankr("bank_c000_r").bankw("bank_c000_w");
 	map(0xe000, 0xf7ff).bankr("bank_e000_r").bankw("bank_e000_w");
 	map(0xf800, 0xffff).bankr("bank_f800_r").bankw("bank_f800_w");
@@ -211,12 +211,12 @@ Memory region &c000-&ffff can be ram or rom. */
 void telestrat_state::telestrat_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0300, 0x030f).m(m_via, FUNC(via6522_device::map));
 	map(0x0310, 0x0313).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x0314, 0x0314).rw(FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
 	map(0x0318, 0x0318).r(FUNC(telestrat_state::port_318_r));
 	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x0320, 0x032f).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0320, 0x032f).m(m_via2, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).bankr("bank_c000_r").bankw("bank_c000_w");
 }
 

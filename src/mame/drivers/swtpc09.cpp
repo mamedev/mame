@@ -133,7 +133,7 @@ void swtpc09_state::uniflex_dmf3_mem(address_map &map)
 	map(0xf024, 0xf024).mirror(0xf0000).rw(FUNC(swtpc09_state::dmf3_control_reg_r), FUNC(swtpc09_state::dmf3_control_reg_w));
 	map(0xf025, 0xf025).mirror(0xf0000).rw(FUNC(swtpc09_state::dmf3_dma_address_reg_r), FUNC(swtpc09_state::dmf3_dma_address_reg_w));
 	//AM_RANGE(0xf030, 0xf03f) AM_MIRROR(0xf0000) AM_NOP
-	map(0xf040, 0xf04f).mirror(0xf0000).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xf040, 0xf04f).mirror(0xf0000).m(m_via, FUNC(via6522_device::map));
 	//AM_RANGE(0xf050, 0xf7ff) AM_MIRROR(0xf0000) AM_NOP
 	map(0xf800, 0xffff).mirror(0xf0000).rom().region("maincpu", 0xf800);
 }

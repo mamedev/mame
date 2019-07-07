@@ -252,7 +252,7 @@ void ggm_state::main_map(address_map &map)
 	// external slot has potential bus conflict with RAM/VIA
 	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(ggm_state::cartridge_r));
 	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x8000, 0x800f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x800f).m(m_via, FUNC(via6522_device::map));
 }
 
 

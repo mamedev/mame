@@ -577,7 +577,7 @@ void prodigy_state::update_bcd()
 void prodigy_state::maincpu_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x200f).rw("via", FUNC(via6522_device::read),FUNC(via6522_device::write));
+	map(0x2000, 0x200f).m("via", FUNC(via6522_device::map));
 	map(0x6000, 0x7fff).rom().region("roms", 0).mirror(0x8000);
 }
 

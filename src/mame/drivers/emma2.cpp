@@ -93,7 +93,7 @@ void emma2_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x0900, 0x090f).mirror(0x02f0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0900, 0x090f).mirror(0x02f0).m(m_via, FUNC(via6522_device::map));
 	map(0x0a00, 0x0a03).mirror(0x00fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0c00, 0x0fff).ram();
 	map(0xd800, 0xdfff).mirror(0x2000).rom();

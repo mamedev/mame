@@ -222,7 +222,7 @@ void ssystem3_state::ssystem3_map(address_map &map)
   probably zusatzger??t memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
-	map(0x6000, 0x600f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x6000, 0x600f).m(m_via6522_0, FUNC(via6522_device::map));
 	map(0xc000, 0xdfff).rom();
 	map(0xf000, 0xffff).rom();
 }

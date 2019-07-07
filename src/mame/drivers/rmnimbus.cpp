@@ -63,7 +63,7 @@ void rmnimbus_state::nimbus_io(address_map &map)
 	map(0x0400, 0x0400).w(FUNC(rmnimbus_state::fdc_ctl_w));
 	map(0x0408, 0x040f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
 	map(0x0410, 0x041f).rw(FUNC(rmnimbus_state::scsi_r), FUNC(rmnimbus_state::scsi_w)).umask16(0x00ff);
-	map(0x0480, 0x049f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x0480, 0x049f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff);
 }
 
 

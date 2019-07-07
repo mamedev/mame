@@ -74,9 +74,9 @@ void microtan_state::main_map(address_map &map)
 	map(0xbc01, 0xbc01).rw(m_ay8910[0], FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xbc02, 0xbc02).w(m_ay8910[1], FUNC(ay8910_device::address_w));
 	map(0xbc03, 0xbc03).rw(m_ay8910[1], FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xbfc0, 0xbfcf).rw(m_via6522[0], FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xbfc0, 0xbfcf).m(m_via6522[0], FUNC(via6522_device::map));
 	map(0xbfd0, 0xbfd3).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xbfe0, 0xbfef).rw(m_via6522[1], FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xbfe0, 0xbfef).m(m_via6522[1], FUNC(via6522_device::map));
 	map(0xbff0, 0xbfff).rw(FUNC(microtan_state::bffx_r), FUNC(microtan_state::bffx_w));
 	map(0xc000, 0xe7ff).rom();
 	map(0xf000, 0xffff).rom();

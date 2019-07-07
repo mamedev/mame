@@ -120,7 +120,7 @@ void jr100_state::mem_map(address_map &map)
 	//map(0x8000, 0xbfff).rom();   expansion rom
 	map(0xc000, 0xc0ff).ram().share("pcg").region("maincpu", 0xc000);
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(m_via, FUNC(via6522_device::write));
+	map(0xc800, 0xc80f).m(m_via, FUNC(via6522_device::map));
 	//map(0xcc00, 0xcfff).;   expansion i/o
 	//map(0xd000, 0xd7ff).rom();   expansion rom for printer control
 	//map(0xd800, 0xdfff).rom();   expansion rom

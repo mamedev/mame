@@ -119,7 +119,7 @@ void interpod_t::interpod_mem(address_map &map)
 	map(0x0400, 0x041f).mirror(0x3be0).m(R6532_TAG, FUNC(mos6532_new_device::io_map));
 	map(0x2000, 0x2001).mirror(0x9ffe).rw(MC6850_TAG, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x4000, 0x47ff).mirror(0xb800).rom().region(R6502_TAG, 0);
-	map(0x8000, 0x800f).mirror(0x5ff0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x800f).mirror(0x5ff0).m(R6522_TAG, FUNC(via6522_device::map));
 }
 
 

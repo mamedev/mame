@@ -126,7 +126,7 @@ void enmirage_state::mirage_map(address_map &map)
 	map(0x8000, 0xbfff).ram();         // main RAM
 	map(0xc000, 0xdfff).ram();         // expansion RAM
 	map(0xe100, 0xe101).rw("acia6850", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xe200, 0xe2ff).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe200, 0xe2ff).m(m_via, FUNC(via6522_device::map));
 	map(0xe400, 0xe4ff).noprw();
 	map(0xe800, 0xe803).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
 	map(0xec00, 0xecef).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));

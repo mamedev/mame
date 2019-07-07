@@ -180,9 +180,9 @@ WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 void gameplan_state::gameplan_main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x1c00).ram();
-	map(0x2000, 0x200f).mirror(0x07f0).rw(m_via_0, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 1 */
-	map(0x2800, 0x280f).mirror(0x07f0).rw(m_via_1, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 2 */
-	map(0x3000, 0x300f).mirror(0x07f0).rw(m_via_2, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 3 */
+	map(0x2000, 0x200f).mirror(0x07f0).m(m_via_0, FUNC(via6522_device::map));    /* VIA 1 */
+	map(0x2800, 0x280f).mirror(0x07f0).m(m_via_1, FUNC(via6522_device::map));    /* VIA 2 */
+	map(0x3000, 0x300f).mirror(0x07f0).m(m_via_2, FUNC(via6522_device::map));    /* VIA 3 */
 	map(0x8000, 0xffff).rom();
 }
 
