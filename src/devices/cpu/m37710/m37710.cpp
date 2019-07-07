@@ -744,14 +744,6 @@ const m37710_cpu_device::set_reg_func m37710_cpu_device::m37710i_set_reg[4] =
 	&m37710_cpu_device::m37710i_set_reg_M1X1,
 };
 
-const m37710_cpu_device::set_line_func m37710_cpu_device::m37710i_set_line[4] =
-{
-	&m37710_cpu_device::m37710i_set_line_M0X0,
-	&m37710_cpu_device::m37710i_set_line_M0X1,
-	&m37710_cpu_device::m37710i_set_line_M1X0,
-	&m37710_cpu_device::m37710i_set_line_M1X1,
-};
-
 const m37710_cpu_device::execute_func m37710_cpu_device::m37710i_execute[4] =
 {
 	&m37710_cpu_device::m37710i_execute_M0X0,
@@ -952,7 +944,54 @@ void m37710_cpu_device::m37710_set_reg(int regnum, unsigned value)
 /* Set an interrupt line */
 void m37710_cpu_device::m37710_set_irq_line(int line, int state)
 {
-	(this->*m_set_line)(line, state);
+	switch(line)
+	{
+		// maskable interrupts
+		case M37710_LINE_ADC:
+		case M37710_LINE_UART1XMIT:
+		case M37710_LINE_UART1RECV:
+		case M37710_LINE_UART0XMIT:
+		case M37710_LINE_UART0RECV:
+		case M37710_LINE_TIMERB2:
+		case M37710_LINE_TIMERB1:
+		case M37710_LINE_TIMERB0:
+		case M37710_LINE_TIMERA4:
+		case M37710_LINE_TIMERA3:
+		case M37710_LINE_TIMERA2:
+		case M37710_LINE_TIMERA1:
+		case M37710_LINE_TIMERA0:
+		case M37710_LINE_IRQ2:
+		case M37710_LINE_IRQ1:
+		case M37710_LINE_IRQ0:
+		case M37710_LINE_DMA0:
+		case M37710_LINE_DMA1:
+		case M37710_LINE_DMA2:
+		case M37710_LINE_DMA3:
+			switch(state)
+			{
+				case CLEAR_LINE:
+					LINE_IRQ &= ~(1 << line);
+					if (m37710_irq_levels[line])
+					{
+						m_m37710_regs[m37710_irq_levels[line]] &= ~8;
+					}
+					break;
+
+				case ASSERT_LINE:
+				case HOLD_LINE:
+					LINE_IRQ |= (1 << line);
+					if (m37710_irq_levels[line])
+					{
+						m_m37710_regs[m37710_irq_levels[line]] |= 8;
+					}
+					break;
+
+				default: break;
+			}
+			break;
+
+		default: break;
+	}
 }
 
 bool m37710_cpu_device::get_m_flag() const
@@ -1230,7 +1269,6 @@ void m37710_cpu_device::m37710i_set_execution_mode(uint32_t mode)
 	m_opcodes89 = m37710i_opcodes3[mode];
 	FTABLE_GET_REG = m37710i_get_reg[mode];
 	FTABLE_SET_REG = m37710i_set_reg[mode];
-	FTABLE_SET_LINE = m37710i_set_line[mode];
 	m_execute = m37710i_execute[mode];
 }
 
