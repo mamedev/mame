@@ -9838,6 +9838,8 @@ cheekyms                        // 8004 (c) [1980?]
 
 @source:chessmate.cpp
 ccmk2                           // Chess Champion MK II
+ccmk2a                          //
+chmate                          //
 
 @source:chessmst.cpp
 chessmst                        //

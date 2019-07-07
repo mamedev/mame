@@ -11,12 +11,14 @@ Microchess, originally made for the KIM-1. Jennings went on to co-found Personal
 (later named VisiCorp, known for VisiCalc).
 
 Jennings also licensed Chessmate to Novag, and they released it as the MK II. Funnily
-enough, MK I had a stronger program. The hardware is almost identical, and the software
-is the same(identical ROM labels). 2 designs were made, one jukebox shape, and one brick
-shape. The one in MAME came from the jukebox, it's assumed both are the same game.
+enough, MK I had a stronger program. MK II hardware is almost identical to Chessmate and
+the software is the same(identical ROM labels). 2 designs were made, one jukebox shape,
+and one brick shape. The one in MAME came from the jukebox, but both have the same ROMs.
 
 TODO:
 - XTAL is unknown, result frequency of 1MHz is correct
+- is there an older version of chmate? chips on pcb photos are dated 1979, but
+  the game is known to be released in 1978
 
 *******************************************************************************
 
@@ -47,15 +49,17 @@ MOS MPS 6332 005 2179
 #include "speaker.h"
 
 // internal artwork
+#include "chessmate.lh" // clickable
 #include "novag_mk2.lh" // clickable
+#include "novag_mk2a.lh" // clickable
 
 
 namespace {
 
-class chessmate_state : public driver_device
+class chmate_state : public driver_device
 {
 public:
-	chessmate_state(const machine_config &mconfig, device_type type, const char *tag) :
+	chmate_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_miot(*this, "miot"),
@@ -65,7 +69,9 @@ public:
 	{ }
 
 	// machine configs
-	void chessmate(machine_config &config);
+	void chmate(machine_config &config);
+	void mk2(machine_config &config);
+	void mk2a(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
@@ -78,7 +84,7 @@ private:
 	required_device<mos6530_device> m_miot;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	optional_ioport_array<4> m_inputs;
+	optional_ioport_array<5> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
@@ -94,7 +100,7 @@ private:
 	u8 m_led_data;
 };
 
-void chessmate_state::machine_start()
+void chmate_state::machine_start()
 {
 	// zerofill
 	m_inp_mux = 0;
@@ -107,7 +113,7 @@ void chessmate_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-INPUT_CHANGED_MEMBER(chessmate_state::reset_button)
+INPUT_CHANGED_MEMBER(chmate_state::reset_button)
 {
 	// assume that NEW GAME button is tied to reset pin(s)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -123,19 +129,19 @@ INPUT_CHANGED_MEMBER(chessmate_state::reset_button)
 
 // 6530 ports
 
-void chessmate_state::update_display()
+void chmate_state::update_display()
 {
 	m_display->write_row(4, m_led_data);
 	m_display->matrix_partial(0, 4, 1 << m_inp_mux, m_7seg_data);
 }
 
-WRITE8_MEMBER(chessmate_state::control_w)
+WRITE8_MEMBER(chmate_state::control_w)
 {
 	// d0-d2: 74145 to input mux/digit select
 	m_inp_mux = data & 7;
 
 	// 74145 Q7: speaker out
-	m_dac->write(BIT(1 << m_inp_mux, 7));
+	m_dac->write(BIT(1 << m_inp_mux, 7) & ~m_inputs[4].read_safe(0));
 
 	// d3-d5: leds (direct)
 	m_led_data = data >> 3 & 7;
@@ -146,13 +152,13 @@ WRITE8_MEMBER(chessmate_state::control_w)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(chessmate_state::digit_w)
+WRITE8_MEMBER(chmate_state::digit_w)
 {
 	m_7seg_data = data;
 	update_display();
 }
 
-READ8_MEMBER(chessmate_state::input_r)
+READ8_MEMBER(chmate_state::input_r)
 {
 	u8 data = 0;
 
@@ -161,7 +167,7 @@ READ8_MEMBER(chessmate_state::input_r)
 	{
 		// note that number/letter buttons are electronically the same
 		u8 i = m_inp_mux - 4;
-		data = m_inputs[i]->read() | m_inputs[i | 2]->read();
+		data = m_inputs[i]->read() | m_inputs[i | 2].read_safe(0);
 	}
 
 	return ~data;
@@ -173,7 +179,7 @@ READ8_MEMBER(chessmate_state::input_r)
     Address Maps
 ******************************************************************************/
 
-void chessmate_state::main_map(address_map &map)
+void chmate_state::main_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x00ff).mirror(0x100).ram();
@@ -189,7 +195,7 @@ void chessmate_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( chessmate )
+static INPUT_PORTS_START( chmate )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / Skill Level")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / Stop Clock")
@@ -217,7 +223,29 @@ static INPUT_PORTS_START( chessmate )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmate_state, reset_button, nullptr) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, nullptr) PORT_NAME("New Game")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mk2a )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("6 / F / Skill Level")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("5 / E / Stop Clock / Rook")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("4 / D / Display Time")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C) PORT_NAME("3 / C / Chess Clock / Bishop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("2 / B / Board Verify / Knight")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A) PORT_NAME("1 / A / White / Pawn")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("8 / H / Black / Queen")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("7 / G / Game Moves")
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_TOGGLE PORT_NAME("Sound Switch")
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, nullptr) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -226,26 +254,38 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void chessmate_state::chessmate(machine_config &config)
+void chmate_state::chmate(machine_config &config)
 {
 	/* basic machine hardware */
 	M6504(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &chessmate_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chmate_state::main_map);
 
 	MOS6530(config, m_miot, 1000000);
-	m_miot->in_pa_callback().set(FUNC(chessmate_state::input_r));
-	m_miot->out_pa_callback().set(FUNC(chessmate_state::digit_w));
-	m_miot->out_pb_callback().set(FUNC(chessmate_state::control_w));
+	m_miot->in_pa_callback().set(FUNC(chmate_state::input_r));
+	m_miot->out_pa_callback().set(FUNC(chmate_state::digit_w));
+	m_miot->out_pb_callback().set(FUNC(chmate_state::control_w));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4+1, 8);
-	m_display->set_segmask(0xf, 0x7f);
-	config.set_default_layout(layout_novag_mk2);
+	m_display->set_segmask(0xf, 0xff);
+	config.set_default_layout(layout_chessmate);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
+
+void chmate_state::mk2(machine_config &config)
+{
+	chmate(config);
+	config.set_default_layout(layout_novag_mk2);
+}
+
+void chmate_state::mk2a(machine_config &config)
+{
+	chmate(config);
+	config.set_default_layout(layout_novag_mk2a);
 }
 
 
@@ -254,7 +294,19 @@ void chessmate_state::chessmate(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
+ROM_START( chmate )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("6530_024", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
+	ROM_LOAD("6332_005", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812) )
+ROM_END
+
 ROM_START( ccmk2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("6530_024", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
+	ROM_LOAD("6332_005", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812) )
+ROM_END
+
+ROM_START( ccmk2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("6530_024", 0x0c00, 0x0400, CRC(4f28c443) SHA1(e33f8b7f38e54d7a6e0f0763f2328cc12cb0eade) )
 	ROM_LOAD("6332_005", 0x1000, 0x1000, CRC(6f10991b) SHA1(90cdc5a15d9ad813ad20410f21081c6e3e481812) )
@@ -268,5 +320,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE    INPUT      STATE            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccmk2, 0,      0, chessmate, chessmate, chessmate_state, empty_init, "Novag", "Chess Champion: MK II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT CMP MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1978, chmate, 0,      0, chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, ccmk2,  chmate, 0, mk2,     chmate, chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
+CONS( 1979, ccmk2a, chmate, 0, mk2a,    mk2a,   chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
