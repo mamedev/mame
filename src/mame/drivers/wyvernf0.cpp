@@ -751,29 +751,29 @@ ROM_START( wyvernf0a ) /* Possibly the first version or even an earlier developm
 	ROM_LOAD( "soft2_7b60.ic36", 0x4000, 0x4000, CRC(569a40c4) SHA1(5391b6cdc854277e63e4658f79889da4a941ee42) ) /* Hand written label SOFT2 7B60 */
 
 	ROM_REGION( 0x10000, "rombank", 0 ) /* Only EXT 4 label was hand written, the others were printed */
-	ROM_LOAD( "a39_03.ic35",    0x0000, 0x4000, CRC(50314281) SHA1(0f4805f06b92c170469b7bc2c0342db919107a91) ) /* Labeled EXT 1 == A39 03 */
-	ROM_LOAD( "a39_04.ic34",    0x4000, 0x4000, CRC(7a225bf9) SHA1(4f0c287051e27f5bc936736225003a685cdf8ad3) ) /* Labeled EXT 2 == A39 04 */
-	ROM_LOAD( "a39_05.ic33",    0x8000, 0x4000, CRC(41f21a67) SHA1(bee4a692259c727baf5fc4f47e09efb953b1c94e) ) /* Labeled EXT 3 == A39 05 */
+	ROM_LOAD( "ext1.ic35",      0x0000, 0x4000, CRC(50314281) SHA1(0f4805f06b92c170469b7bc2c0342db919107a91) ) /* == a39_03.ic35 */
+	ROM_LOAD( "ext2.ic34",      0x4000, 0x4000, CRC(7a225bf9) SHA1(4f0c287051e27f5bc936736225003a685cdf8ad3) ) /* == a39_04.ic34 */
+	ROM_LOAD( "ext3.ic33",      0x8000, 0x4000, CRC(41f21a67) SHA1(bee4a692259c727baf5fc4f47e09efb953b1c94e) ) /* == a39_05.ic33 */
 	ROM_LOAD( "ext4_8ca8.ic32", 0xc000, 0x4000, CRC(793e36de) SHA1(2a316d832ce524250c36602ca910bb4c8befa15d) ) /* Hand written label EXT 4 8CA8 */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "a39_16.ic26", 0x0000, 0x4000, CRC(5a681fb4) SHA1(e31e751a54fa9853acb462ce22dd2ff5286808f0) ) /* Hand written label SOUND 4182 == A39 16 */
-	ROM_FILL(                0xe000, 0x2000, 0xff ) // diagnostics ROM
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // ROM had hand written label
+	ROM_LOAD( "sound_4182.ic26", 0x0000, 0x4000, CRC(5a681fb4) SHA1(e31e751a54fa9853acb462ce22dd2ff5286808f0) ) /* == a39_16.ic26 */
+	ROM_FILL(                    0xe000, 0x2000, 0xff ) // diagnostics ROM
 
 	ROM_REGION( 0x0800, "mcu", 0 )  // protected 68705P5 MCU
 	ROM_LOAD( "mc68705p5s.ic23", 0x0000, 0x0800, NO_DUMP ) /* hand written label P5 5/1 */
 
-	ROM_REGION( 0x10000, "sprites", 0 ) // sprites
-	ROM_LOAD( "a39_11.ic99", 0x0000, 0x4000, CRC(af70e1dc) SHA1(98dba673750cdfdf25c119c24da10428eff6591b) ) /* Hand written label OBJ4 D979 == A39 11 */
-	ROM_LOAD( "a39_10.ic78", 0x4000, 0x4000, CRC(a84380fb) SHA1(ed77892c1a789040fdfecd5903a23b8cbc1df1da) ) /* Hand written label OBJ3 5852 == A39 10 */
-	ROM_LOAD( "a39_09.ic96", 0x8000, 0x4000, CRC(c0cee243) SHA1(97f66dde552c7a011ecc7ca8da0e62bc83ef8102) ) /* Hand written label OBJ2 50FD == A39 09 */
-	ROM_LOAD( "a39_08.ic75", 0xc000, 0x4000, CRC(0ad69501) SHA1(29037c60bed9435568e997689d193f161f6a4f5b) ) /* Hand written label OBJ1 BD50 == A39 08 */
+	ROM_REGION( 0x10000, "sprites", 0 ) // sprites - These 4 ROMs had hand written labels
+	ROM_LOAD( "obj4_d779.ic99", 0x0000, 0x4000, CRC(af70e1dc) SHA1(98dba673750cdfdf25c119c24da10428eff6591b) ) /* == a39_11.ic99 */
+	ROM_LOAD( "obj3_5852.ic78", 0x4000, 0x4000, CRC(a84380fb) SHA1(ed77892c1a789040fdfecd5903a23b8cbc1df1da) ) /* == a39_10.ic78 */
+	ROM_LOAD( "obj2_50fd.ic96", 0x8000, 0x4000, CRC(c0cee243) SHA1(97f66dde552c7a011ecc7ca8da0e62bc83ef8102) ) /* == a39_09.ic96 */
+	ROM_LOAD( "obj1_bd50.ic75", 0xc000, 0x4000, CRC(0ad69501) SHA1(29037c60bed9435568e997689d193f161f6a4f5b) ) /* == a39_08.ic75 */
 
 	ROM_REGION( 0x8000, "tiles", 0 ) // tilemaps
-	ROM_LOAD( "a39_15.ic99",  0x0000, 0x2000, CRC(90a66147) SHA1(8515c43980b7fa55933ca74fb23172e8c832a830) ) /* Labeled SCH 4 == A39 15 */
-	ROM_LOAD( "a39_14.ic73",  0x2000, 0x2000, CRC(a31f3507) SHA1(f72e089dbd700639d64e418812d4b6f4dc1dff75) ) /* Labeled SCH 3 == A39 14 */
-	ROM_LOAD( "a39_13.ic100", 0x4000, 0x2000, CRC(be708238) SHA1(f12d433af7bf6010dea9454a1b3bb2990a42a372) ) /* Labeled SCH 2 == A39 13 */
-	ROM_LOAD( "a39_12.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) ) /* Labeled SCH 1 == A39 12 */
+	ROM_LOAD( "sch_4.ic99",  0x0000, 0x2000, CRC(90a66147) SHA1(8515c43980b7fa55933ca74fb23172e8c832a830) ) /* == a39_15.ic99  */
+	ROM_LOAD( "sch_3.ic73",  0x2000, 0x2000, CRC(a31f3507) SHA1(f72e089dbd700639d64e418812d4b6f4dc1dff75) ) /* == a39_14.ic73  */
+	ROM_LOAD( "sch_2.ic100", 0x4000, 0x2000, CRC(be708238) SHA1(f12d433af7bf6010dea9454a1b3bb2990a42a372) ) /* == a39_13.ic100 */
+	ROM_LOAD( "sch_1.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) ) /* == a39_12.ic74  */
 ROM_END
 
 GAME( 1985, wyvernf0,  0,        wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito Corporation", "Wyvern F-0 (Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
