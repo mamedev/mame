@@ -1042,9 +1042,12 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		writer.Key("MemoryAddress");
 		writer.String(hex_buf);
 
-		sprintf(hex_buf, "0x%08x", m_dma_state.offset);
-		writer.Key("ROMSourceOffset");
+		sprintf(hex_buf, "0x%08x", m_dma_state.offset >> 3);
+		writer.Key("ROMSourceOffsetByte");
 		writer.String(hex_buf);
+
+		writer.Key("ROMSourceOffsetBit");
+		writer.Int(m_dma_state.offset & 7);
 
 		writer.Key("Size");
 		writer.StartArray();
