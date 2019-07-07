@@ -84,7 +84,6 @@ private:
 	DECLARE_WRITE8_MEMBER(video_w);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	uint32_t screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -140,7 +139,7 @@ void proteus3_state::proteus3_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8004, 0x8007).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8008, 0x8009).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // cassette
-	map(0x8010, 0x8011).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // serial keyboard (never writes data)
+	map(0x8010, 0x8011).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // serial keyboard 7E2 (never writes data)
 	map(0xc000, 0xffff).rom();
 }
 
@@ -152,22 +151,22 @@ void proteus3_state::proteus3_mem(address_map &map)
 static INPUT_PORTS_START(proteus3)
 	PORT_START("SERIAL")
 	PORT_CONFNAME(0x0F , 0x00 , "Serial Baud Rate") // F1-F16 pins on MC14411 in X16
-	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "153600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F2,  "115200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "76800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F4,  "57600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "38400")
-	PORT_CONFSETTING(mc14411_device::TIMER_F6,  "28800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "19200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "9600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "4800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F10, "3200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F11, "2400")
-	PORT_CONFSETTING(mc14411_device::TIMER_F12, "2153.3")
-	PORT_CONFSETTING(mc14411_device::TIMER_F13, "1758.8")
-	PORT_CONFSETTING(mc14411_device::TIMER_F14, "1200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F15, "921600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F16, "1843200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F2,  "7200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F4,  "3600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F6,  "1800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300")
+	PORT_CONFSETTING(mc14411_device::TIMER_F10, "200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150")
+	PORT_CONFSETTING(mc14411_device::TIMER_F12, "134.5")
+	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110")
+	PORT_CONFSETTING(mc14411_device::TIMER_F14, "75")
+	PORT_CONFSETTING(mc14411_device::TIMER_F15, "57600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F16, "115200")
 INPUT_PORTS_END
 
 void proteus3_state::kbd_put(u8 data)
