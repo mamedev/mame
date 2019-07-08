@@ -25,8 +25,8 @@
 		</rect>
 	</element>
 
-	<element name="text_from"><text string="FROM"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_to"><text string="TO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_from"><text string="FROM"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="text_to"><text string="TO"><color red="0.6" green="0.6" blue="0.6" /></text></element>
 
 	<element name="text_b1">
 		<rect><color red="0.2" green="0.2" blue="0.2" /></rect>

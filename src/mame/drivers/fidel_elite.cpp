@@ -245,7 +245,7 @@ READ8_MEMBER(elite_state::input_r)
 	// read chessboard sensors
 	if (m_inp_mux < 8)
 	{
-		// EAG chessboard is rotated 90 degrees compared to EAS
+		// EAG chessboard is rotated 90 degrees
 		if (m_rotate)
 			data = m_board->read_rank(m_inp_mux);
 		else

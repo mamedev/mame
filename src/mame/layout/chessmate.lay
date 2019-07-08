@@ -248,9 +248,9 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-2" right="48" top="14.5" bottom="53" />
+		<bounds left="-2" right="48" top="15" bottom="52.5" />
 
-		<bezel element="white"><bounds x="-2" y="14.5" width="50" height="38.5" /></bezel>
+		<bezel element="white"><bounds x="-2" y="15" width="50" height="37.5" /></bezel>
 
 		<bezel element="text_from"><bounds x="8.5" y="15.9" width="10.5" height="1.5" /></bezel>
 		<bezel element="text_to"><bounds x="27" y="15.9" width="10.5" height="1.5" /></bezel>
