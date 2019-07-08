@@ -53,6 +53,7 @@
 DEFINE_DEVICE_TYPE(XMAP9,      xmap9_device,      "xmap9",      "SGI XMAP9")
 DEFINE_DEVICE_TYPE(CMAP,       cmap_device,       "cmap",       "SGI CMAP")
 DEFINE_DEVICE_TYPE(VC2,        vc2_device,        "vc2",        "SGI VC2")
+DEFINE_DEVICE_TYPE(RB2,        rb2_device,        "rb2",        "SGI RB2")
 DEFINE_DEVICE_TYPE(GIO64_XL8,  gio64_xl8_device,  "gio64_xl8",  "SGI 8-bit XL board")
 DEFINE_DEVICE_TYPE(GIO64_XL24, gio64_xl24_device, "gio64_xl24", "SGI 24-bit XL board")
 
@@ -268,6 +269,7 @@ vc2_device::vc2_device(const machine_config &mconfig, const char *tag, device_t 
 void vc2_device::device_start()
 {
 	m_vert_int.resolve_safe();
+	m_screen_timing_changed.resolve_safe();
 
 	m_ram = std::make_unique<uint16_t[]>(RAM_SIZE);
 	m_vt_table = make_unique_clear<uint32_t[]>(2048 * 2048);
@@ -673,6 +675,8 @@ void vc2_device::update_screen_size()
 			src++;
 		}
 	}
+
+	m_screen_timing_changed(1);
 }
 
 bool vc2_device::is_cursor_active(int x, int y)
@@ -728,30 +732,209 @@ WRITE_LINE_MEMBER(vc2_device::vblank_w)
 
 /*************************************
  *
+ *  RB2 Device
+ *
+ *************************************/
+
+/*static*/ const size_t rb2_device::BUFFER_SIZE = (1280 + 64) * (1024 + 64);
+
+rb2_device::rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RB2, tag, owner, clock)
+{
+}
+
+void rb2_device::device_start()
+{
+	m_rgbci = std::make_unique<uint32_t[]>(BUFFER_SIZE);
+	m_cidaux = std::make_unique<uint32_t[]>(BUFFER_SIZE);
+
+	save_item(NAME(m_global_mask));
+	save_item(NAME(m_write_mask));
+	save_item(NAME(m_blend));
+	save_item(NAME(m_fast_clear));
+	save_item(NAME(m_rgbmode));
+	save_item(NAME(m_dblsrc));
+	save_item(NAME(m_plane_enable));
+	save_item(NAME(m_draw_depth));
+	save_item(NAME(m_logicop));
+	save_item(NAME(m_store_shift));
+
+	save_pointer(NAME(&m_rgbci[0]), BUFFER_SIZE);
+	save_pointer(NAME(&m_cidaux[0]), BUFFER_SIZE);
+}
+
+void rb2_device::device_reset()
+{
+	m_write_mask = 0;
+	m_blend = false;
+	m_fast_clear = false;
+	m_rgbmode = false;
+	m_dblsrc = false;
+	m_plane_enable = 0;
+	m_draw_depth = 0;
+	m_logicop = 0;
+	m_store_shift = 0;
+
+	m_dest_buf = &m_rgbci[0];
+	m_buf_ptr = &m_rgbci[0];
+}
+
+void rb2_device::set_write_mask(uint32_t data)
+{
+	m_write_mask = data;
+}
+
+void rb2_device::set_flags(uint16_t data)
+{
+	m_blend = BIT(data, 12);
+	m_fast_clear = BIT(data, 11);
+	m_rgbmode = BIT(data, 10);
+	m_dblsrc = BIT(data, 9);
+	m_plane_enable = (data & 0x1c0) >> 6;
+	m_draw_depth = (data & 0x30) >> 4;
+	m_logicop = data & 0xf;
+
+	static const uint32_t s_store_shift[8][4][2] = {
+		{   { 0,  0 }, // None, 4bpp, Buffer 0/1
+			{ 0,  0 }, // None, 8bpp, Buffer 0/1
+			{ 0,  0 }, // None, 12bpp, Buffer 0/1
+			{ 0,  0 }, // None, 24bpp, Buffer 0/1 (not valid)
+		},
+		{   { 0,  0 }, // RGB/CI, 4bpp, Buffer 0/1
+			{ 0,  8 }, // RGB/CI, 8bpp, Buffer 0/1
+			{ 0, 12 }, // RGB/CI, 12bpp, Buffer 0/1
+			{ 0,  0 }, // RGB/CI, 24bpp, Buffer 0/1 (not valid)
+		},
+		{   { 0,  0 }, // RGBA, 4bpp, Buffer 0/1
+			{ 0,  8 }, // RGBA, 8bpp, Buffer 0/1
+			{ 0, 12 }, // RGBA, 12bpp, Buffer 0/1
+			{ 0,  0 }, // RGBA, 24bpp, Buffer 0/1 (not valid)
+		},
+		{   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
+			{ 0,  0 }, // Invalid, 8bpp, Buffer 0/1
+			{ 0,  0 }, // Invalid, 12bpp, Buffer 0/1
+			{ 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
+		},
+		{   { 8, 16 }, // Overlay, 4bpp, Buffer 0/1
+			{ 8, 16 }, // Overlay, 8bpp, Buffer 0/1
+			{ 8, 16 }, // Overlay, 12bpp, Buffer 0/1
+			{ 8, 16 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
+		},
+		{   { 2,  6 }, // Popup, 4bpp, Buffer 0/1
+			{ 2,  6 }, // Popup, 8bpp, Buffer 0/1
+			{ 2,  6 }, // Popup, 12bpp, Buffer 0/1
+			{ 2,  6 }, // Popup, 24bpp, Buffer 0/1 (not valid)
+		},
+		{   { 0,  4 }, // CID, 4bpp, Buffer 0/1
+			{ 0,  4 }, // CID, 8bpp, Buffer 0/1
+			{ 0,  4 }, // CID, 12bpp, Buffer 0/1
+			{ 0,  4 }, // CID, 24bpp, Buffer 0/1 (not valid)
+		},
+		{   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
+			{ 0,  0 }, // Invalid, 8bpp, Buffer 0/1
+			{ 0,  0 }, // Invalid, 12bpp, Buffer 0/1
+			{ 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
+		},
+	};
+
+	m_store_shift = s_store_shift[m_plane_enable][m_draw_depth][m_dblsrc];
+
+	switch (m_plane_enable)
+	{
+		case 1: // RGB/CI planes
+		case 2: // RGBA planes
+			m_dest_buf = &m_rgbci[0];
+			break;
+		case 4: // Overlay planes
+		case 5: // Popup planes
+		case 6: // CID planes
+			m_dest_buf = &m_cidaux[0];
+			break;
+	}
+}
+
+void rb2_device::set_address(uint32_t address)
+{
+	m_buf_ptr = &m_dest_buf[address];
+}
+
+uint32_t rb2_device::read_pixel()
+{
+	return *m_buf_ptr >> m_store_shift;
+}
+
+void rb2_device::write_pixel(uint32_t data)
+{
+	if (m_blend)
+		store_pixel(data);
+	else
+		logic_pixel(data);
+}
+
+void rb2_device::logic_pixel(uint32_t src)
+{
+	const uint32_t dst = read_pixel();
+
+	switch (m_logicop)
+	{
+		case 0:     store_pixel(0x000000);        break;
+		case 1:     store_pixel(src & dst);       break;
+		case 2:     store_pixel(src & ~dst);      break;
+		case 3:     store_pixel(src);             break;
+		case 4:     store_pixel(~src & dst);      break;
+		case 5:     store_pixel(dst);             break;
+		case 6:     store_pixel(src ^ dst);       break;
+		case 7:     store_pixel(src | dst);       break;
+		case 8:     store_pixel(~(src | dst));    break;
+		case 9:     store_pixel(~(src ^ dst));    break;
+		case 10:    store_pixel(~dst);            break;
+		case 11:    store_pixel(src | ~dst);      break;
+		case 12:    store_pixel(~src);            break;
+		case 13:    store_pixel(~src | dst);      break;
+		case 14:    store_pixel(~(src & dst));    break;
+		case 15:    store_pixel(0xffffff);        break;
+	}
+}
+
+void rb2_device::store_pixel(uint32_t value)
+{
+	const uint32_t write_mask = m_write_mask & m_global_mask;
+	*m_buf_ptr &= ~write_mask;
+	*m_buf_ptr |= (value << m_store_shift) & write_mask;
+}
+
+
+/*************************************
+ *
  *  Newport Device
  *
  *************************************/
 
 /*static*/ const uint32_t newport_base_device::s_host_shifts[4] = { 8, 8, 16, 32 };
 
-newport_base_device::newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask)
+newport_base_device::newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gio64_card_interface(mconfig, *this)
 	, m_screen(*this, "screen")
 	, m_xmap(*this, "xmap%u", 0U)
 	, m_cmap(*this, "cmap%u", 0U)
 	, m_vc2(*this, "vc2")
-	, m_global_mask(global_mask)
+	, m_rb2(*this, "rb2")
+	, m_write_mask_w(*this)
+	, m_draw_flags_w(*this)
+	, m_set_address(*this)
+	, m_write_pixel(*this)
+	, m_read_pixel(*this)
 {
 }
 
 gio64_xl8_device::gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: newport_base_device(mconfig, GIO64_XL8, tag, owner, clock, 0x000000ff)
+	: newport_base_device(mconfig, GIO64_XL8, tag, owner, clock)
 {
 }
 
 gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: newport_base_device(mconfig, GIO64_XL24, tag, owner, clock, 0xffffffff)
+	: newport_base_device(mconfig, GIO64_XL24, tag, owner, clock)
 {
 }
 
@@ -761,13 +944,7 @@ gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *
 
 void newport_base_device::device_start()
 {
-	m_rgbci = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
-	m_cidaux = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
-
 	m_dcb_timeout_timer = timer_alloc(DCB_TIMEOUT);
-
-	save_pointer(NAME(m_rgbci), (1280+64) * (1024+64));
-	save_pointer(NAME(m_cidaux), (1280+64) * (1024+64));
 
 	save_item(NAME(m_rex3.m_draw_mode0));
 	save_item(NAME(m_rex3.m_color_host));
@@ -779,7 +956,6 @@ void newport_base_device::device_start()
 	save_item(NAME(m_rex3.m_rwdouble));
 	save_item(NAME(m_rex3.m_sfactor));
 	save_item(NAME(m_rex3.m_dfactor));
-	save_item(NAME(m_rex3.m_logicop));
 	save_item(NAME(m_rex3.m_store_shift));
 	save_item(NAME(m_rex3.m_write_width));
 	save_item(NAME(m_rex3.m_ls_mode));
@@ -859,6 +1035,12 @@ void newport_base_device::device_start()
 	save_item(NAME(m_ramdac_lut_g));
 	save_item(NAME(m_ramdac_lut_b));
 	save_item(NAME(m_ramdac_lut_index));
+
+	m_write_mask_w.resolve_safe();
+	m_draw_flags_w.resolve_safe();
+	m_set_address.resolve_safe();
+	m_write_pixel.resolve_safe();
+	m_read_pixel.resolve_safe(0);
 }
 
 //-------------------------------------------------
@@ -912,8 +1094,8 @@ void newport_base_device::start_logging()
 	fwrite(&m_rex3, sizeof(rex3_t), 1, m_newview_log);
 	// TODO
 	//fwrite(&m_cmap0, sizeof(cmap_t), 1, m_newview_log);
-	fwrite(&m_rgbci[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
-	fwrite(&m_cidaux[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	//fwrite(&m_rgbci[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	//fwrite(&m_cidaux[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
 }
 
 void newport_base_device::stop_logging()
@@ -945,8 +1127,8 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 	for (int y = cliprect.min_y, sy = y_start; y <= cliprect.max_y && sy < y_end; y++, sy++)
 	{
 		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
-		uint32_t *src_rgbci = &m_rgbci[1344 * y];
-		uint32_t *src_cidaux = &m_cidaux[1344 * y];
+		const uint32_t *src_rgbci = m_rb2->rgbci(y);
+		const uint32_t *src_cidaux = m_rb2->cidaux(y);
 
 		// Fetch the initial DID entry
 		uint16_t curr_did_entry = m_vc2->begin_did_line(y);
@@ -1888,16 +2070,16 @@ uint32_t newport_base_device::get_host_color()
 	return color;
 }
 
-void newport_base_device::write_pixel(uint32_t color)
+void newport_base_device::output_pixel(uint32_t color)
 {
 	const bool shade = BIT(m_rex3.m_draw_mode0, 18);
 	const bool rgbmode = BIT(m_rex3.m_draw_mode1, 15);
 	if (m_rex3.m_color_host)
-		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_host_color());
+		output_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_host_color());
 	else if (shade || rgbmode)
-		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_rgb_color(m_rex3.m_x_start_i, m_rex3.m_y_start_i));
+		output_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, get_rgb_color(m_rex3.m_x_start_i, m_rex3.m_y_start_i));
 	else
-		write_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, color);
+		output_pixel(m_rex3.m_x_start_i, m_rex3.m_y_start_i, color);
 }
 
 bool newport_base_device::pixel_clip_pass(int16_t x, int16_t y)
@@ -1983,9 +2165,26 @@ bool newport_base_device::pixel_clip_pass(int16_t x, int16_t y)
 	return true;
 }
 
-void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
+void newport_base_device::output_pixel(int16_t x, int16_t y, uint32_t color)
 {
-	const uint32_t dst = *dest_buf >> m_rex3.m_store_shift;
+	if (!pixel_clip_pass(x, y))
+	{
+		return;
+	}
+
+	x += m_rex3.m_x_window;
+	y += m_rex3.m_y_window;
+	x -= 0x1000;
+	y -= 0x1000;
+
+	const uint32_t address = (uint32_t)(y * (1280 + 64) + x);
+	m_set_address(address);
+	m_write_pixel(color);
+}
+
+void newport_base_device::blend_pixel(uint32_t src)
+{
+	const uint32_t dst = m_read_pixel();
 
 	float sa = ((src >> 24) & 0xff) / 255.0f;
 	float sb = 0.0f;
@@ -2013,7 +2212,7 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 		sg = (0x92 * BIT(src, 5)) | (0x49 * BIT(src, 4)) | (0x24 * BIT(src, 3));
 		sr = (0x92 * BIT(src, 2)) | (0x49 * BIT(src, 1)) | (0x24 * BIT(src, 0));
 
-		if (BIT(m_rex3.m_draw_mode1, 25))
+		if (m_rex3.m_blend_back)
 		{
 			db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
 			dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
@@ -2032,7 +2231,7 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 		sg = (((src >> 4) & 15) * 0x11) / 255.0f;
 		sr = (((src >> 0) & 15) * 0x11) / 255.0f;
 
-		if (BIT(m_rex3.m_draw_mode1, 25))
+		if (m_rex3.m_blend_back)
 		{
 			db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
 			dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
@@ -2052,7 +2251,7 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 		sg = (uint8_t)(src >>  8) / 255.0f;
 		sr = (uint8_t)(src >>  0) / 255.0f;
 
-		if (BIT(m_rex3.m_draw_mode1, 25))
+		if (m_rex3.m_blend_back)
 		{
 			db = (uint8_t)(m_rex3.m_color_back >> 16) / 255.0f;
 			dg = (uint8_t)(m_rex3.m_color_back >>  8) / 255.0f;
@@ -2158,78 +2357,12 @@ void newport_base_device::blend_pixel(uint32_t *dest_buf, uint32_t src)
 	case 1: // 8bpp (not supported)
 		break;
 	case 2: // 12bpp
-		store_pixel(dest_buf, ((b_blend_i & 0xf0) << 4) | (g_blend_i & 0xf0) | ((r_blend_i & 0xf0) >> 4));
+		m_write_pixel(((b_blend_i & 0xf0) << 4) | (g_blend_i & 0xf0) | ((r_blend_i & 0xf0) >> 4));
 		break;
 	case 3: // 24bpp
-		store_pixel(dest_buf, (b_blend_i << 16) | (g_blend_i << 8) | r_blend_i);
+		m_write_pixel((b_blend_i << 16) | (g_blend_i << 8) | r_blend_i);
 		break;
 	}
-}
-
-void newport_base_device::logic_pixel(uint32_t *dest_buf, uint32_t src)
-{
-	const uint32_t dst = *dest_buf >> m_rex3.m_store_shift;
-
-	switch (m_rex3.m_logicop)
-	{
-		case 0:     store_pixel(dest_buf, 0x000000);        break;
-		case 1:     store_pixel(dest_buf, src & dst);       break;
-		case 2:     store_pixel(dest_buf, src & ~dst);      break;
-		case 3:     store_pixel(dest_buf, src);             break;
-		case 4:     store_pixel(dest_buf, ~src & dst);      break;
-		case 5:     store_pixel(dest_buf, dst);             break;
-		case 6:     store_pixel(dest_buf, src ^ dst);       break;
-		case 7:     store_pixel(dest_buf, src | dst);       break;
-		case 8:     store_pixel(dest_buf, ~(src | dst));    break;
-		case 9:     store_pixel(dest_buf, ~(src ^ dst));    break;
-		case 10:    store_pixel(dest_buf, ~dst);            break;
-		case 11:    store_pixel(dest_buf, src | ~dst);      break;
-		case 12:    store_pixel(dest_buf, ~src);            break;
-		case 13:    store_pixel(dest_buf, ~src | dst);      break;
-		case 14:    store_pixel(dest_buf, ~(src & dst));    break;
-		case 15:    store_pixel(dest_buf, 0xffffff);        break;
-	}
-}
-
-void newport_base_device::store_pixel(uint32_t *dest_buf, uint32_t value)
-{
-	const uint32_t write_mask = m_rex3.m_write_mask & m_global_mask;
-	*dest_buf &= ~write_mask;
-	*dest_buf |= (value << m_rex3.m_store_shift) & write_mask;
-}
-
-void newport_base_device::write_pixel(int16_t x, int16_t y, uint32_t color)
-{
-	if (!pixel_clip_pass(x, y))
-	{
-		return;
-	}
-
-	x += m_rex3.m_x_window;
-	y += m_rex3.m_y_window;
-	x -= 0x1000;
-	y -= 0x1000;
-
-	uint32_t *dest_buf = nullptr;
-	switch (m_rex3.m_plane_enable)
-	{
-		case 1: // RGB/CI planes
-			dest_buf = &m_rgbci[y * (1280 + 64) + x];
-			break;
-		case 2: // RGBA planes
-			// Not yet handled
-			break;
-		case 4: // Overlay planes
-		case 5: // Popup planes
-		case 6: // CID planes
-			dest_buf = &m_cidaux[y * (1280 + 64) + x];
-			break;
-	}
-
-	if (BIT(m_rex3.m_draw_mode1, 18))
-		blend_pixel(dest_buf, color);
-	else
-		logic_pixel(dest_buf, color);
 }
 
 uint32_t newport_base_device::get_rgb_color(int16_t x, int16_t y)
@@ -2533,9 +2666,9 @@ void newport_base_device::do_fline(uint32_t color)
 		const int16_t x16 = (int16_t)(x >> 4);
 		const int16_t y16 = (int16_t)(y >> 4);
 		if (shade || rgbmode)
-			write_pixel(x16, y16, get_rgb_color(x16, y16));
+			output_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x16, y16, color);
+			output_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2566,9 +2699,9 @@ void newport_base_device::do_fline(uint32_t color)
 		const int16_t x16 = (int16_t)(x >> 4);
 		const int16_t y16 = (int16_t)(y >> 4);
 		if (shade || rgbmode)
-			write_pixel(x16, y16, get_rgb_color(x16, y16));
+			output_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x16, y16, color);
+			output_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2592,9 +2725,9 @@ void newport_base_device::do_fline(uint32_t color)
 		const int16_t x16 = (int16_t)(x2 >> 4);
 		const int16_t y16 = (int16_t)(y2 >> 4);
 		if (shade || rgbmode)
-			write_pixel(x16, y16, get_rgb_color(x16, y16));
+			output_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x16, y16, color);
+			output_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2658,9 +2791,9 @@ void newport_base_device::do_iline(uint32_t color)
 		const int16_t y16 = (int16_t)y;
 
 		if (shade || rgbmode)
-			write_pixel(x16, y16, get_rgb_color(x16, y16));
+			output_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x16, y16, color);
+			output_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2692,9 +2825,9 @@ void newport_base_device::do_iline(uint32_t color)
 		const int16_t y16 = (int16_t)y;
 
 		if (shade || rgbmode)
-			write_pixel(x16, y16, get_rgb_color(x16, y16));
+			output_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x16, y16, color);
+			output_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2719,9 +2852,9 @@ void newport_base_device::do_iline(uint32_t color)
 		const int16_t y16 = (int16_t)y2;
 
 		if (shade || rgbmode)
-			write_pixel(x16, y16, get_rgb_color(x16, y16));
+			output_pixel(x16, y16, get_rgb_color(x16, y16));
 		else
-			write_pixel(x16, y16, color);
+			output_pixel(x16, y16, color);
 
 		if (shade)
 			iterate_shade();
@@ -2741,14 +2874,11 @@ uint32_t newport_base_device::do_pixel_read()
 	m_rex3.m_bres_octant_inc1 = 0;
 	const int16_t src_x = m_rex3.m_x_start_i + m_rex3.m_x_window - 0x1000;
 	const int16_t src_y = m_rex3.m_y_start_i + m_rex3.m_y_window - 0x1000;
-	const uint32_t src_addr = src_y * (1280 + 64) + src_x;
 	uint32_t ret = 0;
-	switch (m_rex3.m_plane_enable)
+	m_set_address(src_y * (1280 + 64) + src_x);
+	ret = m_read_pixel();
+	if (m_rex3.m_plane_enable == 1 || m_rex3.m_plane_enable == 2) // RGB/CI or RGBA planes
 	{
-	case 1: // RGB/CI planes
-	case 2: // RGBA planes
-	{
-		ret = m_rgbci[src_addr];
 		uint8_t convert_index = (m_rex3.m_plane_depth << 2) | m_rex3.m_hostdepth;
 		switch (convert_index & 15)
 		{
@@ -2792,15 +2922,8 @@ uint32_t newport_base_device::do_pixel_read()
 			ret = convert_24bpp_bgr_to_12bpp(ret);
 			break;
 		}
-		break;
 	}
-	case 4: // Overlay planes
-	case 5: // Popup planes
-	case 6: // CID planes
-		ret = m_cidaux[src_addr];
-		break;
-	}
-	LOGMASKED(LOG_COMMANDS, "Read %08x (%08x) from %04x, %04x\n", ret, m_rgbci[src_addr], src_x, src_y);
+	LOGMASKED(LOG_COMMANDS, "Read %08x from %04x, %04x\n", ret, src_x, src_y);
 	m_rex3.m_x_start_i++;
 	if (m_rex3.m_x_start_i > m_rex3.m_x_end_i)
 	{
@@ -3054,15 +3177,15 @@ void newport_base_device::do_rex3_command()
 						if (BIT(pattern, bit))
 						{
 							if (m_rex3.m_color_host)
-								write_pixel(start_x, start_y, get_host_color());
+								output_pixel(start_x, start_y, get_host_color());
 							else if ((shade || rgbmode) && !fastclear)
-								write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
+								output_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
 							else
-								write_pixel(start_x, start_y, color);
+								output_pixel(start_x, start_y, color);
 						}
 						else if (opaque)
 						{
-							write_pixel(start_x, start_y, m_rex3.m_color_back);
+							output_pixel(start_x, start_y, m_rex3.m_color_back);
 						}
 
 						bit = (bit - 1) & 0x1f;
@@ -3154,15 +3277,15 @@ void newport_base_device::do_rex3_command()
 							if (BIT(pattern, bit))
 							{
 								if (m_rex3.m_color_host)
-									write_pixel(start_x, start_y, get_host_color());
+									output_pixel(start_x, start_y, get_host_color());
 								else if ((shade || rgbmode) && !fastclear)
-									write_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
+									output_pixel(start_x, start_y, get_rgb_color(start_x, start_y));
 								else
-									write_pixel(start_x, start_y, color);
+									output_pixel(start_x, start_y, color);
 							}
 							else if (opaque)
 							{
-								write_pixel(start_x, start_y, m_rex3.m_color_back);
+								output_pixel(start_x, start_y, m_rex3.m_color_back);
 							}
 
 							bit = (bit - 1) & 0x1f;
@@ -3215,26 +3338,10 @@ void newport_base_device::do_rex3_command()
 				{
 					do
 					{
-						const uint32_t src_addr = (start_y + m_rex3.m_y_window - 0x1000) * (1280 + 64) + (start_x + m_rex3.m_x_window - 0x1000);
-						uint32_t src = 0;
-						switch (mode1 & 7)
-						{
-						case 1: // RGB/CI planes
-							src = m_rgbci[src_addr];
-							break;
-						case 2: // RGBA planes (not yet implemented)
-							break;
-						case 4: // Overlay planes
-						case 5: // Popup planes
-						case 6: // CID planes
-							src = m_cidaux[src_addr];
-							break;
-						default:
-							break;
-						}
-						src >>= m_rex3.m_store_shift;
+						m_set_address((start_y + m_rex3.m_y_window - 0x1000) * (1280 + 64) + (start_x + m_rex3.m_x_window - 0x1000));
+						uint32_t src = m_read_pixel();
 
-						write_pixel(start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move, src);
+						output_pixel(start_x + m_rex3.m_x_move, start_y + m_rex3.m_y_move, src);
 
 						start_x += dx;
 					} while (start_x != end_x && stop_on_x);
@@ -3339,7 +3446,7 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 				LOGMASKED(LOG_REX3 | LOG_UNKNOWN, "    Unknown Plane Enable Value\n");
 				break;
 			}
-			switch ((data32 & 0x00000018) >> 3)
+			switch ((data32 >> 3) & 3)
 			{
 			case 0x00:
 				LOGMASKED(LOG_REX3, "    Plane Draw Depth:    4 bits\n");
@@ -3489,49 +3596,6 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			}
 			m_rex3.m_draw_mode1 = data32;
 
-			static const uint32_t s_store_shift[8][4][2] = {
-				{   { 0,  0 }, // None, 4bpp, Buffer 0/1
-					{ 0,  0 }, // None, 8bpp, Buffer 0/1
-					{ 0,  0 }, // None, 12bpp, Buffer 0/1
-					{ 0,  0 }, // None, 24bpp, Buffer 0/1 (not valid)
-				},
-				{   { 0,  0 }, // RGB/CI, 4bpp, Buffer 0/1
-					{ 0,  8 }, // RGB/CI, 8bpp, Buffer 0/1
-					{ 0, 12 }, // RGB/CI, 12bpp, Buffer 0/1
-					{ 0,  0 }, // RGB/CI, 24bpp, Buffer 0/1 (not valid)
-				},
-				{   { 0,  0 }, // RGBA, 4bpp, Buffer 0/1
-					{ 0,  8 }, // RGBA, 8bpp, Buffer 0/1
-					{ 0, 12 }, // RGBA, 12bpp, Buffer 0/1
-					{ 0,  0 }, // RGBA, 24bpp, Buffer 0/1 (not valid)
-				},
-				{   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
-					{ 0,  0 }, // Invalid, 8bpp, Buffer 0/1
-					{ 0,  0 }, // Invalid, 12bpp, Buffer 0/1
-					{ 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
-				},
-				{   { 8, 16 }, // Overlay, 4bpp, Buffer 0/1
-					{ 8, 16 }, // Overlay, 8bpp, Buffer 0/1
-					{ 8, 16 }, // Overlay, 12bpp, Buffer 0/1
-					{ 8, 16 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
-				},
-				{   { 2,  6 }, // Popup, 4bpp, Buffer 0/1
-					{ 2,  6 }, // Popup, 8bpp, Buffer 0/1
-					{ 2,  6 }, // Popup, 12bpp, Buffer 0/1
-					{ 2,  6 }, // Popup, 24bpp, Buffer 0/1 (not valid)
-				},
-				{   { 0,  4 }, // CID, 4bpp, Buffer 0/1
-					{ 0,  4 }, // CID, 8bpp, Buffer 0/1
-					{ 0,  4 }, // CID, 12bpp, Buffer 0/1
-					{ 0,  4 }, // CID, 24bpp, Buffer 0/1 (not valid)
-				},
-				{   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
-					{ 0,  0 }, // Invalid, 8bpp, Buffer 0/1
-					{ 0,  0 }, // Invalid, 12bpp, Buffer 0/1
-					{ 0,  0 }, // Invalid, 24bpp, Buffer 0/1 (not valid)
-				},
-			};
-
 			m_rex3.m_plane_enable = m_rex3.m_draw_mode1 & 7;
 			m_rex3.m_plane_depth = (m_rex3.m_draw_mode1 >> 3) & 3;
 			m_rex3.m_rwpacked = BIT(m_rex3.m_draw_mode1, 7);
@@ -3539,10 +3603,18 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			m_rex3.m_rwdouble = BIT(m_rex3.m_draw_mode1, 10);
 			m_rex3.m_sfactor = (m_rex3.m_draw_mode1 >> 19) & 7;
 			m_rex3.m_dfactor = (m_rex3.m_draw_mode1 >> 22) & 7;
-			m_rex3.m_logicop = (m_rex3.m_draw_mode1 >> 28) & 15;
+			m_rex3.m_blend_back = BIT(m_rex3.m_draw_mode1, 25);
 
-			m_rex3.m_store_shift = s_store_shift[m_rex3.m_plane_enable][m_rex3.m_plane_depth][BIT(m_rex3.m_draw_mode1, 5)];
 			m_rex3.m_host_shift = 64 - s_host_shifts[m_rex3.m_hostdepth];
+
+			uint16_t draw_flags = BIT(data32, 18) << 12;
+			draw_flags |= BIT(data32, 17) << 11;
+			draw_flags |= BIT(data32, 15) << 10;
+			draw_flags |= BIT(data32,  5) << 9;
+			draw_flags |= (data32 & 7) << 6;
+			draw_flags |= (data32 & 0x18) << 1;
+			draw_flags |= (data32 >> 28) & 0xf;
+			m_draw_flags_w(draw_flags);
 		}
 		if (ACCESSING_BITS_0_31)
 		{
@@ -3969,6 +4041,7 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 			const uint32_t data32 = (uint32_t)(data >> 32);
 			LOGMASKED(LOG_REX3, "REX3 Write Mask Write: %08x\n", data32);
 			m_rex3.m_write_mask = data32 & 0xffffff;
+			m_write_mask_w(m_rex3.m_write_mask);
 		}
 		if (ACCESSING_BITS_0_31)
 		{
@@ -4225,7 +4298,7 @@ void newport_base_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(m_vc2, FUNC(vc2_device::vblank_w));
 }
 
-void newport_base_device::device_add_mconfig(machine_config &config, uint32_t xmap_revision, uint32_t cmap_revision)
+void newport_base_device::device_add_mconfig(machine_config &config, uint32_t xmap_revision, uint32_t cmap_revision, uint32_t global_mask)
 {
 	newport_base_device::device_add_mconfig(config);
 
@@ -4233,14 +4306,20 @@ void newport_base_device::device_add_mconfig(machine_config &config, uint32_t xm
 	XMAP9(config, m_xmap[1], 0, xmap_revision);
 	CMAP(config, m_cmap[0], 0, cmap_revision);
 	CMAP(config, m_cmap[1], 0, cmap_revision);
+	RB2(config, m_rb2, 0, global_mask);
+	write_mask().set(m_rb2, FUNC(rb2_device::set_write_mask));
+	draw_flags().set(m_rb2, FUNC(rb2_device::set_flags));
+	pixel_address().set(m_rb2, FUNC(rb2_device::set_address));
+	pixel_write().set(m_rb2, FUNC(rb2_device::write_pixel));
+	pixel_read().set(m_rb2, FUNC(rb2_device::read_pixel));
 }
 
 void gio64_xl8_device::device_add_mconfig(machine_config &config)
 {
-	newport_base_device::device_add_mconfig(config, 1, 0xa1);
+	newport_base_device::device_add_mconfig(config, 1, 0xa1, 0x000000ff);
 }
 
 void gio64_xl24_device::device_add_mconfig(machine_config &config)
 {
-	newport_base_device::device_add_mconfig(config, 3, 0x02);
+	newport_base_device::device_add_mconfig(config, 3, 0x02, 0x00ffffff);
 }

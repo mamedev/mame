@@ -200,7 +200,68 @@ private:
 	static const size_t RAM_SIZE;
 };
 
-DECLARE_DEVICE_TYPE(XMAP9, xmap9_device)
+DECLARE_DEVICE_TYPE(VC2, vc2_device)
+
+
+/*************************************
+ *
+ *  RB2 Device
+ *
+ *************************************/
+
+class rb2_device : public device_t
+{
+public:
+	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask)
+		: rb2_device(mconfig, tag, owner, clock)
+	{
+		set_global_mask(global_mask);
+	}
+
+	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// Getters
+	const uint32_t *rgbci(int y) const { return &m_rgbci[1344 * y]; }
+	const uint32_t *cidaux(int y) const { return &m_cidaux[1344 * y]; }
+
+	// devcb callbacks
+	void set_write_mask(uint32_t data);
+	void set_flags(uint16_t data);
+	void set_address(uint32_t address);
+	uint32_t read_pixel();
+	void write_pixel(uint32_t data);
+
+private:
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	void logic_pixel(uint32_t src);
+	void store_pixel(uint32_t value);
+
+	void set_global_mask(uint32_t global_mask) { m_global_mask = global_mask; }
+
+	uint32_t  m_global_mask;
+	uint32_t  m_write_mask;
+	bool	  m_blend;
+	bool      m_fast_clear;
+	bool      m_rgbmode;
+	bool      m_dblsrc;
+	uint8_t   m_plane_enable;
+	uint8_t   m_draw_depth;
+	uint8_t   m_logicop;
+	uint8_t   m_store_shift;
+
+	uint32_t *m_dest_buf;
+	uint32_t *m_buf_ptr;
+
+	std::unique_ptr<uint32_t[]> m_rgbci;
+	std::unique_ptr<uint32_t[]> m_cidaux;
+
+	static const size_t BUFFER_SIZE;
+};
+
+DECLARE_DEVICE_TYPE(RB2, rb2_device)
 
 
 /*************************************
@@ -213,7 +274,7 @@ class newport_base_device : public device_t
 						  , public device_gio64_card_interface
 {
 public:
-	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask);
+	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_gio_slot_interface overrides
 	virtual void install_device() override;
@@ -226,6 +287,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vrint_w);
 	DECLARE_WRITE_LINE_MEMBER(update_screen_size);
 
+	auto write_mask() { return m_write_mask_w.bind(); }
+	auto draw_flags() { return m_draw_flags_w.bind(); }
+	auto pixel_address() { return m_set_address.bind(); }
+	auto pixel_write() { return m_write_pixel.bind(); }
+	auto pixel_read() { return m_read_pixel.bind(); }
+
 protected:
 	// device_t overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -233,7 +300,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void device_add_mconfig(machine_config &config, uint32_t xmap_revision, uint32_t cmap_revision);
+	void device_add_mconfig(machine_config &config, uint32_t xmap_revision, uint32_t cmap_revision, uint32_t global_mask);
 	void mem_map(address_map &map) override;
 
 	static constexpr device_timer_id DCB_TIMEOUT = 0;
@@ -279,7 +346,6 @@ protected:
 		uint8_t m_hostdepth;
 		uint8_t m_sfactor;
 		uint8_t m_dfactor;
-		uint8_t m_logicop;
 
 		uint32_t m_store_shift;
 		uint32_t m_host_shift;
@@ -356,6 +422,7 @@ protected:
 		uint32_t m_config;
 		uint32_t m_status;
 		uint32_t m_dcb_mask;
+		bool m_blend_back;
 	};
 
 	void ramdac_write(uint32_t data);
@@ -366,11 +433,9 @@ protected:
 	void write_y_end(int32_t val);
 
 	bool pixel_clip_pass(int16_t x, int16_t y);
-	void write_pixel(uint32_t color);
-	void write_pixel(int16_t x, int16_t y, uint32_t color);
-	void blend_pixel(uint32_t *dest_buf, uint32_t src);
-	void logic_pixel(uint32_t *dest_buf, uint32_t src);
-	void store_pixel(uint32_t *dest_buf, uint32_t src);
+	void output_pixel(uint32_t color);
+	void output_pixel(int16_t x, int16_t y, uint32_t color);
+	void blend_pixel(uint32_t src);
 
 	void iterate_shade();
 
@@ -419,6 +484,7 @@ protected:
 	required_device_array<xmap9_device, 2> m_xmap;
 	required_device_array<cmap_device, 2> m_cmap;
 	required_device<vc2_device> m_vc2;
+	required_device<rb2_device> m_rb2;
 
 	uint32_t m_ramdac_lut_r[256];
 	uint32_t m_ramdac_lut_g[256];
@@ -426,10 +492,14 @@ protected:
 	uint8_t m_ramdac_lut_index;
 
 	rex3_t m_rex3;
-	std::unique_ptr<uint32_t[]> m_rgbci;
-	std::unique_ptr<uint32_t[]> m_cidaux;
 	uint32_t m_global_mask;
 	emu_timer *m_dcb_timeout_timer;
+
+	devcb_write32 m_write_mask_w;
+	devcb_write16 m_draw_flags_w;
+	devcb_write32 m_set_address;
+	devcb_write32 m_write_pixel;
+	devcb_read32 m_read_pixel;
 
 #if ENABLE_NEWVIEW_LOG
 	void start_logging();
