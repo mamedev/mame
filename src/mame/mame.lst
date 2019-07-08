@@ -8994,6 +8994,9 @@ blktigerb1                      // bootleg
 blktigerb2                      // bootleg
 blktigerb3                      // bootleg?
 
+@source:blktiger_ms.cpp
+blktigerm
+
 @source:blmbycar.cpp
 blmbycar                        // (c) 1994 ABM & Gecas - uses same gfx chip as powerins?
 blmbycaru                       // (c) 1994 ABM & Gecas - uses same gfx chip as powerins?
