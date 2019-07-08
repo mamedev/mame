@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Peter Trauner, Wilbert Pol, hap
 // thanks-to:Sean Riddle
 /******************************************************************************
