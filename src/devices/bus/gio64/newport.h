@@ -427,9 +427,7 @@ protected:
 
 	rex3_t m_rex3;
 	std::unique_ptr<uint32_t[]> m_rgbci;
-	std::unique_ptr<uint32_t[]> m_olay;
-	std::unique_ptr<uint32_t[]> m_pup;
-	std::unique_ptr<uint32_t[]> m_cid;
+	std::unique_ptr<uint32_t[]> m_cidaux;
 	uint32_t m_global_mask;
 	emu_timer *m_dcb_timeout_timer;
 

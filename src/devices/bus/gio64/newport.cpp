@@ -47,7 +47,7 @@
 #define LOG_REJECTS     (1 << 9)
 #define LOG_ALL         (LOG_UNKNOWN | LOG_VC2 | LOG_CMAP | LOG_XMAP | LOG_REX3 | LOG_RAMDAC | LOG_COMMANDS | LOG_REJECTS)
 
-#define VERBOSE         (0)//(LOG_REX3 | LOG_CMAP | LOG_XMAP)
+#define VERBOSE         (LOG_REX3 | LOG_CMAP | LOG_XMAP | LOG_COMMANDS)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(XMAP9,      xmap9_device,      "xmap9",      "SGI XMAP9")
@@ -762,16 +762,12 @@ gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *
 void newport_base_device::device_start()
 {
 	m_rgbci = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
-	m_olay = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
-	m_pup = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
-	m_cid = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
+	m_cidaux = make_unique_clear<uint32_t[]>((1280+64) * (1024+64));
 
 	m_dcb_timeout_timer = timer_alloc(DCB_TIMEOUT);
 
 	save_pointer(NAME(m_rgbci), (1280+64) * (1024+64));
-	save_pointer(NAME(m_olay), (1280+64) * (1024+64));
-	save_pointer(NAME(m_pup), (1280+64) * (1024+64));
-	save_pointer(NAME(m_cid), (1280+64) * (1024+64));
+	save_pointer(NAME(m_cidaux), (1280+64) * (1024+64));
 
 	save_item(NAME(m_rex3.m_draw_mode0));
 	save_item(NAME(m_rex3.m_color_host));
@@ -917,9 +913,7 @@ void newport_base_device::start_logging()
 	// TODO
 	//fwrite(&m_cmap0, sizeof(cmap_t), 1, m_newview_log);
 	fwrite(&m_rgbci[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
-	fwrite(&m_olay[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
-	fwrite(&m_pup[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
-	fwrite(&m_cid[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
+	fwrite(&m_cidaux[0], sizeof(uint32_t), (1280+64)*(1024+64), m_newview_log);
 }
 
 void newport_base_device::stop_logging()
@@ -951,9 +945,8 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 	for (int y = cliprect.min_y, sy = y_start; y <= cliprect.max_y && sy < y_end; y++, sy++)
 	{
 		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
-		uint32_t *src_ci = &m_rgbci[1344 * y];
-		uint32_t *src_pup = &m_pup[1344 * y];
-		uint32_t *src_olay = &m_olay[1344 * y];
+		uint32_t *src_rgbci = &m_rgbci[1344 * y];
+		uint32_t *src_cidaux = &m_cidaux[1344 * y];
 
 		// Fetch the initial DID entry
 		uint16_t curr_did_entry = m_vc2->begin_did_line(y);
@@ -1001,9 +994,9 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 				*dest++ = palette[cursor_msb | cursor_pixel];
 				pixel_replaced = true;
 			}
-			else if (*src_pup)
+			else if (*src_cidaux & 0xcc)
 			{
-				const uint32_t src = (*src_pup >> 2) & 3;
+				const uint32_t src = (*src_cidaux >> 2) & 3;
 				*dest++ = palette[popup_msb | src];
 				pixel_replaced = true;
 			}
@@ -1014,12 +1007,12 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 					switch (aux_pix_mode)
 					{
 						case 1: // 2-Bit Underlay
-							*dest++ = palette[aux_msb | ((*src_olay >> 8) & 3)];
+							*dest++ = palette[aux_msb | ((*src_cidaux >> 8) & 3)];
 							pixel_replaced = true;
 							continue;
 						case 2: // 2-Bit Overlay
 						{
-							const uint32_t pix_in = (*src_olay >> 8) & 3;
+							const uint32_t pix_in = (*src_cidaux >> 8) & 3;
 							if (pix_in)
 							{
 								*dest++ = palette[aux_msb | pix_in];
@@ -1030,7 +1023,7 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 						case 6: // 1-Bit Overlay
 						{
 							const uint32_t shift = BIT(table_entry, 1) ? 9 : 8;
-							const uint32_t pix_in = (*src_olay >> shift) & 1;
+							const uint32_t pix_in = (*src_cidaux >> shift) & 1;
 							if (pix_in)
 							{
 								*dest++ = palette[aux_msb | pix_in];
@@ -1040,11 +1033,11 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 						}
 						case 7: // 1-Bit Overlay, 1-Bit Underlay
 						{
-							const uint32_t pix_in = (*src_olay >> 8) & 1;
+							const uint32_t pix_in = (*src_cidaux >> 8) & 1;
 							if (pix_in)
 								*dest++ = palette[aux_msb | pix_in];
 							else
-								*dest++ = palette[aux_msb | ((*src_olay >> 9) & 1)];
+								*dest++ = palette[aux_msb | ((*src_cidaux >> 9) & 1)];
 							pixel_replaced = true;
 							break;
 						}
@@ -1057,12 +1050,12 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 					switch (aux_pix_mode)
 					{
 						case 1: // 8-Bit Underlay
-							*dest++ = palette[aux_msb | ((*src_olay >> 8) & 0xff)];
+							*dest++ = palette[aux_msb | ((*src_cidaux >> 8) & 0xff)];
 							pixel_replaced = true;
 							break;
 						case 2: // 8-Bit Overlay
 						{
-							const uint32_t pix_in = ((*src_olay >> 8) & 0xf) | ((*src_olay >> 12) & 0xf0);
+							const uint32_t pix_in = ((*src_cidaux >> 8) & 0xf) | ((*src_cidaux >> 12) & 0xf0);
 							if (pix_in)
 							{
 								*dest++ = palette[aux_msb | pix_in];
@@ -1073,7 +1066,7 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 						case 6: // 4-Bit Overlay
 						{
 							const uint32_t shift = BIT(table_entry, 1) ? 12 : 8;
-							const uint32_t pix_in = (*src_olay >> shift) & 0xf;
+							const uint32_t pix_in = (*src_cidaux >> shift) & 0xf;
 							if (pix_in)
 							{
 								*dest++ = palette[aux_msb | pix_in];
@@ -1083,11 +1076,11 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 						}
 						case 7: // 4-Bit Overlay, 4-Bit Underlay
 						{
-							const uint32_t pix_in = (*src_pup >> 8) & 0xf;
+							const uint32_t pix_in = (*src_cidaux >> 8) & 0xf;
 							if (pix_in)
 								*dest++ = palette[aux_msb | pix_in];
 							else
-								*dest++ = palette[aux_msb | ((*src_pup >> 12) & 0xf)];
+								*dest++ = palette[aux_msb | ((*src_cidaux >> 12) & 0xf)];
 							pixel_replaced = true;
 							break;
 						}
@@ -1107,17 +1100,17 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 							case 0: // 4bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
-								const uint32_t pix_in = *src_ci;
+								const uint32_t pix_in = *src_rgbci;
 								*dest++ = palette[ci_msb | ((pix_in >> shift) & 0x0f)];
 								break;
 							}
 							case 1: // 8bpp
-								*dest++ = palette[ci_msb | (uint8_t)*src_ci];
+								*dest++ = palette[ci_msb | (uint8_t)*src_rgbci];
 								break;
 							case 2: // 12bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 12 : 0;
-								const uint32_t pix_in = (*src_ci >> shift) & 0x00000fff;
+								const uint32_t pix_in = (*src_rgbci >> shift) & 0x00000fff;
 								*dest++ = palette[(ci_msb & 0x1000) | pix_in];
 								break;
 							}
@@ -1132,27 +1125,27 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 							case 0: // 4bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 4 : 0;
-								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
+								const uint8_t pix_in = (uint8_t)(*src_rgbci >> shift);
 								*dest++ = convert_4bpp_bgr_to_24bpp_rgb(pix_in);
 								break;
 							}
 							case 1: // 8bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 8 : 0;
-								const uint8_t pix_in = (uint8_t)(*src_ci >> shift);
+								const uint8_t pix_in = (uint8_t)(*src_rgbci >> shift);
 								*dest++ = convert_8bpp_bgr_to_24bpp_rgb(pix_in);
 								break;
 							}
 							case 2: // 12bpp
 							{
 								const uint8_t shift = BIT(table_entry, 0) ? 12 : 0;
-								const uint16_t pix_in = (uint16_t)(*src_ci >> shift);
+								const uint16_t pix_in = (uint16_t)(*src_rgbci >> shift);
 								*dest++ = convert_12bpp_bgr_to_24bpp_rgb(pix_in);
 								break;
 							}
 							case 3: // 24bpp
 							{
-								const uint32_t pix_in = (uint32_t)*src_ci;
+								const uint32_t pix_in = (uint32_t)*src_rgbci;
 								const uint8_t r = (uint8_t)(pix_in >> 0);
 								const uint8_t g = (uint8_t)(pix_in >> 8);
 								const uint8_t b = (uint8_t)(pix_in >> 16);
@@ -1172,9 +1165,8 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 
 			ramdac_remap(dest - 1);
 
-			src_ci++;
-			src_pup++;
-			src_olay++;
+			src_rgbci++;
+			src_cidaux++;
 		}
 	}
 
@@ -2228,14 +2220,9 @@ void newport_base_device::write_pixel(int16_t x, int16_t y, uint32_t color)
 			// Not yet handled
 			break;
 		case 4: // Overlay planes
-			dest_buf = &m_olay[y * (1280 + 64) + x];
-			break;
 		case 5: // Popup planes
-			dest_buf = &m_pup[y * (1280 + 64) + x];
-			color = (color << 2) | (color << 6);
-			break;
 		case 6: // CID planes
-			dest_buf = &m_cid[y * (1280 + 64) + x];
+			dest_buf = &m_cidaux[y * (1280 + 64) + x];
 			break;
 	}
 
@@ -2808,13 +2795,9 @@ uint32_t newport_base_device::do_pixel_read()
 		break;
 	}
 	case 4: // Overlay planes
-		ret = m_olay[src_addr];
-		break;
 	case 5: // Popup planes
-		ret = m_pup[src_addr];
-		break;
 	case 6: // CID planes
-		ret = m_cid[src_addr];
+		ret = m_cidaux[src_addr];
 		break;
 	}
 	LOGMASKED(LOG_COMMANDS, "Read %08x (%08x) from %04x, %04x\n", ret, m_rgbci[src_addr], src_x, src_y);
@@ -3242,13 +3225,9 @@ void newport_base_device::do_rex3_command()
 						case 2: // RGBA planes (not yet implemented)
 							break;
 						case 4: // Overlay planes
-							src = m_olay[src_addr];
-							break;
 						case 5: // Popup planes
-							src = m_pup[src_addr] >> 2;
-							break;
 						case 6: // CID planes
-							src = m_cid[src_addr];
+							src = m_cidaux[src_addr];
 							break;
 						default:
 							break;
@@ -3536,15 +3515,15 @@ WRITE64_MEMBER(newport_base_device::rex3_w)
 					{ 8, 16 }, // Overlay, 12bpp, Buffer 0/1
 					{ 8, 16 }, // Overlay, 24bpp, Buffer 0/1 (not valid)
 				},
-				{   { 0,  0 }, // Popup, 4bpp, Buffer 0/1
-					{ 0,  8 }, // Popup, 8bpp, Buffer 0/1
-					{ 0, 12 }, // Popup, 12bpp, Buffer 0/1
-					{ 0,  0 }, // Popup, 24bpp, Buffer 0/1 (not valid)
+				{   { 2,  6 }, // Popup, 4bpp, Buffer 0/1
+					{ 2,  6 }, // Popup, 8bpp, Buffer 0/1
+					{ 2,  6 }, // Popup, 12bpp, Buffer 0/1
+					{ 2,  6 }, // Popup, 24bpp, Buffer 0/1 (not valid)
 				},
-				{   { 0,  0 }, // CID, 4bpp, Buffer 0/1
-					{ 0,  8 }, // CID, 8bpp, Buffer 0/1
-					{ 0, 12 }, // CID, 12bpp, Buffer 0/1
-					{ 0,  0 }, // CID, 24bpp, Buffer 0/1 (not valid)
+				{   { 0,  4 }, // CID, 4bpp, Buffer 0/1
+					{ 0,  4 }, // CID, 8bpp, Buffer 0/1
+					{ 0,  4 }, // CID, 12bpp, Buffer 0/1
+					{ 0,  4 }, // CID, 24bpp, Buffer 0/1 (not valid)
 				},
 				{   { 0,  0 }, // Invalid, 4bpp, Buffer 0/1
 					{ 0,  0 }, // Invalid, 8bpp, Buffer 0/1
