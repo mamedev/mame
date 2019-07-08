@@ -4902,6 +4902,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/trvquest.cpp",
 	MAME_DIR .. "src/mame/drivers/ttchamp.cpp",
 	MAME_DIR .. "src/mame/drivers/tugboat.cpp",
+	MAME_DIR .. "src/mame/drivers/tvg01.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_bozopail.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",
