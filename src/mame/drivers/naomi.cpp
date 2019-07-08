@@ -10837,6 +10837,28 @@ ROM_START( ggisuka )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax1201f01.bin", 0, 4, CRC(325cf843) SHA1(c51d19a4fce37433f37e7ce23801a7fc4e09013d) )
+/*
+  Sammy AM3AHT/AWMPSYSTEM 
+    4-cabinet splitter device, likely was used in GG Isuka, and maybe in 2-player AW-NET games too.
+
+  Case contains 3x PCB stack:
+    AM3AHT-01:
+      Renesas 12363VTE33 H8S/2363 MCU
+      ROM
+      HM62V8512CLFP-5 512K x8bit SRAM
+      33MHz OSC
+      LEDs 4x
+      DIPSW 4x
+    AM3AHW-01: 1-to-4 Video-splitter
+      DSUB connectors 4x
+    AM3AHU-01:
+      Card reader connectors 4x
+*/
+	ROM_REGION( 0x80000, "awmpsystem", 0 )
+	// AM3AHT AWMPSYSTEM
+	// WA0101E03
+	// U1 SUM:A17C Sammy
+	ROM_LOAD("am3aht.u1", 0, 0x80000, CRC(c4a21dbf) SHA1(3200fdf209f8a6c8c9acdb60a2bc1d70af28fc5b) ) // H8S/2363 code
 ROM_END
 
 ROM_START( maxspeed )
