@@ -160,9 +160,20 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/starimg.ipp",
 	MAME_DIR .. "src/frontend/mame/ui/state.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/state.h",
-	MAME_DIR .. "src/frontend/mame/ui/toolbar.ipp",
 	MAME_DIR .. "src/frontend/mame/ui/utils.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/utils.h",
 	MAME_DIR .. "src/frontend/mame/ui/widgets.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/widgets.h",
+}
+
+dependency {
+	--------------------------------------------------
+	-- additional dependencies
+	--------------------------------------------------
+	{ MAME_DIR .. "src/frontend/mame/ui/selmenu.cpp", GEN_DIR .. "emu/ui/toolbar.ipp" },
+}
+
+
+custombuildtask {
+	{ MAME_DIR .. "src/frontend/mame/ui/icons/button0.png",  GEN_DIR .. "emu/ui/toolbar.ipp",     {  MAME_DIR .. "scripts/build/png2str.py", MAME_DIR .. "src/frontend/mame/ui/icons/button1.png", MAME_DIR .. "src/frontend/mame/ui/icons/button2.png"}, {"@echo Converting PNG icons...", PYTHON .. " $(1) $(<) $(2) $(3) $(@)" }},
 }
