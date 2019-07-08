@@ -5037,4 +5037,18 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Softlist entry for Myarc Extended Basic II. Actually a RAM-only cartridge, to be used with the myarcmem expansion card. -->
+	<software name="myxbii">
+		<description>Myarc Extended Basic II</description>
+		<info name="usage" value="Requires myarcmem expansion card and 128K.OS disk"/>
+		<year>1985</year>
+		<publisher>Myarc Inc.</publisher>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="standard"/>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
