@@ -87,10 +87,10 @@ Fairchild 3850PK CPU @ 2MHz (LC circuit), 3853PK
 
 namespace {
 
-class compuchess_state : public driver_device
+class cmpchess_state : public driver_device
 {
 public:
-	compuchess_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cmpchess_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
@@ -145,7 +145,7 @@ private:
 	bool m_blink;
 };
 
-void compuchess_state::machine_start()
+void cmpchess_state::machine_start()
 {
 	// zerofill
 	m_inp_mux = 0;
@@ -160,12 +160,12 @@ void compuchess_state::machine_start()
 	save_item(NAME(m_blink));
 }
 
-void compuchess_state::machine_reset()
+void cmpchess_state::machine_reset()
 {
 	update_reset(ioport("RESET")->read());
 }
 
-void compuchess_state::update_reset(ioport_value state)
+void cmpchess_state::update_reset(ioport_value state)
 {
 	// reset switch is tied to F3850 RESET pin
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
@@ -181,7 +181,7 @@ void compuchess_state::update_reset(ioport_value state)
     Devices, I/O
 ******************************************************************************/
 
-READ8_MEMBER(compuchess_state::beeper_r)
+READ8_MEMBER(cmpchess_state::beeper_r)
 {
 	// cncchess: trigger beeper
 	if (!machine().side_effects_disabled() && m_beeper != nullptr)
@@ -193,7 +193,7 @@ READ8_MEMBER(compuchess_state::beeper_r)
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-void compuchess_state::update_display()
+void cmpchess_state::update_display()
 {
 	// display panel goes into automated blink mode if DP segment is held high,
 	// and DP segment itself by default only appears to be active if no other segments are
@@ -205,32 +205,32 @@ void compuchess_state::update_display()
 	m_display->matrix(m_digit_select, bstate << 8 | digit_data);
 }
 
-WRITE8_MEMBER(compuchess_state::digit_data_w)
+WRITE8_MEMBER(cmpchess_state::digit_data_w)
 {
 	// digit segment data
 	m_digit_data = data;
 	update_display();
 }
 
-READ8_MEMBER(compuchess_state::digit_data_r)
+READ8_MEMBER(cmpchess_state::digit_data_r)
 {
 	return m_digit_data;
 }
 
-WRITE8_MEMBER(compuchess_state::digit_select_w)
+WRITE8_MEMBER(cmpchess_state::digit_select_w)
 {
 	// d0-d3: digit select (active low)
 	m_digit_select = ~data & 0xf;
 	update_display();
 }
 
-WRITE8_MEMBER(compuchess_state::input_w)
+WRITE8_MEMBER(cmpchess_state::input_w)
 {
 	// input matrix is shared with either digit_data_w, or digit_select_w
 	m_inp_mux = data;
 }
 
-READ8_MEMBER(compuchess_state::input_r)
+READ8_MEMBER(cmpchess_state::input_r)
 {
 	u8 data = m_inp_mux;
 
@@ -253,24 +253,24 @@ READ8_MEMBER(compuchess_state::input_r)
     Address Maps
 ******************************************************************************/
 
-void compuchess_state::main_map(address_map &map)
+void cmpchess_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();
 	map(0x1800, 0x18ff).ram();
-	map(0x8000, 0xffff).r(FUNC(compuchess_state::beeper_r));
+	map(0x8000, 0xffff).r(FUNC(cmpchess_state::beeper_r));
 }
 
-void compuchess_state::main_io(address_map &map)
+void cmpchess_state::main_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(compuchess_state::input_r), FUNC(compuchess_state::input_digit_data_w));
-	map(0x01, 0x01).w(FUNC(compuchess_state::digit_select_w));
+	map(0x00, 0x00).rw(FUNC(cmpchess_state::input_r), FUNC(cmpchess_state::input_digit_data_w));
+	map(0x01, 0x01).w(FUNC(cmpchess_state::digit_select_w));
 	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
-void compuchess_state::cnc_io(address_map &map)
+void cmpchess_state::cnc_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(compuchess_state::digit_data_r), FUNC(compuchess_state::digit_data_w));
-	map(0x01, 0x01).rw(FUNC(compuchess_state::input_r), FUNC(compuchess_state::input_digit_select_w));
+	map(0x00, 0x00).rw(FUNC(cmpchess_state::digit_data_r), FUNC(cmpchess_state::digit_data_w));
+	map(0x01, 0x01).rw(FUNC(cmpchess_state::input_r), FUNC(cmpchess_state::input_digit_select_w));
 	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
@@ -306,7 +306,7 @@ static INPUT_PORTS_START( cmpchess )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Black Knight")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, compuchess_state, reset_switch, nullptr) PORT_NAME("Reset Switch") // L.S. switch on the MK I
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, reset_switch, nullptr) PORT_NAME("Reset Switch") // L.S. switch on the MK I
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cncchess )
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( cncchess )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / White Queen")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, compuchess_state, reset_switch, nullptr) PORT_NAME("Reset")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, reset_switch, nullptr) PORT_NAME("Reset")
 INPUT_PORTS_END
 
 
@@ -344,12 +344,12 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void compuchess_state::cmpchess(machine_config &config)
+void cmpchess_state::cmpchess(machine_config &config)
 {
 	/* basic machine hardware */
 	F8(config, m_maincpu, 3.579545_MHz_XTAL/2); // Fairchild 3850PK
-	m_maincpu->set_addrmap(AS_PROGRAM, &compuchess_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &compuchess_state::main_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmpchess_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
 
 	f3853_device &smi(F3853(config, "smi", 3.579545_MHz_XTAL/2));
@@ -360,10 +360,10 @@ void compuchess_state::cmpchess(machine_config &config)
 	m_display->set_segmask(0xf, 0xff);
 	config.set_default_layout(layout_cmpchess);
 
-	TIMER(config, "blink_display").configure_periodic(FUNC(compuchess_state::blink), attotime::from_msec(250)); // approximation
+	TIMER(config, "blink_display").configure_periodic(FUNC(cmpchess_state::blink), attotime::from_msec(250)); // approximation
 }
 
-void compuchess_state::mk1(machine_config &config)
+void cmpchess_state::mk1(machine_config &config)
 {
 	cmpchess(config);
 
@@ -374,12 +374,12 @@ void compuchess_state::mk1(machine_config &config)
 	config.set_default_layout(layout_novag_mk1);
 }
 
-void compuchess_state::cnc(machine_config &config)
+void cmpchess_state::cnc(machine_config &config)
 {
 	mk1(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &compuchess_state::cnc_io);
+	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::cnc_io);
 
 	config.set_default_layout(layout_cncchess);
 
@@ -387,7 +387,7 @@ void compuchess_state::cnc(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 2000); // wrong, see TODO
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
-	TIMER(config, "beeper_off").configure_generic(FUNC(compuchess_state::beeper_off));
+	TIMER(config, "beeper_off").configure_generic(FUNC(cmpchess_state::beeper_off));
 }
 
 
@@ -420,8 +420,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     STATE             INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1977, cmpchess, 0,        0, cmpchess, cmpchess, compuchess_state, empty_init, "Data Cash Systems", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1978, ccmk1,    cmpchess, 0, mk1,      cmpchess, compuchess_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     STATE           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1977, cmpchess, 0,        0, cmpchess, cmpchess, cmpchess_state, empty_init, "Data Cash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, ccmk1,    cmpchess, 0, mk1,      cmpchess, cmpchess_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, cncchess, 0,        0, cnc,      cncchess, compuchess_state, empty_init, "Conic", "Computer Chess (Conic)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cncchess, 0,        0, cnc,      cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

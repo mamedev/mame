@@ -10,10 +10,10 @@ The hardware is pretty similar to KIM-1. In fact, the chess engine is Peter R. J
 Microchess, originally made for the KIM-1. Jennings went on to co-found Personal Software
 (later named VisiCorp, known for VisiCalc).
 
-Jennings also licensed Chessmate to Novag, and they released it as the MK II. Funnily
-enough, MK I had a stronger program. MK II hardware is almost identical to Chessmate and
-the software is the same(identical ROM labels). 2 designs were made, one jukebox shape,
-and one brick shape. The one in MAME came from the jukebox, but both have the same ROMs.
+Jennings also licensed Chessmate to Novag, and they released it as the MK II. The hardware
+is almost identical and the software is the same(identical ROM labels). Two designs were made,
+one jukebox shape, and one brick shape. The one in MAME came from the jukebox, but both
+models have the same ROMs.
 
 TODO:
 - XTAL is unknown, result frequency of 1MHz is correct
@@ -42,7 +42,6 @@ MOS MPS 6332 005 2179
 #include "emu.h"
 #include "cpu/m6502/m6504.h"
 #include "machine/mos6530.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
@@ -226,9 +225,20 @@ static INPUT_PORTS_START( chmate )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, chmate_state, reset_button, nullptr) PORT_NAME("New Game")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mk2 ) // meaning of black/white reversed
+	PORT_INCLUDE( chmate )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / Level")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A / Black")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / White")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( mk2a )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("6 / F / Skill Level")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("6 / F / Level")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("5 / E / Stop Clock / Rook")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("4 / D / Display Time")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C) PORT_NAME("3 / C / Chess Clock / Bishop")
@@ -322,5 +332,5 @@ ROM_END
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1978, chmate, 0,      0, chmate,  chmate, chmate_state, empty_init, "Commodore", "Chessmate", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, ccmk2,  chmate, 0, mk2,     chmate, chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
+CONS( 1979, ccmk2,  chmate, 0, mk2,     mk2,    chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version (jukebox model), aka version B
 CONS( 1979, ccmk2a, chmate, 0, mk2a,    mk2a,   chmate_state, empty_init, "Novag", "Chess Champion: MK II (ver. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -18,14 +18,8 @@
 	</element>
 
 	<element name="hl" defstate="0">
-		<text string=" ">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
-		<rect state="1">
-			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+		<text string=" "/>
+		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
 
 	<element name="text_b01a">
@@ -182,10 +176,10 @@
 		<text string="CB"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 
-	<element name="text_d1"><text string="TIME DISPLAY"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_d2"><text string="TIME SET"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="text_d3"><text string="CHANGE COLOR"><color red="0.9" green="0.9" blue="0.9" /></text></element> <!-- this label isn't on the real device -->
-	<element name="text_d4"><text string="NEW GAME"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_d1"><text string="TIME DISPLAY"><color red="0.65" green="0.65" blue="0.65" /></text></element>
+	<element name="text_d2"><text string="TIME SET"><color red="0.65" green="0.65" blue="0.65" /></text></element>
+	<element name="text_d3"><text string="CHANGE COLOR"><color red="0.65" green="0.65" blue="0.65" /></text></element> <!-- this label isn't on the real device -->
+	<element name="text_d4"><text string="NEW GAME"><color red="0.65" green="0.65" blue="0.65" /></text></element>
 
 
 <!-- build screen -->
