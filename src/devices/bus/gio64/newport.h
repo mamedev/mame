@@ -56,7 +56,7 @@ private:
 	uint32_t m_config;
 	uint32_t m_revision;
 	uint32_t m_fifo_available;
-	uint32_t m_entries;
+	//uint32_t m_entries;
 	uint32_t m_cursor_cmap;
 	uint32_t m_popup_cmap;
 	uint32_t m_mode_table_idx;
