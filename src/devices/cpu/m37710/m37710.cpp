@@ -275,17 +275,17 @@ const int m37710_cpu_device::m37710_int_reg_map[M37710_MASKABLE_INTERRUPTS] =
 	M37710_LINE_UART0RECV,  // level 8  (0x72)
 	M37710_LINE_UART1XMIT,  // level 5  (0x73)
 	M37710_LINE_UART1RECV,  // level 6  (0x74)
-	M37710_LINE_TIMERB2,    // level 16 (0x75)
-	M37710_LINE_TIMERB1,    // level 15 (0x76)
-	M37710_LINE_TIMERB0,    // level 14 (0x77)
-	M37710_LINE_TIMERA4,    // level 13 (0x78)
-	M37710_LINE_TIMERA3,    // level 12 (0x79)
-	M37710_LINE_TIMERA2,    // level 11 (0x7a)
-	M37710_LINE_TIMERA1,    // level 10 (0x7b)
-	M37710_LINE_TIMERA0,    // level 9  (0x7c)
-	M37710_LINE_IRQ2,       // level 19 (0x7d)
+	M37710_LINE_TIMERA0,    // level 16 (0x75)
+	M37710_LINE_TIMERA1,    // level 15 (0x76)
+	M37710_LINE_TIMERA2,    // level 14 (0x77)
+	M37710_LINE_TIMERA3,    // level 13 (0x78)
+	M37710_LINE_TIMERA4,    // level 12 (0x79)
+	M37710_LINE_TIMERB0,    // level 11 (0x7a)
+	M37710_LINE_TIMERB1,    // level 10 (0x7b)
+	M37710_LINE_TIMERB2,    // level 9  (0x7c)
+	M37710_LINE_IRQ0,       // level 19 (0x7d)
 	M37710_LINE_IRQ1,       // level 18 (0x7e)
-	M37710_LINE_IRQ0,       // level 17 (0x7f)
+	M37710_LINE_IRQ2,       // level 17 (0x7f)
 };
 
 const int m37710_cpu_device::m37710_irq_vectors[M37710_INTERRUPT_MAX] =
@@ -938,6 +938,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 				if (!FLAG_I && thispri > curpri && thispri > m_ipl)
 				{
 					// mark us as the best candidate
+					LOGMASKED(LOG_INT, "%s interrupt active with priority %d (PC=%x)\n", m37710_intnames[curirq], thispri, REG_PB<<16 | REG_PC);
 					wantedIRQ = curirq;
 					curpri = thispri;
 				}
@@ -945,6 +946,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 			else
 			{
 				// non-maskable
+				LOGMASKED(LOG_INT, "%s interrupt active (PC=%x)\n", m37710_intnames[curirq], REG_PB<<16 | REG_PC);
 				wantedIRQ = curirq;
 				curpri = 7;
 				break;  // no more processing, NMIs always win
