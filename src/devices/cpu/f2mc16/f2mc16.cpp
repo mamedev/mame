@@ -93,8 +93,6 @@ void f2mc16_device::device_start()
 	state_add(F2MC16_R5, "R5", m_temp).callimport().callexport().formatstr("%02X");
 	state_add(F2MC16_R6, "R6", m_temp).callimport().callexport().formatstr("%02X");
 	state_add(F2MC16_R7, "R7", m_temp).callimport().callexport().formatstr("%02X");
-
-	set_icountptr(m_icount);
 }
 
 void f2mc16_device::device_reset()
