@@ -42,14 +42,20 @@
 
 #include "emu.h"
 
+// Devices
 #include "cpu/i86/i86.h"
 #include "machine/am9517a.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/isa_cards.h"
+
+// Expansion cards 
+//#include "bus/isa/isa.h"
+//#include "bus/isa/isa_cards.h"
+#include "bus/isa/ega.h"
+#include "bus/isa/mda.h"
+
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -203,18 +209,46 @@ void epc_state::epc_io(address_map &map)
 			return data;
 		}
 	);
-
-	map(0x0061, 0x0063).lrw8("ppi8255_rw",
+	                                        // PPI Port A is not mapped
+	map(0x0061, 0x0061).lrw8("ppi8255_rw",	// PPI Port B
 		[this](offs_t offset) -> uint8_t
 		{
-			uint8_t data = m_ppi8255->read(offset);
-			LOGPPI("ppi8255_r %04x\n", offset);
+			uint8_t data = m_ppi8255->read(1);
+			LOGPPI("ppi8255_r Port B: %02x\n", data);
 			return data;
 		},
 		[this](offs_t offset, uint8_t data)
 		{
-			LOGPPI("ppi8255_w %04x: %02x\n", offset, data);
-			m_ppi8255->write(offset, data);
+			LOGPPI("ppi8255_w Port B: %02x\n", data);
+			m_ppi8255->write(1, data);
+		}
+	);
+
+	map(0x0062, 0x0062).lrw8("ppi8255_rw",	// PPI Port C
+		[this](offs_t offset) -> uint8_t
+		{
+			uint8_t data = m_ppi8255->read(2);
+			LOGPPI("ppi8255_r Port C: %02x\n", data);
+			return data;
+		},
+		[this](offs_t offset, uint8_t data)
+		{
+			LOGPPI("ppi8255_w Port C: %02x\n", data);
+			m_ppi8255->write(2, data);
+		}
+	);
+
+	map(0x0063, 0x0063).lrw8("ppi8255_rw",	// PPI Control register
+		[this](offs_t offset) -> uint8_t
+		{
+			uint8_t data = m_ppi8255->read(3);
+			LOGPPI("ppi8255_r Control: %02x\n", data);
+			return data;
+		},
+		[this](offs_t offset, uint8_t data)
+		{
+			LOGPPI("ppi8255_w Control: %02x\n", data);
+			m_ppi8255->write(3, data);
 		}
 	);
 
@@ -453,6 +487,8 @@ WRITE_LINE_MEMBER(epc_state::int_w)
 
 static void epc_isa8_cards(device_slot_interface &device)
 {
+	device.option_add("epc_mda", ISA8_EPC_MDA);
+	device.option_add("ega", ISA8_EGA);
 	// device.option_add("epc_hdc1065", ISA8_EPC_HDC1065);
 	// device.option_add("epc_mb1080", ISA8_EPC_MB1080);
 }
@@ -526,7 +562,7 @@ void epc_state::epc(machine_config &config)
 	//ISA8_SLOT(config, "isa1", 0, m_isabus, epc_isa8_cards, nullptr, false);
 	// This is wrong and will be replaced once the Ericsson Monochrome HR Graphics Board 1070
 	// is implemented and working but works for simple output meanwhile
-	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "epc_mda", false); 
+	ISA8_SLOT(config, "isa1", 0, m_isabus, epc_isa8_cards, "epc_mda", false); 
 
 	ISA8_SLOT(config, "isa2", 0, m_isabus, epc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, epc_isa8_cards, nullptr, false);
