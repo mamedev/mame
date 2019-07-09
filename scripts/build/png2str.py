@@ -19,8 +19,8 @@ def main():
         text += "#ifndef MAME_FRONTEND_UI_TOOLBAR_IPP\n" \
            "#define MAME_FRONTEND_UI_TOOLBAR_IPP\n"
     else:
-        text += "#ifndef MAME_FRONTEND_UI_%s_IPP\n" % os.path.basename(sys.argv[1]).upper()
-        text += "#define MAME_FRONTEND_UI_%s_IPP\n" % os.path.basename(sys.argv[1]).upper()
+        text += "#ifndef MAME_FRONTEND_UI_%s_IPP\n" % os.path.splitext(os.path.basename(sys.argv[1]))[0].upper()
+        text += "#define MAME_FRONTEND_UI_%s_IPP\n" % os.path.splitext(os.path.basename(sys.argv[1]))[0].upper()
 
 
     text += "#pragma once\n\n" \
@@ -66,7 +66,7 @@ def main():
     if len(sys.argv) > 3:
         text += "#endif // MAME_FRONTEND_UI_TOOLBAR_IPP"
     else:
-        text += "#endif // MAME_FRONTEND_UI_%s_IPP" % os.path.basename(sys.argv[1]).upper()
+        text += "#endif // MAME_FRONTEND_UI_%s_IPP" % os.path.splitext(os.path.basename(sys.argv[1]))[0].upper()
 
     open(headerName, 'w').write(text)
     return 0
