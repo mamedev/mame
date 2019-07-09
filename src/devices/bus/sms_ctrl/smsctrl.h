@@ -62,6 +62,11 @@ public:
 
 	void th_pin_w(int state);
 
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
+	// for peripherals that interact with the machine's screen
+	required_device<screen_device> m_screen;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
