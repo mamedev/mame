@@ -117,8 +117,11 @@ u8 master_state::input_r()
 	u8 data = 0;
 
 	// d0-d7: multiplexed inputs
+	// read chessboard sensors
 	if (m_inp_mux < 8)
 		data = m_board->read_file(m_inp_mux, true);
+
+	// read other buttons
 	else if (m_inp_mux < 10)
 		data = m_inputs[m_inp_mux - 8]->read();
 
