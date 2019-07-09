@@ -827,5 +827,6 @@ void pmd85_state::machine_reset()
 	m_startup_mem_map = 1;
 	(this->*update_memory)();
 
-	m_uart->write_cts(0);
+	if (m_uart)
+		m_uart->write_cts(0);
 }
