@@ -171,9 +171,14 @@ dependency {
 	-- additional dependencies
 	--------------------------------------------------
 	{ MAME_DIR .. "src/frontend/mame/ui/selmenu.cpp", GEN_DIR .. "emu/ui/toolbar.ipp" },
+	{ MAME_DIR .. "src/frontend/mame/ui/selmenu.cpp", GEN_DIR .. "emu/ui/starimg.ipp" },
 }
 
 
 custombuildtask {
-	{ MAME_DIR .. "src/frontend/mame/ui/icons/button0.png",  GEN_DIR .. "emu/ui/toolbar.ipp",     {  MAME_DIR .. "scripts/build/png2str.py", MAME_DIR .. "src/frontend/mame/ui/icons/button1.png", MAME_DIR .. "src/frontend/mame/ui/icons/button2.png"}, {"@echo Converting PNG icons...", PYTHON .. " $(1) $(<) $(2) $(3) $(@)" }},
+	{ "$(wildcard " .. MAME_DIR .. "src/frontend/mame/ui/res/*.png" .. ")" ,  GEN_DIR .. "emu/ui/toolbar.ipp", { MAME_DIR .. "scripts/build/png2str.py", MAME_DIR .. "src/frontend/mame/ui/res/*.png" }, { "@echo Converting toolbar PNG images...", PYTHON .. " $(1) $(2) $(@)" } },
+}
+
+custombuildtask {
+	{ MAME_DIR .. "src/frontend/mame/ui/res/favorite_star.png",  GEN_DIR .. "emu/ui/starimg.ipp", { MAME_DIR .. "scripts/build/png2str.py" }, { "@echo Converting PNG image...", PYTHON .. " $(1) $(<) $(@)" } },
 }
