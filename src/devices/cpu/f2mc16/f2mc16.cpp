@@ -39,6 +39,8 @@ f2mc16_device::f2mc16_device(const machine_config &mconfig, device_type type, co
 	m_tmp8 = 0;
 	m_tmp16 = 0;
 	m_tmp32 = 0;
+	m_tmp64 = 0;
+	m_prefix_valid = false;
 }
 
 f2mc16_device::f2mc16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -65,7 +67,7 @@ void f2mc16_device::device_start()
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_ps).callimport().formatstr("%7s").noshow();
 	state_add(F2MC16_DTB, "DTB", m_dtb).formatstr("%02X");
 	state_add(F2MC16_ADB, "ADB", m_adb).formatstr("%02X");
-	state_add(F2MC16_ACC, "AL", m_acc).formatstr("%08X");
+	state_add(F2MC16_ACC, "A", m_acc).formatstr("%08X");
 	state_add(F2MC16_USB, "USB", m_usb).formatstr("%02X");
 	state_add(F2MC16_USP, "USP", m_usp).formatstr("%04X");
 	state_add(F2MC16_SSB, "SSB", m_ssb).formatstr("%02X");
@@ -91,6 +93,8 @@ void f2mc16_device::device_start()
 	state_add(F2MC16_R5, "R5", m_temp).callimport().callexport().formatstr("%02X");
 	state_add(F2MC16_R6, "R6", m_temp).callimport().callexport().formatstr("%02X");
 	state_add(F2MC16_R7, "R7", m_temp).callimport().callexport().formatstr("%02X");
+
+	set_icountptr(m_icount);
 }
 
 void f2mc16_device::device_reset()
@@ -105,6 +109,8 @@ void f2mc16_device::device_reset()
 
 	m_pc = read_16_vector(0xffffdc);
 	m_pcb = read_8_vector(0xffffde);
+
+	m_prefix_valid = false;
 }
 
 void f2mc16_device::state_import(const device_state_entry &entry)
@@ -215,28 +221,75 @@ void f2mc16_device::execute_run()
 	//      util::stream_format(stream, "NEG    A");
 			break;
 
+		// PCB prefix
 		case 0x04:
-	//      stream << "PCB ";
+			m_prefix = m_pcb;
+			m_prefix_valid = true;
+			m_pc++;
 			break;
 
+		// DTB prefix
 		case 0x05:
-	//      stream << "DTB ";
+			m_prefix = m_dtb;
+			m_prefix_valid = true;
+			m_pc++;
 			break;
 
+		// ADB prefix
 		case 0x06:
-	//      stream << "ADB ";
+			m_prefix = m_adb;
+			m_prefix_valid = true;
+			m_pc++;
 			break;
 
+		// SPB prefix
 		case 0x07:
-	//      stream << "SPB ";
+			if (m_ps & F_S)
+			{
+				m_prefix = m_ssb;
+			}
+			else
+			{
+				m_prefix = m_usb;
+			}
+			m_prefix_valid = true;
+			m_pc++;
 			break;
 
+		// LINK #imm8
 		case 0x08:
-	//      util::stream_format(stream, "LINK   #$%02x", operand);
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			if (m_ps & F_S)
+			{
+				m_ssp-=2;
+				write_16((m_ssb << 16) | m_ssp, read_rwX(3));
+				write_rwX(3, m_ssp);
+				m_ssp -= m_tmp8;
+			}
+			else
+			{
+				m_usp-=2;
+				write_16((m_usb << 16) | m_usp, read_rwX(3));
+				write_rwX(3, m_usp);
+				m_ssp -= m_tmp8;
+			}
+			m_pc += 2;
+			m_icount -= 6;
 			break;
 
+		// UNLINK
 		case 0x09:
-	//      stream << "UNLINK";
+			if (m_ps & F_S)
+			{
+				m_ssp = read_rwX(3);
+			}
+			else
+			{
+				m_usp = read_rwX(3);
+			}
+			write_rwX(3, pull_16());
+			m_pc++;
+			m_icount -= 5;
 			break;
 
 		// MOV RP, #imm8
@@ -252,8 +305,20 @@ void f2mc16_device::execute_run()
 	//      stream << "NEGW   A";
 			break;
 
+		// LSLW A
 		case 0x0c:
-	//      stream << "LSLW   A";
+			m_tmp16 = m_acc & 0xffff;
+			m_acc &= 0xffff0000;
+			m_ps &= ~F_C;
+			if (m_tmp16 & 0x8000)
+			{
+				m_ps |= F_C;
+			}
+			m_tmp16 <<= 1;
+			setNZ_16(m_tmp16);
+			m_acc |= m_tmp16;
+			m_pc++;
+			m_icount -= 2;
 			break;
 
 		case 0x0e:
@@ -288,16 +353,31 @@ void f2mc16_device::execute_run()
 	//      stream << "SWAP";
 			break;
 
+		// ADDSP #imm8
 		case 0x17:
-	//      util::stream_format(stream, "ADDSP  #$%02x", operand);
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			if (m_ps & F_S)
+			{
+				m_ssp += m_tmp8;
+			}
+			else
+			{
+				m_usp += m_tmp8;
+			}
+			m_pc += 2;
+			m_icount -= 3;
 			break;
 
 		case 0x18:
 	//      util::stream_format(stream, "ADDL   A, #$%08x", opcodes.r16(pc+1) | (opcodes.r16(pc+3)<<16));
 			break;
 
+		// SUBL A, #imm32
 		case 0x19:
-	//      util::stream_format(stream, "SUBL   A, #$%08x", opcodes.r16(pc+1) | (opcodes.r16(pc+3)<<16));
+			m_tmp32 = read_32((m_pcb << 16) | (m_pc+1));
+			m_acc = doSUB_32(m_acc, m_tmp32);
+			m_pc += 5;
+			m_icount -= 4;
 			break;
 
 		// MOV ILM, #imm8
@@ -313,8 +393,12 @@ void f2mc16_device::execute_run()
 	//      stream << "EXTW";
 			break;
 
+		// ZEXTW
 		case 0x1d:
-	//      stream << "ZEXTW";
+			m_acc &= 0xffff;
+			setNZ_32(m_acc);
+			m_pc++;
+			m_icount--;
 			break;
 
 		case 0x1e:
@@ -361,24 +445,52 @@ void f2mc16_device::execute_run()
 	//      stream << "MULU   A";
 			break;
 
+		// ADDW A
 		case 0x28:
-	//      stream << "ADDW   A";
+			m_tmp16 = doADD_16((m_acc>>16) & 0xffff, m_acc & 0xffff);
+			m_pc++;
+			m_icount -= 2;
 			break;
 
+		// SUBW A
 		case 0x29:
-	//      stream << "SUBW   A";
+			m_tmp16 = doSUB_16((m_acc>>16) & 0xffff, m_acc & 0xffff);
+			m_acc &= 0xffff0000;
+			m_acc |= m_tmp16;
+			m_pc++;
+			m_icount -= 2;
 			break;
 
+		// CBNE A, #imm8
 		case 0x2a:
-	//      util::stream_format(stream, "CBNE   A, #$%02X, $%04X", operand, (s8)opcodes.r8(pc+2) + (pc & 0xffff) + 3);
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			doCMP_8(m_acc & 0xff, m_tmp8);
+			if (m_ps & F_Z) // they're equal
+			{
+				m_pc += 3;
+				m_icount -= 4;
+			}
+			else
+			{
+				m_pc++;
+				take_branch();
+			}
 			break;
 
 		case 0x2b:
 	//      stream << "CMPW   A";
 			break;
 
+		// ANDW A
 		case 0x2c:
-	//      stream << "ANDW   A";
+			m_tmp32 = m_acc;
+			m_tmp32 >>= 16;
+			m_tmp32 |= 0xffff0000;
+			m_acc &= m_tmp32;
+			setNZ_16(m_acc & 0xffff);
+			m_ps &= ~F_V;
+			m_pc++;
+			m_icount -= 2;
 			break;
 
 		case 0x2d:
@@ -405,8 +517,12 @@ void f2mc16_device::execute_run()
 	//      stream << "SUBC   A";
 			break;
 
+		// CMP A, #imm8
 		case 0x33:
-	//      util::stream_format(stream, "CMP    A, #$%02x", operand);
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			doCMP_8(m_acc & 0xff, m_tmp8);
+			m_pc += 2;
+			m_icount -= 2;
 			break;
 
 		case 0x34:
@@ -437,8 +553,23 @@ void f2mc16_device::execute_run()
 	//      util::stream_format(stream, "CWBNE  A, #$%04X, $%04X", opcodes.r16(pc+1), (s8)opcodes.r8(pc+3) + (pc & 0xffff) + 4);
 			break;
 
+		// CMPW A, #imm16
 		case 0x3b:
-	//      util::stream_format(stream, "CMPW   A, #$%04x", opcodes.r16(pc+1));
+			m_tmp16 = read_16((m_pcb<<16) | (m_pc+1));
+			doCMP_16(m_acc & 0xffff, m_tmp16);
+			m_pc += 3;
+			m_icount -= 2;
+			break;
+
+		// ANDW A, #imm16  fc4eb1
+		case 0x3c:
+			m_tmp32 = read_16((m_pcb<<16) | (m_pc+1));
+			m_tmp32 |= 0xffff0000;
+			m_acc &= m_tmp32;
+			setNZ_16(m_acc & 0xffff);
+			m_ps &= ~F_V;
+			m_pc += 3;
+			m_icount -= 2;
 			break;
 
 		case 0x3f:
@@ -478,35 +609,60 @@ void f2mc16_device::execute_run()
 			m_tmp16 = read_16((m_pcb<<16) | (m_pc+1));
 			m_acc <<= 16;
 			m_acc |= m_tmp16;
+			setNZ_16(m_tmp16);
 			m_icount -= 2;
 			m_pc += 3;
 			break;
 
+		// MOVL A, #imm16
 		case 0x4b:
-	//      util::stream_format(stream, "MOVL   A, #$%04x", opcodes.r32(pc+1));
+			m_acc = read_32((m_pcb<<16) | (m_pc + 1));
+			setNZ_32(m_acc);
+			m_icount -= 3;
+			m_pc += 5;
 			break;
 
+		// PUSHW A
 		case 0x4c:
-	//      stream << "PUSHW  A";
+			push_16(m_acc & 0xffff);
+			m_icount -= 4;
+			m_pc++;
 			break;
 
+		// PUSHW AH
 		case 0x4d:
-	//      stream << "PUSHW  AH";
+			push_16((m_acc >> 16) & 0xffff);
+			m_icount -= 4;
+			m_pc++;
 			break;
 
+		// PUSHW PS
 		case 0x4e:
-	//      stream << "PUSHW  PS";
+			push_16(m_ps);
+			m_icount -= 4;
+			m_pc++;
 			break;
 
+		// PUSHW (register bitmap)
 		case 0x4f:
-	//      util::stream_format(stream, "PUSHW   ");
-	//      for (int i = 0; i < 8; i++)
-	//      {
-	//          if (operand & (1<<i))
-	//          {
-	//              util::stream_format(stream, "RW%d, ", i);
-	//          }
-	//      }
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			for (int i = 0; i < 8; i++)
+			{
+				if (m_tmp8 & (1<<i))
+				{
+					push_16(read_rwX(i));
+					m_icount -= 3;
+				}
+			}
+			m_pc += 2;
+			if (m_tmp8 == 0)
+			{
+				m_icount -= 8;
+			}
+			else
+			{
+				m_icount -= 29;
+			}
 			break;
 
 		case 0x52:
@@ -529,38 +685,60 @@ void f2mc16_device::execute_run()
 	//      util::stream_format(stream, "MOVW   $%04x, A", opcodes.r16(pc+1));
 			break;
 
+		// POPW A
 		case 0x5c:
-	//      stream << "POPW   A";
+			m_acc <<= 16;
+			m_acc |= pull_16();
+			m_pc++;
+			m_icount -= 3;
 			break;
 
+		// POPW AH
 		case 0x5d:
-	//      stream << "POPW   AH";
+			m_acc &= 0xffff;
+			m_acc |= (pull_16() << 16);
+			m_pc++;
+			m_icount -= 3;
 			break;
 
+		// POPW PS
 		case 0x5e:
-	//      stream << "POPW   PS";
+			m_ps = pull_16();
+			m_pc++;
+			m_icount -= 4;
 			break;
 
+		// POPW register list
 		case 0x5f:
-	//      util::stream_format(stream, "POPW    ");
-	//      for (int i = 0; i < 8; i++)
-	//      {
-	//          if (operand & (1<<i))
-	//          {
-	//              util::stream_format(stream, "RW%d, ", i);
-	//          }
-	//      }
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			for (int i = 7; i <= 0; i--)
+			{
+				if (m_tmp8 & (1<<i))
+				{
+					write_rwX(i, pull_16());
+					m_icount -= 3;
+				}
+			}
+			m_pc += 2;
+			if (m_tmp8 == 0)
+			{
+				m_icount -= 7;
+			}
 			break;
 
-		case 0x60: //branch_helper(stream, "BRA   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
+		// BRA
+		case 0x60:
+			take_branch();
 			break;
 
 		case 0x61:
 //          stream << "JMP    @A";
 			break;
 
+		// JMP #imm16
 		case 0x62:
-//          util::stream_format(stream, "JMP    #$%04x", opcodes.r16(pc+1));
+			m_pc = read_16((m_pcb<<16) | (m_pc+1));
+			m_icount -= 3;
 			break;
 
 		case 0x63:
@@ -571,12 +749,22 @@ void f2mc16_device::execute_run()
 	//      util::stream_format(stream, "CALL   #$%04x", opcodes.r16(pc+1));
 			break;
 
+		// CALLP #imm24
 		case 0x65:
-	//      util::stream_format(stream, "CALLP  #$%06x", opcodes.r8(pc+3)<<16|opcodes.r8(pc+2)<<8|opcodes.r8(pc+1));
+			push_16(m_pcb);
+			push_16(m_pc+4);
+			m_tmp8 = read_8((m_pcb << 16) | (m_pc + 3));
+			m_tmp16 = read_16((m_pcb << 16) | (m_pc + 1));
+			m_pcb = m_tmp8;
+			m_pc = m_tmp16;
+			m_icount -= 10;
 			break;
 
+		// RETP
 		case 0x66:
-	//      util::stream_format(stream, "RETP");
+			m_pc = pull_16();
+			m_pcb = pull_16() & 0xff;
+			m_icount -= 5;
 			break;
 
 		case 0x67:
@@ -596,7 +784,7 @@ void f2mc16_device::execute_run()
 			break;
 
 		case 0x70:  // ea-type instructions
-			fatalerror("Unknown F2MC EA70 opcode %02x\n", opcode);
+			opcodes_ea70(read_8((m_pcb<<16) | (m_pc+1)));
 			break;
 
 		case 0x71:  // ea-type instructions
@@ -604,15 +792,15 @@ void f2mc16_device::execute_run()
 			break;
 
 		case 0x72:  // ea-type instructions
-			fatalerror("Unknown F2MC EA72 opcode %02x\n", opcode);
+			opcodes_ea72(read_8((m_pcb<<16) | (m_pc+1)));
 			break;
 
 		case 0x73:  // ea-type instructions
-			fatalerror("Unknown F2MC EA73 opcode %02x\n", opcode);
+			opcodes_ea73(read_8((m_pcb<<16) | (m_pc+1)));
 			break;
 
 		case 0x74:  // ea-type instructions
-			fatalerror("Unknown F2MC EA74 opcode %02x\n", opcode);
+			opcodes_ea74(read_8((m_pcb<<16) | (m_pc+1)));
 			break;
 
 		case 0x75:  // ea-type instructions
@@ -631,24 +819,37 @@ void f2mc16_device::execute_run()
 			fatalerror("Unknown F2MC EA78 opcode %02x\n", opcode);
 			break;
 
+		// MOV A, Rx
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
-	//      util::stream_format(stream, "MOV    A, R%d", (opcode & 0x7));
 			break;
 
+		// MOVW A, RWx
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-	//      util::stream_format(stream, "MOVW   A, RW%d", (opcode & 0x7));
 			break;
 
+		// MOV Rx, A
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
-	//      util::stream_format(stream, "MOV    R%d, A", (opcode & 0x7));
+			write_rX(opcode & 0x7, m_acc & 0xff);
+			setNZ_8(m_acc & 0xff);
+			m_pc++;
+			m_icount -= 2;
 			break;
 
+		// MOVW RWx, A
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-	//      util::stream_format(stream, "MOVW   RW%d, A", (opcode & 0x7));
+			write_rwX(opcode & 0x7, m_acc & 0xffff);
+			setNZ_16(m_acc & 0xffff);
+			m_pc++;
+			m_icount -= 2;
 			break;
 
+		// MOV Rx, #imm8
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
-	//      util::stream_format(stream, "MOVW   RW%d, #$%02x", (opcode & 0x7), operand);
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			write_rX(opcode & 7, m_tmp8);
+			setNZ_8(m_tmp8);
+			m_icount -= 2;
+			m_pc += 2;
 			break;
 
 		// MOVW RWx, #imm16
@@ -665,20 +866,41 @@ void f2mc16_device::execute_run()
 			break;
 
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-	//      util::stream_format(stream, "MOVW   A, @R%d+%02x", (opcode & 0x7), operand);
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			m_tmp16 = read_rwX(opcode & 0x7) + (s8)m_tmp8;
+			m_acc <<= 16;
+			m_acc |= read_16(getRWbank(opcode & 0x7, m_tmp16));
+			setNZ_16(m_acc & 0xffff);
+			m_pc += 2;
+			m_icount -= 10;
 			break;
 
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 	//      util::stream_format(stream, "MOVX   A, @R%d+%02x", (opcode & 0x7), operand);
 			break;
 
+		// MOVW @RWx + disp8, A
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
-	//      util::stream_format(stream, "MOVW   @R%d+%02x, A", (opcode & 0x7), operand);
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+1));
+			m_tmp16 = read_rwX(opcode & 0x7) + (s8)m_tmp8;
+			write_16(getRWbank(opcode & 0x7, m_tmp16), m_acc & 0xffff);
+			setNZ_16(m_acc & 0xffff);
+			m_pc += 2;
+			m_icount -= 10;
 			break;
 
+		// MOVN A, #imm4
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 		case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
-	//      util::stream_format(stream, "MOVN   A, #$%01x", (opcode & 0xf));
+			m_acc <<= 16;
+			m_acc |= (opcode & 0xf);
+			m_ps &= ~(F_N|F_Z);
+			if (!(opcode & 0xf))
+			{
+				m_ps |= F_Z;
+			}
+			m_pc++;
+			m_icount--;
 			break;
 
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
@@ -686,22 +908,228 @@ void f2mc16_device::execute_run()
 	  //    util::stream_format(stream, "CALL   #$%01x", (opcode & 0xf));
 			break;
 
-		case 0xf0: //branch_helper(stream, "BEQ   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf1: //branch_helper(stream, "BNE   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf2: //branch_helper(stream, "BC    ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf3: //branch_helper(stream, "BNC   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf4: //branch_helper(stream, "BN    ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf5: //branch_helper(stream, "BP    ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf6: //branch_helper(stream, "BV    ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf7: //branch_helper(stream, "BNV   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf8: //branch_helper(stream, "BT    ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xf9: //branch_helper(stream, "BNT   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xfa: //branch_helper(stream, "BLT   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xfb: //branch_helper(stream, "BGE   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xfc: //branch_helper(stream, "BLE   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xfd: //branch_helper(stream, "BGT   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xfe: //branch_helper(stream, "BLS   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
-		case 0xff: //branch_helper(stream, "BHI   ", (pc & 0xffff)+2, (s8)operand); bytes = 2; break;
+		// BEQ
+		case 0xf0:
+			if (m_ps & F_Z)
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BNE
+		case 0xf1:
+			if (!(m_ps & F_Z))
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BC
+		case 0xf2:
+			if (m_ps & F_C)
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BNC
+		case 0xf3:
+			if (!(m_ps & F_C))
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		//
+		case 0xf4:
+			if (m_ps & F_N)
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BP
+		case 0xf5:
+			if (!(m_ps & F_N))
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BV
+		case 0xf6:
+			if (m_ps & F_V)
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BNV
+		case 0xf7:
+			if (!(m_ps & F_V))
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BT
+		case 0xf8:;
+			if (m_ps & F_T)
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BNT
+		case 0xf9:
+			if (!(m_ps & F_T))
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BLT
+		case 0xfa:
+			{
+				u8 n = (m_ps & F_N) ? 1 : 0;
+				u8 v = (m_ps & F_V) ? 1 : 0;
+				if ((v ^ n) == 1)
+				{
+					take_branch();
+				}
+				else
+				{
+					m_pc += 2;
+					m_icount -= 3;
+				}
+			}
+			break;
+
+		// BGE
+		case 0xfb:
+			{
+				u8 n = (m_ps & F_N) ? 1 : 0;
+				u8 v = (m_ps & F_V) ? 1 : 0;
+				if ((v ^ n) == 0)
+				{
+					take_branch();
+				}
+				else
+				{
+					m_pc += 2;
+					m_icount -= 3;
+				}
+			}
+			break;
+
+		// BLE
+		case 0xfc:
+			{
+				u8 n = (m_ps & F_N) ? 1 : 0;
+				u8 v = (m_ps & F_V) ? 1 : 0;
+				if (((v ^ n) == 1) || (m_ps & F_Z))
+				{
+					take_branch();
+				}
+				else
+				{
+					m_pc += 2;
+					m_icount -= 3;
+				}
+			}
+			break;
+
+		// BGT
+		case 0xfd:
+			{
+				u8 n = (m_ps & F_N) ? 1 : 0;
+				u8 v = (m_ps & F_V) ? 1 : 0;
+				if (((v ^ n) == 1) || !(m_ps & F_Z))
+				{
+					take_branch();
+				}
+				else
+				{
+					m_pc += 2;
+					m_icount -= 3;
+				}
+			}
+			break;
+
+		//BLS
+		case 0xfe:
+			if ((m_ps & F_C) || (m_ps & F_Z))
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
+			break;
+
+		// BHI
+		case 0xff:
+			if (!(m_ps & F_C) || !(m_ps & F_Z))
+			{
+				take_branch();
+			}
+			else
+			{
+				m_pc += 2;
+				m_icount -= 3;
+			}
 			break;
 
 		default:
@@ -720,8 +1148,13 @@ void f2mc16_device::opcodes_str6e(u8 operand)
 		case 0x09:
 			if (read_rwX(0) > 0)
 			{
-				m_tmp8 = read_8((m_dtb<<16) | (m_acc & 0xffff));
-				write_8((m_adb<<16) | ((m_acc >> 16) & 0xffff), m_tmp8);
+				u16 al = (m_acc & 0xffff);
+				u16 ah = (m_acc >> 16) & 0xffff;
+				m_tmp8 = read_8((m_dtb<<16) | al);
+				write_8((m_adb<<16) | ah, m_tmp8);
+				al++;
+				ah++;
+				m_acc = (ah<<16) | al;
 				write_rwX(0, read_rwX(0) - 1);
 				m_icount -= 8;
 			}
@@ -742,6 +1175,54 @@ void f2mc16_device::opcodes_2b6f(u8 operand)
 {
 	switch (operand)
 	{
+		// ASRW A, R0
+		case 0x0e:
+			m_tmp8 = read_rX(0);
+			if (m_tmp8 == 0)
+			{
+				// docs don't say if N is cleared in this case or not
+				m_ps &= ~(F_C|F_T);
+				m_ps |= F_Z;
+				m_pc += 2;
+				m_icount -= 6;
+			}
+			else
+			{
+				m_tmp16 = m_acc & 0xffff;
+				for (u8 count = 0; count < m_tmp8; count++)
+				{
+					// T is set if either carry or T are set beforehand
+					if ((m_ps & F_C) || (m_ps & F_T))
+					{
+						m_ps |= F_T;
+					}
+					// C becomes the previous LSB
+					m_ps &= ~F_C;
+					if (m_tmp16 & 1)
+					{
+						m_ps |= F_C;
+					}
+
+					if (m_tmp16 & 0x8000)
+					{
+						m_tmp16 >>= 1;
+						m_tmp16 |= 1;
+					}
+					else
+					{
+						m_tmp16 >>= 1;
+						m_tmp16 &= ~0x8000;
+					}
+					setNZ_16(m_tmp16);
+					m_icount -= 5;
+				}
+
+				m_acc &= 0xffff0000;
+				m_acc |= m_tmp16;
+				m_pc += 2;
+			}
+			break;
+
 		// MOV DTB, A
 		case 0x10:
 			m_dtb = m_acc & 0xff;
@@ -777,8 +1258,49 @@ void f2mc16_device::opcodes_2b6f(u8 operand)
 			m_icount -= 1;
 			break;
 
+		// MOV @RWx + #disp8, A
+		case 0x30: case 0x32: case 0x34: case 0x36:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX((operand>>1) & 0x3) + (s8)m_tmp8;
+			write_8(getRWbank((operand>>1) & 0x3, m_tmp16), m_acc & 0xff);
+			setNZ_8(m_acc & 0xff);
+			m_pc += 3;
+			m_icount -= 10;
+			break;
+
+		// MOV A, @RWx + disp8
+		case 0x40: case 0x42: case 0x44: case 0x46:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX((operand>>1) & 0x3) + (s8)m_tmp8;
+			m_acc <<= 16;
+			m_acc |= read_8(getRWbank((operand>>1) & 0x3, m_tmp16));
+			setNZ_8(m_acc & 0xff);
+			m_pc += 3;
+			m_icount -= 10;
+			break;
+
 		default:
 			fatalerror("Unknown F2MC 2B6F opcode %02x (PC=%x)\n", operand, (m_pcb<<16) | m_pc);
+			break;
+	}
+}
+
+void f2mc16_device::opcodes_ea70(u8 operand)
+{
+	switch (operand)
+	{
+		// SUBL A, @RWx + disp8
+		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
+			m_tmp8 = read_32((m_pcb<<16) | (m_pc+2));
+			m_tmpea = read_rwX(operand & 7) + (s8)m_tmp8;
+			m_tmp32 = read_32(getRWbank(operand & 7, m_tmpea));
+			m_acc = doSUB_32(m_acc, m_tmpea);
+			m_pc += 3;
+			m_icount -= 7;
+			break;
+
+		default:
+			fatalerror("Unknown F2MC EA70 opcode %02x (PC=%x)\n", operand, (m_pcb<<16) | m_pc);
 			break;
 	}
 }
@@ -787,17 +1309,151 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 {
 	switch (operand)
 	{
+		// INCL @RWx + disp8
+		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
+			m_tmp64 = read_32(getRWbank(operand & 7, m_tmp16));
+			m_tmp64++;
+			write_32(getRWbank(operand & 7, m_tmp16), m_tmp64 & 0xffffffff);
+			setNZ_32(m_tmp64 & 0xffffffff);
+			m_ps &= ~F_V;
+			if (m_tmp32 & 0x100000000)
+			{
+				m_ps |= F_V;
+			}
+			m_pc += 3;
+			m_icount -= 7;
+			break;
+
+		// MOVL A, @RWx + disp8
+		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmpea = read_rwX(operand & 7) + (s8)m_tmp8;
+			m_acc = read_32(getRWbank(operand & 7, m_tmpea));
+			setNZ_32(m_acc);
+			m_pc += 3;
+			m_icount -= 4;
+			break;
+
+		// MOVL A, @RWx + disp16
+		case 0x98: case 0x99: case 0x9a: case 0x9b:
+			m_tmp16 = read_16((m_pcb<<16) | (m_pc+2));
+			m_tmpea = read_rwX(operand & 3) + (s16)m_tmp16;
+			m_acc = read_32(getRWbank(operand & 3, m_tmpea));
+			setNZ_32(m_acc);
+			m_pc += 4;
+			m_icount -= 4;
+			break;
+
+		// MOVL RLx, A
+		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+			write_rlX((operand & 7) >> 1, m_acc);
+			setNZ_32(m_acc);
+			m_pc += 2;
+			m_icount -= 4;
+			break;
+
+		// MOVL @RWx + disp8, A
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
+			write_32(getRWbank(operand & 7, m_tmp16), m_acc);
+			setNZ_32(m_acc);
+			m_pc += 3;
+			m_icount -= 4;
+			break;
+
 		// MOV @RWx, #imm8
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
 			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
 			m_tmp16 = read_rwX(operand & 7);
 			write_8(getRWbank(operand & 7, m_tmp16), m_tmp8);
+			setNZ_8(m_tmp8);
 			m_pc += 3;
 			m_icount -= 2;
 			break;
 
 		default:
 			fatalerror("Unknown F2MC EA71 opcode %02x (PC=%x)\n", operand, (m_pcb<<16) | m_pc);
+			break;
+	}
+}
+
+void f2mc16_device::opcodes_ea72(u8 operand)
+{
+	switch (operand)
+	{
+		// MOVW A, @RWx + disp8
+		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
+			m_acc <<= 16;
+			m_acc |= read_16(getRWbank(operand & 7, m_tmp16));
+			setNZ_16(m_acc & 0xffff);
+			m_pc += 3;
+			m_icount -= 5;
+			break;
+
+		// MOV @RWx + disp8, A
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
+			write_8(getRWbank(operand & 7, m_tmp16), m_acc & 0xff);
+			setNZ_8(m_acc & 0xff);
+			m_pc += 3;
+			m_icount -= 10;
+			break;
+
+		default:
+			fatalerror("Unknown F2MC EA72 opcode %02x (PC=%x)\n", operand, (m_pcb<<16) | m_pc);
+			break;
+	}
+}
+
+void f2mc16_device::opcodes_ea73(u8 operand)
+{
+	switch (operand)
+	{
+		// INCW @RWx + disp8, A
+		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
+			m_tmp32 = read_16(getRWbank(operand & 7, m_tmp16));
+			m_tmp32++;
+			write_16(getRWbank(operand & 7, m_tmp16), m_tmp32 & 0xffff);
+			setNZ_16(m_tmp32 & 0xffff);
+			m_ps &= ~F_V;
+			if (m_tmp32 & 0x10000)
+			{
+				m_ps |= F_V;
+			}
+			m_pc += 3;
+			m_icount -= 5;
+			break;
+
+		default:
+			fatalerror("Unknown F2MC EA73 opcode %02x (PC=%x)\n", operand, (m_pcb<<16) | m_pc);
+			break;
+	}
+}
+
+void f2mc16_device::opcodes_ea74(u8 operand)
+{
+	switch (operand)
+	{
+		// CMP A, @RWx + disp8
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x57:
+			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
+			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
+			m_tmp8 = read_8(getRWbank(operand & 7, m_tmp16));
+			doCMP_8(m_acc & 0xff, m_tmp8);
+			m_pc += 3;
+			m_icount -= 10;
+			break;
+
+		default:
+			fatalerror("Unknown F2MC EA74 opcode %02x (PC=%x)\n", operand, (m_pcb<<16) | m_pc);
 			break;
 	}
 }

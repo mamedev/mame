@@ -63,10 +63,12 @@ private:
 	address_space_config m_program_config;
 	address_space *m_program;
 
-	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16;
-	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8;
+	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmpea;
+	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_prefix;
 	u32 m_acc, m_temp, m_tmp32;
 	s32 m_icount;
+	u64 m_tmp64;
+	bool m_prefix_valid;
 
 	inline u8 read_8(u32 addr)
 	{
@@ -152,15 +154,22 @@ private:
 	inline void write_rlX(int reg, u32 val)
 	{
 		reg &= 3;
-		write_16((reg<<2) + 0x180 + (((m_ps>>8)&0x1f)*0x10), val);
+		write_32((reg<<2) + 0x180 + (((m_ps>>8)&0x1f)*0x10), val);
 	}
 
 	inline void setNZ_8(u8 uVal) { m_ps &= ~(F_N|F_Z); m_ps |= (uVal == 0) ? F_Z : 0; m_ps |= (uVal & 0x80) ? F_N : 0; }
 	inline void setNZ_16(u16 uVal) { m_ps &= ~(F_N|F_Z); m_ps |= (uVal == 0) ? F_Z : 0; m_ps |= (uVal & 0x8000) ? F_N : 0; }
+	inline void setNZ_32(u32 uVal) { m_ps &= ~(F_N|F_Z); m_ps |= (uVal == 0) ? F_Z : 0; m_ps |= (uVal & 0x80000000) ? F_N : 0; }
 
 	// get the full 24 bit address for an @RWx access
 	inline u32 getRWbank(int iReg, u16 uBankAddr)
 	{
+		if (m_prefix_valid)
+		{
+			m_prefix_valid = false;
+			return (m_prefix<<16) | uBankAddr;
+		}
+
 		iReg &= 7;
 		switch (iReg)
 		{
@@ -183,9 +192,207 @@ private:
 		return (m_dtb<<16) | uBankAddr;
 	}
 
+	inline void push_8(u8 val)
+	{
+		if (m_ps & F_S)
+		{
+			m_ssp--;
+			write_8((m_ssb << 16) | m_ssp, val);
+		}
+		else
+		{
+			m_usp--;
+			write_8((m_usb << 16) | m_usp, val);
+		}
+	}
+
+	inline void push_16(u16 val)
+	{
+		if (m_ps & F_S)
+		{
+			m_ssp-=2;
+			write_16((m_ssb << 16) | m_ssp, val);
+		}
+		else
+		{
+			m_usp-=2;
+			write_16((m_usb << 16) | m_usp, val);
+		}
+	}
+
+	inline void push_32(u32 val)
+	{
+		if (m_ps & F_S)
+		{
+			m_ssp-=4;
+			write_32((m_ssb << 16) | m_ssp, val);
+		}
+		else
+		{
+			m_usp-=4;
+			write_32((m_usb << 16) | m_usp, val);
+		}
+	}
+
+	inline u8 pull_8()
+	{
+		u8 rv = 0;
+		if (m_ps & F_S)
+		{
+			rv = read_8((m_ssb << 16) | m_ssp);
+			m_ssp ++;
+		}
+		else
+		{
+			rv = read_8((m_usb << 16) | m_usp);
+			m_usp ++;
+		}
+
+		return rv;
+	}
+
+	inline u16 pull_16()
+	{
+		u16 rv = 0;
+		if (m_ps & F_S)
+		{
+			rv = read_16((m_ssb << 16) | m_ssp);
+			m_ssp += 2;
+		}
+		else
+		{
+			rv = read_16((m_usb << 16) | m_usp);
+			m_usp += 2;
+		}
+
+		return rv;
+	}
+
+	inline u32 pull_32()
+	{
+		u32 rv = 0;
+		if (m_ps & F_S)
+		{
+			rv = read_32((m_ssb << 16) | m_ssp);
+			m_ssp += 4;
+		}
+		else
+		{
+			rv = read_32((m_usb << 16) | m_usp);
+			m_usp += 4;
+		}
+
+		return rv;
+	}
+
+	inline void doCMP_8(u8 lhs, u8 rhs)
+	{
+		m_tmp16 = lhs - rhs;
+		setNZ_16(m_tmp16 & 0xff);
+		m_ps &= ~(F_C|F_V);
+		if (m_tmp16 & 0x100)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (m_tmp16 & 0xff)) & 0x80)
+		{
+			m_ps |= F_V;
+		}
+	}
+	inline void doCMP_16(u16 lhs, u16 rhs)
+	{
+		m_tmp32 = lhs - rhs;
+		setNZ_16(m_tmp32 & 0xffff);
+		m_ps &= ~(F_C|F_V);
+		if (m_tmp32 & 0x10000)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (m_tmp32 & 0xffff)) & 0x8000)
+		{
+			m_ps |= F_V;
+		}
+	}
+
+	inline u8 doSUB_8(u8 lhs, u8 rhs)
+	{
+		m_tmp16 = lhs - rhs;
+		setNZ_16(m_tmp16 & 0xff);
+		m_ps &= ~(F_C|F_V);
+		if (m_tmp16 & 0x100)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (m_tmp16 & 0xff)) & 0x80)
+		{
+			m_ps |= F_V;
+		}
+
+		return m_tmp16 & 0xff;
+	}
+	inline u16 doSUB_16(u16 lhs, u16 rhs)
+	{
+		m_tmp32 = lhs - rhs;
+		setNZ_16(m_tmp32 & 0xffff);
+		m_ps &= ~(F_C|F_V);
+		if (m_tmp32 & 0x10000)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (m_tmp32 & 0xffff)) & 0x8000)
+		{
+			m_ps |= F_V;
+		}
+
+		return m_tmp32 & 0xffff;
+	}
+	inline u32 doSUB_32(u32 lhs, u32 rhs)
+	{
+		m_tmp64 = lhs - rhs;
+		setNZ_32(m_tmp64 & 0xffffffff);
+		m_ps &= ~(F_C|F_V);
+		if (m_tmp64 & 0x100000000)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (m_tmp64 & 0xffffffff)) & 0x8000000)
+		{
+			m_ps |= F_V;
+		}
+
+		return m_tmp64 & 0xffffffff;
+	}
+	inline u16 doADD_16(u16 lhs, u16 rhs)
+	{
+		m_tmp32 = lhs + rhs;
+		m_ps &= ~F_V|F_C;
+		if ((m_tmp32 ^ lhs) & (m_tmp32 ^ rhs) & 0x8000)
+		{
+			m_ps |= F_V;
+		}
+		if (m_tmp32 > 0xffff)
+		{
+			m_ps |= F_C;
+		}
+		setNZ_16(m_tmp32 & 0xffff);
+
+		return m_tmp32 & 0xffff;
+	}
+
+	inline void take_branch()
+	{
+		m_tmp8 = read_8((m_pcb << 16) | (m_pc+1));
+		m_pc = m_pc + 2 + (s8)m_tmp8;
+		m_icount -= 4;
+	}
+
 	void opcodes_str6e(u8 operand);
 	void opcodes_2b6f(u8 operand);
+	void opcodes_ea70(u8 operand);
 	void opcodes_ea71(u8 operand);
+	void opcodes_ea72(u8 operand);
+	void opcodes_ea73(u8 operand);
+	void opcodes_ea74(u8 operand);
 };
 
 DECLARE_DEVICE_TYPE(F2MC16, f2mc16_device)
