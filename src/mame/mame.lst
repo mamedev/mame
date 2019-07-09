@@ -9541,6 +9541,7 @@ caswin                          // (c) 1985
 rcasino                         // (c) 1984 Dyna Electronics (D-2608208A1-2)
 rcasino1                        // (c) 1984 Dyna Electronics (D-2608208A1-1, Larger Board)
 rcasinoo                        // (c) 1984 Dyna Electronics (D-2608208A1-1, Smaller Board)
+rcasino2                        // (c) 1984 Dyna Electronics
 
 @source:cat.cpp
 cat                             //

@@ -428,7 +428,25 @@ ROM_START( rcasinoo )
 	ROM_LOAD( "prom1.e8",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* MB7051 */
 ROM_END
 
+ROM_START( rcasino2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.b18",  0x0000, 0x2000, CRC(ce04c911) SHA1(776af4b07ee57503cf48f5f0651f1e506ae4ec08) )
+	ROM_LOAD( "1.b16",  0x2000, 0x2000, CRC(922b7745) SHA1(4fcf3fc02cac021820ddec89c1f57e7249ff819a) )
+	ROM_LOAD( "2.b15",  0x4000, 0x1000, CRC(b4c99c55) SHA1(e90967d53c4a33cfaace603e3a9eb7e43e747101) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "5.b8",  0x0000, 0x2000, CRC(b2dd4e1e) SHA1(323dcfb26653c17951db65ce2ced3325d35489e4) )
+	ROM_LOAD( "6.b6",  0x2000, 0x1000, CRC(8e0d3b9c) SHA1(c5211d834b0db488839a5c53d00435a0b59cd4ca) )
+	ROM_LOAD( "4.b9",  0x3000, 0x2000, CRC(81d20577) SHA1(50a1e0231400c106539ffa78deb3e0e6c8afc3f5) )
+	ROM_LOAD( "3.b11", 0x5000, 0x1000, CRC(7ca0e78c) SHA1(163cfd1f76ecbd14219146963d1abc4c09c0ac8c) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "mb7051.e9", 0x0000, 0x0020, CRC(93312432) SHA1(3c7abc165e6bc7e0c56ca97d89b0b5e06323b82e) )
+	ROM_LOAD( "mb7051.e8", 0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) )
+ROM_END
+
 GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board, set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino2, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board, set 2)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )
