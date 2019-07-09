@@ -29,18 +29,46 @@ public:
 
 	void sk101bl(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	DECLARE_READ_LINE_MEMBER(p17_r);
 	void p1_w(u8 data);
+	void p24_latch_w(u8 data);
+	void p26_latch_w(u8 data);
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
 
 	required_device<i80c31_device> m_maincpu;
+
+	u8 m_p1_state;
 };
+
+void sk101bl_state::machine_start()
+{
+	save_item(NAME(m_p1_state));
+}
+
+READ_LINE_MEMBER(sk101bl_state::p17_r)
+{
+	return 0;
+}
 
 void sk101bl_state::p1_w(u8 data)
 {
-	logerror("%s: Writing %02X to P1\n", machine().describe_context(), data);
+	m_p1_state = data;
+}
+
+void sk101bl_state::p24_latch_w(u8 data)
+{
+	logerror("%s: Writing %02X to P2.4 latch\n", machine().describe_context(), data);
+}
+
+void sk101bl_state::p26_latch_w(u8 data)
+{
+	logerror("%s: Writing %02X to P2.6 latch (P1.7-4 = %01X)\n", machine().describe_context(), data, m_p1_state >> 4);
 }
 
 void sk101bl_state::prog_map(address_map &map)
@@ -50,7 +78,8 @@ void sk101bl_state::prog_map(address_map &map)
 
 void sk101bl_state::ext_map(address_map &map)
 {
-	map(0x4f00, 0x4f00).unmapw();
+	map(0x1000, 0x1000).mirror(0x0fff).w(FUNC(sk101bl_state::p24_latch_w));
+	map(0x4000, 0x4000).mirror(0x0fff).w(FUNC(sk101bl_state::p26_latch_w));
 	map(0xe000, 0xffff).ram(); // TC5565APL-15L
 }
 
@@ -62,6 +91,7 @@ void sk101bl_state::sk101bl(machine_config &config)
 	I80C31(config, m_maincpu, 11.0592_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sk101bl_state::prog_map);
 	m_maincpu->set_addrmap(AS_IO, &sk101bl_state::ext_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(sk101bl_state::p17_r)).bit(7);
 	m_maincpu->port_out_cb<1>().set(FUNC(sk101bl_state::p1_w));
 }
 
