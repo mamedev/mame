@@ -6,7 +6,7 @@
     The 7700 series is based on the WDC 65C816 core, with the following
     notable changes:
 
-    - Second accumulator called "B" (on the 65816, "A" and "B" were the
+    - Second 16-bit accumulator called "B" (on the 65816, "A" and "B" were the
       two 8-bit halves of the 16-bit "C" accumulator).
     - 6502 emulation mode and XCE instruction are not present.
     - No NMI line.  BRK and the watchdog interrupt are non-maskable, but there
@@ -28,6 +28,9 @@
       not the upper 8 bits of X or Y when in 8-bit X.  The 7700 preserves
       the top bits of all registers in all modes (code in the C74 BIOS
       starting at d881 requires this!).
+    - Unlike the 65C816, the program bank register (known here as PG) is
+      incremented when PC overflows from 0xFFFF, and may be incremented or
+      decremented when the address for a relative branch is calculated.
 
     The various 7700 series models differ primarily by their on board
     peripherals.  The 7750 and later models do include some additional
