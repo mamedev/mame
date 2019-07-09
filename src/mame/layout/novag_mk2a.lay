@@ -44,8 +44,8 @@
 		</disk>
 	</element>
 
-	<element name="text_on"><text string="ON" align="1"><color red="0.65" green="0.65" blue="0.65" /></text></element>
-	<element name="text_off"><text string="OFF" align="2"><color red="0.65" green="0.65" blue="0.65" /></text></element>
+	<element name="text_on"><text string="ON" align="1"><color red="0.4" green="0.4" blue="0.4" /></text></element>
+	<element name="text_off"><text string="OFF" align="2"><color red="0.4" green="0.4" blue="0.4" /></text></element>
 
 	<element name="text_n1">
 		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>

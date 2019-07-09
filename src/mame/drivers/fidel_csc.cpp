@@ -182,12 +182,17 @@ See CSC description above for more information.
 Reversi Sensory Challenger (RSC)
 The 1st version came out in 1980, a program revision was released in 1981.
 Another distinction is the board color and layout, the 1981 version is green.
+Not sure if the 1st version was even released, or just a prototype.
 ---------------------------------
 8*(8+1) buttons, 8*8+1 LEDs
 1KB RAM(2*2114), 4KB ROM
 MOS MPS 6502B CPU, frequency unknown
 MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 0
 PCB label 510-1035A01
+
+To play it on MAME with the sensorboard device, it is recommended to set up
+keyboard shortcuts for the spawn inputs. Then hold the spawn input down while
+clicking on the game board.
 
 ******************************************************************************/
 
@@ -234,6 +239,8 @@ public:
 	void csce(machine_config &config);
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(rsc_init_board);
 
 protected:
 	virtual void machine_start() override;
@@ -334,6 +341,34 @@ void su9_state::su9_set_cpu_freq()
 ******************************************************************************/
 
 // misc handlers
+
+INPUT_CHANGED_MEMBER(csc_state::rsc_init_board)
+{
+	if (!newval)
+		return;
+
+	m_board->cancel_sensor();
+	m_board->cancel_hand();
+	m_board->clear_board();
+
+	// 2 possible initial board positions
+	if (param)
+	{
+		m_board->write_piece(3, 3, 2);
+		m_board->write_piece(4, 3, 1);
+		m_board->write_piece(3, 4, 2);
+		m_board->write_piece(4, 4, 1);
+	}
+	else
+	{
+		m_board->write_piece(3, 3, 1);
+		m_board->write_piece(4, 3, 2);
+		m_board->write_piece(3, 4, 2);
+		m_board->write_piece(4, 4, 1);
+	}
+
+	m_board->refresh();
+}
 
 u16 csc_state::read_inputs()
 {
@@ -558,14 +593,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rsc )
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("ST")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("RV")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("DM")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("CL")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("LV")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PV")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("ST")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("RV")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("DM")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("CL")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("LV")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PV")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+
+	PORT_START("BOARD")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, csc_state, rsc_init_board, 0) PORT_NAME("Board Reset A")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, csc_state, rsc_init_board, 1) PORT_NAME("Board Reset B")
 INPUT_PORTS_END
 
 
@@ -658,6 +697,8 @@ void csc_state::rsc(machine_config &config)
 	m_pia[0]->cb2_handler().set(FUNC(csc_state::pia0_cb2_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->set_spawnpoints(2);
+	m_board->set_delay(attotime::from_msec(300));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
@@ -785,4 +826,4 @@ CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelit
 
 CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super 9 Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1981, reversic, 0,      0, rsc,      rsc,  csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, reversic, 0,      0, rsc,      rsc,  csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

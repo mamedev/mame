@@ -44,6 +44,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_out_pui(*this, "piece_ui%u", 0U),
 	m_out_count(*this, "count_ui%u", 0U),
 	m_inp_rank(*this, "RANK.%u", 1),
+	m_inp_spawn(*this, "SPAWN"),
 	m_inp_ui(*this, "UI"),
 	m_custom_init_cb(*this),
 	m_custom_sensor_cb(*this),
@@ -327,6 +328,13 @@ void sensorboard_device::refresh()
 	}
 }
 
+void sensorboard_device::cancel_sensor()
+{
+	// stop sensor delay
+	m_sensortimer->adjust(attotime::never);
+	m_sensorpos = m_droppos = -1;
+}
+
 void sensorboard_device::cancel_hand()
 {
 	// remove piece from hand (but don't remove it from the board)
@@ -351,7 +359,10 @@ bool sensorboard_device::drop_piece(u8 x, u8 y)
 	u8 piece = m_hand;
 	if (piece != 0)
 	{
-		remove_hand();
+		// lock hand if spawn piece is held down
+		if (m_handpos != -1 || m_inductive || !BIT(m_inp_spawn->read(), piece - 1))
+			remove_hand();
+
 		write_piece(x, y, piece);
 
 		// magnet boards: delay when capturing a piece
@@ -370,6 +381,10 @@ bool sensorboard_device::pickup_piece(u8 x, u8 y)
 	{
 		m_hand = piece;
 		m_handpos = (y << 4 & 0xf0) | (x & 0x0f);
+
+		// possibly remove it immediately
+		if (m_inp_ui->read() & 8)
+			remove_hand();
 	}
 
 	return piece != 0;
@@ -380,12 +395,6 @@ bool sensorboard_device::pickup_piece(u8 x, u8 y)
 //-------------------------------------------------
 //  input handlers (internal use)
 //-------------------------------------------------
-
-void sensorboard_device::cancel_sensor()
-{
-	m_sensortimer->adjust(attotime::never);
-	m_sensorpos = m_droppos = -1;
-}
 
 INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 {
