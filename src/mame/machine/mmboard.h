@@ -12,6 +12,7 @@
 #pragma once
 
 
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -33,6 +34,7 @@ public:
 
 	// configuration helpers
 	void set_disable_leds(int _disable_leds) { m_disable_leds = _disable_leds; }
+	void set_delay(attotime _sensordelay)    { m_sensordelay = _sensordelay; }
 
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(led_w);
@@ -47,8 +49,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
-	required_ioport_array<8> m_sensors;
+protected:
+	required_device<sensorboard_device> m_board;
+	attotime                 m_sensordelay;
 	output_finder<64>        m_led;
 	emu_timer *              m_leds_update_timer;
 	emu_timer *              m_leds_refresh_timer;
@@ -69,7 +72,7 @@ public:
 protected:
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -84,7 +87,7 @@ public:
 protected:
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
