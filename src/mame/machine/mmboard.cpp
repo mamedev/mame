@@ -59,7 +59,7 @@ void mephisto_buttons_board_device::device_add_mconfig(machine_config &config)
 mephisto_board_device::mephisto_board_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_board(*this, "board")
-	, m_sensordelay(attotime::from_msec(150))
+	, m_sensordelay(attotime::from_msec(200))
 	, m_led(*this, "led%u", 0U)
 	, m_disable_leds(false)
 {
