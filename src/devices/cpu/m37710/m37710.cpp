@@ -509,7 +509,7 @@ void m37710_cpu_device::port_w(offs_t offset, uint8_t data)
 		else
 		{
 			uint8_t d = m_port_dir[p];
-			if (d != 0xff)
+			if (d != 0)
 				m_port_out_cb[p](0, data & d, d);
 			m_port_regs[p] = data;
 		}
