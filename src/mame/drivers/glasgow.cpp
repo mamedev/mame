@@ -81,8 +81,6 @@ protected:
 	uint8_t m_lcd_shift_counter;
 	uint8_t m_led7;
 	uint8_t m_key_select;
-
-private:
 };
 
 
