@@ -30,10 +30,7 @@ How to play (quick guide)
 3. Computer plays black, it will work out its move and beep.
 4. Read the move in the display, or look for the flashing LEDs.
 5. Move the computer's piece in the same way you moved yours.
-6. If a piece is being taken, firstly click on the piece then click the blank
-    area at bottom right. This causes the piece to disappear. After that,
-    move the piece that took the other piece.
-7. You'll need to read the official user manual for advanced features, or if
+6. You'll need to read the official user manual for advanced features, or if
     you get messages such as "Err1".
 
 
