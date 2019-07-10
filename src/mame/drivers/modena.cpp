@@ -149,7 +149,7 @@ void mephisto_modena_state::modena(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MEPHISTO_BUTTONS_BOARD(config, m_board, 0);
+	MEPHISTO_BUTTONS_BOARD(config, m_board);
 	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_modena);
 

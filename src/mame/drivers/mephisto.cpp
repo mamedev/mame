@@ -316,7 +316,7 @@ void mephisto_state::mephisto(machine_config &config)
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(mephisto_state::update_nmi), attotime::from_hz(600));
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_SENSORS_BOARD(config, "board");
 	config.set_default_layout(layout_mephisto);
 }
 

@@ -261,8 +261,8 @@ void mmodular_state::alm16(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &mmodular_state::alm16_mem);
 	maincpu.set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(600));
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_DISPLAY_MODUL(config, "display");
 	config.set_default_layout(layout_mmodular);
 }
 
@@ -282,8 +282,8 @@ void mmodular_state::alm32(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_DISPLAY_MODUL(config, "display");
 	config.set_default_layout(layout_mmodular);
 }
 
@@ -303,8 +303,8 @@ void mmodular_state::gen32(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_DISPLAY_MODUL(config, "display");
 	config.set_default_layout(layout_mmodular);
 }
 
@@ -317,8 +317,8 @@ void berlinp_state::berlinp(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MEPHISTO_BUTTONS_BOARD(config, m_board, 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	MEPHISTO_BUTTONS_BOARD(config, m_board);
+	MEPHISTO_DISPLAY_MODUL(config, "display");
 	config.set_default_layout(layout_mmodular);
 }
 

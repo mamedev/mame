@@ -311,8 +311,8 @@ void mephisto_polgar_state::polgar(machine_config &config)
 	outlatch.q_out_cb<4>().set_output("led104");
 	outlatch.q_out_cb<5>().set_output("led105");
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_DISPLAY_MODUL(config, "display");
 	config.set_default_layout(layout_mephisto_lcd);
 }
 
@@ -342,8 +342,8 @@ void mephisto_risc_state::mrisc(machine_config &config)
 	outlatch.q_out_cb<5>().set_output("led105");
 	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_DISPLAY_MODUL(config, "display");
 	config.set_default_layout(layout_mephisto_lcd);
 }
 
@@ -352,7 +352,7 @@ void mephisto_milano_state::milano(machine_config &config)
 	polgar(config);
 	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
 
-	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
 	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_milano);
 }

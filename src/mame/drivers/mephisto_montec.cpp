@@ -470,7 +470,7 @@ void mephisto_montec_state::montec(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
+	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(300));
 
 	config.set_default_layout(layout_mephisto_montec);
@@ -490,7 +490,7 @@ void mephisto_montec_state::megaiv(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::megaiv_mem);
 	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
 
-	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
 	m_board->set_delay(attotime::from_msec(250));
 	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_megaiv);
