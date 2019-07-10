@@ -82,15 +82,13 @@ private:
 /* VIDEO GOODS */
 void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
-	uint8_t characterX, characterY;
-
-	for (characterX = 0; characterX < 32; characterX++)
+	for (uint8_t character_x = 0; character_x < 32; character_x++)
 	{
-		for (characterY = 0; characterY < 32; characterY++)
+		for (uint8_t character_y = 0; character_y < 32; character_y++)
 		{
-			int current_screen_character = (characterY*32) + characterX;
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, m_fix_ram[current_screen_character],
-					1, 0, 0, characterX*8, characterY*8, 0);
+			int current_screen_character = (character_y * 32) + character_x;
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, m_fix_ram[current_screen_character],
+					1, 0, 0, character_x * 8, character_y * 8, 0);
 		}
 	}
 }
@@ -107,15 +105,11 @@ void segald_state::astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 /*  const uint8_t SPR_GFXOFS_LO = 6;*/
 /*  const uint8_t SPR_GFXOFS_HI = 7;*/
 
-	int sx,sy;
-	int spr_number;
-	int spr_base;
-
-	for (spr_number = 0; spr_number < 32; spr_number++)
+	for (int spr_number = 0; spr_number < 32; spr_number++)
 	{
-		spr_base = 0x10 * spr_number;
-		sy = m_obj_ram[spr_base + SPR_Y_TOP];
-		sx = m_obj_ram[spr_base + SPR_X_LO];
+		int spr_base = 0x10 * spr_number;
+		int sy = m_obj_ram[spr_base + SPR_Y_TOP];
+		int sx = m_obj_ram[spr_base + SPR_X_LO];
 
 		if (sx != 0 || sy != 0)
 			logerror("Hey!  A sprite's not at 0,0 : %d %d", sx, sy);
@@ -387,7 +381,6 @@ void segald_state::astron(machine_config &config)
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(segald_state::screen_update_astron));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 

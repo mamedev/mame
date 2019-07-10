@@ -1802,7 +1802,6 @@ void gottlieb_state::g2laser(machine_config &config)
 	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process), this);
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
-	m_laserdisc->set_overlay_palette("palette");
 	m_laserdisc->add_route(0, "speaker", 1.0);
 	m_laserdisc->set_screen(m_screen);
 	/* right channel is processed as data */
@@ -1868,7 +1867,6 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process), this);
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
-	m_laserdisc->set_overlay_palette("palette");
 	m_laserdisc->add_route(0, "speaker", 1.0);
 	m_laserdisc->set_screen(m_screen);
 	/* right channel is processed as data */
