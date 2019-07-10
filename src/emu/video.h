@@ -73,6 +73,8 @@ public:
 	void toggle_record_mng() { toggle_record_movie(MF_MNG); }
 	void toggle_record_avi() { toggle_record_movie(MF_AVI); }
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
+	void compute_snapshot_size(s32 &width, s32 &height);
+	void pixels(u32 *buffer);
 
 	// render a frame
 	void frame_update(bool from_debugger = false);
