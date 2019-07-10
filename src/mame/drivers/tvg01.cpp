@@ -1,8 +1,62 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR, Roberto Fresca
 /*******************************************************************************
 
-    Skeleton driver for gambling game on "TVG01" PCB.
+  The Boat
+  1997(c) Hit Gun Co, LTD.
+  
+  Gambling/Amusing game
+  Selectable through DIP switches.
+
+  Driver by AJR.
+  Additional work by Roberto Fresca.
+
+*******************************************************************************
+
+  Hardware specs...
+
+  Seems based on MSX2.
+  PCB is marked "TVG01"
+
+  CPU:
+  1x Sharp LH0080A (Z80-A).       (IC26)
+
+  I/O:
+  2x NEC D8255AC-2 PPI.           (IC23, IC27)
+
+  Sound:
+  1x GI AY-3-8910A.               (IC18)
+  1x Fujitsu MB3712 (audio amp)   (IC2)
+
+  Video:
+  1x Yamaha V9938 VDP (scratched) (IC13)
+
+  RAM:
+  4x Fujitsu MB81464-15 (256 Kbit DRAM) (VRAM)  (IC6, IC7, IC9, IC10)
+  1x NEC D449C-2 (2K x 8 Static RAM) (WRK RAM)  (IC1)
+
+  ROM:
+  2x Mitsubishi M5L27128K for program.  (IC3, IC5)
+  3x Mitsubishi M5L27128K for graphics. (IC8, IC11, IC14)
+  1x Empty socket for extra data. (*)   (IC16)
+
+  Other:
+  1x 21.47727 MHz Xtal.
+  1x 8 DIP switches bank.
+  1x 2x18 pins edge connector.
+  1x 2x10 pins edge connector.
+
+
+  (*) Note: The CE line of the extra ROM that should be located in the
+      empty socket, is tied to PPI port B, D3.
+
+*******************************************************************************
+
+  Todo:
+
+  - Find the selector for the PPI2 port C multiplexed inputs.
+  - Demux the PPI2 port C inputs.
+
 
 *******************************************************************************/
 
@@ -56,29 +110,48 @@ void tvg01_state::io_map(address_map &map)
 }
 
 static INPUT_PORTS_START(boatrace)
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )       PORT_NAME("P1 - Coin (1 credit)")                // P1 - coin (1 credit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )       PORT_NAME("P2 - Key Up (10 credits)")            // P2 - keyup (10 credits)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)  PORT_NAME("Analyze / Bookkeeping")               // analyze (bookkeeping)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 - Key Out")  PORT_CODE(KEYCODE_W)  // P2 - keyout
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )       PORT_NAME("P1 - Key Up (10 credits)")            // P1 - keyup (10 credits)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Hopper")        PORT_CODE(KEYCODE_H)  // hopper line
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )       PORT_NAME("P2 - Coin (1 credit)")                // P2 - coin (1 credit)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 - Key Out")  PORT_CODE(KEYCODE_Q)  // P1 - keyout
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("12, 16, 26, 45, 56, TS (take score)")  PORT_CODE(KEYCODE_Z)  // Both players: 12, 16, 26, 45, 56, TS (take score)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("13, 23, 34, ST (start), Small")        PORT_CODE(KEYCODE_X)  // Both players: 13, 23, 34, ST (start), Small
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("14, 24, 35, SH, BG (big)")             PORT_CODE(KEYCODE_C)  // Both players: 14, 24, 35, SH, BG (big)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("15, 25, 36, NG (next game)")           PORT_CODE(KEYCODE_V)  // Both players: 15, 25, 36, NG (next game)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("46")     PORT_CODE(KEYCODE_B)  // Both players: 46
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unk-1")  PORT_CODE(KEYCODE_N)  // unknown
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unk-2")  PORT_CODE(KEYCODE_M)  // unknown
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unk-3")  PORT_CODE(KEYCODE_S)  // unknown
+
 	PORT_START("DSW")
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))  PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))  PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))
-	PORT_DIPSETTING(0x04, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))
-	PORT_DIPSETTING(0x08, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown))
+	PORT_DIPNAME(0x0c, 0x0c, DEF_STR(Coinage))  PORT_DIPLOCATION("DSW:6,5")
+	PORT_DIPSETTING(0x0c, "1 Coin 1 Credit / 1 Pulse 10 Credits")
+	PORT_DIPSETTING(0x08, "1 Coin 2 Credit / 1 Pulse 20 Credits")
+	PORT_DIPSETTING(0x04, "1 Coin 5 Credit / 1 Pulse 50 Credits")
+	PORT_DIPSETTING(0x00, "1 Coin 10 Credit / 1 Pulse 100 Credits")
+	PORT_DIPNAME(0x10, 0x10, "Key Out")         PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(0x10, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))
+	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))  PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(0x20, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))
+	PORT_DIPNAME(0x40, 0x40, "Unknown (Should be OFF)")  PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(0x40, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown))
+	PORT_DIPNAME(0x80, 0x80, "Test Mode")       PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
@@ -92,16 +165,17 @@ void tvg01_state::boatrace(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D449C-2 + battery
 
 	i8255_device &ppi1(I8255(config, "ppi1")); // D8255AC-2
+	ppi1.in_pa_callback().set_ioport("IN0");
 	ppi1.out_pb_callback().set_membank("gfxbank").mask(0x03);
 
 	i8255_device &ppi2(I8255(config, "ppi2")); // D8255AC-2
-	ppi2.in_pc_callback().set_constant(0xff);
+	ppi2.in_pc_callback().set_ioport("IN1");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	v9938_device &vdp(V9938(config, "vdp", 21.477272_MHz_XTAL)); // unknown type (surface-scratched 64-pin SDIP)
 	vdp.set_screen_ntsc("screen");
-	vdp.set_vram_size(0x40000); // 4x MB81464-15
+	vdp.set_vram_size(0x20000); // 4x MB81464-15
 	vdp.int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	SPEAKER(config, "mono").front_center();
@@ -120,7 +194,8 @@ ROM_START(boatrace)
 	ROM_LOAD("3.ic8",  0x8000, 0x4000, CRC(74b44e32) SHA1(b36c90a13511c5bf4aef079ac506605096e39067))
 	ROM_LOAD("4.ic11", 0x4000, 0x4000, CRC(4ea36fa3) SHA1(b020a478e8dd72154916c67d71255b5a6a822d6d))
 	ROM_LOAD("5.ic14", 0xc000, 0x4000, CRC(7899a587) SHA1(13cbb7e837e14bc49d8b34dbf876b666cdf48979))
-	// Empty socket for one more ROM (IC16)
+	// Empty socket for one more ROM (IC16), 
 ROM_END
 
-GAME(19??, boatrace, 0, boatrace, boatrace, tvg01_state, empty_init, ROT0, "<unknown>", "All-Japan Boat Race", MACHINE_NOT_WORKING) // title is tentative
+//   YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT        ROT    COMPANY            FULLNAME   FLAGS
+GAME(1987, boatrace, 0,      boatrace, boatrace, tvg01_state, empty_init, ROT0, "Hit Gun Co, LTD", "The Boat", MACHINE_NOT_WORKING)
