@@ -8444,7 +8444,7 @@ GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_
 GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Dolmen", 0 )
 
 GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 )
-GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (US)", 0 )
+GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )
 GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     afega_state, init_redhawki,        ROT0,               "Afega (Hea Dong Corp license)",     "Red Hawk (horizontal, Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     afega_state, init_redhawkg,        ROT0,               "Afega",                             "Red Hawk (horizontal, Greece)", 0 )
 GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 ) // earlier revision? different afega logo and score and credit number fonts compared to other sets
