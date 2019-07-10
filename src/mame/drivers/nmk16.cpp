@@ -5419,7 +5419,7 @@ void afega_state::stagger1(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(4'000'000))); /* verified on pcb */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.60);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	OKIM6295(config, m_oki[0], XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.70);
