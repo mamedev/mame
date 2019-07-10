@@ -36,7 +36,10 @@ protected:
 	bool m_genlock[16];
 	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr, m_fdc_dma_count;
 	u8 m_kbd_p1, m_kbd_p2, m_borderidx;
-	bool m_fdc_intext, m_fdc_int;
+	bool m_fdc_intext, m_fdc_int, m_fdc_drq, m_trap_int, m_trap_drq;
+
+	u16 m_trap_data[8];
+	u32 m_trap_pos, m_trap_len;
 
 	static u16 gco_blend_0(u16, u16);
 	static u16 gco_blend_1(u16, u16);
@@ -86,6 +89,11 @@ protected:
 	u8 fdc_dma_r();
 	void fdc_dma_w(u8 data);
 
+	u16 trap_dma_r(offs_t, u16);
+	u16 trap_r(offs_t offset);
+	void trap_w(offs_t offset, u16 data);
+	u16 trap_clear_interrupt();
+
 	u16 keyscan();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -120,11 +128,36 @@ void mindset_state::machine_start()
 	m_gcos = m_maincpu->space(AS_PROGRAM).cache<1, 0, ENDIANNESS_LITTLE>();
 	for(int i=0; i<2; i++)
 		m_floppy[i] = m_fdco[i]->get_device();
+
+	save_item(NAME(m_fdc_intext));
+	save_item(NAME(m_fdc_int));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_trap_int));
+	save_item(NAME(m_trap_drq));
+	save_item(NAME(m_trap_pos));
+	save_item(NAME(m_trap_len));
+	save_item(NAME(m_trap_data));
+	save_item(NAME(m_palette));
+	save_item(NAME(m_genlock));
+	save_item(NAME(m_dispctrl));
+	save_item(NAME(m_screenpos));
+	save_item(NAME(m_intpos));
+	save_item(NAME(m_intaddr));
+	save_item(NAME(m_fdc_dma_count));
+	save_item(NAME(m_kbd_p1));
+	save_item(NAME(m_kbd_p2));
+	save_item(NAME(m_borderidx));
 }
 
 void mindset_state::machine_reset()
 {
-	m_fdc_intext = m_fdc_int = false;
+	m_fdc_intext = m_fdc_int = m_trap_int = m_fdc_drq = m_trap_drq = false;
+	m_trap_pos = m_trap_len = 0;
+	memset(m_trap_data, 0, sizeof(m_trap_data));
+	memset(m_palette, 0, sizeof(m_palette));
+	memset(m_genlock, 0, sizeof(m_genlock));
+	m_dispctrl = m_screenpos = m_intpos = m_intaddr = m_fdc_dma_count = 0;
+	m_kbd_p1 = m_kbd_p2 = m_borderidx = 0;
 }
 
 int mindset_state::sys_t0_r()
@@ -222,9 +255,22 @@ void mindset_state::dispctrl_w(u16 data)
 
 u16 mindset_state::dispreg_r()
 {
-	// a..5 needed to pass the display test
-	// 0080 needed to allow uploading the palette
-	return 0xa085;
+	switch((m_dispctrl >> 4) & 7) {
+	case 1: { // Read vram at interrupt position
+		u16 v = m_vram[m_intaddr >> 1];
+		if(m_intaddr & 1)
+			v >>= 8;
+		return sw(v << 4);
+		break;
+	}
+	case 5: {
+		// wants 0080 set to be able to upload the palette
+		return 0x0080;
+	}
+	}
+
+	logerror("dispreg read %x\n", (m_dispctrl >> 4) & 7);
+	return 0;
 }
 
 void mindset_state::dispreg_w(u16 data)
@@ -243,19 +289,26 @@ void mindset_state::dispreg_w(u16 data)
 		int intx = (159 - ((m_intpos >> 8) & 255)) * ((m_dispctrl & 0x100) ? 2 : 4);
 		int inty = 199 - (m_intpos & 255);
 		m_intaddr = 0;
-		int mode_type = (m_dispctrl & 0x6000) >> 13;
+		bool bank = m_dispctrl & 0x4000;
+		bool ibm_mode = m_dispctrl & 0x2000;
+		//		bool interleave = m_dispctrl & 0x0800;
 		int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
 		bool large_pixels = m_dispctrl & 0x0100;
-		switch(mode_type) {
-		case 0:
-			m_intaddr = inty * (160 >> (pixels_per_byte_order - large_pixels + 1)) + (intx >> (pixels_per_byte_order - large_pixels + 2));
-			break;
-		case 1:
+		if(ibm_mode)
 			m_intaddr = (inty & 1) * 0x2000 + (inty >> 1) * 80 + (intx >> (3 - large_pixels)) ;
-			break;
+		else {
+			int stepy = 0;
+			if(pixels_per_byte_order == 2) stepy = 40;
+			if(pixels_per_byte_order == 1) stepy = 80;
+			if(pixels_per_byte_order == 0) stepy = 160;
+			
+			m_intaddr = inty * stepy + (intx >> (pixels_per_byte_order - large_pixels + 2));
 		}
 
-		logerror("interrupt position (%3d, %3d) %04x.%04x = %04x (%d,%d)\n", intx, inty, m_dispctrl, m_intpos, m_intaddr, pixels_per_byte_order, large_pixels);
+		if(bank)
+			m_intaddr += 16000;
+
+		logerror("interrupt position (%3d, %3d) ramdac address %04x\n", intx, inty, m_intaddr);
 		break;
 	}
 	case 4: {
@@ -583,10 +636,11 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	// x = go right to left (unimplemented)
 	// f = fast (no idea what it means)
 	// n = invert collision flag (unimplemented)
-	// p = pattern fill (semi-implemented, used by fill_dest_buffer)
+	// p = pattern fill (used by fill_dest_buffer)
 	// i/f = increment source / don't (used by blt_copy_word)
 
 	if(mode & 0x200) {
+		// pattern fill
 		u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
 		for(u16 w=0; w != width/2; w++) {
 			m_gcos->write_word((dst_seg << 4) + dst_adr, src);
@@ -596,6 +650,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	} else {
 		auto blend = gco_blend[(mode >> 2) & 7];
 
+		// Need to rotate rmask depending on the shifts too
 		u16 awmask = ((wmask << 16) | wmask) >> (15 - dst_sft);
 		u16 swmask, mwmask, ewmask;
 		if(dst_sft >= width) {
@@ -685,7 +740,7 @@ void mindset_state::gco_w(u16)
 	u16 packet_adr  = sw(m_gcos->read_word(0xbfd78));
 	u16 global_mode = sw(m_gcos->read_word(0xbfd76));
 
-	if(1)
+	if(0)
 	logerror("GCO: start %04x:%04x mode %04x (%05x)\n", packet_seg, packet_adr, global_mode, m_maincpu->pc());
 
 	switch(global_mode) {
@@ -715,13 +770,13 @@ void mindset_state::fdc_int_w(int state)
 	if(!m_fdc_intext && state)
 		m_fdc_int = true;
 	m_fdc_intext = state;
-	m_maincpu->int0_w(m_fdc_int);
+	m_maincpu->int0_w(m_fdc_int || m_trap_int);
 }
 
 u16 mindset_state::fdc_clear_interrupt()
 {
 	m_fdc_int = false;
-	m_maincpu->int0_w(m_fdc_int);
+	m_maincpu->int0_w(m_fdc_int || m_trap_int);
 	return 0x0000;
 }
 
@@ -752,6 +807,48 @@ void mindset_state::fdc_dma_w(u8 data)
 		m_fdc_dma_count--;
 }
 
+u16 mindset_state::trap_clear_interrupt()
+{
+	m_trap_int = false;
+	m_maincpu->int0_w(m_fdc_int || m_trap_int);
+	return 0x0000;
+}
+
+u16 mindset_state::trap_r(offs_t offset)
+{
+	//	machine().debug_break();
+	logerror("trap_r %04x\n", offset << 1);
+	m_trap_data[m_trap_len++] = (offset << 1) | 0x8000;
+	m_trap_data[m_trap_len++] = 0;
+	m_trap_drq = true;
+	m_maincpu->drq1_w(m_fdc_drq || m_trap_drq);
+	return 0;
+}
+
+void mindset_state::trap_w(offs_t offset, u16 data)
+{
+	//	machine().debug_break();
+	logerror("trap_w %04x, %04x\n", offset << 1, data);
+	m_trap_data[m_trap_len++] = offset << 1;
+	m_trap_data[m_trap_len++] = data;
+	m_trap_drq = true;
+	m_maincpu->drq1_w(m_fdc_drq || m_trap_drq);
+}
+
+u16 mindset_state::trap_dma_r(offs_t, u16 mem_mask)
+{
+	u16 res = m_trap_pos < m_trap_len ? m_trap_data[m_trap_pos++] : 0;
+	logerror("trap dma %04x @ %04x\n", res, mem_mask);
+	if(m_trap_pos >= m_trap_len) {
+		m_trap_drq = false;
+		m_trap_int = true;
+		m_maincpu->drq1_w(m_fdc_drq || m_trap_drq);
+		m_maincpu->int0_w(m_fdc_int || m_trap_int);
+		m_trap_pos = m_trap_len = 0;
+	}
+	return res;
+}
+
 void mindset_state::maincpu_mem(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram();
@@ -761,6 +858,10 @@ void mindset_state::maincpu_mem(address_map &map)
 
 void mindset_state::maincpu_io(address_map &map)
 {
+	map(0x0000, 0x7fff).rw(FUNC(mindset_state::trap_r), FUNC(mindset_state::trap_w));
+
+	map(0x8040, 0x8041).r(FUNC(mindset_state::trap_dma_r));
+	map(0x8048, 0x8049).r(FUNC(mindset_state::trap_clear_interrupt));
 	map(0x8050, 0x8050).w(FUNC(mindset_state::fdc_ctrl_w));
 	map(0x8054, 0x8054).rw(FUNC(mindset_state::fdc_dma_r), FUNC(mindset_state::fdc_dma_w));
 	map(0x8058, 0x8059).w(FUNC(mindset_state::fdc_dma_count_w));
@@ -772,7 +873,7 @@ void mindset_state::maincpu_io(address_map &map)
 	map(0x80c0, 0x80c0).lr8("id3f", []() -> u8 { return 0x3f; }); // serial type 1, maybe?
 	map(0x8100, 0x8100).lr8("id5f", []() -> u8 { return 0x5f; }); // serial type 2
 	map(0x8140, 0x8140).lr8("id70", []() -> u8 { return 0x70; }); // parallel printer, init writes 0x82 at +6
-	map(0x8180, 0x8180).lr8("id73", []() -> u8 { return 0x73; }); // serial type 3
+	map(0x8180, 0x8180).lr8("rs232-id", []() -> u8 { return 0x73; }); // rs232
 
 	map(0x8280, 0x8283).rw(m_syscpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
 	map(0x82a0, 0x82a3).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
@@ -825,7 +926,7 @@ void mindset_state::mindset(machine_config &config)
 
 	I8272A(config, m_fdc, 16_MHz_XTAL/2, true);
 	m_fdc->intrq_wr_callback().set(FUNC(mindset_state::fdc_int_w));
-	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_fdc->drq_wr_callback().set([this](int state) { m_fdc_drq = state; m_maincpu->drq1_w(m_fdc_drq || m_trap_drq); });
 	m_fdc->set_ready_line_connected(false);
 	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
