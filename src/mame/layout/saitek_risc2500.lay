@@ -355,7 +355,7 @@
 	<!-- LCD panel -->
 	<group name="lcd">
 		<bounds x="0" y="0" width="30" height="11.2" />
-		<screen index="0"><bounds x="0" y="0" width="30" height="4" /></screen>
+		<screen index="0" blend="alpha"><bounds x="0" y="0" width="30" height="4" /></screen>
 
 		<bezel name="sym12"  element="sym_colon" ><bounds x="12.0"   y="4.5" width="1.5" height="3" /></bezel>
 		<bezel name="sym13"  element="sym_colon" ><bounds x="24.2"   y="4.5" width="1.5" height="3" /></bezel>
@@ -388,8 +388,8 @@
 	<view name="Internal Layout">
 		<bounds x="0" y="0" width="167" height="90" />
 
-		<bezel element="background"><bounds x="13" y="0" width="154" height="90" /></bezel>
-		<bezel element="blackb"><bounds x="108" y="4" width="30" height="12" /></bezel>
+		<element ref="background"><bounds x="13" y="0" width="154" height="90" /></element>
+		<element ref="blackb"><bounds x="108" y="4" width="30" height="12" /></element>
 
 		<bezel element="text_8"     ><bounds x="18" y="7"  width="2" height="2" /></bezel>
 		<bezel element="text_7"     ><bounds x="18" y="17" width="2" height="2" /></bezel>
