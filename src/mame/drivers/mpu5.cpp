@@ -4,8 +4,7 @@
 
 /* This file contains the hardware emulation, the mpu5.c contains the set listings */
 
-/*
-    Many of the games in here also seem to exist on other hardware.
+/*  Many of the games in here also seem to exist on other hardware.
 
     MPU5
 
@@ -37,8 +36,103 @@
         In general things have been added here if the rom structure and initial code looks like the MPU5 boot code
 
 
-
     15/07/11 - rom loading for most games added, still some missing tho and clones still need sorting out properly.
+*/
+
+/* BARCREST MPU5 XP53922-v1
+  ______________________________________________________________________
+  | _________  _______________ ____________________                 __  |
+  | |__SW1___| ||||BUTTONS|||| ||LAMPS_1|||||||||||                 | | |
+  |           ________________ ____________________                 | | |
+  |           |||||PAYOUT||||| ||LAMPS_2|||||||||||                 | | |
+  | __                                                              |L| |
+  | |S|                                                             |E| |
+  | |W|                                                             |D| |
+  | |I|                                                             |S| |
+  | |T|                                                             | | |
+  | |_|                                                             | | |
+  | __                                                              | | |
+  | |D| _________  _________  _________  _________   _________      |_| |
+  | |A| |4116R LF| TPIC6B273N TPIC6B273N TPIC6B273N  |4116R LF|     __  |
+  | |T| _________  _________  _________  __________  _________      |M| |
+  | |A| |4116R LF| M74HC257B1 M74HC257B1 |ATMEL    | TPIC6B273N     |E| |
+  | |P|            ____________________  |BARCREST | _________      |T| |
+  | |_| _________  |BARCREST 881687    | |881685 X | TPIC6B273N     |E| |
+  | __  |CNY74-4 | |_0605_FU___________| |_0544____|                |R| |
+  | |C|              ________________________________               |S| |
+  | |O|              |.....CON1 (to game cart).......|              | | |
+  | |I|              |_______________________________|              |_| |
+  | |_| _________      _________  _________  _________              __  |
+  | __  |MC1489PG      |74ACT541  |74ACT541  |74ACT541              |B| |
+  | |A| _________  ____________   _________  _________              |A| |
+  | |U| |MC1488P|  |_GAL20V8B__|  |74ACT541  |74ACT541              |R| |
+  | |X|                 XTAL1                                       |B| |
+  | |_|            ________________     _______________             |U| |
+  | __             | SCC68681C1N40 |    |BS62LV1027PCP55  __        |_| |
+  | |A|            |__NXP__________|    |__BSI_________|SN75176BP F     |
+  | |U|                                 _______________           U  o -> LED -12
+  | |X|                                 |BS62LV1027PCP55          S  o -> LED +12 
+  | |P|                  __________     |__BSI_________|          E  o -> LED +24
+  | |O|                  |MC68340AG16E                               o -> LED + +34
+  | |R|                  |L75M     |                              F     |
+  | |T|                  |QGR0633  |   ______     __              U  o -> LED STATUS
+  | |_|                  |_________|   M74HC08N MS6610BSG         S  o -> LED HALT
+  | __      ____   __                                             E __  |
+  | |A|     BATT  SWBAT                                             |A| |
+  | |L|                                                             |U| |
+  | |P|  ______________                                        ___  |D| |
+  | |_|  |||VEND-BUS|||                                       |MIC  |_| |
+  |_____________________________________________________________________|
+
+SW1 = 8 dipswitches
+SWBAT = Single jumper for battery
+
+XTAL1 = 3.6864MHz
+MIC = Microphone
+
+SWIT = SWITCHES
+DATAP = DATAPORT (female DB25)
+COI = COINS
+AUX = AUX-RS232
+ALP = ALPHA
+AUD = AUDIO
+BARBU = BARBUS
+
+Buttons    Payout      Lamps 1    Lamps 2     Leds          Meters      Audio
+ 1 - H3     1 - PAY0    1 - H0     1 \         1 - C7 \ C    1 - 0V      1 - R+
+ 2 - H2     2 - PAY1    2 - H1     2 |         2 - C6 | A    2 - GAP     2 - L-
+ 3 - H1     3 - PAY2    3 - H2     3 | HIGH    3 - C5 | T    3 - M0      3 - R-
+ 4 - H0     4 - PAY3    4 - H3     4 | SIDE    4 - C4 | H    4 - M1      4 - L+
+ 5 - GAP    5 - 0V      5 - H4     5 | 34V     5 - C3 | O    5 - M2      5 - 0V
+ 6 - L3     6 - GAP     6 - H5     6 |         6 - C2 | D    6 - M3      6 - GAP
+ 7 - L2     7 - +24V    7 - GAP    7 |         7 - C1 | E    7 - M4      7 - RIN
+ 8 - L1     8 - IN0     8 - H6     8 |         8 - C0 / S    8 - M5      8 - LIN
+ 9 - L0     9 - IN1     9 - H7     9 /         9 - A7 \      9 - M6      9 - MIC
+10 - SW0   10 - IN2    10 - L0    10 \        10 - A6 | A   10 - M7
+11 - SW1   11 - IN3    11 - L1    11 |        11 - A5 | N   11 \ SENSE
+12 - SW2   12 - +12V   12 - L2    12 | LOW    12 - A4 | O   12 /
+13 - SW3   13 - +5V    13 - L3    13 | SIDE   13 - GAP| D   13 +12
+           14 - 0V     14 - L4    14 | 0V     14 - A3 | E
+                       15 - L5    15 |        15 - A2 | S
+                       16 - L6    16 |        16 - A1 |
+                       17 - L7    17 /        17 - A0 /
+
+Switches   Aux-RS232   Aux Port   Alpha      Vend-Bus
+ 1 - SW0    1 - +12     1 - AX7    1 - CLK    1 - -34
+ 2 - GAP    2 - TX      2 - AX6    2 - D      2 - +12
+ 3 - SW1    3 - RX      3 - AX5    3 - RES    3 - GAP
+ 4 - SW2    4 - RTS     4 - AX4    4 - 0V     4 - TX \
+ 5 - SW3    5 - CTS     5 - AX3    5 - GAP    5 - RX / RS232
+ 6 - L7     6 - GAP     6 - AX2    6 - 0V     6 - RX \
+ 7 - L6     7 - 0V      7 - AX1    7 - +12    7 - TX / VEND
+ 8 - L5                 8 - AX0               8 - TX - O.C.
+ 9 - L4                 9 - 11                9 - 0V
+                       10 - 10
+                       11 - ST
+                       12 - +5
+                       13 - +12
+                       14 - GAP
+                       15 - 0V
 */
 
 
