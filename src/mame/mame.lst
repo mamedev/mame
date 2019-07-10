@@ -21999,7 +21999,9 @@ van32                           // 1991 Mephisto Vancouver 68020
 gen32                           // 1993 Mephisto Genius 68030
 lond020                         // 1996 Mephisto London 68020
 lond030                         // 1996 Mephisto Genius 68030 London Upgrade
+berl16                          // 1992 Mephisto Berlin 68000
 berlinp                         // 1994 Mephisto Berlin Pro 68020
+berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
 bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mod8.cpp

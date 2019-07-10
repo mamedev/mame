@@ -41,6 +41,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "mephisto_berlin.lh"
 #include "mmodular.lh"
 
 
@@ -77,11 +78,13 @@ public:
 		, m_keys(*this, "KEY")
 	{ }
 
+	void berl16(machine_config &config);
 	void berlinp(machine_config &config);
 
 private:
 	DECLARE_READ8_MEMBER(berlinp_input_r);
 
+	void berl16_mem(address_map &map);
 	void berlinp_mem(address_map &map);
 
 	required_device<mephisto_board_device> m_board;
@@ -175,6 +178,18 @@ READ8_MEMBER(berlinp_state::berlinp_input_r)
 		return m_keys->read();
 	else
 		return m_board->input_r(space, offset) ^ 0xff;
+}
+
+void berlinp_state::berl16_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x800000, 0x87ffff).ram();
+	map(0x900000, 0x907fff).ram().share("nvram");
+	map(0xa00000, 0xa00000).r(FUNC(berlinp_state::berlinp_input_r));
+	map(0xb00000, 0xb00000).w(m_board, FUNC(mephisto_board_device::mux_w));
+	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_modul_device::latch_w));
+	map(0xd00008, 0xd00008).w("display", FUNC(mephisto_display_modul_device::io_w));
+	map(0xe00000, 0xe00000).w(m_board, FUNC(mephisto_board_device::led_w));
 }
 
 void berlinp_state::berlinp_mem(address_map &map)
@@ -319,7 +334,15 @@ void berlinp_state::berlinp(machine_config &config)
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board);
 	MEPHISTO_DISPLAY_MODUL(config, "display");
-	config.set_default_layout(layout_mmodular);
+	config.set_default_layout(layout_mephisto_berlin);
+}
+
+void berlinp_state::berl16(machine_config &config)
+{
+	berlinp(config);
+	m68000_device &maincpu(M68000(config.replace(), "maincpu", XTAL(12'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &berlinp_state::berl16_mem);
+	maincpu.set_periodic_int(FUNC(berlinp_state::irq2_line_hold), attotime::from_hz(750));
 }
 
 
@@ -385,9 +408,21 @@ ROM_START( lyon32 )
 	ROM_LOAD("lyon32.bin", 0x00000, 0x20000, CRC(5c128b06) SHA1(954c8f0d3fae29900cb1e9c14a41a9a07a8e185f))
 ROM_END
 
+ROM_START( berl16 )
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("berlin_68000_even.bin", 0x00000, 0x10000, CRC(31337f15) SHA1(0dcacb153a6f8376e6f1c2f3e57e60aad4370740))
+	ROM_LOAD16_BYTE("berlin_68000_odd.bin", 0x00001, 0x10000, CRC(cc146819) SHA1(e4b2c6e496eff4a657a0718be292f563fb4e5688))
+ROM_END
+
 ROM_START( berlinp )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("berlinp.bin", 0x00000, 0x40000, CRC(82fbaf6e) SHA1(729b7cef3dfaecc4594a6178fc4ba6015afa6202))
+ROM_END
+
+ROM_START( berl16l )
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("berlin_68000_london_even.bin", 0x00000, 0x10000, CRC(0ccddbc6) SHA1(90effdc9f2811a24d450b74ccfb24995ce896b86))
+	ROM_LOAD16_BYTE("berlin_68000_london_odd.bin", 0x00001, 0x10000, CRC(5edac658) SHA1(18ebebc5ceffd9a01798d8a3709875120bd096f7))
 ROM_END
 
 ROM_START( bpl32 )
@@ -414,5 +449,7 @@ CONS( 1996, lond020, alm32,   0,      van32,   alm32,   mmodular_state, empty_in
 CONS( 1996, lond030, gen32,   0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
 // not modular boards
+CONS( 1992, berl16,  0,       0,      berl16,  berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin 68000",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1994, berlinp, 0,       0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, berl16l, berl16,  0,      berl16,  berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin 68000 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1996, bpl32,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
