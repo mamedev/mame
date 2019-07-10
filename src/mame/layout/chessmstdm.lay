@@ -436,7 +436,7 @@
 		<bezel name="digit1" element="digit"> <bounds x="114" y="3.5" width="5.66" height="8.5" /></bezel>
 		<bezel name="digit0" element="digit"> <bounds x="120" y="3.5" width="5.66" height="8.5" /></bezel>
 
-		<bezel element="cwhite"><bounds x="17" y="4" width="81" height="81" /></bezel>
+		<bezel element="cblack"><bounds x="17" y="4" width="81" height="81" /></bezel>
 		<group ref="sb_board"><bounds x="17.5" y="4.5" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="1.5" y="4" width="10" height="80" /></group>
 	</view>
