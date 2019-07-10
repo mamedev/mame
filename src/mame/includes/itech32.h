@@ -151,6 +151,7 @@ protected:
 	u8 sound_data_r();
 	void sound_return_w(u8 data);
 	u8 sound_data_buffer_r();
+	void sound_control_w(u8 data);
 	void firq_clear_w(u8 data);
 	void timekill_colora_w(u8 data);
 	void timekill_colorbc_w(u8 data);

@@ -710,6 +710,11 @@ u8 itech32_state::sound_data_buffer_r()
 }
 
 
+void itech32_state::sound_control_w(u8 data)
+{
+}
+
+
 
 /*************************************
  *
@@ -1053,6 +1058,7 @@ void itech32_state::sound_020_map(address_map &map)
 	map(0x0c00, 0x0c00).w(FUNC(itech32_state::sound_bank_w));
 	map(0x1400, 0x1400).w(FUNC(itech32_state::firq_clear_w));
 	map(0x1800, 0x1800).r(FUNC(itech32_state::sound_data_buffer_r)).nopw();
+	map(0x1c00, 0x1c00).w(FUNC(itech32_state::sound_control_w));
 	map(0x2000, 0x3fff).ram();
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();
