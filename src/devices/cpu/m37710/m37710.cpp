@@ -615,30 +615,30 @@ uint8_t m37710_cpu_device::uart0_ctrl_reg0_r()
 {
 	LOGMASKED(LOG_UART, "uart0_ctrl_reg0_r: UART0 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[0], REG_PB<<16 | REG_PC);
 
-	//return m_uart_ctrl_reg0[0];
-	return 0x08; // not hooked up yet
+	return m_uart_ctrl_reg0[0];
 }
 
 void m37710_cpu_device::uart0_ctrl_reg0_w(uint8_t data)
 {
 	LOGMASKED(LOG_UART, "uart0_ctrl_reg0_w %x: UART0 transmit/recv ctrl 0 = %x\n", data, m_uart_ctrl_reg0[0]);
 
-	m_uart_ctrl_reg0[0] = data;
+	// Tx empty flag is read-only
+	m_uart_ctrl_reg0[0] = (data & ~8) | (m_uart_ctrl_reg0[0] & 8);
 }
 
 uint8_t m37710_cpu_device::uart1_ctrl_reg0_r()
 {
 	LOGMASKED(LOG_UART, "uart1_ctrl_reg0_r: UART1 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[1], REG_PB<<16 | REG_PC);
 
-	//return m_uart_ctrl_reg0[1];
-	return 0x08; // not hooked up yet
+	return m_uart_ctrl_reg0[1];
 }
 
 void m37710_cpu_device::uart1_ctrl_reg0_w(uint8_t data)
 {
 	LOGMASKED(LOG_UART, "uart1_ctrl_reg0_w %x: UART1 transmit/recv ctrl 0 = %x\n", data, m_uart_ctrl_reg0[1]);
 
-	m_uart_ctrl_reg0[1] = data;
+	// Tx empty flag is read-only
+	m_uart_ctrl_reg0[1] = (data & ~8) | (m_uart_ctrl_reg0[1] & 8);
 }
 
 uint8_t m37710_cpu_device::uart0_ctrl_reg1_r()
@@ -650,7 +650,7 @@ uint8_t m37710_cpu_device::uart0_ctrl_reg1_r()
 
 void m37710_cpu_device::uart0_ctrl_reg1_w(uint8_t data)
 {
-	LOGMASKED(LOG_UART, "uart0_ctrl_reg0_w %x: UART0 transmit/recv ctrl 1 = %x\n", data, m_uart_ctrl_reg1[0]);
+	LOGMASKED(LOG_UART, "uart0_ctrl_reg1_w %x: UART0 transmit/recv ctrl 1 = %x\n", data, m_uart_ctrl_reg1[0]);
 
 	m_uart_ctrl_reg1[0] = (m_uart_ctrl_reg1[0] & (BIT(data, 2) ? 0xfa : 0x0a)) | (data & 0x05);
 }
