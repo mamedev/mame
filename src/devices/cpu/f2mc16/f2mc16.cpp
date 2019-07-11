@@ -1472,7 +1472,7 @@ void f2mc16_device::opcodes_ea74(u8 operand)
 	switch (operand)
 	{
 		// CMP A, @RWx + disp8
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x57:
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
 			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
 			m_tmp8 = read_8(getRWbank(operand & 7, m_tmp16));
@@ -1502,7 +1502,7 @@ void f2mc16_device::opcodes_ea76(u8 operand)
 	switch (operand)
 	{
 		// CMPW A, @RWx + disp8
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x57:
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 			m_tmp8 = read_8((m_pcb<<16) | (m_pc+2));
 			m_tmp16 = read_rwX(operand & 7) + (s8)m_tmp8;
 			m_tmp16 = read_16(getRWbank(operand & 7, m_tmp16));

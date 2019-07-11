@@ -365,7 +365,7 @@ private:
 	inline u16 doADD_16(u16 lhs, u16 rhs)
 	{
 		m_tmp32 = lhs + rhs;
-		m_ps &= ~F_V|F_C;
+		m_ps &= ~(F_C|F_V);
 		if ((m_tmp32 ^ lhs) & (m_tmp32 ^ rhs) & 0x8000)
 		{
 			m_ps |= F_V;
@@ -381,7 +381,7 @@ private:
 	inline u32 doADD_32(u32 lhs, u32 rhs)
 	{
 		m_tmp64 = lhs + rhs;
-		m_ps &= ~F_V|F_C;
+		m_ps &= ~(F_C|F_V);
 		if ((m_tmp64 ^ lhs) & (m_tmp64 ^ rhs) & 0x80000000)
 		{
 			m_ps |= F_V;
