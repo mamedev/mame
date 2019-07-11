@@ -9740,10 +9740,6 @@ quizard4                        // (c) TAB Austria 1998
 quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
 
-@source:cdr4210.cpp
-cdr4210                         //
-cw7501							// 1996 Panasonic
-
 @source:cedar_magnet.cpp
 cedmag
 mag_time
