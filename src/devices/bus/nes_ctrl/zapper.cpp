@@ -7,8 +7,8 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "zapper.h"
 #include "screen.h"
+#include "zapper.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -48,7 +48,6 @@ ioport_constructor nes_zapper_device::device_input_ports() const
 
 nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NES_ZAPPER, tag, owner, clock),
-	device_video_interface(mconfig, *this),
 	device_nes_control_port_interface(mconfig, *this),
 	m_lightx(*this, "ZAPPER_X"),
 	m_lighty(*this, "ZAPPER_Y"),
@@ -86,17 +85,17 @@ uint8_t nes_zapper_device::read_bit34()
 	int y = m_lighty->read();
 
 	// update the screen if necessary
-	if (!screen().vblank())
+	if (!m_port->m_screen->vblank())
 	{
-		int vpos = screen().vpos();
-		int hpos = screen().hpos();
+		int vpos = m_port->m_screen->vpos();
+		int hpos = m_port->m_screen->hpos();
 
 		if (vpos > y || (vpos == y && hpos >= x))
-			screen().update_now();
+			m_port->m_screen->update_now();
 	}
 
 	// get the pixel at the gun position
-	rgb_t pix = screen().pixel(x, y);
+	rgb_t pix = m_port->m_screen->pixel(x, y);
 
 	// check if the cursor is over a bright pixel
 	// FIXME: still a gross hack

@@ -77,6 +77,8 @@ void nes_state::nes(machine_config &config)
 
 	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
 
 	NES_CART_SLOT(config, m_cartslot, NTSC_APU_CLOCK, nes_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("nes");
@@ -112,6 +114,9 @@ void nes_state::famicom(machine_config &config)
 	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
 	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
+	m_exp->set_screen_tag(m_screen);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("famicom_flop");
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
@@ -142,6 +147,9 @@ void nes_state::famipalc(machine_config &config)
 	NES_CONTROL_PORT(config.replace(), m_ctrl1, fc_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config.replace(), m_ctrl2, fc_control_port2_devices, "joypad");
 	NES_CONTROL_PORT(config, m_exp, fc_expansion_devices, nullptr);
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
+	m_exp->set_screen_tag(m_screen);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("famicom_cass");
 }
