@@ -409,7 +409,7 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		break;
 
 	case 0x4b:
-		util::stream_format(stream, "MOVL   A, #$%04x", opcodes.r32(pc+1));
+		util::stream_format(stream, "MOVL   A, #$%08x", opcodes.r32(pc+1));
 		bytes = 5;
 		break;
 
