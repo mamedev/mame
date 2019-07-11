@@ -41,8 +41,11 @@
 #include "screen.h"
 #include "speaker.h"
 
+// internal artwork
+#include "mephisto_alm16.lh"
+#include "mephisto_alm32.lh"
 #include "mephisto_berlin.lh"
-#include "mmodular.lh"
+#include "mephisto_gen32.lh"
 
 
 class mmodular_state : public driver_device
@@ -278,7 +281,7 @@ void mmodular_state::alm16(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODUL(config, "display");
-	config.set_default_layout(layout_mmodular);
+	config.set_default_layout(layout_mephisto_alm16);
 }
 
 
@@ -299,7 +302,7 @@ void mmodular_state::alm32(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODUL(config, "display");
-	config.set_default_layout(layout_mmodular);
+	config.set_default_layout(layout_mephisto_alm32);
 }
 
 
@@ -320,7 +323,7 @@ void mmodular_state::gen32(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODUL(config, "display");
-	config.set_default_layout(layout_mmodular);
+	config.set_default_layout(layout_mephisto_gen32);
 }
 
 
