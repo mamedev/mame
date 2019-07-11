@@ -6,7 +6,7 @@
 		</screen>
 
 		<!-- workaround for MAME selecting a 2-screen view by default -->
-		<screen index="1"><bounds left="0" top="0" right="1" bottom="1" /><color alpha="0" /></screen>
+		<screen index="1"><bounds left="0" top="0" right="4" bottom="3" /><color alpha="0" /></screen>
 	</view>
 
 	<view name="RGB">
