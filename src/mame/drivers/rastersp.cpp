@@ -16,11 +16,11 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/nscsi/hd.h"
 #include "cpu/i386/i386.h"
 #include "cpu/tms32031/tms32031.h"
 #include "machine/53c7xx.h"
 #include "machine/mc146818.h"
-#include "machine/nscsi_hd.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"

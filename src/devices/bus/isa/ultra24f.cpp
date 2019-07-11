@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "ultra24f.h"
 
+#include "bus/nscsi/hd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(ULTRA24F, ultra24f_device, "ultra24f", "Ultra-24F SCSI Host Adapter")
 

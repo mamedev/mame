@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/hd.h"
 #include "imagedev/harddriv.h"
 
 #define LOG_GENERAL (1U << 0)

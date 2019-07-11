@@ -6,7 +6,7 @@
 #pragma once
 
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/hd.h"
 
 class nscsi_s1410_device : public nscsi_harddisk_device
 {
@@ -75,4 +75,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device)
 
-#endif // MAME_MACHINE_NSCSI_S1410_H
+#endif // MAME_BUS_NSCSI_S1410_H

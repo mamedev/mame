@@ -2142,6 +2142,24 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/nscsi/cd.h,BUSES["NSCSI"] = true
+--@src/devices/bus/nscsi/hd.h,BUSES["NSCSI"] = true
+--@src/devices/bus/nscsi/s1410.h,BUSES["NSCSI"] = true
+---------------------------------------------------
+
+if (BUSES["NSCSI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/nscsi/cd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/cd.h",
+		MAME_DIR .. "src/devices/bus/nscsi/hd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/hd.h",
+		MAME_DIR .. "src/devices/bus/nscsi/s1410.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/s1410.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/nubus/nubus.h,BUSES["NUBUS"] = true
 ---------------------------------------------------
 

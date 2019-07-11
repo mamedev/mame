@@ -33,10 +33,10 @@
 #include "emu.h"
 #include "aha174x.h"
 
+#include "bus/nscsi/hd.h"
 #include "machine/aic6250.h"
 #include "machine/i82355.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(AHA1740, aha1740_device, "aha1740", "AHA-1740 Fast SCSI Host Adapter")
 DEFINE_DEVICE_TYPE(AHA1742A, aha1742a_device, "aha1742a", "AHA-1742A Fast SCSI Host Adapter")

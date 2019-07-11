@@ -12,10 +12,10 @@
 #include "emu.h"
 #include "aha1542b.h"
 
+#include "bus/nscsi/hd.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/gen_latch.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 
 DEFINE_DEVICE_TYPE(AHA1542A, aha1542a_device, "aha1542a", "AHA-1542A SCSI Controller")

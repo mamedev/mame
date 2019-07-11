@@ -16,8 +16,8 @@
 #include "emu.h"
 #include "asc88.h"
 
+#include "bus/nscsi/hd.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 
 DEFINE_DEVICE_TYPE(ASC88, asc88_device, "asc88", "ASC-88 SCSI Adapter")

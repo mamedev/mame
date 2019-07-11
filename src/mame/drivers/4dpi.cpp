@@ -55,8 +55,8 @@
 
 // buses and connectors
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
-#include "machine/nscsi_cd.h"
+#include "bus/nscsi/hd.h"
+#include "bus/nscsi/cd.h"
 #include "bus/rs232/rs232.h"
 #include "bus/sgikbd/sgikbd.h"
 #include "bus/rs232/hlemouse.h"

@@ -33,8 +33,8 @@
 
 #include "emu.h"
 #include "a2scsi.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 
 /***************************************************************************
     PARAMETERS

@@ -17,10 +17,10 @@
 #include "emu.h"
 #include "bt54x.h"
 
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "machine/ncr5390.h"
 //#include "machine/ncr86c05.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(BT542B, bt542b_device, "bt542b", "BusTek BT-542B SCSI Host Adapter") // Rev. G or earlier
 DEFINE_DEVICE_TYPE(BT542BH, bt542bh_device, "bt542bh", "BusLogic BT-542B SCSI Host Adapter (Rev. H)")

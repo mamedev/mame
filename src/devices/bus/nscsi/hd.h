@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NSCSI_HD_H
-#define MAME_MACHINE_NSCSI_HD_H
+#ifndef MAME_BUS_NSCSI_HD_H
+#define MAME_BUS_NSCSI_HD_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(NSCSI_HARDDISK, nscsi_harddisk_device)
 
-#endif // MAME_MACHINE_NSCSI_HD_H
+#endif // MAME_BUS_NSCSI_HD_H

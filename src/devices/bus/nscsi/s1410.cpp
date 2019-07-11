@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
-#include "machine/nscsi_s1410.h"
+#include "bus/nscsi/s1410.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device, "scsi_s1410", "S1410 Hard Disk")
 

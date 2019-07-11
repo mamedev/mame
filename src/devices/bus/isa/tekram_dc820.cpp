@@ -23,11 +23,11 @@
 #include "emu.h"
 #include "tekram_dc820.h"
 
+#include "bus/nscsi/hd.h"
 #include "cpu/i86/i186.h"
 #include "machine/i82355.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(TEKRAM_DC320B, tekram_dc320b_device, "dc320b", "Tekram DC-320B SCSI Controller")
 DEFINE_DEVICE_TYPE(TEKRAM_DC320E, tekram_dc320e_device, "dc320e", "Tekram DC-320E SCSI Controller")
