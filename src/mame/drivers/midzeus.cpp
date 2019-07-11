@@ -14,8 +14,9 @@
 
     TODO:
         * Emulation of those Zeus 1 and 2 graphics chips are incomplete and preliminary respectively.
-	* All games run at wrong speeds compared to pcb recordings; easily noticable in crusnexo
-	* Better understand the link/firewire function on those Zeus 2 games
+	* All games run at incorrect speeds compared to pcb recordings; easily noticable in crusnexo.
+	* Better understand the link/FireWire function on those Zeus 2 games (controlled by the IOASIC's UART function).
+		*This may require FireWire/IEEE 1394 support.
 
 According to a Midway service bulletin
 As of 2/12/2001 the lastest software levels:
