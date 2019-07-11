@@ -8,8 +8,7 @@ Poly-88 driver by Miodrag Milanovic
 2019-05-25 Poly8813 new roms
 
 ToDo:
-- POLY88 - MT 06231: Cassette saving hangs. Also, the system has different
-  formats depending on a switch. Only one format is currently emulated.
+- POLY88 - Polyphase format not working because 8251 device doesn't support sync.
 - POLY8813 - Schematic shows a 8251 on the main board.
 - POLY8813 - Schematic of FDC shows a mc6852 and i8255, no dedicated fdc chip.
 
@@ -100,7 +99,9 @@ static INPUT_PORTS_START( poly88 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_CONFNAME( 0x80, 0x00, "Tape Mode")
+	PORT_CONFSETTING(    0x00, "Byte (300 baud)")
+	PORT_CONFSETTING(    0x80, "Polyphase (2400 baud)")
 
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
@@ -173,12 +174,6 @@ static INPUT_PORTS_START( poly88 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT)
 INPUT_PORTS_END
 
-static const struct CassetteOptions poly88_cassette_options =
-{
-	1,      /* channels */
-	16,     /* bits per sample */
-	7200    /* sample frequency */
-};
 
 /* F4 Character Displayer */
 static const gfx_layout poly88_charlayout =
@@ -219,23 +214,25 @@ void poly88_state::poly88(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_poly88);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
-	m_cassette->set_create_opts(&poly88_cassette_options);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(poly88_state::kansas_r), attotime::from_hz(40000));
 
 	/* uart */
 	I8251(config, m_usart, 16.5888_MHz_XTAL / 9);
-	m_usart->txd_handler().set(FUNC(poly88_state::write_cas_tx));
-	m_usart->rxrdy_handler().set(FUNC(poly88_state::poly88_usart_rxready));
+	m_usart->rxrdy_handler().set(FUNC(poly88_state::usart_ready_w));
+	m_usart->txrdy_handler().set(FUNC(poly88_state::usart_ready_w));
+	m_usart->txd_handler().set([this] (bool state) { m_txd = state; });
+	m_usart->dtr_handler().set([this] (bool state) { m_dtr = state; });
+	m_usart->rts_handler().set([this] (bool state) { m_rts = state; });
 
 	MM5307AA(config, m_brg, 16.5888_MHz_XTAL / 18);
-	m_brg->output_cb().set(FUNC(poly88_state::cassette_txc_rxc_w));
+	m_brg->output_cb().set(FUNC(poly88_state::cassette_clock_w));
 
 	/* snapshot */
 	SNAPSHOT(config, "snapshot", "img", attotime::from_seconds(2)).set_load_callback(FUNC(poly88_state::snapshot_cb), this);

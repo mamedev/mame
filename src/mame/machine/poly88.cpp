@@ -18,9 +18,6 @@ void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 {
 	switch (id)
 	{
-	case TIMER_USART:
-		poly88_usart_timer_callback(ptr, param);
-		break;
 	case TIMER_KEYBOARD:
 		keyboard_callback(ptr, param);
 		break;
@@ -30,19 +27,11 @@ void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-TIMER_CALLBACK_MEMBER(poly88_state::poly88_usart_timer_callback)
-{
-	m_int_vector = 0xe7;
-	m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
+// bits 0-3 baud rate; bit 4 (0=cassette, 1=rs232); bit 5 (1=disable rom and ram)
 void poly88_state::baud_rate_w(uint8_t data)
 {
 	logerror("poly88_baud_rate_w %02x\n",data);
 	m_brg->control_w(data & 15);
-
-	// FIXME
-	m_usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
 }
 
 uint8_t poly88_state::row_number(uint8_t code) {
@@ -154,79 +143,98 @@ IRQ_CALLBACK_MEMBER(poly88_state::poly88_irq_callback)
 	return m_int_vector;
 }
 
-WRITE_LINE_MEMBER(poly88_state::write_cas_tx)
+TIMER_DEVICE_CALLBACK_MEMBER( poly88_state::kansas_r )
 {
-	m_cas_tx = state;
+	if (BIT(m_linec->read(), 7))
+		return;
+
+	// no tape - set uart to idle
+	m_cass_data[1]++;
+	if (m_dtr || (m_cass_data[1] > 32))
+	{
+		m_cass_data[1] = 32;
+		m_rxd = 1;
+	}
+
+	// turn 1200/2400Hz to a bit
+	uint8_t cass_ws = (m_cassette->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_rxd = (m_cass_data[1] < 12) ? 1 : 0;
+		m_cass_data[1] = 0;
+	}
 }
 
-WRITE_LINE_MEMBER(poly88_state::cassette_txc_rxc_w)
+WRITE_LINE_MEMBER(poly88_state::cassette_clock_w)
 {
-	int data;
-	int current_level;
-
-//  if (!(ioport("DSW0")->read() & 0x02)) /* V.24 / Tape Switch */
-	//{
-		/* tape reading */
-		if (m_cassette->get_state()&CASSETTE_PLAY)
+	// incoming @4800Hz (bit), 2400Hz (polyphase)
+	if (BIT(m_linec->read(), 7))
+	{
+		// polyphase
+		// SAVE
+		if (!m_rts)
+			m_cassette->output((m_txd ^ state) ? 1.0 : -1.0);
+		// LOAD
+		if (!m_dtr)
 		{
-			if (m_clk_level_tape)
-			{
-				m_previous_level = (m_cassette->input() > 0.038) ? 1 : 0;
-				m_clk_level_tape = 0;
-			}
+			u8 cass_ws = (m_cassette->input() > +0.04) ? 1 : 0;
+			if (state)
+				m_usart->write_rxd(cass_ws);
+		}
+	}
+	else
+	{
+		// byte mode 300 baud Kansas City format
+		u8 twobit = m_cass_data[3] & 3;
+
+		// SAVE
+		if (m_rts && (twobit == 0))
+		{
+			m_cassette->output(0);
+			m_cass_data[3] = 0;     // reset waveforms
+		}
+		else
+		if (state)
+		{
+			if (twobit == 0)
+				m_cassold = m_txd;
+
+			if (m_cassold)
+				m_cassette->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 			else
-			{
-				current_level = (m_cassette->input() > 0.038) ? 1 : 0;
+				m_cassette->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 
-				if (m_previous_level!=current_level)
-				{
-					data = (!m_previous_level && current_level) ? 1 : 0;
-//data = current_level;
-					m_usart->write_rxd(data);
-
-					m_clk_level_tape = 1;
-				}
-			}
-
-			m_usart->write_rxc(m_clk_level_tape);
+			m_cass_data[3]++;
 		}
 
-		/* tape writing */
-		if (m_cassette->get_state()&CASSETTE_RECORD)
-		{
-			data = m_cas_tx;
-			data ^= m_clk_level_tape;
-			m_cassette->output(data&0x01 ? 1 : -1);
+		// LOAD
+		if (state && !m_dtr && (twobit == 0))
+			m_usart->write_rxd(m_rxd);
+	}
 
-			m_clk_level_tape = m_clk_level_tape ? 0 : 1;
-			m_usart->write_txc(m_clk_level_tape);
-
-			return;
-		}
-
-		m_clk_level_tape = 1;
-
+	if (!m_rts)
 		m_usart->write_txc(state);
-//  }
+
+	if (!m_dtr)
+		m_usart->write_rxc(state);
 }
 
 
 void poly88_state::init_poly88()
 {
-	m_previous_level = 0;
-	m_clk_level_tape = 1;
-
-	m_usart_timer = timer_alloc(TIMER_USART);
 	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
 	m_keyboard_timer->adjust(attotime::from_hz(24000), 0, attotime::from_hz(24000));
 }
 
 void poly88_state::machine_reset()
 {
-	m_intr = 0;
 	m_last_code = 0;
+	m_usart->write_rxd(1);
 	m_usart->write_cts(0);
 	m_brg->control_w(0);
+	m_dtr = m_rts = m_txd = m_rxd = m_cassold = 1;
 }
 
 INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
@@ -235,10 +243,13 @@ INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
+WRITE_LINE_MEMBER(poly88_state::usart_ready_w)
 {
-	//drvm_int_vector = 0xe7;
-	//execute().set_input_line(0, HOLD_LINE);
+	if (state)
+	{
+		m_int_vector = 0xe7;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 uint8_t poly88_state::keyboard_r()
