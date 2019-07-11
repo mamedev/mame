@@ -101,4 +101,14 @@ ROM_START(cdr4210)
 	ROM_LOAD("cr113.bin", 0x00000, 0x40000, CRC(fd2faff9) SHA1(6aafdedf12240ad347427287c0db289f90bd064d))
 ROM_END
 
-SYST(1996, cdr4210, 0, 0, cdr4210, cdr4210, cdr4210_state, empty_init, "Creative Technology", "CD-R 4210 (v1.13)", MACHINE_IS_SKELETON)
+// this should probably be the parent
+ROM_START(cw7501)
+	ROM_REGION16_LE(0x40000, "flash", 0)
+	ROM_LOAD("mk200.bin", 0x00000, 0x40000, CRC(12efd802) SHA1(2986ee5eedbe0cb662a9a7e7fa4e6ca7ccd8c539))
+ROM_END
+
+// another clone: Plasmon CDR 4240
+
+
+SYST(1996, cdr4210, 0,       0, cdr4210, cdr4210, cdr4210_state, empty_init, "Creative Technology", "CD-R 4210 (v1.13)", MACHINE_IS_SKELETON)
+SYST(1996, cw7501,  cdr4210, 0, cdr4210, cdr4210, cdr4210_state, empty_init, "Panasonic", "CW-7501 (v2.00)", MACHINE_IS_SKELETON)
