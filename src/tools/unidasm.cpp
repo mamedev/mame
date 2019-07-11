@@ -922,7 +922,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		char *curarg = argv[arg];
 
 		// is it a switch?
-		if(curarg[0] == '-') {
+		if(curarg[0] == '-' && curarg[1] != '\0') {
 			if(pending_base || pending_arch || pending_mode || pending_skip || pending_count)
 				goto usage;
 
@@ -1051,13 +1051,36 @@ int main(int argc, char *argv[])
 		return 1;
 
 	// Load the file
-	void *data;
-	uint32_t length;
-	osd_file::error filerr = util::core_file::load(opts.filename, &data, length);
-	if(filerr != osd_file::error::NONE)
+	void *data = nullptr;
+	uint32_t length = 0;
+	if(std::strcmp(opts.filename, "-") != 0)
 	{
-		fprintf(stderr, "Error opening file '%s'\n", opts.filename);
-		return 1;
+		osd_file::error filerr = util::core_file::load(opts.filename, &data, length);
+		if(filerr != osd_file::error::NONE)
+		{
+			fprintf(stderr, "Error opening file '%s'\n", opts.filename);
+			return 1;
+		}
+	}
+	else
+	{
+		constexpr uint32_t BLOCK_SIZE = 0x1000;
+		while(!ferror(stdin) && !feof(stdin))
+		{
+			data = realloc(data, length + BLOCK_SIZE);
+			if(data == nullptr)
+			{
+				fprintf(stderr, "Error allocating buffer\n");
+				return 1;
+			}
+
+			length += fread((u8 *)data + length, 1, BLOCK_SIZE, stdin);
+		}
+		if(length == 0 || (ferror(stdin) && !feof(stdin)))
+		{
+			fprintf(stderr, "Error reading from stdin\n");
+			return 1;
+		}
 	}
 
 	// Build the disasm object
