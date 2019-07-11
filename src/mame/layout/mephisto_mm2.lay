@@ -470,8 +470,8 @@
 		<bezel element="text_d4"><bounds x="85.7" y="99.5" width="2.27" height="2.2" /></bezel>
 		<bezel element="text_e5"><bounds x="90.7" y="99.5" width="2.27" height="2.2" /></bezel>
 		<bezel element="text_f6"><bounds x="95.7" y="99.5" width="2.27" height="2.2" /></bezel>
-		<bezel element="text_g7"><bounds x="80" y="104.2" width="2.27" height="2.2" /></bezel>
-		<bezel element="text_h8"><bounds x="85" y="104.2" width="2.27" height="2.2" /></bezel>
+		<bezel element="text_g7"><bounds x="80.7" y="104.5" width="2.27" height="2.2" /></bezel>
+		<bezel element="text_h8"><bounds x="85.7" y="104.5" width="2.27" height="2.2" /></bezel>
 		<bezel element="text_9l"><bounds x="91" y="104.5" width="1.97" height="2.2" /></bezel>
 		<bezel element="text_0r"><bounds x="96" y="104.5" width="1.97" height="2.2" /></bezel>
 

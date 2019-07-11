@@ -21386,7 +21386,6 @@ mm4                             // Mephisto 4
 mm4tk                           // Mephisto 4 Turbo Kit
 mm5                             // Mephisto 5.1 ROM
 mm50                            // Mephisto 5.0 ROM
-mm5tk                           // Mephisto 5.1 ROM Turbo Kit Speed
 rebel5                          // Mephisto 5
 
 @source:mephisto_montec.cpp
