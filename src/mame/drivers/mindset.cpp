@@ -11,6 +11,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "mindset.lh"
+
 class mindset_state: public driver_device
 {
 public:
@@ -28,6 +30,10 @@ protected:
 	required_device<floppy_connector> m_fdco[2];
 	required_shared_ptr<u16> m_vram;
 	required_ioport_array<11> m_kbd_row;
+	output_finder<2> m_floppy_leds;
+	output_finder<> m_red_led;
+	output_finder<> m_yellow_led;
+	output_finder<> m_green_led;
 
 	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcos;
 
@@ -94,6 +100,8 @@ protected:
 	void trap_w(offs_t offset, u16 data);
 	u16 trap_clear_interrupt();
 
+	template<int floppy> void floppy_led_cb(floppy_image_device *, int state);
+
 	u16 keyscan();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -119,15 +127,34 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 	m_fdc(*this, "fdc"),
 	m_fdco{{*this, "fdc:0"}, {*this, "fdc:1"}},
 	m_vram(*this, "vram"),
-	m_kbd_row(*this, "K%02u", 0U)
+	m_kbd_row(*this, "K%02u", 0U),
+	m_floppy_leds(*this, "drive%u_led", 0U),
+	m_red_led(*this, "red_led"),
+	m_yellow_led(*this, "yellow_led"),
+	m_green_led(*this, "green_led")
 {
+}
+
+template<int floppy> void mindset_state::floppy_led_cb(floppy_image_device *, int state)
+{
+	m_floppy_leds[floppy] = state;
 }
 
 void mindset_state::machine_start()
 {
+	m_floppy_leds.resolve();
+	m_red_led.resolve();
+	m_yellow_led.resolve();
+	m_green_led.resolve();
+
 	m_gcos = m_maincpu->space(AS_PROGRAM).cache<1, 0, ENDIANNESS_LITTLE>();
 	for(int i=0; i<2; i++)
 		m_floppy[i] = m_fdco[i]->get_device();
+
+	if(m_floppy[0])
+		m_floppy[0]->setup_led_cb(floppy_image_device::led_cb(&mindset_state::floppy_led_cb<0>, this));
+	if(m_floppy[1])
+		m_floppy[1]->setup_led_cb(floppy_image_device::led_cb(&mindset_state::floppy_led_cb<1>, this));
 
 	save_item(NAME(m_fdc_intext));
 	save_item(NAME(m_fdc_int));
@@ -193,6 +220,10 @@ void mindset_state::sys_p1_w(u8 data)
 void mindset_state::sys_p2_w(u8 data)
 {
 	m_maincpu->int3_w(!(data & 0x80));
+	m_red_led = !BIT(data, 2);
+	m_yellow_led = !BIT(data, 1);
+	m_green_led = !BIT(data, 0);
+	//	logerror("power %s\n", data & 0x40 ? 
 	//  logerror("SYS: write p2 %02x\n", data);
 }
 
@@ -235,6 +266,40 @@ u16 mindset_state::keyscan()
 	for(unsigned int i=0; i<11; i++)
 		if(!(src & (1 << i)))
 			res &= m_kbd_row[i]->read();
+	if(!(src & 0x2000)) {
+		switch((src >> 1) & 3) {
+		case 0:
+			res &= 0xc0;
+			break;
+		case 1:
+			res &= 0xc0;
+			break;
+		case 2:
+			res &= 0xc0;
+			break;
+		case 3:
+			res &= 0xc0;
+			break;
+		}
+	}
+	if(!(src & 0x8000)) {
+		switch((src >> 1) & 3) {
+		case 0:
+			res &= 0xc0;
+			break;
+		case 1:
+			res &= 0xc0;
+			break;
+		case 2:
+			res &= 0xc0;
+			break;
+		case 3:
+			res &= 0xc0;
+			break;
+		}
+	}
+
+	//	logerror("scan src=%04x %04x %d%d/%d(%03x)\n", src, 0xffff ^ src, (src >> 15) & 1, (src >> 13) & 1, (src >> 11) & 3, m_kbdcpu->pc());
 	return res;
 }
 
@@ -281,7 +346,7 @@ void mindset_state::dispreg_w(u16 data)
 		logerror("screen position (%d, %d)\n", (data >> 8) & 15, (data >> 12) & 15);
 		break;
 	case 1:
-		m_borderidx = data & 0xf;
+		m_borderidx = (data >> 8) & 0xf;
 		logerror("border color %x\n", m_borderidx);
 		break;
 	case 2: {
@@ -337,13 +402,19 @@ void mindset_state::dispreg_w(u16 data)
 u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// Temporary gross hack
-	if(cliprect.max_y != 399)
+	if(cliprect.max_y != 479)
 		return 0;
 	const u16 *bank = m_dispctrl & 0x4000 ? m_vram + 8000 : m_vram;
 	bool ibm_mode = m_dispctrl & 0x2000;
 	bool interleave = m_dispctrl & 0x0800;
 	int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
 	bool large_pixels = m_dispctrl & 0x0100;
+
+	bitmap.fill(m_palette[m_borderidx]);
+
+	int dx = ((m_screenpos >>  8) & 15) * (751 - 640) / 15;
+	int dy = ((m_screenpos >> 12) & 15) * (480 - 400) / 15;
+
 
 	if(ibm_mode) {
 		if(large_pixels) {
@@ -355,7 +426,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 						for(u32 yy=0; yy<2; yy++) {
 							const u16 *src = bank + 4096*yy;
 							for(u32 y=yy; y<200; y+=2) {
-								u32 *dest = &bitmap.pix32(2*y+1);
+								u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 								for(u32 x=0; x<320; x+=8) {
 									u16 sv = *src++;
 									*dest++ = m_palette[palind[(sv >>  6) & 3]];
@@ -393,7 +464,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					for(int field=0; field<2; field++) {
 						const u16 *src = bank;
 						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field);
+							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<320; x+=4) {
 								u16 sv = *src++;
 								*dest++ = m_palette[(sv >>  4) & 15];
@@ -414,7 +485,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					for(int field=0; field<2; field++) {
 						const u16 *src = bank;
 						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field);
+							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<320; x+=8) {
 								u16 sv = *src++;
 								*dest++ = m_palette[palind[(sv >>  6) & 3]];
@@ -443,7 +514,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					for(int field=0; field<2; field++) {
 						const u16 *src = bank;
 						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field);
+							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<320; x+=16) {
 								u16 sv = *src++;
 								*dest++ = m_palette[palind[(sv >>  7) & 1]];
@@ -494,7 +565,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 						m_palette[1] = 0xffffff;
 						const u16 *src = bank;
 						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field);
+							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<640; x+=8) {
 								u16 sv = *src++;
 								*dest++ = m_palette[palind[(sv >>  6) & 3]];
@@ -515,7 +586,7 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 					for(int field=0; field<2; field++) {
 						const u16 *src = bank;
 						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field);
+							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<640; x+=16) {
 								u16 sv = *src++;
 								*dest++ = m_palette[palind[(sv >>  7) & 1]];
@@ -890,6 +961,7 @@ static void pc_dd_floppies(device_slot_interface &device)
 void mindset_state::mindset(machine_config &config)
 {
 	config.m_perfect_cpu_quantum = ":syscpu";
+	config.set_default_layout(layout_mindset);
 
 	I80186(config, m_maincpu, 12_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mindset_state::maincpu_mem);
@@ -914,14 +986,16 @@ void mindset_state::mindset(machine_config &config)
 	m_kbdcpu->t1_in_cb().set(FUNC(mindset_state::kbd_t1_r));
 
 	// Should be NTSC actually... we'll see
+	// Pretty sure the pixel clock is the 14.x one, the 12MHz one would only allow 630 pixels
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(100));
-	m_screen->set_size(640, 400);
-	m_screen->set_visarea(0, 639, 0, 399);
+	m_screen->set_size(751, 480);
+	m_screen->set_visarea(0, 750, 0, 479);
 	m_screen->set_screen_update(FUNC(mindset_state::screen_update));
 	// Should be at the position indicated by display reg 2
-	m_screen->scanline().set([this](int scanline) { m_maincpu->int2_w(scanline == 198); });
+	m_screen->scanline().set([this](int scanline) { m_maincpu->int2_w(scanline == 398); });
 	m_screen->screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
 	I8272A(config, m_fdc, 16_MHz_XTAL/2, true);
