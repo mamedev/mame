@@ -3,9 +3,9 @@
 /*******************************************************************************
 
   The Boat
-  1997(c) Hit Gun Co, LTD.
+  1987(c) Hit Gun Co, LTD.
   
-  Gambling/Amusing game
+  Gambling/Amusement game
   Selectable through DIP switches.
 
   Driver by AJR.
