@@ -19,9 +19,8 @@ Notes:
 **********************************************************************/
 
 #include "emu.h"
-#include "lphaser.h"
-
 #include "screen.h"
+#include "lphaser.h"
 
 
 
@@ -85,15 +84,11 @@ ioport_constructor sms_light_phaser_device::device_input_ports() const
 
 sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_LIGHT_PHASER, tag, owner, clock),
-	device_video_interface(mconfig, *this),
 	device_sms_control_port_interface(mconfig, *this),
 	m_lphaser_pins(*this, "CTRL_PORT"),
 	m_lphaser_x(*this, "LPHASER_X"),
 	m_lphaser_y(*this, "LPHASER_Y"), m_sensor_last_state(0), m_lphaser_timer(nullptr)
 {
-	// Workaround for failed validation that occurs when running on a driver
-	// with Sega Scope emulation, which adds 2 screens (left/right lenses).
-	set_screen(*this, ":screen");
 }
 
 
@@ -150,10 +145,10 @@ uint8_t sms_light_phaser_device::peripheral_r()
 int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y )
 {
 	const int r_x_r = LGUN_RADIUS * LGUN_RADIUS;
-	const rectangle &visarea = screen().visible_area();
+	const rectangle &visarea = m_port->m_screen->visible_area();
 	rectangle aim_area;
-	int beam_x = screen().hpos();
-	int beam_y = screen().vpos();
+	int beam_x = m_port->m_screen->hpos();
+	int beam_y = m_port->m_screen->vpos();
 	int beam_x_orig = beam_x;
 	int beam_y_orig = beam_y;
 	int dy, result = 1;
@@ -231,8 +226,8 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 				/* brightness of the lightgray color in the frame drawn by Light Phaser games */
 				const uint8_t sensor_min_brightness = 0x7f;
 
-				screen().update_now();
-				color = screen().pixel(beam_x, beam_y);
+				m_port->m_screen->update_now();
+				color = m_port->m_screen->pixel(beam_x, beam_y);
 
 				/* reference: http://www.w3.org/TR/AERT#color-contrast */
 				brightness = (color.r() * 0.299) + (color.g() * 0.587) + (color.b() * 0.114);
@@ -257,14 +252,14 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 		}
 	}
 
-	timer->adjust(screen().time_until_pos(beam_y, beam_x));
+	timer->adjust(m_port->m_screen->time_until_pos(beam_y, beam_x));
 	return result;
 }
 
 
 uint16_t sms_light_phaser_device::screen_hpos_nonscaled(int scaled_hpos)
 {
-	const rectangle &visarea = screen().visible_area();
+	const rectangle &visarea = m_port->m_screen->visible_area();
 	int offset_x = (scaled_hpos * (visarea.max_x - visarea.min_x)) / 255;
 	return visarea.min_x + offset_x;
 }
@@ -272,7 +267,7 @@ uint16_t sms_light_phaser_device::screen_hpos_nonscaled(int scaled_hpos)
 
 uint16_t sms_light_phaser_device::screen_vpos_nonscaled(int scaled_vpos)
 {
-	const rectangle &visarea = screen().visible_area();
+	const rectangle &visarea = m_port->m_screen->visible_area();
 	int offset_y = (scaled_vpos * (visarea.max_y - visarea.min_y)) / 255;
 	return visarea.min_y + offset_y;
 }

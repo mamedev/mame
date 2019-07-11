@@ -8,6 +8,7 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "ggext.h"
 // slot devices
 #include "smsctrladp.h"
@@ -58,6 +59,7 @@ device_gg_ext_port_interface::~device_gg_ext_port_interface()
 gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GG_EXT_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
+	m_screen(*this, finder_base::DUMMY_TAG),
 	m_device(nullptr),
 	m_th_pin_handler(*this)
 {
