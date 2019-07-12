@@ -101,7 +101,7 @@
 <!-- sb board -->
 
 	<element name="cwhite"><rect><color red="1.00" green="1.00" blue="1.00" /></rect></element>
-	<element name="cblack"><rect><color red="0.30" green="0.30" blue="0.30" /></rect></element>
+	<element name="cblack"><rect><color red="0.40" green="0.40" blue="0.40" /></rect></element>
 
 	<element name="hlbb" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>

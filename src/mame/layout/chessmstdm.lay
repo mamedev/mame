@@ -102,7 +102,7 @@
 
 <!-- sb board -->
 
-	<element name="cblack"><rect><color red="0.44" green="0.08" blue="0.01" /></rect></element>
+	<element name="cblack"><rect><color red="0.5" green="0.14" blue="0.06" /></rect></element>
 	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
 
 	<element name="hlbb" defstate="0">
