@@ -22,9 +22,10 @@ TODO:
 #include "video/hd44780.h"
 #include "speaker.h"
 
-#include "mephisto_lcd.lh"
+// internal artwork
 #include "mephisto_academy.lh"
 #include "mephisto_milano.lh"
+#include "mephisto_polgar.lh"
 
 
 class mephisto_polgar_state : public driver_device
@@ -265,7 +266,7 @@ static INPUT_PORTS_START( polgar )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("LEV")    PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("FCT")    PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
 INPUT_PORTS_END
 
 void mephisto_risc_state::machine_start()
@@ -313,7 +314,7 @@ void mephisto_polgar_state::polgar(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODUL(config, "display");
-	config.set_default_layout(layout_mephisto_lcd);
+	config.set_default_layout(layout_mephisto_polgar);
 }
 
 void mephisto_polgar_state::polgar10(machine_config &config)
@@ -344,7 +345,7 @@ void mephisto_risc_state::mrisc(machine_config &config)
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODUL(config, "display");
-	config.set_default_layout(layout_mephisto_lcd);
+	config.set_default_layout(layout_mephisto_polgar);
 }
 
 void mephisto_milano_state::milano(machine_config &config)
