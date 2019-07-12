@@ -22,7 +22,7 @@ public:
 	void i2c_scl_w(bool line);
 	void i2c_sda_w(bool line);
 
-	u32 get_frame_count() const { return total_frame_count; }
+	u32 get_frame_count() const { return total_frame_count - buffered_frame_count; }
 
 protected:
 	virtual void device_start() override;
@@ -41,7 +41,7 @@ private:
 	int i2c_bus_curbit;
 	uint8_t i2c_bus_curval;
 	int mp3_count, sample_count, current_rate;
-	u32 total_frame_count;
+	u32 total_frame_count, buffered_frame_count;
 
 	mp3dec_t mp3_dec;
 	mp3dec_frame_info_t mp3_info;
