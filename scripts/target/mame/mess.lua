@@ -3739,7 +3739,6 @@ files {
 	MAME_DIR .. "src/mame/includes/pc4.h",
 	MAME_DIR .. "src/mame/video/pc4.cpp",
 	MAME_DIR .. "src/mame/drivers/pc2000.cpp",
-	MAME_DIR .. "src/mame/drivers/pitagjr.cpp",
 	MAME_DIR .. "src/mame/drivers/prestige.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech1.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech2.cpp",

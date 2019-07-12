@@ -14221,6 +14221,7 @@ gjmovie                         // Genius Junior Movie (Germany)
 gjrstar                         // Genius Junior Redstar (Germany)
 gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
+pitagjr                         // Pitagorin Junior
 
 @source:genpc.cpp
 pc                              // 1987 PC with CGA
@@ -32576,9 +32577,6 @@ piratesb                        // bootleg?
 
 @source:piratesh.cpp
 piratesh                        // (c) 1995 Konami
-
-@source:pitagjr.cpp
-pitagjr                         // Pitagorin Junior
 
 @source:pitnrun.cpp
 pitnrun                         // PR  (c) 1984 Taito Corporation
