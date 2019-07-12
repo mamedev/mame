@@ -2971,24 +2971,35 @@ layout_view::layout_view(
 	add_items(layers, local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
 
 	// deal with legacy element groupings
-	if ((layers.backdrops.size() > 1) && layers.overlays.empty())
+	bool legacy(true);
+	for (auto it = layers.screens.begin(); (layers.screens.end() != it) && legacy; ++it)
 	{
-		// multiple backdrop pieces and no overlays (Golly! Ghost! mode):
-		// backdrop (alpha) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
-		m_items.splice(m_items.end(), layers.backdrops);
+		if (!it->screen())
+			legacy = false;
+	}
+	if (!layers.overlays.empty() || (layers.backdrops.size() <= 1))
+	{
+		// screens (none) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
+		for (item &backdrop : layers.backdrops)
+			backdrop.set_blend_mode(BLENDMODE_ADD);
+		if (legacy)
+		{
+			for (item &screen : layers.screens)
+				screen.set_blend_mode(BLENDMODE_NONE);
+		}
 		m_items.splice(m_items.end(), layers.screens);
+		m_items.splice(m_items.end(), layers.overlays);
+		m_items.splice(m_items.end(), layers.backdrops);
 		m_items.splice(m_items.end(), layers.bezels);
 		m_items.splice(m_items.end(), layers.cpanels);
 		m_items.splice(m_items.end(), layers.marquees);
 	}
 	else
 	{
-		// screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
-		for (item &backdrop : layers.backdrops)
-			backdrop.set_blend_mode(BLENDMODE_ADD);
-		m_items.splice(m_items.end(), layers.screens);
-		m_items.splice(m_items.end(), layers.overlays);
+		// multiple backdrop pieces and no overlays (Golly! Ghost! mode):
+		// backdrop (alpha) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 		m_items.splice(m_items.end(), layers.backdrops);
+		m_items.splice(m_items.end(), layers.screens);
 		m_items.splice(m_items.end(), layers.bezels);
 		m_items.splice(m_items.end(), layers.cpanels);
 		m_items.splice(m_items.end(), layers.marquees);
