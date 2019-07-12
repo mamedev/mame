@@ -10,21 +10,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
 #include "includes/poly88.h"
-
-
-void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_KEYBOARD:
-		keyboard_callback(ptr, param);
-		break;
-	default:
-		assert_always(false, "Unknown id in poly88_state::device_timer");
-	}
-}
 
 
 // bits 0-3 baud rate; bit 4 (0=cassette, 1=rs232); bit 5 (1=disable rom and ram)
@@ -32,110 +18,6 @@ void poly88_state::baud_rate_w(uint8_t data)
 {
 	logerror("poly88_baud_rate_w %02x\n",data);
 	m_brg->control_w(data & 15);
-}
-
-uint8_t poly88_state::row_number(uint8_t code) {
-	if (BIT(code,0)) return 0;
-	if (BIT(code,1)) return 1;
-	if (BIT(code,2)) return 2;
-	if (BIT(code,3)) return 3;
-	if (BIT(code,4)) return 4;
-	if (BIT(code,5)) return 5;
-	if (BIT(code,6)) return 6;
-	if (BIT(code,7)) return 7;
-	return 0;
-}
-
-TIMER_CALLBACK_MEMBER(poly88_state::keyboard_callback)
-{
-	int i;
-	uint8_t code;
-	uint8_t key_code = 0;
-	uint8_t shift = m_linec->read() & 0x02 ? 1 : 0;
-	uint8_t ctrl =  m_linec->read() & 0x01 ? 1 : 0;
-
-	for(i = 0; i < 7; i++)
-	{
-		switch ( i )
-		{
-			case 0: code = m_line0->read(); break;
-			case 1: code = m_line1->read(); break;
-			case 2: code = m_line2->read(); break;
-			case 3: code = m_line3->read(); break;
-			case 4: code = m_line4->read(); break;
-			case 5: code = m_line5->read(); break;
-			case 6: code = m_line6->read(); break;
-			default: code = 0;
-		}
-		if (code != 0)
-		{
-			if (i==0 && shift==0) {
-				key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-			}
-			if (i==0 && shift==1) {
-				key_code = 0x20 + row_number(code) + 8*i; // for shifted numbers
-			}
-			if (i==1 && shift==0) {
-				if (row_number(code) < 4) {
-					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-				} else {
-					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
-				}
-			}
-			if (i==1 && shift==1) {
-				if (row_number(code) < 4) {
-					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
-				} else {
-					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-				}
-			}
-			if (i>=2 && i<=4 && shift==1 && ctrl==0) {
-				key_code = 0x60 + row_number(code) + (i-2)*8; // for small letters
-			}
-			if (i>=2 && i<=4 && shift==0 && ctrl==0) {
-				key_code = 0x40 + row_number(code) + (i-2)*8; // for big letters
-			}
-			if (i>=2 && i<=4 && ctrl==1) {
-				key_code = 0x00 + row_number(code) + (i-2)*8; // for CTRL + letters
-			}
-			if (i==5 && shift==1 && ctrl==0) {
-				if (row_number(code)<7) {
-					key_code = 0x60 + row_number(code) + (i-2)*8; // for small letters
-				} else {
-					key_code = 0x40 + row_number(code) + (i-2)*8; // for signs it is switched
-				}
-			}
-			if (i==5 && shift==0 && ctrl==0) {
-				if (row_number(code)<7) {
-					key_code = 0x40 + row_number(code) + (i-2)*8; // for small letters
-				} else {
-					key_code = 0x60 + row_number(code) + (i-2)*8; // for signs it is switched
-				}
-			}
-			if (i==5 && shift==0 && ctrl==1) {
-				key_code = 0x00 + row_number(code) + (i-2)*8; // for letters + ctrl
-			}
-			if (i==6) {
-				switch(row_number(code))
-				{
-					case 0: key_code = 0x11; break;
-					case 1: key_code = 0x12; break;
-					case 2: key_code = 0x13; break;
-					case 3: key_code = 0x14; break;
-					case 4: key_code = 0x20; break; // Space
-					case 5: key_code = 0x0D; break; // Enter
-					case 6: key_code = 0x09; break; // TAB
-					case 7: key_code = 0x0A; break; // LF
-				}
-			}
-		}
-	}
-	if (key_code==0 && m_last_code !=0){
-		m_int_vector = 0xef;
-		m_maincpu->set_input_line(0, HOLD_LINE);
-	} else {
-		m_last_code = key_code;
-	}
 }
 
 IRQ_CALLBACK_MEMBER(poly88_state::poly88_irq_callback)
@@ -224,8 +106,6 @@ WRITE_LINE_MEMBER(poly88_state::cassette_clock_w)
 
 void poly88_state::init_poly88()
 {
-	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
-	m_keyboard_timer->adjust(attotime::from_hz(24000), 0, attotime::from_hz(24000));
 }
 
 void poly88_state::machine_reset()
