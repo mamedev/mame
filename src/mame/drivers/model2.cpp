@@ -3935,7 +3935,7 @@ ROM_START( motoraiddx ) /* Motor Raid DX, Model 2A, Sega ROM board ID# 834-13231
 	MODEL2A_VID_BOARD
 ROM_END
 
-ROM_START( skytargt ) /* Sky Target, Model 2A */
+ROM_START( skytargt ) /* Sky Target, Model 2A, Sega game ID# 833-12178 , Sega ROM board ID# 834-12179 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-18406.12", 0x000000, 0x080000, CRC(fde9c00a) SHA1(01cd519daaf6138d9df4940bf8bb5923a1f163df) )
 	ROM_LOAD32_WORD( "epr-18407.13", 0x000002, 0x080000, CRC(35f8b529) SHA1(faf6dcf8f345c1e7968823f2dba60afcd88f37c2) )
