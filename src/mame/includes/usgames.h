@@ -6,6 +6,7 @@
 #pragma once
 
 #include "emupal.h"
+#include "video/mc6845.h"
 
 class usgames_state : public driver_device
 {
@@ -16,7 +17,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_charram(*this, "charram"),
-		m_leds(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U),
+		m_palette(*this, "palette")
 	{ }
 
 	void usg32(machine_config &config);
@@ -34,22 +36,18 @@ private:
 	required_shared_ptr<uint8_t> m_charram;
 
 	output_finder<5> m_leds;
-
-	tilemap_t *m_tilemap;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(charram_w);
-
-	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void usgames_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void usg185_map(address_map &map);
 	void usgames_map(address_map &map);
+	MC6845_UPDATE_ROW(update_row);
 };
 
 #endif // MAME_INCLUDES_USGAMES_H
