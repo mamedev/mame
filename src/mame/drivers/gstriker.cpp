@@ -326,6 +326,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gstriker )
 	PORT_INCLUDE( gstriker_generic )
 
+	// defaults are confirmed from the jp manual
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -337,13 +338,13 @@ static INPUT_PORTS_START( gstriker )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x00, "2 Players VS CPU Game" ) PORT_DIPLOCATION("SW1:5") // "Cooperation Coin"
+	PORT_DIPNAME( 0x10, 0x10, "2 Players VS CPU Game" ) PORT_DIPLOCATION("SW1:5") // "Cooperation Coin"
 	PORT_DIPSETTING(    0x10, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2 Credits" )
-	PORT_DIPNAME( 0x20, 0x00, "Player VS Player Game" ) PORT_DIPLOCATION("SW1:6") // "Competitive Coin"
+	PORT_DIPNAME( 0x20, 0x20, "Player VS Player Game" ) PORT_DIPLOCATION("SW1:6") // "Competitive Coin"
 	PORT_DIPSETTING(    0x20, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2 Credits" )
-	PORT_DIPNAME( 0x40, 0x40, "New Challenger" ) PORT_DIPLOCATION("SW1:7") // unknown purpose, prolly buy-in on linked cab
+	PORT_DIPNAME( 0x40, 0x40, "New Challenger" ) PORT_DIPLOCATION("SW1:7") // buy-in on linked cab only according to manual
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, "Cabinet Type" ) PORT_DIPLOCATION("SW1:8") // "Cabinet Type"
@@ -354,12 +355,12 @@ static INPUT_PORTS_START( gstriker )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x06, 0x06, "Player(s) VS CPU Time" ) PORT_DIPLOCATION("SW2:2,3") // "Tournament  Time"
+	PORT_DIPNAME( 0x06, 0x04, "Player(s) VS CPU Time" ) PORT_DIPLOCATION("SW2:2,3") // "Tournament  Time"
 	PORT_DIPSETTING(    0x06, "1:30" )
 	PORT_DIPSETTING(    0x04, "2:00" )
 	PORT_DIPSETTING(    0x02, "3:00" )
 	PORT_DIPSETTING(    0x00, "4:00" )
-	PORT_DIPNAME( 0x18, 0x18, "Player VS Player Time" ) PORT_DIPLOCATION("SW2:4,5") // "Competitive Time"
+	PORT_DIPNAME( 0x18, 0x10, "Player VS Player Time" ) PORT_DIPLOCATION("SW2:4,5") // "Competitive Time"
 	PORT_DIPSETTING(    0x18, "2:00" )
 	PORT_DIPSETTING(    0x10, "3:00" )
 	PORT_DIPSETTING(    0x08, "4:00" )
