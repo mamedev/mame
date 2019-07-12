@@ -175,7 +175,8 @@ void nes_arcstick_device::device_add_mconfig(machine_config &config)
 {
 	// expansion port to allow daisy chaining
 	NES_CONTROL_PORT(config, m_daisychain, arcstick_daisy, nullptr);
-	m_daisychain->set_screen_tag(m_port->m_screen);
+	if (m_port != nullptr)
+		m_daisychain->set_screen_tag(m_port->m_screen);
 }
 
 
