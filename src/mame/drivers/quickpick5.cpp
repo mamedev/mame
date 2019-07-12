@@ -65,10 +65,10 @@ private:
 	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	// A0 is inverted to match the Z80's endianness.  Typical Konami.
-	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(space, offset^1);  }
-	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(space, offset^1, data); }
-	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(space, offset^1);  }
-	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(space, offset^1, data); }
+	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(offset^1);  }
+	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(offset^1, data); }
+	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(offset^1);  }
+	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(offset^1, data); }
 
 	WRITE8_MEMBER(control_w)
 	{
@@ -119,11 +119,11 @@ READ8_MEMBER(quickpick5_state::vram_r)
 		offset |= 0x800;
 		if ((offset >= 0x800) && (offset <= 0x880))
 		{
-			return m_k051649->k051649_waveform_r(space, offset & 0x7f);
+			return m_k051649->k051649_waveform_r(offset & 0x7f);
 		}
 		else if ((offset >= 0x8e0) && (offset <= 0x8ff))
 		{
-			return m_k051649->k051649_test_r(space, offset-0x8e0);
+			return m_k051649->k051649_test_r();
 		}
 	}
 
@@ -143,26 +143,26 @@ WRITE8_MEMBER(quickpick5_state::vram_w)
 		offset |= 0x800;
 		if ((offset >= 0x800) && (offset < 0x880))
 		{
-			m_k051649->k051649_waveform_w(space, offset-0x800, data);
+			m_k051649->k051649_waveform_w(offset-0x800, data);
 			return;
 		}
 		else if (offset < 0x88a)
 		{
-			m_k051649->k051649_frequency_w(space, offset-0x880, data);
+			m_k051649->k051649_frequency_w(offset-0x880, data);
 			return;
 		}
 		else if (offset < 0x88f)
 		{
-			m_k051649->k051649_volume_w(space, offset-0x88a, data);
+			m_k051649->k051649_volume_w(offset-0x88a, data);
 			return;
 		}
 		else if (offset < 0x890)
 		{
-			m_k051649->k051649_keyonoff_w(space, 0, data);
+			m_k051649->k051649_keyonoff_w(data);
 			return;
 		}
 
-		m_k051649->k051649_test_w(space, offset-0x8e0, data);
+		m_k051649->k051649_test_w(data);
 		return;
 	}
 

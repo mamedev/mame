@@ -49,7 +49,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(out_w);
 	void summit_palette(palette_device &palette) const;
-	uint32_t screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_summit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mainmap(address_map &map);
 };
 
@@ -58,7 +58,7 @@ void summit_state::video_start()
 {
 }
 
-uint32_t summit_state::screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t summit_state::screen_update_summit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
@@ -314,24 +314,24 @@ void summit_state::summit_palette(palette_device &palette) const
 {
 }
 
-MACHINE_CONFIG_START(summit_state::summit)
+void summit_state::summit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(mainmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", summit_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &summit_state::mainmap);
+	m_maincpu->set_vblank_int("screen", FUNC(summit_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(summit_state, screen_update_summit)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(summit_state::screen_update_summit));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_summit);
 	PALETTE(config, m_palette, FUNC(summit_state::summit_palette), 256);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( pushover )

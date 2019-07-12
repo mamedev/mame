@@ -47,7 +47,6 @@ perhaps III:
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "screen.h"
 #include "speaker.h"
 #include "emupal.h"
@@ -73,7 +72,7 @@ private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(trs80_cmd);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mem_map(address_map &map);
@@ -319,7 +318,7 @@ void meritum_state::machine_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( meritum_state, trs80_cmd )
+QUICKLOAD_LOAD_MEMBER(meritum_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -393,11 +392,12 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(meritum_state::meritum)
+void meritum_state::meritum(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 10_MHz_XTAL / 4) // U880D @ 2.5 MHz or 1.67 MHz by jumper selection
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 10_MHz_XTAL / 4); // U880D @ 2.5 MHz or 1.67 MHz by jumper selection
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritum_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &meritum_state::io_map);
 
 	i8251_device &usart(I8251(config, "usart", 10_MHz_XTAL / 4)); // same as CPU clock
 	usart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -420,14 +420,14 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	i8255_device &mainppi(I8255(config, "mainppi")); // parallel interface
 	mainppi.out_pc_callback().set("nmigate", FUNC(input_merger_device::in_w<0>)).bit(7).invert();
 
-	MCFG_DEVICE_ADD("flopppi", I8255, 0) // floppy disk interface
-	MCFG_DEVICE_ADD("audiopit", PIT8253, 0) // optional audio interface
+	I8255(config, "flopppi", 0); // floppy disk interface
+	PIT8253(config, "audiopit", 0); // optional audio interface
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(10_MHz_XTAL, 107 * 6, 0, 64 * 6, 312, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(meritum_state, screen_update_meritum)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(10_MHz_XTAL, 107 * 6, 0, 64 * 6, 312, 0, 192);
+	screen.set_screen_update(FUNC(meritum_state::screen_update_meritum));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_meritum);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -435,12 +435,13 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_QUICKLOAD_ADD("quickload", meritum_state, trs80_cmd, "cmd", 1.0)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(meritum_state::quickload_cb), this);
+}
 
 /***************************************************************************
 

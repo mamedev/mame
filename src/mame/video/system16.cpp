@@ -131,19 +131,19 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_paletteram_w)
 		int b4 = (newword >> 11) & 1;
 
 		/* Normal colors */
-		r = combine_6_weights(m_weights[0][0], r0, r1, r2, r3, r4, 0);
-		g = combine_6_weights(m_weights[0][1], g0, g1, g2, g3, g4, 0);
-		b = combine_6_weights(m_weights[0][2], b0, b1, b2, b3, b4, 0);
+		r = combine_weights(m_weights[0][0], r0, r1, r2, r3, r4, 0);
+		g = combine_weights(m_weights[0][1], g0, g1, g2, g3, g4, 0);
+		b = combine_weights(m_weights[0][2], b0, b1, b2, b3, b4, 0);
 
 		/* Shadow colors */
-		rs = combine_6_weights(m_weights[1][0], r0, r1, r2, r3, r4, 0);
-		gs = combine_6_weights(m_weights[1][1], g0, g1, g2, g3, g4, 0);
-		bs = combine_6_weights(m_weights[1][2], b0, b1, b2, b3, b4, 0);
+		rs = combine_weights(m_weights[1][0], r0, r1, r2, r3, r4, 0);
+		gs = combine_weights(m_weights[1][1], g0, g1, g2, g3, g4, 0);
+		bs = combine_weights(m_weights[1][2], b0, b1, b2, b3, b4, 0);
 
 		/* Highlight colors */
-		//rh = combine_6_weights(m_weights[1][0], r0, r1, r2, r3, r4, 1);
-		//gh = combine_6_weights(m_weights[1][1], g0, g1, g2, g3, g4, 1);
-		//bh = combine_6_weights(m_weights[1][2], b0, b1, b2, b3, b4, 1);
+		//rh = combine_weights(m_weights[1][0], r0, r1, r2, r3, r4, 1);
+		//gh = combine_weights(m_weights[1][1], g0, g1, g2, g3, g4, 1);
+		//bh = combine_weights(m_weights[1][2], b0, b1, b2, b3, b4, 1);
 
 		m_palette->set_pen_color(offset, rgb_t(r, g, b) );
 
@@ -659,7 +659,7 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -729,7 +729,7 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_devic
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -811,7 +811,7 @@ uint32_t segas1x_bootleg_state::screen_update_system16(screen_device &screen, bi
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else
@@ -874,7 +874,7 @@ uint32_t segas1x_bootleg_state::screen_update_system18old(screen_device &screen,
 					{
 						// if the color is set to maximum, shadow pixels underneath us
 						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

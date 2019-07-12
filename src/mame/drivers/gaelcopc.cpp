@@ -71,22 +71,23 @@ static INPUT_PORTS_START( gaelcopc )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(gaelcopc_state::gaelcopc)
+void gaelcopc_state::gaelcopc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
-	MCFG_DEVICE_PROGRAM_MAP(gaelcopc_map)
+	PENTIUM(config, m_maincpu, 2000000000); /* Pentium4? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelcopc_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(gaelcopc_state::screen_update));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x100);
+}
 
 
 ROM_START(tokyocop)

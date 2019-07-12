@@ -28,6 +28,7 @@
 /* flags for command parsing */
 #define CMDFLAG_NONE                        (0x0000)
 #define CMDFLAG_KEEP_QUOTES                 (0x0001)
+#define CMDFLAG_CUSTOM_HELP                 (0x0002)
 
 /* values for the error code in a command error */
 #define CMDERR_NONE                         (0)
@@ -110,6 +111,8 @@ public:
 
 private:
 	void exit();
+
+	void execute_help_custom(int ref, const std::vector<std::string> &params);
 
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);

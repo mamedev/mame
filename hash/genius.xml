@@ -34,7 +34,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-6386-00" size="0x20000" crc="27a3e197" sha1="cd4fd909a1ed4b8f789130ae57e2861ffd177a53" offset="0" />
+				<rom name="27-6386-00" size="0x20000" crc="27a3e197" sha1="cd4fd909a1ed4b8f789130ae57e2861ffd177a53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-6386-00" size="0x20000" crc="27a3e197" sha1="cd4fd909a1ed4b8f789130ae57e2861ffd177a53" offset="0" />
+				<rom name="27-6386-00" size="0x20000" crc="27a3e197" sha1="cd4fd909a1ed4b8f789130ae57e2861ffd177a53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -60,7 +60,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-6388-00" size="0x20000" crc="f7c10823" sha1="5d168bcde6c904d5d16b5af8e734210d99ac591c" offset="0" />
+				<rom name="27-6388-00" size="0x20000" crc="f7c10823" sha1="5d168bcde6c904d5d16b5af8e734210d99ac591c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -73,7 +73,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-6388-00" size="0x20000" crc="f7c10823" sha1="5d168bcde6c904d5d16b5af8e734210d99ac591c" offset="0" />
+				<rom name="27-6388-00" size="0x20000" crc="f7c10823" sha1="5d168bcde6c904d5d16b5af8e734210d99ac591c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-6431-00" size="0x20000" crc="db628338" sha1="86d88f6a6f399e38cf332516407a0efdde36d4c2" offset="0" />
+				<rom name="27-6431-00" size="0x20000" crc="db628338" sha1="86d88f6a6f399e38cf332516407a0efdde36d4c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -104,7 +104,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5460-00" size="0x40000" crc="cbacea9d" sha1="d5659266ed25233080996c43ebf9ccb6156cd1cc" offset="0" />
+				<rom name="27-5460-00" size="0x40000" crc="cbacea9d" sha1="d5659266ed25233080996c43ebf9ccb6156cd1cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-5664-00" size="0x20000" crc="5afee6c1" sha1="578605d2649c1140f38dcaeae07a1d25f795a85e" offset="0" />
+				<rom name="27-5664-00" size="0x20000" crc="5afee6c1" sha1="578605d2649c1140f38dcaeae07a1d25f795a85e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -132,7 +132,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5777-00" size="0x40000" crc="d77e0d64" sha1="f368c6880475064b187e41b9802740f070cda7e2" offset="0" />
+				<rom name="27-5777-00" size="0x40000" crc="d77e0d64" sha1="f368c6880475064b187e41b9802740f070cda7e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -146,7 +146,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 		<part name="rom" interface="genius_rom">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5883-00" size="0x40000" crc="99214bce" sha1="75294fbc411b0b39b3db4727824faf29127675af" offset="0" />
+				<rom name="27-5883-00" size="0x40000" crc="99214bce" sha1="75294fbc411b0b39b3db4727824faf29127675af"/>
 			</dataarea>
 		</part>
 	</software>

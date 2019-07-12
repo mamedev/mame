@@ -158,7 +158,7 @@ void beezer_state::banked_map(address_map &map)
 	map(0x0600, 0x0600).mirror(0x1ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x0800, 0x080f).mirror(0x1f0).w(FUNC(beezer_state::palette_w));
 	map(0x0a00, 0x0a00).mirror(0x1ff).r(FUNC(beezer_state::line_r));
-	map(0x0e00, 0x0e0f).mirror(0x1f0).rw("via_u6", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0e00, 0x0e0f).mirror(0x1f0).m("via_u6", FUNC(via6522_device::map));
 	map(0x1000, 0x1fff).bankr("rombank_f1");
 	map(0x2000, 0x2fff).bankr("rombank_f3");
 	map(0x3000, 0x3fff).bankr("rombank_e1");
@@ -173,7 +173,7 @@ void beezer_state::sound_map(address_map &map)
 	map(0x0000, 0x07ff).ram(); // 0d
 	map(0x0800, 0x0fff).ram(); // 2d, optional (can be rom)
 	map(0x1000, 0x1007).mirror(0x07f8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0x1800, 0x180f).mirror(0x07f0).rw(m_via_audio, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1800, 0x180f).mirror(0x07f0).m(m_via_audio, FUNC(via6522_device::map));
 	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(beezer_state::dac_w));
 //  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
@@ -278,9 +278,9 @@ void beezer_state::palette_init(palette_device &device)
 
 WRITE8_MEMBER( beezer_state::palette_w )
 {
-	int r = combine_3_weights(m_weights_r, BIT(data, 0), BIT(data, 1), BIT(data, 2));
-	int g = combine_3_weights(m_weights_g, BIT(data, 3), BIT(data, 4), BIT(data, 5));
-	int b = combine_2_weights(m_weights_b, BIT(data, 6), BIT(data, 7));
+	int r = combine_weights(m_weights_r, BIT(data, 0), BIT(data, 1), BIT(data, 2));
+	int g = combine_weights(m_weights_g, BIT(data, 3), BIT(data, 4), BIT(data, 5));
+	int b = combine_weights(m_weights_b, BIT(data, 6), BIT(data, 7));
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }

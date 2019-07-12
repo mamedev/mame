@@ -34,6 +34,7 @@ public:
 		m_user_password_enable = (password != nullptr);
 	}
 
+	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; };
 protected:
 	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -79,6 +80,8 @@ private:
 	uint8_t           m_user_password_enable;
 	const uint8_t *   m_master_password;
 	const uint8_t *   m_user_password;
+	// DMA data transfer time for 1 sector
+	attotime          m_dma_transfer_time;
 };
 
 // ======================> ide_hdd_device

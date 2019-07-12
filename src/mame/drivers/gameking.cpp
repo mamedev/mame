@@ -67,7 +67,7 @@ private:
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	struct Gkio {
 		uint8_t input, input2;
@@ -239,7 +239,7 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
+DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -286,38 +286,39 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 }
 
 
-MACHINE_CONFIG_START(gameking_state::gameking)
+void gameking_state::gameking(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R65C02, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(gameking_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
+	R65C02(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gameking_state::gameking_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(gameking_state::gameking_frame_int));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(48, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 48-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gameking_state, screen_update_gameking)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(48, 32);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gameking_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load), this);
+}
 
-MACHINE_CONFIG_START(gameking_state::gameking1)
+void gameking_state::gameking1(machine_config &config)
+{
 	gameking(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
+}
 
-MACHINE_CONFIG_START(gameking_state::gameking3)
+void gameking_state::gameking3(machine_config &config)
+{
 	gameking(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
+	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
+}
 
 
 ROM_START(gameking)

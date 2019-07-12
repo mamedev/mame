@@ -13,9 +13,10 @@
 //#include "machine/imsc012.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
+#include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
 #include "machine/timekpr.h"
-//#include "machine/wd33c93.h"
+#include "machine/wd33c9x.h"
 
 class harriet_state : public driver_device
 {
@@ -30,7 +31,6 @@ public:
 private:
 	DECLARE_READ8_MEMBER(zpram_r);
 	DECLARE_WRITE8_MEMBER(zpram_w);
-	DECLARE_READ8_MEMBER(unk_status_r);
 
 	void harriet_map(address_map &map);
 
@@ -51,11 +51,6 @@ WRITE8_MEMBER(harriet_state::zpram_w)
 	m_zpram_data[offset] = data;
 }
 
-READ8_MEMBER(harriet_state::unk_status_r)
-{
-	return 0x81;
-}
-
 void harriet_state::harriet_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("monitor", 0);
@@ -64,9 +59,12 @@ void harriet_state::harriet_map(address_map &map)
 	map(0x7f0000, 0x7fffff).ram();
 	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0xf30000, 0xf30fff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
-	map(0xf4003f, 0xf4003f).r(FUNC(harriet_state::unk_status_r));
-	//map(0xf60000, 0xf6000f).rw("c012", FUNC(imsc012_device::read), FUNC(imsc012_device::write));
+	map(0xf30000, 0xf301ff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
+	map(0xf40000, 0xf4003f).rw("scsia:7:wdc", FUNC(wd33c93_device::dir_r), FUNC(wd33c93_device::dir_w)).umask16(0x00ff);
+	//map(0xf60000, 0xf60007).rw("c012", FUNC(imsc012_device::read), FUNC(imsc012_device::write)).umask16(0x00ff);
+	map(0xf60006, 0xf60007).nopr();
+	map(0xfa0000, 0xfa0001).nopr();
+	map(0xfb0000, 0xfb0001).noprw();
 }
 
 static INPUT_PORTS_START( harriet )
@@ -101,14 +99,16 @@ void harriet_state::harriet(machine_config &config)
 
 	HD63450(config, "dmac", 40_MHz_XTAL / 4, "maincpu"); // MC68450R10 (or HD68450Y-10)
 
-	M48T02(config, "timekpr", 0);
+	M48T02(config, "timekpr");
 	NVRAM(config, "zpram", nvram_device::DEFAULT_ALL_0); // MK48Z02
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("mfp", FUNC(mc68901_device::write_rx));
 	rs232.rxd_handler().append("mfp", FUNC(mc68901_device::tbi_w));
 
-	//WD33C93(config, "wdca", 40_MHz_XTAL / 4);
+	NSCSI_BUS(config, "scsia");
+	NSCSI_CONNECTOR(config, "scsia:7").option_set("wdc", WD33C93A).clock(40_MHz_XTAL / 4);
+
 	//WD33C93(config, "wdcb", 40_MHz_XTAL / 4);
 	//IMSC012(config, "c012", 40_MHz_XTAL / 8); // INMOS IMSC012-P20S link adaptor
 }

@@ -20,18 +20,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_LDV1000_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PIONEER_LDV1000, 0)
-
-#define MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(_cb) \
-	downcast<pioneer_ldv1000_device *>(device)->set_command_strobe_callback(DEVCB_##_cb);
-
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -51,9 +39,9 @@ class pioneer_ldv1000_device : public laserdisc_device
 {
 public:
 	// construction/destruction
-	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class cmd_strobe_cb> devcb_base &set_command_strobe_callback(cmd_strobe_cb &&latch) { return m_command_strobe_cb.set_callback(std::forward<cmd_strobe_cb>(latch)); }
+	auto command_strobe_callback() { return m_command_strobe_cb.bind(); }
 
 	// input and output
 	void data_w(uint8_t data);

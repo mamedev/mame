@@ -40,80 +40,80 @@
 #ifndef NLD_MS_W_H_
 #define NLD_MS_W_H_
 
-#include <algorithm>
-
-#include "nld_solver.h"
 #include "nld_matrix_solver.h"
-#include "vector_base.h"
+#include "nld_solver.h"
+#include "plib/vector_ops.h"
+
+#include <algorithm>
 
 namespace netlist
 {
 	namespace devices
 	{
-//#define nl_ext_double _float128 // slow, very slow
-//#define nl_ext_double long double // slightly slower
-#define nl_ext_double nl_double
 
-template <std::size_t m_N, std::size_t storage_N>
+template <typename FT, int SIZE>
 class matrix_solver_w_t: public matrix_solver_t
 {
 	friend class matrix_solver_t;
+
 public:
+	using float_ext_type = FT;
+	using float_type = FT;
 
-	matrix_solver_w_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	// FIXME: dirty hack to make this compile
+	static constexpr const std::size_t storage_N = 100;
 
-	virtual ~matrix_solver_w_t() override;
+	matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
 
-	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual void reset() override { matrix_solver_t::reset(); }
+	void vsetup(analog_net_t::list_t &nets) override;
+	void reset() override { matrix_solver_t::reset(); }
 
 protected:
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 	unsigned solve_non_dynamic(const bool newton_raphson);
 
-	constexpr std::size_t N() const { return (m_N == 0) ? m_dim : m_N; }
+	constexpr std::size_t size() const { return m_dim; }
 
 	void LE_invert();
 
 	template <typename T>
-	void LE_compute_x(T * RESTRICT x);
+	void LE_compute_x(T & x);
 
 
 	template <typename T1, typename T2>
-	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
+	float_ext_type &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
 	template <typename T1, typename T2>
-	inline nl_ext_double &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
+	float_ext_type &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
 
 	/* access to Ainv for fixed columns over row, there store transposed */
 	template <typename T1, typename T2>
-	inline nl_ext_double &Ainv(const T1 &r, const T2 &c) { return m_Ainv[c][r]; }
+	float_ext_type &Ainv(const T1 &r, const T2 &c) { return m_Ainv[c][r]; }
 	template <typename T1>
-	inline nl_ext_double &RHS(const T1 &r) { return m_RHS[r]; }
+	float_ext_type &RHS(const T1 &r) { return m_RHS[r]; }
 
 
 	template <typename T1, typename T2>
-	inline nl_ext_double &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
+	float_ext_type &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
 
-	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
 private:
 	static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
-	nl_ext_double m_A[storage_N][m_pitch];
-	nl_ext_double m_Ainv[storage_N][m_pitch];
-	nl_ext_double m_W[storage_N][m_pitch];
-	nl_ext_double m_RHS[storage_N]; // right hand side - contains currents
+	float_ext_type m_A[storage_N][m_pitch];
+	float_ext_type m_Ainv[storage_N][m_pitch];
+	float_ext_type m_W[storage_N][m_pitch];
+	std::array<float_ext_type, storage_N> m_RHS; // right hand side - contains currents
 
-	nl_ext_double m_lA[storage_N][m_pitch];
+	float_ext_type m_lA[storage_N][m_pitch];
 
 	/* temporary */
-	nl_double H[storage_N][m_pitch] ;
-	unsigned rows[storage_N];
+	float_type H[storage_N][m_pitch] ;
+	std::array<unsigned, storage_N> rows;
 	unsigned cols[storage_N][m_pitch];
-	unsigned colcount[storage_N];
+	std::array<unsigned, storage_N> colcount;
 
 	unsigned m_cnt;
 
-	//nl_ext_double m_RHSx[storage_N];
+	//float_ext_type m_RHSx[storage_N];
 
 	const std::size_t m_dim;
 
@@ -123,28 +123,22 @@ private:
 // matrix_solver_direct
 // ----------------------------------------------------------------------------------------
 
-template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_w_t<m_N, storage_N>::~matrix_solver_w_t()
-{
-}
-
-template <std::size_t m_N, std::size_t storage_N>
-void matrix_solver_w_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
+template <typename FT, int SIZE>
+void matrix_solver_w_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_t::setup_base(nets);
 
-	netlist().save(*this, m_last_RHS, "m_last_RHS");
-
-	for (unsigned k = 0; k < N(); k++)
-		netlist().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
+	// FIXME: This shouldn't be necessary, recalculate on each entry ...
+	for (std::size_t k = 0; k < size(); k++)
+		state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
 }
 
 
 
-template <std::size_t m_N, std::size_t storage_N>
-void matrix_solver_w_t<m_N, storage_N>::LE_invert()
+template <typename FT, int SIZE>
+void matrix_solver_w_t<FT, SIZE>::LE_invert()
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 
 	for (std::size_t i = 0; i < kN; i++)
 	{
@@ -159,18 +153,18 @@ void matrix_solver_w_t<m_N, storage_N>::LE_invert()
 	for (std::size_t i = 0; i < kN; i++)
 	{
 		/* FIXME: Singular matrix? */
-		const nl_double f = 1.0 / W(i,i);
-		const auto * RESTRICT const p = m_terms[i]->m_nzrd.data();
+		const float_type f = 1.0 / W(i,i);
+		const auto * const p = m_terms[i]->m_nzrd.data();
 		const size_t e = m_terms[i]->m_nzrd.size();
 
 		/* Eliminate column i from row j */
 
-		const auto * RESTRICT const pb = m_terms[i]->m_nzbd.data();
+		const auto * const pb = m_terms[i]->m_nzbd.data();
 		const size_t eb = m_terms[i]->m_nzbd.size();
 		for (std::size_t jb = 0; jb < eb; jb++)
 		{
 			const auto j = pb[jb];
-			const nl_double f1 = - W(j,i) * f;
+			const float_type f1 = - W(j,i) * f;
 			if (f1 != 0.0)
 			{
 				for (std::size_t k = 0; k < e; k++)
@@ -184,10 +178,10 @@ void matrix_solver_w_t<m_N, storage_N>::LE_invert()
 	for (std::size_t i = kN; i-- > 0; )
 	{
 		/* FIXME: Singular matrix? */
-		const nl_double f = 1.0 / W(i,i);
+		const float_type f = 1.0 / W(i,i);
 		for (std::size_t j = i; j-- > 0; )
 		{
-			const nl_double f1 = - W(j,i) * f;
+			const float_type f1 = - W(j,i) * f;
 			if (f1 != 0.0)
 			{
 				for (std::size_t k = i; k < kN; k++)
@@ -203,19 +197,19 @@ void matrix_solver_w_t<m_N, storage_N>::LE_invert()
 	}
 }
 
-template <std::size_t m_N, std::size_t storage_N>
+template <typename FT, int SIZE>
 template <typename T>
-void matrix_solver_w_t<m_N, storage_N>::LE_compute_x(
-		T * RESTRICT x)
+void matrix_solver_w_t<FT, SIZE>::LE_compute_x(
+		T & x)
 {
-	const std::size_t kN = N();
+	const std::size_t kN = size();
 
 	for (std::size_t i=0; i<kN; i++)
 		x[i] = 0.0;
 
 	for (std::size_t k=0; k<kN; k++)
 	{
-		const nl_double f = RHS(k);
+		const float_type f = RHS(k);
 
 		for (std::size_t i=0; i<kN; i++)
 			x[i] += Ainv(i,k) * f;
@@ -223,14 +217,14 @@ void matrix_solver_w_t<m_N, storage_N>::LE_compute_x(
 }
 
 
-template <std::size_t m_N, std::size_t storage_N>
-unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
+template <typename FT, int SIZE>
+unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphson)
 {
-	const auto iN = N();
+	const auto iN = size();
 
-	nl_double new_V[storage_N]; // = { 0.0 };
+	std::array<float_type, storage_N> new_V; // = { 0.0 };
 
-	if ((m_cnt % 100) == 0)
+	if ((m_cnt % 50) == 0)
 	{
 		/* complete calculation */
 		this->LE_invert();
@@ -266,7 +260,7 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 			/* construct w = transform(V) * y
 			 * dim: rowcount x iN
 			 * */
-			nl_double w[storage_N];
+			std::array<float_type, storage_N> w;
 			for (unsigned i = 0; i < rowcount; i++)
 			{
 				const unsigned r = rows[i];
@@ -287,7 +281,7 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 				for (unsigned k=0; k< colcount[i]; k++)
 				{
 					const unsigned col = cols[i][k];
-					nl_double f = VT(rows[i],col);
+					float_type f = VT(rows[i],col);
 					if (f!=0.0)
 						for (unsigned j= 0; j < rowcount; j++)
 							H[i][j] += f * Ainv(col,rows[j]);
@@ -297,16 +291,16 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 			for (unsigned i = 0; i < rowcount; i++)
 			{
 				if (H[i][i] == 0.0)
-					printf("%s H singular\n", this->name().c_str());
-				const nl_double f = 1.0 / H[i][i];
+					plib::perrlogger("{} H singular\n", this->name());
+				const float_type f = 1.0 / H[i][i];
 				for (unsigned j = i+1; j < rowcount; j++)
 				{
-					const nl_double f1 = - f * H[j][i];
+					const float_type f1 = - f * H[j][i];
 
 					if (f1!=0.0)
 					{
-						nl_double *pj = &H[j][i+1];
-						const nl_double *pi = &H[i][i+1];
+						float_type *pj = &H[j][i+1];
+						const float_type *pi = &H[i][i+1];
 						for (unsigned k = 0; k < rowcount-i-1; k++)
 							pj[k] += f1 * pi[k];
 							//H[j][k] += f1 * H[i][k];
@@ -316,12 +310,12 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 			}
 			/* Back substitution */
 			//inv(H) w = t     w = H t
-			nl_double t[storage_N];  // FIXME: convert to member
+			std::array<float_type, storage_N> t;  // FIXME: convert to member
 			for (unsigned j = rowcount; j-- > 0; )
 			{
-				nl_double tmp = 0;
-				const nl_double *pj = &H[j][j+1];
-				const nl_double *tj = &t[j+1];
+				float_type tmp = 0;
+				const float_type *pj = &H[j][j+1];
+				const float_type *tj = &t[j+1];
 				for (unsigned k = 0; k < rowcount-j-1; k++)
 					tmp += pj[k] * tj[k];
 					//tmp += H[j][k] * t[k];
@@ -331,7 +325,7 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 			/* x = y - Zt */
 			for (unsigned i=0; i<iN; i++)
 			{
-				nl_double tmp = 0.0;
+				float_type tmp = 0.0;
 				for (unsigned j=0; j<rowcount;j++)
 				{
 					const unsigned row = rows[j];
@@ -343,47 +337,40 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 	}
 	m_cnt++;
 
-	if (0)
+	if (false)
 		for (unsigned i=0; i<iN; i++)
 		{
-			nl_double tmp = 0.0;
+			float_type tmp = 0.0;
 			for (unsigned j=0; j<iN; j++)
 			{
 				tmp += A(i,j) * new_V[j];
 			}
 			if (std::abs(tmp-RHS(i)) > 1e-6)
-				printf("%s failed on row %d: %f RHS: %f\n", this->name().c_str(), i, std::abs(tmp-RHS(i)), RHS(i));
+				plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, std::abs(tmp-RHS(i)), RHS(i));
 		}
 
-	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
+	const float_type err = (newton_raphson ? delta(new_V) : 0.0);
 	store(new_V);
 	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
-template <std::size_t m_N, std::size_t storage_N>
-inline unsigned matrix_solver_w_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+template <typename FT, int SIZE>
+unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 {
-	build_LE_A<matrix_solver_w_t>();
-	build_LE_RHS<matrix_solver_w_t>();
-
-	for (std::size_t i=0, iN=N(); i < iN; i++)
-		m_last_RHS[i] = RHS(i);
+	this->build_LE_A(*this);
+	this->build_LE_RHS(*this);
 
 	this->m_stat_calculations++;
 	return this->solve_non_dynamic(newton_raphson);
 }
 
-template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_w_t<m_N, storage_N>::matrix_solver_w_t(netlist_t &anetlist, const pstring &name,
+template <typename FT, int SIZE>
+matrix_solver_w_t<FT, SIZE>::matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
-: matrix_solver_t(anetlist, name, NOSORT, params)
-	,m_cnt(0)
+	: matrix_solver_t(anetlist, name, NOSORT, params)
+	, m_cnt(0)
 	, m_dim(size)
 {
-	for (std::size_t k = 0; k < N(); k++)
-	{
-		m_last_RHS[k] = 0.0;
-	}
 }
 
 	} //namespace devices

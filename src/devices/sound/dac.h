@@ -258,13 +258,14 @@ DECLARE_DEVICE_TYPE(_dac_type, _dac_class) \
 class _dac_class : public dac_generator<_dac_interface, _dac_coding> \
 {\
 public: \
-	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : \
+	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) : \
 		dac_generator(mconfig, _dac_type, tag, owner, clock, _dac_gain) {} \
 }; \
 DAC_GENERATOR_EPILOG(_dac_type, _dac_class, _dac_description, _dac_shortname)
 
 // DAC chips
 DAC_GENERATOR(AD557, ad557_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD557", "ad557")
+DAC_GENERATOR(AD558, ad558_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD558", "ad558")
 DAC_GENERATOR(AD7224, ad7224_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7224", "ad7224")
 DAC_GENERATOR(AD7521, ad7521_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AD7521", "ad7521")
 DAC_GENERATOR(AD7523, ad7523_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7523", "ad7523")

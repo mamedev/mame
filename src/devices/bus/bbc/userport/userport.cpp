@@ -89,10 +89,10 @@ void bbc_userport_slot_device::device_reset()
 //  pb_r
 //-------------------------------------------------
 
-READ8_MEMBER(bbc_userport_slot_device::pb_r)
+uint8_t bbc_userport_slot_device::pb_r()
 {
 	if (m_device)
-		return m_device->pb_r(space, 0);
+		return m_device->pb_r();
 	else
 		return 0xff;
 }
@@ -102,10 +102,10 @@ READ8_MEMBER(bbc_userport_slot_device::pb_r)
 //  pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(bbc_userport_slot_device::pb_w)
+void bbc_userport_slot_device::pb_w(uint8_t data)
 {
 	if (m_device)
-		m_device->pb_w(space, 0, data);
+		m_device->pb_w(data);
 }
 
 
@@ -116,16 +116,21 @@ WRITE8_MEMBER(bbc_userport_slot_device::pb_w)
 
 // slot devices
 #include "beebspch.h"
+//#include "digitiser.h"
 #include "pointer.h"
+#include "usersplit.h"
 #include "cfa3000kbd.h"
 
 
 void bbc_userport_devices(device_slot_interface &device)
 {
 	device.option_add("amxmouse",   BBC_AMXMOUSE);        /* AMX Mouse */
+	//device.option_add("atr",        BBC_ATR);             /* Advanced Teletext Receiver (GIS) */
 	device.option_add("beebspch",   BBC_BEEBSPCH);        /* Beeb Speech Synthesiser (Watford Electronics) */
+	//device.option_add("beebvdig",   BBC_BEEBVDIG);        /* Beeb Video Digitiser (Watford Electronics) */
 	device.option_add("m512mouse",  BBC_M512MOUSE);       /* Acorn Mouse (provided with Master 512) */
 	device.option_add("tracker",    BBC_TRACKER);         /* Marconi RB2 Tracker Ball / Acorn Tracker Ball */
-//  device.option_add("music4000",  BBC_MUSIC4000);       /* Hybrid Music 4000 Keyboard */
+	device.option_add("usersplit",  BBC_USERSPLIT);       /*User Port Splitter (Watford Electronics) */
+	//device.option_add("music4000",  BBC_MUSIC4000);       /* Hybrid Music 4000 Keyboard */
 	device.option_add("cfa3000kbd", CFA3000_KBD);         /* Henson CFA 3000 Keyboard */
 }

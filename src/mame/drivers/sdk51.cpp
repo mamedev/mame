@@ -45,9 +45,9 @@ private:
 	void datamem_map(address_map &map);
 	void mem0_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(psen_r);
-	DECLARE_READ8_MEMBER(datamem_r);
-	DECLARE_WRITE8_MEMBER(datamem_w);
+	u8 psen_r(offs_t offset);
+	u8 datamem_r(offs_t offset);
+	void datamem_w(offs_t offset, u8 data);
 
 	u8 brkmem_r(offs_t offset);
 	void brkmem_w(offs_t offset, u8 data);
@@ -73,19 +73,19 @@ private:
 	bool m_display_clock;
 };
 
-READ8_MEMBER(sdk51_state::psen_r)
+u8 sdk51_state::psen_r(offs_t offset)
 {
-	return m_progmem->read8(space, offset);
+	return m_progmem->read8(offset);
 }
 
-READ8_MEMBER(sdk51_state::datamem_r)
+u8 sdk51_state::datamem_r(offs_t offset)
 {
-	return m_datamem->read8(space, offset);
+	return m_datamem->read8(offset);
 }
 
-WRITE8_MEMBER(sdk51_state::datamem_w)
+void sdk51_state::datamem_w(offs_t offset, u8 data)
 {
-	m_datamem->write8(space, offset, data);
+	m_datamem->write8(offset, data);
 }
 
 u8 sdk51_state::brkmem_r(offs_t offset)
@@ -280,7 +280,7 @@ void sdk51_state::sdk51(machine_config &config)
 	m_mem0->set_addr_width(14);
 	m_mem0->set_stride(0x2000);
 
-	I8041(config, m_upi, 6_MHz_XTAL);
+	I8041A(config, m_upi, 6_MHz_XTAL);
 	m_upi->p1_in_cb().set(FUNC(sdk51_state::upibus_r));
 	m_upi->p1_out_cb().set(FUNC(sdk51_state::upibus_w));
 	m_upi->p2_in_cb().set("upiexp", FUNC(i8243_device::p2_r));

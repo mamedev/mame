@@ -21,7 +21,7 @@ public:
 	u8 *ram() { return &m_ram[0]; }
 
 	virtual u8 read_cpu_bus(int offset);
-	virtual void write_cpu_bus(int offset, uint8_t data);
+	virtual void write_cpu_bus(int offset, u8 data);
 
 	void irq_hold();
 	void halt_assert();

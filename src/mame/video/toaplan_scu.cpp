@@ -29,7 +29,7 @@ GFXDECODE_MEMBER( toaplan_scu_device::gfxinfo )
 GFXDECODE_END
 
 
-toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TOAPLAN_SCU, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 {
@@ -52,38 +52,35 @@ void toaplan_scu_device::alloc_sprite_bitmap(screen_device &screen)
     Sprite Handlers
 ***************************************************************************/
 
-void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, uint16_t* spriteram, uint32_t bytes )
+void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u16* spriteram, u32 bytes)
 {
-	int offs;
-	m_temp_spritebitmap.fill(0,cliprect);
+	m_temp_spritebitmap.fill(0, cliprect);
 
-	for (offs = 0;offs < bytes/2;offs += 4)
+	for (int offs = 0; offs < bytes / 2; offs += 4)
 	{
-		int attribute,sx,sy,flipx,flipy;
-		int sprite, color;
-
-		attribute = spriteram[offs + 1];
-		int priority = (attribute & 0x0c00)>>10;
+		const u16 attribute = spriteram[offs + 1];
+		const int priority  = (attribute & 0x0c00) >> 10;
 
 		// are 0 priority really skipped, or can they still mask?
 		if (!priority) continue;
 
-		sy = spriteram[offs + 3] >> 7;
-		if (sy != 0x0100) {     /* sx = 0x01a0 or 0x0040*/
-			sprite = spriteram[offs] & 0x7ff;
-			color  = attribute & 0x3f;
+		const int sy = spriteram[offs + 3] >> 7;
+		if (sy != 0x0100)     /* sx = 0x01a0 or 0x0040*/
+		{
+			const u32 sprite = spriteram[offs] & 0x7ff;
+			u32 color        = attribute & 0x3f;
 			color |= priority << 6; // encode colour
 
-			sx = spriteram[offs + 2] >> 7;
-			flipx = attribute & 0x100;
-			if (flipx) sx -= m_xoffs_flipped;
+			int sx          = spriteram[offs + 2] >> 7;
+			const int flipx = attribute & 0x100;
+			if (flipx) sx  -= m_xoffs_flipped;
 
-			flipy = attribute & 0x200;
-			gfx(0)->transpen_raw(m_temp_spritebitmap,cliprect,
+			const int flipy = attribute & 0x200;
+			gfx(0)->transpen_raw(m_temp_spritebitmap, cliprect,
 				sprite,
 				color << 4 /* << 4 because using _raw */ ,
-				flipx,flipy,
-				sx-m_xoffs,sy-16,0);
+				flipx, flipy,
+				sx - m_xoffs, sy - 16, 0);
 		}
 	}
 
@@ -91,28 +88,27 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u
 
 
 /***************************************************************************
-    Draw the game screen in the given bitmap_ind16.
+    Draw the game screen in the given bitmap.
 ***************************************************************************/
 
-void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
 {
-	int y, x;
-	int colourbase = gfx(0)->colorbase();
+	const pen_t *pens = &palette().pen(gfx(0)->colorbase());
 
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t* srcline = &m_temp_spritebitmap.pix16(y);
-		uint16_t* dstline = &bitmap.pix16(y);
+		u16 *srcline = &m_temp_spritebitmap.pix16(y);
+		u32 *dstline = &bitmap.pix32(y);
 
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t pix = srcline[x];
+			const u16 pix = srcline[x];
 
-			if ( (pix>>(4+6)) == priority )
+			if ((pix >> (4 + 6)) == priority)
 			{
-				if (pix&0xf)
+				if (pix & 0xf)
 				{
-					dstline[x] = (pix & 0x3ff)+colourbase;
+					dstline[x] = pens[pix & 0x3ff];
 				}
 			}
 		}

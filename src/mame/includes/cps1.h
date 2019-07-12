@@ -197,7 +197,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
-	IRQ_CALLBACK_MEMBER(cps1_int_ack);
+	void cpu_space_map(address_map &map);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
@@ -236,6 +236,7 @@ public:
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
+	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer_w);
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);

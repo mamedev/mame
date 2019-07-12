@@ -122,7 +122,7 @@ public:
 	void init_neocdz();
 	void init_neocdzj();
 
-	IRQ_CALLBACK_MEMBER(int_callback);
+	uint8_t cdc_irq_ack();
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
 	std::unique_ptr<uint8_t[]> m_sprite_ram;
@@ -132,6 +132,7 @@ public:
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
 	void neocd_main_map(address_map &map);
+	void neocd_vector_map(address_map &map);
 	void neocd_ym_map(address_map &map);
 
 protected:
@@ -899,6 +900,12 @@ void ngcd_state::neocd_main_map(address_map &map)
 	map(0xff0200, 0xffffff).r(FUNC(ngcd_state::unmapped_r));
 }
 
+void ngcd_state::neocd_vector_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff9, 0xfffff9).r(FUNC(ngcd_state::cdc_irq_ack));
+}
+
 
 /*************************************
  *
@@ -958,17 +965,14 @@ INPUT_PORTS_END
 
 /* NeoCD uses custom vectors on IRQ4 to handle various events from the CDC */
 
-IRQ_CALLBACK_MEMBER(ngcd_state::int_callback)
+uint8_t ngcd_state::cdc_irq_ack()
 {
-	if (irqline==4)
-	{
-		if (get_irq_vector_ack()) {
-			set_irq_vector_ack(0);
-			return get_irq_vector();
-		}
+	if (get_irq_vector_ack()) {
+		set_irq_vector_ack(0);
+		return get_irq_vector();
 	}
 
-	return (0x60+irqline*4)/4;
+	return (0x60+4*4)/4;
 }
 
 void ngcd_state::interrupt_callback_type1(void)
@@ -1033,23 +1037,24 @@ uint32_t ngcd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 
-MACHINE_CONFIG_START(ngcd_state::neocd)
+void ngcd_state::neocd(machine_config &config)
+{
 	neogeo_base(config);
 	neogeo_stereo(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_main_map);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ngcd_state::int_callback), this));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &ngcd_state::neocd_vector_map);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &ngcd_state::neocd_audio_io_map);
 
 	subdevice<hc259_device>("systemlatch")->q_out_cb<1>().set_log("NeoCD: write to regular vector change address?"); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update)
+	m_screen->set_screen_update(FUNC(ngcd_state::screen_update));
 
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
+	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
 	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
 	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
@@ -1057,15 +1062,14 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_controls, "joy", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("neocd_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","neocd")
+	CDROM(config, "cdrom").set_interface("neocd_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_type("neocd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
 	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1087,7 +1091,7 @@ ROM_START( neocd )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
 
-	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 
@@ -1101,7 +1105,7 @@ ROM_START( neocdz )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	/* 2MB of 68K RAM */
 
-	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 

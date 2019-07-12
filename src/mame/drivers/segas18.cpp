@@ -211,7 +211,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 		// I/O chip
 		case 0x0000/2:
 		case 0x1000/2:
-			return m_io->read(space, offset) | (open_bus_r(space, 0, mem_mask) & 0xff00);
+			return m_io->read(space, offset) | (open_bus_r(space) & 0xff00);
 
 		// video control latch
 		case 0x2000/2:
@@ -224,7 +224,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 WRITE16_MEMBER( segas18_state::misc_io_w )
@@ -356,7 +356,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 		case 0x3024/2:
 			return ioport("EXSERVICE")->read();
 	}
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -380,7 +380,7 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 			m_lghost_value <<= 1;
 			return result;
 	}
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
@@ -584,7 +584,7 @@ READ16_MEMBER( segas18_state::wwally_custom_io_r )
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
 		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
 
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -1342,7 +1342,7 @@ void segas18_state::system18(machine_config &config)
 	m_vdp->lv6_irq().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
 	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
 	m_vdp->set_alt_timing(1);
-	m_vdp->set_pal_write_base(0x2000);
+	m_vdp->set_pal_write_base(0x1000);
 	m_vdp->set_palette(m_palette);
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.0);
 
@@ -1357,7 +1357,7 @@ void segas18_state::system18(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas18);
-	PALETTE(config, m_palette).set_entries(2048*3+2048 + 64*3);
+	PALETTE(config, m_palette).set_entries(2048*2 + 64*3);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -2749,6 +2749,9 @@ ROM_END
     Moonwalker, Sega System 18
     CPU: FD1094 (317-0158)
     ROM Board: 171-5873B
+   Main board: 837-7530-01
+      Game BD: 833-7528-01 MOONWALKER
+    ROM Board: 834-7529-01
 */
 ROM_START( mwalku )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom cpu 317-0158
@@ -3019,6 +3022,9 @@ ROM_END
     Wally wo Sagase! (Where's Wally?), Sega System 18
     CPU: FD1094 317-0197B
     ROM Board: 171-5873B
+   Main board: 837-8777-01
+      Game BD: 833-8775-01 WALLY
+    ROM Board: 834-8776-01
 */
 ROM_START( wwallyj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197B

@@ -9,7 +9,7 @@ m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *ta
 	device_t(mconfig, M24_Z8000, tag, owner, clock),
 	m_z8000(*this, "z8000"),
 	m_maincpu(*this, ":maincpu"),
-	m_pic(*this, ":mb:pic8259"),
+	m_pic(*this, ":pic"),
 	m_halt_out(*this),
 	m_z8000_halt(true)
 {
@@ -187,7 +187,7 @@ IRQ_CALLBACK_MEMBER(m24_z8000_device::int_cb)
 {
 	if (!irqline)
 	{
-		m_z8000->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_z8000->set_input_line(z8001_device::NVI_LINE, CLEAR_LINE);
 		return 0xff; // NVI, value ignored
 	}
 	else
@@ -227,5 +227,5 @@ WRITE_LINE_MEMBER(m24_z8000_device::mo_w)
 WRITE_LINE_MEMBER(m24_z8000_device::timer_irq_w)
 {
 	m_timer_irq = state ? true : false;
-	m_z8000->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_z8000->set_input_line(z8001_device::NVI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -61,10 +61,11 @@
 		else
 			_p(2, '<Keyword>Win32Proj</Keyword>')
 		end
-		if _ACTION:sub(3) == "2015" or _ACTION:sub(3) == "2017" then
+		if _ACTION:sub(3) == "2015" or _ACTION:sub(3) == "2017" or _ACTION:sub(3) == "llvm" then
 			_p(2,'<PreferredToolArchitecture>x64</PreferredToolArchitecture>')
 		end
-		if _ACTION:sub(3) == "2017" and os.isdir(path.join(os.getenv("VSINSTALLDIR"), "VC/Tools/MSVC/14.14.26428")) then
+		if (_ACTION:sub(3) == "2017" or _ACTION:sub(3) == "llvm")
+		and os.isdir(path.join(os.getenv("VSINSTALLDIR"), "VC/Tools/MSVC/14.14.26428")) then
 			_p(2,'<VCToolsVersion>14.14.26428</VCToolsVersion>')
 		end
 
@@ -461,8 +462,12 @@
 		floating_point(cfg)
 		debug_info(cfg)
 
+		if _ACTION:sub(3) == "llvm" then
+			_p(3,'<SupportJustMyCode>false</SupportJustMyCode>')
+		end
+
 		if  cfg.flags.Symbols
-		and _ACTION:sub(3) ~= "2017"
+		and _ACTION:sub(3) ~= "2017" and _ACTION:sub(3) ~= "llvm"
 		then
 			_p(3, '<ProgramDataBaseFileName>$(OutDir)%s.pdb</ProgramDataBaseFileName>'
 				, path.getbasename(cfg.buildtarget.name)
@@ -518,13 +523,16 @@
 		end
 	end
 
-	local function item_def_lib(cfg)
+	local function item_def_lib(prj, cfg)
 		-- The Xbox360 project files are stored in another place in the project file.
 		if cfg.kind == 'StaticLib' and cfg.platform ~= "Xbox360" then
 			_p(1,'<Lib>')
 				_p(2,'<OutputFile>$(OutDir)%s</OutputFile>',cfg.buildtarget.name)
 				additional_options(2,cfg)
 				link_target_machine(2,cfg)
+				if _ACTION:sub(3) == "llvm" and prj.name == "portaudio" then -- MSVC-LLVM needs special help
+					_p(2,'<AdditionalDependencies>ksuser.lib;%%(AdditionalDependencies)</AdditionalDependencies>')
+				end
 			_p(1,'</Lib>')
 		end
 	end
@@ -596,10 +604,12 @@
 	function vc2010.link(cfg)
 		_p(2,'<Link>')
 		_p(3,'<SubSystem>%s</SubSystem>', iif(cfg.kind == "ConsoleApp", "Console", "Windows"))
-		_p(3,'<GenerateDebugInformation>%s</GenerateDebugInformation>', tostring(cfg.flags.Symbols ~= nil))
+		_p(3,'<GenerateDebugInformation>%s</GenerateDebugInformation>',
+			iif(cfg.flags.Symbols ~= nil, iif(_ACTION:sub(3) ~= "llvm", "true", "DebugFull"), "false")
+			)
 
 		if  cfg.flags.Symbols
-		and _ACTION:sub(3) == "2017"
+		and (_ACTION:sub(3) == "2017" or _ACTION:sub(3) == "llvm")
 		then
 			_p(3, '<ProgramDataBaseFileName>$(OutDir)%s.pdb</ProgramDataBaseFileName>'
 				, path.getbasename(cfg.buildtarget.name)
@@ -686,7 +696,7 @@
 					,premake.esc(cfginfo.name))
 				vs10_clcompile(cfg)
 				resource_compile(cfg)
-				item_def_lib(cfg)
+				item_def_lib(prj, cfg)
 				vc2010.link(cfg)
 				event_hooks(cfg)
 				vs10_masm(prj, cfg)

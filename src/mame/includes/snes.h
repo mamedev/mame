@@ -421,7 +421,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(snes_w_bank1);
 	DECLARE_WRITE8_MEMBER(snes_w_bank2);
 	uint8_t snes_open_bus_r();
-	DECLARE_READ8_MEMBER(snes_open_bus_r);
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
 	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);
@@ -430,8 +429,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(snes_scanline_tick);
 	TIMER_CALLBACK_MEMBER(snes_hblank_tick);
 	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_snes_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_sufami_cart);
 	void snes_init_timers();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

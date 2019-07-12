@@ -43,10 +43,10 @@ ToDo:
 - Need software that does more than plain text (such as games)
 - Add masking feature (only used for the UARTs)
 - Connect devices to the above hardware
-- Fix the display
 - Dump Telcon and Gemini BIOSes
 - Emulate the Co-Power-88 expansion (allows PC-DOS, CP/M-86, etc. to be used)
 - Probably lots of other things
+- Press F3 and screen turns into garbage. This breakage started in the 0.198 to 0.199 cycle.
 
 
 *************************************************************************************************************/
@@ -132,29 +132,28 @@ GFXDECODE_END
 } // anonymous namespace
 
 
-MACHINE_CONFIG_START(zorba_state::zorba)
+void zorba_state::zorba(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zorba_state::zorba_mem);
 	m_maincpu->set_addrmap(AS_IO, &zorba_state::zorba_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_zorba)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(50);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_zorba);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq0")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<0>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq1")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<1>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq2")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<2>))
+	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set(FUNC(zorba_state::irq_w<0>));
+	INPUT_MERGER_ANY_HIGH(config, "irq1").output_handler().set(FUNC(zorba_state::irq_w<1>));
+	INPUT_MERGER_ANY_HIGH(config, "irq2").output_handler().set(FUNC(zorba_state::irq_w<2>));
 
 	/* devices */
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
@@ -167,20 +166,20 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	m_dma->in_iorq_callback().set(FUNC(zorba_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(zorba_state::io_write_byte));
 
-	I8251(config, m_uart0, 0); // U32 COM port J2
+	I8251(config, m_uart0, 24_MHz_XTAL / 12); // U32 COM port J2
 	m_uart0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd)); // TODO: this line has a LED attached
 	m_uart0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_uart0->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<1>));
 	m_uart0->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<0>));
 
-	I8251(config, m_uart1, 0); // U31 printer port J3
+	I8251(config, m_uart1, 24_MHz_XTAL / 12); // U31 printer port J3
 	m_uart1->txd_handler().set("serprn", FUNC(rs232_port_device::write_txd));
 	m_uart1->rts_handler().set("serprn", FUNC(rs232_port_device::write_rts));
 	m_uart1->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<3>));
 	m_uart1->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<2>));
 
-	I8251(config, m_uart2, 0); // U30 serial keyboard J6
+	I8251(config, m_uart2, 24_MHz_XTAL / 12); // U30 serial keyboard J6
 	m_uart2->txd_handler().set("keyboard", FUNC(zorba_keyboard_device::txd_w));
 	m_uart2->rxrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<5>));
 	m_uart2->txrdy_handler().set(FUNC(zorba_state::tx_rx_rdy_w<4>));
@@ -215,25 +214,24 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	pit.out_handler<2>().append(m_uart2, FUNC(i8251_device::write_rxc));
 
 	// CRTC
-	MCFG_DEVICE_ADD(m_crtc, I8275, 14.318'181_MHz_XTAL / 7)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE("irq0", input_merger_device, in_w<1>))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 8); // TODO: character clock divider is 9 during HRTC
+	m_crtc->set_character_width(8);
+	m_crtc->set_refresh_hack(true);
+	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
+	m_crtc->irq_wr_callback().set("irq0", FUNC(input_merger_device::in_w<1>));
+	m_crtc->set_screen("screen");
 
 	// Floppies
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// J1 IEEE-488
-	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_pia1, pia6821_device, ca2_w)) // TODO: gated with PB1 from PIA
+	IEEE488(config, m_ieee);
+	m_ieee->srq_callback().set(m_pia1, FUNC(pia6821_device::ca2_w)); // TODO: gated with PB1 from PIA
 
 	// J2 EIA RS232/internal modem
 	// TODO: this has additional lines compared to a regular RS232 port (TxC in, RxC in, RxC out, speaker in, power)
@@ -243,12 +241,14 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	rs232.dsr_handler().set(m_uart0, FUNC(i8251_device::write_dsr));
 
 	// J3 Parallel printer
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
 	centronics_device &parprn(CENTRONICS(config, "parprn", centronics_devices, "printer"));
 	parprn.busy_handler().set(m_uart1, FUNC(i8251_device::write_cts));
 	parprn.busy_handler().append(m_uart1, FUNC(i8251_device::write_dsr)); // TODO: shared with serial CTS
 	parprn.fault_handler().set(FUNC(zorba_state::printer_fault_w));
 	parprn.select_handler().set(FUNC(zorba_state::printer_select_w));
+
+	output_latch_device &parprndata(OUTPUT_LATCH(config, "parprndata"));
+	parprn.set_output_latch(parprndata);
 
 	// J3 Serial printer
 	rs232_port_device &serprn(RS232_PORT(config, "serprn", default_rs232_devices, nullptr));
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	ZORBA_KEYBOARD(config, "keyboard").rxd_cb().set(m_uart2, FUNC(i8251_device::write_rxd));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("zorba");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -373,10 +373,7 @@ template <unsigned N> WRITE_LINE_MEMBER( zorba_state::irq_w )
 	else if (BIT(m_irq, 3)) vector = 0x88;
 	else                    vector = 0x84; // very wrong, need test cases for other things
 
-	m_maincpu->set_input_line_and_vector(
-			INPUT_LINE_IRQ0,
-			m_irq ? ASSERT_LINE : CLEAR_LINE,
-			vector);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, m_irq ? ASSERT_LINE : CLEAR_LINE, vector); // Z80
 }
 
 
@@ -504,14 +501,15 @@ I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 
 	uint8_t gfx = m_p_chargen[(linecount & 15) + (charcode << 4) + ((gpa & 1) << 11)];
 
+	if (rvv)
+		gfx ^= 0xff;
+
+	// VSP actually overrides reverse video here
 	if (vsp)
 		gfx = 0;
 
 	if (lten)
 		gfx = 0xff;
-
-	if (rvv)
-		gfx ^= 0xff;
 
 	for(i=0;i<8;i++)
 		bitmap.pix32(y, x + 7 - i) = palette[BIT(gfx, i) ? (hlgt ? 2 : 1) : 0];

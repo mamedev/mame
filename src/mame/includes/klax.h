@@ -32,12 +32,12 @@ private:
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 
 	virtual void update_interrupts() override;
-	DECLARE_WRITE16_MEMBER(interrupt_ack_w);
+	void interrupt_ack_w(u16 data = 0);
 
-	DECLARE_WRITE16_MEMBER(klax_latch_w);
+	void klax_latch_w(u16 data);
 
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	uint32_t screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bootleg_sound_map(address_map &map);
 	void klax2bl_map(address_map &map);

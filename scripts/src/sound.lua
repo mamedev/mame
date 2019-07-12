@@ -590,6 +590,7 @@ end
 ---------------------------------------------------
 -- Namco custom sound chips
 --@src/devices/sound/namco.h,SOUNDS["NAMCO"] = true
+--@src/devices/sound/namco_163.h,SOUNDS["NAMCO_163"] = true
 --@src/devices/sound/n63701x.h,SOUNDS["NAMCO_63701X"] = true
 --@src/devices/sound/c140.h,SOUNDS["C140"] = true
 --@src/devices/sound/c352.h,SOUNDS["C352"] = true
@@ -599,6 +600,13 @@ if (SOUNDS["NAMCO"]~=null or SOUNDS["NAMCO_15XX"]~=null or SOUNDS["NAMCO_CUS30"]
 	files {
 		MAME_DIR .. "src/devices/sound/namco.cpp",
 		MAME_DIR .. "src/devices/sound/namco.h",
+	}
+end
+
+if (SOUNDS["NAMCO_163"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/namco_163.cpp",
+		MAME_DIR .. "src/devices/sound/namco_163.h",
 	}
 end
 
@@ -1495,6 +1503,30 @@ if (SOUNDS["IOPSPU"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/iopspu.cpp",
 		MAME_DIR .. "src/devices/sound/iopspu.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/swp00.h,SOUNDS["SWP00"] = true
+---------------------------------------------------
+
+if (SOUNDS["SWP00"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/swp00.cpp",
+		MAME_DIR .. "src/devices/sound/swp00.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/swp20.h,SOUNDS["SWP20"] = true
+---------------------------------------------------
+
+if (SOUNDS["SWP20"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/swp20.cpp",
+		MAME_DIR .. "src/devices/sound/swp20.h",
 	}
 end
 

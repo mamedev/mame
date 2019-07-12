@@ -5,13 +5,10 @@
     Motorola 6821 PIA interface and emulation
 
     Notes:
-        * get_port_b_z_mask() gives the caller the bitmask that shows
+        * port_b_z_mask() gives the caller the bitmask that shows
           which bits are high-impedance when reading port B, and thus
-          neither 0 or 1. get_output_cb2_z() returns the same info
+          neither 0 or 1. cb2_output_z() returns the same info
           for the CB2 pin.
-        * set_port_a_z_mask allows the input callback to indicate
-          which port A bits are disconnected. For these bits, the
-          read operation will return the output buffer's contents.
         * The 'alt' interface functions are used when the A0 and A1
           address bits are swapped.
         * All 'int' data or return values are bool, and should be
@@ -55,21 +52,28 @@ public:
 	auto irqa_handler() { return m_irqa_handler.bind(); }
 	auto irqb_handler() { return m_irqb_handler.bind(); }
 
-	uint8_t reg_r(uint8_t offset);
-	void reg_w(uint8_t offset, uint8_t data);
-
-	DECLARE_READ8_MEMBER( read ) { return reg_r(offset); }
-	DECLARE_WRITE8_MEMBER( write ) { reg_w(offset, data); }
-	DECLARE_READ8_MEMBER( read_alt ) { return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
-	DECLARE_WRITE8_MEMBER( write_alt ) { reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t read_alt(offs_t offset) { return read(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
+	void write_alt(offs_t offset, uint8_t data) { write(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
 
 	uint8_t port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
-	void set_port_a_z_mask(uint8_t data) { m_port_a_z_mask = data; }// see second note in .c
 
 	DECLARE_WRITE8_MEMBER( porta_w ) { write_porta(data); }
 	void write_porta(uint8_t data);
-	void set_a_input(uint8_t data, uint8_t z_mask);
+	void write_porta_line(int line, bool state);
+	void set_a_input(uint8_t data);
 	uint8_t a_output();
+	void set_port_a_input_overrides_output_mask(uint8_t mask) { m_a_input_overrides_output_mask = mask; }
+
+	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { write_porta_line(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { write_porta_line(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { write_porta_line(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { write_porta_line(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { write_porta_line(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { write_porta_line(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { write_porta_line(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { write_porta_line(7, state); }
 
 	DECLARE_WRITE_LINE_MEMBER( ca1_w );
 
@@ -79,7 +83,17 @@ public:
 
 	DECLARE_WRITE8_MEMBER( portb_w ) { write_portb(data); }
 	void write_portb(uint8_t data);
+	void write_portb_line(int line, bool state);
 	uint8_t b_output();
+
+	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { write_portb_line(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { write_portb_line(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { write_portb_line(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { write_portb_line(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { write_portb_line(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { write_portb_line(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { write_portb_line(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { write_portb_line(7, state); }
 
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );
 
@@ -159,8 +173,8 @@ private:
 	uint8_t m_in_ca1;
 	uint8_t m_in_ca2;
 	uint8_t m_out_a;
+	uint8_t m_a_input_overrides_output_mask;
 	uint8_t m_out_ca2;
-	uint8_t m_port_a_z_mask;
 	uint8_t m_ddr_a;
 	uint8_t m_ctl_a;
 	uint8_t m_irq_a1;

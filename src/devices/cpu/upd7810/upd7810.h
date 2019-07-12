@@ -258,6 +258,7 @@ protected:
 	uint8_t   m_mc;     /* port C input or output mask */
 	uint8_t   m_mm;     /* memory mapping */
 	uint8_t   m_mf;     /* port F input or output mask */
+	uint8_t   m_mt;     /* port T input threshold level */
 	uint8_t   m_tmm;    /* timer 0 and timer 1 operating parameters */
 	uint8_t   m_etmm;   /* 16-bit multifunction timer/event counter */
 	uint8_t   m_eom;    /* 16-bit timer/event counter output control */
@@ -483,6 +484,7 @@ protected:
 	void MOV_TXB_A();
 	void MOV_TM0_A();
 	void MOV_TM1_A();
+	void MOV_MT_A();
 	void MOV_ZCM_A();
 	void ANA_V_A();
 	void ANA_A_A();

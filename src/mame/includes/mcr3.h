@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "includes/mcr.h"
+
 #include "machine/74259.h"
 #include "machine/adc0844.h"
 #include "screen.h"

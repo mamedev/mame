@@ -522,7 +522,7 @@ READ32_MEMBER(ms32_state::ms32_read_inputs3)
 
 WRITE32_MEMBER(ms32_state::ms32_sound_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 
 	// give the Z80 time to respond
 	m_maincpu->spin_until_time(attotime::from_usec(40));
@@ -941,7 +941,7 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* Start 1 is already mapped in mahjong inputs */
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* ms32.c mahjongs don't have P2 inputs -> no Start 2*/
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* ms32.cpp mahjongs don't have P2 inputs -> no Start 2*/
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1559,7 +1559,41 @@ INPUT_PORTS_END
 /********** GFX DECODE **********/
 
 /* sprites are contained in 256x256 "tiles" */
-static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
+static const uint32_t sprite_xoffset[256] =
+{
+	STEP8(8*8*8*0,    8), STEP8(8*8*8*1,    8), STEP8(8*8*8*2,    8), STEP8(8*8*8*3,    8),
+	STEP8(8*8*8*4,    8), STEP8(8*8*8*5,    8), STEP8(8*8*8*6,    8), STEP8(8*8*8*7,    8),
+	STEP8(8*8*8*8,    8), STEP8(8*8*8*9,    8), STEP8(8*8*8*10,   8), STEP8(8*8*8*11,   8),
+	STEP8(8*8*8*12,   8), STEP8(8*8*8*13,   8), STEP8(8*8*8*14,   8), STEP8(8*8*8*15,   8),
+	STEP8(8*8*8*16,   8), STEP8(8*8*8*17,   8), STEP8(8*8*8*18,   8), STEP8(8*8*8*19,   8),
+	STEP8(8*8*8*20,   8), STEP8(8*8*8*21,   8), STEP8(8*8*8*22,   8), STEP8(8*8*8*23,   8),
+	STEP8(8*8*8*24,   8), STEP8(8*8*8*25,   8), STEP8(8*8*8*26,   8), STEP8(8*8*8*27,   8),
+	STEP8(8*8*8*28,   8), STEP8(8*8*8*29,   8), STEP8(8*8*8*30,   8), STEP8(8*8*8*31,   8)
+};
+static const uint32_t sprite_yoffset[256] =
+{
+	STEP8(8*8*8*0,  8*8), STEP8(8*8*8*32, 8*8), STEP8(8*8*8*64, 8*8), STEP8(8*8*8*96, 8*8),
+	STEP8(8*8*8*128,8*8), STEP8(8*8*8*160,8*8), STEP8(8*8*8*192,8*8), STEP8(8*8*8*224,8*8),
+	STEP8(8*8*8*256,8*8), STEP8(8*8*8*288,8*8), STEP8(8*8*8*320,8*8), STEP8(8*8*8*352,8*8),
+	STEP8(8*8*8*384,8*8), STEP8(8*8*8*416,8*8), STEP8(8*8*8*448,8*8), STEP8(8*8*8*480,8*8),
+	STEP8(8*8*8*512,8*8), STEP8(8*8*8*544,8*8), STEP8(8*8*8*576,8*8), STEP8(8*8*8*608,8*8),
+	STEP8(8*8*8*640,8*8), STEP8(8*8*8*672,8*8), STEP8(8*8*8*704,8*8), STEP8(8*8*8*736,8*8),
+	STEP8(8*8*8*768,8*8), STEP8(8*8*8*800,8*8), STEP8(8*8*8*832,8*8), STEP8(8*8*8*864,8*8),
+	STEP8(8*8*8*896,8*8), STEP8(8*8*8*928,8*8), STEP8(8*8*8*960,8*8), STEP8(8*8*8*992,8*8)
+};
+static const gfx_layout spritelayout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*8,
+	sprite_xoffset,
+	sprite_yoffset
+};
+
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
@@ -1657,7 +1691,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 
 READ8_MEMBER(ms32_state::latch_r)
 {
-	return m_soundlatch->read(space,0)^0xff;
+	return m_soundlatch->read()^0xff;
 }
 
 WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
@@ -1700,31 +1734,31 @@ void ms32_state::machine_reset()
 
 /********** MACHINE DRIVER **********/
 
-MACHINE_CONFIG_START(ms32_state::ms32)
-
+void ms32_state::ms32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // D70632GD-20 20MHz
-	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	V70(config, m_maincpu, 20000000); // D70632GD-20 20MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ms32_state::ms32_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
-	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
+	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ms32_state, screen_update_ms32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 28*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(ms32_state::screen_update_ms32));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms32)
-	MCFG_PALETTE_ADD("palette", 0x10000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 
 	/* sound hardware */
@@ -1734,24 +1768,23 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymf", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
+	ymf271_device &ymf(YMF271(config, "ymf", 16934400));
+	ymf.add_route(0, "lspeaker", 1.0);
+	ymf.add_route(1, "rspeaker", 1.0);
+//  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf.add_route(3, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ms32_state::f1superb)
+void ms32_state::f1superb(machine_config &config)
+{
 	ms32(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1superb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::f1superb_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1superb)
+	m_gfxdecode->set_info(gfx_f1superb);
 
 	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
-MACHINE_CONFIG_END
+}
 
 
 
@@ -2555,7 +2588,6 @@ void ms32_state::init_ms32_common()
 void ms32_state::init_ss91022_10()
 {
 	init_ms32_common();
-	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00000,0x35, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00000,0xa3, "gfx3");
 }
@@ -2564,7 +2596,6 @@ void ms32_state::init_ss91022_10()
 void ms32_state::init_ss92046_01()
 {
 	init_ms32_common();
-	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx4");
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx3");
 }
@@ -2573,7 +2604,6 @@ void ms32_state::init_ss92046_01()
 void ms32_state::init_ss92047_01()
 {
 	init_ms32_common();
-	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x24000,0x18, "gfx4");
 	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
 }
@@ -2582,7 +2612,6 @@ void ms32_state::init_ss92047_01()
 void ms32_state::init_ss92048_01()
 {
 	init_ms32_common();
-	ms32_rearrange_sprites(machine(), "gfx1");
 	decrypt_ms32_tx(machine(), 0x20400,0xd6, "gfx4");
 	decrypt_ms32_bg(machine(), 0x20400,0xd4, "gfx3");
 }

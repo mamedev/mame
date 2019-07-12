@@ -41,8 +41,8 @@ public:
 	auto intrq_wr_callback() { return m_intrq_cb.bind(); }
 	auto drq_wr_callback() { return m_drq_cb.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_cb(state); }
@@ -66,8 +66,8 @@ private:
 class device_bbc_fdc_interface : public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bbc_fdc_interface(const machine_config &mconfig, device_t &device);

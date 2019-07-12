@@ -129,27 +129,27 @@ void lisa_state::field_interrupts()
 #if 0
 	if (RSIR)
 		// serial interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	else if (int0)
 		// external interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
 	else if (int1)
 		// external interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	else if (int2)
 		// external interrupt
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 	else
 #endif
 	if (m_KBIR)
 		/* COPS VIA interrupt */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	else if (m_FDIR || m_VTIR)
 		/* floppy disk or VBl */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 	else
 		/* clear all interrupts */
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 void lisa_state::set_parity_error_pending(int value)
@@ -159,7 +159,7 @@ void lisa_state::set_parity_error_pending(int value)
 	m_parity_error_pending = value;
 	if (m_parity_error_pending)
 	{
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_7, ASSERT_LINE);
 	}
 	else
 	{
@@ -170,7 +170,7 @@ void lisa_state::set_parity_error_pending(int value)
 	if ((! m_parity_error_pending) && value)
 	{
 		m_parity_error_pending = 1;
-		m_maincpu->pulse_input_line_and_vector(M68K_IRQ_7, attotime::zero, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->pulse_input_line(M68K_IRQ_7, attotime::zero);
 	}
 	else if (m_parity_error_pending && (! value))
 	{
@@ -203,14 +203,7 @@ void lisa_state::COPS_send_data_if_possible()
 //        printf("COPsim: sending %02x to VIA\n", m_fifo_data[m_fifo_head]);
 
 		uint8_t data = m_fifo_data[m_fifo_head];/* output data */
-		m_via0->write_pa0((data>>0)&1);
-		m_via0->write_pa1((data>>1)&1);
-		m_via0->write_pa2((data>>2)&1);
-		m_via0->write_pa3((data>>3)&1);
-		m_via0->write_pa4((data>>4)&1);
-		m_via0->write_pa5((data>>5)&1);
-		m_via0->write_pa6((data>>6)&1);
-		m_via0->write_pa7((data>>7)&1);
+		m_via0->write_pa(data);
 
 		if (m_fifo_head == m_mouse_data_offset)
 			m_mouse_data_offset = -1;    /* we just phased out the mouse data in buffer */
@@ -293,7 +286,7 @@ void lisa_state::scan_keyboard()
 						if (keycode == m_NMIcode)
 						{   /* generate NMI interrupt */
 							pulse_input_line(M68K_IRQ_7, attotime::zero);
-							m_maincpu->set_input_line_vector(M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							m_maincpu->set_input_line(M68K_IRQ_7);
 						}
 #endif
 						COPS_queue_data(&keycode, 1);
@@ -799,7 +792,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (m_maincpu->state_int(M68K_SR) & 0x2000)
+	if (BIT(m_maincpu->get_fc(), 2))
 	{
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
@@ -1005,9 +998,6 @@ void lisa_state::machine_reset()
 			sony_set_enable_lines(m_fdc, 1);   /* on lisa2, drive unit 1 is always selected (?) */
 		}
 	}
-
-	/* reset 68k to pick up proper vectors from MMU */
-	m_maincpu->reset();
 }
 
 INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
@@ -1267,7 +1257,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 		}
 	}
 
-	if (m_maincpu->state_int(M68K_SR) & 0x2000)
+	if (BIT(m_maincpu->get_fc(), 2))
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1473,7 +1463,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 		}
 	}
 
-	if (m_maincpu->state_int(M68K_SR) & 0x2000)
+	if (BIT(m_maincpu->get_fc(), 2))
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 

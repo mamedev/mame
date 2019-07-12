@@ -966,7 +966,7 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 WRITE16_MEMBER( segas16b_state::sound_w16 )
 {
 	if (m_soundlatch != nullptr)
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 	if (m_soundcpu != nullptr)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
@@ -999,13 +999,13 @@ READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
 	{
 		case 0x0000/2:
 			// multiply registers
-			return m_multiplier->read(space, offset, mem_mask);
+			return m_multiplier->read(offset);
 
 		case 0x1000/2:
 			// compare registers
-			return m_cmptimer_1->read(space, offset, mem_mask);
+			return m_cmptimer_1->read(offset);
 	}
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -1021,12 +1021,12 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 	{
 		case 0x0000/2:
 			// multiply registers
-			m_multiplier->write(space, offset, data, mem_mask);
+			m_multiplier->write(offset, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			// compare registers
-			m_cmptimer_1->write(space, offset, data, mem_mask);
+			m_cmptimer_1->write(offset, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1045,7 +1045,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 {
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return m_cmptimer_2->read(space, offset, mem_mask);
+	return m_cmptimer_2->read(offset);
 }
 
 
@@ -1057,7 +1057,7 @@ READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 WRITE16_MEMBER( segas16b_state::unknown_rgn2_w )
 {
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
-	m_cmptimer_2->write(space, offset, data, mem_mask);
+	m_cmptimer_2->write(offset, data, mem_mask);
 }
 
 
@@ -1080,7 +1080,7 @@ READ16_MEMBER( segas16b_state::standard_io_r )
 			return ioport((offset & 1) ? "DSW1" : "DSW2")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -1126,7 +1126,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 
 WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 {
-	m_ym2413->write(space, offset, data >> 8);
+	m_ym2413->write(offset, data >> 8);
 }
 
 
@@ -2434,7 +2434,9 @@ static INPUT_PORTS_START( dunkshot )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW2")
-	//"SW2:1" unused
+	PORT_DIPNAME( 0x01, 0x00, "Winner Advances" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2451,7 +2453,9 @@ static INPUT_PORTS_START( dunkshot )
 	PORT_DIPNAME( 0x40, 0x40, "CPU Starts With +6 Pts." ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	//"SW2:8" unused
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("ANALOGX1")              // fake analog X
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_REVERSE
@@ -2476,6 +2480,15 @@ static INPUT_PORTS_START( dunkshot )
 
 	PORT_START("ANALOGY4")              // fake analog Y
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(4) PORT_REVERSE
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dunkshoto )
+	PORT_INCLUDE( dunkshot )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 
@@ -3470,6 +3483,64 @@ static INPUT_PORTS_START( fantzoneta )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ultracin )
+//  it uses two wheels (see https://youtu.be/Je7Bm9YgiPg?t=33), which seem to rely on bits 0x08, 0x40 and 0x80 of P1 and P2.
+//  for now it's roughly useable by keeping the direction pressed and then pressing the fake button 2. TODO: emulate wheels
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Advertise Sound Interval" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "No Interval" )
+	PORT_DIPSETTING(    0x02, "4 Cycle" )
+	PORT_DIPSETTING(    0x03, "2 Cycle" )
+	PORT_DIPNAME( 0x04, 0x04, "Advertise Coin Indication" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "Coin" )
+	PORT_DIPSETTING(    0x04, "100 - 400 Yen" )
+	PORT_DIPNAME( 0x08, 0x08, "Game Time" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, "Short" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+INPUT_PORTS_END
+
 // we use common sys16b tags to simplify port reads
 static INPUT_PORTS_START( atomicp )
 	PORT_START("SERVICE")   // P1
@@ -3729,13 +3800,13 @@ void segas16b_state::system16b(machine_config &config)
 	m_mapper->pbf().set_inputline(m_soundcpu, 0);
 
 	// video hardware
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_segas16b);
-	PALETTE(config, "palette").set_entries(2048*3);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
+	PALETTE(config, m_palette).set_entries(2048*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -3913,28 +3984,28 @@ void segas16b_state::fpointbla(machine_config &config)
 	m_sprites->set_local_originx(60); // these align the pieces with the playfield
 }
 
-MACHINE_CONFIG_START(segas16b_state::lockonph)
-
+void segas16b_state::lockonph(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
-	MCFG_DEVICE_PROGRAM_MAP(lockonph_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::lockonph_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(lockonph_sound_map)
-	MCFG_DEVICE_IO_MAP(lockonph_sound_iomap)
+	Z80(config, m_soundcpu, XTAL(16'000'000)/4); // ?
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::lockonph_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::lockonph_sound_iomap);
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)
-	MCFG_PALETTE_ADD("palette", 0x2000*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockonph);
+	PALETTE(config, m_palette).set_entries(4096*2);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224) // wrong, other XTAL seems to be 17Mhz?
-	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?
+	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -3950,12 +4021,10 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	m_ym2151->add_route(0, "mono", 0.5);
 	m_ym2151->add_route(1, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
-
-
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000)/16, okim6295_device::PIN7_LOW)); // clock / pin not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.2);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.2);
+}
 
 
 //**************************************************************************
@@ -3981,11 +4050,11 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 }
 
 
-MACHINE_CONFIG_START(segas16b_state::system16c)
+void segas16b_state::system16c(machine_config &config)
+{
 	system16b(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system16c_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16c_map);
+}
 
 
 
@@ -4074,7 +4143,6 @@ ROM_START( aliensyn )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 ROM_END
 
-
 //*************************************************************************************************************************
 //  Alien Syndrome, Sega System 16B
 //  CPU: FD1089A (317-0033)
@@ -4117,7 +4185,6 @@ ROM_START( aliensyn3 )
 	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
-
 //*************************************************************************************************************************
 //  Alien Syndrome, Sega System 16B
 //  CPU: 68000 + MC8123B (317-00xx) (sorry missing code, scratched off label)
@@ -4159,7 +4226,6 @@ ROM_START( aliensyn7 )
 	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-00xx.key",  0x0000, 0x2000, CRC(76b370cd) SHA1(996a4a24dec085caf93cbe614d3b0888379c91dd) )
 ROM_END
-
 
 //*************************************************************************************************************************
 //  Alien Syndrome, Sega System 16B
@@ -4208,8 +4274,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Action Fighter, Sega System 16B
-
-
+//
 ROM_START( afightere )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr10269.bin", 0x00001, 0x08000, CRC(688b4ff7) SHA1(8972b75b6fa72513a6ebb3a5ed5988a43f1b6266) )
@@ -4269,7 +4334,6 @@ ROM_START( afighterf )
 	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
-
 ROM_START( afighterg )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr10160.bin", 0x00001, 0x08000, CRC(86f020da) SHA1(e7ac4b70dc375d9e2491f1a90ae154699e7627a2) ) // == encrypted 10169 (not perfect match) (same rev as 10354)
@@ -4301,7 +4365,6 @@ ROM_START( afighterg )
 	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
-
 ROM_START( afighterh )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr10354.bin", 0x00001, 0x08000, CRC(6dad6dd1) SHA1(8cdd1c10d60cda09f888b2f03b7d4c76100b4ad0) ) // == encrypted 10169 (not perfect match) (same rev as 10160)
@@ -4330,7 +4393,7 @@ ROM_START( afighterh )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4778,6 +4841,7 @@ ROM_START( snapper )
 	ROM_LOAD( "snap5.r05",  0x10000, 0x8000, CRC(378e08eb) SHA1(f2c10bd9e885c185ac2d0d51d907ceca1f21dd7a) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -4811,7 +4875,6 @@ ROM_START( lockonph )
 	ROM_LOAD16_BYTE( "b11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
 	ROM_LOAD16_BYTE( "b13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
 ROM_END
-
 
 
 //*************************************************************************************************************************
@@ -5013,7 +5076,6 @@ ROM_START( aurailj )
 	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(fed38390) SHA1(b5f458bc70c069542be16d476645c153ed1d1b45) )
 ROM_END
 
-
 ROM_START( aurailjd )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-13446.a7", 0x000000, 0x20000, CRC(25221510) SHA1(8c461db9438bc785c5f81e3cb3bcea9adbd2be9c) )
@@ -5052,6 +5114,7 @@ ROM_START( aurailjd )
 	ROM_LOAD( "mpr-13449.a11", 0x10000, 0x20000, CRC(d3d9aaf9) SHA1(0fb3a8cb11033accceb3a43a691fb424cf8b9619) )
 	ROM_RELOAD(                0x30000, 0x20000 )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -5110,7 +5173,6 @@ ROM_START( bayrouted )
 	ROM_LOAD( "mpr-12460.a11", 0x10000, 0x20000, CRC(0bae570d) SHA1(05fa4a3405666342ab66e696a7344cca97569f19) )
 	ROM_LOAD( "mpr-12461.a12", 0x30000, 0x20000, CRC(b03b8b46) SHA1(b0283ac377d464f3d9374a992192ec6c515a3c2f) )
 ROM_END
-
 
 //*************************************************************************************************************************
 //  Bay Route, Sega System 16B
@@ -5254,7 +5316,6 @@ ROM_START( bullet )
 	ROM_LOAD( "epr-10998.a8", 0x10000, 0x8000, CRC(f971a817) SHA1(502c95638e4fd5f87e5fc837cb44b39a5d62f4e4) )
 ROM_END
 
-
 ROM_START( bulletd )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-11010.a4",  0x000000, 0x08000, CRC(c4b7cb63) SHA1(c35fceab2a03f23d9690432a582064d12de950f6) )
@@ -5284,12 +5345,16 @@ ROM_START( bulletd )
 	ROM_LOAD( "epr-10998.a8", 0x10000, 0x8000, CRC(f971a817) SHA1(502c95638e4fd5f87e5fc837cb44b39a5d62f4e4) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Cotton, Sega System 16B
 //  CPU: FD1094 (317-0181A)
 //  ROM Board type: 171-5704
+//  Sega game ID: 833-8021-02 COTTON
+//    Main board: 837-8023-02
+//     ROM board: 834-8022-02
 //
 ROM_START( cotton )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5625,6 +5690,7 @@ ROM_START( cottonjad )
 	ROM_LOAD( "opr-13061.a11", 0x10000, 0x20000, CRC(4d21153f) SHA1(173ddd9633f255c39ca508c37d0562e374704e7b) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -5715,7 +5781,6 @@ ROM_START( dunkshota ) // several ROMs had replacement? (different style to othe
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
 	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
-
 
 ROM_START( dunkshoto )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -5927,6 +5992,9 @@ ROM_END
 //  E-Swat (World), Sega System 16B
 //  CPU: FD1094 (317-0130)
 //  ROM Board type: 171-5797
+//  Sega game ID: 833-7164-02 ESWAT
+//    Main board: 837-7166-02
+//     ROM board: 834-7165-02
 //
 ROM_START( eswat )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5993,7 +6061,9 @@ ROM_END
 //  E-Swat (US), Sega System 16B
 //  CPU: FD1094 (317-0129)
 //  ROM Board type: 171-5797
-//  Sega ID# for ROM board: 834-7165-01
+//  Sega game ID: 833-7164-01 ESWAT
+//    Main board: 837-7166-01
+//     ROM board: 834-7165-01
 //
 ROM_START( eswatu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -6060,7 +6130,7 @@ ROM_END
 //  E-Swat (Japan), Sega System 16B
 //  CPU: FD1094 (317-0128)
 //  ROM Board type: 171-5797
-//  Sega game ID: 833-7164
+//  Sega game ID: 833-7164 ESWAT
 //    Main board: 837-7166
 //     ROM board: 834-7165
 //
@@ -6245,7 +6315,6 @@ ROM_START( exctleag )
 	ROM_LOAD( "epr-11143.a11", 0x40000, 0x8000, CRC(848b7b77) SHA1(8903a39f8f0ffb4ce32117d33282876196516c30) )
 ROM_END
 
-
 ROM_START( exctleagd )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-11939.a4", 0x00000, 0x10000, CRC(42db9082) SHA1(3ac03ad9dc9b5554b0e4ded4520f957e7dc4bf6e) )
@@ -6277,6 +6346,7 @@ ROM_START( exctleagd )
 	ROM_LOAD( "epr-11142.a10", 0x30000, 0x8000, CRC(25d26c66) SHA1(2485afb859f84a9cc90b2091e9ae4eef263f42b3) )
 	ROM_LOAD( "epr-11143.a11", 0x40000, 0x8000, CRC(848b7b77) SHA1(8903a39f8f0ffb4ce32117d33282876196516c30) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -6415,7 +6485,6 @@ ROM_START( fpointbla )
 	ROM_LOAD( "b1-ic19.bin", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
 ROM_END
 
-
 //*************************************************************************************************************************
 //  Flash Point, Sega System 16B
 //  CPU: FD1094 (317-0127A)
@@ -6478,6 +6547,7 @@ ROM_START( fpoint1d )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12592.a10", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -6665,7 +6735,8 @@ ROM_END
 //  Golden Axe (World), Sega System 16B
 //  CPU: FD1094 (317-0120)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-7002-11
+//  Sega game ID: 833-7001-03 GOLDEN AXE
+//     ROM board: 834-7002-03
 //
 ROM_START( goldnaxe3 )
 	ROM_REGION( 0x80000, "maincpu", 0) // 68000 code
@@ -6840,6 +6911,7 @@ ROM_START( goldnaxe1d )
 	ROM_LOAD( "mpr-12384.ic6", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -6977,6 +7049,7 @@ ROM_START( hwchampjd )
 	ROM_LOAD( "pls153.bin",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -7059,6 +7132,8 @@ ROM_END
 //  MVP (Japan), Sega System 16B
 //  CPU: FD1094 (317-0142)
 //  ROM Board type: 171-5704
+//  Sega game ID: 833-7364
+//     ROM board: 834-7365
 //
 ROM_START( mvpj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -7374,7 +7449,6 @@ ROM_START( cencourt )
 ROM_END
 
 
-
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -7421,10 +7495,41 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Ryukyu, Sega System 16B
+//  CPU: FD1094 8M2 (317-5023A)
+//  ROM Board type: 171-5704
+//  Sega game ID: 836-7666 RYUKYU
+//     ROM board: 836-7667
+//
+ROM_START( ryukyu )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-13348a.a7", 0x00000, 0x10000, CRC(64f6ada9) SHA1(31e2adc8697c21ca4aa2d9357f7303644168d0a2) )
+	ROM_LOAD16_BYTE( "epr-13347a.a5", 0x00001, 0x10000, CRC(fade1f50) SHA1(46e6224060d526aa362df1a1026ba445832ad7f3) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-5023a.key", 0x0000, 0x2000, CRC(5e372b89) SHA1(885e56e5a54ed46a230396654696e2fd5f31a382) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-13351.a14", 0x00000, 0x20000, CRC(a68a4e6d) SHA1(ee3e317c7184b41af5dd383d41f7be3eebff0d04) )
+	ROM_LOAD( "opr-13352.a15", 0x20000, 0x20000, CRC(5e5531e4) SHA1(e8e16b35f7985e6cdd77353ca5235db518914744) )
+	ROM_LOAD( "opr-13353.a16", 0x40000, 0x20000, CRC(6d23dfd8) SHA1(21266340290b9854cee0b62fc107cc2981519a80) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "opr-13354.b1", 0x00001, 0x20000, CRC(f07aad99) SHA1(71759525a5b7fe76d112cec93984f0f89cadbc00) )
+	ROM_LOAD16_BYTE( "opr-13356.b5", 0x00000, 0x20000, CRC(5498290b) SHA1(b3115b636d8cb6ecac22d5264b7961e3b807cf04) )
+	ROM_LOAD16_BYTE( "opr-13355.b2", 0x40001, 0x20000, CRC(67890019) SHA1(165c6a32f305273396ec0e9499e00329caadc484) )
+	ROM_LOAD16_BYTE( "opr-13357.b6", 0x40000, 0x20000, CRC(f9e7cf03) SHA1(2258111499c79443faf84fb0495007016282bb3c) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-13349.a10", 0x00000, 0x08000, CRC(b83183f8) SHA1(9d6127f51c04a16bb2637dc9992b843b94613c2b) )
+	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
+ROM_END
+
+//*************************************************************************************************************************
+//  Ryukyu, Sega System 16B
 //  CPU: FD1094 8J2 (317-5023)
 //  ROM Board type: 171-5521
 //
-ROM_START( ryukyu )
+ROM_START( ryukyua )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-13348.a7", 0x00000, 0x10000, CRC(5f0e0c86) SHA1(f8f5912a190d0755cc5158e2e43cceb825f95b4f) )
 	ROM_LOAD16_BYTE( "epr-13347.a5", 0x00001, 0x10000, CRC(398031fa) SHA1(5c118c85b7af1a83726b95bbeb85cb5020254f57) )
@@ -7448,7 +7553,6 @@ ROM_START( ryukyu )
 	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
 ROM_END
 
-
 ROM_START( ryukyud )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-13348.a7", 0x00000, 0x10000, CRC(3a96bdcd) SHA1(5097a5d022eb046826c9e06f61db2c482306abeb) )
@@ -7469,6 +7573,7 @@ ROM_START( ryukyud )
 	ROM_LOAD( "epr-13349.a10", 0x00000, 0x08000, CRC(b83183f8) SHA1(9d6127f51c04a16bb2637dc9992b843b94613c2b) )
 	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -7572,8 +7677,6 @@ ROM_START( sdibl )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "a7.rom", 0x0000, 0x8000, CRC(793f9f7f) SHA1(9e4fde376db9e99a83eb2fc734c6721c122ba9af) )
 ROM_END
-
-
 
 ROM_START(sdibl2)
 	ROM_REGION16_BE(0x40000, "maincpu", 0) // 68000 data
@@ -8041,6 +8144,7 @@ ROM_START( sonicbomd )
 	ROM_LOAD( "epr-11349.a9", 0x20000, 0x8000, CRC(8e4b6204) SHA1(ec0a2812b4726b5ff236f2fbb63fd2dd13cf4935) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -8238,6 +8342,7 @@ ROM_START( tetris1d )
 	ROM_LOAD( "epr-12168.a7", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -8390,7 +8495,9 @@ ROM_END
 //  Tough Turf, Sega System 16B
 //  CPU: 68000 + i8751 (317-0099)
 //  ROM Board type: 171-5358
-//  Sega ID# for ROM board: 834-6949
+//  Sega game ID: 833-6948 TOUGH TURF
+//    Main board: 837-6950
+//     ROM board: 834-6949
 //
 ROM_START( tturfu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -8459,7 +8566,6 @@ ROM_START( wb3 )
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
 	ROM_LOAD( "317-0098.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
-
 
 //*************************************************************************************************************************
 //  Wonder Boy III, Sega System 16B
@@ -8653,6 +8759,7 @@ ROM_START( wb32d )
 	ROM_LOAD( "epr-12127.a7", 0x0000, 0x8000, CRC(0bb901bb) SHA1(c81b198df8e3b0ec568032c76addf0d1a1711194) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -8829,7 +8936,6 @@ ROM_START( wrestwar1 )
 	ROM_LOAD( "mpr-12149.a12", 0x30000, 0x20000, CRC(d6617b19) SHA1(aa36d257eaa52c8c871a39aaa2f29c203525dbaf) )
 ROM_END
 
-
 ROM_START( wrestwar1d )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-12145.a7", 0x00000, 0x20000, CRC(6a50d373) SHA1(bc4ff28f02a326ca535251cc59399149e625b266) )
@@ -8861,6 +8967,7 @@ ROM_START( wrestwar1d )
 	ROM_LOAD( "mpr-12148.a11", 0x10000, 0x20000, CRC(fb9a7f29) SHA1(7ba79c18ab4e586be2deccd78e4479d55eb75a7e) )
 	ROM_LOAD( "mpr-12149.a12", 0x30000, 0x20000, CRC(d6617b19) SHA1(aa36d257eaa52c8c871a39aaa2f29c203525dbaf) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -9226,9 +9333,9 @@ GAME( 1988, ddux,       0,        system16b_fd1094,      ddux,     segas16b_stat
 GAME( 1988, dduxj,      ddux,     system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan) (FD1094 317-0094)", 0 )
 GAME( 1988, ddux1,      ddux,     system16b_i8751,       ddux,     segas16b_state, init_ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1) (8751 317-0095)", 0 )
 
-GAME( 1987, dunkshot,   0,        system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
-GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
-GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,     dunkshot, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
+GAME( 1987, dunkshot,   0,        system16b_fd1089a,     dunkshot,  segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
+GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,     dunkshot,  segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
+GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,     dunkshoto, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
 GAME( 1989, eswat,      0,        system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World) (FD1094 317-0130)", 0 )
 GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US) (FD1094 317-0129)", 0 )
@@ -9260,7 +9367,8 @@ GAME( 1988, cencourt,   passsht,  system16b_mc8123,      cencourt, segas16b_stat
 
 GAME( 1991, riotcity,   0,        system16b,             riotcity, segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
-GAME( 1990, ryukyu,     0,        system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
+GAME( 1990, ryukyu,     0,        system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Rev A, Japan) (FD1094 317-5023A)", 0 )
+GAME( 1990, ryukyua,    ryukyu,   system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
 
 GAME( 1987, defense,    sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "Defense (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdib,       sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
@@ -9288,7 +9396,7 @@ GAME( 1994, toryumon,   0,        system16b_5797,        toryumon, segas16b_stat
 GAME( 1989, tturf,      0,        system16b_i8751,       tturf,    segas16b_state, init_tturf_5704,          ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan) (8751 317-0104)", 0 )
 GAME( 1989, tturfu,     tturf,    system16b_i8751,       tturf,    segas16b_state, init_generic_5358,        ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US) (8751 317-0099)", 0)
 
-GAME( 1996, ultracin,   0,        system16b_5797,        system16b_generic, segas16b_state, init_generic_5797, ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
+GAME( 1996, ultracin,   0,        system16b_5797,        ultracin, segas16b_state, init_generic_5797, ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
 
 GAME( 1988, wb3,        0,        system16b_i8751,       wb3,      segas16b_state, init_wb3_5704,            ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B) (8751 317-0098)", 0 )
 GAME( 1988, wb34,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (FD1094 317-0087)", 0 )
@@ -9814,27 +9922,26 @@ void isgsm_state::machine_reset()
 			m_sprites->set_bank(i, i);
 
 	membank(ISGSM_MAIN_BANK)->set_base(memregion("bios")->base());
-	m_maincpu->reset();
 }
 
 
-MACHINE_CONFIG_START(isgsm_state::isgsm)
+void isgsm_state::isgsm(machine_config &config)
+{
 	system16b(config);
 	// basic machine hardware
 
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_REMOVE("mapper")
+	config.device_remove("maincpu");
+	config.device_remove("mapper");
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
-	MCFG_DEVICE_PROGRAM_MAP(isgsm_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
+	M68000(config, m_maincpu, 16000000); // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	m_maincpu->set_addrmap(AS_PROGRAM, &isgsm_state::isgsm_map);
+	m_maincpu->set_vblank_int("screen", FUNC(isgsm_state::irq4_line_hold));
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
-	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &isgsm_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &isgsm_state::bootleg_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-MACHINE_CONFIG_END
+}
 
 void isgsm_state::init_isgsm()
 {

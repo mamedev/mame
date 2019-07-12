@@ -18,6 +18,7 @@ mb87030_device::mb87030_device(const machine_config &mconfig, const char *tag, d
 
 mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_device(mconfig, type, tag, owner, clock),
+	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_irq_handler(*this),
 	m_dreq_handler(*this)
 {

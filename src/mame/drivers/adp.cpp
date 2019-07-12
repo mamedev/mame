@@ -209,11 +209,11 @@ private:
 	DECLARE_MACHINE_RESET(skattv);
 	void adp_palette(palette_device &device) const;
 	void fstation_palette(palette_device &device) const;
-	IRQ_CALLBACK_MEMBER(duart_iack_handler);
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
 
 	void adp_hd63484_map(address_map &map);
+	void fc7_map(address_map &map);
 	void fashiong_hd63484_map(address_map &map);
 	void fstation_hd63484_map(address_map &map);
 	void fstation_mem(address_map &map);
@@ -248,9 +248,9 @@ void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)
 
 ***************************************************************************/
 
-IRQ_CALLBACK_MEMBER(adp_state::duart_iack_handler)
+void adp_state::fc7_map(address_map &map)
 {
-	return m_duart->get_irq_vector();
+	map(0xfffff9, 0xfffff9).r(m_duart, FUNC(mc68681_device::get_irq_vector));
 }
 
 MACHINE_START_MEMBER(adp_state,skattv)
@@ -540,34 +540,34 @@ void adp_state::fstation_hd63484_map(address_map &map)
 	map(0x80000, 0xfffff).ram();
 }
 
-MACHINE_CONFIG_START(adp_state::quickjac)
-
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(quickjac_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(adp_state, duart_iack_handler)
+void adp_state::quickjac(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::quickjac_mem);
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &adp_state::fc7_map);
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DEVICE_ADD( "duart", MC68681, XTAL(8'664'000) / 2 )
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MC68681(config, m_duart, XTAL(8'664'000) / 2);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
+	m_duart->inport_cb().set_ioport("DSW1");
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, adp_state, rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768));
+	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(384, 280);
+	screen.set_visarea_full();
+	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(adp_state::adp_palette), 0x10);
 
@@ -577,8 +577,7 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	ym2149_device &aysnd(YM2149(config, "aysnd", 3686400/2));
 	aysnd.port_a_read_callback().set_ioport("PA");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.10);
-
-MACHINE_CONFIG_END
+}
 
 void adp_state::skattv(machine_config &config)
 {
@@ -604,32 +603,31 @@ void adp_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(adp_state::funland)
+void adp_state::funland(machine_config &config)
+{
 	quickjac(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(funland_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
-	MCFG_DEVICE_MODIFY("acrtc")
-	MCFG_HD63484_ADDRESS_MAP(fstation_hd63484_map)
-MACHINE_CONFIG_END
+	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+}
 
-MACHINE_CONFIG_START(adp_state::fstation)
+void adp_state::fstation(machine_config &config)
+{
 	funland(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fstation_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::fstation_mem);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
 
 	m_palette->set_init(FUNC(adp_state::fstation_palette));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( quickjac )

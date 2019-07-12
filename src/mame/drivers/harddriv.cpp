@@ -565,7 +565,6 @@ void harddriv_state::driver_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x0207ffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_1bpp_w));
-	map(0xc0000000, 0xc00001ff).rw("gsp", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -579,7 +578,6 @@ void harddriv_state::driver_msp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x000fffff).ram().share("msp_ram");
 	map(0x00700000, 0x007fffff).ram().share("msp_ram");
-	map(0xc0000000, 0xc00001ff).rw("msp", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xfff00000, 0xffffffff).ram().share("msp_ram");
 }
 
@@ -616,7 +614,6 @@ void harddriv_state::multisync_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -658,7 +655,6 @@ void harddriv_state::multisync2_gsp_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0000200f).noprw();                 /* hit during self-test */
 	map(0x02000000, 0x020fffff).rw(FUNC(harddriv_state::hdgsp_vram_2bpp_r), FUNC(harddriv_state::hdgsp_vram_2bpp_w));
-	map(0xc0000000, 0xc00001ff).r("gsp", FUNC(tms34010_device::io_register_r)).w(FUNC(harddriv_state::hdgsp_io_w));
 	map(0xf4000000, 0xf40000ff).rw(FUNC(harddriv_state::hdgsp_control_lo_r), FUNC(harddriv_state::hdgsp_control_lo_w)).share("gsp_control_lo");
 	map(0xf4800000, 0xf48000ff).rw(FUNC(harddriv_state::hdgsp_control_hi_r), FUNC(harddriv_state::hdgsp_control_hi_w)).share("gsp_control_hi");
 	map(0xf5000000, 0xf5000fff).rw(FUNC(harddriv_state::hdgsp_paletteram_lo_r), FUNC(harddriv_state::hdgsp_paletteram_lo_w)).share("gsp_palram_lo");
@@ -1540,6 +1536,7 @@ void harddriv_state::multisync_nomsp(machine_config &config)
 	m_gsp->set_addrmap(AS_PROGRAM, &harddriv_state::multisync_gsp_map);
 	m_gsp->set_pixel_clock(6000000);
 	m_gsp->set_pixels_per_clock(2);
+	m_gsp->ioreg_pre_write().set(FUNC(harddriv_state::hdgsp_io_w));
 	m_gsp->set_scanline_ind16_callback(FUNC(harddriv_state::scanline_multisync));
 
 	/* video hardware */
@@ -1627,7 +1624,6 @@ void harddriv_state::ds3(machine_config &config)
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
@@ -1839,7 +1835,7 @@ void racedrivc_panorama_side_board_device_state::device_add_mconfig(machine_conf
 	/* basic machine hardware */        /* multisync board without MSP */
 	adsp(config);                       /* ADSP board */
 //  dsk(config);                        /* DSK board */
-//  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
+//  HARDDRIV_SOUND_BOARD(config, "sound_board", 0); /* driver sound board */
 }
 
 /* Stun Runner */
@@ -1922,7 +1918,7 @@ steeltalp_board_device_state::steeltalp_board_device_state(const machine_config 
 {
 }
 
-void steeltal_board_device_state::device_add_mconfig(machine_config &config)
+void steeltal_board_device_state::device_add_mconfig(machine_config &config) //todo: add ADSP-2105 on DSPCOM board for communications
 {
 	multisync_msp(config);
 
@@ -2093,14 +2089,14 @@ void harddriv_new_state::racedriv_panorama_machine(machine_config &config)
 	RACEDRIVC_PANORAMA_SIDE_BOARD(config, "leftpcb", 0);
 	RACEDRIVC_PANORAMA_SIDE_BOARD(config, "rightpcb", 0);
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
+//  config.m_minimum_quantum = attotime::from_hz(100000);
 	subdevice<mc68681_device>("mainpcb:duartn68681")->a_tx_cb().set(FUNC(harddriv_new_state::tx_a));
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	subdevice<atari_slapstic_device>("mainpcb:slapstic")->set_chipnum(115);
 
 	TIMER(config, "hack_timer").configure_periodic(FUNC(harddriv_new_state::hack_timer), attotime::from_hz(60));
-//  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+//  config.m_minimum_quantum = attotime::from_hz(60000);
 }
 
 // this is an ugly hack, otherwise MAME's core can't seem to handle partial updates if you have multiple screens with different update frequencies.
@@ -4866,9 +4862,9 @@ void harddriv_state::init_dsk()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x910000, 0x910fff, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), m_dsk_30c.target()), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), m_dsk_30c.target()), 0x00ff);
 
 	/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x914000, 0x917fff, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x914000, 0x917fff, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x918000, 0x91bfff, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x914000, 0x917fff, write16sm_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x914000, 0x917fff, read16smo_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x918000, 0x91bfff, read16smo_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install extra ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x940000, 0x9fffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_small_rom_r), this));
@@ -4882,9 +4878,9 @@ void harddriv_state::init_dsk2()
 	uint8_t *usr3 = memregion("user3")->base();
 
 	/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x824000, 0x824003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x824000, 0x824003, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x825000, 0x825001, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x824000, 0x824003, write16sm_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x824000, 0x824003, read16smo_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x825000, 0x825001, read16smo_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install ASIC61 */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x827000, 0x8277ff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_r), this), write16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_w), this));
@@ -4906,9 +4902,9 @@ void harddriv_state::init_dsk2()
 void harddriv_state::init_dspcom()
 {
 		/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x900003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x900003, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x901000, 0x910001, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x900003, write16sm_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x900003, read16smo_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x901000, 0x910001, read16smo_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install DSPCOM control */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x904000, 0x90401f, write16_delegate(FUNC(harddriv_state::hddspcom_control_w), this));
@@ -5312,10 +5308,10 @@ GAME(  1990, racedrivc1,  racedriv, racedrivc1_machine, racedrivc, harddriv_new_
 
 GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, harddriv_new_state, empty_init, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
 
-GAME(  1991, steeltal,    0,        steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
-GAME(  1991, steeltalg,   steeltal, steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
-GAME(  1991, steeltal1,   steeltal, steeltal1_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
-GAME(  1991, steeltalp,   steeltal, steeltalp_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING )
+GAME(  1991, steeltal,    0,        steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 2)", MACHINE_NODEVICE_LAN )
+GAME(  1991, steeltalg,   steeltal, steeltal_machine,   steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (German, rev 2)", MACHINE_NODEVICE_LAN  )
+GAME(  1991, steeltal1,   steeltal, steeltal1_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (rev 1)", MACHINE_NODEVICE_LAN  )
+GAME(  1991, steeltalp,   steeltal, steeltalp_machine,  steeltal,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Steel Talons (prototype)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 GAME(  1993, strtdriv,    0,        strtdriv_machine,   strtdriv,  harddriv_new_state, empty_init, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
 

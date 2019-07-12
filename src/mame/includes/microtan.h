@@ -8,9 +8,9 @@
  *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
- *  for his site http://www.geo255.redhotant.com
+ *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
- *  for his site http://www.ifrance.com/oric/microtan.html
+ *  for his site http://oric.free.fr/microtan.html
  *
  ******************************************************************************/
 
@@ -21,6 +21,7 @@
 
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
+#include "machine/timer.h"
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "imagedev/cassette.h"
@@ -28,16 +29,17 @@
 class microtan_state : public driver_device
 {
 public:
-	microtan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_irq_line(*this, "irq_line"),
-		m_cassette(*this, "cassette"),
-		m_via6522(*this, "via6522%u", 0),
-		m_ay8910(*this, "ay8910%u", 0),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_led(*this, "led1")
+	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_irq_line(*this, "irq_line")
+		, m_cassette(*this, "cassette")
+		, m_via6522(*this, "via6522%u", 0)
+		, m_ay8910(*this, "ay8910%u", 0)
+		, m_io_keyboard(*this, "ROW%u", 0)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_led(*this, "led1")
 	{ }
 
 	void microtan(machine_config &config);
@@ -47,7 +49,6 @@ public:
 protected:
 	enum
 	{
-		TIMER_READ_CASSETTE,
 		TIMER_PULSE_NMI
 	};
 
@@ -65,6 +66,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device_array<via6522_device, 2> m_via6522;
 	required_device_array<ay8910_device, 2> m_ay8910;
+	required_ioport_array<9> m_io_keyboard;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<> m_led;
 
@@ -90,7 +92,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(read_cassette);
+	TIMER_DEVICE_CALLBACK_MEMBER(read_cassette);
 	TIMER_CALLBACK_MEMBER(pulse_nmi);
 	DECLARE_READ8_MEMBER(via_0_in_a);
 	DECLARE_WRITE8_MEMBER(via_0_out_a);
@@ -101,15 +103,14 @@ private:
 	DECLARE_WRITE8_MEMBER(via_1_out_b);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
-	uint8_t read_dsw();
 	void store_key(int key);
 	image_verify_result verify_snapshot(uint8_t *data, int size);
 	image_init_result parse_intel_hex(uint8_t *snapshot_buff, char *src);
 	image_init_result parse_zillion_hex(uint8_t *snapshot_buff, char *src);
 	void set_cpu_regs(const uint8_t *snapshot_buff, int base);
 	void snapshot_copy(uint8_t *snapshot_buff, int snapshot_size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void main_map(address_map &map);
 };

@@ -186,7 +186,7 @@ READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 {
-	uint8_t ret = m_rtc->read(space, 1);
+	uint8_t ret = m_rtc->read(1);
 	verboselog(1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
@@ -194,12 +194,12 @@ READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
 {
 	verboselog(1, "sgi_ip2_clock_ctl_w: %02x\n", data);
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 {
-	uint8_t ret = m_rtc->read(space, 0);
+	uint8_t ret = m_rtc->read(0);
 	verboselog(1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
 }
@@ -207,7 +207,7 @@ READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_w)
 {
 	verboselog(1, "sgi_ip2_clock_data_w: %02x\n", data);
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 
@@ -405,12 +405,12 @@ void sgi_ip2_state::sgi_ip2_map(address_map &map)
 
 WRITE_LINE_MEMBER(sgi_ip2_state::duarta_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 WRITE_LINE_MEMBER(sgi_ip2_state::duartb_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
@@ -495,8 +495,6 @@ void sgi_ip2_state::init_sgi_ip2()
 	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
 	uint32_t *dst = m_mainram;
 	memcpy(dst, src, 8);
-
-	m_maincpu->reset();
 }
 
 /***************************************************************************

@@ -86,7 +86,10 @@ const tiny_rom_entry *msx_cart_sfg01_device::device_rom_region() const
 
 ROM_START( msx_sfg05 )
 	ROM_REGION(0x8000, "sfg", 0)
-	ROM_LOAD("sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
+	ROM_SYSTEM_BIOS( 0, "sfg05", "SFG05 (original)" )
+	ROMX_LOAD( "sfg05.rom", 0x0, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "sfg05a", "SFG05 (SFG01 upgrade)" ) // SFG01 PCB, Yamaha official upgrade, has YM2151 instead of YM2164
+	ROMX_LOAD( "sfg05a.rom", 0x0, 0x8000, CRC(5bc237f8) SHA1(930338f45c08228108c0831cc4a26014c2674718), ROM_BIOS(1) )
 ROM_END
 
 
@@ -131,22 +134,22 @@ void msx_cart_sfg_device::check_irq()
 {
 	if (m_ym2151_irq_state != CLEAR_LINE || m_ym2148_irq_state != CLEAR_LINE)
 	{
-		m_out_irq_cb(ASSERT_LINE);
+		irq_out(ASSERT_LINE);
 	}
 	else
 	{
-		m_out_irq_cb(CLEAR_LINE);
+		irq_out(CLEAR_LINE);
 	}
 }
 
 
-READ8_MEMBER(msx_cart_sfg_device::read_cart)
+uint8_t msx_cart_sfg_device::read_cart(offs_t offset)
 {
 	switch (offset & 0x3fff)
 	{
 		case 0x3ff0:     // YM-2151 status read
 		case 0x3ff1:     // YM-2151 status read mirror?
-			return m_ym2151->status_r(space, 0);
+			return m_ym2151->status_r();
 
 		case 0x3ff2:     // YM-2148 keyboard column read
 		case 0x3ff3:     // YM-2148 --
@@ -155,7 +158,7 @@ READ8_MEMBER(msx_cart_sfg_device::read_cart)
 		case 0x3ff6:     // YM-2148 MIDI UART status register
 							// ------x- - 1 = received a byte/receive buffer full?
 							// -------x - 1 = ready to send next byte/send buffer empty?
-			return m_ym2148->read(space, offset & 7);
+			return m_ym2148->read(offset & 7);
 	}
 
 	if (offset < 0x8000)
@@ -167,16 +170,16 @@ READ8_MEMBER(msx_cart_sfg_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
+void msx_cart_sfg_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x3fff)
 	{
 		case 0x3ff0:     // YM-2151 register
-			m_ym2151->register_w(space, 0, data);
+			m_ym2151->register_w(data);
 			break;
 
 		case 0x3ff1:    // YM-2151 data
-			m_ym2151->data_w(space, 0, data);
+			m_ym2151->data_w(data);
 			break;
 
 		case 0x3ff2:   // YM-2148 write keyboard row
@@ -191,7 +194,7 @@ WRITE8_MEMBER(msx_cart_sfg_device::write_cart)
 						// x------- - 1 = reset
 						// -----x-- - 1 = enable receiving / sending midi data
 						// -------x - 1 = enable receiving / sending midi data
-			m_ym2148->write(space, offset & 7, data);
+			m_ym2148->write(offset & 7, data);
 			break;
 
 		default:

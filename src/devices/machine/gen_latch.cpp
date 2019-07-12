@@ -2,12 +2,17 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    Generic 8bit and 16 bit latch devices
+    Generic 8 bit and 16 bit latch devices
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "gen_latch.h"
+
+#define LOG_WARN (1U << 0)
+#define VERBOSE (LOG_WARN)
+
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -89,14 +94,14 @@ void generic_latch_base_device::set_latch_written(bool latch_written)
 	}
 }
 
-READ8_MEMBER(generic_latch_base_device::acknowledge_r)
+u8 generic_latch_base_device::acknowledge_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		set_latch_written(false);
 	return space.unmap();
 }
 
-WRITE8_MEMBER(generic_latch_base_device::acknowledge_w)
+void generic_latch_base_device::acknowledge_w(u8 data)
 {
 	set_latch_written(false);
 }
@@ -111,24 +116,24 @@ generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, co
 {
 }
 
-READ8_MEMBER( generic_latch_8_device::read )
+u8 generic_latch_8_device::read()
 {
 	if (!has_separate_acknowledge() && !machine().side_effects_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
 
-WRITE8_MEMBER( generic_latch_8_device::write )
+void generic_latch_8_device::write(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_8_device::sync_callback), this), data);
 }
 
-WRITE8_MEMBER( generic_latch_8_device::preset_w )
+void generic_latch_8_device::preset_w(u8 data)
 {
-	m_latched_value = 0xff;
+	m_latched_value = data;
 }
 
-WRITE8_MEMBER( generic_latch_8_device::clear_w )
+void generic_latch_8_device::clear_w(u8 data)
 {
 	m_latched_value = 0x00;
 }
@@ -154,7 +159,7 @@ void generic_latch_8_device::sync_callback(void *ptr, s32 param)
 
 	// if the latch has been written and the value is changed, log a warning
 	if (is_latch_written() && m_latched_value != value)
-		logerror("Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
+		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;
@@ -182,24 +187,24 @@ generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, 
 {
 }
 
-READ16_MEMBER( generic_latch_16_device::read )
+u16 generic_latch_16_device::read()
 {
 	if (!has_separate_acknowledge() && !machine().side_effects_disabled())
 		set_latch_written(false);
 	return m_latched_value;
 }
 
-WRITE16_MEMBER( generic_latch_16_device::write )
+void generic_latch_16_device::write(u16 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_16_device::sync_callback), this), data);
 }
 
-WRITE16_MEMBER( generic_latch_16_device::preset_w )
+void generic_latch_16_device::preset_w(u16 data)
 {
-	m_latched_value = 0xffff;
+	m_latched_value = data;
 }
 
-WRITE16_MEMBER( generic_latch_16_device::clear_w )
+void generic_latch_16_device::clear_w(u16 data)
 {
 	m_latched_value = 0x0000;
 }
@@ -225,7 +230,7 @@ void generic_latch_16_device::sync_callback(void *ptr, s32 param)
 
 	// if the latch has been written and the value is changed, log a warning
 	if (is_latch_written() && m_latched_value != value)
-		logerror("Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
+		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;

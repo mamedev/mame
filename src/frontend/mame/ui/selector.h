@@ -7,13 +7,14 @@
     Internal UI user interface.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_SELECTOR_H
 #define MAME_FRONTEND_UI_SELECTOR_H
 
+#pragma once
+
+
 #include "ui/menu.h"
+
 
 namespace ui {
 
@@ -44,11 +45,12 @@ private:
 
 	void find_matches(const char *str);
 
-	std::string                m_search;
-	std::vector<std::string>   m_str_items;
-	std::function<void (int)>  m_handler;
-	int                        m_initial;
-	std::string                *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	std::string                    m_search;
+	std::vector<std::string>       m_str_items;
+	std::function<void (int)>      m_handler;
+	std::vector<std::u32string>    m_ucs_items;
+	int                            m_initial;
+	std::string                    *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 };
 
 } // namespace ui

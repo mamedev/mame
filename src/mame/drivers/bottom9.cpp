@@ -36,24 +36,24 @@ READ8_MEMBER(bottom9_state::k052109_051960_r)
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(bottom9_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
@@ -63,9 +63,9 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_k051316->rom_r(offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->read(offset);
 	}
 }
 
@@ -74,7 +74,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->write(offset, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
@@ -90,7 +90,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)
@@ -131,7 +131,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
 
 WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)

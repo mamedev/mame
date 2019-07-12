@@ -8,7 +8,7 @@ Single board version with Dual Screen output
 (MS32 version also exists)
 
 for the time being most of this driver is copied
-from ms32.c, with some adjustments for dual screen.
+from ms32.cpp, with some adjustments for dual screen.
 
 
 Main PCB
@@ -702,7 +702,41 @@ INPUT_PORTS_END
 
 
 /* sprites are contained in 256x256 "tiles" */
-static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
+static const uint32_t sprite_xoffset[256] =
+{
+	STEP8(8*8*8*0,    8), STEP8(8*8*8*1,    8), STEP8(8*8*8*2,    8), STEP8(8*8*8*3,    8),
+	STEP8(8*8*8*4,    8), STEP8(8*8*8*5,    8), STEP8(8*8*8*6,    8), STEP8(8*8*8*7,    8),
+	STEP8(8*8*8*8,    8), STEP8(8*8*8*9,    8), STEP8(8*8*8*10,   8), STEP8(8*8*8*11,   8),
+	STEP8(8*8*8*12,   8), STEP8(8*8*8*13,   8), STEP8(8*8*8*14,   8), STEP8(8*8*8*15,   8),
+	STEP8(8*8*8*16,   8), STEP8(8*8*8*17,   8), STEP8(8*8*8*18,   8), STEP8(8*8*8*19,   8),
+	STEP8(8*8*8*20,   8), STEP8(8*8*8*21,   8), STEP8(8*8*8*22,   8), STEP8(8*8*8*23,   8),
+	STEP8(8*8*8*24,   8), STEP8(8*8*8*25,   8), STEP8(8*8*8*26,   8), STEP8(8*8*8*27,   8),
+	STEP8(8*8*8*28,   8), STEP8(8*8*8*29,   8), STEP8(8*8*8*30,   8), STEP8(8*8*8*31,   8)
+};
+static const uint32_t sprite_yoffset[256] =
+{
+	STEP8(8*8*8*0,  8*8), STEP8(8*8*8*32, 8*8), STEP8(8*8*8*64, 8*8), STEP8(8*8*8*96, 8*8),
+	STEP8(8*8*8*128,8*8), STEP8(8*8*8*160,8*8), STEP8(8*8*8*192,8*8), STEP8(8*8*8*224,8*8),
+	STEP8(8*8*8*256,8*8), STEP8(8*8*8*288,8*8), STEP8(8*8*8*320,8*8), STEP8(8*8*8*352,8*8),
+	STEP8(8*8*8*384,8*8), STEP8(8*8*8*416,8*8), STEP8(8*8*8*448,8*8), STEP8(8*8*8*480,8*8),
+	STEP8(8*8*8*512,8*8), STEP8(8*8*8*544,8*8), STEP8(8*8*8*576,8*8), STEP8(8*8*8*608,8*8),
+	STEP8(8*8*8*640,8*8), STEP8(8*8*8*672,8*8), STEP8(8*8*8*704,8*8), STEP8(8*8*8*736,8*8),
+	STEP8(8*8*8*768,8*8), STEP8(8*8*8*800,8*8), STEP8(8*8*8*832,8*8), STEP8(8*8*8*864,8*8),
+	STEP8(8*8*8*896,8*8), STEP8(8*8*8*928,8*8), STEP8(8*8*8*960,8*8), STEP8(8*8*8*992,8*8)
+};
+static const gfx_layout spritelayout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*8,
+	sprite_xoffset,
+	sprite_yoffset
+};
+
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
@@ -809,21 +843,21 @@ void bnstars_state::bnstars_sound_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(bnstars_state::bnstars)
-
+void bnstars_state::bnstars(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // 20MHz
-	MCFG_DEVICE_PROGRAM_MAP(bnstars_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	V70(config, m_maincpu, 20000000); // 20MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(bnstars_state::ms32_interrupt), "lscreen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
-	MCFG_DEVICE_PROGRAM_MAP(bnstars_sound_map)
+	Z80(config, m_audiocpu, 4000000); // Unverified; it's possibly higher than 4MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bnstars)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bnstars);
 
 	auto &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::xBRG_888, 0x8000);
@@ -835,21 +869,21 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(40*8, 32*8);
+	lscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	lscreen.set_screen_update(FUNC(bnstars_state::screen_update_bnstars_left));
+	lscreen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_right)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(40*8, 32*8);
+	rscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	rscreen.set_screen_update(FUNC(bnstars_state::screen_update_bnstars_right));
+	rscreen.set_palette("palette2");
 
 
 	/* sound hardware */
@@ -859,19 +893,18 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymf1", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
+	ymf271_device &ymf1(YMF271(config, "ymf1", 16934400));
+	ymf1.add_route(0, "lspeaker", 1.0);
+	ymf1.add_route(1, "rspeaker", 1.0);
+//  ymf1.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf1.add_route(3, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymf2", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-//  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
-//  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
-
-MACHINE_CONFIG_END
+	ymf271_device &ymf2(YMF271(config, "ymf2", 16934400));
+	ymf2.add_route(0, "lspeaker", 1.0);
+	ymf2.add_route(1, "rspeaker", 1.0);
+//  ymf2.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf2.add_route(3, "rspeaker", 1.0);
+}
 
 
 ROM_START( bnstars1 )
@@ -933,8 +966,6 @@ ROM_END
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
 void bnstars_state::init_bnstars()
 {
-	ms32_rearrange_sprites(machine(), "gfx1");
-
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx5");
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx4");
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx7");

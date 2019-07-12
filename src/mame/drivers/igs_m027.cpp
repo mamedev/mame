@@ -58,12 +58,11 @@ public:
 	void init_amazoni2();
 
 private:
-	optional_shared_ptr<uint32_t> m_igs_mainram;
+	optional_shared_ptr<u32> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
 	virtual void video_start() override;
-	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void sdwx_gfx_decrypt();
@@ -129,15 +128,6 @@ void igs_m027_state::video_start()
 }
 
 
-
-uint32_t igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_igs017_igs031->screen_update_igs017(screen, bitmap, cliprect);
-	return 0;
-
-}
-
-
 /***************************************************************************
 
     Memory Maps
@@ -174,7 +164,7 @@ void igs_m027_state::igs_majhong_map(address_map &map)
 
 ***************************************************************************/
 #if 0
-static const uint8_t sdwx_tab[] =
+static const u8 sdwx_tab[] =
 {
 	0x49,0x47,0x53,0x30,0x30,0x35,0x35,0x52,0x44,0x34,0x30,0x32,0x30,0x36,0x32,0x31,
 	0x8A,0xBB,0x20,0x67,0x97,0xA5,0x20,0x45,0x6B,0xC0,0xE8,0x0C,0x80,0xFB,0x49,0xAA,
@@ -201,8 +191,8 @@ void igs_m027_state::sdwx_gfx_decrypt()
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	uint8_t *src = (uint8_t *) (memregion("tilemaps")->base());
-	std::vector<uint8_t> result_data(rom_size);
+	u8 *src = (u8 *) (memregion("igs017_igs031:tilemaps")->base());
+	std::vector<u8> result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
@@ -327,69 +317,59 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
-	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
+void igs_m027_state::igs_majhong(machine_config &config)
+{
+	ARM7(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	screen.set_palette("igs017_igs031:palette");
+	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();
-	m_igs017_igs031->set_palette("palette");
+	//m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295
-MACHINE_CONFIG_END
+}
 
 
-
-
-
-MACHINE_CONFIG_START(igs_m027_state::amazonia)
-	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
-	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
+void igs_m027_state::amazonia(machine_config &config)
+{
+	ARM7(config, m_maincpu, 20000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::igs_majhong_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-//  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
+	screen.set_palette("igs017_igs031:palette");
+	screen.screen_vblank().set(FUNC(igs_m027_state::vblank_irq));
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
 	m_igs017_igs031->set_text_reverse_bits();
-	m_igs017_igs031->set_palette("palette");
+	//m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295
-
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 
@@ -436,10 +416,10 @@ ROM_START( slqz3 )
 	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x080000, "tilemaps", 0 )
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "u9",  0x000000, 0x080000, CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "u18", 0x000000, 0x400000, CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 
@@ -489,10 +469,10 @@ ROM_START( fruitpar )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "fruit_paradise_v214.u23", 0x00000, 0x80000, CRC(e37bc4e0) SHA1(f5580e6007dc60f32efd3b3e7e64c5ee446ede8a) )
 
-	ROM_REGION( 0x080000, "tilemaps", 0 )
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "paradise_text.u12", 0x000000, 0x080000, CRC(bdaa4407) SHA1(845eead0902c81290c2b5d7543ac9dfda375fdd1) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_m4101.u13",     0x000000, 0x400000, CRC(84899398) SHA1(badac65af6e03c490798f4368eb2b15db8c590d0) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 
@@ -526,10 +506,10 @@ ROM_START( amazonia )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "amazonia_v-104br.u23", 0x00000, 0x80000, CRC(103d465e) SHA1(68d088f24171e27c0a9b0660f81d3334f730637a) )
 
-	ROM_REGION( 0x480000, "tilemaps", 0 )
+	ROM_REGION( 0x480000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "igs_t2105_cg_v110.u12", 0x000000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
 
-	ROM_REGION( 0x480000, "sprites", 0 )
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_a2107_cg_v110.u13", 0x000000, 0x400000,CRC(d8dadfd7) SHA1(b40a46d56ff46d91e3377be8616c3eed321f7db4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "amazonia_cg.u11", 0x400000, 0x80000, CRC(2ac2cfd1) SHA1(f8750a4727ddabf1415dab6eaa4a72e60e86e7f1) )       // FIXED BITS (xxxxxxxx0xxxxxxx)
 
@@ -545,10 +525,10 @@ ROM_START( amazonkp )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ak_plus_v-204br.u23", 0x00000, 0x80000, CRC(e71f6272) SHA1(1717cc4dad9858f1a54988b7459631de8bac8ebd) )
 
-	ROM_REGION( 0x480000, "tilemaps", 0 )
+	ROM_REGION( 0x480000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "igs_t2105.u12", 0x000000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
 
-	ROM_REGION( 0x480000, "sprites", 0 )
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_a2107.u13",      0x000000, 0x400000,CRC(d8dadfd7) SHA1(b40a46d56ff46d91e3377be8616c3eed321f7db4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "ak_plus_ext_cg.u11", 0x400000, 0x80000, CRC(26796bc0) SHA1(bd259fbd05834de3d90af87235f13b467a492fed) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
@@ -580,10 +560,10 @@ ROM_START( amazoni2 )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "27c4096_akii_b-202br.u23", 0x000000, 0x80000, CRC(7147b43c) SHA1(29a4a20867595650918c4ab892ddb71440bd3f4b) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "akii_text.u12", 0x000000, 0x80000, CRC(60b415ac) SHA1(b4475b0ba1e70504cac9ac05078873df0b16495b) )
 
-	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "u13_27c160_akii_cg.u13", 0x000000, 0x200000, CRC(254bd84f) SHA1(091ecda792c4c4a7bb039b2c708788ef87fdaf86) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x80000, "oki", 0 )  // m6295 samples
@@ -604,10 +584,10 @@ ROM_START( sdwx )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "prg.u16", 0x000000, 0x80000, CRC(c94ef6a8) SHA1(69f2f356e05206b0866a9020253d9a112b56316c) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "text.u24", 0x000000, 0x80000, CRC(60b415ac) SHA1(b4475b0ba1e70504cac9ac05078873df0b16495b) )
 
-	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "cg.u25", 0x000000, 0x200000, CRC(709b9a42) SHA1(18c4b8e159b29c168f5cafb437fe6eb123672471) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) // m6295 samples
@@ -622,10 +602,10 @@ ROM_START( klxyj )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "klxyj_104.u16", 0x000000, 0x80000, CRC(8cb9bdc2) SHA1(5a13d0ff6488a938617a9ea89e7cf607539a1f49) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "klxyj_text.u24", 0x000000, 0x80000, CRC(22dcebd0) SHA1(0383f017135230d020d12c8c6cc3aeb136fe9106) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "a4202.u25", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
@@ -647,10 +627,10 @@ ROM_START( lhzb3 )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb3_104.u9", 0x000000, 0x80000, CRC(70d61846) SHA1(662b59702ef6f26129de6b16346786df92f99097) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "lhzb3_text.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
 
 	ROM_REGION( 0x200000, "unknown", 0 )
@@ -714,10 +694,10 @@ ROM_START( zhongguo )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "p2600.u10", 0x000000, 0x80000, CRC(9ad34135) SHA1(54717753d1296efe49946369fd4a27181f19dbc0) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "t2604.u9", 0x000000, 0x80000, CRC(5401a52d) SHA1(05b47a4b39939c1d5904e3fbd5cc56d6ee9b7953) )
 
-	ROM_REGION( 0x480000, "sprites", 0 )
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m2601.u17", 0x000000, 0x400000, CRC(89736e3f) SHA1(6a22e2eb10d2c740cf21640c43a8caf4c72d3be7) )
 	ROM_LOAD( "m2603.u18", 0x400000, 0x080000, CRC(fb2e91a8) SHA1(29b2f0ce3749539cbe4cfb5c40b240cc7f6147f1) )
 
@@ -735,10 +715,10 @@ ROM_START( mgfx )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "mgfx_101.u10", 0x000000, 0x80000, CRC(897c88a1) SHA1(0f7a7808b9503ff28ad32c0b8e071cb24cff59b1) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "mgfx_text.u9", 0x000000, 0x80000, CRC(e41e7768) SHA1(3d0add7c75c23533309e799fd8853c815e6f811c) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "mgfx_ani.u17", 0x000000, 0x400000, CRC(9fc75f4d) SHA1(acb600739dcf252a5210e28ec96d749573061b27) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
@@ -818,10 +798,10 @@ ROM_START( gonefsh2 )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "gfii_v-904uso.u12", 0x000000, 0x80000, CRC(ef0f6735) SHA1(0add92599b0989f3e50dc64e32ce234b4bd87d33) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "gfii_text.u15", 0x000000, 0x80000, CRC(b48118fd) SHA1(e718d23ce5f7f41ab94df2d05cdd3adbf27eef89) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "gfii_cg.u17", 0x000000, 0x200000, CRC(2568359c) SHA1(f1f240246e53496bf624c84f7cae3edb9675579f) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
@@ -899,10 +879,10 @@ ROM_START( chessc2 )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ccii_v-707uso.u12", 0x000000, 0x80000, CRC(5937b67b) SHA1(967b3adf6f5bf92d63ec460d595e473898a78372) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "ccii_text.u15", 0x000000, 0x80000, CRC(25fed033) SHA1(b321c4994f609906597c3f7d5cdfc2dca63cd340) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "ccii_cg.u17", 0x000000, 0x200000, CRC(47e45157) SHA1(4459799a4a6c30a2d0a3ad9ac54e92b62221e10b) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
@@ -927,11 +907,11 @@ ROM_START( haunthig )
 	ROM_REGION( 0x10000, "plcc", 0 )
 	ROM_LOAD( "hauntedhouse.u17", 0x000000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU) marked J9, not read protected?
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "haunted-h_text.u15", 0x000000, 0x80000, CRC(c23f48c8) SHA1(0cb1b6c61611a081ae4a3c0be51812045ff632fe) )
 
 	// are these PGM-like sprites?
-	ROM_REGION( 0x800000, "sprites", 0 )
+	ROM_REGION( 0x800000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "haunted-h_cg.u32",  0x000000, 0x400000, CRC(e0ea10e6) SHA1(e81be78fea93e72d4b1f4c0b58560bda46cf7948) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "haunted-h_ext.u12", 0x400000, 0x400000, CRC(662eb883) SHA1(831ebe29e1e7a8b2c2fff7fbc608975771c3486c) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
@@ -954,10 +934,10 @@ ROM_START( sddz )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ddz_218cn.u17", 0x000000, 0x80000, CRC(3cfe38d5) SHA1(9c7f82ecffbc22879583519d5f753bb35e973ee3) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "ddz_text.u27", 0x000000, 0x80000, CRC(520dc392) SHA1(0ab2620f20af8253806b6ff4e1d9d77a694da17c) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "ddz_ani.u28", 0x000000, 0x400000, CRC(72487508) SHA1(9f4bbc858960ddaae403e4a3330b2345f6fd6cb3))
 
 	ROM_REGION( 0x200000, "samples", 0 ) // samples, but not OKI? possibly ICS?
@@ -972,10 +952,10 @@ ROM_START( lhzb4 )
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb4_104.u17", 0x000000, 0x80000, CRC(6f349bbb) SHA1(54cf895889ef0f208637ba732ede696ca3603ee0) )
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "lhzb4_text.u27", 0x000000, 0x80000, CRC(8488b039) SHA1(59bc9eccba810fcac2a53866b2da1e71bfd8a6e7) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "a05501.u28", 0x000000, 0x400000, CRC(f78b3714) SHA1(c73d8e50b04126bc4f91783384713624ed133ee2) )
 
 	ROM_REGION( 0x200000, "samples", 0 ) // samples, but not OKI? possibly ICS?
@@ -987,7 +967,7 @@ ROM_END
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
-	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
+	u16 *temp16 = (u16 *)memregion("maincpu")->base();
 
 	// fill with RX 14
 	int i;

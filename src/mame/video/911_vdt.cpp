@@ -280,11 +280,11 @@ READ8_MEMBER( vdt911_device::cru_r )
 {
 	int reply=0;
 
-	offset &= 0x1;
+	offset &= 0xf;
 
 	if (!m_word_select)
 	{   /* select word 0 */
-		switch (offset)
+		switch (offset >> 3)
 		{
 		case 0:
 			reply = m_display_RAM[m_cursor_address];
@@ -299,7 +299,7 @@ READ8_MEMBER( vdt911_device::cru_r )
 	}
 	else
 	{   /* select word 1 */
-		switch (offset)
+		switch (offset >> 3)
 		{
 		case 0:
 			reply = m_cursor_address & 0xff;
@@ -321,7 +321,7 @@ READ8_MEMBER( vdt911_device::cru_r )
 		}
 	}
 
-	return reply;
+	return BIT(reply, offset & 3);
 }
 
 /*
@@ -794,18 +794,18 @@ INPUT_PORTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vdt911_device::device_add_mconfig)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(11.004_MHz_XTAL, 700, 0, 560, 262, 0, 240);
-	screen.set_screen_update(FUNC(vdt911_device::screen_update));
-	screen.set_palette("palette");
+void vdt911_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(11.004_MHz_XTAL, 700, 0, 560, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(vdt911_device::screen_update));
+	m_screen->set_palette("palette");
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
+	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "speaker", 0.50);
 
 	PALETTE(config, "palette", FUNC(vdt911_device::vdt911_palette), ARRAY_LENGTH(vdt911_pens), ARRAY_LENGTH(vdt911_colors));
-MACHINE_CONFIG_END
+}
 
 ioport_constructor vdt911_device::device_input_ports() const
 {

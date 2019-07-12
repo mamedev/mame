@@ -6,17 +6,21 @@
 #pragma once
 
 #include "emupal.h"
+#include "machine/i2cmem.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
 
 class funworld_state : public driver_device
 {
 public:
 	funworld_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
+		m_i2cmem(*this, "i2cmem"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -28,18 +32,16 @@ public:
 	void cuoreuno(machine_config &config);
 	void funquiz(machine_config &config);
 	void witchryl(machine_config &config);
-	void intrgmes(machine_config &config);
 	void fw_brick_1(machine_config &config);
 	void fw_brick_2(machine_config &config);
 
 	void init_saloon();
-	void init_royalcdc();
-	void init_multiwin();
 	void init_mongolnw();
 	void init_soccernw();
 	void init_tabblue();
 	void init_dino4();
 	void init_ctunk();
+	void init_jolycdig();
 
 protected:
 	DECLARE_WRITE8_MEMBER(funworld_videoram_w);
@@ -50,11 +52,12 @@ protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 	void funworld_palette(palette_device &palette) const;
-	uint32_t screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_funworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void magicrd2_map(address_map &map);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_bg_tilemap = nullptr;
 
@@ -68,15 +71,14 @@ private:
 	void cuoreuno_map(address_map &map);
 	void funquiz_map(address_map &map);
 	void funworld_map(address_map &map);
-	void fw_a7_11_map(address_map &map);
-	void intergames_map(address_map &map);
+	void fw_brick_map(address_map &map);
 	void saloon_map(address_map &map);
 	void witchryl_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	optional_device<i2cmem_device> m_i2cmem;
 	output_finder<8> m_lamps;
 };
 
@@ -130,6 +132,74 @@ private:
 	DECLARE_READ8_MEMBER(chinatow_r_32f0);
 
 	void chinatow_map(address_map &map);
+};
+
+
+class multiwin_state : public funworld_state
+{
+public:
+
+	using funworld_state::funworld_state;
+
+	void multiwin(machine_config& config);
+
+	void driver_init() override;
+
+protected:
+	virtual void video_start() override;
+
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(multiwin_opcode_r);
+
+	void multiwin_opcodes_map(address_map& map);
+};
+
+class royalcrdf_state : public funworld_state
+{
+public:
+	using funworld_state::funworld_state;
+
+	void royalcrdf(machine_config& config);
+
+	void driver_init() override;
+
+private:
+	cpu_device* _maincpu {};
+	DECLARE_READ8_MEMBER(royalcrdf_opcode_r);
+
+	void royalcrdf_map(address_map& map);
+	void royalcrdf_opcodes_map(address_map& map);
+};
+
+class intergames_state : public funworld_state
+{
+public:
+	intergames_state(const machine_config &mconfig, device_type type, const char *tag) :
+		funworld_state(mconfig, type, tag),
+		m_crtc(*this, "crtc"),
+		m_ay8910(*this, "ay8910"),
+		m_crtc_selected(false)
+	{ }
+
+	void intrgmes(machine_config &config);
+
+protected:
+	virtual void driver_init() override;
+	virtual void machine_reset() override;
+
+private:
+	uint8_t crtc_or_psg_r(offs_t offset);
+	void crtc_or_psg_w(offs_t offset, uint8_t data);
+	uint8_t prot_r(offs_t offset);
+	void prot_w(offs_t offset, uint8_t data);
+
+	void intergames_map(address_map &map);
+
+	required_device<mc6845_device> m_crtc;
+	required_device<ay8910_device> m_ay8910;
+
+	bool m_crtc_selected;
 };
 
 #endif // MAME_INCLUDES_FUNWORLD_H

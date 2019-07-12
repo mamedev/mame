@@ -90,7 +90,6 @@ private:
 /* VIDEO GOODS */
 uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int charx, chary;
 	const uint8_t pal_bank = m_ld_video_visible == true ? 0x10 : 0x00;
 	const uint32_t trans_mask = m_ld_video_visible == true ? 0 : -1;
 	gfx_element *gfx;// = m_gfxdecode->gfx(0);
@@ -100,9 +99,9 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 
 	/* Draw tiles */
-	for (charx = 0; charx < 32; charx++)
+	for (int charx = 0; charx < 32; charx++)
 	{
-		for (chary = 0; chary < 32; chary++)
+		for (int chary = 0; chary < 32; chary++)
 		{
 			int current_screen_character = (chary*32) + charx;
 
@@ -359,22 +358,24 @@ void esh_state::machine_start()
 
 
 /* DRIVER */
-MACHINE_CONFIG_START(esh_state::esh)
+void esh_state::esh(machine_config &config)
+{
 	/* main cpu */
-	MCFG_DEVICE_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
-	MCFG_DEVICE_PROGRAM_MAP(z80_0_mem)
-	MCFG_DEVICE_IO_MAP(z80_0_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
+	Z80(config, m_maincpu, PCB_CLOCK/6);                       /* The denominator is a Daphne guess based on PacMan's hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &esh_state::z80_0_mem);
+	m_maincpu->set_addrmap(AS_IO, &esh_state::z80_0_io);
+	m_maincpu->set_vblank_int("screen", FUNC(esh_state::vblank_callback_esh));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(*this, esh_state, ld_command_strobe_cb))
-	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, esh_state, screen_update_esh)
-	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
+	PIONEER_LDV1000(config, m_laserdisc, 0);
+	m_laserdisc->command_strobe_callback().set(FUNC(esh_state::ld_command_strobe_cb));
+	m_laserdisc->set_overlay(256, 256, FUNC(esh_state::screen_update_esh));
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	PALETTE(config, m_palette, FUNC(esh_state::esh_palette), 256);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esh);
@@ -383,13 +384,9 @@ MACHINE_CONFIG_START(esh_state::esh)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 // we just disable even lines so we can simulate line blinking
 #define ROM_INTERLACED_GFX \

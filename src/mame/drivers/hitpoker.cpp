@@ -93,7 +93,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(hitpoker_irq);
 	DECLARE_READ8_MEMBER(irq_clear_r);
 	virtual void video_start() override;
-	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -111,12 +111,12 @@ void hitpoker_state::video_start()
 	m_colorram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	int y,x;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	for (y=0;y<31;y++)
 	{
@@ -462,7 +462,8 @@ static GFXDECODE_START( gfx_hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(hitpoker_state::hitpoker)
+void hitpoker_state::hitpoker(machine_config &config)
+{
 	MC68HC11(config, m_maincpu, 1000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hitpoker_state::hitpoker_map);
 	m_maincpu->set_addrmap(AS_IO, &hitpoker_state::hitpoker_io);
@@ -477,9 +478,8 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	screen.set_size(648, 480); //setted by the CRTC
 	screen.set_visarea(0, 648-1, 0, 240-1);
 	screen.set_screen_update(FUNC(hitpoker_state::screen_update_hitpoker));
-	screen.set_palette(m_palette);
 
-	h46505_device &crtc(H46505(config, "crtc", CRTC_CLOCK/2));  /* hand tuned to get ~60 fps */
+	hd6845s_device &crtc(HD6845S(config, "crtc", CRTC_CLOCK/2));  /* hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

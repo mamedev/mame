@@ -53,7 +53,7 @@ private:
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p7_r);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void svmu_io_mem(address_map &map);
 	void svmu_mem(address_map &map);
@@ -75,9 +75,9 @@ WRITE8_MEMBER(svmu_state::page_w)
 READ8_MEMBER(svmu_state::prog_r)
 {
 	if (m_page == 1)
-		return m_flash->read(space, offset);
+		return m_flash->read(offset);
 	else if (m_page == 2)
-		return m_flash->read(space, 0x10000 + offset);
+		return m_flash->read(0x10000 + offset);
 	else
 		return m_bios[offset];
 }
@@ -85,9 +85,9 @@ READ8_MEMBER(svmu_state::prog_r)
 WRITE8_MEMBER(svmu_state::prog_w)
 {
 	if (m_page == 1)
-		m_flash->write(space, offset, data);
+		m_flash->write(offset, data);
 	else if (m_page == 2)
-		m_flash->write(space, 0x10000 + offset, data);
+		m_flash->write(0x10000 + offset, data);
 }
 
 /*
@@ -209,7 +209,7 @@ inline void vmufat_write_word(uint8_t* flash, uint8_t block, offs_t offset, uint
 	flash[(block * 512) + offset + 1] = (data>>8) & 0xff;
 }
 
-QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
+QUICKLOAD_LOAD_MEMBER(svmu_state::quickload_cb)
 {
 	uint32_t size = image.length();
 	uint8_t *flash = m_flash->base();
@@ -341,8 +341,8 @@ void svmu_state::svmu(machine_config &config)
 	/* devices */
 	ATMEL_29C010(config, m_flash);
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(svmu_state, svmu), this), "vms,bin", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "vms,bin"));
+	quickload.set_load_callback(FUNC(svmu_state::quickload_cb), this);
 	quickload.set_interface("svmu_quik");
 
 	/* Software lists */

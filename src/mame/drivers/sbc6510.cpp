@@ -221,7 +221,7 @@ READ8_MEMBER( sbc6510_state::a2_r )
 WRITE8_MEMBER( sbc6510_state::a2_w )
 {
 	m_2 = data;
-	m_terminal->write(space, 0, data);
+	m_terminal->write(data);
 }
 
 void sbc6510_state::machine_start()
@@ -282,8 +282,7 @@ void sbc6510_state::sbc6510(machine_config &config)
 	M6510(config, m_maincpu, XTAL(1'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_mem);
 
-	ATMEGA88(config, m_videocpu, XTAL(16'000'000));
-//  MCFG_DEVICE_DISABLE() // trips SLEEP opcode, needs to be emulated
+	ATMEGA88(config, m_videocpu, XTAL(16'000'000)); // Video CPU trips SLEEP opcode, needs to be emulated
 	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_video_mem);
 	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::sbc6510_video_data);
 	m_videocpu->set_addrmap(AS_IO, &sbc6510_state::sbc6510_video_io);

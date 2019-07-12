@@ -13,6 +13,8 @@ This computer is both a Z80 trainer, and a chess computer.
 
         There is no chess board attached. You supply your own
         and you sync the pieces and the computer instructions.
+        The chess engine was copied from Fidelity's Sensory
+        Chess Challenger 8.
 
         When started, it is in Chess mode. Press 11111 to switch to
         Trainer mode.
@@ -55,6 +57,8 @@ Pasting doesn't work, but if it did...
 
 #include "slc1.lh"
 
+
+namespace {
 
 class slc1_state : public driver_device
 {
@@ -267,20 +271,20 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(slc1_state::slc1)
+void slc1_state::slc1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &slc1_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &slc1_state::io_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************
@@ -297,6 +301,8 @@ ROM_START(slc1)
 	ROMX_LOAD("sc1-v2.bin",      0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(1))
 ROM_END
 
+} // anonymous namespace
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME */
-COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dr. Dieter Scheuschner", "SLC-1" , 0 )
+
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY               FULLNAME */
+COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", 0 )

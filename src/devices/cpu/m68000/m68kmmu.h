@@ -16,44 +16,44 @@
 #endif
 
 // MMU SR register fields
-static constexpr uint16_t M68K_MMU_SR_BUS_ERROR       = 0x8000;
-static constexpr uint16_t M68K_MMU_SR_SUPERVISOR_ONLY = 0x2000;
-static constexpr uint16_t M68K_MMU_SR_WRITE_PROTECT   = 0x0800;
-static constexpr uint16_t M68K_MMU_SR_INVALID         = 0x0400;
-static constexpr uint16_t M68K_MMU_SR_MODIFIED        = 0x0200;
-static constexpr uint16_t M68K_MMU_SR_TRANSPARENT     = 0x0040;
+static constexpr u16 M68K_MMU_SR_BUS_ERROR       = 0x8000;
+static constexpr u16 M68K_MMU_SR_SUPERVISOR_ONLY = 0x2000;
+static constexpr u16 M68K_MMU_SR_WRITE_PROTECT   = 0x0800;
+static constexpr u16 M68K_MMU_SR_INVALID         = 0x0400;
+static constexpr u16 M68K_MMU_SR_MODIFIED        = 0x0200;
+static constexpr u16 M68K_MMU_SR_TRANSPARENT     = 0x0040;
 
 // MMU translation table descriptor field definitions
-static constexpr uint32_t M68K_MMU_DF_DT              = 0x00000003;
-static constexpr uint32_t M68K_MMU_DF_DT_INVALID      = 0x00000000;
-static constexpr uint32_t M68K_MMU_DF_DT_PAGE         = 0x00000001;
-static constexpr uint32_t M68K_MMU_DF_DT_TABLE_4BYTE  = 0x00000002;
-static constexpr uint32_t M68K_MMU_DF_DT_TABLE_8BYTE  = 0x00000003;
-static constexpr uint32_t M68K_MMU_DF_WP              = 0x00000004;
-static constexpr uint32_t M68K_MMU_DF_USED            = 0x00000008;
-static constexpr uint32_t M68K_MMU_DF_MODIFIED        = 0x00000010;
-static constexpr uint32_t M68K_MMU_DF_CI              = 0x00000040;
-static constexpr uint32_t M68K_MMU_DF_SUPERVISOR      = 0000000100;
-static constexpr uint32_t M68K_MMU_DF_ADDR_MASK       = 0xfffffff0;
-static constexpr uint32_t M68K_MMU_DF_IND_ADDR_MASK   = 0xfffffffc;
+static constexpr u32 M68K_MMU_DF_DT              = 0x00000003;
+static constexpr u32 M68K_MMU_DF_DT_INVALID      = 0x00000000;
+static constexpr u32 M68K_MMU_DF_DT_PAGE         = 0x00000001;
+static constexpr u32 M68K_MMU_DF_DT_TABLE_4BYTE  = 0x00000002;
+static constexpr u32 M68K_MMU_DF_DT_TABLE_8BYTE  = 0x00000003;
+static constexpr u32 M68K_MMU_DF_WP              = 0x00000004;
+static constexpr u32 M68K_MMU_DF_USED            = 0x00000008;
+static constexpr u32 M68K_MMU_DF_MODIFIED        = 0x00000010;
+static constexpr u32 M68K_MMU_DF_CI              = 0x00000040;
+static constexpr u32 M68K_MMU_DF_SUPERVISOR      = 0x00000100;
+static constexpr u32 M68K_MMU_DF_ADDR_MASK       = 0xfffffff0;
+static constexpr u32 M68K_MMU_DF_IND_ADDR_MASK   = 0xfffffffc;
 
 // MMU ATC Fields
-static constexpr uint32_t M68K_MMU_ATC_BUSERROR       = 0x08000000;
-static constexpr uint32_t M68K_MMU_ATC_CACHE_IN       = 0x04000000;
-static constexpr uint32_t M68K_MMU_ATC_WRITE_PR       = 0x02000000;
-static constexpr uint32_t M68K_MMU_ATC_MODIFIED       = 0x01000000;
-static constexpr uint32_t M68K_MMU_ATC_MASK           = 0x00ffffff;
-static constexpr uint32_t M68K_MMU_ATC_SHIFT          = 8;
-static constexpr uint32_t M68K_MMU_ATC_VALID          = 0x08000000;
+static constexpr u32 M68K_MMU_ATC_BUSERROR       = 0x08000000;
+static constexpr u32 M68K_MMU_ATC_CACHE_IN       = 0x04000000;
+static constexpr u32 M68K_MMU_ATC_WRITE_PR       = 0x02000000;
+static constexpr u32 M68K_MMU_ATC_MODIFIED       = 0x01000000;
+static constexpr u32 M68K_MMU_ATC_MASK           = 0x00ffffff;
+static constexpr u32 M68K_MMU_ATC_SHIFT          = 8;
+static constexpr u32 M68K_MMU_ATC_VALID          = 0x08000000;
 
 // MMU Translation Control register
-static constexpr uint32_t M68K_MMU_TC_SRE             = 0x02000000;
-static constexpr uint32_t M68K_MMU_TC_FCL             = 0x01000000;
+static constexpr u32 M68K_MMU_TC_SRE             = 0x02000000;
+static constexpr u32 M68K_MMU_TC_FCL             = 0x01000000;
 
 // TT register
-static constexpr uint16_t M68K_MMU_TT_ENABLE          = 0x8000;
+static constexpr u16 M68K_MMU_TT_ENABLE          = 0x8000;
 /* decodes the effective address */
-uint32_t DECODE_EA_32(int ea)
+u32 DECODE_EA_32(int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -66,17 +66,17 @@ uint32_t DECODE_EA_32(int ea)
 		}
 		case 3:     // (An)+
 		{
-			uint32_t ea = EA_AY_PI_32();
+			u32 ea = EA_AY_PI_32();
 			return ea;
 		}
 		case 5:     // (d16, An)
 		{
-			uint32_t ea = EA_AY_DI_32();
+			u32 ea = EA_AY_DI_32();
 			return ea;
 		}
 		case 6:     // (An) + (Xn) + d8
 		{
-			uint32_t ea = EA_AY_IX_32();
+			u32 ea = EA_AY_IX_32();
 			return ea;
 		}
 		case 7:
@@ -85,19 +85,19 @@ uint32_t DECODE_EA_32(int ea)
 			{
 				case 0:     // (xxx).W
 				{
-					uint32_t ea = OPER_I_16();
+					u32 ea = OPER_I_16();
 					return ea;
 				}
 				case 1:     // (xxx).L
 				{
-					uint32_t d1 = OPER_I_16();
-					uint32_t d2 = OPER_I_16();
-					uint32_t ea = (d1 << 16) | d2;
+					u32 d1 = OPER_I_16();
+					u32 d2 = OPER_I_16();
+					u32 ea = (d1 << 16) | d2;
 					return ea;
 				}
 				case 2:     // (d16, PC)
 				{
-					uint32_t ea = EA_PCDI_32();
+					u32 ea = EA_PCDI_32();
 					return ea;
 				}
 				default:    fatalerror("m68k: DECODE_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, m_pc);
@@ -109,7 +109,7 @@ uint32_t DECODE_EA_32(int ea)
 	return 0;
 }
 
-void pmmu_set_buserror(uint32_t addr_in)
+void pmmu_set_buserror(u32 addr_in)
 {
 	if (!machine().side_effects_disabled() && ++m_mmu_tmp_buserror_occurred == 1)
 	{
@@ -122,13 +122,12 @@ void pmmu_set_buserror(uint32_t addr_in)
 
 
 // pmmu_atc_add: adds this address to the ATC
-void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc, const int rw)
+void pmmu_atc_add(u32 logical, u32 physical, int fc, const int rw)
 {
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m_mmu_tc >> 20) & 0xf;
-	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((logical >> ps) << (ps - 8));
-	uint32_t atc_data = (physical >> ps) << (ps - 8);
-
+	const u32 atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((logical >> ps) << (ps - 8));
+	u32 atc_data = (physical >> ps) << (ps - 8);
 
 	if (m_mmu_tmp_sr & (M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID|M68K_MMU_SR_SUPERVISOR_ONLY))
 	{
@@ -196,13 +195,13 @@ void pmmu_atc_flush()
 	m_mmu_atc_rr = 0;
 }
 
-void pmmu_atc_flush_fc_ea(const uint16_t modes)
+void pmmu_atc_flush_fc_ea(const u16 modes)
 {
 	const int fcmask = (modes >> 5) & 7;
 	const int fc = fc_from_modes(modes) & fcmask;
-	const int ps = (m_mmu_tc >> 16) & 0xf;
+	const int ps = (m_mmu_tc >> 20) & 0xf;
 	const int mode = (modes >> 10) & 7;
-	uint32_t ea;
+	u32 ea;
 
 	switch (mode)
 	{
@@ -245,12 +244,12 @@ void pmmu_atc_flush_fc_ea(const uint16_t modes)
 }
 
 template<bool ptest>
-bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
-					 uint32_t& addr_out)
+bool pmmu_atc_lookup(const u32 addr_in, const int fc, const bool rw,
+					 u32& addr_out)
 {
 	MMULOG("%s: LOOKUP addr_in=%08x, fc=%d, ptest=%d\n", __func__, addr_in, fc, ptest);
 	const int ps = (m_mmu_tc >> 20) & 0xf;
-	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((addr_in >> ps) << (ps - 8));
+	const u32 atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((addr_in >> ps) << (ps - 8));
 
 	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
@@ -260,7 +259,7 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
 			continue;
 		}
 
-		const uint32_t atc_data = m_mmu_atc_data[i];
+		const u32 atc_data = m_mmu_atc_data[i];
 
 		if (!ptest && !rw)
 		{
@@ -304,7 +303,7 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
 	return false;
 }
 
-bool pmmu_match_tt(const uint32_t addr_in, const int fc, const uint32_t tt, const bool rw)
+bool pmmu_match_tt(const u32 addr_in, const int fc, const u32 tt, const bool rw)
 {
 	if (!(tt & M68K_MMU_TT_ENABLE))
 	{
@@ -312,10 +311,10 @@ bool pmmu_match_tt(const uint32_t addr_in, const int fc, const uint32_t tt, cons
 	}
 
 	// transparent translation enabled
-	const uint32_t address_base = tt & 0xff000000;
-	const uint32_t address_mask = ((tt << 8) & 0xff000000) ^ 0xff000000;
-	const uint32_t fcmask = (~tt) & 7;
-	const uint32_t fcbits = (tt >> 4) & 7;
+	const u32 address_base = tt & 0xff000000;
+	const u32 address_mask = ((tt << 8) & 0xff000000) ^ 0xff000000;
+	const u32 fcmask = (~tt) & 7;
+	const u32 fcbits = (tt >> 4) & 7;
 	const bool rwmask = (~tt & 0x100);
 	const bool rwbit = (tt & 0x200);
 
@@ -338,7 +337,7 @@ bool pmmu_match_tt(const uint32_t addr_in, const int fc, const uint32_t tt, cons
 	return true;
 }
 
-void update_descriptor(const uint32_t tptr, const int type, const uint32_t entry, const bool rw)
+void update_descriptor(const u32 tptr, const int type, const u32 entry, const bool rw)
 {
 	if (type == M68K_MMU_DF_DT_PAGE && !rw &&
 			!(entry & M68K_MMU_DF_MODIFIED) &&
@@ -355,7 +354,7 @@ void update_descriptor(const uint32_t tptr, const int type, const uint32_t entry
 }
 
 template<bool _long>
-void update_sr(const int type, const uint32_t tbl_entry, const int fc)
+void update_sr(const int type, const u32 tbl_entry, const int fc)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -396,11 +395,11 @@ void update_sr(const int type, const uint32_t tbl_entry, const int fc)
 }
 
 template<bool ptest>
-bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
-						const int limit, const bool rw, uint32_t &addr_out)
+bool pmmu_walk_tables(u32 addr_in, int type, u32 table, const int fc,
+						const int limit, const bool rw, u32 &addr_out)
 {
 	int level = 0;
-	const uint32_t bits = m_mmu_tc & 0xffff;
+	const u32 bits = m_mmu_tc & 0xffff;
 	const int pagesize = (m_mmu_tc >> 20) & 0xf;
 	const int is = (m_mmu_tc >> 16) & 0xf;
 	int bitpos = 12;
@@ -422,7 +421,7 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 		const int table_index  = (bitpos == 16) ? fc : (addr_in >> (32 - indexbits));
 		bitpos -= 4;
 		const bool indirect = (!bitpos || !(bits >> bitpos)) && indexbits;
-		uint32_t tbl_entry, tbl_entry2;
+		u32 tbl_entry, tbl_entry2;
 
 		MMULOG("%s: type %d, table %08x, addr_in %08x, indexbits %d, pageshift %d, indirect %d table_index %08x, rw=%d fc=%d\n",
 				__func__, type, table, addr_in, indexbits, pageshift, indirect, table_index, rw, fc);
@@ -537,9 +536,9 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 
 // pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
 template<bool ptest, bool pload>
-uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, const int limit = 7)
+u32 pmmu_translate_addr_with_fc(u32 addr_in, u8 fc, bool rw, const int limit = 7)
 {
-	uint32_t addr_out = 0;
+	u32 addr_out = 0;
 
 
 	MMULOG("%s: addr_in=%08x, fc=%d, ptest=%d, rw=%d, limit=%d\n",
@@ -578,7 +577,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, cons
 	}
 
 	int type;
-	uint32_t tbl_addr;
+	u32 tbl_addr;
 	// if SRP is enabled and we're in supervisor mode, use it
 	if ((m_mmu_tc & M68K_MMU_TC_SRE) && (fc & 4))
 	{
@@ -626,9 +625,9 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, cons
 
 // FC bits: 2 = supervisor, 1 = program, 0 = data
 // the 68040 is a subset of the 68851 and 68030 PMMUs - the page table sizes are fixed, there is no early termination, etc, etc.
-uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t ptest)
+u32 pmmu_translate_addr_with_fc_040(u32 addr_in, u8 fc, u8 ptest)
 {
-	uint32_t addr_out, tt0, tt1;
+	u32 addr_out, tt0, tt1;
 
 	addr_out = addr_in;
 	m_mmu_tmp_sr = 0;
@@ -655,7 +654,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 	{
 		static constexpr int fcmask[4] = { 4, 4, 0, 0 };
 		static constexpr int fcmatch[4] = { 0, 4, 0, 0 };
-		uint32_t mask = (tt0 >> 16) & 0xff;
+		u32 mask = (tt0 >> 16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
@@ -675,7 +674,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 	{
 		static int fcmask[4] = { 4, 4, 0, 0 };
 		static int fcmatch[4] = { 0, 4, 0, 0 };
-		uint32_t mask = (tt1 >> 16) & 0xff;
+		u32 mask = (tt1 >> 16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
@@ -693,11 +692,11 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 
 	if (m_pmmu_enabled)
 	{
-		uint32_t root_idx = (addr_in >> 25) & 0x7f;
-		uint32_t ptr_idx = (addr_in >> 18) & 0x7f;
-		uint32_t page_idx, page;
-		uint32_t root_ptr, pointer_ptr, page_ptr;
-		uint32_t root_entry, pointer_entry, page_entry;
+		u32 root_idx = (addr_in >> 25) & 0x7f;
+		u32 ptr_idx = (addr_in >> 18) & 0x7f;
+		u32 page_idx, page;
+		u32 root_ptr, pointer_ptr, page_ptr;
+		u32 root_entry, pointer_entry, page_entry;
 
 		// select supervisor or user root pointer
 		if (fc & 4)
@@ -870,9 +869,9 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 }
 
 // pmmu_translate_addr: perform 68851/68030-style PMMU address translation
-uint32_t pmmu_translate_addr(uint32_t addr_in, const bool rw)
+u32 pmmu_translate_addr(u32 addr_in, const bool rw)
 {
-	uint32_t addr_out;
+	u32 addr_out;
 
 	if (CPU_TYPE_IS_040_PLUS())
 	{
@@ -887,7 +886,7 @@ uint32_t pmmu_translate_addr(uint32_t addr_in, const bool rw)
 
 // m68851_mmu_ops: COP 0 MMU opcode handling
 
-int fc_from_modes(const uint16_t modes)
+int fc_from_modes(const u16 modes)
 {
 	if ((modes & 0x1f) == 0)
 	{
@@ -930,9 +929,9 @@ int fc_from_modes(const uint16_t modes)
 	return 0;
 }
 
-void m68851_pload(const uint32_t ea, const uint16_t modes)
+void m68851_pload(const u32 ea, const u16 modes)
 {
-	uint32_t ltmp = DECODE_EA_32(ea);
+	u32 ltmp = DECODE_EA_32(ea);
 	const int fc = fc_from_modes(modes);
 	bool rw = (modes & 0x200);
 
@@ -958,10 +957,10 @@ void m68851_pload(const uint32_t ea, const uint16_t modes)
 	}
 }
 
-void m68851_ptest(const uint32_t ea, const uint16_t modes)
+void m68851_ptest(const u32 ea, const u16 modes)
 {
-	uint32_t v_addr = DECODE_EA_32(ea);
-	uint32_t p_addr;
+	u32 v_addr = DECODE_EA_32(ea);
+	u32 p_addr;
 
 	const int level = (modes >> 10) & 7;
 	const bool rw = (modes & 0x200);
@@ -990,7 +989,7 @@ void m68851_ptest(const uint32_t ea, const uint16_t modes)
 	}
 }
 
-void m68851_pmove_get(uint32_t ea, uint16_t modes)
+void m68851_pmove_get(u32 ea, u16 modes)
 {
 	switch ((modes>>10) & 0x3f)
 	{
@@ -1008,12 +1007,12 @@ void m68851_pmove_get(uint32_t ea, uint16_t modes)
 		break;
 
 	case 0x12: // supervisor root pointer
-		WRITE_EA_64(ea, (uint64_t)m_mmu_srp_limit<<32 | (uint64_t)m_mmu_srp_aptr);
+		WRITE_EA_64(ea, (u64)m_mmu_srp_limit<<32 | (u64)m_mmu_srp_aptr);
 		MMULOG("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", m_ppc, m_mmu_srp_limit, m_mmu_srp_aptr);
 		break;
 
 	case 0x13: // CPU root pointer
-		WRITE_EA_64(ea, (uint64_t)m_mmu_crp_limit<<32 | (uint64_t)m_mmu_crp_aptr);
+		WRITE_EA_64(ea, (u64)m_mmu_crp_limit<<32 | (u64)m_mmu_crp_aptr);
 		MMULOG("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", m_ppc, m_mmu_crp_limit, m_mmu_crp_aptr);
 		break;
 
@@ -1029,14 +1028,14 @@ void m68851_pmove_get(uint32_t ea, uint16_t modes)
 
 }
 
-void m68851_pmove_put(uint32_t ea, uint16_t modes)
+void m68851_pmove_put(u32 ea, u16 modes)
 {
-	uint64_t temp64;
+	u64 temp64;
 	switch ((modes>>13) & 7)
 	{
 	case 0:
 	{
-		uint32_t temp = READ_EA_32(ea);
+		u32 temp = READ_EA_32(ea);
 
 		if (((modes >> 10) & 7) == 2)
 		{
@@ -1136,7 +1135,7 @@ void m68851_pmove_put(uint32_t ea, uint16_t modes)
 			if (m_cpu_type == CPU_TYPE_020)
 			{
 				// DomainOS on Apollo DN3000 will only reset this to 0
-				uint16_t mmu_ac = READ_EA_16(ea);
+				u16 mmu_ac = READ_EA_16(ea);
 				if (mmu_ac != 0)
 				{
 					MMULOG("680x0 PMMU: pc=%x PMOVE to mmu_ac=%08x\n",
@@ -1152,14 +1151,14 @@ void m68851_pmove_put(uint32_t ea, uint16_t modes)
 		}
 		break;
 		case 3: // MMU status
-			uint32_t temp = READ_EA_32(ea);
+			u32 temp = READ_EA_32(ea);
 			logerror("680x0: unsupported PMOVE %x to MMU status, PC %x\n", temp, m_pc);
 			break;
 	}
 }
 
 
-void m68851_pmove(uint32_t ea, uint16_t modes)
+void m68851_pmove(u32 ea, u16 modes)
 {
 	switch ((modes >> 13) & 0x7)
 	{
@@ -1197,8 +1196,8 @@ void m68851_pmove(uint32_t ea, uint16_t modes)
 
 void m68851_mmu_ops()
 {
-	uint16_t modes;
-	uint32_t ea = m_ir & 0x3f;
+	u16 modes;
+	u32 ea = m_ir & 0x3f;
 
 
 	// catch the 2 "weird" encodings up front (PBcc)
@@ -1269,9 +1268,9 @@ void m68851_mmu_ops()
 
 
 /* Apple HMMU translation is much simpler */
-inline uint32_t hmmu_translate_addr(uint32_t addr_in)
+inline u32 hmmu_translate_addr(u32 addr_in)
 {
-	uint32_t addr_out;
+	u32 addr_out;
 
 	addr_out = addr_in;
 
@@ -1306,7 +1305,7 @@ inline uint32_t hmmu_translate_addr(uint32_t addr_in)
 }
 
 public:
-int m68851_buserror(uint32_t& addr)
+int m68851_buserror(u32& addr)
 {
 	if (!m_pmmu_enabled)
 	{

@@ -106,6 +106,7 @@ private:
 
 	u8 irq_cause_r(offs_t offset);
 	void irq_cause_w(offs_t offset, u8 data);
+	uint8_t irq_vector_r(offs_t offset);
 	DECLARE_WRITE16_MEMBER(mouja_irq_timer_ctrl_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
 	DECLARE_READ8_MEMBER(soundstatus_r);
@@ -149,7 +150,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(bangball_scanline);
 	DECLARE_WRITE_LINE_MEMBER(karatour_vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(puzzlet_vblank_irq);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_READ_LINE_MEMBER(rxd_r);
 
 	void balcube_map(address_map &map);
@@ -158,6 +158,7 @@ private:
 	void blzntrnd_map(address_map &map);
 	void blzntrnd_sound_io_map(address_map &map);
 	void blzntrnd_sound_map(address_map &map);
+	void cpu_space_map(address_map &map);
 	void daitoa_map(address_map &map);
 	void daitorid_map(address_map &map);
 	void dharma_map(address_map &map);

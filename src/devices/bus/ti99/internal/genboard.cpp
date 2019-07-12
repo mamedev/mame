@@ -329,7 +329,7 @@ INPUT_CHANGED_MEMBER( genmod_mapper_device::setgm_changed )
     within the gate array. Unlike with real GROMs, no address wrapping occurs,
     and the complete 64K space is available.
 */
-READ8_MEMBER( geneve_mapper_device::read_grom )
+uint8_t geneve_mapper_device::read_grom(offs_t offset)
 {
 	uint8_t reply;
 	if (offset & 0x0002)
@@ -364,7 +364,7 @@ READ8_MEMBER( geneve_mapper_device::read_grom )
     Simulates GROM. The real Geneve does not use GROMs but simulates them
     within the gate array.
 */
-WRITE8_MEMBER( geneve_mapper_device::write_grom )
+void geneve_mapper_device::write_grom(offs_t offset, uint8_t data)
 {
 	if (offset & 0x0002)
 	{
@@ -465,10 +465,10 @@ void geneve_mapper_device::set_extra_waitstates(bool wait)
 
 /*
     Read a byte via the data bus. The decoding has already been done in the
-    SETOFFSET method, and we re-use the values stored there to quickly
+    SETADDRESS method, and we re-use the values stored there to quickly
     access the appropriate component.
 */
-READ8_MEMBER( geneve_mapper_device::readm )
+uint8_t geneve_mapper_device::readm(offs_t offset)
 {
 	uint8_t value = 0;
 
@@ -492,7 +492,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (dec->function == MBOX)
 		{
 			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, true);
+			m_peribox->setaddress_dbin(dec->physaddr, true);
 		}
 	}
 	else
@@ -509,7 +509,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	case MLVIDEO:
 		if (!machine().side_effects_disabled())
 		{
-			value = m_video->read(space, dec->offset>>1);
+			value = m_video->read(dec->offset>>1);
 			LOGMASKED(LOG_READ, "Read video %04x -> %02x\n", dec->offset, value);
 			// Video wait states are created *after* the access
 			// Accordingly, they have no effect when execution is in onchip RAM
@@ -538,7 +538,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// Needs more investigation. We might as well ignore this,
 		// as the high nibble is obviously undefined and takes some past
 		// value floating around.
-		value = m_clock->read(space, dec->offset & 0x000f);
+		value = m_clock->read(dec->offset & 0x000f);
 		if (m_geneve_mode) value |= 0xf0;
 		else value |= ((dec->offset & 0x000f)==0x000f)? 0x20 : 0x10;
 		LOGMASKED(LOG_READ, "Read clock %04x -> %02x\n", dec->offset, value);
@@ -548,7 +548,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		// grom simulation
 		// ++++ ++-- ---- ---+
 		// 1001 1000 0000 00x0
-		if (!machine().side_effects_disabled()) value = read_grom(space, dec->offset, 0xff);
+		if (!machine().side_effects_disabled()) value = read_grom(dec->offset);
 		LOGMASKED(LOG_READ, "Read GROM %04x -> %02x\n", dec->offset, value);
 		break;
 
@@ -571,7 +571,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	case MPEPROM:
 		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
-		value = boot_rom(space, dec->physaddr, 0xff);
+		value = boot_rom(dec->physaddr);
 		break;
 
 	case MPSRAM:
@@ -593,7 +593,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
 		//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
 
-		m_peribox->readz(space, dec->physaddr, &value, 0xff);
+		m_peribox->readz(dec->physaddr, &value);
 		m_peribox->memen_in(CLEAR_LINE);
 		LOGMASKED(LOG_READ, "Read P-Box %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
@@ -605,7 +605,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::writem )
+void geneve_mapper_device::writem(offs_t offset, uint8_t data)
 {
 	decdata *dec;
 	decdata debug;
@@ -627,7 +627,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		if (dec->function == MBOX)
 		{
 			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, false);
+			m_peribox->setaddress_dbin(dec->physaddr, false);
 		}
 	}
 	else
@@ -650,7 +650,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 
 		if (!machine().side_effects_disabled())
 		{
-			m_video->write(space, dec->offset>>1, data);
+			m_video->write(dec->offset>>1, data);
 			LOGMASKED(LOG_WRITE, "Write video %04x <- %02x\n", offset, data);
 			// See above
 			if (m_video_waitstates) set_video_waitcount(15);
@@ -666,7 +666,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	case MLCLOCK:
 		// clock
 		// ++++ ++++ ++++ ----
-		m_clock->write(space, dec->offset & 0x000f, data);
+		m_clock->write(dec->offset & 0x000f, data);
 		LOGMASKED(LOG_WRITE, "Write clock %04x <- %02x\n", offset, data);
 		break;
 
@@ -679,7 +679,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 
 	case MLGROM:
 		// The GROM simulator is only available in TI Mode
-		write_grom(space, dec->offset, data, 0xff);
+		write_grom(dec->offset, data);
 		LOGMASKED(LOG_WRITE, "Write GROM %04x <- %02x\n", offset, data);
 		break;
 
@@ -700,7 +700,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
 		// Ignore EPROM write (unless PFM)
-		if (m_boot_rom != GENEVE_EPROM) write_to_pfm(space, dec->physaddr, data, 0xff);
+		if (m_boot_rom != GENEVE_EPROM) write_to_pfm(dec->physaddr, data);
 		else
 			LOGMASKED(LOG_WARN, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
 		break;
@@ -720,7 +720,7 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	case MBOX:
 		// Route everything else to the P-Box
 		LOGMASKED(LOG_WRITE, "Write P-Box %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
-		m_peribox->write(space, dec->physaddr, data, 0xff);
+		m_peribox->write(dec->physaddr, data);
 		m_peribox->memen_in(CLEAR_LINE);
 		break;
 
@@ -854,7 +854,7 @@ void genmod_mapper_device::decode_mod(geneve_mapper_device::decdata* dec)
 /*
     Boot ROM handling, from EPROM or PFM.
 */
-READ8_MEMBER( geneve_mapper_device::boot_rom )
+uint8_t geneve_mapper_device::boot_rom(offs_t offset)
 {
 	uint8_t value;
 	int pfmaddress = (offset & 0x01ffff) | (m_pfm_bank<<17);
@@ -866,10 +866,10 @@ READ8_MEMBER( geneve_mapper_device::boot_rom )
 		LOGMASKED(LOG_READ, "Read EPROM %04x -> %02x\n", offset & 0x003fff, value);
 		return value;
 	case GENEVE_PFM512:
-		value = m_pfm512->read(space, pfmaddress, mem_mask);
+		value = m_pfm512->read(pfmaddress);
 		break;
 	case GENEVE_PFM512A:
-		value = m_pfm512a->read(space, pfmaddress, mem_mask);
+		value = m_pfm512a->read(pfmaddress);
 		break;
 	default:
 		LOGMASKED(LOG_WARN, "Illegal mode for reading boot ROM: %d\n", m_boot_rom);
@@ -881,7 +881,7 @@ READ8_MEMBER( geneve_mapper_device::boot_rom )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
+void geneve_mapper_device::write_to_pfm(offs_t offset, uint8_t data)
 {
 	// Nota bene: The PFM must be write protected on startup, or the RESET
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
@@ -891,10 +891,10 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
 	switch (m_boot_rom)
 	{
 	case GENEVE_PFM512:
-		m_pfm512->write(space, address, data, mem_mask);
+		m_pfm512->write(address, data);
 		break;
 	case GENEVE_PFM512A:
-		m_pfm512a->write(space, address, data, mem_mask);
+		m_pfm512a->write(address, data);
 		break;
 	default:
 		LOGMASKED(LOG_WARN, "Illegal mode for writing to PFM: %d\n", m_boot_rom);
@@ -907,11 +907,13 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-READ8_MEMBER( geneve_mapper_device::setoffset )
+void geneve_mapper_device::setaddress(offs_t address, uint8_t busctrl)
 {
-	LOGMASKED(LOG_DETAIL, "setoffset = %04x\n", offset);
+	LOGMASKED(LOG_DETAIL, "setaddress = %04x\n", address);
 	m_debug_no_ws = false;
-	m_decoded.offset = offset;
+	m_decoded.offset = address;
+
+	m_read_mode = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	decode_logical(m_read_mode, &m_decoded);
 	if (m_decoded.function == MUNDEF)
@@ -926,9 +928,8 @@ READ8_MEMBER( geneve_mapper_device::setoffset )
 	if (m_decoded.function == MBOX)
 	{
 		m_peribox->memen_in(ASSERT_LINE);
-		m_peribox->setaddress_dbin(space, m_decoded.physaddr, m_read_mode);
+		m_peribox->setaddress_dbin(m_decoded.physaddr, m_read_mode);
 	}
-	return 0;
 }
 
 /*
@@ -994,15 +995,6 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 			m_ready_asserted = false;
 		}
 	}
-}
-
-/*
-    We need the DBIN line for the setoffset operation.
-*/
-WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
-{
-	m_read_mode = (state==ASSERT_LINE);
-	LOGMASKED(LOG_DETAIL, "dbin = %02x\n", m_read_mode? 1:0);
 }
 
 /*

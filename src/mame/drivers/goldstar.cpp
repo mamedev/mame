@@ -628,7 +628,38 @@ void cb3_state::ncb3_map(address_map &map)
 	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
 	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
-	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::command_w));    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+}
+
+void cb3_state::chryangla_map(address_map &map) // most to be verified when the game will show more than test screens only
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
+
+	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf820, 0xf823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xf822, 0xf822).w(FUNC(cb3_state::goldstar_fa00_w)); // hack (connected to ppi output port?, needed for colour banking)
+
+	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
+	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+}
+
+void cb3_state::chryangla_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+	map(0xf800, 0xffff).ram();
 }
 
 void goldstar_state::ncb3_readwriteport(address_map &map)
@@ -674,7 +705,6 @@ void goldstar_state::ncb3_readwriteport(address_map &map)
 
 */
 
-
 void goldstar_state::wcherry_map(address_map &map)
 {
 	map(0x0000, 0xb7ff).rom();
@@ -700,7 +730,7 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xf640, 0xf640).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xf650, 0xf650).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
 	map(0xf660, 0xf660).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
-	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::command_w));    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 
 	map(0xf800, 0xffff).ram();
 }
@@ -817,6 +847,11 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
+void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom().share("decrypted_opcodes");
+	map(0xf800, 0xffff).ram();
+}
 
 void goldstar_state::pkrmast_portmap(address_map &map)
 {
@@ -900,7 +935,7 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
 	map(0xf800, 0xffff).ram();
 }
@@ -933,7 +968,7 @@ void goldstar_state::flaming7_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 //  AM_RANGE(0xc000, 0xd3ff) AM_RAM
 	map(0xf800, 0xffff).ram();
 }
@@ -985,7 +1020,7 @@ void goldstar_state::mbstar_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
 	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));    /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 	map(0xc000, 0xf7ff).rom();
 	map(0xf800, 0xffff).ram();
 }
@@ -1038,7 +1073,7 @@ void wingco_state::magodds_map(address_map &map)
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(wingco_state::magodds_outb850_w));                                /* lamps */
 	map(0xb860, 0xb860).w(FUNC(wingco_state::magodds_outb860_w));                                /* watchdog */
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
 }
 
@@ -1061,7 +1096,7 @@ void goldstar_state::kkotnoli_map(address_map &map)
 	map(0xb830, 0xb830).nopw();                                                /* no ay8910 */
 	map(0xb840, 0xb840).nopw();                                                /* no ay8910 */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1100,7 +1135,7 @@ void goldstar_state::ladylinr_map(address_map &map)
 	map(0xb830, 0xb830).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... unused? */
 	map(0xb840, 0xb840).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb850, 0xb850).nopw();                                                /* just turn off the lamps, if exist */
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 	map(0xf800, 0xffff).ram();
 }
 
@@ -1123,7 +1158,7 @@ void goldstar_state::wcat3_map(address_map &map)
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
 	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::command_w));                /* sound */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 //  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)    /* Other PPI initialized? */
 	map(0xd000, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
@@ -1273,9 +1308,9 @@ void unkch_state::megaline_map(address_map &map)
 void goldstar_state::megaline_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xa0, 0xa0).w("sn1", FUNC(sn76489_device::command_w));                      /* SN76489 #1 */
-	map(0xc0, 0xc0).w("sn2", FUNC(sn76489_device::command_w));                      /* SN76489 #2 */
-	map(0xe0, 0xe0).w("sn3", FUNC(sn76489_device::command_w));                      /* SN76489 #3 */
+	map(0xa0, 0xa0).w("sn1", FUNC(sn76489_device::write));                      /* SN76489 #1 */
+	map(0xc0, 0xc0).w("sn2", FUNC(sn76489_device::write));                      /* SN76489 #2 */
+	map(0xe0, 0xe0).w("sn3", FUNC(sn76489_device::write));                      /* SN76489 #3 */
 	map(0x60, 0x60).w("aysnd", FUNC(ay8910_device::address_w));                 /* AY8910 control? */
 	map(0x80, 0x80).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));        /* AY8910 Input? */
 //  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1330,10 +1365,10 @@ void goldstar_state::bonusch_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x10).portr("IN0");
 	map(0x20, 0x20).portr("IN1");
-	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::command_w));      /* SN76489 #1 */
-	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::command_w));      /* SN76489 #2 */
-	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::command_w));      /* SN76489 #3 */
-	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::command_w));      /* SN76489 #4 */
+	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::write));      /* SN76489 #1 */
+	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::write));      /* SN76489 #2 */
+	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::write));      /* SN76489 #3 */
+	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::write));      /* SN76489 #4 */
 	map(0x60, 0x60).portr("IN3");
 }
 
@@ -1369,9 +1404,9 @@ void goldstar_state::feverch_portmap(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
+	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::write));
+	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::write));
 	//map(0x38, 0x3b)
 }
 
@@ -8443,22 +8478,21 @@ WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 }
 
 
-MACHINE_CONFIG_START(goldstar_state::goldstar)
-
+void goldstar_state::goldstar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(goldstar_map)
-	MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::goldstar_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldstar);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
@@ -8473,28 +8507,25 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::goldstbl)
-
+void goldstar_state::goldstbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(goldstar_map)
-	MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::goldstar_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bl);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
@@ -8509,37 +8540,37 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
-MACHINE_CONFIG_START(goldstar_state::moonlght)
+void goldstar_state::moonlght(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ml)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_ml);
+}
 
-MACHINE_CONFIG_START(goldstar_state::goldfrui)
+void goldstar_state::goldfrui(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_goldfrui)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_goldfrui);
+}
 
 
-MACHINE_CONFIG_START(sanghopm_state::star100)
-
+void sanghopm_state::star100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(star100_map)
-	MCFG_DEVICE_IO_MAP(star100_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sanghopm_state::star100_map);
+	m_maincpu->set_addrmap(AS_IO, &sanghopm_state::star100_readport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sanghopm_state, screen_update_sangho)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sanghopm_state::screen_update_sangho));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
 	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
@@ -8557,30 +8588,27 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	aysnd.port_b_read_callback().set_ioport("DSW6");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::super9)
-
+void goldstar_state::super9(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(goldstar_map)
-//  MCFG_DEVICE_PROGRAM_MAP(nfm_map)
-	MCFG_DEVICE_IO_MAP(goldstar_readport)
-//  MCFG_DEVICE_IO_MAP(unkch_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::goldstar_map);
+//  m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::nfm_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
+//  m_maincpu->set_addrmap(AS_IO, &goldstar_state::unkch_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_super9);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
@@ -8595,9 +8623,8 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
 void goldstar_state::cm_palette(palette_device &palette) const
@@ -8645,12 +8672,12 @@ void goldstar_state::lucky8_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(cb3_state::ncb3)
-
+void cb3_state::ncb3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(ncb3_map)
-	MCFG_DEVICE_IO_MAP(ncb3_readwriteport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb3_state::ncb3_map);
+	m_maincpu->set_addrmap(AS_IO, &cb3_state::ncb3_readwriteport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -8665,14 +8692,13 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
@@ -8684,47 +8710,61 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cb3_state::cb3c)
+void cb3_state::cb3c(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3c)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cb3c);
+}
 
-MACHINE_CONFIG_START(cb3_state::cb3e)
+void cb3_state::cb3e(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3e)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cb3e);
+}
 
-MACHINE_CONFIG_START(cb3_state::chrygld)
+void cb3_state::chryangla(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chry10)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cb3_state::cherrys)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb3_state::chryangla_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &cb3_state::chryangla_decrypted_opcodes_map);
+
+	m_palette->set_init(FUNC(goldstar_state::lucky8_palette));
+}
+
+void cb3_state::chrygld(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cherrys)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_chry10);
+}
 
-MACHINE_CONFIG_START(cb3_state::cm97)
+void cb3_state::cherrys(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cm97)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cherrys);
+}
+
+void cb3_state::cm97(machine_config &config)
+{
+	ncb3(config);
+	m_gfxdecode->set_info(gfx_cm97);
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::wcherry)
-
+void goldstar_state::wcherry(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(wcherry_map)
-	MCFG_DEVICE_IO_MAP(wcherry_readwriteport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::wcherry_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::wcherry_readwriteport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -8739,14 +8779,13 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cb3e);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
@@ -8757,22 +8796,21 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(cmaster_state::cm)
-
+void cmaster_state::cm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cm_map)
-	MCFG_DEVICE_IO_MAP(cm_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cm_portmap);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -8785,14 +8823,13 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmbitmap);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
@@ -8806,20 +8843,27 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cmaster_state::cmasterc)
+void cmaster_state::cmasterc(machine_config &config)
+{
 	cm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cmasterc)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cmasterc);
+}
 
+void cmaster_state::chryangl(machine_config &config)
+{
+	cm(config);
 
-MACHINE_CONFIG_START(goldstar_state::cmast91)
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
+}
 
+void goldstar_state::cmast91(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cm_map)
-	MCFG_DEVICE_IO_MAP(cmast91_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::cmast91_portmap);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -8832,14 +8876,13 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmast91);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cmast91_palette), 256);
@@ -8853,7 +8896,7 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -8863,12 +8906,12 @@ WRITE_LINE_MEMBER(wingco_state::masked_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(wingco_state::lucky8)
-
+void wingco_state::lucky8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lucky8_map)
-	//MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	//->m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -8887,14 +8930,13 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
@@ -8905,8 +8947,7 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	ym2149_device &aysnd(YM2149(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
@@ -8914,14 +8955,14 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(wingco_state::bingowng)
-
+void wingco_state::bingowng(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lucky8_map)
-	//MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -8940,14 +8981,13 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_bingowng)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wingco_state::screen_update_bingowng));
+	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
@@ -8958,8 +8998,7 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
@@ -8967,62 +9006,62 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(wingco_state::bingownga)
+void wingco_state::bingownga(machine_config &config)
+{
 	bingowng(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bingownga)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_bingownga);
+}
 
 
-MACHINE_CONFIG_START(wingco_state::flam7_w4)
+void wingco_state::flam7_w4(machine_config &config)
+{
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
 
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
-	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
-MACHINE_CONFIG_END
+	DS2401(config, m_fl7w4_id);
+}
 
-MACHINE_CONFIG_START(wingco_state::flaming7)
+void wingco_state::flaming7(machine_config &config)
+{
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flaming7)
+	m_gfxdecode->set_info(gfx_flaming7);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
-	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
-MACHINE_CONFIG_END
+	DS2401(config, m_fl7w4_id);
+}
 
-MACHINE_CONFIG_START(wingco_state::flam7_tw)
+void wingco_state::flam7_tw(machine_config &config)
+{
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flam7_tw)
+	m_gfxdecode->set_info(gfx_flam7_tw);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
-	MCFG_DEVICE_ADD(m_fl7w4_id, DS2401)
-MACHINE_CONFIG_END
+	DS2401(config, m_fl7w4_id);
+}
 
-MACHINE_CONFIG_START(wingco_state::mbstar)
+void wingco_state::mbstar(machine_config &config)
+{
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mbstar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::mbstar_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_mbstar)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wingco_state::screen_update_mbstar));
+}
 
 
 
@@ -9039,12 +9078,12 @@ void wingco_state::magodds_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_CONFIG_START(wingco_state::magodds)
-
+void wingco_state::magodds(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(magodds_map)
-	//MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::magodds_map);
+	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -9063,14 +9102,13 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_magical)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wingco_state::screen_update_magical));
+	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magodds);
 	PALETTE(config, m_palette, FUNC(wingco_state::magodds_palette), 256);
@@ -9081,8 +9119,7 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)  // shut up annoying whine
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.00);  // shut up annoying whine
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
@@ -9090,15 +9127,15 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::kkotnoli)
-
+void goldstar_state::kkotnoli(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(kkotnoli_map)
-	//MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::kkotnoli_map);
+	//m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -9113,14 +9150,13 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	m_ppi[2]->in_pa_callback().set_ioport("DSW1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
@@ -9130,18 +9166,16 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-MACHINE_CONFIG_END
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::ladylinr)
-
+void goldstar_state::ladylinr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(ladylinr_map)
-	//MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::ladylinr_map);
+	//m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -9152,14 +9186,13 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
@@ -9170,19 +9203,18 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	AY8930(config, "aysnd", AY_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unused?
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(wingco_state::wcat3)
-
+void wingco_state::wcat3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(wcat3_map)
-	//MCFG_DEVICE_IO_MAP(goldstar_readport)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::wcat3_map);
+	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -9201,14 +9233,13 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
@@ -9219,8 +9250,7 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
@@ -9228,17 +9258,16 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-
-MACHINE_CONFIG_END
+}
 
 
 /* diff with cm machine driver: gfxdecode, OKI & portmap */
-MACHINE_CONFIG_START(cmaster_state::amcoe1)
-
+void cmaster_state::amcoe1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cm_map)
-	MCFG_DEVICE_IO_MAP(amcoe1_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::amcoe1_portmap);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -9251,14 +9280,13 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
@@ -9273,28 +9301,27 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-MACHINE_CONFIG_START(cmaster_state::amcoe1a)
+void cmaster_state::amcoe1a(machine_config &config)
+{
 	amcoe1(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cmaster_state, screen_update_amcoe1a)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmaster_state::screen_update_amcoe1a));
+}
 
 
 /* diff with cm machine driver: gfxdecode, AY8910 volume & portmap */
-MACHINE_CONFIG_START(cmaster_state::amcoe2)
-
+void cmaster_state::amcoe2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cm_map)
-	MCFG_DEVICE_IO_MAP(amcoe2_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::amcoe2_portmap);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -9307,14 +9334,13 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
@@ -9328,17 +9354,17 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 2.00); /* analyzed for clips */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cmaster_state::nfm)
+void cmaster_state::nfm(machine_config &config)
+{
 	amcoe2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nfm_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::nfm_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nfm)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_nfm);
+}
 
 
 WRITE_LINE_MEMBER(unkch_state::vblank_irq)
@@ -9347,24 +9373,23 @@ WRITE_LINE_MEMBER(unkch_state::vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(unkch_state::unkch)
-
+void unkch_state::unkch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(unkch_map)
-	MCFG_DEVICE_IO_MAP(unkch_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::unkch_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::unkch_portmap);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, unkch_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
+	screen.screen_vblank().set(FUNC(unkch_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unkch);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
@@ -9379,28 +9404,27 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* payout hardware */
-	MCFG_TICKET_DISPENSER_ADD("tickets", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+}
 
 
 
 // hw unknown - should be somewhat similar to cm
-MACHINE_CONFIG_START(goldstar_state::pkrmast)
-
+void goldstar_state::pkrmast(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cm_map)
-	MCFG_DEVICE_IO_MAP(pkrmast_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::pkrmast_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkrmast);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
@@ -9414,29 +9438,28 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	aysnd.port_a_read_callback().set_ioport("DSW4");
 	aysnd.port_b_read_callback().set_ioport("DSW5");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(unkch_state::megaline)
-
+void unkch_state::megaline(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(megaline_map)
-	MCFG_DEVICE_IO_MAP(megaline_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::megaline_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::megaline_portmap);
 
-	//MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	//MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	//MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	//I8255A(config, m_ppi[0], 0);
+	//I8255A(config, m_ppi[1], 0);
+	//I8255A(config, m_ppi[2], 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
@@ -9447,14 +9470,11 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn1", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("sn2", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn2", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("sn3", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn3", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
@@ -9462,28 +9482,25 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_END
 
-
-MACHINE_CONFIG_START(unkch_state::bonusch)
-
+void unkch_state::bonusch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(bonusch_map)
-	MCFG_DEVICE_IO_MAP(bonusch_portmap)
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::bonusch_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::bonusch_portmap);
 
-	MCFG_DEVICE_ADD("mcu", I80C51, 12_MHz_XTAL)
-	MCFG_DEVICE_DISABLE()
+	I80C51(config, "mcu", 12_MHz_XTAL).set_disable();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
@@ -9493,25 +9510,20 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn1", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("sn2", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn2", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("sn3", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn3", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("sn4", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn4", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(unkch_state::feverch)
-
-	MCFG_DEVICE_ADD("maincpu", Z80, 12'000'000 / 2) // clock not verified
-	MCFG_DEVICE_PROGRAM_MAP(feverch_map)
-	MCFG_DEVICE_IO_MAP(feverch_portmap)
+void unkch_state::feverch(machine_config &config)
+{
+	Z80(config, m_maincpu, 12'000'000 / 2); // clock not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::feverch_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::feverch_portmap);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -9528,13 +9540,12 @@ MACHINE_CONFIG_START(unkch_state::feverch)
 	m_ppi[2]->in_pb_callback().set_ioport("DSW2");
 	m_ppi[2]->in_pc_callback().set_ioport("DSW3");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
@@ -9543,15 +9554,12 @@ MACHINE_CONFIG_START(unkch_state::feverch)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, 12'000'000 / 12) // actually SN76489AN, clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489A(config, "sn1", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, 12'000'000 / 12) // actually SN76489AN, clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489A(config, "sn2", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
 
-	MCFG_DEVICE_ADD("sn3", SN76489A, 12'000'000 / 12) // actually SN76489AN, clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn3", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
+}
 
 /***************************************************************************
 
@@ -11139,7 +11147,10 @@ ROM_END
 // the program roms on these seem scrambled somehow
 ROM_START( jkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pid-515.u5",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_LOAD( "pid-515.u5",  0x4000, 0x4000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_CONTINUE(0xc000, 0x4000)
+	ROM_CONTINUE(0x8000, 0x4000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
@@ -11156,7 +11167,10 @@ ROM_END
 
 ROM_START( jkrmasta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pid-513.u5",  0x0000, 0x10000, CRC(12fa7ea0) SHA1(71ee141fe01ae2ce9913620b52c54cf445fd0b00) )
+	ROM_LOAD( "pid-513.u5",  0x4000, 0x4000, CRC(12fa7ea0) SHA1(71ee141fe01ae2ce9913620b52c54cf445fd0b00) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_CONTINUE(0xc000, 0x4000)
+	ROM_CONTINUE(0x8000, 0x4000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
@@ -14067,6 +14081,49 @@ ROM_START( nfb96seb )
 	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
 ROM_END
 
+ROM_START( nfb96sec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u34",0x00000, 0x1000, CRC(65e7a70d) SHA1(77b8b7e16e842d6debf9bb13d83dbf4289ab0bd4) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // Same data as other sets, arranged differently
+	ROM_LOAD( "u2", 0x00000, 0x08000, CRC(7d245ff8) SHA1(eebc3c0700aaa5e8d0be22d411f097607e179d5e) )
+	ROM_CONTINUE(   0x10000, 0x08000 )
+	ROM_CONTINUE(   0x08000, 0x08000 )
+	ROM_CONTINUE(   0x00000, 0x08000 )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // Same data as other sets, arranged differently
+	ROM_LOAD( "u35", 0x0000, 0x4000, CRC(ddd6b7cb) SHA1(ff5161d7d25b216fd507a43f9102cde1e1518593) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(    0x2000, 0x2000 )
+	ROM_CONTINUE(    0x0000, 0x2000 )
+	ROM_LOAD( "u1",  0x4000, 0x4000, CRC(fdbb5896) SHA1(edfcfcfbf6306ff40c517eeeb05f91b869ba40d2) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(    0x6000, 0x2000 )
+	ROM_CONTINUE(    0x4000, 0x2000 )
+
+	// taken from new fruit bonus '96, might be wrong
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "proms2", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+ROM_END
 
 // this contains elephants etc. instead of the usual symbols, maybe
 // it's meant to work with the above program roms?
@@ -15951,6 +16008,33 @@ void goldstar_state::init_goldstar()
 	}
 }
 
+void goldstar_state::init_jkrmast()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int A = 0; A < 0x8000; A++)
+	{
+		uint8_t x = ROM[A];
+		x = bitswap<8>(x ^ 0x0a, 5, 6, 1, 4, 7, 2, 3, 0);
+		ROM[A] = x;
+	}
+
+	uint8_t buf[0x8000];
+	memcpy(buf, ROM, 0x8000);
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		if ((i & 0x60) == 0x00)
+			ROM[i] = buf[i^0x08];
+		else if ((i & 0x60) == 0x60)
+			ROM[i] = buf[i^0x10];
+		else if ((i & 0x60) == 0x40)
+			ROM[i] = buf[i^0x18];
+		else if ((i & 0x60) == 0x20)
+			ROM[i] = buf[i];
+	}
+}
+
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
 void cb3_state::do_blockswaps(uint8_t* ROM)
@@ -16053,6 +16137,47 @@ void cb3_state::init_cb3()
 	dump_to_file(ROM);
 }
 
+void goldstar_state::init_chryangl()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0xa0, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x82, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x08, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = ROM[i];
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x22, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x2a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x82, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x2a, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0xa8, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x88, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x22, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x88, 1, 6, 7, 4, 5, 2, 3, 0); break;
+		}
+
+		ROM[i] = x;
+	}
+}
 
 void cb3_state::init_chrygld()
 {
@@ -16717,11 +16842,12 @@ GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3, 
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
 GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
 GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
+GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
 
 // looks like a hack of Cherry Bonus 3
-GAME(  199?, chryangl,  ncb3,     cm,       chryangl, cmaster_state,  init_cmv4,      ROT0, "<unknown>",         "Cherry Angel",                                MACHINE_NOT_WORKING )
+GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
@@ -16749,8 +16875,8 @@ GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
-GAME(  199?, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encrypted
-GAME(  199?, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Joker Master (V512)",                         MACHINE_NOT_WORKING ) // encrypted
+GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
+GAME(  1999, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V512)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 
@@ -16776,7 +16902,6 @@ GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
-GAME(  198?, chryangla, ncb3,     lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Cherry Angel (encrypted, W-4 hardware)",                   MACHINE_NOT_WORKING )
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner",                                               0 )
 GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
@@ -16856,6 +16981,7 @@ GAME(  1996, roypok96c, roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp96
 GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
 GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_nfb96sea,  ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 2, v97-3.3c English)",    MACHINE_WRONG_COLORS ) // encrypted program
 GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 3, v97-3.3c Portuguese)", MACHINE_WRONG_COLORS )
+GAME( 1996, nfb96sec,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 4, v97-3.3c English)",    MACHINE_WRONG_COLORS )
 GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
 GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
 

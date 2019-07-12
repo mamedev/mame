@@ -82,8 +82,8 @@ public:
 	void init_cybiko();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cybiko);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cybikoxt);
 
 	void cybikov1_base(machine_config &config);
 	void cybikov1_flash(machine_config &config);

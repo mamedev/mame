@@ -6,8 +6,6 @@
 #pragma once
 
 
-#define YMF278B_STD_CLOCK (33868800)            /* standard clock for OPL4 */
-
 class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
@@ -16,8 +14,8 @@ public:
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -127,9 +125,10 @@ private:
 
 	emu_timer *m_timer_a, *m_timer_b;
 	int m_clock;
+	int m_rate;
 
 	sound_stream * m_stream;
-	std::unique_ptr<int32_t[]> m_mix_buffer;
+	std::vector<int32_t> m_mix_buffer;
 	devcb_write_line m_irq_handler;
 	uint8_t m_last_fm_data;
 

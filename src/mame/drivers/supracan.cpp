@@ -227,7 +227,7 @@ private:
 	TIMER_CALLBACK_MEMBER(supracan_line_on_callback);
 	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
 	TIMER_CALLBACK_MEMBER(supracan_video_callback);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	int supracan_tilemap_get_region(int layer);
 	void supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count);
@@ -1737,7 +1737,7 @@ WRITE16_MEMBER( supracan_state::video_w )
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
+DEVICE_IMAGE_LOAD_MEMBER( supracan_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1762,7 +1762,7 @@ void supracan_state::machine_start()
 	m_line_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supracan_state::supracan_line_off_callback),this));
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x3fffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x3fffff, read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 }
 
 
@@ -1881,37 +1881,37 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 	}
 }
 
-MACHINE_CONFIG_START(supracan_state::supracan)
+void supracan_state::supracan(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(10'738'635));        /* Correct frequency unknown */
+	m_maincpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(supracan_state::supracan_irq));
 
-	MCFG_DEVICE_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
-	MCFG_DEVICE_PROGRAM_MAP( supracan_mem )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
-
-	MCFG_DEVICE_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
-	MCFG_DEVICE_PROGRAM_MAP( supracan_sound_mem )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
+	M6502(config, m_soundcpu, XTAL(3'579'545));     /* TODO: Verify actual clock */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
+	m_soundcpu->set_vblank_int("screen", FUNC(supracan_state::supracan_sound_irq));
 
 #if !(SOUNDCPU_BOOT_HACK)
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_QUANTUM_PERFECT_CPU("soundcpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.m_perfect_cpu_quantum = subtag("soundcpu");
 #endif
 
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
-	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240 );  /* No idea if this is correct */
+	m_screen->set_screen_update(FUNC(supracan_state::screen_update_supracan));
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(supracan_state::supracan_palette)).set_format(palette_device::xBGR_555, 32768);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supracan)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_supracan);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "supracan_cart")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_GENERIC_LOAD(supracan_state, supracan_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "supracan_cart"));
+	cartslot.set_width(GENERIC_ROM16_WIDTH);
+	cartslot.set_endian(ENDIANNESS_BIG);
+	cartslot.set_device_load(FUNC(supracan_state::cart_load), this);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","supracan")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("supracan");
+}
 
 
 ROM_START( supracan )

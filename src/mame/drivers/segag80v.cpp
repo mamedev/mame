@@ -1350,7 +1350,7 @@ void segag80v_state::init_zektor()
 	/* configure sound */
 	iospace.install_write_handler(0x38, 0x38, write8_delegate(FUNC(speech_sound_device::data_w), (speech_sound_device*)m_speech));
 	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(FUNC(speech_sound_device::control_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8912_device::address_data_w), (ay8912_device*)m_aysnd));
+	iospace.install_write_handler(0x3c, 0x3d, write8sm_delegate(FUNC(ay8912_device::address_data_w), (ay8912_device*)m_aysnd));
 	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),this));
 	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),this));
 

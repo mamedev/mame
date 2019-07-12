@@ -22,7 +22,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::irq_ack_w)
+void jedi_state::irq_ack_w(u8 data)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
@@ -43,7 +43,7 @@ WRITE_LINE_MEMBER(jedi_state::audio_reset_w)
 }
 
 
-READ8_MEMBER(jedi_state::audio_comm_stat_r)
+u8 jedi_state::audio_comm_stat_r()
 {
 	return (m_soundlatch->pending_r() << 7) | (m_sacklatch->pending_r() << 6);
 }
@@ -62,19 +62,19 @@ CUSTOM_INPUT_MEMBER(jedi_state::jedi_audio_comm_stat_r)
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::speech_strobe_w)
+void jedi_state::speech_strobe_w(offs_t offset, u8 data)
 {
 	m_tms->wsq_w(BIT(offset, 8));
 }
 
 
-READ8_MEMBER(jedi_state::speech_ready_r)
+u8 jedi_state::speech_ready_r()
 {
 	return m_tms->readyq_r() << 7;
 }
 
 
-WRITE8_MEMBER(jedi_state::speech_reset_w)
+void jedi_state::speech_reset_w(u8 data)
 {
 	// Flip-flop at 8C controls the power supply to the TMS5220 (through transistors Q6 and Q7)
 	m_tms->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 1.0 : 0.0);

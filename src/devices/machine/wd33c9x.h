@@ -4,36 +4,37 @@
  * wd33c9x.h
  */
 
-#ifndef MAME_MACHINE_WD33C93_H
-#define MAME_MACHINE_WD33C93_H
+#ifndef MAME_MACHINE_WD33C9X_H
+#define MAME_MACHINE_WD33C9X_H
 
 #pragma once
 
 #include "machine/nscsi_bus.h"
 
-class wd33c9x_base_device : public nscsi_device
+class wd33c9x_base_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto drq_cb() { return m_drq_cb.bind(); }
 
 	// Direct Addressing Interface
-	DECLARE_READ8_MEMBER(dir_r);
-	DECLARE_WRITE8_MEMBER(dir_w);
+	uint8_t dir_r(offs_t offset);
+	void dir_w(offs_t offset, uint8_t data);
 
 	// Indirect Addressing Interface
-	DECLARE_READ8_MEMBER(indir_r);
-	DECLARE_WRITE8_MEMBER(indir_w);
+	uint8_t indir_r(offs_t offset);
+	void indir_w(offs_t offset, uint8_t data);
 
 	// Alternative Indirect Addressing Interface
-	DECLARE_READ8_MEMBER(indir_addr_r);
-	DECLARE_WRITE8_MEMBER(indir_addr_w);
-	DECLARE_READ8_MEMBER(indir_reg_r);
-	DECLARE_WRITE8_MEMBER(indir_reg_w);
+	uint8_t indir_addr_r();
+	void indir_addr_w(uint8_t data);
+	uint8_t indir_reg_r();
+	void indir_reg_w(uint8_t data);
 
 	// Master Reset (MR) Interface
-	DECLARE_WRITE_LINE_MEMBER(reset);
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
+	// DMA Interface (for use with DRQ)
 	uint8_t dma_r();
 	void dma_w(const uint8_t data);
 
@@ -47,11 +48,14 @@ protected:
 	virtual void scsi_ctrl_changed() override;
 
 private:
+	static const char *const state_names[];
+	static const char *const substate_names[];
 	static constexpr uint8_t NUM_REGS = 0x20;
 	static constexpr uint8_t REGS_MASK = NUM_REGS - 1;
 	uint8_t m_addr;
 	uint8_t m_regs[NUM_REGS];
 	uint8_t m_command_length;
+	uint8_t m_last_message;
 
 	void start_command();
 
@@ -61,7 +65,6 @@ private:
 	uint16_t m_scsi_state;
 	uint8_t m_mode;
 	uint8_t m_xfr_phase;
-	uint8_t m_step_count;
 
 	void load_transfer_count();
 	bool decrement_transfer_count();
@@ -78,7 +81,6 @@ private:
 	uint8_t m_data_fifo_size;
 
 	uint32_t send_byte(const uint32_t value = 0, const uint32_t mask = 0);
-	void recv_byte();
 
 	uint8_t irq_fifo_pop();
 	void irq_fifo_push(const uint8_t status);
@@ -151,9 +153,9 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(WD33C92, wd33c92_device)
-DECLARE_DEVICE_TYPE(WD33C93, wd33c93_device)
+DECLARE_DEVICE_TYPE(WD33C92,  wd33c92_device)
+DECLARE_DEVICE_TYPE(WD33C93,  wd33c93_device)
 DECLARE_DEVICE_TYPE(WD33C93A, wd33c93a_device)
 DECLARE_DEVICE_TYPE(WD33C93B, wd33c93b_device)
 
-#endif // MAME_MACHINE_WD33C93_H
+#endif // MAME_MACHINE_WD33C9X_H

@@ -7,11 +7,12 @@
  *      - Start2 works (Couriersud)
  *      - Added discrete paddle potentiometers (Couriersud)
  *      - Changes made to run in MAME (Couriersud)
+ *      - Added bonus game dip switch (Couriersud)
+ *      - Added discrete startup latch
  *      - Original version imported from DICE
  *
  * TODO:
- *      - implement discrete startup latch
- *      - implement bonus game dip switch
+ *      - lamp triacs?
  *
  * The MAME team has asked for and received written confirmation from the
  * author of DICE to use, modify and redistribute code under:
@@ -123,8 +124,8 @@ CIRCUIT_LAYOUT( breakout )
 	ANALOG_INPUT(V5, 5)
 	ALIAS(VCC, V5)
 
-#define GNDD "ttllow", Q
-#define P "ttlhigh", Q
+#define GNDD "GND", Q
+#define P "V5", Q
 
 	//----------------------------------------------------------------
 	// Clock circuit
@@ -181,9 +182,11 @@ CIRCUIT_LAYOUT( breakout )
 	DIODE(CR5, "1N914")
 	DIODE(CR7, "1N914")
 
-	QBJT_EB(Q1, "2N3644")
-	QBJT_EB(Q2, "2N3643")
-	QBJT_EB(Q3, "2N3643")
+	// No need to model capacitance
+	QBJT_EB(Q1, "2N3644(CJC=0 CJE=0)")
+	QBJT_EB(Q2, "2N3643(CJC=0 CJE=0)")
+	QBJT_EB(Q3, "2N3643(CJC=0 CJE=0)")
+
 	CAP(C19, CAP_U(0.1))
 	CAP(C16, CAP_U(0.1))
 
@@ -285,9 +288,6 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("J3", 7402)
 	DM9312_DIP(J4)
 	CHIP("J5", 7448)
-#if USE_TRUTHTABLE_7448
-	PARAM(J5.USE_DEACTIVATE, 0) // only use this if compiled with 7448 as a truthtable
-#endif
 	CHIP("J6", 9310)
 	CHIP("J7", 7420)
 	CHIP("J8", 74279)
@@ -1573,7 +1573,7 @@ CIRCUIT_LAYOUT( breakout )
 	RES(R51, RES_K(3.9))
 	RES(R52, RES_K(3.9))
 
-#if (SLOW_BUT_ACCURATE)
+#if (0 && SLOW_BUT_ACCURATE)
 	DIODE(CR6, "1N914")
 	NET_C(E2.11, CR6.K)
 
@@ -1585,15 +1585,11 @@ CIRCUIT_LAYOUT( breakout )
 	PARAM(CR6.ROFF, 1)
 	NET_C(R41.1, R42.1, R43.1, R51.1, R52.1)
 #endif
-#if 1
+
 	CONNECTION("R51", 2, PLAYFIELD)
 	CONNECTION("R43", 2, BSYNC)
 	CONNECTION("R52", 2, SCORE)
-#else
-	CONNECTION("R51", 2, "V5", Q)
-	CONNECTION("R43", 2, "V5", Q)
-	CONNECTION("R52", 2, "V5", Q)
-#endif
+
 	NET_C(R41.2, B9.3)
 	NET_C(R42.2, V5)
 
@@ -1702,35 +1698,106 @@ CIRCUIT_LAYOUT( breakout )
 
 	NET_C(GND, D9.1, D9.2, D9.13, D9.3, D9.4, D9.5)
 
-	HINT(A3.1.sub, NO_DEACTIVATE)
-	HINT(B6.s3, NO_DEACTIVATE)
-	HINT(C4.s3, NO_DEACTIVATE)
-	HINT(C4.s4, NO_DEACTIVATE)
-	HINT(C5.s3, NO_DEACTIVATE)
-	HINT(C5.s4, NO_DEACTIVATE)
-	HINT(D3.2.sub, NO_DEACTIVATE)
-	HINT(E2.s2, NO_DEACTIVATE)
-	HINT(E3.s2, NO_DEACTIVATE)
-	HINT(E5.s4, NO_DEACTIVATE)
-	HINT(E8.2.sub, NO_DEACTIVATE)
-	HINT(E9.s6, NO_DEACTIVATE)
-	HINT(F5.2.sub, NO_DEACTIVATE)
-	HINT(H2.s1, NO_DEACTIVATE)
-	HINT(H3.s1, NO_DEACTIVATE)
-	HINT(H6.sub, NO_DEACTIVATE)
-	HINT(J3.s4, NO_DEACTIVATE)
-	HINT(J5, NO_DEACTIVATE)
-	HINT(J6.sub, NO_DEACTIVATE)
-	HINT(J8.1, NO_DEACTIVATE)
-	HINT(J8.3, NO_DEACTIVATE)
-	HINT(K4.s4, NO_DEACTIVATE)
-	HINT(M3.s2, NO_DEACTIVATE)
-	HINT(M3.s4, NO_DEACTIVATE)
-	HINT(M4.s2, NO_DEACTIVATE)
-	HINT(M6.sub, NO_DEACTIVATE)
-	HINT(M8.s1, NO_DEACTIVATE)
-	HINT(N6.sub, NO_DEACTIVATE)
-	HINT(N7.s3, NO_DEACTIVATE)
+	//----------------------------------------------------------------
+	// Power Pins
+	//----------------------------------------------------------------
+
+	NET_C(V5,                A3.14, A4.14, A5.14, A6.14,
+							 B3.14, B4.16, B5.16, B6.14, B7.16, B8.16, B9.14,
+					  C2.14, C3.14, C4.14, C5.14, C6.14, C7.16, C8.16,
+					  D2.14, D3.14, D4.16, D5.14, D6.14, D7.14, D8.14,
+			   E1.14, E2.14, E3.14, E4.14, E5.14, E6.14, E7.14, E8.14, E9.14,
+					  F2.14,        F4.14, F5.14, F6.16, F7.16, F8.14, F9.14,
+			   H1.14, H2.14, H3.14, H4.14, H5.16, H6.16, H7.14, H8.14, H9.14,
+			   J1.16, J2.14, J3.14, J4.16, J5.16, J6.16, J7.14, J8.16, J9.14,
+			   K1.16, K2.14, K3.14, K4.14, K5.16, K6.16, K7.14, K8.14, K9.14,
+			   L1.16, L2.14, L3.16, L4.14, L5.16, L6.16, L7.14, L8.16, L9.14,
+			   M1.16, M2.5,  M3.14, M4.14, M5.16, M6.16,        M8.14, M9.14,
+			   N1.16, N2.5,  N3.14, N4.14, N5.16, N6.16, N7.14,        N9.16)
+	NET_C(GND,               A3.7,  A4.7,  A5.7,  A6.7,
+							 B3.7,  B4.8,  B5.8,  B6.7,  B7.8,  B8.8,  B9.7,
+					  C2.7,  C3.7,  C4.7,  C5.7,  C6.7,  C7.8,  C8.8,
+					  D2.7,  D3.7,  D4.8,  D5.7,  D6.7,  D7.7,  D8.7,
+			   E1.7,  E2.7,  E3.7,  E4.7,  E5.7,  E6.7,  E7.7,  E8.7,  E9.7,
+					  F2.7,         F4.7,  F5.7,  F6.8,  F7.8,  F8.7,  F9.7,
+			   H1.7,  H2.7,  H3.7,  H4.7,  H5.8,  H6.8,  H7.7,  H8.7,  H9.7,
+			   J1.8,  J2.7,  J3.7,  J4.8,  J5.8,  J6.8,  J7.7,  J8.8,  J9.7,
+			   K1.8,  K2.7,  K3.7,  K4.7,  K5.8,  K6.8,  K7.7,  K8.7,  K9.7,
+			   L1.8,  L2.7,  L3.8,  L4.7,  L5.8,  L6.8,  L7.7,  L8.8,  L9.7,
+			   M1.8,  M2.12, M3.7,  M4.7,  M5.8,  M6.8,         M8.7,  M9.7,
+			   N1.8,  N2.12, N3.7,  N4.7,  N5.8,  N6.8,  N7.7,         N9.8 )
+
+#if (SLOW_BUT_ACCURATE)
+	NET_C(VCC, F1.16)
+	NET_C(GND, F1.8)
+#endif
+
+#if 1
+	// 163% -- manually optimized
+	HINT(B6.C, NO_DEACTIVATE)
+	HINT(C4.C, NO_DEACTIVATE)
+	HINT(C4.D, NO_DEACTIVATE)
+	HINT(C5.C, NO_DEACTIVATE)
+	HINT(C5.D, NO_DEACTIVATE)
+	HINT(E2.B, NO_DEACTIVATE)
+	HINT(E3.B, NO_DEACTIVATE)
+	HINT(E5.D, NO_DEACTIVATE)
+	HINT(E9.F, NO_DEACTIVATE)
+	HINT(H2.A, NO_DEACTIVATE)
+	HINT(H3.A, NO_DEACTIVATE)
+	HINT(J3.D, NO_DEACTIVATE)
+#if (USE_TRUTHTABLE_7448)
+	HINT(J5.s, NO_DEACTIVATE)    // 7448 needs to be disabled in all cases
+#else
+	HINT(J5, NO_DEACTIVATE)    // 7448 needs to be disabled in all cases
+#endif
+	HINT(J6, NO_DEACTIVATE)
+	HINT(J8.A, NO_DEACTIVATE)
+	HINT(J8.C, NO_DEACTIVATE)
+	HINT(K4.D, NO_DEACTIVATE)
+	HINT(M3.B, NO_DEACTIVATE)
+	HINT(M3.D, NO_DEACTIVATE)
+	HINT(M4.B, NO_DEACTIVATE)
+	HINT(M6, NO_DEACTIVATE)
+	HINT(M8.A, NO_DEACTIVATE)
+	HINT(N7.C, NO_DEACTIVATE)
+
+#else
+	// 167% hints provided by log output - manually optimized
+	HINT(M4.B, NO_DEACTIVATE) // 29.001761 197676 6816
+	HINT(M3.C, NO_DEACTIVATE) // inf 129571 0
+	HINT(N7.C, NO_DEACTIVATE) // inf 7850387 0 xx
+	HINT(M3.B, NO_DEACTIVATE) // 23.234535 395870 17038
+	HINT(M3.A, NO_DEACTIVATE) // 14.500880 197676 13632
+	HINT(L7.C, NO_DEACTIVATE) // 122672.000000 122672 1
+	HINT(L7.B, NO_DEACTIVATE) // 122672.000000 122672 1
+	HINT(K7.D, NO_DEACTIVATE) // 122673.000000 122673 1
+	HINT(K7.C, NO_DEACTIVATE) // 122672.000000 122672 1
+	HINT(K7.B, NO_DEACTIVATE) // 122673.000000 122673 1
+	HINT(K7.A, NO_DEACTIVATE) // 122673.000000 122673 1
+	HINT(K4.D, NO_DEACTIVATE) // 1438.774735 4202661 2921  xx
+	HINT(K4.B, NO_DEACTIVATE) // 3.939380 847790 215209 xx
+	HINT(E2.B, NO_DEACTIVATE) // 108.050000 315506 2920 xx
+	HINT(L7.D, NO_DEACTIVATE) // 122672.000000 122672 1
+	HINT(E9.F, NO_DEACTIVATE) // inf 129571 0
+	//HINT(J2.F, NO_DEACTIVATE) // 493.408951 959187 1944
+	HINT(C5.C, NO_DEACTIVATE) // inf 195514 0
+	HINT(M3.D, NO_DEACTIVATE) // 27.744898 418726 15092 xx
+	HINT(J8.A, NO_DEACTIVATE) // 40890.000000 122670 3
+	HINT(E3.B, NO_DEACTIVATE) // 203581.000000 203581 1
+	HINT(M9.D, NO_DEACTIVATE) // inf 323268 0
+	//HINT(L4.B, NO_DEACTIVATE) // 7.290053 1192536 163584
+	HINT(J3.D, NO_DEACTIVATE) // 393.639951 957726 2433 xx
+	HINT(L7.A, NO_DEACTIVATE) // inf 122672 0
+	HINT(F2.A, NO_DEACTIVATE) // 286289.000000 286289 1
+	HINT(M8.A, NO_DEACTIVATE) // 129571.000000 129571 1
+	HINT(J7.B, NO_DEACTIVATE) // inf 122672 0
+	//HINT(H2.A, NO_DEACTIVATE) // 393.839704 958212 2433
+	HINT(H3.A, NO_DEACTIVATE) // 3.932473 850122 216180 xx
+	HINT(J2.E, NO_DEACTIVATE) // 26.140344 203581 7788
+	HINT(J7.A, NO_DEACTIVATE) // inf 122672 0
+	HINT(J8.C, NO_DEACTIVATE) // 40890.000000 122670 3
+#endif
 
 CIRCUIT_LAYOUT_END
 

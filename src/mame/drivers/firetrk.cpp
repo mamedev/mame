@@ -854,82 +854,76 @@ static GFXDECODE_START( gfx_montecar )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(firetrk_state::firetrk)
-
+void firetrk_state::firetrk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
-	MCFG_DEVICE_PROGRAM_MAP(firetrk_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", firetrk_state, firetrk_scanline, "screen", 0, 1)
+	M6800(config, m_maincpu, MASTER_CLOCK/12); /* 750Khz during service mode */
+	m_maincpu->set_addrmap(AS_PROGRAM, &firetrk_state::firetrk_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(firetrk_state::firetrk_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 5);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_firetrk)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 0, 320, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(firetrk_state::screen_update_firetrk));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(firetrk_state::firetrk_palette), 28);
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_firetrk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firetrk);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, firetrk_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, firetrk_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(firetrk_state::superbug)
+void firetrk_state::superbug(machine_config &config)
+{
 	firetrk(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(superbug_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &firetrk_state::superbug_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_superbug)
+	m_screen->set_screen_update(FUNC(firetrk_state::screen_update_superbug));
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbug)
+	m_gfxdecode->set_info(gfx_superbug);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, superbug_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config.replace(), m_discrete, superbug_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(firetrk_state::montecar)
+void firetrk_state::montecar(machine_config &config)
+{
 	firetrk(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(montecar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &firetrk_state::montecar_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_montecar)
+	m_screen->set_screen_update(FUNC(firetrk_state::screen_update_montecar));
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
+	m_gfxdecode->set_info(gfx_montecar);
 
 	m_palette->set_entries(46);
 	m_palette->set_init(FUNC(firetrk_state::montecar_palette));
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, montecar_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config.replace(), m_discrete, montecar_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( firetrk )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD(          "032823-02.c1", 0x2000, 0x800, CRC(9570bdd3) SHA1(4d26a9490d05d53da55fc59459a4dce5bca6c761) )
 	ROM_LOAD(          "032824-01.d1", 0x2800, 0x800, CRC(a5fc5629) SHA1(bf20510d8623eda2740ff296a7813a3e6f7ec76e) )
-	ROM_LOAD_NIB_HIGH( "032816-01.k1", 0x3000, 0x800, CRC(c0535598) SHA1(15cb6985b0b22140b7fae1e050e0b63dd4d0f793) )
+	ROM_LOAD_NIB_HIGH( "032816-01.k1", 0x3000, 0x800, CRC(c0535598) SHA1(15cb6985b0b22140b7fae1e050e0b63dd4d0f793) ) // one PCB has been found with this ROM labeled 032816-02.k1, CRC matches
 	ROM_LOAD_NIB_LOW ( "032820-01.k2", 0x3000, 0x800, CRC(5733f9ed) SHA1(0f19a40793dadfb7de2c2b54a44929b414d0f4ed) )
 	ROM_LOAD_NIB_HIGH( "032815-01.j1", 0x3800, 0x800, CRC(506ee759) SHA1(d111356c84f3d9942a27fbe243e716d14c258a16) )
 	ROM_LOAD_NIB_LOW ( "032819-01.j2", 0x3800, 0x800, CRC(f1c3fa87) SHA1(d75cf4ad0bcac3289c068837fc24cfe84ce7542a) )

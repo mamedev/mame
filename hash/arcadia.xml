@@ -383,7 +383,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="3dbowl.bin" size="4096" crc="f3c08e19" sha1="edd33cabd3d600e9e3d3c22f326a065ea6ebe32c" offset="0000" />
+				<rom name="3dbowl.bin" size="4096" crc="f3c08e19" sha1="edd33cabd3d600e9e3d3c22f326a065ea6ebe32c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -397,7 +397,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="3dsoccera.bin" size="8192" crc="1b5be22a" sha1="d3df9ed4e09bacacde47fa4f1128383fd62ffd6e" offset="0000" />
+				<rom name="3dsoccera.bin" size="8192" crc="1b5be22a" sha1="d3df9ed4e09bacacde47fa4f1128383fd62ffd6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -410,7 +410,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="3dsoccer.bin" size="8192" crc="4da68df8" sha1="50e799c96be3613f937825c6c722521bc6df0162" offset="0000" />
+				<rom name="3dsoccer.bin" size="8192" crc="4da68df8" sha1="50e799c96be3613f937825c6c722521bc6df0162"/>
 			</dataarea>
 		</part>
 	</software>
@@ -423,7 +423,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="alieninv.bin" size="4096" crc="1f65b21e" sha1="8d17de81fbf70db8fe32830763c6a940aa9124c3" offset="0000" />
+				<rom name="alieninv.bin" size="4096" crc="1f65b21e" sha1="8d17de81fbf70db8fe32830763c6a940aa9124c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -436,7 +436,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="American Football.bin" size="8192" crc="b10a08b5" sha1="2feb388ce4a6163fe7856c0d34fa42a0720dd66c" offset="0000" />
+				<rom name="American Football.bin" size="8192" crc="b10a08b5" sha1="2feb388ce4a6163fe7856c0d34fa42a0720dd66c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -448,7 +448,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="astroinv.bin" size="4096" crc="ddcf5b2c" sha1="b6f693e3333607181fbe3a43dffa9f30f9656998" offset="0000" />
+				<rom name="astroinv.bin" size="4096" crc="ddcf5b2c" sha1="b6f693e3333607181fbe3a43dffa9f30f9656998"/>
 			</dataarea>
 		</part>
 	</software>
@@ -461,7 +461,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="autorace.bin" size="4096" crc="99ac48ca" sha1="6182219b2b8c8747f67d627a056ac947754f0978" offset="0000" />
+				<rom name="autorace.bin" size="4096" crc="99ac48ca" sha1="6182219b2b8c8747f67d627a056ac947754f0978"/>
 			</dataarea>
 		</part>
 	</software>
@@ -473,7 +473,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="baseball.bin" size="4096" crc="1cf08155" sha1="f4d39aaab61e6b01c673166ae54841d450860b31" offset="0000" />
+				<rom name="baseball.bin" size="4096" crc="1cf08155" sha1="f4d39aaab61e6b01c673166ae54841d450860b31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -487,7 +487,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="vidpanz.bin" size="4096" crc="6818c8bd" sha1="21eadc7841e0a59671aacca93d28d81c580f16f2" offset="0000" />
+				<rom name="vidpanz.bin" size="4096" crc="6818c8bd" sha1="21eadc7841e0a59671aacca93d28d81c580f16f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -499,7 +499,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="blckjack.bin" size="4096" crc="0930ce04" sha1="a8afadfcaea847c2e998005652ace36803d6601b" offset="0000" />
+				<rom name="blckjack.bin" size="4096" crc="0930ce04" sha1="a8afadfcaea847c2e998005652ace36803d6601b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -511,7 +511,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="boxing.bin" size="4096" crc="9240891b" sha1="0fc3a8a33f2e89b2b32ea0a962effcf3ee430d34" offset="0000" />
+				<rom name="boxing.bin" size="4096" crc="9240891b" sha1="0fc3a8a33f2e89b2b32ea0a962effcf3ee430d34"/>
 			</dataarea>
 		</part>
 	</software>
@@ -524,7 +524,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="brainqz.bin" size="4096" crc="ca58b3f8" sha1="e9560e064043946b6bc0a88087d4164adf62e773" offset="0000" />
+				<rom name="brainqz.bin" size="4096" crc="ca58b3f8" sha1="e9560e064043946b6bc0a88087d4164adf62e773"/>
 			</dataarea>
 		</part>
 	</software>
@@ -537,7 +537,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="breakawy.bin" size="4096" crc="33c348c1" sha1="396fe12bd34cc7cd555ad3b9b66f20e56e862385" offset="0000" />
+				<rom name="breakawy.bin" size="4096" crc="33c348c1" sha1="396fe12bd34cc7cd555ad3b9b66f20e56e862385"/>
 			</dataarea>
 		</part>
 	</software>
@@ -549,7 +549,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="bsktball.bin" size="4096" crc="e93938f6" sha1="c6e3f963ea9db520bcd682a3206cc291504c9e3d" offset="0000" />
+				<rom name="bsktball.bin" size="4096" crc="e93938f6" sha1="c6e3f963ea9db520bcd682a3206cc291504c9e3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -575,7 +575,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="cattrax.bin" size="4096" crc="fd2cf496" sha1="b0982ed95d92a4d97a5451acbee36af10ff99a3f" offset="0000" />
+				<rom name="cattrax.bin" size="4096" crc="fd2cf496" sha1="b0982ed95d92a4d97a5451acbee36af10ff99a3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -588,7 +588,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="circus.bin" size="4096" crc="086ebc8c" sha1="e8abeb702d9a7b7e12e1cea02946dae267b23041" offset="0000" />
+				<rom name="circus.bin" size="4096" crc="086ebc8c" sha1="e8abeb702d9a7b7e12e1cea02946dae267b23041"/>
 			</dataarea>
 		</part>
 	</software>
@@ -600,7 +600,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="combat.bin" size="4096" crc="a6bffa9e" sha1="87addcdd0fccb5f36066f21938458235d5a37bd0" offset="0000" />
+				<rom name="combat.bin" size="4096" crc="a6bffa9e" sha1="87addcdd0fccb5f36066f21938458235d5a37bd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -613,7 +613,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="cclimber.bin" size="4096" crc="76e773fa" sha1="0c6ce7577a121e7810ec54c5dd180a55dd0ace17" offset="0000" />
+				<rom name="cclimber.bin" size="4096" crc="76e773fa" sha1="0c6ce7577a121e7810ec54c5dd180a55dd0ace17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -638,7 +638,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="doraemon.bin" size="8192" crc="62c45881" sha1="a16fda96d00c8b08bb362f2573a45939aa6be051" offset="0000" />
+				<rom name="doraemon.bin" size="8192" crc="62c45881" sha1="a16fda96d00c8b08bb362f2573a45939aa6be051"/>
 			</dataarea>
 		</part>
 	</software>
@@ -650,7 +650,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="drslump.bin" size="8192" crc="927c375a" sha1="389259f1505deef5c0fb83f9cf8b0f7fa4ed5d04" offset="0000" />
+				<rom name="drslump.bin" size="8192" crc="927c375a" sha1="389259f1505deef5c0fb83f9cf8b0f7fa4ed5d04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -663,7 +663,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="escape.bin" size="4096" crc="fc7eba76" sha1="87f81511ea5b7a9671fb945cb22bb578bedb47c9" offset="0000" />
+				<rom name="escape.bin" size="4096" crc="fc7eba76" sha1="87f81511ea5b7a9671fb945cb22bb578bedb47c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -675,7 +675,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="funkyfsh.bin" size="8192" crc="77c19320" sha1="e56be2ecd8284cd43a44620d56d6615766f45451" offset="0000" />
+				<rom name="funkyfsh.bin" size="8192" crc="77c19320" sha1="e56be2ecd8284cd43a44620d56d6615766f45451"/>
 			</dataarea>
 		</part>
 	</software>
@@ -688,7 +688,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="golf" />
 			<dataarea name="rom" size="6144">
-				<rom name="golf.bin" size="6144" crc="a23c7a01" sha1="7c9251e42fd03b9c26a13d0e25cdf9a838319a39" offset="0000" />
+				<rom name="golf.bin" size="6144" crc="a23c7a01" sha1="7c9251e42fd03b9c26a13d0e25cdf9a838319a39"/>
 			</dataarea>
 		</part>
 	</software>
@@ -701,7 +701,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="gpmonaco.bin" size="4096" crc="5e033f9c" sha1="7dcc1387892fa7275514c91ce584f83a5d3e14d6" offset="0000" />
+				<rom name="gpmonaco.bin" size="4096" crc="5e033f9c" sha1="7dcc1387892fa7275514c91ce584f83a5d3e14d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -714,7 +714,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="gstennis.bin" size="8192" crc="8bf2dfa9" sha1="03cedd5fd67ff11a4ac74d513f03a2266af89446" offset="0000" />
+				<rom name="gstennis.bin" size="8192" crc="8bf2dfa9" sha1="03cedd5fd67ff11a4ac74d513f03a2266af89446"/>
 			</dataarea>
 		</part>
 	</software>
@@ -726,7 +726,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="hobo.bin" size="8192" crc="1cec4b21" sha1="cebb340cb0a50b2815dafc6df8f46d814015a49f" offset="0000" />
+				<rom name="hobo.bin" size="8192" crc="1cec4b21" sha1="cebb340cb0a50b2815dafc6df8f46d814015a49f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -746,7 +746,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="horserac.bin" size="4096" crc="560daa7f" sha1="72dd8dea83bf9ab7d486931516e99b2209ca0a1d" offset="0000" />
+				<rom name="horserac.bin" size="4096" crc="560daa7f" sha1="72dd8dea83bf9ab7d486931516e99b2209ca0a1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -759,7 +759,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="jumpbug.bin" size="8192" crc="97060a54" sha1="d0ace24fd1f3805e46b077e8a4770f922157c8c4" offset="0000" />
+				<rom name="jumpbug.bin" size="8192" crc="97060a54" sha1="d0ace24fd1f3805e46b077e8a4770f922157c8c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -773,7 +773,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="jumpbuga.bin" size="8192" crc="dc0264b8" sha1="bf3ccf7a54409f22ca4295b1df1c01bfbbe9f0a2" offset="0000" />
+				<rom name="jumpbuga.bin" size="8192" crc="dc0264b8" sha1="bf3ccf7a54409f22ca4295b1df1c01bfbbe9f0a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -785,7 +785,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="jungler.bin" size="8192" crc="dfb5dd55" sha1="8d6e32ab3cc872017c597e61c076330015411435" offset="0000" />
+				<rom name="jungler.bin" size="8192" crc="dfb5dd55" sha1="8d6e32ab3cc872017c597e61c076330015411435"/>
 			</dataarea>
 		</part>
 	</software>
@@ -798,7 +798,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="macross.bin" size="8192" crc="4c885af2" sha1="3d24ab9e42ff44a223bb53c5491dea7f41691df2" offset="0000" />
+				<rom name="macross.bin" size="8192" crc="4c885af2" sha1="3d24ab9e42ff44a223bb53c5491dea7f41691df2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -811,7 +811,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="gundam.bin" size="8192" crc="1241f128" sha1="4b07a88b06008ddfc3676983e826e107caf3ba0f" offset="0000" />
+				<rom name="gundam.bin" size="8192" crc="1241f128" sha1="4b07a88b06008ddfc3676983e826e107caf3ba0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -824,7 +824,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="msslewar.bin" size="4096" crc="a615f068" sha1="cc3e46adc8a3ed2cbfd5f9bbbf96f61f4e2ecebe" offset="0000" />
+				<rom name="msslewar.bin" size="4096" crc="a615f068" sha1="cc3e46adc8a3ed2cbfd5f9bbbf96f61f4e2ecebe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -837,7 +837,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="nbblemen.bin" size="4096" crc="7832f7ad" sha1="a2f3d269e422e6ee89d58f001d39438704178e17" offset="0000" />
+				<rom name="nbblemen.bin" size="4096" crc="7832f7ad" sha1="a2f3d269e422e6ee89d58f001d39438704178e17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -850,7 +850,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="nbblemena.bin" size="4096" crc="08d8b186" sha1="ca2efbcb1f1f580b7995aa47ab7da09fa4a1b9e2" offset="0000" />
+				<rom name="nbblemena.bin" size="4096" crc="08d8b186" sha1="ca2efbcb1f1f580b7995aa47ab7da09fa4a1b9e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -863,7 +863,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="oceanbat.bin" size="4096" crc="449e80cb" sha1="444146bf89c3a0e0e010f6a30e675be3f2b023a7" offset="0000" />
+				<rom name="oceanbat.bin" size="4096" crc="449e80cb" sha1="444146bf89c3a0e0e010f6a30e675be3f2b023a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -876,7 +876,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="parashtr.bin" size="4096" crc="4f538848" sha1="2e7c8e4263eec7f033019ec763effebca40ca30b" offset="0000" />
+				<rom name="parashtr.bin" size="4096" crc="4f538848" sha1="2e7c8e4263eec7f033019ec763effebca40ca30b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -888,7 +888,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="pleiades.bin" size="8192" crc="4f19fd9b" sha1="bdb7ce3d4552c82be3cf8db43d5ad103f9d9cc91" offset="0000" />
+				<rom name="pleiades.bin" size="8192" crc="4f19fd9b" sha1="bdb7ce3d4552c82be3cf8db43d5ad103f9d9cc91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -900,7 +900,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="r2dtank.bin" size="4096" crc="a0626e23" sha1="e1daef4cc1e8c51cf542d900ba7139f5f472f2c8" offset="0000" />
+				<rom name="r2dtank.bin" size="4096" crc="a0626e23" sha1="e1daef4cc1e8c51cf542d900ba7139f5f472f2c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -912,7 +912,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="redclash.bin" size="4096" crc="a06f284b" sha1="7a94f4f1768e4c62209cc03adc0fbadb954d2c24" offset="0000" />
+				<rom name="redclash.bin" size="4096" crc="a06f284b" sha1="7a94f4f1768e4c62209cc03adc0fbadb954d2c24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -925,7 +925,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="robtkllr.bin" size="4096" crc="4671b7f7" sha1="acb45a8314fe531390d1c58be23ae860fa344c94" offset="0000" />
+				<rom name="robtkllr.bin" size="4096" crc="4671b7f7" sha1="acb45a8314fe531390d1c58be23ae860fa344c94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -937,7 +937,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="route16.bin" size="8192" crc="8169864e" sha1="6f6d0c0e2ae06112643c63cb6892f8c7269c98a6" offset="0000" />
+				<rom name="route16.bin" size="8192" crc="8169864e" sha1="6f6d0c0e2ae06112643c63cb6892f8c7269c98a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -950,7 +950,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="soccer.bin" size="4096" crc="b0b98a92" sha1="1a575203b78af7ac992f109add1721dda8872fc1" offset="0000" />
+				<rom name="soccer.bin" size="4096" crc="b0b98a92" sha1="1a575203b78af7ac992f109add1721dda8872fc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -986,7 +986,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="spaceatt.bin" size="4096" crc="e3794a2c" sha1="25a27466dc3ffb6013cd4f632947834002c80105" offset="0000" />
+				<rom name="spaceatt.bin" size="4096" crc="e3794a2c" sha1="25a27466dc3ffb6013cd4f632947834002c80105"/>
 			</dataarea>
 		</part>
 	</software>
@@ -999,7 +999,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="spcemssn.bin" size="4096" crc="3ff224e5" sha1="a46fa9cbc12cb83218d3936ec3f4d0a4aff8cd60" offset="0000" />
+				<rom name="spcemssn.bin" size="4096" crc="3ff224e5" sha1="a46fa9cbc12cb83218d3936ec3f4d0a4aff8cd60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1012,7 +1012,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="spcerdrs.bin" size="4096" crc="88defacf" sha1="c2c247b57c3d3a9321f7c16e48b1d733bd7d7dbb" offset="0000" />
+				<rom name="spcerdrs.bin" size="4096" crc="88defacf" sha1="c2c247b57c3d3a9321f7c16e48b1d733bd7d7dbb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1025,7 +1025,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="spcesqdn.bin" size="4096" crc="caa5f449" sha1="e76efb5f2707f67775d09d2d1547a4af0254b7b1" offset="0000" />
+				<rom name="spcesqdn.bin" size="4096" crc="caa5f449" sha1="e76efb5f2707f67775d09d2d1547a4af0254b7b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1038,7 +1038,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="6144">
-				<rom name="spcevult.bin" size="6144" crc="7666a712" sha1="a1697ee165307792f07fdd7767122140958a4e9f" offset="0000" />
+				<rom name="spcevult.bin" size="6144" crc="7666a712" sha1="a1697ee165307792f07fdd7767122140958a4e9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1050,7 +1050,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="spiders.bin" size="4096" crc="bb88daea" sha1="e2fe75ec968a586a9c4885df02481b00abef2bc7" offset="0000" />
+				<rom name="spiders.bin" size="4096" crc="bb88daea" sha1="e2fe75ec968a586a9c4885df02481b00abef2bc7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1063,7 +1063,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="starchss.bin" size="4096" crc="83e6e40b" sha1="348ca876b1113827d8e7ffb9b2422e863ba92b0f" offset="0000" />
+				<rom name="starchss.bin" size="4096" crc="83e6e40b" sha1="348ca876b1113827d8e7ffb9b2422e863ba92b0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1075,7 +1075,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="superbuga.bin" size="4096" crc="15436f39" sha1="bf22e0fae67bc3c2147a669b194752e34fe3564d" offset="0000" />
+				<rom name="superbuga.bin" size="4096" crc="15436f39" sha1="bf22e0fae67bc3c2147a669b194752e34fe3564d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1087,7 +1087,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="superbug.bin" size="4096" crc="fef2aae9" sha1="1e7f7b81ecd2f766c94bd5ff17763374fb0318f1" offset="0000" />
+				<rom name="superbug.bin" size="4096" crc="fef2aae9" sha1="1e7f7b81ecd2f766c94bd5ff17763374fb0318f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1100,7 +1100,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="theend.bin" size="4096" crc="e66f362d" sha1="1148aa1525d7b46640babb50b004c79abec45d3a" offset="0000" />
+				<rom name="theend.bin" size="4096" crc="e66f362d" sha1="1148aa1525d7b46640babb50b004c79abec45d3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1112,7 +1112,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
-				<rom name="tnksalot.bin" size="4096" crc="0076422e" sha1="c431d5190e86f3dfbb3e8b1a3b9bec82bb5014ae" offset="0000" />
+				<rom name="tnksalot.bin" size="4096" crc="0076422e" sha1="c431d5190e86f3dfbb3e8b1a3b9bec82bb5014ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1124,7 +1124,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="8192">
-				<rom name="turtles.bin" size="8192" crc="306e39c1" sha1="a806e3f248a962bb99e2515f489d45bb11fb0a0e" offset="0000" />
+				<rom name="turtles.bin" size="8192" crc="306e39c1" sha1="a806e3f248a962bb99e2515f489d45bb11fb0a0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1152,7 +1152,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="12288">
-				<rom name="dicte2g.bin" size="12288" crc="6289f607" sha1="23d5d52e3403b3e9cd7864a16abac03508db8c97" offset="0000" />
+				<rom name="dicte2g.bin" size="12288" crc="6289f607" sha1="23d5d52e3403b3e9cd7864a16abac03508db8c97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1165,7 +1165,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="12288">
-				<rom name="dictg2e.bin" size="12288" crc="0739504d" sha1="de2c037c5ec9b31f2ae63a467dcd82647f92e908" offset="0000" />
+				<rom name="dictg2e.bin" size="12288" crc="0739504d" sha1="de2c037c5ec9b31f2ae63a467dcd82647f92e908"/>
 			</dataarea>
 		</part>
 	</software>

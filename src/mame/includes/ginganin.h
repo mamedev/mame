@@ -22,6 +22,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_vregs(*this, "vregs"),
 		m_fgram(*this, "fgram"),
+		m_bgrom(*this, "bgrom"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -35,20 +36,22 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_txtram;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_vregs;
-	required_shared_ptr<uint16_t> m_fgram;
+	required_shared_ptr<u16> m_txtram;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_vregs;
+	required_shared_ptr<u16> m_fgram;
+
+	required_region_ptr<u8> m_bgrom;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;
 	tilemap_t     *m_tx_tilemap;
-	int         m_layers_ctrl;
-	int         m_flipscreen;
+	int           m_layers_ctrl;
+	int           m_flipscreen;
 #ifdef MAME_DEBUG
-	int         m_posx;
-	int         m_posy;
+	int           m_posx;
+	int           m_posy;
 #endif
 
 	/* devices */
@@ -58,9 +61,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(ginganin_fgram16_w);
-	DECLARE_WRITE16_MEMBER(ginganin_txtram16_w);
-	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);
+	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void txtram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -68,9 +71,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_ginganin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
-	void ginganin_map(address_map &map);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
 

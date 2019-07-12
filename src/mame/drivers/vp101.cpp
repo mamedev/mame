@@ -9,6 +9,7 @@
         - VP101: Johnny Nero.  The original (?)
         - VP100: Special Forces Elite Training.  A not-quite-complete VP101; missing ATA DMA.
         - VP50 : Zoofari.  Cost-reduced (?) with TX4925 SoC, much less complex FPGA.
+               : Rhythm Nation.
 
     Preliminary driver by R. Belmont
 
@@ -453,7 +454,19 @@ ROM_START(zoofari)
 	DISK_IMAGE_READONLY("zoofari", 0, SHA1(8fb9cfb1ab2660f40b643fcd772243903bd69a6c) )
 ROM_END
 
+ROM_START(rhnation)
+	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
+	ROM_LOAD( "rhythm_nation_rev_3.1.5_m27v322.u13", 0x000000, 0x400000, CRC(456f043d) SHA1(cc166897fdbdaa3583e44816da9dfbbf303f5c61) )
+
+	ROM_REGION(0x80000, "pic", 0)       /* PIC18c242 program - read-protected, need dumped */
+	ROM_LOAD( " pic18c242-i-sp.u22", 0x000000, 0x80000, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE_READONLY("rhn010104", 0, SHA1(5bc2e5817b29bf42ec483414242795fd76d749d9) )
+ROM_END
+
 GAME( 2002,  specfrce,  0,          vp101,  vp101, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002,  specfrceo, specfrce,   vp101,  vp101, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003,  rhnation,  0,          vp50,   vp50,  vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Rhythm Nation (v01.00.04)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004,  jnero,     0,          vp101,  vp101, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Johnny Nero Action Hero (v01.01.08)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006,  zoofari,   0,          vp50,   vp50,  vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Zoofari",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

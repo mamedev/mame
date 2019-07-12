@@ -579,87 +579,56 @@ static INPUT_PORTS_START( gal3 )
 	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout tile_layout =
+void gal3_state::gal3(machine_config &config)
 {
-	16,16,
-	RGN_FRAC(1,4),  /* number of tiles */
-	8,      /* bits per pixel */
-	{       /* plane offsets */
-		0,1,2,3,4,5,6,7
-	},
-	{ /* x offsets */
-		0*8,RGN_FRAC(1,4)+0*8,RGN_FRAC(2,4)+0*8,RGN_FRAC(3,4)+0*8,
-		1*8,RGN_FRAC(1,4)+1*8,RGN_FRAC(2,4)+1*8,RGN_FRAC(3,4)+1*8,
-		2*8,RGN_FRAC(1,4)+2*8,RGN_FRAC(2,4)+2*8,RGN_FRAC(3,4)+2*8,
-		3*8,RGN_FRAC(1,4)+3*8,RGN_FRAC(2,4)+3*8,RGN_FRAC(3,4)+3*8
-	},
-	{ /* y offsets */
-		0*32,1*32,2*32,3*32,
-		4*32,5*32,6*32,7*32,
-		8*32,9*32,10*32,11*32,
-		12*32,13*32,14*32,15*32
-	},
-	8*64 /* sprite offset */
-};
+	m68020_device &maincpu(M68020(config, "maincpu", 49152000/2));
+	maincpu.set_addrmap(AS_PROGRAM, &gal3_state::cpu_mst_map);
+	maincpu.set_vblank_int("lscreen", FUNC(gal3_state::irq1_line_hold));
 
-static GFXDECODE_START( gfx_gal3_l )
-	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
-GFXDECODE_END
+	m68020_device &cpusly(M68020(config, "cpuslv", 49152000/2));
+	cpusly.set_addrmap(AS_PROGRAM, &gal3_state::cpu_slv_map);
+	cpusly.set_vblank_int("lscreen", FUNC(gal3_state::irq1_line_hold));
 
-static GFXDECODE_START( gfx_gal3_r )
-	GFXDECODE_ENTRY( "obj_board2", 0x000000, tile_layout,  0x000, 0x20 )
-GFXDECODE_END
+	m68000_device &rs_cpu(M68000(config, "rs_cpu", 49152000/4));
+	rs_cpu.set_addrmap(AS_PROGRAM, &gal3_state::rs_cpu_map);
+	rs_cpu.set_vblank_int("lscreen", FUNC(gal3_state::irq5_line_hold));  /// programmable via 148 IC
 
-MACHINE_CONFIG_START(gal3_state::gal3)
-	MCFG_DEVICE_ADD("maincpu", M68020, 49152000/2)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mst_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
+	m68000_device &sound_cpu(M68000(config, "sound_cpu", 12000000)); // ??
+	sound_cpu.set_addrmap(AS_PROGRAM, &gal3_state::sound_cpu_map);
 
-	MCFG_DEVICE_ADD("cpuslv", M68020, 49152000/2)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_slv_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
-
-	MCFG_DEVICE_ADD("rs_cpu", M68000, 49152000/4)
-	MCFG_DEVICE_PROGRAM_MAP(rs_cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq5_line_hold)  /// programmable via 148 IC
-
-	MCFG_DEVICE_ADD("sound_cpu", M68000, 12000000) // ??
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
-
-	MCFG_DEVICE_ADD("psn_b1_cpu", M68000, 12000000) // ??
-	MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map)
+	m68000_device &psn_b1_cpu(M68000(config, "psn_b1_cpu", 12000000)); // ??
+	psn_b1_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 /*
-    MCFG_DEVICE_ADD("psn_b2_cpu", M68000, 12000000) // ??
-    MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map,0)
+    m68000_device &psn_b2_cpu(M68000(config, "psn_b2_cpu", 12000000)); // ??
+    psn_b2_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 
-    MCFG_DEVICE_ADD("psn_b3_cpu", M68000, 12000000) // ??
-    MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map,0)
+    m68000_device &psn_b3_cpu(M68000(config, "psn_b3_cpu", 12000000)); // ??
+    psn_b3_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 */
-	MCFG_QUANTUM_TIME(attotime::from_hz(60*8000)) /* 8000 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(60*8000); /* 8000 CPU slices per frame */
 
 	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
 
 	// video chain 1
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette_1")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(64*8, 64*8);
+	lscreen.set_visarea(0*8, 512-1, 0*8, 512-1);
+	lscreen.set_screen_update(FUNC(gal3_state::screen_update_left));
+	lscreen.set_palette(m_palette[0]);
 
-	GFXDECODE(config, "gfxdecode_1", m_palette[0], gfx_gal3_l);
 	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
 	m_palette[0]->set_membits(16);
 
 	NAMCO_C355SPR(config, m_c355spr[0], 0);
 	m_c355spr[0]->set_screen("lscreen");
-	m_c355spr[0]->set_gfxdecode_tag("gfxdecode_1");
+	m_c355spr[0]->set_palette(m_palette[0]);
 	m_c355spr[0]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[0]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[0]->set_palxor(0xf); // reverse mapping
-	m_c355spr[0]->set_gfxregion(0);
+	m_c355spr[0]->set_color_base(0x1000); // TODO : verify palette offset
 
 	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
 	m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
@@ -671,25 +640,24 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 
 	// video chain 2
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette_2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(64*8, 64*8);
+	rscreen.set_visarea(0*8, 512-1, 0*8, 512-1);
+	rscreen.set_screen_update(FUNC(gal3_state::screen_update_right));
+	rscreen.set_palette(m_palette[1]);
 
-	GFXDECODE(config, "gfxdecode_2", m_palette[1], gfx_gal3_r);
 	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
 	m_palette[1]->set_membits(16);
 
 	NAMCO_C355SPR(config, m_c355spr[1], 0);
 	m_c355spr[1]->set_screen("rscreen");
-	m_c355spr[1]->set_gfxdecode_tag("gfxdecode_2");
+	m_c355spr[1]->set_palette(m_palette[1]);
 	m_c355spr[1]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[1]->set_palxor(0xf); // reverse mapping
-	m_c355spr[1]->set_gfxregion(0);
+	m_c355spr[1]->set_color_base(0x1000); // TODO : verify palette offset
 
 	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
 	m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
@@ -712,7 +680,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	m_c140_16a->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
 	m_c140_16a->add_route(0, "lspeaker", 0.50);
 	m_c140_16a->add_route(1, "rspeaker", 0.50);
-MACHINE_CONFIG_END
+}
 
 /*
 
@@ -864,17 +832,17 @@ ROM_START( gal3 )
 	ROM_LOAD32_BYTE( "glc1-dsp-ptol.2n", 0x000003, 0x80000, CRC(b318534a) SHA1(6fcf2ead6dd0d5a6f22438520588ba4e33ca39a8) )  /* least significant */
 
 	/********* OBJ board x2 *********/
-	ROM_REGION( 0x200000, "obj_board1", 0 )
-	ROM_LOAD( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
-	ROM_LOAD( "glc1-obj-obj1.9w", 0x080000, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
-	ROM_LOAD( "glc1-obj-obj2.9y", 0x100000, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
-	ROM_LOAD( "glc1-obj-obj3.9z", 0x180000, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
+	ROM_REGION( 0x200000, "c355spr_1", 0 )
+	ROM_LOAD32_BYTE( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj1.9w", 0x000001, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj2.9y", 0x000002, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj3.9z", 0x000003, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
 
-	ROM_REGION( 0x200000, "obj_board2", 0 )
-	ROM_LOAD( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
-	ROM_LOAD( "glc1-obj-obj1.9w", 0x080000, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
-	ROM_LOAD( "glc1-obj-obj2.9y", 0x100000, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
-	ROM_LOAD( "glc1-obj-obj3.9z", 0x180000, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
+	ROM_REGION( 0x200000, "c355spr_2", 0 )
+	ROM_LOAD32_BYTE( "glc1-obj-obj0.9t", 0x000000, 0x80000, CRC(0fe98d33) SHA1(5cfefa342fe2fa278d010927d761cb51105a4a60) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj1.9w", 0x000001, 0x80000, CRC(660a4f6d) SHA1(c3c3525f51280e71f2d607649a6b5434cbd862c8) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj2.9y", 0x000002, 0x80000, CRC(90bcc5a3) SHA1(76cb23e295bb15279e046e83f8e4ab9f85f68243) )
+	ROM_LOAD32_BYTE( "glc1-obj-obj3.9z", 0x000003, 0x80000, CRC(65244f07) SHA1(fd876ca5f198914f15864397b358e56fcaa41e90) )
 
 	/********* PSN board x3 *********/
 	ROM_REGION( 0x040000, "psn_b1_cpu", 0 )

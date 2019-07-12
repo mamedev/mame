@@ -114,7 +114,7 @@ private:
 	DECLARE_WRITE8_MEMBER(testb_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void jokrwild_palette(palette_device &palette) const;
-	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jokrwild_map(address_map &map);
 };
 
@@ -154,7 +154,7 @@ void jokrwild_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
 
-uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -413,11 +413,11 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(jokrwild_state::jokrwild)
-
+void jokrwild_state::jokrwild(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(jokrwild_map)
+	M6809(config, m_maincpu, MASTER_CLOCK/2);  /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &jokrwild_state::jokrwild_map);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -432,13 +432,12 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	pia1.readpb_handler().set_ioport("IN3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  // From MC6845, registers 00 & 04. (value-1)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    // From MC6845, registers 01 & 06.
-	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((32+1)*8, (32+1)*8);                  // From MC6845, registers 00 & 04. (value-1)
+	screen.set_visarea(0*8, 24*8-1, 0*8, 26*8-1);    // From MC6845, registers 01 & 06.
+	screen.set_screen_update(FUNC(jokrwild_state::screen_update_jokrwild));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_jokrwild);
 	PALETTE(config, "palette", FUNC(jokrwild_state::jokrwild_palette), 512);
@@ -448,8 +447,7 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-
-MACHINE_CONFIG_END
+}
 
 
 /*************************

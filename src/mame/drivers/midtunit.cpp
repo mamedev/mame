@@ -65,7 +65,6 @@ void midtunit_state::main_map(address_map &map)
 	map(0x01f00000, 0x01f0001f).w(m_video, FUNC(midtunit_video_device::midtunit_control_w));
 	map(0x02000000, 0x07ffffff).r(m_video, FUNC(midtunit_video_device::midtunit_gfxrom_r)).share("gfxrom");
 	map(0x1f800000, 0x1fffffff).rom().region("maincpu", 0); /* mirror used by MK */
-	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
 }
 

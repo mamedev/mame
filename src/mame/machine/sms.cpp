@@ -2,8 +2,8 @@
 // copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 #include "emu.h"
 #include "crsshair.h"
+#include "cpu/z80/z80.h"
 #include "video/315_5124.h"
-#include "sound/sn76496.h"
 #include "sound/ym2413.h"
 #include "includes/sms.h"
 
@@ -18,11 +18,17 @@
 #define ENABLE_EXT_RAM   0x10
 
 
+TIMER_CALLBACK_MEMBER(sms_state::lphaser_th_generate)
+{
+	m_vdp->hcount_latch();
+}
+
+
 void sms_state::lphaser_hcount_latch()
 {
 	/* A delay seems to occur when the Light Phaser latches the
 	   VDP hcount, then an offset is added here to the hpos. */
-	m_vdp->hcount_latch_at_hpos(m_main_scr->hpos() + m_lphaser_x_offs);
+	m_lphaser_th_timer->adjust(m_main_scr->time_until_pos(m_main_scr->vpos(), m_main_scr->hpos() + m_lphaser_x_offs));
 }
 
 
@@ -203,54 +209,46 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 READ8_MEMBER(sms_state::sms_count_r)
 {
 	if (offset & 0x01)
-		return m_vdp->hcount_read(*m_space, offset);
+		return m_vdp->hcount_read();
 	else
-		return m_vdp->vcount_read(*m_space, offset);
+		return m_vdp->vcount_read();
 }
 
 
 /*
- Check if the pause button is pressed.
- If the gamegear is in sms mode, check if the start button is pressed.
+ If the gamegear is in sms mode, the start button performs the pause function.
  */
-WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
+WRITE_LINE_MEMBER(sms_state::gg_pause_callback)
 {
-	bool pause_pressed = false;
-
-	if (!m_is_mark_iii)
+	if (!state)
 	{
-		// clear TH latch of the controller ports
-		m_ctrl1_th_latch = 0;
-		m_ctrl2_th_latch = 0;
-	}
+		bool pause_pressed = false;
 
-	if (m_is_gamegear)
-	{
-		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
-			return;
+		if (m_cartslot->exists() && m_cartslot->get_sms_mode())
+		{
+			if (!(m_port_start->read() & 0x80))
+				pause_pressed = true;
+		}
 
-		if (!(m_port_start->read() & 0x80))
-			pause_pressed = true;
-	}
-	else
-	{
-		if (!(m_port_pause->read() & 0x80))
-			pause_pressed = true;
-	}
+		if (pause_pressed)
+		{
+			if (!m_gg_paused)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	if (pause_pressed)
-	{
-		if (!m_paused)
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_gg_paused = 1;
+		}
+		else
+		{
+			if (m_gg_paused)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-		m_paused = 1;
+			m_gg_paused = 0;
+		}
 	}
-	else
-		m_paused = 0;
 }
 
 
-WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
+WRITE_LINE_MEMBER(sms_state::sms_n_csync_callback)
 {
 	if (m_port_rapid.found())
 	{
@@ -414,7 +412,9 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		if (m_ctrl1_th_latch)
 		{
-			m_port_dd_reg &= ~0x40;
+			if (m_vdp->hcount_latched())
+				m_port_dd_reg &= ~0x40;
+
 			m_ctrl1_th_latch = 0;
 		}
 	}
@@ -436,7 +436,9 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		if (m_ctrl2_th_latch)
 		{
-			m_port_dd_reg &= ~0x80;
+			if (m_vdp->hcount_latched())
+				m_port_dd_reg &= ~0x80;
+
 			m_ctrl2_th_latch = 0;
 		}
 	}
@@ -467,9 +469,9 @@ void sms_state::smsj_set_audio_control(uint8_t data)
 	    1,1 : Both PSG and FM enabled
 	*/
 	if (m_smsj_audio_control == 0x00 || m_smsj_audio_control == 0x03)
-		m_psg_sms->set_output_gain(ALL_OUTPUTS, 1.0);
+		m_vdp->set_output_gain(ALL_OUTPUTS, 1.0);
 	else
-		m_psg_sms->set_output_gain(ALL_OUTPUTS, 0.0);
+		m_vdp->set_output_gain(ALL_OUTPUTS, 0.0);
 
 	if (m_smsj_audio_control == 0x01 || m_smsj_audio_control == 0x03)
 		m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
@@ -515,26 +517,14 @@ READ8_MEMBER(sms_state::smsj_audio_control_r)
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_register_port_w)
 {
-	m_ym->write(space, 0, data & 0x3f);
+	m_ym->write(0, data & 0x3f);
 }
 
 
 WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 {
 	//logerror("data_port_w %x %x\n", offset, data);
-	m_ym->write(space, 1, data);
-}
-
-
-WRITE8_MEMBER(sms_state::sms_psg_w)
-{
-	m_psg_sms->write(data);
-}
-
-
-WRITE8_MEMBER(sms_state::gg_psg_w)
-{
-	m_psg_gg->write(data);
+	m_ym->write(1, data);
 }
 
 
@@ -543,7 +533,7 @@ WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 	if (m_cartslot->exists() && m_cartslot->get_sms_mode())
 		return;
 
-	m_psg_gg->stereo_w(space, offset, data, mem_mask);
+	m_vdp->psg_stereo_w(data);
 }
 
 
@@ -1033,12 +1023,7 @@ void sms_state::machine_start()
 		m_led_pwr = 1;
 	}
 
-	char str[7];
-
-	m_cartslot = machine().device<sega8_cart_slot_device>("slot");
-	m_cardslot = machine().device<sega8_card_slot_device>("mycard");
-	m_smsexpslot = machine().device<sms_expansion_slot_device>("smsexp");
-	m_sgexpslot = machine().device<sg1000_expansion_slot_device>("sgexp");
+	m_cartslot = m_slot.target();
 	m_space = &m_maincpu->space(AS_PROGRAM);
 
 	if (m_mainram == nullptr)
@@ -1064,7 +1049,9 @@ void sms_state::machine_start()
 		}
 	}
 
-	save_item(NAME(m_paused));
+	m_lphaser_th_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_th_generate),this));
+
+	save_item(NAME(m_gg_paused));
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_port_dc_reg));
 	save_item(NAME(m_port_dd_reg));
@@ -1099,30 +1086,23 @@ void sms_state::machine_start()
 	if (m_is_gamegear)
 	{
 		save_item(NAME(m_gg_sio));
-	}
-
-	if (m_is_sdisp)
-	{
-		machine().save().register_postload(save_prepost_delegate(FUNC(sms_state::store_post_load), this));
-
-		save_item(NAME(m_store_control));
-		save_item(NAME(m_store_cart_selection_data));
-
-		m_slots[0] = m_cartslot;
-		for (int i = 1; i < 16; i++)
-		{
-			sprintf(str,"slot%i",i + 1);
-			m_slots[i] = machine().device<sega8_cart_slot_device>(str);
-		}
-		for (int i = 0; i < 16; i++)
-		{
-			sprintf(str,"slot%i",i + 16 + 1);
-			m_cards[i] = machine().device<sega8_card_slot_device>(str);
-		}
+		// The game Ecco requires SP to be initialized, so, to run on a BIOS-less Game
+		// Gear, probably a custom chip like the 315-5378 does the initialization, as
+		// done by the 315-5342 chip on the Power Base Converter for Sega Genesis/MD.
+		// Reference: http://www.smspower.org/forums/14084-PowerBaseConverterInfo
+		m_maincpu->set_state_int(Z80_SP, 0xdff0);
 	}
 
 	if (m_cartslot)
 		m_cartslot->save_ram();
+}
+
+void smssdisp_state::machine_start()
+{
+	sms_state::machine_start();
+
+	save_item(NAME(m_store_control));
+	save_item(NAME(m_store_cart_selection_data));
 }
 
 void sms_state::machine_reset()
@@ -1166,15 +1146,17 @@ void sms_state::machine_reset()
 		m_gg_sio[4] = 0x00;
 	}
 
-	if (m_is_sdisp)
-	{
-		m_store_control = 0;
-		m_store_cart_selection_data = 0;
-		store_select_cart(m_store_cart_selection_data);
-	}
-
 	setup_bios();
 	setup_media_slots();
+}
+
+void smssdisp_state::machine_reset()
+{
+	m_store_control = 0;
+	m_store_cart_selection_data = 0;
+	store_select_cart(m_store_cart_selection_data);
+
+	sms_state::machine_reset();
 }
 
 READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
@@ -1191,7 +1173,7 @@ WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 }
 
 
-void sms_state::store_post_load()
+void smssdisp_state::device_post_load()
 {
 	store_select_cart(m_store_cart_selection_data);
 }
@@ -1206,7 +1188,7 @@ void sms_state::store_post_load()
 // that seems to change the active cart/card slot pair or, for the 4th
 // game switch onward of the 16-3 model, the active cart slot only.
 
-void sms_state::store_select_cart(uint8_t data)
+void smssdisp_state::store_select_cart(uint8_t data)
 {
 	uint8_t slot = data >> 4;
 	uint8_t slottype = data & 0x08;
@@ -1214,9 +1196,9 @@ void sms_state::store_select_cart(uint8_t data)
 	// The SMS Store Display Unit only uses the logical cartridge slot to
 	// map the active cartridge or card slot, of its multiple ones.
 	if (slottype == 0)
-		m_cartslot = m_slots[slot];
+		m_cartslot = m_slots[slot].target();
 	else
-		m_cartslot = m_cards[slot];
+		m_cartslot = m_cards[slot].target();
 
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
@@ -1285,16 +1267,6 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 
 	m_sscope_state = 0;
 	m_frame_sscope_state = 0;
-}
-
-
-READ32_MEMBER(sms_state::sms_pixel_color)
-{
-	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
-	int beam_x = m_main_scr->hpos();
-	int beam_y = m_main_scr->vpos();
-
-	return vdp_bitmap.pix32(beam_y, beam_x);
 }
 
 

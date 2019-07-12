@@ -29,15 +29,17 @@
 class _8080bw_state : public mw8080bw_state
 {
 public:
-	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag) :
-		mw8080bw_state(mconfig, type, tag),
-		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
-		m_claybust_gun_on(*this, "claybust_gun"),
-		m_speaker(*this, "speaker"),
-		m_eeprom(*this, "eeprom"),
-		m_palette(*this, "palette"),
-		m_gunx(*this, "GUNX"),
-		m_guny(*this, "GUNY")
+	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mw8080bw_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
+		, m_schaser_effect_555_timer(*this, "schaser_sh_555")
+		, m_claybust_gun_on(*this, "claybust_gun")
+		, m_speaker(*this, "speaker")
+		, m_eeprom(*this, "eeprom")
+		, m_palette(*this, "palette")
+		, m_gunx(*this, "GUNX")
+		, m_guny(*this, "GUNY")
+		, m_timer_state(1)
 	{ }
 
 	void indianbtbr(machine_config &config);
@@ -76,13 +78,16 @@ public:
 	void init_spacecom();
 	void init_vortex();
 	void init_attackfc();
+	void init_invrvnge();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
+	uint8_t sflush_in0_r();
 	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
 	DECLARE_CUSTOM_INPUT_MEMBER(claybust_gun_on_r);
 
 private:
 	/* devices/memory pointers */
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
 	optional_device<speaker_sound_device> m_speaker;
@@ -106,7 +111,10 @@ private:
 	uint8_t m_schaser_background_disable;
 	uint8_t m_schaser_background_select;
 	uint16_t m_claybust_gun_pos;
+	u8 m_sound_data;
+	bool m_timer_state;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	DECLARE_READ8_MEMBER(indianbt_r);
 	DECLARE_READ8_MEMBER(polaris_port00_r);
 	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
@@ -121,6 +129,7 @@ private:
 	DECLARE_READ8_MEMBER(darthvdr_01_r);
 	DECLARE_WRITE8_MEMBER(darthvdr_00_w);
 	DECLARE_WRITE8_MEMBER(darthvdr_08_w);
+	IRQ_CALLBACK_MEMBER(darthvdr_interrupt_vector);
 	DECLARE_WRITE8_MEMBER(ballbomb_01_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_2_w);
@@ -133,8 +142,8 @@ private:
 	DECLARE_WRITE8_MEMBER(schaser_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(rollingc_sh_port_w);
 	DECLARE_READ8_MEMBER(invrvnge_02_r);
-	DECLARE_WRITE8_MEMBER(invrvnge_sh_port_1_w);
-	DECLARE_WRITE8_MEMBER(invrvnge_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(invrvnge_port03_w);
+	DECLARE_WRITE8_MEMBER(invrvnge_port05_w);
 	DECLARE_WRITE8_MEMBER(lupin3_00_w);
 	DECLARE_WRITE8_MEMBER(lupin3_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lupin3_sh_port_2_w);
@@ -193,7 +202,7 @@ private:
 	uint32_t screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(polaris_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(polaris_60hz_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(claybust_gun_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(schaser_effect_555_cb);
 	DECLARE_WRITE8_MEMBER(indianbt_sh_port_3_w);

@@ -16,10 +16,10 @@
 		<publisher>Acorn</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="bbcmasterdemonstrationcartridge_1.rom" size="16384" crc="fc40c0e8" sha1="970ff4721e707f3c843f4fb09ce7f03e7ab265ae" offset="0" />
+				<rom name="bbcmasterdemonstrationcartridge_1.rom" size="16384" crc="fc40c0e8" sha1="970ff4721e707f3c843f4fb09ce7f03e7ab265ae" />
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="bbcmasterdemonstrationcartridge_2.rom" size="16384" crc="2e73522d" sha1="ff39620d93b18fd36a4718474495211a46ef8184" offset="0" />
+				<rom name="bbcmasterdemonstrationcartridge_2.rom" size="16384" crc="2e73522d" sha1="ff39620d93b18fd36a4718474495211a46ef8184" />
 			</dataarea>
 		</part>
 	</software>
@@ -31,10 +31,10 @@
 		<info name="release" value="SQB30" />
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="viewspell.rom" size="16384" crc="e8840023" sha1="94036e81c4684f245a0111279a0a665262e93271" offset="0" />
+				<rom name="viewspell.rom" size="16384" crc="e8840023" sha1="94036e81c4684f245a0111279a0a665262e93271" />
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="viewstore.rom" size="16384" crc="bc69c63e" sha1="5b9bf5bd57af043ddeaa182d188ceaea801bd11f" offset="0" />
+				<rom name="viewstore.rom" size="16384" crc="bc69c63e" sha1="5b9bf5bd57af043ddeaa182d188ceaea801bd11f" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<publisher>Care Electronics</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="lorom" size="16384">
-				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" offset="0" />
+				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" />
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@
 		<publisher>Acorn</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="vfs170.rom" size="16384" crc="b124a0bb" sha1="ba31c757815cf470402d7829a70a0e1d3fb1355b" offset="0" />
+				<rom name="vfs170.rom" size="16384" crc="b124a0bb" sha1="ba31c757815cf470402d7829a70a0e1d3fb1355b" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,10 +67,10 @@
 		<publisher>The Soft Option</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="uprom" size="16384">
-				<rom name="VideoROM_3.1.rom" size="16384" crc="e2089d1c" sha1="32c3aed1e8dc44997a7b567da012b85687062193" offset="0" />
+				<rom name="VideoROM_3.1.rom" size="16384" crc="e2089d1c" sha1="32c3aed1e8dc44997a7b567da012b85687062193" />
 			</dataarea>
 			<dataarea name="lorom" size="16384">
-				<rom name="BootROM_1.4.rom" size="16384" crc="59639755" sha1="173f619e0c794c5f2bbf1ad0beba92bce1d9716a" offset="0" />
+				<rom name="BootROM_1.4.rom" size="16384" crc="59639755" sha1="173f619e0c794c5f2bbf1ad0beba92bce1d9716a" />
 			</dataarea>
 		</part>
 	</software>

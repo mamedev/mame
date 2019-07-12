@@ -24,18 +24,17 @@ public:
 		m_bgpaletteram(*this, "bgpalette"),
 		m_fgpaletteram(*this, "fgpalette"),
 		m_sharedram(*this, "sharedram"),
+		m_dswb_io(*this, "DSWB"),
+		m_tjump_io(*this, "TJUMP"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ymsnd(*this, "ymsnd"),
-		m_dsp(*this, "dsp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
-	void demonwld(machine_config &config);
-	void samesame(machine_config &config);
 	void truxton(machine_config &config);
 	void outzone(machine_config &config);
 	void vimana(machine_config &config);
@@ -43,161 +42,115 @@ public:
 	void hellfire(machine_config &config);
 	void zerowing(machine_config &config);
 
-	void init_toaplan1();
-	void init_demonwld();
-
-	DECLARE_MACHINE_RESET(toaplan1);
-
 protected:
-	required_shared_ptr<uint16_t> m_bgpaletteram;
-	required_shared_ptr<uint16_t> m_fgpaletteram;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	optional_shared_ptr<uint8_t> m_sharedram;
+	required_shared_ptr<u16> m_bgpaletteram;
+	required_shared_ptr<u16> m_fgpaletteram;
+
+	optional_shared_ptr<u8> m_sharedram;
+
+	optional_ioport m_dswb_io;
+	optional_ioport m_tjump_io;
 
 	int m_intenable;
 
-	/* Demon world */
-	int m_dsp_on;
-	int m_dsp_bio;
-	int m_dsp_execute;
-	uint32_t m_dsp_addr_w;
-	uint32_t m_main_ram_seg;
+	std::unique_ptr<u16[]> m_tilevram[4];
+	/*
+	std::unique_ptr<u16[]> m_tilevram[3];   //  ||  Drawn in this order
+	std::unique_ptr<u16[]> m_tilevram[2];   //  ||
+	std::unique_ptr<u16[]> m_tilevram[1];   // \||/
+	std::unique_ptr<u16[]> m_tilevram[0];   //  \/
+	*/
 
-	std::unique_ptr<uint16_t[]> m_pf4_tilevram16;   /*  ||  Drawn in this order */
-	std::unique_ptr<uint16_t[]> m_pf3_tilevram16;   /*  ||  */
-	std::unique_ptr<uint16_t[]> m_pf2_tilevram16;   /* \||/ */
-	std::unique_ptr<uint16_t[]> m_pf1_tilevram16;   /*  \/  */
+	optional_shared_ptr<u16> m_spriteram;
+	std::unique_ptr<u16[]> m_buffered_spriteram;
+	std::unique_ptr<u16[]> m_spritesizeram;
+	std::unique_ptr<u16[]> m_buffered_spritesizeram;
 
-	optional_shared_ptr<uint16_t> m_spriteram;
-	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
-	std::unique_ptr<uint16_t[]> m_spritesizeram16;
-	std::unique_ptr<uint16_t[]> m_buffered_spritesizeram16;
+	s32 m_bcu_flipscreen;     /* Tile   controller flip flag */
+	s32 m_fcu_flipscreen;     /* Sprite controller flip flag */
 
-	int32_t m_bcu_flipscreen;     /* Tile   controller flip flag */
-	int32_t m_fcu_flipscreen;     /* Sprite controller flip flag */
+	s32 m_pf_voffs;
+	s32 m_spriteram_offs;
 
-	int32_t m_pf_voffs;
-	int32_t m_spriteram_offs;
-
-	int32_t m_pf1_scrollx;
-	int32_t m_pf1_scrolly;
-	int32_t m_pf2_scrollx;
-	int32_t m_pf2_scrolly;
-	int32_t m_pf3_scrollx;
-	int32_t m_pf3_scrolly;
-	int32_t m_pf4_scrollx;
-	int32_t m_pf4_scrolly;
+	s32 m_scrollx[4];
+	s32 m_scrolly[4];
 
 #ifdef MAME_DEBUG
-	int m_display_pf1;
-	int m_display_pf2;
-	int m_display_pf3;
-	int m_display_pf4;
+	int m_display_pf[4];
 	int m_displog;
 #endif
 
-	int32_t m_tiles_offsetx;
-	int32_t m_tiles_offsety;
+	s32 m_tiles_offsetx;
+	s32 m_tiles_offsety;
 
-	tilemap_t *m_pf1_tilemap;
-	tilemap_t *m_pf2_tilemap;
-	tilemap_t *m_pf3_tilemap;
-	tilemap_t *m_pf4_tilemap;
+	tilemap_t *m_tilemap[4];
 
-	DECLARE_WRITE16_MEMBER(toaplan1_intenable_w);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_addrsel_w);
-	DECLARE_READ16_MEMBER(demonwld_dsp_r);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_w);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_bio_w);
-	DECLARE_READ_LINE_MEMBER(demonwld_bio_r);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_ctrl_w);
-	DECLARE_READ16_MEMBER(samesame_port_6_word_r);
-	DECLARE_READ16_MEMBER(toaplan1_shared_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_shared_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_reset_sound_w);
-	DECLARE_WRITE8_MEMBER(toaplan1_coin_w);
-	DECLARE_WRITE16_MEMBER(samesame_coin_w);
+	void intenable_w(u8 data);
+	u8 shared_r(offs_t offset);
+	void shared_w(offs_t offset, u8 data);
+	void reset_sound_w(u8 data);
+	void coin_w(u8 data);
 
-	DECLARE_READ16_MEMBER(toaplan1_frame_done_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_tile_offsets_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_bcu_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_fcu_flipscreen_w);
-	DECLARE_READ16_MEMBER(toaplan1_spriteram_offs_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_spriteram_offs_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_bgpalette_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_fgpalette_w);
-	DECLARE_READ16_MEMBER(toaplan1_spriteram16_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_spriteram16_w);
-	DECLARE_READ16_MEMBER(toaplan1_spritesizeram16_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_spritesizeram16_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_bcu_control_w);
-	DECLARE_READ16_MEMBER(toaplan1_tileram_offs_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_tileram_offs_w);
-	DECLARE_READ16_MEMBER(toaplan1_tileram16_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_tileram16_w);
-	DECLARE_READ16_MEMBER(toaplan1_scroll_regs_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_scroll_regs_w);
+	u16 frame_done_r();
+	DECLARE_WRITE16_MEMBER(tile_offsets_w);
+	void bcu_flipscreen_w(u8 data);
+	void fcu_flipscreen_w(u8 data);
+	u16 spriteram_offs_r();
+	void spriteram_offs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bgpalette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void fgpalette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 spriteram_r();
+	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 spritesizeram_r();
+	void spritesizeram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bcu_control_w(offs_t offset, u16 data);
+	u16 tileram_offs_r();
+	void tileram_offs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 tileram_r(offs_t offset);
+	void tileram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 scroll_regs_r(offs_t offset);
+	void scroll_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	// Fire Shark sound
-	uint8_t m_to_mcu;
-	uint8_t m_cmdavailable;
+	u8 vimana_dswb_invert_r();
+	u8 vimana_tjump_invert_r();
 
-	DECLARE_READ8_MEMBER(vimana_dswb_invert_r);
-	DECLARE_READ8_MEMBER(vimana_tjump_invert_r);
-	DECLARE_WRITE16_MEMBER(samesame_mcu_w);
-	DECLARE_READ8_MEMBER(samesame_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(samesame_sound_done_w);
-	DECLARE_READ8_MEMBER(samesame_cmdavailable_r);
+	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
-
-	DECLARE_VIDEO_START(toaplan1);
 	DECLARE_MACHINE_RESET(zerowing);
-	DECLARE_MACHINE_RESET(demonwld);
-	DECLARE_MACHINE_RESET(vimana);
-	uint32_t screen_update_toaplan1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan1);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_samesame);
-	void toaplan1_interrupt();
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void interrupt();
 
-	void demonwld_restore_dsp();
-	void toaplan1_create_tilemaps();
-	void toaplan1_vram_alloc();
-	void toaplan1_spritevram_alloc();
-	void toaplan1_set_scrolls();
+	void create_tilemaps();
+	void vram_alloc();
+	void spritevram_alloc();
+	void set_scrolls();
 	void register_common();
-	void toaplan1_log_vram();
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void demonwld_dsp(int enable);
-	void toaplan1_reset_sound();
-	void toaplan1_driver_savestate();
-	void demonwld_driver_savestate();
-	DECLARE_WRITE_LINE_MEMBER(toaplan1_reset_callback);
+	void log_vram();
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void draw_sprite_custom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+		int priority);
+	void reset_sound();
+	DECLARE_WRITE_LINE_MEMBER(reset_callback);
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ym3812_device> m_ymsnd;
-	optional_device<tms32010_device> m_dsp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
-	void demonwld_main_map(address_map &map);
-	void demonwld_sound_io_map(address_map &map);
 	void hellfire_main_map(address_map &map);
 	void hellfire_sound_io_map(address_map &map);
 	void outzone_main_map(address_map &map);
 	void outzone_sound_io_map(address_map &map);
 	void outzonecv_main_map(address_map &map);
-	void samesame_hd647180_io_map(address_map &map);
-	void samesame_hd647180_mem_map(address_map &map);
-	void samesame_main_map(address_map &map);
-	void toaplan1_sound_map(address_map &map);
+	void sound_map(address_map &map);
 	void truxton_main_map(address_map &map);
 	void truxton_sound_io_map(address_map &map);
 	void vimana_hd647180_io_map(address_map &map);
@@ -218,19 +171,91 @@ public:
 
 	void rallybik(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
-	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
-	DECLARE_VIDEO_START(rallybik);
-	uint32_t screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_rallybik);
+	u16 tileram_r(offs_t offset);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	required_device<toaplan_scu_device> m_spritegen;
 	void rallybik_main_map(address_map &map);
 	void rallybik_sound_io_map(address_map &map);
+};
+
+class toaplan1_demonwld_state : public toaplan1_state
+{
+public:
+	toaplan1_demonwld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		toaplan1_state(mconfig, type, tag),
+		m_dsp(*this, "dsp")
+	{
+	}
+
+	void demonwld(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	/* Demon world */
+	int m_dsp_on;
+	int m_dsp_bio;
+	int m_dsp_execute;
+	u32 m_dsp_addr_w;
+	u32 m_main_ram_seg;
+
+	void dsp_addrsel_w(u16 data);
+	u16 dsp_r();
+	void dsp_w(u16 data);
+	void dsp_bio_w(u16 data);
+	DECLARE_READ_LINE_MEMBER(bio_r);
+	void dsp_ctrl_w(u8 data);
+	void dsp_int_w(int enable);
+
+	required_device<tms32010_device> m_dsp;
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+};
+
+class toaplan1_samesame_state : public toaplan1_state
+{
+public:
+	toaplan1_samesame_state(const machine_config &mconfig, device_type type, const char *tag) :
+		toaplan1_state(mconfig, type, tag)
+	{
+	}
+
+	void samesame(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	// Fire Shark sound
+	u8 m_to_mcu;
+	u8 m_cmdavailable;
+
+	void mcu_w(u8 data);
+	u8 soundlatch_r();
+	void sound_done_w(u8 data);
+	u8 cmdavailable_r();
+	u8 port_6_word_r();
+
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
+	void hd647180_io_map(address_map &map);
+	void hd647180_mem_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TOAPLAN1_H

@@ -85,6 +85,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	drq_cb(*this),
 	hld_cb(*this),
 	enp_cb(*this),
+	ready_cb(*this), // actually output by the drive, not by the FDC
 	enmf_cb(*this)
 {
 	force_ready = false;
@@ -107,6 +108,7 @@ void wd_fdc_device_base::device_start()
 	drq_cb.resolve();
 	hld_cb.resolve();
 	enp_cb.resolve();
+	ready_cb.resolve();
 	enmf_cb.resolve();
 
 	if (!has_enmf && !enmf_cb.isnull())
@@ -120,6 +122,7 @@ void wd_fdc_device_base::device_start()
 	enmf = false;
 	floppy = nullptr;
 	status = 0x00;
+	mr = true;
 
 	save_item(NAME(status));
 	save_item(NAME(command));
@@ -134,6 +137,9 @@ void wd_fdc_device_base::device_start()
 	save_item(NAME(counter));
 	save_item(NAME(status_type_1));
 	save_item(NAME(last_dir));
+	if (!disable_mfm)
+		save_item(NAME(dden));
+	save_item(NAME(mr));
 }
 
 void wd_fdc_device_base::device_reset()
@@ -143,40 +149,52 @@ void wd_fdc_device_base::device_reset()
 
 void wd_fdc_device_base::soft_reset()
 {
-	command = 0x00;
-	main_state = IDLE;
-	sub_state = IDLE;
-	cur_live.state = IDLE;
-	track = 0x00;
-	sector = 0x01;
-	status = 0x00;
-	data = 0x00;
-	cmd_buffer = track_buffer = sector_buffer = -1;
-	counter = 0;
-	status_type_1 = true;
-	last_dir = 1;
-
-	// gnd == enmf enabled, otherwise disabled (default)
-	if (!enmf_cb.isnull() && has_enmf)
-		enmf = enmf_cb() ? false : true;
-
-	intrq = false;
-	if (!intrq_cb.isnull())
-	{
-		intrq_cb(intrq);
+	if(mr) {
+		mr_w(0);
+		mr_w(1);
 	}
-	drq = false;
-	if (!drq_cb.isnull())
-	{
-		drq_cb(drq);
-	}
-	hld = false;
-	intrq_cond = 0;
-	live_abort();
+}
 
-	// trigger a restore after everything else is reset too, in particular the floppy device itself
-	sub_state = INITIAL_RESTORE;
-	t_gen->adjust(attotime::zero);
+WRITE_LINE_MEMBER(wd_fdc_device_base::mr_w)
+{
+	if(mr && !state) {
+		command = 0x00;
+		main_state = IDLE;
+		sub_state = IDLE;
+		cur_live.state = IDLE;
+		track = 0x00;
+		sector = 0x01;
+		status = 0x00;
+		data = 0x00;
+		cmd_buffer = track_buffer = sector_buffer = -1;
+		counter = 0;
+		status_type_1 = true;
+		last_dir = 1;
+		mr = false;
+
+		// gnd == enmf enabled, otherwise disabled (default)
+		if (!enmf_cb.isnull() && has_enmf)
+			enmf = enmf_cb() ? false : true;
+
+		intrq = false;
+		if (!intrq_cb.isnull())
+		{
+			intrq_cb(intrq);
+		}
+		drq = false;
+		if (!drq_cb.isnull())
+		{
+			drq_cb(drq);
+		}
+		hld = false;
+		intrq_cond = 0;
+		live_abort();
+	} else if(state && !mr) {
+		// trigger a restore after everything else is reset too, in particular the floppy device itself
+		sub_state = INITIAL_RESTORE;
+		t_gen->adjust(attotime::zero);
+		mr = true;
+	}
 }
 
 void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
@@ -1088,6 +1106,11 @@ void wd_fdc_device_base::do_cmd_w()
 void wd_fdc_device_base::cmd_w(uint8_t val)
 {
 	if (inverted_bus) val ^= 0xff;
+	if (!mr) {
+		logerror("Not initiating command %02x during master reset\n", val);
+		return;
+	}
+
 	LOGCOMP("Initiating command %02x\n", val);
 
 	if(intrq && !(intrq_cond & I_IMM)) {
@@ -1117,7 +1140,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 uint8_t wd_fdc_device_base::status_r()
 {
-	if(intrq && !(intrq_cond & I_IMM)) {
+	if(intrq && !(intrq_cond & I_IMM) && !machine().side_effects_disabled()) {
 		intrq = false;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -1169,7 +1192,7 @@ void wd_fdc_device_base::track_w(uint8_t val)
 	if (inverted_bus) val ^= 0xff;
 
 	// No more than one write in flight
-	if(track_buffer != -1)
+	if(track_buffer != -1 || !mr)
 		return;
 
 	track_buffer = val;
@@ -1192,6 +1215,8 @@ void wd_fdc_device_base::do_sector_w()
 
 void wd_fdc_device_base::sector_w(uint8_t val)
 {
+	if (!mr) return;
+
 	if (inverted_bus) val ^= 0xff;
 
 	// No more than one write in flight
@@ -1218,6 +1243,8 @@ uint8_t wd_fdc_device_base::sector_r()
 
 void wd_fdc_device_base::data_w(uint8_t val)
 {
+	if (!mr) return;
+
 	if (inverted_bus) val ^= 0xff;
 
 	data = val;
@@ -1226,7 +1253,8 @@ void wd_fdc_device_base::data_w(uint8_t val)
 
 uint8_t wd_fdc_device_base::data_r()
 {
-	drop_drq();
+	if (!machine().side_effects_disabled())
+		drop_drq();
 
 	uint8_t val = data;
 	if (inverted_bus) val ^= 0xff;
@@ -1277,6 +1305,9 @@ void wd_fdc_device_base::spinup()
 
 void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 {
+	if(!ready_cb.isnull())
+		ready_cb(state);
+
 	// why is this even possible?
 	if (!floppy)
 		return;

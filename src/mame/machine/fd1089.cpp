@@ -110,7 +110,7 @@
     CPU #     Type  Status   Game             Seed    Unencrypted data range
     --------- ------- --- -------------------- -- -----------------------------------
     317-0013A FD1089B [1] Enduro Racer         01 030000-04ffff + 100000-1fffff
-    317-0016  FD1089? ??? Fantasy Zone         05 ?
+    317-0016  FD1089B [2] Fantasy Zone         05 ?
     317-0018  FD1089A [1] Action Fighter       03 400000-4fffff + 840000-8dffff + c00000-c4ffff + ff0000-ffffff
     317-0019  FD1089A [1] Outrun               07 000000-03ffff
     317-0021  FD1089A [2] Alex Kidd            0b ?

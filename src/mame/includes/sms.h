@@ -26,11 +26,11 @@
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
-#include "sound/sn76496.h"
 #include "sound/ym2413.h"
 #include "video/315_5124.h"
 
 #include "screen.h"
+#include "machine/timer.h"
 
 
 class sms_state : public driver_device
@@ -41,8 +41,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "sms_vdp"),
 		m_main_scr(*this, "screen"),
-		m_psg_sms(*this, "segapsg"),
-		m_psg_gg(*this, "gamegear"),
 		m_ym(*this, "ym2413"),
 		m_port_ctrl1(*this, CONTROL1_TAG),
 		m_port_ctrl2(*this, CONTROL2_TAG),
@@ -63,14 +61,16 @@ public:
 		m_is_gamegear(false),
 		m_is_smsj(false),
 		m_is_mark_iii(false),
-		m_is_sdisp(false),
 		m_ioctrl_region_is_japan(false),
 		m_has_bios_0400(false),
 		m_has_bios_2000(false),
 		m_has_bios_full(false),
 		m_has_jpn_sms_cart_slot(false),
 		m_has_pwr_led(false),
-		m_store_cart_selection_data(false)
+		m_slot(*this, "slot"),
+		m_cardslot(*this, "mycard"),
+		m_smsexpslot(*this, "smsexp"),
+		m_sgexpslot(*this, "sgexp")
 	{ }
 
 	void sms_base(machine_config &config);
@@ -93,13 +93,14 @@ public:
 	void sms2_ntsc(machine_config &config);
 	void sms1_kr(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+	DECLARE_WRITE_LINE_MEMBER(gg_pause_callback);
 
 	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	void store_post_load();
-	void store_select_cart(uint8_t data);
+	template <typename X> static void screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock);
+	template <typename X> static void screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock);
+	template <typename X> static void screen_gg_raw_params(screen_device &screen, X &&pixelclock);
 
 	DECLARE_READ8_MEMBER(read_0000);
 	DECLARE_READ8_MEMBER(read_4000);
@@ -121,8 +122,6 @@ protected:
 	DECLARE_READ8_MEMBER(gg_sio_r);
 	DECLARE_WRITE8_MEMBER(gg_sio_w);
 	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
-	DECLARE_WRITE8_MEMBER(gg_psg_w);
-	DECLARE_WRITE8_MEMBER(sms_psg_w);
 	DECLARE_READ8_MEMBER(smsj_audio_control_r);
 	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
 	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
@@ -130,11 +129,10 @@ protected:
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_n_csync_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
-	DECLARE_READ32_MEMBER(sms_pixel_color);
 
 	DECLARE_VIDEO_START(gamegear);
 	DECLARE_VIDEO_RESET(gamegear);
@@ -170,8 +168,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<sega315_5124_device> m_vdp;
 	required_device<screen_device> m_main_scr;
-	optional_device<segapsg_device> m_psg_sms;
-	optional_device<gamegear_device> m_psg_gg;
 	optional_device<ym2413_device> m_ym;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
@@ -213,7 +209,6 @@ protected:
 	bool m_is_gamegear;
 	bool m_is_smsj;
 	bool m_is_mark_iii;
-	bool m_is_sdisp;
 	bool m_ioctrl_region_is_japan;
 	bool m_has_bios_0400;
 	bool m_has_bios_2000;
@@ -233,7 +228,7 @@ protected:
 	uint8_t m_port_dc_reg;
 	uint8_t m_port_dd_reg;
 	uint8_t m_gg_sio[5];
-	int m_paused;
+	int m_gg_paused;
 
 	uint8_t m_ctrl1_th_state;
 	uint8_t m_ctrl2_th_state;
@@ -242,6 +237,8 @@ protected:
 
 	// Data needed for Light Phaser
 	int m_lphaser_x_offs;   /* Needed to 'calibrate' lphaser; set at cart loading */
+	emu_timer *m_lphaser_th_timer;
+	TIMER_CALLBACK_MEMBER(lphaser_th_generate);
 
 	// Data needed for SegaScope (3D glasses)
 	uint8_t m_sscope_state;
@@ -256,15 +253,10 @@ protected:
 
 	// slot devices
 	sega8_cart_slot_device *m_cartslot;
-	sega8_card_slot_device *m_cardslot;
-	sms_expansion_slot_device *m_smsexpslot;
-	sg1000_expansion_slot_device *m_sgexpslot;
-
-	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
-	sega8_cart_slot_device *m_slots[16];
-	sega8_card_slot_device *m_cards[16];
-	uint8_t m_store_control;
-	uint8_t m_store_cart_selection_data;
+	optional_device<sega8_cart_slot_device> m_slot;
+	optional_device<sega8_card_slot_device> m_cardslot;
+	optional_device<sms_expansion_slot_device> m_smsexpslot;
+	optional_device<sg1000_expansion_slot_device> m_sgexpslot;
 };
 
 class smssdisp_state : public sms_state
@@ -272,21 +264,36 @@ class smssdisp_state : public sms_state
 public:
 	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		sms_state(mconfig, type, tag),
-		m_control_cpu(*this, "control")
+		m_control_cpu(*this, "control"),
+		m_slots(*this, {"slot", "slot2", "slot3", "slot4", "slot5", "slot6", "slot7", "slot8", "slot9", "slot10", "slot11", "slot12", "slot13", "slot14", "slot15", "slot16"}),
+		m_cards(*this, "slot%u", 17U),
+		m_store_cart_selection_data(0)
 	{ }
 
-	required_device<cpu_device> m_control_cpu;
+	void sms_sdisp(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_post_load() override;
+
+private:
 	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
 	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
+	void store_select_cart(uint8_t data);
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
-	void init_smssdisp();
 
 	DECLARE_READ8_MEMBER(store_cart_peek);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
-	void sms_sdisp(machine_config &config);
 	void sms_store_mem(address_map &map);
+
+	required_device<cpu_device> m_control_cpu;
+	required_device_array<sega8_cart_slot_device, 16> m_slots;
+	required_device_array<sega8_card_slot_device, 16> m_cards;
+
+	uint8_t m_store_control;
+	uint8_t m_store_cart_selection_data;
 };
 
 

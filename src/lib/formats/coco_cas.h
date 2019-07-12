@@ -7,13 +7,14 @@
     Format code for CoCo CAS (*.cas) files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_COCO_CAS_H
+#define MAME_FORMATS_COCO_CAS_H
 
-#ifndef COCO_CAS_H
-#define COCO_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(coco_cassette_formats);
 CASSETTE_FORMATLIST_EXTERN(alice32_cassette_formats);
 
-#endif /* COCO_CAS_H */
+#endif // MAME_FORMATS_COCO_CAS_H

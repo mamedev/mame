@@ -162,7 +162,7 @@ void spc1000_fdd_exp_device::device_start()
 
 void spc1000_fdd_exp_device::device_reset()
 {
-	m_cpu->set_input_line_vector(0, 0);
+	m_cpu->set_input_line_vector(0, 0); // Z80
 
 	// enable rom (is this really needed? it does not seem necessary for FDD to work)
 	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x0fff, 0x2000, memregion("fdccpu")->base());

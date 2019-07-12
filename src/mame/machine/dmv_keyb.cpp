@@ -229,7 +229,7 @@ void dmv_keyboard_device::device_reset()
 
 void dmv_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8741(config, m_maincpu, XTAL(6'000'000));
+	I8741A(config, m_maincpu, XTAL(6'000'000));
 	m_maincpu->p1_in_cb().set(FUNC(dmv_keyboard_device::port1_r));
 	m_maincpu->p2_in_cb().set(FUNC(dmv_keyboard_device::port2_r));
 	m_maincpu->p2_out_cb().set(FUNC(dmv_keyboard_device::port2_w));

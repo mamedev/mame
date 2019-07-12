@@ -55,7 +55,7 @@ void electron_sp64_device::device_reset()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_sp64_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_sp64_device::read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2)
 {
 	uint8_t data = 0xff;
 
@@ -68,15 +68,14 @@ uint8_t electron_sp64_device::read(address_space &space, offs_t offset, int infc
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
-		offs_t rom_page_offset = m_page_register * 0x4000;
+		offs_t rom_page_offset = m_page_register << 14;
 
 		switch (romqa)
 		{
 		case 0:
-			data = m_rom[rom_page_offset + (offset & 0x3fff)];
+			data = m_rom[rom_page_offset | (offset & 0x3fff)];
 			break;
 		case 1:
 			data = m_ram[offset & 0x1fff];
@@ -91,7 +90,7 @@ uint8_t electron_sp64_device::read(address_space &space, offs_t offset, int infc
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_sp64_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_sp64_device::write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2)
 {
 	if (infc)
 	{
@@ -102,8 +101,7 @@ void electron_sp64_device::write(address_space &space, offs_t offset, uint8_t da
 			break;
 		}
 	}
-
-	if (!infc && !infd)
+	else if (oe)
 	{
 		if (romqa == 1)
 		{

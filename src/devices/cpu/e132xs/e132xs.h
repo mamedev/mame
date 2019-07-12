@@ -439,8 +439,6 @@ private:
 	uint32_t m_drcoptions;
 	uint8_t m_cache_dirty;
 
-	uml::parameter   m_regmap[16];
-
 	uml::code_handle *m_entry;
 	uml::code_handle *m_nocode;
 	uml::code_handle *m_interrupt_checks;

@@ -285,7 +285,7 @@ void edge1_device_base::map(address_map &map)
 	 */
 	map(0x000, 0x003).rw(FUNC(edge1_device_base::reg0_r), FUNC(edge1_device_base::reg0_w));
 
-	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x100, 0x103).rw(FUNC(edge1_device_base::control_r), FUNC(edge1_device_base::control_w));
 	map(0x104, 0x107).rw(FUNC(edge1_device_base::status_r), FUNC(edge1_device_base::status_w));
@@ -353,7 +353,7 @@ void edge2plus_processor_device_base::map(address_map &map)
 	map(0x008, 0x008).lr8("mouse_x", []() { return 0; });
 	map(0x00c, 0x00c).lr8("mouse_y", []() { return 0; });
 
-	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x100, 0x103).rw(FUNC(edge2plus_processor_device_base::control_r), FUNC(edge2plus_processor_device_base::control_w));
 	map(0x104, 0x107).rw(FUNC(edge2plus_processor_device_base::status_r), FUNC(edge2plus_processor_device_base::status_w));
@@ -475,7 +475,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 	TMS32030(config, m_dsp, 30_MHz_XTAL);
 	m_dsp->holda().set(FUNC(mpcb828_device::holda));
 	m_dsp->set_disable();
-	//MCFG_DEVICE_ADDRESS_MAP(0, map_dynamic<2>)
+	//m_dsp->set_addrmap(0, map_dynamic<2>);
 
 	BT458(config, "ramdac", 83'020'800);
 
@@ -484,7 +484,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
 	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
 
 	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));
-MACHINE_CONFIG_END
+}
 
 /*
  * MPCB849: EDGE-1 graphics, 2 megapixels, single screen, 60Hz refresh.

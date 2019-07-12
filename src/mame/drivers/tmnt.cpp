@@ -61,6 +61,7 @@ Updates:
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/k054321.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
@@ -75,7 +76,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return m_k052109->word_r(space, offset, mem_mask);
+	return m_k052109->word_r(offset);
 }
 
 WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
@@ -83,7 +84,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	m_k052109->word_w(space, offset, data, mem_mask);
+	m_k052109->word_w(offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
@@ -91,9 +92,9 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		m_k052109->write(space, offset, (data >> 8) & 0xff);
+		m_k052109->write(offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		m_k052109->write(space, offset + 0x2000, data & 0xff);
+		m_k052109->write(offset + 0x2000, data & 0xff);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
@@ -115,7 +116,7 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return m_k053245->k053245_word_r(space, offset, mem_mask);
+		return m_k053245->k053245_word_r(offset);
 	}
 }
 
@@ -126,7 +127,7 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		m_k053245->k053245_word_w(space, offset, data, mem_mask);
+		m_k053245->k053245_word_w(offset, data, mem_mask);
 	}
 }
 
@@ -134,7 +135,7 @@ READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
 {
 	offset &= ~1;   /* handle mirror address */
 
-	return m_k053245->k053244_r(space, offset + 1) | (m_k053245->k053244_r(space, offset) << 8);
+	return m_k053245->k053244_r(offset + 1) | (m_k053245->k053244_r(offset) << 8);
 }
 
 WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
@@ -142,9 +143,9 @@ WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 	offset &= ~1;   /* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
-		m_k053245->k053244_w(space, offset, (data >> 8) & 0xff);
+		m_k053245->k053244_w(offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		m_k053245->k053244_w(space, offset + 1, data & 0xff);
+		m_k053245->k053244_w(offset + 1, data & 0xff);
 }
 
 /* cuebrick, mia, tmnt */
@@ -170,16 +171,16 @@ INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 
 WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 {
-	m_k053260->main_write(space, offset, data);
+	m_k053260->main_write(offset, data);
 
 	if (offset)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
 WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(tmnt_state::prmrsocr_audio_bankswitch_w)
@@ -349,7 +350,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 			{
 				if ((space.read_word(0x180006 + 128 * i) >> 8) == logical_pri)
 				{
-					m_k053245->k053245_word_w(space, 8 * i, hardware_pri, 0x00ff);
+					m_k053245->k053245_word_w(8 * i, hardware_pri, 0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -440,7 +441,7 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (m_last == 0 && (data & 0x20) != 0)
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 		m_last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -546,7 +547,7 @@ void tmnt_state::punkshot_main_map(address_map &map)
 	map(0x0a0006, 0x0a0007).portr("P1/P2");
 	map(0x0a0020, 0x0a0021).w(FUNC(tmnt_state::punkshot_0a0020_w));
 	map(0x0a0040, 0x0a0043).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x0a0080, 0x0a0081).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::punkshot_k052109_word_noA12_w));
 	map(0x110000, 0x110007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
@@ -570,14 +571,14 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 	map(0x0a0028, 0x0a0029).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0b0000, 0x0b3fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x0c0000, 0x0c001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
-	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 }
 
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
 	/* I think this is more than just a trigger */
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 void tmnt_state::blswhstl_main_map(address_map &map)
@@ -587,7 +588,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x204000, 0x207fff).ram(); /* main RAM */
 	map(0x300000, 0x303fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
 	map(0x680000, 0x68001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x700000, 0x700001).portr("P1");
 	map(0x700002, 0x700003).portr("P2");
@@ -598,7 +599,7 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x700400, 0x700401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0x780600, 0x780603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x780604, 0x780605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 }
 
 WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
@@ -607,7 +608,7 @@ WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_k053251->write(space, offset, (data >> 8) & 0xff);
+		m_k053251->write(offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
 		and got marked as dirty in the write above... how was the original hardware working?!? */
@@ -630,9 +631,9 @@ void tmnt_state::glfgreat_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));  /* 053936? */
 	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1/P2");
 	map(0x120002, 0x120003).portr("P3/P4");
 	map(0x120004, 0x120005).portr("COINS/DSW3");
@@ -653,14 +654,12 @@ void tmnt_state::prmrsocr_main_map(address_map &map)
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
-	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
+	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w)).umask16(0x00ff);    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x120000, 0x120001).portr("P1/COINS");
 	map(0x120002, 0x120003).portr("P2/EEPROM");
-	map(0x12100d, 0x12100d).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x12100f, 0x12100f).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x121015, 0x121015).r("soundlatch3", FUNC(generic_latch_8_device::read));
+	map(0x121000, 0x12101f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x122000, 0x122001).w(FUNC(tmnt_state::prmrsocr_eeprom_w));    /* EEPROM + video control */
 	map(0x123000, 0x123001).w(FUNC(tmnt_state::prmrsocr_sound_irq_w));
 	map(0x200000, 0x207fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
@@ -691,7 +690,7 @@ void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t d
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			m_k053245->k053245_word_w(space, offs, data, 0xffff);
+			m_k053245->k053245_word_w(offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
@@ -926,7 +925,7 @@ void tmnt_state::tmnt2_main_map(address_map &map)
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
 
@@ -951,7 +950,7 @@ void tmnt_state::ssriders_main_map(address_map &map)
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
-	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
 
@@ -960,7 +959,7 @@ void tmnt_state::sunsetbl_main_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 	map(0x104000, 0x107fff).ram(); /* main RAM */
 	map(0x14c000, 0x14cfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x180000, 0x183fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x184000, 0x18ffff).ram();
 	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
@@ -987,9 +986,9 @@ void tmnt_state::thndrx2_main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* main RAM */
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
+	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
 	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));
 	map(0x500200, 0x500201).portr("P1/COINS");
 	map(0x500202, 0x500203).r(FUNC(tmnt_state::thndrx2_eeprom_r));
@@ -1072,26 +1071,15 @@ void tmnt_state::thndrx2_audio_map(address_map &map)
 }
 
 
-READ8_MEMBER(tmnt_state::k054539_ctrl_r)
-{
-	return m_k054539->read(space, 0x200 + offset, 0xff);
-}
-
-WRITE8_MEMBER(tmnt_state::k054539_ctrl_w)
-{
-	m_k054539->write(space, 0x200 + offset, data, 0xff);
-}
-
 void tmnt_state::prmrsocr_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe0ff).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
-	map(0xe100, 0xe12f).rw(FUNC(tmnt_state::k054539_ctrl_r), FUNC(tmnt_state::k054539_ctrl_w));
-	map(0xf000, 0xf000).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0xf002, 0xf002).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf003, 0xf003).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe12f).lrw8("k054539_rw",
+		[this](offs_t offset) { return m_k054539->read(((offset & 0x100) << 1) | (offset & 0xff)); },
+		[this](offs_t offset, u8 data) { m_k054539->write(((offset & 0x100) << 1) | (offset & 0xff), data); });
+	map(0xf000, 0xf003).m("k054321", FUNC(k054321_device::sound_map));
 	map(0xf800, 0xf800).w(FUNC(tmnt_state::prmrsocr_audio_bankswitch_w));
 }
 
@@ -2382,9 +2370,7 @@ void tmnt_state::prmrsocr(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2");
-	GENERIC_LATCH_8(config, "soundlatch3");
+	K054321(config, "k054321", "lspeaker", "rspeaker");
 
 	K054539(config, m_k054539, XTAL(18'432'000));
 	m_k054539->timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);

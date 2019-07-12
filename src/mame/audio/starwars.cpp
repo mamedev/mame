@@ -68,8 +68,8 @@ READ8_MEMBER(starwars_state::starwars_main_ready_flag_r)
 
 WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
 {
-	m_soundlatch->acknowledge_w(space, 0, 0);
-	m_mainlatch->acknowledge_w(space, 0, 0);
+	m_soundlatch->acknowledge_w();
+	m_mainlatch->acknowledge_w();
 
 	/* reset sound CPU here  */
 	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);

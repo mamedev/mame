@@ -6,7 +6,7 @@
 
 *********************************************************************
 
-    MXC-06 chip to produce sprites, see dec0.c
+    MXC-06 chip to produce sprites, see decmxc06.cpp
     BAC-06 chip for background
     ??? for text layer
 
@@ -27,9 +27,8 @@ uint32_t stadhero_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_spritegen->set_flip_screen(flip);
 	m_pf1_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_tilegen->set_bppmultmask(0x8, 0x7);
-	m_tilegen->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
+	m_tilegen->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram, 0x800/2);
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

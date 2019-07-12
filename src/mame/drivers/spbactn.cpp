@@ -422,7 +422,7 @@ void spbactn_state::spbactn(machine_config &config)
 	// actual blanking frequencies unknown, but should be close to NTSC
 	m_screen->set_raw(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240);
 #else
-	// MCFG_SCREEN_RAW_PARAMS breaks sprites; keeping this in for now
+	// set_raw breaks sprites; keeping this in for now
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -436,7 +436,6 @@ void spbactn_state::spbactn(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800/2);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(8,10,4);
@@ -490,7 +489,6 @@ void spbactn_state::spbactnp(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800/2);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(12,14,8);

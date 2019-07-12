@@ -159,8 +159,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void pcat_dyn_state::pcat_dyn_sb_conf(device_t *device)
 {
-	device = device->subdevice("pc_joy");
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // remove joystick
 }
 
 void pcat_dyn_state::pcat_dyn(machine_config &config)
@@ -206,7 +205,8 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	serport.cts_handler().set("ns16550", FUNC(ins8250_uart_device::cts_w));
 
 	ISA8(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
 	//m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));

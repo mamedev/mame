@@ -73,7 +73,7 @@ public:
 private:
 	DECLARE_READ8_MEMBER(unknown_r);
 	void carrera_palette(palette_device &palette) const;
-	uint32_t screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_carrera(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void carrera_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -268,7 +268,7 @@ static GFXDECODE_START( gfx_carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-uint32_t carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t carrera_state::screen_update_carrera(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count = 0;
@@ -315,20 +315,20 @@ void carrera_state::carrera_palette(palette_device &palette) const
 }
 
 
-MACHINE_CONFIG_START(carrera_state::carrera)
+void carrera_state::carrera(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 6)
-	MCFG_DEVICE_PROGRAM_MAP(carrera_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, MASTER_CLOCK / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &carrera_state::carrera_map);
+	m_maincpu->set_addrmap(AS_IO, &carrera_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(carrera_state, screen_update_carrera)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(carrera_state::screen_update_carrera));
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
 	crtc.set_screen("screen");
@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	aysnd.port_a_read_callback().set(FUNC(carrera_state::unknown_r));
 	aysnd.port_b_read_callback().set(FUNC(carrera_state::unknown_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( carrera )

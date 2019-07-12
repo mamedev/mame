@@ -93,6 +93,7 @@ constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
 DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "Motorola MC68HC05C4")
 DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "Motorola MC68HC05C8")
 DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "Motorola MC68HC705C8A")
+DEFINE_DEVICE_TYPE(M68HC05L9,   m68hc05l9_device,   "m68hc05l9",   "Motorola MC68HC05L9")
 
 
 
@@ -106,6 +107,7 @@ m68hc05_device::m68hc05_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
+		u32 addr_width,
 		address_map_constructor internal_map)
 	: m6805_base_device(
 			mconfig,
@@ -113,7 +115,7 @@ m68hc05_device::m68hc05_device(
 			owner,
 			clock,
 			type,
-			{ s_hc_ops, s_hc_cycles, 13, 0x00ff, 0x00c0, M68HC05_VECTOR_SWI },
+			{ s_hc_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, M68HC05_VECTOR_SWI },
 			internal_map)
 	, m_port_cb_r{ *this, *this, *this, *this }
 	, m_port_cb_w{ *this, *this, *this, *this }
@@ -707,8 +709,9 @@ m68hc705_device::m68hc705_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
+		u32 addr_width,
 		address_map_constructor internal_map)
-	: m68hc05_device(mconfig, tag, owner, clock, type, internal_map)
+	: m68hc05_device(mconfig, tag, owner, clock, type, addr_width, internal_map)
 {
 }
 
@@ -757,6 +760,7 @@ m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C4,
+			13,
 			address_map_constructor(FUNC(m68hc05c4_device::c4_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
@@ -822,6 +826,7 @@ m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C8,
+			13,
 			address_map_constructor(FUNC(m68hc05c8_device::c8_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
@@ -893,6 +898,7 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			owner,
 			clock,
 			M68HC705C8A,
+			13,
 			address_map_constructor(FUNC(m68hc705c8a_device::c8a_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
@@ -928,4 +934,77 @@ void m68hc705c8a_device::device_reset()
 std::unique_ptr<util::disasm_interface> m68hc705c8a_device::create_disassembler()
 {
 	return std::make_unique<m68hc05_disassembler>(m68hc705c8a_syms);
+}
+
+
+
+/****************************************************************************
+ * MC68HC05L9 device
+ ****************************************************************************/
+
+void m68hc05l9_device::l9_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map.unmap_value_high();
+
+	map(0x0000, 0x0003).rw(FUNC(m68hc05l9_device::port_read), FUNC(m68hc05l9_device::port_latch_w));
+	map(0x0004, 0x0007).rw(FUNC(m68hc05l9_device::port_ddr_r), FUNC(m68hc05l9_device::port_ddr_w));
+	// 0x0008 count down
+	// 0x0009-0x000a configuration
+	// 0x000b minute alarm
+	// 0x000c hour alarm
+	// 0x000d BAUD
+	// 0x000e SCCR1
+	// 0x000f SCCR2l9_device
+	// 0x0010 SCSR
+	// 0x0011 SCDR
+	map(0x0012, 0x0012).rw(FUNC(m68hc05l9_device::tcr_r), FUNC(m68hc05l9_device::tcr_w));
+	map(0x0013, 0x0013).r(FUNC(m68hc05l9_device::tsr_r));
+	map(0x0014, 0x0015).r(FUNC(m68hc05l9_device::icr_r));
+	map(0x0016, 0x0017).rw(FUNC(m68hc05l9_device::ocr_r), FUNC(m68hc05l9_device::ocr_w));
+	map(0x0018, 0x001b).r(FUNC(m68hc05l9_device::timer_r));
+	// 0x001c RTC flags
+	// 0x001d hours
+	// 0x001e minutes
+	// 0x001f seconds
+	map(0x0020, 0x004f).rom(); // user ROM
+	map(0x0050, 0x00ff).ram(); // RAM/stack
+	// 0x0100-0x01ff unused
+	map(0x0200, 0x027f).ram(); // display RAM (128x5)
+	// 0x0280-0x048f reserved for slaves (528x5)
+	// 0x0490-0x07ff unused
+	map(0x0800, 0x1e69).rom(); // user ROM
+	map(0x1e6a, 0x1fef).rom(); // self-test (vectors at 0x1fe0-0x1fef)
+	map(0x1ff0, 0x1fff).rom(); // user vectors
+	// 0x2000-0xffff external memory
+}
+
+
+m68hc05l9_device::m68hc05l9_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: m68hc05_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			M68HC05L9,
+			16,
+			address_map_constructor(FUNC(m68hc05l9_device::l9_map), this))
+{
+	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0x1f }});
+}
+
+
+
+void m68hc05l9_device::device_start()
+{
+	m68hc05_device::device_start();
+
+	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
+	add_timer_state();
+}
+
+
+std::unique_ptr<util::disasm_interface> m68hc05l9_device::create_disassembler()
+{
+	return std::make_unique<m68hc05_disassembler>(m68hc05c4_syms);
 }

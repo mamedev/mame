@@ -43,7 +43,6 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 void taito_en_device::device_start()
 {
 	// tell the pump about the ESP chips
-	m_pump->set_esp(m_esp);
 	uint8_t *ROM = m_osrom->base();
 	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
 	for (int i = 0; i < 3; i++)
@@ -113,6 +112,11 @@ void taito_en_device::en_sound_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("osram");  // mirror
 }
 
+void taito_en_device::fc7_map(address_map &map)
+{
+	map(0xfffffd, 0xfffffd).r(m_duart68681, FUNC(mc68681_device::get_irq_vector));
+}
+
 
 /*************************************
  *
@@ -136,13 +140,13 @@ WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
 
 /*************************************
  *
- *  M68681 callback
+ *  ES5510 callback
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(taito_en_device::duart_iack)
+void taito_en_device::es5505_clock_changed(u32 data)
 {
-	return m_duart68681->get_irq_vector();
+	m_pump->set_unscaled_clock(data);
 }
 
 
@@ -193,7 +197,7 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_audiocpu, XTAL(30'476'100) / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taito_en_device::en_sound_map);
-	m_audiocpu->set_irq_acknowledge_callback(FUNC(taito_en_device::duart_iack));
+	m_audiocpu->set_addrmap(m68000_device::AS_CPU_SPACE, &taito_en_device::fc7_map);
 
 	ES5510(config, m_esp, XTAL(10'000'000)); // from Gun Buster schematics
 	m_esp->set_disable();
@@ -213,10 +217,12 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'100) / (2 * 16 * 32));
+	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
 	ES5505(config, m_ensoniq, XTAL(30'476'100) / 2);
+	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
 	m_ensoniq->set_region0("ensoniq.0");
 	m_ensoniq->set_region1("ensoniq.0");
 	m_ensoniq->set_channels(4);

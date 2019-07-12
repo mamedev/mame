@@ -510,7 +510,7 @@ void mc146818_device::update_irq()
 //  read - I/O handler for reading
 //-------------------------------------------------
 
-READ8_MEMBER( mc146818_device::read )
+uint8_t mc146818_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 	switch (offset)
@@ -520,14 +520,14 @@ READ8_MEMBER( mc146818_device::read )
 		break;
 
 	case 1:
-		data = read_direct(space, m_index);
+		data = read_direct(m_index);
 		break;
 	}
 
 	return data;
 }
 
-READ8_MEMBER( mc146818_device::read_direct )
+uint8_t mc146818_device::read_direct(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -569,7 +569,7 @@ READ8_MEMBER( mc146818_device::read_direct )
 //  write - I/O handler for writing
 //-------------------------------------------------
 
-WRITE8_MEMBER( mc146818_device::write )
+void mc146818_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -578,12 +578,12 @@ WRITE8_MEMBER( mc146818_device::write )
 		break;
 
 	case 1:
-		write_direct(space, m_index, data);
+		write_direct(m_index, data);
 		break;
 	}
 }
 
-WRITE8_MEMBER( mc146818_device::write_direct )
+void mc146818_device::write_direct(offs_t offset, uint8_t data)
 {
 	LOG("mc146818_port_w(): offset=0x%02x data=0x%02x\n", offset, data);
 

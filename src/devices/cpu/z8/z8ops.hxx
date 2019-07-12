@@ -245,7 +245,8 @@ void z8_device::add_carry(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst + src + C */
 	uint8_t data = register_read(dst);
-	uint16_t new_data = data + src + flag(C);
+	uint8_t c = flag(C) ? 1 : 0;
+	uint16_t new_data = data + src + c;
 
 	set_flag_c(new_data & 0x100);
 	new_data &= 0xff;
@@ -253,7 +254,7 @@ void z8_device::add_carry(uint8_t dst, uint8_t src)
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) == (src & 0x80)) && ((new_data & 0x80) != (src & 0x80)));
 	set_flag_d(0);
-	set_flag_h(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10));
+	set_flag_h((data & 0x0f) + (src & 0x0f) + c >= 0x10);
 
 	register_write(dst, new_data);
 }
@@ -277,7 +278,7 @@ void z8_device::add(uint8_t dst, uint8_t src)
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) == (src & 0x80)) && ((new_data & 0x80) != (src & 0x80)));
 	set_flag_d(0);
-	set_flag_h(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10));
+	set_flag_h((data & 0x0f) + (src & 0x0f) >= 0x10);
 
 	register_write(dst, new_data);
 }
@@ -400,7 +401,8 @@ void z8_device::subtract_carry(uint8_t dst, uint8_t src)
 {
 	/* dst <- dst - src - C */
 	uint8_t data = register_read(dst);
-	uint16_t new_data = data - src - flag(C);
+	uint8_t c = flag(C) ? 1 : 0;
+	uint16_t new_data = data - src - c;
 
 	set_flag_c(new_data & 0x100);
 	new_data &= 0xff;
@@ -408,7 +410,7 @@ void z8_device::subtract_carry(uint8_t dst, uint8_t src)
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
 	set_flag_d(1);
-	set_flag_h(!(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10)));
+	set_flag_h((data & 0x0f) < (src & 0x0f) + c);
 
 	register_write(dst, new_data);
 }
@@ -432,7 +434,7 @@ void z8_device::subtract(uint8_t dst, uint8_t src)
 	set_flag_s(new_data & 0x80);
 	set_flag_v(((data & 0x80) != (src & 0x80)) && ((new_data & 0x80) == (src & 0x80)));
 	set_flag_d(1);
-	set_flag_h(!(((data & 0x1f) == 0x0f) && ((new_data & 0x1f) == 0x10)));
+	set_flag_h((data & 0x0f) < (src & 0x0f));
 
 	register_write(dst, new_data);
 }

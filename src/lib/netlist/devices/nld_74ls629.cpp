@@ -40,7 +40,7 @@
 
 
 #include "nld_74ls629.h"
-#include "../analog/nlid_twoterm.h"
+#include "netlist/analog/nlid_twoterm.h"
 
 namespace netlist
 {
@@ -100,11 +100,14 @@ namespace netlist
 		{
 			m_R_FC.set_R(90000.0);
 			m_R_RNG.set_R(90000.0);
-			m_clock.do_reset();
+			m_clock.reset();
 		}
 		NETLIB_UPDATEI();
 
-		NETLIB_UPDATE_PARAMI() { update_dev(); }
+		NETLIB_UPDATE_PARAMI()
+		{
+			/* update param may be called from anywhere, update_dev(time) is not a good idea */
+		}
 
 	public:
 		NETLIB_SUB(SN74LS629clk) m_clock;
@@ -121,37 +124,37 @@ namespace netlist
 	NETLIB_OBJECT(SN74LS629_dip)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
-			register_subalias("1",  m_2.m_FC);
-			register_subalias("2",  m_1.m_FC);
-			register_subalias("3",  m_1.m_RNG);
+			register_subalias("1",  m_B.m_FC);
+			register_subalias("2",  m_A.m_FC);
+			register_subalias("3",  m_A.m_RNG);
 
-			register_subalias("6",  m_1.m_ENQ);
-			register_subalias("7",  m_1.m_clock.m_Y);
+			register_subalias("6",  m_A.m_ENQ);
+			register_subalias("7",  m_A.m_clock.m_Y);
 
-			register_subalias("8",  m_1.m_R_FC.m_N);
-			register_subalias("9",  m_1.m_R_FC.m_N);
-			connect(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+			register_subalias("8",  m_A.m_R_FC.m_N);
+			register_subalias("9",  m_A.m_R_FC.m_N);
+			connect(m_A.m_R_FC.m_N, m_B.m_R_FC.m_N);
 
-			register_subalias("10",  m_2.m_clock.m_Y);
+			register_subalias("10",  m_B.m_clock.m_Y);
 
-			register_subalias("11",  m_2.m_ENQ);
-			register_subalias("14",  m_2.m_RNG);
+			register_subalias("11",  m_B.m_ENQ);
+			register_subalias("14",  m_B.m_RNG);
 		}
 
 		NETLIB_UPDATEI() { }
 
 		NETLIB_RESETI()
 		{
-			m_1.do_reset();
-			m_2.do_reset();
+			m_A.reset();
+			m_B.reset();
 		}
 
 	private:
-		NETLIB_SUB(SN74LS629) m_1;
-		NETLIB_SUB(SN74LS629) m_2;
+		NETLIB_SUB(SN74LS629) m_A;
+		NETLIB_SUB(SN74LS629) m_B;
 	};
 
 
@@ -207,7 +210,7 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= NL_FCONST(0.1e-6) / m_CAP();
+			freq *= plib::constants<nl_double>::cast(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
@@ -231,8 +234,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(SN74LS629)
-	NETLIB_DEVICE_IMPL(SN74LS629_dip)
+	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
+	NETLIB_DEVICE_IMPL(SN74LS629_dip, "SN74LS629_DIP", "1.CAP1,2.CAP2")
 
 	} //namespace devices
 } // namespace netlist

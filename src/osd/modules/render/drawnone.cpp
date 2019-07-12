@@ -34,6 +34,8 @@ render_primitive_list *renderer_none::get_primitives()
 	client.top = bounds.Top;
 	client.bottom = bounds.Bottom;
 #endif
+	if ((rect_width(&client) == 0) || (rect_height(&client) == 0))
+		return nullptr;
 	win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
 	return &win->target()->get_primitives();
 }

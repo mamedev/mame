@@ -39,7 +39,6 @@ MB7051 - fuse programmed prom.
 #include "sound/dac.h"
 #include "sound/mea8000.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -80,7 +79,7 @@ private:
 	DECLARE_MACHINE_RESET(brailab4);
 	DECLARE_VIDEO_START(brailab4);
 	INTERRUPT_GEN_MEMBER(homelab_frame);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(homelab);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -663,7 +662,7 @@ static GFXDECODE_START( gfx_homelab )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
-QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
+QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i=0;
@@ -750,103 +749,106 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 }
 
 /* Machine driver */
-MACHINE_CONFIG_START(homelab_state::homelab)
+void homelab_state::homelab(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(homelab2_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab2_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(homelab_state::homelab_frame));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(40*8, 25*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
-	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(40*8, 25*8);
+	screen.set_visarea(0, 40*8-1, 0, 25*8-1);
+	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab2));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+}
 
-MACHINE_CONFIG_START(homelab_state::homelab3)
+void homelab_state::homelab3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(homelab3_mem)
-	MCFG_DEVICE_IO_MAP(homelab3_io)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::homelab3_mem);
+	m_maincpu->set_addrmap(AS_IO, &homelab_state::homelab3_io);
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
-	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab3));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+}
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(homelab_state::brailab4)
+void homelab_state::brailab4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(brailab4_mem)
-	MCFG_DEVICE_IO_MAP(brailab4_io)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homelab_state::brailab4_mem);
+	m_maincpu->set_addrmap(AS_IO, &homelab_state::brailab4_io);
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
-	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(homelab_state::screen_update_homelab3));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
+	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homelab);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MEA8000(config, "mea8000", 3840000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("mea8000", MEA8000, 3840000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+}
 
 void homelab_state::init_brailab4()
 {

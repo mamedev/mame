@@ -45,6 +45,7 @@ public:
 	void ataripc1(machine_config &config);
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
+	void kaypropc(machine_config &config);
 	void epc(machine_config &config);
 	void m15(machine_config &config);
 	void bondwell(machine_config &config);
@@ -65,6 +66,10 @@ public:
 	void comport(machine_config &config);
 	void mpc1600(machine_config &config);
 	void ittxtra(machine_config &config);
+	void cadd810(machine_config &config);
+	void juko16(machine_config &config);
+	void hyo88t(machine_config &config);
+	void kyoxt(machine_config &config);
 
 	void init_bondwell();
 
@@ -171,13 +176,6 @@ static DEVICE_INPUT_DEFAULTS_START( pccga )
 DEVICE_INPUT_DEFAULTS_END
 
 
-#define MCFG_CPU_PC(mem, port, type, clock) \
-	MCFG_DEVICE_ADD("maincpu", type, clock)                \
-	MCFG_DEVICE_PROGRAM_MAP(mem##_map) \
-	MCFG_DEVICE_IO_MAP(port##_io) \
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-
-
 // Floppy configurations
 void pc_state::cfg_dual_720K(device_t *device)
 {
@@ -199,29 +197,34 @@ void pc_state::cfg_single_720K(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-MACHINE_CONFIG_START(pc_state::pccga)
+void pc_state::pccga(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc8, pc8, I8088, 4772720)   /* 4,77 MHz */
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", 4772720)); /* 4.77 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
 
 /**************************************************************** Atari PC1 ***
@@ -253,13 +256,12 @@ Expansion: 8087 FPU
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::ataripc1)
+void pc_state::ataripc1(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("ega")
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_360K)
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa1")->set_default_option("ega");
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_single_360K);
+}
 
 ROM_START ( ataripc1 )
 	ROM_REGION(0x10000,"bios", 0)
@@ -327,11 +329,15 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(    0x02, "On (12 MHz)" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(pc_state::bondwell)
+void pc_state::bondwell(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_PC(pc8, pc8, I8088, 4772720) // turbo?
-MACHINE_CONFIG_END
+
+	i8088_cpu_device &maincpu(I8088(config.replace(), "maincpu", 4772720)); /* turbo? */
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+}
 
 ROM_START( bw230 )
 	ROM_REGION(0x10000,"bios", 0)
@@ -355,13 +361,14 @@ ToDo: The ROM for the CGA is available (see ROM section)
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::mpc1600)
+void pc_state::mpc1600(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa8", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa8", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 	subdevice<ram_device>(RAM_TAG)->set_default_size("128K").set_extra_options("256K, 512K, 640K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( mpc1600 )
 	ROM_REGION(0x10000,"bios", 0)
@@ -374,29 +381,6 @@ ROM_START( mpc1600 )
 ROM_END
 
 
-/*********************************************************** Commodore PC-1 ***
-
-Links: http://www.amiga-stuff.com/hardware/pc-i.html , http://www.zimmers.net/cbmpics/cpci.html
-Form Factor: Desktop
-CPU: 8088 @ 4.77 MHz
-RAM: 512K / 640K
-Bus: Proprietary expansion slot, carrying almost all ISA signals
-Video: On board, MDA/Hercules/CGA
-Mass storage: 1x 5.25" 360K
-On board ports: Floppy, floppy expansion (for Amiga A1010/1011 (720 KB, 3.5") or A1020 (360 KB, 5.25" drives), speaker (but no speaker fitted), mouse,
-Options: 8087 FPU
-Expansion: Expansion box: 2x ISA
-
-******************************************************************************/
-
-
-ROM_START( compc1 )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_LOAD("pc1_bios.bin", 0xc000, 0x4000, CRC(e37367c8) SHA1(9aac9c38b4ebdb9a740e393199c2eff75a0bde03))
-	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
-ROM_END
-
 /********************************************************** Compaq Portable ***
 
 Links:  https://en.wikipedia.org/wiki/Compaq_Portable , http://oldcomputers.net/compaqi.html ,
@@ -407,12 +391,12 @@ CPU:
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::comport)
+void pc_state::comport(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("ega")
+	subdevice<isa8_slot_device>("isa1")->set_default_option("ega");
 	subdevice<ram_device>(RAM_TAG)->set_default_size("128K").set_extra_options("256K, 512K, 640K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( comport )
 	ROM_REGION(0x10000, "bios", 0)
@@ -423,7 +407,7 @@ ROM_START( comport )
 	ROMX_LOAD("compaq_portable_rev_c.bin", 0xe000, 0x2000, CRC(1d1f7c38) SHA1(d9782eb46cd1a7d40f3e8b37eb48db04ac588acb), ROM_BIOS(1))
 
 	ROM_REGION(0x8000,"gfx1", 0)
-	ROM_LOAD("compaq_portable_video_cpqvid.bin", 0x0000, 0x2000, BAD_DUMP CRC(3ae64565) SHA1(6eeb06620e588a2f7bfab72eb4fadbd70503ea94))
+	ROM_LOAD("compaq_portable_video_cpqvid.bin", 0x0000, 0x1ffe, BAD_DUMP CRC(3ae64565) SHA1(6eeb06620e588a2f7bfab72eb4fadbd70503ea94))
 ROM_END
 
 
@@ -445,11 +429,11 @@ Expansion: Expansion box, with 5 ISA slots and space for a 5.25" drive and a har
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::dgone)
+void pc_state::dgone(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_dual_720K);
+}
 
 ROM_START( dgone )
 	ROM_REGION(0x10000,"bios", 0)
@@ -483,11 +467,15 @@ Options: 8087 FPU, EagleNet File server, EightPort serial card, High Resolution 
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::eagle1600)
+void pc_state::eagle1600(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
-MACHINE_CONFIG_END
+
+	i8086_cpu_device &maincpu(I8086(config.replace(), "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+}
 
 ROM_START( eagle1600 )
 	ROM_REGION(0x10000,"bios", 0)
@@ -553,14 +541,18 @@ void pc_state::epc_io(address_map &map)
 	map(0x0070, 0x0071).rw("i8251", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
-MACHINE_CONFIG_START(pc_state::epc)
+void pc_state::epc(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("ega")
-	MCFG_DEVICE_ADD("i8251", I8251, 0) // clock?
-MACHINE_CONFIG_END
+
+	i8088_cpu_device &maincpu(I8088(config.replace(), "maincpu", 4772720));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::epc_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	subdevice<isa8_slot_device>("isa1")->set_default_option("ega");
+	I8251(config, "i8251", 0); // clock?
+}
 
 ROM_START( epc )
 	ROM_REGION(0x10000,"bios", 0)
@@ -613,25 +605,30 @@ void pc_state::ibm5550_io(address_map &map)
 	map(0x00a0, 0x00a0).r(FUNC(pc_state::unk_r));
 }
 
-MACHINE_CONFIG_START(pc_state::ibm5550)
+void pc_state::ibm5550(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc16, ibm5550, I8086, 8000000)
+	i8086_cpu_device &maincpu(I8086(config, "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::ibm5550_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( ibm5550 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
@@ -679,36 +676,42 @@ Misc: A Kaypro 16/2 is a configuration without harddisk but with two floppy disk
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::kaypro16)
+void pc_state::kaypro16(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_MODIFY("isa3")
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_MODIFY("isa4")
-	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_MODIFY("isa5")
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
+	subdevice<isa8_slot_device>("isa1")->set_fixed(true);
+	subdevice<isa8_slot_device>("isa2")->set_fixed(true);
+	subdevice<isa8_slot_device>("isa3")->set_fixed(true);
+	subdevice<isa8_slot_device>("isa4")->set_fixed(true);
+	subdevice<isa8_slot_device>("isa5")->set_default_option(nullptr);
 	subdevice<ram_device>(RAM_TAG)->set_default_size("256K").set_extra_options("512K, 640K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( kaypro16 )
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("pc102782.bin", 0xe000, 0x2000, CRC(ade4ed14) SHA1(de6d87ae83a71728d60df6a5964e680487ea8400))
 ROM_END
 
+/**************************************************************** Kaypro PC ***
+
+Links:  https://www.youtube.com/watch?v=2YAEOhYEZbc ,
+
+******************************************************************************/
+
+ROM_START( kaypropc )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("kpb203n.rom", 0xe000, 0x2000, CRC(49ea41e9) SHA1(14db6b8f302833f64f6e740a293d12f76e71f78f))
+ROM_END
 
 /******************************************************************** MK-88 ***
 
 ******************************************************************************/
 // MK-88
-MACHINE_CONFIG_START(pc_state::mk88)
+void pc_state::mk88(machine_config &config)
+{
 	poisk2(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("cga_ec1841")
-MACHINE_CONFIG_END
+	subdevice<isa8_slot_device>("isa1")->set_default_option("cga_ec1841");
+}
 
 // MK-88
 ROM_START( mk88 )
@@ -749,14 +752,14 @@ Options: 8087 FPU, K101 memory upgrade in 64K steps, 1.2MB floppy and controller
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::ncrpc4i)
+void pc_state::ncrpc4i(machine_config & config)
+{
 	pccga(config);
-	//MCFG_DEVICE_MODIFY("mb:isa")
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	subdevice<ram_device>(RAM_TAG)->set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( ncrpc4i )
 	ROM_REGION(0x10000,"bios", 0)
@@ -787,15 +790,14 @@ static DEVICE_INPUT_DEFAULTS_START( m15 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x01, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(pc_state::m15)
+void pc_state::m15(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(m15)
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(m15));
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_dual_720K);
 
 	subdevice<ram_device>(RAM_TAG)->set_default_size("448K").set_extra_options("16K, 160K, 304K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( olivm15 )
 	ROM_REGION(0x10000,"bios", 0)
@@ -820,18 +822,20 @@ Options: 8087 FPU
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::olytext30)
+void pc_state::olytext30(machine_config &config)
+{
 	pccga(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_single_720K)
-	MCFG_DEVICE_MODIFY("isa3")
-	MCFG_SLOT_DEFAULT_OPTION("")
-	MCFG_DEVICE_MODIFY("isa5")
-	MCFG_SLOT_DEFAULT_OPTION("hdc")
+
+	v20_device &maincpu(V20(config.replace(), "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_single_720K);
+	subdevice<isa8_slot_device>("isa3")->set_default_option("");
+	subdevice<isa8_slot_device>("isa5")->set_default_option("hdc");
 	subdevice<ram_device>(RAM_TAG)->set_default_size("768K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( olytext30 )
 	ROM_REGION(0x10000, "bios", 0)
@@ -843,24 +847,29 @@ ROM_END
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::poisk2)
+void pc_state::poisk2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
+	i8086_cpu_device &maincpu(I8086(config, "maincpu", 4772720));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_poisk2", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga_poisk2", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( poisk2 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
@@ -934,26 +943,29 @@ static DEVICE_INPUT_DEFAULTS_START( iskr3104 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(pc_state::iskr3104)
+void pc_state::iskr3104(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc16, pc16, I8086, 4772720)
+	i8086_cpu_device &maincpu(I8086(config, "maincpu", 4772720));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(iskr3104)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr3104));
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "ega", false) // FIXME: determine ISA bus clock
-	MCFG_SLOT_OPTION_DEFAULT_BIOS("ega", "iskr3104")
-
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "ega", false).set_option_default_bios("ega", "iskr3104"); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( iskr3104 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
@@ -1010,27 +1022,32 @@ static DEVICE_INPUT_DEFAULTS_START( siemens )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x30)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(pc_state::siemens)
+void pc_state::siemens(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(siemens)
+	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(siemens));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hercules", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hdc", false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "hercules", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( sicpc1605 )
 	ROM_REGION(0x10000,"bios", 0)
@@ -1054,31 +1071,36 @@ Options: 8087 FPU
 
 ******************************************************************************/
 
-MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
-	MCFG_CPU_PC(pc8, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
+void pc_state::laser_turbo_xt(machine_config &config)
+{
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false) // Multi I/O card (includes FDC)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa8", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false); // Multi I/O card (includes FDC)
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa8", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K,768K,896K,1024K,1408K,1536K,1664K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
 ROM_START( laser_turbo_xt )
 	ROM_REGION(0x10000, "bios", 0)
@@ -1132,28 +1154,32 @@ void pc_state::zenith_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("bios", 0x8000);
 }
 
-MACHINE_CONFIG_START(pc_state::zenith)
+void pc_state::zenith(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_PC(zenith, pc8, I8088, XTAL(14'318'181)/3) /* 4,77 MHz */
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::zenith_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_dual_720K);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
 ROM_START( zdsupers )
 	ROM_REGION(0x10000,"bios", 0)
@@ -1161,6 +1187,108 @@ ROM_START( zdsupers )
 	ROMX_LOAD("z184m v3.1d.10d", 0x8000, 0x8000, CRC(44012c3b) SHA1(f2f28979798874386ca8ba3dd3ead24ae7c2aeb4), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v29e", "v2.9e" )
 	ROMX_LOAD("z184m v2.9e.10d", 0x8000, 0x8000, CRC(de2f200b) SHA1(ad5ce601669a82351e412fc6c1c70c47779a1e55), ROM_BIOS(1))
+ROM_END
+
+/************************************************************** CompuAdd 810 **
+
+http://mkgraham.dx.am/810.html
+https://smg.photobucket.com/user/zzm113/library?page=1
+
+System has an AT style enhanced keyboard, despite changing that, the emulated 810
+emits a steady beep and waits for F1 to be pressed.
+
+******************************************************************************/
+
+void pc_state::cadd810(machine_config &config)
+{
+	pccga(config);
+	config.device_remove("kbd");
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+}
+
+ROM_START( cadd810 )
+	ROM_REGION(0x10000,"bios", 0) // continuous beep, complains about missing keyboard
+	ROM_LOAD("compuadd810.bin",0xc000, 0x4000, CRC(39dc8f28) SHA1(c0d50186db30c924fad7d42d4aefb7ae8dd32c7d))
+	ROM_REGION(0x2000,"ide", 0)
+	ROM_LOAD("wd_ide_bios_rev_2.0.bin",0x0000,0x2000, NO_DUMP) //missing: dump of hd controller
+ROM_END
+
+/****************************** JUKO NEST true 16 bit variants (8086 and V30 ***
+
+https://www.vogons.org/viewtopic.php?f=46&t=60077
+https://sites.google.com/site/misterzeropage/
+http://www.vcfed.org/forum/showthread.php?67127-Juko-nest-n3
+
+******************************************************************************/
+
+void pc_state::juko16(machine_config &config)
+{
+	/* basic machine hardware */
+	v30_device &maincpu(V30(config, "maincpu", 4772720));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+
+	/* keyboard */
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
+}
+
+ROM_START( juko16 )
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "v107", "v1.07")
+	ROMX_LOAD("c22.bin", 0xc000, 0x2000, BAD_DUMP CRC(e947237b) SHA1(65e84675752a4deb0d0712e2aba8c0735959b43a),ROM_BIOS(0))
+	ROMX_LOAD("c24.bin", 0xe000, 0x2000, BAD_DUMP CRC(1d3246e4) SHA1(4ff875d15b1231a2464dfe08e480c637fa0c4613),ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v201", "v2.01")
+	ROMX_LOAD("juko_nest_odd.bin", 0xc000, 0x2000, CRC(2bfa545f) SHA1(1cdaf90323cbed3224b4b8863bf27e709be6a73a),ROM_BIOS(1))
+	ROMX_LOAD("juko_nest_even.bin", 0xe000, 0x2000, CRC(2bfa545f) SHA1(1cdaf90323cbed3224b4b8863bf27e709be6a73a),ROM_BIOS(1))
+ROM_END
+
+
+/****************************************************** Hyosung Topstar 88T ***
+
+http://minuszerodegrees.net/xt_clone_bios/xt_clone_bios.htm
+
+******************************************************************************/
+
+ROM_START( hyo88t )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "hyosung_topstar_88t_v3.0.bin", 0xc000, 0x4000, CRC(2429046b) SHA1(e2a8e1ffdd4c6ff84791f486df3204811fa5f589))
+ROM_END
+
+/*************************************************************** Kyocera XT ***
+
+http://www.hampa.ch/pce/download.html
+
+******************************************************************************/
+
+ROM_START( kyoxt )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "kyocera.rom", 0xc000, 0x4000, CRC(cd732ac6) SHA1(7258fc18565135870e31962e4bd528a06d1ee0e0))
+ROM_END
+
+/*********************Panasonic Sr. Partner / *** Nixdorf 8810/25 CPC - PC01 ***
+
+Luggable machine with a 9" monochrome enhanced CGA display and an electrostatic printer
+ROM is identical between the Nixdorf and the Panasonic
+Displays "PIT1 ERROR"
+
+******************************************************************************/
+
+ROM_START( nixpc01 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD( "nx01.bin", 0xc000, 0x4000, CRC(b0a75d1f) SHA1(7c2890eced917969968fc2e7491cda90a9734e03))
 ROM_END
 
 
@@ -1175,13 +1303,13 @@ COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state,
 COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
-COMP( 1984, compc1,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Commodore Business Machines",     "Commodore PC-1" ,       MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                 MACHINE_NOT_WORKING )
 COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",               MACHINE_NOT_WORKING )
 COMP( 1990, mc1702,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
+COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
 COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                   0 )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
@@ -1200,3 +1328,8 @@ COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state,
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
+COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
+COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state, empty_init,    "JUKO",                            "NEST 8086 and V30",     MACHINE_NOT_WORKING )
+COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
+COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
+COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )

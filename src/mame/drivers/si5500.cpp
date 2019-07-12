@@ -41,7 +41,7 @@ private:
 	u8 gpibpsi_input_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(gpibc_we_w);
 	DECLARE_WRITE_LINE_MEMBER(gpibc_dbin_w);
-	u8 keypad_r();
+	u8 keypad_r(offs_t offset);
 
 	void mem_map(address_map &map);
 	void cru_map(address_map &map);
@@ -72,20 +72,31 @@ void si5500_state::mainic_w(offs_t offset, u8 data)
 
 WRITE_LINE_MEMBER(si5500_state::gpib_int_w)
 {
-	m_mainpsi->set_single_int(4, state);
+	m_mainpsi->set_int_line(4, state);
 }
 
 WRITE_LINE_MEMBER(si5500_state::acc_int_w)
 {
-	m_mainpsi->set_single_int(5, state);
+	m_mainpsi->set_int_line(5, state);
 }
 
 u8 si5500_state::gpibpsi_input_r(offs_t offset)
 {
-	if (offset == tms9901_device::P0_P7)
-		return m_gpib_data;
-
-	return 0xff;
+	switch (offset)
+	{
+	case tms9901_device::P0:
+	case tms9901_device::P1:
+	case tms9901_device::P2:
+	case tms9901_device::P3:
+	case tms9901_device::P4:
+	case tms9901_device::P5:
+	case tms9901_device::P6:
+		return BIT(m_gpib_data, offset-tms9901_device::P0);
+	case tms9901_device::INT15_P7:
+		return BIT(m_gpib_data, 7);
+	default:
+		return 1;
+	}
 }
 
 WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
@@ -93,7 +104,7 @@ WRITE_LINE_MEMBER(si5500_state::gpibc_we_w)
 	if (!state)
 	{
 		u16 pio = m_gpibpsi->pio_outputs();
-		m_gpibc->reg8_w(machine().dummy_space(), (pio >> 8) & 7, pio & 0xff);
+		m_gpibc->write((pio >> 8) & 7, pio & 0xff);
 	}
 }
 
@@ -102,19 +113,17 @@ WRITE_LINE_MEMBER(si5500_state::gpibc_dbin_w)
 	if (state)
 	{
 		u16 pio = m_gpibpsi->pio_outputs();
-		m_gpib_data = m_gpibc->reg8_r(machine().dummy_space(), (pio >> 8) & 7);
+		m_gpib_data = m_gpibc->read((pio >> 8) & 7);
 	}
 }
 
-u8 si5500_state::keypad_r()
+u8 si5500_state::keypad_r(offs_t offset)
 {
-	u8 result = 0xff;
-
 	for (int n = 0; n < 4; n++)
 		if (!BIT(m_keyplatch->output_state(), n))
-			result &= m_keypad[n]->read();
-
-	return result;
+			if (!BIT(m_keypad[n]->read(), offset))
+				return 0;
+	return 1;
 }
 
 void si5500_state::mem_map(address_map &map)
@@ -125,28 +134,19 @@ void si5500_state::mem_map(address_map &map)
 
 void si5500_state::cru_map(address_map &map)
 {
-	// MAME currently has incompatible addressing for CRU reads and writes
-	map(0x00, 0x03).r(m_mainpsi, FUNC(tms9901_device::read));
-	map(0x08, 0x0b).r("acc", FUNC(tms9902_device::cruread));
-	map(0x0c, 0x0f).r("adpsi", FUNC(tms9901_device::read));
-	map(0x16, 0x16).nopr();
-	map(0x17, 0x17).r(FUNC(si5500_state::keypad_r));
-	map(0x40, 0x43).r("nvrpsi", FUNC(tms9901_device::read));
-	map(0x44, 0x47).r(m_gpibpsi, FUNC(tms9901_device::read));
-	map(0x80, 0xff).r("novram", FUNC(x2201_device::read_byte));
-
-	map(0x000, 0x01f).w(m_mainpsi, FUNC(tms9901_device::write));
-	map(0x040, 0x05f).w("acc", FUNC(tms9902_device::cruwrite));
-	map(0x060, 0x07f).w("adpsi", FUNC(tms9901_device::write));
-	map(0x080, 0x087).w("outlatch1", FUNC(ls259_device::write_d0));
-	map(0x088, 0x08f).w("outlatch2", FUNC(ls259_device::write_d0));
-	map(0x090, 0x097).w("outlatch3", FUNC(ls259_device::write_d0));
-	map(0x0a0, 0x0a7).w("outlatch4", FUNC(ls259_device::write_d0));
-	map(0x0a8, 0x0af).w("outlatch5", FUNC(ls259_device::write_d0));
-	map(0x0b0, 0x0bf).w(m_keyplatch, FUNC(ls259_device::write_d0));
-	map(0x200, 0x21f).w("nvrpsi", FUNC(tms9901_device::write));
-	map(0x220, 0x23f).w(m_gpibpsi, FUNC(tms9901_device::write));
-	map(0x400, 0x7ff).w("novram", FUNC(x2201_device::write));
+	map(0x0000, 0x003f).rw(m_mainpsi, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
+	map(0x0080, 0x00bf).rw("acc", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
+	map(0x00c0, 0x00ff).rw("adpsi", FUNC(tms9901_device::read), FUNC(tms9901_device::write));
+	map(0x0100, 0x010f).w("outlatch1", FUNC(ls259_device::write_d0));
+	map(0x0110, 0x011f).w("outlatch2", FUNC(ls259_device::write_d0));
+	map(0x0120, 0x012f).w("outlatch3", FUNC(ls259_device::write_d0));
+	map(0x0140, 0x014f).w("outlatch4", FUNC(ls259_device::write_d0));
+	map(0x0150, 0x015f).w("outlatch5", FUNC(ls259_device::write_d0));
+	map(0x0160, 0x016f).w(m_keyplatch, FUNC(ls259_device::write_d0)).nopr();
+	map(0x0170, 0x017f).r(FUNC(si5500_state::keypad_r));
+	map(0x0400, 0x043f).rw("nvrpsi", FUNC(tms9901_device::read), FUNC(tms9901_device::write));
+	map(0x0440, 0x047f).rw(m_gpibpsi, FUNC(tms9901_device::read), FUNC(tms9901_device::write));
+	map(0x0800, 0x0fff).rw("novram", FUNC(x2201_device::read), FUNC(x2201_device::write));
 }
 
 static INPUT_PORTS_START(si5500)
@@ -186,7 +186,7 @@ void si5500_state::si5500(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &si5500_state::cru_map);
 
 	TMS9901(config, m_mainpsi, 10_MHz_XTAL / 4);
-	m_mainpsi->intlevel_cb().set(FUNC(si5500_state::mainic_w));
+	m_mainpsi->intreq_cb().set(FUNC(si5500_state::mainic_w));
 
 	tms9902_device &acc(TMS9902(config, "acc", 10_MHz_XTAL / 4));
 	acc.int_cb().set(FUNC(si5500_state::acc_int_w));

@@ -17,6 +17,9 @@ public:
 	xavix2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+protected:
+	xavix2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
@@ -121,22 +124,21 @@ public:
 	O(sty_abx);
 
 	O(stz_aba);
-	O(stz_zpg);
+	O(stz_xav_zpg);
 
-	O(bit_zpx);
+	O(bit_xav_zpx);
 	O(bit_abx);
 	O(bit_imm);
 
-	O(asr_zpg);
+	O(asr_xav_zpg);
 	O(asr_aba);
-	O(asr_zpx);
+	O(asr_xav_zpx);
 	O(asr_acc);
 	O(asr_abx);
 
 	O(cmc_imp);
 	O(sev_imp);
 
-	O(callf_aba);
 	O(jmpf_ind);
 
 #undef O
@@ -160,6 +162,13 @@ enum {
 	SXAVIX_PB
 };
 
+class xavix2002_device : public xavix2000_device {
+public:
+	xavix2002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 DECLARE_DEVICE_TYPE(XAVIX2000, xavix2000_device)
+DECLARE_DEVICE_TYPE(XAVIX2002, xavix2002_device)
 
 #endif // MAME_CPU_M6502_XAVIX2000_H

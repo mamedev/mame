@@ -45,21 +45,23 @@
 #ifndef NLD_9310_H_
 #define NLD_9310_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
-#define TTL_9310(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)         \
-		NET_REGISTER_DEV(TTL_9310, name)                                        \
-		NET_CONNECT(name, CLK, cCLK)                                            \
-		NET_CONNECT(name, ENP,  cENP)                                           \
-		NET_CONNECT(name, ENT,  cENT)                                           \
-		NET_CONNECT(name, CLRQ, cCLRQ)                                          \
-		NET_CONNECT(name, LOADQ,_LOADQ)                                         \
-		NET_CONNECT(name, A,    cA)                                             \
-		NET_CONNECT(name, B,    cB)                                             \
-		NET_CONNECT(name, C,    cC)                                             \
+#define TTL_9310(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)        \
+		NET_REGISTER_DEV(TTL_9310, name)                                       \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CLK, cCLK)                                           \
+		NET_CONNECT(name, ENP,  cENP)                                          \
+		NET_CONNECT(name, ENT,  cENT)                                          \
+		NET_CONNECT(name, CLRQ, cCLRQ)                                         \
+		NET_CONNECT(name, LOADQ,_LOADQ)                                        \
+		NET_CONNECT(name, A,    cA)                                            \
+		NET_CONNECT(name, B,    cB)                                            \
+		NET_CONNECT(name, C,    cC)                                            \
 		NET_CONNECT(name, D,    cD)
 
-#define TTL_9310_DIP(name)                                                      \
+#define TTL_9310_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_9310_DIP, name)
 
 #endif /* NLD_9310_H_ */

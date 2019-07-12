@@ -44,14 +44,14 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 {
 	if (m_readzoomroms)
-		return m_k051316->rom_r(space, offset);
+		return m_k051316->rom_r(offset);
 	else
-		return m_k051316->read(space, offset);
+		return m_k051316->read(offset);
 }
 
 WRITE8_MEMBER(rollerg_state::soundirq_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 void rollerg_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

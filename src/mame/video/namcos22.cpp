@@ -1710,7 +1710,7 @@ void namcos22_state::draw_sprites()
 	}
 }
 
-READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
+READ32_MEMBER(namcos22s_state::namcos22s_vics_control_r)
 {
 	u32 ret = m_vics_control[offset];
 
@@ -1734,7 +1734,7 @@ READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
 	return ret;
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_vics_control_w)
+WRITE32_MEMBER(namcos22s_state::namcos22s_vics_control_w)
 {
 	COMBINE_DATA(&m_vics_control[offset]);
 }
@@ -1879,7 +1879,7 @@ low byte is indirect pen, high byte is shift amount when spot is in alpha blend 
 
 */
 
-READ16_MEMBER(namcos22_state::spotram_r)
+READ16_MEMBER(namcos22s_state::spotram_r)
 {
 	if (offset == 2)
 	{
@@ -1895,7 +1895,7 @@ READ16_MEMBER(namcos22_state::spotram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::spotram_w)
+WRITE16_MEMBER(namcos22s_state::spotram_w)
 {
 	switch (offset)
 	{
@@ -1921,7 +1921,7 @@ WRITE16_MEMBER(namcos22_state::spotram_w)
 	}
 }
 
-void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
+void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
 {
 	const pen_t *pens = m_palette->pens();
 	u8 pen = 0;
@@ -2072,16 +2072,21 @@ void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap
 	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
 	m_bgtilemap->set_palette_offset(m_text_palbase);
 
-	if (m_is_ss22)
-	{
-		m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 4, 4);
-		namcos22s_mix_text_layer(screen, bitmap, cliprect, 4);
-	}
-	else
-	{
-		m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 2, 3);
-		namcos22_mix_text_layer(screen, bitmap, cliprect);
-	}
+	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 2, 3);
+	namcos22_mix_text_layer(screen, bitmap, cliprect);
+}
+
+void namcos22s_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int scroll_x = m_tilemapattr[0] - 0x35c;
+	int scroll_y = m_tilemapattr[1];
+
+	m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff);
+	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
+	m_bgtilemap->set_palette_offset(m_text_palbase);
+
+	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 4, 4);
+	namcos22s_mix_text_layer(screen, bitmap, cliprect, 4);
 }
 
 
@@ -2116,7 +2121,7 @@ void namcos22_state::update_palette()
 }
 
 
-WRITE16_MEMBER(namcos22_state::namcos22s_czattr_w)
+WRITE16_MEMBER(namcos22s_state::namcos22s_czattr_w)
 {
 	/*
 	       0    1    2    3    4    5    6    7
@@ -2145,12 +2150,12 @@ WRITE16_MEMBER(namcos22_state::namcos22s_czattr_w)
 	}
 }
 
-READ16_MEMBER(namcos22_state::namcos22s_czattr_r)
+READ16_MEMBER(namcos22s_state::namcos22s_czattr_r)
 {
 	return m_czattr[offset];
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
+WRITE32_MEMBER(namcos22s_state::namcos22s_czram_w)
 {
 	/*
 	czram contents, it's basically a big cz compare table
@@ -2177,13 +2182,13 @@ WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
 	}
 }
 
-READ32_MEMBER(namcos22_state::namcos22s_czram_r)
+READ32_MEMBER(namcos22s_state::namcos22s_czram_r)
 {
 	int bank = m_czattr[5] & 3;
 	return (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
 }
 
-void namcos22_state::recalc_czram()
+void namcos22s_state::recalc_czram()
 {
 	for (int bank = 0; bank < 4; bank++)
 	{
@@ -2245,12 +2250,11 @@ void namcos22_state::recalc_czram()
 
 void namcos22_state::update_mixer()
 {
-	int i;
 	m_poly->wait("update_mixer");
 #if 0 // show reg contents
 	char msg1[0x1000] = {0}, msg2[0x1000] = {0};
 	int st = 0x000 / 16;
-	for (i = st; i < (st+3); i++)
+	for (int i = st; i < (st+3); i++)
 	{
 		sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
 		strcat(msg1,msg2);
@@ -2357,7 +2361,7 @@ void namcos22_state::update_mixer()
 		m_fog_colormask       = m_mixer[0x84/4];
 
 		// fog color per cz type
-		for (i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			m_fog_r_per_cztype[i] = nthbyte(m_mixer, 0x0100+i);
 			m_fog_g_per_cztype[i] = nthbyte(m_mixer, 0x0180+i);
@@ -2370,7 +2374,7 @@ void namcos22_state::update_mixer()
 
 /*********************************************************************************************/
 
-u32 namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 namcos22s_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	render_frame_active();
 	update_mixer();
@@ -2448,30 +2452,7 @@ void namcos22_state::init_tables()
 	matrix3d_identity(m_viewmatrix);
 	memset(m_polygonram, 0xcc, m_polygonram.bytes());
 
-	// init spotram (super22 only)
-	if (m_is_ss22)
-	{
-		m_spotram = make_unique_clear<u16[]>(0x800);
-		save_pointer(NAME(m_spotram), 0x800);
-	}
-
-	// init czram tables (super22 only)
-	if (m_is_ss22)
-	{
-		for (int bank = 0; bank < 4; bank++)
-		{
-			m_banked_czram[bank] = make_unique_clear<u16[]>(0x100);
-			m_recalc_czram[bank] = make_unique_clear<u8[]>(0x2000);
-			m_cz_was_written[bank] = 1;
-
-			save_pointer(NAME(m_banked_czram[bank]), 0x100, bank);
-			save_pointer(NAME(m_recalc_czram[bank]), 0x2000, bank);
-		}
-
-		save_item(NAME(m_czattr));
-		save_item(NAME(m_cz_was_written));
-	}
-	else
+	if (!m_is_ss22)
 	{
 		save_item(NAME(m_fog_r_per_cztype));
 		save_item(NAME(m_fog_g_per_cztype));
@@ -2562,6 +2543,29 @@ void namcos22_state::init_tables()
 		default:
 			break;
 	}
+}
+
+void namcos22s_state::init_tables()
+{
+	namcos22_state::init_tables();
+
+	// init spotram (super22 only)
+	m_spotram = make_unique_clear<u16[]>(0x800);
+	save_pointer(NAME(m_spotram), 0x800);
+
+	// init czram tables (super22 only)
+	for (int bank = 0; bank < 4; bank++)
+	{
+		m_banked_czram[bank] = make_unique_clear<u16[]>(0x100);
+		m_recalc_czram[bank] = make_unique_clear<u8[]>(0x2000);
+		m_cz_was_written[bank] = 1;
+
+		save_pointer(NAME(m_banked_czram[bank]), 0x100, bank);
+		save_pointer(NAME(m_recalc_czram[bank]), 0x2000, bank);
+	}
+
+	save_item(NAME(m_czattr));
+	save_item(NAME(m_cz_was_written));
 }
 
 void namcos22_state::video_start()

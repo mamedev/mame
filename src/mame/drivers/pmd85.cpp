@@ -38,6 +38,7 @@ Notes on emulation status and to do list:
 10. PMD-85, Didaktik Alfa 2 and Didaktik Beta (ROMs and documentation needed).
 11. FDD interface (ROMs and disk images needed).
 12. "Duch & Pampuch" Mato game displays scores with incorrect characters.
+13. Tape save in pmd851 is badly formatted - cannot be loaded.
 
 PMD-85 technical information
 ============================
@@ -169,6 +170,16 @@ I/O ports
     ROM module is not supported by Didaktik Alfa and Mato.
 
 
+Commands
+--------
+DUMP aaaa - dump memory from aaaa
+JUMP aaaa - start program at aaaa
+MEM aaaa  - show 16 bytes from aaaa-up
+MGLD xx   - load file number xx from cassette
+MGSV xx aaaa bbbb yyyyyyyy - save memory range aaaa to bbbb to cassette with file number xx and filename yyyyyyyy
+SUB aaaa bb cc dd... - write bytes to memory starting at aaaa with bb,cc,dd...
+
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -180,7 +191,6 @@ I/O ports
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -628,13 +638,13 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(pmd85_cassette_formats);
 	m_cassette->set_create_opts(&pmd85_cassette_options);
-	m_cassette->set_default_state((cassette_state) (CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("pmd85_cass");
 
 	/* software lists */

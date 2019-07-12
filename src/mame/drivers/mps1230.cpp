@@ -128,7 +128,6 @@ void mps1230_state::mps1230_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0xc000, 0xdfff).ram(); // as per the service manual
-	map(0xff80, 0xffff).ram(); // internal in cpu
 }
 
 /***************************************************************************
@@ -138,15 +137,17 @@ void mps1230_state::mps1230_map(address_map &map)
 static INPUT_PORTS_START( mps1230 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mps1230_state::mps1230)
-	MCFG_DEVICE_ADD(CPU_TAG, UPD7810, 11060000)
-	MCFG_DEVICE_PROGRAM_MAP(mps1230_map)
-MACHINE_CONFIG_END
+void mps1230_state::mps1230(machine_config &config)
+{
+	UPD7810(config, m_maincpu, 11060000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mps1230_state::mps1230_map);
+}
 
-MACHINE_CONFIG_START(mps1230_state::mps1000)
-	MCFG_DEVICE_ADD(CPU_TAG, Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(mps1230_map)
-MACHINE_CONFIG_END
+void mps1230_state::mps1000(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mps1230_state::mps1230_map);
+}
 
 /***************************************************************************
 

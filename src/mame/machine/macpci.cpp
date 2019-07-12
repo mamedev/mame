@@ -186,11 +186,11 @@ READ8_MEMBER(macpci_state::mac_5396_r)
 {
 	if (offset < 0x100)
 	{
-		return m_539x_1->read(space, offset>>4);
+		return m_539x_1->read(offset>>4);
 	}
 	else    // pseudo-DMA: read from the FIFO
 	{
-		return m_539x_1->read(space, 2);
+		return m_539x_1->read(2);
 	}
 
 	// never executed
@@ -201,11 +201,11 @@ WRITE8_MEMBER(macpci_state::mac_5396_w)
 {
 	if (offset < 0x100)
 	{
-		m_539x_1->write(space, offset>>4, data);
+		m_539x_1->write(offset>>4, data);
 	}
 	else    // pseudo-DMA: write to the FIFO
 	{
-		m_539x_1->write(space, 2, data);
+		m_539x_1->write(2, data);
 	}
 }
 

@@ -6,7 +6,8 @@
  */
 
 #include "nld_74193.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -31,6 +32,7 @@ namespace netlist
 		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
 		, m_BORROWQ(*this, "BORROWQ")
 		, m_CARRYQ(*this, "CARRYQ")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -54,6 +56,7 @@ namespace netlist
 		object_array_t<logic_output_t, 4> m_Q;
 		logic_output_t m_BORROWQ;
 		logic_output_t m_CARRYQ;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(74193_dip, 74193)
@@ -67,6 +70,7 @@ namespace netlist
 			register_subalias("5", m_CU);
 			register_subalias("6", m_Q[2]);
 			register_subalias("7", m_Q[3]);
+			register_subalias("8", "GND");
 
 			register_subalias("9", m_D);
 			register_subalias("10", m_C);
@@ -75,7 +79,7 @@ namespace netlist
 			register_subalias("13", m_BORROWQ);
 			register_subalias("14", m_CLEAR);
 			register_subalias("15", m_A);
-
+			register_subalias("16", "VCC");
 		}
 	};
 
@@ -87,7 +91,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	static constexpr netlist_time delay[4] =
+	static constexpr const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),
@@ -139,8 +143,8 @@ namespace netlist
 		m_CARRYQ.push(tCarry, NLTIME_FROM_NS(20)); //FIXME timing
 	}
 
-	NETLIB_DEVICE_IMPL(74193)
-	NETLIB_DEVICE_IMPL(74193_dip)
+	NETLIB_DEVICE_IMPL(74193,    "TTL_74193", "+A,+B,+C,+D,+CLEAR,+LOADQ,+CU,+CD,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74193_dip, "TTL_74193_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

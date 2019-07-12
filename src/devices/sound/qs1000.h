@@ -27,6 +27,8 @@ class qs1000_device :   public device_t,
 						public device_rom_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	// construction/destruction
 	qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -40,6 +42,7 @@ public:
 	//auto serial_w() { return m_serial_w_cb.bind(); }
 
 	// external
+	i8052_device &cpu() const { return *m_cpu; }
 	void serial_in(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( set_irq );
 

@@ -245,11 +245,12 @@ public:
 	// osd_output interface ...
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)  override;
 	bool verbose() const { return m_print_verbose; }
-	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
+	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
 
 	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
 	static std::list<std::shared_ptr<osd_window>> s_window_list;
+
 protected:
 	virtual bool input_init();
 	virtual void input_pause();

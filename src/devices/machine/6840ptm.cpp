@@ -423,7 +423,7 @@ void ptm6840_device::reload_count(int idx)
 //  read - Read Timer
 //-------------------------------------------------
 
-READ8_MEMBER( ptm6840_device::read )
+uint8_t ptm6840_device::read(offs_t offset)
 {
 	int val;
 
@@ -487,7 +487,7 @@ READ8_MEMBER( ptm6840_device::read )
 //  write - Write Timer
 //-------------------------------------------------
 
-WRITE8_MEMBER( ptm6840_device::write )
+void ptm6840_device::write(offs_t offset, uint8_t data)
 {
 	switch ( offset )
 	{
@@ -660,10 +660,6 @@ void ptm6840_device::set_gate(int idx, int state)
 	m_gate[idx] = state;
 }
 
-WRITE_LINE_MEMBER( ptm6840_device::set_g1 ) { set_gate(0, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_g2 ) { set_gate(1, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_g3 ) { set_gate(2, state); }
-
 
 //-------------------------------------------------
 //  set_clock - set clock status (0 or 1)
@@ -681,10 +677,6 @@ void ptm6840_device::set_clock(int idx, int state)
 		}
 	}
 }
-
-WRITE_LINE_MEMBER( ptm6840_device::set_c1 ) { set_clock(0, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_c2 ) { set_clock(1, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_c3 ) { set_clock(2, state); }
 
 
 //-------------------------------------------------

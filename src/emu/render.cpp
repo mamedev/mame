@@ -111,22 +111,6 @@ static const render_quad_texuv oriented_texcoords[8] =
 	{ { 1,1 }, { 1,0 }, { 0,1 }, { 0,0 } }      // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y
 };
 
-// layer orders
-static constexpr std::pair<item_layer, int> layer_order_standard[]{
-		{ ITEM_LAYER_SCREEN,    -1 }, // FIXME: invalid blend mode - we're relying on the goodness of the OSD
-		{ ITEM_LAYER_OVERLAY,   BLENDMODE_RGB_MULTIPLY },
-		{ ITEM_LAYER_BACKDROP,  BLENDMODE_ADD },
-		{ ITEM_LAYER_BEZEL,     BLENDMODE_ALPHA },
-		{ ITEM_LAYER_CPANEL,    BLENDMODE_ALPHA },
-		{ ITEM_LAYER_MARQUEE,   BLENDMODE_ALPHA } };
-static constexpr std::pair<item_layer, int> layer_order_alternate[]{
-		{ ITEM_LAYER_BACKDROP,  BLENDMODE_ALPHA },
-		{ ITEM_LAYER_SCREEN,    BLENDMODE_ADD },
-		{ ITEM_LAYER_OVERLAY,   BLENDMODE_RGB_MULTIPLY },
-		{ ITEM_LAYER_BEZEL,     BLENDMODE_ALPHA },
-		{ ITEM_LAYER_CPANEL,    BLENDMODE_ALPHA },
-		{ ITEM_LAYER_MARQUEE,   BLENDMODE_ALPHA } };
-
 
 
 //**************************************************************************
@@ -176,25 +160,6 @@ inline void normalize_bounds(render_bounds &bounds)
 		std::swap(bounds.y0, bounds.y1);
 }
 
-
-//-------------------------------------------------
-//  get_layer_and_blendmode - return the
-//  appropriate layer index and blendmode
-//-------------------------------------------------
-
-inline item_layer get_layer_and_blendmode(layout_view &view, int index, int &blendmode)
-{
-	//  if we have multiple backdrop pieces and no overlays, render:
-	//      backdrop (add) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
-	//  else render:
-	//      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
-
-	std::pair<item_layer, int> const *const layer_order(((view.items(ITEM_LAYER_BACKDROP).size() > 1) && view.items(ITEM_LAYER_OVERLAY).empty()) ? layer_order_alternate : layer_order_standard);
-
-	// select the layer and blend mode
-	blendmode = layer_order[index].second;
-	return layer_order[index].first;
-}
 
 //**************************************************************************
 //  RENDER PRIMITIVE
@@ -396,7 +361,7 @@ void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, text
 	assert(bitmap.cliprect().contains(sbounds));
 
 	// ensure we have a valid palette for palettized modes
-	if (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_PALETTEA16)
+	if (format == TEXFORMAT_PALETTE16)
 		assert(bitmap.palette() != nullptr);
 
 	// invalidate references to the old bitmap
@@ -446,8 +411,8 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 	int sheight = m_sbounds.height();
 
 	// ensure height/width are non-zero
-	if (dwidth < 1) dwidth = 1;
-	if (dheight < 1) dheight = 1;
+	if (dwidth == 0) dwidth = 1;
+	if (dheight == 0) dheight = 1;
 
 	texinfo.unique_id = m_id;
 	texinfo.old_id = m_old_id;
@@ -536,7 +501,6 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 	switch (m_format)
 	{
 		case TEXFORMAT_PALETTE16:
-		case TEXFORMAT_PALETTEA16:
 
 			assert(m_bitmap->palette() != nullptr);
 
@@ -719,7 +683,6 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 	switch (texformat)
 	{
 		case TEXFORMAT_PALETTE16:
-		case TEXFORMAT_PALETTEA16:
 			if (m_palclient == nullptr) // if adjusted palette hasn't been created yet, create it
 			{
 				m_palclient = std::make_unique<palette_client>(*palette);
@@ -941,11 +904,6 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 	, m_transform_container(true)
 {
 	// determine the base layer configuration based on options
-	m_base_layerconfig.set_backdrops_enabled(manager.machine().options().use_backdrops());
-	m_base_layerconfig.set_overlays_enabled(manager.machine().options().use_overlays());
-	m_base_layerconfig.set_bezels_enabled(manager.machine().options().use_bezels());
-	m_base_layerconfig.set_cpanels_enabled(manager.machine().options().use_cpanels());
-	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
 	// aspect and scale options
@@ -1296,40 +1254,38 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 		throw emu_fatalerror("Mandatory artwork is missing");
 
 	// scan the current view for all screens
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
+	for (layout_view::item &curitem : m_curview->items())
 	{
-		// iterate over items in the layer
-		for (layout_view::item &curitem : m_curview->items(layer))
-			if (curitem.screen())
+		if (curitem.screen())
+		{
+			// use a hard-coded default visible area for vector screens
+			screen_device *const screen = curitem.screen();
+			const rectangle vectorvis(0, 639, 0, 479);
+			const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
+
+			// apply target orientation to the bounds
+			render_bounds bounds = curitem.bounds();
+			apply_orientation(bounds, m_orientation);
+			normalize_bounds(bounds);
+
+			// based on the orientation of the screen container, check the bitmap
+			float xscale, yscale;
+			if (!(orientation_add(m_orientation, screen->container().orientation()) & ORIENTATION_SWAP_XY))
 			{
-				// use a hard-coded default visible area for vector screens
-				screen_device *const screen = curitem.screen();
-				const rectangle vectorvis(0, 639, 0, 479);
-				const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
-
-				// apply target orientation to the bounds
-				render_bounds bounds = curitem.bounds();
-				apply_orientation(bounds, m_orientation);
-				normalize_bounds(bounds);
-
-				// based on the orientation of the screen container, check the bitmap
-				float xscale, yscale;
-				if (!(orientation_add(m_orientation, screen->container().orientation()) & ORIENTATION_SWAP_XY))
-				{
-					xscale = float(visarea.width()) / bounds.width();
-					yscale = float(visarea.height()) / bounds.height();
-				}
-				else
-				{
-					xscale = float(visarea.height()) / bounds.width();
-					yscale = float(visarea.width()) / bounds.height();
-				}
-
-				// pick the greater
-				maxxscale = std::max(xscale, maxxscale);
-				maxyscale = std::max(yscale, maxyscale);
-				screens_considered++;
+				xscale = float(visarea.width()) / bounds.width();
+				yscale = float(visarea.height()) / bounds.height();
 			}
+			else
+			{
+				xscale = float(visarea.height()) / bounds.width();
+				yscale = float(visarea.width()) / bounds.height();
+			}
+
+			// pick the greater
+			maxxscale = std::max(xscale, maxxscale);
+			maxyscale = std::max(yscale, maxyscale);
+			screens_considered++;
+		}
 	}
 
 	// if there were no screens considered, pick a nominal default
@@ -1378,42 +1334,33 @@ render_primitive_list &render_target::get_primitives()
 	root_xform.orientation = m_orientation;
 	root_xform.no_center = false;
 
-	// iterate over layers back-to-front, but only if we're running
+	// iterate over items in the view, but only if we're running
 	if (m_manager.machine().phase() >= machine_phase::RESET)
-		for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
+		for (layout_view::item &curitem : m_curview->items())
 		{
-			int blendmode;
-			item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
-			if (m_curview->layer_enabled(layer))
-			{
-				// iterate over items in the layer
-				for (layout_view::item &curitem : m_curview->items(layer))
-				{
-					// first apply orientation to the bounds
-					render_bounds bounds = curitem.bounds();
-					apply_orientation(bounds, root_xform.orientation);
-					normalize_bounds(bounds);
+			// first apply orientation to the bounds
+			render_bounds bounds = curitem.bounds();
+			apply_orientation(bounds, root_xform.orientation);
+			normalize_bounds(bounds);
 
-					// apply the transform to the item
-					object_transform item_xform;
-					item_xform.xoffs = root_xform.xoffs + bounds.x0 * root_xform.xscale;
-					item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
-					item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
-					item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
-					item_xform.color.r = curitem.color().r * root_xform.color.r;
-					item_xform.color.g = curitem.color().g * root_xform.color.g;
-					item_xform.color.b = curitem.color().b * root_xform.color.b;
-					item_xform.color.a = curitem.color().a * root_xform.color.a;
-					item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
-					item_xform.no_center = false;
+			// apply the transform to the item
+			object_transform item_xform;
+			item_xform.xoffs = root_xform.xoffs + bounds.x0 * root_xform.xscale;
+			item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
+			item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
+			item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
+			item_xform.color.r = curitem.color().r * root_xform.color.r;
+			item_xform.color.g = curitem.color().g * root_xform.color.g;
+			item_xform.color.b = curitem.color().b * root_xform.color.b;
+			item_xform.color.a = curitem.color().a * root_xform.color.a;
+			item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
+			item_xform.no_center = false;
 
-					// if there is no associated element, it must be a screen element
-					if (curitem.screen() != nullptr)
-						add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), blendmode);
-					else
-						add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), blendmode);
-				}
-			}
+			// if there is no associated element, it must be a screen element
+			if (curitem.screen() != nullptr)
+				add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
+			else
+				add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), curitem.blend_mode());
 		}
 
 	// if we are not in the running stage, draw an outer box
@@ -2521,38 +2468,30 @@ bool render_target::map_point_internal(s32 target_x, s32 target_y, render_contai
 		return false;
 	}
 
-	// loop through each layer
-	for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
+	// iterate over items in the view
+	for (layout_view::item &item : m_curview->items())
 	{
-		int blendmode;
-		item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
-		if (m_curview->layer_enabled(layer))
+		bool checkit;
+
+		// if we're looking for a particular container, verify that we have the right one
+		if (container != nullptr)
+			checkit = (item.screen() != nullptr && &item.screen()->container() == container);
+
+		// otherwise, assume we're looking for an input
+		else
+			checkit = item.has_input();
+
+		// this target is worth looking at; now check the point
+		if (checkit && target_fx >= item.bounds().x0 && target_fx < item.bounds().x1 && target_fy >= item.bounds().y0 && target_fy < item.bounds().y1)
 		{
-			// iterate over items in the layer
-			for (layout_view::item &item : m_curview->items(layer))
-			{
-				bool checkit;
-
-				// if we're looking for a particular container, verify that we have the right one
-				if (container != nullptr)
-					checkit = (item.screen() != nullptr && &item.screen()->container() == container);
-
-				// otherwise, assume we're looking for an input
-				else
-					checkit = item.has_input();
-
-				// this target is worth looking at; now check the point
-				if (checkit && target_fx >= item.bounds().x0 && target_fx < item.bounds().x1 && target_fy >= item.bounds().y0 && target_fy < item.bounds().y1)
-				{
-					// point successfully mapped
-					mapped_x = (target_fx - item.bounds().x0) / (item.bounds().x1 - item.bounds().x0);
-					mapped_y = (target_fy - item.bounds().y0) / (item.bounds().y1 - item.bounds().y0);
-					mapped_input_port = item.input_tag_and_mask(mapped_input_mask);
-					return true;
-				}
-			}
+			// point successfully mapped
+			mapped_x = (target_fx - item.bounds().x0) / (item.bounds().x1 - item.bounds().x0);
+			mapped_y = (target_fy - item.bounds().y0) / (item.bounds().y1 - item.bounds().y0);
+			mapped_input_port = item.input_tag_and_mask(mapped_input_mask);
+			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -2603,6 +2542,8 @@ int render_target::view_index(layout_view &targetview) const
 
 void render_target::config_load(util::xml::data_node const &targetnode)
 {
+	int tmpint;
+
 	// find the view
 	const char *viewname = targetnode.get_attribute_string("view", nullptr);
 	if (viewname != nullptr)
@@ -2619,26 +2560,6 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		}
 
 	// modify the artwork config
-	int tmpint = targetnode.get_attribute_int("backdrops", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_backdrops_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("overlays", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_overlays_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("bezels", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_bezels_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("cpanels", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_cpanels_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("marquees", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_marquees_enabled(tmpint);
-
 	tmpint = targetnode.get_attribute_int("zoom", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_zoom_to_screen(tmpint);
@@ -2693,11 +2614,6 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 	// output the layer config
 	if (m_layerconfig != m_base_layerconfig)
 	{
-		targetnode.set_attribute_int("backdrops", m_layerconfig.backdrops_enabled());
-		targetnode.set_attribute_int("overlays", m_layerconfig.overlays_enabled());
-		targetnode.set_attribute_int("bezels", m_layerconfig.bezels_enabled());
-		targetnode.set_attribute_int("cpanels", m_layerconfig.cpanels_enabled());
-		targetnode.set_attribute_int("marquees", m_layerconfig.marquees_enabled());
 		targetnode.set_attribute_int("zoom", m_layerconfig.zoom_to_screen());
 		changed = true;
 	}
@@ -2948,7 +2864,7 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 			case render_primitive::QUAD:
 			{
 				// stop when we hit an alpha texture
-				if (PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_PALETTEA16)
+				if (PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_ARGB32)
 					goto done;
 
 				// if this quad can't be cleanly removed from the extents list, we're done

@@ -123,7 +123,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(qx10);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void qx10_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
@@ -337,7 +337,7 @@ WRITE8_MEMBER( qx10_state::cmos_sel_w )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( qx10_state, qx10 )
+QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -471,12 +471,12 @@ WRITE8_MEMBER(qx10_state::memory_write_byte)
 
 WRITE8_MEMBER(qx10_state::mc146818_w)
 {
-	m_rtc->write(space, !offset, data);
+	m_rtc->write(!offset, data);
 }
 
 READ8_MEMBER(qx10_state::mc146818_r)
 {
-	return m_rtc->read(space, !offset);
+	return m_rtc->read(!offset);
 }
 
 WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
@@ -721,12 +721,13 @@ static void keyboard(device_slot_interface &device)
 	device.option_add("qx10", QX10_KEYBOARD);
 }
 
-MACHINE_CONFIG_START(qx10_state::qx10)
+void qx10_state::qx10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MAIN_CLK / 4)
-	MCFG_DEVICE_PROGRAM_MAP(qx10_mem)
-	MCFG_DEVICE_IO_MAP(qx10_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	Z80(config, m_maincpu, MAIN_CLK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qx10_state::qx10_mem);
+	m_maincpu->set_addrmap(AS_IO, &qx10_state::qx10_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -735,7 +736,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_qx10)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
 	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
 
 	/* Devices */
@@ -801,8 +802,8 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 
 	UPD7220(config, m_hgdc, MAIN_CLK/6); // unk clock
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(qx10_state::hgdc_display_pixels), this);
-	m_hgdc->set_draw_text_callback(FUNC(qx10_state::hgdc_draw_text), this);
+	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
+	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
 	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
@@ -824,11 +825,10 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "qx10_flop")
+	SOFTWARE_LIST(config, "flop_list").set_original("qx10_flop");
 
-	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", 3)
-
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(qx10_state::quickload_cb), this);
+}
 
 /* ROM definition */
 ROM_START( qx10 )

@@ -136,7 +136,7 @@ private:
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_READ8_MEMBER(test_r);
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq);
 
 	void _7smash_io(address_map &map);
@@ -202,14 +202,14 @@ void luckgrln_state::video_start()
 	save_item(NAME(m_palette_ram));
 }
 
-uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	const rectangle &visarea = screen.visible_area();
 
 	rectangle clip = visarea;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -861,42 +861,41 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(luckgrln_state::luckgrln)
-	MCFG_DEVICE_ADD(m_maincpu, Z180,8000000)
-	MCFG_DEVICE_PROGRAM_MAP(mainmap)
-	MCFG_DEVICE_IO_MAP(luckgrln_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", luckgrln_state, irq)
+void luckgrln_state::luckgrln(machine_config &config)
+{
+	Z180(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::mainmap);
+	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
+	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
 
-	h46505_device &crtc(H46505(config, "crtc", 6000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 6000000/4)); /* HD6845SP; unknown clock, hand tuned to get ~60 fps */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, 0)
+	MSM6242(config, "rtc", 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(luckgrln_state::screen_update));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_luckgrln)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckgrln);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	SPEAKER(config, "mono").front_center();
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(luckgrln_state::_7smash)
+void luckgrln_state::_7smash(machine_config &config)
+{
 	luckgrln(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(_7smash_map)
-	MCFG_DEVICE_IO_MAP(_7smash_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::_7smash_map);
+	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::_7smash_io);
 
-	MCFG_DEVICE_REMOVE("rtc")
-MACHINE_CONFIG_END
+	config.device_remove("rtc");
+}
 
 void luckgrln_state::init_luckgrln()
 {

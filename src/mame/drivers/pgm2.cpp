@@ -729,17 +729,6 @@ void pgm2_state::machine_reset()
 	module_clk_cnt = 151; // this needed because of "false" clock pulse happen during gpio init
 }
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 4, 0, 12, 8, 20, 16, 28, 24 },
-	{ STEP8(0,4*8) },
-	32*8
-};
-
 static const gfx_layout tiles32x32x8_layout =
 {
 	32,32,
@@ -752,7 +741,7 @@ static const gfx_layout tiles32x32x8_layout =
 };
 
 static GFXDECODE_START( pgm2_tx )
-	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 0x800/4/0x10 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_lsb, 0, 0x800/4/0x10 )
 GFXDECODE_END
 
 static GFXDECODE_START( pgm2_bg )

@@ -26,6 +26,7 @@ public:
 		I8X9X_SBUF_TX,
 		I8X9X_SP_CON,
 		I8X9X_SP_STAT,
+		I8X9X_BAUD_RATE,
 		I8X9X_IOC0,
 		I8X9X_IOC1,
 		I8X9X_IOS0,
@@ -132,6 +133,8 @@ private:
 	u8 sbuf, sp_con, sp_stat;
 	u8 serial_send_buf;
 	u64 serial_send_timer;
+	u16 baud_reg;
+	bool brh;
 
 	u16 timer_value(int timer, u64 current_time) const;
 	u64 timer_time_until(int timer, u64 current_time, u16 timer_value) const;

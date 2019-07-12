@@ -134,12 +134,12 @@ void vt220_state::vt220(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("16K");
 }
 
-MACHINE_CONFIG_START(vt220_state::vt220a)
+void vt220_state::vt220a(machine_config &config)
+{
 	vt220(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(vt220a_mem)
-	MCFG_DEVICE_IO_MAP(vt220a_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220a_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt220_state::vt220a_io);
+}
 
 /* ROM definitions */
 ROM_START(vt220)

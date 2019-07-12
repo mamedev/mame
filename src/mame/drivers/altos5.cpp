@@ -43,7 +43,7 @@ public:
 
 	void init_altos5();
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(altos5);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 private:
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -321,7 +321,7 @@ WRITE8_MEMBER( altos5_state::port09_w )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
+QUICKLOAD_LOAD_MEMBER(altos5_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -409,7 +409,8 @@ void altos5_state::init_altos5()
 	membank("bankwf")->configure_entries(0, 50, &RAM[0], 0x1000);
 }
 
-MACHINE_CONFIG_START(altos5_state::altos5)
+void altos5_state::altos5(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &altos5_state::mem_map);
@@ -470,14 +471,12 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(altos5_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "altos5")
-	MCFG_QUICKLOAD_ADD("quickload", altos5_state, altos5, "com,cpm", 3)
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("altos5");
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(altos5_state::quickload_cb), this);
+}
 
 
 /* ROM definition */

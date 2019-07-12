@@ -763,17 +763,20 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_CONF", 0x080, 0x080 ) // Auto LF on CR
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(funkball_state::funkball)
-	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
-	MCFG_DEVICE_PROGRAM_MAP(funkball_map)
-	MCFG_DEVICE_IO_MAP(funkball_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void funkball_state::funkball(machine_config &config)
+{
+	MEDIAGX(config, m_maincpu, 66666666*3.5); // 66,6 MHz x 3.5
+	m_maincpu->set_addrmap(AS_PROGRAM, &funkball_state::funkball_map);
+	m_maincpu->set_addrmap(AS_IO, &funkball_state::funkball_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, funkball_state, voodoo_0_pci_r, voodoo_0_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (7, FUNC(funkball_state::voodoo_0_pci_r), this);
+	pcibus.set_device_write(7, FUNC(funkball_state::voodoo_0_pci_w), this);
+	pcibus.set_device_read (18, FUNC(funkball_state::cx5510_pci_r), this);
+	pcibus.set_device_write(18, FUNC(funkball_state::cx5510_pci_w), this);
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -781,18 +784,18 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("maincpu")
+	VOODOO_1(config, m_voodoo, STD_VOODOO_1_CLOCK);
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 0);
+	m_voodoo->set_screen_tag("screen");
+	m_voodoo->set_cpu_tag(m_maincpu);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(funkball_state, screen_update)
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(funkball_state::screen_update));
+	screen.set_size(1024, 1024);
+	screen.set_visarea(0, 511, 16, 447);
 
 	ns16550_device &uart(NS16550(config, "uart", 1843200)); // exact type unknown
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -809,7 +812,7 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	INTEL_28F320J5(config, "u29");
 	INTEL_28F320J5(config, "u30");
 	INTEL_28F320J5(config, "u3");
-MACHINE_CONFIG_END
+}
 
 ROM_START( funkball )
 	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)

@@ -77,7 +77,7 @@ void menu_barcode_reader::populate(float &customtop, float &custombottom)
 		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Enter Code"), "", 0, ITEMREF_ENTER_BARCODE);
 
-		customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+		customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 	}
 }
 

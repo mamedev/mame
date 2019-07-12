@@ -20,7 +20,7 @@
     Hyper Crash (Version C) GX790
     Kitten Kaboodle         GX712
     Nyan Nyan Panic (Japan) GX712
-
+    Bubble System
 
 driver by Bryan McPhail
 
@@ -35,6 +35,8 @@ modified by Hau
 modified by hap
 06/09/2012
  Special thx 2 Neusneus, Audrey Tautou, my water bottle, chair, sleepiness
+
+Bubble System added 2019 ArcadeHacker/Bryan McPhail
 
 Notes:
 - blkpnthr:
@@ -76,6 +78,12 @@ WRITE_LINE_MEMBER(nemesis_state::blkpnthr_vblank_irq)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(2, HOLD_LINE);
+}
+
+WRITE_LINE_MEMBER(nemesis_state::bubsys_vblank_irq)
+{
+	if (state && m_irq_on)
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
@@ -137,9 +145,55 @@ WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
 WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
 {
 	if (state)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
+WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
+{
+	if (state) // On Bubble System this goes to an LS02 NOR before the Z80, so there may be a disable somewhere
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
+{
+	COMBINE_DATA(&m_bubsys_control_ram[offset]);
+	//logerror("bubsys_mcu_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+
+	if (offset==1)
+	{
+		// NOP?
+		if (m_bubsys_control_ram[1]==0)
+		{
+		}
+		// Read
+		else if (m_bubsys_control_ram[1]==1)
+		{
+			// The MCU copies the requested page of bubble memory to 0xf00 of shared RAM
+			int page = m_bubsys_control_ram[0] & 0x7ff;
+			//int unknownBit = m_bubsys_control_ram[0] & 0x800;
+
+			logerror("\tCopy page %02x to shared ram\n", page);
+
+			const uint8_t *src = memregion("bubblememory")->base();
+			memcpy(m_bubsys_shared_ram + 0xf00/2, src + page * 0x90, 0x80);
+
+			// The last 2 bytes of the block are loaded into the control register
+			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
+
+			m_maincpu->set_input_line(5, HOLD_LINE);
+		}
+		// Write?
+		else if (m_bubsys_control_ram[1]==2)
+		{
+			logerror("Request to write to bubble memory?  %04x\n", m_bubsys_control_ram[0]);
+		}
+	}
+	else
+	{
+		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here
+	}
+}
 
 READ16_MEMBER(nemesis_state::gx400_sharedram_word_r)
 {
@@ -255,11 +309,12 @@ void nemesis_state::nemesis_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -285,11 +340,12 @@ void nemesis_state::gx400_map(address_map &map)
 	map(0x010000, 0x01ffff).ram();
 	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -311,15 +367,49 @@ void nemesis_state::gx400_map(address_map &map)
 	map(0x080000, 0x0bffff).rom();
 }
 
+void nemesis_state::bubsys_map(address_map &map)
+{
+	map(0x000000, 0x000fff).ram().share("bubsys_shared"); /* Shared with MCU */
+	map(0x010000, 0x01ffff).ram(); /* PROGRAM RAM */
+	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
+	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x040000, 0x040007).ram().w(FUNC(nemesis_state::bubsys_mcu_w)).share("bubsys_control"); // Shared with MCU
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x056000, 0x056fff).ram().share("spriteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x05c402, 0x05c403).portr("DSW0");
+	map(0x05c404, 0x05c405).portr("DSW1");
+	map(0x05c406, 0x05c407).portr("TEST");
+	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x05cc00, 0x05cc01).portr("IN0");
+	map(0x05cc02, 0x05cc03).portr("IN1");
+	map(0x05cc04, 0x05cc05).portr("IN2");
+	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x070000, 0x073fff).ram();  /* WORK RAM */
+	map(0x078000, 0x07ffff).rom();  /* Empty diagnostic ROM slot */
+}
+
 void nemesis_state::konamigt_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -346,11 +436,12 @@ void nemesis_state::rf2_gx400_map(address_map &map)
 	map(0x010000, 0x01ffff).ram();
 	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x050000, 0x051fff).ram();
-	map(0x050000, 0x0503ff).share("xscroll1");
-	map(0x050400, 0x0507ff).share("xscroll2");
-	map(0x050f00, 0x050f7f).share("yscroll2");
-	map(0x050f80, 0x050fff).share("yscroll1");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
 	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
 	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
@@ -440,11 +531,12 @@ void nemesis_state::salamand_map(address_map &map)
 	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
 	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x180000, 0x180fff).ram().share("spriteram");       /* more sprite ram ??? */
-	map(0x190000, 0x191fff).ram();
-	map(0x190000, 0x1903ff).share("xscroll2");
-	map(0x190400, 0x1907ff).share("xscroll1");
-	map(0x190f00, 0x190f7f).share("yscroll1");
-	map(0x190f80, 0x190fff).share("yscroll2");
+	map(0x190000, 0x1903ff).ram().share("xscroll2");
+	map(0x190400, 0x1907ff).ram().share("xscroll1");
+	map(0x190800, 0x190eff).ram();
+	map(0x190f00, 0x190f7f).ram().share("yscroll1");
+	map(0x190f80, 0x190fff).ram().share("yscroll2");
+	map(0x191000, 0x191fff).ram();
 }
 
 void nemesis_state::blkpnthr_map(address_map &map)
@@ -465,11 +557,12 @@ void nemesis_state::blkpnthr_map(address_map &map)
 	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
 	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
-	map(0x180000, 0x181fff).ram();
-	map(0x180000, 0x1803ff).share("xscroll1");
-	map(0x180400, 0x1807ff).share("xscroll2");
-	map(0x180f00, 0x180f7f).share("yscroll2");
-	map(0x180f80, 0x180fff).share("yscroll1");
+	map(0x180000, 0x1803ff).ram().share("xscroll1");
+	map(0x180400, 0x1807ff).ram().share("xscroll2");
+	map(0x180800, 0x180eff).ram();
+	map(0x180f00, 0x180f7f).ram().share("yscroll2");
+	map(0x180f80, 0x180fff).ram().share("yscroll1");
+	map(0x181000, 0x181fff).ram();
 	map(0x190000, 0x190fff).ram().share("spriteram");       /* more sprite ram ??? */
 }
 
@@ -493,11 +586,12 @@ void nemesis_state::citybomb_map(address_map &map)
 	map(0x211000, 0x211fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
 	map(0x212000, 0x212fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
 	map(0x213000, 0x213fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
-	map(0x300000, 0x301fff).ram();
-	map(0x300000, 0x3003ff).share("xscroll1");
-	map(0x300400, 0x3007ff).share("xscroll2");
-	map(0x300f00, 0x300f7f).share("yscroll2");
-	map(0x300f80, 0x300fff).share("yscroll1");
+	map(0x300000, 0x3003ff).ram().share("xscroll1");
+	map(0x300400, 0x3007ff).ram().share("xscroll2");
+	map(0x300800, 0x300eff).ram();
+	map(0x300f00, 0x300f7f).ram().share("yscroll2");
+	map(0x300f80, 0x300fff).ram().share("yscroll1");
+	map(0x301000, 0x301fff).ram();
 	map(0x310000, 0x310fff).ram().share("spriteram");       /* more sprite ram ??? */
 }
 
@@ -521,11 +615,12 @@ void nemesis_state::nyanpani_map(address_map &map)
 	map(0x203000, 0x203fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
 	map(0x210000, 0x21ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x300000, 0x300fff).ram().share("spriteram");       /* more sprite ram ??? */
-	map(0x310000, 0x311fff).ram();
-	map(0x310000, 0x3103ff).share("xscroll1");
-	map(0x310400, 0x3107ff).share("xscroll2");
-	map(0x310f00, 0x310f7f).share("yscroll2");
-	map(0x310f80, 0x310fff).share("yscroll1");
+	map(0x310000, 0x3103ff).ram().share("xscroll1");
+	map(0x310400, 0x3107ff).ram().share("xscroll2");
+	map(0x310800, 0x310eff).ram();
+	map(0x310f00, 0x310f7f).ram().share("yscroll2");
+	map(0x310f80, 0x310fff).ram().share("yscroll1");
+	map(0x311000, 0x311fff).ram();
 }
 
 READ8_MEMBER(nemesis_state::wd_r)
@@ -598,11 +693,12 @@ void nemesis_state::hcrash_map(address_map &map)
 	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
 	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
 	map(0x180000, 0x180fff).ram().share("spriteram");
-	map(0x190000, 0x191fff).ram();
-	map(0x190000, 0x1903ff).share("xscroll2");
-	map(0x190400, 0x1907ff).share("xscroll1");
-	map(0x190f00, 0x190f7f).share("yscroll1");
-	map(0x190f80, 0x190fff).share("yscroll2");
+	map(0x190000, 0x1903ff).ram().share("xscroll2");
+	map(0x190400, 0x1907ff).ram().share("xscroll1");
+	map(0x190800, 0x190eff).ram();
+	map(0x190f00, 0x190f7f).ram().share("yscroll1");
+	map(0x190f80, 0x190fff).ram().share("yscroll2");
+	map(0x191000, 0x191fff).ram();
 }
 
 /******************************************************************************/
@@ -1314,6 +1410,75 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bubsys )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)    // power-up
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)    // shoot
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)    // missile
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW0")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), DEF_STR( None ), SW1)
+	/* "None" = coin slot B disabled */
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "50k and every 100k" )
+	PORT_DIPSETTING(    0x10, "30k" )
+	PORT_DIPSETTING(    0x08, "50k" )
+	PORT_DIPSETTING(    0x00, "100k" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("TEST")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 /******************************************************************************/
 
 static const gfx_layout charlayout =
@@ -1440,7 +1605,6 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_gx400_irq1_cnt));
 	save_item(NAME(m_selected_ip));
-
 	save_item(NAME(m_tilemap_flip));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_irq_port_last));
@@ -2431,18 +2595,6 @@ a black background and numbers that count down from 99 to 0, and below that text
 'PRESENTED BY KONAMI". A tune also plays while the numbers count down.
 When the counter reaches 0 the game boots.
 
-I suspect that the 'GETTING READY' stuff is actually warming up the bubble memory
-(which operates at 30-40 degrees C) and the 'WARMING UP NOW' part is actually copying
-data from the bubble memory to the 2x 6264 SRAMs on the small plug-in PCB or some other
-on-board RAM then the game runs entirely from RAM thereafter. This is assuming the
-bubble memory is not fast enough to be directly accessed in real time.
-This is speculation at this early stage.... it's entirely possible that the game does
-run from the bubble memory.
-
-Only two games were released on the 'Bubble Memory' version of the
-GX400 hardware ....
-1985/02 TwinBee
-1985/05 Gradius (Japan release) / Nemesis (International release)
 
 The harness pinout matches Scramble with 3 additional wires....
 -12V = A15 (pin 15 solder side)
@@ -2680,17 +2832,17 @@ void nemesis_state::bubsys(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_map);
-	//TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
-	m_maincpu->set_disable();
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::bubsys_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<4>().set(FUNC(nemesis_state::sound_nmi_w));
 	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
 	ls259_device &intlatch(LS259(config, "intlatch"));
@@ -2751,10 +2903,12 @@ void nemesis_state::bubsys(machine_config &config)
 
 
 ROM_START( bubsys )
-	ROM_REGION( 0x140000, "maincpu", ROMREGION_ERASE00 )
-	// no dump, MCU provides code there
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) // Fujitsu MCU, unknown type
+	ROM_REGION( 0x49000, "bubblememory", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
@@ -2763,10 +2917,51 @@ ROM_START( bubsys )
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
 	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
-
-	ROM_REGION( 0x4000, "sram", 0 ) // raw RAM dumps, just for emulation aid, to be removed ...
-	ROM_LOAD( "sram1.ic1", 0x0000, 0x2000, CRC(45fc9453) SHA1(eeb4ff2c2c9d3b6ea9d0f0e8fd4873f2cce2cff9) )
-	ROM_LOAD( "sram2.ic3", 0x2000, 0x2000, CRC(dda768be) SHA1(e98bae3ccf63eb67193346e9c40257a3ddb88e59) )
 ROM_END
 
-GAME( 1985, bubsys,   0,         bubsys,    nemesis, nemesis_state, empty_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+ROM_START( gradiusb )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
+
+	ROM_REGION( 0x48360, "bubblememory", 0 )
+	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
+	ROM_LOAD16_WORD_SWAP( "gradius.bin", 0x000, 0x48360, CRC(f83b9607) SHA1(53493c2d5b0e66dd6b75865abf0982ee50c01a6f) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
+	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_LOAD( "400b03.8g",   0x00000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
+
+	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
+	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+ROM_END
+
+void nemesis_state::bubsys_init()
+{
+	/*
+	    The MCU is the master of the system and controls the /RESET and /HALT lines of the 68000.
+	    At boot the MCU halts the 68000 and copies the 68000 boot program to shared RAM which
+	    takes 30.65 milliseconds then the 68000 starts execution.
+
+	    As the MCU is not dumped we effectively start the simulation at the point the 68000
+	    is released, and manually copy the boot program to 68000 address space.
+	*/
+
+	const uint8_t *src = memregion("maincpu")->base();
+	memcpy(m_bubsys_shared_ram, src, 0x1e0);
+
+	/*
+	    The MCU sets this flag once the boot program is copied.  The 68000 will reset
+	    if the value is not correct.
+	*/
+	m_bubsys_control_ram[3]=0x240;
+}
+
+GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", 0 )
+// Bubble System Twinbee
+// Bubble System RF2
+// Bubble System Galactic Warriors
+// Bubble System Attack Rush

@@ -17,15 +17,15 @@ public:
 	template <typename T> void set_vector_tag(T &&tag) { m_vector.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
-	DECLARE_WRITE8_MEMBER(go_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
+	void go_w(u8 data = 0);
+	void reset_w(u8 data = 0);
 
-	DECLARE_WRITE16_MEMBER(go_word_w);
-	DECLARE_WRITE16_MEMBER(reset_word_w);
+	void go_word_w(u16 data = 0);
+	void reset_word_w(u16 data = 0);
 
 	/* Tempest and Quantum use this capability */
-	void set_flip_x(int flip) { flip_x = flip; }
-	void set_flip_y(int flip) { flip_y = flip; }
+	void set_flip_x(bool flip) { m_flip_x = flip; }
+	void set_flip_y(bool flip) { m_flip_y = flip; }
 
 	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
 	TIMER_CALLBACK_MEMBER(run_state_machine);
@@ -49,64 +49,60 @@ protected:
 
 	void vg_flush();
 	void vg_add_point_buf(int x, int y, rgb_t color, int intensity);
-	void vg_add_clip (int xmin, int ymin, int xmax, int ymax);
+	void vg_add_clip(int xmin, int ymin, int xmax, int ymax);
 
 	void register_state();
 
-	uint8_t *avgdvg_vectorram;
-	size_t avgdvg_vectorram_size;
+	required_shared_ptr<u8> m_vectorram;
+	optional_shared_ptr<u8> m_colorram;
+	required_region_ptr<u8> m_prom;
 
-	uint8_t *avgdvg_colorram;
+	int m_xmin, m_xmax, m_ymin, m_ymax;
+	int m_xcenter, m_ycenter;
+	emu_timer *m_vg_run_timer, *m_vg_halt_timer;
 
+	bool m_flip_x, m_flip_y;
 
-	int xmin, xmax, ymin, ymax;
-	int xcenter, ycenter;
-	emu_timer *vg_run_timer, *vg_halt_timer;
+	int m_nvect;
+	vgvector m_vectbuf[MAXVECT];
 
-	int flip_x, flip_y;
+	u16 m_pc;
+	u8 m_sp;
+	u16 m_dvx;
+	u16 m_dvy;
+	u8 m_dvy12;
+	u16 m_timer;
+	u16 m_stack[4];
+	u16 m_data;
 
-	int nvect;
-	vgvector vectbuf[MAXVECT];
+	u8 m_state_latch;
+	u8 m_int_latch;
+	u8 m_scale;
+	u8 m_bin_scale;
+	u8 m_intensity;
+	u8 m_color;
+	u8 m_enspkl;
+	u8 m_spkl_shift;
+	u8 m_map;
 
+	u16 m_hst;
+	u16 m_lst;
+	u16 m_izblank;
 
-	uint16_t m_pc;
-	uint8_t m_sp;
-	uint16_t m_dvx;
-	uint16_t m_dvy;
-	uint8_t m_dvy12;
-	uint16_t m_timer;
-	uint16_t m_stack[4];
-	uint16_t m_data;
+	u8 m_op;
+	u8 m_halt;
+	u8 m_sync_halt;
 
-	uint8_t m_state_latch;
-	uint8_t m_int_latch;
-	uint8_t m_scale;
-	uint8_t m_bin_scale;
-	uint8_t m_intensity;
-	uint8_t m_color;
-	uint8_t m_enspkl;
-	uint8_t m_spkl_shift;
-	uint8_t m_map;
+	u16 m_xdac_xor;
+	u16 m_ydac_xor;
 
-	uint16_t m_hst;
-	uint16_t m_lst;
-	uint16_t m_izblank;
+	s32 m_xpos;
+	s32 m_ypos;
 
-	uint8_t m_op;
-	uint8_t m_halt;
-	uint8_t m_sync_halt;
-
-	uint16_t m_xdac_xor;
-	uint16_t m_ydac_xor;
-
-	int32_t m_xpos;
-	int32_t m_ypos;
-
-	int32_t m_clipx_min;
-	int32_t m_clipy_min;
-	int32_t m_clipx_max;
-	int32_t m_clipy_max;
-
+	s32 m_clipx_min;
+	s32 m_clipy_min;
+	s32 m_clipx_max;
+	s32 m_clipy_max;
 
 	virtual int handler_0() = 0;
 	virtual int handler_1() = 0;
@@ -116,7 +112,7 @@ protected:
 	virtual int handler_5() = 0;
 	virtual int handler_6() = 0;
 	virtual int handler_7() = 0;
-	virtual uint8_t state_addr() = 0;
+	virtual u8 state_addr() = 0;
 	virtual void update_databus() = 0;
 	virtual void vggo() = 0;
 	virtual void vgrst() = 0;
@@ -141,7 +137,7 @@ protected:
 	virtual int handler_5() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
-	virtual uint8_t state_addr() override;
+	virtual u8 state_addr() override;
 	virtual void update_databus() override;
 	virtual void vggo() override;
 	virtual void vgrst() override;
@@ -173,7 +169,7 @@ protected:
 	virtual int handler_5() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
-	virtual uint8_t state_addr() override;
+	virtual u8 state_addr() override;
 	virtual void update_databus() override;
 	virtual void vggo() override;
 	virtual void vgrst() override;
@@ -211,6 +207,9 @@ protected:
 	virtual int handler_7() override;
 	virtual void update_databus() override;
 	virtual void vgrst() override;
+
+private:
+	required_region_ptr<u8> m_bank_region;
 };
 
 // device type definition

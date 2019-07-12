@@ -149,26 +149,26 @@
 <!-- were there more disks? were they different from the above? -->
 	<software name="systems1" cloneof="system">
 		<description>System Disks (Spa, Newer, Only disks 1 &amp; 2)</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3">
 			<feature name="part_id" value="Disk 1 - LocoScript 1.21" />
-			<dataarea name="flop" size="195584">
-				<rom name="sistema1a.dsk" size="195584" crc="c241602e" sha1="cd13d32f6726876f0f8708e15b70ce07f1513c1a" offset="0" />
+			<dataarea name="flop" size="195584"><!-- 43 tracks, the last three are blank -->
+				<rom name="sistema1a.dsk" size="195584" crc="c241602e" sha1="cd13d32f6726876f0f8708e15b70ce07f1513c1a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3">
+		<part name="flop2" interface="floppy_3"><!-- 43 tracks, first 40 is duplicate of cpm104es.dsk, the last three are blank -->
 			<feature name="part_id" value="Disk 2 - C/PM Plus 1.4" />
 			<dataarea name="flop" size="195584">
-				<rom name="sistema1b.dsk" size="195584" crc="fdf61fd6" sha1="1e0617db2c65c3b6bbc0b3731a78f278cd4b6dde" offset="0" />
+				<rom name="sistema1b.dsk" size="195584" crc="fdf61fd6" sha1="1e0617db2c65c3b6bbc0b3731a78f278cd4b6dde" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cpmplus">
 		<description>CP/M Plus v1.4 (UK)</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="199680">
@@ -179,7 +179,7 @@
 
 	<software name="cpmplusg" cloneof="cpmplus">
 		<description>CP/M Plus v1.4 (Ger)</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
@@ -189,22 +189,123 @@
 	</software>
 
 	<software name="cpmpluss" cloneof="cpmplus">
-		<description>CP/M Plus v1.4 (Spa)</description>
-		<year>19??</year>
+		<description>CP/M Plus v1.4 (Spa) Duplicate</description>
+		<year>1985</year>
 		<publisher>Amstrad</publisher>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop1" interface="floppy_3"><!-- Duplicate of sistema1b.dsk -->
 			<dataarea name="flop" size="194816">
 				<rom name="cpm104es.dsk" size="194816" crc="bdae6e80" sha1="a0a08c7fce2c2623214f3d963bc078f301b8695c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="cpmplswe" cloneof="cpmplus"><!-- Adds swedish keyboard and localized error messages for some system applications -->
+		<description>CP/M Plus v1.4 (Swe) work copy</description>
+		<year>1985</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3"><!-- The image is a dump of a work copy with some files deleted and some added/customized -->
+			<dataarea name="flop" size="194816">
+				<rom name="cpm104swe.dsk" size="194816" crc="61af15ef" sha1="a388e96b206fa0b02c802504aa919267cc2d48a2" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco3">
+		<description>LocoScript Installation Program v3.00a (English)</description>
+		<year>1993</year>
+		<publisher>Locomotive Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="loco3a.dsk" size="194816" crc="c5bcba47" sha1="2ddabe837983d735cb06ccbb9b1b9d705debc409" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="loco3b.dsk" size="194816" crc="43b702b2" sha1="459d43e40763ed0a4ac86d6eb1cb85424d4f5816" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco306">
+		<description>LocoScript v3.06 (UK)</description>
+		<year>1993</year>
+		<publisher>Locomotive Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3discosueltoa_v3.06_en.dsk" size="195584" crc="96d7350b" sha1="cd1b557809d8a1d14d5aaa02deba6b53b36df05d" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+			<dataarea name="flop" size="195584">
+				<rom name="loco3discosueltob_v3.06_en.dsk" size="195584" crc="2495bb2c" sha1="75cbbe872f393e58b41e9809ece086a86eb5a835" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco3a" cloneof="loco3">
+		<description>LocoScript Installation Program v3.06b (English)</description>
+		<year>1993</year>
+		<publisher>Locomotive Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3_a.dsk" size="195584" crc="2e2de806" sha1="9c1cf379f3879198f304742a792a2c9e9eca5e93" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3_b.dsk" size="195584" crc="281f13e0" sha1="675e171bf81f1a23ed1250fb5fa810f8ed6dfb2b" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3">
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3_c.dsk" size="195584" crc="702a56de" sha1="2e16a72560a92ab9ba184c54dacb8ced9af9ae32" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco406">
+		<description>LocoScript v4.06 (UK)</description>
+		<year>1997</year>
+		<publisher>Locomotive Software</publisher>
+		<part name="flop1" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+			<dataarea name="flop" size="195584">
+				<rom name="loco406a.dsk" size="195584" crc="fd2790f4" sha1="5ad2ceaabf4c3c372af30d60a9093ca3c09fea43" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+			<dataarea name="flop" size="195584">
+				<rom name="loco406b.dsk" size="195584" crc="ff3b73d9" sha1="6978a648d11a5c0b7e81122dde8b25f87a4b5c94" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco410">
+		<description>LocoScript v4.10 (UK)</description>
+		<year>1996</year>
+		<publisher>Locomotive Software</publisher>
+		<part name="flop1" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+			<dataarea name="flop" size="195584">
+				<rom name="loco410a.dsk" size="195584" crc="7caf63c8" sha1="e3b0dfbdf75b7f25daccf6b1da9ec857674e078c" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco410b.dsk" size="195584" crc="96d7903a" sha1="def416388c8b93895243f5c6d7df0c9bc1569082" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- SYSTEM disks not working... might need more RAM (512k systems are currently broken) or some other missing features -->
 
 	<software name="loco203" supported="no">
 		<description>LocoScript v2.03 (UK)</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
@@ -215,7 +316,7 @@
 
 	<software name="loco216" supported="no">
 		<description>LocoScript v2.16 (UK?)</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
@@ -235,139 +336,48 @@
 		</part>
 	</software>
 
-	<software name="loco3" supported="no">
-		<description>LocoScript v3.?? (UK?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="194816">
-				<rom name="loco3a.dsk" size="194816" crc="c5bcba47" sha1="2ddabe837983d735cb06ccbb9b1b9d705debc409" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_3">
-			<dataarea name="flop" size="194816">
-				<rom name="loco3b.dsk" size="194816" crc="43b702b2" sha1="459d43e40763ed0a4ac86d6eb1cb85424d4f5816" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="loco3a" cloneof="loco3" supported="no">
-		<description>LocoScript v3.?? (UK?, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3_a.dsk" size="195584" crc="2e2de806" sha1="9c1cf379f3879198f304742a792a2c9e9eca5e93" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3_b.dsk" size="195584" crc="281f13e0" sha1="675e171bf81f1a23ed1250fb5fa810f8ed6dfb2b" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3_c.dsk" size="195584" crc="702a56de" sha1="2e16a72560a92ab9ba184c54dacb8ced9af9ae32" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="loco306" supported="no">
-		<description>LocoScript v3.06 (UK?, Disco Suelto?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3discosueltoa_v3.06_en.dsk" size="195584" crc="96d7350b" sha1="cd1b557809d8a1d14d5aaa02deba6b53b36df05d" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3discosueltob_v3.06_en.dsk" size="195584" crc="2495bb2c" sha1="75cbbe872f393e58b41e9809ece086a86eb5a835" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="loco3up" supported="no">
-		<description>LocoScript v3.?? Upgrade? (UK?)</description>
-		<year>19??</year>
+		<description>LocoScript v3.?? Upgrade (UK)</description>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3upgradea.dsk" size="195584" crc="8e4a6be7" sha1="a706f4f3d6dfdcb6f0e359692156805e8702d172" offset="0" />
+		<part name="flop1" interface="floppy_3"><!-- directory not readable by SAMdisk, contains 2 sectors with data, a few with E5 and most with 00 -->
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3upgradea.dsk" size="195584" crc="8e4a6be7" sha1="a706f4f3d6dfdcb6f0e359692156805e8702d172" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3">
-			<dataarea name="flop" size="11264">
-				<rom name="loco3upgradeb.dsk" size="11264" crc="f0eba18a" sha1="72ad56da616a0f7f114a37e262bcf3b638e29724" offset="0" />
+		<part name="flop2" interface="floppy_3"><!-- directory not readable by SAMdisk, all tracks are blank -->
+			<dataarea name="flop" size="11264"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3upgradeb.dsk" size="11264" crc="f0eba18a" sha1="72ad56da616a0f7f114a37e262bcf3b638e29724" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3upgradec.dsk" size="195584" crc="acbb82a2" sha1="09f1e2f9afb202bc929db263dcff80287236d680" offset="0" />
+		<part name="flop3" interface="floppy_3"><!-- 2 Locoscript files only: read.me and contents.doc -->
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3upgradec.dsk" size="195584" crc="acbb82a2" sha1="09f1e2f9afb202bc929db263dcff80287236d680" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
-		<part name="flop4" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco3upgraded.dsk" size="195584" crc="9bcd9089" sha1="4adc138ad941a0fc171e0d834f4c859aa8a6b14a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="loco406" supported="no">
-		<description>LocoScript v4.06 (UK?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco406a.dsk" size="195584" crc="fd2790f4" sha1="5ad2ceaabf4c3c372af30d60a9093ca3c09fea43" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco406b.dsk" size="195584" crc="ff3b73d9" sha1="6978a648d11a5c0b7e81122dde8b25f87a4b5c94" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="loco410" supported="no">
-		<description>LocoScript v4.10 (UK?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco410a.dsk" size="195584" crc="7caf63c8" sha1="e3b0dfbdf75b7f25daccf6b1da9ec857674e078c" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco410b.dsk" size="195584" crc="96d7903a" sha1="def416388c8b93895243f5c6d7df0c9bc1569082" offset="0" />
+		<part name="flop4" interface="floppy_3"><!-- 11 files -->
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco3upgraded.dsk" size="195584" crc="9bcd9089" sha1="4adc138ad941a0fc171e0d834f4c859aa8a6b14a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="loco4ex" supported="no">
 		<description>LocoScript v4.?? Examples? (UK?)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="195584">
-				<rom name="loco4examplesa.dsk" size="195584" crc="a9dabd40" sha1="e06457ade8f48528876536c7cf275b6820312ca4" offset="0" />
+			<dataarea name="flop" size="195584"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco4examplesa.dsk" size="195584" crc="a9dabd40" sha1="e06457ade8f48528876536c7cf275b6820312ca4" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3">
-			<dataarea name="flop" size="11264">
-				<rom name="loco4examplesb.dsk" size="11264" crc="f0eba18a" sha1="72ad56da616a0f7f114a37e262bcf3b638e29724" offset="0" />
+		<part name="flop2" interface="floppy_3"><!-- directory not readable by SAMdisk, all tracks are blank -->
+			<dataarea name="flop" size="11264"><!-- Dump has excess tracks that will not fit a real SD floppy -->
+				<rom name="loco4examplesb.dsk" size="11264" crc="f0eba18a" sha1="72ad56da616a0f7f114a37e262bcf3b638e29724" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -481,15 +491,15 @@
 		<year>1983</year>
 		<publisher>SORCIM</publisher>
 		<info name="usage" value="Requires CP/M"/>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop1" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
 			<dataarea name="flop" size="195584">
-				<rom name="supercalc2a.dsk" size="195584" crc="159b541c" sha1="3e2f6de67fff4e85ac4504a42dc37eab160a0e8e" offset="0" />
+				<rom name="supercalc2a.dsk" size="195584" crc="159b541c" sha1="3e2f6de67fff4e85ac4504a42dc37eab160a0e8e" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3">
+		<part name="flop2" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
 			<dataarea name="flop" size="195584">
-				<rom name="supercalc2b.dsk" size="195584" crc="c2c3c0b4" sha1="afb34580aa4edca668afa9944547f1479d0d8342" offset="0" />
+				<rom name="supercalc2b.dsk" size="195584" crc="c2c3c0b4" sha1="afb34580aa4edca668afa9944547f1479d0d8342" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1273,18 +1283,18 @@
 
 	<software name="magicmat">
 		<description>Magic Maths (UK)</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>School Software</publisher>
 		<info name="usage" value="Requires CP/M"/>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop1" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
 			<dataarea name="flop" size="195584">
-				<rom name="magic_maths_a.dsk" size="195584" crc="b594c6ab" sha1="cb635f0dfb91caf1b2a31466b708102371a9cc00" offset="0" />
+				<rom name="magic_maths_a.dsk" size="195584" crc="b594c6ab" sha1="cb635f0dfb91caf1b2a31466b708102371a9cc00" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_3">
+		<part name="flop2" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
 			<dataarea name="flop" size="48128">
-				<rom name="magic_maths_b.dsk" size="48128" crc="0cb109a8" sha1="93612f59ec1b5da893c6205c3aea0dcd1f2bda8f" offset="0" />
+				<rom name="magic_maths_b.dsk" size="48128" crc="0cb109a8" sha1="93612f59ec1b5da893c6205c3aea0dcd1f2bda8f" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1340,9 +1350,9 @@
 		<description>Mot (Spa)</description>
 		<year>1989</year>
 		<publisher>Opera Soft</publisher>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop1" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
 			<dataarea name="flop" size="214528">
-				<rom name="mot_pcw.dsk" size="214528" crc="6cbaea6f" sha1="97605206e3f030f3cf0e3102ba8a6ad555adac97" offset="0" />
+				<rom name="mot_pcw.dsk" size="214528" crc="6cbaea6f" sha1="97605206e3f030f3cf0e3102ba8a6ad555adac97" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1800,6 +1810,17 @@
 		</part>
 	</software>
 
+	<software name="tomahawk">
+	  <description>Tomahawk</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="188416">
+				<rom name="tomahawk.dsk" size="188416" crc="3c930315" sha1="caff058ea7586eae70a3dc2f2bc31a0bbc7ad390" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="trivial">
 		<description>Trivial Pursuit (Spa)</description>
 		<year>19??</year>
@@ -1958,26 +1979,13 @@
 		</part>
 	</software>
 
-	<software name="tomahawk" supported="no">
-		<description>Tomahawk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires CP/M"/>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="188416">
-				<rom name="tomahawk.dsk" size="188416" crc="3c930315" sha1="caff058ea7586eae70a3dc2f2bc31a0bbc7ad390" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tomahawk1" cloneof="tomahawk" supported="no">
-		<description>Tomahawk (Alt?)</description>
-		<year>19??</year>
+		<description>Tomahawk (Alt?) </description>
+		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires CP/M"/>
-		<part name="flop1" interface="floppy_3">
+		<part name="flop1" interface="floppy_3"><!-- This dump is missing the copy protection track 41 and will not work -->
 			<dataarea name="flop" size="187136">
-				<rom name="tomahawk1.dsk" size="187136" crc="22291c7a" sha1="8f9f88e1c233d36e24a7666823eb81aab2706238" offset="0" />
+				<rom name="tomahawk1.dsk" size="187136" crc="22291c7a" sha1="8f9f88e1c233d36e24a7666823eb81aab2706238" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

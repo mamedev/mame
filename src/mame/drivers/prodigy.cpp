@@ -577,7 +577,7 @@ void prodigy_state::update_bcd()
 void prodigy_state::maincpu_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x200f).rw("via", FUNC(via6522_device::read),FUNC(via6522_device::write));
+	map(0x2000, 0x200f).m("via", FUNC(via6522_device::map));
 	map(0x6000, 0x7fff).rom().region("roms", 0).mirror(0x8000);
 }
 
@@ -659,8 +659,8 @@ void prodigy_state::prodigy(machine_config &config)
 	m_via->cb1_handler().set(FUNC(prodigy_state::via_cb1_w));
 	m_via->cb2_handler().set(FUNC(prodigy_state::via_cb2_w));
 
-	NETLIST_CPU(config, m_bcd, XTAL(2'000'000) * 30);
-	m_bcd->set_constructor(netlist_prodigy);
+	NETLIST_CPU(config, m_bcd, XTAL(2'000'000) * 30)
+		.set_source(netlist_prodigy);
 
 	NETLIST_LOGIC_INPUT(config, m_cb1); m_cb1->set_params("cb1.IN", 0);
 	NETLIST_LOGIC_INPUT(config, m_cb2); m_cb2->set_params("cb2.IN", 0);
@@ -721,5 +721,5 @@ ROM_START(prodigy)
 	ROM_LOAD("0x2000.bin",  0x0000, 0x02000, CRC(8d60345a) SHA1(fff18ff12e1b1be91f8eac1178605a682564eff2))
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY                 FULLNAME               FLAGS
-CONS( 1981, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY             FULLNAME           FLAGS
+CONS( 1981, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts", "Destiny Prodigy", MACHINE_NO_SOUND )

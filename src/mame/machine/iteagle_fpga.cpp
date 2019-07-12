@@ -51,7 +51,8 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 	set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
 }
 
-MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
+void iteagle_fpga_device::device_add_mconfig(machine_config &config)
+{
 	NVRAM(config, "eagle2_rtc", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "eagle1_bram", nvram_device::DEFAULT_ALL_1);
 
@@ -72,7 +73,7 @@ MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
 	com2.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxa_w));
 	com2.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcda_w));
 	com2.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsa_w));
-MACHINE_CONFIG_END
+}
 
 void iteagle_fpga_device::device_start()
 {
@@ -85,6 +86,10 @@ void iteagle_fpga_device::device_start()
 	pci_device::device_start();
 	status = 0x5555;
 	command = 0x5555;
+
+	// always keep this device memory ranges active
+	command |= 3;
+	command_mask &= ~3;
 
 	add_map(sizeof(m_fpga_regs), M_IO, FUNC(iteagle_fpga_device::fpga_map));
 	// fpga defaults to base address 0x00000300
@@ -277,7 +282,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x14/4: // GUN1-- Interrupt & 0x4==0x00080000
-			result = (m_guny_cb(0) << 16) | (m_gunx_cb(0) << 0);
+			result = (m_gun_y << 16) | (m_gun_x << 0);
 			if (LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
@@ -720,6 +725,10 @@ void iteagle_eeprom_device::device_start()
 	pci_device::device_start();
 	skip_map_regs(1);
 	add_map(0x10, M_IO, FUNC(iteagle_eeprom_device::eeprom_map));
+
+	// always keep this device memory ranges active
+	command |= 3;
+	command_mask &= ~3;
 }
 
 void iteagle_eeprom_device::device_reset()
@@ -817,6 +826,10 @@ void iteagle_periph_device::device_start()
 	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
 	m_rtc_regs[0xb] = 0x02; // 24-hour format
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
+
+	// always keep this device memory ranges active
+	command |= 3;
+	command_mask &= ~3;
 
 	// Save states
 	save_item(NAME(m_ctrl_regs));

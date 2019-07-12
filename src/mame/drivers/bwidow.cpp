@@ -407,7 +407,7 @@ WRITE8_MEMBER(bwidow_state::irq_ack_w)
 void bwidow_state::bwidow_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x27ff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x27ff).ram().share("avg:vectorram").region("maincpu", 0x2000);
 	map(0x2800, 0x5fff).rom();
 	map(0x6000, 0x67ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x6800, 0x6fff).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
@@ -436,7 +436,7 @@ void bwidow_state::bwidowp_map(address_map &map)
 	map(0x2800, 0x2800).w("avg", FUNC(avg_device::reset_w));
 	map(0x3000, 0x3000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3800, 0x3800).w(FUNC(bwidow_state::bwidow_misc_w)); /* coin counters, leds */
-	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
+	map(0x4000, 0x47ff).ram().share("avg:vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x6fff).rom();
 	map(0x6000, 0x6000).w(FUNC(bwidow_state::irq_ack_w)); /* interrupt acknowledge */
 	map(0x8000, 0x803f).w(FUNC(bwidow_state::earom_write));
@@ -462,7 +462,7 @@ void bwidow_state::spacduel_map(address_map &map)
 	map(0x0f00, 0x0f3f).w(FUNC(bwidow_state::earom_write));
 	map(0x1000, 0x10ff).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1400, 0x14ff).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x2000, 0x27ff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x27ff).ram().share("avg:vectorram").region("maincpu", 0x2000);
 	map(0x2800, 0x3fff).rom();
 	map(0x4000, 0xffff).rom();
 }
@@ -763,22 +763,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(bwidow_state::bwidow)
-
+void bwidow_state::bwidow(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(bwidow_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bwidow_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	M6502(config, m_maincpu, MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::bwidow_map);
+	m_maincpu->set_periodic_int(FUNC(bwidow_state::irq0_line_assert), attotime::from_hz(CLOCK_3KHZ / 12));
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 4)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector", 0);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 4);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 480, 0, 440);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
 	avg_device &avg(AVG(config, "avg", 0));
 	avg.set_vector_tag("vector");
@@ -786,54 +786,52 @@ MACHINE_CONFIG_START(bwidow_state::bwidow)
 	/* sound hardware */
 	bwidow_audio(config);
 
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bwidow_state::bwidowp)
+void bwidow_state::bwidowp(machine_config &config)
+{
 	bwidow(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bwidowp_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::bwidowp_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bwidow_state::gravitar)
+void bwidow_state::gravitar(machine_config &config)
+{
 	bwidow(config);
 
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
+	subdevice<screen_device>("screen")->set_visarea(0, 420, 0, 400);
 
 	/* sound hardware */
 	gravitar_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(bwidow_state::lunarbat)
+void bwidow_state::lunarbat(machine_config &config)
+{
 	gravitar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spacduel_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 500, 0, 440)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_visarea(0, 500, 0, 440);
+}
 
 
-MACHINE_CONFIG_START(bwidow_state::spacduel)
+void bwidow_state::spacduel(machine_config &config)
+{
 	gravitar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spacduel_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 540, 0, 400)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_visarea(0, 540, 0, 400);
+}
 
 
 
@@ -860,7 +858,7 @@ ROM_START( bwidow )
 	ROM_RELOAD(                  0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -879,7 +877,7 @@ ROM_START( bwidowp )
 	ROM_RELOAD(                  0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "avgsmr",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Proms */
@@ -905,7 +903,7 @@ ROM_START( gravitar )
 	ROM_RELOAD(                  0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Address decoding */
@@ -931,7 +929,7 @@ ROM_START( gravitar2 )
 	ROM_RELOAD(                  0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Address decoding */
@@ -957,7 +955,7 @@ ROM_START( gravitar1 )
 	ROM_RELOAD(                  0xf000, 0x1000 )  /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Address decoding */
@@ -982,7 +980,7 @@ ROM_START( lunarbat )
 	ROM_RELOAD(                 0xf000, 0x1000 )  /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Address decoding */
@@ -1011,7 +1009,7 @@ ROM_START( lunarba1 )
 	ROM_RELOAD(              0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Address decoding */
@@ -1040,7 +1038,7 @@ ROM_START( spacduel )
 	ROM_RELOAD(                 0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",  0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -1064,7 +1062,7 @@ ROM_START( spacduel1 )
 	ROM_RELOAD(                 0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",  0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
@@ -1088,7 +1086,7 @@ ROM_START( spacduel0 )
 	ROM_RELOAD(                 0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.n4",  0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 

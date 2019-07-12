@@ -67,7 +67,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
 
@@ -117,7 +117,7 @@ void chance32_state::video_start()
 }
 
 
-uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -458,25 +458,24 @@ void chance32_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(chance32_state::chance32)
-
+void chance32_state::chance32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(chance32_map)
-	MCFG_DEVICE_IO_MAP(chance32_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chance32_state::chance32_map);
+	m_maincpu->set_addrmap(AS_IO, &chance32_state::chance32_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(chance32_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(52.786)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*16, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(52.786);
+//  screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*16, 32*8);
+	screen.set_visarea(0, 35*16-1, 0, 29*8-1);
+	screen.set_screen_update(FUNC(chance32_state::screen_update_chance32));
 
-	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
+	hd6845s_device &crtc(HD6845S(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(16);
@@ -488,9 +487,8 @@ MACHINE_CONFIG_START(chance32_state::chance32)
 	SPEAKER(config, "mono").front_center();
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 
 ROM_START( chance32 )
@@ -518,12 +516,12 @@ ROM_START( chance32 )
 	ROM_LOAD( "gal20v8a.u57.jed.bin", 0x0000, 0x157, CRC(787c4159) SHA1(f4a869b317c6be1024f1ca21bcc4af478c8227c8) )
 	ROM_LOAD( "gal20v8a.u58.jed.bin", 0x0000, 0x157, CRC(7b16053b) SHA1(cdb289d4f27c7a1a918393943bb8db9712e2f52e) )
 
-	ROM_LOAD( "gal16v8a.u47.jed.bin", 0x0000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
+	ROM_LOAD( "gal16v8a.u47.jed.bin", 0x0000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8a.u48.jed.bin", 0x0000, 0x117, CRC(5f1360ef) SHA1(56e4ee0dbae5602d810b2f7c744a71eb1a1e08a8) )
 
 	ROM_LOAD( "gal16v8a.u32.jed.bin", 0x0000, 0x117, CRC(c0784cd1) SHA1(0ae2ce482d379e29c2a9f130fc0d9ed928faef98) )
 
-	ROM_LOAD( "gal16v8a.u24.jed.bin", 0x0000, 0x117, CRC(a733f0de) SHA1(6eec26043cedb3cae4efe93faa84a07327be468b) )
+	ROM_LOAD( "gal16v8a.u24.jed.bin", 0x0000, 0x117, NO_DUMP )
 ROM_END
 
 

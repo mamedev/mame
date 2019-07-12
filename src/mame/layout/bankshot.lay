@@ -4,8 +4,8 @@
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="static_bg"><rect><color red="0.16" green="0.04" blue="0.05" /></rect></element>
-	<element name="disk_bg"><disk><color red="0.16" green="0.04" blue="0.05" /></disk></element>
+	<element name="static_bg"><rect><color red="0.13" green="0.03" blue="0.04" /></rect></element>
+	<element name="disk_bg"><disk><color red="0.13" green="0.03" blue="0.04" /></disk></element>
 	<element name="static_white"><rect><color red="0.9" green="0.9" blue="0.9" /></rect></element>
 	<element name="disk_white"><disk><color red="0.9" green="0.9" blue="0.9" /></disk></element>
 
@@ -16,6 +16,10 @@
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
 		</disk>
 		<disk state="1">
+			<color red="0.6" green="0.15" blue="0.17" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<disk state="2">
 			<color red="1.0" green="0.24" blue="0.27" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
 		</disk>

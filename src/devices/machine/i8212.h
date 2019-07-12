@@ -38,10 +38,6 @@ public:
 	// construction/destruction
 	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_di_rd_callback(Object &&cb) { return m_read_di.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_do_wr_callback(Object &&cb) { return m_write_do.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_md_rd_callback(Object &&cb) { return m_read_md.set_callback(std::forward<Object>(cb)); }
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto di_rd_callback() { return m_read_di.bind(); }
 	auto do_wr_callback() { return m_write_do.bind(); }

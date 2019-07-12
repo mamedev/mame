@@ -214,7 +214,7 @@ void icebox_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( icebox )
 	PORT_START("BAUD")
-	PORT_DIPNAME( 0x0f, 0x0e, "Baud Rate for Terminal")
+	PORT_DIPNAME( 0x0f, 0x0e, "Baud Rate for Terminal") PORT_DIPLOCATION("SW:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "50")
 	PORT_DIPSETTING(    0x01, "75")
 	PORT_DIPSETTING(    0x02, "110")
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( icebox )
 	PORT_DIPSETTING(    0x0c, "4800")
 	PORT_DIPSETTING(    0x0e, "9600")
 	PORT_DIPSETTING(    0x0f, "19200")
-	PORT_DIPNAME( 0xf0, 0x70, "Baud Rate for Printer")
+	PORT_DIPNAME( 0xf0, 0x70, "Baud Rate for Printer") PORT_DIPLOCATION("SW:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "50")
 	PORT_DIPSETTING(    0x10, "75")
 	PORT_DIPSETTING(    0x20, "110")
@@ -251,8 +251,8 @@ INPUT_PORTS_END
 void icebox_state::machine_reset()
 {
 	u8 data = ioport("BAUD")->read();
-	m_brg->write_str(data & 15); // Terminal
-	m_brg->write_stt((data >> 4) & 15); // Printer
+	m_brg->str_w(data & 15); // Terminal
+	m_brg->stt_w((data >> 4) & 15); // Printer
 	m_maincpu->set_pc(0xf000);
 	m_f1 = 0;
 }
@@ -290,7 +290,7 @@ void icebox_state::port_f1_w(u8 data)
 WRITE_LINE_MEMBER(icebox_state::drq_w)
 {
 	if (BIT(m_f1, 2))
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80
 }
 
 static void floppies(device_slot_interface &device)
@@ -307,11 +307,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // we need to remove bit 7 which 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(icebox_state::icebox)
+void icebox_state::icebox(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 9'830'400 / 4) // unknown divisor
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 9'830'400 / 4); // unknown divisor
+	m_maincpu->set_addrmap(AS_PROGRAM, &icebox_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &icebox_state::io_map);
 
 	I8251(config, m_uart0, 0);
 	m_uart0->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -334,7 +335,7 @@ MACHINE_CONFIG_START(icebox_state::icebox)
 	rs232b.dsr_handler().set(m_uart1, FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set(m_uart1, FUNC(i8251_device::write_cts));
 
-	COM5016_5(config, m_brg, 4.9152_MHz_XTAL);   // BR1941L
+	COM5016_5(config, m_brg, 4.9152_MHz_XTAL);   // BR1941L-05
 	m_brg->fr_handler().set(m_uart0, FUNC(i8251_device::write_txc));
 	m_brg->fr_handler().append(m_uart0, FUNC(i8251_device::write_rxc));
 	m_brg->ft_handler().set(m_uart1, FUNC(i8251_device::write_txc));
@@ -342,11 +343,9 @@ MACHINE_CONFIG_START(icebox_state::icebox)
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->drq_wr_callback().set(FUNC(icebox_state::drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, floppies, "flop", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, floppies, "flop", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 /* ROM definition */
 ROM_START( icebox )

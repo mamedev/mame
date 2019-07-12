@@ -199,7 +199,8 @@ public:
 		m_rombase(*this, "rombase"),
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
-		m_dcs(*this, "dcs")
+		m_dcs(*this, "dcs"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -221,6 +222,7 @@ private:
 	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
+	required_device<palette_device> m_palette;
 
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
@@ -231,7 +233,7 @@ private:
 		TIMER_IRQ0_STOP
 	};
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	DECLARE_READ32_MEMBER(control_r);
 	DECLARE_WRITE32_MEMBER(control_w);
@@ -313,13 +315,15 @@ void kinst_state::machine_reset()
  *
  *************************************/
 
-uint32_t kinst_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pen = m_palette->pens();
+
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *src = &m_video_base[640/4 * y];
-		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x += 2)
@@ -327,8 +331,8 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			uint32_t data = *src++;
 
 			/* store two pixels */
-			*dest++ = (data >>  0) & 0x7fff;
-			*dest++ = (data >> 16) & 0x7fff;
+			*dest++ = pen[(data >>  0) & 0x7fff];
+			*dest++ = pen[(data >> 16) & 0x7fff];
 		}
 	}
 	return 0;
@@ -738,9 +742,8 @@ void kinst_state::kinst(machine_config &config)
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 319, 0, 239);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
-	screen.set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::BGR_555);
+	PALETTE(config, m_palette, palette_device::BGR_555);
 
 	/* sound hardware */
 	DCS_AUDIO_2K(config, m_dcs, 0);

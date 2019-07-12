@@ -49,15 +49,23 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void m68k_reset_peripherals() override;
+
 private:
 	required_device<mc68340_serial_module_device> m_serial;
 	required_device_array<mc68340_timer_module_device, 2> m_timer;
 
+	void update_ipl();
+	void internal_vectors_r(address_map &map);
+	uint8_t int_ack(offs_t offset);
+
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
 
 	void start_68340_sim();
-	void do_pit_irq();
 	void do_tick_pit();
+	uint8_t pit_irq_level() const;
+	uint8_t pit_arbitrate(uint8_t level) const;
+	uint8_t pit_iack();
 
 	int calc_cs(offs_t address) const;
 	int get_timer_index(mc68340_timer_module_device *timer) { return (timer == m_timer[0].target()) ? 0 : 1; }
@@ -99,6 +107,8 @@ private:
 	uint32_t m_m68340_base;
 
 	emu_timer *m_irq_timer;
+
+	uint8_t m_ipl;
 
 	devcb_write8        m_pa_out_cb;
 	devcb_read8         m_pa_in_cb;

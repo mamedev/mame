@@ -138,15 +138,15 @@ WRITE32_MEMBER(gizmondo_state::s3c2440_gpio_port_w)
 
 INPUT_CHANGED_MEMBER(gizmondo_state::port_changed)
 {
-	m_s3c2440->s3c2440_request_eint( 4);
-	//m_s3c2440->s3c2440_request_irq( S3C2440_INT_EINT1);
+	m_s3c2440->s3c2440_request_eint(4);
+	//m_s3c2440->s3c2440_request_irq(S3C2440_INT_EINT1);
 }
 
 #if 0
-QUICKLOAD_LOAD_MEMBER( gizmondo_state, gizmondo )
+QUICKLOAD_LOAD_MEMBER(gizmondo_state::quickload_cb)
 {
-	return gizmondo_quickload( image, file_type, quickload_size, 0x3000E000); // eboot
-	//return gizmondo_quickload( image, file_type, quickload_size, 0x30400000); // wince
+	return gizmondo_quickload(image, file_type, quickload_size, 0x3000E000); // eboot
+	//return gizmondo_quickload(image, file_type, quickload_size, 0x30400000); // wince
 }
 #endif
 
@@ -189,18 +189,19 @@ void gizmondo_state::init_gizmondo()
 	// do nothing
 }
 
-MACHINE_CONFIG_START(gizmondo_state::gizmondo)
-	MCFG_DEVICE_ADD("maincpu", ARM9, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(gizmondo_map)
+void gizmondo_state::gizmondo(machine_config &config)
+{
+	ARM9(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gizmondo_state::gizmondo_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE("gf4500", gf4500_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(320, 240);
+	screen.set_visarea_full();
+	screen.set_screen_update("gf4500", FUNC(gf4500_device::screen_update));
 
 	GF4500(config, m_gf4500, 0);
 
@@ -213,9 +214,9 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 	DISKONCHIP_G3(config, "diskonchip", 64);
 
 #if 0
-	MCFG_QUICKLOAD_ADD("quickload", gizmondo_state, wince, "bin", 0)
+	QUICKLOAD(config, "quickload", "bin", 0).set_load_callback(FUNC(gizmondo_state::quickload_cb), this);
 #endif
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( gizmondo )
 	PORT_START( "PORTF-01" )

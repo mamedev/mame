@@ -24,12 +24,6 @@
         * NEC PC-8300 (similar hardware to PC-8201)
         * NEC PC-8300 w/BradyWriter II ROMs
 
-******************************************************************************************/
-
-/*
-
-    TODO:
-
     - bar code reader (!RxDB -> RST5.5, Hewlett-Packard HREDS-3050 interface)
     - un-Y2K-hack tandy200
     - keyboard is unresponsive for couple of seconds after boot
@@ -44,14 +38,12 @@
     - tandy200 RTC alarm
     - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
+    - cassette is not working on pc8201, pc8201a, npc8300
 
     10 FOR A=0 TO 255
     20 PRINT CHR$(A);
     30 NEXT A
 
-*/
-
-/*
 
                           * PC-8201/8300 HARDWARE PORT DEFINITIONS *
 
@@ -63,7 +55,7 @@
     C8255      072  114   Video interface port C (8255)
     CW8255     073  115   Video interface command/mode port (8255)
 
-*/
+******************************************************************************************/
 
 
 #include "emu.h"
@@ -383,7 +375,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 	uint8_t data = 0xff;
 
 	if (m_rom_sel)
-		data = m_cas_cart->read_rom(space, m_rom_addr & 0x1ffff);
+		data = m_cas_cart->read_rom(m_rom_addr & 0x1ffff);
 
 	return data;
 }
@@ -533,32 +525,16 @@ READ8_MEMBER( kc85_state::lcd_r )
 {
 	uint8_t data = 0;
 
-	data |= m_lcdc0->read(space, offset);
-	data |= m_lcdc1->read(space, offset);
-	data |= m_lcdc2->read(space, offset);
-	data |= m_lcdc3->read(space, offset);
-	data |= m_lcdc4->read(space, offset);
-	data |= m_lcdc5->read(space, offset);
-	data |= m_lcdc6->read(space, offset);
-	data |= m_lcdc7->read(space, offset);
-	data |= m_lcdc8->read(space, offset);
-	data |= m_lcdc9->read(space, offset);
+	for (uint8_t i = 0; i < 10; i++)
+		data |= m_lcdc[i]->read(space, offset);
 
 	return data;
 }
 
 WRITE8_MEMBER( kc85_state::lcd_w )
 {
-	m_lcdc0->write(space, offset, data);
-	m_lcdc1->write(space, offset, data);
-	m_lcdc2->write(space, offset, data);
-	m_lcdc3->write(space, offset, data);
-	m_lcdc4->write(space, offset, data);
-	m_lcdc5->write(space, offset, data);
-	m_lcdc6->write(space, offset, data);
-	m_lcdc7->write(space, offset, data);
-	m_lcdc8->write(space, offset, data);
-	m_lcdc9->write(space, offset, data);
+	for (uint8_t i = 0; i < 10; i++)
+		m_lcdc[i]->write(space, offset, data);
 }
 
 /* Memory Maps */
@@ -963,14 +939,8 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 	m_keylatch = (m_keylatch & 0x100) | data;
 
 	/* LCD */
-	m_lcdc0->cs2_w(BIT(data, 0));
-	m_lcdc1->cs2_w(BIT(data, 1));
-	m_lcdc2->cs2_w(BIT(data, 2));
-	m_lcdc3->cs2_w(BIT(data, 3));
-	m_lcdc4->cs2_w(BIT(data, 4));
-	m_lcdc5->cs2_w(BIT(data, 5));
-	m_lcdc6->cs2_w(BIT(data, 6));
-	m_lcdc7->cs2_w(BIT(data, 7));
+	for (uint8_t i = 0; i < 8; i++)
+		m_lcdc[i]->cs2_w(BIT(data, i));
 
 	/* RTC */
 	m_rtc->c0_w(BIT(data, 0));
@@ -1001,8 +971,8 @@ WRITE8_MEMBER( kc85_state::i8155_pb_w )
 	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
 
 	/* LCD */
-	m_lcdc8->cs2_w(BIT(data, 0));
-	m_lcdc9->cs2_w(BIT(data, 1));
+	m_lcdc[8]->cs2_w(BIT(data, 0));
+	m_lcdc[9]->cs2_w(BIT(data, 1));
 
 	/* beeper */
 	m_buzzer = BIT(data, 2);
@@ -1325,7 +1295,7 @@ WRITE_LINE_MEMBER( kc85_state::kc85_sod_w )
 
 READ_LINE_MEMBER( kc85_state::kc85_sid_r )
 {
-	return m_cassette->input() > 0.0;
+	return (m_cassette->input() > 0.04) ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER( tandy200_state::kc85_sod_w )
@@ -1335,7 +1305,7 @@ WRITE_LINE_MEMBER( tandy200_state::kc85_sod_w )
 
 READ_LINE_MEMBER( tandy200_state::kc85_sid_r )
 {
-	return m_cassette->input() > 0.0;
+	return (m_cassette->input() > 0.04) ? 0 : 1;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
@@ -1382,7 +1352,7 @@ void kc85_state::kc85(machine_config &config)
 	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "trsm100_cart", "bin,rom");
@@ -1431,7 +1401,7 @@ void pc8201_state::pc8201(machine_config &config)
 	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "pc8201_cart", "bin,rom");
@@ -1487,7 +1457,7 @@ void trsm100_state::trsm100(machine_config &config)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL(1'000'000))
 
@@ -1556,7 +1526,7 @@ void tandy200_state::tandy200(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* option ROM cartridge */
 	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "tandy200_cart", "bin,rom");

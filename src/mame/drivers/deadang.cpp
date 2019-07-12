@@ -88,12 +88,21 @@ void deadang_state::main_map(address_map &map)
 
 void popnrun_state::popnrun_main_map(address_map &map)
 {
-	main_map(map);
 	map(0x00000, 0x03bff).ram();
 	map(0x03c00, 0x03dff).ram().share("spriteram");
 	map(0x03e00, 0x03fff).ram();
+	map(0x04000, 0x04fff).ram().share("share1");
+	map(0x05000, 0x05fff).writeonly();
+	map(0x06000, 0x0600f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0x06010, 0x07fff).writeonly();
 	map(0x08000, 0x08fff).ram().w(FUNC(popnrun_state::popnrun_text_w)).share("videoram");
+	map(0x0a000, 0x0a001).portr("P1_P2");
+	map(0x0a002, 0x0a003).portr("DSW");
+	map(0x0c000, 0x0cfff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0d000, 0x0dfff).writeonly();
 	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
+	map(0x0e100, 0x0ffff).writeonly();
+	map(0xc0000, 0xfffff).rom();
 }
 
 void deadang_state::sub_map(address_map &map)
@@ -325,10 +334,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4); // V30
 
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4); // V30
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
@@ -336,10 +345,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4); // V30
 
 	if(scanline == 0) // vblank-in irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4); // V30
 }
 
 /* Machine Drivers */

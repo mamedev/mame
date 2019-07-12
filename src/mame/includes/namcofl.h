@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, ElSemi
 
+#include "machine/namcomcu.h"
 #include "machine/timer.h"
 #include "screen.h"
 #include "video/namco_c123tmap.h"
@@ -13,8 +14,6 @@
 #define NAMCOFL_HBSTART (288)
 #define NAMCOFL_VTOTAL      (262)   /* needs to be checked */
 #define NAMCOFL_VBSTART (224)
-
-#define NAMCOFL_SPRITEGFX       0
 
 class namcofl_state : public driver_device
 {
@@ -49,7 +48,7 @@ private:
 	required_device<namco_c123tmap_device> m_c123tmap;
 	required_device<namco_c169roz_device> m_c169roz;
 	required_device<namco_c355spr_device> m_c355spr;
-	required_device<cpu_device> m_mcu;
+	required_device<m37710_cpu_device> m_mcu;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_in2;
@@ -98,6 +97,5 @@ private:
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void RozCB(uint16_t code, int *tile, int *mask, int which);
 	void namcoc75_am(address_map &map);
-	void namcoc75_io(address_map &map);
 	void namcofl_mem(address_map &map);
 };

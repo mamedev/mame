@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+    Known cartridges (*=dumped) (#=sourced)
+
+    *Guitar Favorites (K7357)
+
+    *Barbie Guitar Party (K9901)
+    *Hot Wheels Road Tunes (K9902)
+    *Spongebob Squarepants Surf's Up (K9903)
+
+     (is there a K9904?)
+
+    *Nashville Hits (K9905)
+    *Rock 101 (K9906)
+    *American Idol Guitar Greats (K9907)
+
+
+    cartridge pinout (not identical to I Can Play Piano)
+
+    1 ground    2 ground
+    3 A0        4 A1
+    5 A2        6 A3
+    7 A4        8 A5
+    9 A6       10 A7
+    11 A17      12 A18
+    13 A21      14 A20
+    15 A19      16 A8
+    17 A9       18 A10
+    19 A11      20 A12
+    21 A13      22 A14
+    23 A15      24 A16
+    25 /CE      26 ground
+    27 ground   28 /OE
+    29 D15      30 D7
+    31 D14      32 D6
+    33 D13      34 D5
+    35 D12      36 D4
+    37 Vcc      38 Vcc
+    39 D11      40 D3
+    41 D10      42 D2
+    43 D9       44 D1
+    45 D8       46 D0
+    47 ground   48 Gnd
+
+-->
+
+<softwarelist name="icanguit" description="Fisher-Price / Mattel I Can Play Guitar cartridges">
+	<software name="guitfav" supported="no">
+		<description>Guitar Favorites (K7357)</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icanplayguitar_guitarfavorites.bin" size="0x800000" crc="c804822e" sha1="81e10a033355f4ba4be23a6741bd9d81c5627544"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barbie" supported="no">
+		<description>Barbie Guitar Party (K9901)</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpgbarbieguitarparty.bin" size="0x800000" crc="0355a72a" sha1="ca39f3a4c5c10e6435c6fa5f006c7878cf74f74e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadtune" supported="no">
+		<description>Hot Wheels - Road Tunes (K9902)</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpgroadtunes.bin" size="0x800000" crc="d2c4da6b" sha1="28cb2ea079e4a4885523ef94999342365316ef12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surfsup" supported="no">
+		<description>SpongeBob SquarePants - Surf's Up (K9903)</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpgsurfsup.bin" size="0x800000" crc="c6ead0fd" sha1="f49ec1cf28e960dd5a253482e74978b67d92f652"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nashhits" supported="no">
+		<description>Nashville Hits (K9905)</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpgnashvillehits.bin" size="0x800000" crc="b3615978" sha1="9c8d5c085feb55ed18d118d4dd7b9ff72872f3bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rock101" supported="no">
+		<description>Rock 101 (K9906)</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpgrock101.bin" size="0x800000" crc="74b81353" sha1="d2cc03d043242e7fc6595dacfb2cde36612bb44a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggreats" supported="no">
+		<description>American Idol - Guitar Greats (K9907)</description>
+		<year>2007</year>
+		<publisher>Fisher-Price / Mattel</publisher>
+		<part name="cart" interface="icanguit_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="icpgguitargreats.bin" size="0x800000" crc="5a4daf19" sha1="4f673c39fe95399ebfd02257c7b6b80ec44ed14f"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

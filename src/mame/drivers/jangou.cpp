@@ -164,18 +164,18 @@ void jangou_state::jangou_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const r = combine_weights(weights_rg, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const g = combine_weights(weights_rg, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -260,14 +260,14 @@ READ8_MEMBER(jangou_state::input_system_r)
 
 WRITE8_MEMBER(jangou_state::sound_latch_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(jangou_state::sound_latch_r)
 {
 	m_cpu_1->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
+	return m_soundlatch->read();
 }
 
 /* Jangou HC-55516 CVSD */
@@ -870,25 +870,25 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 }
 
 /* Note: All frequencies and dividers are unverified */
-MACHINE_CONFIG_START(jangou_state::jangou)
-
+void jangou_state::jangou(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu0", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
-	MCFG_DEVICE_IO_MAP(cpu0_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jangou_state,  irq0_line_hold)
+	Z80(config, m_cpu_0, MASTER_CLOCK / 8);
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::cpu0_map);
+	m_cpu_0->set_addrmap(AS_IO, &jangou_state::cpu0_io);
+	m_cpu_0->set_vblank_int("screen", FUNC(jangou_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("cpu1", Z80, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_IO_MAP(cpu1_io)
+	Z80(config, m_cpu_1, MASTER_CLOCK / 8);
+	m_cpu_1->set_addrmap(AS_PROGRAM, &jangou_state::cpu1_map);
+	m_cpu_1->set_addrmap(AS_IO, &jangou_state::cpu1_io);
 
-	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
+	JANGOU_BLITTER(config, "blitter", MASTER_CLOCK/4);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240) // assume same as nightgal.cpp
-	MCFG_SCREEN_UPDATE_DRIVER(jangou_state, screen_update_jangou)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240); // assume same as nightgal.cpp
+	screen.set_screen_update(FUNC(jangou_state::screen_update_jangou));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(jangou_state::jangou_palette), 32);
 
@@ -902,66 +902,62 @@ MACHINE_CONFIG_START(jangou_state::jangou)
 	aysnd.port_b_read_callback().set(FUNC(jangou_state::input_system_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	HC55516(config, m_cvsd, MASTER_CLOCK / 1024);
+	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-MACHINE_CONFIG_START(jangou_state::jngolady)
+void jangou_state::jngolady(machine_config &config)
+{
 	jangou(config);
 
 	/* basic machine hardware */
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::jngolady_cpu0_map);
 
-	MCFG_DEVICE_MODIFY("cpu0")
-	MCFG_DEVICE_PROGRAM_MAP(jngolady_cpu0_map)
+	m_cpu_1->set_addrmap(AS_PROGRAM, &jangou_state::jngolady_cpu1_map);
+	m_cpu_1->set_addrmap(AS_IO, &jangou_state::jngolady_cpu1_io);
 
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(jngolady_cpu1_map)
-	MCFG_DEVICE_IO_MAP(jngolady_cpu1_io)
-
-	MCFG_DEVICE_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
+	NSC8105(config, m_nsc, MASTER_CLOCK / 8);
+	m_nsc->set_addrmap(AS_PROGRAM, &jangou_state::nsc_map);
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,jngolady)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,jngolady)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("cvsd")
+	config.device_remove("cvsd");
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, jangou_state, jngolady_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(400'000));
+	m_msm->vck_legacy_callback().set(FUNC(jangou_state::jngolady_vclk_cb));
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(jangou_state::cntrygrl)
+void jangou_state::cntrygrl(machine_config &config)
+{
 	jangou(config);
 
 	/* basic machine hardware */
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::cntrygrl_cpu0_map);
+	m_cpu_0->set_addrmap(AS_IO, &jangou_state::cntrygrl_cpu0_io);
 
-	MCFG_DEVICE_MODIFY("cpu0")
-	MCFG_DEVICE_PROGRAM_MAP(cntrygrl_cpu0_map )
-	MCFG_DEVICE_IO_MAP(cntrygrl_cpu0_io )
-
-	MCFG_DEVICE_REMOVE("cpu1")
+	config.device_remove("cpu1");
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("cvsd")
-	MCFG_DEVICE_REMOVE("soundlatch")
-MACHINE_CONFIG_END
+	config.device_remove("cvsd");
+	config.device_remove("soundlatch");
+}
 
-MACHINE_CONFIG_START(jangou_state::roylcrdn)
+void jangou_state::roylcrdn(machine_config &config)
+{
 	jangou(config);
 
 	/* basic machine hardware */
+	m_cpu_0->set_addrmap(AS_PROGRAM, &jangou_state::roylcrdn_cpu0_map);
+	m_cpu_0->set_addrmap(AS_IO, &jangou_state::roylcrdn_cpu0_io);
 
-	MCFG_DEVICE_MODIFY("cpu0")
-	MCFG_DEVICE_PROGRAM_MAP(roylcrdn_cpu0_map )
-	MCFG_DEVICE_IO_MAP(roylcrdn_cpu0_io )
-
-	MCFG_DEVICE_REMOVE("cpu1")
+	config.device_remove("cpu1");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -969,9 +965,9 @@ MACHINE_CONFIG_START(jangou_state::roylcrdn)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("cvsd")
-	MCFG_DEVICE_REMOVE("soundlatch")
-MACHINE_CONFIG_END
+	config.device_remove("cvsd");
+	config.device_remove("soundlatch");
+}
 
 
 /*************************************
@@ -1190,7 +1186,10 @@ ROM_END
 
 /****************************************
 
-  Royal Card (amusement).
+  Royal Card.
+  Amusement.
+  1985-01-01
+
   PCB silkscreened "FD-510"
 
   1x Z80 @ 2.5 MHz. (measured)
@@ -1215,6 +1214,30 @@ ROM_START( roylcrdn )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mb7051.3h",  0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )
+ROM_END
+
+/*
+  Royal Card (Part Two)
+  Miki Corp
+  Ver. 1.02
+  1982-04-10
+
+  PCB silkscreened (c) MIKI CORP
+
+*/
+ROM_START( roylcrdna )
+	ROM_REGION( 0x10000, "cpu0", 0 )
+	ROM_LOAD( "rc4.ic11",     0x0000, 0x1000, CRC(4a7d9479) SHA1(0c695128b0a66c077013991d062c28a3f00857d1) )
+	ROM_LOAD( "rc5.ic12",     0x1000, 0x1000, CRC(577ca478) SHA1(ab138673f74a618f6842f8a6bdf840ef661f27b8) )
+	ROM_LOAD( "rc6.ic13",     0x2000, 0x1000, CRC(42507bb5) SHA1(458b5580d9d20687972cccb12490bd58d9b09175) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "rc1.k5", 0x0000, 0x1000, CRC(935d0e1c) SHA1(0d5b067f6931585c8138b211cf73e5f585af8101) )
+	ROM_LOAD( "rc2.l5", 0x1000, 0x1000, CRC(4429362e) SHA1(0bbb6dedf919e0453be2db6343827c5787d139f3) )
+	ROM_LOAD( "rc3.n5", 0x2000, 0x1000, CRC(50562072) SHA1(7f2ef4f4237d55198af307f6b81af6306c07ce95) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.h3",  0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )
 ROM_END
 
 
@@ -1298,16 +1321,17 @@ void jangou_state::init_luckygrl()
  *
  *************************************/
 
-GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,  empty_init,    ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  jngolady,  0,        jngolady, jngolady, jangou_state,  init_jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Jangou [BET] (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,  empty_init,    ROT0, "Logitec",      "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  jngolady,  0,        jngolady, jngolady, jangou_state,  init_jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Royal Denshi", "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Country Girl (Japan set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",   "Fruits & Bunny (World?)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Amusement",    "Royal Card (Nichibutsu HW)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1982,  roylcrdna, roylcrdn, roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Miki Corp.",   "Royal Card Part-Two (Nichibutsu HW, Ver. 1.02)",  MACHINE_SUPPORTS_SAVE )
 
 /* The following might not run there... */
-GAME( 1985,  luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /*
 Some other games that might run on this HW:

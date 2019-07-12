@@ -202,8 +202,8 @@ void wicat_state::video_io(address_map &map)
 
 void wicat_state::wd1000_mem(address_map &map)
 {
-	map(0x0000, 0x17ff).rom().region("wd3", 0x0000);
-	map(0x1800, 0x1fff).noprw();
+	map(0x0000, 0x0bff).rom().region("wd3", 0x0000);
+	map(0x0c00, 0x0fff).noprw();
 }
 
 void wicat_state::wd1000_io(address_map &map)
@@ -584,13 +584,13 @@ WRITE8_MEMBER( wicat_state::vram_w )
 
 READ8_MEMBER(wicat_state::video_dma_r)
 {
-	return m_videodma->read(space,offset/2);
+	return m_videodma->read(offset/2);
 }
 
 WRITE8_MEMBER(wicat_state::video_dma_w)
 {
 	if(!(offset & 0x01))
-		m_videodma->write(space,offset/2,data);
+		m_videodma->write(offset/2,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart0_r)
@@ -784,7 +784,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &wicat_state::video_mem);
 	m_videocpu->set_addrmap(AS_IO, &wicat_state::video_io);
 
-	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
+	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, z8002_device::NVI_LINE);
 
 	LS259(config, m_videoctrl);
 	m_videoctrl->q_out_cb<0>().set(FUNC(wicat_state::crtc_irq_clear_w));
@@ -799,7 +799,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videodma->out_memw_callback().set(FUNC(wicat_state::vram_w));
 	m_videodma->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
 
-	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
+	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, z8002_device::NMI_LINE);
 
 	IM6402(config, m_videouart, 0);
 	m_videouart->set_rrc(0);

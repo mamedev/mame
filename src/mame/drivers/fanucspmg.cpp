@@ -956,8 +956,7 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "i8087", XTAL(15'000'000)/3));
-	i8087.set_addrmap(AS_PROGRAM, &fanucspmg_state::maincpu_mem);
-	i8087.set_data_width(16);
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
 	//i8087.irq().set_inputline("maincpu", INPUT_LINE_NMI);  // TODO: presumably this is connected to the pic
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
@@ -1006,7 +1005,7 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);
 	screen.set_screen_update(CRTC_TAG, FUNC(mc6845_device::screen_update));
 
-	HD6845(config, m_crtc, XTAL(8'000'000)/2);
+	HD6845S(config, m_crtc, XTAL(8'000'000)/2);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

@@ -51,7 +51,6 @@ To Do:
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 #include "emma2.lh"
 
@@ -94,7 +93,7 @@ void emma2_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x0900, 0x090f).mirror(0x02f0).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0900, 0x090f).mirror(0x02f0).m(m_via, FUNC(via6522_device::map));
 	map(0x0a00, 0x0a03).mirror(0x00fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0c00, 0x0fff).ram();
 	map(0xd800, 0xdfff).mirror(0x2000).rom();
@@ -191,10 +190,11 @@ void emma2_state::machine_reset()
 	m_dig_change = 0;
 }
 
-MACHINE_CONFIG_START(emma2_state::emma2)
+void emma2_state::emma2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1'000'000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	M6502(config, m_maincpu, 1'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &emma2_state::mem_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_emma2);
@@ -211,14 +211,14 @@ MACHINE_CONFIG_START(emma2_state::emma2)
 	m_pia->irqa_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pia->irqb_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
-	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-MACHINE_CONFIG_END
+
+	/* cassette */
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 
 /* ROM definition */

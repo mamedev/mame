@@ -8,14 +8,14 @@
  *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
- *  for his site http:://www.geo255.redhotant.com
+ *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
- *  for his site http://www.ifrance.com/oric/microtan.html
+ *  for his site http://oric.free.fr/microtan.html
  *
  *  Microtan65 memory map
  *
  *  range     short     description
- *  0000-01FF SYSRAM    system ram
+ *  0000-01ff SYSRAM    system ram
  *                      0000-003f variables
  *                      0040-00ff basic
  *                      0100-01ff stack
@@ -26,7 +26,7 @@
  *  bc04      SPACEINV  space invasion sound (?)
  *  bfc0-bfcf VIA6522-0 VIA 6522 #0
  *  bfd0-bfd3 SIO       serial i/o
- *  bfe0-bfef VIA6522-1 VIA 6522 #0
+ *  bfe0-bfef VIA6522-1 VIA 6522 #1
  *  bff0      GFX_KBD   R: chunky graphics on W: reset KBD interrupt
  *  bff1      NMI       W: start delayed NMI
  *  bff2      HEX       W: hex. keypad column
@@ -34,6 +34,20 @@
  *  c000-e7ff BASIC     BASIC Interpreter ROM
  *  f000-f7ff XBUG      XBUG ROM
  *  f800-ffff TANBUG    TANBUG ROM
+ *
+ *  Tanbug commands:
+ *  B         Set breakpoint
+ *  C         copy (move) memory block
+ *  G         Go
+ *  L         Hex dump
+ *  M         Modify memory
+ *  N         Exit single-step mode
+ *  O         Hex calculator
+ *  P         Step once
+ *  R         Register examine/modify
+ *  S         Enter single-step mode
+ *  BAS       Start BASIC (You need to choose maximum memory via dipswitches)
+ *  WAR       Re-enter BASIC (warm start)
  *
  *****************************************************************************/
 
@@ -44,12 +58,12 @@
 /* Components */
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6551.h"
-#include "sound/wave.h"
 
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "softlist.h"
 
 
 void microtan_state::main_map(address_map &map)
@@ -60,9 +74,9 @@ void microtan_state::main_map(address_map &map)
 	map(0xbc01, 0xbc01).rw(m_ay8910[0], FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xbc02, 0xbc02).w(m_ay8910[1], FUNC(ay8910_device::address_w));
 	map(0xbc03, 0xbc03).rw(m_ay8910[1], FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xbfc0, 0xbfcf).rw(m_via6522[0], FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xbfc0, 0xbfcf).m(m_via6522[0], FUNC(via6522_device::map));
 	map(0xbfd0, 0xbfd3).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xbfe0, 0xbfef).rw(m_via6522[1], FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xbfe0, 0xbfef).m(m_via6522[1], FUNC(via6522_device::map));
 	map(0xbff0, 0xbfff).rw(FUNC(microtan_state::bffx_r), FUNC(microtan_state::bffx_w));
 	map(0xc000, 0xe7ff).rom();
 	map(0xf000, 0xffff).rom();
@@ -207,40 +221,44 @@ static GFXDECODE_START( gfx_microtan )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(microtan_state::microtan)
+void microtan_state::microtan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6502, 6_MHz_XTAL / 8)  // 750 kHz
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state, interrupt)
+	M6502(config, m_maincpu, 6_MHz_XTAL / 8);  // 750 kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &microtan_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(microtan_state::interrupt));
 
 	// The 6502 IRQ line is active low and probably driven by open collector outputs (guess).
 	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set_inputline(m_maincpu, 0);
 
 	/* video hardware - include overscan */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(32*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*16, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 16*16);
+	screen.set_visarea(0*8, 32*8-1, 0*16, 16*16-1);
+	screen.set_screen_update(FUNC(microtan_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_microtan)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_microtan);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910[0], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", 0.5)
-	MCFG_QUICKLOAD_ADD("quickload", microtan_state, microtan, "hex", 0.5)
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "dmp,m65"));
+	snapshot.set_load_callback(FUNC(microtan_state::snapshot_cb), this);
+	snapshot.set_interface("mt65_snap");
+	QUICKLOAD(config, "quickload", "hex").set_load_callback(FUNC(microtan_state::quickload_cb), this);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( m_cassette )
+	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	TIMER(config, "read_cassette").configure_periodic(FUNC(microtan_state::read_cassette), attotime::from_hz(20000)); // cass read
 
 	/* acia */
 	mos6551_device &acia(MOS6551(config, "acia", 0));
@@ -255,13 +273,16 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	m_via6522[0]->cb2_handler().set(FUNC(microtan_state::via_0_out_cb2));
 	m_via6522[0]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_0>));
 
-	MCFG_DEVICE_ADD(m_via6522[1], VIA6522, 6_MHz_XTAL / 8)
+	VIA6522(config, m_via6522[1], 6_MHz_XTAL / 8);
 	m_via6522[1]->writepa_handler().set(FUNC(microtan_state::via_1_out_a));
 	m_via6522[1]->writepb_handler().set(FUNC(microtan_state::via_1_out_b));
 	m_via6522[1]->ca2_handler().set(FUNC(microtan_state::via_1_out_ca2));
 	m_via6522[1]->cb2_handler().set(FUNC(microtan_state::via_1_out_cb2));
 	m_via6522[1]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_1>));
-MACHINE_CONFIG_END
+
+	/* software lists */
+	SOFTWARE_LIST(config, "snap_list").set_original("mt65_snap");
+}
 
 ROM_START( microtan )
 	ROM_REGION( 0x10000, "maincpu", 0 )

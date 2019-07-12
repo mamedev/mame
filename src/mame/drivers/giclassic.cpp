@@ -138,10 +138,10 @@ READ16_MEMBER(giclassic_state::vrom_r)
 {
 	if (m_control & 8)
 	{
-		return m_k056832->piratesh_rom_r(space, offset + 0x1000);
+		return m_k056832->piratesh_rom_r(offset + 0x1000);
 	}
 
-	return m_k056832->piratesh_rom_r(space, offset);
+	return m_k056832->piratesh_rom_r(offset);
 }
 
 void giclassic_state::satellite_main(address_map &map)
@@ -274,7 +274,7 @@ void giclassicsvr_state::server_main(address_map &map)
 	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram();
 	map(0x280000, 0x281fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
-	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES
+	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_w)); // SPRITES
 	map(0x300060, 0x30006f).r(m_k055673, FUNC(k055673_device::k055673_ps_rom_word_r)); // SPRITES
 	map(0x308000, 0x30803f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x320000, 0x32001f).rw("k053252a", FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CRTC 1
@@ -295,69 +295,68 @@ void giclassicsvr_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(giclassic_state::giclassic)
-
+void giclassic_state::giclassic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
-	MCFG_DEVICE_PROGRAM_MAP(satellite_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
+	M68000(config, m_maincpu, XTAL(20'000'000) / 2); // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &giclassic_state::satellite_main);
+	m_maincpu->set_vblank_int("screen", FUNC(giclassic_state::giclassic_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(600, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(giclassic_state, screen_update_giclassic)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(600, 384);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(giclassic_state::screen_update_giclassic));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
 	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(giclassic_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 1, 0);
+	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette(m_palette);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
-
+void giclassicsvr_state::giclassvr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
-	MCFG_DEVICE_PROGRAM_MAP(server_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
+	M68000(config, m_maincpu, XTAL(16'000'000)); // unknown speed
+	m_maincpu->set_addrmap(AS_PROGRAM, &giclassicsvr_state::server_main);
+	m_maincpu->set_vblank_int("screen", FUNC(giclassicsvr_state::giclassicsvr_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(600, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(giclassicsvr_state, screen_update_giclassicsvr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(giclassicsvr_state::screen_update_giclassicsvr));
+	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 16384);
 	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(giclassicsvr_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4PIRATESH, 0, 0);
+	m_k056832->set_config(K056832_BPP_4PIRATESH, 0, 0);
 	m_k056832->set_palette(m_palette);
 
 	K055673(config, m_k055673, 0);
 	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback), this);
-	m_k055673->set_config("gfx2", K055673_LAYOUT_PS, -60, 24);
+	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette(m_palette);
 
 	K053252(config, "k053252a", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
 	K053252(config, "k053252b", XTAL(32'000'000)/4).set_offsets(40, 16); // TODO
-MACHINE_CONFIG_END
+}
 
 ROM_START( giclasex )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
 	ROM_LOAD16_WORD_SWAP( "gsgu760ae01.12t", 0x000000, 0x080000, CRC(f0f9c118) SHA1(1753d53946bc0703d329e4a09c452713b260da75) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD( "gsgu760ae03.14c", 0x000000, 0x080000, CRC(1663d327) SHA1(98c1a9653d38f4918f78b3a11af0c29c658201f5) )
 	ROM_LOAD( "gsgu760ae02.14e", 0x080000, 0x080000, CRC(2b9fe163) SHA1(f60190a9689a70d6c5bb14fb46b7ac2267cf0969) )
 ROM_END
@@ -366,11 +365,11 @@ ROM_START( giclassvr )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
 	ROM_LOAD16_WORD_SWAP( "gsgu_760_fd01.34e.bin", 0x000000, 0x080000, CRC(da89c1d7) SHA1(551d050a9b6e54fbf98e966eb37924b644037893) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD( "gsgu_760_ad04.25q", 0x080000, 0x080000, CRC(71a45742) SHA1(fbddd54f5fb236662f7cc7e9b350723bc5404f72) )
 	ROM_LOAD( "gsgu_760_ad05.25r", 0x000000, 0x080000, CRC(44221eec) SHA1(966452e606e828b536ed11cbdd626a2fe3165199) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k055673", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34j", 0x000000, 0x080000, CRC(6d33c720) SHA1(35da3e1f0133a76480d2078fae89ea87b841ffc7) )
 	ROM_LOAD32_WORD( "gsgu_760_ad02.34k", 0x000002, 0x080000, CRC(8057a417) SHA1(82d4a1d84729e9f0a8aff4c219a19601b89caf15) )
 ROM_END

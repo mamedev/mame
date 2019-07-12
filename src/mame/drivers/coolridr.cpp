@@ -509,10 +509,12 @@ public:
 	objcachemanager m_decode[2];
 	void aquastge(machine_config &config);
 	void coolridr(machine_config &config);
+	void coolridr_h1_map(address_map &map);
 	void aquastge_h1_map(address_map &map);
 	void aquastge_submap(address_map &map);
 	void coolridr_submap(address_map &map);
 	void system_h1_map(address_map &map);
+	void system_h1_submap(address_map &map);
 	void system_h1_sound_map(address_map &map);
 	template<int Chip> void scsp_map(address_map &map);
 };
@@ -2786,9 +2788,6 @@ void coolridr_state::system_h1_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().share("share1").nopw();
 	map(0x01000000, 0x01ffffff).rom().region("gfx_data", 0x0000000);
 
-	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
-
-	map(0x03f00000, 0x03f0ffff).ram().share("share3"); /*Communication area RAM*/
 	map(0x03f40000, 0x03f4ffff).ram().share("txt_vram");//text tilemap + "lineram"
 	map(0x04000000, 0x0400000f).rw(FUNC(coolridr_state::unk_blit_r), FUNC(coolridr_state::unk_blit_w)).share("txt_blit");
 	map(0x04000010, 0x04000013).w(FUNC(coolridr_state::blit_mode_w));
@@ -2800,6 +2799,14 @@ void coolridr_state::system_h1_map(address_map &map)
 	map(0x20000000, 0x201fffff).rom().share("share1");
 
 	map(0x60000000, 0x600003ff).nopw();
+}
+
+void coolridr_state::coolridr_h1_map(address_map &map)
+{
+	system_h1_map(map);
+	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
+
+	map(0x03f00000, 0x03f0ffff).ram().share("share3"); /*Communication area RAM*/
 }
 
 void coolridr_state::aquastge_h1_map(address_map &map)
@@ -2916,7 +2923,7 @@ WRITE32_MEMBER(coolridr_state::sound_dma_w)
 
 
 
-void coolridr_state::coolridr_submap(address_map &map)
+void coolridr_state::system_h1_submap(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom(); // note: SH7032 only supports 64KB
 
@@ -2931,8 +2938,6 @@ void coolridr_state::coolridr_submap(address_map &map)
 //  map(0x04200000, 0x0420003f).ram(); /* unknown */
 
 	map(0x05000000, 0x05000fff).ram();
-	map(0x05200000, 0x052001ff).ram();
-	map(0x05300000, 0x0530ffff).ram().share("share3"); /*Communication area RAM*/
 //  map(0x05fffe00, 0x05ffffff).rw(FUNC(coolridr_state::sh7032_r), FUNC(coolridr_state::sh7032_w)); // SH-7032H internal i/o
 	map(0x06000000, 0x060001ff).ram().share("nvram"); // backup RAM
 	map(0x06100000, 0x0610001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
@@ -2940,11 +2945,19 @@ void coolridr_state::coolridr_submap(address_map &map)
 	map(0x07ffe000, 0x07ffffff).ram(); // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
 }
 
+void coolridr_state::coolridr_submap(address_map &map)
+{
+	system_h1_submap(map);
+	map(0x05200000, 0x052001ff).ram();
+	map(0x05300000, 0x0530ffff).ram().share("share3"); /*Communication area RAM*/
+}
+
 void coolridr_state::aquastge_submap(address_map &map)
 {
-	coolridr_submap(map);
-	map(0x05200000, 0x0537ffff).ram();
+	system_h1_submap(map);
+	map(0x05200000, 0x0520ffff).ram();
 	map(0x05210000, 0x0521ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x05220000, 0x0537ffff).ram();
 	map(0x06000200, 0x06000207).nopw(); // program bug?
 }
 
@@ -3219,17 +3232,18 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 
 #define MAIN_CLOCK XTAL(28'636'363)
 
-MACHINE_CONFIG_START(coolridr_state::coolridr)
-	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 MHz
-	MCFG_DEVICE_PROGRAM_MAP(system_h1_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, interrupt_main, "screen", 0, 1)
+void coolridr_state::coolridr(machine_config &config)
+{
+	SH2(config, m_maincpu, MAIN_CLOCK);  // 28 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", M68000, 22579000/2) // 22.579 MHz XTAL / 2 = 11.2895 MHz
-	MCFG_DEVICE_PROGRAM_MAP(system_h1_sound_map)
+	M68000(config, m_soundcpu, 22579000/2); // 22.579 MHz XTAL / 2 = 11.2895 MHz
+	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 MHz
-	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, interrupt_sub, "screen", 0, 1)
+	SH1(config, m_subcpu, 16000000);  // SH7032 HD6417032F20!! 16 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
+	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3245,21 +3259,21 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	io.an_port_callback<5>().set_ioport("AN5");
 	io.an_port_callback<6>().set_ioport("AN6");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coolridr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<0>)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 512);
+	m_screen->set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
+	m_screen->set_screen_update(FUNC(coolridr_state::screen_update<0>));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<1>)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(640, 512);
+	screen2.set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
+	screen2.set_screen_update(FUNC(coolridr_state::screen_update<1>));
+	screen2.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
@@ -3280,20 +3294,19 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
 	scsp2.add_route(0, "lspeaker", 1.0);
 	scsp2.add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(coolridr_state::aquastge)
+void coolridr_state::aquastge(machine_config &config)
+{
 	coolridr(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aquastge_h1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::aquastge_h1_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(aquastge_submap)
+	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::aquastge_submap);
 
 	sega_315_5649_device &io(SEGA_315_5649(config.replace(), "io", 0));
 	io.in_pc_callback().set_ioport("IN0");
 	io.in_pd_callback().set_ioport("IN1");
-MACHINE_CONFIG_END
+}
 
 ROM_START( coolridr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */
@@ -3447,5 +3460,5 @@ void coolridr_state::init_aquastge()
 	m_colbase = 0;
 }
 
-GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
 GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

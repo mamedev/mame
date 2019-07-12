@@ -97,7 +97,6 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 #define FTABLE_GET_REG  m_get_reg
 #define FTABLE_SET_REG  m_set_reg
-#define FTABLE_SET_LINE m_set_line
 
 #define SRC         m_source        /* Source Operand */
 #define DST         m_destination   /* Destination Operand */

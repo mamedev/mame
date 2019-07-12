@@ -7,12 +7,13 @@
     Format code for wave (*.wav) files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_WAVFILE_H
+#define MAME_FORMATS_WAVFILE_H
 
-#ifndef WAVFILE_H
-#define WAVFILE_H
+#pragma once
 
 #include "cassimg.h"
 
 extern const struct CassetteFormat wavfile_format;
 
-#endif /* WAVFILE_H */
+#endif // MAME_FORMATS_WAVFILE_H

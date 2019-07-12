@@ -93,7 +93,7 @@ public:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	uint32_t screen_update_nes(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	NESCTRL_BRIGHTPIXEL_CB(bright_pixel);
+	void screen_vblank_nes(int state);
 
 	void init_famicom();
 

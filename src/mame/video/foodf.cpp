@@ -85,18 +85,18 @@ WRITE16_MEMBER(foodf_state::foodf_paletteram_w)
 	bit0 = (newword >> 0) & 0x01;
 	bit1 = (newword >> 1) & 0x01;
 	bit2 = (newword >> 2) & 0x01;
-	r = combine_3_weights(m_rweights, bit0, bit1, bit2);
+	r = combine_weights(m_rweights, bit0, bit1, bit2);
 
 	/* green component */
 	bit0 = (newword >> 3) & 0x01;
 	bit1 = (newword >> 4) & 0x01;
 	bit2 = (newword >> 5) & 0x01;
-	g = combine_3_weights(m_gweights, bit0, bit1, bit2);
+	g = combine_weights(m_gweights, bit0, bit1, bit2);
 
 	/* blue component */
 	bit0 = (newword >> 6) & 0x01;
 	bit1 = (newword >> 7) & 0x01;
-	b = combine_2_weights(m_bweights, bit0, bit1);
+	b = combine_weights(m_bweights, bit0, bit1);
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }

@@ -81,10 +81,7 @@ void splash_state::splash_map(address_map &map)
 	map(0x840002, 0x840003).portr("DSW2");
 	map(0x840004, 0x840005).portr("P1");
 	map(0x840006, 0x840007).portr("P2");
-	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
+	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
@@ -138,7 +135,7 @@ WRITE8_MEMBER(splash_state::sound_bank_w)
 void splash_state::roldfrog_update_irq(  )
 {
 	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x18 : 0);
-	m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
+	m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); // Z80
 }
 
 WRITE8_MEMBER(splash_state::roldfrog_vblank_ack_w)
@@ -164,10 +161,7 @@ void splash_state::roldfrog_map(address_map &map)
 	map(0x840002, 0x840003).portr("DSW2");
 	map(0x840004, 0x840005).portr("P1");
 	map(0x840006, 0x840007).portr("P2");
-	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
+	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
@@ -523,7 +517,7 @@ void splash_state::splash(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM3812(config, "ymsnd", XTAL(30'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.80);	/* 3.75MHz (30/8) */
+	YM3812(config, "ymsnd", XTAL(30'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.80);   /* 3.75MHz (30/8) */
 
 	MSM5205(config, m_msm, XTAL(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(splash_state::splash_msm5205_int)); /* IRQ handler */
@@ -603,7 +597,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int1)
 		if (m_msm_toggle1 == 0)
 		{
 			m_msm_source|=1;
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
 		}
 	}
 }
@@ -618,7 +612,7 @@ WRITE_LINE_MEMBER(funystrp_state::adpcm_int2)
 		if (m_msm_toggle2 == 0)
 		{
 			m_msm_source|=2;
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
 		}
 	}
 }
@@ -641,11 +635,11 @@ void funystrp_state::machine_start()
 void funystrp_state::funystrp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);	/* 12 MHz (24/2) */
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);  /* 12 MHz (24/2) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &funystrp_state::funystrp_map);
 	m_maincpu->set_vblank_int("screen", FUNC(funystrp_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(24'000'000)/4);	/* 6MHz (24/4) */
+	Z80(config, m_audiocpu, XTAL(24'000'000)/4);    /* 6MHz (24/4) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &funystrp_state::funystrp_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &funystrp_state::funystrp_sound_io_map);
 
@@ -670,12 +664,12 @@ void funystrp_state::funystrp(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MSM5205(config, m_msm1, XTAL(400'000));
-	m_msm1->vck_legacy_callback().set(FUNC(funystrp_state::adpcm_int1));	/* interrupt function */
+	m_msm1->vck_legacy_callback().set(FUNC(funystrp_state::adpcm_int1));    /* interrupt function */
 	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);  /* 1 / 48 */       /* Sample rate = 400kHz/64 */
 	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MSM5205(config, m_msm2, XTAL(400'000));
-	m_msm2->vck_legacy_callback().set(FUNC(funystrp_state::adpcm_int2));	/* interrupt function */
+	m_msm2->vck_legacy_callback().set(FUNC(funystrp_state::adpcm_int2));    /* interrupt function */
 	m_msm2->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 */       /* Sample rate = 400kHz/96 */
 	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.80);
 }

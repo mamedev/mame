@@ -201,6 +201,7 @@ enum {
 	MIPS3_PAGEMASK,
 	MIPS3_WIRED,
 	MIPS3_BADVADDR,
+	MIPS3_LLADDR,
 	MIPS3_R0H,
 	MIPS3_R1H,
 	MIPS3_R2H,
@@ -237,6 +238,9 @@ enum {
 
 #define MIPS3_MAX_FASTRAM       3
 #define MIPS3_MAX_HOTSPOTS      16
+
+/* COP1 CCR register */
+#define COP1_FCR31              (m_core->ccr[1][31])
 
 /***************************************************************************
 INTERRUPT CONSTANTS
@@ -297,6 +301,7 @@ public:
 
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
+	void set_secondary_cache_line_size(uint8_t secondary_cache_line_size) { c_secondary_cache_line_size = secondary_cache_line_size; }
 	void set_system_clock(uint32_t system_clock) { c_system_clock = system_clock; }
 
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
@@ -427,6 +432,7 @@ protected:
 	uint32_t        c_system_clock;
 	uint32_t        m_cpu_clock;
 	emu_timer *     m_compare_int_timer;
+	uint32_t        m_tlb_seed;
 
 	/* derived info based on flavor */
 	uint32_t        m_pfnmask;
@@ -436,11 +442,13 @@ protected:
 	bool            m_bigendian;
 	uint32_t        m_byte_xor;
 	uint32_t        m_word_xor;
+	uint32_t        m_dword_xor;
 	data_accessors  m_memory;
 
 	/* cache memory */
 	size_t          c_icache_size;
 	size_t          c_dcache_size;
+	uint8_t         c_secondary_cache_line_size;
 
 	/* MMU */
 	mips3_tlb_entry m_tlb[MIPS3_MAX_TLB_ENTRIES];
@@ -504,7 +512,6 @@ protected:
 	}               m_hotspot[MIPS3_MAX_HOTSPOTS];
 	bool            m_isdrc;
 
-
 	void generate_exception(int exception, int backup);
 	void generate_tlb_exception(int exception, offs_t address);
 	virtual void check_irqs();
@@ -522,6 +529,7 @@ private:
 	uint32_t compute_config_register();
 	uint32_t compute_prid_register();
 
+	uint32_t generate_tlb_index();
 	void tlb_map_entry(int tlbindex);
 	void tlb_write_common(int tlbindex);
 
@@ -588,6 +596,7 @@ public:
 	void func_printf_exception();
 	void func_printf_debug();
 	void func_printf_probe();
+	void func_debug_break();
 	void func_unimplemented();
 private:
 	/* internal compiler state */

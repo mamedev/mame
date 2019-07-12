@@ -132,6 +132,7 @@ protected:
 	virtual void machine_reset() override;
 	void common_sound(machine_config &config);
 	void equites_map(address_map &map);
+	void equites_common_map(address_map &map);
 	void mcu_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
@@ -142,6 +143,7 @@ class gekisou_state : public equites_state
 public:
 	using equites_state::equites_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
+	void clsunk(machine_config &config);
 	void gekisou(machine_config &config);
 
 protected:

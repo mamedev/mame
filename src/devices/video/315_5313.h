@@ -9,49 +9,9 @@
 #include "video/315_5124.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
-#include "sound/sn76496.h"
 
 
-#define MCFG_SEGA315_5313_IS_PAL(_bool) \
-	downcast<sega315_5313_device &>(*device).set_is_pal(_bool);
-
-#define MCFG_SEGA315_5313_INT_CB(_devcb) \
-	downcast<sega315_5313_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5313_PAUSE_CB(_devcb) \
-	downcast<sega315_5313_device &>(*device).set_pause_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5313_SND_IRQ_CALLBACK(_write) \
-	downcast<sega315_5313_device &>(*device).set_sndirqline_callback(DEVCB_##_write);
-
-#define MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(_write) \
-	downcast<sega315_5313_device &>(*device).set_lv6irqline_callback(DEVCB_##_write);
-
-#define MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(_write) \
-	downcast<sega315_5313_device &>(*device).set_lv4irqline_callback(DEVCB_##_write);
-
-#define MCFG_SEGA315_5313_ALT_TIMING(_data) \
-	downcast<sega315_5313_device &>(*device).set_alt_timing(_data);
-
-#define MCFG_SEGA315_5313_PAL_WRITE_BASE(_data) \
-	downcast<sega315_5313_device &>(*device).set_pal_write_base(_data);
-
-#define MCFG_SEGA315_5313_PALETTE(_palette_tag) \
-	downcast<sega315_5313_device &>(*device).set_palette(_palette_tag);
-
-
-// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
-#define MCFG_SEGA315_5313_32X_SCANLINE_CB(_class, _method) \
-	downcast<sega315_5313_device &>(*device).set_md_32x_scanline(sega315_5313_device::md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_SEGA315_5313_32X_INTERRUPT_CB(_class, _method) \
-	downcast<sega315_5313_device &>(*device).set_md_32x_interrupt(sega315_5313_device::md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(_class, _method) \
-	downcast<sega315_5313_device &>(*device).set_md_32x_scanline_helper(sega315_5313_device::md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, this));
-
-
-class sega315_5313_device : public sega315_5313_mode4_device, public device_mixer_interface
+class sega315_5313_device : public sega315_5313_mode4_device
 {
 public:
 	template <typename T>
@@ -63,24 +23,22 @@ public:
 
 	sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	typedef device_delegate<void (int x, uint32_t priority, uint16_t &lineptr)> md_32x_scanline_delegate;
+	typedef device_delegate<void (int x, uint32_t priority, uint32_t &lineptr)> md_32x_scanline_delegate;
 	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
 	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
 
-	template <class Object> devcb_base &set_sndirqline_callback(Object &&cb) { return m_sndirqline_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_lv6irqline_callback(Object &&cb) { return m_lv6irqline_callback.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_lv4irqline_callback(Object &&cb) { return m_lv4irqline_callback.set_callback(std::forward<Object>(cb)); }
 	auto snd_irq() { return m_sndirqline_callback.bind(); }
 	auto lv6_irq() { return m_lv6irqline_callback.bind(); }
 	auto lv4_irq() { return m_lv4irqline_callback.bind(); }
 
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
 	void set_pal_write_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
-	template <typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
 
-	template <typename Object> void set_md_32x_scanline(Object &&cb) { m_32x_scanline_func = std::forward<Object>(cb); }
-	template <typename Object> void set_md_32x_interrupt(Object &&cb) { m_32x_interrupt_func = std::forward<Object>(cb); }
-	template <typename Object> void set_md_32x_scanline_helper(Object &&cb) { m_32x_scanline_helper_func = std::forward<Object>(cb); }
+	// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
+	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func = md_32x_scanline_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_interrupt(T &&... args) { m_32x_interrupt_func = md_32x_interrupt_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_scanline_helper(T &&... args) { m_32x_scanline_helper_func = md_32x_scanline_helper_delegate(std::forward<T>(args)...); }
 
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 
@@ -117,8 +75,8 @@ public:
 			m_render_bitmap->fill(0);
 	}
 
-	std::unique_ptr<bitmap_ind16> m_render_bitmap;
-	std::unique_ptr<uint16_t[]> m_render_line;
+	std::unique_ptr<bitmap_rgb32> m_render_bitmap;
+	std::unique_ptr<uint32_t[]> m_render_line;
 	std::unique_ptr<uint16_t[]> m_render_line_raw;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
@@ -222,13 +180,10 @@ private:
 	std::unique_ptr<uint8_t[]> m_highpri_renderline;
 	std::unique_ptr<uint32_t[]> m_video_renderline;
 	std::unique_ptr<uint16_t[]> m_palette_lookup;
-	std::unique_ptr<uint16_t[]> m_palette_lookup_sprite; // for C2
-	std::unique_ptr<uint16_t[]> m_palette_lookup_shadow;
-	std::unique_ptr<uint16_t[]> m_palette_lookup_highlight;
 
 	address_space *m_space68k;
 	required_device<m68000_base_device> m_cpu68k;
-	required_device<sn76496_base_device> m_snsnd;
+	optional_device<palette_device> m_ext_palette;
 };
 
 

@@ -152,6 +152,30 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 
 //-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(cococart_slot_device::cts_read)
+{
+	uint8_t result = 0x00;
+	if (m_cart)
+		result = m_cart->cts_read(space, offset);
+	return result;
+}
+
+
+//-------------------------------------------------
+//  cts_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(cococart_slot_device::cts_write)
+{
+	if (m_cart)
+		m_cart->cts_write(space, offset, data);
+}
+
+
+//-------------------------------------------------
 //  scs_read
 //-------------------------------------------------
 
@@ -412,11 +436,11 @@ image_init_result cococart_slot_device::call_load()
 	{
 		memory_region *cart_mem = m_cart->get_cart_memregion();
 		uint8_t *base = cart_mem->base();
-		offs_t read_length, cart_legnth = cart_mem->bytes();;
+		offs_t read_length, cart_length = cart_mem->bytes();
 
 		if (!loaded_through_softlist())
 		{
-			read_length = fread(base, cart_legnth);
+			read_length = fread(base, cart_length);
 		}
 		else
 		{
@@ -424,7 +448,7 @@ image_init_result cococart_slot_device::call_load()
 			memcpy(base, get_software_region("rom"), read_length);
 		}
 
-		while (read_length < cart_legnth)
+		while (read_length < cart_length)
 		{
 			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
 			memcpy(base + read_length, base, len);
@@ -498,6 +522,27 @@ void device_cococart_interface::interface_pre_start()
 		throw emu_fatalerror("Expected device().owner() to be of type cococart_slot_device");
 	if (!m_host)
 		throw emu_fatalerror("Expected m_owning_slot->owner() to be of type device_cococart_host_interface");
+}
+
+
+//-------------------------------------------------
+//  cts_read - Signifies a read where the CTS pin
+//  on the cartridge slot was asserted ($C000-FFEF)
+//-------------------------------------------------
+
+READ8_MEMBER(device_cococart_interface::cts_read)
+{
+	return 0x00;
+}
+
+
+//-------------------------------------------------
+//  cts_write - Signifies a write where the CTS pin
+//  on the cartridge slot was asserted ($C000-FFEF)
+//-------------------------------------------------
+
+WRITE8_MEMBER(device_cococart_interface::cts_write)
+{
 }
 
 
@@ -593,40 +638,6 @@ memory_region* device_cococart_interface::get_cart_memregion()
 address_space &device_cococart_interface::cartridge_space()
 {
 	return host().cartridge_space();
-}
-
-
-//-------------------------------------------------
-//  install_read_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler)
-{
-	address_space &space(cartridge_space());
-	space.install_read_handler(addrstart, addrend, rhandler);
-}
-
-
-//-------------------------------------------------
-//  install_write_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler)
-{
-	address_space &space(cartridge_space());
-	space.install_write_handler(addrstart, addrend, whandler);
-}
-
-
-//-------------------------------------------------
-//  install_readwrite_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler)
-{
-	address_space &space(cartridge_space());
-	space.install_read_handler(addrstart, addrend, rhandler);
-	space.install_write_handler(addrstart, addrend, whandler);
 }
 
 

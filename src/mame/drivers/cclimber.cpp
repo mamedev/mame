@@ -255,8 +255,8 @@ void cclimber_state::machine_start()
 
 WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
 {
-	m_soundlatch->write(space,offset,data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
@@ -327,10 +327,12 @@ void cclimber_state::cclimber_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
@@ -355,10 +357,12 @@ void cclimber_state::cannonb_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
@@ -402,10 +406,12 @@ void cclimber_state::yamato_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
@@ -1105,33 +1111,33 @@ WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cclimber_state::root)
-
+void cclimber_state::root(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(18'432'000)/3/2)  /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cclimber_map)
-	MCFG_DEVICE_IO_MAP(cclimber_portmap)
+	Z80(config, m_maincpu, XTAL(18'432'000)/3/2);  /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
+	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
 
-	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0)
+	LS259(config, m_mainlatch, 0);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cclimber_state::screen_update_cclimber));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(cclimber_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cclimber);
 	PALETTE(config, m_palette, FUNC(cclimber_state::cclimber_palette), 16*4+8*4);
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,cclimber)
-MACHINE_CONFIG_END
+}
 
 
 void cclimber_state::cclimber(machine_config &config)
@@ -1160,7 +1166,8 @@ void cclimber_state::ckongb(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(cclimber_state::cannonb)
+void cclimber_state::cannonb(machine_config &config)
+{
 	cclimber(config);
 
 	/* basic machine hardware */
@@ -1171,8 +1178,8 @@ MACHINE_CONFIG_START(cclimber_state::cannonb)
 	m_mainlatch->q_out_cb<2>().set_nop(); // not used
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cannonb)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cannonb);
+}
 
 void cclimber_state::bagmanf(machine_config &config)
 {
@@ -1185,7 +1192,8 @@ void cclimber_state::bagmanf(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(cclimber_state::yamato)
+void cclimber_state::yamato(machine_config &config)
+{
 	root(config);
 
 	/* basic machine hardware */
@@ -1195,15 +1203,15 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::yamato_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(yamato_audio_map)
-	MCFG_DEVICE_IO_MAP(yamato_audio_portmap)
+	Z80(config, m_audiocpu, 3072000); /* 3.072 MHz ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::yamato_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &cclimber_state::yamato_audio_portmap);
 
 	/* video hardware */
 	m_palette->set_entries(16*4+8*4+256);
 	m_palette->set_init(FUNC(cclimber_state::yamato_palette));
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_yamato));
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1211,10 +1219,11 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 
 	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(cclimber_state::toprollr)
+void cclimber_state::toprollr(machine_config &config)
+{
 	cclimber(config);
 
 	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
@@ -1229,43 +1238,42 @@ MACHINE_CONFIG_START(cclimber_state::toprollr)
 	m_mainlatch->q_out_cb<6>().set(FUNC(cclimber_state::toprollr_rombank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_toprollr)
+	m_gfxdecode->set_info(gfx_toprollr);
 	m_palette->set_entries(32*5);
 	m_palette->set_init(FUNC(cclimber_state::toprollr_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_toprollr)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_toprollr));
+}
 
 
-MACHINE_CONFIG_START(cclimber_state::swimmer)
-
+void cclimber_state::swimmer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(18'432'000)/6)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(swimmer_map)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::swimmer_map);
 
-	MCFG_DEVICE_ADD(m_mainlatch, LS259, 0)
+	LS259(config, m_mainlatch, 0);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
 	m_mainlatch->q_out_cb<3>().set(FUNC(cclimber_state::sidebg_enable_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(cclimber_state::palette_bank_w));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(swimmer_audio_map)
-	MCFG_DEVICE_IO_MAP(swimmer_audio_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cclimber_state, nmi_line_pulse,  (double)4000000/16384) /* IRQs are triggered by the main CPU */
+	Z80(config, m_audiocpu, XTAL(4'000'000)/2);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::swimmer_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &cclimber_state::swimmer_audio_portmap);
+	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_pulse), attotime::from_hz((double)4000000/16384)); /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.57); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cclimber_state::screen_update_swimmer));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(cclimber_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_swimmer);
 	PALETTE(config, m_palette, FUNC(cclimber_state::swimmer_palette), 32*8+4*8+1);
@@ -1280,11 +1288,12 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 
 	AY8910(config, "ay2", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
-MACHINE_CONFIG_END
+}
 
 void cclimber_state::guzzler(machine_config &config)
 {
 	swimmer(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::guzzler_map);
 }

@@ -130,6 +130,22 @@ i8245_device::i8245_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8244_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(clock(), LINE_CLOCKS, START_ACTIVE_SCAN, END_ACTIVE_SCAN, m_screen_lines, START_Y, START_Y + SCREEN_HEIGHT);
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

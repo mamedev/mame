@@ -412,22 +412,22 @@ INPUT_PORTS_END
 
 READ16_MEMBER(cubeqst_state::read_rotram)
 {
-	return m_rotatecpu->rotram_r(space, offset, mem_mask);
+	return m_rotatecpu->rotram_r(offset);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_rotram)
 {
-	m_rotatecpu->rotram_w(space, offset, data, mem_mask);
+	m_rotatecpu->rotram_w(offset, data, mem_mask);
 }
 
 READ16_MEMBER(cubeqst_state::read_sndram)
 {
-	return m_soundcpu->sndram_r(space, offset, mem_mask);
+	return m_soundcpu->sndram_r(offset);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_sndram)
 {
-	m_soundcpu->sndram_w(space, offset, data, mem_mask);
+	m_soundcpu->sndram_w(offset, data, mem_mask);
 }
 
 void cubeqst_state::m68k_program_map(address_map &map)
@@ -574,7 +574,6 @@ void cubeqst_state::cubeqst(machine_config &config)
 		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
 	}
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "rdac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac0", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "ldac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac0", -1.0, DAC_VREF_NEG_INPUT);
 	vref.add_route(0, "rdac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac1", -1.0, DAC_VREF_NEG_INPUT);

@@ -910,7 +910,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(magictg_state::magictg)
+void magictg_state::magictg(machine_config &config)
+{
 	R5000BE(config, m_mips, 150000000); /* TODO: CPU type and clock are unknown */
 	//m_mips->set_icache_size(16384); /* TODO: Unknown */
 	//m_mips->set_dcache_size(16384); /* TODO: Unknown */
@@ -927,35 +928,38 @@ MACHINE_CONFIG_START(magictg_state::magictg)
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, magictg_state, pci_dev0_r, pci_dev0_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, magictg_state, voodoo_0_pci_r, voodoo_0_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (0, FUNC(magictg_state::pci_dev0_r), this);
+	pcibus.set_device_write(0, FUNC(magictg_state::pci_dev0_w), this);
+	pcibus.set_device_read (7, FUNC(magictg_state::voodoo_0_pci_r), this);
+	pcibus.set_device_write(7, FUNC(magictg_state::voodoo_0_pci_w), this);
 
 #if defined(USE_TWO_3DFX)
-	MCFG_PCI_BUS_LEGACY_DEVICE(8, DEVICE_SELF, magictg_state, voodoo_1_pci_r, voodoo_1_pci_w)
+	pcibus.set_device_read (8, FUNC(magictg_state::voodoo_1_pci_r), this);
+	pcibus.set_device_write(8, FUNC(magictg_state::voodoo_1_pci_w), this);
 #endif
-	MCFG_PCI_BUS_LEGACY_DEVICE(9, DEVICE_SELF, magictg_state, zr36120_pci_r, zr36120_pci_w) // TODO: ZR36120 device
+	pcibus.set_device_read (9, FUNC(magictg_state::zr36120_pci_r), this); // TODO: ZR36120 device
+	pcibus.set_device_write(9, FUNC(magictg_state::zr36120_pci_w), this); // TODO: ZR36120 device
 
-	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("mips")
+	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(4,0);
+	m_voodoo[0]->set_screen_tag("screen");
+	m_voodoo[0]->set_cpu_tag(m_mips);
 
-	MCFG_DEVICE_ADD("voodoo_1", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("mips")
+	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(4,0);
+	m_voodoo[1]->set_screen_tag("screen");
+	m_voodoo[1]->set_cpu_tag(m_mips);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
-
-	MCFG_SCREEN_UPDATE_DRIVER(magictg_state, screen_update_magictg)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(1024, 1024);
+	screen.set_visarea(0, 511, 16, 447);
+	screen.set_screen_update(FUNC(magictg_state::screen_update_magictg));
+}
 
 
 /*************************************

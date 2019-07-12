@@ -563,7 +563,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(sengokmj_state::vblank_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 }
 
 WRITE16_MEMBER( sengokmj_state::layer_en_w )
@@ -577,8 +577,8 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 }
 
 
-MACHINE_CONFIG_START(sengokmj_state::sengokmj)
-
+void sengokmj_state::sengokmj(machine_config &config)
+{
 	/* basic machine hardware */
 	V30(config, m_maincpu, 16000000/2); /* V30-8 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sengokmj_state::sengokmj_map);

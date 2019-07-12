@@ -375,6 +375,7 @@ static void osd_sdl_info(void)
 void sdl_osd_interface::video_register()
 {
 	video_options_add("soft", nullptr);
+	video_options_add("accel", nullptr);
 #if USE_OPENGL
 	video_options_add("opengl", nullptr);
 #endif

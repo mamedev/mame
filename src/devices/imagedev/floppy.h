@@ -25,19 +25,6 @@
 #include "sound/samples.h"
 #include "softlist_dev.h"
 
-#define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
-	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	static_cast<floppy_connector *>(device)->set_formats(_formats);
-
-#define MCFG_FLOPPY_DRIVE_ADD_FIXED(_tag, _slot_intf, _def_slot, _formats)  \
-	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
-	static_cast<floppy_connector *>(device)->set_formats(_formats);
-
-#define MCFG_FLOPPY_DRIVE_SOUND(_doit) \
-	static_cast<floppy_connector *>(device)->enable_sound(_doit);
-
 #define DECLARE_FLOPPY_FORMATS(_name) \
 	static const floppy_format_type _name []
 
@@ -204,6 +191,12 @@ protected:
 	uint32_t revolution_count;
 	int cyl, subcyl;
 
+	/* Current floppy zone cache */
+	attotime cache_start_time, cache_end_time, cache_weak_start;
+	int cache_index;
+	u32 cache_entry;
+	bool cache_weak;
+
 	bool image_dirty;
 	int ready_counter;
 
@@ -216,10 +209,19 @@ protected:
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
-	int find_index(uint32_t position, const std::vector<uint32_t> &buf);
+	int find_index(uint32_t position, const std::vector<uint32_t> &buf) const;
+	bool test_track_last_entry_warps(const std::vector<uint32_t> &buf) const;
+	attotime position_to_time(const attotime &base, int position) const;
+
 	void write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg);
 	void commit_image();
-	attotime get_next_index_time(std::vector<uint32_t> &buf, int index, int delta, attotime base);
+
+	u32 hash32(u32 val) const;
+
+	void cache_clear();
+	void cache_fill_index(const std::vector<uint32_t> &buf, int &index, attotime &base);
+	void cache_fill(const attotime &when);
+	void cache_weakness_setup();
 
 	// Sound
 	bool    m_make_sound;

@@ -137,6 +137,7 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/defimg.ipp",
 	MAME_DIR .. "src/frontend/mame/ui/dirmenu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/dirmenu.h",
+	MAME_DIR .. "src/frontend/mame/ui/icorender.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/icorender.h",
 	MAME_DIR .. "src/frontend/mame/ui/inifile.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/inifile.h",

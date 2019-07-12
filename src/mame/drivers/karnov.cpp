@@ -769,10 +769,10 @@ void karnov_state::machine_reset()
 void karnov_state::karnov(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);	/* 10 MHz */
+	M68000(config, m_maincpu, 10000000);    /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	M6502(config, m_audiocpu, 1500000);		/* Accurate */
+	M6502(config, m_audiocpu, 1500000);     /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */
@@ -793,8 +793,6 @@ void karnov_state::karnov(machine_config &config)
 	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
 	DECO_KARNOVSPRITES(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(2);
-	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
@@ -870,8 +868,6 @@ void karnov_state::wndrplnt(machine_config &config)
 	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 
 	DECO_KARNOVSPRITES(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(2);
-	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 

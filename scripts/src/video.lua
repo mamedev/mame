@@ -115,6 +115,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/crt9028.h,VIDEOS["CRT9028"] = true
+--------------------------------------------------
+
+if (VIDEOS["CRT9028"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/crt9028.cpp",
+		MAME_DIR .. "src/devices/video/crt9028.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/crt9212.h,VIDEOS["CRT9212"] = true
 --------------------------------------------------
 
@@ -593,6 +605,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mm5445.h,VIDEOS["MM5445"] = true
+--------------------------------------------------
+
+if (VIDEOS["MM5445"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mm5445.cpp",
+		MAME_DIR .. "src/devices/video/mm5445.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/msm6222b.h,VIDEOS["MSM6222B"] = true
 --------------------------------------------------
 
@@ -711,6 +735,17 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pwm.h,VIDEOS["PWM_DISPLAY"] = true
+--------------------------------------------------
+if (VIDEOS["PWM_DISPLAY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pwm.cpp",
+		MAME_DIR .. "src/devices/video/pwm.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/sed1200.h,VIDEOS["SED1200"] = true
 --------------------------------------------------
 if (VIDEOS["SED1200"]~=null) then
@@ -787,6 +822,18 @@ if (VIDEOS["STVVDP"]~=null) then
 		MAME_DIR .. "src/devices/video/stvvdp1.h",
 		MAME_DIR .. "src/devices/video/stvvdp2.cpp",
 		MAME_DIR .. "src/devices/video/stvvdp2.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/t6963c.h,VIDEOS["T6963C"] = true
+--------------------------------------------------
+
+if (VIDEOS["T6963C"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/t6963c.cpp",
+		MAME_DIR .. "src/devices/video/t6963c.h",
 	}
 end
 
@@ -1146,5 +1193,28 @@ if (VIDEOS["PS2GS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/ps2gs.cpp",
 		MAME_DIR .. "src/devices/video/ps2gs.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/decsfb.h,VIDEOS["DECSFB"] = true
+--------------------------------------------------
+if (VIDEOS["DECSFB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/decsfb.cpp",
+		MAME_DIR .. "src/devices/video/decsfb.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/bt47x.h,VIDEOS["BT47X"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT47X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt47x.cpp",
+		MAME_DIR .. "src/devices/video/bt47x.h",
 	}
 end

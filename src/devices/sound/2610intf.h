@@ -18,13 +18,12 @@ public:
 	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	virtual space_config_vector memory_space_config() const override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// update request from fm.cpp
 	static void update_request(device_t *param) { downcast<ym2610_device *>(param)->update_request(); }

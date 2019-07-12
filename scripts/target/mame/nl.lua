@@ -29,6 +29,7 @@ CPUS["I8085"] = true
 --CPUS["M680X0"] = true
 --CPUS["TMS9900"] = true
 --CPUS["COP400"] = true
+CPUS["F8"] = true
 
 --------------------------------------------------
 -- Specify all the sound cores necessary for the
@@ -47,7 +48,9 @@ SOUNDS["TMS5220"] = true
 --SOUNDS["YM3812"] = true
 --SOUNDS["CEM3394"] = true
 --SOUNDS["VOTRAX"] = true
+SOUNDS["BEEP"] = true
 SOUNDS["VOLT_REG"] = true
+SOUNDS["SPEAKER"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -59,8 +62,10 @@ VIDEOS["FIXFREQ"] = true
 -- specify available machine cores
 --------------------------------------------------
 
+MACHINES["INPUT_MERGER"] = true
 MACHINES["NETLIST"] = true
 MACHINES["Z80DMA"] = true
+MACHINES["Z80DAISY"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["AY31015"] = true
 MACHINES["KB3600"] = true
@@ -73,6 +78,7 @@ MACHINES["6522VIA"] = true
 MACHINES["6821PIA"] = true
 MACHINES["I8255"] = true
 MACHINES["WATCHDOG"] = true
+MACHINES["EEPROMDEV"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL7474"] = true
@@ -81,7 +87,7 @@ MACHINES["WATCHDOG"] = true
 --MACHINES["Z80CTC"] = true
 --MACHINES["68681"] = true
 --MACHINES["BANKDEV"] = true
-
+MACHINES["F3853"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -125,12 +131,16 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_pongd.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
+	MAME_DIR .. "src/mame/machine/nl_rebound.cpp",
+	MAME_DIR .. "src/mame/machine/nl_rebound.h",
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 
 	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
 	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
+  MAME_DIR .. "src/mame/machine/nl_gtrak10.cpp",
+  MAME_DIR .. "src/mame/machine/nl_gtrak10.h",
 
 	MAME_DIR .. "src/mame/drivers/prodigy.cpp",
 	MAME_DIR .. "src/mame/machine/nl_prodigy.cpp",
@@ -142,11 +152,13 @@ files{
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
 
+  MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
+
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
 
-	MAME_DIR .. "src/mame/drivers/mario.cpp",
+  MAME_DIR .. "src/mame/drivers/mario.cpp",
 	MAME_DIR .. "src/mame/includes/mario.h",
   MAME_DIR .. "src/mame/audio/nl_mario.cpp",
   MAME_DIR .. "src/mame/audio/nl_mario.h",
@@ -177,6 +189,33 @@ files{
   MAME_DIR .. "src/mame/includes/zaccaria.h",
   MAME_DIR .. "src/mame/video/zaccaria.cpp",
 
+  MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
+
+  MAME_DIR .. "src/mame/drivers/palestra.cpp",
+  MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
+  MAME_DIR .. "src/mame/machine/nl_palestra.h",
+
+  MAME_DIR .. "src/mame/drivers/testpat.cpp",
+  MAME_DIR .. "src/mame/machine/nl_tp1983.cpp",
+  MAME_DIR .. "src/mame/machine/nl_tp1983.h",
+  MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
+  MAME_DIR .. "src/mame/machine/nl_tp1985.h",
+
+  -- Skeletons ...
+  MAME_DIR .. "src/mame/drivers/a1supply.cpp",
+  MAME_DIR .. "src/mame/drivers/aleisttl.cpp",
+  MAME_DIR .. "src/mame/drivers/bailey.cpp",
+  MAME_DIR .. "src/mame/drivers/chicago.cpp",
+  MAME_DIR .. "src/mame/drivers/electra.cpp",
+  MAME_DIR .. "src/mame/drivers/exidyttl.cpp",
+  MAME_DIR .. "src/mame/drivers/fungames.cpp",
+  MAME_DIR .. "src/mame/drivers/meadwttl.cpp",
+  MAME_DIR .. "src/mame/drivers/monacogp.cpp",
+  MAME_DIR .. "src/mame/drivers/pse.cpp",
+  MAME_DIR .. "src/mame/drivers/ramtek.cpp",
+  MAME_DIR .. "src/mame/drivers/segattl.cpp",
+  MAME_DIR .. "src/mame/drivers/taitottl.cpp",
+  MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
 }
 end
 

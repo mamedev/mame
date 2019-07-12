@@ -74,6 +74,9 @@ protected:
 	void set_irq_slot(unsigned slot , int state);
 	void set_sts_slot(unsigned slot , int state);
 	void set_flg_slot(unsigned slot , int state);
+	void set_irq_nextsc_slot(unsigned slot , int state);
+	void set_sts_nextsc_slot(unsigned slot , int state);
+	void set_flg_nextsc_slot(unsigned slot , int state);
 	void set_dmar_slot(unsigned slot , int state);
 
 	// Character generator

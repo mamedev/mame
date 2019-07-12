@@ -465,18 +465,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(crgolf_state::crgolf)
-
+void crgolf_state::crgolf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/3/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &crgolf_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, MASTER_CLOCK/3/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::sound_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
 	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
@@ -486,9 +486,7 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screena_enable_w));
 
 	GENERIC_LATCH_8(config, "soundlatch1").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-
 
 	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
 	ADDRESS_MAP_BANK(config, "vrambank").set_map(&crgolf_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
@@ -496,46 +494,44 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 	PALETTE(config, m_palette, FUNC(crgolf_state::crgolf_palette), 0x20);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(crgolf_state, screen_update_crgolf)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 8, 247);
+	screen.set_screen_update(FUNC(crgolf_state::screen_update_crgolf));
+	screen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, "aysnd", MASTER_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(crgolf_state::crgolfhi)
+void crgolf_state::crgolfhi(machine_config &config)
+{
 	crgolf(config);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, crgolf_state, vck_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(crgolf_state::vck_callback));
+	m_msm->set_prescaler_selector(msm5205_device::S64_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(crgolf_state::mastrglf)
+void crgolf_state::mastrglf(machine_config &config)
+{
 	crgolfhi(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mastrglf_map)
-	MCFG_DEVICE_IO_MAP(mastrglf_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &crgolf_state::mastrglf_map);
+	m_maincpu->set_addrmap(AS_IO, &crgolf_state::mastrglf_io);
+	m_maincpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(mastrglf_submap)
-	MCFG_DEVICE_IO_MAP(mastrglf_subio)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::mastrglf_submap);
+	m_audiocpu->set_addrmap(AS_IO, &crgolf_state::mastrglf_subio);
+	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
 	PALETTE(config.replace(), m_palette, FUNC(crgolf_state::mastrglf_palette), 0x100);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

@@ -62,8 +62,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_VULCAN,     a2bus_vulcan_device,     "a2vulcan", "Applied Engineering Vulcan IDE controller")
-DEFINE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device, "a2vulgld", "Applied Engineering Vulcan Gold IDE controller")
+DEFINE_DEVICE_TYPE(A2BUS_VULCAN,     a2bus_vulcan_device,     "a2vulcan", "Applied Engineering Vulcan IDE controller (IIgs version)")
+DEFINE_DEVICE_TYPE(A2BUS_VULCANIIE,  a2bus_vulcaniie_device,  "a2vuliie", "Applied Engineering Vulcan IDE controller (//e version)")
+DEFINE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device, "a2vulgld", "Applied Engineering Vulcan Gold IDE controller (IIgs version)")
 
 #define VULCAN_ROM_REGION  "vulcan_rom"
 #define VULCAN_ATA_TAG     "vulcan_ata"
@@ -71,6 +72,11 @@ DEFINE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device, "a2vulgld", "Appli
 ROM_START( vulcan )
 	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
 	ROM_LOAD( "ae vulcan rom v1.4.bin", 0x000000, 0x004000, CRC(798d5825) SHA1(1d668e856e33c6eeb10fe26975341afa8acb81f5) )
+ROM_END
+
+ROM_START( vulcaniie )
+	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
+	ROM_LOAD( "ae vulcan vul 1.42e20 - 27128.bin", 0x000000, 0x004000, CRC(eee02aea) SHA1(d88ed27cd776f967b0e3440e05712b3830995f24) )
 ROM_END
 
 ROM_START( vulcangold )
@@ -100,6 +106,11 @@ const tiny_rom_entry *a2bus_vulcan_device::device_rom_region() const
 	return ROM_NAME( vulcan );
 }
 
+const tiny_rom_entry *a2bus_vulcaniie_device::device_rom_region() const
+{
+	return ROM_NAME( vulcaniie );
+}
+
 const tiny_rom_entry *a2bus_vulcangold_device::device_rom_region() const
 {
 	return ROM_NAME( vulcangold );
@@ -118,6 +129,11 @@ a2bus_vulcanbase_device::a2bus_vulcanbase_device(const machine_config &mconfig, 
 
 a2bus_vulcan_device::a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, tag, owner, clock)
+{
+}
+
+a2bus_vulcaniie_device::a2bus_vulcaniie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_vulcanbase_device(mconfig, A2BUS_VULCANIIE, tag, owner, clock)
 {
 }
 
@@ -148,6 +164,16 @@ void a2bus_vulcan_device::device_start()
 	// disable 40 meg partition size limit / protection in v1.4 ROMs
 	m_rom[0x59e] = 0xea;
 	m_rom[0x59f] = 0xea;
+}
+
+void a2bus_vulcaniie_device::device_start()
+{
+	// call base class
+	a2bus_vulcanbase_device::device_start();
+
+	// disable 40 meg partition size limit / protection in v1.4 ROMs
+	m_rom[0x540] = 0xea;
+	m_rom[0x541] = 0xea;
 }
 
 void a2bus_vulcanbase_device::device_reset()

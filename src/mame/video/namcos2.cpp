@@ -91,7 +91,9 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	apply_clip(clip, cliprect);
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
-	bool roz_enable = ((m_gfx_ctrl & 0x7000) ? true : false);
+	// Phelios contradicts with this so disabled 
+	// (level 0 ROZ is actually used by stages 2, 3 and 4 at very least)
+	//bool roz_enable = ((m_gfx_ctrl & 0x7000) ? true : false);
 
 	for (pri = 0; pri < 16; pri++)
 	{
@@ -99,7 +101,7 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
 
-			if (roz_enable)
+			//if (roz_enable)
 			{
 				if (((m_gfx_ctrl & 0x7000) >> 12) == pri / 2)
 				{

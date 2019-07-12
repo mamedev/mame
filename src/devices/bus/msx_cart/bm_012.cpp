@@ -39,7 +39,8 @@ void msx_cart_bm_012_device::bm_012_memory_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
+void msx_cart_bm_012_device::device_add_mconfig(machine_config &config)
+{
 	// 12MHz XTAL @ X1
 	// Toshiba TMPZ84C015AF-6 (@U5) components:
 	// - Z80
@@ -51,10 +52,10 @@ MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 	TMPZ84C015(config, m_tmpz84c015af, XTAL(12'000'000)/2);         /* 6 MHz */
 	m_tmpz84c015af->set_addrmap(AS_PROGRAM, &msx_cart_bm_012_device::bm_012_memory_map);
 	// PIO callbacks
-	m_tmpz84c015af->in_pa_callback().set("bm012_pio", FUNC(z80pio_device::pa_r));
-	m_tmpz84c015af->out_pa_callback().set("bm012_pio", FUNC(z80pio_device::pa_w));
-	m_tmpz84c015af->in_pb_callback().set("bm012_pio", FUNC(z80pio_device::pb_r));
-	m_tmpz84c015af->out_pb_callback().set("bm012_pio", FUNC(z80pio_device::pb_w));
+	m_tmpz84c015af->in_pa_callback().set("bm012_pio", FUNC(z80pio_device::port_a_read));
+	m_tmpz84c015af->out_pa_callback().set("bm012_pio", FUNC(z80pio_device::port_a_write));
+	m_tmpz84c015af->in_pb_callback().set("bm012_pio", FUNC(z80pio_device::port_b_read));
+	m_tmpz84c015af->out_pb_callback().set("bm012_pio", FUNC(z80pio_device::port_b_write));
 	m_tmpz84c015af->out_brdy_callback().set("bm012_pio", FUNC(z80pio_device::strobe_b));
 	// SIO callbacks
 	m_tmpz84c015af->out_txda_callback().set("mdout", FUNC(midi_port_device::write_txd));
@@ -69,13 +70,12 @@ MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 	m_bm012_pio->out_brdy_callback().set("tmpz84c015af", FUNC(tmpz84c015_device::strobe_b));
 
 	// MIDI ports
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(*this, msx_cart_bm_012_device, midi_in))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(msx_cart_bm_012_device::midi_in));
 
-	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+}
 
 
 ROM_START( msx_cart_bm_012 )
@@ -94,9 +94,8 @@ const tiny_rom_entry *msx_cart_bm_012_device::device_rom_region() const
 void msx_cart_bm_012_device::device_start()
 {
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0x70, 0x73, write8_delegate(FUNC(z80pio_device::write_alt), m_bm012_pio.target()));
-	space.install_read_handler(0x70, 0x73, read8_delegate(FUNC(z80pio_device::read_alt), m_bm012_pio.target()));
+	io_space().install_write_handler(0x70, 0x73, write8sm_delegate(FUNC(z80pio_device::write_alt), m_bm012_pio.target()));
+	io_space().install_read_handler(0x70, 0x73, read8sm_delegate(FUNC(z80pio_device::read_alt), m_bm012_pio.target()));
 }
 
 

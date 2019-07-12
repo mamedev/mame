@@ -15,7 +15,7 @@
 #define BORDER_RIGHT    (32)
 #define BORDER_TOP  (16)    // (plus bottom)
 
-class a2_video_device : public device_t, public device_palette_interface
+class a2_video_device : public device_t, public device_palette_interface, public device_video_interface
 {
 public:
 	// construction/destruction
@@ -42,6 +42,13 @@ public:
 	int m_char_size;
 
 	int m_sysconfig;
+
+	DECLARE_WRITE_LINE_MEMBER(txt_w);
+	DECLARE_WRITE_LINE_MEMBER(mix_w);
+	DECLARE_WRITE_LINE_MEMBER(scr_w);
+	DECLARE_WRITE_LINE_MEMBER(res_w);
+	DECLARE_WRITE_LINE_MEMBER(dhires_w);
+	DECLARE_WRITE_LINE_MEMBER(an2_w);
 
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);

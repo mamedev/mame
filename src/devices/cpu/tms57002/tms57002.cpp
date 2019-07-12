@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    tms57002.c
+    tms57002.cpp
 
     TMS57002 "DASP" emulator.
 
@@ -21,7 +21,7 @@ void tms57002_device::internal_pgm(address_map &map)
 	map(0x00, 0xff).ram();
 }
 
-tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, macc(0), macc_read(0), macc_write(0), st0(0), st1(0), sti(0), txrd(0)
@@ -40,13 +40,15 @@ std::unique_ptr<util::disasm_interface> tms57002_device::create_disassembler()
 
 WRITE_LINE_MEMBER(tms57002_device::pload_w)
 {
-	uint8_t olds = sti;
-	if(state)
+	u8 olds = sti;
+	if (state)
 		sti &= ~IN_PLOAD;
 	else
 		sti |= IN_PLOAD;
-	if(olds ^ sti) {
-		if (sti & IN_PLOAD) {
+	if (olds ^ sti)
+	{
+		if (sti & IN_PLOAD)
+		{
 			hidx = 0;
 			pc = 0;
 			ca = 0;
@@ -57,13 +59,15 @@ WRITE_LINE_MEMBER(tms57002_device::pload_w)
 
 WRITE_LINE_MEMBER(tms57002_device::cload_w)
 {
-	uint8_t olds = sti;
-	if(state)
+	u8 olds = sti;
+	if (state)
 		sti &= ~IN_CLOAD;
 	else
 		sti |= IN_CLOAD;
-	if(olds ^ sti) {
-		if (sti & IN_CLOAD) {
+	if (olds ^ sti)
+	{
+		if (sti & IN_CLOAD)
+		{
 			hidx = 0;
 			//ca = 0; // Seems extremely dubious
 		}
@@ -95,20 +99,23 @@ void tms57002_device::device_reset()
 	cache_flush();
 }
 
-WRITE8_MEMBER(tms57002_device::data_w)
+void tms57002_device::data_w(u8 data)
 {
-	switch(sti & (IN_PLOAD|IN_CLOAD)) {
+	switch (sti & (IN_PLOAD|IN_CLOAD))
+	{
 	case 0:
 		hidx = 0;
 		sti &= ~SU_CVAL;
 		break;
 	case IN_PLOAD:
 		host[hidx++] = data;
-		if(hidx >= 3) {
-			uint32_t val = (host[0]<<16) | (host[1]<<8) | host[2];
+		if (hidx >= 3)
+		{
+			u32 val = (host[0]<<16) | (host[1]<<8) | host[2];
 			hidx = 0;
 
-			switch(sti & SU_MASK) {
+			switch (sti & SU_MASK)
+			{
 			case SU_ST0:
 				st0 = val;
 				sti = (sti & ~SU_MASK) | SU_ST1;
@@ -125,17 +132,21 @@ WRITE8_MEMBER(tms57002_device::data_w)
 		}
 		break;
 	case IN_CLOAD:
-		if(sti & SU_CVAL) {
+		if (sti & SU_CVAL)
+		{
 			host[hidx++] = data;
-			if(hidx >= 4) {
-				uint32_t val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
+			if (hidx >= 4)
+			{
+				u32 val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
 				sti &= ~SU_CVAL;
 				update[update_counter_head] = val;
 				update_counter_head = (update_counter_head + 1) & 0x0f;
 				hidx = 1; // the write shouldn't really happen until CLOAD is high though
 				update_empty();
 			}
-		} else {
+		}
+		else
+		{
 			sa = data;
 			hidx = 0;
 			sti |= SU_CVAL;
@@ -144,8 +155,9 @@ WRITE8_MEMBER(tms57002_device::data_w)
 		break;
 	case IN_PLOAD|IN_CLOAD:
 		host[hidx++] = data;
-		if(hidx >= 4) {
-			uint32_t val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
+		if (hidx >= 4)
+		{
+			u32 val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
 			hidx = 0;
 			cmem[ca++] = val;
 		}
@@ -153,15 +165,16 @@ WRITE8_MEMBER(tms57002_device::data_w)
 	};
 }
 
-READ8_MEMBER(tms57002_device::data_r)
+u8 tms57002_device::data_r()
 {
-	uint8_t res;
-	if(!(sti & S_HOST))
+	u8 res;
+	if (!(sti & S_HOST))
 		return 0xff;
 
 	res = host[hidx];
 	hidx++;
-	if(hidx == 4) {
+	if (hidx == 4)
+	{
 		hidx = 0;
 		sti &= ~S_HOST;
 		update_dready();
@@ -202,14 +215,15 @@ void tms57002_device::update_empty()
 
 WRITE_LINE_MEMBER(tms57002_device::sync_w)
 {
-	if(sti & (IN_PLOAD /*| IN_CLOAD*/))
+	if (sti & (IN_PLOAD /*| IN_CLOAD*/))
 		return;
 
 	allow_update = 1;
 	pc = 0;
 	ca = 0;
 	id = 0;
-	if(!(st0 & ST0_INCS)) {
+	if (!(st0 & ST0_INCS))
+	{
 		ba0--;
 		ba1++;
 	}
@@ -220,20 +234,21 @@ WRITE_LINE_MEMBER(tms57002_device::sync_w)
 
 void tms57002_device::xm_init()
 {
-	uint32_t adr = xoa + xba;
-	uint32_t mask = 0;
+	u32 adr = xoa + xba;
+	u32 mask = 0;
 
-	switch(st0 & ST0_M) {
+	switch (st0 & ST0_M)
+	{
 	case ST0_M_64K:  mask = 0x0ffff; break;
 	case ST0_M_256K: mask = 0x3ffff; break;
 	case ST0_M_1M:   mask = 0xfffff; break;
 	}
-	if(st0 & ST0_WORD)
+	if (st0 & ST0_WORD)
 		adr <<= 2;
 	else
 		adr <<= 1;
 
-	if(!(st0 & ST0_SEL))
+	if (!(st0 & ST0_SEL))
 		adr <<= 1;
 
 	xm_adr = adr & mask;
@@ -241,158 +256,183 @@ void tms57002_device::xm_init()
 
 inline void tms57002_device::xm_step_read()
 {
-	uint32_t adr = xm_adr;
-	uint8_t v = data->read_byte(adr);
+	u32 adr = xm_adr;
+	u8 v = data->read_byte(adr);
 	int done;
-	if(st0 & ST0_WORD) {
-		if(st0 & ST0_SEL) {
+	if (st0 & ST0_WORD)
+	{
+		if (st0 & ST0_SEL)
+		{
 			int off = 16 - ((adr & 3) << 3);
 			txrd = (txrd & ~(0xff << off)) | (v << off);
 			done = off == 0;
-		} else {
+		}
+		else
+		{
 			int off = 20 - ((adr & 7) << 2);
 			txrd = (txrd & ~(0xf << off)) | ((v & 0xf) << off);
 			done = off == 0;
 		}
-	} else {
-		if(st0 & ST0_SEL) {
+	}
+	else
+	{
+		if (st0 & ST0_SEL)
+		{
 			int off = 16 - ((adr & 1) << 3);
 			txrd = (txrd & ~(0xff << off)) | (v << off);
 			done = off == 8;
-			if(done)
+			if (done)
 				txrd &= 0xffff00;
-		} else {
+		}
+		else
+		{
 			int off = 20 - ((adr & 3) << 2);
 			txrd = (txrd & ~(0xf << off)) | ((v & 0xf) << off);
 			done = off == 8;
-			if(done)
+			if (done)
 				txrd &= 0xffff00;
 		}
 	}
-	if(done) {
+	if (done)
+	{
 		xrd = txrd;
 		sti &= ~S_READ;
 		xm_adr = 0;
-	} else
+	}
+	else
 		xm_adr = adr+1;
 }
 
 inline void tms57002_device::xm_step_write()
 {
-	uint32_t adr = xm_adr;
-	uint8_t v;
+	u32 adr = xm_adr;
+	u8 v;
 	int done;
-	if(st0 & ST0_WORD) {
-		if(st0 & ST0_SEL) {
+	if (st0 & ST0_WORD)
+	{
+		if (st0 & ST0_SEL)
+		{
 			int off = 16 - ((adr & 3) << 3);
 			v = xwr >> off;
 			done = off == 0;
-		} else {
+		}
+		else
+		{
 			int off = 20 - ((adr & 7) << 2);
 			v = (xwr >> off) & 0xf;
 			done = off == 0;
 		}
-	} else {
-		if(st0 & ST0_SEL) {
+	}
+	else
+	{
+		if (st0 & ST0_SEL)
+		{
 			int off = 16 - ((adr & 1) << 3);
 			v = xwr >> off;
 			done = off == 8;
-		} else {
+		}
+		else
+		{
 			int off = 20 - ((adr & 3) << 2);
 			v = (xwr >> off) & 0xf;
 			done = off == 8;
 		}
 	}
 	data->write_byte(adr, v);
-	if(done) {
+	if (done)
+	{
 		sti &= ~S_WRITE;
 		xm_adr = 0;
-	} else
+	}
+	else
 		xm_adr = adr+1;
 }
 
-int64_t tms57002_device::macc_to_output_0(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_0(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	m = (m + rounding) & rmask;
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
 	}
 	return m;
 }
 
-int64_t tms57002_device::macc_to_output_1(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_1(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m1 = m & 0xfe00000000000ULL;
-	if(m1 && m1 != 0xfe00000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xfe00000000000ULL)
+		over = true;
 	m <<= 2;
 
 	m = (m + rounding) & rmask;
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
 	}
 	return m;
 }
 
-int64_t tms57002_device::macc_to_output_2(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_2(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m1 = m & 0xff80000000000ULL;
-	if(m1 && m1 != 0xff80000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xff80000000000ULL)
+		over = true;
 	m <<= 4;
 
 	m = (m + rounding) & rmask;
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
 	}
 	return m;
 }
 
-int64_t tms57002_device::macc_to_output_3(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_3(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m >>= 8;
@@ -401,38 +441,40 @@ int64_t tms57002_device::macc_to_output_3(int64_t rounding, uint64_t rmask)
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
 	}
 	return m;
 }
 
-int64_t tms57002_device::macc_to_output_0s(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_0s(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	m = (m + rounding) & rmask;
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
-		if(m & 0x8000000000000ULL)
+		if (m & 0x8000000000000ULL)
 			m = 0xffff800000000000ULL;
 		else
 			m = 0x00007fffffffffffULL;
@@ -440,29 +482,30 @@ int64_t tms57002_device::macc_to_output_0s(int64_t rounding, uint64_t rmask)
 	return m;
 }
 
-int64_t tms57002_device::macc_to_output_1s(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_1s(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m1 = m & 0xfe00000000000ULL;
-	if(m1 && m1 != 0xfe00000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xfe00000000000ULL)
+		over = true;
 	m <<= 2;
 
 	m = (m + rounding) & rmask;
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
-		if(m & 0x8000000000000ULL)
+		if (m & 0x8000000000000ULL)
 			m = 0xffff800000000000ULL;
 		else
 			m = 0x00007fffffffffffULL;
@@ -470,29 +513,30 @@ int64_t tms57002_device::macc_to_output_1s(int64_t rounding, uint64_t rmask)
 	return m;
 }
 
-int64_t tms57002_device::macc_to_output_2s(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_2s(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m1 = m & 0xff80000000000ULL;
-	if(m1 && m1 != 0xff80000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xff80000000000ULL)
+		over = true;
 	m <<= 4;
 
 	m = (m + rounding) & rmask;
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
-		if(m & 0x8000000000000ULL)
+		if (m & 0x8000000000000ULL)
 			m = 0xffff800000000000ULL;
 		else
 			m = 0x00007fffffffffffULL;
@@ -500,11 +544,11 @@ int64_t tms57002_device::macc_to_output_2s(int64_t rounding, uint64_t rmask)
 	return m;
 }
 
-int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
+s64 tms57002_device::macc_to_output_3s(s64 rounding, u64 rmask)
 {
-	int64_t m = macc_read;
-	uint64_t m1;
-	int over = 0;
+	s64 m = macc_read;
+	u64 m1;
+	int over = false;
 
 	// Overflow detection and shifting
 	m >>= 8;
@@ -513,13 +557,14 @@ int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
 
 	// Second overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL)
-		over = 1;
+	if (m1 && m1 != 0xf800000000000ULL)
+		over = true;
 
 	// Overflow handling
-	if(over) {
+	if (over)
+	{
 		st1 |= ST1_MOV;
-		if(m & 0x8000000000000ULL)
+		if (m & 0x8000000000000ULL)
 			m = 0xffff800000000000ULL;
 		else
 			m = 0x00007fffffffffffULL;
@@ -527,60 +572,64 @@ int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
 	return m;
 }
 
-int64_t tms57002_device::check_macc_overflow_0()
+s64 tms57002_device::check_macc_overflow_0()
 {
-	int64_t m = macc_read;
-	uint64_t m1;
+	s64 m = macc_read;
+	u64 m1;
 
 	// Overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL) {
+	if (m1 && m1 != 0xf800000000000ULL)
+	{
 		st1 |= ST1_MOV;
 	}
 	return m;
 }
 
-int64_t tms57002_device::check_macc_overflow_1()
+s64 tms57002_device::check_macc_overflow_1()
 {
-	int64_t m = macc_read;
-	uint64_t m1;
+	s64 m = macc_read;
+	u64 m1;
 
 	// Overflow detection
 	m1 = m & 0xfe00000000000ULL;
-	if(m1 && m1 != 0xfe00000000000ULL) {
+	if (m1 && m1 != 0xfe00000000000ULL)
+	{
 		st1 |= ST1_MOV;
 	}
 	return m;
 }
 
-int64_t tms57002_device::check_macc_overflow_2()
+s64 tms57002_device::check_macc_overflow_2()
 {
-	int64_t m = macc_read;
-	uint64_t m1;
+	s64 m = macc_read;
+	u64 m1;
 
 	// Overflow detection
 	m1 = m & 0xff80000000000ULL;
-	if(m1 && m1 != 0xff80000000000ULL) {
+	if (m1 && m1 != 0xff80000000000ULL)
+	{
 		st1 |= ST1_MOV;
 	}
 	return m;
 }
 
-int64_t tms57002_device::check_macc_overflow_3()
+s64 tms57002_device::check_macc_overflow_3()
 {
 	return macc_read;
 }
 
-int64_t tms57002_device::check_macc_overflow_0s()
+s64 tms57002_device::check_macc_overflow_0s()
 {
-	int64_t m = macc_read;
-	uint64_t m1;
+	s64 m = macc_read;
+	u64 m1;
 
 	// Overflow detection
 	m1 = m & 0xf800000000000ULL;
-	if(m1 && m1 != 0xf800000000000ULL) {
+	if (m1 && m1 != 0xf800000000000ULL)
+	{
 		st1 |= ST1_MOV;
-		if(m & 0x8000000000000ULL)
+		if (m & 0x8000000000000ULL)
 			m = 0xffff800000000000ULL;
 		else
 			m = 0x00007fffffffffffULL;
@@ -588,16 +637,17 @@ int64_t tms57002_device::check_macc_overflow_0s()
 	return m;
 }
 
-int64_t tms57002_device::check_macc_overflow_1s()
+s64 tms57002_device::check_macc_overflow_1s()
 {
-	int64_t m = macc_read;
-	uint64_t m1;
+	s64 m = macc_read;
+	u64 m1;
 
 	// Overflow detection
 	m1 = m & 0xfe00000000000ULL;
-	if(m1 && m1 != 0xfe00000000000ULL) {
+	if (m1 && m1 != 0xfe00000000000ULL)
+	{
 		st1 |= ST1_MOV;
-		if(m & 0x8000000000000ULL)
+		if (m & 0x8000000000000ULL)
 			m = 0xffff800000000000ULL;
 		else
 			m = 0x00007fffffffffffULL;
@@ -605,16 +655,17 @@ int64_t tms57002_device::check_macc_overflow_1s()
 	return m;
 }
 
-int64_t tms57002_device::check_macc_overflow_2s()
+s64 tms57002_device::check_macc_overflow_2s()
 {
-	int64_t m = macc_read;
-	uint64_t m1;
+	s64 m = macc_read;
+	u64 m1;
 
 	// Overflow detection
 	m1 = m & 0xff80000000000ULL;
-	if(m1 && m1 != 0xff80000000000ULL) {
+	if (m1 && m1 != 0xff80000000000ULL)
+	{
 		st1 |= ST1_MOV;
-		if(m & 0x8000000000000ULL)
+		if (m & 0x8000000000000ULL)
 			m = 0xffff800000000000ULL;
 		else
 			m = 0x00007fffffffffffULL;
@@ -622,23 +673,23 @@ int64_t tms57002_device::check_macc_overflow_2s()
 	return m;
 }
 
-int64_t tms57002_device::check_macc_overflow_3s()
+s64 tms57002_device::check_macc_overflow_3s()
 {
 	return macc_read;
 }
 
-uint32_t tms57002_device::get_cmem(uint8_t addr)
+u32 tms57002_device::get_cmem(u8 addr)
 {
-	if(sa == addr && update_counter_head != update_counter_tail)
+	if (sa == addr && update_counter_head != update_counter_tail)
 		sti |= S_UPDATE;
 
-	if(sti & S_UPDATE)
+	if (sti & S_UPDATE)
 	{
 		cmem[addr] = update[update_counter_tail];
 		update_counter_tail = (update_counter_tail + 1) & 0x0f;
 		update_empty();
 
-		if(update_counter_head == update_counter_tail)
+		if (update_counter_head == update_counter_tail)
 			sti &= ~S_UPDATE;
 
 		return cmem[addr]; // The value of crm is ignored during an update.
@@ -646,10 +697,10 @@ uint32_t tms57002_device::get_cmem(uint8_t addr)
 	else
 	{
 		int crm = (st1 & ST1_CRM) >> ST1_CRM_SHIFT;
-		uint32_t cvar = cmem[addr];
-		if(crm == 1)
+		u32 cvar = cmem[addr];
+		if (crm == 1)
 			return (cvar & 0xffff0000);
-		else if(crm == 2)
+		else if (crm == 2)
 			return (cvar << 16);
 		return cvar;
 	}
@@ -659,52 +710,56 @@ void tms57002_device::cache_flush()
 {
 	int i;
 	cache.hused = cache.iused = 0;
-	for(i=0; i != 256; i++)
+	for (i = 0; i != 256; i++)
 		cache.hashbase[i] = -1;
-	for(i=0; i != HBS; i++) {
+	for (i = 0; i != HBS; i++)
+	{
 		cache.hashnode[i].st1 = 0;
 		cache.hashnode[i].ipc = -1;
 		cache.hashnode[i].next = -1;
 	}
-	for(i=0; i != IBS; i++) {
+	for (i = 0; i != IBS; i++)
+	{
 		cache.inst[i].op = 0;
 		cache.inst[i].next = -1;
 		cache.inst[i].param = 0;
 	}
 }
 
-void tms57002_device::add_one(cstate *cs, unsigned short op, uint8_t param)
+void tms57002_device::add_one(cstate *cs, u16 op, u8 param)
 {
-	short ipc = cache.iused++;
+	s16 ipc = cache.iused++;
 	cache.inst[ipc].op = op;
 	cache.inst[ipc].param = param;
 	cache.inst[ipc].next = -1;
-	if(cs->ipc != -1)
+	if (cs->ipc != -1)
 		cache.inst[cs->ipc].next = ipc;
 	cs->ipc = ipc;
-	if(cs->hnode != -1) {
+	if (cs->hnode != -1)
+	{
 		cache.hashnode[cs->hnode].ipc = ipc;
 		cs->hnode = -1;
 	}
 }
 
-void tms57002_device::decode_one(uint32_t opcode, cstate *cs, void (tms57002_device::*dec)(uint32_t opcode, unsigned short *op, cstate *cs))
+void tms57002_device::decode_one(u32 opcode, cstate *cs, void (tms57002_device::*dec)(u32 opcode, u16 *op, cstate *cs))
 {
-	unsigned short op = 0;
+	u16 op = 0;
 	(this->*dec)(opcode, &op, cs);
-	if(!op)
+	if (!op)
 		return;
 	add_one(cs, op, opcode & 0xff);
 }
 
-short tms57002_device::get_hash(unsigned char adr, uint32_t st1, short *pnode)
+s16 tms57002_device::get_hash(u8 adr, u32 st1, s16 *pnode)
 {
-	short hnode;
+	s16 hnode;
 	st1 &= ST1_CACHE;
 	*pnode = -1;
 	hnode = cache.hashbase[adr];
-	while(hnode != -1) {
-		if(cache.hashnode[hnode].st1 == st1)
+	while(hnode != -1)
+	{
+		if (cache.hashnode[hnode].st1 == st1)
 			return cache.hashnode[hnode].ipc;
 		*pnode = hnode;
 		hnode = cache.hashnode[hnode].next;
@@ -712,13 +767,13 @@ short tms57002_device::get_hash(unsigned char adr, uint32_t st1, short *pnode)
 	return -1;
 }
 
-short tms57002_device::get_hashnode(unsigned char adr, uint32_t st1, short pnode)
+s16 tms57002_device::get_hashnode(u8 adr, u32 st1, s16 pnode)
 {
-	short hnode = cache.hused++;
+	s16 hnode = cache.hused++;
 	cache.hashnode[hnode].st1 = st1 & ST1_CACHE;
 	cache.hashnode[hnode].ipc = -1;
 	cache.hashnode[hnode].next = -1;
-	if(pnode == -1)
+	if (pnode == -1)
 		cache.hashbase[adr] = hnode;
 	else
 		cache.hashnode[pnode].next = hnode;
@@ -727,15 +782,16 @@ short tms57002_device::get_hashnode(unsigned char adr, uint32_t st1, short pnode
 
 int tms57002_device::decode_get_pc()
 {
-	short pnode, res;
+	s16 pnode, res;
 	cstate cs;
-	uint8_t adr = pc;
+	u8 adr = pc;
 
 	res = get_hash(adr, st1, &pnode);
-	if(res != -1)
+	if (res != -1)
 		return res;
 
-	if(HBS - cache.hused < 256 || IBS - cache.iused < 256*3) {
+	if (HBS - cache.hused < 256 || IBS - cache.iused < 256*3)
+	{
 		cache_flush();
 		pnode = -1;
 	}
@@ -744,13 +800,14 @@ int tms57002_device::decode_get_pc()
 	cs.ipc = -1;
 	cs.branch = 0;
 
-	for(;;) {
-		short ipc;
-		uint32_t opcode = program->read_dword(adr);
+	for (;;)
+	{
+		s16 ipc;
+		u32 opcode = program->read_dword(adr);
 
 		cs.inc = 0;
 
-		if((opcode & 0xfc0000) == 0xfc0000)
+		if ((opcode & 0xfc0000) == 0xfc0000)
 			decode_one(opcode, &cs, &tms57002_device::decode_cat3);
 		else {
 			decode_one(opcode, &cs, &tms57002_device::decode_cat2_pre);
@@ -759,12 +816,13 @@ int tms57002_device::decode_get_pc()
 		}
 		add_one(&cs, cs.inc, 0);
 
-		if(cs.branch)
+		if (cs.branch)
 			break;
 
 		adr++;
 		ipc = get_hash(adr, st1, &pnode);
-		if(ipc != -1) {
+		if (ipc != -1)
+		{
 			cache.inst[cs.ipc].next = ipc;
 			break;
 		}
@@ -778,18 +836,20 @@ void tms57002_device::execute_run()
 {
 	int ipc = -1;
 
-	while(icount > 0 && !(sti & (S_IDLE | IN_PLOAD /*| IN_CLOAD*/))) {
+	while(icount > 0 && !(sti & (S_IDLE | IN_PLOAD /*| IN_CLOAD*/)))
+	{
 		int iipc;
 
 		debugger_instruction_hook(pc);
 
-		if(ipc == -1)
+		if (ipc == -1)
 			ipc = decode_get_pc();
 
 		iipc = ipc;
 
-		if(sti & (S_READ|S_WRITE)) {
-			if(sti & S_READ)
+		if (sti & (S_READ|S_WRITE))
+		{
+			if (sti & S_READ)
 				xm_step_read();
 			else
 				xm_step_write();
@@ -798,11 +858,13 @@ void tms57002_device::execute_run()
 		macc_read = macc_write;
 		macc_write = macc;
 
-		for(;;) {
+		for (;;)
+		{
 			const icd *i = cache.inst + ipc;
 
 			ipc = i->next;
-			switch(i->op) {
+			switch (i->op)
+			{
 			case 0:
 				goto inst;
 
@@ -829,24 +891,30 @@ void tms57002_device::execute_run()
 	inst:
 		icount--;
 
-		if(rptc) {
+		if (rptc)
+		{
 			rptc--;
 			ipc = iipc;
-		} else if(sti & S_BRANCH) {
+		}
+		else if (sti & S_BRANCH)
+		{
 			sti &= ~S_BRANCH;
 			ipc = -1;
-		} else {
+		}
+		else
+		{
 			pc++; // Wraps if it reaches 256, next wraps too
 			update_pc0();
 		}
 
-		if(rptc_next) {
+		if (rptc_next)
+		{
 			rptc = rptc_next;
 			rptc_next = 0;
 		}
 	}
 
-	if(icount > 0)
+	if (icount > 0)
 		icount = 0;
 }
 
@@ -854,12 +922,15 @@ void tms57002_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 {
 	assert(samples == 1);
 
-	if(st0 & ST0_SIM) {
+	if (st0 & ST0_SIM)
+	{
 		si[0] = (inputs[0][0] << 8) & 0xffffff;
 		si[1] = (inputs[1][0] << 8) & 0xffffff;
 		si[2] = (inputs[2][0] << 8) & 0xffffff;
 		si[3] = (inputs[3][0] << 8) & 0xffffff;
-	} else {
+	}
+	else
+	{
 		si[0] = inputs[0][0] & 0xffffff;
 		si[1] = inputs[1][0] & 0xffffff;
 		si[2] = inputs[2][0] & 0xffffff;
@@ -955,17 +1026,17 @@ void tms57002_device::device_start()
 	save_item(NAME(allow_update));
 }
 
-uint32_t tms57002_device::execute_min_cycles() const
+u32 tms57002_device::execute_min_cycles() const
 {
 	return 1;
 }
 
-uint32_t tms57002_device::execute_max_cycles() const
+u32 tms57002_device::execute_max_cycles() const
 {
 	return 3;
 }
 
-uint32_t tms57002_device::execute_input_lines() const
+u32 tms57002_device::execute_input_lines() const
 {
 	return 0;
 }

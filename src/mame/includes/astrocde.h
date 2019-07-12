@@ -43,6 +43,7 @@ public:
 		m_astrocade_sound1(*this, "astrocade1"),
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
+		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -57,6 +58,7 @@ public:
 	optional_device<astrocade_io_device> m_astrocade_sound1;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
+	optional_shared_ptr<uint8_t> m_nvram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
@@ -129,6 +131,7 @@ public:
 	DECLARE_READ8_MEMBER(profpac_videoram_r);
 	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
+	DECLARE_WRITE_LINE_MEMBER(lightpen_trigger_w);
 	void init_profpac();
 	void init_spacezap();
 	void init_robby();

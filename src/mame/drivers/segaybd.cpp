@@ -22,11 +22,11 @@
 ****************************************************************************
 
     Known bugs:
-        * still seems to be some glitchiness in the games in general
+        * pdriftl's comms doesn't work
 
 ****************************************************************************
 
-Network Board (used for Power Drift)
+Network Board (used for Power Drift: Link Version)
 -------------
 
 Board: 834-6740
@@ -666,7 +666,7 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intl)
 WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 {
 	// shared ram interrupt request from maincpu side
-	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // RST $28
+	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 - RST $28
 }
 
 
@@ -1330,7 +1330,7 @@ void segaybd_state::yboard(machine_config &config)
 	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
-	PALETTE(config, m_palette).set_entries(8192*3);
+	PALETTE(config, m_palette).set_entries(8192*2);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -1398,6 +1398,7 @@ void segaybd_state::yboard_deluxe(machine_config &config)
 //*************************************************************************************************************************
 //  Galaxy Force 2 (World), Sega Y-board
 //  CPU: 68000 (317-????)
+//  GAME BD: 834-6614-02 GALAXY FORCE 2
 //
 ROM_START( gforce2 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
@@ -2722,7 +2723,6 @@ void segaybd_state::init_generic()
 	save_item(NAME(m_timer_irq_state));
 	save_item(NAME(m_vblank_irq_state));
 	save_item(NAME(m_misc_io_data));
-	save_item(NAME(m_tmp_bitmap));
 }
 
 
@@ -2790,7 +2790,7 @@ GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pd
 GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_pdrift)
 
 GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )

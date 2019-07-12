@@ -1395,6 +1395,8 @@ void nes_vt_state::nes_vt(machine_config &config)
 
 	NES_CONTROL_PORT(config, m_ctrl1, nes_control_port1_devices, "joypad");
 	NES_CONTROL_PORT(config, m_ctrl2, nes_control_port2_devices, "joypad");
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_ddr(machine_config &config)
@@ -1403,6 +1405,8 @@ void nes_vt_state::nes_vt_ddr(machine_config &config)
 
 	NES_CONTROL_PORT(config, m_ctrl1, majesco_control_port1_devices, "ddr");
 	NES_CONTROL_PORT(config, m_ctrl2, majesco_control_port2_devices, nullptr);
+	m_ctrl1->set_screen_tag(m_screen);
+	m_ctrl2->set_screen_tag(m_screen);
 }
 
 void nes_vt_state::nes_vt_hum(machine_config &config)
@@ -1506,14 +1510,14 @@ static INPUT_PORTS_START( nes_vt_fp )
 	PORT_DIPNAME( 0x06, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, "472-in-1" )
 	PORT_DIPSETTING(    0x06, "128-in-1" )
-MACHINE_CONFIG_END
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_vt_fa )
 	PORT_START("CARTSEL")
 	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, "508-in-1" )
 	PORT_DIPSETTING(    0x01, "130-in-1" )
-MACHINE_CONFIG_END
+INPUT_PORTS_END
 
 
 ROM_START( vdogdeme )
@@ -1524,6 +1528,26 @@ ROM_END
 ROM_START( vdogdemo )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(054af705) SHA1(e730aeaa94b9cc28aa8b512a5bf411ec45226831) )
+ROM_END
+
+ROM_START( pinkjelly )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "seesaw.bin", 0x00000, 0x200000, CRC(67b5a079) SHA1(36ebfd64809af072b73acfa3a426b57017851bf4) )
+ROM_END
+
+ROM_START( vtpinball )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(62e52c23) SHA1(b83b82c928b9fe82abfaa915196322153787c8ce) )
+ROM_END
+
+ROM_START( vtsndtest )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(ddc2bc9c) SHA1(fb9209c62d1496ba7fe379e8a078cabd48cccd9b) )
+ROM_END
+
+ROM_START( vtboxing )
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(c115b1af) SHA1(82106e1c11c3279c5d8731c112f713fa3f290125) )
 ROM_END
 
 ROM_START( mc_dgear )
@@ -1579,6 +1603,16 @@ ROM_END
 ROM_START( mc_sp69 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "sports game 69-in-1.prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
+ROM_END
+
+ROM_START( polmega )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "megamax.bin", 0x00000, 0x400000, CRC(ef3aade3) SHA1(0c130080ace000cbe43e70a805d4301e05840294) )
+ROM_END
+
+ROM_START( silv35 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "silverlit35.bin", 0x00000, 0x400000, CRC(7540e350) SHA1(a0cb456136560fa4d8a365dd44d815ec0e9fc2e7) )
 ROM_END
 
 ROM_START( pjoyn50 )
@@ -1793,6 +1827,18 @@ CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT
 // this is glitchy even in other emulators, might just be entirely unfinished, it selects banks but they don't contain the required gfx?
 CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
 
+// Bundled as "VT03 Demo" on the V.R. Technology VT SDK
+CONS( 200?, pinkjelly, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "VRT VT SDK 'Pink Jelly' (VT03 Demo)", MACHINE_IMPERFECT_GRAPHICS )
+
+// Bundled as "C-Compiler Demo Program 2" on the V.R. Technology VT SDK
+CONS( 200?, vtpinball, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT / OJ-Jungle", "VRT VT SDK 'Pinball' (C-Compiler Demo Program 2)", MACHINE_NOT_WORKING )
+
+// Bundled as "Sound Generator FMDemo" on the V.R. Technology VT SDK
+CONS( 200?, vtsndtest, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'VT03 Sound Test' (Sound Generator FMDemo)", MACHINE_IMPERFECT_CONTROLS )
+
+// Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
+CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
+
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
 CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
@@ -1831,6 +1877,10 @@ CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Int
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
 CONS( 200?, mc_sp69,   0,  0,  nes_vt_sp69,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
+
+// CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes?
+CONS( 200?, polmega,   0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 200?, silv35,    0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 
 // Hummer systems, scrambled bank register
 CONS( 200?, mc_sam60,  0,  0,  nes_vt_hum,    nes_vt, nes_vt_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )

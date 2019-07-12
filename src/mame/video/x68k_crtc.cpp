@@ -22,6 +22,8 @@ x68k_crtc_device::x68k_crtc_device(const machine_config &mconfig, device_type ty
 	, m_gvram_read_callback(*this)
 	, m_tvram_write_callback(*this)
 	, m_gvram_write_callback(*this)
+	, m_clock_69m(0)
+	, m_clock_50m(0)
 	, m_operation(0)
 	, m_vblank(false)
 	, m_hblank(false)
@@ -203,7 +205,7 @@ void x68k_crtc_device::refresh_mode()
 		div = BIT(m_reg[20], 0) ? 3 : 6;
 	if ((m_reg[20] & 0x0c) == 0)
 		div *= 2;
-	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? 69.55199_MHz_XTAL : 38.86363_MHz_XTAL) / div) * (scr.max_x * scr.max_y);
+	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? clock_69m() : clock_39m()) / div) * (scr.max_x * scr.max_y);
 	LOG("screen().configure(%i,%i,[%i,%i,%i,%i],%f)\n", scr.max_x, scr.max_y, visiblescr.min_x, visiblescr.min_y, visiblescr.max_x, visiblescr.max_y, refresh.as_hz());
 	screen().configure(scr.max_x, scr.max_y, visiblescr, refresh.as_attoseconds());
 }

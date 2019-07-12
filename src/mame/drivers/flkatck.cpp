@@ -10,6 +10,10 @@
     TO DO:
         -What does 0x900X do? (Z80)
 
+NOTE: There is known to exist a USA version of Flak Attack - currently not dumped
+
+24MHz & 3.579545MHz OSCs
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -69,13 +73,13 @@ WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 			flkatck_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:  /* sound code number */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			break;
 		case 0x06:  /* Cause interrupt on audio CPU */
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
 		case 0x07:  /* watchdog reset */
-			m_watchdog->reset_w(space, 0, data);
+			m_watchdog->watchdog_reset();
 			break;
 	}
 }
@@ -214,11 +218,11 @@ void flkatck_state::machine_reset()
 void flkatck_state::flkatck(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309(config, m_maincpu, 3000000*4); /* HD63C09EP, 24/8 MHz */
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); /* HD63C09EP, 3MHz (24MHz/8) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &flkatck_state::flkatck_map);
 	m_maincpu->set_vblank_int("screen", FUNC(flkatck_state::flkatck_interrupt));
 
-	Z80(config, m_audiocpu, 3579545);   /* NEC D780C-1, 3.579545 MHz */
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);   /* NEC D780C-1, 3.579545MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flkatck_state::flkatck_sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(600);
@@ -246,9 +250,9 @@ void flkatck_state::flkatck(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(flkatck_state::volume_callback));
 	m_k007232->add_route(0, "lspeaker", 0.50);
 	m_k007232->add_route(0, "rspeaker", 0.50);
@@ -259,45 +263,45 @@ void flkatck_state::flkatck(machine_config &config)
 
 
 ROM_START( mx5000 )
-	ROM_REGION( 0x18000, "maincpu", 0 )     /* 6309 code */
+	ROM_REGION( 0x18000, "maincpu", 0 )  /* 6309 code */
 	ROM_LOAD( "669_r01.16c", 0x010000, 0x006000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) ) /* banked ROM */
 	ROM_CONTINUE(            0x006000, 0x00a000 )           /* fixed ROM */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )  /* 64k for the SOUND CPU */
 	ROM_LOAD( "669_m02.16b", 0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "mask4m.5e",   0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) /* tiles + sprites */
+	ROM_REGION( 0x080000, "gfx1", 0 )  /* tiles + sprites */
+	ROM_LOAD( "gx669f03.5e",   0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) /* MASK4M */
 
-	ROM_REGION( 0x040000, "k007232", 0 ) /* 007232 data (chip 1) */
-	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
+	ROM_REGION( 0x040000, "k007232", 0 )  /* 007232 data (chip 1) */
+	ROM_LOAD( "gx669f04.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) /* MASK2M */
 ROM_END
 
 ROM_START( flkatck )
-	ROM_REGION( 0x18000, "maincpu", 0 )     /* 6309 code */
+	ROM_REGION( 0x18000, "maincpu", 0 )  /* 6309 code */
 	ROM_LOAD( "669_p01.16c", 0x010000, 0x006000, CRC(c5cd2807) SHA1(22ddd911a23954ff2d52552e07323f5f0ddaeead) ) /* banked ROM */
 	ROM_CONTINUE(            0x006000, 0x00a000 )           /* fixed ROM */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )  /* 64k for the SOUND CPU */
 	ROM_LOAD( "669_m02.16b", 0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "mask4m.5e",   0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) /* tiles + sprites */
+	ROM_REGION( 0x080000, "gfx1", 0 )  /* tiles + sprites */
+	ROM_LOAD( "gx669f03.5e",   0x000000, 0x080000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) /* MASK4M */
 
-	ROM_REGION( 0x040000, "k007232", 0 ) /* 007232 data (chip 1) */
-	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
+	ROM_REGION( 0x040000, "k007232", 0 )  /* 007232 data (chip 1) */
+	ROM_LOAD( "gx669f04.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) /* MASK2M */
 ROM_END
 
 // identical to flkatck except for the board / ROM type configuration
 ROM_START( flkatcka )
-	ROM_REGION( 0x18000, "maincpu", 0 )     /* 6309 code */
+	ROM_REGION( 0x18000, "maincpu", 0 )  /* 6309 code */
 	ROM_LOAD( "669_p01.16c", 0x010000, 0x006000, CRC(c5cd2807) SHA1(22ddd911a23954ff2d52552e07323f5f0ddaeead) ) /* banked ROM */
 	ROM_CONTINUE(            0x006000, 0x00a000 )           /* fixed ROM */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )  /* 64k for the SOUND CPU */
 	ROM_LOAD( "669_m02.16b", 0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 ) /* tiles + sprites */ // same data as above set, on PWB 450593 sub-board instead.
+	ROM_REGION( 0x080000, "gfx1", 0 )  /* tiles + sprites */ // same data as above set, on PWB 450593 sub-board instead.
 	ROM_LOAD16_BYTE( "669_f03a.4b",   0x000001, 0x010000, CRC(f0ed4c1e) SHA1(58efe3cd81054d22de54a7d195aa3b865bde4a01) )
 	ROM_LOAD16_BYTE( "669_f03e.4d",   0x000000, 0x010000, CRC(95a57a26) SHA1(c8aa30c2c734c0740630b1b04ae43c69931cc7c1) )
 	ROM_LOAD16_BYTE( "669_f03b.5b",   0x020001, 0x010000, CRC(e2593f3c) SHA1(aa0f6d04015650eaef17c4a39f228eaccf9a2948) )
@@ -307,10 +311,10 @@ ROM_START( flkatcka )
 	ROM_LOAD16_BYTE( "669_f03d.7b",   0x060001, 0x010000, CRC(18d48f9e) SHA1(b95e38aa813e0f3a0dc6bd45fdb4bf71f7e2066c) )
 	ROM_LOAD16_BYTE( "669_f03h.7d",   0x060000, 0x010000, CRC(abfe76e7) SHA1(f8661f189308e83056ec442fa6c936efff67ba0a) )
 
-	ROM_REGION( 0x040000, "k007232", 0 ) /* 007232 data (chip 1) */
-	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
+	ROM_REGION( 0x040000, "k007232", 0 )  /* 007232 data (chip 1) */
+	ROM_LOAD( "gx669f04.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) /* MASK2M */
 ROM_END
 
-GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatcka,mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000,   0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatck,  mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatcka, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )

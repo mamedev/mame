@@ -28,25 +28,27 @@
 #ifndef NLD_2716_H_
 #define NLD_2716_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define EPROM_2716(name, cGQ, cEPQ, cA0, cA1, cA2, cA3, cA4, cA5, cA6, cA7, cA8, cA9, cA10) \
-		NET_REGISTER_DEV(EPROM_2716, name) \
-		NET_CONNECT(name, GQ,  cGQ)     \
-		NET_CONNECT(name, EPQ, cEPQ)    \
-		NET_CONNECT(name, A0,  cA0)     \
-		NET_CONNECT(name, A1,  cA1)     \
-		NET_CONNECT(name, A2,  cA2)     \
-		NET_CONNECT(name, A3,  cA3)     \
-		NET_CONNECT(name, A4,  cA4)     \
-		NET_CONNECT(name, A5,  cA5)     \
-		NET_CONNECT(name, A6,  cA6)     \
-		NET_CONNECT(name, A7,  cA7)     \
-		NET_CONNECT(name, A8,  cA8)     \
-		NET_CONNECT(name, A9,  cA9)     \
+		NET_REGISTER_DEV(EPROM_2716, name)                                     \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, GQ,  cGQ)                                            \
+		NET_CONNECT(name, EPQ, cEPQ)                                           \
+		NET_CONNECT(name, A0,  cA0)                                            \
+		NET_CONNECT(name, A1,  cA1)                                            \
+		NET_CONNECT(name, A2,  cA2)                                            \
+		NET_CONNECT(name, A3,  cA3)                                            \
+		NET_CONNECT(name, A4,  cA4)                                            \
+		NET_CONNECT(name, A5,  cA5)                                            \
+		NET_CONNECT(name, A6,  cA6)                                            \
+		NET_CONNECT(name, A7,  cA7)                                            \
+		NET_CONNECT(name, A8,  cA8)                                            \
+		NET_CONNECT(name, A9,  cA9)                                            \
 		NET_CONNECT(name, A10, cA10)
 
-#define EPROM_2716_DIP(name)                                 \
+#define EPROM_2716_DIP(name)                                                   \
 		NET_REGISTER_DEV(EPROM_2716_DIP, name)
 
 #endif /* NLD_2716_H_ */

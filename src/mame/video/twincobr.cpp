@@ -24,11 +24,9 @@
 
 TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 {
-	int code, tile_number, color;
-
-	code = m_bgvideoram16[tile_index+m_bg_ram_bank];
-	tile_number = code & 0x0fff;
-	color = (code & 0xf000) >> 12;
+	const u16 code = m_bgvideoram16[tile_index+m_bg_ram_bank];
+	const u32 tile_number = code & 0x0fff;
+	const u32 color = (code & 0xf000) >> 12;
 	SET_TILE_INFO_MEMBER(2,
 			tile_number,
 			color,
@@ -37,11 +35,9 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
 {
-	int code, tile_number, color;
-
-	code = m_fgvideoram16[tile_index];
-	tile_number = (code & 0x0fff) | m_fg_rom_bank;
-	color = (code & 0xf000) >> 12;
+	const u16 code = m_fgvideoram16[tile_index];
+	const u32 tile_number = (code & 0x0fff) | m_fg_rom_bank;
+	const u32 color = (code & 0xf000) >> 12;
 	SET_TILE_INFO_MEMBER(1,
 			tile_number,
 			color,
@@ -50,11 +46,9 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(twincobr_state::get_tx_tile_info)
 {
-	int code, tile_number, color;
-
-	code = m_txvideoram16[tile_index];
-	tile_number = code & 0x07ff;
-	color = (code & 0xf800) >> 11;
+	const u16 code = m_txvideoram16[tile_index];
+	const u32 tile_number = code & 0x07ff;
+	const u32 color = (code & 0xf800) >> 11;
 	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
@@ -93,9 +87,9 @@ void twincobr_state::video_start()
 
 	twincobr_create_tilemaps();
 
-	m_txvideoram16 = make_unique_clear<uint16_t[]>(m_txvideoram_size);
-	m_fgvideoram16 = make_unique_clear<uint16_t[]>(m_fgvideoram_size);
-	m_bgvideoram16 = make_unique_clear<uint16_t[]>(m_bgvideoram_size);
+	m_txvideoram16 = make_unique_clear<u16[]>(m_txvideoram_size);
+	m_fgvideoram16 = make_unique_clear<u16[]>(m_fgvideoram_size);
+	m_bgvideoram16 = make_unique_clear<u16[]>(m_bgvideoram_size);
 
 	m_display_on = 0;
 
@@ -135,140 +129,148 @@ WRITE_LINE_MEMBER(twincobr_state::flipscreen_w)
 WRITE_LINE_MEMBER(twincobr_state::bg_ram_bank_w)
 {
 	m_bg_ram_bank = state ? 0x1000 : 0x0000;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 WRITE_LINE_MEMBER(twincobr_state::fg_rom_bank_w)
 {
 	m_fg_rom_bank = state ? 0x1000 : 0x0000;
+	m_fg_tilemap->mark_all_dirty();
 }
 
 
-WRITE16_MEMBER(twincobr_state::twincobr_txoffs_w)
+void twincobr_state::twincobr_txoffs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txoffs);
 	m_txoffs %= m_txvideoram_size;
 }
-READ16_MEMBER(twincobr_state::twincobr_txram_r)
+u16 twincobr_state::twincobr_txram_r()
 {
 	return m_txvideoram16[m_txoffs];
 }
-WRITE16_MEMBER(twincobr_state::twincobr_txram_w)
+void twincobr_state::twincobr_txram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txvideoram16[m_txoffs]);
 	m_tx_tilemap->mark_tile_dirty(m_txoffs);
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_bgoffs_w)
+void twincobr_state::twincobr_bgoffs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgoffs);
 	m_bgoffs %= (m_bgvideoram_size >> 1);
 }
-READ16_MEMBER(twincobr_state::twincobr_bgram_r)
+u16 twincobr_state::twincobr_bgram_r()
 {
 	return m_bgvideoram16[m_bgoffs+m_bg_ram_bank];
 }
-WRITE16_MEMBER(twincobr_state::twincobr_bgram_w)
+void twincobr_state::twincobr_bgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram16[m_bgoffs+m_bg_ram_bank]);
 	m_bg_tilemap->mark_tile_dirty((m_bgoffs+m_bg_ram_bank));
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_fgoffs_w)
+void twincobr_state::twincobr_fgoffs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fgoffs);
 	m_fgoffs %= m_fgvideoram_size;
 }
-READ16_MEMBER(twincobr_state::twincobr_fgram_r)
+u16 twincobr_state::twincobr_fgram_r()
 {
 	return m_fgvideoram16[m_fgoffs];
 }
-WRITE16_MEMBER(twincobr_state::twincobr_fgram_w)
+void twincobr_state::twincobr_fgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram16[m_fgoffs]);
 	m_fg_tilemap->mark_tile_dirty(m_fgoffs);
 }
 
 
-WRITE16_MEMBER(twincobr_state::twincobr_txscroll_w)
+void twincobr_state::twincobr_txscroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset == 0) {
+	if (offset == 0)
+	{
 		COMBINE_DATA(&m_txscrollx);
 		m_tx_tilemap->set_scrollx(0, m_txscrollx);
 	}
-	else {
+	else
+	{
 		COMBINE_DATA(&m_txscrolly);
 		m_tx_tilemap->set_scrolly(0, m_txscrolly);
 	}
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_bgscroll_w)
+void twincobr_state::twincobr_bgscroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset == 0) {
+	if (offset == 0)
+	{
 		COMBINE_DATA(&m_bgscrollx);
 		m_bg_tilemap->set_scrollx(0, m_bgscrollx);
 	}
-	else {
+	else
+	{
 		COMBINE_DATA(&m_bgscrolly);
 		m_bg_tilemap->set_scrolly(0, m_bgscrolly);
 	}
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_fgscroll_w)
+void twincobr_state::twincobr_fgscroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset == 0) {
+	if (offset == 0)
+	{
 		COMBINE_DATA(&m_fgscrollx);
 		m_fg_tilemap->set_scrollx(0, m_fgscrollx);
 	}
-	else {
+	else
+	{
 		COMBINE_DATA(&m_fgscrolly);
 		m_fg_tilemap->set_scrolly(0, m_fgscrolly);
 	}
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_exscroll_w)/* Extra unused video layer */
+void twincobr_state::twincobr_exscroll_w(offs_t offset, u16 data)/* Extra unused video layer */
 {
 	if (offset == 0) logerror("PC - write %04x to unknown video scroll Y register\n",data);
 	else logerror("PC - write %04x to unknown video scroll X register\n",data);
 }
 
 /******************** Wardner interface to this hardware ********************/
-WRITE8_MEMBER(twincobr_state::wardner_txlayer_w)
+void twincobr_state::wardner_txlayer_w(offs_t offset, u8 data)
 {
 	int shift = 8 * (offset & 1);
-	twincobr_txoffs_w(space, offset / 2, data << shift, 0xff << shift);
+	twincobr_txoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_bglayer_w)
+void twincobr_state::wardner_bglayer_w(offs_t offset, u8 data)
 {
 	int shift = 8 * (offset & 1);
-	twincobr_bgoffs_w(space, offset / 2, data << shift, 0xff << shift);
+	twincobr_bgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_fglayer_w)
+void twincobr_state::wardner_fglayer_w(offs_t offset, u8 data)
 {
 	int shift = 8 * (offset & 1);
-	twincobr_fgoffs_w(space, offset / 2, data << shift, 0xff << shift);
+	twincobr_fgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_txscroll_w)
+void twincobr_state::wardner_txscroll_w(offs_t offset, u8 data)
 {
 	int shift = 8 * (offset & 1);
-	twincobr_txscroll_w(space, offset / 2, data << shift, 0xff << shift);
+	twincobr_txscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_bgscroll_w)
+void twincobr_state::wardner_bgscroll_w(offs_t offset, u8 data)
 {
 	int shift = 8 * (offset & 1);
-	twincobr_bgscroll_w(space, offset / 2, data << shift, 0xff << shift);
+	twincobr_bgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_fgscroll_w)
+void twincobr_state::wardner_fgscroll_w(offs_t offset, u8 data)
 {
 	int shift = 8 * (offset & 1);
-	twincobr_fgscroll_w(space, offset / 2, data << shift, 0xff << shift);
+	twincobr_fgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_exscroll_w)/* Extra unused video layer */
+void twincobr_state::wardner_exscroll_w(offs_t offset, u8 data)/* Extra unused video layer */
 {
 	switch (offset)
 	{
@@ -279,37 +281,39 @@ WRITE8_MEMBER(twincobr_state::wardner_exscroll_w)/* Extra unused video layer */
 	}
 }
 
-READ8_MEMBER(twincobr_state::wardner_videoram_r)
+u8 twincobr_state::wardner_videoram_r(offs_t offset)
 {
 	int shift = 8 * (offset & 1);
-	switch (offset/2) {
-		case 0: return twincobr_txram_r(space,0,0xffff) >> shift;
-		case 1: return twincobr_bgram_r(space,0,0xffff) >> shift;
-		case 2: return twincobr_fgram_r(space,0,0xffff) >> shift;
+	switch (offset / 2)
+	{
+		case 0: return twincobr_txram_r() >> shift;
+		case 1: return twincobr_bgram_r() >> shift;
+		case 2: return twincobr_fgram_r() >> shift;
 	}
 	return 0;
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_videoram_w)
+void twincobr_state::wardner_videoram_w(offs_t offset, u8 data)
 {
 	int shift = 8 * (offset & 1);
-	switch (offset/2) {
-		case 0: twincobr_txram_w(space,0,data << shift, 0xff << shift); break;
-		case 1: twincobr_bgram_w(space,0,data << shift, 0xff << shift); break;
-		case 2: twincobr_fgram_w(space,0,data << shift, 0xff << shift); break;
+	switch (offset / 2)
+	{
+		case 0: twincobr_txram_w(0,data << shift, 0xff << shift); break;
+		case 1: twincobr_bgram_w(0,data << shift, 0xff << shift); break;
+		case 2: twincobr_fgram_w(0,data << shift, 0xff << shift); break;
 	}
 }
 
-READ8_MEMBER(twincobr_state::wardner_sprite_r)
+u8 twincobr_state::wardner_sprite_r(offs_t offset)
 {
-	uint16_t *spriteram16 = reinterpret_cast<uint16_t *>(m_spriteram8->live());
+	u16 *spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
 	int shift = (offset & 1) * 8;
 	return spriteram16[offset/2] >> shift;
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_sprite_w)
+void twincobr_state::wardner_sprite_w(offs_t offset, u8 data)
 {
-	uint16_t *spriteram16 = reinterpret_cast<uint16_t *>(m_spriteram8->live());
+	u16 *spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
 	if (offset & 1)
 		spriteram16[offset/2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
 	else
@@ -320,7 +324,7 @@ WRITE8_MEMBER(twincobr_state::wardner_sprite_w)
 
 
 
-void twincobr_state::twincobr_log_vram()
+void twincobr_state::log_vram()
 {
 #ifdef MAME_DEBUG
 
@@ -360,12 +364,12 @@ void twincobr_state::twincobr_log_vram()
 }
 
 
-uint32_t twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 twincobr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	twincobr_log_vram();
+	log_vram();
 
-	uint16_t *buffered_spriteram16;
-	uint32_t bytes;
+	u16 *buffered_spriteram16;
+	u32 bytes;
 	if (m_spriteram16 != nullptr)
 	{
 		buffered_spriteram16 = m_spriteram16->buffer();
@@ -373,13 +377,13 @@ uint32_t twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_in
 	}
 	else
 	{
-		buffered_spriteram16 = reinterpret_cast<uint16_t *>(m_spriteram8->buffer());
+		buffered_spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->buffer());
 		bytes = m_spriteram8->bytes();
 	}
 
 	if (!m_display_on)
 	{
-		bitmap.fill(0, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 	else
 	{

@@ -25,7 +25,6 @@
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "sound/ym2151.h"
 #include "video/mc6845.h"
 

@@ -1921,13 +1921,13 @@ static GFXDECODE_START( gfx_cpokerpk )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(igspoker_state::igspoker)
-
+void igspoker_state::igspoker(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(igspoker_prg_map)
-	MCFG_DEVICE_IO_MAP(igspoker_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igspoker_state, igs_interrupt, "screen", 0, 1)
+	Z80(config, m_maincpu, 3579545);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igspoker_state::igspoker_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &igspoker_state::igspoker_io_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(igspoker_state::igs_interrupt), "screen", 0, 1);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(igspoker_state::igs_nmi_and_coins_w));
@@ -1935,66 +1935,65 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	ppi.in_pc_callback().set_ioport("COINS");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8) // TODO: wrong screen size!
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8); // TODO: wrong screen size!
+	m_screen->set_visarea(0*8, 64*8-1, 0, 32*8-1);
+	m_screen->set_screen_update(FUNC(igspoker_state::screen_update_igs_video));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_igspoker)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igspoker);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_END
+void igspoker_state::csk227it(machine_config &config)
+{
+	igspoker(config);
+}
 
-MACHINE_CONFIG_START(igspoker_state::csk227it)
+void igspoker_state::csk234it(machine_config &config)
+{
+	igspoker(config);
+}
+
+void igspoker_state::igs_ncs(machine_config &config)
+{
+	igspoker(config);
+}
+
+void igspoker_state::number10(machine_config &config)
+{
 	igspoker(config);
 
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &igspoker_state::number10_io_map);
 
-MACHINE_CONFIG_START(igspoker_state::csk234it)
-	igspoker(config);
+	config.device_remove("ppi");
 
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(igspoker_state::screen_update_cpokerpk));
 
-MACHINE_CONFIG_START(igspoker_state::igs_ncs)
-	igspoker(config);
-
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(igspoker_state::number10)
-	igspoker(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(number10_io_map)
-
-	MCFG_DEVICE_REMOVE("ppi")
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)
 	MCFG_VIDEO_START_OVERRIDE(igspoker_state,cpokerpk)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(igspoker_state::cpokerpk)
+void igspoker_state::cpokerpk(machine_config &config)
+{
 	number10(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cpokerpk)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_IO, &igspoker_state::cpokerpk_io_map);
+	m_gfxdecode->set_info(gfx_cpokerpk);
+}
 
 
-MACHINE_CONFIG_START(igspoker_state::pktetris)
+void igspoker_state::pktetris(machine_config &config)
+{
 	igspoker(config);
-
-MACHINE_CONFIG_END
+}
 
 
 
@@ -2255,6 +2254,69 @@ ROM_START( cpokerx )
 	ROM_LOAD( "22v10b.u22", 0x02000, 0x001704, CRC(609a1aaa) SHA1(b123c93929f932e4ee343a7109f8b16717845d8b) )
 ROM_END
 
+ROM_START( cpoker101 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u20-v01.bin",        0x00000, 0x10000, CRC(ce99fe3c) SHA1(b5df1f2f5c086626b072b9978383484f699f628b) )
+	ROM_LOAD( "champion7.u21",      0x18000, 0x8000,  CRC(123ff157) SHA1(aa1d1dc589a2d1ca38b667ab88706280347088b4) )
+	ROM_IGNORE(                              0x8000)
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "champion3.u6", 0x00000, 0x20000, CRC(f3e61b24) SHA1(b18998defb6e51daef4ac5a5865674565ffb9029) )
+	ROM_LOAD( "champion2.u5", 0x20000, 0x20000, CRC(a68b305f) SHA1(f872d2bf7ab194145dffe6b254ae0ad66aa6a497) )
+	ROM_LOAD( "champion1.u4", 0x40000, 0x20000, CRC(860be7c9) SHA1(41bc58713076276aeefc44c7ea903549692b0224) )
+
+	//copy?
+	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x60000 )
+ROM_END
+
+ROM_START( cpoker201f )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u20-201f.bin",       0x00000, 0x10000, CRC(000e0f8d) SHA1(63ded0c3bfaeed6b57870706d379a975cc5790c4) )
+	ROM_LOAD( "champion7.u21",      0x18000, 0x8000,  CRC(123ff157) SHA1(aa1d1dc589a2d1ca38b667ab88706280347088b4) )
+	ROM_IGNORE(                              0x8000)
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "champion3.u6", 0x00000, 0x20000, CRC(f3e61b24) SHA1(b18998defb6e51daef4ac5a5865674565ffb9029) )
+	ROM_LOAD( "champion2.u5", 0x20000, 0x20000, CRC(a68b305f) SHA1(f872d2bf7ab194145dffe6b254ae0ad66aa6a497) )
+	ROM_LOAD( "champion1.u4", 0x40000, 0x20000, CRC(860be7c9) SHA1(41bc58713076276aeefc44c7ea903549692b0224) )
+
+	//copy?
+	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x60000 )
+ROM_END
+
+ROM_START( cpoker210ks )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u20-210ks.bin",      0x00000, 0x10000, CRC(8900ccba) SHA1(e8796602db0ab1c1e73ab37d380e7fe39060646d) )
+	ROM_LOAD( "champion7.u21",      0x18000, 0x8000,  CRC(123ff157) SHA1(aa1d1dc589a2d1ca38b667ab88706280347088b4) )
+	ROM_IGNORE(                              0x8000)
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "champion3.u6", 0x00000, 0x20000, CRC(f3e61b24) SHA1(b18998defb6e51daef4ac5a5865674565ffb9029) )
+	ROM_LOAD( "champion2.u5", 0x20000, 0x20000, CRC(a68b305f) SHA1(f872d2bf7ab194145dffe6b254ae0ad66aa6a497) )
+	ROM_LOAD( "champion1.u4", 0x40000, 0x20000, CRC(860be7c9) SHA1(41bc58713076276aeefc44c7ea903549692b0224) )
+
+	//copy?
+	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x60000 )
+ROM_END
+
+ROM_START( cpoker300us )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u20 v300us.bin",     0x00000, 0x10000, CRC(510dc75c) SHA1(0514135211ccada2aa7c1d87bf2bac64399cfc51) )
+	ROM_LOAD( "champion7.u21",      0x18000, 0x8000,  CRC(123ff157) SHA1(aa1d1dc589a2d1ca38b667ab88706280347088b4) )
+	ROM_IGNORE(                              0x8000)
+
+	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_LOAD( "u50-champion 3.bin", 0x00000, 0x20000, CRC(9f076732) SHA1(0d62db6a26e219032801ca90dc78470005a81ff2) )
+	ROM_LOAD( "u51-champion 2.bin", 0x20000, 0x20000, CRC(9b775e3a) SHA1(df4a3ef284924900af8035059f167668f33fdb6a) )
+	ROM_LOAD( "u52-champion 1.bin", 0x40000, 0x20000, CRC(c032f9a5) SHA1(468a4b8729ad3a4f0f2045bc4aa6ba853f103b70) )
+
+	//copy?
+	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x60000 )
+ROM_END
 
 ROM_START( igs_ncs )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -2854,27 +2916,36 @@ void igspoker_state::init_kungfu()
 }
 
 
-GAMEL( 1993?,cpoker,    0,        igspoker, cpoker,   igspoker_state, init_cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
-GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, init_cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
-GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                        0, layout_igspoker )
-GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
-GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
-GAMEL( 1998, chleagxa,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
-GAMEL( 1998, chleagxb,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
-GAMEL( 198?, csk227it,  0,        csk227it, csk227,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) /* SU 062 */
-GAMEL( 198?, csk234it,  csk227it, csk234it, csk234,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) /* SU 062 */
-GAMEL( 2000, number10,  0,        number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                         0, layout_igspoker )
-GAMEL( 2000, numbr10l,  number10, number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Lattine)",                       0, layout_igspoker )
-GAMEL( 198?, igs_ncs,   0,        igs_ncs,  igs_ncs,  igspoker_state, init_igs_ncs,  ROT0, "IGS",                  "New Champion Skill (v100n)",                   0, layout_igspoker ) /* SU 062 */
-GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, blue board)",    0, layout_igspoker )
-GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, green board)",   0, layout_igspoker )
-GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian Cup (bootleg V220IT)",        0, layout_igspoker )
+GAMEL( 1993?,cpoker,      0,      igspoker, cpoker,   igspoker_state, init_cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
+GAMEL( 1993?,cpokert,     cpoker, igspoker, cpoker,   igspoker_state, init_cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
+GAMEL( 1993, cpokerx,     cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                        0, layout_igspoker )
+GAMEL( 1993, cpoker101,   cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v101)",                        MACHINE_NOT_WORKING, layout_igspoker ) // need to verify protection handling and inputs/outputs on these
+GAMEL( 1993, cpoker201f,  cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v201F)",                       MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 1993, cpoker210ks, cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v210KS)",                      MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 1993, cpoker300us, cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v300US)",                      MACHINE_NOT_WORKING, layout_igspoker ) // different encryption or mapping?
 
-GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs,  igspoker_state, init_igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",              MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
+GAMEL( 2000, chleague,    0,        igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
+GAMEL( 2000, chleagul,    chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
+GAMEL( 1998, chleagxa,    chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
+GAMEL( 1998, chleagxb,    chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
 
-GAMEL( 1998, stellecu,  0,        number10, number10, igspoker_state, empty_init,    ROT0, "Sure",                 "Stelle e Cubi (Italy)",                        MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 198?, csk227it,    0,        csk227it, csk227,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) /* SU 062 */
+GAMEL( 198?, csk234it,    csk227it, csk234it, csk234,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) /* SU 062 */
 
-GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, init_pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
-GAMEL( 199?, igstet341, pktet346, pktetris, igstet341,igspoker_state, init_tet341,   ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
+GAMEL( 2000, number10,    0,        number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                         0, layout_igspoker )
+GAMEL( 2000, numbr10l,    number10, number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Lattine)",                       0, layout_igspoker )
 
-GAMEL( 1992, kungfu,    0,        igspoker, cpoker,   igspoker_state, init_kungfu,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 198?, igs_ncs,     0,        igs_ncs,  igs_ncs,  igspoker_state, init_igs_ncs,  ROT0, "IGS",                  "New Champion Skill (v100n)",                   0, layout_igspoker ) /* SU 062 */
+
+GAMEL( 199?, cpokerpk,    0,        cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, blue board)",    0, layout_igspoker )
+GAMEL( 199?, cpokerpkg,   cpokerpk, cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, green board)",   0, layout_igspoker )
+GAMEL( 199?, citalcup,    cpokerpk, cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian Cup (bootleg V220IT)",        0, layout_igspoker )
+
+GAMEL( 2000, igs_ncs2,    0,        igs_ncs,  igs_ncs,  igspoker_state, init_igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",              MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
+
+GAMEL( 1998, stellecu,    0,        number10, number10, igspoker_state, empty_init,    ROT0, "Sure",                 "Stelle e Cubi (Italy)",                        MACHINE_NOT_WORKING, layout_igspoker )
+
+GAMEL( 1993?,pktet346,    0,        pktetris, pktet346, igspoker_state, init_pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
+GAMEL( 199?, igstet341,   pktet346, pktetris, igstet341,igspoker_state, init_tet341,   ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
+
+GAMEL( 1992, kungfu,      0,        igspoker, cpoker,   igspoker_state, init_kungfu,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker )

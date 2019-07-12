@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+Simple layout for Little Casino (monochrome)
+-->
+
+<mamelayout version="2">
+	<element name="background">
+	</element>
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0" right="640" bottom="70" />
+			<color red="0.87" green="0.91" blue="0.43" />
+		</rect>
+		<rect>
+			<bounds left="0" top="75" right="640" bottom="240" />
+			<color red="0.10" green="0.44" blue="0.72" />
+		</rect>
+		<rect>
+			<bounds left="0" top="240" right="640" bottom="410" />
+			<color red="0.77" green="0.14" blue="0.14" />
+		</rect>
+		<rect>
+			<bounds left="0" top="415" right="640" bottom="480" />
+			<color red="0.18" green="0.85" blue="0.33" />
+		</rect>
+	</element>
+	<element name="button" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+	</element>
+	<view name="Buttons">
+		<backdrop element="background">
+			<bounds x="0" y="0" width="640" height="580" />
+		</backdrop>
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<overlay name="overlay" element="overlay">
+			<bounds x="0" y="0" width="640" height="480" />
+		</overlay>
+		<cpanel name="button_0" element="button" inputtag="Q" inputmask="0x01">
+			<bounds x="80" y="505" width="70" height="35" />
+		</cpanel>
+		<cpanel name="button_1" element="button" inputtag="Q" inputmask="0x02">
+			<bounds x="180" y="505" width="70" height="35" />
+		</cpanel>
+		<cpanel name="button_2" element="button" inputtag="Q" inputmask="0x04">
+			<bounds x="280" y="505" width="70" height="35" />
+		</cpanel>
+		<cpanel name="button_3" element="button" inputtag="Q" inputmask="0x08">
+			<bounds x="380" y="505" width="70" height="35" />
+		</cpanel>
+		<cpanel name="button_4" element="button" inputtag="Q" inputmask="0x10">
+			<bounds x="480" y="505" width="70" height="35" />
+		</cpanel>
+	</view>
+</mamelayout>

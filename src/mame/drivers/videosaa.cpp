@@ -96,7 +96,7 @@ void videosaa_state::videosaa(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(videosaa_state::screen_update));
 
-	H46505(config, "crtc", 10_MHz_XTAL); // unknown divider
+	HD6845S(config, "crtc", 10_MHz_XTAL); // unknown divider
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx);
 

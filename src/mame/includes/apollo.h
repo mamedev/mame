@@ -14,7 +14,6 @@
 #pragma once
 
 
-#include "machine/apollo_dbg.h"
 #include "machine/apollo_kbd.h"
 
 #include "cpu/m68000/m68000.h"
@@ -89,11 +88,6 @@ uint8_t apollo_get_ram_config_byte(void);
 
 //apollo_get_node_id - get the node id
 uint32_t apollo_get_node_id(void);
-
-#if 0
-	// should be called by the CPU core before executing each instruction
-int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
-#endif
 
 void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
 
@@ -221,8 +215,9 @@ public:
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
-	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
-	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
+	void cpu_space_map(address_map &map);
+	u16 apollo_irq_acknowledge(offs_t offset);
+	u16 apollo_pic_get_vector();
 	void apollo_bus_error();
 	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
@@ -265,7 +260,6 @@ public:
 	void select_dma_channel(int channel, bool state);
 
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
-	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
 	void common(machine_config &config);
 	void apollo(machine_config &config);
@@ -687,14 +681,14 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
-	virtual void rcv_complete(); // Rx completed receiving byte
-	virtual void tra_complete(); // Tx completed sending byte
-	virtual void tra_callback(); // Tx send bit
+	virtual void rcv_complete() override; // Rx completed receiving byte
+	virtual void tra_complete() override; // Tx completed sending byte
+	virtual void tra_callback() override; // Tx send bit
 
 	TIMER_CALLBACK_MEMBER( poll_timer );
 	void xmit_char(uint8_t data);

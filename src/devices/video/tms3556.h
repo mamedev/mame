@@ -19,12 +19,6 @@
 /* if DOUBLE_WIDTH set, the horizontal resolution is doubled */
 #define TMS3556_DOUBLE_WIDTH 0
 
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_TMS3556_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TMS3556, 0)
 
 ///*************************************************************************
 //  TYPE DEFINITIONS

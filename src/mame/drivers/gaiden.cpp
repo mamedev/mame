@@ -758,7 +758,7 @@ void gaiden_state::shadoww(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gaiden_state::irq5_line_assert));
 
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::sound_map);	/* IRQs are triggered by the YM2203 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::sound_map);  /* IRQs are triggered by the YM2203 */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -776,7 +776,6 @@ void gaiden_state::shadoww(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(10,9,4);

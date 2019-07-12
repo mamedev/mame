@@ -153,22 +153,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tgtpanic_state::tgtpanic)
-
+void tgtpanic_state::tgtpanic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(prg_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tgtpanic_state, irq0_line_hold,  20) /* Unverified */
+	Z80(config,m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tgtpanic_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &tgtpanic_state::io_map);
+	m_maincpu->set_periodic_int(FUNC(tgtpanic_state::irq0_line_hold), attotime::from_hz(20)); /* Unverified */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) /* Unverified */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* Unverified */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 192 - 1, 0, 192 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(tgtpanic_state, screen_update)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60); /* Unverified */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* Unverified */
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 192 - 1, 0, 192 - 1);
+	m_screen->set_screen_update(FUNC(tgtpanic_state::screen_update));
+}
 
 
 	/*************************************

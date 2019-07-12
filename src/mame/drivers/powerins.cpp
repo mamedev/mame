@@ -243,19 +243,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-/* 8x8x4 tiles */
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{STEP4(0,1)},
-	{STEP8(0,4)},
-	{STEP8(0,4*8)},
-	8*8*4
-};
-
-
 /* 16x16x4 tiles (made of two 8x16 tiles) */
 static const gfx_layout layout_16x16x4 =
 {
@@ -270,9 +257,9 @@ static const gfx_layout layout_16x16x4 =
 
 
 static GFXDECODE_START( gfx_powerins )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x20 ) // [0] Tiles
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,   0x200, 0x10 ) // [1] Tiles
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4, 0x400, 0x40 ) // [2] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,       0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x200, 0x10 ) // [1] Tiles
+	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4,       0x400, 0x40 ) // [2] Sprites
 GFXDECODE_END
 
 

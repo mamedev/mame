@@ -67,6 +67,10 @@
 
  2800      DAC output (Stratovox only)
 
+New code to better emulate the protection was added in 0.194, but it turned
+out to harbour a bug (see MT 07310). Therefore the previous patches have been
+restored, and the protection routine has been nullified (but still there in
+case someone wants to revisit it).
  ***************************************************************************/
 
 #include "emu.h"
@@ -589,7 +593,48 @@ MACHINE_START_MEMBER(route16_state, jongpute)
 
 void route16_state::init_route16()
 {
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+	rom[0x105] = 0; // remove jp nz,4109
+	rom[0x106] = 0;
+	rom[0x107] = 0;
+
+	rom[0x72a] = 0; // remove jp nz,4238
+	rom[0x72b] = 0;
+	rom[0x72c] = 0;
+	init_route16c();
+}
+
+void route16_state::init_route16a()
+{
 	save_item(NAME(m_protection_data));
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+	rom[0x105] = 0; // remove jp nz,4109
+	rom[0x106] = 0;
+	rom[0x107] = 0;
+
+	rom[0x731] = 0; // remove jp nz,4238
+	rom[0x732] = 0;
+	rom[0x733] = 0;
+
+	rom[0x0e9] = 0x3a; // remove call 2CCD
+
+	rom[0x747] = 0xc3; // skip protection checking
+	rom[0x748] = 0x56;
+	rom[0x749] = 0x07;
+}
+
+void route16_state::init_route16c()
+{
+	save_item(NAME(m_protection_data));
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+	rom[0x0e9] = 0x3a; // remove call 2CD8
+
+	rom[0x754] = 0xc3; // skip protection checking
+	rom[0x755] = 0x63;
+	rom[0x756] = 0x07;
 }
 
 void route16_state::route16(machine_config &config)
@@ -660,7 +705,6 @@ void route16_state::stratvox(machine_config &config)
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
@@ -1059,6 +1103,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
 	return 0x00;
 }
 
+// never called, see notes.
 READ8_MEMBER(route16_state::route16_prot_read)
 {
 	m_protection_data++;
@@ -1084,8 +1129,8 @@ READ8_MEMBER(route16_state::route16_prot_read)
  *************************************/
 
 GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16a, route16,  route16,  route16,  route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
 GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 

@@ -135,7 +135,7 @@ private:
 	required_ioport m_i30;
 	required_ioport m_sensor;
 	required_device<i80c32_device> m_maincpu;
-	required_device<x2404p_device> m_i2cmem;
+	required_device<i2c_x2404p_device> m_i2cmem;
 	output_finder<9> m_digits;
 	output_finder<5,8> m_leds;
 };
@@ -700,7 +700,7 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);
 	screen.set_palette("palette");
 
-	X2404P(config, m_i2cmem);
+	I2C_X2404P(config, m_i2cmem);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -742,8 +742,8 @@ ROM_END
 *************************/
 
 //     YEAR  NAME      PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
-GAMEL( 1993, spset005, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET005 Set chip",  MACHINE_NOT_WORKING, layout_splus )
-GAMEL( 1993, spset015, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET015 Set chip",  MACHINE_NOT_WORKING, layout_splus )
-GAMEL( 1996, spset026, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET026 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1993, spset005, 0,      splus,   splus, splus_state, empty_init, ROT0,  "IGT - International Game Technology", "S-Plus SET005 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1993, spset015, 0,      splus,   splus, splus_state, empty_init, ROT0,  "IGT - International Game Technology", "S-Plus SET015 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1996, spset026, 0,      splus,   splus, splus_state, empty_init, ROT0,  "IGT - International Game Technology", "S-Plus SET026 Set chip",  MACHINE_NOT_WORKING, layout_splus )
 
 GAMEL( 1994, spss4240, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

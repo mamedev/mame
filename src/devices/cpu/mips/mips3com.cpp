@@ -137,6 +137,18 @@ void mips3_device::mips3com_tlbwi()
 
 
 /*-------------------------------------------------
+generate_tlb_index - generate a random tlb index
+-------------------------------------------------*/
+
+uint32_t mips3_device::generate_tlb_index()
+{
+	// Actual hardware uses a free running counter to generate the index.
+	// This impementation uses a linear congruential generator so that DRC and non-DRC code sequences match.
+	m_tlb_seed = 214013 * m_tlb_seed + 2531011;
+	return (m_tlb_seed >> 16) & 0x3f;
+}
+
+/*-------------------------------------------------
     mips3com_tlbwr - execute the tlbwr instruction
 -------------------------------------------------*/
 
@@ -146,9 +158,9 @@ void mips3_device::mips3com_tlbwr()
 	uint32_t unwired = m_tlbentries - wired;
 	uint32_t tlbindex = m_tlbentries - 1;
 
-	/* "random" is based off of the current cycle counting through the non-wired pages */
+	/* "random" is based off of linear congruential sequence through the non-wired pages */
 	if (unwired > 0)
-		tlbindex = ((total_cycles() - m_core->count_zero_time) % unwired + wired) & 0x3f;
+		tlbindex = (generate_tlb_index() % unwired) + wired;
 
 	/* use the common handler to write to this tlbindex */
 	tlb_write_common(tlbindex);
@@ -273,6 +285,13 @@ uint32_t mips3_device::compute_config_register()
 		else if (c_icache_size <= 0x40000) configreg |= 6 << 9;
 		else                                   configreg |= 7 << 9;
 
+		if (c_secondary_cache_line_size != 0) {
+			configreg &= ~((0xf << 20) | (1 << 17));
+					if (c_secondary_cache_line_size <= 0x10) configreg |= 0 << 22;
+			else if (c_secondary_cache_line_size <= 0x20) configreg |= 1 << 22;
+			else if (c_secondary_cache_line_size <= 0x40) configreg |= 2 << 22;
+			else                                          configreg |= 3 << 22;
+		}
 		/* set the system clock divider */
 		int divisor = 2;
 		if (c_system_clock != 0)
@@ -344,7 +363,6 @@ uint32_t mips3_device::compute_prid_register()
 	// never executed
 	//return 0x2000;
 }
-
 
 /*-------------------------------------------------
     tlb_map_entry - map a single TLB
@@ -436,7 +454,6 @@ void mips3_device::tlb_write_common(int tlbindex)
 
 		/* remap this TLB entry */
 		tlb_map_entry(tlbindex);
-
 		/* log the two halves once they are in */
 		tlb_entry_log_half(entry, tlbindex, 0);
 		tlb_entry_log_half(entry, tlbindex, 1);

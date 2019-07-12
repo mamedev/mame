@@ -169,7 +169,6 @@ void cball_state::cpu_map(address_map &map)
 	map.global_mask(0x7fff);
 
 	map(0x0000, 0x03ff).r(FUNC(cball_state::wram_r)).mask(0x7f);
-	map(0x0400, 0x07ff).readonly();
 	map(0x1001, 0x1001).portr("1001");
 	map(0x1003, 0x1003).portr("1003");
 	map(0x1020, 0x1020).portr("1020");
@@ -179,7 +178,7 @@ void cball_state::cpu_map(address_map &map)
 	map(0x2800, 0x2800).portr("2800");
 
 	map(0x0000, 0x03ff).w(FUNC(cball_state::wram_w)).mask(0x7f);
-	map(0x0400, 0x07ff).w(FUNC(cball_state::vram_w)).share("video_ram");
+	map(0x0400, 0x07ff).ram().w(FUNC(cball_state::vram_w)).share("video_ram");
 	map(0x1800, 0x1800).noprw(); /* watchdog? */
 	map(0x1810, 0x1811).noprw();
 	map(0x1820, 0x1821).noprw();
@@ -264,27 +263,27 @@ static GFXDECODE_START( gfx_cball )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(cball_state::cball)
-
+void cball_state::cball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 16) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	M6800(config, m_maincpu, XTAL(12'096'000) / 16); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cball_state::cpu_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(0, 255, 0, 223);
+	m_screen->set_screen_update(FUNC(cball_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cball)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cball);
 
 	PALETTE(config, m_palette, FUNC(cball_state::cball_palette), 6);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( cball )

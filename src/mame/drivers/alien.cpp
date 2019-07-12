@@ -44,7 +44,7 @@
      - Alien Danger (c) 2007
      - Chibi Maruko-chan Aim Fuji Nippon Ichi! (c) 2008
  *   - Donkey Kong Banana Kingdom (c) 2006
- !   - Super Mario Fushigi No Korokoro Party 2 (c) 2005
+ !   - Super Mario Fushigi no Korokoro Party 2 (c) 2005
 
     Single player medal machines:
     Medalusion:
@@ -136,27 +136,27 @@ void alien_state::machine_reset()
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(alien_state::alien)
+void alien_state::alien(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
-	MCFG_DEVICE_PROGRAM_MAP(alien_map)
-	MCFG_CPU_FORCE_NO_DRC()
+	SH4LE(config, m_maincpu, MASTER_CLOCK);    /* 200MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &alien_state::alien_map);
+	m_maincpu->set_force_no_drc(true);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(alien_state, screen_update)
-	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(alien_state::screen_update));
+	screen.set_size((32)*8, (32)*8);
+	screen.set_visarea_full();
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
-MACHINE_CONFIG_END
+}
 
 void alien_state::init_dkbanans()
 {
@@ -275,5 +275,5 @@ GAME( 2006, pingu,    0,        alien, alien, alien_state, empty_init,    ROT0, 
 GAME( 2007, dkbanana, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, dkbanans, dkbanana, alien, alien, alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, dokodemo, 0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, masmario, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi No Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, masmario, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, wontame,  0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver E)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

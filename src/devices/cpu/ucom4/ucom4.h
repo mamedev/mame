@@ -11,27 +11,6 @@
 
 #pragma once
 
-enum
-{
-	NEC_UCOM4_PORTA = 0,
-	NEC_UCOM4_PORTB,
-	NEC_UCOM4_PORTC,
-	NEC_UCOM4_PORTD,
-	NEC_UCOM4_PORTE,
-	NEC_UCOM4_PORTF,
-	NEC_UCOM4_PORTG,
-	NEC_UCOM4_PORTH,
-	NEC_UCOM4_PORTI
-};
-
-enum
-{
-	NEC_UCOM43 = 0,
-	NEC_UCOM44,
-	NEC_UCOM45
-};
-
-
 // pinout reference
 
 /*
@@ -81,6 +60,26 @@ public:
 	auto write_i() { return m_write_i.bind(); }
 
 protected:
+	enum
+	{
+		NEC_UCOM43 = 0,
+		NEC_UCOM44,
+		NEC_UCOM45
+	};
+
+	enum
+	{
+		PORTA = 0,
+		PORTB,
+		PORTC,
+		PORTD,
+		PORTE,
+		PORTF,
+		PORTG,
+		PORTH,
+		PORTI
+	};
+
 	// construction/destruction
 	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 

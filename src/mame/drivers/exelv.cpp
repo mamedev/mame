@@ -380,7 +380,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 READ8_MEMBER(exelv_state::rom_r)
 {
 	if (m_cart && m_cart->exists())
-		return m_cart->read_rom(space, offset + 0x200);
+		return m_cart->read_rom(offset + 0x200);
 
 	return 0;
 }
@@ -521,7 +521,7 @@ void exelv_state::exl100(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+	//SPEECHROM(config, "vsm", 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

@@ -164,17 +164,18 @@ Notes:
 
     TODO:
 
-    - fix uk101 video to 64x16
     - floppy PIA is actually a 6820
     - break key
     - power on reset
     - Superboard II revisions A/C/D
     - uk101 medium resolution graphics
     - uk101 ay-3-8910 sound
-    - cassette
     - faster cassette
     - floppy
+    - need floppies to test with
+    - support for BAS files and other formats
     - wemon?
+    - rs232
 
 */
 
@@ -454,7 +455,7 @@ void sb2m600_state::osi600_mem(address_map &map)
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xdf00, 0xdf00).rw(FUNC(sb2m600_state::keyboard_r), FUNC(sb2m600_state::keyboard_w));
-	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -465,7 +466,7 @@ void uk101_state::uk101_mem(address_map &map)
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).noprw();  // bios sets this to spaces at boot
 	map(0xdc00, 0xdfff).r(FUNC(uk101_state::keyboard_r)).w(FUNC(uk101_state::keyboard_w));
-	map(0xf000, 0xf001).mirror(0x00fe).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).mirror(0x00fe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -480,7 +481,7 @@ void c1p_state::c1p_mem(address_map &map)
 	map(0xd400, 0xd7ff).ram().share("color_ram");
 	map(0xd800, 0xd800).w(FUNC(c1p_state::ctrl_w));
 	map(0xdf00, 0xdf00).rw(FUNC(c1p_state::keyboard_r), FUNC(c1p_state::keyboard_w));
-	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf7c0, 0xf7c0).w(FUNC(c1p_state::osi630_sound_w));
 	map(0xf7e0, 0xf7e0).w(FUNC(c1p_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
@@ -499,7 +500,7 @@ void c1pmf_state::c1pmf_mem(address_map &map)
 	map(0xd400, 0xd7ff).ram().share("color_ram");
 	map(0xd800, 0xd800).w(FUNC(c1pmf_state::ctrl_w));
 	map(0xdf00, 0xdf00).rw(FUNC(c1pmf_state::keyboard_r), FUNC(c1pmf_state::keyboard_w));
-	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xf000, 0xf001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf7c0, 0xf7c0).w(FUNC(c1pmf_state::osi630_sound_w));
 	map(0xf7e0, 0xf7e0).w(FUNC(c1pmf_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
@@ -609,17 +610,34 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-WRITE_LINE_MEMBER( sb2m600_state::write_cassette_clock )
+TIMER_DEVICE_CALLBACK_MEMBER( sb2m600_state::kansas_w )
 {
-	m_acia_0->write_rxd((m_cassette->input() > 0.0) ? 1 : 0);
+	m_cass_data[3]++;
 
-	m_acia_0->write_txc(state);
-	m_acia_0->write_rxc(state);
+	if (m_cassbit != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cassbit;
+	}
+
+	if (m_cassbit)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-WRITE_LINE_MEMBER( sb2m600_state::cassette_tx )
+TIMER_DEVICE_CALLBACK_MEMBER( sb2m600_state::kansas_r)
 {
-	m_cassette->output(state ? +1.0 : -1.0);
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_acia->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
 }
 
 void sb2m600_state::machine_start()
@@ -728,13 +746,18 @@ void sb2m600_state::osi600(machine_config &config)
 	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
-	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(sb2m600_state::write_cassette_clock));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(sb2m600_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "kansas_r").configure_periodic(FUNC(sb2m600_state::kansas_r), attotime::from_hz(40000)); // cass read
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -752,14 +775,22 @@ void uk101_state::uk101(machine_config &config)
 	uk101_video(config);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
 
-	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(uk101_state::cassette_tx));
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
 
-	CLOCK(config, "cassette_clock", 500000).signal_handler().set(FUNC(uk101_state::write_cassette_clock));
+	/* cassette ACIA */
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(uk101_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "kansas_r").configure_periodic(FUNC(uk101_state::kansas_r), attotime::from_hz(40000)); // cass read
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -789,13 +820,18 @@ void c1p_state::c1p(machine_config &config)
 	PIA6821(config, "pia_3", 0);
 
 	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(c1p_state::cassette_tx));
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
-	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(c1p_state::write_cassette_clock));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 4'800)); // 300 baud x 16(divider) = 4800
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(c1p_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "kansas_r").configure_periodic(FUNC(c1p_state::kansas_r), attotime::from_hz(40000)); // cass read
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -895,8 +931,8 @@ void c1p_state::init_c1p()
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY            FULLNAME                            FLAGS
-COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
+COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", 0 )
 //COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
+COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           0 )
 COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            0 )

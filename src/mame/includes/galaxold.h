@@ -300,7 +300,7 @@ public:
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
 	void bagmanmc_map(address_map &map);
-	void bongo(address_map &map);
+	void bongo_map(address_map &map);
 	void bongo_io(address_map &map);
 	void bullsdrtg_data_map(address_map &map);
 	void ckongg_map(address_map &map);
@@ -313,7 +313,7 @@ public:
 	void guttang_map(address_map &map);
 	void hexpoola_data(address_map &map);
 	void hexpoola_io(address_map &map);
-	void hunchbkg(address_map &map);
+	void hunchbkg_map(address_map &map);
 	void hunchbkg_data(address_map &map);
 	void hustlerb3_map(address_map &map);
 	void mooncrst_map(address_map &map);
@@ -327,8 +327,8 @@ public:
 	void scramb3_map(address_map &map);
 	void scramblb_map(address_map &map);
 	void scrambler_map(address_map &map);
-	void spcwarp(address_map &map);
-	void tazzmang(address_map &map);
+	void spcwarp_map(address_map &map);
+	void tazzmang_map(address_map &map);
 
 protected:
 	virtual void machine_start() override { m_leds.resolve(); }

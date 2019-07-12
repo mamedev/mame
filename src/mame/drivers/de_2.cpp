@@ -528,10 +528,11 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 }
 
 
-MACHINE_CONFIG_START(de_2_state::de_bg_audio)
+void de_2_state::de_bg_audio(machine_config &config)
+{
 	/* sound CPU */
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(de_2_audio_map)
+	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_audiocpu->set_addrmap(AS_PROGRAM, &de_2_state::de_2_audio_map);
 
 	SPEAKER(config, "bg").front_center();
 
@@ -539,11 +540,11 @@ MACHINE_CONFIG_START(de_2_state::de_bg_audio)
 	m_ym2151->irq_handler().set(FUNC(de_2_state::ym2151_irq_w));
 	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.50);
 
-	MCFG_DEVICE_ADD("msm5205", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm5205, XTAL(384'000));
+	m_msm5205->vck_legacy_callback().set(FUNC(de_2_state::msm5205_irq_w));
+	m_msm5205->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm5205->add_route(ALL_OUTPUTS, "bg", 0.50);
+}
 
 void de_2_state::de_type1(machine_config &config)
 {
@@ -756,6 +757,17 @@ ROM_START(poto_a32)
 	ROM_LOAD("potof5.rom", 0x10000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
 ROM_END
 
+ROM_START(poto_a31)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("potob5.3-1", 0x4000, 0x4000, CRC(b7be6fa8) SHA1(3ef77daafaf31e2388ac207275aa060f854bd4b9))
+	ROM_LOAD("potoc5.3-1", 0x8000, 0x8000, CRC(4ce1d254) SHA1(4d24a230ae3a37674cc25ab5ae40c57acbdf5f04))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("potof7.rom", 0x8000, 0x8000, CRC(2e60b2e3) SHA1(0be89fc9b2c6548392febb35c1ace0eb912fc73f))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("potof6.rom", 0x00000, 0x10000, CRC(62b8f74b) SHA1(f82c706b88f49341bab9014bd83371259eb53b47))
+	ROM_LOAD("potof5.rom", 0x10000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
+ROM_END
+
 ROM_START(poto_a29)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("potob5.2-9", 0x4000, 0x4000, CRC(f01b5510) SHA1(90c632ee74a2dbf877cfe013a69067b1771f1d67))
@@ -941,6 +953,7 @@ GAME( 1987, lwar_e90, lwar_a83, de_type1,        de_2, de_2_state, empty_init, R
 GAME( 1989, mnfb_c29, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, mnfb_c27, mnfb_c29, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1990, poto_a32, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, poto_a31, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.1)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, play_a24, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, robo_a34, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)

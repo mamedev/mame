@@ -213,7 +213,7 @@ void gaelco3d_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER( common );
 	m_tms_offset_xor = 0;
-	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	m_soundlatch->acknowledge_w();
 }
 
 
@@ -428,16 +428,6 @@ WRITE_LINE_MEMBER(gaelco3d_state::tms_control3_w)
 	if (LOG)
 		logerror("%06X:tms_control3_w = %d\n", m_maincpu->pc(), state);
 }
-
-
-WRITE16_MEMBER(gaelco3d_state::tms_comm_w)
-{
-	COMBINE_DATA(&m_tms_comm_base[offset ^ m_tms_offset_xor]);
-	if (LOG)
-		logerror("%s:tms_comm_w(%02X) = %08X & %08X\n", machine().describe_context(), offset*2, data, mem_mask);
-}
-
-
 
 /*************************************
  *
@@ -679,17 +669,10 @@ void gaelco3d_state::main_map(address_map &map)
 	map(0x510042, 0x510043).r(FUNC(gaelco3d_state::sound_status_r));
 	map(0x510100, 0x510101).rw(FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
 	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
-	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_d0(space, offset >> 2, data, mem_mask);
-												 });
+	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w", [this](offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); });
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
-	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
+	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
-	map(0xfe7f80, 0xfe7fff).w(FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
 }
 
 
@@ -705,17 +688,10 @@ void gaelco3d_state::main020_map(address_map &map)
 	map(0x510042, 0x510043).r(FUNC(gaelco3d_state::sound_status_r));
 	map(0x510100, 0x510101).rw(FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
 	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
-	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_mainlatch->write_d0(space, offset >> 1, data, mem_mask);
-												 });
+	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w", [this](offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); });
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
-	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 2, data, mem_mask);
-												 });
+	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
-	map(0xfe7f80, 0xfe7fff).w(FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
 }
 
 void gaelco3d_state::tms_map(address_map &map)
@@ -1257,4 +1233,4 @@ GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_ini
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (Version 1.2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )

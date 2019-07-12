@@ -414,7 +414,7 @@ GFXDECODE_END
 
 WRITE8_MEMBER( zwackery_state::pia1_porta_w )
 {
-	m_cheap_squeak_deluxe->sr_w(space, 0, data >> 4);
+	m_cheap_squeak_deluxe->sr_w(data >> 4);
 }
 
 
@@ -441,10 +441,7 @@ WRITE_LINE_MEMBER(zwackery_state::pia0_irq_w)
 
 READ8_MEMBER( zwackery_state::pia1_porta_r )
 {
-	uint8_t data = ioport("IN1")->read();
-	m_pia1->set_port_a_z_mask(data);
-
-	return data;
+	return ioport("IN1")->read();
 }
 
 READ8_MEMBER( zwackery_state::pia1_portb_r )
@@ -457,10 +454,7 @@ READ8_MEMBER( zwackery_state::pia1_portb_r )
 
 READ8_MEMBER( zwackery_state::pia2_porta_r )
 {
-	uint8_t data = ioport("IN3")->read();
-	m_pia2->set_port_a_z_mask(data);
-
-	return data;
+	return ioport("IN3")->read();
 }
 
 
@@ -479,7 +473,7 @@ READ8_MEMBER( zwackery_state::pia2_porta_r )
 READ8_MEMBER( zwackery_state::ptm_r )
 {
 	m_maincpu->adjust_icount(-14);
-	return m_ptm->read(space, offset);
+	return m_ptm->read(offset);
 }
 
 void zwackery_state::machine_start()

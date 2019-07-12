@@ -24,10 +24,10 @@ void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
 
 
 // make this a function!
-// pppppppp ff--atttt tttttttt tttttttt
+// pppppppp ffattttt tttttttt tttttttt
 #define HNG64_GET_TILE_INFO                                                     \
 {                                                                               \
-	uint16_t tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                      \
+	uint16_t tilemapinfo = (m_videoregs[reg]>>shift)&0xffff;                    \
 	int tileno,pal, flip;                                                       \
 																				\
 	tileno = m_videoram[tile_index+(offset/4)];                                 \
@@ -220,21 +220,6 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 	}
 }
 
-static inline uint32_t alpha_additive_r32(uint32_t d, uint32_t s, uint8_t level)
-{
-	uint32_t add;
-	add = (s & 0x00ff0000) + (d & 0x00ff0000);
-	if (add & 0x01000000) d = (d & 0xff00ffff) | (0x00ff0000);
-	else d = (d & 0xff00ffff) | (add & 0x00ff0000);
-	add = (s & 0x000000ff) + (d & 0x000000ff);
-	if (add & 0x00000100) d = (d & 0xffffff00) | (0x000000ff);
-	else d = (d & 0xffffff00) | (add & 0x000000ff);
-	add = (s & 0x0000ff00) + (d & 0x0000ff00);
-	if (add & 0x00010000) d = (d & 0xffff00ff) | (0x0000ff00);
-	else d = (d & 0xffff00ff) | (add & 0x0000ff00);
-	return d;
-}
-
 
 /*-------------------------------------------------
     tilemap_draw_roz_core - render the tilemap's
@@ -247,7 +232,7 @@ do {                                                                            
 	if (blit->drawformat == HNG64_TILEMAP_NORMAL)                                       \
 		*(uint32_t *)dest = clut[INPUT_VAL];                                              \
 	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)                                \
-		*(uint32_t *)dest = alpha_additive_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha);  \
+		*(uint32_t *)dest = add_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL]);  \
 	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)                                   \
 		*(uint32_t *)dest = alpha_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha);     \
 } while (0)

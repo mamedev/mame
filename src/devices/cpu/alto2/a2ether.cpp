@@ -522,7 +522,7 @@ void alto2_cpu_device::rx_breath_of_life(void* ptr, int32_t arg)
 		m_eth.rx_timer->adjust(attotime::from_seconds(m_eth.breath_of_life), 0);
 	} else {
 		// receive at a rate of 5.44us per word
-		m_eth.rx_timer->adjust(attotime::from_usec(5.44), arg);
+		m_eth.rx_timer->adjust(attotime::from_nsec(5440), arg);
 	}
 	eth_wakeup();
 }
@@ -557,10 +557,10 @@ void alto2_cpu_device::tx_packet(void* ptr, int32_t arg)
 		// the FIFO is empty now: clear the OBUSY and WLF flip flops
 		PUT_ETH_OBUSY(m_eth.status, 0);
 		PUT_ETH_WLF(m_eth.status, 0);
-		m_eth.tx_timer->adjust(attotime::from_usec(5.44), -1);
+		m_eth.tx_timer->adjust(attotime::from_nsec(5440), -1);
 	} else {
 		// transmit the next word after 5.44us
-		m_eth.tx_timer->adjust(attotime::from_usec(5.44), arg + 1);
+		m_eth.tx_timer->adjust(attotime::from_nsec(5440), arg + 1);
 	}
 	eth_wakeup();
 }
@@ -722,7 +722,7 @@ void alto2_cpu_device::f2_late_eodfct()
 	uint8_t a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
 	if (0 == BF(a49)) {
 		m_task_wakeup &= ~(1 << task_ether);
-		m_eth.tx_timer->adjust(attotime::from_usec(5.44), 0);
+		m_eth.tx_timer->adjust(attotime::from_nsec(5440), 0);
 	}
 }
 
@@ -774,7 +774,7 @@ void alto2_cpu_device::f2_late_eefct()
 	PUT_ETH_OBUSY(m_eth.status, 1);
 	PUT_ETH_OEOT(m_eth.status, 1);
 	// end transmitting the packet
-	m_eth.tx_timer->adjust(attotime::from_usec(5.44), -1);
+	m_eth.tx_timer->adjust(attotime::from_nsec(5440), -1);
 	eth_wakeup();
 }
 

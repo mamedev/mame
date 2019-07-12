@@ -8,11 +8,11 @@
 
 void slapshot_state::video_start()
 {
-	m_spriteram_delayed = std::make_unique<uint16_t[]>(m_spriteram.bytes() / 2);
-	m_spriteram_buffered = std::make_unique<uint16_t[]>(m_spriteram.bytes() / 2);
+	m_spriteram_delayed = std::make_unique<u16[]>(m_spriteram.bytes() / 2);
+	m_spriteram_buffered = std::make_unique<u16[]>(m_spriteram.bytes() / 2);
 	m_spritelist = auto_alloc_array(machine(), struct slapshot_tempsprite, 0x400);
 
-	m_sprites_disabled = 1;
+	m_sprites_disabled = true;
 	m_sprites_active_area = 0;
 
 	save_item(NAME(m_sprites_disabled));
@@ -29,7 +29,7 @@ void slapshot_state::video_start()
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
+void slapshot_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 *primasks, int y_offset)
 {
 	/*
 	    Sprite format:
@@ -84,15 +84,10 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	    000b - 000f : unused
 
 	*/
-	int x, y, off, extoffs;
-	int code, color, spritedata, spritecont, flipx, flipy;
-	int xcurrent, ycurrent, big_sprite = 0;
+	int big_sprite = 0;
 	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0, last_continuation_tile = 0;   /* for zooms */
-	uint32_t zoomword, zoomx, zoomy, zx = 0, zy = 0, zoomxlatch = 0, zoomylatch = 0;   /* for zooms */
-	int scroll1x, scroll1y;
+	u32 zoomword, zoomx, zoomy, zx = 0, zy = 0, zoomxlatch = 0, zoomylatch = 0;   /* for zooms */
 	int scrollx = 0, scrolly = 0;
-	int curx, cury;
-	int x_offset;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
@@ -100,7 +95,7 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 	/* must remember enable status from last frame because driftout fails to
 	   reactivate them from a certain point onwards. */
-	int disabled = m_sprites_disabled;
+	bool disabled = m_sprites_disabled;
 
 	/* must remember master scroll from previous frame because driftout
 	   sometimes doesn't set it. */
@@ -110,13 +105,13 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	/* must also remember the sprite bank from previous frame. */
 	int area = m_sprites_active_area;
 
-	scroll1x = 0;
-	scroll1y = 0;
-	x = y = 0;
-	xcurrent = ycurrent = 0;
-	color = 0;
+	int scroll1x = 0;
+	int scroll1y = 0;
+	int x = 0, y = 0;
+	int xcurrent = 0, ycurrent = 0;
+	u32 color = 0;
 
-	x_offset = 3;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
+	int x_offset = 3;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
 	if (m_sprites_flipscreen) x_offset = -x_offset;
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
@@ -125,11 +120,10 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
 		area = 0;
 
-
-	for (off = 0; off < 0x4000; off += 16)
+	for (int off = 0; off < 0x4000; off += 16)
 	{
 		/* sprites_active_area may change during processing */
-		int offs = off + area;
+		const int offs = off + area;
 
 		if (m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
 		{
@@ -169,9 +163,8 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		if (disabled)
 			continue;
 
-		spritedata = m_spriteram_buffered[(offs + 8) / 2];
-
-		spritecont = (spritedata & 0xff00) >> 8;
+		const u16 spritedata = m_spriteram_buffered[(offs + 8) / 2];
+		const u16 spritecont = (spritedata & 0xff00) >> 8;
 
 		if ((spritecont & 0x08) != 0)   /* sprite continuation flag set */
 		{
@@ -192,10 +185,8 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			last_continuation_tile = 1;   /* don't clear big_sprite until last tile done */
 		}
 
-
 		if ((spritecont & 0x04) == 0)
 			color = spritedata & 0xff;
-
 
 // DG: the bigsprite == 0 check fixes "tied-up" little sprites in Thunderfox
 // which (mostly?) have spritecont = 0x20 when they are not continuations
@@ -286,28 +277,22 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			last_continuation_tile = 0;
 		}
 
-		code = 0;
-		extoffs = offs;
+		u32 code = 0;
+		int extoffs = offs;
 		if (extoffs >= 0x8000) extoffs -= 0x4000;   /* spriteram[0x4000-7fff] has no corresponding extension area */
 
-		{
-			int i;
-
-			code = m_spriteram_buffered[(offs)/2] & 0xff;
-			i = (m_spriteext[(extoffs >> 4)] & 0xff00 );
-			code = (i | code);
-		}
-
+		code = m_spriteram_buffered[(offs)/2] & 0xff;
+		code |= (m_spriteext[(extoffs >> 4)] & 0xff00);
 
 		if (code == 0) continue;
 
-		flipx = spritecont & 0x01;
-		flipy = spritecont & 0x02;
+		int flipx = spritecont & 0x01;
+		int flipy = spritecont & 0x02;
 
-		curx = (x + scrollx) & 0xfff;
+		int curx = (x + scrollx) & 0xfff;
 		if (curx >= 0x800)  curx -= 0x1000;   /* treat it as signed */
 
-		cury = (y + scrolly) & 0xfff;
+		int cury = (y + scrolly) & 0xfff;
 		if (cury >= 0x800)  cury -= 0x1000;   /* treat it as signed */
 
 		if (m_sprites_flipscreen)
@@ -371,21 +356,19 @@ void slapshot_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-void slapshot_state::taito_handle_sprite_buffering(  )
+void slapshot_state::handle_sprite_buffering()
 {
 	if (m_prepare_sprites)   /* no buffering */
 	{
 		memcpy(m_spriteram_buffered.get(), m_spriteram, m_spriteram.bytes());
-		m_prepare_sprites = 0;
+		m_prepare_sprites = false;
 	}
 }
 
-void slapshot_state::taito_update_sprites_active_area(  )
+void slapshot_state::update_sprites_active_area()
 {
-	int off;
-
 	/* if the frame was skipped, we'll have to do the buffering now */
-	taito_handle_sprite_buffering();
+	handle_sprite_buffering();
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
 	if (m_sprites_active_area == 0x8000 &&
@@ -393,7 +376,7 @@ void slapshot_state::taito_update_sprites_active_area(  )
 			m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
 		m_sprites_active_area = 0;
 
-	for (off = 0; off < 0x4000; off += 16)
+	for (int off = 0; off < 0x4000; off += 16)
 	{
 		/* sprites_active_area may change during processing */
 		int offs = off + m_sprites_active_area;
@@ -419,14 +402,13 @@ void slapshot_state::taito_update_sprites_active_area(  )
 	}
 }
 
-WRITE_LINE_MEMBER(slapshot_state::screen_vblank_taito_no_buffer)
+WRITE_LINE_MEMBER(slapshot_state::screen_vblank_no_buffer)
 {
 	// rising edge
 	if (state)
 	{
-		taito_update_sprites_active_area();
-
-		m_prepare_sprites = 1;
+		update_sprites_active_area();
+		m_prepare_sprites = true;
 	}
 }
 
@@ -434,7 +416,7 @@ WRITE_LINE_MEMBER(slapshot_state::screen_vblank_taito_no_buffer)
 /**************************************************************
                 SCREEN REFRESH
 
-Slapshot and Metalb use in the PRI chip
+Slapshot and Opwolf3 use in the PRI chip
 ---------------------------------------
 
 +4  xxxx0000   BG1
@@ -447,13 +429,11 @@ One exception is the "puck" in early attract which is
 a bg layer given priority over some sprites.
 ********************************************************************/
 
-uint32_t slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint8_t layer[5];
-	uint8_t tilepri[5];
-	uint8_t spritepri[4];
-	uint16_t priority;
+	u8 layer[5];
+	u8 tilepri[5];
+	u8 spritepri[4];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_Z))
@@ -487,11 +467,11 @@ uint32_t slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	}
 #endif
 
-	taito_handle_sprite_buffering();
+	handle_sprite_buffering();
 
 	m_tc0480scp->tilemap_update();
 
-	priority = m_tc0480scp->get_bg_priority();
+	const u16 priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -499,18 +479,18 @@ uint32_t slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = m_tc0360pri->read(space, 4) & 0x0f;     /* bg0 */
-	tilepri[1] = m_tc0360pri->read(space, 4) >> 4;       /* bg1 */
-	tilepri[2] = m_tc0360pri->read(space, 5) & 0x0f;     /* bg2 */
-	tilepri[3] = m_tc0360pri->read(space, 5) >> 4;       /* bg3 */
+	tilepri[0] = m_tc0360pri->read(4) & 0x0f;     /* bg0 */
+	tilepri[1] = m_tc0360pri->read(4) >> 4;       /* bg1 */
+	tilepri[2] = m_tc0360pri->read(5) & 0x0f;     /* bg2 */
+	tilepri[3] = m_tc0360pri->read(5) >> 4;       /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = m_tc0360pri->read(space, 7) & 0x0f;    /* fg (text layer) */
+	tilepri[layer[4]] = m_tc0360pri->read(9) & 0x0f;    /* fg (text layer) */
 
-	spritepri[0] = m_tc0360pri->read(space, 6) & 0x0f;
-	spritepri[1] = m_tc0360pri->read(space, 6) >> 4;
-	spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
-	spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
+	spritepri[0] = m_tc0360pri->read(6) & 0x0f;
+	spritepri[1] = m_tc0360pri->read(6) >> 4;
+	spritepri[2] = m_tc0360pri->read(7) & 0x0f;
+	spritepri[3] = m_tc0360pri->read(7) >> 4;
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
@@ -535,20 +515,17 @@ uint32_t slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 #endif
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
+	u32 primasks[4] = {0,0,0,0};
+
+	for (int i = 0; i < 4; i++)
 	{
-		int primasks[4] = {0,0,0,0};
-		int i;
-
-		for (i = 0; i < 4; i++)
-		{
-			if (spritepri[i] < tilepri[(layer[0])]) primasks[i] |= 0xaaaa;
-			if (spritepri[i] < tilepri[(layer[1])]) primasks[i] |= 0xcccc;
-			if (spritepri[i] < tilepri[(layer[2])]) primasks[i] |= 0xf0f0;
-			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
-		}
-
-		draw_sprites(screen,bitmap,cliprect,primasks,0);
+		if (spritepri[i] < tilepri[(layer[0])]) primasks[i] |= 0xaaaa;
+		if (spritepri[i] < tilepri[(layer[1])]) primasks[i] |= 0xcccc;
+		if (spritepri[i] < tilepri[(layer[2])]) primasks[i] |= 0xf0f0;
+		if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 	}
+
+	draw_sprites(screen,bitmap,cliprect,primasks,0);
 
 	/*
 	TODO: This isn't the correct way to handle the priority. At the moment of

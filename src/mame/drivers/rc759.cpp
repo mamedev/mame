@@ -482,7 +482,7 @@ void rc759_state::rc759_io(address_map &map)
 	map(0x000, 0x003).mirror(0x0c).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x020, 0x020).r(FUNC(rc759_state::keyboard_r));
 	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
-	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::command_w));
+	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
 	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
 //  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
 	map(0x070, 0x077).mirror(0x08).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -571,10 +571,6 @@ void rc759_state::rc759(machine_config &config)
 	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
 	keyb.set_keyboard_callback(FUNC(rc759_state::keyb_put));
 
-	// cassette
-	CASSETTE(config, m_cas);
-	m_cas->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
-
 	// sound
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -602,6 +598,11 @@ void rc759_state::rc759(machine_config &config)
 	// floppy drives
 	FLOPPY_CONNECTOR(config, "fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc759_floppies, "hd", floppy_image_device::default_floppy_formats);
+
+	// cassette
+	CASSETTE(config, m_cas);
+	m_cas->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cas->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

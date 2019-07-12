@@ -333,7 +333,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 		m_cmos_write_enabled = true;
 		break;
 	case WDOG:
-		m_rtc->watchdog_write(space, offset, data);
+		m_rtc->watchdog_write();
 		break;
 	default:
 		if (LOG_IRQ)
@@ -345,7 +345,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 
 READ8_MEMBER(atlantis_state::cmos_r)
 {
-	uint8_t result = m_rtc->read(space, offset);
+	uint8_t result = m_rtc->read(offset);
 	// Initial RTC check expects reads to the RTC to take some time
 	if (offset == 0x7ff9)
 		m_maincpu->eat_cycles(30);
@@ -367,7 +367,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 			m_serial_count = 0;
 	}
 	else if (m_cmos_write_enabled) {
-		m_rtc->write(space, offset, data);
+		m_rtc->write(offset, data);
 		m_cmos_write_enabled = false;
 		if (LOG_RTC || offset >= 0x7ff0)
 			logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset, data, mem_mask);
@@ -883,7 +883,7 @@ void atlantis_state::mwskins(machine_config &config)
 	com1.dsr_handler().set(m_uart1, FUNC(ins8250_uart_device::dsr_w));
 	com1.ri_handler().set(m_uart1, FUNC(ins8250_uart_device::ri_w));
 	com1.cts_handler().set(m_uart1, FUNC(ins8250_uart_device::cts_w));
-	//MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("com1", mwskins_comm)
+	//com1.set_option_device_input_defaults("com1", DEVICE_INPUT_DEFAULTS_NAME(mwskins_comm));
 
 	rs232_port_device &com2(RS232_PORT(config, "com2", default_rs232_devices, nullptr));
 	com2.rxd_handler().set(m_uart2, FUNC(ins8250_uart_device::rx_w));

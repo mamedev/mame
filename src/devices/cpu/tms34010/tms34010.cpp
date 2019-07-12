@@ -7,6 +7,9 @@
     Copyright Alex Pasadyn/Zsolt Vasvari
     Parts based on code by Aaron Giles
 
+    TMS34020 TODO:
+    - Big endian mode isn't implemented
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -26,36 +29,80 @@
 #define LOGCONTROLREGS(...) LOGMASKED(LOG_CONTROL_REGS, __VA_ARGS__)
 #define LOGGRAPHICSOPS(...) LOGMASKED(LOG_GRAPHICS_OPS, __VA_ARGS__)
 
+void tms34010_device::internal_regs_map(address_map &map)
+{
+	//map(0x00000000, 0xbfffffff); General use
+	map(0xc0000000, 0xc00001ff).rw(FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w)); // IO registers
+	//map(0xc0000200, 0xc0001fff).noprw(); Reserved (for IO registers?)
+	//map(0xc0002000, 0xffffdfff); General use
+	//map(0xffffe000, 0xfffffbff).noprw(); Reserved (for interrupt vectors, maybe)
+	//map(0xfffffc00, 0xffffffff); Interrupt Vectors
+}
 
-DEFINE_DEVICE_TYPE(TMS34010, tms34010_device, "tms34010", "TMS34010")
-DEFINE_DEVICE_TYPE(TMS34020, tms34020_device, "tms34020", "TMS34020")
+void tms34020_device::internal_regs_map(address_map &map)
+{
+	//map(0x00000000, 0x000fffff); General use and extended trap vectors
+	//map(0x00100000, 0xbfffffff); General use
+	map(0xc0000000, 0xc00003ff).rw(FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w)); // IO registers
+	//map(0xc0000400, 0xc0001fff).noprw(); Reserved for IO registers
+	//map(0xc0002000, 0xffefffff); General use
+	//map(0xfff00000, 0xffffdfff); General use and extended trap vectors
+	//map(0xffffe000, 0xfffffbbf).noprw(); Reserved for interrupt vectors and extended trap vectors
+	//map(0xfffffbc0, 0xffffffff); Interrupt vectors and trap vectors
+}
+
+DEFINE_DEVICE_TYPE(TMS34010, tms34010_device, "tms34010", "Texas Instruments TMS34010")
+DEFINE_DEVICE_TYPE(TMS34020, tms34020_device, "tms34020", "Texas Instruments TMS34020")
 
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
-tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)
-	, m_halt_on_reset(false), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_cache(nullptr)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3, internal_regs_map)
+	, m_pc(0)
+	, m_ppc(0)
+	, m_st(0)
+	, m_pixel_write(nullptr)
+	, m_pixel_read(nullptr)
+	, m_raster_op(nullptr)
+	, m_pixel_op(nullptr)
+	, m_pixel_op_timing(0)
+	, m_convsp(0)
+	, m_convdp(0)
+	, m_convmp(0)
+	, m_gfxcycles(0)
+	, m_pixelshift(0)
+	, m_is_34020(0)
+	, m_reset_deferred(false)
+	, m_halt_on_reset(false)
+	, m_hblank_stable(0)
+	, m_external_host_access(0)
+	, m_executing(0)
+	, m_program(nullptr)
+	, m_cache(nullptr)
 	, m_pixclock(0)
-	, m_pixperclock(0), m_scantimer(nullptr), m_icount(0)
+	, m_pixperclock(0)
+	, m_scantimer(nullptr)
+	, m_icount(0)
 	, m_output_int_cb(*this)
+	, m_ioreg_pre_write_cb(*this)
 {
 }
 
 
 tms34010_device::tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34010, tag, owner, clock)
+	: tms340x0_device(mconfig, TMS34010, tag, owner, clock, address_map_constructor(FUNC(tms34010_device::internal_regs_map), this))
 {
 	m_is_34020 = 0;
 }
 
 
 tms34020_device::tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms340x0_device(mconfig, TMS34020, tag, owner, clock)
+	: tms340x0_device(mconfig, TMS34020, tag, owner, clock, address_map_constructor(FUNC(tms34020_device::internal_regs_map), this))
 {
 	m_is_34020 = 1;
 }
@@ -582,6 +629,7 @@ void tms340x0_device::device_start()
 	m_scanline_ind16_cb.bind_relative_to(*owner());
 	m_scanline_rgb32_cb.bind_relative_to(*owner());
 	m_output_int_cb.resolve();
+	m_ioreg_pre_write_cb.resolve();
 	m_to_shiftreg_cb.bind_relative_to(*owner());
 	m_from_shiftreg_cb.bind_relative_to(*owner());
 
@@ -625,7 +673,6 @@ void tms340x0_device::device_start()
 	save_item(NAME(m_pixelshift));
 	save_item(NAME(m_gfxcycles));
 	save_pointer(NAME(&m_regs[0].reg), ARRAY_LENGTH(m_regs));
-	machine().save().register_postload(save_prepost_delegate(FUNC(tms340x0_device::tms34010_state_postload), this));
 
 	set_icountptr(m_icount);
 }
@@ -661,7 +708,7 @@ void tms340x0_device::device_reset()
 
 	if (m_reset_deferred)
 	{
-		io_register_w(*m_program, REG_HSTCTLH, 0x8000, 0xffff);
+		io_register_w(REG_HSTCTLH, 0x8000, 0xffff);
 	}
 }
 
@@ -1089,8 +1136,11 @@ static const char *const ioreg_name[] =
 	"HCOUNT", "VCOUNT", "DPYADR", "REFCNT"
 };
 
-WRITE16_MEMBER( tms34010_device::io_register_w )
+void tms34010_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if (!m_ioreg_pre_write_cb.isnull())
+		m_ioreg_pre_write_cb(offset, data, mem_mask);
+
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1237,8 +1287,11 @@ static const char *const ioreg020_name[] =
 	"IHOST3L", "IHOST3H", "IHOST4L", "IHOST4H"
 };
 
-WRITE16_MEMBER( tms34020_device::io_register_w )
+void tms34020_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if (!m_ioreg_pre_write_cb.isnull())
+		m_ioreg_pre_write_cb(offset, data, mem_mask);
+
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1398,7 +1451,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
     I/O REGISTER READS
 ***************************************************************************/
 
-READ16_MEMBER( tms34010_device::io_register_r )
+u16 tms34010_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
@@ -1439,7 +1492,7 @@ READ16_MEMBER( tms34010_device::io_register_r )
 }
 
 
-READ16_MEMBER( tms34020_device::io_register_r )
+u16 tms34020_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
@@ -1479,7 +1532,7 @@ READ16_MEMBER( tms34020_device::io_register_r )
     SAVE STATE
 ***************************************************************************/
 
-void tms340x0_device::tms34010_state_postload()
+void tms340x0_device::device_post_load()
 {
 	set_raster_op();
 	set_pixel_function();
@@ -1490,7 +1543,7 @@ void tms340x0_device::tms34010_state_postload()
     HOST INTERFACE WRITES
 ***************************************************************************/
 
-WRITE16_MEMBER( tms340x0_device::host_w )
+void tms340x0_device::host_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int reg = offset;
 	unsigned int addr;
@@ -1527,8 +1580,8 @@ WRITE16_MEMBER( tms340x0_device::host_w )
 		case TMS34010_HOST_CONTROL:
 		{
 			m_external_host_access = true;
-			if (mem_mask&0xff00) io_register_w(*m_program, REG_HSTCTLH, data & 0xff00, 0xff00);
-			if (mem_mask&0x00ff) io_register_w(*m_program, REG_HSTCTLL, data & 0x00ff, 0x00ff);
+			if (mem_mask&0xff00) io_register_w(REG_HSTCTLH, data & 0xff00, 0xff00);
+			if (mem_mask&0x00ff) io_register_w(REG_HSTCTLL, data & 0x00ff, 0x00ff);
 			m_external_host_access = false;
 			break;
 		}
@@ -1546,7 +1599,7 @@ WRITE16_MEMBER( tms340x0_device::host_w )
     HOST INTERFACE READS
 ***************************************************************************/
 
-READ16_MEMBER( tms340x0_device::host_r )
+u16 tms340x0_device::host_r(offs_t offset)
 {
 	int reg = offset;
 	unsigned int addr;

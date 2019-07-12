@@ -2846,10 +2846,13 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 		}
 		else
 		{
-			m_start_address[idx] = rstart;
-			m_end_address[idx] = rend - subamask - 1;
-			m_masks[idx] = mmask;
-			idx++;
+			if (rstart < rend - subamask)
+			{
+				m_start_address[idx] = rstart;
+				m_end_address[idx] = rend - subamask - 1;
+				m_masks[idx] = mmask;
+				idx++;
+			}
 			m_start_address[idx] = rend - subamask;
 			m_end_address[idx] = rend;
 			m_masks[idx] = emask;

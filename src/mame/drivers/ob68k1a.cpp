@@ -76,9 +76,9 @@ Notes:
 READ8_MEMBER( ob68k1a_state::pia_r )
 {
 	if (offset) {
-		return m_pia1->read(space,0);
+		return m_pia1->read(0);
 	} else {
-		return m_pia0->read(space,0);
+		return m_pia0->read(0);
 	}
 }
 
@@ -90,9 +90,9 @@ READ8_MEMBER( ob68k1a_state::pia_r )
 WRITE8_MEMBER( ob68k1a_state::pia_w )
 {
 	if (offset) {
-		m_pia1->write(space,0,data);
+		m_pia1->write(0,data);
 	} else {
-		m_pia0->write(space,0,data);
+		m_pia0->write(0,data);
 	}
 }
 
@@ -160,16 +160,14 @@ void ob68k1a_state::machine_start()
 void ob68k1a_state::machine_reset()
 {
 	// initialize COM8116
-	m_dbrg->write_stt(0x0e);
-	m_dbrg->write_str(0x0e);
+	m_dbrg->stt_w(0x0e);
+	m_dbrg->str_w(0x0e);
 
 	// set reset vector
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
 	uint8_t *rom = memregion(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
-
-	m_maincpu->reset();
 }
 
 
@@ -179,7 +177,7 @@ void ob68k1a_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ob68k1a )
+//  machine_config( ob68k1a )
 //-------------------------------------------------
 
 void ob68k1a_state::ob68k1a(machine_config &config)

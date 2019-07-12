@@ -759,12 +759,6 @@ address_map::address_map(device_t &device, int spacenum)
 		memintf->get_addrmap(spacenum)(*this);
 		m_device = &device;
 	}
-	else
-	{
-		// if the owner didn't provide a map, use the default device map
-		if (!spaceconfig->m_default_map.isnull())
-			spaceconfig->m_default_map(*this);
-	}
 
 	// construct the internal device map (last so it takes priority)
 	if (!spaceconfig->m_internal_map.isnull())
@@ -841,7 +835,7 @@ address_map_entry &address_map::operator()(offs_t start, offs_t end)
 //  import_submaps - propagate in the device submaps
 //-------------------------------------------------
 
-void address_map::import_submaps(running_machine &machine, device_t &owner, int data_width, endianness_t endian)
+void address_map::import_submaps(running_machine &machine, device_t &owner, int data_width, endianness_t endian, int addr_shift)
 {
 	address_map_entry *prev = nullptr;
 	address_map_entry *entry = m_entrylist.first();
@@ -863,7 +857,7 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 			address_map submap(*mapdevice, entry);
 
 			// Recursively import if needed
-			submap.import_submaps(machine, *mapdevice, data_width, endian);
+			submap.import_submaps(machine, *mapdevice, data_width, endian, addr_shift);
 
 			offs_t max_end = entry->m_addrend - entry->m_addrstart;
 
@@ -873,6 +867,24 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 				while (submap.m_entrylist.count())
 				{
 					address_map_entry *subentry = submap.m_entrylist.detach_head();
+
+					if (addr_shift > 0)
+					{
+						subentry->m_addrstart <<= addr_shift;
+						subentry->m_addrend = ((subentry->m_addrend + 1) << addr_shift) - 1;
+						subentry->m_addrmirror <<= addr_shift;
+						subentry->m_addrmask <<= addr_shift;
+						subentry->m_addrselect <<= addr_shift;
+					}
+					else if (addr_shift < 0)
+					{
+						subentry->m_addrstart >>= -addr_shift;
+						subentry->m_addrend >>= -addr_shift;
+						subentry->m_addrmirror >>= -addr_shift;
+						subentry->m_addrmask >>= -addr_shift;
+						subentry->m_addrselect >>= -addr_shift;
+					}
+
 					if (subentry->m_addrend > max_end)
 						subentry->m_addrend = max_end;
 
@@ -901,6 +913,10 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 					if ((entry->m_mask >> i) & 1)
 						ratio ++;
 				ratio = data_width / ratio;
+				if (addr_shift > 0)
+					ratio <<= addr_shift;
+				else if (addr_shift < 0)
+					max_end = ((max_end + 1) << -addr_shift) - 1;
 				max_end = (max_end + 1) / ratio - 1;
 
 				// Then merge the contents taking the ratio into account
@@ -939,11 +955,22 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 					if (subentry->m_addrend > max_end)
 						subentry->m_addrend = max_end;
 
-					subentry->m_addrstart = subentry->m_addrstart * ratio + entry->m_addrstart;
-					subentry->m_addrend = (subentry->m_addrend + 1) * ratio - 1 + entry->m_addrstart;
-					subentry->m_addrmirror = (subentry->m_addrmirror / ratio) | entry->m_addrmirror;
-					subentry->m_addrmask = (subentry->m_addrmask / ratio) | entry->m_addrmask;
-					subentry->m_addrselect = (subentry->m_addrselect / ratio) | entry->m_addrselect;
+					if (addr_shift < 0)
+					{
+						subentry->m_addrstart = ((subentry->m_addrstart * ratio) >> -addr_shift) + entry->m_addrstart;
+						subentry->m_addrend = (((subentry->m_addrend + 1) * ratio - 1) >> -addr_shift) + entry->m_addrstart;
+						subentry->m_addrmirror = ((subentry->m_addrmirror / ratio) << -addr_shift) | entry->m_addrmirror;
+						subentry->m_addrmask = ((subentry->m_addrmask / ratio) << -addr_shift) | entry->m_addrmask;
+						subentry->m_addrselect = ((subentry->m_addrselect / ratio) << -addr_shift) | entry->m_addrselect;
+					}
+					else
+					{
+						subentry->m_addrstart = subentry->m_addrstart * ratio + entry->m_addrstart;
+						subentry->m_addrend = (subentry->m_addrend + 1) * ratio - 1 + entry->m_addrstart;
+						subentry->m_addrmirror = (subentry->m_addrmirror / ratio) | entry->m_addrmirror;
+						subentry->m_addrmask = (subentry->m_addrmask / ratio) | entry->m_addrmask;
+						subentry->m_addrselect = (subentry->m_addrselect / ratio) | entry->m_addrselect;
+					}
 
 					if (subentry->m_addrstart > entry->m_addrend)
 					{

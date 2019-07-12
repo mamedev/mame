@@ -211,6 +211,16 @@ class md_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	md_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: md_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "megadriv_cart"; }
 	virtual const char *file_extensions() const override { return "smd,bin,md,gen"; }
@@ -268,13 +278,5 @@ DECLARE_DEVICE_TYPE(COPERA_CART_SLOT, copera_cart_slot_device)
  ***************************************************************************/
 
 #define MDSLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_MD_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, MD_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_MD_CARTRIDGE_NOT_MANDATORY                                     \
-	static_cast<md_cart_slot_device *>(device)->set_must_be_loaded(false);
-
 
 #endif // MAME_BUS_MEGADRIVE_MD_SLOT_H

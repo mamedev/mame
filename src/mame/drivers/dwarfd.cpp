@@ -747,7 +747,7 @@ void dwarfd_state::dwarfd(machine_config &config)
 	screen.set_visarea(0, 272*2-1, 0, 200-1);
 	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
 
-	I8275(config, m_crtc, 10595000/3);
+	I8275(config, m_crtc, 10595000/8);
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(dwarfd_state::display_pixels));
 	m_crtc->irq_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);

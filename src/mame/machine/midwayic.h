@@ -25,9 +25,9 @@ public:
 
 	void set_upper(int upper) { m_upper = upper; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( status_r );
+	u8 read();
+	void write(u8 data);
+	u8 status_r();
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
@@ -35,12 +35,17 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void generate_serial_data(int upper);
 	void serial_register_state();
 
+	required_ioport m_io_serial_digit;
+
 	uint8_t   m_data[16]; // reused by other devices
 	int     m_upper;
+
 private:
 	uint8_t   m_buff;
 	uint8_t   m_idx;
@@ -95,9 +100,9 @@ public:
 
 	void set_yearoffs(int yearoffs) { m_yearoffs = yearoffs; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( status_r );
+	u8 read();
+	void write(u8 data);
+	u8 status_r();
 
 	void set_default_nvram(const uint8_t *nvram);
 
