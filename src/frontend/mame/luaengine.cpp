@@ -1850,12 +1850,12 @@ void lua_engine::initialize()
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
 			"frame_update", &video_manager::frame_update,
-			"size", [this](video_manager &vm) {
+			"size", [](video_manager &vm) {
 					s32 width, height;
 					vm.compute_snapshot_size(width, height);
 					return std::tuple<s32, s32>(width, height);
 				},
-			"pixels", [this](video_manager &vm, sol::this_state s) {
+			"pixels", [](video_manager &vm, sol::this_state s) {
 					lua_State *L = s;
 					luaL_Buffer buff;
 					s32 width, height;
