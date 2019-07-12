@@ -278,10 +278,12 @@
 		<description>3 Games in One!: Breakout - Centipede - Warlords (Euro)</description>
 		<year>2005</year>
 		<publisher>DSI Games</publisher>
-		<info name="serial" value="AGB-B6ZP"/>
+		<info name="serial" value="AGB-B6ZP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="3 games in one! - breakout + centipede + warlords (europe) (en,fr,de,es,it).bin" size="4194304" crc="2af65e94" sha1="f898df0332cc62371f35cc1c7c2b9d5c9e95c403"/>
+				<rom name="agb-b6zp-0.u1" size="4194304" crc="2af65e94" sha1="f898df0332cc62371f35cc1c7c2b9d5c9e95c403"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3875,11 +3877,14 @@
 		<description>Bratz - Rock Angelz (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BRRE-USA, AGB-BRRP"/>
+		<info name="serial" value="AGB-BRRE-USA, AGB-BRRP-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="bratz - rock angelz (usa, europe).bin" size="8388608" crc="aa245d0c" sha1="eb2b8ddbb5ca2449f80ddf2c7bec2bd0b4a75e47"/>
+				<rom name="agb-brrp-0.u1" size="8388608" crc="aa245d0c" sha1="eb2b8ddbb5ca2449f80ddf2c7bec2bd0b4a75e47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5244,11 +5249,14 @@
 		<description>The Chronicles of Narnia - The Lion, the Witch and the Wardrobe (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Buena Vista Games</publisher>
-		<info name="serial" value="AGB-B2WE-USA, AGB-B2WP"/>
+		<info name="serial" value="AGB-B2WE-USA, AGB-B2WP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="chronicles of narnia, the - the lion, the witch and the wardrobe (usa, europe) (en,fr,de,es,it,nl,sv,da).bin" size="16777216" crc="7e198522" sha1="fea89a96320771ba69354f5452610327aad49ec0"/>
+				<rom name="agb-b2wp-0.u1" size="16777216" crc="7e198522" sha1="fea89a96320771ba69354f5452610327aad49ec0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5321,14 +5329,17 @@
 	</software>
 
 	<software name="cinderlau" cloneof="cinderla">
-		<description>Cinderella - Magical Dreams (USA)</description>
+		<description>Disney's Cinderella - Magical Dreams (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Disney Interactive</publisher>
-		<info name="serial" value="AGB-BCDE-USA"/>
+		<info name="serial" value="AGB-BCDE-USA, AGB-BCDP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="cinderella - magical dreams (usa) (en,fr,de,es,it).bin" size="8388608" crc="22f19169" sha1="1682d023933bf758c78ce2c18b503efd4f0803b9"/>
+				<rom name="agb-bcdp-0.u1" size="8388608" crc="22f19169" sha1="1682d023933bf758c78ce2c18b503efd4f0803b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10764,7 +10775,7 @@
 		<year>2005</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Fifa 06 Soccer (USA Box)" />
-		<info name="serial" value="AGB-BF6E-USA, AGB-BF6P-EUR"/>
+		<info name="serial" value="AGB-BF6E-USA, AGB-BF6P-EUR (EAX03304784C)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -11717,11 +11728,14 @@
 		<description>Franklin's Great Adventures (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
-		<info name="serial" value="AGB-BFLP"/>
+		<info name="serial" value="AGB-BFLP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="franklin's great adventures (europe) (en,fr,de,es,it,nl,pt,da).bin" size="4194304" crc="22e65767" sha1="24f3cac73f6d21500cc4acd5238b0176d35db0d2"/>
+				<rom name="agb-bflp-0.u1" size="4194304" crc="22e65767" sha1="24f3cac73f6d21500cc4acd5238b0176d35db0d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15613,7 +15627,7 @@
 		<description>The Incredibles - Rise of the Underminer (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BIQE-USA, AGB-BIQP-EUR"/>
+		<info name="serial" value="AGB-BIQE-USA, AGB-BIQP-EUR, AGB-BIQP-UKV"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -17534,10 +17548,12 @@
 		<description>The Koala Brothers - Outback Adventures (Euro)</description>
 		<year>2005</year>
 		<publisher>The Game Factory</publisher>
-		<info name="serial" value="AGB-BAKP"/>
+		<info name="serial" value="AGB-BAKP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="koala brothers - outback adventures (europe) (en,fr,de,es,it,nl,pt,da).bin" size="8388608" crc="abd866ea" sha1="6e037beff51fd108ba9c7169c571437a5325ebf4"/>
+				<rom name="agb-bakp-0.u1" size="8388608" crc="abd866ea" sha1="6e037beff51fd108ba9c7169c571437a5325ebf4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18165,11 +18181,14 @@
 		<description>The Land Before Time - Into the Mysterious Beyond (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
-		<info name="serial" value="AGB-BLOP"/>
+		<info name="serial" value="AGB-BLOP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="land before time, the - into the mysterious beyond (europe) (en,fr,de,es,it,nl,pt,da).bin" size="8388608" crc="5485eefa" sha1="30820bceb45bbf70cb78e9f66462248430444528"/>
+				<rom name="agb-blop-0.u1" size="8388608" crc="5485eefa" sha1="30820bceb45bbf70cb78e9f66462248430444528"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20247,11 +20266,15 @@
 		<description>Mario Power Tennis (Euro)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-BTMP"/>
+		<info name="serial" value="AGB-BTMP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
+			<feature name="u3" value="U3 [empty]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
-				<rom name="mario power tennis (europe) (en,fr,de,es,it).bin" size="16777216" crc="c8db4f60" sha1="d61990974040d405b5bf8436ac8e1e0beb0f7964"/>
+				<rom name="agb-btmp-0.u1" size="16777216" crc="c8db4f60" sha1="d61990974040d405b5bf8436ac8e1e0beb0f7964"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30244,7 +30267,7 @@
 		<description>Shrek - Super Slam (Euro)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-B4UP-EUR"/>
+		<info name="serial" value="AGB-B4UP-EUR (80989.133.EU)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -30634,7 +30657,7 @@
 		<description>The Sims 2 (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-B46E-USA, AGB-B46P-EUR"/>
+		<info name="serial" value="AGB-B46E-USA, AGB-B46P-EUR (MXX03304261C)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -33227,7 +33250,7 @@
 		<description>Super Mario Advance 4 - Super Mario Bros. 3 (USA, Aus, Rev. 1)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AX4E-USA"/>
+		<info name="serial" value="AGB-AX4E-USA, AGB-AX4U-AUS"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 MASKROM AGB" />
@@ -33805,10 +33828,10 @@
 	</software>
 
 	<software name="takchal">
-		<description>Tak - The Great Juju Challenge (Euro, USA)</description>
+		<description>Tak - The Great Juju Challenge (Euro, USA, Aus)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BJWE-USA"/>
+		<info name="serial" value="AGB-BJWE-USA, AGB-BJWP-AUS"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
@@ -39047,11 +39070,14 @@
 		<description>Crash Superpack: Crash Bandicoot 2 - N-Tranced + Crash Nitro Kart (USA)</description>
 		<year>2005?</year>
 		<publisher>Sierra Entertainment</publisher>
-		<info name="serial" value="AGB-B8AE-USA"/>
+		<info name="serial" value="AGB-B8AE-USA (7242380)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="crash superpack (usa).bin" size="16777216" crc="2c38bae2" sha1="23934042b3f7ac414def68246c281e20f735a1d7"/>
+				<rom name="agb-b8ae-0.u1" size="16777216" crc="2c38bae2" sha1="23934042b3f7ac414def68246c281e20f735a1d7"/>
 			</dataarea>
 		</part>
 	</software>
