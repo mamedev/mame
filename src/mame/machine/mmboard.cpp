@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "mmboard.h"
+#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -170,7 +171,7 @@ WRITE8_MEMBER( mephisto_board_device::led_w )
 mephisto_display_modul_device::mephisto_display_modul_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MEPHISTO_DISPLAY_MODUL, tag, owner, clock)
 	, m_lcdc(*this, "hd44780")
-	, m_beeper(*this, "beeper")
+	, m_dac(*this, "dac")
 {
 }
 
@@ -193,8 +194,11 @@ void mephisto_display_modul_device::device_add_mconfig(machine_config &config)
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -234,7 +238,7 @@ WRITE8_MEMBER(mephisto_display_modul_device::io_w)
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
 		m_lcdc->write(BIT(data, 0), m_latch);
 
-	m_beeper->set_state(BIT(data, 2) | BIT(data, 3));
+	m_dac->write(data >> 2 & 3);
 
 	m_ctrl = data;
 }

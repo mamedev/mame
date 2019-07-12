@@ -67,7 +67,8 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 #include "machine/74259.h"
 #include "machine/mmboard.h"
 #include "machine/timer.h"
-#include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -81,7 +82,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_outlatch(*this, "outlatch")
-		, m_beep(*this, "beeper")
+		, m_dac(*this, "dac")
 		, m_key1(*this, "KEY1_%u", 0U)
 		, m_key2(*this, "KEY2_%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
@@ -95,7 +96,11 @@ public:
 private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<hc259_device> m_outlatch;
-	required_device<beep_device> m_beep;
+	required_device<dac_bit_interface> m_dac;
+	required_ioport_array<8> m_key1;
+	required_ioport_array<8> m_key2;
+	output_finder<4> m_digits;
+
 	DECLARE_WRITE8_MEMBER(write_lcd);
 	DECLARE_WRITE8_MEMBER(mephisto_NMI);
 	DECLARE_READ8_MEMBER(read_keys);
@@ -114,10 +119,6 @@ private:
 	void mephisto_mem(address_map &map);
 	void mm2_mem(address_map &map);
 	void rebel5_mem(address_map &map);
-
-	required_ioport_array<8> m_key1;
-	required_ioport_array<8> m_key2;
-	output_finder<4> m_digits;
 };
 
 
@@ -294,12 +295,13 @@ void mephisto_state::mephisto(machine_config &config)
 	m_outlatch->q_out_cb<3>().set_output("led103");
 	m_outlatch->q_out_cb<4>().set_output("led104");
 	m_outlatch->q_out_cb<5>().set_output("led105");
-	m_outlatch->q_out_cb<6>().set(m_beep, FUNC(beep_device::set_state));
+	m_outlatch->q_out_cb<6>().set(m_dac, FUNC(dac_bit_interface::write));
 	m_outlatch->q_out_cb<7>().set(FUNC(mephisto_state::write_led7));
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(mephisto_state::update_nmi), attotime::from_hz(600));
 

@@ -365,7 +365,7 @@ void mephisto_academy_state::academy(machine_config &config)
 
 	hc259_device &outlatch(HC259(config.replace(), "outlatch"));
 	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));
-	outlatch.q_out_cb<2>().set("display:beeper", FUNC(beep_device::set_state)).invert();
+	outlatch.q_out_cb<2>().set("display:dac", FUNC(dac_byte_interface::write));
 
 	config.set_default_layout(layout_mephisto_academy);
 }

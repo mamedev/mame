@@ -40,7 +40,8 @@ How to play (quick guide)
 #include "cpu/m68000/m68000.h"
 #include "machine/mmboard.h"
 #include "machine/timer.h"
-#include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -54,7 +55,7 @@ public:
 	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_beep(*this, "beeper")
+		, m_dac(*this, "dac")
 		, m_board(*this, "board")
 		, m_keyboard(*this, "LINE%u", 0)
 		, m_digits(*this, "digit%u", 0U)
@@ -75,7 +76,7 @@ protected:
 	void glasgow_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<beep_device> m_beep;
+	required_device<dac_bit_interface> m_dac;
 	required_device<mephisto_board_device> m_board;
 	required_ioport_array<2> m_keyboard;
 	output_finder<4> m_digits;
@@ -122,7 +123,7 @@ WRITE8_MEMBER( glasgow_state::glasgow_lcd_flag_w )
 {
 	uint8_t const lcd_flag = data & 0x81;
 
-	m_beep->set_state(BIT(lcd_flag, 0));
+	m_dac->write(BIT(lcd_flag, 0));
 
 	if (lcd_flag)
 		m_led7 = 255;
@@ -187,7 +188,7 @@ WRITE8_MEMBER( amsterd_state::write_board )
 
 WRITE8_MEMBER( amsterd_state::write_beeper )
 {
-	m_beep->set_state(BIT(data, 0));
+	m_dac->write(BIT(data, 0));
 }
 
 READ8_MEMBER( amsterd_state::read_newkeys )  //Amsterdam, Roma, Dallas 32, Roma 32
@@ -317,13 +318,15 @@ void glasgow_state::glasgow(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(200));
 
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(glasgow_state::update_nmi), attotime::from_hz(50));
+
 	/* video hardware */
 	config.set_default_layout(layout_mephisto_glasgow);
 
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 44).add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	TIMER(config, "nmi_timer").configure_periodic(FUNC(glasgow_state::update_nmi), attotime::from_hz(50));
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void amsterd_state::amsterd(machine_config &config)

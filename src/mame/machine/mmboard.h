@@ -13,8 +13,8 @@
 
 
 #include "machine/sensorboard.h"
-#include "sound/beep.h"
 #include "video/hd44780.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -112,7 +112,7 @@ protected:
 
 private:
 	optional_device<hd44780_device> m_lcdc;
-	required_device<beep_device> m_beeper;
+	required_device<dac_byte_interface> m_dac;
 	uint8_t m_latch;
 	uint8_t m_ctrl;
 };

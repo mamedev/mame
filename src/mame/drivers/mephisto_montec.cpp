@@ -21,6 +21,8 @@
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
@@ -41,7 +43,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
-		, m_beeper(*this, "beeper")
+		, m_dac(*this, "dac")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
 		, m_low_leds(*this, "led%u", 0U)
@@ -91,7 +93,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
-	required_device<beep_device> m_beeper;
+	required_device<dac_bit_interface> m_dac;
 	optional_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 	output_finder<16> m_low_leds, m_high_leds;
@@ -228,7 +230,7 @@ WRITE8_MEMBER(mephisto_montec_state::montec_nmi_ack_w)
 
 WRITE8_MEMBER(mephisto_montec_state::montec_beeper_w)
 {
-	m_beeper->set_state(BIT(data, 7) ? 0 : 1);
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
@@ -247,7 +249,7 @@ WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 		}
 	}
 
-	m_beeper->set_state(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 }
 
 READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
@@ -324,7 +326,7 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_led_data_w)
 	else
 		m_leds_mux |= (1 << offset);
 
-	m_beeper->set_state(BIT(m_leds_mux, 7));
+	m_dac->write(BIT(m_leds_mux, 7));
 }
 
 void mephisto_montec_state::smondial_mem(address_map &map)
@@ -355,7 +357,7 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 	}
 
 	m_input_mux = data ^ 0xff;
-	m_beeper->set_state(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 	m_maincpu->set_input_line(M65C02_NMI_LINE, CLEAR_LINE);
 }
 
@@ -396,7 +398,7 @@ WRITE8_MEMBER(mephisto_montec_state::mondial_input_mux_w)
 	}
 
 	m_input_mux = data;
-	m_beeper->set_state(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 	m_maincpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
 }
 
@@ -516,8 +518,9 @@ void mephisto_montec_state::montec(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(300));
