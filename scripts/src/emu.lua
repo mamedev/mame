@@ -211,6 +211,8 @@ files {
 	MAME_DIR .. "src/emu/validity.h",
 	MAME_DIR .. "src/emu/video.cpp",
 	MAME_DIR .. "src/emu/video.h",
+	MAME_DIR .. "src/emu/frame.cpp",
+	MAME_DIR .. "src/emu/frame.h",
 	MAME_DIR .. "src/emu/xtal.cpp",
 	MAME_DIR .. "src/emu/xtal.h",
 	MAME_DIR .. "src/emu/rendersw.hxx",

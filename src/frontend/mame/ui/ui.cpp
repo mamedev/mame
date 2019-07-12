@@ -157,7 +157,6 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_handler_callback(nullptr)
 	, m_handler_callback_type(ui_callback_type::GENERAL)
 	, m_handler_param(0)
-	, m_single_step(false)
 	, m_showfps(false)
 	, m_showfps_end(0)
 	, m_show_profiler(false)
@@ -389,7 +388,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	container.empty();
 
 	// if we're paused, dim the whole screen
-	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
+	if (machine().phase() >= machine_phase::RESET && (machine().frame().is_single_stepping() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
 		if (ui::menu::stack_has_special_main_menu(machine()))
@@ -857,10 +856,10 @@ void mame_ui_manager::process_natural_keyboard()
 void mame_ui_manager::increase_frameskip()
 {
 	// get the current value and increment it
-	int newframeskip = machine().video().frameskip() + 1;
+	int newframeskip = machine().frame().frameskip() + 1;
 	if (newframeskip > MAX_FRAMESKIP)
 		newframeskip = -1;
-	machine().video().set_frameskip(newframeskip);
+	machine().frame().set_frameskip(newframeskip);
 
 	// display the FPS counter for 2 seconds
 	show_fps_temp(2.0);
@@ -874,10 +873,10 @@ void mame_ui_manager::increase_frameskip()
 void mame_ui_manager::decrease_frameskip()
 {
 	// get the current value and decrement it
-	int newframeskip = machine().video().frameskip() - 1;
+	int newframeskip = machine().frame().frameskip() - 1;
 	if (newframeskip < -1)
 		newframeskip = MAX_FRAMESKIP;
-	machine().video().set_frameskip(newframeskip);
+	machine().frame().set_frameskip(newframeskip);
 
 	// display the FPS counter for 2 seconds
 	show_fps_temp(2.0);
@@ -1051,13 +1050,6 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (show_profiler())
 		draw_profiler(container);
 
-	// if we're single-stepping, pause now
-	if (single_step())
-	{
-		machine().pause();
-		set_single_step(false);
-	}
-
 	// determine if we should disable the rest of the UI
 	bool has_keyboard = machine_info().has_keyboard();
 	bool ui_disabled = (has_keyboard && !machine().ui_active());
@@ -1193,11 +1185,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// pause single step
 	if (machine().ui_input().pressed(IPT_UI_PAUSE_SINGLE))
-	{
-		machine().rewind_capture();
-		set_single_step(true);
-		machine().resume();
-	}
+		machine().frame().step_single_frame();
 
 	// rewind single step
 	if (machine().ui_input().pressed(IPT_UI_REWIND_SINGLE))

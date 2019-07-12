@@ -378,7 +378,7 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
 		fatalerror("Out of polygon buffer &space!\n");
 
 	/* if we've accumulated a completed poly set of data, queue it */
-	if (!machine().video().skip_this_frame())
+	if (!machine().frame().skip_this_frame())
 	{
 		if (m_polydata_count >= 18 && (m_polydata_count % 2) == 1 && IS_POLYEND(m_polydata_buffer[m_polydata_count - 2]))
 		{

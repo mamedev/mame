@@ -203,8 +203,9 @@ void running_machine::start()
 	// init the osd layer
 	m_manager.osd().init(*this);
 
-	// create the video manager
+	// create the video manager, frame manager, and UI
 	m_video = std::make_unique<video_manager>(*this);
+	m_frame = std::make_unique<frame_manager>(*this);
 	m_ui = manager().create_ui(*this);
 
 	// initialize the base time (needed for doing record/playback)

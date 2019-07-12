@@ -1508,7 +1508,7 @@ void cave_state::get_sprite_info(int chip)
 
 	if (m_kludge == 3)   /* mazinger metmqstr */
 	{
-		if (machine().video().skip_this_frame() == 0)
+		if (machine().frame().skip_this_frame() == 0)
 		{
 			m_spriteram_bank[chip] = m_spriteram_bank_delay[chip];
 			(this->*m_get_sprite_info)(chip);
@@ -1517,7 +1517,7 @@ void cave_state::get_sprite_info(int chip)
 	}
 	else
 	{
-		if (machine().video().skip_this_frame() == 0)
+		if (machine().frame().skip_this_frame() == 0)
 		{
 			m_spriteram_bank[chip] = (m_videoregs[chip][4] & 3) % spriteram_bankmax;
 			(this->*m_get_sprite_info)(chip);

@@ -96,6 +96,7 @@
 #include "drawgfx.h"
 #include "tilemap.h"
 #include "video.h"
+#include "./frame.h"
 
 // sound-related
 #include "sound.h"

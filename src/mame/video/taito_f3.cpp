@@ -441,7 +441,7 @@ WRITE_LINE_MEMBER(taito_f3_state::screen_vblank)
 	{
 		if (m_sprite_lag==2)
 		{
-			if (machine().video().skip_this_frame() == 0)
+			if (machine().frame().skip_this_frame() == 0)
 			{
 				get_sprite_info(m_spriteram16_buffered.get());
 			}
@@ -449,7 +449,7 @@ WRITE_LINE_MEMBER(taito_f3_state::screen_vblank)
 		}
 		else if (m_sprite_lag == 1)
 		{
-			if (machine().video().skip_this_frame() == 0)
+			if (machine().frame().skip_this_frame() == 0)
 			{
 				get_sprite_info(m_spriteram.target());
 			}
