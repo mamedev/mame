@@ -40431,6 +40431,7 @@
 		</part>
 	</software>
 
+	<!--
 	<software name="4nickmov">
 		<description>4 Games on One Game Pak (Nickelodeon Movies) (USA)</description>
 		<year>2004</year>
@@ -40445,6 +40446,7 @@
 			</dataarea>
 		</part>
 	</software>
+	-->
 
 	<software name="4racing">
 		<description>4 Games on One Game Pak (Racing) (USA)</description>
