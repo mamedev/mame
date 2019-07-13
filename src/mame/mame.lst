@@ -15470,6 +15470,9 @@ tmscramb                        // Tomy
 tmtennis                        // Tomy
 ufombs                          // Bambino
 
+@source:hhtiger.cpp
+hhtiger                         // 1983 H/H Tiger
+
 @source:hideseek.cpp
 hideseek                        //
 
