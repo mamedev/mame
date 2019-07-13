@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE16_MEMBER( linectrl_w );
 	DECLARE_READ16_MEMBER( linectrl_r );
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack);
+	void zoom_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack);
 	// void wraparound_enable(int status);   unused? // shall we merge this into the configuration intf?
 	// void set_offset(int xoffs, int yoffs); unused?   // shall we merge this into the configuration intf?
 

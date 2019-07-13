@@ -3012,7 +3012,6 @@ void metro_state::i4100_config(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));
-	m_screen->set_palette("vdp:palette");
 }
 
 void metro_state::i4220_config(machine_config &config)
@@ -3026,7 +3025,6 @@ void metro_state::i4220_config(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp2", FUNC(imagetek_i4100_device::screen_update));
-	m_screen->set_palette("vdp2:palette");
 }
 
 void metro_state::i4300_config(machine_config &config)
@@ -3040,7 +3038,6 @@ void metro_state::i4300_config(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp3", FUNC(imagetek_i4100_device::screen_update));
-	m_screen->set_palette("vdp3:palette");
 }
 
 // TODO: these comes from the CRTC inside the i4100
@@ -3651,7 +3648,6 @@ void metro_state::blzntrnd(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 304-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(metro_state::screen_update_psac_vdp2_mix));
-	m_screen->set_palette("vdp2:palette");
 	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
