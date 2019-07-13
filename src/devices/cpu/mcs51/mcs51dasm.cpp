@@ -278,6 +278,7 @@ const mcs51_disassembler::mem_info mcs51_disassembler::i8xc51gb_names[] = {
 	{ 0x1ea, "c1cf2"  },
 	{ 0x1eb, "c1cf3"  },
 	{ 0x1ec, "c1cf4"  },
+	{ 0x1ed, "cre"    },
 	{ 0x1ee, "cr1"    },
 	{ 0x1ef, "cf1"    },
 
