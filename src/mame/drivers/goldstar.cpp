@@ -940,6 +940,11 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
+void goldstar_state::lucky8f_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+}
+
 void goldstar_state::flaming7_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -8957,6 +8962,13 @@ void wingco_state::lucky8(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void wingco_state::lucky8f(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::lucky8f_decrypted_opcodes_map);
+}
+
 void wingco_state::bingowng(machine_config &config)
 {
 	/* basic machine hardware */
@@ -11648,6 +11660,37 @@ ROM_START( lucky8e )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+ROM_START( lucky8f ) // like the parent, but encrypted. Has an extra ROM (unverified purpose). Possibly bootleg? PCB has no Wing markings or stickers
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a2.ic85",   0x0000, 0x8000, CRC(b80f3c11) SHA1(6a4e1f986ef019d41d0236992faa17bdb2e095ad) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "a5.ic19",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "a4.ic18",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "a3.ic17",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "a9.ic23",   0x0000, 0x2000, CRC(4d41bc1f) SHA1(d5529c8e200d8fba2fe503fb20a7ad862c065c8c) )
+	ROM_LOAD( "a8.ic22",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "a7.ic21",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "a6.ic20",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.ic26", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "82s129.ic25", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.ic65", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.ic47", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.ic66", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION( 0x1000, "dec_table", 0 ) // possibly related to encryption? currently unused by the emulation
+	ROM_LOAD( "a1.ic91", 0x0000, 0x01000, CRC(8a660a97) SHA1(8d23e98886276824353c6c6572e3d93ddb40f0f0) )
+ROM_END
 
 /*
   New Lucky 8 Lines / New Super 8 Lines.
@@ -16235,6 +16278,129 @@ void wingco_state::init_lucky8a()
 	ROM[0x0010] = 0x21;
 }
 
+void wingco_state::init_lucky8f() // TODO: simplify
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch(i & 0x1249)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0x44, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0x51, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0008: x = bitswap<8>(x ^ 0x10, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0009: x = bitswap<8>(x ^ 0x54, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0040: x = bitswap<8>(x ^ 0x15, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0041: x = bitswap<8>(x ^ 0x14, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0048: x = bitswap<8>(x ^ 0x05, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0049: x = bitswap<8>(x ^ 0x55, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0200: x = bitswap<8>(x ^ 0x05, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0201: x = bitswap<8>(x ^ 0x51, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0208: x = bitswap<8>(x ^ 0x40, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0209: x = bitswap<8>(x ^ 0x54, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0240: x = bitswap<8>(x ^ 0x51, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0241: x = bitswap<8>(x ^ 0x41, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0248: x = bitswap<8>(x ^ 0x50, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0249: x = bitswap<8>(x ^ 0x55, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x1000: x = bitswap<8>(x ^ 0x41, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x54, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1008: x = bitswap<8>(x ^ 0x04, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1009: x = bitswap<8>(x ^ 0x54, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1040: x = bitswap<8>(x ^ 0x15, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1041: x = bitswap<8>(x ^ 0x14, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1048: x = bitswap<8>(x ^ 0x11, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1049: x = bitswap<8>(x ^ 0x55, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1200: x = bitswap<8>(x ^ 0x11, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1201: x = bitswap<8>(x ^ 0x54, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1208: x = bitswap<8>(x ^ 0x40, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1209: x = bitswap<8>(x ^ 0x51, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1240: x = bitswap<8>(x ^ 0x54, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1241: x = bitswap<8>(x ^ 0x41, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1248: x = bitswap<8>(x ^ 0x05, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1249: x = bitswap<8>(x ^ 0x55, 7, 0, 5, 6, 3, 4, 1, 2); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch(i & 0x5249)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0x01, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0x15, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0008: x = bitswap<8>(x ^ 0x04, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0009: x = bitswap<8>(x ^ 0x41, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0040: x = bitswap<8>(x ^ 0x00, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0041: x = bitswap<8>(x ^ 0x50, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0048: x = bitswap<8>(x ^ 0x41, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0049: x = bitswap<8>(x ^ 0x10, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0200: x = bitswap<8>(x ^ 0x40, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0201: x = bitswap<8>(x ^ 0x54, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0208: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0209: x = bitswap<8>(x ^ 0x05, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0240: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0241: x = bitswap<8>(x ^ 0x05, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0248: x = bitswap<8>(x ^ 0x14, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0249: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1000: x = bitswap<8>(x ^ 0x04, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x15, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1008: x = bitswap<8>(x ^ 0x10, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1009: x = bitswap<8>(x ^ 0x41, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1040: x = bitswap<8>(x ^ 0x00, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1041: x = bitswap<8>(x ^ 0x44, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1048: x = bitswap<8>(x ^ 0x41, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1049: x = bitswap<8>(x ^ 0x40, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1200: x = bitswap<8>(x ^ 0x04, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1201: x = bitswap<8>(x ^ 0x45, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1208: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1209: x = bitswap<8>(x ^ 0x05, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1240: x = bitswap<8>(x ^ 0x00, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1241: x = bitswap<8>(x ^ 0x50, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1248: x = bitswap<8>(x ^ 0x14, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1249: x = bitswap<8>(x ^ 0x01, 7, 4, 5, 0, 3, 6, 1, 2); break;
+			case 0x4000: x = bitswap<8>(x ^ 0x01, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x4001: x = bitswap<8>(x ^ 0x45, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x4008: x = bitswap<8>(x ^ 0x01, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x4009: x = bitswap<8>(x ^ 0x44, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x4040: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x4041: x = bitswap<8>(x ^ 0x11, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x4048: x = bitswap<8>(x ^ 0x14, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x4049: x = bitswap<8>(x ^ 0x40, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x4200: x = bitswap<8>(x ^ 0x04, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x4201: x = bitswap<8>(x ^ 0x54, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x4208: x = bitswap<8>(x ^ 0x40, 7, 4, 5, 0, 3, 6, 1, 2); break;
+			case 0x4209: x = bitswap<8>(x ^ 0x05, 7, 4, 5, 0, 3, 6, 1, 2); break;
+			case 0x4240: x = bitswap<8>(x ^ 0x00, 7, 0, 5, 4, 3, 6, 1, 2); break;
+			case 0x4241: x = bitswap<8>(x ^ 0x50, 7, 0, 5, 4, 3, 6, 1, 2); break;
+			case 0x4248: x = bitswap<8>(x ^ 0x44, 7, 0, 5, 4, 3, 6, 1, 2); break;
+			case 0x4249: x = bitswap<8>(x ^ 0x04, 7, 6, 5, 2, 3, 0, 1, 4); break;
+			case 0x5000: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 2, 3, 0, 1, 4); break;
+			case 0x5001: x = bitswap<8>(x ^ 0x15, 7, 6, 5, 2, 3, 0, 1, 4); break;
+			case 0x5008: x = bitswap<8>(x ^ 0x01, 7, 2, 5, 6, 3, 0, 1, 4); break;
+			case 0x5009: x = bitswap<8>(x ^ 0x50, 7, 2, 5, 6, 3, 0, 1, 4); break;
+			case 0x5040: x = bitswap<8>(x ^ 0x00, 7, 0, 5, 6, 3, 2, 1, 4); break;
+			case 0x5041: x = bitswap<8>(x ^ 0x44, 7, 0, 5, 6, 3, 2, 1, 4); break;
+			case 0x5048: x = bitswap<8>(x ^ 0x14, 7, 0, 5, 6, 3, 2, 1, 4); break;
+			case 0x5049: x = bitswap<8>(x ^ 0x01, 7, 2, 5, 0, 3, 6, 1, 4); break;
+			case 0x5200: x = bitswap<8>(x ^ 0x10, 7, 2, 5, 0, 3, 6, 1, 4); break;
+			case 0x5201: x = bitswap<8>(x ^ 0x51, 7, 2, 5, 0, 3, 6, 1, 4); break;
+			case 0x5208: x = bitswap<8>(x ^ 0x40, 7, 0, 5, 2, 3, 6, 1, 4); break;
+			case 0x5209: x = bitswap<8>(x ^ 0x14, 7, 0, 5, 2, 3, 6, 1, 4); break;
+			case 0x5240: x = bitswap<8>(x ^ 0x00, 7, 4, 5, 2, 3, 0, 1, 6); break;
+			case 0x5241: x = bitswap<8>(x ^ 0x05, 7, 4, 5, 2, 3, 0, 1, 6); break;
+			case 0x5248: x = bitswap<8>(x ^ 0x41, 7, 4, 5, 2, 3, 0, 1, 6); break;
+			case 0x5249: x = bitswap<8>(x ^ 0x10, 7, 2, 5, 4, 3, 0, 1, 6); break;
+		}
+
+		ROM[i] = x;
+	}
+}
+
 void cmaster_state::init_nfb96sea()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -16896,6 +17062,7 @@ GAMEL( 1989, lucky8b,   lucky8,   lucky8,   lucky8b,  wingco_state,   empty_init
 GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8d,   lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8f,   lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8f,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 7, W-4, encrypted)",                0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
