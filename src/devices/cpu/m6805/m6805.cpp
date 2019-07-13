@@ -307,7 +307,7 @@ void m6805_base_device::device_reset()
 	/* IRQ disabled */
 	SEI;
 
-	rm16(0xfffe, m_pc);
+	rm16(0xfffe & m_params.m_vector_mask, m_pc);
 }
 
 
@@ -356,7 +356,7 @@ bool m6805_base_device::test_il()
 
 void m6805_base_device::interrupt_vector()
 {
-	rm16(0xfffa, m_pc);
+	rm16(0xfffa & m_params.m_vector_mask, m_pc);
 }
 
 /* Generate interrupts */

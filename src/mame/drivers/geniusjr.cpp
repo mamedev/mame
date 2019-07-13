@@ -237,7 +237,7 @@ void geniusjr_state::gj5000(machine_config &config)
 
 void geniusjr_state::gjrstar(machine_config &config)
 {
-	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock (type also uncertain)
+	M68HC05L9(config, m_maincpu, 8'000'000); // unknown clock (type also uncertain, could be L7 instead of L9)
 	m_maincpu->set_addrmap(AS_PROGRAM, &geniusjr_state::gjrstar_map);
 
 	m_bank_size = 0x2000;
@@ -315,4 +315,4 @@ COMP( 1996, gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty
 COMP( 1996, gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998, gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998, gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
-COMP( 199?, pitagjr,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Pitagorin Junior", MACHINE_IS_SKELETON )
+COMP( 199?, pitagjr,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",  "Pitagorin Junior",                  MACHINE_IS_SKELETON )

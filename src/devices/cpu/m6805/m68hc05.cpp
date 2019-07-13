@@ -109,6 +109,7 @@ m68hc05_device::m68hc05_device(
 		u32 clock,
 		device_type type,
 		u32 addr_width,
+		u16 vector_mask,
 		address_map_constructor internal_map)
 	: m6805_base_device(
 			mconfig,
@@ -116,7 +117,7 @@ m68hc05_device::m68hc05_device(
 			owner,
 			clock,
 			type,
-			{ s_hc_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, M68HC05_VECTOR_SWI },
+			{ s_hc_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, vector_mask, M68HC05_VECTOR_SWI },
 			internal_map)
 	, m_port_cb_r{ *this, *this, *this, *this }
 	, m_port_cb_w{ *this, *this, *this, *this }
@@ -567,12 +568,12 @@ void m68hc05_device::interrupt()
 			LOGINT("servicing external interrupt\n");
 			m_irq_latch = 0;
 			m_pending_interrupts &= ~M68HC05_INT_IRQ;
-			rm16(M68HC05_VECTOR_IRQ, m_pc);
+			rm16(M68HC05_VECTOR_IRQ & m_params.m_vector_mask, m_pc);
 		}
 		else if (m_pending_interrupts & M68HC05_INT_TIMER)
 		{
 			LOGINT("servicing timer interrupt\n");
-			rm16(M68HC05_VECTOR_TIMER, m_pc);
+			rm16(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
 		}
 		else
 		{
@@ -712,7 +713,7 @@ m68hc705_device::m68hc705_device(
 		device_type type,
 		u32 addr_width,
 		address_map_constructor internal_map)
-	: m68hc05_device(mconfig, tag, owner, clock, type, addr_width, internal_map)
+	: m68hc05_device(mconfig, tag, owner, clock, type, addr_width, (1U << addr_width) - 1, internal_map)
 {
 }
 
@@ -762,6 +763,7 @@ m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *ta
 			clock,
 			M68HC05C4,
 			13,
+			0x1fff,
 			address_map_constructor(FUNC(m68hc05c4_device::c4_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
@@ -828,6 +830,7 @@ m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *ta
 			clock,
 			M68HC05C8,
 			13,
+			0x1fff,
 			address_map_constructor(FUNC(m68hc05c8_device::c8_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
@@ -989,6 +992,7 @@ m68hc05l9_device::m68hc05l9_device(machine_config const &mconfig, char const *ta
 			clock,
 			M68HC05L9,
 			16,
+			0x1fff,
 			address_map_constructor(FUNC(m68hc05l9_device::l9_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0x1f }});
@@ -1071,6 +1075,7 @@ m68hc05l11_device::m68hc05l11_device(machine_config const &mconfig, char const *
 			clock,
 			M68HC05L11,
 			16, // FIXME: 16 logical mapped to 23 physical
+			0x7fff,
 			address_map_constructor(FUNC(m68hc05l11_device::l11_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xff }});

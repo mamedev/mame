@@ -65,6 +65,25 @@ protected:
 			, m_addr_width(addr_width)
 			, m_sp_mask(sp_mask)
 			, m_sp_floor(sp_floor)
+			, m_vector_mask((1U << addr_width) - 1)
+			, m_swi_vector(swi_vector)
+		{
+		}
+
+		configuration_params(
+				op_handler_table &ops,
+				cycle_count_table &cycles,
+				u32 addr_width,
+				u32 sp_mask,
+				u32 sp_floor,
+				u16 vector_mask,
+				u16 swi_vector)
+			: m_ops(ops)
+			, m_cycles(cycles)
+			, m_addr_width(addr_width)
+			, m_sp_mask(sp_mask)
+			, m_sp_floor(sp_floor)
+			, m_vector_mask(vector_mask)
 			, m_swi_vector(swi_vector)
 		{
 		}
@@ -74,6 +93,7 @@ protected:
 		u32 m_addr_width;
 		u32 m_sp_mask;
 		u32 m_sp_floor;
+		u16 m_vector_mask;
 		u16 m_swi_vector;
 	};
 

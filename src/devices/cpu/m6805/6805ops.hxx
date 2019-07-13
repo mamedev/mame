@@ -502,7 +502,7 @@ OP_HANDLER( swi )
 	pushbyte(m_a);
 	pushbyte(m_cc);
 	SEI;
-	rm16(m_params.m_swi_vector, m_pc);
+	rm16(m_params.m_swi_vector & m_params.m_vector_mask, m_pc);
 }
 
 // $84 ILLEGAL

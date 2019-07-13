@@ -80,6 +80,7 @@ protected:
 			u32 clock,
 			device_type type,
 			u32 addr_width,
+			u16 vector_mask,
 			address_map_constructor internal_map);
 
 	void set_port_bits(std::array<u8, PORT_COUNT> const &bits);
