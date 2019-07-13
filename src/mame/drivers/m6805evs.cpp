@@ -13,7 +13,7 @@ XC68HC26P = PPI (3 ports), uses 8 addresses.
 
 2014-01-12 Skeleton driver
 
-Memory map:
+Memory map for MC68HC705P9:
 0000, 0000  PORTA       Port A data register
 0001, 0001  PORTB       Port B data register
 0002, 0002  PORTC       Port C data register
@@ -56,13 +56,12 @@ Memory map:
 
 
 ToDo:
-- Add CMOS family support to M6085 CPU core (different timings, different peripherals)
 - Everything
 
 ******************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68hc05.h"
 
 
 class m6805evs_state : public driver_device
@@ -87,12 +86,8 @@ void m6805evs_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 
-	// AM_RANGE(0x0000, 0x001f) I/O registers live here
-	map(0x0020, 0x004f).rom().region("eprom", 0x0020);
-	map(0x0080, 0x00ff).ram();
-	map(0x0100, 0x0900).rom().region("eprom", 0x0100);
-	// AM_RANGE(0x1f00, 0x1fef) bootloader ROM lives here
-	map(0x1ff8, 0x1fff).rom().region("eprom", 0x1ff0);
+	//map(0x0800, 0x1fff).rom().region("eprom", 0x0800);
+	//map(0xfff0, 0xffff).rom().region("eprom", 0xfff0);
 }
 
 static INPUT_PORTS_START( m6805evs )
@@ -104,16 +99,18 @@ void m6805evs_state::machine_reset()
 
 void m6805evs_state::m6805evs(machine_config &config)
 {
-	/* basic machine hardware */
-	M6805(config, m_maincpu, XTAL(4'000'000));
-
-//  Needs a 13-bits address bus wide version of the cpu
-//  m_maincpu->set_addrmap(AS_PROGRAM, &m6805evs_state::mem_map);
+	// FIXME: should this be MC68HC05E0 instead?
+	// (MC68HC705P9 doesn't use an external EPROM either and is also incompatible)
+	M68HC05C8(config, m_maincpu, XTAL(4'000'000));
+	//m_maincpu->set_addrmap(AS_PROGRAM, &m6805evs_state::mem_map);
 }
 
 ROM_START(m6805evs)
-	ROM_REGION(0x2000, "eprom", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "evsbug12.bin", 0x0000, 0x2000, CRC(8b581aef) SHA1(eacf425cc8a042085ccc4097cc61570b633b1e38) )
+
+	ROM_REGION(0x2000, "mcu", 0)
+	ROM_LOAD( "mc68hc705p9cp.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
 

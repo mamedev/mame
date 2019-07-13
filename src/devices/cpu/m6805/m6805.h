@@ -12,7 +12,6 @@
 //**************************************************************************
 
 // device type definition
-DECLARE_DEVICE_TYPE(M6805,     m6805_device)
 DECLARE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device)
 DECLARE_DEVICE_TYPE(HD63705,   hd63705_device)
 
@@ -299,16 +298,6 @@ protected:
 	// address spaces
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-};
-
-
-// ======================> m6805_device
-
-class m6805_device : public m6805_base_device
-{
-public:
-	// construction/destruction
-	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
