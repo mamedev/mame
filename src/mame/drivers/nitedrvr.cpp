@@ -123,7 +123,7 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8, 8,
+	8, 16,
 	64,
 	1,
 	{ 0 },
@@ -153,7 +153,7 @@ void nitedrvr_state::nitedrvr(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 278, 0, 256); // ~57 Hz
+	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240);
 	// PROM derives VRESET, VBLANK, VSYNC, IRQ from vertical scan count and last VBLANK
 	screen.set_screen_update(FUNC(nitedrvr_state::screen_update_nitedrvr));
 	screen.set_palette(m_palette);
