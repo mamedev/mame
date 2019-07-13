@@ -6,6 +6,7 @@ Elektor SC/MP
 
 2009-11-22 Skeleton driver.
 2012-05-10 Added keyboard [Robbbert]
+2019-07-12 Added cassette [Robbbert]
 
 To Use:
 - Press MINUS to enter data input mode
@@ -14,11 +15,9 @@ To Use:
 At the moment Paste cannot be tested, but if it worked, you could
 paste this in:  -0F0011^22^33^44^55^66^77^88^99^
 
-It seems the only way to exit each mode is to do a Soft Reset.
+It seems the only way to exit each mode is to press NRST.
 
 ToDo:
-- Add Cassette
-- Verify that ROMS are good (they seem to be)
 
 
 ****************************************************************************/
@@ -126,7 +125,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( elekscmp_state::kansas_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER( elekscmp_state::kansas_w )
 {
-	u8 twobit = m_cass_data[3] & 3;
+	u8 twobit = m_cass_data[3] & 7;
 	m_cass_data[3]++;
 
 	if (twobit == 0)
@@ -216,13 +215,12 @@ void elekscmp_state::elekscmp(machine_config &config)
 /* ROM definition */
 ROM_START( elekscmp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	// Too many possible errors, few found and fixed, but not sure if there are more
-	ROM_LOAD( "elbug.001", 0x0000, 0x0200, BAD_DUMP CRC(f733da28) SHA1(b65d98be03eab80478167964beec26bb327bfdf3))
-	ROM_LOAD( "elbug.002", 0x0200, 0x0200, BAD_DUMP CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
-	ROM_LOAD( "elbug.003", 0x0400, 0x0200, BAD_DUMP CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
+	ROM_LOAD( "elbug.001", 0x0000, 0x0200, CRC(f733da28) SHA1(b65d98be03eab80478167964beec26bb327bfdf3))
+	ROM_LOAD( "elbug.002", 0x0200, 0x0200, CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
+	ROM_LOAD( "elbug.003", 0x0400, 0x0200, CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                FULLNAME         FLAGS */
-COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)
+COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", 0 )
