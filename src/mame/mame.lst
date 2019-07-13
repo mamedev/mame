@@ -38621,7 +38621,7 @@ tvc64pru                        //
 tvcapcom                        //
 
 @source:tvg01.cpp
-boatrace                        //
+theboat                         //
 
 @source:tvgame.cpp
 tvgame                          //

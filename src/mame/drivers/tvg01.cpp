@@ -53,10 +53,7 @@
 *******************************************************************************
 
   Todo:
-
-  - Find the selector for the PPI2 port C multiplexed inputs.
-  - Demux the PPI2 port C inputs.
-
+  - hopper for payout
 
 *******************************************************************************/
 
@@ -74,22 +71,50 @@ class tvg01_state : public driver_device
 public:
 	tvg01_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_player_inputs{{*this, "INP1.%u", 0U}, {*this, "INP2.%u", 0U}}
 	{
 	}
 
-	void boatrace(machine_config &config);
+	void theboat(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 
 private:
+	template <int P> void input_select_w(u8 data);
+	u8 player_inputs_r();
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+
+	required_ioport_array<6> m_player_inputs[2];
+
+	u8 m_input_select[2];
 };
 
 void tvg01_state::machine_start()
 {
 	membank("gfxbank")->configure_entries(0, 4, memregion("gfx")->base(), 0x4000);
+
+	save_item(NAME(m_input_select));
+}
+
+template <int P>
+void tvg01_state::input_select_w(u8 data)
+{
+	m_input_select[P] = data;
+}
+
+u8 tvg01_state::player_inputs_r()
+{
+	u8 result = 0xff;
+
+	for (int p = 0; p < 2; p++)
+		for (int n = 0; n < 6; n++)
+			if (!BIT(m_input_select[p], n))
+				result &= m_player_inputs[p][n]->read();
+
+	return result;
 }
 
 void tvg01_state::mem_map(address_map &map)
@@ -109,26 +134,95 @@ void tvg01_state::io_map(address_map &map)
 	map(0xa0, 0xa3).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-static INPUT_PORTS_START(boatrace)
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )       PORT_NAME("P1 - Coin (1 credit)")                // P1 - coin (1 credit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )       PORT_NAME("P2 - Key Up (10 credits)")            // P2 - keyup (10 credits)
+static INPUT_PORTS_START(theboat)
+	PORT_START("INP0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )       PORT_NAME("P1 Coin (1 credit)")                  // P1 - coin (1 credit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )       PORT_NAME("P2 Key Up (10 credits)")              // P2 - keyup (10 credits)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)  PORT_NAME("Analyze / Bookkeeping")               // analyze (bookkeeping)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 - Key Out")  PORT_CODE(KEYCODE_W)  // P2 - keyout
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )       PORT_NAME("P1 - Key Up (10 credits)")            // P1 - keyup (10 credits)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Hopper")        PORT_CODE(KEYCODE_H)  // hopper line
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )       PORT_NAME("P2 - Coin (1 credit)")                // P2 - coin (1 credit)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 - Key Out")  PORT_CODE(KEYCODE_Q)  // P1 - keyout
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Pay Out")  PORT_CODE(KEYCODE_I)    // P2 - keyout
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )       PORT_NAME("P1 Key Up (10 credits)")              // P1 - keyup (10 credits)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Hopper")        PORT_CODE(KEYCODE_L)  // hopper line
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )       PORT_NAME("P2 Coin (1 credit)")                  // P2 - coin (1 credit)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Pay Out")  PORT_CODE(KEYCODE_U)    // P1 - keyout
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("12, 16, 26, 45, 56, TS (take score)")  PORT_CODE(KEYCODE_Z)  // Both players: 12, 16, 26, 45, 56, TS (take score)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("13, 23, 34, ST (start), Small")        PORT_CODE(KEYCODE_X)  // Both players: 13, 23, 34, ST (start), Small
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("14, 24, 35, SH, BG (big)")             PORT_CODE(KEYCODE_C)  // Both players: 14, 24, 35, SH, BG (big)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("15, 25, 36, NG (next game)")           PORT_CODE(KEYCODE_V)  // Both players: 15, 25, 36, NG (next game)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("46")     PORT_CODE(KEYCODE_B)  // Both players: 46
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unk-1")  PORT_CODE(KEYCODE_N)  // unknown
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unk-2")  PORT_CODE(KEYCODE_M)  // unknown
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unk-3")  PORT_CODE(KEYCODE_S)  // unknown
+	PORT_START("INP1.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 1-2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 1-3") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 1-4") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 1-5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP1.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 1-6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 2-3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 2-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 2-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP1.2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 2-6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 3-4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 3-5") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 3-6") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP1.3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 4-5") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("P1 Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Big") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Next Game") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 4-6") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP1.4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Take Score") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Small") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 SH") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP1.5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 5-6") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP2.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 1-2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 1-3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 1-4")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 1-5")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INP2.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 1-6")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 2-3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 2-4")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 2-5")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP2.2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 2-6")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 3-4")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 3-5")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 3-6")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP2.3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 4-5")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )      PORT_NAME("P2 Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Next Game")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 4-6")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP2.4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Take Score")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Small")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 SH")
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INP2.5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Bet 5-6")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
 	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))  PORT_DIPLOCATION("DSW:8")
@@ -156,7 +250,7 @@ static INPUT_PORTS_START(boatrace)
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
 
-void tvg01_state::boatrace(machine_config &config)
+void tvg01_state::theboat(machine_config &config)
 {
 	z80_device &maincpu(Z80(config, "maincpu", 21.477272_MHz_XTAL / 6)); // LH0080A
 	maincpu.set_addrmap(AS_PROGRAM, &tvg01_state::mem_map);
@@ -165,11 +259,13 @@ void tvg01_state::boatrace(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D449C-2 + battery
 
 	i8255_device &ppi1(I8255(config, "ppi1")); // D8255AC-2
-	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pa_callback().set_ioport("INP0");
 	ppi1.out_pb_callback().set_membank("gfxbank").mask(0x03);
 
 	i8255_device &ppi2(I8255(config, "ppi2")); // D8255AC-2
-	ppi2.in_pc_callback().set_ioport("IN1");
+	ppi2.out_pa_callback().set(FUNC(tvg01_state::input_select_w<0>));
+	ppi2.out_pb_callback().set(FUNC(tvg01_state::input_select_w<1>));
+	ppi2.in_pc_callback().set(FUNC(tvg01_state::player_inputs_r));
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
@@ -185,7 +281,7 @@ void tvg01_state::boatrace(machine_config &config)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-ROM_START(boatrace)
+ROM_START(theboat)
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("1.ic3", 0x0000, 0x4000, CRC(04a0ef56) SHA1(40256f858032efa1375d336f141dbbd08a8802f7))
 	ROM_LOAD("2.ic5", 0x4000, 0x4000, CRC(c18d4a61) SHA1(c40a8b7dcaa90ed871be20605fc853949361257e))
@@ -198,4 +294,4 @@ ROM_START(boatrace)
 ROM_END
 
 //   YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT        ROT    COMPANY            FULLNAME   FLAGS
-GAME(1987, boatrace, 0,      boatrace, boatrace, tvg01_state, empty_init, ROT0, "Hit Gun Co, LTD", "The Boat", MACHINE_NOT_WORKING)
+GAME(1987, theboat,  0,      theboat,  theboat,  tvg01_state, empty_init, ROT0, "Hit Gun Co, LTD", "The Boat", MACHINE_SUPPORTS_SAVE)
