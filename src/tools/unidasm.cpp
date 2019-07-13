@@ -296,6 +296,7 @@ struct options
 	const char *            filename;
 	offs_t                  basepc;
 	uint8_t                 norawbytes;
+	uint8_t                 xchbytes;
 	uint8_t                 lower;
 	uint8_t                 upper;
 	uint8_t                 flipped;
@@ -951,6 +952,8 @@ static int parse_options(int argc, char *argv[], options *opts)
 				opts->norawbytes = true;
 			else if(tolower((uint8_t)curarg[1]) == 'u')
 				opts->upper = true;
+			else if(tolower((uint8_t)curarg[1]) == 'x')
+				opts->xchbytes = true;
 			else
 				goto usage;
 		}
@@ -1029,7 +1032,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 usage:
 	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
-	printf("   [-mode <n>] [-norawbytes] [-flipped] [-upper] [-lower]\n");
+	printf("   [-mode <n>] [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
 	printf("   [-skip <n>] [-count <n>]\n");
 	printf("\n");
 	printf("Supported architectures:");
@@ -1080,7 +1083,14 @@ int main(int argc, char *argv[])
 	base_buffer.data.resize(rounded_size + 8, 0x00);
 	base_buffer.size = length;
 	base_buffer.base_pc = opts.basepc;
-	memcpy(&base_buffer.data[0], (const u8 *)data + opts.skip, length - opts.skip);
+	if(opts.xchbytes) {
+		for(uint32_t offset = opts.skip; offset < length - 1; offset += 2) {
+			base_buffer.data[offset - opts.skip] = ((const u8 *)data)[offset + 1];
+			base_buffer.data[offset - opts.skip + 1] = ((const u8 *)data)[offset];
+		}
+	}
+	else
+		memcpy(&base_buffer.data[0], (const u8 *)data + opts.skip, length - opts.skip);
 
 	// Build the decryption buffers if needed
 	unidasm_data_buffer opcodes_buffer(disasm.get(), opts.dasm), params_buffer(disasm.get(), opts.dasm);
