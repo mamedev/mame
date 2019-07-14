@@ -25,18 +25,6 @@ TODO:
         case 0x34:  Emulation info
         case 0x40:  Snapshot block
 
-Notes:
-
-TZX format specification lists
-8064 pulses for a header block and 3220 for a data block
-
-but the documentation on worldofspectrum lists
-8063 pulses for a header block and 3223 for a data block
-
-see http://www.worldofspectrum.org/faq/reference/48kreference.htm#TapeDataStructure
-
-We are currently using the numbers from the TZX specification...
-
 */
 
 #include <assert.h>
@@ -537,7 +525,7 @@ static int tzx_cas_do_work( int16_t **buffer )
 		case 0x10:  /* Standard Speed Data Block (.TAP block) */
 			pause_time = cur_block[1] + (cur_block[2] << 8);
 			data_size = cur_block[3] + (cur_block[4] << 8);
-			pilot_length = (cur_block[5] == 0x00) ?  8064 : 3220;
+			pilot_length = (cur_block[5] < 128) ?  8063 : 3223;
 			size += tzx_cas_handle_block(buffer, &cur_block[5], pause_time, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 			current_block++;
 			break;
@@ -815,8 +803,7 @@ static int tap_cas_to_wav_size( const uint8_t *casdata, int caslen )
 	while (p < casdata + caslen)
 	{
 		int data_size = p[0] + (p[1] << 8);
-		int pilot_length = (p[2] == 0x00) ? 8064 : 3220;    /* TZX specification */
-//  int pilot_length = (p[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
+		int pilot_length = (p[2] == 0x00) ? 8063 : 3223;
 		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
 		size += tzx_cas_handle_block(nullptr, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
@@ -834,8 +821,7 @@ static int tap_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes )
 	while (size < length)
 	{
 		int data_size = bytes[0] + (bytes[1] << 8);
-		int pilot_length = (bytes[2] == 0x00) ? 8064 : 3220;    /* TZX specification */
-//  int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
+		int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;
 		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
 		bytes += 2;
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
