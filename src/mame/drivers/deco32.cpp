@@ -394,9 +394,9 @@ void captaven_state::captaven_map(address_map &map)
 	map(0x130000, 0x131fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x148000, 0x14800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
 	map(0x160000, 0x167fff).ram(); /* Extra work RAM */
-	map(0x168000, 0x168000).r(FUNC(captaven_state::captaven_dsw1_r));
-	map(0x168001, 0x168001).r(FUNC(captaven_state::captaven_dsw2_r));
-	map(0x168002, 0x168002).r(FUNC(captaven_state::captaven_dsw3_r));
+	map(0x168000, 0x168000).lr8("dsw1_r", [this]() { return m_io_dsw[0]->read(); });
+	map(0x168001, 0x168001).lr8("dsw2_r", [this]() { return m_io_dsw[1]->read(); });
+	map(0x168002, 0x168002).lr8("dsw3_r", [this]() { return m_io_dsw[2]->read(); });
 	map(0x168003, 0x168003).r(FUNC(captaven_state::captaven_soundcpu_status_r));
 	map(0x178000, 0x178003).w(FUNC(captaven_state::pri_w));
 	map(0x180000, 0x18001f).rw("tilegen1", FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
@@ -418,8 +418,8 @@ void fghthist_state::fghthist_map(address_map &map)
 //  map(0x000000, 0x001fff).rom().w(FUNC(fghthist_state::pf1_data_w)); // wtf??
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x11ffff).ram();
-	map(0x120020, 0x120021).r(FUNC(fghthist_state::fghthist_in0_r));
-	map(0x120024, 0x120025).r(FUNC(fghthist_state::fghthist_in1_r));
+	map(0x120020, 0x120021).lr16("in0_r", [this]() { return m_io_in[0]->read(); });
+	map(0x120024, 0x120025).lr16("in1_r", [this]() { return m_io_in[1]->read(); });
 	map(0x120028, 0x120028).r(FUNC(fghthist_state::eeprom_r));
 	map(0x12002c, 0x12002c).w(FUNC(fghthist_state::eeprom_w));
 	map(0x12002d, 0x12002d).w(FUNC(fghthist_state::volume_w));
@@ -475,10 +475,10 @@ void fghthist_state::fghthsta_memmap(address_map &map)
 // raster effects appear to need some work on it anyway?
 void dragngun_state::dragngun_map(address_map &map)
 {
-	map(0x0000000, 0x00fffff).rom();
+	map(0x0000000, 0x00fffff).rom().region("maincpu", 0x000000);
 	map(0x0100000, 0x011ffff).ram();
 	map(0x0120000, 0x0127fff).rw(FUNC(dragngun_state::ioprot_r), FUNC(dragngun_state::ioprot_w)).umask32(0x0000ffff);
-//  map(0x01204c0, 0x01204c3) AM_WRITE(sound_w)
+//  map(0x01204c0, 0x01204c3).w(FUNC(dragngun_state::sound_w));
 	map(0x0128000, 0x012800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
 	map(0x0130000, 0x0131fff).ram().w(FUNC(dragngun_state::buffered_palette_w)).share("paletteram");
 	map(0x0138000, 0x0138003).noprw(); /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
@@ -507,7 +507,7 @@ void dragngun_state::dragngun_map(address_map &map)
 	map(0x0220000, 0x0221fff).ram().share("spriteram"); /* Main spriteram */
 	map(0x0228000, 0x02283ff).ram(); //0x10 byte increments only
 	map(0x0230000, 0x0230003).w(FUNC(dragngun_state::spriteram_dma_w));
-	map(0x0300000, 0x03fffff).rom();
+	map(0x0300000, 0x03fffff).rom().region("maincpu", 0x100000);
 	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0410000, 0x0410003).w(FUNC(dragngun_state::volume_w));
 	map(0x0418000, 0x0418003).w(FUNC(dragngun_state::speaker_switch_w));
@@ -531,7 +531,7 @@ void dragngun_state::lockloadu_map(address_map &map)
 
 void dragngun_state::lockload_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
+	map(0x000000, 0x0fffff).rom().region("maincpu", 0x000000);
 	map(0x100000, 0x11ffff).ram();
 	map(0x120000, 0x127fff).rw(FUNC(dragngun_state::ioprot_r), FUNC(dragngun_state::ioprot_w)).umask32(0x0000ffff);
 	map(0x128000, 0x12800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
@@ -558,7 +558,7 @@ void dragngun_state::lockload_map(address_map &map)
 	map(0x220000, 0x221fff).ram().share("spriteram"); /* Main spriteram */
 	map(0x228000, 0x2283ff).ram();             //0x10 byte increments only
 	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
-	map(0x300000, 0x3fffff).rom();
+	map(0x300000, 0x3fffff).rom().region("maincpu", 0x100000);
 	map(0x410000, 0x410003).w(FUNC(dragngun_state::volume_w));
 	map(0x420000, 0x420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
 	map(0x440000, 0x440003).portr("IN2");
@@ -648,8 +648,8 @@ void deco32_state::h6280_sound_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x110000, 0x110001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x120000, 0x120001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
 }
@@ -666,8 +666,8 @@ void deco32_state::z80_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xb000, 0xb000).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc000, 0xc000).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb000, 0xb000).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc000, 0xc000).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd000, 0xd000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 }
 
@@ -694,20 +694,20 @@ void dragngun_state::lockloadu_sound_map(address_map &map)
 //  PROTECTION
 //**************************************************************************
 
-READ16_MEMBER( deco32_state::ioprot_r )
+u16 deco32_state::ioprot_r(offs_t offset)
 {
-	offs_t real_address = 0 + (offset *2);
+	offs_t real_address = 0 + (offset * 2);
 	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
+	u8 cs = 0;
 
-	return m_ioprot->read_data( deco146_addr, cs );
+	return m_ioprot->read_data(deco146_addr, cs);
 }
 
-WRITE16_MEMBER( deco32_state::ioprot_w )
+void deco32_state::ioprot_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	offs_t real_address = 0 + (offset *2);
+	offs_t real_address = 0 + (offset * 2);
 	offs_t deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	uint8_t cs = 0;
+	u8 cs = 0;
 
 	m_ioprot->write_data( deco146_addr, data, mem_mask, cs );
 }
@@ -717,10 +717,10 @@ WRITE16_MEMBER( deco32_state::ioprot_w )
 //  SOUND
 //**************************************************************************
 
-WRITE8_MEMBER( deco32_state::volume_w )
+void deco32_state::volume_w(u8 data)
 {
 	// TODO: assume linear with a 0.0-1.0 dB scale for now
-	uint8_t raw_vol = 0xff - data;
+	const u8 raw_vol = 0xff - data;
 	float vol_output = ((float)raw_vol) / 255.0f;
 
 	m_ym2151->set_output_gain(ALL_OUTPUTS, vol_output);
@@ -728,7 +728,7 @@ WRITE8_MEMBER( deco32_state::volume_w )
 	m_oki[1]->set_output_gain(ALL_OUTPUTS, vol_output);
 }
 
-READ8_MEMBER( captaven_state::captaven_soundcpu_status_r )
+u8 captaven_state::captaven_soundcpu_status_r()
 {
 	// 7-------  sound cpu status (0 = busy)
 	// -6543210  unknown
@@ -736,7 +736,7 @@ READ8_MEMBER( captaven_state::captaven_soundcpu_status_r )
 	return 0xff;
 }
 
-WRITE32_MEMBER( dragngun_state::volume_w )
+void dragngun_state::volume_w(u32 data)
 {
 	m_vol_main->ce_w(BIT(data, 2));
 	m_vol_main->clk_w(BIT(data, 1));
@@ -750,7 +750,7 @@ WRITE32_MEMBER( dragngun_state::volume_w )
 	}
 }
 
-WRITE32_MEMBER( dragngun_state::speaker_switch_w )
+void dragngun_state::speaker_switch_w(u32 data)
 {
 	// TODO: This should switch the oki3 output between the gun speaker and the standard speakers
 	m_gun_speaker_disabled = bool(BIT(data, 0));
@@ -788,20 +788,20 @@ WRITE_LINE_MEMBER( nslasher_state::tattass_sound_irq_w )
 {
 	if (state)
 	{
-		uint8_t data = m_ioprot->soundlatch_r();
+		u8 data = m_ioprot->soundlatch_r();
 		// Swap bits 0 and 3 to correct for design error from BSMT schematic
 		data = bitswap<8>(data, 7, 6, 5, 4, 0, 2, 1, 3);
 		m_decobsmt->bsmt_comms_w(data);
 	}
 }
 
-WRITE8_MEMBER( deco32_state::sound_bankswitch_w )
+void deco32_state::sound_bankswitch_w(u8 data)
 {
 	m_oki[0]->set_rom_bank((data >> 0) & 1);
 	m_oki[1]->set_rom_bank((data >> 1) & 1);
 }
 
-WRITE8_MEMBER( dragngun_state::lockload_okibank_lo_w )
+void dragngun_state::lockload_okibank_lo_w(u8 data)
 {
 	m_oki2_bank = (m_oki2_bank & 2) | ((data >> 1) & 1);
 	logerror("Load OKI2 Bank Low bits: %02x, Current : %02x\n",(data >> 1) & 1, m_oki2_bank);
@@ -809,7 +809,7 @@ WRITE8_MEMBER( dragngun_state::lockload_okibank_lo_w )
 	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
 
-WRITE8_MEMBER( dragngun_state::lockload_okibank_hi_w )
+void dragngun_state::lockload_okibank_hi_w(u8 data)
 {
 	m_oki2_bank = (m_oki2_bank & 1) | ((data & 1) << 1); // TODO : Actually value unverified
 	logerror("Load OKI2 Bank Hi bits: %02x, Current : %02x\n",((data & 1) << 1), m_oki2_bank);
@@ -821,19 +821,19 @@ WRITE8_MEMBER( dragngun_state::lockload_okibank_hi_w )
 //  VIDEO
 //**************************************************************************
 
-WRITE32_MEMBER( deco32_state::vblank_ack_w )
+void deco32_state::vblank_ack_w(u32 data)
 {
 	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 }
 
 template<int Chip>
-READ32_MEMBER(deco32_state::spriteram_r)
+u32 deco32_state::spriteram_r(offs_t offset)
 {
 	return m_spriteram16[Chip][offset] ^ 0xffff0000;
 }
 
 template<int Chip>
-WRITE32_MEMBER(deco32_state::spriteram_w)
+void deco32_state::spriteram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
@@ -841,15 +841,15 @@ WRITE32_MEMBER(deco32_state::spriteram_w)
 }
 
 template<int Chip>
-WRITE32_MEMBER(deco32_state::buffer_spriteram_w)
+void deco32_state::buffer_spriteram_w(u32 data)
 {
 	std::copy(&m_spriteram16[Chip][0], &m_spriteram16[Chip][0x2000/4], &m_spriteram16_buffered[Chip][0]);
 }
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
-template <int TileMap> WRITE32_MEMBER( deco32_state::pf_rowscroll_w ) { COMBINE_DATA(&m_pf_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[TileMap][offset]); }
+template <int TileMap> void deco32_state::pf_rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_pf_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf_rowscroll[TileMap][offset]); }
 
-READ32_MEMBER( dragngun_state::unk_video_r)
+u32 dragngun_state::unk_video_r()
 {
 	return machine().rand();
 }
@@ -906,60 +906,53 @@ DECO16IC_BANK_CB_MEMBER( nslasher_state::bank_callback )
 //  INPUTS
 //**************************************************************************
 
-READ8_MEMBER( captaven_state::captaven_dsw1_r ) { return ioport("DSW1")->read(); }
-READ8_MEMBER( captaven_state::captaven_dsw2_r ) { return ioport("DSW2")->read(); }
-READ8_MEMBER( captaven_state::captaven_dsw3_r ) { return ioport("DSW3")->read(); }
-
-READ16_MEMBER( fghthist_state::fghthist_in0_r ) { return ioport("IN0")->read(); }
-READ16_MEMBER( fghthist_state::fghthist_in1_r ) { return ioport("IN1")->read(); }
-
 // TODO: probably clears both player 1 and player 2
-WRITE32_MEMBER( dragngun_state::gun_irq_ack_w )
+void dragngun_state::gun_irq_ack_w(u32 data)
 {
 	m_deco_irq->lightgun_irq_ack_w(data);
 }
 
 // TODO: improve this, Y axis not understood at all
-READ32_MEMBER( dragngun_state::lockload_gun_mirror_r )
+u32 dragngun_state::lockload_gun_mirror_r(offs_t offset)
 {
 //logerror("%08x:Read gun %d\n",m_maincpu->pc(),offset);
 
-	switch(offset)
+	switch (offset)
 	{
 		case 0:
-			return ((ioport("INPUTS")->read() & 0x30) << 5) | (ioport("LIGHT0_X")->read()) | 0xffff800;
+			return ((m_io_inputs->read() & 0x30) << 5) | (m_io_light_x[0]->read()) | 0xffff800;
 
 		case 1:
-			return ((ioport("INPUTS")->read() & 0x3000) >> 3) | (ioport("LIGHT1_X")->read()) | 0xffff800;
+			return ((m_io_inputs->read() & 0x3000) >> 3) | (m_io_light_x[1]->read()) | 0xffff800;
 	}
 
 	return ~0;
 }
 
-READ32_MEMBER( dragngun_state::lightgun_r )
+u32 dragngun_state::lightgun_r()
 {
 	/* Ports 0-3 are read, but seem unused */
 	switch (m_lightgun_port)
 	{
-	case 4: return ioport("LIGHT0_X")->read();
-	case 5: return ioport("LIGHT1_X")->read();
-	case 6: return ioport("LIGHT0_Y")->read();
-	case 7: return ioport("LIGHT1_Y")->read();
+	case 4: return m_io_light_x[0]->read();
+	case 5: return m_io_light_x[1]->read();
+	case 6: return m_io_light_y[0]->read();
+	case 7: return m_io_light_y[1]->read();
 	}
 
 //  logerror("Illegal lightgun port %d read \n",m_lightgun_port);
 	return 0;
 }
 
-WRITE32_MEMBER( dragngun_state::lightgun_w )
+void dragngun_state::lightgun_w(offs_t offset, u32 data)
 {
 //  logerror("Lightgun port %d\n",m_lightgun_port);
-	m_lightgun_port=offset;
+	m_lightgun_port = offset;
 }
 
 INPUT_CHANGED_MEMBER( dragngun_state::lockload_gun_trigger )
 {
-	switch ((uint8_t)(uintptr_t)param)
+	switch ((u8)(uintptr_t)param)
 	{
 	case 0: m_deco_irq->lightgun1_trigger_w(!newval); break;
 	case 1: m_deco_irq->lightgun2_trigger_w(!newval); break;
@@ -971,12 +964,12 @@ INPUT_CHANGED_MEMBER( dragngun_state::lockload_gun_trigger )
 //  EEPROM
 //**************************************************************************
 
-READ8_MEMBER( deco32_state::eeprom_r )
+u8 deco32_state::eeprom_r()
 {
 	return 0xfe | m_eeprom->do_read();
 }
 
-WRITE8_MEMBER( deco32_state::eeprom_w )
+void deco32_state::eeprom_w(u8 data)
 {
 	// 7-------  unknown
 	// -6------  eeprom cs
@@ -993,7 +986,7 @@ WRITE8_MEMBER( deco32_state::eeprom_w )
 	pri_w(data & 0x03);
 }
 
-WRITE8_MEMBER( dragngun_state::eeprom_w )
+void dragngun_state::eeprom_w(u8 data)
 {
 	// 76543---  unknown
 	// -----2--  eeprom cs
@@ -1005,7 +998,7 @@ WRITE8_MEMBER( dragngun_state::eeprom_w )
 	m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE32_MEMBER( nslasher_state::tattass_control_w )
+void nslasher_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	/* Eprom in low byte */
 	if (ACCESSING_BITS_0_7)
@@ -1034,9 +1027,8 @@ WRITE32_MEMBER( nslasher_state::tattass_control_w )
 		{
 			if (m_buf_ptr)
 			{
-				int i;
 				logerror("Eprom reset (bit count %d): ", m_read_bit_count);
-				for (i = 0; i < m_buf_ptr; i++)
+				for (int i = 0; i < m_buf_ptr; i++)
 					logerror("%s", BIT(m_buffer, m_buf_ptr - 1 - i) ? "1" : "0");
 				logerror("\n");
 
@@ -1058,10 +1050,10 @@ WRITE32_MEMBER( nslasher_state::tattass_control_w )
 			/* Handle pending read */
 			if (m_pending_command == 1)
 			{
-				int d = m_read_bit_count >> 3;
-				int m = 7 - (m_read_bit_count & 0x7);
-				int a = (m_byte_addr + d) & 0x3ff;
-				int b = m_eeprom->internal_read(a);
+				const int d = m_read_bit_count >> 3;
+				const int m = 7 - (m_read_bit_count & 0x7);
+				const int a = (m_byte_addr + d) & 0x3ff;
+				const int b = m_eeprom->internal_read(a);
 
 				m_tattass_eprom_bit = (b >> m) & 1;
 
@@ -1113,7 +1105,8 @@ WRITE32_MEMBER( nslasher_state::tattass_control_w )
 		}
 		else
 		{
-			if (!(BIT(data, 6))) {
+			if (!(BIT(data, 6)))
+			{
 				logerror("Cs set low\n");
 				m_buf_ptr = 0;
 			}
@@ -1144,7 +1137,7 @@ WRITE32_MEMBER( nslasher_state::tattass_control_w )
 	//logerror("%08x: %08x data\n",data,mem_mask);
 }
 
-READ16_MEMBER( nslasher_state::port_b_tattass )
+u16 nslasher_state::port_b_tattass()
 {
 	return m_tattass_eprom_bit;
 }
@@ -1154,18 +1147,18 @@ READ16_MEMBER( nslasher_state::port_b_tattass )
 //  MACHINE
 //**************************************************************************
 
-READ32_MEMBER( fghthist_state::unk_status_r )
+u32 fghthist_state::unk_status_r()
 {
 	// bit 3 needs to be 0
 	return 0xfffffff7;
 }
 
-READ16_MEMBER( nslasher_state::nslasher_debug_r )
+u16 nslasher_state::nslasher_debug_r()
 {
 	return 0xffff;
 }
 
-READ32_MEMBER( captaven_state::_71_r )
+u32 captaven_state::_71_r()
 {
 	/* Bit 0x80 goes high when sprite DMA is complete, and low
 	while it's in progress, we don't bother to emulate it */
@@ -1178,12 +1171,12 @@ void captaven_state::init_captaven()
 	deco56_decrypt_gfx(machine(), "gfx2");
 }
 
-extern void process_dvi_data(device_t *device,uint8_t* dvi_data, int offset, int regionsize);
+extern void process_dvi_data(device_t *device,u8* dvi_data, int offset, int regionsize);
 
 void dragngun_state::dragngun_init_common()
 {
-	const uint8_t *SRC_RAM = memregion("gfx1")->base();
-	uint8_t *DST_RAM = memregion("gfx2")->base();
+	const u8 *SRC_RAM = memregion("gfx1")->base();
+	u8 *DST_RAM = memregion("gfx2")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -1194,7 +1187,7 @@ void dragngun_state::dragngun_init_common()
 
 #if 0
 	{
-		uint8_t *ROM = memregion("dvi")->base();
+		u8 *ROM = memregion("dvi")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -1222,16 +1215,16 @@ void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
-	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
+	ROM[0x01b32c/4] = 0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
 void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
-	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
-	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
+	u32 *ROM = (u32 *)memregion("maincpu")->base();
+	ROM[0x01a1b4/4] = 0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
 void fghthist_state::init_fghthist()
@@ -1242,23 +1235,23 @@ void fghthist_state::init_fghthist()
 
 void dragngun_state::init_lockload()
 {
-//  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
+//  u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 
-//  ROM[0x3fe3c0/4]=0xe1a00000;//  NOP test switch lock
-//  ROM[0x3fe3cc/4]=0xe1a00000;//  NOP test switch lock
-//  ROM[0x3fe40c/4]=0xe1a00000;//  NOP test switch lock
+//  ROM[0x1fe3c0/4] = 0xe1a00000;//  NOP test switch lock
+//  ROM[0x1fe3cc/4] = 0xe1a00000;//  NOP test switch lock
+//  ROM[0x1fe40c/4] = 0xe1a00000;//  NOP test switch lock
 
 	save_item(NAME(m_oki2_bank));
 }
 
 void nslasher_state::init_tattass()
 {
-	uint8_t *RAM = memregion("gfx1")->base();
-	std::vector<uint8_t> tmp(0x80000);
+	u8 *RAM = memregion("gfx1")->base();
+	std::vector<u8> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
@@ -1284,8 +1277,8 @@ void nslasher_state::init_tattass()
 
 void nslasher_state::init_nslasher()
 {
-	uint8_t *RAM = memregion("gfx1")->base();
-	std::vector<uint8_t> tmp(0x80000);
+	u8 *RAM = memregion("gfx1")->base();
+	std::vector<u8> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	std::copy(&RAM[0x080000], &RAM[0x100000], tmp.begin());
@@ -2844,15 +2837,15 @@ ROM_START( captavenj ) /* DE-0351-x PCB (x=3 or 4) */
 ROM_END
 
 ROM_START( dragngun )
-	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_REGION(0x200000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "kb02.a9",  0x000000, 0x40000, CRC(4fb9cfea) SHA1(e20fbae32682fc5fdc82070d2d6c73b5b7ac13f8) )
 	ROM_LOAD32_BYTE( "kb06.c9",  0x000001, 0x40000, CRC(2395efec) SHA1(3c08299a6cdeebf9d3d5d367ab435eec76986194) )
 	ROM_LOAD32_BYTE( "kb00.a5",  0x000002, 0x40000, CRC(1539ff35) SHA1(6c82fe01f5ebf5cdd3a914cc823499fa6a26f9a9) )
 	ROM_LOAD32_BYTE( "kb04.c5",  0x000003, 0x40000, CRC(5b5c1ec2) SHA1(3c5c02b7e432cf1861e0c8db23b302dc47774a42) )
-	ROM_LOAD32_BYTE( "kb03.a10", 0x300000, 0x40000, CRC(6c6a4f42) SHA1(ae96fe81f9ba587eb3194dbffa0233413d63c4c6) )
-	ROM_LOAD32_BYTE( "kb07.c10", 0x300001, 0x40000, CRC(2637e8a1) SHA1(7bcd1b1f3a4e6aaa0a3b78ca77dc666948c87547) )
-	ROM_LOAD32_BYTE( "kb01.a7",  0x300002, 0x40000, CRC(d780ba8d) SHA1(0e315c718c038962b6020945b48bcc632de6f5e1) )
-	ROM_LOAD32_BYTE( "kb05.c7",  0x300003, 0x40000, CRC(fbad737b) SHA1(04e16abe8c4cec4f172bea29516535511db9db90) )
+	ROM_LOAD32_BYTE( "kb03.a10", 0x100000, 0x40000, CRC(6c6a4f42) SHA1(ae96fe81f9ba587eb3194dbffa0233413d63c4c6) )
+	ROM_LOAD32_BYTE( "kb07.c10", 0x100001, 0x40000, CRC(2637e8a1) SHA1(7bcd1b1f3a4e6aaa0a3b78ca77dc666948c87547) )
+	ROM_LOAD32_BYTE( "kb01.a7",  0x100002, 0x40000, CRC(d780ba8d) SHA1(0e315c718c038962b6020945b48bcc632de6f5e1) )
+	ROM_LOAD32_BYTE( "kb05.c7",  0x100003, 0x40000, CRC(fbad737b) SHA1(04e16abe8c4cec4f172bea29516535511db9db90) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "kb10.n25",  0x00000,  0x10000,  CRC(ec56f560) SHA1(feb9491683ba7f1000edebb568d6b3471fcc87fb) )
@@ -2924,15 +2917,15 @@ ROM_START( dragngun )
 ROM_END
 
 ROM_START( dragngunj )
-	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_REGION(0x200000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "ka-02.a9",  0x000000, 0x40000, CRC(402a03f9) SHA1(cdd5da9e35191bd716eb6245360702adb6078a94) )
 	ROM_LOAD32_BYTE( "ka-06.c9",  0x000001, 0x40000, CRC(26822853) SHA1(8a9e61c9ac9a5aa4b21f063f700acfebac8d408b) )
 	ROM_LOAD32_BYTE( "ka-00.a5",  0x000002, 0x40000, CRC(cc9e321b) SHA1(591d5f13a558960dbf286ca4541be0e42b234f2f) )
 	ROM_LOAD32_BYTE( "ka-04.c5",  0x000003, 0x40000, CRC(5fd9d935) SHA1(8fd87b05325fae84860bbf1e169a3946f3197307) )
-	ROM_LOAD32_BYTE( "ka-03.a10", 0x300000, 0x40000, CRC(e213c859) SHA1(aa0610427bbaa22da7f44289fdf9baf37b636710) )
-	ROM_LOAD32_BYTE( "ka-07.c10", 0x300001, 0x40000, CRC(f34c54eb) SHA1(6b67cdb1d2dcc272de96292254914a212ff351cd) )
-	ROM_LOAD32_BYTE( "ka-01.a7",  0x300002, 0x40000, CRC(1b52364c) SHA1(151365adc26bc7d71a4d2fc73bca598d3aa09f81) )
-	ROM_LOAD32_BYTE( "ka-05.c7",  0x300003, 0x40000, CRC(4c975f52) SHA1(3c6b287c77a049e3f8822ed9d545733e8ea3357b) )
+	ROM_LOAD32_BYTE( "ka-03.a10", 0x100000, 0x40000, CRC(e213c859) SHA1(aa0610427bbaa22da7f44289fdf9baf37b636710) )
+	ROM_LOAD32_BYTE( "ka-07.c10", 0x100001, 0x40000, CRC(f34c54eb) SHA1(6b67cdb1d2dcc272de96292254914a212ff351cd) )
+	ROM_LOAD32_BYTE( "ka-01.a7",  0x100002, 0x40000, CRC(1b52364c) SHA1(151365adc26bc7d71a4d2fc73bca598d3aa09f81) )
+	ROM_LOAD32_BYTE( "ka-05.c7",  0x100003, 0x40000, CRC(4c975f52) SHA1(3c6b287c77a049e3f8822ed9d545733e8ea3357b) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "ka-10.n25",  0x00000,  0x10000,  CRC(ec56f560) SHA1(feb9491683ba7f1000edebb568d6b3471fcc87fb) )
@@ -3347,15 +3340,11 @@ ROM_START( fghthistjb ) /* DE-0380-1 PCB */
 ROM_END
 
 ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly different hardware, a unique PCB and not a Dragongun conversion */
-	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_BYTE( "nl-00-1.a6", 0x000002, 0x40000, CRC(7a39bf8d) SHA1(8b1a6407bab74b3960a243a6c04c0005a82126f1) )
-	ROM_CONTINUE(                  0x300002, 0x40000 )
-	ROM_LOAD32_BYTE( "nl-01-1.a8", 0x000000, 0x40000, CRC(d23afcb7) SHA1(de7b5bc936a87cc6511d588b0bf082bbf745581c) )
-	ROM_CONTINUE(                  0x300000, 0x40000 )
-	ROM_LOAD32_BYTE( "nl-02-1.d6", 0x000003, 0x40000, CRC(730e0168) SHA1(fdfa0d335c03c2c528326f90948e642f9ea43150) )
-	ROM_CONTINUE(                  0x300003, 0x40000 )
-	ROM_LOAD32_BYTE( "nl-03-1.d8", 0x000001, 0x40000, CRC(51a53ece) SHA1(ee2c8858844a47fa1e83c30c06d78cf49219dc33) )
-	ROM_CONTINUE(                  0x300001, 0x40000 )
+	ROM_REGION(0x200000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_BYTE( "nl-00-1.a6", 0x000002, 0x80000, CRC(7a39bf8d) SHA1(8b1a6407bab74b3960a243a6c04c0005a82126f1) )
+	ROM_LOAD32_BYTE( "nl-01-1.a8", 0x000000, 0x80000, CRC(d23afcb7) SHA1(de7b5bc936a87cc6511d588b0bf082bbf745581c) )
+	ROM_LOAD32_BYTE( "nl-02-1.d6", 0x000003, 0x80000, CRC(730e0168) SHA1(fdfa0d335c03c2c528326f90948e642f9ea43150) )
+	ROM_LOAD32_BYTE( "nl-03-1.d8", 0x000001, 0x80000, CRC(51a53ece) SHA1(ee2c8858844a47fa1e83c30c06d78cf49219dc33) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "nm-06-.p22",  0x00000,  0x10000,  CRC(31d1c245) SHA1(326e35e7ebd8ea761d90e856c50d86512327f2a5) )
@@ -3420,15 +3409,11 @@ ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly d
 ROM_END
 
 ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly different hardware, a unique PCB and not a Dragongun conversion */
-	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_BYTE( "nf-00-1.a6", 0x000002, 0x40000, CRC(2c8045d4) SHA1(4c900951d56bd22e30905969b8eb687d9b4363bd) )
-	ROM_CONTINUE(                  0x300002, 0x40000 )
-	ROM_LOAD32_BYTE( "nf-01-1.a8", 0x000000, 0x40000, CRC(6f160117) SHA1(05738f61890e9d6d2b25330958c0e7369f2ff4a6) )
-	ROM_CONTINUE(                  0x300000, 0x40000 )
-	ROM_LOAD32_BYTE( "nf-02-1.d6", 0x000003, 0x40000, CRC(bd353948) SHA1(ddcc12b3d1c8919eb7eb961d61f6286e6b37a58e) )
-	ROM_CONTINUE(                  0x300003, 0x40000 )
-	ROM_LOAD32_BYTE( "nf-03-1.d8", 0x000001, 0x40000, CRC(118a9a72) SHA1(e0b2fd21f477e531d6a04256767874f13e031a48) )
-	ROM_CONTINUE(                  0x300001, 0x40000 )
+	ROM_REGION(0x200000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_BYTE( "nf-00-1.a6", 0x000002, 0x80000, CRC(2c8045d4) SHA1(4c900951d56bd22e30905969b8eb687d9b4363bd) )
+	ROM_LOAD32_BYTE( "nf-01-1.a8", 0x000000, 0x80000, CRC(6f160117) SHA1(05738f61890e9d6d2b25330958c0e7369f2ff4a6) )
+	ROM_LOAD32_BYTE( "nf-02-1.d6", 0x000003, 0x80000, CRC(bd353948) SHA1(ddcc12b3d1c8919eb7eb961d61f6286e6b37a58e) )
+	ROM_LOAD32_BYTE( "nf-03-1.d8", 0x000001, 0x80000, CRC(118a9a72) SHA1(e0b2fd21f477e531d6a04256767874f13e031a48) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "nj-06-1.p22",  0x00000,  0x10000,  CRC(31d1c245) SHA1(326e35e7ebd8ea761d90e856c50d86512327f2a5) )
@@ -3493,15 +3478,11 @@ ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly di
 ROM_END
 
 ROM_START( lockloadu ) /* Board No. DE-0359-2 + Bottom board DE-0360-4, a Dragongun conversion */
-	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_BYTE( "nh-00-0.b5", 0x000002, 0x40000, CRC(b8a57164) SHA1(b700a08db2ad1aa1bf0a32635ffbd5d3f08713ee) )
-	ROM_CONTINUE(                  0x300002, 0x40000 )
-	ROM_LOAD32_BYTE( "nh-01-0.b8", 0x000000, 0x40000, CRC(e371ac50) SHA1(c448b54bc8962844b490994607b21b0c806d7714) )
-	ROM_CONTINUE(                  0x300000, 0x40000 )
-	ROM_LOAD32_BYTE( "nh-02-0.d5", 0x000003, 0x40000, CRC(3e361e82) SHA1(b5445d44f2a775c141fdc561d5489234c39445a4) )
-	ROM_CONTINUE(                  0x300003, 0x40000 )
-	ROM_LOAD32_BYTE( "nh-03-0.d8", 0x000001, 0x40000, CRC(d08ee9c3) SHA1(9a85710a11940df047e83e8d5977a23d6c67d665) )
-	ROM_CONTINUE(                  0x300001, 0x40000 )
+	ROM_REGION(0x200000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_BYTE( "nh-00-0.b5", 0x000002, 0x80000, CRC(b8a57164) SHA1(b700a08db2ad1aa1bf0a32635ffbd5d3f08713ee) )
+	ROM_LOAD32_BYTE( "nh-01-0.b8", 0x000000, 0x80000, CRC(e371ac50) SHA1(c448b54bc8962844b490994607b21b0c806d7714) )
+	ROM_LOAD32_BYTE( "nh-02-0.d5", 0x000003, 0x80000, CRC(3e361e82) SHA1(b5445d44f2a775c141fdc561d5489234c39445a4) )
+	ROM_LOAD32_BYTE( "nh-03-0.d8", 0x000001, 0x80000, CRC(d08ee9c3) SHA1(9a85710a11940df047e83e8d5977a23d6c67d665) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "nh-06-0.n25",  0x00000,  0x10000,  CRC(7a1af51d) SHA1(54e6b16d3f5b787d3c6eb7203d8854e6e0fb9803) )
