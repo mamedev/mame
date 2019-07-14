@@ -708,26 +708,26 @@
 		<bezel element="piece_5"><bounds x="575" y="465" width="20" height="20" /></bezel>
 		<bezel element="piece_6"><bounds x="650" y="465" width="20" height="20" /></bezel>
 
-		<bezel element="hl" inputtag="IN.0" inputmask="0x004"><bounds x="474" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x002"><bounds x="474" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x001"><bounds x="474" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x200"><bounds x="474" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x100"><bounds x="474" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x004"><bounds x="549" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x002"><bounds x="549" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x001"><bounds x="549" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x200"><bounds x="549" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x100"><bounds x="549" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x008"><bounds x="624" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x010"><bounds x="624" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x020"><bounds x="624" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x040"><bounds x="624" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.1" inputmask="0x080"><bounds x="624" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x008"><bounds x="699" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x010"><bounds x="699" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x020"><bounds x="699" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x040"><bounds x="699" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
-		<bezel element="hl" inputtag="IN.0" inputmask="0x080"><bounds x="699" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x010"><bounds x="474" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x008"><bounds x="474" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x004"><bounds x="474" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x002"><bounds x="474" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x001"><bounds x="474" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x010"><bounds x="549" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x008"><bounds x="549" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x004"><bounds x="549" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x002"><bounds x="549" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x001"><bounds x="549" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x020"><bounds x="624" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x040"><bounds x="624" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x080"><bounds x="624" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x100"><bounds x="624" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x200"><bounds x="624" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x020"><bounds x="699" y="331" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x040"><bounds x="699" y="385" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x080"><bounds x="699" y="439" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x100"><bounds x="699" y="493" width="72" height="51" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x200"><bounds x="699" y="547" width="72" height="51" /><color alpha="0.15" /></bezel>
 
 	</view>
 </mamelayout>

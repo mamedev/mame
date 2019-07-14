@@ -213,7 +213,7 @@ WRITE_LINE_MEMBER(ggm_state::shift_data_w)
 
 WRITE8_MEMBER(ggm_state::select_w)
 {
-	// input mux, digit select
+	// PA0-PA7: input mux, digit select
 	m_inp_mux = data;
 	update_display();
 }

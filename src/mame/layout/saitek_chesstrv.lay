@@ -481,7 +481,7 @@
 	</group>
 
 
-<!-- digits, button panel -->
+<!-- digits -->
 
 	<group name="digits">
 		<bounds x="0" y="0" width="45" height="15" />
@@ -490,6 +490,9 @@
 		<bezel name="digit1" element="digit"><bounds x="25" y="0" width="10" height="15" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="35" y="0" width="10" height="15" /></bezel>
 	</group>
+
+
+<!-- button panel -->
 
 	<group name="buttons">
 		<bounds x="-1" y="28.5" width="32" height="10.1" />
