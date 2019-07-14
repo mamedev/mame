@@ -57,6 +57,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/clock.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -72,46 +73,100 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
+		, m_pio(*this, "pio")
 		, m_p_videoram(*this, "videoram")
 		, m_p_attribram(*this, "attribram")
 		, m_p_chargen(*this, "chargen")
 		, m_rs232(*this, "keyboard")
-	{
-	}
+		, m_clock(*this, "cass_clock")
+	{ }
 
-	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
-	DECLARE_READ_LINE_MEMBER(binbug_serial_r);
-	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	void binbug_base(machine_config &config);
+	void binbug(machine_config &config);
+
+protected:
+	DECLARE_WRITE_LINE_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// needed by dg680 class
 	required_device<cpu_device> m_maincpu; // S2650 or Z80
 	required_device<cassette_image_device> m_cass;
+	optional_device<z80pio_device> m_pio;
 
-	void binbug_base(machine_config &config);
-	void binbug(machine_config &config);
+	uint8_t m_framecnt;
+	u8 m_cass_data[4];
+	bool m_cassold, m_cassinbit, m_cassoutbit;
+
+private:
 	void binbug_data(address_map &map);
 	void binbug_mem(address_map &map);
-private:
-	uint8_t m_framecnt;
+	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
+	DECLARE_READ_LINE_MEMBER(binbug_serial_r);
+	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attribram;
 	required_region_ptr<u8> m_p_chargen;
 	optional_device<rs232_port_device> m_rs232;
+
+public:
+	required_device<clock_device> m_clock;
 };
 
 WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
 {
 }
 
+WRITE_LINE_MEMBER( binbug_state::kansas_w )
+{
+	u8 twobit = m_cass_data[3] & 15;
+
+	if (state)
+	{
+		if (twobit == 0)
+			m_cassold = m_cassoutbit;
+
+		if (m_cassold)
+			m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+		else
+			m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+
+		m_cass_data[3]++;
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( binbug_state::kansas_r )
+{
+	// no tape - set to idle
+	m_cass_data[1]++;
+	if (m_cass_data[1] > 32)
+	{
+		m_cass_data[1] = 32;
+		m_cassinbit = 1;
+	}
+
+	/* cassette - turn 1200/2400Hz to a bit */
+	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cassinbit = (m_cass_data[1] < 12) ? 1 : 0;
+		m_cass_data[1] = 0;
+		if (m_pio)
+			m_pio->pb0_w(m_cassinbit);
+	}
+}
+
 READ_LINE_MEMBER( binbug_state::binbug_serial_r )
 {
-	return m_rs232->rxd_r() & (m_cass->input() < 0.03);
+	return m_rs232->rxd_r() & m_cassinbit;
 }
 
 WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 {
-	m_cass->output(state ? -1.0 : +1.0);
+	m_cassinbit = 1;
+	m_cassoutbit = state;
 }
 
 void binbug_state::binbug_mem(address_map &map)
@@ -318,8 +373,12 @@ void binbug_state::binbug_base(machine_config &config)
 
 	/* Cassette */
 	CASSETTE(config, m_cass);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(binbug_state::kansas_r), attotime::from_hz(40000));
+
+	CLOCK(config, m_clock, 4'800); // 300 baud x 16(divider) = 4800
+	m_clock->signal_handler().set(FUNC(binbug_state::kansas_w));
 }
 
 void binbug_state::binbug(machine_config &config)
@@ -422,30 +481,27 @@ class dg680_state : public binbug_state
 public:
 	dg680_state(const machine_config &mconfig, device_type type, const char *tag)
 		: binbug_state(mconfig, type, tag)
-		, m_ctc(*this, "z80ctc")
-		, m_pio(*this, "z80pio")
+		, m_ctc(*this, "ctc")
 	{ }
 
+	void dg680(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_READ8_MEMBER(port08_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	void kbd_put(u8 data);
-	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
 
-	void dg680(machine_config &config);
 	void dg680_io(address_map &map);
 	void dg680_mem(address_map &map);
 
-private:
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
 	uint8_t m_protection[0x100];
 	virtual void machine_reset() override;
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80pio_device> m_pio;
 };
 
 void dg680_state::dg680_mem(address_map &map)
@@ -473,13 +529,14 @@ void dg680_state::dg680_io(address_map &map)
 void dg680_state::machine_reset()
 {
 	m_maincpu->set_pc(0xd000);
+	m_pio_b = 0xFF;
 }
 
 // this is a guess there is no information available
 static const z80_daisy_config dg680_daisy_chain[] =
 {
-	{ "z80ctc" },
-	{ "z80pio" },
+	{ "ctc" },
+	{ "pio" },
 	{ 0x00 }
 };
 
@@ -490,6 +547,8 @@ INPUT_PORTS_END
 
 void dg680_state::kbd_put(u8 data)
 {
+	if (data == 8)
+		data = 127;   // fix backspace
 	m_term_data = data;
 	/* strobe in keyboard data */
 	m_pio->strobe_a(0);
@@ -505,14 +564,16 @@ READ8_MEMBER( dg680_state::porta_r )
 
 READ8_MEMBER( dg680_state::portb_r )
 {
-	return m_pio_b | (m_cass->input() > 0.03);
+	return m_pio_b | m_cassinbit;
 }
 
 // bit 1 = cassout; bit 2 = motor on
 WRITE8_MEMBER( dg680_state::portb_w )
 {
+	if (BIT(m_pio_b ^ data, 2))
+		m_cass->change_state(BIT(data, 2) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 	m_pio_b = data & 0xfe;
-	m_cass->output(BIT(data, 1) ? -1.0 : +1.0);
+	m_cassoutbit = BIT(data, 1);
 }
 
 READ8_MEMBER( dg680_state::port08_r )
@@ -527,26 +588,14 @@ WRITE8_MEMBER( dg680_state::port08_w )
 	m_protection[breg] = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::time_tick)
-{
-// ch0 is for the clock
-	m_ctc->trg0(1);
-	m_ctc->trg0(0);
-// no idea about ch2
-	m_ctc->trg2(1);
-	m_ctc->trg2(0);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
-{
-// ch3 is for cassette
-	m_ctc->trg3(1);
-	m_ctc->trg3(0);
-}
 
 void dg680_state::dg680(machine_config &config)
 {
 	binbug_base(config);
+	m_clock->signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
+	m_clock->signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
+
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* basic machine hardware */
 	z80_device& maincpu(Z80(config, m_maincpu, XTAL(8'000'000) / 4));
@@ -559,19 +608,17 @@ void dg680_state::dg680(machine_config &config)
 	keyb.set_keyboard_callback(FUNC(dg680_state::kbd_put));
 
 	/* Devices */
-	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(8'000'000) / 4));
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
+	Z80CTC(config, m_ctc, XTAL(8'000'000) / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<0>(200);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000) / 4));
-	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio.in_pa_callback().set(FUNC(dg680_state::porta_r));
+	Z80PIO(config, m_pio, XTAL(8'000'000) / 4);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(dg680_state::porta_r));
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used
-	pio.in_pb_callback().set(FUNC(dg680_state::portb_r));
-	pio.out_pb_callback().set(FUNC(dg680_state::portb_w));
-
-	TIMER(config, "ctc0").configure_periodic(FUNC(dg680_state::time_tick), attotime::from_hz(200));
-	TIMER(config, "ctc3").configure_periodic(FUNC(dg680_state::uart_tick), attotime::from_hz(4800));
+	m_pio->in_pb_callback().set(FUNC(dg680_state::portb_r));
+	m_pio->out_pb_callback().set(FUNC(dg680_state::portb_w));
 }
 
 /* ROM definition */
@@ -589,4 +636,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME                   FLAGS
-COMP( 1980, dg680, 0,      0,      dg680,   dg680, dg680_state, empty_init, "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1980, dg680, 0,      0,      dg680,   dg680, dg680_state, empty_init, "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NO_SOUND_HW )
