@@ -1322,7 +1322,7 @@ void cps2_state::cps2(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

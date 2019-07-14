@@ -654,7 +654,7 @@ void cps_state::fcrash_build_palette()
 		g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 		b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-		m_palette->set_pen_color (offset, rgb_t(r, g, b));
+		m_palette->set_pen_color(offset, rgb_t(r, g, b));
 	}
 }
 
@@ -1741,7 +1741,7 @@ void cps_state::fcrash(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(4096);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1804,7 +1804,7 @@ void cps_state::kodb(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1845,7 +1845,7 @@ void cps_state::mtwinsb(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1886,7 +1886,7 @@ void cps_state::sf2mdt(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(4096);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1937,7 +1937,7 @@ void cps_state::knightsb(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2319,7 +2319,7 @@ void cps_state::dinopic(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2506,7 +2506,7 @@ void cps_state::sgyxz(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
 	m_screen->set_palette(m_palette);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	EEPROM_93C46_8BIT(config, "eeprom");
 
@@ -2631,7 +2631,7 @@ void cps_state::punipic(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2819,7 +2819,7 @@ void cps_state::sf2m1(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3198,7 +3198,7 @@ void cps_state::slampic(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3296,7 +3296,7 @@ void cps_state::varthb(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette).set_entries(0xc00);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
