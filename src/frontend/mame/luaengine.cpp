@@ -1819,7 +1819,9 @@ void lua_engine::initialize()
  * video:skip_this_frame() - is current frame going to be skipped
  * video:speed_factor() - get speed factor
  * video:speed_percent() - get percent from realtime
- * video:frame_update()
+ * video:frame_update() - render a frame
+ * video:size() - get width and height of snapshot bitmap in pixels
+ * video:pixels() - get binary bitmap of all screens as string
  *
  * video.frameskip - current frameskip
  * video.throttled - throttle state
@@ -1848,6 +1850,22 @@ void lua_engine::initialize()
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
 			"frame_update", &video_manager::frame_update,
+			"size", [](video_manager &vm) {
+					s32 width, height;
+					vm.compute_snapshot_size(width, height);
+					return std::tuple<s32, s32>(width, height);
+				},
+			"pixels", [](video_manager &vm, sol::this_state s) {
+					lua_State *L = s;
+					luaL_Buffer buff;
+					s32 width, height;
+					vm.compute_snapshot_size(width, height);
+					int size = width * height * 4;
+					u32 *ptr = (u32 *)luaL_buffinitsize(L, &buff, size);
+					vm.pixels(ptr);
+					luaL_pushresultsize(&buff, size);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				},
 			"frameskip", sol::property(&video_manager::frameskip, &video_manager::set_frameskip),
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
@@ -1920,7 +1938,7 @@ void lua_engine::initialize()
  * target:hidden() - is target hidden
  * target:is_ui_target() - is ui render target
  * target:index() - target index
- * target:view_name(index) - current target layout view name
+ * target:view_name([opt] index) - current target layout view name
  *
  * target.max_update_rate -
  * target.view - current target layout view
@@ -2005,8 +2023,9 @@ void lua_engine::initialize()
  * screen:height() - screen height
  * screen:width() - screen width
  * screen:orientation() - screen angle, flipx, flipy
- * screen:refresh() - screen refresh rate
- * screen:snapshot() - save snap shot
+ * screen:refresh() - screen refresh rate in Hz
+ * screen:refresh_attoseconds() - screen refresh rate in attoseconds
+ * screen:snapshot([opt] filename) - save snap shot
  * screen:type() - screen drawing type
  * screen:frame_number() - screen frame count
  * screen:name() - screen device full name
@@ -2095,6 +2114,7 @@ void lua_engine::initialize()
 					return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
 				},
 			"refresh", [](screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); },
+			"refresh_attoseconds", [](screen_device &sdev) { return sdev.refresh_attoseconds(); },
 			"snapshot", [this](screen_device &sdev, sol::object filename) -> sol::object {
 					emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 					osd_file::error filerr;

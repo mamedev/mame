@@ -1261,10 +1261,8 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	}
 
 	// get the minimum width/height and set it on the target
-	s32 width = m_snap_width;
-	s32 height = m_snap_height;
-	if (width == 0 || height == 0)
-		m_snap_target->compute_minimum_size(width, height);
+	s32 width, height;
+	compute_snapshot_size(width, height);
 	m_snap_target->set_bounds(width, height);
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
@@ -1279,6 +1277,40 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	else
 		snap_renderer::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
 	primlist.release_lock();
+}
+
+
+//-------------------------------------------------
+//  compute_snapshot_size - computes width and
+//  height of the current snapshot target
+//  accounting for OPTION_SNAPSIZE
+//-------------------------------------------------
+
+void video_manager::compute_snapshot_size(s32 &width, s32 &height)
+{
+	width = m_snap_width;
+	height = m_snap_height;
+	if (width == 0 || height == 0)
+		m_snap_target->compute_minimum_size(width, height);
+}
+
+
+//-------------------------------------------------
+//  pixels - fills the specified buffer with the
+//  RGB values of each pixel in the snapshot target
+//-------------------------------------------------
+
+void video_manager::pixels(u32 *buffer)
+{
+	create_snapshot_bitmap(nullptr);
+	for (int y = 0; y < m_snap_bitmap.height(); y++)
+	{
+		const u32 *src = &m_snap_bitmap.pix(y, 0);
+		for (int x = 0; x < m_snap_bitmap.width(); x++)
+		{
+			*buffer++ = *src++;
+		}
+	}
 }
 
 
