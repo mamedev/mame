@@ -8,7 +8,7 @@
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="0.45" green="1" blue="0.1" /></led7seg>
+		<led7seg><color red="0.4" green="1" blue="0" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
@@ -550,7 +550,7 @@
 	<view name="Internal Layout (Full)">
 		<bounds left="-13" right="131.8" top="-1.5" bottom="87.5" />
 
-		<group ref="panel"><bounds x="91" y="28" width="38.0769" height="55" /></group>
+		<group ref="panel"><bounds x="91" y="29.4" width="38.0769" height="55" /></group>
 
 		<bezel element="white"><bounds x="-1" y="-1.5" width="89" height="89" /></bezel>
 		<bezel element="black2"><bounds x="3" y="2.5" width="81" height="81" /></bezel>
