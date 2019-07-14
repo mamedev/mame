@@ -26,7 +26,7 @@
 	<!-- chess symbols are in 7seg style -->
 	<element name="piece_1">
 		<text string=" ">
-			<bounds x="0" y="0" width="5" height="6" />
+			<bounds x="0" y="0" width="6" height="6" />
 			<color red="0" green="0" blue="0" />
 		</text>
 		<rect>
@@ -34,17 +34,17 @@
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="4" y="2.5" width="1" height="2.5" />
+			<bounds x="5" y="2.5" width="1" height="2.5" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="5" width="5" height="1" />
+			<bounds x="0" y="5" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 	</element>
 	<element name="piece_2">
 		<text string=" ">
-			<bounds x="0" y="0" width="5" height="6" />
+			<bounds x="0" y="0" width="6" height="6" />
 			<color red="0" green="0" blue="0" />
 		</text>
 		<rect>
@@ -52,21 +52,21 @@
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="4" y="2" width="1" height="3" />
+			<bounds x="5" y="2" width="1" height="3" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="2" width="5" height="1" />
+			<bounds x="0" y="2" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="5" width="5" height="1" />
+			<bounds x="0" y="5" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 	</element>
 	<element name="piece_3">
 		<text string=" ">
-			<bounds x="0" y="0" width="5" height="6" />
+			<bounds x="0" y="0" width="6" height="6" />
 			<color red="0" green="0" blue="0" />
 		</text>
 		<rect>
@@ -74,17 +74,17 @@
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="4" y="2.5" width="1" height="2.5" />
+			<bounds x="5" y="2.5" width="1" height="2.5" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="5" width="5" height="1" />
+			<bounds x="0" y="5" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 	</element>
 	<element name="piece_4">
 		<text string=" ">
-			<bounds x="0" y="0" width="5" height="6" />
+			<bounds x="0" y="0" width="6" height="6" />
 			<color red="0" green="0" blue="0" />
 		</text>
 		<rect>
@@ -92,21 +92,21 @@
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="4" y="2" width="1" height="3" />
+			<bounds x="5" y="2" width="1" height="3" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="2" width="5" height="1" />
+			<bounds x="0" y="2" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="5" width="5" height="1" />
+			<bounds x="0" y="5" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 	</element>
 	<element name="piece_5">
 		<text string=" ">
-			<bounds x="0" y="0" width="5" height="6" />
+			<bounds x="0" y="0" width="6" height="6" />
 			<color red="0" green="0" blue="0" />
 		</text>
 		<rect>
@@ -114,17 +114,17 @@
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="4" y="0" width="1" height="6" />
+			<bounds x="5" y="0" width="1" height="6" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="5" width="5" height="1" />
+			<bounds x="0" y="5" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 	</element>
 	<element name="piece_6">
 		<text string=" ">
-			<bounds x="0" y="0" width="5" height="6" />
+			<bounds x="0" y="0" width="6" height="6" />
 			<color red="0" green="0" blue="0" />
 		</text>
 		<rect>
@@ -132,15 +132,15 @@
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="4" y="0" width="1" height="6" />
+			<bounds x="5" y="0" width="1" height="6" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="2" width="5" height="1" />
+			<bounds x="0" y="2" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 		<rect>
-			<bounds x="0" y="5" width="5" height="1" />
+			<bounds x="0" y="5" width="6" height="1" />
 			<color red="0.7" green="0.6" blue="0.4" />
 		</rect>
 	</element>
@@ -278,12 +278,12 @@
 		<bezel element="text_2"><bounds x="30.5" y="50.5" width="9" height="4" /></bezel>
 		<bezel element="text_3"><bounds x="40.5" y="50.5" width="9" height="4" /></bezel>
 
-		<bezel element="piece_1"><bounds x="23.3" y="55.5" width="3.4" height="4" /></bezel>
-		<bezel element="piece_2"><bounds x="33.3" y="55.5" width="3.4" height="4" /></bezel>
-		<bezel element="piece_3"><bounds x="43.3" y="55.5" width="3.4" height="4" /></bezel>
-		<bezel element="piece_4"><bounds x="23.3" y="45.5" width="3.4" height="4" /></bezel>
-		<bezel element="piece_5"><bounds x="33.3" y="45.5" width="3.4" height="4" /></bezel>
-		<bezel element="piece_6"><bounds x="43.3" y="45.5" width="3.4" height="4" /></bezel>
+		<bezel element="piece_1"><bounds x="23.3" y="56" width="3.4" height="3.4" /></bezel>
+		<bezel element="piece_2"><bounds x="33.3" y="56" width="3.4" height="3.4" /></bezel>
+		<bezel element="piece_3"><bounds x="43.3" y="56" width="3.4" height="3.4" /></bezel>
+		<bezel element="piece_4"><bounds x="23.3" y="46" width="3.4" height="3.4" /></bezel>
+		<bezel element="piece_5"><bounds x="33.3" y="46" width="3.4" height="3.4" /></bezel>
+		<bezel element="piece_6"><bounds x="43.3" y="46" width="3.4" height="3.4" /></bezel>
 
 		<bezel element="disk_black"><bounds x="24.5" y="34.5" width="1" height="1" /></bezel>
 		<bezel element="disk_white"><bounds x="34.5" y="34.5" width="1" height="1" /></bezel>

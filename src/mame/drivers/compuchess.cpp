@@ -178,7 +178,7 @@ void cmpchess_state::update_reset(ioport_value state)
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 READ8_MEMBER(cmpchess_state::beeper_r)
