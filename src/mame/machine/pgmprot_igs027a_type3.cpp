@@ -193,7 +193,7 @@ void pgm_arm_type3_state::pgm_arm_type3(machine_config &config) // ARM7 Shared m
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::_55857G_arm7_map);
 }
 
-void pgm_arm_type3_state::pgm_arm_type3_22m(machine_config &config) // ARM7 uses 22MHz XTAL (dmnfrnt theglad killbldp)
+void pgm_arm_type3_state::pgm_arm_type3_22m(machine_config &config) // ARM7 uses 22MHz XTAL (dmnfrnt theglad)
 {
 	pgm_arm_type3(config);
 
@@ -212,6 +212,13 @@ void pgm_arm_type3_state::pgm_arm_type3_33m(machine_config &config) // ARM7 uses
 	pgm_arm_type3(config);
 
 	m_prot->set_clock(XTAL(33'000'000));
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_33_8688m(machine_config &config) // ARM7 uses 33.8688MHz XTAL (killbldp)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(XTAL(33'868'800));
 }
 
 
