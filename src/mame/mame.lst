@@ -21389,12 +21389,12 @@ meijinsn                        // (c) 1986 SNK
 mekd2                           // 1977 Motorola Evaluation Kit
 
 @source:mephisto.cpp
-mm2                             // Mephisto 2
-mm4                             // Mephisto 4
-mm4tk                           // Mephisto 4 Turbo Kit
-mm5                             // Mephisto 5.1 ROM
-mm50                            // Mephisto 5.0 ROM
-rebel5                          // Mephisto 5
+mm2                             // Mephisto MM II
+bup                             // Mephisto B&P
+mm4tk                           // Mephisto MM IV (Turbo Kit)
+mm4                             // Mephisto MM IV
+mm5                             // Mephisto MM V
+rebel5                          // Mephisto Rebell 5.0
 
 @source:mephisto_montec.cpp
 mondial                         // 1985 Mephisto Mondial
