@@ -361,7 +361,7 @@ void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, text
 	assert(bitmap.cliprect().contains(sbounds));
 
 	// ensure we have a valid palette for palettized modes
-	if (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_PALETTEA16)
+	if (format == TEXFORMAT_PALETTE16)
 		assert(bitmap.palette() != nullptr);
 
 	// invalidate references to the old bitmap
@@ -501,7 +501,6 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 	switch (m_format)
 	{
 		case TEXFORMAT_PALETTE16:
-		case TEXFORMAT_PALETTEA16:
 
 			assert(m_bitmap->palette() != nullptr);
 
@@ -684,7 +683,6 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 	switch (texformat)
 	{
 		case TEXFORMAT_PALETTE16:
-		case TEXFORMAT_PALETTEA16:
 			if (m_palclient == nullptr) // if adjusted palette hasn't been created yet, create it
 			{
 				m_palclient = std::make_unique<palette_client>(*palette);
@@ -2866,7 +2864,7 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 			case render_primitive::QUAD:
 			{
 				// stop when we hit an alpha texture
-				if (PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_PALETTEA16)
+				if (PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_ARGB32)
 					goto done;
 
 				// if this quad can't be cleanly removed from the extents list, we're done

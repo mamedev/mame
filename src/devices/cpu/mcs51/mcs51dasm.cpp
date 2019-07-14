@@ -153,6 +153,9 @@ const mcs51_disassembler::mem_info mcs51_disassembler::i8052_names[] = {
 	{ 0x1ad, "et2"    },
 	{ 0x1bd, "pt2"    },
 
+	{ 0x190, "t2"     },
+	{ 0x191, "t2ex"   },
+
 	{ 0x1c8, "cprl2"  },
 	{ 0x1c9, "ct2"    },
 	{ 0x1ca, "tr2"    },
@@ -169,6 +172,121 @@ const mcs51_disassembler::mem_info mcs51_disassembler::i80c52_names[] = {
 	{  0xb7, "iph"    },
 	{  0xa9, "saddr"  },
 	{  0xb9, "saden"  },
+	{  0xc9, "t2mod"  },
+
+	{ -1 }
+};
+
+const mcs51_disassembler::mem_info mcs51_disassembler::i8xc51fx_names[] = {
+	{  0xd8, "ccon"   },
+	{  0xd9, "cmod"   },
+	{  0xe9, "cl"     },
+	{  0xf9, "ch"     },
+	{  0xda, "ccapm0" },
+	{  0xdb, "ccapm1" },
+	{  0xdc, "ccapm2" },
+	{  0xdd, "ccapm3" },
+	{  0xde, "ccapm4" },
+	{  0xea, "ccap0l" },
+	{  0xfa, "ccap0h" },
+	{  0xeb, "ccap1l" },
+	{  0xfb, "ccap1h" },
+	{  0xec, "ccap2l" },
+	{  0xfc, "ccap2h" },
+	{  0xed, "ccap3l" },
+	{  0xfd, "ccap3h" },
+	{  0xee, "ccap4l" },
+	{  0xfe, "ccap4h" },
+
+	{ 0x192, "eci"    },
+	{ 0x193, "cex0"   },
+	{ 0x194, "cex1"   },
+	{ 0x195, "cex2"   },
+	{ 0x196, "cex3"   },
+	{ 0x197, "cex4"   },
+
+	{ 0x1ae, "ec"     },
+	{ 0x1be, "ppc"    },
+
+	{ 0x1d8, "ccf0"   },
+	{ 0x1d9, "ccf1"   },
+	{ 0x1da, "ccf2"   },
+	{ 0x1db, "ccf3"   },
+	{ 0x1dc, "ccf4"   },
+	{ 0x1de, "cr"     },
+	{ 0x1df, "cf"     },
+};
+
+const mcs51_disassembler::mem_info mcs51_disassembler::i8xc51gb_names[] = {
+	{  0x84, "ad0"    },
+	{  0x94, "ad1"    },
+	{  0xa4, "ad2"    },
+	{  0xb4, "ad3"    },
+	{  0xc4, "ad4"    },
+	{  0xd4, "ad5"    },
+	{  0xe4, "ad6"    },
+	{  0xf4, "ad7"    },
+	{  0x85, "acon"   },
+	{  0xc7, "acmp"   },
+
+	{  0xe8, "c1con"  },
+	{  0x9f, "c1mod"  },
+	{  0xaf, "cl1"    },
+	{  0xbf, "ch1"    },
+	{  0x9a, "c1capm0"},
+	{  0x9b, "c1capm1"},
+	{  0x9c, "c1capm2"},
+	{  0x9d, "c1capm3"},
+	{  0x9e, "c1capm4"},
+	{  0xaa, "c1cap0l"},
+	{  0xba, "c1cap0h"},
+	{  0xab, "c1cap1l"},
+	{  0xbb, "c1cap1h"},
+	{  0xac, "c1cap2l"},
+	{  0xbc, "c1cap2h"},
+	{  0xad, "c1cap3l"},
+	{  0xbd, "c1cap3h"},
+	{  0xae, "c1cap4l"},
+	{  0xbe, "c1cap4h"},
+
+	{  0xc6, "exicon" },
+	{  0xa7, "iea"    },
+	{  0xb6, "ipa"    },
+	{  0xb5, "ipah"   },
+
+	{  0xa5, "oscr"   },
+	{  0xa6, "wdtrst" },
+
+	{  0xc0, "p4"     },
+	{  0xf8, "p5"     },
+
+	{  0xd7, "sepcon" },
+	{  0xe7, "sepdat" },
+	{  0xf7, "sepstat"},
+
+	{ 0x1c0, "sepclk" },
+	{ 0x1c1, "sepdat" },
+	{ 0x1c2, "eci1"   },
+	{ 0x1c3, "c1ex0"  },
+	{ 0x1c4, "c1ex1"  },
+	{ 0x1c5, "c1ex2"  },
+	{ 0x1c6, "c1ex3"  },
+	{ 0x1c7, "c1ex4"  },
+
+	{ 0x1e8, "c1cf0"  },
+	{ 0x1e9, "c1cf1"  },
+	{ 0x1ea, "c1cf2"  },
+	{ 0x1eb, "c1cf3"  },
+	{ 0x1ec, "c1cf4"  },
+	{ 0x1ed, "cre"    },
+	{ 0x1ee, "cr1"    },
+	{ 0x1ef, "cf1"    },
+
+	{ 0x1fa, "int2"   },
+	{ 0x1fb, "int3"   },
+	{ 0x1fc, "int4"   },
+	{ 0x1fd, "int5"   },
+	{ 0x1fe, "int6"   },
 
 	{ -1 }
 };
@@ -272,10 +390,7 @@ std::string mcs51_disassembler::get_bit_address( uint8_t arg ) const
 	if(arg < 0x80)
 	{
 		//Bit address 0-7F can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
-		if(arg < 0x7f)
-			return util::string_format("$%02X.%d", (arg >> 3) | 0x20, arg & 0x07);
-		else
-			return util::string_format("$%02X", arg);
+		return util::string_format("$%02X.%d", (arg >> 3) | 0x20, arg & 0x07);
 	}
 	else
 	{
@@ -1122,14 +1237,22 @@ i8052_disassembler::i8052_disassembler() : mcs51_disassembler(default_names, i80
 {
 }
 
-i80c51_disassembler::i80c51_disassembler() : mcs51_disassembler(default_names, i80c52_names)
+i80c51_disassembler::i80c51_disassembler() : mcs51_disassembler(default_names)
 {
 }
 
-i80c52_disassembler::i80c52_disassembler() : mcs51_disassembler(default_names, i80c52_names, i80c52_names)
+i80c52_disassembler::i80c52_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names)
 {
 }
 
-ds5002fp_disassembler::ds5002fp_disassembler() : mcs51_disassembler(default_names, i80c52_names, ds5002fp_names, i8xc751_names)
+i8xc51fx_disassembler::i8xc51fx_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, i8xc51fx_names)
+{
+}
+
+i8xc51gb_disassembler::i8xc51gb_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, i8xc51fx_names, i8xc51gb_names)
+{
+}
+
+ds5002fp_disassembler::ds5002fp_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, ds5002fp_names, i8xc751_names)
 {
 }

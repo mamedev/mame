@@ -257,35 +257,32 @@ void firefox_state::video_start()
 
 uint32_t firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int sprite;
 	int gfxtop = screen.visible_area().top();
 
 	bitmap.fill(m_palette->pen_color(256), cliprect);
 
-	for( sprite = 0; sprite < 32; sprite++ )
+	for (int sprite = 0; sprite < 32; sprite++)
 	{
-		uint8_t *sprite_data = m_spriteram + ( 0x200 * m_sprite_bank ) + ( sprite * 16 );
-		int flags = sprite_data[ 0 ];
-		int y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
-		int x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );
+		uint8_t *sprite_data = m_spriteram + (0x200 * m_sprite_bank) + (sprite * 16);
+		int flags = sprite_data[0];
+		int y = sprite_data[1] + (256 * ((flags >> 0) & 1));
+		int x = sprite_data[2] + (256 * ((flags >> 1) & 1));
 
-		if( x != 0 )
+		if (x != 0)
 		{
-			int row;
-
-			for( row = 0; row < 8; row++ )
+			for (int row = 0; row < 8; row++)
 			{
-				int color = ( flags >> 2 ) & 0x03;
+				int color = (flags >> 2) & 0x03;
 				int flipy = flags & 0x10;
 				int flipx = flags & 0x20;
-				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
+				int code = sprite_data[15 - row] + (256 * ((flags >> 6) & 3));
 
-				m_gfxdecode->gfx( 1 )->transpen(bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - (row * 16), 0);
 			}
 		}
 	}
 
-	m_bgtiles->draw(screen, bitmap, cliprect, 0, 0 );
+	m_bgtiles->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -693,7 +690,6 @@ void firefox_state::firefox(machine_config &config)
 	PHILIPS_22VP931(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(64*8, 525, FUNC(firefox_state::screen_update_firefox));
 	m_laserdisc->set_overlay_clip(7*8, 53*8-1, 44, 480+44);
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 0.50);
 	m_laserdisc->add_route(1, "rspeaker", 0.50);
 	m_laserdisc->add_ntsc_screen(config, "screen");

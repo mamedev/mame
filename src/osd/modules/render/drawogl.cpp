@@ -1908,9 +1908,6 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
 			break;
-		case TEXFORMAT_PALETTEA16:
-			texture->format = SDL_TEXFORMAT_PALETTE16A;
-			break;
 		case TEXFORMAT_YUY16:
 			if (texsource->palette != nullptr)
 				texture->format = SDL_TEXFORMAT_YUY16_PALETTED;
@@ -2062,30 +2059,6 @@ static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int wi
 	}
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*--src];
-}
-
-
-
-//============================================================
-//  copyline_palettea16
-//============================================================
-
-static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
-{
-	int x;
-
-	assert(xborderpix == 0 || xborderpix == 1);
-	if (xborderpix)
-		*dst++ = palette[*src];
-	for (x = 0; x < width; x++)
-	{
-		int srcpix = *src++;
-		uint32_t dstval = palette[srcpix];
-		for (int x2 = 0; x2 < xprescale; x2++)
-			*dst++ = dstval;
-	}
-	if (xborderpix)
-		*dst++ = palette[*--src];
 }
 
 
@@ -2357,10 +2330,6 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 				{
 					case TEXFORMAT_PALETTE16:
 						copyline_palette16((uint32_t *)dst, (uint16_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
-						break;
-
-					case TEXFORMAT_PALETTEA16:
-						copyline_palettea16((uint32_t *)dst, (uint16_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_RGB32:

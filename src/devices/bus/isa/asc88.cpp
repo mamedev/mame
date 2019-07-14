@@ -16,8 +16,8 @@
 #include "emu.h"
 #include "asc88.h"
 
+#include "bus/nscsi/devices.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 
 DEFINE_DEVICE_TYPE(ASC88, asc88_device, "asc88", "ASC-88 SCSI Adapter")
@@ -150,12 +150,6 @@ ioport_constructor asc88_device::device_input_ports() const
 	return INPUT_PORTS_NAME(asc88);
 }
 
-static void asc88_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", NCR5380N);
-}
-
 void asc88_device::scsic_config(device_t *device)
 {
 	downcast<ncr5380n_device &>(*device).irq_handler().set("^^", FUNC(asc88_device::irq_w));
@@ -165,15 +159,16 @@ void asc88_device::scsic_config(device_t *device)
 void asc88_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", asc88_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", asc88_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", asc88_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", asc88_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", asc88_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", asc88_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", asc88_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", asc88_scsi_devices, "scsic", true)
-		.set_option_machine_config("scsic", [this] (device_t *device) { scsic_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
+		.option_add_internal("scsic", NCR5380N)
+		.machine_config([this] (device_t *device) { scsic_config(device); });
 
 	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306N
 }

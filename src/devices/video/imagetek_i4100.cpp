@@ -819,7 +819,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
  *
  ***************************************************************************/
 
-void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &clip,
+void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip,
 							uint32_t const gfxstart, uint16_t const width, uint16_t const height,
 							uint16_t color, int const flipx, int const flipy, int sx, int sy,
 							uint32_t const scale, uint8_t const prival )
@@ -845,100 +845,97 @@ void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_ind16 &
 			return;
 	}
 
-	if (bitmap.bpp() == 16)
+	const pen_t *pal = &m_palette->pen((m_sprite_color_code & 0x0f) << 8);
+	const uint8_t *source_base;
+	if (is_8bpp)
+		source_base = &m_gfxrom[gfxstart % m_gfxrom.bytes()];
+	else
+		source_base = &m_expanded_gfx1[(gfxstart % m_gfxrom.bytes()) << 1];
+
+	int const sprite_screen_height = (scale * height + 0x8000) >> 16;
+	int const sprite_screen_width = (scale * width + 0x8000) >> 16;
+	if (sprite_screen_width && sprite_screen_height)
 	{
-		const pen_t *pal = &m_palette->pen((m_sprite_color_code & 0x0f) << 8);
-		const uint8_t *source_base;
-		if (is_8bpp)
-			source_base = &m_gfxrom[gfxstart % m_gfxrom.bytes()];
-		else
-			source_base = &m_expanded_gfx1[(gfxstart % m_gfxrom.bytes()) << 1];
+		/* compute sprite increment per screen pixel */
+		int dx = (width << 16) / sprite_screen_width;
+		int dy = (height << 16) / sprite_screen_height;
 
-		int const sprite_screen_height = (scale * height + 0x8000) >> 16;
-		int const sprite_screen_width = (scale * width + 0x8000) >> 16;
-		if (sprite_screen_width && sprite_screen_height)
+		int ex = sx + sprite_screen_width;
+		int ey = sy + sprite_screen_height;
+
+		int x_index_base;
+		int y_index;
+
+		if (flipx)
 		{
-			/* compute sprite increment per screen pixel */
-			int dx = (width << 16) / sprite_screen_width;
-			int dy = (height << 16) / sprite_screen_height;
+			x_index_base = (sprite_screen_width - 1) * dx;
+			dx = -dx;
+		}
+		else
+		{
+			x_index_base = 0;
+		}
 
-			int ex = sx + sprite_screen_width;
-			int ey = sy + sprite_screen_height;
+		if (flipy)
+		{
+			y_index = (sprite_screen_height - 1) * dy;
+			dy = -dy;
+		}
+		else
+		{
+			y_index = 0;
+		}
 
-			int x_index_base;
-			int y_index;
+		if (sx < clip.min_x)
+		{ /* clip left */
+			int pixels = clip.min_x - sx;
+			sx += pixels;
+			x_index_base += pixels * dx;
+		}
+		if (sy < clip.min_y)
+		{ /* clip top */
+			int pixels = clip.min_y - sy;
+			sy += pixels;
+			y_index += pixels * dy;
+		}
+		if (ex > clip.max_x + 1)
+		{ /* clip right */
+			int pixels = ex - clip.max_x - 1;
+			ex -= pixels;
+		}
+		if (ey > clip.max_y + 1)
+		{ /* clip bottom */
+			int pixels = ey - clip.max_y - 1;
+			ey -= pixels;
+		}
 
-			if (flipx)
+		if (ex > sx)
+		{ /* skip if inner loop doesn't draw anything */
+			int y;
+			bitmap_ind8 &priority_bitmap = screen.priority();
+			if (priority_bitmap.valid())
 			{
-				x_index_base = (sprite_screen_width - 1) * dx;
-				dx = -dx;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
-
-			if (flipy)
-			{
-				y_index = (sprite_screen_height - 1) * dy;
-				dy = -dy;
-			}
-			else
-			{
-				y_index = 0;
-			}
-
-			if (sx < clip.min_x)
-			{ /* clip left */
-				int pixels = clip.min_x - sx;
-				sx += pixels;
-				x_index_base += pixels * dx;
-			}
-			if (sy < clip.min_y)
-			{ /* clip top */
-				int pixels = clip.min_y - sy;
-				sy += pixels;
-				y_index += pixels * dy;
-			}
-			if (ex > clip.max_x + 1)
-			{ /* clip right */
-				int pixels = ex - clip.max_x - 1;
-				ex -= pixels;
-			}
-			if (ey > clip.max_y + 1)
-			{ /* clip bottom */
-				int pixels = ey - clip.max_y - 1;
-				ey -= pixels;
-			}
-
-			if (ex > sx)
-			{ /* skip if inner loop doesn't draw anything */
-				int y;
-				bitmap_ind8 &priority_bitmap = screen.priority();
-				if (priority_bitmap.valid())
+				for (y = sy; y < ey; y++)
 				{
-					for (y = sy; y < ey; y++)
+					const uint8_t *source = source_base + (y_index >> 16) * width;
+					uint32_t *dest = &bitmap.pix32(y);
+					uint8_t *pri = &priority_bitmap.pix8(y);
+					int x, x_index = x_index_base;
 					{
-						const uint8_t *source = source_base + (y_index >> 16) * width;
-						uint16_t *dest = &bitmap.pix16(y);
-						uint8_t *pri = &priority_bitmap.pix8(y);
-						int x, x_index = x_index_base;
+						for (x = sx; x < ex; x++)
 						{
-							for (x = sx; x < ex; x++)
+							uint8_t const c = source[x_index >> 16];
+
+							if (c != trans)
 							{
-								uint8_t const c = source[x_index >> 16];
+								if (pri[x] <= prival)
+									dest[x] = pal[color + c];
 
-								if (c != trans)
-								{
-									if (pri[x] <= prival)
-										dest[x] = pal[color + c];
-
-									pri[x] = 0xff;
-								}
-								x_index += dx;
+								pri[x] = 0xff;
 							}
-							y_index += dy;
+							x_index += dx;
 						}
+						y_index += dy;
 					}
 				}
 			}
@@ -974,7 +971,7 @@ void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_ind16 &
 
 ***************************************************************************/
 
-void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	int max_x = (m_screen_xoffset + 1) * 2;
 	int max_y = (m_screen_yoffset + 1) * 2;
@@ -1065,7 +1062,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 }
 
 
- inline uint8_t imagetek_i4100_device::get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool const big, uint16_t *pix )
+inline uint8_t imagetek_i4100_device::get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool const big, uint32_t &pix)
 {
 	// Use code as an index into the tiles set table
 	int table_index = (code & 0x1ff0) >> 3;
@@ -1073,9 +1070,9 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 
 	if (code & 0x8000) // Special: draw a tile of a single color (i.e. not from the gfx ROMs)
 	{
-		*pix = code & 0x0fff;
+		pix = m_palette->pen(code & 0x0fff);
 
-		if ((*pix & 0xf) != 0xf)
+		if ((code & 0xf) != 0xf)
 			return 1;
 		else
 			return 0;
@@ -1092,22 +1089,23 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 			data = gfx1->get_data(tile2);
 		else
 		{
-			*pix = 0;
+			pix = rgb_t::black();
 			return 0;
 		}
 
+		uint32_t idx = 0;
 		switch (flipxy)
 		{
 			default:
-			case 0x0: *pix = data[(y                    * (big ? 16 : 8)) + x];                    break;
-			case 0x1: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + x];                    break;
-			case 0x2: *pix = data[(y                    * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
-			case 0x3: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
+			case 0x0: idx = (y                    * (big ? 16 : 8)) + x;                    break;
+			case 0x1: idx = (((big ? 15 : 7) - y) * (big ? 16 : 8)) + x;                    break;
+			case 0x2: idx = (y                    * (big ? 16 : 8)) + ((big ? 15 : 7) - x); break;
+			case 0x3: idx = (((big ? 15 : 7) - y) * (big ? 16 : 8)) + ((big ? 15 : 7) - x); break;
 		}
 
-		*pix |= (tile & 0x0f000000) >> 16;
+		pix = m_palette->pen(data[idx] | (tile & 0x0f000000) >> 16);
 
-		if ((*pix & 0xff) != 0xff)
+		if ((data[idx] & 0xff) != 0xff)
 			return 1;
 		else
 			return 0;
@@ -1124,22 +1122,23 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 			data = gfx1->get_data(tile2);
 		else
 		{
-			*pix = 0;
+			pix = rgb_t::black();
 			return 0;
 		}
 
+		uint32_t idx = 0;
 		switch (flipxy)
 		{
 			default:
-			case 0x0: *pix = data[(y                    * (big ? 16 : 8)) + x];                    break;
-			case 0x1: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + x];                    break;
-			case 0x2: *pix = data[(y                    * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
-			case 0x3: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
+			case 0x0: idx = (y                    * (big ? 16 : 8)) + x;                    break;
+			case 0x1: idx = (((big ? 15 : 7) - y) * (big ? 16 : 8)) + x;                    break;
+			case 0x2: idx = (y                    * (big ? 16 : 8)) + ((big ? 15 : 7) - x); break;
+			case 0x3: idx = (((big ? 15 : 7) - y) * (big ? 16 : 8)) + ((big ? 15 : 7) - x); break;
 		}
 
-		*pix |= (tile & 0x0ff00000) >> 16;
+		pix = m_palette->pen(data[idx] | (tile & 0x0ff00000) >> 16);
 
-		if ((*pix & 0xf) != 0xf)
+		if ((data[idx] & 0xf) != 0xf)
 			return 1;
 		else
 			return 0;
@@ -1166,7 +1165,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t const pcode,
+void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t const pcode,
 							int sx, int sy, int wx, int wy, bool const big, uint16_t const *tilemapram, int const layer )
 {
 	int y;
@@ -1216,14 +1215,13 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 	{
 		int scrolly = (sy + y - wy) & (windowheight - 1);
 		int x;
-		uint16_t *dst;
 		uint8_t *priority_baseaddr;
 		int srcline = (wy + scrolly) & (height - 1);
 		int srctilerow = srcline >> (big ? 4 : 3);
 
 		if (!m_screen_flip)
 		{
-			dst = &bitmap.pix16(y);
+			uint32_t *dst = &bitmap.pix32(y);
 			priority_baseaddr = &priority_bitmap.pix8(y);
 
 			for (x = min_x; x <= max_x; x++)
@@ -1233,10 +1231,10 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 				int srctilecol = srccol >> (big ? 4 : 3);
 				int tileoffs = srctilecol + srctilerow * BIG_NX;
 
-				uint16_t dat = 0;
+				uint32_t dat = 0;
 
 				uint16_t tile = tilemapram[tileoffs];
-				uint8_t draw = get_tile_pix(tile, big ? (srccol & 0xf) : (srccol & 0x7), big ? (srcline & 0xf) : (srcline & 0x7), big, &dat);
+				uint8_t draw = get_tile_pix(tile, big ? (srccol & 0xf) : (srccol & 0x7), big ? (srcline & 0xf) : (srcline & 0x7), big, dat);
 
 				if (draw)
 				{
@@ -1247,7 +1245,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 		}
 		else // flipped case
 		{
-			dst = &bitmap.pix16(scrheight-y-1);
+			uint32_t *dst = &bitmap.pix32(scrheight-y-1);
 			priority_baseaddr = &priority_bitmap.pix8(scrheight-y-1);
 
 			for (x = min_x; x <= max_x; x++)
@@ -1257,10 +1255,10 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 				int srctilecol = srccol >> (big ? 4 : 3);
 				int tileoffs = srctilecol + srctilerow * BIG_NX;
 
-				uint16_t dat = 0;
+				uint32_t dat = 0;
 
 				uint16_t tile = tilemapram[tileoffs];
-				uint8_t draw = get_tile_pix(tile, big ? (srccol & 0xf) : (srccol & 0x7), big ? (srcline & 0xf) : (srcline & 0x7), big, &dat);
+				uint8_t draw = get_tile_pix(tile, big ? (srccol & 0xf) : (srccol & 0x7), big ? (srcline & 0xf) : (srcline & 0x7), big, dat);
 
 				if (draw)
 				{
@@ -1273,7 +1271,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 }
 
 
-void imagetek_i4100_device::draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void imagetek_i4100_device::draw_layers( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri )
 {
 	// Draw all the layers with priority == pri
 	for (int layer = 2; layer >= 0; layer--)
@@ -1301,19 +1299,24 @@ void imagetek_i4100_device::draw_layers( screen_device &screen, bitmap_ind16 &bi
 }
 
 
-uint32_t imagetek_i4100_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void imagetek_i4100_device::draw_foreground(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
-	bitmap.fill(m_background_color, cliprect);
-
 	if (m_screen_blank == true)
-		return 0;
+		return;
 
 	for (int pri = 3; pri >= 0; pri--)
 		draw_layers(screen, bitmap, cliprect, pri);
 
 	draw_sprites(screen, bitmap, cliprect);
+}
+
+uint32_t imagetek_i4100_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->pen(m_background_color), cliprect);
+
+	draw_foreground(screen, bitmap, cliprect);
 
 	return 0;
 }

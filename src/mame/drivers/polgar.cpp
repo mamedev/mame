@@ -22,9 +22,10 @@ TODO:
 #include "video/hd44780.h"
 #include "speaker.h"
 
-#include "mephisto_lcd.lh"
+// internal artwork
 #include "mephisto_academy.lh"
 #include "mephisto_milano.lh"
+#include "mephisto_polgar.lh"
 
 
 class mephisto_polgar_state : public driver_device
@@ -265,7 +266,7 @@ static INPUT_PORTS_START( polgar )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("LEV")    PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("FCT")    PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
 INPUT_PORTS_END
 
 void mephisto_risc_state::machine_start()
@@ -311,9 +312,9 @@ void mephisto_polgar_state::polgar(machine_config &config)
 	outlatch.q_out_cb<4>().set_output("led104");
 	outlatch.q_out_cb<5>().set_output("led105");
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
-	config.set_default_layout(layout_mephisto_lcd);
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_DISPLAY_MODUL(config, "display");
+	config.set_default_layout(layout_mephisto_polgar);
 }
 
 void mephisto_polgar_state::polgar10(machine_config &config)
@@ -342,9 +343,9 @@ void mephisto_risc_state::mrisc(machine_config &config)
 	outlatch.q_out_cb<5>().set_output("led105");
 	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
-	MEPHISTO_SENSORS_BOARD(config, "board", 0);
-	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
-	config.set_default_layout(layout_mephisto_lcd);
+	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_DISPLAY_MODUL(config, "display");
+	config.set_default_layout(layout_mephisto_polgar);
 }
 
 void mephisto_milano_state::milano(machine_config &config)
@@ -352,7 +353,7 @@ void mephisto_milano_state::milano(machine_config &config)
 	polgar(config);
 	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
 
-	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
 	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_milano);
 }
@@ -364,7 +365,7 @@ void mephisto_academy_state::academy(machine_config &config)
 
 	hc259_device &outlatch(HC259(config.replace(), "outlatch"));
 	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));
-	outlatch.q_out_cb<2>().set("display:beeper", FUNC(beep_device::set_state)).invert();
+	outlatch.q_out_cb<2>().set("display:dac", FUNC(dac_byte_interface::write));
 
 	config.set_default_layout(layout_mephisto_academy);
 }

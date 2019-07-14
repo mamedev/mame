@@ -459,7 +459,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-12" right="98" top="-17" bottom="87" />
+		<bounds left="-12" right="98" top="-13.5" bottom="87" />
 
 		<bezel element="white"><bounds x="0" y="-1" width="98" height="88" /></bezel>
 
@@ -529,50 +529,50 @@
 	<!-- panel 7seg leds -->
 
 		<bezel name="digit3" element="digit">
-			<bounds x="33" y="-13.5" width="5.66" height="8.5" />
+			<bounds x="33" y="-11.5" width="5.66" height="8.5" />
 		</bezel>
 		<bezel name="digit2" element="digit">
-			<bounds x="38.66" y="-13.5" width="5.66" height="8.5" />
+			<bounds x="38.66" y="-11.5" width="5.66" height="8.5" />
 		</bezel>
 		<bezel name="digit1" element="digit">
-			<bounds x="47.16" y="-13.5" width="5.66" height="8.5" />
+			<bounds x="47.16" y="-11.5" width="5.66" height="8.5" />
 		</bezel>
 		<bezel name="digit0" element="digit">
-			<bounds x="52.82" y="-13.5" width="5.66" height="8.5" />
+			<bounds x="52.82" y="-11.5" width="5.66" height="8.5" />
 		</bezel>
 
 		<bezel name="2.7" element="led">
-			<bounds x="45.58" y="-12" width="0.85" height="0.85" />
+			<bounds x="45.58" y="-10" width="0.85" height="0.85" />
 		</bezel>
 		<bezel name="3.7" element="led">
-			<bounds x="45.13" y="-7.35" width="0.85" height="0.85" />
+			<bounds x="45.13" y="-5.35" width="0.85" height="0.85" />
 		</bezel>
 
 	<!-- panel buttons -->
 
-		<bezel element="black"><bounds x="73" y="-13.5" width="5" height="3" /></bezel>
-		<bezel element="text_tm"><bounds x="73.05" y="-13.45" width="4.9" height="2.9" /></bezel>
-		<bezel element="hlp" inputtag="IN.2" inputmask="0x100"><bounds x="73" y="-13.5" width="5" height="3" /><color alpha="0.25" /></bezel>
+		<bezel element="black"><bounds x="73" y="-11.5" width="5" height="3" /></bezel>
+		<bezel element="text_tm"><bounds x="73.05" y="-11.45" width="4.9" height="2.9" /></bezel>
+		<bezel element="hlp" inputtag="IN.2" inputmask="0x100"><bounds x="73" y="-11.5" width="5" height="3" /><color alpha="0.25" /></bezel>
 
-		<bezel element="black"><bounds x="79.2" y="-13.5" width="5" height="3" /></bezel>
-		<bezel element="text_rv"><bounds x="79.25" y="-13.45" width="4.9" height="2.9" /></bezel>
-		<bezel element="hlp" inputtag="IN.1" inputmask="0x100"><bounds x="79.2" y="-13.5" width="5" height="3" /><color alpha="0.25" /></bezel>
+		<bezel element="black"><bounds x="79.2" y="-11.5" width="5" height="3" /></bezel>
+		<bezel element="text_rv"><bounds x="79.25" y="-11.45" width="4.9" height="2.9" /></bezel>
+		<bezel element="hlp" inputtag="IN.1" inputmask="0x100"><bounds x="79.2" y="-11.5" width="5" height="3" /><color alpha="0.25" /></bezel>
 
-		<bezel element="black"><bounds x="85.4" y="-13.5" width="5" height="3" /></bezel>
-		<bezel element="text_speak"><bounds x="85.45" y="-13.45" width="4.9" height="2.9" /></bezel>
-		<bezel element="hlp" inputtag="IN.0" inputmask="0x100"><bounds x="85.4" y="-13.5" width="5" height="3" /><color alpha="0.25" /></bezel>
+		<bezel element="black"><bounds x="85.4" y="-11.5" width="5" height="3" /></bezel>
+		<bezel element="text_speak"><bounds x="85.45" y="-11.45" width="4.9" height="2.9" /></bezel>
+		<bezel element="hlp" inputtag="IN.0" inputmask="0x100"><bounds x="85.4" y="-11.5" width="5" height="3" /><color alpha="0.25" /></bezel>
 
-		<bezel element="black"><bounds x="73" y="-8" width="5" height="3" /></bezel>
-		<bezel element="text_st"><bounds x="73.05" y="-7.95" width="4.9" height="2.9" /></bezel>
-		<bezel element="hlp" inputtag="IN.5" inputmask="0x100"><bounds x="73" y="-8" width="5" height="3" /><color alpha="0.25" /></bezel>
+		<bezel element="black"><bounds x="73" y="-6" width="5" height="3" /></bezel>
+		<bezel element="text_st"><bounds x="73.05" y="-5.95" width="4.9" height="2.9" /></bezel>
+		<bezel element="hlp" inputtag="IN.5" inputmask="0x100"><bounds x="73" y="-6" width="5" height="3" /><color alpha="0.25" /></bezel>
 
-		<bezel element="black"><bounds x="79.2" y="-8" width="5" height="3" /></bezel>
-		<bezel element="text_dm"><bounds x="79.25" y="-7.95" width="4.9" height="2.9" /></bezel>
-		<bezel element="hlp" inputtag="IN.4" inputmask="0x100"><bounds x="79.2" y="-8" width="5" height="3" /><color alpha="0.25" /></bezel>
+		<bezel element="black"><bounds x="79.2" y="-6" width="5" height="3" /></bezel>
+		<bezel element="text_dm"><bounds x="79.25" y="-5.95" width="4.9" height="2.9" /></bezel>
+		<bezel element="hlp" inputtag="IN.4" inputmask="0x100"><bounds x="79.2" y="-6" width="5" height="3" /><color alpha="0.25" /></bezel>
 
-		<bezel element="black"><bounds x="85.4" y="-8" width="5" height="3" /></bezel>
-		<bezel element="text_lv"><bounds x="85.45" y="-7.95" width="4.9" height="2.9" /></bezel>
-		<bezel element="hlp" inputtag="IN.3" inputmask="0x100"><bounds x="85.4" y="-8" width="5" height="3" /><color alpha="0.25" /></bezel>
+		<bezel element="black"><bounds x="85.4" y="-6" width="5" height="3" /></bezel>
+		<bezel element="text_lv"><bounds x="85.45" y="-5.95" width="4.9" height="2.9" /></bezel>
+		<bezel element="hlp" inputtag="IN.3" inputmask="0x100"><bounds x="85.4" y="-6" width="5" height="3" /><color alpha="0.25" /></bezel>
 
 	</view>
 </mamelayout>

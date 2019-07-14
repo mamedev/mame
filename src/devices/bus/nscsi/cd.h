@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NSCSI_CD_H
-#define MAME_MACHINE_NSCSI_CD_H
+#ifndef MAME_BUS_NSCSI_CD_H
+#define MAME_BUS_NSCSI_CD_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ DECLARE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device)
 DECLARE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_APPLE, nscsi_cdrom_apple_device)
 
-#endif // MAME_MACHINE_NSCSI_CD_H
+#endif // MAME_BUS_NSCSI_CD_H

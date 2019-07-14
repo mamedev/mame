@@ -90,7 +90,6 @@ private:
 /* VIDEO GOODS */
 uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int charx, chary;
 	const uint8_t pal_bank = m_ld_video_visible == true ? 0x10 : 0x00;
 	const uint32_t trans_mask = m_ld_video_visible == true ? 0 : -1;
 	gfx_element *gfx;// = m_gfxdecode->gfx(0);
@@ -100,9 +99,9 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 
 	/* Draw tiles */
-	for (charx = 0; charx < 32; charx++)
+	for (int charx = 0; charx < 32; charx++)
 	{
-		for (chary = 0; chary < 32; chary++)
+		for (int chary = 0; chary < 32; chary++)
 		{
 			int current_screen_character = (chary*32) + charx;
 
@@ -372,7 +371,6 @@ void esh_state::esh(machine_config &config)
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->command_strobe_callback().set(FUNC(esh_state::ld_command_strobe_cb));
 	m_laserdisc->set_overlay(256, 256, FUNC(esh_state::screen_update_esh));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 

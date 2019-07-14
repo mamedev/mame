@@ -38,6 +38,7 @@ Notes on emulation status and to do list:
 10. PMD-85, Didaktik Alfa 2 and Didaktik Beta (ROMs and documentation needed).
 11. FDD interface (ROMs and disk images needed).
 12. "Duch & Pampuch" Mato game displays scores with incorrect characters.
+13. Tape save in pmd851 is badly formatted - cannot be loaded.
 
 PMD-85 technical information
 ============================
@@ -167,6 +168,16 @@ I/O ports
     ----------
     1xxx10aa    8255 (ROM reading)
     ROM module is not supported by Didaktik Alfa and Mato.
+
+
+Commands
+--------
+DUMP aaaa - dump memory from aaaa
+JUMP aaaa - start program at aaaa
+MEM aaaa  - show 16 bytes from aaaa-up
+MGLD xx   - load file number xx from cassette
+MGSV xx aaaa bbbb yyyyyyyy - save memory range aaaa to bbbb to cassette with file number xx and filename yyyyyyyy
+SUB aaaa bb cc dd... - write bytes to memory starting at aaaa with bb,cc,dd...
 
 
 *******************************************************************************/

@@ -77,23 +77,20 @@ private:
 /* VIDEO GOODS */
 uint32_t istellar_state::screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	/* clear */
 	bitmap.fill(0, cliprect);
 
 	/* Draw tiles */
-	for (y = 0; y < 32; y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 32; x++)
+		for (int x = 0; x < 32; x++)
 		{
-			int tile = m_tile_ram[x+y*32];
-			int attr = m_tile_control_ram[x+y*32];
+			int tile = m_tile_ram[x + y * 32];
+			int attr = m_tile_control_ram[x + y * 32];
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,attr & 0x0f,0, 0, x*8, y*8, 0);
+			m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, tile, attr & 0x0f, 0, 0, x * 8, y * 8, 0);
 		}
 	}
-
 
 	/* Draw sprites */
 
@@ -298,7 +295,6 @@ void istellar_state::istellar(machine_config &config)
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(istellar_state::screen_update_istellar));
-	m_laserdisc->set_overlay_palette(m_palette);
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 

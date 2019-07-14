@@ -438,11 +438,8 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 
 INPUT_CHANGED_MEMBER(sensorboard_device::ui_spawn)
 {
-	if (!newval)
-		return;
-
-	u8 pos = (u8)(uintptr_t)param;
-	if (pos > m_maxspawn)
+	u8 pos = (newval) ? (u8)(uintptr_t)param : 32 - count_leading_zeros(m_inp_spawn->read());
+	if (pos == 0 || pos > m_maxspawn)
 		return;
 
 	cancel_sensor();

@@ -365,7 +365,7 @@ private:
 	inline u16 doADD_16(u16 lhs, u16 rhs)
 	{
 		m_tmp32 = lhs + rhs;
-		m_ps &= ~F_V|F_C;
+		m_ps &= ~(F_C|F_V);
 		if ((m_tmp32 ^ lhs) & (m_tmp32 ^ rhs) & 0x8000)
 		{
 			m_ps |= F_V;
@@ -377,6 +377,22 @@ private:
 		setNZ_16(m_tmp32 & 0xffff);
 
 		return m_tmp32 & 0xffff;
+	}
+	inline u32 doADD_32(u32 lhs, u32 rhs)
+	{
+		m_tmp64 = lhs + rhs;
+		m_ps &= ~(F_C|F_V);
+		if ((m_tmp64 ^ lhs) & (m_tmp64 ^ rhs) & 0x80000000)
+		{
+			m_ps |= F_V;
+		}
+		if (m_tmp64 > 0xffffffff)
+		{
+			m_ps |= F_C;
+		}
+		setNZ_32(m_tmp64 & 0xffffffff);
+
+		return m_tmp64 & 0xffffffff;
 	}
 
 	inline void take_branch()
@@ -393,6 +409,10 @@ private:
 	void opcodes_ea72(u8 operand);
 	void opcodes_ea73(u8 operand);
 	void opcodes_ea74(u8 operand);
+	void opcodes_ea75(u8 operand);
+	void opcodes_ea76(u8 operand);
+	void opcodes_ea77(u8 operand);
+	void opcodes_ea78(u8 operand);
 };
 
 DECLARE_DEVICE_TYPE(F2MC16, f2mc16_device)

@@ -17,10 +17,9 @@
 #include "emu.h"
 #include "bt54x.h"
 
+#include "bus/nscsi/devices.h"
 #include "machine/ncr5390.h"
 //#include "machine/ncr86c05.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(BT542B, bt542b_device, "bt542b", "BusTek BT-542B SCSI Host Adapter") // Rev. G or earlier
 DEFINE_DEVICE_TYPE(BT542BH, bt542bh_device, "bt542bh", "BusLogic BT-542B SCSI Host Adapter (Rev. H)")
@@ -68,20 +67,6 @@ void bt54x_device::local_map(address_map &map)
 	map(0xf8000, 0xfffff).rom().region("mpu", 0);
 }
 
-static void scsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", NCR53C94);
-}
-
-static void fast_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", NCR53CF94); // FAS216
-}
-
 void bt54x_device::asc_config(device_t *device)
 {
 	ncr53c94_device &asc = downcast<ncr53c94_device &>(*device);
@@ -109,14 +94,16 @@ void bt54x_device::fsc_base(machine_config &config)
 	//busintf.dma_ack_callback().set("scsi:7:scsic", FUNC(ncr53cf94_device::dma_w));
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", fast_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", fast_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", fast_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", fast_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", fast_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", fast_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", fast_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", fast_scsi_devices, "scsic", true).set_option_machine_config("scsic", [this] (device_t *device) { fsc_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
+		.option_add_internal("scsic", NCR53CF94) // FAS216
+		.machine_config([this] (device_t *device) { fsc_config(device); });
 }
 
 void bt542b_device::device_add_mconfig(machine_config &config)
@@ -129,14 +116,16 @@ void bt542b_device::device_add_mconfig(machine_config &config)
 	//busintf.dma_ack_callback().set("scsi:7:scsic", FUNC(ncr53c94_device::dma_w));
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, "scsic", true).set_option_machine_config("scsic", [this] (device_t *device) { asc_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
+		.option_add_internal("scsic", NCR53C94)
+		.machine_config([this] (device_t *device) { asc_config(device); });
 
 	DP8473(config, m_fdc, 24_MHz_XTAL);
 }

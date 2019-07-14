@@ -884,6 +884,9 @@ borisdpl                        //
 @source:aci_ggm.cpp
 ggm
 
+@source:aci_prodigy.cpp
+prodigy
+
 @source:acommand.cpp
 acommand                        // (c) 1990
 
@@ -14221,6 +14224,7 @@ gjmovie                         // Genius Junior Movie (Germany)
 gjrstar                         // Genius Junior Redstar (Germany)
 gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
+pitagjr                         // Pitagorin Junior
 
 @source:genpc.cpp
 pc                              // 1987 PC with CGA
@@ -14582,6 +14586,7 @@ lucky8b                         // (c) 1989 Wing Co. Ltd
 lucky8c                         // (c) 1989 Wing Co. Ltd
 lucky8d                         // (c) 1989 Wing Co. Ltd
 lucky8e                         // (c) 1989 Wing Co. Ltd
+lucky8f                         // bootleg?
 luckybar                        // unknown
 luckylad                        // (c) 1985 Wing Co. Ltd
 magodds                         // 198? (c) Micro Manufacturing Ltd.
@@ -15468,6 +15473,9 @@ tmpacman                        // Tomy
 tmscramb                        // Tomy
 tmtennis                        // Tomy
 ufombs                          // Bambino
+
+@source:hhtiger.cpp
+hhtiger                         // 1983 H/H Tiger
 
 @source:hideseek.cpp
 hideseek                        //
@@ -21386,11 +21394,12 @@ mm4                             // Mephisto 4
 mm4tk                           // Mephisto 4 Turbo Kit
 mm5                             // Mephisto 5.1 ROM
 mm50                            // Mephisto 5.0 ROM
-mm5tk                           // Mephisto 5.1 ROM Turbo Kit Speed
 rebel5                          // Mephisto 5
 
 @source:mephisto_montec.cpp
-smondial                        // 1986 Mephisto Super Mondial
+mondial                         // 1985 Mephisto Mondial
+smondial                        // 1986 Mephisto Super Mondial (Ver A)
+smondialb                       // 1986 Mephisto Super Mondial (Ver B)
 montec                          // 1987 Mephisto Monte Carlo
 mondial2                        // 1987 Mephisto Mondial II
 smondial2                       // 1989 Mephisto Super Mondial II
@@ -21999,7 +22008,9 @@ van32                           // 1991 Mephisto Vancouver 68020
 gen32                           // 1993 Mephisto Genius 68030
 lond020                         // 1996 Mephisto London 68020
 lond030                         // 1996 Mephisto Genius 68030 London Upgrade
+berl16                          // 1992 Mephisto Berlin 68000
 berlinp                         // 1994 Mephisto Berlin Pro 68020
+berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
 bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mod8.cpp
@@ -32574,9 +32585,6 @@ piratesb                        // bootleg?
 @source:piratesh.cpp
 piratesh                        // (c) 1995 Konami
 
-@source:pitagjr.cpp
-pitagjr                         // Pitagorin Junior
-
 @source:pitnrun.cpp
 pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
@@ -33173,9 +33181,6 @@ pr_walls                        // Wall Street (Project)
 pr_whlft                        // Wheel Of Fortune (Project)
 pr_wldkn                        // Wild Kings (Project)
 pr_wnstk                        // Winning Streak (Coinworld)
-
-@source:prodigy.cpp
-prodigy                        // ACI Destiny Prodigy, 1981
 
 @source:prof180x.cpp
 prof180x                        //
@@ -38617,7 +38622,7 @@ tvc64pru                        //
 tvcapcom                        //
 
 @source:tvg01.cpp
-boatrace                        //
+theboat                         //
 
 @source:tvgame.cpp
 tvgame                          //
@@ -40161,6 +40166,9 @@ wrally                          // (c) 1993 - Ref 930705
 wrallya                         // (c) 1993 - Ref 930705
 wrallyat                        // (c) 1993 - Ref 930217
 wrallyb                         // (c) 1993 - Ref 930217
+
+@source:wrinkles.cpp
+wrinkles
 
 @source:wswan.cpp
 wscolor                         // Bandai WonderSwan Color Handheld

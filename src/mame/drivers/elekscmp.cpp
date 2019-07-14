@@ -6,6 +6,7 @@ Elektor SC/MP
 
 2009-11-22 Skeleton driver.
 2012-05-10 Added keyboard [Robbbert]
+2019-07-12 Added cassette [Robbbert]
 
 To Use:
 - Press MINUS to enter data input mode
@@ -14,17 +15,18 @@ To Use:
 At the moment Paste cannot be tested, but if it worked, you could
 paste this in:  -0F0011^22^33^44^55^66^77^88^99^
 
-It seems the only way to exit each mode is to do a Soft Reset.
+It seems the only way to exit each mode is to press NRST.
 
 ToDo:
-- Add Cassette
-- Verify that ROMS are good (they seem to be)
 
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
+#include "imagedev/cassette.h"
+#include "machine/timer.h"
+#include "speaker.h"
 #include "elekscmp.lh"
 
 
@@ -34,23 +36,32 @@ public:
 	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_x(*this, "X%u", 0U)
+		, m_cass(*this, "cassette")
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digit(*this, "digit%u", 0U)
 	{ }
 
 	void elekscmp(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);
+	DECLARE_READ_LINE_MEMBER(cass_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	uint8_t convert_key(uint8_t data);
+	bool m_cassinbit, m_cassoutbit, m_cassold;
+	u8 m_cass_data[4];
 
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_ioport_array<4> m_x;
+	required_device<scmp_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	required_ioport_array<3> m_io_keyboard;
 	output_finder<8> m_digit;
 };
 
@@ -76,25 +87,59 @@ uint8_t elekscmp_state::convert_key(uint8_t data)
 
 READ8_MEMBER(elekscmp_state::keyboard_r)
 {
-	uint8_t data;
-
-	data = m_x[0]->read();
+	u8 data = m_io_keyboard[0]->read();
 	if (data)
 		return 0x80 | convert_key(data);
 
-	data = m_x[1]->read();
+	data = m_io_keyboard[1]->read();
 	if (data)
 		return 0x88 | convert_key(data);
 
-	data = m_x[2]->read();
+	data = m_io_keyboard[2]->read();
 	if (data)
 		return 0x80 | (convert_key(data) << 4);
 
-	data = m_x[3]->read();
-	if (data)
-		m_maincpu->reset();
-
 	return 0;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( elekscmp_state::kansas_r )
+{
+	// no tape - set uart to idle
+	m_cass_data[1]++;
+	if (m_cass_data[1] > 32)
+	{
+		m_cass_data[1] = 32;
+		m_cassinbit = 1;
+	}
+
+	/* cassette - turn 1200/2400Hz to a bit */
+	u8 cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cassinbit = (m_cass_data[1] < 12) ? 1 : 0;
+		m_cass_data[1] = 0;
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( elekscmp_state::kansas_w )
+{
+	u8 twobit = m_cass_data[3] & 7;
+	m_cass_data[3]++;
+
+	if (twobit == 0)
+		m_cassold = m_cassoutbit;
+
+	if (m_cassold)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
+
+READ_LINE_MEMBER( elekscmp_state::cass_r )
+{
+	return m_cassinbit;
 }
 
 void elekscmp_state::mem_map(address_map &map)
@@ -139,31 +184,43 @@ static INPUT_PORTS_START( elekscmp )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Modify") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Run") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('X')
 
-	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NRST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, elekscmp_state, reset_button, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(elekscmp_state::reset_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 void elekscmp_state::elekscmp(machine_config &config)
 {
 	/* basic machine hardware */
-	INS8060(config, m_maincpu, XTAL(4'000'000));
+	INS8060(config, m_maincpu, XTAL(1'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &elekscmp_state::mem_map);
+	m_maincpu->s_out().set([this] (bool state) { m_cassoutbit = state; });
+	m_maincpu->s_in().set(FUNC(elekscmp_state::cass_r));
 
 	/* video hardware */
 	config.set_default_layout(layout_elekscmp);
+
+	SPEAKER(config, "mono").front_center();
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(elekscmp_state::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(elekscmp_state::kansas_r), attotime::from_hz(40000));
 }
 
 /* ROM definition */
 ROM_START( elekscmp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	// Too many possible errors, few found and fixed, but not sure if there are more
-	ROM_LOAD( "elbug.001", 0x0000, 0x0200, BAD_DUMP CRC(f733da28) SHA1(b65d98be03eab80478167964beec26bb327bfdf3))
-	ROM_LOAD( "elbug.002", 0x0200, 0x0200, BAD_DUMP CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
-	ROM_LOAD( "elbug.003", 0x0400, 0x0200, BAD_DUMP CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
+	ROM_LOAD( "elbug.001", 0x0000, 0x0200, CRC(f733da28) SHA1(b65d98be03eab80478167964beec26bb327bfdf3))
+	ROM_LOAD( "elbug.002", 0x0200, 0x0200, CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
+	ROM_LOAD( "elbug.003", 0x0400, 0x0200, CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                FULLNAME         FLAGS */
-COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)
+COMP( 1977, elekscmp, 0,      0,      elekscmp, elekscmp, elekscmp_state, empty_init, "Elektor Electronics", "Elektor SC/MP", 0 )

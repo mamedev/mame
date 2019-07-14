@@ -117,48 +117,29 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// configuration
-	bool overlay_configured() const { return (m_overwidth > 0 && m_overheight > 0 && (!m_overupdate_ind16.isnull() || !m_overupdate_rgb32.isnull())); }
+	bool overlay_configured() const { return (m_overwidth > 0 && m_overheight > 0 && (!m_overupdate_rgb32.isnull())); }
 	void get_overlay_config(laserdisc_overlay_config &config) { config = static_cast<laserdisc_overlay_config &>(*this); }
 	void set_overlay_config(const laserdisc_overlay_config &config) { static_cast<laserdisc_overlay_config &>(*this) = config; }
 
 	// configuration helpers
 	template <typename... T> void set_get_disc(T &&... args) { m_getdisc_callback = get_disc_delegate(std::forward<T>(args)...); }
 	template <typename... T> void set_audio(T &&... args) { m_audio_callback = audio_delegate(std::forward<T>(args)...); }
-	template <class FunctionClass>
 	// FIXME: these should be aware of current device for resolving the tag
-	void set_overlay(uint32_t width, uint32_t height, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
-	{
-		set_overlay(width, height, screen_update_ind16_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
 	template <class FunctionClass>
 	void set_overlay(uint32_t width, uint32_t height, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
 	{
 		set_overlay(width, height, screen_update_rgb32_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
 	}
 	template <class FunctionClass>
-	void set_overlay(uint32_t width, uint32_t height, const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
-	{
-		set_overlay(width, height, screen_update_ind16_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
 	void set_overlay(uint32_t width, uint32_t height, const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
 	{
 		set_overlay(width, height, screen_update_rgb32_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_overlay(uint32_t width, uint32_t height, screen_update_ind16_delegate &&update)
-	{
-		m_overwidth = width;
-		m_overheight = height;
-		m_overclip.set(0, width - 1, 0, height - 1);
-		m_overupdate_ind16 = std::move(update);
-		m_overupdate_rgb32 = screen_update_rgb32_delegate();
 	}
 	void set_overlay(uint32_t width, uint32_t height, screen_update_rgb32_delegate &&update)
 	{
 		m_overwidth = width;
 		m_overheight = height;
 		m_overclip.set(0, width - 1, 0, height - 1);
-		m_overupdate_ind16 = screen_update_ind16_delegate();
 		m_overupdate_rgb32 = std::move(update);
 	}
 	void set_overlay_clip(int32_t minx, int32_t maxx, int32_t miny, int32_t maxy) { m_overclip.set(minx, maxx, miny, maxy); }
@@ -172,7 +153,6 @@ public:
 		m_orig_config.m_overscalex = m_overscalex = scalex;
 		m_orig_config.m_overscaley = m_overscaley = scaley;
 	}
-	template <typename T> void set_overlay_palette(T &&tag) { m_overlay_palette.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// timer IDs
@@ -297,7 +277,6 @@ private:
 	uint32_t              m_overwidth;            // overlay screen width
 	uint32_t              m_overheight;           // overlay screen height
 	rectangle           m_overclip;             // overlay visarea
-	screen_update_ind16_delegate m_overupdate_ind16; // overlay update delegate
 	screen_update_rgb32_delegate m_overupdate_rgb32; // overlay update delegate
 
 	// disc parameters
@@ -351,7 +330,6 @@ private:
 	screen_bitmap       m_overbitmap[2];        // overlay bitmaps
 	int                 m_overindex;            // index of the overlay bitmap
 	render_texture *    m_overtex;              // texture for the overlay
-	optional_device<palette_device> m_overlay_palette; // overlay screen palette
 };
 
 // iterator - interface iterator works for subclasses too

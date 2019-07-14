@@ -11,8 +11,7 @@
 #include "emu.h"
 #include "a590.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/devices.h"
 
 
 //**************************************************************************
@@ -115,12 +114,6 @@ ioport_constructor a2091_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void dmac_hdc_device::scsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("harddisk", NSCSI_HARDDISK);
-}
-
 void dmac_hdc_device::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
@@ -137,12 +130,12 @@ void dmac_hdc_device::device_add_mconfig(machine_config &config)
 	dmac.cfgout_handler().set(FUNC(dmac_hdc_device::dmac_cfgout_w));
 
 	NSCSI_BUS(config, "scsi", 0);
-	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93A)
 		.machine_config([this](device_t *device) { wd33c93(device); });
 }

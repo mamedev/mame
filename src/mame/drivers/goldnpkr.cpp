@@ -1374,7 +1374,9 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
 	DECLARE_WRITE8_MEMBER(mux_port_w);
-	DECLARE_WRITE8_MEMBER(wcfalcon_snd_w);
+	uint8_t ay8910_data_r();
+	void ay8910_data_w(uint8_t data);
+	void ay8910_control_w(uint8_t data);
 	DECLARE_WRITE8_MEMBER(pia0_a_w);
 	DECLARE_WRITE8_MEMBER(pia0_b_w);
 	DECLARE_WRITE8_MEMBER(pia1_a_w);
@@ -1413,6 +1415,8 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_mux_data;
 	uint8_t m_pia0_PA_data;
+	uint8_t m_ay8910_data;
+	uint8_t m_ay8910_control;
 };
 
 class blitz_state : public goldnpkr_state
@@ -1693,20 +1697,28 @@ WRITE8_MEMBER(goldnpkr_state::mux_port_w)
 
 /* Demuxing ay8910 data/address from Falcon board, PIA portA out */
 
-uint8_t wcfalcon_flag = 0;
-
-WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
+uint8_t goldnpkr_state::ay8910_data_r()
 {
-	if (wcfalcon_flag == 0)
-	{
-		m_ay8910->data_address_w(0, data);
-	}
-	else
-	{
-		m_ay8910->data_address_w(1, data);
-	}
+	return (m_ay8910_control & 0xc0) == 0x40 ? m_ay8910->data_r() : 0xff;
+}
 
-	wcfalcon_flag = wcfalcon_flag ^ 1;
+void goldnpkr_state::ay8910_data_w(uint8_t data)
+{
+	m_ay8910_data = data;
+}
+
+void goldnpkr_state::ay8910_control_w(uint8_t data)
+{
+	if (BIT(data, 7))
+		m_ay8910->data_address_w(BIT(data, 6), m_ay8910_data);
+
+	m_ay8910_control = data;
+
+	m_lamps[0] = !BIT(data, 0);
+	m_lamps[1] = !BIT(data, 1);
+	m_lamps[2] = !BIT(data, 2);
+	m_lamps[3] = !BIT(data, 3);
+	m_lamps[4] = !BIT(data, 4);
 }
 
 
@@ -4447,7 +4459,9 @@ void goldnpkr_state::wcfalcon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::witchcrd_falcon_map);
 
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
-	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w)); /* port A out, custom handler due to address + data are muxed */
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::ay8910_control_w));
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::ay8910_data_w));
 
 	/* video hardware */
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
@@ -4509,7 +4523,9 @@ void goldnpkr_state::wildcrdb(machine_config &config)
 	mcu.set_addrmap(AS_IO, &goldnpkr_state::wildcrdb_mcu_io_map);
 
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
-	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::ay8910_control_w));
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::ay8910_data_w));
 
 	/* video hardware */
 //  m_gfxdecode->set_info(gfx_wildcard);

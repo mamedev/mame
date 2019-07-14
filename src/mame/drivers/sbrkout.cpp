@@ -79,7 +79,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sbrkout(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
@@ -369,14 +369,13 @@ WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
  *
  *************************************/
 
-uint32_t sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *videoram = m_videoram;
-	int ball;
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	for (ball = 2; ball >= 0; ball--)
+	for (int ball = 2; ball >= 0; ball--)
 	{
 		int code = ((videoram[0x380 + 0x18 + ball * 2 + 1] & 0x80) >> 7);
 		int sx = 31 * 8 - videoram[0x380 + 0x10 + ball * 2];
@@ -581,7 +580,6 @@ void sbrkout_state::sbrkout(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(sbrkout_state::screen_update_sbrkout));
-	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

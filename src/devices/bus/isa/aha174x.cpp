@@ -33,10 +33,10 @@
 #include "emu.h"
 #include "aha174x.h"
 
+#include "bus/nscsi/devices.h"
 #include "machine/aic6250.h"
 #include "machine/i82355.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 DEFINE_DEVICE_TYPE(AHA1740, aha1740_device, "aha1740", "AHA-1740 Fast SCSI Host Adapter")
 DEFINE_DEVICE_TYPE(AHA1742A, aha1742a_device, "aha1742a", "AHA-1742A Fast SCSI Host Adapter")
@@ -80,12 +80,6 @@ void aha174x_device::hpc_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("mcode", 0);
 }
 
-static void aha174x_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", AIC6251A);
-}
-
 void aha174x_device::scsic_config(device_t *device)
 {
 	device->set_clock(40_MHz_XTAL / 2); // divider not verified
@@ -107,15 +101,15 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	IDT7201(config, m_fifo[1]);
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", aha174x_scsi_devices, "scsic", true)
-		.set_option_machine_config("scsic", [this] (device_t *device) { scsic_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6251A)
+		.machine_config([this] (device_t *device) { scsic_config(device); });
 }
 
 void aha1742a_device::device_add_mconfig(machine_config &config)
@@ -134,15 +128,15 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 	IDT7201(config, m_fifo[1]);
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", aha174x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", aha174x_scsi_devices, "scsic", true)
-		.set_option_machine_config("scsic", [this] (device_t *device) { scsic_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6251A)
+		.machine_config([this] (device_t *device) { scsic_config(device); });
 
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
 }

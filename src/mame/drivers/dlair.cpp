@@ -128,7 +128,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void dleuro_palette(palette_device &palette) const;
-	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
 
 	void dleuro_io_map(address_map &map);
@@ -220,16 +220,18 @@ void dlair_state::dleuro_palette(palette_device &palette) const
  *
  *************************************/
 
-uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// redraw the overlay
 	for (int y = 0; y < 32; y++)
+	{
 		for (int x = 0; x < 32; x++)
 		{
 			uint8_t const *const base = &m_videoram[y * 64 + x * 2 + 1];
 			// TODO: opaque?
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
+			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
+	}
 
 	return 0;
 }
@@ -782,7 +784,6 @@ void dlair_state::dleuro(machine_config &config)
 
 	PHILIPS_22VP932(config, m_22vp932, 0);
 	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
-	m_22vp932->set_overlay_palette(m_palette);
 	m_22vp932->add_route(0, "lspeaker", 1.0);
 	m_22vp932->add_route(1, "rspeaker", 1.0);
 

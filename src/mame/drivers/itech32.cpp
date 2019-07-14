@@ -357,6 +357,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32031/tms32031.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 
@@ -425,9 +426,7 @@ void itech32_state::machine_start()
 	save_item(NAME(m_xint_state));
 	save_item(NAME(m_qint_state));
 	save_item(NAME(m_irq_base));
-	save_item(NAME(m_sound_data));
 	save_item(NAME(m_sound_return));
-	save_item(NAME(m_sound_int_state));
 	save_item(NAME(m_special_result));
 	save_item(NAME(m_p1_effx));
 	save_item(NAME(m_p1_effy));
@@ -443,9 +442,7 @@ void itech32_state::machine_start()
 void itech32_state::machine_reset()
 {
 	m_vint_state = m_xint_state = m_qint_state = 0;
-	m_sound_data = 0;
 	m_sound_return = 0;
-	m_sound_int_state = 0;
 }
 
 void drivedge_state::machine_start()
@@ -493,7 +490,7 @@ void itech32_state::color_w(u8 data)
 
 CUSTOM_INPUT_MEMBER(itech32_state::special_port_r)
 {
-	if (m_sound_int_state)
+	if (m_soundlatch->pending_r())
 		m_special_result ^= 1;
 
 	return m_special_result;
@@ -670,31 +667,19 @@ void itech32_state::sound_bank_w(u8 data)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech32_state::delayed_sound_data_w)
-{
-	m_sound_data = param;
-	m_sound_int_state = 1;
-	m_soundcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-}
-
-
 void itech32_state::sound_data_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), data & 0xff);
+	// seems hacky, but sound CPU should lose fewer bytes this way
+	if (m_soundlatch2.found() && m_soundlatch->pending_r())
+		m_soundlatch2->write(data);
+	else
+		m_soundlatch->write(data);
 }
 
 
 u8 itech32_state::sound_return_r()
 {
 	return m_sound_return;
-}
-
-
-u8 itech32_state::sound_data_r()
-{
-	m_soundcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	m_sound_int_state = 0;
-	return m_sound_data;
 }
 
 
@@ -706,7 +691,12 @@ void itech32_state::sound_return_w(u8 data)
 
 u8 itech32_state::sound_data_buffer_r()
 {
-	return 0;
+	return m_soundlatch->pending_r() << 7;
+}
+
+
+void itech32_state::sound_control_w(u8 data)
+{
 }
 
 
@@ -1034,7 +1024,7 @@ void itech32_state::itech020_map(address_map &map)
 void itech32_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0000).w(FUNC(itech32_state::sound_return_w));
-	map(0x0400, 0x0400).r(FUNC(itech32_state::sound_data_r));
+	map(0x0400, 0x0400).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0800, 0x083f).mirror(0x80).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
 	map(0x0c00, 0x0c00).w(FUNC(itech32_state::sound_bank_w));
 	map(0x1000, 0x1000).nopw();    /* noisy */
@@ -1048,11 +1038,13 @@ void itech32_state::sound_map(address_map &map)
 /*------ Rev 2 sound board memory layout ------*/
 void itech32_state::sound_020_map(address_map &map)
 {
-	map(0x0000, 0x0000).mirror(0x400).r(FUNC(itech32_state::sound_data_r));
+	map(0x0000, 0x0000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x0400, 0x0400).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0x0800, 0x083f).mirror(0x80).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
 	map(0x0c00, 0x0c00).w(FUNC(itech32_state::sound_bank_w));
 	map(0x1400, 0x1400).w(FUNC(itech32_state::firq_clear_w));
 	map(0x1800, 0x1800).r(FUNC(itech32_state::sound_data_buffer_r)).nopw();
+	map(0x1c00, 0x1c00).w(FUNC(itech32_state::sound_control_w));
 	map(0x2000, 0x3fff).ram();
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();
@@ -1665,6 +1657,8 @@ void itech32_state::base_devices(machine_config &config)
 	MC6809E(config, m_soundcpu, SOUND_CLOCK/8); // EF68B09EP
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_map);
 
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
+
 	nvram_device &nvram(NVRAM(config, "nvram"));
 	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
 
@@ -1726,8 +1720,6 @@ void itech32_state::bloodstm(machine_config &config)
 
 void drivedge_state::drivedge(machine_config &config)
 {
-	base_devices(config);
-
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, CPU020_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &drivedge_state::main_map);
@@ -1738,6 +1730,7 @@ void drivedge_state::drivedge(machine_config &config)
 	TMS32031(config, m_dsp[1], TMS_CLOCK);
 	m_dsp[1]->set_addrmap(AS_PROGRAM, &drivedge_state::tms2_map);
 
+	base_devices(config);
 	m_palette->set_format(palette_device::xBGR_888, 32768);
 
 	via(config);
@@ -1760,13 +1753,19 @@ void drivedge_state::drivedge(machine_config &config)
 
 void itech32_state::sftm(machine_config &config)
 {
-	base_devices(config);
-
 	M68EC020(config, m_maincpu, CPU020_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::itech020_map);
 
+	base_devices(config);
+
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_020_map);
 	m_soundcpu->set_periodic_int(FUNC(itech32_state::irq1_line_assert), attotime::from_hz(4*60));
+
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6809_IRQ_LINE);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
+
+	GENERIC_LATCH_8(config, m_soundlatch2);
+	m_soundlatch2->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<1>));
 
 	m_palette->set_format(palette_device::xRGB_888, 32768);
 }
