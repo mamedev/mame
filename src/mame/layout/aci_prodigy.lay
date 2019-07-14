@@ -640,11 +640,11 @@
 		<!-- display -->
 		<bezel element="gold"><bounds x="471" y="197" width="303" height="121" /></bezel>
 		<bezel element="black"><bounds x="474" y="200" width="297" height="115" /></bezel>
-		<bezel element="blackb"><bounds x="538.5" y="210" width="168" height="68" /></bezel>
-		<bezel name="digit0" element="digit"><bounds x="558.5" y="220" width="32" height="48" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="590.5" y="220" width="32" height="48" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="622.5" y="220" width="32" height="48" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="654.5" y="220" width="32" height="48" /></bezel>
+		<bezel element="blackb"><bounds x="523.5" y="210" width="198" height="49" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="542.5" y="215" width="26" height="39" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="587.5" y="215" width="26" height="39" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="631.5" y="215" width="26" height="39" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="676.5" y="215" width="26" height="39" /></bezel>
 
 		<!-- keypad -->
 		<bezel element="gold"><bounds x="471" y="328" width="303" height="273" /></bezel>

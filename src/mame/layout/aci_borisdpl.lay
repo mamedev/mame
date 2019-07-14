@@ -757,20 +757,20 @@
 <!-- build screen -->
 
 	<view name="Internal Layout (Full)">
-		<bounds left="-4" right="94" top="7" bottom="152" />
+		<bounds left="-4" right="94" top="16.5" bottom="152" />
 
 		<bezel element="cwhite"><bounds x="8" y="30" width="84" height="84" /></bezel>
 		<group ref="sb_board"><bounds x="10" y="32" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-3" y="32" width="10" height="80" /></group>
 
-		<group ref="digits"><bounds x="10" y="9" width="80" height="19" /></group>
+		<group ref="digits"><bounds x="10" y="18.5" width="40" height="9.5" /></group>
 		<group ref="buttons"><bounds x="8" y="116" width="84" height="34" /></group>
 	</view>
 
 	<view name="Internal Layout (Buttons)">
-		<bounds left="6" right="94" top="2" bottom="64" />
+		<bounds left="6" right="94" top="11.5" bottom="64" />
 
-		<group ref="digits"><bounds x="10" y="4" width="80" height="19" /></group>
+		<group ref="digits"><bounds x="10" y="13.5" width="40" height="9.5" /></group>
 		<bezel element="black"><bounds x="6" y="25" width="88" height="1" /></bezel>
 		<group ref="buttons"><bounds x="8" y="28" width="84" height="34" /></group>
 	</view>
