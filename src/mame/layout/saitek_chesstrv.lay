@@ -178,6 +178,12 @@
 		<text string="1" align="2"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
 
+	<element name="text_warning">
+		<text string="Chess Traveler's built-in chessboard is not electronic, player uses keypad to enter moves.">
+			<color red="0.3" green="0.3" blue="0.3" />
+		</text>
+	</element>
+
 
 <!-- sb board -->
 
@@ -554,8 +560,9 @@
 <!-- build screen -->
 
 	<view name="Internal Layout (Full)">
-		<bounds left="-5" right="31.775" top="-11.8" bottom="39.3" />
+		<bounds left="-5" right="31.775" top="-11.2" bottom="39.3" />
 
+		<bezel element="text_warning"><bounds x="0" y="-4.7" width="31" height="0.76725" /></bezel>
 		<group ref="sb_board"><bounds x="0" y="-3.8" width="31" height="31" /></group>
 		<group ref="sb_ui"><bounds x="-4.5" y="-3.8" width="3.875" height="31" /></group>
 

@@ -348,6 +348,13 @@
 		<text string="1" align="2"><color red="0.95" green="0.8" blue="0.6" /></text>
 	</element>
 
+	<element name="text_warning">
+		<rect><color red="0.7" green="0.56" blue="0.42" /></rect>
+		<text string="Boris Diplomat's built-in chessboard is not electronic, player uses keypad to enter moves.">
+			<color red="0.5" green="0.4" blue="0.3" />
+		</text>
+	</element>
+
 
 <!-- sb board -->
 
@@ -760,6 +767,7 @@
 		<bounds left="-4" right="94" top="16.5" bottom="152" />
 
 		<bezel element="cwhite"><bounds x="8" y="30" width="84" height="84" /></bezel>
+		<bezel element="text_warning"><bounds x="10" y="30.02" width="80" height="1.98" /></bezel>
 		<group ref="sb_board"><bounds x="10" y="32" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-3" y="32" width="10" height="80" /></group>
 

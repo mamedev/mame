@@ -190,6 +190,13 @@
 		<text string="H"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 
+	<element name="text_warning">
+		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
+		<text string="SC 2's built-in chessboard is not electronic, player uses keypad to enter moves.">
+			<color red="0.61" green="0.6" blue="0.59" />
+		</text>
+	</element>
+
 
 <!-- sb board -->
 
@@ -556,6 +563,8 @@
 		<bezel element="black2"><bounds x="3" y="2.5" width="81" height="81" /></bezel>
 		<group ref="sb_board"><bounds x="3.5" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
+
+		<bezel element="text_warning"><bounds x="3.5" y="-0.5" width="80" height="1.98" /></bezel>
 
 		<bezel element="text_8"><bounds x="0.2" y="7"  width="2" height="2" /></bezel>
 		<bezel element="text_7"><bounds x="0.2" y="17" width="2" height="2" /></bezel>
