@@ -2256,8 +2256,6 @@ void cps_state::cps1_update_transmasks()
 
 void cps_state::video_start()
 {
-	int i;
-
 	MACHINE_RESET_CALL_MEMBER(cps);
 
 	/* Put in some const */
