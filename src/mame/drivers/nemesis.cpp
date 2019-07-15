@@ -27,6 +27,9 @@ driver by Bryan McPhail
 TODO:
 - hcrash: coin insertion isn't always recognized.
 - hcrash: Konami GT-type inputs doesn't work properly.
+- gradiusb: requires ~16 seconds to resume after each death, way too much?
+- gradiusb: missing gfxs on title screen logo;
+- gradiusb: still needs proper MCU emulation;
 
 modified by Hau
 03/27/2009
@@ -2960,7 +2963,7 @@ void nemesis_state::bubsys_init()
 }
 
 GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", 0 )
+GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
 // Bubble System Twinbee
 // Bubble System RF2
 // Bubble System Galactic Warriors
