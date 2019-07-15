@@ -79,7 +79,7 @@
   - 2x pots to handle the B-G background color/intensity.
 
 
-  * Super Mini-Boy, Draw Poker
+  * Super Mini-Boy, Joker Poker
 
   Board silkscreened on top:
   be MVX-001-02  ('be' is a Bonanza Enterprises logo).
@@ -123,11 +123,11 @@ VR1-VR6: variable resistor to handle B-G background color/intensity & sound
 
 * Denotes unpopulated
 
-  - PRG ROMs:       5x 2764 (8Kb) - 3 for Draw Poker
+  - PRG ROMs:       5x 2764 (8Kb) - 3 for Joker Poker
   - GFX ROMs:       1x 2764 (8Kb) for text layer.
                     3x 2764 (8Kb) for gfx tiles.
 					
-NOTE: 10MHz XTAL verified for Draw Poker, Super Mini-Boy is stated as 12.4725MHz
+NOTE: 10MHz XTAL verified for Joker Poker, Super Mini-Boy is stated as 12.4725MHz
 
 *******************************************************************************
 
