@@ -142,6 +142,10 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		stream << "NOP";
 		break;
 
+	case 0x01:
+		stream << "INT9";
+		break;
+
 	case 0x03:
 		util::stream_format(stream, "NEG    A");
 		break;
@@ -395,6 +399,11 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		stream << "NOTW   A";
 		break;
 
+	case 0x40:
+		util::stream_format(stream, "MOV    A, dir(%02x)", operand);
+		bytes = 2;
+		break;
+
 	case 0x41:
 		util::stream_format(stream, "MOV    dir(%02x), A", operand);
 		bytes = 2;
@@ -416,6 +425,11 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 	case 0x47:
 		util::stream_format(stream, "MOVW   SP, A");
+		break;
+
+	case 0x48:
+		util::stream_format(stream, "MOVW   A, dir(%02x)", operand);
+		bytes = 2;
 		break;
 
 	case 0x49:
@@ -557,9 +571,19 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 				bytes = 2;
 				break;
 
+			case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
+				util::stream_format(stream, "BBC    dir(%02x), %d, $%x", opcodes.r8(pc+2), operand & 7, pc+4+(s8)opcodes.r8(pc+3));
+				bytes = 4;
+				break;
+
 			case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 				util::stream_format(stream, "BBC    $%04x, %d, $%x", opcodes.r16(pc+2), operand & 7, pc+5+(s8)opcodes.r8(pc+4));
 				bytes = 5;
+				break;
+
+			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
+				util::stream_format(stream, "BBS    dir(%02x), %d, $%x", opcodes.r8(pc+2), operand & 7, pc+4+(s8)opcodes.r8(pc+3));
+				bytes = 4;
 				break;
 
 			case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
@@ -725,6 +749,10 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 						util::stream_format(stream, "ADDL   A, RL%d", (operand & 0x6)>>1);
 						bytes = 2;
 						break;
+
+					default:
+						stream << "UNK ea-type 70 0x";
+						break;
 				}
 				break;
 
@@ -734,6 +762,20 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			case 0x9: bytes = ea_form1_helper(stream, "ANDL  ", pc, operand, opcodes.r16(pc+2), true); break;
 			case 0xb: bytes = ea_form1_helper(stream, "ORL   ", pc, operand, opcodes.r16(pc+2), true); break;
 			case 0xd: bytes = ea_form1_helper(stream, "XORL  ", pc, operand, opcodes.r16(pc+2), true); break;
+
+			case 0x6:
+				switch (operand & 0xf)
+				{
+					case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+						util::stream_format(stream, "CMPL   A, RL%d", (operand & 0x6)>>1);
+						bytes = 2;
+						break;
+
+					default:
+						stream << "UNK ea-type 70 6x";
+						break;
+				}
+				break;
 
 			default:
 				stream << "UNK ea-type 70";
@@ -923,7 +965,7 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 				break;
 
 			case 0x5f:
-				util::stream_format(stream, "INCW   A, $%04x", (operand & 0x1), opcodes.r16(pc+2));
+				util::stream_format(stream, "INCW   $%04x", opcodes.r16(pc+2));
 				bytes = 4;
 				break;
 
@@ -948,7 +990,7 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 				break;
 
 			case 0x7f:
-				util::stream_format(stream, "DECW   A, $%04x", (operand & 0x1), opcodes.r16(pc+2));
+				util::stream_format(stream, "DECW   $%04x", opcodes.r16(pc+2));
 				bytes = 4;
 				break;
 
@@ -1185,6 +1227,11 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 				util::stream_format(stream, "MULUW  A, @RW%d+", (operand & 0x3));
 				bytes = 2;
+				break;
+
+			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
+				util::stream_format(stream, "MULUW  A, @RW%d + #$%02x", (operand & 0x7), opcodes.r8(pc+2));
+				bytes = 3;
 				break;
 
 			default:

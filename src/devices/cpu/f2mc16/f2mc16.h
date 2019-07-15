@@ -316,6 +316,20 @@ private:
 			m_ps |= F_V;
 		}
 	}
+	inline void doCMP_32(u32 lhs, u32 rhs)
+	{
+		m_tmp64 = lhs - rhs;
+		setNZ_32(m_tmp64 & 0xffffffff);
+		m_ps &= ~(F_C|F_V);
+		if (m_tmp64 & 0x100000000)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (m_tmp64 & 0xffffffff)) & 0x80000000)
+		{
+			m_ps |= F_V;
+		}
+	}
 
 	inline u8 doSUB_8(u8 lhs, u8 rhs)
 	{
