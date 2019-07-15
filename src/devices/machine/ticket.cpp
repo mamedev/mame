@@ -27,6 +27,7 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device, "ticket_dispenser", "Ticket Dispenser")
+DEFINE_DEVICE_TYPE(HOPPER, hopper_device, "coin_hopper", "Coin Hopper")
 
 
 
@@ -38,21 +39,31 @@ DEFINE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device, "ticket_dispenser"
 //  ticket_dispenser_device - constructor
 //-------------------------------------------------
 
-ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TICKET_DISPENSER, tag, owner, clock),
-		m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
-		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
-		m_period(attotime::from_msec(100)),
-		m_hopper_type(false),
-		m_motoron(0),
-		m_ticketdispensed(0),
-		m_ticketnotdispensed(0),
-		m_status(0),
-		m_power(0),
-		m_timer(nullptr)
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_motor_sense(TICKET_MOTOR_ACTIVE_LOW)
+	, m_status_sense(TICKET_STATUS_ACTIVE_LOW)
+	, m_period(attotime::from_msec(100))
+	, m_hopper_type(false)
+	, m_motoron(0)
+	, m_ticketdispensed(0)
+	, m_ticketnotdispensed(0)
+	, m_status(0)
+	, m_power(0)
+	, m_timer(nullptr)
+	, m_output(*this, "led2") // TODO: probably shouldn't be hardcoded
 {
 }
 
+ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ticket_dispenser_device(mconfig, TICKET_DISPENSER, tag, owner, clock)
+{
+}
+
+hopper_device::hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ticket_dispenser_device(mconfig, HOPPER, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  ~ticket_dispenser_device - destructor
@@ -61,36 +72,6 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 ticket_dispenser_device::~ticket_dispenser_device()
 {
 }
-
-
-//**************************************************************************
-//  CONFIGURATION HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  static_set_period - configure the clock period
-//  for dispensing
-//-------------------------------------------------
-
-void ticket_dispenser_device::static_set_period(device_t &device, const attotime &period)
-{
-	downcast<ticket_dispenser_device &>(device).m_period = period;
-}
-
-
-//-------------------------------------------------
-//  static_set_senses - configure the senses of
-//  the motor and status bits
-//-------------------------------------------------
-
-void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense, bool hopper_type)
-{
-	ticket_dispenser_device &ticket = downcast<ticket_dispenser_device &>(device);
-	ticket.m_motor_sense = motor_sense;
-	ticket.m_status_sense = status_sense;
-	ticket.m_hopper_type = hopper_type;
-}
-
 
 
 //**************************************************************************
@@ -132,7 +113,7 @@ WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
 			{
 				LOG(("%s: Ticket Power Off\n", machine().describe_context()));
 				m_timer->adjust(attotime::never);
-				machine().output().set_led_value(2, 0);
+				m_output = 0;
 			}
 			m_power = false;
 		}
@@ -155,6 +136,8 @@ void ticket_dispenser_device::device_start()
 	m_ticketnotdispensed = !m_ticketdispensed;
 
 	m_timer = timer_alloc();
+
+	m_output.resolve();
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_power));
@@ -190,11 +173,11 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 		m_status = !m_status;
 		LOG(("%s: Ticket Power Off\n", machine().describe_context()));
 		m_timer->adjust(attotime::never);
-		machine().output().set_led_value(2, 0);
+		m_output = 0;
 	}
 
-	// update LED status (fixme: should map to an output)
-	machine().output().set_led_value(2, (m_status == m_ticketdispensed));
+	// update output status
+	m_output = m_status == m_ticketdispensed;
 
 	// if we just dispensed, increment global count
 	if (m_status == m_ticketdispensed)

@@ -10,31 +10,35 @@ todo - convert to tilemap
 #include "emu.h"
 #include "includes/funybubl.h"
 
-
-WRITE8_MEMBER(funybubl_state::funybubl_paldatawrite)
+rgb_t funybubl_state::funybubl_R6B6G6(uint32_t raw)
 {
-	int colchanged ;
-	uint32_t coldat;
-
-	m_paletteram[offset] = data;
-	colchanged = offset >> 2;
-	coldat = m_paletteram[colchanged * 4] | (m_paletteram[colchanged * 4 + 1] << 8) |
-			(m_paletteram[colchanged * 4 + 2] << 16) | (m_paletteram[colchanged * 4 + 3] << 24);
-
-	m_palette->set_pen_color(colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
+	return rgb_t(pal6bit(raw >> 12), pal6bit(raw >>  0), pal6bit(raw >>  6));
 }
 
+WRITE8_MEMBER(funybubl_state::tilemap_w)
+{
+	COMBINE_DATA(&m_tilemapram[offset]);
+	m_tilemap->mark_tile_dirty(offset>>1);
+}
+
+TILE_GET_INFO_MEMBER(funybubl_state::get_tile_info)
+{
+	uint16_t const code = m_tilemapram[tile_index << 1] | (m_tilemapram[(tile_index << 1) | 1] << 8);
+	SET_TILE_INFO_MEMBER(0, code & 0x7fff, BIT(code, 15), 0);
+}
 
 void funybubl_state::video_start()
 {
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funybubl_state::get_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap->set_transparent_pen(0);
 }
 
 void funybubl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *source = &m_banked_vram[0x2000 - 0x20];
-	uint8_t *finish = source - 0x1000;
+	uint8_t *source = &m_spriteram[0x1000 - 0x20];
+	uint8_t *finish = m_spriteram;
 
-	while (source > finish)
+	while (source >= finish)
 	{
 		int xpos, ypos, tile;
 
@@ -73,25 +77,11 @@ void funybubl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-uint32_t funybubl_state::screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t funybubl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, offs;
-	offs = 0;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
-	for (y = 0; y < 32; y++)
-	{
-		for (x = 0; x< 64; x++)
-		{
-			int data;
-
-			data = m_banked_vram[offs] | (m_banked_vram[offs + 1] << 8);
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
-			offs += 2;
-		}
-	}
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
 
@@ -103,7 +93,7 @@ uint32_t funybubl_state::screen_update_funybubl(screen_device &screen, bitmap_in
 		fp = fopen("funnybubsprites", "w+b");
 		if (fp)
 		{
-			fwrite(&m_banked_vram[0x1000], 0x1000, 1, fp);
+			fwrite(&m_spriteram[0], 0x1000, 1, fp);
 			fclose(fp);
 		}
 	}

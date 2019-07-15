@@ -73,76 +73,75 @@ void bingowav_state::machine_start()
 }
 
 
-ADDRESS_MAP_START(bingowav_state::bingowav_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainioh", te7750_device, read, write, 0xff00)
-	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainiol", te7750_device, read, write, 0x00ff)
-	AM_RANGE(0x140000, 0x140001) AM_READNOP
-	AM_RANGE(0x150000, 0x150001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x150002, 0x150003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("maintmp", tmp68301_device, regs_r, regs_w)
-ADDRESS_MAP_END
+void bingowav_state::bingowav_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x120000, 0x12001f).rw("mainioh", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0xff00);
+	map(0x120000, 0x12001f).rw("mainiol", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff);
+	map(0x140000, 0x140001).nopr();
+	map(0x150001, 0x150001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x150003, 0x150003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+}
 
-ADDRESS_MAP_START(bingowav_state::bingowav_audio_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITENOP
-ADDRESS_MAP_END
+void bingowav_state::bingowav_audio_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xf200, 0xf200).nopw();
+}
 
-ADDRESS_MAP_START(bingowav_state::bingowav_drive_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-ADDRESS_MAP_END
+void bingowav_state::bingowav_drive_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+}
 
-ADDRESS_MAP_START(bingowav_state::bingowav_control_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP
-ADDRESS_MAP_END
+void bingowav_state::bingowav_control_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xf000, 0xf000).nopw();
+}
 
 
 static INPUT_PORTS_START( bingowav )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(bingowav_state::bingowav)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) // actually TMP63803F-16
-	MCFG_CPU_PROGRAM_MAP(bingowav_main_map)
+void bingowav_state::bingowav(machine_config &config)
+{
+	TMP68301(config, m_maincpu, 12000000); // actually TMP63803F-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_main_map);
 
-	MCFG_DEVICE_ADD("maintmp", TMP68301, 0) // wrong
-	MCFG_TMP68301_CPU("maincpu")
+	te7750_device &mainioh(TE7750(config, "mainioh"));
+	mainioh.ios_cb().set_constant(5);
 
-	MCFG_DEVICE_ADD("mainioh", TE7750, 0)
-	MCFG_TE7750_IOS_CB(CONSTANT(5))
+	te7750_device &mainiol(TE7750(config, "mainiol"));
+	mainiol.ios_cb().set_constant(4);
 
-	MCFG_DEVICE_ADD("mainiol", TE7750, 0)
-	MCFG_TE7750_IOS_CB(CONSTANT(4))
+	Z80(config, "audiocpu", 4000000).set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_audio_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(bingowav_audio_map)
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt.set_master_tag(m_maincpu);
+	tc0140syt.set_slave_tag("audiocpu");
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	m68000_device &termcpu(M68000(config, "termcpu", 12000000)); // actually TMP63803F-16
+	termcpu.set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_drive_map);
+	termcpu.set_disable();
 
-	MCFG_CPU_ADD("termcpu", M68000, 12000000) // actually TMP63803F-16
-	MCFG_CPU_PROGRAM_MAP(bingowav_drive_map)
-	MCFG_DEVICE_DISABLE()
-
-	MCFG_CPU_ADD("ctrlcpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(bingowav_control_map)
-MACHINE_CONFIG_END
+	Z80(config, "ctrlcpu", XTAL(16'000'000) / 4).set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_control_map);
+}
 
 
 ROM_START( bingowav )
@@ -166,4 +165,4 @@ ROM_START( bingowav )
 ROM_END
 
 
-GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, 0, ROT0, "Taito", "Bingo Wave", MACHINE_IS_SKELETON )
+GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, empty_init, ROT0, "Taito", "Bingo Wave", MACHINE_IS_SKELETON )

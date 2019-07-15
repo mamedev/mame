@@ -62,15 +62,16 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	model2_state *state = object.state;
 	bitmap_rgb32 *destmap = (bitmap_rgb32 *)&m_destmap;
 	uint32_t *p = &destmap->pix32(scanline);
+//  uint8_t  *gamma_value = &state->m_gamma_table[0];
 
 	/* extract color information */
-	const uint16_t *colortable_r = &state->m_colorxlat[0x0000/2];
-	const uint16_t *colortable_g = &state->m_colorxlat[0x4000/2];
-	const uint16_t *colortable_b = &state->m_colorxlat[0x8000/2];
-	const uint16_t *lumaram = &state->m_lumaram[0];
-	uint32_t  lumabase = object.lumabase;
+//  const uint16_t *colortable_r = &state->m_colorxlat[0x0000/2];
+//  const uint16_t *colortable_g = &state->m_colorxlat[0x4000/2];
+//  const uint16_t *colortable_b = &state->m_colorxlat[0x8000/2];
+//  const uint16_t *lumaram = &state->m_lumaram[0];
+//  uint32_t  lumabase = object.lumabase;
 	uint32_t  color = object.colorbase;
-	uint8_t   luma;
+//  uint8_t   luma;
 	uint32_t  tr, tg, tb;
 	int     x;
 #endif
@@ -79,23 +80,27 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	return;
 #else
 
-	luma = lumaram[(lumabase + (0xf << 3))];
+//  luma = lumaram[(lumabase + (0xf << 3))];
 
 	// fix luma overflow
-	luma = std::min((int)luma,0x3f);
-	
-	color = state->m_palram[(color + 0x1000)] & 0x7fff;
+//  luma = std::min((int)luma,0x3f);
 
-	colortable_r += ((color >>  0) & 0x1f) << 8;
-	colortable_g += ((color >>  5) & 0x1f) << 8;
-	colortable_b += ((color >> 10) & 0x1f) << 8;
+	color = state->m_palram[(color + 0x1000)] & 0xffff;
+
+//  colortable_r += ((color >>  0) & 0x1f) << 8;
+//  colortable_g += ((color >>  5) & 0x1f) << 8;
+//  colortable_b += ((color >> 10) & 0x1f) << 8;
 
 	/* we have the 6 bits of luma information along with 5 bits per color component */
 	/* now build and index into the master color lookup table and extract the raw RGB values */
 
-	tr = colortable_r[(luma)] & 0xff;
-	tg = colortable_g[(luma)] & 0xff;
-	tb = colortable_b[(luma)] & 0xff;
+	// untextured path doesn't use luma & color table, cfr. Daytona and Motor Raid
+	tr = pal5bit((color >> 0) & 0x1f); //colortable_r[(luma)] & 0xff;
+	tg = pal5bit((color >> 5) & 0x1f); //colortable_g[(luma)] & 0xff;
+	tb = pal5bit((color >> 10) & 0x1f); //colortable_b[(luma)] & 0xff;
+//  tr = gamma_value[tr];
+//  tg = gamma_value[tg];
+//  tb = gamma_value[tb];
 
 	/* build the final color */
 	color = rgb_t(tr, tg, tb);
@@ -133,6 +138,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	uint32_t  tex_mirr_x = object.texmirrorx;
 	uint32_t  tex_mirr_y = object.texmirrory;
 	uint32_t *sheet = object.texsheet;
+	uint8_t  *gamma_value = &state->m_gamma_table[0];
 	float ooz = extent.param[0].start;
 	float uoz = extent.param[1].start;
 	float voz = extent.param[2].start;
@@ -155,7 +161,7 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		float z = recip_approx(ooz) * 256.0f;
 		int32_t u = uoz * z;
 		int32_t v = voz * z;
-		uint32_t  tr, tg, tb;
+		int  tr, tg, tb;
 		uint16_t  t;
 		uint8_t luma;
 		int u2;
@@ -184,13 +190,18 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 
 		// Virtua Striker sets up a luma of 0x40 for national flags on bleachers, fix here.
 		luma = std::min((int)luma,0x3f);
+		// (Again) Virtua Striker seem to lookup colortable with a reversed endianness (stadium ads)
+		// TODO: it breaks Mexican flag colors tho ...
+//      luma^= 1;
 
 		/* we have the 6 bits of luma information along with 5 bits per color component */
 		/* now build and index into the master color lookup table and extract the raw RGB values */
-
 		tr = colortable_r[(luma)] & 0xff;
 		tg = colortable_g[(luma)] & 0xff;
 		tb = colortable_b[(luma)] & 0xff;
+		tr = gamma_value[tr];
+		tg = gamma_value[tg];
+		tb = gamma_value[tb];
 
 		p[x] = rgb_t(tr, tg, tb);
 	}

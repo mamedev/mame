@@ -22,10 +22,10 @@
 //-------------------------------------------------
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
-	: device_t(mconfig, type, tag, nullptr, 0),
-		m_system(nullptr),
-		m_flip_screen_x(0),
-		m_flip_screen_y(0)
+	: device_t(mconfig, type, tag, nullptr, 0)
+	, m_system(nullptr)
+	, m_flip_screen_x(0)
+	, m_flip_screen_y(0)
 {
 }
 
@@ -71,6 +71,27 @@ void driver_device::set_game_driver(const game_driver &game)
 void driver_device::static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback)
 {
 	downcast<driver_device &>(device).m_callbacks[type] = callback;
+}
+
+
+//-------------------------------------------------
+//  empty_init - default implementation which
+//  calls driver init
+//-------------------------------------------------
+
+void driver_device::empty_init()
+{
+	driver_init();
+}
+
+
+//-------------------------------------------------
+//  driver_init - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::driver_init()
+{
 }
 
 
@@ -267,7 +288,7 @@ void driver_device::device_reset_after_children()
 //  NMI callbacks
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )   { device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )   { device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 INTERRUPT_GEN_MEMBER( driver_device::nmi_line_assert )  { device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE); }
 
 
@@ -369,22 +390,4 @@ void driver_device::flip_screen_y_set(u32 on)
 		m_flip_screen_y = on;
 		updateflip();
 	}
-}
-
-
-/***************************************************************************
-PORT READING HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-custom_port_read - act like input_port_read
-but it is a custom port, it is useful for
-e.g. input ports which expect the same port
-repeated both in the upper and lower half
--------------------------------------------------*/
-
-CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
-{
-	const char *tag = (const char *)param;
-	return ioport(tag)->read();
 }

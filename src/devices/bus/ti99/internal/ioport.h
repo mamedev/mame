@@ -29,14 +29,14 @@ public:
 	{ }
 
 	// Methods called from the console / ioport
-	virtual DECLARE_READ8Z_MEMBER( readz ) { };
-	virtual DECLARE_WRITE8_MEMBER( write ) { };
-	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
-	virtual DECLARE_READ8Z_MEMBER( crureadz ) { };
-	virtual DECLARE_WRITE8_MEMBER( cruwrite ) { };
-	virtual DECLARE_WRITE_LINE_MEMBER( memen_in ) { };
-	virtual DECLARE_WRITE_LINE_MEMBER( msast_in ) { };
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_in ) { };
+	virtual DECLARE_READ8Z_MEMBER( readz ) { }
+	virtual void write(offs_t offset, uint8_t data) { }
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { }
+	virtual DECLARE_READ8Z_MEMBER( crureadz ) { }
+	virtual void cruwrite(offs_t offset, uint8_t data) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( memen_in ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( msast_in ) { }
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_in ) { }
 
 	void set_ioport(ioport_device* ioport) { m_ioport = ioport; }
 
@@ -57,20 +57,31 @@ class ioport_device : public device_t, public device_slot_interface
 	friend class ioport_attached_device;
 
 public:
-	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename U>
+	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: ioport_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 
-	template<class _Object> static devcb_base &static_set_extint_callback(device_t &device, _Object object)  {  return downcast<ioport_device &>(device).m_console_extint.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<ioport_device &>(device).m_console_ready.set_callback(object); }
+	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Methods called from the console
 	DECLARE_READ8Z_MEMBER( readz );
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 	DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin );
 	DECLARE_READ8Z_MEMBER( crureadz );
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( memen_in );
 	DECLARE_WRITE_LINE_MEMBER( msast_in );
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
+
+	// Callbacks
+	auto extint_cb() { return m_console_extint.bind(); }
+	auto ready_cb() { return m_console_ready.bind(); }
 
 protected:
 	void device_start() override;
@@ -87,21 +98,7 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device)
 
-SLOT_INTERFACE_EXTERN(ti99_io_port);
-SLOT_INTERFACE_EXTERN(ti99_io_port_ev);
-
-#define MCFG_IOPORT_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_IOPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port, nullptr, false)
-
-#define MCFG_IOPORT_ADD_WITH_PEB( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_IOPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port_ev, "peb", false)
-
-#define MCFG_IOPORT_EXTINT_HANDLER( _extint ) \
-	devcb = &bus::ti99::internal::ioport_device::static_set_extint_callback( *device, DEVCB_##_extint );
-
-#define MCFG_IOPORT_READY_HANDLER( _ready ) \
-	devcb = &bus::ti99::internal::ioport_device::static_set_ready_callback( *device, DEVCB_##_ready );
+void ti99_ioport_options_plain(device_slot_interface &device);
+void ti99_ioport_options_evpc(device_slot_interface &device);
 
 #endif /* __TI99IOPORT__ */

@@ -175,7 +175,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(bp1200);
+	void init_bp1200();
 	DECLARE_WRITE16_MEMBER(unknown_82200_w);
 	DECLARE_READ16_MEMBER(latch_84000_r);
 	DECLARE_WRITE16_MEMBER(latch_84002_w);
@@ -198,7 +198,7 @@ private:
  Driver Init
 ******************************************************************************/
 
-DRIVER_INIT_MEMBER(bpmmicro_state,bp1200)
+void bpmmicro_state::init_bp1200()
 {
 	m_shifter = 0;
 	m_latch = 0;
@@ -330,24 +330,26 @@ read <- 00
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(bpmmicro_state::i286_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM // 512k ram
-	AM_RANGE(0x082200, 0x82201) AM_WRITE(unknown_82200_w)
-	AM_RANGE(0x084000, 0x84001) AM_READ(latch_84000_r) // GUESS: this is reading the octal latch
-	AM_RANGE(0x084002, 0x84003) AM_WRITE(latch_84002_w) // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
-	AM_RANGE(0x08400e, 0x8400f) AM_WRITE(unknown_8400e_w)
-	AM_RANGE(0x084018, 0x84019) AM_WRITE(unknown_84018_w)
-	AM_RANGE(0x08401a, 0x8401b) AM_WRITE(unknown_8401a_w)
-	AM_RANGE(0x08401c, 0x8401d) AM_WRITE(eeprom_8401c_w)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM AM_REGION("bios", 0x10000)
+void bpmmicro_state::i286_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).ram(); // 512k ram
+	map(0x082200, 0x82201).w(FUNC(bpmmicro_state::unknown_82200_w));
+	map(0x084000, 0x84001).r(FUNC(bpmmicro_state::latch_84000_r)); // GUESS: this is reading the octal latch
+	map(0x084002, 0x84003).w(FUNC(bpmmicro_state::latch_84002_w)); // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
+	map(0x08400e, 0x8400f).w(FUNC(bpmmicro_state::unknown_8400e_w));
+	map(0x084018, 0x84019).w(FUNC(bpmmicro_state::unknown_84018_w));
+	map(0x08401a, 0x8401b).w(FUNC(bpmmicro_state::unknown_8401a_w));
+	map(0x08401c, 0x8401d).w(FUNC(bpmmicro_state::eeprom_8401c_w));
+	map(0x0f0000, 0x0fffff).rom().region("bios", 0x10000);
 	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
-	AM_RANGE(0xfffff0, 0xffffff) AM_ROM AM_REGION("bios", 0x1fff0) //?
-ADDRESS_MAP_END
+	map(0xfffff0, 0xffffff).rom().region("bios", 0x1fff0); //?
+}
 
-ADDRESS_MAP_START(bpmmicro_state::i286_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void bpmmicro_state::i286_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 /******************************************************************************
@@ -360,14 +362,15 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(bpmmicro_state::bpmmicro)
+void bpmmicro_state::bpmmicro(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(32'000'000)/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
-	MCFG_CPU_PROGRAM_MAP(i286_mem)
-	MCFG_CPU_IO_MAP(i286_io)
+	I80286(config, m_maincpu, XTAL(32'000'000)/4); /* divider is guessed, cpu is an AMD N80L286-16/S part */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bpmmicro_state::i286_mem);
+	m_maincpu->set_addrmap(AS_IO, &bpmmicro_state::i286_io);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom_u38")
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, "eeprom_u38");
+}
 
 
 
@@ -388,26 +391,26 @@ ROM_START(bp1200)
 	// W2  A[B C]
 	ROM_DEFAULT_BIOS("v124")
 	ROM_SYSTEM_BIOS( 0, "v124", "BP-1200 V1.24")
-	ROMX_LOAD("version_1.24_u8.st_m27c256b-12f1l.u8", 0x10001, 0x8000, CRC(86d46d76) SHA1(4733b03a28689a3d2c58278495fbf31d0c74ac01), ROM_SKIP(1) | ROM_BIOS(1)) // "bios1200.v124a.u8" on bpmmicro site
-	ROMX_LOAD("version_1.24_u9.st_m27c256b-12f1l.u9", 0x10000, 0x8000, CRC(3bcc5c72) SHA1(3b281f2b464d8a4e366f8e2f0a8fa6dfd0a8f28c), ROM_SKIP(1) | ROM_BIOS(1)) // "bios1200.v124a.u9" on bpmmicro site
+	ROMX_LOAD("version_1.24_u8.st_m27c256b-12f1l.u8", 0x10001, 0x8000, CRC(86d46d76) SHA1(4733b03a28689a3d2c58278495fbf31d0c74ac01), ROM_SKIP(1) | ROM_BIOS(0)) // "bios1200.v124a.u8" on bpmmicro site
+	ROMX_LOAD("version_1.24_u9.st_m27c256b-12f1l.u9", 0x10000, 0x8000, CRC(3bcc5c72) SHA1(3b281f2b464d8a4e366f8e2f0a8fa6dfd0a8f28c), ROM_SKIP(1) | ROM_BIOS(0)) // "bios1200.v124a.u9" on bpmmicro site
 	ROM_SYSTEM_BIOS( 1, "v118", "BP-1200 V1.18")
-	ROMX_LOAD("version_1.18_u8_2000.am27c256.u8", 0x10001, 0x8000, CRC(f8afa614) SHA1(a372bc35aea30595ab8f05c5e641021b45043ed3), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("version_1.18_u9_2000.am27c256.u9", 0x10000, 0x8000, CRC(049b2ad1) SHA1(c9405ff805f3814493ad007bae7a8cb6a12aeb32), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("version_1.18_u8_2000.am27c256.u8", 0x10001, 0x8000, CRC(f8afa614) SHA1(a372bc35aea30595ab8f05c5e641021b45043ed3), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("version_1.18_u9_2000.am27c256.u9", 0x10000, 0x8000, CRC(049b2ad1) SHA1(c9405ff805f3814493ad007bae7a8cb6a12aeb32), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v113", "BP-1200 V1.13")
-	ROMX_LOAD("bp-1200_v1.13_u8_1992_1997.at27c256r-12pc.u8", 0x10001, 0x8000, CRC(ec61dcad) SHA1(dbfee285456d24b93c1fa6e8557b13ab80c3c877), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD("bp-1200_v1.13_u9_1992_1995.at27c256r-12pc.u9", 0x10000, 0x8000, CRC(91ca5e70) SHA1(4a8c1894a67dfd5e0db088519a3ee4edaafdef58), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("bp-1200_v1.13_u8_1992_1997.at27c256r-12pc.u8", 0x10001, 0x8000, CRC(ec61dcad) SHA1(dbfee285456d24b93c1fa6e8557b13ab80c3c877), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("bp-1200_v1.13_u9_1992_1995.at27c256r-12pc.u9", 0x10000, 0x8000, CRC(91ca5e70) SHA1(4a8c1894a67dfd5e0db088519a3ee4edaafdef58), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "v111", "BP-1200 V1.11")
-	ROMX_LOAD("bp-1200_version_1.11_u8_1992_1995.at27c256r-12pc.u8", 0x10001, 0x8000, CRC(d1c051e4) SHA1(b27007a931b0662b3dc7e2d41c6ec5ed0cd49308), ROM_SKIP(1) | ROM_BIOS(4))
-	ROMX_LOAD("bp-1200_version_1.11_u9_1992_1995.at27c256r-12pc.u9", 0x10000, 0x8000, CRC(99d46ba1) SHA1(144dbe6ed989ea88cfc1f6d1142508bb92519f87), ROM_SKIP(1) | ROM_BIOS(4))
+	ROMX_LOAD("bp-1200_version_1.11_u8_1992_1995.at27c256r-12pc.u8", 0x10001, 0x8000, CRC(d1c051e4) SHA1(b27007a931b0662b3dc7e2d41c6ec5ed0cd49308), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("bp-1200_version_1.11_u9_1992_1995.at27c256r-12pc.u9", 0x10000, 0x8000, CRC(99d46ba1) SHA1(144dbe6ed989ea88cfc1f6d1142508bb92519f87), ROM_SKIP(1) | ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "v105", "BP-1200 V1.05")
-	ROMX_LOAD("bp-1200_1.05_u8__(c)_1993_rev_c__bp_microsystems.27c64-12pc.u8", 0x1c001, 0x2000, CRC(2c13a43c) SHA1(5dd67a09f72f693c085160b9beedd2454ba4ec37), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.05 U8 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U8
-	ROMX_LOAD("bp-1200_1.05_u9__(c)_1993_rev_c__bp_microsystems.27c64-12pc.u9", 0x1c000, 0x2000, CRC(b88a311c) SHA1(fb5e0543c811cbbf8f24d1de204b4c0c1bd2f485), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.05 U9 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U9
+	ROMX_LOAD("bp-1200_1.05_u8__=c=_1993_rev_c__bp_microsystems.27c64-12pc.u8", 0x1c001, 0x2000, CRC(2c13a43c) SHA1(5dd67a09f72f693c085160b9beedd2454ba4ec37), ROM_SKIP(1) | ROM_BIOS(4)) // "BP-1200 1.05 U8 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U8
+	ROMX_LOAD("bp-1200_1.05_u9__=c=_1993_rev_c__bp_microsystems.27c64-12pc.u9", 0x1c000, 0x2000, CRC(b88a311c) SHA1(fb5e0543c811cbbf8f24d1de204b4c0c1bd2f485), ROM_SKIP(1) | ROM_BIOS(4)) // "BP-1200 1.05 U9 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U9
 	ROM_SYSTEM_BIOS( 5, "v104", "BP-1200 V1.04")
-	ROMX_LOAD("bp-1200_1.04_u8__(c)_1992_rev_c__bp_microsystems.27c64.u8", 0x1c001, 0x2000, CRC(2ab47324) SHA1(052e578dae5db023f94b35d686a5352ffceec414), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.04 U8 // (C) 1992 REV C // BP Microsystems" OTP 27C64 @ U8
-	ROMX_LOAD("bp-1200_1.04_u9__(c)_1993_rev_c__bp_microsystems.27c64.u9", 0x1c000, 0x2000, CRC(17b94d7a) SHA1(7ceed660dbdc638ac86ca8ba7fa456c297d88766), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.04 U9 // (C) 1993 REV C // BP Microsystems" OTP 27C64 @ U9
+	ROMX_LOAD("bp-1200_1.04_u8__=c=_1992_rev_c__bp_microsystems.27c64.u8", 0x1c001, 0x2000, CRC(2ab47324) SHA1(052e578dae5db023f94b35d686a5352ffceec414), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.04 U8 // (C) 1992 REV C // BP Microsystems" OTP 27C64 @ U8
+	ROMX_LOAD("bp-1200_1.04_u9__=c=_1993_rev_c__bp_microsystems.27c64.u9", 0x1c000, 0x2000, CRC(17b94d7a) SHA1(7ceed660dbdc638ac86ca8ba7fa456c297d88766), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.04 U9 // (C) 1993 REV C // BP Microsystems" OTP 27C64 @ U9
 	ROM_SYSTEM_BIOS( 6, "v103", "BP-1200 V1.03")
-	ROMX_LOAD("bp-1200_1.03_u8__(c)_1992_rev_c__bp_microsystems.27c64a-12.u8", 0x1c001, 0x2000, CRC(b01968b6) SHA1(d0c6aa0f0fe47b0915658e8c27286ab6ea90972e), ROM_SKIP(1) | ROM_BIOS(7)) // "BP-1200 1.03 U8 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U8
-	ROMX_LOAD("bp-1200_1.03_u9__(c)_1992_rev_c__bp_microsystems.27c64a-12.u9", 0x1c000, 0x2000, CRC(f58ffebb) SHA1(700d3ffed269fff6dc1cf2190bde8b989715c22a), ROM_SKIP(1) | ROM_BIOS(7)) // "BP-1200 1.03 U9 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U9
+	ROMX_LOAD("bp-1200_1.03_u8__=c=_1992_rev_c__bp_microsystems.27c64a-12.u8", 0x1c001, 0x2000, CRC(b01968b6) SHA1(d0c6aa0f0fe47b0915658e8c27286ab6ea90972e), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.03 U8 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U8
+	ROMX_LOAD("bp-1200_1.03_u9__=c=_1992_rev_c__bp_microsystems.27c64a-12.u9", 0x1c000, 0x2000, CRC(f58ffebb) SHA1(700d3ffed269fff6dc1cf2190bde8b989715c22a), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.03 U9 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U9
 ROM_END
 
 
@@ -416,5 +419,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT         COMPANY              FULLNAME      FLAGS
-COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT         COMPANY            FULLNAME   FLAGS
+COMP( 1992, bp1200, 0,      0,      bpmmicro, bpmmicro, bpmmicro_state, init_bp1200, "BP Microsystems", "BP-1200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

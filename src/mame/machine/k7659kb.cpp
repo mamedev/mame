@@ -53,7 +53,7 @@ const tiny_rom_entry *k7659_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  DISCRETE_SOUND_START( k7659kb )
+//  DISCRETE_SOUND_START( k7659kb_discrete )
 //-------------------------------------------------
 
 
@@ -61,9 +61,9 @@ const tiny_rom_entry *k7659_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(k7659_keyboard_device::device_add_mconfig)
-
-MACHINE_CONFIG_END
+void k7659_keyboard_device::device_add_mconfig(machine_config &config)
+{
+}
 
 
 //-------------------------------------------------

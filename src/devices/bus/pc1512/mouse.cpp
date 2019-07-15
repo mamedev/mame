@@ -88,8 +88,8 @@ void pc1512_mouse_device::device_start()
 
 static INPUT_PORTS_START( mouse )
 	PORT_START("MOUSEB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_mouse_device, mouse_button_1_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_mouse_device, mouse_button_2_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_mouse_device, mouse_button_1_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_mouse_device, mouse_button_2_changed, 0)
 
 	PORT_START("MOUSEX")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_mouse_device, mouse_x_changed, 0)
@@ -113,6 +113,7 @@ ioport_constructor pc1512_mouse_device::device_input_ports() const
 //  SLOT_INTERFACE( pc1512_mouse_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( pc1512_mouse_port_devices )
-	SLOT_INTERFACE("mouse", PC1512_MOUSE)
-SLOT_INTERFACE_END
+void pc1512_mouse_port_devices(device_slot_interface &device)
+{
+	device.option_add("mouse", PC1512_MOUSE);
+}

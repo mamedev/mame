@@ -129,8 +129,7 @@ void msm6242_device::device_start()
 
 void msm6242_device::device_reset()
 {
-	if (!m_out_int_handler.isnull())
-		m_out_int_handler(CLEAR_LINE);
+	set_irq(false);
 }
 
 
@@ -180,6 +179,21 @@ void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
+//-------------------------------------------------
+//  set_irq - set the IRQ flag and output
+//-------------------------------------------------
+
+void msm6242_device::set_irq(bool active)
+{
+	if (active)
+		m_reg[0] |= 0x04;
+	else
+		m_reg[0] &= 0x0b;
+
+	if (!m_out_int_handler.isnull())
+		m_out_int_handler(active ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 //-------------------------------------------------
 //  irq
@@ -194,8 +208,7 @@ void msm6242_device::irq(uint8_t irq_type)
 		LOGIRQ("%s: MSM6242 logging IRQ #%u\n", machine().describe_context(), irq_type);
 
 		// ...and assert the output line
-		if (!m_out_int_handler.isnull())
-			m_out_int_handler(ASSERT_LINE);
+		set_irq(true);
 	}
 }
 
@@ -515,10 +528,15 @@ WRITE8_MEMBER( msm6242_device::write )
 	{
 		case MSM6242_REG_CD:
 			//  x--- 30s ADJ
-			//  -x-- IRQ FLAG
-			//  --x- BUSY
+			//  -x-- IRQ FLAG (software can only clear this)
+			//  --x- BUSY (read-only)
 			//  ---x HOLD
-			m_reg[0] = data & 0x0f;
+			if (!BIT(data, 2) && BIT(m_reg[0], 2))
+			{
+				LOGIRQENABLE("%s: MSM6242 acknowledging irq\n", machine().describe_context());
+				set_irq(false);
+			}
+			m_reg[0] = (data & 0x09) | (m_reg[0] & 0x06);
 			break;
 
 		case MSM6242_REG_CE:
@@ -536,8 +554,7 @@ WRITE8_MEMBER( msm6242_device::write )
 			else
 			{
 				m_irq_flag = 0;
-				if ( !m_out_int_handler.isnull() )
-					m_out_int_handler( CLEAR_LINE );
+				set_irq(false);
 
 				LOGIRQENABLE("%s: MSM6242 disabling irq\n", machine().describe_context());
 			}

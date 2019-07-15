@@ -7,49 +7,26 @@
 
 #pragma once
 
-
 #include "screen.h"
-
-#define MCFG_K053252_INT1_EN_CB(_devcb) \
-	devcb = &k053252_device::set_int1_en_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_K053252_INT2_EN_CB(_devcb) \
-	devcb = &k053252_device::set_int2_en_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_K053252_INT1_ACK_CB(_devcb) \
-	devcb = &k053252_device::set_int1_ack_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_K053252_INT2_ACK_CB(_devcb) \
-	devcb = &k053252_device::set_int2_ack_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_K053252_INT_TIME_CB(_devcb) \
-	devcb = &k053252_device::set_int_time_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_K053252_OFFSETS(_offsx, _offsy) \
-	k053252_device::set_offsets(*device, _offsx, _offsy);
-
-#define MCFG_K053252_SET_SLAVE_SCREEN(_tag) \
-	k053252_device::static_set_slave_screen(*device, "^" _tag);
-
 
 class k053252_device : public device_t, public device_video_interface
 {
 public:
 	k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_int1_en_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int1_en_cb.set_callback(std::forward<Object>(obj)); }
-	template <class Object> static devcb_base &set_int2_en_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int2_en_cb.set_callback(std::forward<Object>(obj)); }
-	template <class Object> static devcb_base &set_int1_ack_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int1_ack_cb.set_callback(std::forward<Object>(obj)); }
-	template <class Object> static devcb_base &set_int2_ack_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int2_ack_cb.set_callback(std::forward<Object>(obj)); }
-	template <class Object> static devcb_base &set_int_time_callback(device_t &device, Object &&obj) { return downcast<k053252_device &>(device).m_int_time_cb.set_callback(std::forward<Object>(obj)); }
-	static void set_offsets(device_t &device, int offsx, int offsy) { downcast<k053252_device &>(device).m_offsx = offsx; downcast<k053252_device &>(device).m_offsy = offsy; }
+	auto int1_en() { return m_int1_en_cb.bind(); }
+	auto int2_en() { return m_int2_en_cb.bind(); }
+	auto int1_ack() { return m_int1_ack_cb.bind(); }
+	auto int2_ack() { return m_int2_ack_cb.bind(); }
+	auto int_time() { return m_int_time_cb.bind(); }
+	void set_offsets(int offsx, int offsy) { m_offsx = offsx; m_offsy = offsy; }
 
 	DECLARE_READ8_MEMBER( read );  // CCU registers
 	DECLARE_WRITE8_MEMBER( write );
 
 	void res_change();
 
-	static void static_set_slave_screen(device_t &device, const char *tag);
+	void set_slave_screen(const char *tag) { m_slave_screen.set_tag(tag); }
 
 protected:
 	// device-level overrides

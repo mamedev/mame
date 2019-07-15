@@ -777,23 +777,20 @@ void diskonchip_g3_device::device_start()
 
 	memset(m_sec_2, 0, sizeof(m_sec_2));
 
-	m_data[0] = std::make_unique<uint8_t[]>(m_data_size[0]);
-	memset(m_data[0].get(), 0, sizeof(uint8_t) * m_data_size[0]);
-	m_data[1] = std::make_unique<uint8_t[]>(m_data_size[1]);
-	memset(m_data[1].get(), 0, sizeof(uint8_t) * m_data_size[1]);
-	m_data[2] = std::make_unique<uint8_t[]>(m_data_size[2]);
-	memset(m_data[2].get(), 0, sizeof(uint8_t) * m_data_size[2]);
+	m_data[0] = make_unique_clear<uint8_t[]>(m_data_size[0]);
+	m_data[1] = make_unique_clear<uint8_t[]>(m_data_size[1]);
+	m_data[2] = make_unique_clear<uint8_t[]>(m_data_size[2]);
 
 //  diskonchip_load( device, "diskonchip");
 
-	save_item( NAME(m_planes));
-	save_item( NAME(m_blocks));
-	save_item( NAME(m_pages));
-	save_item( NAME(m_user_data_size));
-	save_item( NAME(m_extra_area_size));
-	save_pointer( NAME(m_data[0].get()), m_data_size[0]);
-	save_pointer( NAME(m_data[1].get()), m_data_size[1]);
-	save_pointer( NAME(m_data[2].get()), m_data_size[2]);
+	save_item(NAME(m_planes));
+	save_item(NAME(m_blocks));
+	save_item(NAME(m_pages));
+	save_item(NAME(m_user_data_size));
+	save_item(NAME(m_extra_area_size));
+	save_pointer(NAME(m_data[0]), m_data_size[0]);
+	save_pointer(NAME(m_data[1]), m_data_size[1]);
+	save_pointer(NAME(m_data[2]), m_data_size[2]);
 }
 
 //-------------------------------------------------

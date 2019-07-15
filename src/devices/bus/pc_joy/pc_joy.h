@@ -14,11 +14,7 @@
 #pragma once
 
 
-#define MCFG_PC_JOY_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PC_JOY, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, "basic_joy", false)
-
-SLOT_INTERFACE_EXTERN(pc_joysticks);
+void pc_joysticks(device_slot_interface &device);
 
 class device_pc_joy_interface : public device_slot_card_interface
 {
@@ -39,7 +35,7 @@ protected:
 class pc_joy_device : public device_t, public device_slot_interface
 {
 public:
-	pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ8_MEMBER(joy_port_r);
 	DECLARE_WRITE8_MEMBER(joy_port_w);
@@ -59,7 +55,7 @@ class pc_basic_joy_device : public device_t,
 							public device_pc_joy_interface
 {
 public:
-	pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t x1(int delta) override { return (m_x1->read() > delta); }

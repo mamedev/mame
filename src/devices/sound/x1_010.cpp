@@ -87,17 +87,16 @@ struct X1_010_CHANNEL {
 DEFINE_DEVICE_TYPE(X1_010, x1_010_device, "x1_010", "Seta X1-010")
 
 x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, X1_010, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_region(*this, DEVICE_SELF),
-		m_rate(0),
-		m_adr(0),
-		m_stream(nullptr),
-		m_sound_enable(0),
-		m_base_clock(0)
+	: device_t(mconfig, X1_010, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 20)
+	, m_rate(0)
+	, m_stream(nullptr)
+	, m_sound_enable(0)
+	, m_reg(nullptr)
+	, m_HI_WORD_BUF(nullptr)
+	, m_base_clock(0)
 {
-	std::fill(std::begin(m_reg), std::end(m_reg), 0);
-	std::fill(std::begin(m_HI_WORD_BUF), std::end(m_HI_WORD_BUF), 0);
 	std::fill(std::begin(m_smp_offset), std::end(m_smp_offset), 0);
 	std::fill(std::begin(m_env_offset), std::end(m_env_offset), 0);
 }
@@ -123,13 +122,38 @@ void x1_010_device::device_start()
 	/* get stream channels */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
 
+	m_reg = make_unique_clear<uint8_t[]>(0x2000);
+	m_HI_WORD_BUF = make_unique_clear<uint8_t[]>(0x2000);
+
 	save_item(NAME(m_rate));
 	save_item(NAME(m_sound_enable));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_HI_WORD_BUF));
+	save_pointer(NAME(m_reg), 0x2000);
+	save_pointer(NAME(m_HI_WORD_BUF), 0x2000);
 	save_item(NAME(m_smp_offset));
 	save_item(NAME(m_env_offset));
 	save_item(NAME(m_base_clock));
+}
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void x1_010_device::device_clock_changed()
+{
+	m_base_clock    = clock();
+	m_rate          = clock() / 512;
+
+	m_stream->set_sample_rate(m_rate);
+}
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void x1_010_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 
@@ -140,17 +164,14 @@ void x1_010_device::enable_w(int data)
 
 /* Use these for 8 bit CPUs */
 
-
-READ8_MEMBER( x1_010_device::read )
+u8 x1_010_device::read(offs_t offset)
 {
-	offset ^= m_adr;
 	return m_reg[offset];
 }
 
-WRITE8_MEMBER( x1_010_device::write )
+void x1_010_device::write(offs_t offset, u8 data)
 {
 	int channel, reg;
-	offset ^= m_adr;
 
 	channel = offset/sizeof(X1_010_CHANNEL);
 	reg     = offset%sizeof(X1_010_CHANNEL);
@@ -167,20 +188,20 @@ WRITE8_MEMBER( x1_010_device::write )
 
 /* Use these for 16 bit CPUs */
 
-READ16_MEMBER( x1_010_device::word_r )
+u16 x1_010_device::word_r(offs_t offset)
 {
 	uint16_t  ret;
 
 	ret = m_HI_WORD_BUF[offset]<<8;
-	ret += (read( space, offset )&0xff);
+	ret += (read( offset )&0xff);
 	LOG_REGISTER_READ("%s: Read X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
-WRITE16_MEMBER( x1_010_device::word_w )
+void x1_010_device::word_w(offs_t offset, u16 data)
 {
 	m_HI_WORD_BUF[offset] = (data>>8)&0xff;
-	write( space, offset, data&0xff );
+	write( offset, data&0xff );
 	LOG_REGISTER_WRITE("%s: Write X1-010 Offset:%04X Data:%04X\n", machine().describe_context(), offset, data);
 }
 
@@ -193,9 +214,9 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 {
 	X1_010_CHANNEL  *reg;
 	int     ch, i, volL, volR, freq, div;
-	int8_t   *start, *end, data;
+	int8_t   data;
 	uint8_t  *env;
-	uint32_t smp_offs, smp_step, env_offs, env_step, delta;
+	uint32_t start, end, smp_offs, smp_step, env_offs, env_step, delta;
 
 	// mixer buffer zero clear
 	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
@@ -210,8 +231,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			stream_sample_t *bufR = outputs[1];
 			div = (reg->status&0x80) ? 1 : 0;
 			if( (reg->status&2) == 0 ) {                        // PCM sampling
-				start    = m_region + reg->start*0x1000;
-				end      = m_region + (0x100-reg->end)*0x1000;
+				start    = reg->start*0x1000;
+				end      = (0x100-reg->end)*0x1000;
 				volL     = ((reg->volume>>4)&0xf)*VOL_BASE;
 				volR     = ((reg->volume>>0)&0xf)*VOL_BASE;
 				smp_offs = m_smp_offset[ch];
@@ -232,14 +253,14 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						reg->status &= 0xfe;                    // Key off
 						break;
 					}
-					data = *(start+delta);
+					data = (int8_t)(read_byte(start+delta));
 					*bufL++ += (data*volL/256);
 					*bufR++ += (data*volR/256);
 					smp_offs += smp_step;
 				}
 				m_smp_offset[ch] = smp_offs;
 			} else {                                            // Wave form
-				start    = (int8_t *)&(m_reg[reg->volume*128+0x1000]);
+				start    = (reg->volume*128+0x1000);
 				smp_offs = m_smp_offset[ch];
 				freq     = ((reg->pitch_hi<<8)+reg->frequency)>>div;
 				smp_step = (uint32_t)((float)m_base_clock/128.0f/1024.0f/4.0f*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
@@ -263,7 +284,7 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					vol = *(env+(delta&0x7f));
 					volL = ((vol>>4)&0xf)*VOL_BASE;
 					volR = ((vol>>0)&0xf)*VOL_BASE;
-					data  = *(start+((smp_offs>>FREQ_BASE_BITS)&0x7f));
+					data  = (int8_t)(m_reg[start+((smp_offs>>FREQ_BASE_BITS)&0x7f)]);
 					*bufL++ += (data*volL/256);
 					*bufR++ += (data*volR/256);
 					smp_offs += smp_step;

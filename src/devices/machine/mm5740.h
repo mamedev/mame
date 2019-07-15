@@ -80,23 +80,6 @@ Vgg                  18          -12V
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MM5740_MATRIX_X1(_cb)       devcb = &mm5740_device::set_x_cb<0>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X2(_cb)       devcb = &mm5740_device::set_x_cb<1>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X3(_cb)       devcb = &mm5740_device::set_x_cb<2>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X4(_cb)       devcb = &mm5740_device::set_x_cb<3>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X5(_cb)       devcb = &mm5740_device::set_x_cb<4>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X6(_cb)       devcb = &mm5740_device::set_x_cb<5>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X7(_cb)       devcb = &mm5740_device::set_x_cb<6>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X8(_cb)       devcb = &mm5740_device::set_x_cb<7>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X9(_cb)       devcb = &mm5740_device::set_x_cb<8>(*device, DEVCB_##_cb);
-#define MCFG_MM5740_SHIFT_CB(_cb)        devcb = &mm5740_device::set_shift_cb(*device, DEVCB_##_cb);
-#define MCFG_MM5740_CONTROL_CB(_cb)      devcb = &mm5740_device::set_control_cb(*device, DEVCB_##_cb);
-#define MCFG_MM5740_DATA_READY_CB(_cb)   devcb = &mm5740_device::set_data_ready_cb(*device, DEVCB_##_cb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -111,22 +94,11 @@ public:
 	// public interface
 	uint16_t b_r();
 
-	template <unsigned N, typename Object> static devcb_base &set_x_cb(device_t &device, Object &&cb)
-	{
-		return downcast<mm5740_device &>(device).m_read_x[N].set_callback(std::forward<Object>(cb));
-	}
-	template <typename Object> static devcb_base &set_shift_cb(device_t &device, Object &&cb)
-	{
-		return downcast<mm5740_device &>(device).m_read_shift.set_callback(std::forward<Object>(cb));
-	}
-	template <typename Object> static devcb_base &set_control_cb(device_t &device, Object &&cb)
-	{
-		return downcast<mm5740_device &>(device).m_read_control.set_callback(std::forward<Object>(cb));
-	}
-	template <typename Object> static devcb_base &set_data_ready_cb(device_t &device, Object &&cb)
-	{
-		return downcast<mm5740_device &>(device).m_write_data_ready.set_callback(std::forward<Object>(cb));
-	}
+	template <unsigned N> auto x_cb() { return m_read_x[N].bind(); }
+	auto shift_cb() { return m_read_shift.bind(); }
+	auto control_cb() { return m_read_control.bind(); }
+	auto data_ready_cb() { return m_write_data_ready.bind(); }
+
 	static uint32_t calc_effective_clock_key_debounce(uint32_t capacitance);
 
 protected:

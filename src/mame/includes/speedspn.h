@@ -1,14 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Farfetch'd
+#ifndef MAME_INCLUDES_SPEEDSPN_H
+#define MAME_INCLUDES_SPEEDSPN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 
 class speedspn_state : public driver_device
 {
 public:
-	speedspn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	speedspn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -17,8 +22,16 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_prgbank(*this, "prgbank"),
 		m_okibank(*this, "okibank"),
-		m_attram(*this, "attram") { }
+		m_attram(*this, "attram")
+	{ }
 
+	void speedspn(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
@@ -44,13 +57,13 @@ public:
 	DECLARE_WRITE8_MEMBER(display_disable_w);
 	DECLARE_WRITE8_MEMBER(okibank_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void speedspn(machine_config &config);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void io_map(address_map &map);
 	void oki_map(address_map &map);
 	void program_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SPEEDSPN_H

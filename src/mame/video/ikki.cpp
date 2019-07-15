@@ -13,32 +13,31 @@ Video hardware driver by Uki
 #include "emu.h"
 #include "includes/ikki.h"
 
-PALETTE_INIT_MEMBER(ikki_state, ikki)
+void ikki_state::ikki_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i | 0x000]);
+		int const g = pal4bit(color_prom[i | 0x100]);
+		int const b = pal4bit(color_prom[i | 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* sprites lookup table */
-	for (i = 0; i < 0x200; i++)
+	// sprites lookup table
+	for (int i = 0; i < 0x200; i++)
 	{
 		uint16_t ctabentry = color_prom[i] ^ 0xff;
 
 		if (((i & 0x07) == 0x07) && (ctabentry == 0))
 		{
-			/* punch through */
+			// punch through
 			m_punch_through_pen = i;
 			ctabentry = 0x100;
 		}
@@ -46,35 +45,31 @@ PALETTE_INIT_MEMBER(ikki_state, ikki)
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* bg lookup table */
-	for (i = 0x200; i < 0x400; i++)
+	// bg lookup table
+	for (int i = 0x200; i < 0x400; i++)
 	{
-		uint8_t ctabentry = color_prom[i];
+		uint8_t const ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
 {
-	m_flipscreen = (data >> 2) & 1;
+	m_flipscreen = BIT(data, 2);
 }
 
 
 void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_spriteram;
-	int y;
-	offs_t offs;
-
 	m_sprite_bitmap.fill(m_punch_through_pen, cliprect);
 
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (offs_t offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		int code = (spriteram[offs + 2] & 0x80) | (spriteram[offs + 1] >> 1);
-		int color = spriteram[offs + 2] & 0x3f;
+		int code = (m_spriteram[offs + 2] & 0x80) | (m_spriteram[offs + 1] >> 1);
+		int color = m_spriteram[offs + 2] & 0x3f;
 
-		int x = spriteram[offs + 3];
-			y = spriteram[offs + 0];
+		int x = m_spriteram[offs + 3];
+		int y = m_spriteram[offs + 0];
 
 		if (m_flipscreen)
 			x = 240 - x;
@@ -97,14 +92,12 @@ void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 	}
 
-	/* copy the sprite bitmap into the main bitmap, skipping the transparent pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	// copy the sprite bitmap into the main bitmap, skipping the transparent pixels
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int x;
-
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t pen = m_sprite_bitmap.pix16(y, x);
+			uint16_t const pen = m_sprite_bitmap.pix16(y, x);
 
 			if (m_palette->pen_indirect(pen) != 0x100)
 				bitmap.pix16(y, x) = pen;
@@ -122,44 +115,39 @@ void ikki_state::video_start()
 
 uint32_t ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
 	uint8_t *VIDEOATTR = memregion("user1")->base();
 
-	/* draw bg layer */
-
-	for (offs = 0; offs < (m_videoram.bytes() / 2); offs++)
+	// draw bg layer
+	for (offs_t offs = 0; offs < (m_videoram.bytes() / 2); offs++)
 	{
-		int color, bank;
-
-		int sx = offs / 32;
-		int sy = offs % 32;
+		int const sx = offs / 32;
+		int const sy = offs % 32;
 		int y = sy*8;
 		int x = sx*8;
 
-		int d = VIDEOATTR[sx];
-
+		int const d = VIDEOATTR[sx];
 		switch (d)
 		{
-			case 0x02: /* scroll area */
+			case 0x02: // scroll area
 				x = sx * 8 - m_scroll[1];
 				if (x < 0)
 					x += 8 * 22;
 				y = (sy * 8 + ~m_scroll[0]) & 0xff;
 				break;
 
-			case 0x03: /* non-scroll area */
+			case 0x03: // non-scroll area
 				break;
 
-			case 0x00: /* sprite disable? */
+			case 0x00: // sprite disable?
 				break;
 
-			case 0x0d: /* sprite disable? */
+			case 0x0d: // sprite disable?
 				break;
 
-			case 0x0b: /* non-scroll area (?) */
+			case 0x0b: // non-scroll area (?)
 				break;
 
-			case 0x0e: /* unknown */
+			case 0x0e: // unknown
 				break;
 		}
 
@@ -169,32 +157,28 @@ uint32_t ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bit
 			y = 248 - y;
 		}
 
-		color = m_videoram[offs * 2];
-		bank = (color & 0xe0) << 3;
-		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
+		int color = m_videoram[offs * 2];
+		int const bank = (color & 0xe0) << 3;
+		color = ((color & 0x1f) << 0) | ((color & 0x80) >> 2);
 
 		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
-			m_videoram[offs * 2 + 1] + bank,
-			color,
-			m_flipscreen,m_flipscreen,
-			x,y);
+				m_videoram[offs * 2 + 1] + bank,
+				color,
+				m_flipscreen,m_flipscreen,
+				x,y);
 	}
 
 	draw_sprites(bitmap, cliprect);
 
-	/* mask sprites */
-
-	for (offs = 0; offs < (m_videoram.bytes() / 2); offs++)
+	// mask sprites
+	for (offs_t offs = 0; offs < (m_videoram.bytes() / 2); offs++)
 	{
-		int sx = offs / 32;
-		int sy = offs % 32;
+		int const sx = offs / 32;
+		int const sy = offs % 32;
 
-		int d = VIDEOATTR[sx];
-
+		int const d = VIDEOATTR[sx];
 		if ((d == 0) || (d == 0x0d))
 		{
-			int color, bank;
-
 			int y = sy * 8;
 			int x = sx * 8;
 
@@ -204,15 +188,15 @@ uint32_t ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bit
 				y = 248 - y;
 			}
 
-			color = m_videoram[offs * 2];
-			bank = (color & 0xe0) << 3;
+			int color = m_videoram[offs * 2];
+			int const bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
-				m_videoram[offs * 2 + 1] + bank,
-				color,
-				m_flipscreen,m_flipscreen,
-				x,y);
+					m_videoram[offs * 2 + 1] + bank,
+					color,
+					m_flipscreen,m_flipscreen,
+					x,y);
 		}
 	}
 

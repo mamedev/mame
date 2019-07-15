@@ -4,7 +4,22 @@
 
     i8243.h
 
-    Intel 8243 Port Expander
+    Intel 8243 Input/Output Expander
+
+****************************************************************************
+                            _____   _____
+                   P50   1 |*    \_/     | 24  VCC
+                   P40   2 |             | 23  P51
+                   P41   3 |             | 22  P52
+                   P42   4 |             | 21  P53
+                   P43   5 |             | 20  P60
+                   _CS   6 |             | 19  P61
+                  PROG   7 |    8243     | 18  P62
+                   P23   8 |             | 17  P63
+                   P22   9 |             | 16  P73
+                   P21  10 |             | 15  P72
+                   P20  11 |             | 14  P71
+                   GND  12 |_____________| 13  P70
 
 ***************************************************************************/
 
@@ -13,59 +28,44 @@
 
 #pragma once
 
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_I8243_ADD(_tag, _read, _write) \
-	MCFG_DEVICE_ADD(_tag, I8243, 0) \
-	MCFG_I8243_READHANDLER(_read) \
-	MCFG_I8243_WRITEHANDLER(_write)
-#define MCFG_I8243_READHANDLER(_devcb) \
-	devcb = &i8243_device::set_read_handler(*device, DEVCB_##_devcb);
-#define MCFG_I8243_WRITEHANDLER(_devcb) \
-	devcb = &i8243_device::set_write_handler(*device, DEVCB_##_devcb);
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-
-// ======================> i8243_device
-
 class i8243_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_handler(device_t &device, Object &&cb) { return downcast<i8243_device &>(device).m_readhandler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_handler(device_t &device, Object &&cb) { return downcast<i8243_device &>(device).m_writehandler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto p4_in_cb() { return m_readhandler[0].bind(); }
+	auto p4_out_cb() { return m_writehandler[0].bind(); }
+	auto p5_in_cb() { return m_readhandler[1].bind(); }
+	auto p5_out_cb() { return m_writehandler[1].bind(); }
+	auto p6_in_cb() { return m_readhandler[2].bind(); }
+	auto p6_out_cb() { return m_writehandler[2].bind(); }
+	auto p7_in_cb() { return m_readhandler[3].bind(); }
+	auto p7_out_cb() { return m_writehandler[3].bind(); }
 
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	uint8_t p2_r();
+	void p2_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
+	DECLARE_WRITE_LINE_MEMBER(cs_w);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_post_load() override { }
-	virtual void device_clock_changed() override { }
 
 private:
+	void output_update(int which);
 
-	uint8_t       m_p[4];             /* 4 ports' worth of data */
-	uint8_t       m_p2out;            /* port 2 bits that will be returned */
-	uint8_t       m_p2;               /* most recent port 2 value */
-	uint8_t       m_opcode;           /* latched opcode */
-	uint8_t       m_prog;             /* previous PROG state */
+	uint8_t         m_p[4];         // 4 ports' worth of data
+	uint8_t         m_p2out;        // port 2 bits that will be returned
+	uint8_t         m_p2;           // most recent port 2 value
+	uint8_t         m_opcode;       // latched opcode
+	bool            m_prog;         // previous PROG state
+	bool            m_cs;           // chip select
 
-	devcb_read8    m_readhandler;
-	devcb_write8   m_writehandler;
+	devcb_read8     m_readhandler[4];
+	devcb_write8    m_writehandler[4];
 };
 
 

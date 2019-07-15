@@ -404,9 +404,10 @@ void gba_rom_wariotws_device::gpio_dev_write(uint16_t data, int gpio_dirs)
  Carts with Flash RAM
  -------------------------------------------------*/
 
-MACHINE_CONFIG_START(gba_rom_flash_device::device_add_mconfig)
-	MCFG_PANASONIC_MN63F805MNP_ADD("flash")
-MACHINE_CONFIG_END
+void gba_rom_flash_device::device_add_mconfig(machine_config &config)
+{
+	PANASONIC_MN63F805MNP(config, "flash");
+}
 
 
 READ32_MEMBER(gba_rom_flash_device::read_ram)
@@ -450,9 +451,10 @@ WRITE32_MEMBER(gba_rom_flash_device::write_ram)
 	}
 }
 
-MACHINE_CONFIG_START(gba_rom_flash1m_device::device_add_mconfig)
-	MCFG_SANYO_LE26FV10N1TS_ADD("flash")
-MACHINE_CONFIG_END
+void gba_rom_flash1m_device::device_add_mconfig(machine_config &config)
+{
+	SANYO_LE26FV10N1TS(config, "flash");
+}
 
 
 READ32_MEMBER(gba_rom_flash1m_device::read_ram)
@@ -1058,7 +1060,7 @@ void gba_eeprom_device::write(uint32_t data)
 
 			if (m_bits == 0)
 			{
-				osd_printf_verbose("%08x: EEPROM: %02x to %x\n", machine().device("maincpu")->safe_pc(), m_eep_data, m_addr);
+				osd_printf_verbose("%s: EEPROM: %02x to %x\n", machine().describe_context().c_str(), m_eep_data, m_addr);
 				if (m_addr >= m_data_size)
 					fatalerror("eeprom: invalid address (%x)\n", m_addr);
 

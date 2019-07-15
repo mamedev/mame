@@ -13,7 +13,7 @@
 
 
 #include "isa.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
 //**************************************************************************

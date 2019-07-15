@@ -12,68 +12,31 @@
 #pragma once
 
 
-#define MCFG_HUC6202_NEXT_PIXEL_0_CB(_devcb) \
-	devcb = &huc6202_device::set_next_pixel_0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(_devcb) \
-	devcb = &huc6202_device::set_time_til_next_event_0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_VSYNC_CHANGED_0_CB(_devcb) \
-	devcb = &huc6202_device::set_vsync_changed_0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_HSYNC_CHANGED_0_CB(_devcb) \
-	devcb = &huc6202_device::set_hsync_changed_0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_READ_0_CB(_devcb) \
-	devcb = &huc6202_device::set_read_0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_WRITE_0_CB(_devcb) \
-	devcb = &huc6202_device::set_write_0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_NEXT_PIXEL_1_CB(_devcb) \
-	devcb = &huc6202_device::set_next_pixel_1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(_devcb) \
-	devcb = &huc6202_device::set_time_til_next_event_1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_VSYNC_CHANGED_1_CB(_devcb) \
-	devcb = &huc6202_device::set_vsync_changed_1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_HSYNC_CHANGED_1_CB(_devcb) \
-	devcb = &huc6202_device::set_hsync_changed_1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_READ_1_CB(_devcb) \
-	devcb = &huc6202_device::set_read_1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HUC6202_WRITE_1_CB(_devcb) \
-	devcb = &huc6202_device::set_write_1_callback(*device, DEVCB_##_devcb);
-
-
 class huc6202_device : public device_t
 {
 public:
 	// construction/destruction
 	huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_next_pixel_0_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_next_pixel_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_time_til_next_event_0_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_time_til_next_event_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_vsync_changed_0_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_vsync_changed_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_hsync_changed_0_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_hsync_changed_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_0_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_read_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_0_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_write_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_next_pixel_1_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_next_pixel_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_time_til_next_event_1_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_time_til_next_event_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_vsync_changed_1_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_vsync_changed_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_hsync_changed_1_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_hsync_changed_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_1_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_read_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_1_callback(device_t &device, Object &&cb) { return downcast<huc6202_device &>(device).m_write_1_cb.set_callback(std::forward<Object>(cb)); }
+	auto next_pixel_0_callback() { return m_next_pixel_0_cb.bind(); }
+	auto time_til_next_event_0_callback() { return m_time_til_next_event_0_cb.bind(); }
+	auto vsync_changed_0_callback() { return m_vsync_changed_0_cb.bind(); }
+	auto hsync_changed_0_callback() { return m_hsync_changed_0_cb.bind(); }
+	auto read_0_callback() { return m_read_0_cb.bind(); }
+	auto write_0_callback() { return m_write_0_cb.bind(); }
+	auto next_pixel_1_callback() { return m_next_pixel_1_cb.bind(); }
+	auto time_til_next_event_1_callback() { return m_time_til_next_event_1_cb.bind(); }
+	auto vsync_changed_1_callback() { return m_vsync_changed_1_cb.bind(); }
+	auto hsync_changed_1_callback() { return m_hsync_changed_1_cb.bind(); }
+	auto read_1_callback() { return m_read_1_cb.bind(); }
+	auto write_1_callback() { return m_write_1_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( io_read );
-	DECLARE_WRITE8_MEMBER( io_write );
-	DECLARE_READ16_MEMBER( next_pixel );
-	DECLARE_READ16_MEMBER( time_until_next_event );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 io_read(offs_t offset);
+	void io_write(offs_t offset, u8 data);
+	u16 next_pixel();
+	u16 time_until_next_event();
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 

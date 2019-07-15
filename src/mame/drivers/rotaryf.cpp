@@ -38,6 +38,9 @@ public:
 	{
 	}
 
+	void rotaryf(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
@@ -57,7 +60,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
-	void rotaryf(machine_config &config);
 	void rotaryf_io_map(address_map &map);
 	void rotaryf_map(address_map &map);
 };
@@ -194,23 +196,25 @@ uint32_t rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-ADDRESS_MAP_START(rotaryf_state::rotaryf_map)
-	AM_RANGE(0x0000, 0x17ff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x7000, 0x73ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM /* writes 00, 18, 27, 3C, 7E, FE to A019, A039, A059... A179 */
-ADDRESS_MAP_END
+void rotaryf_state::rotaryf_map(address_map &map)
+{
+	map(0x0000, 0x17ff).mirror(0x4000).rom();
+	map(0x7000, 0x73ff).mirror(0x0c00).ram();
+	map(0x8000, 0x9fff).mirror(0x4000).ram().share("videoram");
+	map(0xa000, 0xa1ff).ram(); /* writes 00, 18, 27, 3C, 7E, FE to A019, A039, A059... A179 */
+}
 
-ADDRESS_MAP_START(rotaryf_state::rotaryf_io_map)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP
-	AM_RANGE(0x04, 0x04) AM_WRITENOP
-	AM_RANGE(0x07, 0x07) AM_WRITENOP
-	AM_RANGE(0x20, 0x20) AM_WRITENOP
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("COIN") AM_WRITENOP
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW")
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
-ADDRESS_MAP_END
+void rotaryf_state::rotaryf_io_map(address_map &map)
+{
+	map(0x02, 0x02).nopw();
+	map(0x04, 0x04).nopw();
+	map(0x07, 0x07).nopw();
+	map(0x20, 0x20).nopw();
+	map(0x21, 0x21).portr("COIN").nopw();
+	map(0x26, 0x26).portr("DSW");
+	map(0x28, 0x2b).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x30).w(FUNC(rotaryf_state::port30_w));
+}
 
 
 static INPUT_PORTS_START( rotaryf )
@@ -259,50 +263,50 @@ static INPUT_PORTS_START( rotaryf )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(rotaryf_state::rotaryf)
-
+void rotaryf_state::rotaryf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
-	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
-	MCFG_CPU_IO_MAP(rotaryf_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rotaryf_state, rotaryf_interrupt, "screen", 0, 1)
+	I8085A(config, m_maincpu, 4000000); /* ?? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rotaryf_state::rotaryf_map);
+	m_maincpu->set_addrmap(AS_IO, &rotaryf_state::rotaryf_io_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(rotaryf_state::rotaryf_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(rotaryf_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(rotaryf_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(rotaryf_state, portc_w))
-	//MCFG_I8255_TRISTATE_PORTC_CB(CONSTANT(0))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(rotaryf_state::porta_w));
+	ppi.in_pb_callback().set(FUNC(rotaryf_state::portb_r));
+	ppi.out_pc_callback().set(FUNC(rotaryf_state::portc_w));
+	//ppi.tri_pc_callback().set_constant(0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size is a guess, taken from mw8080bw */
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(rotaryf_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(32*8, 262);     /* vert size is a guess, taken from mw8080bw */
+	screen.set_visarea(1*8, 30*8-1, 0*8, 32*8-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(rotaryf_state::screen_update));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                 // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                          // decay_res: N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))          // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(56))                    // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(10))               // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                    // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))    // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                  // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(1)                           // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                 // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                 // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                             // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(rotaryf_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(rotaryf_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( rotaryf )
@@ -316,4 +320,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, 0, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, empty_init, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

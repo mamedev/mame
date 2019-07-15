@@ -26,6 +26,8 @@ Bottom board - M75-B-A (all versions regardless of mask ROM/EPROM)
 #include "includes/iremipt.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/rstbuf.h"
 #include "sound/2203intf.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
@@ -72,71 +74,78 @@ WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
 
 
 
-ADDRESS_MAP_START(vigilant_state::vigilant_map)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::vigilant_map(address_map &map)
+{
+	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x0000, 0x7fff).rom();
+	map(0xc020, 0xc0df).ram().share("spriteram");
+	map(0xc800, 0xcfff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).ram().share("videoram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::vigilant_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("m72", m72_audio_device, sound_command_w)    /* SD */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)          /* OUT2 */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(bank_select_w)  /* PBANK */
-	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w)      /* HSPL, HSPH */
-	AM_RANGE(0x82, 0x83) AM_WRITE(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
-	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w)        /* RCOD */
-ADDRESS_MAP_END
+void vigilant_state::vigilant_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));    /* SD */
+	map(0x01, 0x01).portr("IN1").w(FUNC(vigilant_state::vigilant_out2_w));          /* OUT2 */
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2").w(FUNC(vigilant_state::bank_select_w));  /* PBANK */
+	map(0x80, 0x81).w(FUNC(vigilant_state::vigilant_horiz_scroll_w));      /* HSPL, HSPH */
+	map(0x82, 0x83).w(FUNC(vigilant_state::vigilant_rear_horiz_scroll_w)); /* RHSPL, RHSPH */
+	map(0x84, 0x84).w(FUNC(vigilant_state::vigilant_rear_color_w));        /* RCOD */
+}
 
-ADDRESS_MAP_START(vigilant_state::kikcubic_map)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::kikcubic_map(address_map &map)
+{
+	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc0ff).ram().share("spriteram");
+	map(0xc800, 0xcaff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xd000, 0xdfff).ram().share("videoram");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::kikcubic_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(kikcubic_coin_w) /* also flip screen, and...? */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
+void vigilant_state::kikcubic_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1").w(FUNC(vigilant_state::kikcubic_coin_w)); /* also flip screen, and...? */
+	map(0x01, 0x01).portr("DSW2");
+	map(0x02, 0x02).portr("IN0");
+	map(0x03, 0x03).portr("IN1");
+	map(0x04, 0x04).portr("IN2").w(FUNC(vigilant_state::bank_select_w));
+	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(vigilant_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void vigilant_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(vigilant_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x81) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)   /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)            /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w) /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r) /* S ROM C */
-ADDRESS_MAP_END
+void vigilant_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x81).r("soundlatch", FUNC(generic_latch_8_device::read)).w(m_audio, FUNC(m72_audio_device::vigilant_sample_addr_w));   /* STL / STH */
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));            /* COUNT UP */
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w)); /* IRQ clear */
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r)); /* S ROM C */
+}
 
-ADDRESS_MAP_START(vigilant_state::buccanrs_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)             /* SDRE */
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)  /* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)                /* COUNT UP */
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)     /* IRQ clear */
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)             /* S ROM C */
-ADDRESS_MAP_END
+void vigilant_state::buccanrs_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x02, 0x03).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));             /* SDRE */
+	map(0x80, 0x81).w(m_audio, FUNC(m72_audio_device::vigilant_sample_addr_w));  /* STL / STH */
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));                /* COUNT UP */
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));   /* IRQ clear */
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));             /* S ROM C */
+}
 
 
 static INPUT_PORTS_START( vigilant )
@@ -449,7 +458,7 @@ static const gfx_layout buccaneer_back_layout =
 	16*8
 };
 
-static GFXDECODE_START( vigilant )
+static GFXDECODE_START( gfx_vigilant )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   256, 16 )    /* colors 256-511 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,   0, 16 )    /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, back_layout,   512,  2 )    /* actually the background uses colors */
@@ -457,7 +466,7 @@ static GFXDECODE_START( vigilant )
 													/* pens we can handle it more easily. */
 GFXDECODE_END
 
-static GFXDECODE_START( buccanrs )
+static GFXDECODE_START( gfx_buccanrs )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   256, 16 )    /* colors 256-511 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout_buccanrs,   0, 16 )   /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, buccaneer_back_layout,   512,  2 )  /* actually the background uses colors */
@@ -465,156 +474,186 @@ static GFXDECODE_START( buccanrs )
 													/* pens we can handle it more easily. */
 GFXDECODE_END
 
-static GFXDECODE_START( kikcubic )
+static GFXDECODE_START( gfx_kikcubic )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 16 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(vigilant_state::vigilant)
-
+void vigilant_state::vigilant(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(vigilant_map)
-	MCFG_CPU_IO_MAP(vigilant_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::vigilant_map);
+	m_maincpu->set_addrmap(AS_IO, &vigilant_state::vigilant_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
-								/* IRQs are generated by main Z80 and YM2151 */
+	z80_device &soundcpu(Z80(config, "soundcpu", 3.579545_MHz_XTAL));
+	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &vigilant_state::sound_io_map);
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(128*55));    /* clocked by V1 */
+	/* IRQs are generated by main Z80 and YM2151 */
+	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
+
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((16*8)-1, (64-16)*8-4, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea((16*8)-1, (64-16)*8-4, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vigilant)
-	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vigilant);
+	PALETTE(config, m_palette).set_entries(512+32); /* 512 real palette, 32 virtual palette */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
-	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "lspeaker", 0.55);
+	ymsnd.add_route(1, "rspeaker", 0.55);
 
-MACHINE_CONFIG_START(vigilant_state::buccanrs)
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
+void vigilant_state::buccanrs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5688800)          /* 5.688800 MHz */
-	MCFG_CPU_PROGRAM_MAP(vigilant_map)
-	MCFG_CPU_IO_MAP(vigilant_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 5688800);          /* 5.688800 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::vigilant_map);
+	m_maincpu->set_addrmap(AS_IO, &vigilant_state::vigilant_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, 18432000/6)          /* 3.072000 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(buccanrs_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
+	z80_device &soundcpu(Z80(config, "soundcpu", 18432000/6));  /* 3.072000 MHz */
+	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &vigilant_state::buccanrs_sound_io_map);
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(128*55));    /* clocked by V1 */
 								/* IRQs are generated by main Z80 and YM2151 */
+	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
+
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(16*8, (64-16)*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buccanrs)
-	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buccanrs);
+	PALETTE(config, m_palette).set_entries(512+32); /* 512 real palette, 32 virtual palette */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
-	MCFG_SOUND_ADD("ym1", YM2203, 18432000/6)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(3, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
+	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
-	MCFG_SOUND_ADD("ym2", YM2203, 18432000/6)
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(3, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", 18432000/6));
+	ym1.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ym1.add_route(0, "lspeaker",  0.35);
+	ym1.add_route(0, "rspeaker", 0.35);
+	ym1.add_route(1, "lspeaker",  0.35);
+	ym1.add_route(1, "rspeaker", 0.35);
+	ym1.add_route(2, "lspeaker",  0.35);
+	ym1.add_route(2, "rspeaker", 0.35);
+	ym1.add_route(3, "lspeaker",  0.50);
+	ym1.add_route(3, "rspeaker", 0.50);
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 18432000/6));;
+	ym2.add_route(0, "lspeaker",  0.35);
+	ym2.add_route(0, "rspeaker", 0.35);
+	ym2.add_route(1, "lspeaker",  0.35);
+	ym2.add_route(1, "rspeaker", 0.35);
+	ym2.add_route(2, "lspeaker",  0.35);
+	ym2.add_route(2, "rspeaker", 0.35);
+	ym2.add_route(3, "lspeaker",  0.50);
+	ym2.add_route(3, "rspeaker", 0.50);
 
-MACHINE_CONFIG_START(vigilant_state::kikcubic)
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
+void vigilant_state::kikcubic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(kikcubic_map)
-	MCFG_CPU_IO_MAP(kikcubic_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::kikcubic_map);
+	m_maincpu->set_addrmap(AS_IO, &vigilant_state::kikcubic_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
+	z80_device &soundcpu(Z80(config, "soundcpu", 3.579545_MHz_XTAL));
+	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &vigilant_state::sound_io_map);
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(128*55));    /* clocked by V1 */
 								/* IRQs are generated by main Z80 and YM2151 */
+	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
+
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_kikcubic)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(vigilant_state::screen_update_kikcubic));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kikcubic)
-	MCFG_PALETTE_ADD("palette", 256)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kikcubic);
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
-	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_dac_tag("dac");
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "lspeaker", 0.55);
+	ymsnd.add_route(1, "rspeaker", 0.55);
+
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -627,39 +666,39 @@ MACHINE_CONFIG_END
 
 ROM_START( vigilant ) // World Rev E
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "VG_A-8H-E.ic55",  0x00000, 0x08000, CRC(0d4e6866) SHA1(50ddeb34e72d3f6368b3da5cddf0f510693c8cce) )
-	ROM_LOAD( "VG_A-8L-A.ic57",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
+	ROM_LOAD( "vg_a-8h-e.ic55",  0x00000, 0x08000, CRC(0d4e6866) SHA1(50ddeb34e72d3f6368b3da5cddf0f510693c8cce) )
+	ROM_LOAD( "vg_a-8l-a.ic57",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "VG_A-5J-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // 27C512 on E/G set
-	ROM_LOAD( "VG_B-4F-.ic34",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
-	ROM_LOAD( "VG_B-4J-.ic35",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
+	ROM_LOAD( "vg_b-4f-.ic34",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
+	ROM_LOAD( "vg_b-4j-.ic35",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) // 27C1000 on E/G set
-	ROM_LOAD( "VG_B-6L-.ic62",  0x00000, 0x10000, CRC(fbe9552d) SHA1(3c7c218f13c0a94bb624745d81d63db9423777ea) )
+	ROM_LOAD( "vg_b-6l-.ic62",  0x00000, 0x10000, CRC(fbe9552d) SHA1(3c7c218f13c0a94bb624745d81d63db9423777ea) )
 	ROM_CONTINUE(0x20000,0x10000)
-	ROM_LOAD( "VG_B-6K-.ic61",  0x10000, 0x10000, CRC(ae09d5c0) SHA1(9da5b824b148c1e1478e3f4b44ba4348376ed7d5) )
+	ROM_LOAD( "vg_b-6k-.ic61",  0x10000, 0x10000, CRC(ae09d5c0) SHA1(9da5b824b148c1e1478e3f4b44ba4348376ed7d5) )
 	ROM_CONTINUE(0x30000,0x10000)
-	ROM_LOAD( "VG_B-6P-.ic64",  0x40000, 0x10000, CRC(afb77461) SHA1(18707768a4768b579c94092a260e286d3214b977) )
+	ROM_LOAD( "vg_b-6p-.ic64",  0x40000, 0x10000, CRC(afb77461) SHA1(18707768a4768b579c94092a260e286d3214b977) )
 	ROM_CONTINUE(0x60000,0x10000)
-	ROM_LOAD( "VG_B-6N-.ic63",  0x50000, 0x10000, CRC(5065cd35) SHA1(9a03c5af024fcae6b3371bb04be3e811ecc390d7) )
+	ROM_LOAD( "vg_b-6n-.ic63",  0x50000, 0x10000, CRC(5065cd35) SHA1(9a03c5af024fcae6b3371bb04be3e811ecc390d7) )
 	ROM_CONTINUE(0x70000,0x10000)
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) // 27C512 on E/G set
-	ROM_LOAD( "VG_B-1D-.ic2",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
-	ROM_LOAD( "VG_B-1F-.ic3",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
-	ROM_LOAD( "VG_B-1H-.ic4",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
+	ROM_LOAD( "vg_b-1d-.ic2",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
+	ROM_LOAD( "vg_b-1f-.ic3",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
+	ROM_LOAD( "vg_b-1h-.ic4",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "VG_A-4D-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
@@ -667,39 +706,39 @@ ROM_END
 
 ROM_START( vigilantg ) // US Rev G
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "VG_A-8H-G.ic55",  0x00000, 0x08000, CRC(9444c04e) SHA1(463d2dae48df2d237bd19d5e16cab032df0d9052) )
-	ROM_LOAD( "VG_A-8L-.ic57",   0x10000, 0x10000, CRC(7f95799b) SHA1(a371671c3c26976314aaac4e410bff0f13a8a085) )
+	ROM_LOAD( "vg_a-8h-g.ic55",  0x00000, 0x08000, CRC(9444c04e) SHA1(463d2dae48df2d237bd19d5e16cab032df0d9052) )
+	ROM_LOAD( "vg_a-8l-.ic57",   0x10000, 0x10000, CRC(7f95799b) SHA1(a371671c3c26976314aaac4e410bff0f13a8a085) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "VG_A-5J-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // 27C512 on E/G set
-	ROM_LOAD( "VG_B-4F-.ic34",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
-	ROM_LOAD( "VG_B-4J-.ic35",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
+	ROM_LOAD( "vg_b-4f-.ic34",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
+	ROM_LOAD( "vg_b-4j-.ic35",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) // 27C1000 on E/G set
-	ROM_LOAD( "VG_B-6L-.ic62",  0x00000, 0x10000, CRC(fbe9552d) SHA1(3c7c218f13c0a94bb624745d81d63db9423777ea) )
+	ROM_LOAD( "vg_b-6l-.ic62",  0x00000, 0x10000, CRC(fbe9552d) SHA1(3c7c218f13c0a94bb624745d81d63db9423777ea) )
 	ROM_CONTINUE(0x20000,0x10000)
-	ROM_LOAD( "VG_B-6K-.ic61",  0x10000, 0x10000, CRC(ae09d5c0) SHA1(9da5b824b148c1e1478e3f4b44ba4348376ed7d5) )
+	ROM_LOAD( "vg_b-6k-.ic61",  0x10000, 0x10000, CRC(ae09d5c0) SHA1(9da5b824b148c1e1478e3f4b44ba4348376ed7d5) )
 	ROM_CONTINUE(0x30000,0x10000)
-	ROM_LOAD( "VG_B-6P-.ic64",  0x40000, 0x10000, CRC(afb77461) SHA1(18707768a4768b579c94092a260e286d3214b977) )
+	ROM_LOAD( "vg_b-6p-.ic64",  0x40000, 0x10000, CRC(afb77461) SHA1(18707768a4768b579c94092a260e286d3214b977) )
 	ROM_CONTINUE(0x60000,0x10000)
-	ROM_LOAD( "VG_B-6N-.ic63",  0x50000, 0x10000, CRC(5065cd35) SHA1(9a03c5af024fcae6b3371bb04be3e811ecc390d7) )
+	ROM_LOAD( "vg_b-6n-.ic63",  0x50000, 0x10000, CRC(5065cd35) SHA1(9a03c5af024fcae6b3371bb04be3e811ecc390d7) )
 	ROM_CONTINUE(0x70000,0x10000)
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) // 27C512 on E/G set
-	ROM_LOAD( "VG_B-1D-.ic2",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
-	ROM_LOAD( "VG_B-1F-.ic3",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
-	ROM_LOAD( "VG_B-1H-.ic4",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
+	ROM_LOAD( "vg_b-1d-.ic2",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
+	ROM_LOAD( "vg_b-1f-.ic3",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
+	ROM_LOAD( "vg_b-1h-.ic4",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "VG_A-4D-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
@@ -707,12 +746,12 @@ ROM_END
 
 ROM_START( vigilanto ) // US (earliest base version)
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "VG_A-8H-.ic55",  0x00000, 0x08000, CRC(8d15109e) SHA1(9ef57047a0b53cd0143a260193b33e3d5680ca71) )
-	ROM_LOAD( "VG_A-8L-.ic57",  0x10000, 0x10000, CRC(7f95799b) SHA1(a371671c3c26976314aaac4e410bff0f13a8a085) )
+	ROM_LOAD( "vg_a-8h-.ic55",  0x00000, 0x08000, CRC(8d15109e) SHA1(9ef57047a0b53cd0143a260193b33e3d5680ca71) )
+	ROM_LOAD( "vg_a-8l-.ic57",  0x10000, 0x10000, CRC(7f95799b) SHA1(a371671c3c26976314aaac4e410bff0f13a8a085) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "VG_A-5J-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // 23C1000 28 pin mask ROM on base/A/B/C/D set, top half empty
 	ROM_LOAD( "613.ic34",  0x00000, 0x10000, CRC(ee7a6c2f) SHA1(e676654d5bdc53604d503fd1fe244a84372efaec) )
@@ -735,13 +774,13 @@ ROM_START( vigilanto ) // US (earliest base version)
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "VG_A-4D-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
@@ -749,12 +788,12 @@ ROM_END
 
 ROM_START( vigilanta ) // World Rev A
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "VG_A-8H-A.ic55",  0x00000, 0x08000, CRC(97df1454) SHA1(4c29e57529e20315459d36c1f1ad3d729546bef0) )
-	ROM_LOAD( "VG_A-8L-A.ic57",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
+	ROM_LOAD( "vg_a-8h-a.ic55",  0x00000, 0x08000, CRC(97df1454) SHA1(4c29e57529e20315459d36c1f1ad3d729546bef0) )
+	ROM_LOAD( "vg_a-8l-a.ic57",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound, matches base set */
-	ROM_LOAD( "VG_A-5J-A.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-a.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // 23C1000 28 pin mask ROM on base/A/B/C/D set, top half empty
 	ROM_LOAD( "613.ic34",  0x00000, 0x10000, CRC(ee7a6c2f) SHA1(e676654d5bdc53604d503fd1fe244a84372efaec) )
@@ -777,13 +816,13 @@ ROM_START( vigilanta ) // World Rev A
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples, matches base set */
-	ROM_LOAD( "VG_A-4D-A.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples, matches base set */
+	ROM_LOAD( "vg_a-4d-a.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
@@ -791,12 +830,12 @@ ROM_END
 
 ROM_START( vigilantb ) // US Rev B
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "VG_A-8H-B.ic55",  0x00000, 0x08000, CRC(05350c2a) SHA1(5fe932bcae34b8f85ffb519879db4115a5ff5464) )
-	ROM_LOAD( "VG_A-8L-.ic57",  0x10000, 0x10000, CRC(7f95799b) SHA1(a371671c3c26976314aaac4e410bff0f13a8a085) )
+	ROM_LOAD( "vg_a-8h-b.ic55",  0x00000, 0x08000, CRC(05350c2a) SHA1(5fe932bcae34b8f85ffb519879db4115a5ff5464) )
+	ROM_LOAD( "vg_a-8l-.ic57",  0x10000, 0x10000, CRC(7f95799b) SHA1(a371671c3c26976314aaac4e410bff0f13a8a085) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "VG_A-5J-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // 23C1000 28 pin mask ROM on base/A/B/C/D set, top half empty
 	ROM_LOAD( "613.ic34",  0x00000, 0x10000, CRC(ee7a6c2f) SHA1(e676654d5bdc53604d503fd1fe244a84372efaec) )
@@ -819,13 +858,13 @@ ROM_START( vigilantb ) // US Rev B
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "VG_A-4D-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
@@ -833,12 +872,12 @@ ROM_END
 
 ROM_START( vigilantc ) // World Rev C
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "VG_A-8H-C.ic55",  0x00000, 0x08000, CRC(d72682e8) SHA1(2401a6397164ff66d96f6023f021c615d70108a5) )
-	ROM_LOAD( "VG_A-8L-A.ic57",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
+	ROM_LOAD( "vg_a-8h-c.ic55",  0x00000, 0x08000, CRC(d72682e8) SHA1(2401a6397164ff66d96f6023f021c615d70108a5) )
+	ROM_LOAD( "vg_a-8l-a.ic57",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "VG_A-5J-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // 23C1000 28 pin mask ROM on base/A/B/C/D set, top half empty
 	ROM_LOAD( "613.ic34",  0x00000, 0x10000, CRC(ee7a6c2f) SHA1(e676654d5bdc53604d503fd1fe244a84372efaec) )
@@ -861,13 +900,13 @@ ROM_START( vigilantc ) // World Rev C
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "VG_A-4D-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
@@ -875,12 +914,12 @@ ROM_END
 
 ROM_START( vigilantd ) // Japan Rev D
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "VG_A-8H-D.ic55",  0x00000, 0x08000, CRC(ba848713) SHA1(b357cbf404fb1874d555797ed9fb37f946cc4340) )
-	ROM_LOAD( "VG_A-8L-D.ic57",  0x10000, 0x10000, CRC(3b12b1d8) SHA1(2f9207f8d8ec41ea1b8f5bf3c69a97d1d09f6c3f) )
+	ROM_LOAD( "vg_a-8h-d.ic55",  0x00000, 0x08000, CRC(ba848713) SHA1(b357cbf404fb1874d555797ed9fb37f946cc4340) )
+	ROM_LOAD( "vg_a-8l-d.ic57",  0x10000, 0x10000, CRC(3b12b1d8) SHA1(2f9207f8d8ec41ea1b8f5bf3c69a97d1d09f6c3f) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound, matches base set */
-	ROM_LOAD( "VG_A-5J-D.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-d.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) // 23C1000 28 pin mask ROM on base/A/B/C/D set, top half empty
 	ROM_LOAD( "613.ic34",  0x00000, 0x10000, CRC(ee7a6c2f) SHA1(e676654d5bdc53604d503fd1fe244a84372efaec) )
@@ -903,13 +942,13 @@ ROM_START( vigilantd ) // Japan Rev D
 	ROM_LOAD( "612.ic4",  0x20000, 0x10000, CRC(85057c81) SHA1(47663e17f08f47d847605c14e849266468ff39ba) )
 	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples, matches base set */
-	ROM_LOAD( "VG_A-4D-D.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples, matches base set */
+	ROM_LOAD( "vg_a-4d-d.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10_7a.ic52", 0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // tbp24s10, 82s129-equivalent - video timing
@@ -943,13 +982,13 @@ ROM_START( vigilantbl ) /* Bootleg */
 	ROM_LOAD( "e01_c06.bin",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
 	ROM_LOAD( "f01_c07.bin",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "d04_c01.bin",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - not convinced these exist in this form on bootleg */
-	ROM_LOAD( "VG_B-8R.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
-	ROM_LOAD( "VG_B-4M.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
-	ROM_LOAD( "VG_B-1B.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1",  0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 ROM_END
 
 
@@ -970,7 +1009,7 @@ ROM_START( kikcubic )
 	ROM_LOAD( "mqj-00",       0x00000, 0x40000, CRC(7fb0c58f) SHA1(f70ff39e2d648606686c87cf1a7a3ffb46c2656a) )
 	ROM_LOAD( "mqj-10",       0x40000, 0x40000, CRC(3a189205) SHA1(063d664d4cf709931b5e3a5b6eb7c75bcd57b518) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "mqj-v0",       0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
@@ -1003,7 +1042,7 @@ ROM_START( kikcubicb )
 	ROM_LOAD( "8.bin",        0x50000, 0x10000, CRC(947dbd4e) SHA1(278ad7126bacb752886800cf48c6fe704427149d) )
 	ROM_RELOAD(               0x70000, 0x10000 )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
 	ROM_LOAD( "mqj-v0",       0x00000, 0x10000, CRC(54762956) SHA1(f08e983af28b16d27505d465ca64e7c7a93373a4) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
@@ -1015,30 +1054,30 @@ ROM_END
 
 ROM_START( buccanrs )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "BC-011_K-163.U58",  0x00000, 0x10000, CRC(bf1d7e6f) SHA1(55dcf993515b57c3eb1fab98097a2171df3e38ed) ) // both halves are identical (correct for rom type on this board tho)
-	ROM_LOAD( "BC-012_K-163.U25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
+	ROM_LOAD( "bc-011_k-163.u58",  0x00000, 0x10000, CRC(bf1d7e6f) SHA1(55dcf993515b57c3eb1fab98097a2171df3e38ed) ) // both halves are identical (correct for rom type on this board tho)
+	ROM_LOAD( "bc-012_k-163.u25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "BC-001_K-0161.U128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
+	ROM_LOAD( "bc-001_k-0161.u128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "BC-003_K-0161.U212",  0x00000, 0x10000, CRC(95e3c517) SHA1(9954830ebc3a6414a3236f4e41981db082e5ea19) )
-	ROM_LOAD( "BC-004_K-0161.U189",  0x10000, 0x10000, CRC(fe2377ab) SHA1(8578c5466d98f140fdfc41e91cd841e725786e32) )
+	ROM_LOAD( "bc-003_k-0161.u212",  0x00000, 0x10000, CRC(95e3c517) SHA1(9954830ebc3a6414a3236f4e41981db082e5ea19) )
+	ROM_LOAD( "bc-004_k-0161.u189",  0x10000, 0x10000, CRC(fe2377ab) SHA1(8578c5466d98f140fdfc41e91cd841e725786e32) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "BC-005_K-0161.U113",  0x00000, 0x10000, CRC(16dc435f) SHA1(0c13e9786b356770c84f94684697e43d0ea9e7cc) )
+	ROM_LOAD( "bc-005_k-0161.u113",  0x00000, 0x10000, CRC(16dc435f) SHA1(0c13e9786b356770c84f94684697e43d0ea9e7cc) )
 	ROM_CONTINUE(        0x20000, 0x10000 )
-	ROM_LOAD( "BC-006_K-161.U80",   0x10000, 0x10000, CRC(4fe3bf97) SHA1(7910ace1eed80bfafa1f9f057ed67e23aa446a22) )
-	ROM_LOAD( "BC-008_K-161.U52",   0x40000, 0x10000, CRC(078aef7f) SHA1(72e60d39d8af8bd31e9ae019b12620797eb0af7f) )
+	ROM_LOAD( "bc-006_k-161.u80",   0x10000, 0x10000, CRC(4fe3bf97) SHA1(7910ace1eed80bfafa1f9f057ed67e23aa446a22) )
+	ROM_LOAD( "bc-008_k-161.u52",   0x40000, 0x10000, CRC(078aef7f) SHA1(72e60d39d8af8bd31e9ae019b12620797eb0af7f) )
 	ROM_CONTINUE(        0x60000, 0x10000 )
-	ROM_LOAD( "BC-007_K-161.U70",   0x50000, 0x10000, CRC(f650fa90) SHA1(c87081b4d6b09f865d08c5120da3d0fb3196a2c3) )
+	ROM_LOAD( "bc-007_k-161.u70",   0x50000, 0x10000, CRC(f650fa90) SHA1(c87081b4d6b09f865d08c5120da3d0fb3196a2c3) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "BC-009_K-163.U49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
-	ROM_LOAD( "BC-010_K-163.U27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
+	ROM_LOAD( "bc-009_k-163.u49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
+	ROM_LOAD( "bc-010_k-163.u27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "BC-002_K-0161.U74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "bc-002_k-0161.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // == ic52 video timing prom from vigilante
@@ -1055,29 +1094,29 @@ ROM_END
 ROM_START( buccanrsa )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "bc-011",  0x00000, 0x08000, CRC(6b657ef1) SHA1(a3356654d4b04177af23b39e924cc5ad64930bb6) )
-	ROM_LOAD( "BC-012_K-163.U25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
+	ROM_LOAD( "bc-012_k-163.u25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "BC-001_K-0161.U128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
+	ROM_LOAD( "bc-001_k-0161.u128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "BC-003_K-0161.U212",  0x00000, 0x10000, CRC(95e3c517) SHA1(9954830ebc3a6414a3236f4e41981db082e5ea19) )
-	ROM_LOAD( "BC-004_K-0161.U189",  0x10000, 0x10000, CRC(fe2377ab) SHA1(8578c5466d98f140fdfc41e91cd841e725786e32) )
+	ROM_LOAD( "bc-003_k-0161.u212",  0x00000, 0x10000, CRC(95e3c517) SHA1(9954830ebc3a6414a3236f4e41981db082e5ea19) )
+	ROM_LOAD( "bc-004_k-0161.u189",  0x10000, 0x10000, CRC(fe2377ab) SHA1(8578c5466d98f140fdfc41e91cd841e725786e32) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "BC-005_K-0161.U113",  0x00000, 0x10000, CRC(16dc435f) SHA1(0c13e9786b356770c84f94684697e43d0ea9e7cc) )
+	ROM_LOAD( "bc-005_k-0161.u113",  0x00000, 0x10000, CRC(16dc435f) SHA1(0c13e9786b356770c84f94684697e43d0ea9e7cc) )
 	ROM_CONTINUE(        0x20000, 0x10000 )
-	ROM_LOAD( "BC-006_K-161.U80",   0x10000, 0x10000, CRC(4fe3bf97) SHA1(7910ace1eed80bfafa1f9f057ed67e23aa446a22) )
-	ROM_LOAD( "BC-008_K-161.U52",   0x40000, 0x10000, CRC(078aef7f) SHA1(72e60d39d8af8bd31e9ae019b12620797eb0af7f) )
+	ROM_LOAD( "bc-006_k-161.u80",   0x10000, 0x10000, CRC(4fe3bf97) SHA1(7910ace1eed80bfafa1f9f057ed67e23aa446a22) )
+	ROM_LOAD( "bc-008_k-161.u52",   0x40000, 0x10000, CRC(078aef7f) SHA1(72e60d39d8af8bd31e9ae019b12620797eb0af7f) )
 	ROM_CONTINUE(        0x60000, 0x10000 )
-	ROM_LOAD( "BC-007_K-161.U70",   0x50000, 0x10000, CRC(f650fa90) SHA1(c87081b4d6b09f865d08c5120da3d0fb3196a2c3) )
+	ROM_LOAD( "bc-007_k-161.u70",   0x50000, 0x10000, CRC(f650fa90) SHA1(c87081b4d6b09f865d08c5120da3d0fb3196a2c3) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "BC-009_K-163.U49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
-	ROM_LOAD( "BC-010_K-163.U27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
+	ROM_LOAD( "bc-009_k-163.u49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
+	ROM_LOAD( "bc-010_k-163.u27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "BC-002_K-0161.U74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "bc-002_k-0161.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // == ic52 video timing prom from vigilante
@@ -1089,30 +1128,30 @@ ROM_END
 
 ROM_START( buccanrsb )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "rr_Du.u58",  0x00000, 0x08000, CRC(dcad3a8b) SHA1(e961927bdff28db18b829ce3f64051ff1604d1e6) )
-	ROM_LOAD( "BC-012_K-163.U25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
+	ROM_LOAD( "rr_du.u58",  0x00000, 0x08000, CRC(dcad3a8b) SHA1(e961927bdff28db18b829ce3f64051ff1604d1e6) )
+	ROM_LOAD( "bc-012_k-163.u25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "BC-001_K-0161.U128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
+	ROM_LOAD( "bc-001_k-0161.u128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "BC-003_K-0161.U212",  0x00000, 0x10000, CRC(95e3c517) SHA1(9954830ebc3a6414a3236f4e41981db082e5ea19) )
-	ROM_LOAD( "BC-004_K-0161.U189",  0x10000, 0x10000, CRC(fe2377ab) SHA1(8578c5466d98f140fdfc41e91cd841e725786e32) )
+	ROM_LOAD( "bc-003_k-0161.u212",  0x00000, 0x10000, CRC(95e3c517) SHA1(9954830ebc3a6414a3236f4e41981db082e5ea19) )
+	ROM_LOAD( "bc-004_k-0161.u189",  0x10000, 0x10000, CRC(fe2377ab) SHA1(8578c5466d98f140fdfc41e91cd841e725786e32) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "BC-005_K-0161.U113",  0x00000, 0x10000, CRC(16dc435f) SHA1(0c13e9786b356770c84f94684697e43d0ea9e7cc) )
+	ROM_LOAD( "bc-005_k-0161.u113",  0x00000, 0x10000, CRC(16dc435f) SHA1(0c13e9786b356770c84f94684697e43d0ea9e7cc) )
 	ROM_CONTINUE(        0x20000, 0x10000 )
-	ROM_LOAD( "BC-006_K-161.U80",   0x10000, 0x10000, CRC(4fe3bf97) SHA1(7910ace1eed80bfafa1f9f057ed67e23aa446a22) )
-	ROM_LOAD( "BC-008_K-161.U52",   0x40000, 0x10000, CRC(078aef7f) SHA1(72e60d39d8af8bd31e9ae019b12620797eb0af7f) )
+	ROM_LOAD( "bc-006_k-161.u80",   0x10000, 0x10000, CRC(4fe3bf97) SHA1(7910ace1eed80bfafa1f9f057ed67e23aa446a22) )
+	ROM_LOAD( "bc-008_k-161.u52",   0x40000, 0x10000, CRC(078aef7f) SHA1(72e60d39d8af8bd31e9ae019b12620797eb0af7f) )
 	ROM_CONTINUE(        0x60000, 0x10000 )
-	ROM_LOAD( "BC-007_K-161.U70",   0x50000, 0x10000, CRC(f650fa90) SHA1(c87081b4d6b09f865d08c5120da3d0fb3196a2c3) )
+	ROM_LOAD( "bc-007_k-161.u70",   0x50000, 0x10000, CRC(f650fa90) SHA1(c87081b4d6b09f865d08c5120da3d0fb3196a2c3) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "BC-009_K-163.U49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
-	ROM_LOAD( "BC-010_K-163.U27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
+	ROM_LOAD( "bc-009_k-163.u49",   0x20000, 0x20000, CRC(0c6188fb) SHA1(d49034384c6d0e94db2890223b32a2a49e79a639) )
+	ROM_LOAD( "bc-010_k-163.u27",  0x00000, 0x20000, CRC(2d383ff8) SHA1(3062baac27feba69c6ed94935c5ced72d89ed4fb) )
 
-	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "BC-002_K-0161.U74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
+	ROM_REGION( 0x10000, "m72", 0 ) /* samples */
+	ROM_LOAD( "bc-002_k-0161.u74",  0x00000, 0x10000, CRC(36ee1dac) SHA1(6dfd2a885c0b1c9347abc4b204ade66551c4b404) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "prom1.u54",  0x0000, 0x0100, CRC(c324835e) SHA1(cf6ffe38523badfda211d341410e93e647de87a9) ) // == ic52 video timing prom from vigilante
@@ -1121,18 +1160,18 @@ ROM_START( buccanrsb )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, vigilant_state, 0, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, 0, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, vigilant_state, empty_init, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, empty_init, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

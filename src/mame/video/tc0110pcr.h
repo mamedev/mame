@@ -6,38 +6,36 @@
 #pragma once
 
 
-class tc0110pcr_device : public device_t
+class tc0110pcr_device : public device_t, public device_palette_interface
 {
 public:
-	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w ); /* color index goes up in step of 2 */
-	DECLARE_WRITE16_MEMBER( step1_word_w );   /* color index goes up in step of 1 */
-	DECLARE_WRITE16_MEMBER( step1_rbswap_word_w );    /* swaps red and blue components */
-	DECLARE_WRITE16_MEMBER( step1_4bpg_word_w );  /* only 4 bits per color gun */
+	u16 word_r(offs_t offset);
+	void word_w(offs_t offset, u16 data); /* color index goes up in step of 2 */
+	void step1_word_w(offs_t offset, u16 data);   /* color index goes up in step of 1 */
+	void step1_rbswap_word_w(offs_t offset, u16 data);    /* swaps red and blue components */
+	void step1_4bpg_word_w(offs_t offset, u16 data);  /* only 4 bits per color gun */
 
 	void restore_colors();
-
-	static void static_set_palette_tag(device_t &device, const char *tag);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
+
+	// device_palette_interface overrides
+	virtual u32 palette_entries() const override { return TC0110PCR_RAM_SIZE; }
 
 private:
+	static const unsigned TC0110PCR_RAM_SIZE = 0x2000 / 2;
+
 	std::unique_ptr<uint16_t[]>     m_ram;
 	int          m_type;
 	int          m_addr;
-	required_device<palette_device> m_palette;
 };
 
 DECLARE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device)
-
-#define MCFG_TC0110PCR_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TC0110PCR, 0)
-#define MCFG_TC0110PCR_PALETTE(_palette_tag) \
-	tc0110pcr_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif // MAME_VIDEO_TC0110PCR_H

@@ -24,24 +24,45 @@ DEFINE_DEVICE_TYPE(EXCELLENT_SPRITE, excellent_spr_device, "excellent_spr", "Exc
 
 excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXCELLENT_SPRITE, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)
+	, m_gfx_region(*this, DEVICE_SELF)
+	, m_colbase(0)
 {
 }
 
 
 void excellent_spr_device::device_start()
 {
-	m_ram = make_unique_clear<uint8_t[]>(0x1000);
-	save_pointer(NAME(m_ram.get()), 0x1000);
+	/* 16x16x4 */
+	gfx_layout layout_16x16x4 =
+	{
+		16,16,  /* 16*16 sprites */
+		0,
+		4,  /* 4 bits per pixel */
+//  { 16, 48, 0, 32 },
+		{ 48, 16, 32, 0 },
+		{ STEP16(0,1) },
+		{ STEP16(0,16*4) },
+		16*16*4   /* every sprite takes 128 consecutive bytes */
+	};
+	layout_16x16x4.total = m_gfx_region->bytes() / ((16*16*4) / 8);
+
+	m_colpri_cb.bind_relative_to(*owner());
+	m_ram = make_unique_clear<u8[]>(0x1000);
+
+	save_pointer(NAME(m_ram), 0x1000);
+
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x4, m_gfx_region->base(), 0, 0x10, m_colbase));
 }
 
 
-READ8_MEMBER(excellent_spr_device::read)
+u8 excellent_spr_device::read(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(excellent_spr_device::write)
+void excellent_spr_device::write(offs_t offset, u8 data)
 {
 	m_ram[offset] = data;
 }
@@ -72,34 +93,38 @@ void excellent_spr_device::device_reset()
 ****************************************************************/
 
 
-void excellent_spr_device::aquarium_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int y_offs )
+void excellent_spr_device::aquarium_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	int offs, chain_pos;
-	int x, y, curx, cury;
-	uint8_t col, flipx, flipy, chain;
-	uint16_t code;
+	const bool priority = !m_colpri_cb.isnull();
 
-	for (offs = 0; offs < 0x1000; offs += 8)
+	int start, end, inc;
+	if (priority) { start = 0x1000 - 8; end =     -8; inc = -8; }
+	else          { start =          0; end = 0x1000; inc = +8; }
+
+	for (int offs = start; offs != end; offs += inc)
 	{
-		code = ((m_ram[offs + 5]) & 0xff) + (((m_ram[offs + 6]) & 0xff) << 8);
+		u32 code = ((m_ram[offs + 5]) & 0xff) + (((m_ram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;
 
-		if (!(m_ram[offs + 4] &0x80))  /* active sprite ? */
+		if (!(m_ram[offs + 4] & 0x80))  /* active sprite ? */
 		{
-			x = ((m_ram[offs + 0]) &0xff) + (((m_ram[offs + 1]) & 0xff) << 8);
-			y = ((m_ram[offs + 2]) &0xff) + (((m_ram[offs + 3]) & 0xff) << 8);
+			int x = ((m_ram[offs + 0]) & 0xff) + (((m_ram[offs + 1]) & 0xff) << 8);
+			int y = ((m_ram[offs + 2]) & 0xff) + (((m_ram[offs + 3]) & 0xff) << 8);
 
 			/* Treat coords as signed */
 			if (x & 0x8000)  x -= 0x10000;
 			if (y & 0x8000)  y -= 0x10000;
 
-			col = ((m_ram[offs + 7]) & 0x0f);
-			chain = (m_ram[offs + 4]) & 0x07;
-			flipy = (m_ram[offs + 4]) & 0x10;
-			flipx = (m_ram[offs + 4]) & 0x20;
+			u32 pri_mask = 0;
+			u32 colour = ((m_ram[offs + 7]) & 0x0f);
+			const u8 chain = (m_ram[offs + 4]) & 0x07;
+			const bool flipy = (m_ram[offs + 4]) & 0x10;
+			const bool flipx = (m_ram[offs + 4]) & 0x20;
+			if (priority)
+				m_colpri_cb(colour, pri_mask);
 
-			curx = x;
-			cury = y;
+			int curx = x;
+			int cury = y;
 
 			if (((m_ram[offs + 4]) & 0x08) && flipy)
 				cury += (chain * 16);
@@ -107,25 +132,44 @@ void excellent_spr_device::aquarium_draw_sprites( bitmap_ind16 &bitmap, const re
 			if (!(((m_ram[offs + 4]) & 0x08)) && flipx)
 				curx += (chain * 16);
 
-
-			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
+			for (int chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						code,
-						col,
-						flipx, flipy,
-						curx,cury,0);
+				if (priority)
+				{
+					gfx(0)->prio_transpen(bitmap,cliprect,
+							code,
+							colour,
+							flipx, flipy,
+							curx,cury,
+							screen.priority(),pri_mask,0);
 
-				/* wrap around y */
-				gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						code,
-						col,
-						flipx, flipy,
-						curx,cury + 256,0);
+					/* wrap around y */
+					gfx(0)->prio_transpen(bitmap,cliprect,
+							code,
+							colour,
+							flipx, flipy,
+							curx,cury + 256,
+							screen.priority(),pri_mask,0);
+				}
+				else
+				{
+					gfx(0)->transpen(bitmap,cliprect,
+							code,
+							colour,
+							flipx, flipy,
+							curx,cury,0);
+
+					/* wrap around y */
+					gfx(0)->transpen(bitmap,cliprect,
+							code,
+							colour,
+							flipx, flipy,
+							curx,cury + 256,0);
+				}
 
 				code++;
 
-				if ((m_ram[offs + 4]) &0x08)   /* Y chain */
+				if ((m_ram[offs + 4]) & 0x08)   /* Y chain */
 				{
 					if (flipy)
 						cury -= 16;
@@ -153,54 +197,66 @@ void excellent_spr_device::aquarium_draw_sprites( bitmap_ind16 &bitmap, const re
 #endif
 }
 
-void excellent_spr_device::gcpinbal_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int y_offs, int priority )
+void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	uint8_t *spriteram = m_ram.get();
-	int offs, chain_pos;
-	int x, y, curx, cury;
-//  int priority = 0;
-	uint8_t col, flipx, flipy, chain;
-	uint16_t code;
+	const bool priority = !m_colpri_cb.isnull();
 
+	int start, end, inc;
+	if (priority) { start = 0x1000 - 8; end =     -8; inc = -8; }
+	else          { start =          0; end = 0x1000; inc = +8; }
 
-	for (offs = 0x1000 - 8; offs >= 0; offs -= 8)
+	for (int offs = start; offs != end; offs += inc)
 	{
-		code = ((spriteram[offs + 5]) & 0xff) + (((spriteram[offs + 6]) & 0xff) << 8);
+		u32 code = ((m_ram[offs + 5]) & 0xff) + (((m_ram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;
 
-		if (!(spriteram[offs + 4] &0x80))   /* active sprite ? */
+		if (!(m_ram[offs + 4] & 0x80))   /* active sprite ? */
 		{
-			x = ((spriteram[offs + 0]) & 0xff) + (((spriteram[offs + 1]) & 0xff) << 8);
-			y = ((spriteram[offs + 2]) & 0xff) + (((spriteram[offs + 3]) & 0xff) << 8);
+			int x = ((m_ram[offs + 0]) & 0xff) + (((m_ram[offs + 1]) & 0xff) << 8);
+			int y = ((m_ram[offs + 2]) & 0xff) + (((m_ram[offs + 3]) & 0xff) << 8);
 
 			/* Treat coords as signed */
 			if (x & 0x8000)  x -= 0x10000;
 			if (y & 0x8000)  y -= 0x10000;
 
-			col  = ((spriteram[offs + 7]) & 0x0f) | 0x60;
-			chain = (spriteram[offs + 4]) & 0x07;
-			flipy = (spriteram[offs + 4]) & 0x10;
-			flipx = 0;
+			u32 pri_mask = 0;
+			u32 colour = ((m_ram[offs + 7]) & 0x0f);
+			const u8 chain = (m_ram[offs + 4]) & 0x07;
+			const bool flipy = (m_ram[offs + 4]) & 0x10;
+			const bool flipx = 0;
+			if (priority)
+				m_colpri_cb(colour, pri_mask);
 
-			curx = x;
-			cury = y;
+			int curx = x;
+			int cury = y;
 
-			if (((spriteram[offs + 4]) & 0x08) && flipy)
+			if (((m_ram[offs + 4]) & 0x08) && flipy)
 				cury += (chain * 16);
 
-			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
+			for (int chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-						code,
-						col,
-						flipx, flipy,
-						curx,cury,
-						screen.priority(),
-						priority ? 0xfc : 0xf0,0);
+				if (priority)
+				{
+					gfx(0)->prio_transpen(bitmap,cliprect,
+							code,
+							colour,
+							flipx, flipy,
+							curx,cury,
+							screen.priority(),pri_mask,0);
+				}
+				else
+				{
+					gfx(0)->transpen(bitmap,cliprect,
+							code,
+							colour,
+							flipx, flipy,
+							curx,cury,
+							0);
+				}
 
 				code++;
 
-				if ((spriteram[offs + 4]) & 0x08)   /* Y chain */
+				if ((m_ram[offs + 4]) & 0x08)   /* Y chain */
 				{
 					if (flipy)  cury -= 16;
 					else cury += 16;

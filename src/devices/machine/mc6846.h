@@ -14,36 +14,17 @@
 #pragma once
 
 
-#define MCFG_MC6846_OUT_PORT_CB(_devcb) \
-	devcb = &mc6846_device::set_out_port_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MC6846_OUT_CP1_CB(_devcb) \
-	devcb = &mc6846_device::set_out_cp1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MC6846_OUT_CP2_CB(_devcb) \
-	devcb = &mc6846_device::set_out_cp2_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MC6846_IN_PORT_CB(_devcb) \
-	devcb = &mc6846_device::set_in_port_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MC6846_OUT_CTO_CB(_devcb) \
-	devcb = &mc6846_device::set_out_cto_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MC6846_IRQ_CB(_devcb) \
-	devcb = &mc6846_device::set_irq_callback(*device, DEVCB_##_devcb);
-
-
 class mc6846_device : public device_t
 {
 public:
 	mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_port_callback(device_t &device, Object &&cb) { return downcast<mc6846_device &>(device).m_out_port_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_cp1_callback(device_t &device, Object &&cb) { return downcast<mc6846_device &>(device).m_out_cp1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_cp2_callback(device_t &device, Object &&cb) { return downcast<mc6846_device &>(device).m_out_cp2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_port_callback(device_t &device, Object &&cb) { return downcast<mc6846_device &>(device).m_in_port_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_cto_callback(device_t &device, Object &&cb) { return downcast<mc6846_device &>(device).m_out_cto_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<mc6846_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_port() { return m_out_port_cb.bind(); }
+	auto in_port() { return m_in_port_cb.bind(); }
+	auto cp1() { return m_out_cp1_cb.bind(); }
+	auto cp2() { return m_out_cp2_cb.bind(); }
+	auto cto() { return m_out_cto_cb.bind(); }
+	auto irq() { return m_irq_cb.bind(); }
 
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER(read);

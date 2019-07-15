@@ -178,13 +178,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PCE_CD, pce_cd_device)
 
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define MCFG_PCE_CD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PCE_CD, 0)
-
-
 #endif // MAME_MACHINE_PCE_CD_H

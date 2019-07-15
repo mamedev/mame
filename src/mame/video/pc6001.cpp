@@ -17,60 +17,56 @@
  *
  ****************************************/
 
-static const rgb_t defcolors[] =
+static constexpr rgb_t defcolors[] =
 {
-	rgb_t(0x07, 0xff, 0x00), /* GREEN */
-	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
-	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
-	rgb_t(0xcc, 0x00, 0x3b), /* RED */
-	rgb_t(0xff, 0xff, 0xff), /* BUFF */
-	rgb_t(0x07, 0xe3, 0x99), /* CYAN */
-	rgb_t(0xff, 0x1c, 0xff), /* MAGENTA */
-	rgb_t(0xff, 0x81, 0x00), /* ORANGE */
+	rgb_t(0x07, 0xff, 0x00), // GREEN
+	rgb_t(0xff, 0xff, 0x00), // YELLOW
+	rgb_t(0x3b, 0x08, 0xff), // BLUE
+	rgb_t(0xcc, 0x00, 0x3b), // RED
+	rgb_t(0xff, 0xff, 0xff), // BUFF
+	rgb_t(0x07, 0xe3, 0x99), // CYAN
+	rgb_t(0xff, 0x1c, 0xff), // MAGENTA
+	rgb_t(0xff, 0x81, 0x00), // ORANGE
 
-	/* MC6847 specific */
-	rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
-	rgb_t(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
-	rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
-	rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
+	// MC6847 specific
+	rgb_t(0x00, 0x7c, 0x00), // ALPHANUMERIC DARK GREEN
+	rgb_t(0x07, 0xff, 0x00), // ALPHANUMERIC BRIGHT GREEN
+	rgb_t(0x91, 0x00, 0x00), // ALPHANUMERIC DARK ORANGE
+	rgb_t(0xff, 0x81, 0x00)  // ALPHANUMERIC BRIGHT ORANGE
 };
 
-static const rgb_t mk2_defcolors[] =
+static constexpr rgb_t mk2_defcolors[] =
 {
-	rgb_t(0x00, 0x00, 0x00), /* BLACK */
-	rgb_t(0xff, 0xaf, 0x00), /* ORANGE */
-	rgb_t(0x00, 0xff, 0xaf), /* tone of GREEN */
-	rgb_t(0xaf, 0xff, 0x00), /* tone of GREEN */
-	rgb_t(0xaf, 0x00, 0xff), /* VIOLET */
-	rgb_t(0xff, 0x00, 0xaf), /* SCARLET */
-	rgb_t(0x00, 0xaf, 0xff), /* LIGHT BLUE */
-	rgb_t(0xaf, 0xaf, 0xaf), /* GRAY */
-	rgb_t(0x00, 0x00, 0x00), /* BLACK */
-	rgb_t(0xff, 0x00, 0x00), /* RED */
-	rgb_t(0x00, 0xff, 0x00), /* GREEN */
-	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
-	rgb_t(0x00, 0x00, 0xff), /* BLUE */
-	rgb_t(0xff, 0x00, 0xff), /* PINK */
-	rgb_t(0x00, 0xff, 0xff), /* CYAN */
-	rgb_t(0xff, 0xff, 0xff)  /* WHITE */
+	rgb_t(0x00, 0x00, 0x00), // BLACK
+	rgb_t(0xff, 0xaf, 0x00), // ORANGE
+	rgb_t(0x00, 0xff, 0xaf), // tone of GREEN
+	rgb_t(0xaf, 0xff, 0x00), // tone of GREEN
+	rgb_t(0xaf, 0x00, 0xff), // VIOLET
+	rgb_t(0xff, 0x00, 0xaf), // SCARLET
+	rgb_t(0x00, 0xaf, 0xff), // LIGHT BLUE
+	rgb_t(0xaf, 0xaf, 0xaf), // GRAY
+	rgb_t(0x00, 0x00, 0x00), // BLACK
+	rgb_t(0xff, 0x00, 0x00), // RED
+	rgb_t(0x00, 0xff, 0x00), // GREEN
+	rgb_t(0xff, 0xff, 0x00), // YELLOW
+	rgb_t(0x00, 0x00, 0xff), // BLUE
+	rgb_t(0xff, 0x00, 0xff), // PINK
+	rgb_t(0x00, 0xff, 0xff), // CYAN
+	rgb_t(0xff, 0xff, 0xff)  // WHITE
 };
 
-PALETTE_INIT_MEMBER(pc6001_state, pc6001)
+void pc6001_state::pc6001_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<8+4;i++)
+	for(int i=0;i<8+4;i++)
 		palette.set_pen_color(i+8,defcolors[i]);
 }
 
-PALETTE_INIT_MEMBER(pc6001mk2_state,pc6001mk2)
+void pc6001mk2_state::pc6001mk2_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<8;i++)
+	for(int i=0;i<8;i++)
 		palette.set_pen_color(i+8,defcolors[i]);
 
-	for(i=0x10;i<0x20;i++)
+	for(int i=0x10;i<0x20;i++)
 		palette.set_pen_color(i,mk2_defcolors[i-0x10]);
 }
 
@@ -108,7 +104,7 @@ uint8_t pc6001_state::pc6001_get_char_rom(uint8_t ch, int line)
 	return gfx[ch*16+line];
 }
 #endif
- 
+
 void pc6001_state::video_start()
 {
 	#if 0
@@ -131,7 +127,7 @@ void pc6001mk2_state::video_start()
 
 void pc6001sr_state::video_start()
 {
-//	m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
+//  m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
 	m_gvram = auto_alloc_array_clear(machine(), uint8_t, 320*256*8); // TODO: size
 	save_pointer(NAME(m_gvram), 320*256*8);
 }
@@ -574,12 +570,12 @@ uint32_t pc6001sr_state::screen_update_pc6001sr(screen_device &screen, bitmap_in
 			for(x=0;x<320;x+=2)
 			{
 				uint32_t vram_addr;
-				
+
 				if(x >= 256)
 					vram_addr = 0x1a00 + (x-256)+y*64;
 				else
 					vram_addr = x+y*256;
-				
+
 				color = (m_gvram[vram_addr] & 0xf0) >> 4;
 
 				if (cliprect.contains(x, y+0))

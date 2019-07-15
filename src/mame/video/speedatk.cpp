@@ -9,44 +9,42 @@
 #include "includes/speedatk.h"
 
 
-PALETTE_INIT_MEMBER(speedatk_state, speedatk)
+void speedatk_state::speedatk_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x10; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x10; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x20;
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = color_prom[i] & 0x0f;
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -63,23 +61,23 @@ WRITE8_MEMBER(speedatk_state::m6845_w)
 	if(offset == 0)
 	{
 		m_crtc_index = data;
-		m_crtc->address_w(space,0,data);
+		m_crtc->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_crtc->register_w(space,0,data);
+		m_crtc->register_w(data);
 	}
 }
 
-uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t speedatk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
 	uint16_t tile;
 	uint8_t color, region;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	count = (m_crtc_vreg[0x0c]<<8)|(m_crtc_vreg[0x0d] & 0xff);
 

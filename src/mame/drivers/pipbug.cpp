@@ -54,11 +54,13 @@ public:
 	{
 	}
 
+	void pipbug(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
 	required_device<rs232_port_device> m_rs232;
-	required_device<cpu_device> m_maincpu;
-	DECLARE_QUICKLOAD_LOAD_MEMBER( pipbug );
-	void pipbug(machine_config &config);
+	required_device<s2650_device> m_maincpu;
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void pipbug_data(address_map &map);
 	void pipbug_mem(address_map &map);
 };
@@ -68,16 +70,18 @@ WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
 // 0x80 is written here - not connected in the baby 2650
 }
 
-ADDRESS_MAP_START(pipbug_state::pipbug_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff) AM_ROM
-	AM_RANGE( 0x0400, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void pipbug_state::pipbug_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x7fff).ram();
+}
 
-ADDRESS_MAP_START(pipbug_state::pipbug_data)
+void pipbug_state::pipbug_data(address_map &map)
+{
 //  ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(pipbug_ctrl_w)
-ADDRESS_MAP_END
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(pipbug_state::pipbug_ctrl_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pipbug )
@@ -92,7 +96,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
+QUICKLOAD_LOAD_MEMBER(pipbug_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -156,21 +160,22 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	return result;
 }
 
-MACHINE_CONFIG_START(pipbug_state::pipbug)
+void pipbug_state::pipbug(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
-	MCFG_CPU_DATA_MAP(pipbug_data)
-	MCFG_S2650_FLAG_OUTPUT(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipbug_state::pipbug_mem);
+	m_maincpu->set_addrmap(AS_DATA, &pipbug_state::pipbug_data);
+	m_maincpu->flag_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", S2650_SENSE_LINE))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set_inputline(m_maincpu, S2650_SENSE_LINE);
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(pipbug_state::quickload_cb), this);
+}
 
 
 /* ROM definition */
@@ -181,5 +186,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1979, pipbug, 0,      0,      pipbug,   pipbug, pipbug_state, 0,    "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1979, pipbug, 0,      0,      pipbug,  pipbug, pipbug_state, empty_init, "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )

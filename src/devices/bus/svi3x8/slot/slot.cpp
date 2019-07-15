@@ -20,11 +20,11 @@ DEFINE_DEVICE_TYPE(SVI_SLOT_BUS, svi_slot_bus_device, "svislotbus", "SVI Slot Bu
 //  svi_slot_bus_device - constructor
 //-------------------------------------------------
 
-svi_slot_bus_device::svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SVI_SLOT_BUS, tag, owner, clock),
-	m_int_handler(*this),
-	m_romdis_handler(*this),
-	m_ramdis_handler(*this)
+svi_slot_bus_device::svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SVI_SLOT_BUS, tag, owner, clock)
+	, m_int_handler(*this)
+	, m_romdis_handler(*this)
+	, m_ramdis_handler(*this)
 {
 }
 
@@ -71,14 +71,14 @@ void svi_slot_bus_device::add_card(device_svi_slot_interface *card)
 //  mreq_r - memory read from slot
 //-------------------------------------------------
 
-READ8_MEMBER( svi_slot_bus_device::mreq_r )
+uint8_t svi_slot_bus_device::mreq_r(offs_t offset)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 	uint8_t data = 0xff;
 
 	while (entry)
 	{
-		data &= entry->mreq_r(space, offset);
+		data &= entry->mreq_r(offset);
 		entry = entry->next();
 	}
 
@@ -89,13 +89,13 @@ READ8_MEMBER( svi_slot_bus_device::mreq_r )
 //  mreq_w - memory write to slot
 //-------------------------------------------------
 
-WRITE8_MEMBER( svi_slot_bus_device::mreq_w )
+void svi_slot_bus_device::mreq_w(offs_t offset, uint8_t data)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 
 	while (entry)
 	{
-		entry->mreq_w(space, offset, data);
+		entry->mreq_w(offset, data);
 		entry = entry->next();
 	}
 }
@@ -104,14 +104,14 @@ WRITE8_MEMBER( svi_slot_bus_device::mreq_w )
 //  iorq_r - memory read from slot
 //-------------------------------------------------
 
-READ8_MEMBER( svi_slot_bus_device::iorq_r )
+uint8_t svi_slot_bus_device::iorq_r(offs_t offset)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 	uint8_t data = 0xff;
 
 	while (entry)
 	{
-		data &= entry->iorq_r(space, offset);
+		data &= entry->iorq_r(offset);
 		entry = entry->next();
 	}
 
@@ -122,13 +122,13 @@ READ8_MEMBER( svi_slot_bus_device::iorq_r )
 //  iorq_w - memory write to slot
 //-------------------------------------------------
 
-WRITE8_MEMBER( svi_slot_bus_device::iorq_w )
+void svi_slot_bus_device::iorq_w(offs_t offset, uint8_t data)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 
 	while (entry)
 	{
-		entry->iorq_w(space, offset, data);
+		entry->iorq_w(offset, data);
 		entry = entry->next();
 	}
 }
@@ -204,22 +204,10 @@ DEFINE_DEVICE_TYPE(SVI_SLOT, svi_slot_device, "svislot", "SVI Slot")
 //  svi_slot_device - constructor
 //-------------------------------------------------
 
-svi_slot_device::svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SVI_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_bus_tag(nullptr)
+svi_slot_device::svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SVI_SLOT, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
 {
-}
-
-//-------------------------------------------------
-//  set_bus - set owner bus tag
-//-------------------------------------------------
-
-void svi_slot_device::set_bus(device_t &device, device_t *owner, const char *bus_tag)
-{
-	svi_slot_device &card = dynamic_cast<svi_slot_device &>(device);
-	card.m_owner = owner;
-	card.m_bus_tag = bus_tag;
 }
 
 //-------------------------------------------------
@@ -232,7 +220,7 @@ void svi_slot_device::device_start()
 
 	if (dev)
 	{
-		svi_slot_bus_device *bus = downcast<svi_slot_bus_device *>(m_owner->subdevice(m_bus_tag));
+		svi_slot_bus_device *bus = downcast<svi_slot_bus_device *>(owner()->subdevice(SVIBUS_TAG));
 		bus->add_card(dev);
 	}
 }

@@ -7,9 +7,7 @@
 
 #define M2COMM_SIMULATION
 
-
-#define MCFG_M2COMM_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, M2COMM, 0)
+#include "osdcore.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -44,6 +42,8 @@ public:
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
 
+	void set_frameoffset(uint16_t offset) { m_frameoffset = offset; };
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,11 +56,14 @@ private:
 	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
 	uint8_t m_fg;             // i960 flip gate - bit0 is stored, bit7 is connected to ZFG bit 0
 
-	emu_file m_line_rx;       // rx line - can be either differential, simple serial or toslink
-	emu_file m_line_tx;       // tx line - is differential, simple serial and toslink
+	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
+	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
-	uint8_t m_buffer[0x4000];
+	uint8_t m_buffer0[0x1000];
+	uint8_t m_buffer1[0x1000];
+	uint8_t m_framesync;
+	uint16_t m_frameoffset;
 
 #ifdef M2COMM_SIMULATION
 	uint8_t m_linkenable;
@@ -68,8 +71,13 @@ private:
 	uint8_t m_linkalive;
 	uint8_t m_linkid;
 	uint8_t m_linkcount;
+	uint8_t m_zfg_delay;
 
 	void comm_tick();
+	void read_fg();
+	int read_frame(int dataSize);
+	void send_data(uint8_t frameType, int frameStart, int frameSize, int dataSize);
+	void send_frame(int dataSize);
 #endif
 };
 

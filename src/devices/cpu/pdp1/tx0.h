@@ -21,33 +21,20 @@ enum
 };
 
 
-#define MCFG_TX0_CONFIG(_cpy_devcb, _r1l_devcb, _dis_devcb, _r3l_devcb, _prt_devcb, _rsv_devcb, _p6h_devcb, _p7h_devcb, _sel_devcb, _res_devcb) \
-	tx0_device::set_cpy_cb(*device, DEVCB_##_cpy_devcb); \
-	tx0_device::set_r1l_cb(*device, DEVCB_##_r1l_devcb); \
-	tx0_device::set_dis_cb(*device, DEVCB_##_dis_devcb); \
-	tx0_device::set_r3l_cb(*device, DEVCB_##_r3l_devcb); \
-	tx0_device::set_prt_cb(*device, DEVCB_##_prt_devcb); \
-	tx0_device::set_rsv_cb(*device, DEVCB_##_rsv_devcb); \
-	tx0_device::set_p6h_cb(*device, DEVCB_##_p6h_devcb); \
-	tx0_device::set_p7h_cb(*device, DEVCB_##_p7h_devcb); \
-	tx0_device::set_sel_cb(*device, DEVCB_##_sel_devcb); \
-	tx0_device::set_res_cb(*device, DEVCB_##_res_devcb);
-
-
 class tx0_device : public cpu_device
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_cpy_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_cpy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_r1l_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_r1l_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dis_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_dis_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_r3l_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_r3l_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_prt_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_prt_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rsv_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_rsv_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p6h_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_p6h_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p7h_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_p7h_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sel_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_sel_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_res_cb(device_t &device, Object &&cb) { return downcast<tx0_device &>(device).m_io_reset_callback.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto cpy() { return m_cpy_handler.bind(); }
+	auto r1l() { return m_r1l_handler.bind(); }
+	auto dis() { return m_dis_handler.bind(); }
+	auto r3l() { return m_r3l_handler.bind(); }
+	auto prt() { return m_prt_handler.bind(); }
+	auto rsv() { return m_rsv_handler.bind(); }
+	auto p6h() { return m_p6h_handler.bind(); }
+	auto p7h() { return m_p7h_handler.bind(); }
+	auto sel() { return m_sel_handler.bind(); }
+	auto res() { return m_io_reset_callback.bind(); }
 
 	void pulse_reset();
 	void io_complete();
@@ -147,7 +134,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	void execute_instruction_8kw();
@@ -162,7 +149,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	void execute_instruction_64kw();

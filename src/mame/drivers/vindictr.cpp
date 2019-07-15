@@ -38,11 +38,10 @@
 void vindictr_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-MACHINE_RESET_MEMBER(vindictr_state,vindictr)
+void vindictr_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -71,28 +70,29 @@ READ16_MEMBER(vindictr_state::port1_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(vindictr_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
-	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
-	AM_RANGE(0x260020, 0x26002f) AM_READ_PORT("260020")
-	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
-	AM_RANGE(0x2e0000, 0x2e0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0x360010, 0x360011) AM_WRITENOP
-	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
-	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(vindictr_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0x3f4f80, 0x3f4fff) AM_MIRROR(0x8000) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x3f5000, 0x3f7fff) AM_MIRROR(0x8000) AM_RAM
-ADDRESS_MAP_END
+void vindictr_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fffff);
+	map(0x000000, 0x05ffff).rom();
+	map(0x0e0000, 0x0e0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x260000, 0x26000f).portr("260000");
+	map(0x260010, 0x26001f).r(FUNC(vindictr_state::port1_r));
+	map(0x260020, 0x26002f).portr("260020");
+	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
+	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x360000, 0x360001).w(FUNC(vindictr_state::scanline_int_ack_w));
+	map(0x360010, 0x360011).nopw();
+	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
+	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
+	map(0x3e0000, 0x3e0fff).ram().w(FUNC(vindictr_state::vindictr_paletteram_w)).share("paletteram");
+	map(0x3f0000, 0x3f1fff).mirror(0x8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x3f2000, 0x3f3fff).mirror(0x8000).ram().share("mob");
+	map(0x3f4000, 0x3f4f7f).mirror(0x8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0x3f4f80, 0x3f4fff).mirror(0x8000).ram().share("mob:slip");
+	map(0x3f5000, 0x3f7fff).mirror(0x8000).ram();
+}
 
 
 
@@ -169,7 +169,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( vindictr )
+static GFXDECODE_START( gfx_vindictr )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout,      0, 64 )      /* characters 8x8 */
 GFXDECODE_END
@@ -182,47 +182,45 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(vindictr_state::vindictr)
-
+void vindictr_state::vindictr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	M68010(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vindictr_state::main_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(vindictr_state,vindictr)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vindictr)
-	MCFG_PALETTE_ADD("palette", 2048*8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vindictr);
+	PALETTE(config, m_palette).set_entries(2048*8);
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, vindictr_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", vindictr_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_COLS, 64,64).set_info_callback(FUNC(vindictr_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(vindictr_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, vindictr_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(vindictr_state, screen_update_vindictr)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(vindictr_state,vindictr)
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(vindictr_state::screen_update_vindictr));
+	m_screen->set_palette(m_palette);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:tms")
-MACHINE_CONFIG_END
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("260010").bit(12);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+	config.device_remove("jsa:tms");
+}
 
 
 
@@ -535,7 +533,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(vindictr_state,vindictr)
+void vindictr_state::init_vindictr()
 {
 }
 
@@ -547,11 +545,11 @@ DRIVER_INIT_MEMBER(vindictr_state,vindictr)
  *
  *************************************/
 
-GAME( 1988, vindictr,  0,        vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 5)", 0 )
-GAME( 1988, vindictre, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 5)", 0 )
-GAME( 1988, vindictrg, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (German, rev 1)", 0 )
-GAME( 1988, vindictre4,vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 4)", 0 )
-GAME( 1988, vindictr4, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 4)", 0 )
-GAME( 1988, vindictre3,vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 3)", 0 )
-GAME( 1988, vindictr2, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 2)", 0 )
-GAME( 1988, vindictr1, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 1)", 0 )
+GAME( 1988, vindictr,  0,        vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 5)", 0 )
+GAME( 1988, vindictre, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 5)", 0 )
+GAME( 1988, vindictrg, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (German, rev 1)", 0 )
+GAME( 1988, vindictre4,vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 4)", 0 )
+GAME( 1988, vindictr4, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 4)", 0 )
+GAME( 1988, vindictre3,vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 3)", 0 )
+GAME( 1988, vindictr2, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 2)", 0 )
+GAME( 1988, vindictr1, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 1)", 0 )

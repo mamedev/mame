@@ -56,9 +56,11 @@ DEFINE_DEVICE_TYPE(ZX8301, zx8301_device, "zx8301", "Sinclair ZX8301")
 
 
 // default address map
-ADDRESS_MAP_START(zx8301_device::zx8301)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-ADDRESS_MAP_END
+void zx8301_device::zx8301(address_map &map)
+{
+	if (!has_configured_map(0))
+		map(0x00000, 0x1ffff).ram();
+}
 
 
 //-------------------------------------------------
@@ -112,7 +114,7 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ZX8301, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(zx8301_device::zx8301), this))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(zx8301_device::zx8301), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_write_vsync(*this)
 	, m_dispoff(1)
@@ -276,6 +278,9 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 {
 	int x = 0;
 
+	bool flash_active = false;
+	int flash_color = 0;
+
 	for (int word = 0; word < 64; word++)
 	{
 		uint8_t byte_high = readbyte(da++);
@@ -290,9 +295,15 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 
 			int color = (green << 2) | (red << 1) | blue;
 
+			if (flash_active)
+			{
+				color = flash_color;
+			}
+
 			if (flash && m_flash)
 			{
-				color = 0;
+				flash_active = !flash_active;
+				flash_color = color;
 			}
 
 			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];

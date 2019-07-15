@@ -11,6 +11,12 @@
 #include "emu.h"
 #include "includes/galaga.h"
 
+#define LOG_DEBUG           (1 << 0U)
+#define LOG_ALL             (LOG_DEBUG)
+
+#define VERBOSE             (LOG_ALL)
+
+#include "logmacro.h"
 
 #define MAX_STARS 252
 #define STARS_COLOR_BASE (64*4+64*4)
@@ -33,7 +39,7 @@ There are 63 stars in each set, 126 displayed at any one time
 
 */
 
-struct galaga_state::star galaga_state::m_star_seed_tab[252]=
+galaga_state::star const galaga_state::s_star_seed_tab[252]=
 {
 /* also shared by Bosconian */
 
@@ -325,63 +331,150 @@ struct galaga_state::star galaga_state::m_star_seed_tab[252]=
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galaga_state,galaga)
+void galaga_state::galaga_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* core palette */
-	for (i = 0;i < 32;i++)
+	// core palette
+	for (int i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		bit0 = ((*color_prom) >> 0) & 0x01;
-		bit1 = ((*color_prom) >> 1) & 0x01;
-		bit2 = ((*color_prom) >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = ((*color_prom) >> 3) & 0x01;
-		bit1 = ((*color_prom) >> 4) & 0x01;
-		bit2 = ((*color_prom) >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = ((*color_prom) >> 6) & 0x01;
-		bit2 = ((*color_prom) >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(*color_prom, 6);
+		bit2 = BIT(*color_prom, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 
-	/* palette for the stars */
-	for (i = 0;i < 64;i++)
+	// palette for the stars
+	for (int i = 0; i < 64; i++)
 	{
-		int bits,r,g,b;
-		static const int map[4] = { 0x00, 0x47, 0x97 ,0xde };
+		static constexpr int map[4] = { 0x00, 0x47, 0x97 ,0xde };
 
-		bits = (i >> 0) & 0x03;
-		r = map[bits];
-		bits = (i >> 2) & 0x03;
-		g = map[bits];
-		bits = (i >> 4) & 0x03;
-		b = map[bits];
+		int const r = map[(i >> 0) & 0x03];
+		int const g = map[(i >> 2) & 0x03];
+		int const b = map[(i >> 4) & 0x03];
 
-		palette.set_indirect_color(32 + i,rgb_t(r,g,b));
+		palette.set_indirect_color(32 + i, rgb_t(r, g, b));
 	}
 
-	/* characters */
-	for (i = 0;i < 64*4;i++)
-		palette.set_pen_indirect(i, (*(color_prom++) & 0x0f) + 0x10);   /* chars */
+	// characters
+	for (int i = 0; i < 64*4; i++)
+		palette.set_pen_indirect(i, (*color_prom++ & 0x0f) | 0x10);
 
-	/* sprites */
-	for (i = 0;i < 64*4;i++)
-		palette.set_pen_indirect(64*4+i, (*(color_prom++) & 0x0f));
+	// sprites
+	for (int i = 0; i < 64*4; i++)
+		palette.set_pen_indirect(64*4 + i, *color_prom++ & 0x0f);
 
-	/* now the stars */
-	for (i = 0;i < 64;i++)
-		palette.set_pen_indirect(64*4+64*4+i, 32 + i);
+	// now the stars
+	for (int i = 0; i < 64; i++)
+		palette.set_pen_indirect(64*4 + 64*4 + i, 32 + i);
 }
 
+/***************************************************************************
 
+    Star field documentation
+
+    Couriersud, May 2019:
+
+    The code below was manually applied based on a pull request from
+    Jindřich Makovička. He based his work on information published by
+    Wolfgang Scherr about the 05XX on pin4.at.
+
+    Wolfgang shared is VHDL implementation with the MAME team. I have
+    created a spreadsheet implementation for his decode logic.
+
+    Both implementations use the same Galois type LFSR( tap 15,12,10,5).
+    Using the same seed value, the following holds true:
+
+    Decode_W(lfsr[t-4]) = Decode_J(lfsr[t])
+
+    The two decoding algorithm (Wolfgang, Jindřich) thus deliver the same
+    results but with a 4 clock difference.
+
+    Jindřich's code filters out stars with y<4. This matches the starfield
+    measurements documented above. Wolfgang states that his code matches his
+    measurements and there are stars with y<4.
+    We need to have a closer look at this.
+
+    Both implementations are complex compared to other star field gnerators
+    used in the industry. We thus now have two decoding solutions matching
+    the output. I wonder if there is a simpler one.
+
+***************************************************************************/
+
+void galaga_state::starfield_init()
+{
+	const uint16_t feed = 0x9420;
+
+	int idx = 0;
+	for (uint16_t sf = 0; sf < 4; ++sf)
+	{
+		// starfield select flags
+		uint16_t sf1 = (sf >> 1) & 1;
+		uint16_t sf2 = sf & 1;
+
+		uint16_t i = 0x70cc;
+		for (int cnt = 0; cnt < 65535; ++cnt)
+		{
+			// output enable lookup
+			uint16_t xor1 = i ^ (i >> 3);
+			uint16_t xor2 = xor1 ^ (i >> 2);
+			uint16_t oe = (sf1 ? 0 : 0x4000) | ((sf1 ^ sf2) ? 0 : 0x1000);
+			if ((i & 0x8007) == 0x8007
+				&& (~i & 0x2008) == 0x2008
+				&& (xor1 & 0x0100) == (sf1 ? 0 : 0x0100)
+				&& (xor2 & 0x0040) == (sf2 ? 0 : 0x0040)
+				&& (i & 0x5000) == oe
+				&& cnt >= 256 * 4)
+			{
+				// color lookup
+				uint16_t xor3 = (i >> 1) ^ (i >> 6);
+				uint16_t clr =
+					(((i >> 9) & 0x07)
+					 | ((xor3 ^ (i >> 4) ^ (i >> 7)) & 0x08)
+					 | (~xor3 & 0x10)
+					 | (((i >> 2) ^ (i >> 5)) & 0x20))
+					^ ((i & 0x4000) ? 0 : 0x24)
+					^ ((((i >> 2) ^ i) & 0x1000) ? 0x21 : 0);
+#if 0
+				m_star_seed_tab[idx].x = cnt % 256;
+				m_star_seed_tab[idx].y = cnt / 256;
+				m_star_seed_tab[idx].col = clr;
+				m_star_seed_tab[idx].set = sf;
+#else
+				int x = cnt % 256;
+				int y = cnt / 256;
+				int col = clr;
+				int set = sf;
+
+				if ((x != s_star_seed_tab[idx].x) || (y != s_star_seed_tab[idx].y)
+					|| (col != s_star_seed_tab[idx].col) || (s_star_seed_tab[idx].set != set))
+					LOGMASKED(LOG_DEBUG, "Mismatch: %d %d %d %d %d %d %d %d\n", x, y, col, set, s_star_seed_tab[idx].x,
+						s_star_seed_tab[idx].y, s_star_seed_tab[idx].col, s_star_seed_tab[idx].set);
+#endif
+				++idx;
+			}
+
+			// update the LFSR
+			if (i & 1)
+				i = (i >> 1) ^ feed;
+			else
+				i = (i >> 1);
+		}
+	}
+}
 
 /***************************************************************************
 
@@ -438,6 +531,8 @@ VIDEO_START_MEMBER(galaga_state,galaga)
 	save_item(NAME(m_stars_scrollx));
 	save_item(NAME(m_stars_scrolly));
 	save_item(NAME(m_galaga_gfxbank));
+
+	starfield_init();
 }
 
 
@@ -537,14 +632,14 @@ void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		{
 			int x,y;
 
-			if ( (set_a == m_star_seed_tab[star_cntr].set) || ( set_b == m_star_seed_tab[star_cntr].set) )
+			if ((set_a == s_star_seed_tab[star_cntr].set) || (set_b == s_star_seed_tab[star_cntr].set))
 			{
-				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256 + 16;
-				y = (112 + m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
+				x = (s_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256 + 16;
+				y = (112 + s_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
 				/* 112 is a tweak to get alignment about perfect */
 
 				if (cliprect.contains(x, y))
-					bitmap.pix16(y, x) = STARS_COLOR_BASE + m_star_seed_tab[ star_cntr ].col;
+					bitmap.pix16(y, x) = STARS_COLOR_BASE + s_star_seed_tab[ star_cntr ].col;
 			}
 
 		}

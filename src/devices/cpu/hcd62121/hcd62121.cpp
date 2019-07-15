@@ -49,7 +49,7 @@ constexpr u8 FLAG_ZL = 0x02;
 constexpr u8 FLAG_ZH = 0x01;
 
 
-DEFINE_DEVICE_TYPE(HCD62121, hcd62121_cpu_device, "hcd62121_cpu_device", "Hitachi HCD62121")
+DEFINE_DEVICE_TYPE(HCD62121, hcd62121_cpu_device, "hcd62121", "Hitachi HCD62121")
 
 
 hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -377,7 +377,7 @@ void hcd62121_cpu_device::device_start()
 	state_add(HCD62121_R78, "R78", m_reg[0x00]).callimport().callexport().formatstr("%8s");
 	state_add(HCD62121_R7C, "R7C", m_reg[0x00]).callimport().callexport().formatstr("%8s");
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -820,7 +820,7 @@ void hcd62121_cpu_device::execute_run()
 	{
 		offs_t pc = (m_cseg << 16) | m_ip;
 
-		debugger_instruction_hook(this, pc);
+		debugger_instruction_hook(pc);
 		m_prev_pc = pc;
 
 		u8 op = read_op();
@@ -1752,7 +1752,7 @@ void hcd62121_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *hcd62121_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hcd62121_cpu_device::create_disassembler()
 {
-	return new hcd62121_disassembler;
+	return std::make_unique<hcd62121_disassembler>();
 }

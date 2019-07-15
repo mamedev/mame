@@ -42,6 +42,16 @@ void skydiver_state::video_start()
 
 	save_item(NAME(m_nmion));
 	save_item(NAME(m_width));
+
+	m_leds.resolve();
+	m_lamp_s.resolve();
+	m_lamp_k.resolve();
+	m_lamp_y.resolve();
+	m_lamp_d.resolve();
+	m_lamp_i.resolve();
+	m_lamp_v.resolve();
+	m_lamp_e.resolve();
+	m_lamp_r.resolve();
 }
 
 
@@ -83,59 +93,59 @@ WRITE_LINE_MEMBER(skydiver_state::coin_lockout_w)
 
 WRITE_LINE_MEMBER(skydiver_state::start_lamp_1_w)
 {
-	output().set_led_value(0, state);
+	m_leds[0] = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::start_lamp_2_w)
 {
-	output().set_led_value(1, state);
+	m_leds[1] = state;
 }
 
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_s_w)
 {
-	output().set_value("lamps", state);
+	m_lamp_s = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_k_w)
 {
-	output().set_value("lampk", state);
+	m_lamp_k = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_y_w)
 {
-	output().set_value("lampy", state);
+	m_lamp_y = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_d_w)
 {
-	output().set_value("lampd", state);
+	m_lamp_d = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_i_w)
 {
-	output().set_value("lampi", state);
+	m_lamp_i = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_v_w)
 {
-	output().set_value("lampv", state);
+	m_lamp_v = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_e_w)
 {
-	output().set_value("lampe", state);
+	m_lamp_e = state;
 }
 
 WRITE_LINE_MEMBER(skydiver_state::lamp_r_w)
 {
-	output().set_value("lampr", state);
+	m_lamp_r = state;
 }
 
 WRITE8_MEMBER(skydiver_state::latch3_watchdog_w)
 {
-	m_watchdog->reset_w(space, 0, 0);
-	m_latch3->write_a0(space, offset, 0);
+	m_watchdog->watchdog_reset();
+	m_latch3->write_a0(offset);
 }
 
 

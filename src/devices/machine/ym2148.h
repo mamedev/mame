@@ -13,23 +13,11 @@
 
 #pragma once
 
+#include "diserial.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
-
-#define MCFG_YM2148_TXD_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_txd_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_YM2148_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_port_write_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_YM2148_PORT_READ_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_port_read_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_YM2148_IRQ_HANDLER(_devcb) \
-	devcb = &ym2148_device::set_irq_handler(*device, DEVCB_##_devcb);
-
 
 class ym2148_device : public device_t, public device_serial_interface
 {
@@ -37,14 +25,14 @@ public:
 	// construction/destruction
 	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_port_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_read_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_port_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2148_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto txd_handler() { return m_txd_handler.bind(); }
+	auto port_write_handler() { return m_port_write_handler.bind(); }
+	auto port_read_handler() { return m_port_read_handler.bind(); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 	uint8_t get_irq_vector();
@@ -78,8 +66,9 @@ private:
 	enum
 	{
 		STATUS_TRANSMIT_READY = 0x01,
-		STATUS_RECEIVE_BUFFER_FULL = 0x2,
-		STATUS_OVERRUN_ERROR = 0x20,
+		STATUS_RECEIVE_BUFFER_FULL = 0x02,
+		STATUS_OVERRUN_ERROR = 0x10,
+		STATUS_FRAMING_ERROR = 0x20,
 		CONTROL_TRANSMIT_ENABLE = 0x01,
 		CONTROL_TRANSMIT_IRQ_ENABLE = 0x02,
 		CONTROL_RECEIVE_ENABLE = 0x04,

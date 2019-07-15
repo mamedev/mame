@@ -38,13 +38,6 @@ macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_typ
 {
 }
 
-void macpds_slot_device::static_set_macpds_slot(device_t &device, const char *tag, const char *slottag)
-{
-	macpds_slot_device &macpds_card = dynamic_cast<macpds_slot_device &>(device);
-	macpds_card.m_macpds_tag = tag;
-	macpds_card.m_macpds_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -53,7 +46,7 @@ void macpds_slot_device::device_start()
 {
 	device_macpds_card_interface *dev = dynamic_cast<device_macpds_card_interface *>(get_card_device());
 
-	if (dev) device_macpds_card_interface::static_set_macpds_tag(*dev, m_macpds_tag, m_macpds_slottag);
+	if (dev) dev->set_macpds_tag(m_macpds_tag, m_macpds_slottag);
 }
 
 //**************************************************************************
@@ -61,12 +54,6 @@ void macpds_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(MACPDS, macpds_device, "macpds", "Mac 68000 Processor-Direct Bus")
-
-void macpds_device::static_set_cputag(device_t &device, const char *tag)
-{
-	macpds_device &macpds = downcast<macpds_device &>(device);
-	macpds.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -164,13 +151,6 @@ device_macpds_card_interface::~device_macpds_card_interface()
 {
 }
 
-void device_macpds_card_interface::static_set_macpds_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_macpds_card_interface &macpds_card = dynamic_cast<device_macpds_card_interface &>(device);
-	macpds_card.m_macpds_tag = tag;
-	macpds_card.m_macpds_slottag = slottag;
-}
-
 void device_macpds_card_interface::set_macpds_device()
 {
 	m_macpds = dynamic_cast<macpds_device *>(device().machine().device(m_macpds_tag));
@@ -182,9 +162,7 @@ void device_macpds_card_interface::install_bank(offs_t start, offs_t end, const 
 	char bank[256];
 
 	// append an underscore and the slot name to the bank so it's guaranteed unique
-	strcpy(bank, tag);
-	strcat(bank, "_");
-	strcat(bank, m_macpds_slottag);
+	snprintf(bank, sizeof(bank), "%s_%s", tag, m_macpds_slottag);
 
 	m_macpds->install_bank(start, end, bank, data);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -522,11 +522,11 @@ namespace bgfx { namespace hlsl
 						, bindDesc.BindCount
 						);
 
-					const char * end = bx::strFind(bindDesc.Name, "Sampler");
-					if (NULL != end)
+					bx::StringView end = bx::strFind(bindDesc.Name, "Sampler");
+					if (!end.isEmpty() )
 					{
 						Uniform un;
-						un.name.assign(bindDesc.Name, (end - bindDesc.Name) );
+						un.name.assign(bindDesc.Name, (end.getPtr() - bindDesc.Name) );
 						un.type = UniformType::Enum(BGFX_UNIFORM_SAMPLERBIT | UniformType::Int1);
 						un.num = 1;
 						un.regIndex = uint16_t(bindDesc.BindPoint);
@@ -624,8 +624,17 @@ namespace bgfx { namespace hlsl
 			int32_t start  = 0;
 			int32_t end    = INT32_MAX;
 
+			if (!hlslfp.empty())
+			{
+				bx::StringView logfp = bx::strFind(log, hlslfp.c_str() );
+				if (!logfp.isEmpty() )
+				{
+					log = logfp.getPtr() + hlslfp.length();
+				}
+			}
+
 			bool found = false
-				|| 2 == sscanf(log, "(%u,%u):",  &line, &column)
+				|| 2 == sscanf(log, "(%u,%u",  &line, &column)
 				|| 2 == sscanf(log, " :%u:%u: ", &line, &column)
 				;
 
@@ -694,7 +703,7 @@ namespace bgfx { namespace hlsl
 							// included in the uniform blob that the application must upload
 							// we can't just remove them, because unused functions might still reference
 							// them and cause a compile error when they're gone
-							if (!!bx::findIdentifierMatch(strLine.c_str(), it->c_str() ) )
+							if (!bx::findIdentifierMatch(strLine.c_str(), it->c_str() ).isEmpty() )
 							{
 								strLine = strLine.replace(index, strLength, "static");
 								unusedUniforms.erase(it);

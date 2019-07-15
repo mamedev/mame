@@ -11,21 +11,6 @@
 
 #pragma once
 
-/***************************************************************************
-    INTERFACE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_CESBLIT_ADD(_tag, _screen, _clock) \
-	MCFG_DEVICE_ADD(_tag, CESBLIT, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen)
-
-#define MCFG_CESBLIT_MAP    MCFG_DEVICE_PROGRAM_MAP
-
-#define MCFG_CESBLIT_COMPUTE_ADDR(_compute_addr) \
-	cesblit_device::static_set_compute_addr(*device, _compute_addr);
-
-#define MCFG_CESBLIT_IRQ_CB(_devcb) \
-	devcb = &cesblit_device::static_set_irq_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -41,12 +26,18 @@ public:
 	typedef int (*compute_addr_t) (uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
 
 	// construction/destruction
+	template <typename T>
+	cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: cesblit_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+
 	cesblit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
+	// configuration
 	void set_compute_addr(compute_addr_t compute_addr)  { m_compute_addr = compute_addr; }
-	static void static_set_compute_addr(device_t &device, compute_addr_t compute_addr) { downcast<cesblit_device &>(device).set_compute_addr(compute_addr); }
-	template <class Object> static devcb_base &static_set_irq_callback(device_t &device, Object &&cb) { return downcast<cesblit_device &>(device).m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_blit_irq_cb.bind(); }
 
 	DECLARE_WRITE16_MEMBER(color_w);
 	DECLARE_WRITE16_MEMBER(addr_hi_w);

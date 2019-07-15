@@ -4252,21 +4252,6 @@ public:
 };
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DISCRETE_ADD(_tag, _clock, _intf) \
-	MCFG_DEVICE_ADD(_tag, DISCRETE, _clock) \
-	MCFG_DISCRETE_INTF(_intf)
-
-#define MCFG_DISCRETE_REPLACE(_tag, _clock, _intf) \
-	MCFG_DEVICE_REPLACE(_tag, DISCRETE, _clock) \
-	MCFG_DISCRETE_INTF(_intf)
-
-#define MCFG_DISCRETE_INTF(_intf) \
-	discrete_device::static_set_intf(*device, (const discrete_block *)&(_intf##_discrete_interface));
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -4286,16 +4271,16 @@ protected:
 
 public:
 	// inline configuration helpers
-	static void static_set_intf(device_t &device, const discrete_block *intf);
+	void set_intf(const discrete_block *intf) { m_intf = intf; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	virtual ~discrete_device(void);
 
 	template<int DiscreteInput>
 	DECLARE_WRITE_LINE_MEMBER(write_line)
 	{
-		write(machine().dummy_space(), DiscreteInput, state ? 1 : 0);
+		write(DiscreteInput, state ? 1 : 0);
 	}
 
 	/* --------------------------------- */
@@ -4377,7 +4362,17 @@ class discrete_sound_device :   public discrete_device,
 {
 public:
 	// construction/destruction
-	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const discrete_block *intf)
+		: discrete_sound_device(mconfig, tag, owner, clock)
+	{
+		set_intf(intf);
+	}
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, const discrete_block *intf)
+		: discrete_sound_device(mconfig, tag, owner, uint32_t(0))
+	{
+		set_intf(intf);
+	}
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~discrete_sound_device(void) { };
 
 	/* --------------------------------- */
@@ -4531,8 +4526,8 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 	return discrete_node_factory< C >().Create(pdev, block);
 }
 
-#define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name##_discrete_interface[]
-#define DISCRETE_SOUND_START(name) const discrete_block name##_discrete_interface[] = {
+#define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name[]
+#define DISCRETE_SOUND_START(name) const discrete_block name[] = {
 //#define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  new discrete_node_factory< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
 #define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  &discrete_create_node< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
 
@@ -4716,7 +4711,7 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 #define DISCRETE_WAVLOG2(NODE1,GAIN1,NODE2,GAIN2)                       DSC_SND_ENTRY( NODE_SPECIAL, dso_wavlog  , DSO_WAVLOG  , 4, DSE( static_cast<int>(NODE1),NODE_NC,static_cast<int>(NODE2),NODE_NC ), DSE( NODE1,GAIN1,NODE2,GAIN2 ), nullptr, "DISCRETE_WAVLOG2" ),
 
 /* import */
-#define DISCRETE_IMPORT(INFO)                                           DSC_SND_ENTRY( NODE_SPECIAL, special     , DSO_IMPORT  , 0, DSE( 0 ), DSE( 0 ), &(INFO##_discrete_interface), "DISCRETE_IMPORT" ),
+#define DISCRETE_IMPORT(INFO)                                           DSC_SND_ENTRY( NODE_SPECIAL, special     , DSO_IMPORT  , 0, DSE( 0 ), DSE( 0 ), &(INFO), "DISCRETE_IMPORT" ),
 #define DISCRETE_DELETE(NODE_FROM, NODE_TO)                             DSC_SND_ENTRY( NODE_SPECIAL, special     , DSO_DELETE  , 2, DSE( static_cast<int>(NODE_FROM), static_cast<int>(NODE_TO) ), DSE( NODE_FROM, NODE_TO ), nullptr, "DISCRETE_DELETE" ),
 #define DISCRETE_REPLACE                                                DSC_SND_ENTRY( NODE_SPECIAL, special     , DSO_REPLACE , 0, DSE( 0 ), DSE( 0 ), nullptr, "DISCRETE_REPLACE" ),
 

@@ -145,37 +145,25 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k051960_device::set_plane_order(device_t &device, int order)
+void k051960_device::set_plane_order(int order)
 {
-	k051960_device &dev = downcast<k051960_device &>(device);
-
 	switch (order)
 	{
 		case K051960_PLANEORDER_BASE:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
+			set_info(gfxinfo);
 			break;
 
 		case K051960_PLANEORDER_MIA:
-			device_gfx_interface::static_set_info(dev, gfxinfo_reverse);
+			set_info(gfxinfo_reverse);
 			break;
 
 		case K051960_PLANEORDER_GRADIUS3:
-			device_gfx_interface::static_set_info(dev, gfxinfo_gradius3);
+			set_info(gfxinfo_gradius3);
 			break;
 
 		default:
 			fatalerror("Unknown plane_order\n");
 	}
-}
-
-//-------------------------------------------------
-//  set_screen_tag - set screen we are attached to
-//-------------------------------------------------
-
-void k051960_device::set_screen_tag(device_t &device, const char *tag)
-{
-	k051960_device &dev = dynamic_cast<k051960_device &>(device);
-	dev.m_screen.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -217,7 +205,7 @@ void k051960_device::device_start()
 	save_item(NAME(m_readroms));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_spriterombank));
-	save_pointer(NAME(m_ram.get()), 0x400);
+	save_pointer(NAME(m_ram), 0x400);
 }
 
 //-------------------------------------------------
@@ -278,7 +266,7 @@ int k051960_device::k051960_fetchromdata( int byte )
 	return m_sprite_rom[addr];
 }
 
-READ8_MEMBER( k051960_device::k051960_r )
+u8 k051960_device::k051960_r(offs_t offset)
 {
 	if (m_readroms)
 	{
@@ -290,14 +278,14 @@ READ8_MEMBER( k051960_device::k051960_r )
 		return m_ram[offset];
 }
 
-WRITE8_MEMBER( k051960_device::k051960_w )
+void k051960_device::k051960_w(offs_t offset, u8 data)
 {
 	m_ram[offset] = data;
 }
 
 
 /* should this be split by k051960? */
-READ8_MEMBER( k051960_device::k051937_r )
+u8 k051960_device::k051937_r(offs_t offset)
 {
 	if (m_readroms && offset >= 4 && offset < 8)
 		return k051960_fetchromdata(offset & 3);
@@ -308,7 +296,7 @@ READ8_MEMBER( k051960_device::k051937_r )
 	return 0;
 }
 
-WRITE8_MEMBER( k051960_device::k051937_w )
+void k051960_device::k051937_w(offs_t offset, u8 data)
 {
 	if (offset == 0)
 	{

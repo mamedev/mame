@@ -360,9 +360,9 @@ void snes_ppu_device::device_start()
 
 	save_item(NAME(m_regs));
 
-	save_pointer(NAME(m_vram.get()), SNES_VRAM_SIZE);
-	save_pointer(NAME(m_cgram.get()), SNES_CGRAM_SIZE/2);
-	save_pointer(NAME(m_oam_ram.get()), SNES_OAM_SIZE/2);
+	save_pointer(NAME(m_vram), SNES_VRAM_SIZE);
+	save_pointer(NAME(m_cgram), SNES_CGRAM_SIZE/2);
+	save_pointer(NAME(m_oam_ram), SNES_OAM_SIZE/2);
 }
 
 void snes_ppu_device::device_reset()
@@ -378,7 +378,7 @@ void snes_ppu_device::device_reset()
 	m_beam.current_vert = 0;
 
 	/* Set STAT78 to NTSC or PAL */
-	m_stat78 = (ATTOSECONDS_TO_HZ(screen().frame_period().attoseconds()) >= 59.0) ? SNES_NTSC : SNES_PAL;
+	m_stat78 = (screen().frame_period().as_hz() >= 59.0) ? SNES_NTSC : SNES_PAL;
 	m_beam.last_visible_line = m_stat78 & SNES_PAL ? 240 : 225;
 	m_mode = 0;
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known

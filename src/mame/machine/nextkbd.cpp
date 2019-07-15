@@ -6,14 +6,15 @@
 
 DEFINE_DEVICE_TYPE(NEXTKBD, nextkbd_device, "nextkbd", "NeXT Keyboard")
 
-ADDRESS_MAP_START(nextkbd_device::amap)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_snd_r, ctrl_snd_w, 0xff000000)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_kms_r, ctrl_kms_w, 0x00ff0000)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_dma_r, ctrl_dma_w, 0x0000ff00)
-	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_cmd_r, ctrl_cmd_w, 0x000000ff)
-	AM_RANGE(0x4, 0x7) AM_READWRITE(cdata_r,  cdata_w)
-	AM_RANGE(0x8, 0xb) AM_READWRITE(kmdata_r, kmdata_w)
-ADDRESS_MAP_END
+void nextkbd_device::amap(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(nextkbd_device::status_snd_r), FUNC(nextkbd_device::ctrl_snd_w));
+	map(0x1, 0x1).rw(FUNC(nextkbd_device::status_kms_r), FUNC(nextkbd_device::ctrl_kms_w));
+	map(0x2, 0x2).rw(FUNC(nextkbd_device::status_dma_r), FUNC(nextkbd_device::ctrl_dma_w));
+	map(0x3, 0x3).rw(FUNC(nextkbd_device::status_cmd_r), FUNC(nextkbd_device::ctrl_cmd_w));
+	map(0x4, 0x7).rw(FUNC(nextkbd_device::cdata_r), FUNC(nextkbd_device::cdata_w));
+	map(0x8, 0xb).rw(FUNC(nextkbd_device::kmdata_r), FUNC(nextkbd_device::kmdata_w));
+}
 
 nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEXTKBD, tag, owner, clock),

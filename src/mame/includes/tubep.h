@@ -1,20 +1,19 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+#ifndef MAME_INCLUDES_TUBEP_H
+#define MAME_INCLUDES_TUBEP_H
+
+#pragma once
+
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tubep_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TUBEP_SCANLINE,
-		TIMER_RJAMMER_SCANLINE,
-		TIMER_SPRITE
-	};
-
-	tubep_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tubep_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_textram(*this, "textram"),
 		m_backgroundram(*this, "backgroundram"),
 		m_sprite_colorsharedram(*this, "sprite_color"),
@@ -24,7 +23,20 @@ public:
 		m_slave(*this, "slave"),
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
+
+	void tubepb(machine_config &config);
+	void tubep(machine_config &config);
+	void rjammer(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_TUBEP_SCANLINE,
+		TIMER_RJAMMER_SCANLINE,
+		TIMER_SPRITE
+	};
 
 	uint8_t m_sound_latch;
 	uint8_t m_ls74;
@@ -90,10 +102,10 @@ public:
 	DECLARE_MACHINE_RESET(tubep);
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_PALETTE_INIT(tubep);
+	void tubep_palette(palette_device &palette);
 	DECLARE_MACHINE_START(rjammer);
 	DECLARE_MACHINE_RESET(rjammer);
-	DECLARE_PALETTE_INIT(rjammer);
+	void rjammer_palette(palette_device &palette) const;
 	uint32_t screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tubep_scanline_callback);
@@ -109,10 +121,6 @@ public:
 	optional_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
 
-
-	void tubepb(machine_config &config);
-	void tubep(machine_config &config);
-	void rjammer(machine_config &config);
 	void nsc_map(address_map &map);
 	void rjammer_main_map(address_map &map);
 	void rjammer_main_portmap(address_map &map);
@@ -126,6 +134,8 @@ public:
 	void tubep_second_portmap(address_map &map);
 	void tubep_sound_map(address_map &map);
 	void tubep_sound_portmap(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_TUBEP_H

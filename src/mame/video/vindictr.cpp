@@ -77,7 +77,7 @@ const atari_motion_objects_config vindictr_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(vindictr_state,vindictr)
+void vindictr_state::video_start()
 {
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));
@@ -100,8 +100,8 @@ WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
 	int c;
 
 	/* first blend the data */
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	data = m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	data = m_paletteram[offset];
 
 	/* now generate colors at all 16 intensities */
 	for (c = 0; c < 8; c++)
@@ -171,7 +171,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				break;
 
 			case 6:     /* /VIRQ */
-				scanline_int_gen(*m_maincpu);
+				scanline_int_write_line(1);
 				break;
 
 			case 7:     /* /PFVS */
@@ -179,8 +179,8 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				/* a new vscroll latches the offset into a counter; we must adjust for this */
 				int offset = scanline;
 				const rectangle &visible_area = screen.visible_area();
-				if (offset > visible_area.max_y)
-					offset -= visible_area.max_y + 1;
+				if (offset > visible_area.bottom())
+					offset -= visible_area.bottom() + 1;
 
 				if (m_playfield_yscroll != ((data - offset) & 0x1ff))
 				{
@@ -213,11 +213,11 @@ uint32_t vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_in
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
 					/* partially verified via schematics (there are a lot of PALs involved!):
@@ -253,11 +253,11 @@ uint32_t vindictr_state::screen_update_vindictr(screen_device &screen, bitmap_in
 
 	/* now go back and process the upper bit of MO priority */
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
 					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;

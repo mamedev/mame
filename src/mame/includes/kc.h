@@ -5,9 +5,10 @@
  * includes/kc.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_KC_H
 #define MAME_INCLUDES_KC_H
+
+#pragma once
 
 /* Devices */
 #include "imagedev/cassette.h"
@@ -16,15 +17,15 @@
 
 // Components
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/kc_keyb.h"
 #include "machine/rescap.h"
-#include "cpu/z80/z80daisy.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
+#include "emupal.h"
+#include "screen.h"
 
 // Devices
 #include "imagedev/cassette.h"
@@ -54,26 +55,29 @@
 // cassette input polling frequency
 #define KC_CASSETTE_TIMER_FREQUENCY attotime::from_hz(44100)
 
-
 class kc_state : public driver_device
 {
 public:
 	kc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_z80pio(*this, "z80pio"),
-			m_z80ctc(*this, "z80ctc"),
-			m_ram(*this, RAM_TAG),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_z80pio(*this, "z80pio")
+		, m_z80ctc(*this, "z80ctc")
+		, m_ram(*this, RAM_TAG)
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_screen(*this, "screen")
+		, m_expansions(*this, {"m8", "mc", "exp"})
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<screen_device> m_screen;
+	required_device_array<kcexp_slot_device, 3> m_expansions;
 
 	// defined in machine/kc.c
 	virtual void machine_start() override;
@@ -130,7 +134,7 @@ public:
 
 	// driver state
 	uint8_t *             m_ram_base;
-	uint8_t *             m_video_ram;
+	std::unique_ptr<uint8_t[]> m_video_ram;
 	int                 m_pio_data[2];
 	int                 m_high_resolution;
 	uint8_t               m_ardy;
@@ -146,13 +150,12 @@ public:
 	int                 m_astb;
 	int                 m_cassette_in;
 
-	kcexp_slot_device * m_expansions[3];
-	DECLARE_PALETTE_INIT(kc85);
+	void kc85_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void kc85_3(machine_config &config);
 	void kc85_3_io(address_map &map);
 	void kc85_3_mem(address_map &map);
@@ -164,7 +167,7 @@ class kc85_4_state : public kc_state
 public:
 	kc85_4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kc_state(mconfig, type, tag)
-		{ }
+	{ }
 
 	// defined in machine/kc.c
 	virtual void machine_reset() override;

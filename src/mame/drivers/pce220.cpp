@@ -33,7 +33,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,13 +47,19 @@ class pce220_state : public driver_device
 {
 public:
 	pce220_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_beep(*this, "beeper"),
-			m_serial(*this, PCE220SERIAL_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_beep(*this, "beeper")
+		, m_serial(*this, PCE220SERIAL_TAG)
+	{ }
 
+	void pce220(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beep;
@@ -78,6 +84,11 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
+
+	void pce220_palette(palette_device &palette) const;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( lcd_status_r );
 	DECLARE_WRITE8_MEMBER( lcd_control_w );
@@ -99,11 +110,7 @@ public:
 	DECLARE_READ8_MEMBER( irq_status_r );
 	DECLARE_WRITE8_MEMBER( irq_ack_w );
 	DECLARE_WRITE8_MEMBER( irq_mask_w );
-	DECLARE_PALETTE_INIT(pce220);
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
-	void pce220(machine_config &config);
+
 	void pce220_io(address_map &map);
 	void pce220_mem(address_map &map);
 };
@@ -115,6 +122,10 @@ public:
 		: pce220_state(mconfig, type, tag)
 		{ }
 
+	void pcg850v(machine_config &config);
+	void pcg815(machine_config &config);
+
+private:
 	uint8_t m_g850v_bank_num;
 	uint8_t m_lcd_effects;
 	uint8_t m_lcd_contrast;
@@ -129,8 +140,6 @@ public:
 	DECLARE_WRITE8_MEMBER( g850v_lcd_control_w );
 	DECLARE_READ8_MEMBER( g850v_lcd_data_r );
 	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
-	void pcg850v(machine_config &config);
-	void pcg815(machine_config &config);
 	void pcg850v_io(address_map &map);
 };
 
@@ -576,59 +585,62 @@ WRITE8_MEMBER( pcg850v_state::g850v_lcd_data_w )
 }
 
 
-ADDRESS_MAP_START(pce220_state::pce220_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
-ADDRESS_MAP_END
+void pce220_state::pce220_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xffff).bankr("bank4");
+}
 
-ADDRESS_MAP_START(pce220_state::pce220_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(kb_r)
-	AM_RANGE(0x11, 0x12) AM_WRITE(kb_matrix_w)
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("SHIFT")
-	AM_RANGE(0x14, 0x14) AM_READWRITE(timer_r, timer_w)
-	AM_RANGE(0x15, 0x15) AM_READWRITE(port15_r, port15_w)
-	AM_RANGE(0x16, 0x16) AM_READWRITE(irq_status_r, irq_ack_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
-	AM_RANGE(0x19, 0x19) AM_READWRITE(rom_bank_r, rom_bank_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(boot_bank_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
-	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
-	AM_RANGE(0x1e, 0x1e) AM_WRITENOP //???
-	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r)
-	AM_RANGE(0x58, 0x58) AM_WRITE(lcd_control_w)
-	AM_RANGE(0x59, 0x59) AM_READ(lcd_status_r)
-	AM_RANGE(0x5a, 0x5a) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x5b, 0x5b) AM_READ(lcd_data_r)
-ADDRESS_MAP_END
+void pce220_state::pce220_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x10, 0x10).r(FUNC(pce220_state::kb_r));
+	map(0x11, 0x12).w(FUNC(pce220_state::kb_matrix_w));
+	map(0x13, 0x13).portr("SHIFT");
+	map(0x14, 0x14).rw(FUNC(pce220_state::timer_r), FUNC(pce220_state::timer_w));
+	map(0x15, 0x15).rw(FUNC(pce220_state::port15_r), FUNC(pce220_state::port15_w));
+	map(0x16, 0x16).rw(FUNC(pce220_state::irq_status_r), FUNC(pce220_state::irq_ack_w));
+	map(0x17, 0x17).w(FUNC(pce220_state::irq_mask_w));
+	map(0x18, 0x18).rw(FUNC(pce220_state::port18_r), FUNC(pce220_state::port18_w));
+	map(0x19, 0x19).rw(FUNC(pce220_state::rom_bank_r), FUNC(pce220_state::rom_bank_w));
+	map(0x1a, 0x1a).w(FUNC(pce220_state::boot_bank_w));
+	map(0x1b, 0x1b).w(FUNC(pce220_state::ram_bank_w));
+	map(0x1c, 0x1c).nopw(); //peripheral reset
+	map(0x1d, 0x1d).portr("BATTERY");
+	map(0x1e, 0x1e).nopw(); //???
+	map(0x1f, 0x1f).r(FUNC(pce220_state::port1f_r));
+	map(0x58, 0x58).w(FUNC(pce220_state::lcd_control_w));
+	map(0x59, 0x59).r(FUNC(pce220_state::lcd_status_r));
+	map(0x5a, 0x5a).w(FUNC(pce220_state::lcd_data_w));
+	map(0x5b, 0x5b).r(FUNC(pce220_state::lcd_data_r));
+}
 
-ADDRESS_MAP_START(pcg850v_state::pcg850v_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(kb_r)
-	AM_RANGE(0x11, 0x12) AM_WRITE(kb_matrix_w)
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("SHIFT")
-	AM_RANGE(0x14, 0x14) AM_READWRITE(timer_r, timer_w)
-	AM_RANGE(0x15, 0x15) AM_READWRITE(port15_r, port15_w)
-	AM_RANGE(0x16, 0x16) AM_READWRITE(irq_status_r, irq_ack_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
-	AM_RANGE(0x19, 0x19) AM_READWRITE(rom_bank_r, rom_bank_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(boot_bank_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
-	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
-	AM_RANGE(0x1e, 0x1e) AM_WRITENOP //???
-	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(g850v_lcd_status_r, g850v_lcd_control_w)
-	AM_RANGE(0x41, 0x41) AM_READWRITE(g850v_lcd_data_r, g850v_lcd_data_w)
-	AM_RANGE(0x69, 0x69) AM_READWRITE(g850v_bank_r, g850v_bank_w)
-ADDRESS_MAP_END
+void pcg850v_state::pcg850v_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x10, 0x10).r(FUNC(pcg850v_state::kb_r));
+	map(0x11, 0x12).w(FUNC(pcg850v_state::kb_matrix_w));
+	map(0x13, 0x13).portr("SHIFT");
+	map(0x14, 0x14).rw(FUNC(pcg850v_state::timer_r), FUNC(pcg850v_state::timer_w));
+	map(0x15, 0x15).rw(FUNC(pcg850v_state::port15_r), FUNC(pcg850v_state::port15_w));
+	map(0x16, 0x16).rw(FUNC(pcg850v_state::irq_status_r), FUNC(pcg850v_state::irq_ack_w));
+	map(0x17, 0x17).w(FUNC(pcg850v_state::irq_mask_w));
+	map(0x18, 0x18).rw(FUNC(pcg850v_state::port18_r), FUNC(pcg850v_state::port18_w));
+	map(0x19, 0x19).rw(FUNC(pcg850v_state::rom_bank_r), FUNC(pcg850v_state::rom_bank_w));
+	map(0x1a, 0x1a).w(FUNC(pcg850v_state::boot_bank_w));
+	map(0x1b, 0x1b).w(FUNC(pcg850v_state::ram_bank_w));
+	map(0x1c, 0x1c).nopw(); //peripheral reset
+	map(0x1d, 0x1d).portr("BATTERY");
+	map(0x1e, 0x1e).nopw(); //???
+	map(0x1f, 0x1f).r(FUNC(pcg850v_state::port1f_r));
+	map(0x40, 0x40).rw(FUNC(pcg850v_state::g850v_lcd_status_r), FUNC(pcg850v_state::g850v_lcd_control_w));
+	map(0x41, 0x41).rw(FUNC(pcg850v_state::g850v_lcd_data_r), FUNC(pcg850v_state::g850v_lcd_data_w));
+	map(0x69, 0x69).rw(FUNC(pcg850v_state::g850v_bank_r), FUNC(pcg850v_state::g850v_bank_w));
+}
 
 INPUT_CHANGED_MEMBER(pce220_state::kb_irq)
 {
@@ -867,7 +879,7 @@ void pce220_state::machine_start()
 
 	m_vram = (uint8_t*)memregion("lcd_vram")->base();
 
-	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
+	subdevice<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pcg850v_state::machine_start()
@@ -881,7 +893,7 @@ void pcg850v_state::machine_start()
 	membank("bank4")->configure_entries(0, 22, rom, 0x4000);
 
 	m_vram = (uint8_t*)memregion("lcd_vram")->base();
-	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
+	subdevice<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pce220_state::machine_reset()
@@ -925,120 +937,111 @@ TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 	}
 }
 
-PALETTE_INIT_MEMBER(pce220_state,pce220)
+void pce220_state::pce220_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 
-MACHINE_CONFIG_START(pce220_state::pce220)
+void pce220_state::pce220(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
-	MCFG_CPU_PROGRAM_MAP(pce220_mem)
-	MCFG_CPU_IO_MAP(pce220_io)
+	Z80(config, m_maincpu, 3072000); // CMOS-SC7852
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce220_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce220_state::pce220_io);
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pce220_state, screen_update)
-	MCFG_SCREEN_SIZE(24*6, 4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 24*6-1, 0, 4*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pce220_state::screen_update));
+	screen.set_size(24*6, 4*8);
+	screen.set_visarea(0, 24*6-1, 0, 4*8-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	PALETTE(config, "palette", FUNC(pce220_state::pce220_palette), 2);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pce220_state::pce220_timer_callback), attotime::from_msec(468));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
-MACHINE_CONFIG_END
+	PCE220SERIAL(config, m_serial, 0);
+}
 
-MACHINE_CONFIG_START(pcg850v_state::pcg815)
+void pcg850v_state::pcg815(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000) ) // 3.54MHz
-	MCFG_CPU_PROGRAM_MAP(pce220_mem)
-	MCFG_CPU_IO_MAP(pcg850v_io)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // 3.54MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
-	MCFG_SCREEN_SIZE(144, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 32-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
+	screen.set_size(144, 32);
+	screen.set_visarea(0, 144-1, 0, 32-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
-MACHINE_CONFIG_END
+	PCE220SERIAL(config, m_serial, 0);
+}
 
-MACHINE_CONFIG_START(pcg850v_state::pcg850v)
+void pcg850v_state::pcg850v(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) ) // CMOS-SC7852
-	MCFG_CPU_PROGRAM_MAP(pce220_mem)
-	MCFG_CPU_IO_MAP(pcg850v_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)); // CMOS-SC7852
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
+	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
 
 	/* video hardware */
 	// 6 lines x 24 characters, resp. 144 x 48 pixel
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
-	MCFG_SCREEN_SIZE(144, 48)
-	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 48-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
+	screen.set_size(144, 48);
+	screen.set_visarea(0, 144-1, 0, 48-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pce220_timer", pce220_state, pce220_timer_callback, attotime::from_msec(468))
+	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K") // 32K internal + 32K external card
+	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
-MACHINE_CONFIG_END
+	PCE220SERIAL(config, m_serial, 0);
+}
 
 /* ROM definition */
 ROM_START( pce220 )
@@ -1046,17 +1049,17 @@ ROM_START( pce220 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "v 0.1")
 	ROM_SYSTEM_BIOS( 1, "v2", "v 0.2")
-	ROM_LOAD( "bank0.bin",      0x0000, 0x4000, CRC(1fa94d11) SHA1(24c54347dbb1423388360a359aa09db47d2057b7))
-	ROM_LOAD( "bank1.bin",      0x4000, 0x4000, CRC(0f9864b0) SHA1(6b7301c96f1a865e1931d82872a1ed5d1f80644e))
-	ROM_LOAD( "bank2.bin",      0x8000, 0x4000, CRC(1625e958) SHA1(090440600d461aa7efe4adbf6e975aa802aabeec))
-	ROM_LOAD( "bank3.bin",      0xc000, 0x4000, CRC(ed9a57f8) SHA1(58087dc64103786a40325c0a1e04bd88bfd6da57))
-	ROM_LOAD( "bank4.bin",     0x10000, 0x4000, CRC(e37665ae) SHA1(85f5c84f69f79e7ac83b30397b2a1d9629f9eafa))
-	ROMX_LOAD( "bank5.bin",     0x14000, 0x4000, CRC(6b116e7a) SHA1(b29f5a070e846541bddc88b5ee9862cc36b88eee),ROM_BIOS(2))
-	ROMX_LOAD( "bank5_0.1.bin", 0x14000, 0x4000, CRC(13c26eb4) SHA1(b9cd0efd6b195653b9610e20ad8aab541824a689),ROM_BIOS(1))
-	ROMX_LOAD( "bank6.bin",     0x18000, 0x4000, CRC(4fbfbd18) SHA1(e5aab1df172dcb94aa90e7d898eacfc61157ff15),ROM_BIOS(2))
-	ROMX_LOAD( "bank6_0.1.bin", 0x18000, 0x4000, CRC(e2cda7a6) SHA1(01b1796d9485fde6994cb5afbe97514b54cfbb3a),ROM_BIOS(1))
-	ROMX_LOAD( "bank7.bin",     0x1c000, 0x4000, CRC(5e98b5b6) SHA1(f22d74d6a24f5929efaf2983caabd33859232a94),ROM_BIOS(2))
-	ROMX_LOAD( "bank7_0.1.bin", 0x1c000, 0x4000, CRC(d8e821b2) SHA1(18245a75529d2f496cdbdc28cdf40def157b20c0),ROM_BIOS(1))
+	ROM_LOAD(  "bank0.bin",      0x0000, 0x4000, CRC(1fa94d11) SHA1(24c54347dbb1423388360a359aa09db47d2057b7))
+	ROM_LOAD(  "bank1.bin",      0x4000, 0x4000, CRC(0f9864b0) SHA1(6b7301c96f1a865e1931d82872a1ed5d1f80644e))
+	ROM_LOAD(  "bank2.bin",      0x8000, 0x4000, CRC(1625e958) SHA1(090440600d461aa7efe4adbf6e975aa802aabeec))
+	ROM_LOAD(  "bank3.bin",      0xc000, 0x4000, CRC(ed9a57f8) SHA1(58087dc64103786a40325c0a1e04bd88bfd6da57))
+	ROM_LOAD(  "bank4.bin",     0x10000, 0x4000, CRC(e37665ae) SHA1(85f5c84f69f79e7ac83b30397b2a1d9629f9eafa))
+	ROMX_LOAD( "bank5.bin",     0x14000, 0x4000, CRC(6b116e7a) SHA1(b29f5a070e846541bddc88b5ee9862cc36b88eee), ROM_BIOS(1))
+	ROMX_LOAD( "bank5_0.1.bin", 0x14000, 0x4000, CRC(13c26eb4) SHA1(b9cd0efd6b195653b9610e20ad8aab541824a689), ROM_BIOS(0))
+	ROMX_LOAD( "bank6.bin",     0x18000, 0x4000, CRC(4fbfbd18) SHA1(e5aab1df172dcb94aa90e7d898eacfc61157ff15), ROM_BIOS(1))
+	ROMX_LOAD( "bank6_0.1.bin", 0x18000, 0x4000, CRC(e2cda7a6) SHA1(01b1796d9485fde6994cb5afbe97514b54cfbb3a), ROM_BIOS(0))
+	ROMX_LOAD( "bank7.bin",     0x1c000, 0x4000, CRC(5e98b5b6) SHA1(f22d74d6a24f5929efaf2983caabd33859232a94), ROM_BIOS(1))
+	ROMX_LOAD( "bank7_0.1.bin", 0x1c000, 0x4000, CRC(d8e821b2) SHA1(18245a75529d2f496cdbdc28cdf40def157b20c0), ROM_BIOS(0))
 
 	ROM_REGION( 0x200, "lcd_vram", ROMREGION_ERASE00)   //HD61202 internal RAM (4096 bits)
 ROM_END
@@ -1111,7 +1114,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY    FULLNAME        FLAGS
-COMP( 1991, pce220,  0,      0,      pce220,   pce220,  pce220_state,  0,    "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
-COMP( 1992, pcg815,  0,      0,      pcg815,   pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
-COMP( 2001, pcg850v, 0,      0,      pcg850v,  pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
+COMP( 1991, pce220,  0,      0,      pce220,  pce220,  pce220_state,  empty_init, "Sharp", "PC-E220",  MACHINE_NOT_WORKING )
+COMP( 1992, pcg815,  0,      0,      pcg815,  pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G815",  MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,      0,      pcg850v, pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G850V", MACHINE_NOT_WORKING )

@@ -61,7 +61,7 @@ enum lr35902_flag
 //  LR35902 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(LR35902, lr35902_cpu_device, "lr35902", "LR35902")
+DEFINE_DEVICE_TYPE(LR35902, lr35902_cpu_device, "lr35902", "Sharp LR35902")
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -185,7 +185,7 @@ void lr35902_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_PC).formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_F).mask(0xf0).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -232,9 +232,9 @@ void lr35902_cpu_device::device_reset()
 	m_entering_halt = false;
 }
 
-util::disasm_interface *lr35902_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> lr35902_cpu_device::create_disassembler()
 {
-	return new lr35902_disassembler;
+	return std::make_unique<lr35902_disassembler>();
 }
 
 void lr35902_cpu_device::check_interrupts()
@@ -362,7 +362,7 @@ void lr35902_cpu_device::execute_run()
 				/* Fetch and count cycles */
 				bool was_halted = (m_enable & HALTED);
 				check_interrupts();
-				debugger_instruction_hook(this, m_PC);
+				debugger_instruction_hook(m_PC);
 				if ( m_enable & HALTED ) {
 					cycles_passed(m_has_halt_bug ? 2 : 4);
 					m_execution_state = 1;

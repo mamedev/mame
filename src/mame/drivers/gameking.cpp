@@ -29,6 +29,7 @@
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -37,18 +38,26 @@
 class gameking_state : public driver_device
 {
 public:
-	gameking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gameking_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_io_joy(*this, "JOY"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
-	DECLARE_DRIVER_INIT(gameking);
+	void gameking(machine_config &config);
+	void gameking3(machine_config &config);
+	void gameking1(machine_config &config);
+
+	void init_gameking();
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(gameking);
+
+private:
+	void gameking_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(lcd_r);
@@ -58,7 +67,7 @@ public:
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	struct Gkio {
 		uint8_t input, input2;
@@ -69,11 +78,8 @@ public:
 		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
 		uint8_t res2[0x4c];
 	};
-	void gameking(machine_config &config);
-	void gameking3(machine_config &config);
-	void gameking1(machine_config &config);
 	void gameking_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
@@ -148,20 +154,21 @@ READ8_MEMBER(gameking_state::lcd_r)
 	return data;
 }
 
-ADDRESS_MAP_START(gameking_state::gameking_mem)
-	AM_RANGE(0x0000, 0x007f) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0080, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM // lcd 2nd copy
+void gameking_state::gameking_mem(address_map &map)
+{
+	map(0x0000, 0x007f).rw(FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
+	map(0x0080, 0x01ff).ram();
+	map(0x0200, 0x03ff).ram(); // lcd 2nd copy
 
-	AM_RANGE(0x0600, 0x077f) AM_READWRITE(lcd_r, lcd_w)
-	AM_RANGE(0x0d00, 0x0fff) AM_RAM // d00, e00, f00 prooved on handheld
+	map(0x0600, 0x077f).rw(FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
+	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
 //  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
 
 //  AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank3000")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4000")
-	AM_RANGE(0x8000, 0xffaf) AM_ROMBANK("bank8000")
-	AM_RANGE(0xffb0, 0xffff) AM_ROMBANK("bankboot") // cpu seems to read from 8000 bank, and for exceptions ignore bank
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).bankr("bank4000");
+	map(0x8000, 0xffaf).bankr("bank8000");
+	map(0xffb0, 0xffff).bankr("bankboot"); // cpu seems to read from 8000 bank, and for exceptions ignore bank
+}
 
 
 static INPUT_PORTS_START( gameking )
@@ -176,18 +183,17 @@ static INPUT_PORTS_START( gameking )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
 INPUT_PORTS_END
 
-static const unsigned char gameking_palette[] =
+static constexpr rgb_t gameking_pens[] =
 {
-	255, 255, 255,
-	127, 127, 127,
-	63, 63, 63,
-	0, 0, 0
+	{ 255, 255, 255 },
+	{ 127, 127, 127 },
+	{  63,  63,  63 },
+	{   0,   0,   0 }
 };
 
-PALETTE_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::gameking_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(gameking_palette) / 3; i++)
-		palette.set_pen_color(i, gameking_palette[i*3], gameking_palette[i*3+1], gameking_palette[i*3+2]);
+	palette.set_pen_colors(0, gameking_pens);
 }
 
 
@@ -209,7 +215,7 @@ uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_in
 }
 
 
-DRIVER_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::init_gameking()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer), this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer2), this));
@@ -233,7 +239,7 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
+DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -280,39 +286,39 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 }
 
 
-MACHINE_CONFIG_START(gameking_state::gameking)
+void gameking_state::gameking(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 6000000)
-	MCFG_CPU_PROGRAM_MAP(gameking_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
+	R65C02(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gameking_state::gameking_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(gameking_state::gameking_frame_int));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(48, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 48-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gameking_state, screen_update_gameking)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(48, 32);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gameking_palette) * 3)
-	MCFG_PALETTE_INIT_OWNER(gameking_state, gameking )
+	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gameking_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load), this);
+}
 
-MACHINE_CONFIG_START(gameking_state::gameking1)
+void gameking_state::gameking1(machine_config &config)
+{
 	gameking(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
+}
 
-MACHINE_CONFIG_START(gameking_state::gameking3)
+void gameking_state::gameking3(machine_config &config)
+{
 	gameking(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
+	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
+}
 
 
 ROM_START(gameking)
@@ -326,9 +332,9 @@ ROM_START(gamekin3)
 	ROM_LOAD("gm220.bin", 0x10000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
-CONS( 2003,  gameking,    0,  0,  gameking1,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW
 
-CONS( 2003,  gamekin3,    0,  0,  gameking3,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003, gamekin3, 0, 0, gameking3, gameking, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // gameking 3: similiar cartridges, accepts gameking cartridges, gameking3 cartridges not working on gameking (illegal cartridge scroller)
 // my gameking bios backup solution might work on it

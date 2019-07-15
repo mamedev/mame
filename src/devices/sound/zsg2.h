@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont, hap
+// copyright-holders:Olivier Galibert, R. Belmont, hap, superctr
 /*
     ZOOM ZSG-2 custom wavetable synthesizer
 */
@@ -9,20 +9,6 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ZSG2_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, ZSG2, _clock)
-#define MCFG_ZSG2_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, ZSG2, _clock)
-
-#define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
-	devcb = &zsg2_device::set_ext_read_handler(*device, DEVCB_##_devcb);
-
-
 // ======================> zsg2_device
 
 class zsg2_device : public device_t,
@@ -31,8 +17,8 @@ class zsg2_device : public device_t,
 public:
 	zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_ext_read_handler(device_t &device, Object &&cb) { return downcast<zsg2_device &>(device).m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto ext_read() { return m_ext_read_handler.bind(); }
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -46,12 +32,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	const uint16_t STATUS_ACTIVE = 0x8000;
+
 	// 16 registers per channel, 48 channels
 	struct zchan
 	{
 		uint16_t v[16];
-		bool is_playing;
-		int16_t *samples;
+		uint16_t status;
 		uint32_t cur_pos;
 		uint32_t step_ptr;
 		uint32_t step;
@@ -59,13 +46,32 @@ private:
 		uint32_t end_pos;
 		uint32_t loop_pos;
 		uint32_t page;
+
 		uint16_t vol;
-		uint16_t flags;
-		uint8_t panl;
-		uint8_t panr;
+		uint16_t vol_initial;
+		uint16_t vol_target;
+		int16_t vol_delta;
+
+		uint16_t output_cutoff;
+		uint16_t output_cutoff_initial;
+		uint16_t output_cutoff_target;
+		int16_t output_cutoff_delta;
+
+		int32_t emphasis_filter_state;
+
+		int32_t output_filter_state;
+
+		// Attenuation for output channels
+		uint8_t output_gain[4];
+
+		int16_t samples[5]; // +1 history
 	};
 
+	uint16_t m_gain_tab[256];
+	uint16_t m_reg[32];
+
 	zchan m_chan[48];
+	uint32_t m_sample_count;
 
 	required_region_ptr<uint32_t> m_mem_base;
 	uint32_t m_read_address;
@@ -83,6 +89,9 @@ private:
 	void control_w(int reg, uint16_t data);
 	uint16_t control_r(int reg);
 	int16_t *prepare_samples(uint32_t offset);
+	void filter_samples(zchan *ch);
+	int16_t get_ramp(uint8_t val);
+	inline uint16_t ramp(uint16_t current, uint16_t target, int16_t delta);
 };
 
 DECLARE_DEVICE_TYPE(ZSG2, zsg2_device)

@@ -26,13 +26,14 @@
     RD becomes a Motorola-style R/W control signal (R = 1, W = 0),
     and WR becomes an active-low "M Enable" input.
 
-    TE7750, TE7751, TE7753 and TE7754 appear to be functionally
-    almost identical, though only the last two are pin-compatible.
+    TE7750, TE7751, TE7752, TE7753 and TE7754 appear to be nearly
+    identical functionally, though they have three different pinouts
+    (TE7751/TE7752 appear to be pin-compatible, as are TE7753/TE7754).
     One known difference is that TE7753 resets all output latches to
     "H" and TE7754 resets them to "L" (the latches can be written in
-    soft mode before the ports are set for output). TE7750 and TE7751
-    probably do either one or the other, but available documentation
-    is incomplete.
+    soft mode before the ports are set for output). TE7750, TE7751 and
+    TE7752 should do either one or the other, but available
+    documentation for these parts is incomplete.
 
 ***********************************************************************
 
@@ -53,6 +54,17 @@
      1  1  0  0   CR3                    W*          W*
 
     * CR1-CR3 are only writable in soft mode.
+
+    IOS0 IOS1 IOS2    P1  P2  P3  P4  P5  P6  P7  P8  P9
+    ---- ---- ----    --  --  --  --  --  --  --  --  --
+      0    0    0     CR1 CR1 CR1 CR2 CR2 CR2 CR3 CR0 CR3
+      0    0    1      I   O   O   O   O   O   O  CR0  O
+      0    1    0      I   I   O   O   O   O   O  CR0  O
+      0    1    1      I   I   I   O   O   O   O  CR0  O
+      1    0    0      I   I   I   I   O   O   O  CR0  O
+      1    0    1      I   I   I   I   I   O   O  CR0  O
+      1    1    0      I   I   I   I   I   I   O  CR0  O
+      1    1    1      I   I   I   I   I   I   I  CR0  O
 
 ***********************************************************************
 
@@ -165,6 +177,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(TE7750, te7750_device, "te7750", "TE7750 Super I/O Expander")
+DEFINE_DEVICE_TYPE(TE7752, te7752_device, "te7752", "TE7752 Super I/O Expander")
 
 //**************************************************************************
 //  DEVICE DEFINITION
@@ -174,13 +187,27 @@ DEFINE_DEVICE_TYPE(TE7750, te7750_device, "te7750", "TE7750 Super I/O Expander")
 //  te7750_device - constructor
 //-------------------------------------------------
 
-te7750_device::te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, TE7750, tag, owner, clock),
-		m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-		m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-		m_ios_cb(*this)
+te7750_device::te7750_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_ios_cb(*this)
 {
 	std::fill(std::begin(m_data_dir), std::end(m_data_dir), 0xff);
+}
+
+te7750_device::te7750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: te7750_device(mconfig, TE7750, tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  te7752_device - constructor
+//-------------------------------------------------
+
+te7752_device::te7752_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: te7750_device(mconfig, TE7752, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------

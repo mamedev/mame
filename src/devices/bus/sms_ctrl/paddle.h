@@ -53,7 +53,6 @@ private:
 
 
 // device type definition
-extern const device_type SMS_PADDLE;
-
+DECLARE_DEVICE_TYPE(SMS_PADDLE, sms_paddle_device)
 
 #endif // MAME_BUS_SMS_CTRL_PADDLE_H

@@ -23,23 +23,21 @@ void starshp1_state::set_pens()
 }
 
 
-PALETTE_INIT_MEMBER(starshp1_state, starshp1)
+void starshp1_state::starshp1_palette(palette_device &palette) const
 {
-	int i;
-
-	static const uint16_t colortable_source[] =
+	static constexpr uint16_t colortable_source[] =
 	{
-		0, 3,       /* 0x00 - 0x01 - alpha numerics */
-		0, 2,       /* 0x02 - 0x03 - sprites (Z=0) */
-		0, 5,       /* 0x04 - 0x05 - sprites (Z=1) */
-		0, 2, 4, 6, /* 0x06 - 0x09 - spaceship (EXPLODE=0) */
-		0, 6, 6, 7, /* 0x0a - 0x0d - spaceship (EXPLODE=1) */
-		5, 2,       /* 0x0e - 0x0f - star field */
-		7,          /* 0x10        - phasor */
-		5, 7        /* 0x11        - circle */
+		0, 3,       // 0x00 - 0x01 - alpha numerics
+		0, 2,       // 0x02 - 0x03 - sprites (Z=0)
+		0, 5,       // 0x04 - 0x05 - sprites (Z=1)
+		0, 2, 4, 6, // 0x06 - 0x09 - spaceship (EXPLODE=0)
+		0, 6, 6, 7, // 0x0a - 0x0d - spaceship (EXPLODE=1)
+		5, 2,       // 0x0e - 0x0f - star field
+		7,          // 0x10        - phasor
+		5, 7        // 0x11        - circle
 	};
 
-	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (unsigned i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 		palette.set_pen_indirect(i, colortable_source[i]);
 }
 
@@ -305,14 +303,11 @@ void starshp1_state::draw_circle(bitmap_ind16 &bitmap)
 
 int starshp1_state::spaceship_collision(bitmap_ind16 &bitmap, const rectangle &rect)
 {
-	int x;
-	int y;
-
-	for (y = rect.min_y; y <= rect.max_y; y++)
+	for (int y = rect.top(); y <= rect.bottom(); y++)
 	{
 		const uint16_t* pLine = &m_helper.pix16(y);
 
-		for (x = rect.min_x; x <= rect.max_x; x++)
+		for (int x = rect.left(); x <= rect.right(); x++)
 			if (pLine[x] != 0)
 				return 1;
 	}
@@ -337,10 +332,10 @@ int starshp1_state::circle_collision(const rectangle &rect)
 
 	int r = get_radius();
 
-	return point_in_circle(rect.min_x, rect.min_y, center_x, center_y, r) ||
-			point_in_circle(rect.min_x, rect.max_y, center_x, center_y, r) ||
-			point_in_circle(rect.max_x, rect.min_y, center_x, center_y, r) ||
-			point_in_circle(rect.max_x, rect.max_y, center_x, center_y, r);
+	return point_in_circle(rect.left(), rect.top(), center_x, center_y, r) ||
+			point_in_circle(rect.left(), rect.bottom(), center_x, center_y, r) ||
+			point_in_circle(rect.right(), rect.top(), center_x, center_y, r) ||
+			point_in_circle(rect.right(), rect.bottom(), center_x, center_y, r);
 }
 
 
@@ -378,13 +373,10 @@ WRITE_LINE_MEMBER(starshp1_state::screen_vblank_starshp1)
 	// rising edge
 	if (state)
 	{
-		rectangle rect;
 		const rectangle &visarea = m_screen->visible_area();
 
-		rect.min_x = get_sprite_hpos(13);
-		rect.min_y = get_sprite_vpos(13);
-		rect.max_x = rect.min_x + m_gfxdecode->gfx(1)->width() - 1;
-		rect.max_y = rect.min_y + m_gfxdecode->gfx(1)->height() - 1;
+		rectangle rect(get_sprite_hpos(13), 0, get_sprite_vpos(13), 0);
+		rect.set_size(m_gfxdecode->gfx(1)->width(), m_gfxdecode->gfx(1)->height());
 
 		rect &= m_helper.cliprect();
 

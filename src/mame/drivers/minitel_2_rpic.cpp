@@ -26,6 +26,7 @@
     - Modem and sound output.
     - The rear serial port.
     - Parameters I2C 24C02 EEPROM.
+    - Screen should go blank when switched off
 
     The original firmware and the experimental demo rom are currently both working.
 
@@ -52,6 +53,7 @@
 #include "machine/timer.h"
 #include "video/ef9345.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -92,14 +94,19 @@ public:
 		{
 		}
 
-	required_device<cpu_device> m_maincpu;
+	void minitel2(machine_config &config);
+
+private:
+	required_device<i80c32_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
-	DECLARE_WRITE8_MEMBER ( port_w );
-	DECLARE_READ8_MEMBER ( port_r );
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_WRITE8_MEMBER(port3_w);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_READ8_MEMBER(port3_r);
 
 	DECLARE_WRITE8_MEMBER ( dev_crtl_reg_w );
 	DECLARE_READ8_MEMBER ( dev_keyb_ser_r );
@@ -107,19 +114,18 @@ public:
 	DECLARE_READ8_MEMBER ( ts9347_io_r );
 	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 
-	void minitel2(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
-protected:
+
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
 
-	char port0, port1, port2, port3;
+	uint8_t port1, port3;
 
 	int keyboard_para_ser;
-	unsigned char keyboard_x_row_reg;
+	uint8_t keyboard_x_row_reg;
 
-	unsigned char last_ctrl_reg;
+	uint8_t last_ctrl_reg;
 };
 
 void minitel_state::machine_start()
@@ -134,95 +140,74 @@ void minitel_state::machine_start()
 	m_palette->set_pen_color( 7, 255, 255, 255);
 }
 
-WRITE8_MEMBER(minitel_state::port_w)
+WRITE8_MEMBER(minitel_state::port1_w)
 {
-	LOG("port_w: write %02X to PORT (offset=%02X)\n", data, offset);
+	LOG("port_w: write %02X to PORT1\n", data);
 
-	switch(offset| 0x20000)
+	if( (port1 ^ data) & PORT_1_KBSERIN )
 	{
-		case MCS51_PORT_P0:
-			port0 = data;
-		break;
-		case MCS51_PORT_P1:
-
-			if( (port1 ^ data) & PORT_1_KBSERIN )
-			{
-				LOG("PORT_1_KBSERIN : %d \n", data & PORT_1_KBSERIN );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_DCD )
-			{
-				LOG("PORT_1_MDM_DCD : %d \n", data & PORT_1_MDM_DCD );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_PRD )
-			{
-				LOG("PORT_1_MDM_PRD : %d \n", data & PORT_1_MDM_PRD );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_TXD )
-			{
-				LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_RTS )
-			{
-				LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
-			}
-
-			if( (port1 ^ data) & PORT_1_KBLOAD )
-			{
-				LOG("PORT_1_KBLOAD : %d PC:0x%x\n", data & PORT_1_KBLOAD,m_maincpu->pc() );
-
-				if(data & PORT_1_KBLOAD)
-					keyboard_para_ser = 1;
-				else
-					keyboard_para_ser = 0;
-			}
-
-			if( (port1 ^ data) & PORT_1_SCL )
-			{
-				LOG("PORT_1_SCL : %d \n", data & PORT_1_SCL );
-			}
-
-			if( (port1 ^ data) & PORT_1_SDA )
-			{
-				LOG("PORT_1_SDA : %d \n", data & PORT_1_SDA );
-			}
-
-			port1=data;
-		break;
-
-		case MCS51_PORT_P2:
-			port2=data;
-		break;
-
-		case MCS51_PORT_P3:
-			port3=data;
-		break;
+		LOG("PORT_1_KBSERIN : %d \n", data & PORT_1_KBSERIN );
 	}
+
+	if( (port1 ^ data) & PORT_1_MDM_DCD )
+	{
+		LOG("PORT_1_MDM_DCD : %d \n", data & PORT_1_MDM_DCD );
+	}
+
+	if( (port1 ^ data) & PORT_1_MDM_PRD )
+	{
+		LOG("PORT_1_MDM_PRD : %d \n", data & PORT_1_MDM_PRD );
+	}
+
+	if( (port1 ^ data) & PORT_1_MDM_TXD )
+	{
+		LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
+	}
+
+	if( (port1 ^ data) & PORT_1_MDM_RTS )
+	{
+		LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
+	}
+
+	if( (port1 ^ data) & PORT_1_KBLOAD )
+	{
+		LOG("PORT_1_KBLOAD : %d PC:0x%x\n", data & PORT_1_KBLOAD,m_maincpu->pc() );
+
+		if(data & PORT_1_KBLOAD)
+			keyboard_para_ser = 1;
+		else
+			keyboard_para_ser = 0;
+	}
+
+	if( (port1 ^ data) & PORT_1_SCL )
+	{
+		LOG("PORT_1_SCL : %d \n", data & PORT_1_SCL );
+	}
+
+	if( (port1 ^ data) & PORT_1_SDA )
+	{
+		LOG("PORT_1_SDA : %d \n", data & PORT_1_SDA );
+	}
+
+	port1 = data;
 }
 
-READ8_MEMBER(minitel_state::port_r)
+WRITE8_MEMBER(minitel_state::port3_w)
 {
-	LOG("port_r: read PORT (offset=%02X) %x\n", offset,m_maincpu->pc());
+	LOG("port_w: write %02X to PORT3\n", data);
+	port3 = data;
+}
 
-	switch(offset | 0x20000)
-	{
-		case MCS51_PORT_P0:
-			LOG("port_r: read %02X from PORT0\n", port0);
-			return port0;
-		case MCS51_PORT_P1:
-			LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
-			return ( (port1&0xFE) | ((keyboard_x_row_reg>>7)&1) ) ;
-		case MCS51_PORT_P2:
-			LOG("port_r: read %02X from PORT2\n", port2);
-			return port2;
-		case MCS51_PORT_P3:
-			LOG("port_r: read %02X from PORT3\n", port3);
-			return port3;
-	}
-	return 0;
+READ8_MEMBER(minitel_state::port1_r)
+{
+	LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
+	return ( (port1&0xFE) | ((keyboard_x_row_reg>>7)&1) ) ;
+}
+
+READ8_MEMBER(minitel_state::port3_r)
+{
+	LOG("port_r: read %02X from PORT3\n", port3);
+	return port3;
 }
 
 WRITE8_MEMBER(minitel_state::dev_crtl_reg_w)
@@ -281,14 +266,14 @@ READ8_MEMBER(minitel_state::dev_keyb_ser_r)
 
 READ8_MEMBER ( minitel_state::ts9347_io_r )
 {
-	return m_ts9347->data_r(space, offset, 0xff);
+	return m_ts9347->data_r(offset);
 }
 
 WRITE8_MEMBER ( minitel_state::ts9347_io_w )
 {
 	LOG("minitel_state::ts9347_io_w : %x %x\n",offset, data);
 
-	m_ts9347->data_w(space, offset, data, 0xff);
+	m_ts9347->data_w(offset, data);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)
@@ -296,16 +281,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)
 	m_ts9347->update_scanline((uint16_t)param);
 }
 
-ADDRESS_MAP_START(minitel_state::mem_prg)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void minitel_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(minitel_state::mem_io)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dev_keyb_ser_r, dev_crtl_reg_w)
+void minitel_state::mem_io(address_map &map)
+{
+	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
 	/* ts9347 */
-	AM_RANGE(0x4000, 0x5ffF) AM_READWRITE(ts9347_io_r, ts9347_io_w)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(port_r, port_w)
-ADDRESS_MAP_END
+	map(0x4000, 0x5ffF).rw(FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( minitel2 )
@@ -415,25 +401,31 @@ static INPUT_PORTS_START( minitel2 )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(minitel_state::minitel2)
+void minitel_state::minitel2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
+	I80C32(config, m_maincpu, XTAL(14'318'181)); //verified on pcb
+	m_maincpu->set_addrmap(AS_PROGRAM, &minitel_state::mem_prg);
+	m_maincpu->set_addrmap(AS_IO, &minitel_state::mem_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(minitel_state::port1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(minitel_state::port1_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(minitel_state::port3_r));
+	m_maincpu->port_out_cb<3>().set(FUNC(minitel_state::port3_w));
 
-	MCFG_DEVICE_ADD("ts9347", TS9347, 0)
-	MCFG_EF9345_PALETTE("palette")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("minitel_sl", minitel_state, minitel_scanline, "screen", 0, 10)
+	TS9347(config, m_ts9347, 0);
+	m_ts9347->set_palette_tag(m_palette);
+
+	TIMER(config, "minitel_sl", 0).configure_scanline(FUNC(minitel_state::minitel_scanline), "screen", 0, 10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE("ts9347", ts9347_device, screen_update)
-	MCFG_SCREEN_SIZE(512, 312)
-	MCFG_SCREEN_VISIBLE_AREA(2, 512-10, 0, 278-1)
-	MCFG_PALETTE_ADD("palette", 8+1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update("ts9347", FUNC(ts9347_device::screen_update));
+	screen.set_size(512, 312);
+	screen.set_visarea(2, 512-10, 0, 278-1);
 
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette).set_entries(8+1);
+}
 
 ROM_START( minitel2 )
 
@@ -441,13 +433,16 @@ ROM_START( minitel2 )
 	ROM_DEFAULT_BIOS("ft_bv4")
 
 	ROM_SYSTEM_BIOS(0, "ft_bv4", "Minitel 2 ROM BV4")
-	ROMX_LOAD( "MINITEL2_BV4.BIN",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
+	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844a0a7) SHA1(d3e9079b080dbcee27ad870ec6c39ac42e7deacf), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "demov1", "Minitel 2 Demo")
-	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607F2482) SHA1(7965EDBEF68E45D09DC67A4684DA56003EFF6328), ROM_BIOS(2) )
+	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607f2482) SHA1(7965edbef68e45d09dc67a4684da56003eff6328), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "ft_bv9", "Minitel 2 ROM Bv9")
+	ROMX_LOAD( "bv9.1402",           0x0000, 0x8000, CRC(ace5d65e) SHA1(c8d589f8af6bd7d339964fdece937a76db972115), ROM_BIOS(2) )
 
 	ROM_REGION( 0x4000, "ts9347", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
-COMP( 1989, minitel2,      0,     0, minitel2,    minitel2, minitel_state,   0, "Philips", "Minitel 2", MACHINE_NO_SOUND )
+COMP( 1989, minitel2, 0, 0, minitel2, minitel2, minitel_state, empty_init, "Philips", "Minitel 2", MACHINE_NO_SOUND )

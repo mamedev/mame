@@ -38,13 +38,6 @@ nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void nubus_slot_device::static_set_nubus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	nubus_slot_device &nubus_card = dynamic_cast<nubus_slot_device &>(device);
-	nubus_card.m_nubus_tag = tag;
-	nubus_card.m_nubus_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -53,7 +46,7 @@ void nubus_slot_device::device_start()
 {
 	device_nubus_card_interface *dev = dynamic_cast<device_nubus_card_interface *>(get_card_device());
 
-	if (dev) device_nubus_card_interface::static_set_nubus_tag(*dev, m_nubus_tag, m_nubus_slottag);
+	if (dev) dev->set_nubus_tag(m_nubus_tag, m_nubus_slottag);
 }
 
 //**************************************************************************
@@ -61,12 +54,6 @@ void nubus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(NUBUS, nubus_device, "nubus", "NuBus")
-
-void nubus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	nubus_device &nubus = downcast<nubus_device &>(device);
-	nubus.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -83,23 +70,24 @@ nubus_device::nubus_device(const machine_config &mconfig, const char *tag, devic
 
 nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(nullptr),
+	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_out_irq9_cb(*this),
 	m_out_irqa_cb(*this),
 	m_out_irqb_cb(*this),
 	m_out_irqc_cb(*this),
 	m_out_irqd_cb(*this),
-	m_out_irqe_cb(*this),
-	m_cputag(nullptr)
+	m_out_irqe_cb(*this)
 {
 }
+
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void nubus_device::device_start()
+void nubus_device::device_resolve_objects()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
 	// resolve callbacks
 	m_out_irq9_cb.resolve_safe();
 	m_out_irqa_cb.resolve_safe();
@@ -110,10 +98,10 @@ void nubus_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  device_start - device-specific startup
 //-------------------------------------------------
 
-void nubus_device::device_reset()
+void nubus_device::device_start()
 {
 }
 
@@ -124,15 +112,14 @@ void nubus_device::add_nubus_card(device_nubus_card_interface *card)
 
 void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
+	int buswidth = m_space->data_width();
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+			m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -141,15 +128,14 @@ void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 
 void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
+	int buswidth = m_space->data_width();
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+			m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -158,15 +144,14 @@ void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhan
 
 void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
+	int buswidth = m_space->data_width();
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+			m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -175,15 +160,14 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 
 void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, uint32_t mask)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
+	int buswidth = m_space->data_width();
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(start, end, rhandler, mask);
+			m_space->install_read_handler(start, end, rhandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(start, end, rhandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_read_handler(start, end, rhandler, ((uint64_t)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -192,15 +176,14 @@ void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_dele
 
 void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, uint32_t mask)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
+	int buswidth = m_space->data_width();
 	switch(buswidth)
 	{
 		case 32:
-			m_maincpu->space(AS_PROGRAM).install_write_handler(start, end, whandler, mask);
+			m_space->install_write_handler(start, end, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_write_handler(start, end, whandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_write_handler(start, end, whandler, ((uint64_t)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -210,9 +193,7 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 void nubus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, 0, tag );
+	m_space->install_readwrite_bank(start, end, 0, tag);
 	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
@@ -266,45 +247,52 @@ device_nubus_card_interface::~device_nubus_card_interface()
 {
 }
 
-void device_nubus_card_interface::static_set_nubus_tag(device_t &device, const char *tag, const char *slottag)
+void device_nubus_card_interface::interface_pre_start()
 {
-	device_nubus_card_interface &nubus_card = dynamic_cast<device_nubus_card_interface &>(device);
-	nubus_card.m_nubus_tag = tag;
-	nubus_card.m_nubus_slottag = slottag;
-}
-
-void device_nubus_card_interface::set_nubus_device()
-{
-	if (!strncmp(m_nubus_slottag, "pds030", 6))
+	if (!m_nubus)
 	{
-		m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
-	}
-	else if (!strncmp(m_nubus_slottag, "lcpds", 6))
-	{
-		m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
-	}
-	else
-	{
-		// extract the slot number from the last digit of the slot tag
-		int tlen = strlen(m_nubus_slottag);
-
-		if (m_nubus_slottag[tlen-1] == '9')
+		if (!strncmp(m_nubus_slottag, "pds030", 6))
 		{
-			m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+			m_slot = 0x9;   // '030 PDS slots phantom slot as NuBus slots $9, $A, and $B
+		}
+		else if (!strncmp(m_nubus_slottag, "lcpds", 6))
+		{
+			m_slot = 0xe;   // LC PDS slots phantom slot as NuBus slot $E
 		}
 		else
 		{
-			m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
+			// extract the slot number from the last digit of the slot tag
+			int tlen = strlen(m_nubus_slottag);
+
+			if (m_nubus_slottag[tlen-1] == '9')
+			{
+				m_slot = (m_nubus_slottag[tlen-1] - '9') + 9;
+			}
+			else
+			{
+				m_slot = (m_nubus_slottag[tlen-1] - 'a') + 0xa;
+			}
 		}
-	}
 
-	if (m_slot < 9 || m_slot > 0xe)
-	{
-		fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
-	}
+		if (m_slot < 9 || m_slot > 0xe)
+		{
+			fatalerror("Slot %x out of range for Apple NuBus\n", m_slot);
+		}
 
-	m_nubus = dynamic_cast<nubus_device *>(device().machine().device(m_nubus_tag));
-	m_nubus->add_nubus_card(this);
+		device_t *const bus = device().machine().device(m_nubus_tag);
+		if (!bus)
+		{
+			fatalerror("Can't find NuBus device %s\n", m_nubus_tag);
+		}
+
+		m_nubus = dynamic_cast<nubus_device *>(bus);
+		if (!m_nubus)
+		{
+			fatalerror("Device %s (%s) is not an instance of nubus_device\n", bus->tag(), bus->name());
+		}
+
+		nubus().add_nubus_card(this);
+	}
 }
 
 void device_nubus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
@@ -312,11 +300,9 @@ void device_nubus_card_interface::install_bank(offs_t start, offs_t end, const c
 	char bank[256];
 
 	// append an underscore and the slot name to the bank so it's guaranteed unique
-	strcpy(bank, tag);
-	strcat(bank, "_");
-	strcat(bank, m_nubus_slottag);
+	snprintf(bank, sizeof(bank), "%s_%s", tag, m_nubus_slottag);
 
-	m_nubus->install_bank(start, end, bank, data);
+	nubus().install_bank(start, end, bank, data);
 }
 
 void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb, bool reverse_rom)
@@ -456,20 +442,19 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	// now install the ROM
 	uint32_t addr = get_slotspace() + 0x01000000;
 	char bankname[128];
-	strcpy(bankname, "rom_");
-	strcat(bankname, m_nubus_slottag);
+	snprintf(bankname, sizeof(bankname), "rom_%s", m_nubus_slottag);
 	addr -= romlen;
 //  printf("Installing ROM at %x, length %x\n", addr, romlen);
 	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space
 	{
 		uint32_t off = 0;
 		while(off < 0x1000000) {
-			m_nubus->install_bank(addr + off, addr+off+romlen-1, bankname, &m_declaration_rom[0]);
+			nubus().install_bank(addr + off, addr+off+romlen-1, bankname, &m_declaration_rom[0]);
 			off += romlen;
 		}
 	}
 	else
 	{
-		m_nubus->install_bank(addr, addr+romlen-1, bankname, &m_declaration_rom[0]);
+		nubus().install_bank(addr, addr+romlen-1, bankname, &m_declaration_rom[0]);
 	}
 }

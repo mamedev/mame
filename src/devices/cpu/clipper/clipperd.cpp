@@ -2,6 +2,7 @@
 // copyright-holders:Patrick Mackinlay
 
 #include "emu.h"
+#include "cpu/clipper/common.h"
 #include "clipperd.h"
 
 /*
@@ -272,12 +273,12 @@ offs_t clipper_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 0x20: case 0x21: case 0x22: case 0x23:
 		case 0x24: case 0x25: case 0x26: case 0x27:
-			util::stream_format(stream, "saved%d", R2);
+			util::stream_format(stream, "saved%d", opcodes.r16(pc) & 0x7);
 			break;
 
 		case 0x28: case 0x29: case 0x2a: case 0x2b:
 		case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-			util::stream_format(stream, "restd%d", R2);
+			util::stream_format(stream, "restd%d", opcodes.r16(pc) & 0x7);
 			break;
 
 		case 0x30: util::stream_format(stream, "cnvsw   f%d,r%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
@@ -297,6 +298,10 @@ offs_t clipper_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case 0x3e: util::stream_format(stream, "trapfn"); break;
 		case 0x3f: util::stream_format(stream, "loadfs  r%d,f%d", (opcodes.r16(pc+2) & 0xf0) >> 4, opcodes.r16(pc+2) & 0xf); break;
 
+#if C400_INSTRUCTIONS
+		case 0x44: util::stream_format(stream, "cnvxsw  f%d,f%d", (opcodes.r16(pc + 2) & 0xf0) >> 4, opcodes.r16(pc + 2) & 0xf); break;
+		case 0x46: util::stream_format(stream, "cnvxdw  f%d,f%d", (opcodes.r16(pc + 2) & 0xf0) >> 4, opcodes.r16(pc + 2) & 0xf); break;
+#endif
 		default:
 			util::stream_format(stream, "macro   0x%04x 0x%04x", opcodes.r16(pc), opcodes.r16(pc+2));
 			break;

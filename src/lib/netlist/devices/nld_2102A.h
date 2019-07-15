@@ -24,25 +24,27 @@
 #ifndef NLD_2102A_H_
 #define NLD_2102A_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define RAM_2102A(name, cCEQ, cA0, cA1, cA2, cA3, cA4, cA5, cA6, cA7, cA8, cA9, cRWQ, cDI)  \
-		NET_REGISTER_DEV(RAM_2102A, name)   \
-		NET_CONNECT(name, CEQ, cCEQ)    \
-		NET_CONNECT(name, A0,  cA0)     \
-		NET_CONNECT(name, A1,  cA1)     \
-		NET_CONNECT(name, A2,  cA2)     \
-		NET_CONNECT(name, A3,  cA3)     \
-		NET_CONNECT(name, A4,  cA4)     \
-		NET_CONNECT(name, A5,  cA5)     \
-		NET_CONNECT(name, A6,  cA6)     \
-		NET_CONNECT(name, A7,  cA7)     \
-		NET_CONNECT(name, A8,  cA8)     \
-		NET_CONNECT(name, A9,  cA9)     \
-		NET_CONNECT(name, RWQ, cRWQ)    \
+		NET_REGISTER_DEV(RAM_2102A, name)                                      \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CEQ, cCEQ)                                           \
+		NET_CONNECT(name, A0,  cA0)                                            \
+		NET_CONNECT(name, A1,  cA1)                                            \
+		NET_CONNECT(name, A2,  cA2)                                            \
+		NET_CONNECT(name, A3,  cA3)                                            \
+		NET_CONNECT(name, A4,  cA4)                                            \
+		NET_CONNECT(name, A5,  cA5)                                            \
+		NET_CONNECT(name, A6,  cA6)                                            \
+		NET_CONNECT(name, A7,  cA7)                                            \
+		NET_CONNECT(name, A8,  cA8)                                            \
+		NET_CONNECT(name, A9,  cA9)                                            \
+		NET_CONNECT(name, RWQ, cRWQ)                                           \
 		NET_CONNECT(name, DI, cDI)
 
-#define RAM_2102A_DIP(name)                                 \
+#define RAM_2102A_DIP(name)                                                    \
 		NET_REGISTER_DEV(RAM_2102A_DIP, name)
 
 #endif /* NLD_2102A_H_ */

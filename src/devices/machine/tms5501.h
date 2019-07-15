@@ -34,24 +34,7 @@
 
 #pragma once
 
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TMS5501_IRQ_CALLBACK(_write) \
-	devcb = &tms5501_device::set_irq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_TMS5501_XMT_CALLBACK(_write) \
-	devcb = &tms5501_device::set_xmt_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_TMS5501_XI_CALLBACK(_read) \
-	devcb = &tms5501_device::set_xi_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_TMS5501_XO_CALLBACK(_write) \
-	devcb = &tms5501_device::set_xo_wr_callback(*device, DEVCB_##_write);
+#include "diserial.h"
 
 
 
@@ -68,10 +51,10 @@ public:
 	// construction/destruction
 	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xmt_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xmt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xi_rd_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xo_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return m_write_int.bind(); }
+	auto xmt_callback() { return m_write_xmt.bind(); }
+	auto xi_callback() { return m_read_xi.bind(); }
+	auto xo_callback() { return m_write_xo.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( rcv_w );
 
@@ -81,6 +64,17 @@ public:
 	uint8_t get_vector();
 
 	virtual void io_map(address_map &map);
+
+	DECLARE_READ8_MEMBER( rb_r );
+	DECLARE_READ8_MEMBER( xi_r );
+	DECLARE_READ8_MEMBER( rst_r );
+	DECLARE_READ8_MEMBER( sta_r );
+	DECLARE_WRITE8_MEMBER( cmd_w );
+	DECLARE_WRITE8_MEMBER( rr_w );
+	DECLARE_WRITE8_MEMBER( tb_w );
+	DECLARE_WRITE8_MEMBER( xo_w );
+	DECLARE_WRITE8_MEMBER( mr_w );
+	DECLARE_WRITE8_MEMBER( tmr_w );
 
 protected:
 	// device-level overrides
@@ -155,7 +149,7 @@ private:
 	void set_interrupt(uint8_t mask);
 	void check_interrupt();
 
-	devcb_write_line m_write_irq;
+	devcb_write_line m_write_int;
 	devcb_write_line m_write_xmt;
 	devcb_read8 m_read_xi;
 	devcb_write8 m_write_xo;
@@ -172,17 +166,6 @@ private:
 	int m_xi7;
 
 	emu_timer *m_timer[5];
-
-	DECLARE_READ8_MEMBER( rb_r );
-	DECLARE_READ8_MEMBER( xi_r );
-	DECLARE_READ8_MEMBER( rst_r );
-	DECLARE_READ8_MEMBER( sta_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_WRITE8_MEMBER( rr_w );
-	DECLARE_WRITE8_MEMBER( tb_w );
-	DECLARE_WRITE8_MEMBER( xo_w );
-	DECLARE_WRITE8_MEMBER( mr_w );
-	DECLARE_WRITE8_MEMBER( tmr_w );
 };
 
 

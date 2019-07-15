@@ -21,10 +21,11 @@
 DEFINE_DEVICE_TYPE(UPD7227, upd7227_device, "upd7227", "NEC uPD7227")
 
 
-ADDRESS_MAP_START(upd7227_device::upd7227_map)
-	AM_RANGE(0x00, 0x27) AM_RAM
-	AM_RANGE(0x40, 0x67) AM_RAM
-ADDRESS_MAP_END
+void upd7227_device::upd7227_map(address_map &map)
+{
+	map(0x00, 0x27).ram();
+	map(0x40, 0x67).ram();
+}
 
 
 
@@ -46,19 +47,6 @@ upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, d
 	, m_si(1)
 	, m_so(1)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_offsets - configuration helper
-//-------------------------------------------------
-
-void upd7227_device::static_set_offsets(device_t &device, int sx, int sy)
-{
-	upd7227_device &upd7227 = downcast<upd7227_device &>(device);
-
-	upd7227.m_sx = sx;
-	upd7227.m_sy = sy;
 }
 
 

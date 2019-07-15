@@ -34,33 +34,7 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_Z80PIO_OUT_INT_CB(_devcb) \
-	devcb = &z80pio_device::set_out_int_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_IN_PA_CB(_devcb) \
-	devcb = &z80pio_device::set_in_pa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_PA_CB(_devcb) \
-	devcb = &z80pio_device::set_out_pa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_ARDY_CB(_devcb) \
-	devcb = &z80pio_device::set_out_ardy_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_IN_PB_CB(_devcb) \
-	devcb = &z80pio_device::set_in_pb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_PB_CB(_devcb) \
-	devcb = &z80pio_device::set_out_pb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80PIO_OUT_BRDY_CB(_devcb) \
-	devcb = &z80pio_device::set_out_brdy_callback(*device, DEVCB_##_devcb);
+#include "machine/z80daisy.h"
 
 
 //**************************************************************************
@@ -84,13 +58,14 @@ public:
 	// construction/destruction
 	z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80pio_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb) { return downcast<z80pio_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<z80pio_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_ardy_callback(device_t &device, Object &&cb) { return downcast<z80pio_device &>(device).m_out_ardy_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb) { return downcast<z80pio_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<z80pio_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_brdy_callback(device_t &device, Object &&cb) { return downcast<z80pio_device &>(device).m_out_brdy_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
+	auto in_pa_callback() { return m_in_pa_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_ardy_callback() { return m_out_ardy_cb.bind(); }
+	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_brdy_callback() { return m_out_brdy_cb.bind(); }
+
 
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
@@ -122,10 +97,6 @@ public:
 	uint8_t port_b_read() { return port_read(PORT_B); }
 	void port_a_write(uint8_t data) { port_write(PORT_A, data); }
 	void port_b_write(uint8_t data) { port_write(PORT_B, data); }
-	DECLARE_WRITE8_MEMBER( pa_w ) { port_a_write(data); }
-	DECLARE_READ8_MEMBER( pa_r ) { return port_a_read(); }
-	DECLARE_WRITE8_MEMBER( pb_w ) { port_b_write(data); }
-	DECLARE_READ8_MEMBER( pb_r ) { return port_b_read(); }
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { port_write(PORT_A, 0, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { port_write(PORT_A, 1, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { port_write(PORT_A, 2, state); }
@@ -144,12 +115,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { port_write(PORT_B, 7, state); }
 
 	// standard read/write, with C/D in bit 1, B/A in bit 0
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// alternate read/write, with C/D in bit 0, B/A in bit 1
-	DECLARE_READ8_MEMBER( read_alt );
-	DECLARE_WRITE8_MEMBER( write_alt );
+	u8 read_alt(offs_t offset);
+	void write_alt(offs_t offset, u8 data);
 
 private:
 	enum

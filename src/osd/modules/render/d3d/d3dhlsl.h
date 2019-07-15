@@ -101,6 +101,14 @@ public:
 		CU_POST_SCANLINE_BRIGHT_OFFSET,
 		CU_POST_POWER,
 		CU_POST_FLOOR,
+		CU_CHROMA_MODE,
+		CU_CHROMA_A,
+		CU_CHROMA_B,
+		CU_CHROMA_C,
+		CU_CHROMA_CONVERSION_GAIN,
+		CU_CHROMA_Y_GAIN,
+		CU_LUT_ENABLE,
+		CU_UI_LUT_ENABLE,
 
 		CU_COUNT
 	};
@@ -207,6 +215,12 @@ struct hlsl_options
 	float                   floor[3];
 	float                   phosphor[3];
 	float                   saturation;
+	int                     chroma_mode;
+	float                   chroma_a[2];
+	float                   chroma_b[2];
+	float                   chroma_c[2];
+	float                   chroma_conversion_gain[3];
+	float                   chroma_y_gain[3];
 
 	// NTSC
 	int                     yiq_enable;
@@ -241,6 +255,12 @@ struct hlsl_options
 	float                   bloom_level6_weight;
 	float                   bloom_level7_weight;
 	float                   bloom_level8_weight;
+
+	// Final
+	char lut_texture[1024];
+	int lut_enable;
+	char ui_lut_texture[1024];
+	int ui_lut_enable;
 };
 
 struct slider_desc
@@ -332,11 +352,13 @@ private:
 	int                     color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     prescale_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     deconverge_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     scanline_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     defocus_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     post_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
 	int                     downsample_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     chroma_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     distortion_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     vector_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     vector_buffer_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
@@ -356,6 +378,10 @@ private:
 	double                  delta_t;                    // data for delta_time
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
+	bitmap_argb32           lut_bitmap;
+	texture_info *          lut_texture;
+	bitmap_argb32           ui_lut_bitmap;
+	texture_info *          ui_lut_texture;
 	hlsl_options *          options;                    // current options
 
 	IDirect3DSurface9 *     black_surface;              // black dummy surface
@@ -381,6 +407,7 @@ private:
 	effect *                prescale_effect;            // pointer to the prescale-effect object
 	effect *                post_effect;                // pointer to the post-effect object
 	effect *                distortion_effect;          // pointer to the distortion-effect object
+	effect *                scanline_effect;
 	effect *                focus_effect;               // pointer to the focus-effect object
 	effect *                phosphor_effect;            // pointer to the phosphor-effect object
 	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
@@ -389,6 +416,7 @@ private:
 	effect *                bloom_effect;               // pointer to the bloom composite effect
 	effect *                downsample_effect;          // pointer to the bloom downsample effect
 	effect *                vector_effect;              // pointer to the vector-effect object
+	effect *                chroma_effect;
 
 	texture_info *          curr_texture;
 	d3d_render_target *     curr_render_target;

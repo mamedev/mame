@@ -11,15 +11,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PC9801_KBD_IRQ_CALLBACK(_write) \
-	devcb = &pc9801_kbd_device::set_irq_wr_callback(*device, DEVCB_##_write);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -32,7 +23,7 @@ public:
 	// construction/destruction
 	pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<pc9801_kbd_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	auto irq_wr_callback() { return m_write_irq.bind(); }
 
 	virtual ioport_constructor device_input_ports() const override;
 

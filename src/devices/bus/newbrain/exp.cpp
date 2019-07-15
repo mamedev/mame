@@ -77,11 +77,11 @@ void newbrain_expansion_slot_device::device_reset()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-uint8_t newbrain_expansion_slot_device::mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+uint8_t newbrain_expansion_slot_device::mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->mreq_r(space, offset, data, romov, exrm, raminh);
+		data = m_card->mreq_r(offset, data, romov, exrm, raminh);
 	}
 
 	return data;
@@ -92,11 +92,11 @@ uint8_t newbrain_expansion_slot_device::mreq_r(address_space &space, offs_t offs
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-void newbrain_expansion_slot_device::mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
+void newbrain_expansion_slot_device::mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
 	if (m_card != nullptr)
 	{
-		m_card->mreq_w(space, offset, data, romov, exrm, raminh);
+		m_card->mreq_w(offset, data, romov, exrm, raminh);
 	}
 }
 
@@ -105,11 +105,11 @@ void newbrain_expansion_slot_device::mreq_w(address_space &space, offs_t offset,
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-uint8_t newbrain_expansion_slot_device::iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+uint8_t newbrain_expansion_slot_device::iorq_r(offs_t offset, uint8_t data, bool &prtov)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->iorq_r(space, offset, data, prtov);
+		data = m_card->iorq_r(offset, data, prtov);
 	}
 
 	return data;
@@ -120,11 +120,11 @@ uint8_t newbrain_expansion_slot_device::iorq_r(address_space &space, offs_t offs
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-void newbrain_expansion_slot_device::iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov)
+void newbrain_expansion_slot_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 {
 	if (m_card != nullptr)
 	{
-		m_card->iorq_w(space, offset, data, prtov);
+		m_card->iorq_w(offset, data, prtov);
 	}
 }
 
@@ -137,7 +137,8 @@ void newbrain_expansion_slot_device::iorq_w(address_space &space, offs_t offset,
 #include "eim.h"
 #include "fdc.h"
 
-SLOT_INTERFACE_START( newbrain_expansion_cards )
-	SLOT_INTERFACE("eim", NEWBRAIN_EIM)
-	SLOT_INTERFACE("fdc", NEWBRAIN_FDC)
-SLOT_INTERFACE_END
+void newbrain_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("eim", NEWBRAIN_EIM);
+	device.option_add("fdc", NEWBRAIN_FDC);
+}

@@ -9,6 +9,7 @@
 
 #include "emuopts.h"
 #include "harddisk.h"
+#include "romload.h"
 
 
 OPTION_GUIDE_START(dsk_option_guide)
@@ -19,7 +20,7 @@ OPTION_GUIDE_START(dsk_option_guide)
 	OPTION_INT('K', "hunksize",         "Hunk Bytes")
 OPTION_GUIDE_END
 
-static const char *dsk_option_spec =
+static char const *const dsk_option_spec =
 	"C1-[203]-1024;H1/[2]/4/8;S1-[12]-64;L267;K6408";
 
 
@@ -35,8 +36,8 @@ diablo_image_device::diablo_image_device(const machine_config &mconfig, const ch
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),
-		m_device_image_load(device_image_load_delegate()),
-		m_device_image_unload(device_image_func_delegate()),
+		m_device_image_load(load_delegate()),
+		m_device_image_unload(unload_delegate()),
 		m_interface(nullptr)
 {
 }

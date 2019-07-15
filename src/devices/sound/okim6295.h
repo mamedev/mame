@@ -15,24 +15,6 @@
 
 #include "sound/okiadpcm.h"
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_OKIM6295_ADD(tag, clock, pin7) \
-		MCFG_DEVICE_ADD((tag), OKIM6295, (clock)) \
-		MCFG_OKIM6295_PIN7(pin7)
-
-#define MCFG_OKIM6295_REPLACE(tag, clock, pin7) \
-		MCFG_DEVICE_REPLACE((tag), OKIM6295, (clock)) \
-		MCFG_OKIM6295_PIN7(pin7)
-
-#define MCFG_OKIM6295_PIN7(pin7) \
-		okim6295_device::static_set_pin7(*device, (okim6295_device::pin7));
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -45,29 +27,32 @@ class okim6295_device : public device_t,
 						public device_rom_interface
 {
 public:
-	enum
+	enum pin7_state
 	{
 		PIN7_LOW = 0,
 		PIN7_HIGH = 1
 	};
 
 	// construction/destruction
+	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, pin7_state pin7)
+		: okim6295_device(mconfig, tag, owner, clock)
+	{
+		config_pin7(pin7);
+	}
 	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_pin7(device_t &device, int pin7);
+	void config_pin7(pin7_state pin7) { assert(!started()); m_pin7_state = pin7; }
 
 	// runtime configuration
 	void set_pin7(int pin7);
 
-	uint8_t read_status();
-	void write_command(uint8_t command);
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read();
+	void write(uint8_t command);
 
 protected:
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;

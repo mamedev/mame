@@ -11,6 +11,7 @@
 
 #include <algorithm>
 
+/*static*/ constexpr int ef9369_device::NUMCOLORS;
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

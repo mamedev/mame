@@ -7,13 +7,10 @@
     Common PowerPC definitions and functions
 
 ***************************************************************************/
+#ifndef MAME_CPU_POWERPC_PPCCOM_H
+#define MAME_CPU_POWERPC_PPCCOM_H
 
 #pragma once
-
-#ifndef __PPCCOM_H__
-#define __PPCCOM_H__
-
-#include "ppc.h"
 
 
 /***************************************************************************
@@ -305,6 +302,11 @@ enum
 /* Machine State Register bits - 603 */
 #define MSR603_TGPR         0x00020000  /* Temporary GPR Remapping */
 
+/* ESA Save and Restore Register bits - 602 */
+#define SPR602_ESASRR_EE    0x00000001  /* External Interrupt Enable */
+#define SPR602_ESASRR_SA    0x00000002  /* Supervisor access mode */
+#define SPR602_ESASRR_AP    0x00000004  /* Access privilege state */
+#define SPR602_ESASRR_PR    0x00000008  /* Privilege Level */
 
 /* DSISR bits for DSI/alignment exceptions */
 #define DSISR_DIRECT        0x80000000      /* DSI: direct-store error interrupt */
@@ -478,5 +480,4 @@ enum
 extern offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op);
 
 
-
-#endif /* __PPCCOM_H__ */
+#endif // MAME_CPU_POWERPC_PPCCOM_H

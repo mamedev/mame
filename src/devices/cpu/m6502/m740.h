@@ -44,7 +44,7 @@ public:
 
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -54,7 +54,6 @@ protected:
 
 #define O(o) void o ## _full(); void o ## _partial()
 
-	u32 inst_state_base;        /* Current instruction bank */
 	virtual u32 get_state_base() const override;
 
 	uint8_t do_clb(uint8_t in, uint8_t bit);

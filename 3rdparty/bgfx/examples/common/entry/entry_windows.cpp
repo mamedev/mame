@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -266,6 +266,7 @@ namespace entry
 		WM_USER_WINDOW_CREATE = WM_USER,
 		WM_USER_WINDOW_DESTROY,
 		WM_USER_WINDOW_SET_TITLE,
+		WM_USER_WINDOW_SET_FLAGS,
 		WM_USER_WINDOW_SET_POS,
 		WM_USER_WINDOW_SET_SIZE,
 		WM_USER_WINDOW_TOGGLE_FRAME,
@@ -324,6 +325,7 @@ namespace entry
 			, m_width(0)
 			, m_height(0)
 			, m_flags(0)
+			, m_flagsEnabled(false)
 		{
 		}
 
@@ -333,6 +335,7 @@ namespace entry
 		uint32_t m_height;
 		uint32_t m_flags;
 		tinystl::string m_title;
+		bool m_flagsEnabled;
 	};
 
 	static void mouseCapture(HWND _hwnd, bool _capture)
@@ -466,7 +469,9 @@ namespace entry
 			RegisterClassExA(&wnd);
 
 			m_windowAlloc.alloc();
-			m_hwnd[0] = CreateWindowA("bgfx"
+			m_hwnd[0] = CreateWindowExA(
+				  WS_EX_ACCEPTFILES
+				, "bgfx"
 				, "BGFX"
 				, WS_OVERLAPPEDWINDOW|WS_VISIBLE
 				, 0
@@ -586,6 +591,23 @@ namespace entry
 					{
 						Msg* msg = (Msg*)_lparam;
 						SetWindowTextA(m_hwnd[_wparam], msg->m_title.c_str() );
+						delete msg;
+					}
+					break;
+
+				case WM_USER_WINDOW_SET_FLAGS:
+					{
+						Msg* msg = (Msg*)_lparam;
+
+						if (msg->m_flagsEnabled)
+						{
+							m_flags[_wparam] |= msg->m_flags;
+						}
+						else
+						{
+							m_flags[_wparam] &= ~msg->m_flags;
+						}
+
 						delete msg;
 					}
 					break;
@@ -838,6 +860,17 @@ namespace entry
 					}
 					break;
 
+				case WM_DROPFILES:
+					{
+						HDROP drop = (HDROP)_wparam;
+						char tmp[bx::kMaxFilePath];
+						uint32_t result = DragQueryFileA(drop, 0, tmp, sizeof(tmp) );
+						BX_UNUSED(result);
+						WindowHandle handle = findHandle(_hwnd);
+						m_eventQueue.postDropFileEvent(handle, tmp);
+					}
+					break;
+
 				default:
 					break;
 				}
@@ -871,6 +904,7 @@ namespace entry
 			HDC hdc = GetDC(_hwnd);
 			SelectObject(hdc, brush);
 			FillRect(hdc, &rect, brush);
+			ReleaseDC(_hwnd, hdc);
 		}
 
 		void adjust(HWND _hwnd, uint32_t _width, uint32_t _height, bool _windowFrame)
@@ -1081,9 +1115,12 @@ namespace entry
 		PostMessage(s_ctx.m_hwnd[0], WM_USER_WINDOW_SET_TITLE, _handle.idx, (LPARAM)msg);
 	}
 
-	void toggleWindowFrame(WindowHandle _handle)
+	void setWindowFlags(WindowHandle _handle, uint32_t _flags, bool _enabled)
 	{
-		PostMessage(s_ctx.m_hwnd[0], WM_USER_WINDOW_TOGGLE_FRAME, _handle.idx, 0);
+		Msg* msg = new Msg;
+		msg->m_flags = _flags;
+		msg->m_flagsEnabled = _enabled;
+		PostMessage(s_ctx.m_hwnd[0], WM_USER_WINDOW_SET_FLAGS, _handle.idx, (LPARAM)msg);
 	}
 
 	void toggleFullscreen(WindowHandle _handle)

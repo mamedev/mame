@@ -1,6 +1,113 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="mac_flop" description="Macintosh Disk images">
+<softwarelist name="mac_flop" description="Macintosh 400K/800K Disk images">
+
+	<software name="airborne">
+		<description>Airborne!</description>
+		<year>1984</year>
+		<publisher>Silicon Beach</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "409600">
+				<rom name="Airborne!.image" size="409600" crc="5d3729c2" sha1="2519b4afa8f803d0d7098d1b33f1c39abe0a50fa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdrkcast">
+		<description>Beyond Dark Castle</description>
+		<year>1987</year>
+		<publisher>Silicon Beach Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<!-- modified with a saved preference file -->
+				<rom name="disk1.img" size="819200" crc="7b51b582" sha1="d5856e6504cf652b8601e9e60f45703ce7458fa1" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="disk2.img" size="819200" crc="8c63ffcc" sha1="587392d1937b9d776d30be48bd272217265c737b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macbtx">
+		<description>MacBTX 1&amp;1</description>
+		<year>1994</year>
+		<publisher>format Verlag</publisher>
+		<info name="developer" value="1&amp;1 Telekommunikation" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="disk1.img" size="819200" crc="91244158" sha1="9181122e95c740da555056ef227088ddcefc8fd5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macdrawde">
+		<description>MacDraw 1.9.5 (German)</description>
+		<year>1986</year>
+		<publisher>Apple</publisher>
+		<info name="version" value="D2-1.9.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="disk1.img" size="819200" crc="73599d46" sha1="5b883383827d2742220b89de083c646c308853d0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ps25lede">
+		<description>Photoshop 2.5.1 Limited Edition (German)</description>
+		<year>1993</year>
+		<publisher>Adobe</publisher>
+		<info name="serial" value="SGG250R3007877-635" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="disk1.img" size="819200" crc="d3978ea5" sha1="d44173c57f2385406555d3fff7fd6b30c68b2116" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="disk2.img" size="819200" crc="b422f894" sha1="1682a6b07fa4b88fa8f6860944736f1a85df0805" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="disk3.img" size="819200" crc="09866adc" sha1="93a20fe8d7e2d352cd42631962a7c7d9c918a472" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="radius" supported="no">
+		<description>RadiusWare</description>
+		<year>1991</year>
+		<publisher>Radius</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="disk1.img" size="819200" crc="7c11fe05" sha1="5256aece3878fbe4479d7e8c0fd3bb38d71db0f1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys11">
+		<description>System Software 1.1</description>
+		<year>1984</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "409600">
+				<rom name="System Disk.img" size="409600" crc="de4046ba" sha1="cbee2d1ceffb15c312066b7b35ad022ce1895cdb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys30">
+		<description>System Software 3.0</description>
+		<year>1986</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="System Tools.img" size="819200" crc="d3768bcb" sha1="0546dd0fa34f4e6d913e4254ddb5350e1e42800c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="sys603">
 		<!-- This version of the System Software was shipped with the Macintosh IIcx and SE/30 -->
@@ -28,7 +135,6 @@
 			</dataarea>
 		</part>
 	</software>
-
 
 	<software name="sys605">
 		<!-- This version of the System Software was shipped with the Macintosh IIfx -->

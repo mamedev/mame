@@ -84,7 +84,8 @@ WRITE_LINE_MEMBER( vip_byteio_port_device::q_w ) { if (m_cart != nullptr) m_cart
 //  SLOT_INTERFACE( vip_byteio_cards )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( vip_byteio_cards )
-	//SLOT_INTERFACE("exp2", VP576_BYTEIO)
-	SLOT_INTERFACE("ascii", VP620)
-SLOT_INTERFACE_END
+void vip_byteio_cards(device_slot_interface &device)
+{
+	//device.option_add("exp2", VP576_BYTEIO);
+	device.option_add("ascii", VP620);
+}

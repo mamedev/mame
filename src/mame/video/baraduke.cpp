@@ -17,36 +17,36 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(baraduke_state, baraduke)
+void baraduke_state::baraduke_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	int bit0,bit1,bit2,bit3,r,g,b;
 
-	for (i = 0; i < 2048; i++)
+	for (int i = 0; i < 2048; i++)
 	{
-		/* red component */
-		bit0 = (color_prom[2048] >> 0) & 0x01;
-		bit1 = (color_prom[2048] >> 1) & 0x01;
-		bit2 = (color_prom[2048] >> 2) & 0x01;
-		bit3 = (color_prom[2048] >> 3) & 0x01;
-		r = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
+		int bit0, bit1, bit2, bit3;
 
-		/* green component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		g = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
+		// red component
+		bit0 = BIT(color_prom[2048], 0);
+		bit1 = BIT(color_prom[2048], 1);
+		bit2 = BIT(color_prom[2048], 2);
+		bit3 = BIT(color_prom[2048], 3);
+		int const r = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
 
-		/* blue component */
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
-		b = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
+		// green component
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		bit3 = BIT(color_prom[0], 3);
+		int const g = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		// blue component
+		bit0 = BIT(color_prom[0], 4);
+		bit1 = BIT(color_prom[0], 5);
+		bit2 = BIT(color_prom[0], 6);
+		bit3 = BIT(color_prom[0], 7);
+		int const b = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -343,5 +343,8 @@ WRITE_LINE_MEMBER(baraduke_state::screen_vblank_baraduke)
 
 			m_copy_sprites = 0;
 		}
+
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_mcu->set_input_line(0, HOLD_LINE);
 	}
 }

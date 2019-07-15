@@ -9,17 +9,6 @@
 #include "machine/watchdog.h"
 
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CUS117_CPUS(_maincpu, _subcpu) \
-		namco_c117_device::set_cpu_tags(*device, _maincpu, _subcpu);
-
-#define MCFG_CUS117_SUBRES_CB(_devcb) \
-		devcb = &namco_c117_device::set_subres_cb(*device, DEVCB_##_devcb);
-
-
 //***************************************************************************
 //  TYPE DEFINITIONS
 //***************************************************************************
@@ -32,9 +21,13 @@ public:
 	//construction/destruction
 	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_cpu_tags(device_t &device, const char *maintag, const char *subtag);
-	template<class _Object> static devcb_base &set_subres_cb(device_t &device, _Object object) { return downcast<namco_c117_device &>(device).m_subres_cb.set_callback(object); }
+	// configuration
+	template <typename T, typename U> void set_cpu_tags(T &&maintag, U &&subtag)
+	{
+		m_cpuexec[0].set_tag(std::forward<T>(maintag));
+		m_cpuexec[1].set_tag(std::forward<U>(subtag));
+	}
+	auto subres_cb() { return m_subres_cb.bind(); }
 
 	DECLARE_READ8_MEMBER(main_r);
 	DECLARE_READ8_MEMBER(sub_r);
@@ -73,12 +66,8 @@ private:
 	address_space *            m_program;
 
 	// cpu interfaces
-	device_execute_interface * m_cpuexec[2];
-	direct_read_data<0> *      m_cpudirect[2];
-
-	// configuration
-	const char *               m_maincpu_tag;
-	const char *               m_subcpu_tag;
+	required_device<cpu_device> m_cpuexec[2];
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cpucache[2];
 
 	required_device<watchdog_timer_device> m_watchdog;
 };

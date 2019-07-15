@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Luca Elia
 /*
 Vs. Janshi Brandnew Stars
 (c)1997 Jaleco
@@ -8,7 +8,7 @@ Single board version with Dual Screen output
 (MS32 version also exists)
 
 for the time being most of this driver is copied
-from ms32.c, with some adjustments for dual screen.
+from ms32.cpp, with some adjustments for dual screen.
 
 
 Main PCB
@@ -104,21 +104,30 @@ class bnstars_state : public ms32_state
 {
 public:
 	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ms32_state(mconfig, type, tag),
-			m_ms32_tx0_ram(*this, "tx0_ram"),
-			m_ms32_tx1_ram(*this, "tx1_ram"),
-			m_ms32_bg0_ram(*this, "bg0_ram"),
-			m_ms32_bg1_ram(*this, "bg1_ram"),
-			m_ms32_roz0_ram(*this, "roz0_ram"),
-			m_ms32_roz1_ram(*this, "roz1_ram"),
-			m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0),
-			m_ms32_spram(*this, "spram"),
-			m_ms32_tx0_scroll(*this, "tx0_scroll"),
-			m_ms32_bg0_scroll(*this, "bg0_scroll"),
-			m_ms32_tx1_scroll(*this, "tx1_scroll"),
-			m_ms32_bg1_scroll(*this, "bg1_scroll"),
-			m_p1_keys(*this, "P1KEY.%u", 0),
-			m_p2_keys(*this, "P2KEY.%u", 0) { }
+		: ms32_state(mconfig, type, tag)
+		, m_ms32_tx0_ram(*this, "tx0_ram")
+		, m_ms32_tx1_ram(*this, "tx1_ram")
+		, m_ms32_bg0_ram(*this, "bg0_ram")
+		, m_ms32_bg1_ram(*this, "bg1_ram")
+		, m_ms32_roz0_ram(*this, "roz0_ram")
+		, m_ms32_roz1_ram(*this, "roz1_ram")
+		, m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0)
+		, m_ms32_spram(*this, "spram")
+		, m_ms32_tx0_scroll(*this, "tx0_scroll")
+		, m_ms32_bg0_scroll(*this, "bg0_scroll")
+		, m_ms32_tx1_scroll(*this, "tx1_scroll")
+		, m_ms32_bg1_scroll(*this, "bg1_scroll")
+		, m_p1_keys(*this, "P1KEY.%u", 0)
+		, m_p2_keys(*this, "P2KEY.%u", 0)
+	{ }
+
+	void bnstars(machine_config &config);
+
+	void init_bnstars();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+
+private:
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
@@ -147,21 +156,17 @@ public:
 	DECLARE_WRITE32_MEMBER(ms32_roz0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
 	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
-	DECLARE_DRIVER_INIT(bnstars);
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_roz0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *sprram_top, size_t sprram_size);
-	void bnstars(machine_config &config);
 	void bnstars_map(address_map &map);
 	void bnstars_sound_map(address_map &map);
 };
@@ -552,7 +557,7 @@ uint32_t bnstars_state::screen_update_bnstars_right(screen_device &screen, bitma
 
 static INPUT_PORTS_START( bnstars )
 	PORT_START("P1")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)0)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -595,7 +600,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)1)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)1)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -697,11 +702,45 @@ INPUT_PORTS_END
 
 
 /* sprites are contained in 256x256 "tiles" */
-static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
+static const uint32_t sprite_xoffset[256] =
+{
+	STEP8(8*8*8*0,    8), STEP8(8*8*8*1,    8), STEP8(8*8*8*2,    8), STEP8(8*8*8*3,    8),
+	STEP8(8*8*8*4,    8), STEP8(8*8*8*5,    8), STEP8(8*8*8*6,    8), STEP8(8*8*8*7,    8),
+	STEP8(8*8*8*8,    8), STEP8(8*8*8*9,    8), STEP8(8*8*8*10,   8), STEP8(8*8*8*11,   8),
+	STEP8(8*8*8*12,   8), STEP8(8*8*8*13,   8), STEP8(8*8*8*14,   8), STEP8(8*8*8*15,   8),
+	STEP8(8*8*8*16,   8), STEP8(8*8*8*17,   8), STEP8(8*8*8*18,   8), STEP8(8*8*8*19,   8),
+	STEP8(8*8*8*20,   8), STEP8(8*8*8*21,   8), STEP8(8*8*8*22,   8), STEP8(8*8*8*23,   8),
+	STEP8(8*8*8*24,   8), STEP8(8*8*8*25,   8), STEP8(8*8*8*26,   8), STEP8(8*8*8*27,   8),
+	STEP8(8*8*8*28,   8), STEP8(8*8*8*29,   8), STEP8(8*8*8*30,   8), STEP8(8*8*8*31,   8)
+};
+static const uint32_t sprite_yoffset[256] =
+{
+	STEP8(8*8*8*0,  8*8), STEP8(8*8*8*32, 8*8), STEP8(8*8*8*64, 8*8), STEP8(8*8*8*96, 8*8),
+	STEP8(8*8*8*128,8*8), STEP8(8*8*8*160,8*8), STEP8(8*8*8*192,8*8), STEP8(8*8*8*224,8*8),
+	STEP8(8*8*8*256,8*8), STEP8(8*8*8*288,8*8), STEP8(8*8*8*320,8*8), STEP8(8*8*8*352,8*8),
+	STEP8(8*8*8*384,8*8), STEP8(8*8*8*416,8*8), STEP8(8*8*8*448,8*8), STEP8(8*8*8*480,8*8),
+	STEP8(8*8*8*512,8*8), STEP8(8*8*8*544,8*8), STEP8(8*8*8*576,8*8), STEP8(8*8*8*608,8*8),
+	STEP8(8*8*8*640,8*8), STEP8(8*8*8*672,8*8), STEP8(8*8*8*704,8*8), STEP8(8*8*8*736,8*8),
+	STEP8(8*8*8*768,8*8), STEP8(8*8*8*800,8*8), STEP8(8*8*8*832,8*8), STEP8(8*8*8*864,8*8),
+	STEP8(8*8*8*896,8*8), STEP8(8*8*8*928,8*8), STEP8(8*8*8*960,8*8), STEP8(8*8*8*992,8*8)
+};
+static const gfx_layout spritelayout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*8,
+	sprite_xoffset,
+	sprite_yoffset
+};
+
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
-static GFXDECODE_START( bnstars )
+static GFXDECODE_START( gfx_bnstars )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x5000, 0x10 ) /* Roz scr1 */
 	GFXDECODE_ENTRY( "gfx4", 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
@@ -743,129 +782,129 @@ WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)
 }
 
 
-ADDRESS_MAP_START(bnstars_state::bnstars_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
+void bnstars_state::bnstars_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rom();
 
-	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w)
+	map(0xfc800000, 0xfc800003).w(FUNC(bnstars_state::ms32_sound_w));
 
-	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("P1")
-	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ_PORT("P2")
-	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
+	map(0xfcc00004, 0xfcc00007).portr("P1");
+	map(0xfcc00008, 0xfcc0000b).portr("P2");
+	map(0xfcc00010, 0xfcc00013).portr("DSW");
 
-	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP
-	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
+	map(0xfce00034, 0xfce00037).nopw();
+	map(0xfce00038, 0xfce0003b).w(FUNC(bnstars_state::reset_sub_w));
 
-	AM_RANGE(0xfce00050, 0xfce00053) AM_WRITENOP
-	AM_RANGE(0xfce00058, 0xfce0005b) AM_WRITENOP
-	AM_RANGE(0xfce0005c, 0xfce0005f) AM_WRITENOP
-	AM_RANGE(0xfce00300, 0xfce00303) AM_WRITENOP
+	map(0xfce00050, 0xfce00053).nopw();
+	map(0xfce00058, 0xfce0005b).nopw();
+	map(0xfce0005c, 0xfce0005f).nopw();
+	map(0xfce00300, 0xfce00303).nopw();
 
-	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITEONLY AM_SHARE("roz_ctrl.0")
-	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITEONLY AM_SHARE("roz_ctrl.1") // guess
-	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITEONLY AM_SHARE("tx0_scroll")
-	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITEONLY AM_SHARE("bg0_scroll")
-	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITEONLY AM_SHARE("tx1_scroll")
-	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITEONLY AM_SHARE("bg1_scroll")
+	map(0xfce00400, 0xfce0045f).writeonly().share("roz_ctrl.0");
+	map(0xfce00700, 0xfce0075f).writeonly().share("roz_ctrl.1"); // guess
+	map(0xfce00a00, 0xfce00a17).writeonly().share("tx0_scroll");
+	map(0xfce00a20, 0xfce00a37).writeonly().share("bg0_scroll");
+	map(0xfce00c00, 0xfce00c17).writeonly().share("tx1_scroll");
+	map(0xfce00c20, 0xfce00c37).writeonly().share("bg1_scroll");
 
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(bnstars1_mahjong_select_w) // ?
+	map(0xfce00e00, 0xfce00e03).w(FUNC(bnstars_state::bnstars1_mahjong_select_w)); // ?
 
-	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
+	map(0xfd000000, 0xfd000003).r(FUNC(bnstars_state::ms32_sound_r));
 
 	/* wrote together */
-	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
-	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
-	AM_RANGE(0xfd200000, 0xfd237fff) AM_DEVREADWRITE16("palette2", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette2")
-	AM_RANGE(0xfd400000, 0xfd437fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_SHARE("roz1_ram")
-	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_SHARE("roz0_ram")
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM AM_SHARE("spram")
-	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE(ms32_tx1_ram_w) AM_SHARE("tx1_ram")
-	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE(ms32_bg1_ram_w) AM_SHARE("bg1_ram")
-	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE(ms32_tx0_ram_w) AM_SHARE("tx0_ram")
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_SHARE("bg0_ram")
+	map(0xfd040000, 0xfd047fff).ram(); // priority ram
+	map(0xfd080000, 0xfd087fff).ram();
+	map(0xfd200000, 0xfd237fff).rw("palette2", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette2");
+	map(0xfd400000, 0xfd437fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0xfe000000, 0xfe01ffff).ram().w(FUNC(bnstars_state::ms32_roz1_ram_w)).share("roz1_ram");
+	map(0xfe400000, 0xfe41ffff).ram().w(FUNC(bnstars_state::ms32_roz0_ram_w)).share("roz0_ram");
+	map(0xfe800000, 0xfe83ffff).ram().share("spram");
+	map(0xfea00000, 0xfea07fff).ram().w(FUNC(bnstars_state::ms32_tx1_ram_w)).share("tx1_ram");
+	map(0xfea08000, 0xfea0ffff).ram().w(FUNC(bnstars_state::ms32_bg1_ram_w)).share("bg1_ram");
+	map(0xfec00000, 0xfec07fff).ram().w(FUNC(bnstars_state::ms32_tx0_ram_w)).share("tx0_ram");
+	map(0xfec08000, 0xfec0ffff).ram().w(FUNC(bnstars_state::ms32_bg0_ram_w)).share("bg0_ram");
 
-	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0xfee00000, 0xfee1ffff).ram();
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(bnstars_state::bnstars_sound_map)
-	AM_RANGE(0x0000, 0x3eff) AM_ROM
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf2", ymf271_device, read, write)
-	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)
-	AM_RANGE(0x3f20, 0x3f2f) AM_DEVREADWRITE("ymf1", ymf271_device, read, write)
-	AM_RANGE(0x3f40, 0x3f40) AM_WRITENOP   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
-	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")
-ADDRESS_MAP_END
-
-void bnstars_state::machine_reset()
+void bnstars_state::bnstars_sound_map(address_map &map)
 {
-	irq_init();
-	membank("bank4")->set_entry(0);
-	membank("bank5")->set_entry(1);
+	map(0x0000, 0x3eff).rom();
+	map(0x3f00, 0x3f0f).rw("ymf2", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+	map(0x3f10, 0x3f10).rw(FUNC(bnstars_state::latch_r), FUNC(bnstars_state::to_main_w));
+	map(0x3f20, 0x3f2f).rw("ymf1", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
+	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
+	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
+	map(0x3f80, 0x3f80).w(FUNC(bnstars_state::ms32_snd_bank_w));
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xbfff).bankr("z80bank1");
+	map(0xc000, 0xffff).bankr("z80bank2");
 }
 
 
-MACHINE_CONFIG_START(bnstars_state::bnstars)
-
+void bnstars_state::bnstars(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
-	MCFG_CPU_PROGRAM_MAP(bnstars_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	V70(config, m_maincpu, 20000000); // 20MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(bnstars_state::ms32_interrupt), "lscreen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(bnstars_sound_map)
+	Z80(config, m_audiocpu, 4000000); // Unverified; it's possibly higher than 4MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bnstars)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bnstars);
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_FORMAT(XBRG)
-	MCFG_PALETTE_MEMBITS(16)
+	auto &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::xBRG_888, 0x8000);
+	palette.set_membits(16);
 
-	MCFG_PALETTE_ADD("palette2", 0x8000)
-	MCFG_PALETTE_FORMAT(XBRG)
-	MCFG_PALETTE_MEMBITS(16)
+	auto &palette2(PALETTE(config, "palette2"));
+	palette2.set_format(palette_device::xBRG_888, 0x8000);
+	palette2.set_membits(16);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(40*8, 32*8);
+	lscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	lscreen.set_screen_update(FUNC(bnstars_state::screen_update_bnstars_left));
+	lscreen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_right)
-	MCFG_SCREEN_PALETTE("palette2")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(40*8, 32*8);
+	rscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	rscreen.set_screen_update(FUNC(bnstars_state::screen_update_bnstars_right));
+	rscreen.set_palette("palette2");
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ymf1", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ymf271_device &ymf1(YMF271(config, "ymf1", 16934400));
+	ymf1.add_route(0, "lspeaker", 1.0);
+	ymf1.add_route(1, "rspeaker", 1.0);
+//  ymf1.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf1.add_route(3, "rspeaker", 1.0);
 
-	MCFG_SOUND_ADD("ymf2", YMF271, 16934400)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-MACHINE_CONFIG_END
+	ymf271_device &ymf2(YMF271(config, "ymf2", 16934400));
+	ymf2.add_route(0, "lspeaker", 1.0);
+	ymf2.add_route(1, "rspeaker", 1.0);
+//  ymf2.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
+//  ymf2.add_route(3, "rspeaker", 1.0);
+}
 
 
 ROM_START( bnstars1 )
@@ -925,10 +964,8 @@ ROM_END
 
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
-DRIVER_INIT_MEMBER(bnstars_state,bnstars)
+void bnstars_state::init_bnstars()
 {
-	ms32_rearrange_sprites(machine(), "gfx1");
-
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx5");
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx4");
 	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx7");
@@ -937,4 +974,4 @@ DRIVER_INIT_MEMBER(bnstars_state,bnstars)
 	configure_banks();
 }
 
-GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bnstars1, 0, bnstars, bnstars, bnstars_state, init_bnstars, ROT0, "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )

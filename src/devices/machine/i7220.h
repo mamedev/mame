@@ -37,28 +37,6 @@
 #define I7110_MBM_SIZE (128 * 1024) // 1 megabit
 #define I7115_MBM_SIZE (512 * 1024) // 4 megabit
 
-
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_I7220_IRQ_CALLBACK(_write) \
-	devcb = &i7220_device::set_intrq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_I7220_DRQ_CALLBACK(_write) \
-	devcb = &i7220_device::set_drq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_I7220_DATA_SIZE(data_size) \
-	i7220_device::set_data_size(*device, data_size);
-
-
-
-///*************************************************************************
-//  TYPE DEFINITIONS
-///*************************************************************************
-
-// ======================> i7220_device
-
 class i7220_device : public device_t,
 					 public device_image_interface
 {
@@ -66,10 +44,10 @@ public:
 	// construction/destruction
 	i7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<i7220_device &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<i7220_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return intrq_cb.bind(); }
+	auto drq_callback() { return drq_cb.bind(); }
 
-	static void set_data_size(device_t &device, int data_size) { downcast<i7220_device &>(device).m_data_size = data_size; }
+	void set_data_size(int data_size) { m_data_size = data_size; }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

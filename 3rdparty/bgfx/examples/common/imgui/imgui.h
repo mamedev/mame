@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -7,7 +7,7 @@
 #define IMGUI_H_HEADER_GUARD
 
 #include <bgfx/bgfx.h>
-#include <ocornut-imgui/imgui.h>
+#include <dear-imgui/imgui.h>
 #include <iconfontheaders/icons_kenney.h>
 #include <iconfontheaders/icons_font_awesome.h>
 
@@ -133,7 +133,7 @@ namespace ImGui
 	{
 		return false
 			|| ImGui::IsAnyItemHovered()
-			|| ImGui::IsAnyWindowHovered()
+			|| ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
 			;
 	}
 

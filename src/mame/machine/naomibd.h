@@ -8,17 +8,11 @@
 #include "machine/naomig1.h"
 #include "machine/x76f100.h"
 
-#define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _irq_cb)    \
-	MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                        \
-	naomi_board::static_set_eeprom_tag(*device, _eeprom_tag);
-
 class naomi_board : public naomi_g1_device
 {
 public:
-	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag);
-
 	// Can be patched in the underlying class
-	virtual void submap(address_map &map);
+	virtual void submap(address_map &map) override;
 
 	DECLARE_WRITE16_MEMBER(rom_offseth_w);          // 5f7000
 	DECLARE_WRITE16_MEMBER(rom_offsetl_w);          // 5f7004
@@ -51,13 +45,12 @@ protected:
 	virtual void board_write(offs_t offset, uint16_t data);
 
 	uint32_t rom_offset;
+	optional_device<x76f100_device> eeprom;
+
 private:
 	uint32_t dma_offset, dma_cur_offset;
 	uint16_t dma_count;
 	bool pio_ready, dma_ready;
-
-	const char *eeprom_tag;
-	x76f100_device *eeprom;
 };
 
 #endif // MAME_MACHINE_NAOMIBD_H

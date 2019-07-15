@@ -17,8 +17,7 @@
 
 #include "emu.h"
 #include "includes/spectrum.h"
-#include "screen.h"
-
+#include "includes/spec128.h"
 
 /***************************************************************************
   Start the video hardware emulation.
@@ -31,12 +30,18 @@ VIDEO_START_MEMBER(spectrum_state,spectrum)
 
 	m_previous_border_x = 0;
 	m_previous_border_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_border_bitmap);
+	m_screen->register_screen_bitmap(m_border_bitmap);
 	m_previous_screen_x = 0;
 	m_previous_screen_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_screen_bitmap);
+	m_screen->register_screen_bitmap(m_screen_bitmap);
 
 	m_screen_location = m_video_ram;
+
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
+	m_CyclesPerLine = SPEC_CYCLES_PER_LINE;
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
 VIDEO_START_MEMBER(spectrum_state,spectrum_128)
@@ -47,12 +52,18 @@ VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 
 	m_previous_border_x = 0;
 	m_previous_border_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_border_bitmap);
+	m_screen->register_screen_bitmap(m_border_bitmap);
 	m_previous_screen_x = 0;
 	m_previous_screen_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_screen_bitmap);
+	m_screen->register_screen_bitmap(m_screen_bitmap);
 
 	m_screen_location = m_ram->pointer() + (5 << 14);
+
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
+	m_CyclesPerLine = SPEC128_CYCLES_PER_LINE;
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
 
@@ -176,34 +187,34 @@ uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_in
 }
 
 
-static const rgb_t spectrum_palette[16] = {
-	rgb_t(0x00, 0x00, 0x00),
-	rgb_t(0x00, 0x00, 0xbf),
-	rgb_t(0xbf, 0x00, 0x00),
-	rgb_t(0xbf, 0x00, 0xbf),
-	rgb_t(0x00, 0xbf, 0x00),
-	rgb_t(0x00, 0xbf, 0xbf),
-	rgb_t(0xbf, 0xbf, 0x00),
-	rgb_t(0xbf, 0xbf, 0xbf),
-	rgb_t(0x00, 0x00, 0x00),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t(0xff, 0xff, 0xff)
+static constexpr rgb_t spectrum_pens[16] = {
+	{ 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0xbf },
+	{ 0xbf, 0x00, 0x00 },
+	{ 0xbf, 0x00, 0xbf },
+	{ 0x00, 0xbf, 0x00 },
+	{ 0x00, 0xbf, 0xbf },
+	{ 0xbf, 0xbf, 0x00 },
+	{ 0xbf, 0xbf, 0xbf },
+	{ 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0xff },
+	{ 0xff, 0x00, 0x00 },
+	{ 0xff, 0x00, 0xff },
+	{ 0x00, 0xff, 0x00 },
+	{ 0x00, 0xff, 0xff },
+	{ 0xff, 0xff, 0x00 },
+	{ 0xff, 0xff, 0xff }
 };
-/* Initialise the palette */
-PALETTE_INIT_MEMBER(spectrum_state,spectrum)
+// Initialise the palette
+void spectrum_state::spectrum_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
+	palette.set_pen_colors(0, spectrum_pens);
 }
 
 void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 {
-	unsigned int x = machine().first_screen()->hpos();
-	unsigned int y = machine().first_screen()->vpos();
+	unsigned int x = m_screen->hpos();
+	unsigned int y = m_screen->vpos();
 	int width = m_screen_bitmap.width();
 	int height = m_screen_bitmap.height();
 
@@ -259,8 +270,8 @@ void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 
 void spectrum_state::spectrum_UpdateBorderBitmap()
 {
-	unsigned int x = machine().first_screen()->hpos();
-	unsigned int y = machine().first_screen()->vpos();
+	unsigned int x = m_screen->hpos();
+	unsigned int y = m_screen->vpos();
 	int width = m_border_bitmap.width();
 	int height = m_border_bitmap.height();
 

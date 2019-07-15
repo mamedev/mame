@@ -6,20 +6,15 @@
 #pragma once
 
 
-#define MCFG_NAMCO_AUDIO_VOICES(_voices) \
-	namco_audio_device::set_voices(*device, _voices);
-
-#define MCFG_NAMCO_AUDIO_STEREO(_stereo) \
-	namco_audio_device::set_stereo(*device, _stereo);
-
-
 class namco_audio_device : public device_t,
 							public device_sound_interface
 {
 public:
-	// static configuration
-	static void set_voices(device_t &device, int voices) { downcast<namco_audio_device &>(device).m_voices = voices; }
-	static void set_stereo(device_t &device, int stereo) { downcast<namco_audio_device &>(device).m_stereo = stereo; }
+	// configuration
+	void set_voices(int voices) { m_voices = voices; }
+	void set_stereo(bool stereo) { m_stereo = stereo; }
+
+	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
 
 protected:
 	static constexpr unsigned MAX_VOICES = 8;
@@ -62,14 +57,14 @@ protected:
 
 	/* global sound parameters */
 	int m_wave_size;
-	int32_t m_sound_enable;
+	bool m_sound_enable;
 	sound_stream *m_stream;
 	int m_namco_clock;
 	int m_sample_rate;
 	int m_f_fracbits;
 
 	int m_voices;     /* number of voices */
-	int m_stereo;     /* set to 1 to indicate stereo (e.g., System 1) */
+	bool m_stereo;    /* set to indicate stereo (e.g., System 1) */
 
 	/* decoded waveform table */
 	int16_t *m_waveform[MAX_VOLUME];
@@ -82,7 +77,6 @@ class namco_device : public namco_audio_device
 public:
 	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(pacman_sound_enable_w);
 	DECLARE_WRITE8_MEMBER(pacman_sound_w);
 
 	void polepos_sound_enable(int enable);

@@ -154,7 +154,7 @@ WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
 
 WRITE8_MEMBER(rpunch_state::rpunch_gga_w)
 {
-	m_gga->write(space, offset >> 4, data & 0xff);
+	m_gga->write(space, offset >> 5, data & 0xff);
 }
 
 

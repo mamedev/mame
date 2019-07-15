@@ -15,20 +15,11 @@ msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, const ch
 
 msx_slot_rom_device::msx_slot_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, msx_internal_slot_interface()
+	, msx_internal_slot_interface(mconfig, *this)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)
 	, m_rom(nullptr)
 {
-}
-
-
-void msx_slot_rom_device::set_rom_start(device_t &device, const char *region, uint32_t offset)
-{
-	msx_slot_rom_device &dev = downcast<msx_slot_rom_device &>(device);
-
-	dev.m_rom_region.set_tag(region);
-	dev.m_region_offset = offset;
 }
 
 
@@ -44,11 +35,11 @@ void msx_slot_rom_device::device_start()
 }
 
 
-READ8_MEMBER(msx_slot_rom_device::read)
+uint8_t msx_slot_rom_device::read(offs_t offset)
 {
-	if ( offset >= m_start_address && offset < m_end_address )
+	if (offset >= m_start_address && offset < m_end_address)
 	{
-		return m_rom[ offset - m_start_address ];
+		return m_rom[offset - m_start_address];
 	}
 	return 0xFF;
 }

@@ -99,14 +99,15 @@ READ8_MEMBER(sh7604_sci_device::receive_data_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(sh7604_sci_device::sci_regs)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(serial_mode_r,   serial_mode_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(bitrate_r,       bitrate_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(serial_control_r,serial_control_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(transmit_data_r, transmit_data_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(serial_status_r, serial_ack_w)
-	AM_RANGE(0x05, 0x05) AM_READ(receive_data_r)
-ADDRESS_MAP_END
+void sh7604_sci_device::sci_regs(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(sh7604_sci_device::serial_mode_r), FUNC(sh7604_sci_device::serial_mode_w));
+	map(0x01, 0x01).rw(FUNC(sh7604_sci_device::bitrate_r), FUNC(sh7604_sci_device::bitrate_w));
+	map(0x02, 0x02).rw(FUNC(sh7604_sci_device::serial_control_r), FUNC(sh7604_sci_device::serial_control_w));
+	map(0x03, 0x03).rw(FUNC(sh7604_sci_device::transmit_data_r), FUNC(sh7604_sci_device::transmit_data_w));
+	map(0x04, 0x04).rw(FUNC(sh7604_sci_device::serial_status_r), FUNC(sh7604_sci_device::serial_ack_w));
+	map(0x05, 0x05).r(FUNC(sh7604_sci_device::receive_data_r));
+}
 
 //-------------------------------------------------
 //  sh7604_sci_device - constructor

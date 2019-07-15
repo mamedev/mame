@@ -66,17 +66,19 @@ public:
 	{ }
 
 	void msbc1(machine_config &config);
-	void msbc1_mem(address_map &map);
+
 private:
+	void msbc1_mem(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(msbc1_state::msbc1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM
-	AM_RANGE(0xf80000, 0xf87fff) AM_ROM AM_REGION(MC68000R12_TAG, 0)
-ADDRESS_MAP_END
+void msbc1_state::msbc1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram();
+	map(0xf80000, 0xf87fff).rom().region(MC68000R12_TAG, 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( msbc1 )
@@ -88,15 +90,14 @@ void msbc1_state::machine_reset()
 	uint8_t *rom = memregion(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
-
-	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(msbc1_state::msbc1)
+void msbc1_state::msbc1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL(12'500'000))
-	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
-MACHINE_CONFIG_END
+	M68000(config, m_maincpu, XTAL(12'500'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &msbc1_state::msbc1_mem);
+}
 
 /* ROM definition */
 ROM_START( msbc1 )
@@ -121,5 +122,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1985, msbc1,  0,      0,       msbc1,     msbc1, msbc1_state, 0,    "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1985, msbc1, 0,      0,      msbc1,   msbc1, msbc1_state, empty_init, "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -68,8 +68,8 @@ void device_vtlb_interface::interface_validity_check(validity_checker &valid) co
 		const address_space_config *spaceconfig = intf->space_config(m_space);
 		if (spaceconfig == nullptr)
 			osd_printf_error("No memory address space configuration found for space %d\n", m_space);
-		else if ((1 << spaceconfig->m_page_shift) <= VTLB_FLAGS_MASK || spaceconfig->m_logaddr_width <= spaceconfig->m_page_shift)
-			osd_printf_error("Invalid page shift %d for VTLB\n", spaceconfig->m_page_shift);
+		else if ((1 << spaceconfig->page_shift()) <= VTLB_FLAGS_MASK || spaceconfig->logaddr_width() <= spaceconfig->page_shift())
+			osd_printf_error("Invalid page shift %d for VTLB\n", spaceconfig->page_shift());
 	}
 }
 
@@ -83,16 +83,18 @@ void device_vtlb_interface::interface_pre_start()
 {
 	// fill in CPU information
 	const address_space_config *spaceconfig = device().memory().space_config(m_space);
-	m_pageshift = spaceconfig->m_page_shift;
-	m_addrwidth = spaceconfig->m_logaddr_width;
+	m_pageshift = spaceconfig->page_shift();
+	m_addrwidth = spaceconfig->logaddr_width();
 
 	// allocate the entry array
 	m_live.resize(m_fixed + m_dynamic);
 	memset(&m_live[0], 0, m_live.size()*sizeof(m_live[0]));
 
 	// allocate the lookup table
-	m_table.resize((size_t) 1 << (m_addrwidth - m_pageshift));
-	memset(&m_table[0], 0, m_table.size()*sizeof(m_table[0]));
+	m_table.resize((size_t)1 << (m_addrwidth - m_pageshift));
+	memset(&m_table[0], 0, m_table.size() * sizeof(m_table[0]));
+	m_refcnt.resize((size_t)1 << (m_addrwidth - m_pageshift));
+	memset(&m_refcnt[0], 0, m_refcnt.size() * sizeof(m_refcnt[0]));
 	// pointer to first element for quick access
 	m_table_base = &m_table[0];
 
@@ -114,6 +116,7 @@ void device_vtlb_interface::interface_post_start()
 {
 	device().save_item(NAME(m_live));
 	device().save_item(NAME(m_table));
+	device().save_item(NAME(m_refcnt));
 	if (m_fixed > 0)
 		device().save_item(NAME(m_fixedpages));
 }
@@ -176,9 +179,16 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 	{
 		int liveindex = m_dynindex++ % m_dynamic;
 
+
 		// if an entry already exists at this index, free it
 		if (m_live[liveindex] != 0)
-			m_table[m_live[liveindex] - 1] = 0;
+		{
+			if (m_refcnt[m_live[liveindex] - 1] <= 1)
+				m_table[m_live[liveindex] - 1] = 0;
+			else
+				m_refcnt[m_live[liveindex] - 1]--;
+		}
+
 
 		// claim this new entry
 		m_live[liveindex] = tableindex + 1;
@@ -230,14 +240,19 @@ void device_vtlb_interface::vtlb_load(int entrynum, int numpages, offs_t address
 	// if an entry already exists at this index, free it
 	if (m_live[liveindex] != 0)
 	{
-		int pagecount = m_fixedpages[entrynum];
 		int oldtableindex = m_live[liveindex] - 1;
-		for (pagenum = 0; pagenum < pagecount; pagenum++)
-			m_table[oldtableindex + pagenum] = 0;
+		m_refcnt[oldtableindex]--;
+		if (m_refcnt[oldtableindex] == 0) {
+			int pagecount = m_fixedpages[entrynum];
+			for (pagenum = 0; pagenum < pagecount; pagenum++) {
+				m_table[oldtableindex + pagenum] = 0;
+			}
+		}
 	}
 
 	// claim this new entry
 	m_live[liveindex] = tableindex + 1;
+	m_refcnt[tableindex]++;
 
 	// store the raw value, making sure the "fixed" flag is set
 	value |= VTLB_FLAG_FIXED;

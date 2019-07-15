@@ -34,7 +34,7 @@ static const discrete_lfsr_desc nitedrvr_lfsr =
 #define NITEDRVR_SCREECH1_SND   NODE_13
 #define NITEDRVR_SCREECH2_SND   NODE_14
 
-DISCRETE_SOUND_START(nitedrvr)
+DISCRETE_SOUND_START(nitedrvr_discrete)
 	/************************************************/
 	/* nitedrvr  Effects Relataive Gain Table       */
 	/*                                              */

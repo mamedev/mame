@@ -104,7 +104,7 @@
 
   List of encrypted games currently known:
 
- CPU Part #         Game                   Comments
+ CPU Part #     Game                    Comments
   315-5010      Pengo                   unencrypted version available
   315-5013      Super Zaxxon            used Zaxxon for known plaintext attack
   315-5014      Buck Rogers / Zoom 909  unencrypted version available
@@ -112,8 +112,8 @@
   315-5018      Yamato
   ???-????      Top Roller              same key as Yamato
   315-5028      Sindbad Mystery
-  315-5030      Up'n Down &             unencrypted version available
-  ???-???? M120 Razzmatazz
+  315-5030      Up'n Down               unencrypted version available
+  ???-???? M120 Razzmatazz              same key as Up'n Down
   315-5033      Regulus                 unencrypted version available
   315-5041 M140 Mister Viking
   315-5048      SWAT                    used Bull Fight for k.p.a.
@@ -123,15 +123,15 @@
   315-5064      Water Match             used Mister Viking for k.p.a.
   315-5065      Bull Fight
   315-5069      Star Force              game by Tehkan; same key as Super Locomotive
-  ???-????      Pinball Action          game by Tehkan; also has a simple bitswap on top
   ???-????      Spatter
   315-5084      Jongkyo                 TABLE INCOMPLETE game by Kiwako; also has a simple bitswap on top
   315-5093      Pitfall II
   315-5098      Ninja Princess          unencrypted version available; same key as Up'n Down
   315-5102      Sega Ninja              unencrypted version available
   315-5110      I'm Sorry               used My Hero for k.p.a.
-  315-5114      ?? pcb 834-5492         same key as Regulus
+  315-5114      Champion Pro Wrestling  same key as Regulus
   315-5115      TeddyBoy Blues
+  315-5128      Pinball Action          game by Tehkan; also has a simple bitswap on top
   315-5132      My Hero
   315-5135      Heavy Metal &
                 Wonder Boy (set 1a & 3; bootlegs?)
@@ -278,10 +278,8 @@ DEFINE_DEVICE_TYPE(SEGA_315_5013, sega_315_5013_device, "sega_315_5013", "Sega 3
 DEFINE_DEVICE_TYPE(SEGA_315_5014, sega_315_5014_device, "sega_315_5014", "Sega 315-5014")
 DEFINE_DEVICE_TYPE(SEGA_315_5018, sega_315_5018_device, "sega_315_5018", "Sega 315-5018")
 DEFINE_DEVICE_TYPE(SEGA_315_5010, sega_315_5010_device, "sega_315_5010", "Sega 315-5010")
-
-// below are unknown part numbers
-DEFINE_DEVICE_TYPE(SEGA_315_SPAT, sega_315_spat_device, "sega_315_spat", "Sega 315-???? Spat") // unknown part number
-DEFINE_DEVICE_TYPE(SEGA_CPU_PBACTIO4, sega_cpu_pbactio4_device, "sega_pbactio4", "Sega pbactio4")
+DEFINE_DEVICE_TYPE(SEGA_315_SPAT, sega_315_spat_device, "sega_315_spat", "Sega 315-5xxx (Spatter)") // unknown part number
+DEFINE_DEVICE_TYPE(SEGA_315_5128, sega_315_5128_device, "sega_315_5128", "Sega 315-5128")
 
 
 
@@ -324,18 +322,6 @@ void segacrpt_z80_device::device_reset()
 	z80_device::device_reset();
 }
 
-void segacrpt_z80_device::set_decrypted_tag(device_t &device, const char* decrypted_tag)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_decrypted_tag = decrypted_tag;
-}
-
-void segacrpt_z80_device::set_decrypted_ptr(device_t &device, uint8_t* ptr)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_decrypted_ptr = ptr;
-}
-
 void segacrpt_z80_device::set_region_p(uint8_t* ptr)
 {
 	m_region_ptr = ptr;
@@ -344,24 +330,6 @@ void segacrpt_z80_device::set_region_p(uint8_t* ptr)
 void segacrpt_z80_device::set_decrypted_p(uint8_t* ptr)
 {
 	m_decrypted_ptr = ptr;
-}
-
-void segacrpt_z80_device::set_size(device_t &device, int size)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_decode_size = size;
-}
-
-void segacrpt_z80_device::set_numbanks(device_t &device, int numbanks)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_numbanks = numbanks;
-}
-
-void segacrpt_z80_device::set_banksize(device_t &device, int banksize)
-{
-	segacrpt_z80_device &dev = downcast<segacrpt_z80_device &>(device);
-	dev.m_banksize = banksize;
 }
 
 
@@ -1001,8 +969,8 @@ void sega_315_5010_device::decrypt()
 
 
 
-sega_cpu_pbactio4_device::sega_cpu_pbactio4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_CPU_PBACTIO4, tag, owner, clock) {}
-void sega_cpu_pbactio4_device::decrypt()
+sega_315_5128_device::sega_315_5128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrpt_z80_device(mconfig, SEGA_315_5128, tag, owner, clock) {}
+void sega_315_5128_device::decrypt()
 {
 	static const uint8_t convtable[32][4] =
 	{

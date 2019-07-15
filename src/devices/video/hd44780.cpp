@@ -345,27 +345,27 @@ uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(hd44780_device::read)
+u8 hd44780_device::read(offs_t offset)
 {
 	switch (offset & 0x01)
 	{
-		case 0: return control_read(space, 0);
-		case 1: return data_read(space, 0);
+		case 0: return control_read();
+		case 1: return data_read();
 	}
 
 	return 0;
 }
 
-WRITE8_MEMBER(hd44780_device::write)
+void hd44780_device::write(offs_t offset, u8 data)
 {
 	switch (offset & 0x01)
 	{
-		case 0: control_write(space, 0, data);  break;
-		case 1: data_write(space, 0, data);     break;
+		case 0: control_write(data);  break;
+		case 1: data_write(data);     break;
 	}
 }
 
-WRITE8_MEMBER(hd44780_device::control_write)
+void hd44780_device::control_write(u8 data)
 {
 	if (m_data_len == 4)
 	{
@@ -485,11 +485,11 @@ WRITE8_MEMBER(hd44780_device::control_write)
 	m_first_cmd = false;
 }
 
-READ8_MEMBER(hd44780_device::control_read)
+u8 hd44780_device::control_read()
 {
 	if (m_data_len == 4)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			update_nibble(0, 1);
 
 		if (m_nibble)
@@ -503,7 +503,7 @@ READ8_MEMBER(hd44780_device::control_read)
 	}
 }
 
-WRITE8_MEMBER(hd44780_device::data_write)
+void hd44780_device::data_write(u8 data)
 {
 	if (m_busy_flag)
 	{
@@ -543,7 +543,7 @@ WRITE8_MEMBER(hd44780_device::data_write)
 	set_busy_flag(41);
 }
 
-READ8_MEMBER(hd44780_device::data_read)
+u8 hd44780_device::data_read()
 {
 	uint8_t data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
 
@@ -551,7 +551,7 @@ READ8_MEMBER(hd44780_device::data_read)
 
 	if (m_data_len == 4)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			update_nibble(1, 1);
 
 		if (m_nibble)
@@ -560,7 +560,7 @@ READ8_MEMBER(hd44780_device::data_read)
 			data = (data << 4) & 0xf0;
 	}
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		update_ac(m_direction);
 		set_busy_flag(41);

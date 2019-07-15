@@ -18,8 +18,6 @@
 #include "emu.h"
 #include "legacy.h"
 
-#include "cpu/m6502/m6502.h"
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -78,7 +76,7 @@ void nes_ffe4_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_exram));
 	save_item(NAME(m_exram_enabled));
@@ -138,7 +136,7 @@ void nes_ffe8_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_ffe3_device::write_h)
+void nes_ffe3_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper8 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -166,7 +164,7 @@ void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		{
 			if (m_irq_count == 0xffff)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 				m_irq_count = 0;
 				m_irq_enable = 0;
 			}
@@ -176,7 +174,7 @@ void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-WRITE8_MEMBER(nes_ffe4_device::write_l)
+void nes_ffe4_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper6 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -192,7 +190,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_l)
 
 		case 0x401:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x402:
 			m_irq_count = (m_irq_count & 0xff00) | data;
@@ -204,7 +202,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_l)
 	}
 }
 
-WRITE8_MEMBER(nes_ffe4_device::chr_w)
+void nes_ffe4_device::chr_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 10;
 	if (m_exram_enabled)
@@ -214,7 +212,7 @@ WRITE8_MEMBER(nes_ffe4_device::chr_w)
 		m_chr_access[bank][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(nes_ffe4_device::chr_r)
+uint8_t nes_ffe4_device::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 	if (m_exram_enabled)
@@ -224,7 +222,7 @@ READ8_MEMBER(nes_ffe4_device::chr_r)
 }
 
 
-WRITE8_MEMBER(nes_ffe4_device::write_h)
+void nes_ffe4_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper6 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -259,7 +257,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_ffe8_device::write_l)
+void nes_ffe8_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("mapper17 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -274,7 +272,7 @@ WRITE8_MEMBER(nes_ffe8_device::write_l)
 
 		case 0x401:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x402:
 			m_irq_count = (m_irq_count & 0xff00) | data;

@@ -70,7 +70,7 @@ READ8Z_MEMBER(sams_memory_expansion_device::readz)
 	}
 }
 
-WRITE8_MEMBER(sams_memory_expansion_device::write)
+void sams_memory_expansion_device::write(offs_t offset, uint8_t data)
 {
 	int base;
 
@@ -104,7 +104,7 @@ READ8Z_MEMBER(sams_memory_expansion_device::crureadz)
 /*
     CRU write. Turns on the mapper and allows to change it.
 */
-WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
+void sams_memory_expansion_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==SAMS_CRU_BASE)
 		m_crulatch->write_bit((offset & 0x000e) >> 1, data);
@@ -120,15 +120,14 @@ WRITE_LINE_MEMBER(sams_memory_expansion_device::map_mode_w)
 	m_map_mode = state;
 }
 
-MACHINE_CONFIG_START(sams_memory_expansion_device::device_add_mconfig)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_DEFAULT_VALUE(0)
+void sams_memory_expansion_device::device_add_mconfig(machine_config &config)
+{
+	RAM(config, RAM_TAG).set_default_size("1M").set_default_value(0);
 
-	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sams_memory_expansion_device, access_mapper_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sams_memory_expansion_device, map_mode_w))
-MACHINE_CONFIG_END
+	LS259(config, m_crulatch); // U8
+	m_crulatch->q_out_cb<0>().set(FUNC(sams_memory_expansion_device::access_mapper_w));
+	m_crulatch->q_out_cb<1>().set(FUNC(sams_memory_expansion_device::map_mode_w));
+}
 
 void sams_memory_expansion_device::device_start()
 {

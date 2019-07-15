@@ -11,24 +11,9 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I4100_GFXDECODE(gfxtag) \
-	imagetek_i4100_device::static_set_gfxdecode_tag(*device, ("^" gfxtag));
-
-#define MCFG_I4100_BLITTER_END_CALLBACK(_devcb) \
-	devcb = &imagetek_i4100_device::static_set_blitter_irq_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_I4100_TILEMAP_XOFFSETS(_a, _b, _c) \
-	imagetek_i4100_device::static_set_tmap_xoffsets(*device, _a, _b, _c);
-
-#define MCFG_I4100_TILEMAP_YOFFSETS(_a, _b, _c) \
-	imagetek_i4100_device::static_set_tmap_yoffsets(*device, _a, _b, _c);
+#include "video/bufsprite.h"
 
 
 //**************************************************************************
@@ -38,6 +23,7 @@
 // ======================> i4100_device
 
 class imagetek_i4100_device : public device_t,
+							  public device_gfx_interface,
 							  public device_video_interface
 {
 public:
@@ -46,14 +32,71 @@ public:
 
 	void map(address_map &map);
 
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3);
-	static void static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3);
+	void set_tmap_xoffsets(int x1, int x2, int x3) { m_tilemap_scrolldx[0] = x1; m_tilemap_scrolldx[1] = x2; m_tilemap_scrolldx[2] = x3; }
+	void set_tmap_yoffsets(int y1, int y2, int y3) { m_tilemap_scrolldy[0] = y1; m_tilemap_scrolldy[1] = y2; m_tilemap_scrolldy[2] = y3; }
 
-	template <class Object> static devcb_base &static_set_blitter_irq_callback(device_t &device, Object &&cb) { return downcast<imagetek_i4100_device &>(device).m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto blit_irq_cb() { return m_blit_irq_cb.bind(); }
+	void set_spriteram_buffered(bool buffer) { m_spriteram_buffered = buffer; }
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_foreground(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_eof);
 
-	// I/O operations
+protected:
+	imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool has_ext_tiles);
+
+	// device-level overrides
+	//virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	required_shared_ptr<uint16_t> m_vram_0;
+	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr<uint16_t> m_vram_2;
+	required_shared_ptr<uint16_t> m_scratchram;
+	required_shared_ptr<uint16_t> m_blitter_regs;
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_shared_ptr<uint16_t> m_tiletable;
+	required_shared_ptr<uint16_t> m_window;
+	required_shared_ptr<uint16_t> m_scroll;
+
+	required_device<palette_device> m_palette;
+	required_region_ptr<uint8_t> m_gfxrom;
+
+	std::unique_ptr<uint8_t[]>      m_expanded_gfx1;
+
+	devcb_write_line m_blit_irq_cb;
+
+	uint16_t m_rombank;
+	size_t m_gfxrom_size;
+	bool m_crtc_unlock;
+	uint16_t m_sprite_count;
+	uint16_t m_sprite_priority;
+	uint16_t m_sprite_xoffset,m_sprite_yoffset;
+	uint16_t m_sprite_color_code;
+	uint8_t m_layer_priority[3];
+	uint16_t m_background_color;
+	uint16_t m_screen_xoffset,m_screen_yoffset;
+	bool m_layer_tile_select[3];
+	bool m_screen_blank;
+	bool m_screen_flip;
+	const bool m_support_8bpp, m_support_16x16;
+	int  m_tilemap_scrolldx[3];
+	int  m_tilemap_scrolldy[3];
+	bool m_spriteram_buffered;
+
+	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
+
+	enum
+	{
+		TIMER_BLIT_END = 1
+	};
+
+	emu_timer *m_blit_done_timer;
+
+		// I/O operations
 	DECLARE_READ16_MEMBER( vram_0_r );
 	DECLARE_READ16_MEMBER( vram_1_r );
 	DECLARE_READ16_MEMBER( vram_2_r );
@@ -106,68 +149,15 @@ public:
 	DECLARE_WRITE16_MEMBER( screen_ctrl_w );
 	DECLARE_WRITE16_MEMBER( rombank_w );
 
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-protected:
-	imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool has_ext_tiles);
-
-	// device-level overrides
-	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	required_shared_ptr<uint16_t> m_vram_0;
-	required_shared_ptr<uint16_t> m_vram_1;
-	required_shared_ptr<uint16_t> m_vram_2;
-	required_shared_ptr<uint16_t> m_scratchram;
-	required_shared_ptr<uint16_t> m_blitter_regs;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_tiletable;
-	required_shared_ptr<uint16_t> m_window;
-	required_shared_ptr<uint16_t> m_scroll;
-
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_region_ptr<uint8_t> m_gfxrom;
-
-	std::unique_ptr<uint8_t[]>      m_expanded_gfx1;
-
-	devcb_write_line m_blit_irq_cb;
-
-	uint16_t m_rombank;
-	size_t m_gfxrom_size;
-	bool m_crtc_unlock;
-	uint16_t m_sprite_count;
-	uint16_t m_sprite_priority;
-	uint16_t m_sprite_xoffset,m_sprite_yoffset;
-	uint16_t m_sprite_color_code;
-	uint8_t m_layer_priority[3];
-	uint16_t m_background_color;
-	uint16_t m_screen_xoffset,m_screen_yoffset;
-	bool m_layer_tile_select[3];
-	bool m_screen_blank;
-	bool m_screen_flip;
-	const bool m_support_8bpp, m_support_16x16;
-	int  m_tilemap_scrolldx[3];
-	int  m_tilemap_scrolldy[3];
-
-	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
-
-	enum
-	{
-		TIMER_BLIT_END = 1
-	};
-
-	emu_timer *m_blit_done_timer;
-
-	void draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool big, uint16_t *pix );
-	void draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t pcode,
-					int sx, int sy, int wx, int wy, bool big, uint16_t *tilemapram, int layer );
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_layers( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri );
+	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool const big, uint32_t &pix );
+	void draw_tilemap( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t const pcode,
+					int sx, int sy, int wx, int wy, bool const big, uint16_t const *tilemapram, int const layer );
+	void draw_spritegfx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip,
+					uint32_t const gfxstart, uint16_t const width, uint16_t const height,
+					uint16_t color, int const flipx, int const flipy, int sx, int sy,
+					uint32_t const scale, uint8_t const prival );
+	void draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void expand_gfx1();
 
 // A 2048 x 2048 virtual tilemap
@@ -179,6 +169,8 @@ protected:
 	static constexpr uint32_t WIN_NY = (0x20);
 
 	bool m_inited_hack;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_ext);
 };
 
 class imagetek_i4220_device : public imagetek_i4100_device
@@ -187,14 +179,11 @@ public:
 	// construction/destruction
 	imagetek_i4220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void v2_map(address_map &map);
-
 	// needed by Blazing Tornado / Grand Striker 2 for mixing with PSAC
 	// (it's unknown how the chip enables external sync)
-	uint16_t get_background_pen() { return m_background_color; };
+	uint32_t get_background_pen() { return m_palette->pen(m_background_color); };
 
-protected:
-
+	void v2_map(address_map &map);
 };
 
 class imagetek_i4300_device : public imagetek_i4100_device
@@ -204,10 +193,6 @@ public:
 	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void v3_map(address_map &map);
-
-
-protected:
-
 };
 
 // device type definition

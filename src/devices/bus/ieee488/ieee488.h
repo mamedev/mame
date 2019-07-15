@@ -12,67 +12,18 @@
 
 #pragma once
 
+void cbm_ieee488_devices(device_slot_interface &device);
+void hp_ieee488_devices(device_slot_interface &device);
+void remote488_devices(device_slot_interface &device);
 
-
+DECLARE_DEVICE_TYPE(IEEE488,      ieee488_device)
+DECLARE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device)
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define IEEE488_TAG         "ieee_bus"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_IEEE488_BUS_ADD() \
-	MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0)
-
-
-#define MCFG_IEEE488_EOI_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB_##_write);
-
-#define MCFG_IEEE488_DAV_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_dav_callback(DEVCB_##_write);
-
-#define MCFG_IEEE488_NRFD_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB_##_write);
-
-#define MCFG_IEEE488_NDAC_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB_##_write);
-
-#define MCFG_IEEE488_IFC_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB_##_write);
-
-#define MCFG_IEEE488_SRQ_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_srq_callback(DEVCB_##_write);
-
-#define MCFG_IEEE488_ATN_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_atn_callback(DEVCB_##_write);
-
-#define MCFG_IEEE488_REN_CALLBACK(_write) \
-	devcb = &downcast<ieee488_device *>(device)->set_ren_callback(DEVCB_##_write);
-
-
-#define MCFG_IEEE488_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, IEEE488_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<ieee488_slot_device *>(device)->set_address(_address);
-
-
-#define MCFG_CBM_IEEE488_ADD(_default_drive) \
-	MCFG_IEEE488_SLOT_ADD("ieee4", 4, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, _default_drive) \
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_SLOT_ADD("ieee12", 12, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_SLOT_ADD("ieee13", 13, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_SLOT_ADD("ieee14", 14, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_SLOT_ADD("ieee15", 15, cbm_ieee488_devices, nullptr) \
-	MCFG_IEEE488_BUS_ADD()
 
 
 
@@ -89,21 +40,27 @@ class ieee488_device : public device_t
 {
 public:
 	// construction/destruction
-	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_eoi_callback(Object &&cb) { return m_write_eoi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dav_callback(Object &&cb) { return m_write_dav.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nrfd_callback(Object &&cb) { return m_write_nrfd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ndac_callback(Object &&cb) { return m_write_ndac.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ifc_callback(Object &&cb) { return m_write_ifc.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_srq_callback(Object &&cb) { return m_write_srq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_atn_callback(Object &&cb) { return m_write_atn.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ren_callback(Object &&cb) { return m_write_ren.set_callback(std::forward<Object>(cb)); }
+	auto eoi_callback() { return m_write_eoi.bind(); }
+	auto dav_callback() { return m_write_dav.bind(); }
+	auto nrfd_callback() { return m_write_nrfd.bind(); }
+	auto ndac_callback() { return m_write_ndac.bind(); }
+	auto ifc_callback() { return m_write_ifc.bind(); }
+	auto srq_callback() { return m_write_srq.bind(); }
+	auto atn_callback() { return m_write_atn.bind(); }
+	auto ren_callback() { return m_write_ren.bind(); }
+
+	// This CB reports changes to the DIO lines on the bus (whose value comes from
+	// ANDing the DIO lines of each device on the bus)
+	// This CB is needed by those controllers that start a parallel poll and wait
+	// for some condition to be set by devices on the DIO lines (e.g. PHI controller).
+	auto dio_callback() { return m_write_dio.bind(); }
 
 	void add_device(ieee488_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
-	uint8_t dio_r() { return get_data(); }
+	uint8_t read_dio() { return get_data(); }
 	DECLARE_READ8_MEMBER( dio_r ) { return get_data(); }
 	DECLARE_READ_LINE_MEMBER( eoi_r ) { return get_signal(EOI); }
 	DECLARE_READ_LINE_MEMBER( dav_r ) { return get_signal(DAV); }
@@ -115,16 +72,16 @@ public:
 	DECLARE_READ_LINE_MEMBER( ren_r ) { return get_signal(REN); }
 
 	// writes for host (driver_device)
-	void dio_w(uint8_t data) { return set_data(this, data); }
-	DECLARE_WRITE8_MEMBER( dio_w ) { set_data(this, data); }
-	DECLARE_WRITE_LINE_MEMBER( eoi_w ) { set_signal(this, EOI, state); }
-	DECLARE_WRITE_LINE_MEMBER( dav_w ) { set_signal(this, DAV, state); }
-	DECLARE_WRITE_LINE_MEMBER( nrfd_w ) { set_signal(this, NRFD, state); }
-	DECLARE_WRITE_LINE_MEMBER( ndac_w ) { set_signal(this, NDAC, state); }
-	DECLARE_WRITE_LINE_MEMBER( ifc_w ) { set_signal(this, IFC, state); }
-	DECLARE_WRITE_LINE_MEMBER( srq_w ) { set_signal(this, SRQ, state); }
-	DECLARE_WRITE_LINE_MEMBER( atn_w ) { set_signal(this, ATN, state); }
-	DECLARE_WRITE_LINE_MEMBER( ren_w ) { set_signal(this, REN, state); }
+	void write_dio(uint8_t data) { set_data(this, data); }
+	DECLARE_WRITE8_MEMBER( host_dio_w ) { set_data(this, data); }
+	DECLARE_WRITE_LINE_MEMBER( host_eoi_w ) { set_signal(this, EOI, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_dav_w ) { set_signal(this, DAV, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_nrfd_w ) { set_signal(this, NRFD, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_ndac_w ) { set_signal(this, NDAC, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_ifc_w ) { set_signal(this, IFC, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_srq_w ) { set_signal(this, SRQ, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_atn_w ) { set_signal(this, ATN, state); }
+	DECLARE_WRITE_LINE_MEMBER( host_ren_w ) { set_signal(this, REN, state); }
 
 	// writes for peripherals (device_t)
 	void dio_w(device_t *device, uint8_t data) { set_data(device, data); }
@@ -137,6 +94,20 @@ public:
 	void atn_w(device_t *device, int state) { set_signal(device, ATN, state); }
 	void ren_w(device_t *device, int state) { set_signal(device, REN, state); }
 
+	// helper functions
+	static void add_cbm_devices(machine_config &config, const char *_default_drive)
+	{
+		IEEE488_SLOT(config, "ieee4", 4, cbm_ieee488_devices, nullptr);
+		IEEE488_SLOT(config, "ieee8", 8, cbm_ieee488_devices, _default_drive);
+		IEEE488_SLOT(config, "ieee9", 9, cbm_ieee488_devices, nullptr);
+		IEEE488_SLOT(config, "ieee10", 10, cbm_ieee488_devices, nullptr);
+		IEEE488_SLOT(config, "ieee11", 11, cbm_ieee488_devices, nullptr);
+		IEEE488_SLOT(config, "ieee12", 12, cbm_ieee488_devices, nullptr);
+		IEEE488_SLOT(config, "ieee13", 13, cbm_ieee488_devices, nullptr);
+		IEEE488_SLOT(config, "ieee14", 14, cbm_ieee488_devices, nullptr);
+		IEEE488_SLOT(config, "ieee15", 15, cbm_ieee488_devices, nullptr);
+		IEEE488(config, IEEE488_TAG);
+	}
 protected:
 	enum
 	{
@@ -180,6 +151,7 @@ private:
 	devcb_write_line   m_write_srq;
 	devcb_write_line   m_write_atn;
 	devcb_write_line   m_write_ren;
+	devcb_write8       m_write_dio;
 
 	void set_signal(device_t *device, int signal, int state);
 	int get_signal(int signal);
@@ -198,7 +170,31 @@ class ieee488_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	ieee488_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, int address, T &&opts, char const *dflt)
+		: ieee488_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_address(address);
+	}
 	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static void add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot);
+	static void add_cbm_defaults(machine_config &config, const char *_default_drive)
+	{
+		add_cbm_slot(config, "ieee4", 4, nullptr);
+		add_cbm_slot(config, "ieee8", 8, _default_drive);
+		add_cbm_slot(config, "ieee9", 9, nullptr);
+		add_cbm_slot(config, "ieee10", 10, nullptr);
+		add_cbm_slot(config, "ieee11", 11, nullptr);
+		add_cbm_slot(config, "ieee12", 12, nullptr);
+		add_cbm_slot(config, "ieee13", 13, nullptr);
+		add_cbm_slot(config, "ieee14", 14, nullptr);
+		add_cbm_slot(config, "ieee15", 15, nullptr);
+	}
 
 	void set_address(int address) { m_address = address; }
 	int get_address() { return m_address; }
@@ -243,15 +239,5 @@ protected:
 private:
 	device_ieee488_interface *m_next;
 };
-
-
-// device type definition
-DECLARE_DEVICE_TYPE(IEEE488,      ieee488_device)
-DECLARE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device)
-
-
-SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
-SLOT_INTERFACE_EXTERN( hp_ieee488_devices );
-
 
 #endif // MAME_BUS_IEEE488_IEEE488_H

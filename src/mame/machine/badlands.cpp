@@ -2,13 +2,13 @@
 // copyright-holders:Aaron Giles
 /***************************************************************
 
-	Badlands
-	
-	functions required by both badlands.cpp and 
-	badlandsbl.cpp drivers.
+    Badlands
 
-	Eventually this file will be nuked once both i/o and 
-	gfx_layout systems are properly state-ized.
+    functions required by both badlands.cpp and
+    badlandsbl.cpp drivers.
+
+    Eventually this file will be nuked once both i/o and
+    gfx_layout systems are properly state-ized.
 
 ***************************************************************/
 
@@ -24,7 +24,7 @@
  *************************************/
 
 // TODO: doesn't link?
-#ifdef UNUSED_FUNCTION 
+#ifdef UNUSED_FUNCTION
 const gfx_layout badlands_molayout =
 {
 	16,8,
@@ -68,10 +68,10 @@ INPUT_PORTS_START( badlands )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")   /* response buffer full */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")    /* command buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
 
 	PORT_START("PEDALS")    /* fake for pedals */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Pedal")

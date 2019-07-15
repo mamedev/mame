@@ -202,7 +202,7 @@ struct legacy_poly_manager
 
 static void **allocate_array(running_machine &machine, size_t *itemsize, uint32_t itemcount);
 static void *poly_item_callback(void *param, int threadid);
-static void poly_state_presave(legacy_poly_manager *poly);
+static void poly_state_presave(legacy_poly_manager &poly);
 
 
 
@@ -1359,7 +1359,7 @@ static void *poly_item_callback(void *param, int threadid)
     ensure everything is synced before saving
 -------------------------------------------------*/
 
-static void poly_state_presave(legacy_poly_manager *poly)
+static void poly_state_presave(legacy_poly_manager &poly)
 {
-	poly_wait(poly, "pre-save");
+	poly_wait(&poly, "pre-save");
 }

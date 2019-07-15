@@ -218,7 +218,7 @@ void jaguar_state::sound_start()
 READ16_MEMBER( jaguar_state::jerry_regs_r )
 {
 	if (offset != JINTCTRL && offset != JINTCTRL+2)
-		logerror("%08X:jerry read register @ F10%03X\n", space.device().safe_pcbase(), offset * 2);
+		logerror("%s:jerry read register @ F10%03X\n", machine().describe_context(), offset * 2);
 
 	switch (offset)
 	{
@@ -245,7 +245,7 @@ WRITE16_MEMBER( jaguar_state::jerry_regs_w )
 	}
 
 	if (offset != JINTCTRL && offset != JINTCTRL+2 && offset != ASICTRL)
-		logerror("%08X:jerry write register @ F10%03X = %04X\n", space.device().safe_pcbase(), offset * 2, data);
+		logerror("%s:jerry write register @ F10%03X = %04X\n", machine().describe_context(), offset * 2, data);
 }
 
 
@@ -261,7 +261,7 @@ WRITE16_MEMBER( jaguar_state::jerry_regs_w )
 WRITE32_MEMBER( jaguar_state::dsp_flags_w )
 {
 	/* write the data through */
-	m_dsp->ctrl_w(space, offset, data, mem_mask);
+	m_dsp->ctrl_w(offset, data, mem_mask);
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
@@ -323,7 +323,7 @@ void jaguar_state::serial_update()
 
 READ32_MEMBER( jaguar_state::serial_r )
 {
-	logerror("%08X:jaguar_serial_r(%X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
 	return 0;
 }
 
@@ -353,13 +353,13 @@ WRITE32_MEMBER( jaguar_state::serial_w )
 				logerror("Unexpected write to SMODE = %X\n", data);
 			if ((data & 0x3f) == 0x15)
 			{
-				attotime rate = attotime::from_hz(26000000) * (32 * 2 * (m_serial_frequency + 1));
+				attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
 				m_serial_timer->adjust(rate, 0, rate);
 			}
 			break;
 
 		default:
-			logerror("%08X:jaguar_serial_w(%X,%X)\n", space.device().safe_pcbase(), offset, data);
+			logerror("%s:jaguar_serial_w(%X,%X)\n", machine().describe_context(), offset, data);
 			break;
 	}
 }

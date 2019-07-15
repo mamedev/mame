@@ -18,22 +18,6 @@
 
 /*************************************
  *
- *  Device configuration macros
- *
- *************************************/
-
-#define MCFG_S2636_OFFSETS(yoffs, xoffs) \
-		s2636_device::set_offsets(*device, (yoffs), (xoffs));
-
-#define MCFG_S2636_DIVIDER(divider) \
-		s2636_device::set_divider(*device, (divider));
-
-#define MCFG_S2623_SET_INTREQ_CALLBACK(cb) \
-		devcb = &s2636_device::set_intreq_cb(*device, DEVCB_##cb);
-
-
-/*************************************
- *
  *  Device state class
  *
  *************************************/
@@ -45,24 +29,11 @@ class s2636_device : public device_t,
 public:
 	s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_offsets(device_t &device, int y_offset, int x_offset)
-	{
-		s2636_device &dev = downcast<s2636_device &>(device);
-		dev.m_x_offset = x_offset;
-		dev.m_y_offset = y_offset;
-	}
+	void set_offsets(int y_offset, int x_offset) { m_x_offset = x_offset; m_y_offset = y_offset; }
 
-	static void set_divider(device_t &device, int divider)
-	{
-		s2636_device &dev = downcast<s2636_device &>(device);
-		dev.m_divider = divider;
-	}
+	void set_divider(int divider) { m_divider = divider; }
 
-	template <class Object> static devcb_base &set_intreq_cb(device_t &device, Object &&cb)
-	{
-		s2636_device &dev = downcast<s2636_device &>(device);
-		return dev.m_intreq_cb.set_callback(std::forward<Object>(cb));
-	}
+	auto intreq_cb() { return m_intreq_cb.bind(); }
 
 	// returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
 	// D0-D2 of each pixel is the pixel color

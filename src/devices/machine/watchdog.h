@@ -1,24 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-
 #ifndef MAME_MACHINE_WATCHDOG_H
 #define MAME_MACHINE_WATCHDOG_H
 
 #pragma once
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_WATCHDOG_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WATCHDOG_TIMER, 0)
-#define MCFG_WATCHDOG_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-#define MCFG_WATCHDOG_VBLANK_INIT(_screen, _count) \
-	watchdog_timer_device::static_set_vblank_count(*device, _screen, _count);
-#define MCFG_WATCHDOG_TIME_INIT(_time) \
-	watchdog_timer_device::static_set_time(*device, _time);
+#include <screen.h>
 
 
 //**************************************************************************
@@ -31,11 +18,11 @@ class watchdog_timer_device : public device_t
 {
 public:
 	// construction/destruction
-	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration helpers
-	static void static_set_vblank_count(device_t &device, const char *screen_tag, int32_t count);
-	static void static_set_time(device_t &device, attotime time);
+	template <typename T> void set_vblank_count(T &&screen_tag, int32_t count) { m_screen.set_tag(std::forward<T>(screen_tag)); m_vblank_count = count; }
+	void set_time(attotime time) { m_time = time; }
 
 	// watchdog control
 	void watchdog_reset();
@@ -43,12 +30,12 @@ public:
 	int32_t get_vblank_counter() const { return m_counter; }
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER( reset_w );
-	DECLARE_READ8_MEMBER( reset_r );
-	DECLARE_WRITE16_MEMBER( reset16_w );
-	DECLARE_READ16_MEMBER( reset16_r );
-	DECLARE_WRITE32_MEMBER( reset32_w );
-	DECLARE_READ32_MEMBER( reset32_r );
+	void reset_w(u8 data = 0);
+	u8 reset_r(address_space &space);
+	void reset16_w(u16 data = 0);
+	u16 reset16_r(address_space &space);
+	void reset32_w(u32 data = 0);
+	u32 reset32_r(address_space &space);
 
 protected:
 	// device-level overrides
@@ -63,13 +50,13 @@ private:
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
 
 	// configuration data
-	int32_t                   m_vblank_count; // number of VBLANKs until resetting the machine
+	int32_t                 m_vblank_count; // number of VBLANKs until resetting the machine
 	attotime                m_time;         // length of time until resetting the machine
-	const char *            m_screen_tag;   // the tag of the screen this timer tracks
+	optional_device<screen_device> m_screen; // the tag of the screen this timer tracks
 
 	// internal state
 	bool                    m_enabled;      // is the watchdog enabled?
-	int32_t                   m_counter;      // counter for VBLANK tracking
+	int32_t                 m_counter;      // counter for VBLANK tracking
 	emu_timer *             m_timer;        // timer for triggering reset
 };
 

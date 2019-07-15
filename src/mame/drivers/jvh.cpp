@@ -21,56 +21,60 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	void jvh2(machine_config &config);
+	void common(machine_config &config);
 	void jvh(machine_config &config);
+	void jvh2(machine_config &config);
+
+	void init_jvh();
+
+private:
 	void escape_io(address_map &map);
 	void jvh_map(address_map &map);
 	void jvh_sub_map(address_map &map);
 	void movmastr_io(address_map &map);
-protected:
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	DECLARE_DRIVER_INIT(jvh);
 };
 
 
 
-ADDRESS_MAP_START(jvh_state::jvh_map)
-	AM_RANGE(0x0000, 0x3bff) AM_ROM
-	AM_RANGE(0x3c00, 0x3cff) AM_RAM
-ADDRESS_MAP_END
+void jvh_state::jvh_map(address_map &map)
+{
+	map(0x0000, 0x3bff).rom();
+	map(0x3c00, 0x3cff).ram();
+}
 
-ADDRESS_MAP_START(jvh_state::escape_io)
-	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
-	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
-	//AM_RANGE(0x06, 0x07) AM_READ(sw6_r)
-	//AM_RANGE(0x10, 0x15) AM_WRITE(snd_w)
-	//AM_RANGE(0x16, 0x16) AM_WRITE(latch_w)
-	//AM_RANGE(0x17, 0x19) AM_WRITE(out1a_w)
-	//AM_RANGE(0x1a, 0x1a) AM_WRITE(enable_w)
-	//AM_RANGE(0x1b, 0x1f) AM_WRITE(out1b_w)
-	//AM_RANGE(0x20, 0x27) AM_WRITE(out2a_w)
-	//AM_RANGE(0x28, 0x2f) AM_WRITE(out2b_w)
-	//AM_RANGE(0x30, 0x37) AM_WRITE(out3a_w)
-	//AM_RANGE(0x3e, 0x3e) AM_WRITE(irq_enable)
-	//AM_RANGE(0x3f, 0x3f) AM_WRITE(zc_enable)
-	//AM_RANGE(0x40, 0x47) AM_WRITE(digit_w)
-	//AM_RANGE(0x48, 0x4b) AM_WRITE(bcd_w)
-	//AM_RANGE(0x4c, 0x50) AM_WRITE(panel_w)
-	//AM_RANGE(0x51, 0x55) AM_WRITE(col_w)
-	//AM_RANGE(0x58, 0x5f) AM_WRITE(out5b_w)
-	//AM_RANGE(0x60, 0x67) AM_WRITE(out6a_w)
-	//AM_RANGE(0x68, 0x6f) AM_WRITE(out6b_w)
-	//AM_RANGE(0x70, 0x74) AM_WRITE(out7a_w)
-	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
-ADDRESS_MAP_END
+void jvh_state::escape_io(address_map &map)
+{
+	//map(0x0010, 0x002f).r(FUNC(jvh_state::sw1_r));
+	//map(0x0030, 0x005f).r(FUNC(jvh_state::dip_r));
+	//map(0x0060, 0x007f).r(FUNC(jvh_state::sw6_r));
+	//map(0x0020, 0x002b).w(FUNC(jvh_state::snd_w));
+	//map(0x002c, 0x002d).w(FUNC(jvh_state::latch_w));
+	//map(0x002e, 0x0033).w(FUNC(jvh_state::out1a_w));
+	//map(0x0034, 0x0035).w(FUNC(jvh_state::enable_w));
+	//map(0x0036, 0x003f).w(FUNC(jvh_state::out1b_w));
+	//map(0x0040, 0x004f).w(FUNC(jvh_state::out2a_w));
+	//map(0x0050, 0x005f).w(FUNC(jvh_state::out2b_w));
+	//map(0x0060, 0x006f).w(FUNC(jvh_state::out3a_w));
+	//map(0x007c, 0x007d).w(FUNC(jvh_state::irq_enable));
+	//map(0x007e, 0x007f).w(FUNC(jvh_state::zc_enable));
+	//map(0x0080, 0x008f).w(FUNC(jvh_state::digit_w));
+	//map(0x0090, 0x0097).w(FUNC(jvh_state::bcd_w));
+	//map(0x0098, 0x00a1).w(FUNC(jvh_state::panel_w));
+	//map(0x00a2, 0x00ab).w(FUNC(jvh_state::col_w));
+	//map(0x00b0, 0x00bf).w(FUNC(jvh_state::out5b_w));
+	//map(0x00c0, 0x00cf).w(FUNC(jvh_state::out6a_w));
+	//map(0x00d0, 0x00df).w(FUNC(jvh_state::out6b_w));
+	//map(0x00e0, 0x00e9).w(FUNC(jvh_state::out7a_w));
+	//map(0x00ea, 0x00ff).w(FUNC(jvh_state::sol_w));
+}
 
-ADDRESS_MAP_START(jvh_state::movmastr_io)
+void jvh_state::movmastr_io(address_map &map)
+{
 	//AM_RANGE(0x01, 0x02) AM_READ(sw1_r)
 	//AM_RANGE(0x03, 0x05) AM_READ(dip_r)
 	//AM_RANGE(0x08, 0x09) AM_READ(sw6_r)
@@ -96,13 +100,14 @@ ADDRESS_MAP_START(jvh_state::movmastr_io)
 	//AM_RANGE(0x68, 0x6f) AM_WRITE(out6b2_w)
 	//AM_RANGE(0x70, 0x74) AM_WRITE(out7a2_w)
 	//AM_RANGE(0x75, 0x7f) AM_WRITE(sol_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(jvh_state::jvh_sub_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE("via", via6522_device, read, write)
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM
-ADDRESS_MAP_END
+void jvh_state::jvh_sub_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x0080, 0x008f).m("via", FUNC(via6522_device::map));
+	map(0xc000, 0xdfff).mirror(0x2000).rom();
+}
 
 static INPUT_PORTS_START( jvh )
 INPUT_PORTS_END
@@ -111,31 +116,34 @@ void jvh_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(jvh_state,jvh)
+void jvh_state::init_jvh()
 {
 }
 
-MACHINE_CONFIG_START(jvh_state::jvh)
+void jvh_state::common(machine_config &config)
+{
 	// CPU TMS9980A; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
+	TMS9980A(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jvh_state::jvh_map);
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+	m6802_cpu_device &soundcpu(M6802(config, "soundcpu", XTAL(4'000'000)));
+	soundcpu.set_addrmap(AS_PROGRAM, &jvh_state::jvh_sub_map);
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4) // MC6802 E clock
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
-MACHINE_CONFIG_END
+	via6522_device &via(VIA6522(config, "via", XTAL(4'000'000) / 4)); // MC6802 E clock
+	via.irq_handler().set_inputline("soundcpu", M6802_IRQ_LINE);
+}
 
-MACHINE_CONFIG_START(jvh_state::jvh2)
-	// CPU TMS9980At; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
+void jvh_state::jvh(machine_config &config)
+{
+	common(config);
+	m_maincpu->set_addrmap(AS_IO, &jvh_state::escape_io);
+}
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
-
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
-MACHINE_CONFIG_END
+void jvh_state::jvh2(machine_config &config)
+{
+	common(config);
+	m_maincpu->set_addrmap(AS_IO, &jvh_state::movmastr_io);
+}
 
 
 
@@ -164,5 +172,5 @@ ROM_START(movmastr)
 ROM_END
 
 
-GAME(1987,  escape,    0,  jvh,  jvh, jvh_state,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Escape",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(19??,  movmastr,  0,  jvh2, jvh, jvh_state,  jvh,  ROT0,  "Jac Van Ham (Royal)",    "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, escape,   0, jvh,  jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, init_jvh, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL)

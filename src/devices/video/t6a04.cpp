@@ -231,7 +231,7 @@ READ8_MEMBER(t6a04_device::data_read)
 		output_reg = ((((*ti82_video)<<8)+ti82_video[1])>>(10-pos_bit));
 	}
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		m_output_reg = output_reg;
 

@@ -15,45 +15,44 @@
 
 
 // 3 bit colour value. bit 2->green, bit 1->red, bit 0->blue
-static const uint8_t kc85_palette[KC85_PALETTE_SIZE * 3] =
+static constexpr rgb_t kc85_pens[KC85_PALETTE_SIZE] =
 {
 	// foreground colours, "full" of each component
-	0x00, 0x00, 0x00,    // black
-	0x00, 0x00, 0xd0,    // blue
-	0xd0, 0x00, 0x00,    // red
-	0xd0, 0x00, 0xd0,    // magenta
-	0x00, 0xd0, 0x00,    // green
-	0x00, 0xd0, 0xd0,    // cyan
-	0xd0, 0xd0, 0x00,    // yellow
-	0xd0, 0xd0, 0xd0,    // white
+	{ 0x00, 0x00, 0x00 },   // black
+	{ 0x00, 0x00, 0xd0 },   // blue
+	{ 0xd0, 0x00, 0x00 },   // red
+	{ 0xd0, 0x00, 0xd0 },   // magenta
+	{ 0x00, 0xd0, 0x00 },   // green
+	{ 0x00, 0xd0, 0xd0 },   // cyan
+	{ 0xd0, 0xd0, 0x00 },   // yellow
+	{ 0xd0, 0xd0, 0xd0 },   // white
 
 	// full of each component + half of another component
-	0x00, 0x00, 0x00,    // black
-	0x60, 0x00, 0xa0,    // violet
-	0xa0, 0x60, 0x00,    // brown
-	0xa0, 0x00, 0x60,    // red/purple
-	0x00, 0xa0, 0x60,    // pastel green
-	0x00, 0x60, 0xa0,    // sky blue
-	0xa0, 0xa0, 0x60,    // yellow/green
-	0xd0, 0xd0, 0xd0,    // white
+	{ 0x00, 0x00, 0x00 },   // black
+	{ 0x60, 0x00, 0xa0 },   // violet
+	{ 0xa0, 0x60, 0x00 },   // brown
+	{ 0xa0, 0x00, 0x60 },   // red/purple
+	{ 0x00, 0xa0, 0x60 },   // pastel green
+	{ 0x00, 0x60, 0xa0 },   // sky blue
+	{ 0xa0, 0xa0, 0x60 },   // yellow/green
+	{ 0xd0, 0xd0, 0xd0 },   // white
 
 	// background colours are slightly darker than foreground colours
-	0x00, 0x00, 0x00,    // black
-	0x00, 0x00, 0xa0,    // dark blue
-	0xa0, 0x00, 0x00,    // dark red
-	0xa0, 0x00, 0xa0,    // dark magenta
-	0x00, 0xa0, 0x00,    // dark green
-	0x00, 0xa0, 0xa0,    // dark cyan
-	0xa0, 0xa0, 0x00,    // dark yellow
-	0xa0, 0xa0, 0xa0     // dark white (grey)
+	{ 0x00, 0x00, 0x00 },   // black
+	{ 0x00, 0x00, 0xa0 },   // dark blue
+	{ 0xa0, 0x00, 0x00 },   // dark red
+	{ 0xa0, 0x00, 0xa0 },   // dark magenta
+	{ 0x00, 0xa0, 0x00 },   // dark green
+	{ 0x00, 0xa0, 0xa0 },   // dark cyan
+	{ 0xa0, 0xa0, 0x00 },   // dark yellow
+	{ 0xa0, 0xa0, 0xa0 }    // dark white (grey)
 };
 
 
-/* Initialise the palette */
-PALETTE_INIT_MEMBER(kc_state,kc85)
+// Initialise the palette
+void kc_state::kc85_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(kc85_palette) / 3; i++ )
-		palette.set_pen_color(i, kc85_palette[i*3], kc85_palette[i*3+1], kc85_palette[i*3+2]);
+	palette.set_pen_colors(0, kc85_pens);
 }
 
 /* set new blink state */
@@ -61,8 +60,7 @@ WRITE_LINE_MEMBER( kc_state::video_toggle_blink_state )
 {
 	if (state)
 	{
-		machine().first_screen()->update_partial(machine().first_screen()->vpos());
-
+		m_screen->update_partial(m_screen->vpos());
 		m_kc85_blink_state = !m_kc85_blink_state;
 	}
 }
@@ -149,9 +147,8 @@ void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t c
 
 void kc85_4_state::video_start()
 {
-	m_video_ram = machine().memory().region_alloc("videoram", (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2), 1, ENDIANNESS_LITTLE)->base();
-	memset(m_video_ram, 0, (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
-	m_display_video_ram = m_video_ram;
+	m_video_ram = make_unique_clear<uint8_t[]>((KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
+	m_display_video_ram = &m_video_ram[0];
 
 	m_kc85_blink_state = 0;
 }
@@ -160,9 +157,9 @@ void kc85_4_state::video_control_w(int data)
 {
 	/* calculate address of video ram to display */
 	if (data & 1)
-		m_display_video_ram = m_video_ram + (KC85_4_SCREEN_PIXEL_RAM_SIZE + KC85_4_SCREEN_COLOUR_RAM_SIZE);
+		m_display_video_ram = &m_video_ram[KC85_4_SCREEN_PIXEL_RAM_SIZE + KC85_4_SCREEN_COLOUR_RAM_SIZE];
 	else
-		m_display_video_ram = m_video_ram;
+		m_display_video_ram = &m_video_ram[0];
 
 	m_high_resolution = (data & 0x08) ? 0 : 1;
 }
@@ -195,8 +192,7 @@ uint32_t kc85_4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void kc_state::video_start()
 {
-	m_video_ram = machine().memory().region_alloc("videoram", 0x4000, 1, ENDIANNESS_LITTLE)->base();
-	memset(m_video_ram, 0, 0x4000);
+	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
 
 	m_kc85_blink_state = 0;
 }
@@ -204,8 +200,8 @@ void kc_state::video_start()
 uint32_t kc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* colour ram takes up 0x02800 bytes */
-	uint8_t *pixel_ram = m_video_ram;
-	uint8_t *colour_ram = m_video_ram + 0x02800;
+	uint8_t *pixel_ram = &m_video_ram[0];
+	uint8_t *colour_ram = &m_video_ram[0x2800];
 
 	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
 	{

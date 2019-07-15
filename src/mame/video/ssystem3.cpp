@@ -36,13 +36,10 @@ static const unsigned char ssystem3_palette[] =
 };
 
 
-PALETTE_INIT_MEMBER(ssystem3_state, ssystem3)
+void ssystem3_state::palette_init(palette_device &palette)
 {
-	int i;
-
-	for ( i = 0; i < sizeof(ssystem3_palette) / 3; i++ ) {
+	for (int i = 0; i < sizeof(ssystem3_palette) / 3; i++)
 		m_palette->set_pen_color(i, ssystem3_palette[i*3], ssystem3_palette[i*3+1], ssystem3_palette[i*3+2]);
-	}
 }
 
 

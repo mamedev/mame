@@ -7,12 +7,14 @@
 *************************************************************************/
 
 #include "sound/okim6295.h"
+#include "cpu/h6280/h6280.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
+#include "emupal.h"
 
 class rohga_state : public driver_device
 {
@@ -21,83 +23,68 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_deco146(*this, "ioprot"),
-		m_deco104(*this, "ioprot104"),
+		m_ioprot(*this, "ioprot"),
 		m_decocomn(*this, "deco_common"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_deco_tilegen2(*this, "tilegen2"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2") ,
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_pf3_rowscroll(*this, "pf3_rowscroll"),
-		m_pf4_rowscroll(*this, "pf4_rowscroll"),
-		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2"),
+		m_deco_tilegen(*this, "tilegen%u", 1),
+		m_oki(*this, "oki%u", 1),
+		m_spriteram(*this, "spriteram%u", 1),
+		m_pf_rowscroll(*this, "pf%u_rowscroll", 1),
+		m_sprgen(*this, "spritegen%u", 1),
 		m_palette(*this, "palette")
 	{ }
 
+	void wizdfire(machine_config &config);
+	void nitrobal(machine_config &config);
+	void hangzo(machine_config &config);
+	void schmeisr(machine_config &config);
+	void rohga(machine_config &config);
+
+	void init_wizdfire();
+	void init_nitrobal();
+	void init_schmeisr();
+	void init_hangzo();
+	void init_rohga();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<deco146_device> m_deco146;
-	optional_device<deco104_device> m_deco104;
+	required_device<h6280_device> m_audiocpu;
+	required_device<deco_146_base_device> m_ioprot;
 	required_device<decocomn_device> m_decocomn;
-	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<deco16ic_device> m_deco_tilegen2;
-	required_device<okim6295_device> m_oki1;
-	required_device<okim6295_device> m_oki2;
-	required_device<buffered_spriteram16_device> m_spriteram;
-	optional_device<buffered_spriteram16_device> m_spriteram2;
+	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<okim6295_device, 2> m_oki;
+	optional_device_array<buffered_spriteram16_device, 2> m_spriteram;
 
 	/* memory pointers */
-	optional_shared_ptr<uint16_t> m_pf1_rowscroll;
-	optional_shared_ptr<uint16_t> m_pf2_rowscroll;
-	required_shared_ptr<uint16_t> m_pf3_rowscroll;
-	required_shared_ptr<uint16_t> m_pf4_rowscroll;
+	optional_shared_ptr_array<u16, 4> m_pf_rowscroll;
 
-	optional_device<decospr_device> m_sprgen1;
-	optional_device<decospr_device> m_sprgen2;
+	optional_device_array<decospr_device, 2> m_sprgen;
 
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
-	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(wizdfire);
-	DECLARE_DRIVER_INIT(nitrobal);
-	DECLARE_DRIVER_INIT(schmeisr);
-	DECLARE_DRIVER_INIT(hangzo);
-	DECLARE_DRIVER_INIT(rohga);
+	u16 irq_ack_r();
+	void irq_ack_w(u16 data);
+	void rohga_buffer_spriteram16_w(u16 data);
+	void sound_bankswitch_w(u8 data);
+
 	DECLARE_VIDEO_START(wizdfire);
-	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask);
+	u32 screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri, u16 primask);
 	void mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(rohga_pri_callback);
 	DECOSPR_COLOUR_CB_MEMBER(rohga_col_callback);
 	DECOSPR_COLOUR_CB_MEMBER(schmeisr_col_callback);
 
-	READ16_MEMBER( nb_protection_region_0_146_r );
-	WRITE16_MEMBER( nb_protection_region_0_146_w );
-	READ16_MEMBER( wf_protection_region_0_104_r );
-	WRITE16_MEMBER( wf_protection_region_0_104_w );
-	void wizdfire(machine_config &config);
-	void nitrobal(machine_config &config);
-	void hangzo(machine_config &config);
-	void schmeisr(machine_config &config);
-	void rohga(machine_config &config);
+	u16 ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void hangzo_map(address_map &map);
 	void hotb_base_map(address_map &map);
 	void nitrobal_map(address_map &map);
-	void nitrobal_sound_map(address_map &map);
 	void rohga_map(address_map &map);
-	void rohga_sound_map(address_map &map);
+	void sound_map(address_map &map);
 	void schmeisr_map(address_map &map);
 	void wizdfire_map(address_map &map);
 };

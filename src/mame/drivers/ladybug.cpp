@@ -69,27 +69,110 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 
-ADDRESS_MAP_START(ladybug_state::ladybug_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x8000, 0x8fff) AM_READNOP
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("videolatch", ls259_device, write_d0)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
 
-ADDRESS_MAP_START(ladybug_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+// Protection?
+READ8_MEMBER(sraider_state::sraider_8005_r)
+{
+	// This must return X011111X or cpu #1 will hang
+	// see code at rst $10
+	return 0x3e;
+}
+
+// Unknown IO
+WRITE8_MEMBER(sraider_state::sraider_misc_w)
+{
+	switch(offset)
+	{
+	// These 8 bits are stored in the latch at A7
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+		m_weird_value[offset & 7] = data & 1;
+		break;
+	// These 6 bits are stored in the latch at N7
+	case 0x08:
+		m_sraider_0x30 = data & 0x3f;
+		break;
+	// These 6 bits are stored in the latch at N8
+	case 0x10:
+		m_sraider_0x38 = data & 0x3f;
+		break;
+	default:
+		logerror("(%s) write to %02X\n", machine().describe_context(), offset);
+		break;
+	}
+}
+
+
+void ladybug_state::ladybug_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x73ff).w(m_video, FUNC(ladybug_video_device::spr_w));
+	map(0x8000, 0x8fff).nopr();
+	map(0x9000, 0x9000).portr("IN0");
+	map(0x9001, 0x9001).portr("IN1");
+	map(0x9002, 0x9002).portr("DSW0");
+	map(0x9003, 0x9003).portr("DSW1");
+	map(0xa000, 0xa007).w("videolatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::write));
+	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::write));
+	map(0xd000, 0xd7ff).rw(m_video, FUNC(ladybug_video_device::bg_r), FUNC(ladybug_video_device::bg_w));
+	map(0xe000, 0xe000).portr("IN2");
+}
+
+
+void dorodon_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+}
+
+
+void sraider_state::sraider_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).ram();
+	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w));
+	map(0x8005, 0x8005).r(FUNC(sraider_state::sraider_8005_r));  // protection check?
+	map(0x8006, 0x8006).writeonly().share("sound_low");
+	map(0x8007, 0x8007).writeonly().share("sound_high");
+	map(0x9000, 0x9000).portr("IN0");
+	map(0x9001, 0x9001).portr("IN1");
+	map(0x9002, 0x9002).portr("DSW0");
+	map(0x9003, 0x9003).portr("DSW1");
+	map(0xd000, 0xd7ff).w("video", FUNC(ladybug_video_device::bg_w));
+	map(0xe000, 0xe000).nopw();  //unknown 0x10 when in attract, 0x20 when coined/playing
+}
+
+void sraider_state::sraider_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).ram();
+	map(0x8000, 0x8000).readonly().share("sound_low");
+	map(0xa000, 0xa000).readonly().share("sound_high");
+	map(0xc000, 0xc000).nopr(); //some kind of sync
+	map(0xe000, 0xe0ff).writeonly().share("grid_data");
+	map(0xe800, 0xe800).w(FUNC(sraider_state::sraider_io_w));
+}
+
+void sraider_state::sraider_cpu2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::write));
+	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::write));
+	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::write));
+	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::write));
+	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::write));
+	map(0x28, 0x3f).w(FUNC(sraider_state::sraider_misc_w));  // lots unknown
+}
+
 
 INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
 {
@@ -105,9 +188,6 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 }
 
 
-#define LADYBUG_P1_CONTROL_PORT_TAG ("CONTP1")
-#define LADYBUG_P2_CONTROL_PORT_TAG ("CONTP2")
-
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
 {
 	return m_p1_control->read();
@@ -115,32 +195,25 @@ CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
 
 CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
 {
-	uint32_t ret;
-
-	/* upright cabinet only uses a single set of controls */
-	if (m_port_dsw0->read() & 0x20)
-		ret = m_p2_control->read();
-	else
-		ret = m_p1_control->read();
-
-	return ret;
+	// upright cabinet only uses a single set of controls */
+	return ((m_port_dsw0->read() & 0x20) ? m_p2_control : m_p1_control)->read();
 }
 
 
 static INPUT_PORTS_START( ladybug )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ladybug_state,ladybug_p1_control_r, nullptr)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ladybug_state, ladybug_p1_control_r, nullptr)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ladybug_state,ladybug_p2_control_r, nullptr)
-	/* This should be connected to the 4V clock. I don't think the game uses it. */
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ladybug_state, ladybug_p2_control_r, nullptr)
+	// This should be connected to the 4V clock. I don't think the game uses it.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* Note that there are TWO VBlank inputs, one is active low, the other active */
-	/* high. There are probably other differencies in the hardware, but emulating */
-	/* them this way is enough to get the game running. */
+	// Note that there are TWO VBlank inputs, one is active low, the other active
+	// high. There are probably other differencies in the hardware, but emulating
+	// them this way is enough to get the game running.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
@@ -202,14 +275,14 @@ static INPUT_PORTS_START( ladybug )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin1_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 
-	PORT_START(LADYBUG_P1_CONTROL_PORT_TAG)
+	PORT_START("CONTP1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START(LADYBUG_P2_CONTROL_PORT_TAG)
+	PORT_START("CONTP2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -471,6 +544,82 @@ static INPUT_PORTS_START( dorodon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sraider )
+	PORT_START("IN0")   /* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")   /* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSW0")  /* DSW0 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )
+	PORT_DIPSETTING(    0x00, "3 Letters" )
+	PORT_DIPSETTING(    0x04, "10 Letters" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+
+	/* Free Play setting works when it's set for both */
+	PORT_START("DSW1")  /* DSW1 */
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
+	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
+	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+INPUT_PORTS_END
+
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
@@ -481,6 +630,17 @@ static const gfx_layout charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8 /* every char takes 8 consecutive bytes */
 };
+static const gfx_layout charlayout2 =
+{
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	2,  /* 2 bits per pixel */
+	{ 0, 512*8*8 }, /* the two bitplanes are separated */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8 /* every char takes 8 consecutive bytes */
+};
+
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
@@ -504,58 +664,137 @@ static const gfx_layout spritelayout2 =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( ladybug )
+static const gfx_layout gridlayout =
+{
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	1,  /* 1 bit per pixel */
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+	8*8 /* every char takes 8 consecutive bytes */
+};
+static const gfx_layout gridlayout2 =
+{
+	8,8,    /* 8*8 characters */
+	512,    /* 512 characters */
+	1,  /* 1 bit per pixel */
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
+	8*8 /* every char takes 8 consecutive bytes */
+};
+
+static GFXDECODE_START( gfx_ladybug )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 4*8, 16 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(ladybug_state,ladybug)
+static GFXDECODE_START( gfx_sraider )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout2,             0,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,          4*8, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,         4*8, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gridlayout,    4*8+4*16+32,  1 )
+	GFXDECODE_ENTRY( "gfx3", 0, gridlayout2,   4*8+4*16+32,  1 )
+GFXDECODE_END
+
+
+void sraider_state::machine_start()
 {
+	ladybug_base_state::machine_start();
+
+	save_item(NAME(m_grid_color));
+	save_item(NAME(m_sraider_0x30));
+	save_item(NAME(m_sraider_0x38));
+	save_item(NAME(m_weird_value));
 }
 
-MACHINE_CONFIG_START(ladybug_state::ladybug)
+void sraider_state::machine_reset()
+{
+	ladybug_base_state::machine_reset();
 
+	m_grid_color = 0;
+	m_sraider_0x30 = 0;
+	m_sraider_0x38 = 0;
+	std::fill(std::begin(m_weird_value), std::end(m_weird_value), 0);
+}
+
+
+void ladybug_state::ladybug(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(ladybug_map)
-
-	MCFG_MACHINE_START_OVERRIDE(ladybug_state,ladybug)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ladybug_state::ladybug_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(ladybug_state::screen_update_ladybug));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladybug)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ladybug);
+	PALETTE(config, "palette", FUNC(ladybug_state::ladybug_palette), 4*8 + 4*16, 32);
 
-	MCFG_DEVICE_ADD("videolatch", LS259, 0) // L5 on video board or H3 on single board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ladybug_state, flipscreen_w)) // no other outputs used
+	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag("gfxdecode");
 
-	MCFG_VIDEO_START_OVERRIDE(ladybug_state,ladybug)
+	ls259_device &videolatch(LS259(config, "videolatch")); // L5 on video board or H3 on single board
+	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flipscreen_w)); // no other outputs used
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_SOUND_ADD("sn2", SN76489, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ladybug_state::dorodon)
+void dorodon_state::dorodon(machine_config &config)
+{
 	ladybug(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_OPCODES, &dorodon_state::decrypted_opcodes_map);
+}
+
+void sraider_state::sraider(machine_config &config)
+{
+	/* basic machine hardware */
+	z80_device &maincpu(Z80(config, "maincpu", 4000000));   /* 4 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu1_map);
+	maincpu.set_vblank_int("screen", FUNC(sraider_state::irq0_line_hold));
+
+	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
+	sub.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu2_map);
+	sub.set_addrmap(AS_IO, &sraider_state::sraider_cpu2_io_map);
+	sub.set_vblank_int("screen", FUNC(sraider_state::irq0_line_hold));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(sraider_state::screen_update_sraider));
+	screen.screen_vblank().set(FUNC(sraider_state::screen_vblank_sraider));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sraider);
+	PALETTE(config, m_palette, FUNC(sraider_state::sraider_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
+
+	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag(m_gfxdecode);
+	ZEROHOUR_STARS(config, m_stars, 0);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -733,23 +972,51 @@ ROM_START( dorodon2 )
 	ROM_LOAD( "dorodon.bp2", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* timing?? */
 ROM_END
 
-DRIVER_INIT_MEMBER(ladybug_state,dorodon)
+ROM_START( sraider )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sraid3.r4",    0x0000, 0x2000, CRC(0f389774) SHA1(c67596e6bf00175ff0a241506cd2f88114d05933) )
+	ROM_LOAD( "sraid2.n4",    0x2000, 0x2000, CRC(38a48db0) SHA1(6f4f384d702fb8ee4bb2ef579638239d57e32ddd) )
+	ROM_LOAD( "sraid1.m4",    0x4000, 0x2000, CRC(2f302a4e) SHA1(3a902ce6858f38df88b60830bef4b1d45b09b2df) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "sraid-s4.h6",  0x0000, 0x2000, CRC(57173a12) SHA1(6cb8fd4826e499f9a4e63621d58bc4b596cc261e) )
+	ROM_LOAD( "sraid-s5.j6",  0x2000, 0x2000, CRC(5a459179) SHA1(a261c8f3c7c4cd4587c003bbbe815d2c4e01ffbc) )
+	ROM_LOAD( "sraid-s6.l6",  0x4000, 0x2000, CRC(ea3aa25d) SHA1(353c0d075d5e0a3bc25a65e2748f5eb5212a844d) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "sraid-s0.k6",  0x0000, 0x1000, CRC(a0373909) SHA1(00e3bd5dd90769d670fc3c51edd1cd4b69e6132d) )
+	ROM_LOAD( "sraids11.l6",  0x1000, 0x1000, CRC(ba22d949) SHA1(83762ced1df92ff594887e44d5b783826bbfb0c9) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "sraid-s7.m2",  0x0000, 0x1000, CRC(299f8e07) SHA1(1de71f251286088487da7285d6f8070147002af5) )
+	ROM_LOAD( "sraid-s8.n2",  0x1000, 0x1000, CRC(57ba8888) SHA1(2aa1a5f682d146a55a96e471bb78e5c60da02bf9) )
+
+	ROM_REGION( 0x1000, "gfx3", 0 ) /* fixed portion of the grid */
+	ROM_LOAD( "sraid-s9.f6",  0x0000, 0x1000, CRC(2380b90f) SHA1(0310554e3f2ec973c2bb6e816d04e5c0c1e0a0b9) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "srpr10-1.a2",  0x0000, 0x0020, CRC(121fdb99) SHA1(3bc092da40beb129a4df3db2f55d22bbbcf7bad8) )
+	ROM_LOAD( "srpr10-2.l3",  0x0020, 0x0020, CRC(88b67e70) SHA1(e21ee2939e96dffee101bd92c62ed975b6b64001) )
+	ROM_LOAD( "srpr10-3.c1",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+ROM_END
+
+
+void dorodon_state::init_dorodon()
 {
 	/* decode the opcodes */
-
-	offs_t i;
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *table = memregion("user1")->base();
 
-	for (i = 0; i < 0x6000; i++)
+	for (offs_t i = 0; i < 0x6000; i++)
 		m_decrypted_opcodes[i] = table[rom[i]];
 }
 
 
-GAME( 1981, cavenger,  0,       ladybug, cavenger, ladybug_state, 0,       ROT0,   "Universal",              "Cosmic Avenger",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybug,   0,       ladybug, ladybug,  ladybug_state, 0,       ROT270, "Universal",              "Lady Bug",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybugb,  ladybug, ladybug, ladybug,  ladybug_state, 0,       ROT270, "bootleg",                "Lady Bug (bootleg set 1)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybugb2, ladybug, ladybug, ladybug,  ladybug_state, 0,       ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
-GAME( 1982, dorodon,   0,       dorodon, dorodon,  ladybug_state, dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 1)",                         MACHINE_SUPPORTS_SAVE ) // license or bootleg?
-GAME( 1982, dorodon2,  dorodon, dorodon, dorodon,  ladybug_state, dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 2)",                         MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1982, snapjack,  0,       ladybug, snapjack, ladybug_state, 0,       ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cavenger,  0,       ladybug, cavenger, ladybug_state, empty_init,   ROT0,   "Universal",              "Cosmic Avenger",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybug,   0,       ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "Universal",              "Lady Bug",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb,  ladybug, ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "bootleg",                "Lady Bug (bootleg set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb2, ladybug, ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
+GAME( 1982, dorodon,   0,       dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 1)",                         MACHINE_SUPPORTS_SAVE ) // license or bootleg?
+GAME( 1982, dorodon2,  dorodon, dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 2)",                         MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1982, snapjack,  0,       ladybug, snapjack, ladybug_state, empty_init,   ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sraider,   0,       sraider, sraider,  sraider_state, empty_init,   ROT270, "Universal",              "Space Raider",                            MACHINE_SUPPORTS_SAVE )

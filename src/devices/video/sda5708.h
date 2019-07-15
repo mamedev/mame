@@ -41,13 +41,6 @@
  *
  */
 
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_SDA5708_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, SDA5708, 0)
-
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -105,6 +98,7 @@ private:
 		SDA5708_DATA_COMMAND   = 0x00
 	};
 
+	output_finder<8, 7, 5> m_dots;
 	uint8_t m_serial;
 	uint8_t m_load;
 	uint8_t m_reset;
@@ -120,6 +114,6 @@ private:
 
 
 // device type definition
-extern const device_type SDA5708;
+DECLARE_DEVICE_TYPE(SDA5708, sda5708_device)
 
 #endif // MAME_VIDEO_SDA5708_H

@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(SED1520, sed1520_device, "sed1520", "Epson SED1520")
 sed1520_device::sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SED1520, tag, owner, clock), m_lcd_on(0), m_busy(0), m_page(0), m_column(0), m_old_column(0), m_start_line(0),
 	m_adc(0), m_static_drive(0), m_modify_write(false),
-	m_screen_update_func(nullptr)
+	m_screen_update_cb()
 {
 }
 
@@ -44,6 +44,8 @@ sed1520_device::sed1520_device(const machine_config &mconfig, const char *tag, d
 
 void sed1520_device::device_start()
 {
+	m_screen_update_cb.bind_relative_to(*owner());
+
 	// state saving
 	save_item(NAME(m_lcd_on));
 	save_item(NAME(m_busy));
@@ -84,8 +86,8 @@ uint32_t sed1520_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	if (m_lcd_on)
 	{
-		if (m_screen_update_func)
-			m_screen_update_func(*this, bitmap, cliprect, m_vram, m_start_line, m_adc);
+		if (!m_screen_update_cb.isnull())
+			m_screen_update_cb(bitmap, cliprect, m_vram, m_start_line, m_adc);
 	}
 	else if (m_static_drive)
 		return UPDATE_HAS_NOT_CHANGED;

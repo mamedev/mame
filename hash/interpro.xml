@@ -1,0 +1,341 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="interpro" description="Intergraph InterPro software">
+
+	<!--
+	Intergraph distributed all InterPro software, including that from 3rd
+	parties, on CD-ROM disc sets. A base 4-CD set of system software
+	contains the CLIX operating system and other programs such as editors,
+	compilers and graphics tools. Additional sets were typically organised
+	according to lines of business such as "Plant and Building Solutions",
+	"Architecture, Engineering and Construction", etc., and contained
+	application software aimed at companies in those industries.
+
+	All CD-ROM software is installed using the DELTOOLS package, and the
+	"newprod" utility in particular. In some cases, valid load keys (serial
+	numbers) are required to decrypt the delivered software and enable it
+	to be installed. In addition, some software has other runtime licensing
+	which must be configured before the programs will operate.
+
+	Finally, there are two sets of floppy disks that can be created via the
+	REBUILD and DIAG products. The REBUILD floppy disks are used to boot the
+	initial blue screen utility which allows configuring the system and
+	preparing a hard disk for installation, and to initiate the installation
+	process. The DIAG disks are used to launch the full suite of system
+	hardware diagnostic routines, via the FDMDISK monitor.
+	-->
+
+	<software name="iss">
+		<description>Intergraph System Software</description>
+		<year>1999</year>
+		<publisher>Intergraph</publisher>
+
+		<info name="date" value="05-MAY-1999"/>
+
+		<!-- System Software Disc I#05-MAY-1999#050599#FMDA0320N -->
+		<part name="disc1" interface="cdrom">
+			<feature name="part_id" value="System Software Disc I" />
+			<diskarea name="cdrom">
+				<disk name="iss_050599_1" sha1="5d556b4df2dccdc681095fedcf836a5b0a7782a0" writeable="no" />
+			</diskarea>
+		</part>
+
+		<!-- System Software Disc II#05-MAY-1999#050599#FMDA0320N -->
+		<part name="disc2" interface="cdrom">
+			<feature name="part_id" value="System Software Disc II" />
+			<diskarea name="cdrom">
+				<disk name="iss_050599_2" sha1="3813db83871668eed97b43f2384b7e95a649598a" writeable="no" />
+			</diskarea>
+		</part>
+
+		<!-- System Software Disc III#05-MAY-1999#050599#FMDA0320N -->
+		<part name="disc3" interface="cdrom">
+			<feature name="part_id" value="System Software Disc III" />
+			<diskarea name="cdrom">
+				<disk name="iss_050599_3" sha1="c8b08cd45ef1614b3db1cd0fb8e6539e3bcc5725" writeable="no" />
+			</diskarea>
+		</part>
+
+		<!-- System Software Disc IV#05-MAY-1999#050599#FMDA0170B -->
+		<part name="disc4" interface="cdrom">
+			<feature name="part_id" value="System Software Disc IV" />
+			<diskarea name="cdrom">
+				<disk name="iss_050599_4" sha1="2681b4cd8d355b6abfcfebb1b40a6d8a5ef37fe9" writeable="no" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mech">
+		<description>Intergraph Mechanical Software</description>
+		<year>1997</year>
+		<publisher>Intergraph</publisher>
+
+		<info name="date" value="17-AUG-1997"/>
+
+		<!-- MDEM Software #17-AUG-1997#081797#FMDA0320N (disc label: MMDA6680B) -->
+		<part name="disc1" interface="cdrom">
+			<feature name="part_id" value="MDEM Software" />
+			<diskarea name="cdrom">
+				<disk name="mech_081797_1" sha1="a03f9a9b08d6220b49f1be8a50a2032323f69fb8" writeable="no" />
+			</diskarea>
+		</part>
+
+		<!-- MDEM Disc II#17-AUG-1997#081797#FMDA0310J (disc label: MMDA67107) -->
+		<part name="disc2" interface="cdrom">
+			<feature name="part_id" value="MDEM Disc II" />
+			<diskarea name="cdrom">
+				<disk name="mech_081797_2" sha1="a269113a742c8dbf081855bcf2135b70c42738ef" writeable="no" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	The REBUILD product allows a set of system rebuild floppy disks to be
+	created from source binary data. When using the software, the user is
+	prompted to select from the following options, causing different
+	combinations of "boot" and "root" source data to be written to disk.
+
+	    1)  125/32C/220/225 Systems     (80186 IOP and ROP Graphics)
+	    2)  200/240 Systems             (80186 IOP and optional IFB Graphics)
+	    3)  300/400/3000/4000 Systems   (80386 IOP and optional IFB Graphics)
+	    4)  2000 Systems                (C300 Clipper IOP and optional MMG Graphics)
+	    5)  6000 Systems                (C300 Clipper IOP and optional EDGE Graphics)
+	    6)  2400 Systems                (C4T Clipper GTPLUS Graphics)
+	    7)  6440/6480 Systems           (C4T Clipper EDGE Graphics)
+	    8)  6400/6450 Systems           (C4T Clipper GTII Graphics)
+	    9)  6640/6680 Systems           (C400 Clipper EDGE graphics)
+	    10) 6600 Servers                (C400 Clipper Servers)
+	    11) 6700/6800 Servers           (C400I Clipper Server)
+	    12) 6740/6780/6840/6880 Systems (C400I Clipper EDGE graphics)
+	    13) 6750/6850 Systems           (C400I Clipper GT graphics)
+	    14) 2500/2700/2800 Systems      (C400I Clipper Servers)
+	    15) 2530/2730/2830 Systems      (C400I Clipper GT graphics)
+
+	Ignoring the first 3 options which are unsupported in MAME at this point,
+	the remaining systems use one of 3 possible boot images: CLIPPER, C400 or
+	C400E.
+	-->
+	<software name="rebuild">
+		<description>Rebuild Floppies</description>
+		<year>1998</year>
+		<publisher>Intergraph</publisher>
+
+		<info name="product_id" value="SS01003AA-0706A" />
+		<info name="product_title" value="Rebuild Floppies" />
+		<info name="product_date" value="10-JAN-1998" />
+		<info name="product_name" value="REBUILD" />
+		<info name="product_version" value="07.06.00.09" />
+		<info name="product_class" value="System Nucleus" />
+
+		<!-- rebuild boot floppies for C300, C400E and C400 respectively -->
+		<part name="boot_clipper" interface="floppy_3_5">
+			<feature name="part_id" value="C300 Rebuild Boot Floppy" />
+			<feature name="compatibility" value="2000,2020,6000,6040" />
+			<dataarea name="flop" size="1474560">
+				<rom name="clipper.img" size="1474560" crc="f182eb64" sha1="0e104e4db9f666ccc0d618b402666d90f025a3b4" />
+			</dataarea>
+		</part>
+		<part name="boot_c400e" interface="floppy_3_5">
+			<feature name="part_id" value="C400E Rebuild Boot Floppy" />
+			<feature name="compatibility" value="6600,6640,6680" />
+			<dataarea name="flop" size="1474560">
+				<rom name="c400e.img" size="1474560" crc="7285f377" sha1="9700aa90018c264d63010aefc26557ffa9035fdc" />
+			</dataarea>
+		</part>
+		<part name="boot_c400" interface="floppy_3_5">
+			<feature name="part_id" value="C400 Rebuild Boot Floppy" />
+			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
+			<dataarea name="flop" size="1474560">
+				<rom name="c400.img" size="1474560" crc="7e739d42" sha1="ca3f2244d1167553482cd73c59cea74e181f37c7" />
+			</dataarea>
+		</part>
+
+		<!-- rebuild root floppies for 2000 and 2020 systems -->
+		<part name="20x0_root2" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #2/4" />
+			<feature name="compatibility" value="2000,2020"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="20x0_root2.img" size="1474560" crc="66ee95eb" sha1="9b6e316f4c038ef471a84a82e396376b361c970a" />
+			</dataarea>
+		</part>
+		<part name="20x0_root3" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #3/4" />
+			<feature name="compatibility" value="2000,2020"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="20x0_root3.img" size="1474560" crc="de490556" sha1="882c46e193a5467b66ffe2cd0ac8518df087d112" />
+			</dataarea>
+		</part>
+		<part name="20x0_root4" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #4/4" />
+			<feature name="compatibility" value="2000,2020"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="20x0_root4.img" size="1474560" crc="2b0e3f01" sha1="e191057117aee120301143f25d5446f55789009c" />
+			</dataarea>
+		</part>
+
+		<!-- rebuild root floppies for 2400 and 2430 systems -->
+		<part name="24x0_root2" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #2/4" />
+			<feature name="compatibility" value="2400,2430"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="24x0_root2.img" size="1474560" crc="f6a7ba45" sha1="c810cec284f61921ab1ffffe5e71b291d0a295a6" />
+			</dataarea>
+		</part>
+		<part name="24x0_root3" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #3/4" />
+			<feature name="compatibility" value="2400,2430"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="24x0_root3.img" size="1474560" crc="1659399b" sha1="9ad4b4492654e76f4d5284af15b0235553b63f46" />
+			</dataarea>
+		</part>
+		<part name="24x0_root4" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #4/4" />
+			<feature name="compatibility" value="2400,2430"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="24x0_root4.img" size="1474560" crc="594b2c9c" sha1="b69812399b7b32abbe81d00945b0d96a27b04c19" />
+			</dataarea>
+		</part>
+
+		<!-- rebuild root floppies for 6000 and 6040 systems -->
+		<part name="60x0_root2" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #2/4" />
+			<feature name="compatibility" value="6000,6040"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="60x0_root2.img" size="1474560" crc="7ca8534b" sha1="bffb0eda4a8cdbe2e910b94ec64629cd9dc95095" />
+			</dataarea>
+		</part>
+		<part name="60x0_root3" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #3/4" />
+			<feature name="compatibility" value="6000,6040"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="60x0_root3.img" size="1474560" crc="2723ee4d" sha1="80dd7c43e40fd3437cf897b4c15c0b9c644a0644" />
+			</dataarea>
+		</part>
+		<part name="60x0_root4" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #4/4" />
+			<feature name="compatibility" value="6000,6040"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="60x0_root4.img" size="1474560" crc="27764477" sha1="be89a8ba99aebe99b0bddc914b62c0ac106b56cc" />
+			</dataarea>
+		</part>
+
+		<!-- rebuild root floppies for 6400 and 6450 systems -->
+		<part name="6450_root2" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #2/4" />
+			<feature name="compatibility" value="6400,6450"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="6450_root2.img" size="1474560" crc="33bb336f" sha1="74a05fb7b7f615f0e2b3186da34bd32d7e3d0880" />
+			</dataarea>
+		</part>
+		<part name="6450_root3" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #3/4" />
+			<feature name="compatibility" value="6400,6450"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="6450_root3.img" size="1474560" crc="7a9d0379" sha1="fc1623163b6a18ba840c43cfba5ca41a72deeb80" />
+			</dataarea>
+		</part>
+		<part name="6450_root4" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #4/4" />
+			<feature name="compatibility" value="6400,6450"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="6450_root4.img" size="1474560" crc="224cfb96" sha1="19edcc1a796eee9fdc4ec02e503ce46664c26a29" />
+			</dataarea>
+		</part>
+
+		<!-- TODO: root floppy images for all other systems -->
+	</software>
+
+	<!--
+	The DIAG product allows a set of system hardware diagnostic floppy disks
+	to be created from source binary data. When using the software, the user is
+	prompted to select from the following options, causing different
+	combinations of source data to be written to disk.
+
+	    1) amethyst  - 32C/100/200
+	    2) emerald   - 6000/6100/6200/6500/6600
+	    3) topaz     - 300/3000/4000/5000
+	    4) turquoise - 2000
+	    5) IOP based 6500 ( Manufacturing Test Only )
+	    6) sapphire  - 2400/2500/6400/2700/6700/6800/2800
+
+	Currently the Emerald, Turquoise and Sapphire systems are supported. Turquoise
+	diagnostics consists of a single floppy, while Emerald and Sapphire systems have
+	a 3 disk set. Sapphire systems also have an additional disk containing an image
+	which can be used to reflash the system.
+	-->
+	<software name="diag">
+		<description>Diagnostic Floppies</description>
+		<year>1994</year>
+		<publisher>Intergraph</publisher>
+
+		<info name="product_id" value="SS01086AA-0703A" />
+		<info name="product_title" value="Workstation/Server Diagnostics" />
+		<info name="product_date" value="30-MAR-1994" />
+		<info name="product_name" value="DIAG" />
+		<info name="product_version" value="07.03.15.00" />
+		<info name="product_class" value="Hardware Diagnostics" />
+
+		<!-- Emerald systems have a three-disk set of diagnostic floppies -->
+		<part name="emerald1" interface="floppy_3_5">
+			  <feature name="part_id" value="Emerald Diagnostic Floppy #1/3" />
+			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
+			  <dataarea name="flop" size="1474560">
+					<rom name="emerald1.img" size="1474560" crc="2130e140" sha1="4cfcd2683bb05d04d13909e98e5bd67128534077" />
+			  </dataarea>
+		</part>
+		<part name="emerald2" interface="floppy_3_5">
+			  <feature name="part_id" value="Emerald Diagnostic Floppy #2/3" />
+			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
+			  <dataarea name="flop" size="1474560">
+					<rom name="emerald2.img" size="1474560" crc="971c761c" sha1="7c9b1eea5daf919ecde02cf8a1f394e383058708" />
+			  </dataarea>
+		</part>
+		<part name="emerald3" interface="floppy_3_5">
+			  <feature name="part_id" value="Emerald Diagnostic Floppy #3/3" />
+			  <feature name="compatibility" value="6000,6040,6100,6200,6500,6600" />
+			  <dataarea name="flop" size="1474560">
+					<rom name="emerald3.img" size="1474560" crc="1951566a" sha1="2aa1c7aed43901627f35df8c87785385a5fba701" />
+			  </dataarea>
+		</part>
+
+		<!-- Turquoise systems have a single diagnostic floppy -->
+		<part name="turq" interface="floppy_3_5">
+			<feature name="part_id" value="Turqouise Diagnostic Floppy" />
+			<feature name="compatibility" value="2000,2020" />
+			<dataarea name="flop" size="1474560">
+				<rom name="turq.img" size="1474560" crc="70e2980a" sha1="3fa2f0c54ef27e16e579563db9cd70b68e11e403" />
+			</dataarea>
+		</part>
+
+		<!-- Sapphire systems have a four-disk set of diagnostic floppies -->
+		<part name="sapphire" interface="floppy_3_5">
+			<feature name="part_id" value="Sapphire Flash ROM Floppy" />
+			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
+			<dataarea name="flop" size="1474560">
+				<rom name="sapphire.img" size="1474560" crc="1721d7d1" sha1="fc25109c4c7b2d94d0fd55e7cebaa03e7177ad5e" />
+			</dataarea>
+		</part>
+		<part name="sapphire1" interface="floppy_3_5">
+			<feature name="part_id" value="Sapphire Diagnostic Floppy #1/3" />
+			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
+			<dataarea name="flop" size="1474560">
+				<rom name="sapphire1.img" size="1474560" crc="e0db6354" sha1="75fb42ae87d78daaeac30390bef335419425da09" />
+			</dataarea>
+		</part>
+		<part name="sapphire2" interface="floppy_3_5">
+			<feature name="part_id" value="Sapphire Diagnostic Floppy #2/3" />
+			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
+			<dataarea name="flop" size="1474560">
+				<rom name="sapphire2.img" size="1474560" crc="955065d1" sha1="6df92a7986a83d31e91189c8097b9b4f8d02960f" />
+			</dataarea>
+		</part>
+		<part name="sapphire3" interface="floppy_3_5">
+			<feature name="part_id" value="Sapphire Diagnostic Floppy #3/3" />
+			<feature name="compatibility" value="2400,2430,6440,6480,6400,6450,6750,6850,6740,6780,6840,6880,6700,6800,2500,2700,2800,2530,2730,2830" />
+			<dataarea name="flop" size="1474560">
+				<rom name="sapphire3.img" size="1474560" crc="2f14fcb2" sha1="2d33087273c14597fc065e13d05e1ce9d1841704" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

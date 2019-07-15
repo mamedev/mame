@@ -318,7 +318,7 @@ void i386_device::i386_bsr_r32_rm32()      // Opcode 0x0f bd
 	} else {
 		m_ZF = 0;
 		dst = temp = 31;
-		while( (src & (1 << temp)) == 0 ) {
+		while( (src & (1U << temp)) == 0 ) {
 			temp--;
 			dst = temp;
 			CYCLES(CYCLES_BSR);
@@ -767,6 +767,7 @@ void i386_device::i386_iret32()            // Opcode 0xcf
 		i386_load_segment_descriptor(CS);
 		CHANGE_PC(m_eip);
 	}
+	m_auto_clear_RF = false;
 	CYCLES(CYCLES_IRET);
 }
 
@@ -1030,10 +1031,20 @@ void i386_device::i386_enter32()           // Opcode 0xc8
 
 	if(level > 0)
 	{
-		for(x=1;x<level-1;x++)
+		for(x=1;x<=level-1;x++)
 		{
-			REG32(EBP) -= 4;
-			PUSH32(READ32(REG32(EBP)));
+			uint32_t addr;
+			if(!STACK_32BIT)
+			{
+				REG16(BP) -= 4;
+				addr = REG16(BP);
+			}
+			else
+			{
+				REG32(EBP) -= 4;
+				addr = REG32(EBP);
+			}
+			PUSH32(READ32(i386_translate(SS, addr, 0)));
 		}
 		PUSH32(frameptr);
 	}
@@ -1524,9 +1535,9 @@ void i386_device::i386_pop_rm32()          // Opcode 0x8f
 		if( modrm >= 0xc0 ) {
 			STORE_RM32(modrm, value);
 		} else {
-			ea = GetEA(modrm,1);
 			try
 			{
+				ea = GetEA(modrm,1);
 				WRITE32(ea, value);
 			}
 			catch(uint64_t e)

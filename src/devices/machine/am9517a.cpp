@@ -39,6 +39,18 @@
 
 */
 
+/*
+ * The EISA_DMA device represents the 82C37A-compatible DMA devices present in
+ * EISA bus systems, in particular those embedded within the i82357 Integrated
+ * System Peripheral. The device supports 32 bit addressing, 32 bit data sizes,
+ * and 24 bit transfer counts, allowing DMA across 64k boundaries. It also adds
+ * stop registers, supporting ring-buffer memory arrangements.
+ *
+ * TODO
+ *   - stop registers
+ *   - 16/32-bit transfer sizes
+ */
+
 #include "emu.h"
 #include "am9517a.h"
 
@@ -52,8 +64,9 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(AM9517A,      am9517a_device,      "am9517a",  "AM9517A")
-DEFINE_DEVICE_TYPE(V53_DMAU,     upd71071_v53_device, "v53_dmau", "V53 DMAU")
+DEFINE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device,     "v5x_dmau", "V5X DMAU")
 DEFINE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device, "pcx_dmac", "PC Transporter DMAC")
+DEFINE_DEVICE_TYPE(EISA_DMA,     eisa_dma_device,     "eisa_dma", "EISA DMA")
 
 
 //**************************************************************************
@@ -132,7 +145,7 @@ enum
 //  dma_request -
 //-------------------------------------------------
 
-inline void am9517a_device::dma_request(int channel, int state)
+void am9517a_device::dma_request(int channel, int state)
 {
 	LOG("AM9517A Channel %u DMA Request: %u\n", channel, state);
 
@@ -215,7 +228,7 @@ inline void am9517a_device::set_eop(int state)
 
 
 //-------------------------------------------------
-//  dma_read -
+//  get_state1 -
 //-------------------------------------------------
 
 inline int am9517a_device::get_state1(bool msb_changed)
@@ -235,7 +248,7 @@ inline int am9517a_device::get_state1(bool msb_changed)
 //  dma_read -
 //-------------------------------------------------
 
-inline void am9517a_device::dma_read()
+void am9517a_device::dma_read()
 {
 	offs_t offset = m_channel[m_current_channel].m_address;
 
@@ -257,7 +270,7 @@ inline void am9517a_device::dma_read()
 //  dma_write -
 //-------------------------------------------------
 
-inline void am9517a_device::dma_write()
+void am9517a_device::dma_write()
 {
 	offs_t offset = m_channel[m_current_channel].m_address;
 
@@ -290,13 +303,11 @@ inline void am9517a_device::dma_advance()
 {
 	bool msb_changed = false;
 
-	m_channel[m_current_channel].m_count--;
-
 	if (m_current_channel || !COMMAND_MEM_TO_MEM || !COMMAND_CH0_ADDRESS_HOLD)
 	{
 		if (MODE_ADDRESS_DECREMENT)
 		{
-			m_channel[m_current_channel].m_address--;
+			m_channel[m_current_channel].m_address -= transfer_size(m_current_channel);
 			m_channel[m_current_channel].m_address &= m_address_mask;
 
 			if ((m_channel[m_current_channel].m_address & 0xff) == 0xff)
@@ -306,7 +317,7 @@ inline void am9517a_device::dma_advance()
 		}
 		else
 		{
-			m_channel[m_current_channel].m_address++;
+			m_channel[m_current_channel].m_address += transfer_size(m_current_channel);
 			m_channel[m_current_channel].m_address &= m_address_mask;
 
 			if ((m_channel[m_current_channel].m_address & 0xff) == 0x00)
@@ -316,7 +327,7 @@ inline void am9517a_device::dma_advance()
 		}
 	}
 
-	if (m_channel[m_current_channel].m_count == 0xffff)
+	if (m_channel[m_current_channel].m_count-- == 0)
 	{
 		end_of_process();
 	}
@@ -430,8 +441,13 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: am9517a_device(mconfig, V53_DMAU, tag, owner, clock)
+v5x_dmau_device::v5x_dmau_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: am9517a_device(mconfig, V5X_DMAU, tag, owner, clock)
+	, m_in_mem16r_cb(*this)
+	, m_out_mem16w_cb(*this)
+	, m_in_io16r_cb{ { *this },{ *this },{ *this },{ *this } }
+	, m_out_io16w_cb{ { *this },{ *this },{ *this },{ *this } }
+
 {
 }
 
@@ -447,7 +463,7 @@ pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const ch
 void am9517a_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_out_hreq_cb.resolve_safe();
@@ -686,12 +702,12 @@ void am9517a_device::execute_run()
 			m_channel[m_current_channel].m_count--;
 			if (MODE_ADDRESS_DECREMENT)
 			{
-				m_channel[m_current_channel].m_address--;
+				m_channel[m_current_channel].m_address -= transfer_size(m_current_channel);
 				m_channel[m_current_channel].m_address &= m_address_mask;
 			}
 			else
 			{
-				m_channel[m_current_channel].m_address++;
+				m_channel[m_current_channel].m_address += transfer_size(m_current_channel);
 				m_channel[m_current_channel].m_address &= m_address_mask;
 			}
 
@@ -707,7 +723,7 @@ void am9517a_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( am9517a_device::read )
+uint8_t am9517a_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -771,7 +787,7 @@ READ8_MEMBER( am9517a_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( am9517a_device::write )
+void am9517a_device::write(offs_t offset, uint8_t data)
 {
 	if (!BIT(offset, 3))
 	{
@@ -980,10 +996,17 @@ WRITE_LINE_MEMBER( am9517a_device::dreq3_w )
 //  upd71071 register layouts
 //-------------------------------------------------
 
-void upd71071_v53_device::device_start()
+void v5x_dmau_device::device_start()
 {
 	am9517a_device::device_start();
 	m_address_mask = 0x00ffffff;
+
+	m_in_mem16r_cb.resolve_safe(0);
+	m_out_mem16w_cb.resolve_safe();
+	for (auto &cb : m_in_io16r_cb)
+		cb.resolve_safe(0);
+	for (auto &cb : m_out_io16w_cb)
+		cb.resolve_safe();
 
 	m_selected_channel = 0;
 	m_base = 0;
@@ -992,7 +1015,7 @@ void upd71071_v53_device::device_start()
 	save_item(NAME(m_base));
 }
 
-void upd71071_v53_device::device_reset()
+void v5x_dmau_device::device_reset()
 {
 	am9517a_device::device_reset();
 
@@ -1001,7 +1024,7 @@ void upd71071_v53_device::device_reset()
 }
 
 
-READ8_MEMBER(upd71071_v53_device::read)
+uint8_t v5x_dmau_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 	int channel = m_selected_channel;
@@ -1085,7 +1108,7 @@ READ8_MEMBER(upd71071_v53_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(upd71071_v53_device::write)
+void v5x_dmau_device::write(offs_t offset, uint8_t data)
 {
 	int channel = m_selected_channel;
 
@@ -1096,12 +1119,12 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 			//m_buswidth = data & 0x02;
 			//if (data & 0x01)
 			//  soft_reset();
-			logerror("DMA: Initialise [%02x]\n", data);
+			LOG("DMA: Initialise [%02x]\n", data);
 			break;
 		case 0x01:  // Channel
 			m_selected_channel = data & 0x03;
 			m_base = data & 0x04;
-			logerror("DMA: Channel selected [%02x]\n", data);
+			LOG("DMA: Channel selected [%02x]\n", data);
 			break;
 		case 0x02:  // Count (low)
 			m_channel[channel].m_base_count =
@@ -1109,7 +1132,7 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_count =
 				(m_channel[channel].m_count & 0xff00) | data;
-			logerror("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
+			LOG("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
 			break;
 		case 0x03:  // Count (high)
 			m_channel[channel].m_base_count =
@@ -1117,7 +1140,7 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_count =
 				(m_channel[channel].m_count & 0x00ff) | (data << 8);
-			logerror("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
+			LOG("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
 			break;
 		case 0x04:  // Address (low)
 			m_channel[channel].m_base_address =
@@ -1125,7 +1148,7 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0xffffff00) | data;
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x05:  // Address (mid)
 			m_channel[channel].m_base_address =
@@ -1133,7 +1156,7 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0xffff00ff) | (data << 8);
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x06:  // Address (high)
 			m_channel[channel].m_base_address =
@@ -1141,7 +1164,7 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0xff00ffff) | (data << 16);
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x07:  // Address (highest)
 			m_channel[channel].m_base_address =
@@ -1149,37 +1172,88 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0x00ffffff) | (data << 24);
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x0a:  // Mode control
 			m_channel[channel].m_mode = data;
 			// clear terminal count
 			m_status &= ~(1 << channel);
 
-			logerror("DMA: Channel %i Mode control set [%02x]\n",m_selected_channel,m_channel[channel].m_mode);
+			LOG("DMA: Channel %i Mode control set [%02x]\n",m_selected_channel,m_channel[channel].m_mode);
 			break;
 
 		case 0x08:  // Device control (low)
 			m_command = data;
-			logerror("DMA: Device control low set [%02x]\n",data);
+			LOG("DMA: Device control low set [%02x]\n",data);
 			break;
 		case 0x09:  // Device control (high)
 			m_command_high = data;
-			logerror("DMA: Device control high set [%02x]\n",data);
+			LOG("DMA: Device control high set [%02x]\n",data);
 			break;
 		case 0x0e:  // Request
 			//m_reg.request = data;
-			logerror("(invalid) DMA: Request set [%02x]\n",data); // no software requests on the v53 integrated version
+			LOG("(invalid) DMA: Request set [%02x]\n",data); // no software requests on the v53 integrated version
 			break;
 		case 0x0f:  // Mask
 			m_mask = data & 0x0f;
-			logerror("DMA: Mask set [%02x]\n",data);
+			LOG("DMA: Mask set [%02x]\n",data);
 			break;
 
 
 	}
 	trigger(1);
 
+}
+
+void v5x_dmau_device::dma_read()
+{
+	if (m_channel[m_current_channel].m_mode & 0x1)
+	{
+		offs_t const offset = m_channel[m_current_channel].m_address >> 1;
+
+		switch (MODE_TRANSFER_MASK)
+		{
+		case MODE_TRANSFER_VERIFY:
+		case MODE_TRANSFER_WRITE:
+			m_temp = m_in_io16r_cb[m_current_channel](offset);
+			break;
+
+		case MODE_TRANSFER_READ:
+			m_temp = m_in_mem16r_cb(offset);
+			break;
+		}
+	}
+	else
+		am9517a_device::dma_read();
+}
+
+void v5x_dmau_device::dma_write()
+{
+	if (m_channel[m_current_channel].m_mode & 0x1)
+	{
+		offs_t const offset = m_channel[m_current_channel].m_address >> 1;
+
+		switch (MODE_TRANSFER_MASK)
+		{
+		case MODE_TRANSFER_VERIFY:
+		{
+			u16 const v1 = m_in_mem16r_cb(offset);
+			if (0 && m_temp != v1)
+				logerror("verify error %04x vs. %04x\n", m_temp, v1);
+		}
+		break;
+
+		case MODE_TRANSFER_WRITE:
+			m_out_mem16w_cb(offset, m_temp);
+			break;
+
+		case MODE_TRANSFER_READ:
+			m_out_io16w_cb[m_current_channel](offset, m_temp);
+			break;
+		}
+	}
+	else
+		am9517a_device::dma_write();
 }
 
 void pcxport_dmac_device::device_reset()
@@ -1234,4 +1308,18 @@ void pcxport_dmac_device::end_of_process()
 	set_dack();
 
 	m_state = STATE_SI;
+}
+
+eisa_dma_device::eisa_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: am9517a_device(mconfig, EISA_DMA, tag, owner, clock)
+{
+}
+
+void eisa_dma_device::device_start()
+{
+	am9517a_device::device_start();
+
+	m_address_mask = 0xffffffffU;
+
+	save_item(NAME(m_stop));
 }

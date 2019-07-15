@@ -841,7 +841,7 @@ void scudsp_cpu_device::execute_run()
 	{
 		m_update_mul = 0;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if ( m_delay )
 		{
@@ -993,7 +993,7 @@ void scudsp_cpu_device::device_start()
 	m_in_dma_cb.resolve_safe(0);
 	m_out_dma_cb.resolve_safe();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void scudsp_cpu_device::device_reset()
@@ -1010,13 +1010,15 @@ void scudsp_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-ADDRESS_MAP_START(scudsp_cpu_device::program_map)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void scudsp_cpu_device::program_map(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
-ADDRESS_MAP_START(scudsp_cpu_device::data_map)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void scudsp_cpu_device::data_map(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SCUDSP, tag, owner, clock)
@@ -1051,7 +1053,7 @@ void scudsp_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-util::disasm_interface *scudsp_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> scudsp_cpu_device::create_disassembler()
 {
-	return new scudsp_disassembler;
+	return std::make_unique<scudsp_disassembler>();
 }

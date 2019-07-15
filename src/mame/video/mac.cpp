@@ -59,14 +59,8 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "machine/ram.h"
 #include "render.h"
 
-PALETTE_INIT_MEMBER(mac_state,mac)
-{
-	palette.set_pen_color(0, 0xff, 0xff, 0xff);
-	palette.set_pen_color(1, 0x00, 0x00, 0x00);
-}
-
 // 4-level grayscale
-PALETTE_INIT_MEMBER(mac_state,macgsc)
+void mac_state::macgsc_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x7f, 0x7f, 0x7f);
@@ -226,7 +220,6 @@ VIDEO_RESET_MEMBER(mac_state,maceagle)
 
 VIDEO_RESET_MEMBER(mac_state,macrbv)
 {
-	rectangle visarea;
 	int htotal, vtotal;
 	double framerate;
 	int view;
@@ -242,16 +235,14 @@ VIDEO_RESET_MEMBER(mac_state,macrbv)
 
 	m_rbv_type = RBV_TYPE_RBV;
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
 	view = 0;
 
 	m_rbv_montype = m_montype.read_safe(2);
+	rectangle visarea;
 	switch (m_rbv_montype)
 	{
 		case 1: // 15" portrait display
-			visarea.max_x = 640-1;
-			visarea.max_y = 870-1;
+			visarea.set(0, 640-1, 0, 870-1);
 			htotal = 832;
 			vtotal = 918;
 			framerate = 75.0;
@@ -259,8 +250,7 @@ VIDEO_RESET_MEMBER(mac_state,macrbv)
 			break;
 
 		case 2: // 12" RGB
-			visarea.max_x = 512-1;
-			visarea.max_y = 384-1;
+			visarea.set(0, 512-1, 0, 384-1);
 			htotal = 640;
 			vtotal = 407;
 			framerate = 60.15;
@@ -268,23 +258,21 @@ VIDEO_RESET_MEMBER(mac_state,macrbv)
 
 		case 6: // 13" RGB
 		default:
-			visarea.max_x = 640-1;
-			visarea.max_y = 480-1;
+			visarea.set(0, 640-1, 0, 480-1);
 			htotal = 800;
 			vtotal = 525;
 			framerate = 59.94;
 			break;
 	}
 
-//    printf("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
-	machine().first_screen()->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+//    logerror("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.width(), visarea.height(), framerate);
+	m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
 	render_target *target = machine().render().first_target();
 	target->set_view(view);
 }
 
 VIDEO_RESET_MEMBER(mac_state,macsonora)
 {
-	rectangle visarea;
 	int htotal, vtotal;
 	double framerate;
 	int view = 0;
@@ -300,15 +288,12 @@ VIDEO_RESET_MEMBER(mac_state,macsonora)
 
 	m_rbv_type = RBV_TYPE_SONORA;
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-
 	m_rbv_montype = m_montype.read_safe(2);
+	rectangle visarea;
 	switch (m_rbv_montype)
 	{
 		case 1: // 15" portrait display
-			visarea.max_x = 640-1;
-			visarea.max_y = 870-1;
+			visarea.set(0, 640-1, 0, 870-1);
 			htotal = 832;
 			vtotal = 918;
 			framerate = 75.0;
@@ -316,8 +301,7 @@ VIDEO_RESET_MEMBER(mac_state,macsonora)
 			break;
 
 		case 2: // 12" RGB
-			visarea.max_x = 512-1;
-			visarea.max_y = 384-1;
+			visarea.set(0, 512-1, 0, 384-1);
 			htotal = 640;
 			vtotal = 407;
 			framerate = 60.15;
@@ -325,16 +309,15 @@ VIDEO_RESET_MEMBER(mac_state,macsonora)
 
 		case 6: // 13" RGB
 		default:
-			visarea.max_x = 640-1;
-			visarea.max_y = 480-1;
+			visarea.set(0, 640-1, 0, 480-1);
 			htotal = 800;
 			vtotal = 525;
 			framerate = 59.94;
 			break;
 	}
 
-//    printf("Sonora reset: monitor is %dx%d @ %f Hz\n", visarea.max_x+1, visarea.max_y+1, framerate);
-	machine().first_screen()->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+//    logerror("Sonora reset: monitor is %dx%d @ %f Hz\n", visarea.width(), visarea.height(), framerate);
+	m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
 	render_target *target = machine().render().first_target();
 	target->set_view(view);
 }

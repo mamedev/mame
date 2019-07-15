@@ -22,18 +22,6 @@
 
 #pragma once
 
-#include "dioutput.h"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DM9368_RBO_CALLBACK(_write) \
-	devcb = &dm9368_device::set_rbo_wr_callback(*device, DEVCB_##_read);
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -41,29 +29,35 @@
 
 // ======================> dm9368_device
 
-class dm9368_device :   public device_t,
-						public device_output_interface
+class dm9368_device : public device_t
 {
 public:
-	// construction/destruction
-	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	auto update_cb() { return m_update_cb.bind(); }
+	auto rbo_cb() { return m_rbo_cb.bind(); }
 
-	void a_w(uint8_t data);
+	// construction/destruction
+	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void a_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( rbi_w ) { m_rbi = state; }
 	DECLARE_READ_LINE_MEMBER( rbo_r ) { return m_rbo; }
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
+	void update();
+
 private:
-	devcb_write_line   m_write_rbo;
+	devcb_write8       m_update_cb;
+	devcb_write_line   m_rbo_cb;
 
 	int m_rbi;
 	int m_rbo;
 
-	static const uint8_t s_segment_data[16];
+	static const u8 s_segment_data[16];
 };
 
 

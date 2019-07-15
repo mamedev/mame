@@ -108,7 +108,8 @@ WRITE16_MEMBER(psx_parallel_slot_device::exp_w)
 // slot devices
 #include "gamebooster.h"
 
-SLOT_INTERFACE_START( psx_parallel_devices )
-	SLOT_INTERFACE("gamebooster", PSX_GAMEBOOSTER)
-SLOT_INTERFACE_END
+void psx_parallel_devices(device_slot_interface &device)
+{
+	device.option_add("gamebooster", PSX_GAMEBOOSTER);
+}
 

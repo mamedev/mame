@@ -23,16 +23,6 @@
 #define TRS80M2_KEYBOARD_TAG    "trs80m2kb"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(_write) \
-	devcb = &trs80m2_keyboard_device::set_clock_wr_callback(*device, DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -45,7 +35,7 @@ public:
 	// construction/destruction
 	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
+	auto clock_wr_callback() { return m_write_clock.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
@@ -66,8 +56,9 @@ private:
 		LED_1
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8021_device> m_maincpu;
 	required_ioport_array<12> m_y;
+	output_finder<2> m_leds;
 
 	devcb_write_line   m_write_clock;
 

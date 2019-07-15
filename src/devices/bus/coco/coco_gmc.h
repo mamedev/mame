@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include "cococart.h"
+
 // device type definition
-extern const device_type COCO_PAK_GMC;
+DECLARE_DEVICE_TYPE(COCO_PAK_GMC, device_cococart_interface)
 
 #endif // MAME_BUS_COCO_COCO_GMC_H

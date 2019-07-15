@@ -1,28 +1,45 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo, Takahiro Nogi
+#ifndef MAME_INCLUDES_SRMP2_H
+#define MAME_INCLUDES_SRMP2_H
+
+#pragma once
+
 #include "sound/msm5205.h"
 #include "video/seta001.h"
-
-struct iox_t
-{
-	int reset,ff_event,ff_1,protcheck[4],protlatch[4];
-	uint8_t data;
-	uint8_t mux;
-	uint8_t ff;
-};
+#include "emupal.h"
 
 class srmp2_state : public driver_device
 {
 public:
-	srmp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	struct iox_t
+	{
+		int reset,ff_event,ff_1,protcheck[4],protlatch[4];
+		uint8_t data;
+		uint8_t mux;
+		uint8_t ff;
+	};
+
+	srmp2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_adpcm_rom(*this, "adpcm"),
+		m_mainbank(*this, "mainbank")
+	{ }
 
+	void mjyuugi(machine_config &config);
+	void srmp2(machine_config &config);
+	void rmgoldyh(machine_config &config);
+	void srmp3(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<seta001_device> m_seta001;
 	required_device<msm5205_device> m_msm;
+	required_region_ptr<uint8_t> m_adpcm_rom;
+	optional_memory_bank m_mainbank;
 
 	int m_color_bank;
 	int m_gfx_bank;
@@ -62,9 +79,9 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_START(srmp2);
-	DECLARE_PALETTE_INIT(srmp2);
+	void srmp2_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(srmp3);
-	DECLARE_PALETTE_INIT(srmp3);
+	void srmp3_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(rmgoldyh);
 	DECLARE_MACHINE_START(mjyuugi);
 
@@ -74,10 +91,7 @@ public:
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
-	void mjyuugi(machine_config &config);
-	void srmp2(machine_config &config);
-	void rmgoldyh(machine_config &config);
-	void srmp3(machine_config &config);
+
 	void mjyuugi_map(address_map &map);
 	void rmgoldyh_io_map(address_map &map);
 	void rmgoldyh_map(address_map &map);
@@ -85,3 +99,5 @@ public:
 	void srmp3_io_map(address_map &map);
 	void srmp3_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SRMP2_H

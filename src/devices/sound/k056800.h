@@ -11,18 +11,6 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_K056800_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), K056800, (clock))
-
-#define MCFG_K056800_INT_HANDLER(cb) \
-		devcb = &k056800_device::set_int_handler(*device, (DEVCB_##cb));
-
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -32,8 +20,8 @@ public:
 	// construction/destruction
 	k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb) { return downcast<k056800_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto int_callback() { return m_int_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( host_r );
 	DECLARE_WRITE8_MEMBER( host_w );

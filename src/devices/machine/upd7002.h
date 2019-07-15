@@ -16,15 +16,6 @@
 #pragma once
 
 /***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-#define UPD7002_GET_ANALOGUE(name)  int name(int channel_number)
-
-#define UPD7002_EOC(name)   void name(int data)
-
-
-/***************************************************************************
     MACROS
 ***************************************************************************/
 
@@ -36,12 +27,12 @@ public:
 
 	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_get_analogue_callback(device_t &device, get_analogue_delegate &&callback) { downcast<upd7002_device &>(device).m_get_analogue_cb = std::move(callback); }
-	static void set_eoc_callback(device_t &device, eoc_delegate &&callback) { downcast<upd7002_device &>(device).m_eoc_cb = std::move(callback); }
+	template <typename... T> void set_get_analogue_callback(T &&... args) { m_get_analogue_cb = get_analogue_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_eoc_callback(T &&... args) { m_eoc_cb = eoc_delegate(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER(eoc_r);
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ_LINE_MEMBER(eoc_r);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -93,16 +84,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(UPD7002, upd7002_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_UPD7002_GET_ANALOGUE_CB(_class, _method) \
-		upd7002_device::set_get_analogue_callback(*device, upd7002_device::get_analogue_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_UPD7002_EOC_CB(_class, _method) \
-		upd7002_device::set_eoc_callback(*device, upd7002_device::eoc_delegate(&_class::_method, #_class "::" #_method, this));
 
 #endif // MAME_MACHINE_UPD7002_H

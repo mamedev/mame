@@ -170,7 +170,7 @@ void capricorn_cpu_device::device_start()
 	state_add(STATE_GENFLAGS , "GENFLAGS" , m_flags).noshow().formatstr("%9s");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_arp));
@@ -178,7 +178,7 @@ void capricorn_cpu_device::device_start()
 	save_item(NAME(m_reg_E));
 	save_item(NAME(m_flags));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void capricorn_cpu_device::device_reset()
@@ -201,7 +201,7 @@ void capricorn_cpu_device::execute_run()
 			// Handle interrupt
 			take_interrupt();
 		} else {
-			debugger_instruction_hook(this, m_genpc);
+			debugger_instruction_hook(m_genpc);
 
 			uint8_t opcode = fetch();
 			execute_one(opcode);
@@ -238,9 +238,9 @@ void capricorn_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-util::disasm_interface *capricorn_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> capricorn_cpu_device::create_disassembler()
 {
-	return new capricorn_disassembler;
+	return std::make_unique<capricorn_disassembler>();
 }
 
 void capricorn_cpu_device::start_mem_burst(ea_addr_t addr)
@@ -299,7 +299,7 @@ void capricorn_cpu_device::WM(ea_addr_t& addr , uint8_t v)
 uint8_t capricorn_cpu_device::fetch()
 {
 	m_genpc = read_u16(REG_PC | GP_REG_MASK);
-	return m_direct->read_byte(m_genpc);
+	return m_cache->read_byte(m_genpc);
 }
 
 void capricorn_cpu_device::offset_pc(uint16_t offset)

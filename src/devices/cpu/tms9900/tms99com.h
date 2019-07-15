@@ -13,11 +13,14 @@
     TI990/12   Multi-chip implementation, faster than 990/10. Huge instruction set
 
     TMS9900    Mono-chip implementation, 1976. Used in the TI-99/4(A) computer.
+               No mapper, no privileged mode.
 
     TMS9940    Microcontroller with 2kb ROM, 128b RAM, decrementer, CRU bus, 1979
 
-    TMS9980    8-bit variant of tms9900.  Two distinct chips actually : tms9980a
-               and tms9981 with an extra clock and simplified power supply
+    TMS9980    like TMS9900, but with integrated 16/8 databus multiplexer,
+               smaller address/cru space, and simplified interrupt input.
+               Two distinct chips actually: tms9980a, and tms9981 with an
+               extra clock and simplified power supply
 
     TMS9985    9940 with 8kb ROM, 256b RAM, and a 8-bit external bus, c. 1978 (never released)
 
@@ -25,8 +28,9 @@
 
     SBP68689   Improved 9989, built as an ASIC as 9989 was running scarce
 
-    TMS9995    TMS9985-like, with many improvements (but no ROM). Used in the
-               TI-99/8 prototype and the Geneve computer.
+    TMS9995    TMS9985-like, with many improvements (but no ROM). Used in
+               some arcade systems, in the TI-99/2 and TI-99/8 prototype,
+               and in the Geneve computer.
 
     TMS99000   Improved mono-chip implementation, meant to replace 990/10, 1981
     TMS99105   This chip is available in several variants which are similar
@@ -40,32 +44,6 @@
 
 #ifndef __TMS99COMMON_H__
 #define __TMS99COMMON_H__
-
-#define MCFG_TMS99xx_ADD(_tag, _device, _clock, _prgmap, _iomap )       \
-	MCFG_DEVICE_ADD(_tag, _device, _clock)      \
-	MCFG_DEVICE_PROGRAM_MAP(_prgmap)            \
-	MCFG_DEVICE_IO_MAP(_iomap)
-
-#define MCFG_TMS99xx_EXTOP_HANDLER( _extop) \
-	devcb = &tms99xx_device::static_set_extop_callback( *device, DEVCB_##_extop );
-
-#define MCFG_TMS99xx_INTLEVEL_HANDLER( _intlevel ) \
-	devcb = &tms99xx_device::static_set_intlevel_callback( *device, DEVCB_##_intlevel );
-
-#define MCFG_TMS99xx_IAQ_HANDLER( _iaq )    \
-	devcb = &tms99xx_device::static_set_iaq_callback( *device, DEVCB_##_iaq );
-
-#define MCFG_TMS99xx_CLKOUT_HANDLER( _clkout ) \
-	devcb = &tms99xx_device::static_set_clkout_callback( *device, DEVCB_##_clkout );
-
-#define MCFG_TMS99xx_WAIT_HANDLER( _wait ) \
-	devcb = &tms99xx_device::static_set_wait_callback( *device, DEVCB_##_wait );
-
-#define MCFG_TMS99xx_HOLDA_HANDLER( _holda ) \
-	devcb = &tms99xx_device::static_set_holda_callback( *device, DEVCB_##_holda );
-
-#define MCFG_TMS99xx_DBIN_HANDLER( _dbin ) \
-	devcb = &tms99xx_device::static_set_dbin_callback( *device, DEVCB_##_dbin );
 
 enum
 {
@@ -90,4 +68,16 @@ enum
 	LREX_OP = 7
 };
 
+/*
+    These values represent line states for bus control lines. In a setaddress
+    operation, the current state of the address bus lines is represented
+    by the address where these values are written to. The callee should check
+    the values to find out whether a read or write operation will follow.
+*/
+enum
+{
+	TMS99xx_BUS_WRITE = 0,
+	TMS99xx_BUS_DBIN = 1,
+	TMS99xx_BUS_IAQ = 2
+};
 #endif /* __TMS99COMMON_H__ */

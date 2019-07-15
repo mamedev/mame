@@ -36,7 +36,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint8_t cb_r() override;
 	virtual uint8_t pb_r() override;
 
 private:

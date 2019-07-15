@@ -27,7 +27,7 @@
 
 
 
-static const unsigned char ti85_colors[32*7][3] =
+static constexpr rgb_t ti85_colors[32*7] =
 {
 	{ 0xae, 0xcd, 0xb0 },   { 0xaa, 0xc9, 0xae },   { 0xa6, 0xc5, 0xad },   { 0xa3, 0xc1, 0xab },   { 0x9f, 0xbd, 0xaa },   { 0x9b, 0xb9, 0xa8 },   { 0x98, 0xb5, 0xa7 },  //0x00
 	{ 0xae, 0xcd, 0xb0 },   { 0xa9, 0xc8, 0xae },   { 0xa4, 0xc3, 0xac },   { 0xa0, 0xbe, 0xaa },   { 0x9b, 0xb9, 0xa8 },   { 0x96, 0xb4, 0xa6 },   { 0x92, 0xaf, 0xa4 },  //0x01
@@ -63,7 +63,7 @@ static const unsigned char ti85_colors[32*7][3] =
 	{ 0x57, 0x74, 0x8c },   { 0x56, 0x73, 0x8b },   { 0x55, 0x72, 0x8b },   { 0x55, 0x71, 0x8b },   { 0x54, 0x70, 0x8a },   { 0x53, 0x6f, 0x8a },   { 0x53, 0x6f, 0x8a }  //0x1f
 };
 
-static const unsigned short ti85_palette[32][7] =
+static const unsigned short ti85_pens[32][7] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 },
 	{ 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d },
@@ -99,19 +99,14 @@ static const unsigned short ti85_palette[32][7] =
 	{ 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf }
 };
 
-PALETTE_INIT_MEMBER(ti85_state, ti85)
+void ti85_state::ti85_palette(palette_device &palette)
 {
-	uint8_t i, j, r, g, b;
+	for (int i = 0; i < 224; i++)
+		palette.set_indirect_color(i, ti85_colors[i]);
 
-	for ( i = 0; i < 224; i++ )
-	{
-		r = ti85_colors[i][0]; g = ti85_colors[i][1]; b = ti85_colors[i][2];
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	for (i=0; i < 32; i++)
-		for (j=0; j < 7; j++)
-			palette.set_pen_indirect(i*7+j, ti85_palette[i][j]);
+	for (int i = 0; i < 32; i++)
+		for (int j = 0; j < 7; j++)
+			palette.set_pen_indirect(i*7+j, ti85_pens[i][j]);
 
 	if (!strncmp(machine().system().name, "ti81", 4))
 	{
@@ -136,7 +131,7 @@ PALETTE_INIT_MEMBER(ti85_state, ti85)
 	}
 	else
 	{
-		/* don't allocate memory for the others drivers */
+		// don't allocate memory for the others drivers
 		return;
 	}
 
@@ -159,7 +154,7 @@ uint32_t ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bit
 		for (y=0; y<m_ti_screen_y_size; y++)
 			for (x=0; x<m_ti_screen_x_size; x++)
 				for (b=0; b<8; b++)
-					bitmap.pix16(y, x*8+b) = ti85_palette[m_LCD_contrast&0x1f][6];
+					bitmap.pix16(y, x*8+b) = ti85_pens[m_LCD_contrast&0x1f][6];
 		return 0;
 	}
 
@@ -182,12 +177,12 @@ uint32_t ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bit
 						+ ((*(m_frames.get()+4*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
 						+ ((*(m_frames.get()+5*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01);
 
-				bitmap.pix16(y, x*8+b) = ti85_palette[m_LCD_contrast&0x1f][brightnes];
+				bitmap.pix16(y, x*8+b) = ti85_pens[m_LCD_contrast&0x1f][brightnes];
 			}
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ti85_state,ti82)
+void ti85_state::ti82_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(160, 190, 170));
 	palette.set_pen_color(1, rgb_t(83, 111, 138));

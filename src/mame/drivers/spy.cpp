@@ -64,7 +64,7 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
 	if (m_rambank & 1)
 	{
-		m_palette->write8(space,offset,data);
+		m_palette->write8(offset,data);
 	}
 	else if (m_rambank & 2)
 	{
@@ -332,7 +332,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 
 WRITE8_MEMBER(spy_state::spy_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(spy_state::sound_bank_w)
@@ -354,53 +354,55 @@ READ8_MEMBER(spy_state::k052109_051960_r)
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(spy_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
-ADDRESS_MAP_START(spy_state::spy_map)
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r, spy_bankedram1_w) AM_SHARE("ram")
-	AM_RANGE(0x0800, 0x1aff) AM_RAM
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
-	AM_RANGE(0x3fa0, 0x3fa0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x3fb0, 0x3fb0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(spy_sh_irqtrigger_w)
-	AM_RANGE(0x3fd0, 0x3fd0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3fd1, 0x3fd1) AM_READ_PORT("P1")
-	AM_RANGE(0x3fd2, 0x3fd2) AM_READ_PORT("P2")
-	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void spy_state::spy_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rw(FUNC(spy_state::spy_bankedram1_r), FUNC(spy_state::spy_bankedram1_w)).share("ram");
+	map(0x0800, 0x1aff).ram();
+	map(0x2000, 0x5fff).rw(FUNC(spy_state::k052109_051960_r), FUNC(spy_state::k052109_051960_w));
+	map(0x3f80, 0x3f80).w(FUNC(spy_state::bankswitch_w));
+	map(0x3f90, 0x3f90).w(FUNC(spy_state::spy_3f90_w));
+	map(0x3fa0, 0x3fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3fb0, 0x3fb0).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x3fc0, 0x3fc0).w(FUNC(spy_state::spy_sh_irqtrigger_w));
+	map(0x3fd0, 0x3fd0).portr("SYSTEM");
+	map(0x3fd1, 0x3fd1).portr("P1");
+	map(0x3fd2, 0x3fd2).portr("P2");
+	map(0x3fd3, 0x3fd3).portr("DSW1");
+	map(0x3fe0, 0x3fe0).portr("DSW2");
+	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(spy_state::spy_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void spy_state::spy_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(FUNC(spy_state::sound_bank_w));
+	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( spy )
@@ -439,7 +441,7 @@ static INPUT_PORTS_START( spy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )        /* PMCFIRQ signal from the PMC */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )        /* PMCFIRQ signal from the PMC */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -492,59 +494,58 @@ void spy_state::machine_reset()
 	m_old_3f90 = -1;
 }
 
-MACHINE_CONFIG_START(spy_state::spy)
-
+void spy_state::spy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(24'000'000) / 8) // 3 MHz? (divided by 051961)
-	MCFG_CPU_PROGRAM_MAP(spy_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spy_state,  spy_interrupt)
+	MC6809E(config, m_maincpu, XTAL(24'000'000) / 8); // 3 MHz? (divided by 051961)
+	m_maincpu->set_addrmap(AS_PROGRAM, &spy_state::spy_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spy_state::spy_interrupt));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(spy_sound_map) /* nmi by the sound chip */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spy_state::spy_sound_map); /* nmi by the sound chip */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(spy_state, screen_update_spy)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(spy_state::screen_update_spy));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(spy_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(spy_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(spy_state, sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(spy_state::sprite_callback), this);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(spy_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	K007232(config, m_k007232_1, 3579545);
+	m_k007232_1->port_write().set(FUNC(spy_state::volume_callback0));
+	m_k007232_1->add_route(0, "mono", 0.20);
+	m_k007232_1->add_route(1, "mono", 0.20);
 
-	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(spy_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, 3579545);
+	m_k007232_2->port_write().set(FUNC(spy_state::volume_callback1));
+	m_k007232_2->add_route(0, "mono", 0.20);
+	m_k007232_2->add_route(1, "mono", 0.20);
+}
 
 
 /***************************************************************************
@@ -608,5 +609,5 @@ ROM_START( spyu )
 ROM_END
 
 
-GAME( 1989, spy,  0,   spy, spy, spy_state, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spyu, spy, spy, spy, spy_state, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spy,  0,   spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spyu, spy, spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )

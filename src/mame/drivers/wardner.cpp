@@ -18,7 +18,7 @@ Supported games:
 Notes:
         Basically the same video and machine hardware as Flying Shark,
           except for the Main CPU which is a Z80 here.
-        See twincobr.c machine and video drivers to complete the
+        See twincobr.cpp machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
         Press 0 (actually P1 button 3) on startup to skip some video RAM tests
@@ -142,27 +142,31 @@ class wardner_state : public twincobr_state
 {
 public:
 	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
-		: twincobr_state(mconfig, type, tag),
-		m_membank(*this, "membank")
+		: twincobr_state(mconfig, type, tag)
+		, m_membank(*this, "membank")
 	{
 	}
 
+	void wardner(machine_config &config);
+
+	void init_wardner();
+
+protected:
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	DECLARE_DRIVER_INIT(wardner);
 
-	void wardner(machine_config &config);
-	void DSP_io_map(address_map &map);
-	void DSP_program_map(address_map &map);
+	void dsp_io_map(address_map &map);
+	void dsp_program_map(address_map &map);
 	void main_bank_map(address_map &map);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
-protected:
-	virtual void driver_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -173,77 +177,84 @@ WRITE8_MEMBER(wardner_state::wardner_bank_w)
 	m_membank->set_bank(data & 7);
 }
 
-ADDRESS_MAP_START(wardner_state::main_program_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w)                     // AM_SHARE("spriteram8")
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write8)  // AM_SHARE("palette")
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITEONLY AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0xffff) AM_DEVREAD("membank", address_map_bank_device, read8)
-ADDRESS_MAP_END
+void wardner_state::main_program_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0x8fff).w(FUNC(wardner_state::wardner_sprite_w));                     // .share("spriteram8")
+	map(0xa000, 0xafff).w(m_palette, FUNC(palette_device::write8));  // .share("palette")
+	map(0xc000, 0xc7ff).writeonly().share("sharedram");
+	map(0x8000, 0xffff).r(m_membank, FUNC(address_map_bank_device::read8));
+}
 
 // Overlapped RAM/Banked ROM
-// Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
-ADDRESS_MAP_START(wardner_state::main_bank_map)
-	AM_RANGE(0x00000, 0x00fff) AM_READ(wardner_sprite_r) AM_SHARE("spriteram8")
-	AM_RANGE(0x01000, 0x01fff) AM_ROM AM_REGION("maincpu", 0x1000)
-	AM_RANGE(0x02000, 0x02fff) AM_READONLY AM_SHARE("palette")
-	AM_RANGE(0x03000, 0x03fff) AM_ROM AM_REGION("maincpu", 0x3000)
-	AM_RANGE(0x04000, 0x047ff) AM_READONLY AM_SHARE("sharedram")
-	AM_RANGE(0x04800, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x4800)
-ADDRESS_MAP_END
+// Can't use map(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
+void wardner_state::main_bank_map(address_map &map)
+{
+	map(0x00000, 0x00fff).r(FUNC(wardner_state::wardner_sprite_r)).share("spriteram8");
+	map(0x01000, 0x01fff).rom().region("maincpu", 0x1000);
+	map(0x02000, 0x02fff).readonly().share("palette");
+	map(0x03000, 0x03fff).rom().region("maincpu", 0x3000);
+	map(0x04000, 0x047ff).readonly().share("sharedram");
+	map(0x04800, 0x3ffff).rom().region("maincpu", 0x4800);
+}
 
-ADDRESS_MAP_START(wardner_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x10, 0x13) AM_WRITE(wardner_txscroll_w)       /* scroll text layer */
-	AM_RANGE(0x14, 0x15) AM_WRITE(wardner_txlayer_w)        /* offset in text video RAM */
-	AM_RANGE(0x20, 0x23) AM_WRITE(wardner_bgscroll_w)       /* scroll bg layer */
-	AM_RANGE(0x24, 0x25) AM_WRITE(wardner_bglayer_w)        /* offset in bg video RAM */
-	AM_RANGE(0x30, 0x33) AM_WRITE(wardner_fgscroll_w)       /* scroll fg layer */
-	AM_RANGE(0x34, 0x35) AM_WRITE(wardner_fglayer_w)        /* offset in fg video RAM */
-	AM_RANGE(0x40, 0x43) AM_WRITE(wardner_exscroll_w)       /* scroll extra layer (not used) */
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWA")
-	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSWB")
-	AM_RANGE(0x54, 0x54) AM_READ_PORT("P1")
-	AM_RANGE(0x56, 0x56) AM_READ_PORT("P2")
-	AM_RANGE(0x58, 0x58) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x5a, 0x5a) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)
-	AM_RANGE(0x5c, 0x5c) AM_DEVWRITE("mainlatch", ls259_device, write_nibble_d0)
-	AM_RANGE(0x60, 0x65) AM_READWRITE(wardner_videoram_r, wardner_videoram_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(wardner_bank_w)
-ADDRESS_MAP_END
+void wardner_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x02, 0x02).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x10, 0x13).w(FUNC(wardner_state::wardner_txscroll_w));       /* scroll text layer */
+	map(0x14, 0x15).w(FUNC(wardner_state::wardner_txlayer_w));        /* offset in text video RAM */
+	map(0x20, 0x23).w(FUNC(wardner_state::wardner_bgscroll_w));       /* scroll bg layer */
+	map(0x24, 0x25).w(FUNC(wardner_state::wardner_bglayer_w));        /* offset in bg video RAM */
+	map(0x30, 0x33).w(FUNC(wardner_state::wardner_fgscroll_w));       /* scroll fg layer */
+	map(0x34, 0x35).w(FUNC(wardner_state::wardner_fglayer_w));        /* offset in fg video RAM */
+	map(0x40, 0x43).w(FUNC(wardner_state::wardner_exscroll_w));       /* scroll extra layer (not used) */
+	map(0x50, 0x50).portr("DSWA");
+	map(0x52, 0x52).portr("DSWB");
+	map(0x54, 0x54).portr("P1");
+	map(0x56, 0x56).portr("P2");
+	map(0x58, 0x58).portr("SYSTEM");
+	map(0x5a, 0x5a).w("coinlatch", FUNC(ls259_device::write_nibble_d0));
+	map(0x5c, 0x5c).w("mainlatch", FUNC(ls259_device::write_nibble_d0));
+	map(0x60, 0x65).rw(FUNC(wardner_state::wardner_videoram_r), FUNC(wardner_state::wardner_videoram_w));
+	map(0x70, 0x70).w(FUNC(wardner_state::wardner_bank_w));
+}
 
 
 /***************************** Z80 Sound Memory Map *************************/
 
-ADDRESS_MAP_START(wardner_state::sound_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x807f) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM
-ADDRESS_MAP_END
+void wardner_state::sound_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x807f).ram();
+	map(0xc000, 0xc7ff).ram().share("sharedram");
+	map(0xc800, 0xcfff).ram();
+}
 
-ADDRESS_MAP_START(wardner_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-ADDRESS_MAP_END
+void wardner_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+}
 
 
 /***************************** TMS32010 Memory Map **************************/
 
-ADDRESS_MAP_START(wardner_state::DSP_program_map)
-	AM_RANGE(0x000, 0x5ff) AM_ROM
-ADDRESS_MAP_END
+void wardner_state::dsp_program_map(address_map &map)
+{
+	map(0x000, 0x5ff).rom();
+}
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-ADDRESS_MAP_START(wardner_state::DSP_io_map)
-	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_dsp_addrsel_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(twincobr_dsp_bio_w)
-ADDRESS_MAP_END
+void wardner_state::dsp_io_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(wardner_state::wardner_dsp_addrsel_w));
+	map(0x01, 0x01).rw(FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
+	map(0x03, 0x03).w(FUNC(wardner_state::twincobr_dsp_bio_w));
+}
 
 
 /*****************************************************************************
@@ -327,28 +338,28 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
-	3,      /* 3 bits per pixel */
-	{ 0*2048*8*8, 1*2048*8*8, 2*2048*8*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
+	8,8,             /* 8*8 characters */
+	RGN_FRAC(1,3),   /* 2048 characters */
+	3,               /* 3 bits per pixel */
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) }, /* the bitplanes are separated */
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8              /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
-	8,8,    /* 8*8 tiles */
-	4096,   /* 4096 tiles */
-	4,      /* 4 bits per pixel */
-	{ 0*4096*8*8, 1*4096*8*8, 2*4096*8*8, 3*4096*8*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every tile takes 8 consecutive bytes */
+	8,8,             /* 8*8 tiles */
+	RGN_FRAC(1,4),   /* 4096 tiles */
+	4,               /* 4 bits per pixel */
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* the bitplanes are separated */
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8              /* every tile takes 8 consecutive bytes */
 };
 
 
-static GFXDECODE_START( wardner )
+static GFXDECODE_START( gfx_wardner )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   1536, 32 )  /* colors 1536-1791 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   1280, 16 )  /* colors 1280-1535 */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,   1024, 16 )  /* colors 1024-1079 */
@@ -357,87 +368,81 @@ GFXDECODE_END
 
 void wardner_state::driver_start()
 {
-	/* Save-State stuff in src/machine/twincobr.c */
-	twincobr_driver_savestate();
+	/* Save-State stuff in src/machine/twincobr.cpp */
+	driver_savestate();
 }
 
 void wardner_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(twincobr);
+	twincobr_state::machine_reset();
 
 	m_membank->set_bank(0);
 }
 
-MACHINE_CONFIG_START(wardner_state::wardner)
-
+void wardner_state::wardner(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)      /* 6MHz */
-	MCFG_CPU_PROGRAM_MAP(main_program_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wardner_state,  wardner_interrupt)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4);   /* 6MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wardner_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &wardner_state::main_io_map);
 
-	MCFG_DEVICE_ADD("membank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(main_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "membank").set_map(&wardner_state::main_bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x8000);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'000'000)/4)     /* 3.5MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_program_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'000'000) / 4));    /* 3.5MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
+	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(14'000'000))       /* 14MHz Crystal CLKin */
-	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
+	TMS32010(config, m_dsp, XTAL(14'000'000));       /* 14MHz Crystal CLKin */
+	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_CPU_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(wardner_state, twincobr_BIO_r))
+	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
+	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wardner_state, int_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(wardner_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(wardner_state, bg_ram_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wardner_state, fg_rom_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wardner_state, display_on_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));
+	mainlatch.q_out_cb<3>().set(FUNC(wardner_state::flipscreen_w));
+	mainlatch.q_out_cb<4>().set(FUNC(wardner_state::bg_ram_bank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(wardner_state::fg_rom_bank_w));
+	mainlatch.q_out_cb<6>().set(FUNC(wardner_state::display_on_w));
 
-	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wardner_state, dsp_int_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(wardner_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wardner_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wardner_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(wardner_state, coin_lockout_2_w))
+	ls259_device &coinlatch(LS259(config, "coinlatch"));
+	coinlatch.q_out_cb<0>().set(FUNC(wardner_state::dsp_int_w));
+	coinlatch.q_out_cb<4>().set(FUNC(wardner_state::coin_counter_1_w));
+	coinlatch.q_out_cb<5>().set(FUNC(wardner_state::coin_counter_2_w));
+	coinlatch.q_out_cb<6>().set(FUNC(wardner_state::coin_lockout_1_w));
+	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(14'000'000)/4) /* 3.5MHz measured on CLKin */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(2)
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(32, 14);
 
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram8")
+	BUFFERED_SPRITERAM8(config, m_spriteram8);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000)/2, 446, 0, 320, 286, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram8", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(14_MHz_XTAL/2, 446, 0, 320, 286, 0, 240);
+	m_screen->set_screen_update(FUNC(wardner_state::screen_update));
+	m_screen->screen_vblank().set(m_spriteram8, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wardner)
-	MCFG_PALETTE_ADD("palette", 1792)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wardner);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 4096);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'000'000)/4)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'000'000) / 4));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -601,6 +606,6 @@ ROM_START( wardnerj )
 ROM_END
 
 
-GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, 0, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, 0, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, 0, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )

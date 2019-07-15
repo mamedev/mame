@@ -31,12 +31,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(port_fe_r) override;
+	virtual uint8_t iorq_r(offs_t offset) override;
 
 private:
 	required_ioport m_exp_line3;

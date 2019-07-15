@@ -13,34 +13,6 @@
 
 #include "debugger.h"
 
-
-// read-only on 70x0
-#define MCFG_TMS7000_IN_PORTA_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 0, DEVCB_##_devcb);
-#define MCFG_TMS7000_OUT_PORTA_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 0, DEVCB_##_devcb);
-
-// write-only
-#define MCFG_TMS7000_OUT_PORTB_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 1, DEVCB_##_devcb);
-
-#define MCFG_TMS7000_IN_PORTC_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 2, DEVCB_##_devcb);
-#define MCFG_TMS7000_OUT_PORTC_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 2, DEVCB_##_devcb);
-
-#define MCFG_TMS7000_IN_PORTD_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 3, DEVCB_##_devcb);
-#define MCFG_TMS7000_OUT_PORTD_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 3, DEVCB_##_devcb);
-
-// TMS70C46 only
-#define MCFG_TMS7000_IN_PORTE_CB(_devcb) \
-	devcb = &tms7000_device::set_port_read_cb(*device, 4, DEVCB_##_devcb);
-#define MCFG_TMS7000_OUT_PORTE_CB(_devcb) \
-	devcb = &tms7000_device::set_port_write_cb(*device, 4, DEVCB_##_devcb);
-
-
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST };
 
 enum
@@ -57,13 +29,23 @@ public:
 	// construction/destruction
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	template<class Object>
-	static devcb_base &set_port_read_cb(device_t &device, int p, Object &&object) { return downcast<tms7000_device &>(device).m_port_in_cb[p].set_callback(std::move(object)); }
-	template<class Object>
-	static devcb_base &set_port_write_cb(device_t &device, int p, Object &&object) { return downcast<tms7000_device &>(device).m_port_out_cb[p].set_callback(std::move(object)); }
+	// read-only on 70x0
+	auto in_porta() { return m_port_in_cb[0].bind(); }
+	auto out_porta() { return m_port_out_cb[0].bind(); }
 
-	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!machine().side_effect_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
+	// write-only
+	auto out_portb() { return m_port_out_cb[1].bind(); }
+
+	auto in_portc() { return m_port_in_cb[2].bind(); }
+	auto out_portc() { return m_port_out_cb[2].bind(); }
+	auto in_portd() { return m_port_in_cb[3].bind(); }
+	auto out_portd() { return m_port_out_cb[3].bind(); }
+
+	// TMS70C46 only
+	auto in_porte() { return m_port_in_cb[4].bind(); }
+	auto out_porte() { return m_port_out_cb[4].bind(); }
+
+	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
 	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
 
 	DECLARE_READ8_MEMBER(tms7000_pf_r);
@@ -113,7 +95,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	uint32_t chip_get_family() const { return m_info_flags & CHIP_FAMILY_MASK; }
 
@@ -127,7 +109,7 @@ protected:
 	uint32_t m_info_flags;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 
 	bool m_irq_state[2];
@@ -174,8 +156,8 @@ protected:
 	inline uint16_t read_mem16(uint16_t address) { return m_program->read_byte(address) << 8 | m_program->read_byte((address + 1) & 0xffff); }
 	inline void write_mem16(uint16_t address, uint16_t data) { m_program->write_byte(address, data >> 8 & 0xff); m_program->write_byte((address + 1) & 0xffff, data & 0xff); }
 
-	inline uint8_t imm8() { return m_direct->read_byte(m_pc++); }
-	inline uint16_t imm16() { uint16_t ret = m_direct->read_byte(m_pc++) << 8; return ret | m_direct->read_byte(m_pc++); }
+	inline uint8_t imm8() { return m_cache->read_byte(m_pc++); }
+	inline uint16_t imm16() { uint16_t ret = m_cache->read_byte(m_pc++) << 8; return ret | m_cache->read_byte(m_pc++); }
 
 	inline uint8_t pull8() { return m_program->read_byte(m_sp--); }
 	inline void push8(uint8_t data) { m_program->write_byte(++m_sp, data); }
@@ -349,7 +331,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dockbus_data_w);
 
 	// access I/O port E if databus is disabled
-	DECLARE_READ8_MEMBER(e_bus_data_r) { return machine().side_effect_disabled() ? 0xff : ((m_control & 0x20) ? 0xff : m_port_in_cb[4]()); }
+	DECLARE_READ8_MEMBER(e_bus_data_r) { return machine().side_effects_disabled() ? 0xff : ((m_control & 0x20) ? 0xff : m_port_in_cb[4]()); }
 	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (~m_control & 0x20) m_port_out_cb[4](data); }
 
 	void tms70c46_mem(address_map &map);

@@ -28,50 +28,8 @@
 
 #pragma once
 
+#include "diserial.h"
 
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_MC2661_RXC(_clock) \
-	mc2661_device::static_set_rxc(*device, _clock);
-
-#define MCFG_MC2661_TXC(_clock) \
-	mc2661_device::static_set_txc(*device, _clock);
-
-#define MCFG_MC2661_TXD_HANDLER(_write) \
-	devcb = &mc2661_device::set_txd_callback(*device, DEVCB_##_write);
-
-#define MCFG_MC2661_RXRDY_HANDLER(_write) \
-	devcb = &mc2661_device::set_rxrdy_callback(*device, DEVCB_##_write);
-
-#define MCFG_MC2661_TXRDY_HANDLER(_write) \
-	devcb = &mc2661_device::set_txrdy_callback(*device, DEVCB_##_write);
-
-#define MCFG_MC2661_RTS_HANDLER(_write) \
-	devcb = &mc2661_device::set_rts_callback(*device, DEVCB_##_write);
-
-#define MCFG_MC2661_DTR_HANDLER(_write) \
-	devcb = &mc2661_device::set_dtr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MC2661_TXEMT_DSCHG_HANDLER(_write) \
-	devcb = &mc2661_device::set_txemt_dschg_callback(*device, DEVCB_##_write);
-
-#define MCFG_MC2661_BKDET_HANDLER(_write) \
-	devcb = &mc2661_device::set_bkdet_callback(*device, DEVCB_##_write);
-
-#define MCFG_MC2661_XSYNC_HANDLER(_write) \
-	devcb = &mc2661_device::set_xsync_callback(*device, DEVCB_##_write);
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-// ======================> mc2661_device
 
 class mc2661_device :  public device_t,
 						public device_serial_interface
@@ -80,20 +38,20 @@ public:
 	// construction/destruction
 	mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_rxc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_rxc = clock; }
-	static void static_set_txc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_txc = clock; }
+	void set_rxc(int clock) { m_rxc = clock; }
+	void set_txc(int clock) { m_txc = clock; }
 
-	template <class Object> static devcb_base &set_txd_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_txd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rxrdy_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_rxrdy.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_txrdy_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_txrdy.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rts_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_rts.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dtr_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_dtr.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_txemt_dschg_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_txemt_dschg.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_bkdet_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_bkdet.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xsync_callback(device_t &device, Object &&cb) { return downcast<mc2661_device &>(device).m_write_xsync.set_callback(std::forward<Object>(cb)); }
+	auto txd_handler() { return m_write_txd.bind(); }
+	auto rxrdy_handler() { return m_write_rxrdy.bind(); }
+	auto txrdy_handler() { return m_write_txrdy.bind(); }
+	auto rts_handler() { return m_write_rts.bind(); }
+	auto dtr_handler() { return m_write_dtr.bind(); }
+	auto txemt_dschg_handler() { return m_write_txemt_dschg.bind(); }
+	auto bkdet_handler() { return m_write_bkdet.bind(); }
+	auto xsync_handler() { return m_write_xsync.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
@@ -138,8 +96,6 @@ private:
 	int m_sync_index;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(MC2661, mc2661_device)
 
 #endif // MAME_MACHINE_MC2661_H

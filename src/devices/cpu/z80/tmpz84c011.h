@@ -23,50 +23,6 @@
 // For daisy chain configuration, insert this:
 #define TMPZ84C011_DAISY_INTERNAL { "tmpz84c011_ctc" }
 
-// CTC callbacks
-#define MCFG_TMPZ84C011_ZC0_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_zc0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_ZC1_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_zc1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_ZC2_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_zc2_callback(*device, DEVCB_##_devcb);
-
-
-// I/O callbacks
-#define MCFG_TMPZ84C011_PORTA_READ_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_inportsa_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTB_READ_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_inportsb_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTC_READ_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_inportsc_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTD_READ_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_inportsd_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTE_READ_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_inportse_cb(*device, DEVCB_##_devcb);
-
-
-#define MCFG_TMPZ84C011_PORTA_WRITE_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_outportsa_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTB_WRITE_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_outportsb_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTC_WRITE_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_outportsc_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTD_WRITE_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_outportsd_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C011_PORTE_WRITE_CB(_devcb) \
-	devcb = &tmpz84c011_device::set_outportse_cb(*device, DEVCB_##_devcb);
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -76,22 +32,22 @@ class tmpz84c011_device : public z80_device
 public:
 	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc1_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc2_cb.set_callback(object); }
+	// configuration helpers
+	auto zc0_callback() { return m_zc0_cb.bind(); }
+	auto zc1_callback() { return m_zc1_cb.bind(); }
+	auto zc2_callback() { return m_zc2_cb.bind(); }
 
-	template<class _Object> static devcb_base & set_outportsa_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsa.set_callback(object); }
-	template<class _Object> static devcb_base & set_outportsb_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsb.set_callback(object); }
-	template<class _Object> static devcb_base & set_outportsc_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsc.set_callback(object); }
-	template<class _Object> static devcb_base & set_outportsd_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportsd.set_callback(object); }
-	template<class _Object> static devcb_base & set_outportse_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_outportse.set_callback(object); }
+	auto out_pa_callback() { return m_outportsa.bind(); }
+	auto out_pb_callback() { return m_outportsb.bind(); }
+	auto out_pc_callback() { return m_outportsc.bind(); }
+	auto out_pd_callback() { return m_outportsd.bind(); }
+	auto out_pe_callback() { return m_outportse.bind(); }
 
-	template<class _Object> static devcb_base & set_inportsa_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportsa.set_callback(object); }
-	template<class _Object> static devcb_base & set_inportsb_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportsb.set_callback(object); }
-	template<class _Object> static devcb_base & set_inportsc_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportsc.set_callback(object); }
-	template<class _Object> static devcb_base & set_inportsd_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportsd.set_callback(object); }
-	template<class _Object> static devcb_base & set_inportse_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportse.set_callback(object); }
+	auto in_pa_callback() { return m_inportsa.bind(); }
+	auto in_pb_callback() { return m_inportsb.bind(); }
+	auto in_pc_callback() { return m_inportsc.bind(); }
+	auto in_pd_callback() { return m_inportsd.bind(); }
+	auto in_pe_callback() { return m_inportse.bind(); }
 
 	// CTC public interface
 	DECLARE_WRITE_LINE_MEMBER( trg0 ) { m_ctc->trg0(state); }

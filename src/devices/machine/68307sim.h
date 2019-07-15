@@ -43,6 +43,9 @@ public:
 	void write_picr(m68307_cpu_device* m68k, uint16_t data, uint16_t mem_mask);
 	void write_pivr(m68307_cpu_device* m68k, uint16_t data, uint16_t mem_mask);
 
+	uint8_t get_ipl(const m68307_cpu_device *m68k) const;
+	uint8_t get_int_type(const m68307_cpu_device* m68k, uint8_t pri) const;
+
 	void reset();
 };
 

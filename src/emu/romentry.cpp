@@ -8,7 +8,9 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "romentry.h"
+
 #include "strformat.h"
 
 

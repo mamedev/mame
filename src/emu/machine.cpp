@@ -82,6 +82,7 @@
 #include "dirtc.h"
 #include "image.h"
 #include "network.h"
+#include "romload.h"
 #include "ui/uimain.h"
 #include <time.h>
 #include <rapidjson/writer.h>
@@ -107,8 +108,7 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: primary_screen(nullptr),
-		m_side_effect_disabled(0),
+	: m_side_effects_disabled(0),
 		debug_flags(0),
 		m_config(_config),
 		m_system(_config.gamedrv()),
@@ -142,9 +142,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	device_iterator iter(root_device());
 	for (device_t &device : iter)
 		device.set_machine(*this);
-
-	// find devices
-	primary_screen = screen_device_iterator(root_device()).first();
 
 	// fetch core options
 	if (options().debug())
@@ -915,7 +912,7 @@ void running_machine::handle_saveload()
 			u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
-			emu_file file(m_saveload_searchpath, openflags);
+			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (filerr == osd_file::error::NONE)
 			{
@@ -1322,16 +1319,17 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-ADDRESS_MAP_START(dummy_space_device::dummy)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void dummy_space_device::dummy(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(dummy_space_device::read), FUNC(dummy_space_device::write));
+}
 
 DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space")
 
 dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(), address_map_constructor(FUNC(dummy_space_device::dummy), this))
+	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(FUNC(dummy_space_device::dummy), this))
 {
 }
 

@@ -16,7 +16,7 @@
 		<info name="author" value="Gerard van den Brandhof" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="ace20.rom" size="4096" crc="55fa7172" sha1="93b080d3e00b8837f72b12852dabe3194249b08a" offset="0"/>
+				<rom name="ace20.rom" size="4096" crc="55fa7172" sha1="93b080d3e00b8837f72b12852dabe3194249b08a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,7 +28,7 @@
 		<info name="author" value="Gerard van den Brandhof" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="ace22.rom" size="4096" crc="f435ffd4" sha1="0ded6633b455f11d1df119224ab19b4f01323f87" offset="0"/>
+				<rom name="ace22.rom" size="4096" crc="f435ffd4" sha1="0ded6633b455f11d1df119224ab19b4f01323f87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@
 		<info name="author" value="Gerard van den Brandhof" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="ace30.rom" size="4096" crc="c054fd62" sha1="a49bb8ef3db877e5bf9ae214dcbc5fa7eb06aead" offset="0"/>
+				<rom name="ace30.rom" size="4096" crc="c054fd62" sha1="a49bb8ef3db877e5bf9ae214dcbc5fa7eb06aead"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48,12 +48,12 @@
 	<software name="aekmon">
 		<description>AEK Monitor ROM</description>
 		<year>1982</year>
-		<publisher>&lt;homebrew&gt;</publisher>
+		<publisher>Alan Knowles</publisher>
 		<info name="usage" value="Type LINK #A7C7" />
 		<info name="author" value="Alan Knowles" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="aek_monitor.rom" size="4096" crc="097d4e13" sha1="0dcdb884d5f38ff7c0c32810a397c18469edc348" offset="0"/>
+				<rom name="aek_monitor.rom" size="4096" crc="097d4e13" sha1="0dcdb884d5f38ff7c0c32810a397c18469edc348"/>
 			</dataarea>
 		</part>
 	</software>
@@ -61,12 +61,12 @@
 	<software name="aekscrn">
 		<description>AEK Screen ROM</description>
 		<year>1983</year>
-		<publisher>&lt;homebrew&gt;</publisher>
+		<publisher>Alan Knowles</publisher>
 		<info name="usage" value="Type LINK #AFF0" />
 		<info name="author" value="Alan Knowles" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="aek_screen.rom" size="4096" crc="1be4706a" sha1="d43104f2f28f5a79a54aca7c41dbc8047d6d2120" offset="0"/>
+				<rom name="aek_screen.rom" size="4096" crc="1be4706a" sha1="d43104f2f28f5a79a54aca7c41dbc8047d6d2120"/>
 			</dataarea>
 		</part>
 	</software>
@@ -77,7 +77,7 @@
 		<publisher>A&amp;F Software</publisher>
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="utilikit.rom" size="4096" crc="013b8f93" sha1="b4341f116a6d1e0cbcd39d64e0b5d14a90dc0356" offset="0" />
+				<rom name="utilikit.rom" size="4096" crc="013b8f93" sha1="b4341f116a6d1e0cbcd39d64e0b5d14a90dc0356" />
 			</dataarea>
 		</part>
 	</software>
@@ -88,7 +88,7 @@
 		<publisher>Acornsoft</publisher>
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="atomcalc.rom" size="4096" crc="3a7409cd" sha1="102e43a446e9ad5459916d432551044f419da0c3" offset="0" />
+				<rom name="atomcalc.rom" size="4096" crc="3a7409cd" sha1="102e43a446e9ad5459916d432551044f419da0c3" />
 			</dataarea>
 		</part>
 	</software>
@@ -97,10 +97,10 @@
 		<description>Atom Demo</description>
 		<year>1980</year>
 		<publisher>Acornsoft</publisher>
-		<info name="usage" value="Type RUN" />
+		<info name="usage" value="Type ?18=#A0&lt;CR&gt;OLD&lt;CR&gt;RUN" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="atomdemo.rom" size="4096" crc="cdf4810f" sha1="36054b1a85341b2131d7c43231a6349a5c984116" offset="0"/>
+				<rom name="atomdemo.rom" size="4096" crc="cdf4810f" sha1="36054b1a85341b2131d7c43231a6349a5c984116"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@
 		<info name="author" value="Kees van Oss" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="atomicw.rom" size="4096" crc="a3fd737d" sha1="d418d9322c69c49106ed2c268ad0864c0f2c4c1b" offset="0" />
+				<rom name="atomicw.rom" size="4096" crc="a3fd737d" sha1="d418d9322c69c49106ed2c268ad0864c0f2c4c1b" />
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@
 		<info name="author" value="Kees van Oss" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="atomicw11.rom" size="4096" crc="c3ad78cc" sha1="5177929bd26bd455f7bfade3a245e8f5221c751e" offset="0" />
+				<rom name="atomicw11.rom" size="4096" crc="c3ad78cc" sha1="5177929bd26bd455f7bfade3a245e8f5221c751e" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@
 		<info name="author" value="Kees van Oss" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="atomicw12.rom" size="4096" crc="0801b4f1" sha1="40c2f0418bd9b38b17a913d23e5ed574f991cdeb" offset="0"/>
+				<rom name="atomicw12.rom" size="4096" crc="0801b4f1" sha1="40c2f0418bd9b38b17a913d23e5ed574f991cdeb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -147,7 +147,7 @@
 		<publisher>ECD Computer Workshop</publisher>
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="axr1.rom" size="4096" crc="868fda8b" sha1="f8417787c28818a7646b9b59d706ef890255049f" offset="0" />
+				<rom name="axr1.rom" size="4096" crc="868fda8b" sha1="f8417787c28818a7646b9b59d706ef890255049f" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,7 +159,7 @@
 		<info name="author" value="Bram Poot" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="combox.rom" size="4096" crc="9c8210ab" sha1="ea293f49a98721cdbdf985d6f2fe636290ef0e75" offset="0" />
+				<rom name="combox.rom" size="4096" crc="9c8210ab" sha1="ea293f49a98721cdbdf985d6f2fe636290ef0e75" />
 			</dataarea>
 		</part>
 	</software>
@@ -170,7 +170,7 @@
 		<publisher>Procyon</publisher>
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="disatom.rom" size="4096" crc="f0a28f40" sha1="c48f3c43dea6a71cdfba7d8beac617af5fabbbab" offset="0"/>
+				<rom name="disatom.rom" size="4096" crc="f0a28f40" sha1="c48f3c43dea6a71cdfba7d8beac617af5fabbbab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -182,7 +182,7 @@
 		<info name="author" value="Frans le Blanc" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="diskrom.rom" size="4096" crc="797ae59d" sha1="93dd8731e4daec31aeb150b279e2da1493a0dbd1" offset="0"/>
+				<rom name="diskrom.rom" size="4096" crc="797ae59d" sha1="93dd8731e4daec31aeb150b279e2da1493a0dbd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -193,7 +193,7 @@
 		<publisher>Acorn</publisher>
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="econet.rom" size="4096" crc="f4e0fc4a" sha1="a3aaaa0f41557c94f668cf1aa019659116a38cfd" offset="0"/>
+				<rom name="econet.rom" size="4096" crc="f4e0fc4a" sha1="a3aaaa0f41557c94f668cf1aa019659116a38cfd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -205,7 +205,7 @@
 		<info name="author" value="Gerrit Hillebrand" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="gags21.rom" size="4096" crc="eb4a72c2" sha1="059261bbee866c8f2ea19e04ebe84dfc55945bff" offset="0" />
+				<rom name="gags21.rom" size="4096" crc="eb4a72c2" sha1="059261bbee866c8f2ea19e04ebe84dfc55945bff" />
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +217,7 @@
 		<info name="author" value="Gerrit Hillebrand" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="gags22.rom" size="4096" crc="cfa943f5" sha1="a750735839b78837e27bb0256890c1759a9278c8" offset="0" />
+				<rom name="gags22.rom" size="4096" crc="cfa943f5" sha1="a750735839b78837e27bb0256890c1759a9278c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -229,7 +229,7 @@
 		<info name="author" value="Gerrit Hillebrand" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="gags23.rom" size="4096" crc="35e1d713" sha1="94cc2887ad9fea1849d1d53c64d0668e77696ef4" offset="0" />
+				<rom name="gags23.rom" size="4096" crc="35e1d713" sha1="94cc2887ad9fea1849d1d53c64d0668e77696ef4" />
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@
 		<info name="author" value="Gerrit Hillebrand" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="gags24.rom" size="4096" crc="578dc6c7" sha1="de8fb4f6a67b18e5b73afb11738c348b1517f6e6" offset="0"/>
+				<rom name="gags24.rom" size="4096" crc="578dc6c7" sha1="de8fb4f6a67b18e5b73afb11738c348b1517f6e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -253,7 +253,7 @@
 		<info name="author" value="Jos Horsmeijer" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="josbox.rom" size="4096" crc="ee8df1cd" sha1="5654332f668b52c0021dd277ddfc2400d0140182" offset="0"/>
+				<rom name="josbox.rom" size="4096" crc="ee8df1cd" sha1="5654332f668b52c0021dd277ddfc2400d0140182"/>
 			</dataarea>
 		</part>
 	</software>
@@ -265,7 +265,7 @@
 		<info name="author" value="Frans van Hoesel" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pcharme.rom" size="4096" crc="9e8bd79f" sha1="66c57622448b448aa6080911dccb03456d0e3b81" offset="0" />
+				<rom name="pcharme.rom" size="4096" crc="9e8bd79f" sha1="66c57622448b448aa6080911dccb03456d0e3b81" />
 			</dataarea>
 		</part>
 	</software>
@@ -277,7 +277,7 @@
 		<info name="author" value="Frans van Hoesel" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pcharme_alt.rom" size="4096" crc="3824cce5" sha1="fd50428e18f039b642c967255c435e14df26c949" offset="0"/>
+				<rom name="pcharme_alt.rom" size="4096" crc="3824cce5" sha1="fd50428e18f039b642c967255c435e14df26c949"/>
 			</dataarea>
 		</part>
 	</software>
@@ -289,7 +289,7 @@
 		<info name="author" value="Wouter Ras" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="mousebox.rom" size="4096" crc="0dff30e4" sha1="b7c0b9c23fcc5cfdc06cb2d2a9e7c2658e248ef7" offset="0" />
+				<rom name="mousebox.rom" size="4096" crc="0dff30e4" sha1="b7c0b9c23fcc5cfdc06cb2d2a9e7c2658e248ef7" />
 			</dataarea>
 		</part>
 	</software>
@@ -301,7 +301,7 @@
 		<info name="usage" value="Type LINK #AF00" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="toolbox.rom" size="4096" crc="3d8d5c18" sha1="b80736c7a63152d89e66b9848e197b54f698aedc" offset="0" />
+				<rom name="toolbox.rom" size="4096" crc="3d8d5c18" sha1="b80736c7a63152d89e66b9848e197b54f698aedc" />
 			</dataarea>
 		</part>
 	</software>
@@ -313,7 +313,7 @@
 		<info name="usage" value="Type LINK #AF00" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="toolkit.rom" size="4096" crc="9661561c" sha1="faa0394232caf7626499c9bc57c6af36017fe852" offset="0" />
+				<rom name="toolkit.rom" size="4096" crc="9661561c" sha1="faa0394232caf7626499c9bc57c6af36017fe852" />
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +325,7 @@
 		<info name="usage" value="Type DEBUG" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="psion_debug.rom" size="4096" crc="1a317711" sha1="a3dd1a5f25470006e0c76694796cf01b0f01ec64" offset="0"/>
+				<rom name="psion_debug.rom" size="4096" crc="1a317711" sha1="a3dd1a5f25470006e0c76694796cf01b0f01ec64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -337,7 +337,7 @@
 		<info name="usage" value="Type EDIT" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="psion_edit" size="4096" crc="4a80d67a" sha1="9c0bc1d41c88d88b601627de92026903d3d6a154" offset="0"/>
+				<rom name="psion_edit" size="4096" crc="4a80d67a" sha1="9c0bc1d41c88d88b601627de92026903d3d6a154"/>
 			</dataarea>
 		</part>
 	</software>
@@ -349,7 +349,7 @@
 		<info name="usage" value="Type LINK 44992" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="ross_utility.rom" size="4096" crc="4e284c5e" sha1="9d6dd5d4bce4ea2c0d65131b56d666fecf590492" offset="0"/>
+				<rom name="ross_utility.rom" size="4096" crc="4e284c5e" sha1="9d6dd5d4bce4ea2c0d65131b56d666fecf590492"/>
 			</dataarea>
 		</part>
 	</software>
@@ -361,7 +361,7 @@
 		<info name="usage" value="Type RXBOX" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="rxbox.rom" size="4096" crc="109d879b" sha1="6a52769860933798492490a31fc82fd3865e3386" offset="0"/>
+				<rom name="rxbox.rom" size="4096" crc="109d879b" sha1="6a52769860933798492490a31fc82fd3865e3386"/>
 			</dataarea>
 		</part>
 	</software>
@@ -374,7 +374,7 @@
 		<info name="author" value="B.Poot/J.Jobse" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="salfaa26.rom" size="4096" crc="48bfffaa" sha1="e267ef008eeb15ee598d5d81ae7d218b50f2ec20" offset="0" />
+				<rom name="salfaa26.rom" size="4096" crc="48bfffaa" sha1="e267ef008eeb15ee598d5d81ae7d218b50f2ec20" />
 			</dataarea>
 		</part>
 	</software>
@@ -387,7 +387,7 @@
 		<info name="author" value="B.Poot/J.Jobse" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="salfaac20.rom" size="4096" crc="45876648" sha1="b0419d0bc57e07c154230ce5ed0b441dc5f0d113" offset="0" />
+				<rom name="salfaac20.rom" size="4096" crc="45876648" sha1="b0419d0bc57e07c154230ce5ed0b441dc5f0d113" />
 			</dataarea>
 		</part>
 	</software>
@@ -400,7 +400,7 @@
 		<info name="author" value="Kees van Oss" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="sdrom3.rom" size="4096" crc="1a9c9dd1" sha1="1a722878d00433f541ae26b95db325dd80de579a" offset="0" />
+				<rom name="sdrom3.rom" size="4096" crc="1a9c9dd1" sha1="1a722878d00433f541ae26b95db325dd80de579a" />
 			</dataarea>
 		</part>
 	</software>
@@ -412,7 +412,7 @@
 		<info name="usage" value="Type LINK #AF00" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="superbasic.rom" size="4096" crc="d5392f92" sha1="2815eef95f4471a3674745abbb5547b6cf16d4ad" offset="0"/>
+				<rom name="superbasic.rom" size="4096" crc="d5392f92" sha1="2815eef95f4471a3674745abbb5547b6cf16d4ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -423,7 +423,7 @@
 		<publisher>Watford Electronics</publisher>
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="werom.rom" size="4096" crc="dfcb3bf8" sha1="85a19146844da2d6f03e1cde37ee17429eedeb0d" offset="0" />
+				<rom name="werom.rom" size="4096" crc="dfcb3bf8" sha1="85a19146844da2d6f03e1cde37ee17429eedeb0d" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@
 		<info name="usage" value="Type LINK #A000" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="willow_utility.rom" size="4096" crc="5f058699" sha1="4bfdd06f6298218d359f494c029d7099c50c1a8f" offset="0"/>
+				<rom name="willow_utility.rom" size="4096" crc="5f058699" sha1="4bfdd06f6298218d359f494c029d7099c50c1a8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -447,7 +447,7 @@
 		<info name="usage" value="Type EDIT" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="wordpack.rom" size="4096" crc="a2c49c46" sha1="892aaae1ba349410e1ca20adbdddad1d999953a4" offset="0"/>
+				<rom name="wordpack.rom" size="4096" crc="a2c49c46" sha1="892aaae1ba349410e1ca20adbdddad1d999953a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -459,7 +459,7 @@
 		<info name="usage" value="Type ED64" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="wordpack64.rom" size="4096" crc="54e828dd" sha1="65b373800c5d816192e72cc9a817215840f83ed4" offset="0"/>
+				<rom name="wordpack64.rom" size="4096" crc="54e828dd" sha1="65b373800c5d816192e72cc9a817215840f83ed4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -471,7 +471,7 @@
 		<info name="usage" value="Requires 80 column VDU board" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="wordpack80.rom" size="4096" crc="0716607a" sha1="d85814c5aedadd4ca4fa8312483ce62eb4de9d5e" offset="0"/>
+				<rom name="wordpack80.rom" size="4096" crc="0716607a" sha1="d85814c5aedadd4ca4fa8312483ce62eb4de9d5e"/>
 			</dataarea>
 		</part>
 	</software>

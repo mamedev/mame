@@ -10,12 +10,6 @@
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 
-#define MCFG_ESQ2X16_SQ1_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, ESQ2X16_SQ1, 60)
-
-#define MCFG_ESQ2X16_SQ1_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
 class esq2x16_sq1_device : public esqvfd_device {
 public:
 	esq2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,14 +19,15 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	uint8_t m_lcdpg[4][32];
 	int m_lcdPage;
-	int m_lcdPos,m_lcdSavedPos;
+	int m_lcdPos, m_lcdSavedPos;
+	output_finder<4, 32*7> m_lcdPix;
 
-	uint8_t m_leds[16];
-	uint8_t m_ledsDirty[16];
+	output_finder<16> m_leds;
 
 private:
 	void lcd_reset();

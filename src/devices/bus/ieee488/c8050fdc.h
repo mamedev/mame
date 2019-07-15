@@ -19,24 +19,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C8050_SYNC_CALLBACK(_write) \
-	devcb = &c8050_fdc_device::set_sync_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_C8050_READY_CALLBACK(_write) \
-	devcb = &c8050_fdc_device::set_ready_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_C8050_BRDY_CALLBACK(_write) \
-	devcb = &c8050_fdc_device::set_brdy_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_C8050_ERROR_CALLBACK(_write) \
-	devcb = &c8050_fdc_device::set_error_wr_callback(*device, DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -48,10 +30,10 @@ public:
 	// construction/destruction
 	c8050_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_sync_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_sync.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ready_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_brdy_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_brdy.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_error_wr_callback(device_t &device, Object &&cb) { return downcast<c8050_fdc_device &>(device).m_write_error.set_callback(std::forward<Object>(cb)); }
+	auto sync_wr_callback() { return m_write_sync.bind(); }
+	auto ready_wr_callback() { return m_write_ready.bind(); }
+	auto brdy_wr_callback() { return m_write_brdy.bind(); }
+	auto error_wr_callback() { return m_write_error.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

@@ -8,7 +8,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="280zzap.bin" size="2048" crc="e4d285e5" sha1="0de670d6f78e3011e84fefc65f70544cdad3320e" offset="0" />
+				<rom name="280zzap.bin" size="2048" crc="e4d285e5" sha1="0de670d6f78e3011e84fefc65f70544cdad3320e" />
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="hardday.bin" size="2048" crc="9234ddf6" sha1="d8a7826f5a4f251e31e4aa5670bc86a696827741" offset="0" />
+				<rom name="hardday.bin" size="2048" crc="9234ddf6" sha1="d8a7826f5a4f251e31e4aa5670bc86a696827741" />
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="adssm.bin" size="2048" crc="b8d4df61" sha1="93ffa31d308e62a1f0b09f20489bd620a08de37b" offset="0" />
+				<rom name="adssm.bin" size="2048" crc="b8d4df61" sha1="93ffa31d308e62a1f0b09f20489bd620a08de37b" />
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="amazmaze.bin" size="2048" crc="cd57c485" sha1="8c833f077830db847caad91a3f040ac7ddcd33f8" offset="0" />
+				<rom name="amazmaze.bin" size="2048" crc="cd57c485" sha1="8c833f077830db847caad91a3f040ac7ddcd33f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="artiduel.bin" size="4096" crc="4f372019" sha1="24f6accc59301773e7471a831a5e3312c61694b0" offset="0" />
+				<rom name="artiduel.bin" size="4096" crc="4f372019" sha1="24f6accc59301773e7471a831a5e3312c61694b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="artillery duel (5-23) (1982)(astrocade inc.)(proto).bin" size="4096" crc="2227f488" sha1="e8b9a13b5b712ff5e2269813271777956d69be3c" offset="0" />
+				<rom name="artillery duel (5-23) (1982)(astrocade inc.)(proto).bin" size="4096" crc="2227f488" sha1="e8b9a13b5b712ff5e2269813271777956d69be3c" />
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="artillery duel (1982)(astrocade inc.)(proto).bin" size="4096" crc="53f75720" sha1="376027b2974aa73e523dc0c139f723168a379ece" offset="0" />
+				<rom name="artillery duel (1982)(astrocade inc.)(proto).bin" size="4096" crc="53f75720" sha1="376027b2974aa73e523dc0c139f723168a379ece" />
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="artillery duel (1982)(astrocade inc.)(proto)[a].bin" size="2048" crc="2521a6ec" sha1="4b02162dd5503e08479929be36de5a6648410310" offset="0" />
+				<rom name="artillery duel (1982)(astrocade inc.)(proto)[a].bin" size="2048" crc="2521a6ec" sha1="4b02162dd5503e08479929be36de5a6648410310" />
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 		<publisher>Perkins Engineering and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="artjello.bin" size="8192" crc="bc0d0336" sha1="b935acbee0cd8f2729140a4ce23c88e8641c62b0" offset="0" />
+				<rom name="artjello.bin" size="8192" crc="bc0d0336" sha1="b935acbee0cd8f2729140a4ce23c88e8641c62b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +109,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="astrobat.bin" size="4096" crc="0b5298bc" sha1="cdf7a2a8608c3e90d0cc8a4b751276b76de72f8c" offset="0" />
+				<rom name="astrobat.bin" size="4096" crc="0b5298bc" sha1="cdf7a2a8608c3e90d0cc8a4b751276b76de72f8c" />
 			</dataarea>
 		</part>
 	</software>
@@ -121,19 +121,20 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="bbasic.bin" size="4096" crc="90e276aa" sha1="abb85bc19419a1d81c698884f81a53d85806885d" offset="0" />
+				<rom name="bbasic.bin" size="4096" crc="90e276aa" sha1="abb85bc19419a1d81c698884f81a53d85806885d" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="astrobas">
 		<description>Bally BASIC (Astrovision)</description>
-<!-- <note>The updated release of BASIC used an internal 2000 baud interface (not emulated) to load and save programs.</note> -->
+<!-- <note>The updated release of BASIC used an internal 2000 baud interface to load and save programs.</note> -->
 		<year>1981</year>
 		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
+			<feature name="slot" value="rom_cass" />
 			<dataarea name="rom" size="4096">
-				<rom name="astrobas.bin" size="4096" crc="70514687" sha1="a2ac8995a6217b7190aa9b18f49261c0ed3c6b5a" offset="0" />
+				<rom name="astrobas.bin" size="4096" crc="70514687" sha1="a2ac8995a6217b7190aa9b18f49261c0ed3c6b5a" />
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +145,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="bbasdemo.bin" size="8192" crc="007e70d5" sha1="6ed1f49e6581ecea5328e3c5f99026afd7f1f7e4" offset="0" />
+				<rom name="bbasdemo.bin" size="8192" crc="007e70d5" sha1="6ed1f49e6581ecea5328e3c5f99026afd7f1f7e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +157,7 @@
 		<publisher>RGB Electronics</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="balchecn.bin" size="2048" crc="0086beeb" sha1="87133a9dc67361ead997f35e8f7dcde07c2d18a7" offset="0" />
+				<rom name="balchecn.bin" size="2048" crc="0086beeb" sha1="87133a9dc67361ead997f35e8f7dcde07c2d18a7" />
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +169,7 @@
 		<publisher>RGB Electronics</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="balcheco.bin" size="2048" crc="46a375ad" sha1="ea2bd23ee9c107b39b62e115e730d4ae8be346cb" offset="0" />
+				<rom name="balcheco.bin" size="2048" crc="46a375ad" sha1="ea2bd23ee9c107b39b62e115e730d4ae8be346cb" />
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +181,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="colorbas.bin" size="4096" crc="e1c30ede" sha1="7b5fa4cd585081c5d51127d32d02a33ed44b5843" offset="0" />
+				<rom name="colorbas.bin" size="4096" crc="e1c30ede" sha1="7b5fa4cd585081c5d51127d32d02a33ed44b5843" />
 			</dataarea>
 		</part>
 	</software>
@@ -191,7 +192,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="ballypin.bin" size="4096" crc="3f431613" sha1="05b680777aa9639620c790f0590d96416d49bf94" offset="0" />
+				<rom name="ballypin.bin" size="4096" crc="3f431613" sha1="05b680777aa9639620c790f0590d96416d49bf94" />
 			</dataarea>
 		</part>
 	</software>
@@ -203,7 +204,7 @@
 		<publisher>John Collins, WaveMakers, and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="checkbac.bin" size="8192" crc="9a3b9be2" sha1="5eb38af57bb375fcbb086f104c0c84655f907b3f" offset="0" />
+				<rom name="checkbac.bin" size="8192" crc="9a3b9be2" sha1="5eb38af57bb375fcbb086f104c0c84655f907b3f" />
 			</dataarea>
 		</part>
 	</software>
@@ -214,7 +215,7 @@
 		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="biorhy.bin" size="4096" crc="fc4bd27c" sha1="1ba84a04ea5d7d87c213d978fecc188a4a8517a6" offset="0" />
+				<rom name="biorhy.bin" size="4096" crc="fc4bd27c" sha1="1ba84a04ea5d7d87c213d978fecc188a4a8517a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -225,7 +226,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="blckjack.bin" size="4096" crc="78d45a11" sha1="7b92e3ad161e31926a730780d1f28015310dd7d7" offset="0" />
+				<rom name="blckjack.bin" size="4096" crc="78d45a11" sha1="7b92e3ad161e31926a730780d1f28015310dd7d7" />
 			</dataarea>
 		</part>
 	</software>
@@ -237,7 +238,7 @@
 		<publisher>Perkins Engineering</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="blue ram basic 1.0 (1980)(perkins engineering)(proto)[not playable].bin" size="4096" crc="2fa59f1e" sha1="ef27b8863b05afe58259fdf5755e919699485e4f" offset="0" />
+				<rom name="blue ram basic 1.0 (1980)(perkins engineering)(proto)[not playable].bin" size="4096" crc="2fa59f1e" sha1="ef27b8863b05afe58259fdf5755e919699485e4f" />
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +250,7 @@
 		<publisher>Perkins Engineering</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="brbsic10.bin" size="8192" crc="50112e64" sha1="8e7f0ba7a7f37f09f1c808b50647af3a04e1a92e" offset="0" />
+				<rom name="brbsic10.bin" size="8192" crc="50112e64" sha1="8e7f0ba7a7f37f09f1c808b50647af3a04e1a92e" />
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +262,7 @@
 		<publisher>Perkins Engineering</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="brbsic11.bin" size="8192" crc="4da03dfe" sha1="9c6759075c2e99d261d0b48b49983ae195d8fda4" offset="0" />
+				<rom name="brbsic11.bin" size="8192" crc="4da03dfe" sha1="9c6759075c2e99d261d0b48b49983ae195d8fda4" />
 			</dataarea>
 		</part>
 	</software>
@@ -273,7 +274,7 @@
 		<publisher>Perkins Engineering and Ken Lill</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="blueutil.bin" size="8192" crc="004ee140" sha1="e76915c4bfb01df855e047b074e2c4605613ed76" offset="0" />
+				<rom name="blueutil.bin" size="8192" crc="004ee140" sha1="e76915c4bfb01df855e047b074e2c4605613ed76" />
 			</dataarea>
 		</part>
 	</software>
@@ -284,7 +285,7 @@
 		<publisher>Esoterica</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="bstdroid.bin" size="4096" crc="79fe386b" sha1="addc89e0add729f2a93cd1774f6f5c1c693e6068" offset="0" />
+				<rom name="bstdroid.bin" size="4096" crc="79fe386b" sha1="addc89e0add729f2a93cd1774f6f5c1c693e6068" />
 			</dataarea>
 		</part>
 	</software>
@@ -295,7 +296,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="bowling.bin" size="4096" crc="1f8bc8ba" sha1="de27100803a414989d538ca34fc1b3e122dfac78" offset="0" />
+				<rom name="bowling.bin" size="4096" crc="1f8bc8ba" sha1="de27100803a414989d538ca34fc1b3e122dfac78" />
 			</dataarea>
 		</part>
 	</software>
@@ -306,7 +307,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="brckyard.bin" size="4096" crc="28f9e502" sha1="4c1a9efcd4435f6a79dc2212c4d0d17ea753809c" offset="0" />
+				<rom name="brckyard.bin" size="4096" crc="28f9e502" sha1="4c1a9efcd4435f6a79dc2212c4d0d17ea753809c" />
 			</dataarea>
 		</part>
 	</software>
@@ -317,7 +318,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="buylove.bin" size="8192" crc="fc6f4f7b" sha1="1b668dc092a2102ac5be0a88b0c5a69871034209" offset="0" />
+				<rom name="buylove.bin" size="8192" crc="fc6f4f7b" sha1="1b668dc092a2102ac5be0a88b0c5a69871034209" />
 			</dataarea>
 		</part>
 	</software>
@@ -329,7 +330,7 @@
 		<publisher>L&amp;M Software and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="candyman.bin" size="8192" crc="0fc97852" sha1="c87644de2b9231d74cd8c82d612ebd5412a3d87c" offset="0" />
+				<rom name="candyman.bin" size="8192" crc="0fc97852" sha1="c87644de2b9231d74cd8c82d612ebd5412a3d87c" />
 			</dataarea>
 		</part>
 	</software>
@@ -340,7 +341,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="checkers.bin" size="2048" crc="757bab8f" sha1="9ef927e88e3f799276966b569c2402f6b25be416" offset="0" />
+				<rom name="checkers.bin" size="2048" crc="757bab8f" sha1="9ef927e88e3f799276966b569c2402f6b25be416" />
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +353,7 @@
 		<publisher>The Bit Fiddlers and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="chicken.bin" size="4096" crc="5b946526" sha1="714235b6919dcdae55f9e2a361fc1264d14aa84e" offset="0" />
+				<rom name="chicken.bin" size="4096" crc="5b946526" sha1="714235b6919dcdae55f9e2a361fc1264d14aa84e" />
 			</dataarea>
 		</part>
 	</software>
@@ -364,7 +365,7 @@
 		<publisher>L&amp;M Software and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="claim.bin" size="8192" crc="1edeae0e" sha1="d9dc00d62b7cddd74facba39b6efdc0da1b415b0" offset="0" />
+				<rom name="claim.bin" size="8192" crc="1edeae0e" sha1="d9dc00d62b7cddd74facba39b6efdc0da1b415b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -376,7 +377,7 @@
 		<publisher>WaveMakers and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="collwack.bin" size="8192" crc="313fee89" sha1="3345251dae2dcace5400561196e7f7c23a9056d8" offset="0" />
+				<rom name="collwack.bin" size="8192" crc="313fee89" sha1="3345251dae2dcace5400561196e7f7c23a9056d8" />
 			</dataarea>
 		</part>
 	</software>
@@ -387,7 +388,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="colbook.bin" size="8192" crc="14f36aba" sha1="41eaaa061ed47996219b70bc0ed7d6a19c4b3c28" offset="0" />
+				<rom name="colbook.bin" size="8192" crc="14f36aba" sha1="41eaaa061ed47996219b70bc0ed7d6a19c4b3c28" />
 			</dataarea>
 		</part>
 	</software>
@@ -399,7 +400,7 @@
 		<publisher>Astrocade and Dave Carson Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="conan.bin" size="8192" crc="8a6adbfe" sha1="8b0d3125b805d57b9958b0e7a4f0e9d1a70f6353" offset="0" />
+				<rom name="conan.bin" size="8192" crc="8a6adbfe" sha1="8b0d3125b805d57b9958b0e7a4f0e9d1a70f6353" />
 			</dataarea>
 		</part>
 	</software>
@@ -410,7 +411,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="conanp.bin" size="8192" crc="15b1afea" sha1="bc4f757271fca69e0de3973f43d363c4474e2fb7" offset="0" />
+				<rom name="conanp.bin" size="8192" crc="15b1afea" sha1="bc4f757271fca69e0de3973f43d363c4474e2fb7" />
 			</dataarea>
 		</part>
 	</software>
@@ -422,7 +423,7 @@
 		<publisher>Robert Leake, Harry Hanson, Brett Bilbrey, Joe Borrello, and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="c4simon.bin" size="8192" crc="05dd02c8" sha1="e47795e5d89dbab89b879d154faafad4ca150d14" offset="0" />
+				<rom name="c4simon.bin" size="8192" crc="05dd02c8" sha1="e47795e5d89dbab89b879d154faafad4ca150d14" />
 			</dataarea>
 		</part>
 	</software>
@@ -433,7 +434,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cosmicrd.bin" size="8192" crc="2a77b3fb" sha1="09ae145e3dbfd132f5130a0cbb508f4fbcf35bee" offset="0" />
+				<rom name="cosmicrd.bin" size="8192" crc="2a77b3fb" sha1="09ae145e3dbfd132f5130a0cbb508f4fbcf35bee" />
 			</dataarea>
 		</part>
 	</software>
@@ -444,7 +445,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cosmicra.bin" size="8192" crc="869b692e" sha1="b71b81eeaf10b59efb1b51d88b1e758305d5f1e4" offset="0" />
+				<rom name="cosmicra.bin" size="8192" crc="869b692e" sha1="b71b81eeaf10b59efb1b51d88b1e758305d5f1e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +456,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cosmica2.bin" size="8192" crc="37670f78" sha1="30044130dd3b41295351fa3905d53e26e52b3745" offset="0" />
+				<rom name="cosmica2.bin" size="8192" crc="37670f78" sha1="30044130dd3b41295351fa3905d53e26e52b3745" />
 			</dataarea>
 		</part>
 	</software>
@@ -467,7 +468,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cosmic35.bin" size="8192" crc="e3d723a0" sha1="337cdffe2260dc6d36d674fa35047cb5a3598bf9" offset="0" />
+				<rom name="cosmic35.bin" size="8192" crc="e3d723a0" sha1="337cdffe2260dc6d36d674fa35047cb5a3598bf9" />
 			</dataarea>
 		</part>
 	</software>
@@ -478,7 +479,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cosmic36.bin" size="8192" crc="00b6fe88" sha1="5a3772b8524361b174c761ef759659b4a63166fa" offset="0" />
+				<rom name="cosmic36.bin" size="8192" crc="00b6fe88" sha1="5a3772b8524361b174c761ef759659b4a63166fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -489,7 +490,7 @@
 		<publisher>Riff Raff Games</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="crazy climber (2011)(riff raff games)[ccv054f].bin" size="8187" crc="bf864c44" sha1="3fc71a3061ddc39788920b27ce11d0ea545e3da6" offset="0" />
+				<rom name="crazy climber (2011)(riff raff games)[ccv054f].bin" size="8187" crc="bf864c44" sha1="3fc71a3061ddc39788920b27ce11d0ea545e3da6" />
 			</dataarea>
 		</part>
 	</software>
@@ -500,7 +501,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="dealdemo.bin" size="4096" crc="16b77b44" sha1="302ad18ea17b12a474ebbba1a882d8aad8cf5e94" offset="0" />
+				<rom name="dealdemo.bin" size="4096" crc="16b77b44" sha1="302ad18ea17b12a474ebbba1a882d8aad8cf5e94" />
 			</dataarea>
 		</part>
 	</software>
@@ -511,7 +512,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="dogpatch.bin" size="2048" crc="77bed6ba" sha1="263e6372392bc37a2228eb455d1477dcd41d9104" offset="0" />
+				<rom name="dogpatch.bin" size="2048" crc="77bed6ba" sha1="263e6372392bc37a2228eb455d1477dcd41d9104" />
 			</dataarea>
 		</part>
 	</software>
@@ -522,7 +523,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="eightday.bin" size="4096" crc="0bac683f" sha1="ada7eeff503d9ece7c0c3fcd1c007a6218930195" offset="0" />
+				<rom name="eightday.bin" size="4096" crc="0bac683f" sha1="ada7eeff503d9ece7c0c3fcd1c007a6218930195" />
 			</dataarea>
 		</part>
 	</software>
@@ -534,7 +535,7 @@
 		<publisher>Barry McCleave</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="fawn1.bin" size="2048" crc="2ff0fbef" sha1="cb8a8c3b049465e927a0401b390383a63f8e7708" offset="0" />
+				<rom name="fawn1.bin" size="2048" crc="2ff0fbef" sha1="cb8a8c3b049465e927a0401b390383a63f8e7708" />
 			</dataarea>
 		</part>
 	</software>
@@ -546,7 +547,7 @@
 		<publisher>Barry McCleave</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="fawn2.bin" size="2048" crc="72dd4512" sha1="586281ff1adf4c567acb68884331339f23b2ada3" offset="0" />
+				<rom name="fawn2.bin" size="2048" crc="72dd4512" sha1="586281ff1adf4c567acb68884331339f23b2ada3" />
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +559,7 @@
 		<publisher>WaveMakers and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="flymonk.bin" size="8192" crc="9e08814d" sha1="82dde335da2d504b0b1b41aa2bb24fbfbdc3ddc4" offset="0" />
+				<rom name="flymonk.bin" size="8192" crc="9e08814d" sha1="82dde335da2d504b0b1b41aa2bb24fbfbdc3ddc4" />
 			</dataarea>
 		</part>
 	</software>
@@ -569,7 +570,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="football.bin" size="4096" crc="fc8998a9" sha1="1d07b45162fab5497fe0a3d4ccb1b33bfd47177a" offset="0" />
+				<rom name="football.bin" size="4096" crc="fc8998a9" sha1="1d07b45162fab5497fe0a3d4ccb1b33bfd47177a" />
 			</dataarea>
 		</part>
 	</software>
@@ -581,7 +582,7 @@
 		<publisher>Richard Degler</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="ziggyjx.bin" size="4096" crc="286d4dd4" sha1="b888c5381b0f8e05829d09850a64975458bbfbe4" offset="0" />
+				<rom name="ziggyjx.bin" size="4096" crc="286d4dd4" sha1="b888c5381b0f8e05829d09850a64975458bbfbe4" />
 			</dataarea>
 		</part>
 	</software>
@@ -593,7 +594,7 @@
 		<publisher>Richard Degler</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="ziggymo.bin" size="4096" crc="18a2eb1e" sha1="bf2f934737211aed5c0bd052c5277194edff1977" offset="0" />
+				<rom name="ziggymo.bin" size="4096" crc="18a2eb1e" sha1="bf2f934737211aed5c0bd052c5277194edff1977" />
 			</dataarea>
 		</part>
 	</software>
@@ -604,7 +605,7 @@
 		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="galactic.bin" size="4096" crc="ba558eb7" sha1="939857d621715b831d558bcb2fd2f0f9e9b37676" offset="0" />
+				<rom name="galactic.bin" size="4096" crc="ba558eb7" sha1="939857d621715b831d558bcb2fd2f0f9e9b37676" />
 			</dataarea>
 		</part>
 	</software>
@@ -615,7 +616,7 @@
 		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="galaxian.bin" size="4096" crc="d75e9672" sha1="fb13e40c9ebadcb68beb7294a732ecf1b2f2ec30" offset="0" />
+				<rom name="galaxian.bin" size="4096" crc="d75e9672" sha1="fb13e40c9ebadcb68beb7294a732ecf1b2f2ec30" />
 			</dataarea>
 		</part>
 	</software>
@@ -626,7 +627,7 @@
 		<publisher>Dave Carson and Ken Lill</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="golddigger, goldrush (8-11-84) (1984)(dave carson and ken lill)(proto).bin" size="2048" crc="20755476" sha1="3537ded59d46a539e05a5f178a409346f1673bd9" offset="0" />
+				<rom name="golddigger, goldrush (8-11-84) (1984)(dave carson and ken lill)(proto).bin" size="2048" crc="20755476" sha1="3537ded59d46a539e05a5f178a409346f1673bd9" />
 			</dataarea>
 		</part>
 	</software>
@@ -637,7 +638,7 @@
 		<publisher>Dave Carson and Ken Lill</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="golddigger, goldrush (198x)(dave carson and ken lill)(proto).bin" size="2048" crc="994661a1" sha1="ca71326eb5cd243d2240804bb314235d96b45380" offset="0" />
+				<rom name="golddigger, goldrush (198x)(dave carson and ken lill)(proto).bin" size="2048" crc="994661a1" sha1="ca71326eb5cd243d2240804bb314235d96b45380" />
 			</dataarea>
 		</part>
 	</software>
@@ -648,7 +649,7 @@
 		<publisher>Dave Carson and Ken Lill</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="golddigger, goldrush (198x)(dave carson and ken lill)(proto)[a].bin" size="2048" crc="face3b05" sha1="a54d2eb5f304fb83ad125560b0e555b0d1beb9ae" offset="0" />
+				<rom name="golddigger, goldrush (198x)(dave carson and ken lill)(proto)[a].bin" size="2048" crc="face3b05" sha1="a54d2eb5f304fb83ad125560b0e555b0d1beb9ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -659,7 +660,7 @@
 		<publisher>Astrovision</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="grandprx.bin" size="4096" crc="7b3b7b70" sha1="fd133dc402b6ecbcc718ffb895a16e07979ab329" offset="0" />
+				<rom name="grandprx.bin" size="4096" crc="7b3b7b70" sha1="fd133dc402b6ecbcc718ffb895a16e07979ab329" />
 			</dataarea>
 		</part>
 	</software>
@@ -671,7 +672,7 @@
 		<publisher>Esoterica, WaveMakers, and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="jigqb2b.bin" size="8192" crc="a1eb3e15" sha1="61c890b4090463827aafd0cd512ccb090a27426d" offset="0" />
+				<rom name="jigqb2b.bin" size="8192" crc="a1eb3e15" sha1="61c890b4090463827aafd0cd512ccb090a27426d" />
 			</dataarea>
 		</part>
 	</software>
@@ -682,7 +683,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="feelfine.bin" size="4096" crc="2d9d9eb0" sha1="038a3be5857ff06a2a61429592044d06d0179e14" offset="0" />
+				<rom name="feelfine.bin" size="4096" crc="2d9d9eb0" sha1="038a3be5857ff06a2a61429592044d06d0179e14" />
 			</dataarea>
 		</part>
 	</software>
@@ -694,7 +695,7 @@
 		<publisher>Spectre Systems</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="icbmatk.bin" size="4096" crc="bc2b6fe3" sha1="a3ff72346366d518b6f5011ec7bf160c159a1b62" offset="0" />
+				<rom name="icbmatk.bin" size="4096" crc="bc2b6fe3" sha1="a3ff72346366d518b6f5011ec7bf160c159a1b62" />
 			</dataarea>
 		</part>
 	</software>
@@ -706,7 +707,7 @@
 		<publisher>Spectre Systems</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="icbmatkp.bin" size="4096" crc="49ed3563" sha1="9de812c0d9632379cb3f76edf7908856c81a0dec" offset="0" />
+				<rom name="icbmatkp.bin" size="4096" crc="49ed3563" sha1="9de812c0d9632379cb3f76edf7908856c81a0dec" />
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +718,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="letitbe.bin" size="4096" crc="baf0019d" sha1="e9fc668a901567274b843da66def4be3dc087c3f" offset="0" />
+				<rom name="letitbe.bin" size="4096" crc="baf0019d" sha1="e9fc668a901567274b843da66def4be3dc087c3f" />
 			</dataarea>
 		</part>
 	</software>
@@ -728,7 +729,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="lttrmtch.bin" size="4096" crc="2cf68f93" sha1="266f6978b8f9e6bad36dc21031193ca93cd55be4" offset="0" />
+				<rom name="lttrmtch.bin" size="4096" crc="2cf68f93" sha1="266f6978b8f9e6bad36dc21031193ca93cd55be4" />
 			</dataarea>
 		</part>
 	</software>
@@ -739,7 +740,7 @@
 		<publisher>Richard Degler</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="life.bin" size="2048" crc="752d13fd" sha1="f31cfef8dde6cd5bc030a1e0aae2655da09a2a34" offset="0" />
+				<rom name="life.bin" size="2048" crc="752d13fd" sha1="f31cfef8dde6cd5bc030a1e0aae2655da09a2a34" />
 			</dataarea>
 		</part>
 	</software>
@@ -750,7 +751,7 @@
 		<publisher>The Bit Fiddlers</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="mlangman.bin" size="2048" crc="5393f920" sha1="d5249c6026dd8f277212d58209c1d03e8567d769" offset="0" />
+				<rom name="mlangman.bin" size="2048" crc="5393f920" sha1="d5249c6026dd8f277212d58209c1d03e8567d769" />
 			</dataarea>
 		</part>
 	</software>
@@ -762,7 +763,7 @@
 		<publisher>Dave Carson Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="mazeman.bin" size="4096" crc="565a644c" sha1="4b16f6138d4ecffe532995fa697e9e312550e88a" offset="0" />
+				<rom name="mazeman.bin" size="4096" crc="565a644c" sha1="4b16f6138d4ecffe532995fa697e9e312550e88a" />
 			</dataarea>
 		</part>
 	</software>
@@ -773,7 +774,7 @@
 		<publisher>Dave Carson Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="mazeman (1984)(dave carson software)(proto).bin" size="4096" crc="af649678" sha1="f296ebdfe1a8c4f1dacf06914be1918b92f4d2b3" offset="0" />
+				<rom name="mazeman (1984)(dave carson software)(proto).bin" size="4096" crc="af649678" sha1="f296ebdfe1a8c4f1dacf06914be1918b92f4d2b3" />
 			</dataarea>
 		</part>
 	</software>
@@ -785,7 +786,7 @@
 		<publisher>Spectre Systems and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="matk.bin" size="4096" crc="88f56c4e" sha1="5443b7891b40b314e123f34cf80e7bf797c25f65" offset="0" />
+				<rom name="matk.bin" size="4096" crc="88f56c4e" sha1="5443b7891b40b314e123f34cf80e7bf797c25f65" />
 			</dataarea>
 		</part>
 	</software>
@@ -796,7 +797,7 @@
 		<publisher>L&amp;M Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="mscandy.bin" size="4096" crc="14e93a41" sha1="39cc94a350892ac57dfa144bcf5ba12973d9684b" offset="0" />
+				<rom name="mscandy.bin" size="4096" crc="14e93a41" sha1="39cc94a350892ac57dfa144bcf5ba12973d9684b" />
 			</dataarea>
 		</part>
 	</software>
@@ -808,7 +809,7 @@
 		<publisher>Astrocade, Phillip Harris, and Alternative Engineering</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="muncher.bin" size="8192" crc="e4726657" sha1="02f37ded48b1fb9ba0a2d7e45f5b0a85eaecb1c8" offset="0" />
+				<rom name="muncher.bin" size="8192" crc="e4726657" sha1="02f37ded48b1fb9ba0a2d7e45f5b0a85eaecb1c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -820,7 +821,7 @@
 		<publisher>Astrocade and Dave Carson Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="musicmak.bin" size="8192" crc="b242ef84" sha1="8101424ebbc2a31d7e750b6d00f01e657fd97cf8" offset="0" />
+				<rom name="musicmak.bin" size="8192" crc="b242ef84" sha1="8101424ebbc2a31d7e750b6d00f01e657fd97cf8" />
 			</dataarea>
 		</part>
 	</software>
@@ -831,7 +832,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="musicmap.bin" size="8192" crc="a76828d0" sha1="924cecf006f91bf49f2bcc1e14c55646a0ee93ff" offset="0" />
+				<rom name="musicmap.bin" size="8192" crc="a76828d0" sha1="924cecf006f91bf49f2bcc1e14c55646a0ee93ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -842,7 +843,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="music maker (1981)(astrocade inc.)(proto).bin" size="7376" crc="cc97a150" sha1="6a35509709497151f4f810a958fc5abf3852afc6" offset="0" />
+				<rom name="music maker (1981)(astrocade inc.)(proto).bin" size="7376" crc="cc97a150" sha1="6a35509709497151f4f810a958fc5abf3852afc6" />
 			</dataarea>
 		</part>
 	</software>
@@ -854,7 +855,7 @@
 		<publisher>Astrocade, Dave Carson, and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="nodie.bin" size="8192" crc="784b256a" sha1="8dd34f2428a65ac590a26b25904a96e6f04e01d2" offset="0" />
+				<rom name="nodie.bin" size="8192" crc="784b256a" sha1="8dd34f2428a65ac590a26b25904a96e6f04e01d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -866,7 +867,7 @@
 		<publisher>Bob Wiseman and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="oldyaht.bin" size="8192" crc="be686630" sha1="aea64bc366d710206d04086b0627cfb29c086149" offset="0" />
+				<rom name="oldyaht.bin" size="8192" crc="be686630" sha1="aea64bc366d710206d04086b0627cfb29c086149" />
 			</dataarea>
 		</part>
 	</software>
@@ -878,7 +879,7 @@
 		<publisher>WaveMakers and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="outpost.bin" size="8192" crc="7bd3cfbb" sha1="f7172d2d690fd615c1e8d3073d7f697b4a24b100" offset="0" />
+				<rom name="outpost.bin" size="8192" crc="7bd3cfbb" sha1="f7172d2d690fd615c1e8d3073d7f697b4a24b100" />
 			</dataarea>
 		</part>
 	</software>
@@ -890,7 +891,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="pacman.bin" size="8192" crc="17363546" sha1="3d0e2b3fc4adfd0297a609bd78eb8b557414ea23" offset="0" />
+				<rom name="pacman.bin" size="8192" crc="17363546" sha1="3d0e2b3fc4adfd0297a609bd78eb8b557414ea23" />
 			</dataarea>
 		</part>
 	</software>
@@ -901,7 +902,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="pac-man (198x)(astrocade inc.)(proto)[a].bin" size="8192" crc="ca3a67dd" sha1="fc5cd6ec56e0f2d3acf7acfd4dbc560bdf63c768" offset="0" />
+				<rom name="pac-man (198x)(astrocade inc.)(proto)[a].bin" size="8192" crc="ca3a67dd" sha1="fc5cd6ec56e0f2d3acf7acfd4dbc560bdf63c768" />
 			</dataarea>
 		</part>
 	</software>
@@ -912,7 +913,7 @@
 		<publisher>Dave Carson Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pacmaze (198x)(dave carson software)(proto).bin" size="4096" crc="cff3a6cc" sha1="f8d1b6eb9c4e148b76a46bda7ca3e976abeba056" offset="0" />
+				<rom name="pacmaze (198x)(dave carson software)(proto).bin" size="4096" crc="cff3a6cc" sha1="f8d1b6eb9c4e148b76a46bda7ca3e976abeba056" />
 			</dataarea>
 		</part>
 	</software>
@@ -923,7 +924,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="paperbck.bin" size="4096" crc="274766cd" sha1="e2b3ca147ba72762d7ada3e5b3e81b8e858a940f" offset="0" />
+				<rom name="paperbck.bin" size="4096" crc="274766cd" sha1="e2b3ca147ba72762d7ada3e5b3e81b8e858a940f" />
 			</dataarea>
 		</part>
 	</software>
@@ -934,7 +935,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="pirate.bin" size="4096" crc="7b1b206a" sha1="3ad79a4381441c7f28479ad6b50c9105ca1ba7e4" offset="0" />
+				<rom name="pirate.bin" size="4096" crc="7b1b206a" sha1="3ad79a4381441c7f28479ad6b50c9105ca1ba7e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -946,13 +947,13 @@
 		<publisher>Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="quadra1.bin" size="8192" crc="b43b17dd" sha1="6eba2bd2b244f28ba6e556d2731a5f6b7b58a7fb" offset="0" />
-				<rom name="quadra2.bin" size="8192" crc="878cb3a5" sha1="eef5ef7dffa5597963a7eeb98b2621ac8c8c49c0" offset="0" />
-				<rom name="quadra3.bin" size="8192" crc="b1219aa9" sha1="03874231d7a26ebbf209f4fe01c5ac1915543d76" offset="0" />
-				<rom name="quadra4.bin" size="8192" crc="231f56ff" sha1="3ddcf28429b4bffd9bfebfeae72fce047fdd7d91" offset="0" />
-				<rom name="quadra5.bin" size="8192" crc="ef2c7744" sha1="a4c14915f8aad1540168ffe84aa9c5cdcb473884" offset="0" />
-				<rom name="quadra6.bin" size="8192" crc="d333e1e3" sha1="99e5108899d02ce50ca23dfdaaa5ddaf5d47e6fc" offset="0" />
-				<rom name="quadra7.bin" size="8192" crc="97c70ffa" sha1="f1bc962f782b78dd2fcc688e8f9a160e858006e3" offset="0" />
+				<rom name="quadra1.bin" size="8192" crc="b43b17dd" sha1="6eba2bd2b244f28ba6e556d2731a5f6b7b58a7fb" />
+				<rom name="quadra2.bin" size="8192" crc="878cb3a5" sha1="eef5ef7dffa5597963a7eeb98b2621ac8c8c49c0" />
+				<rom name="quadra3.bin" size="8192" crc="b1219aa9" sha1="03874231d7a26ebbf209f4fe01c5ac1915543d76" />
+				<rom name="quadra4.bin" size="8192" crc="231f56ff" sha1="3ddcf28429b4bffd9bfebfeae72fce047fdd7d91" />
+				<rom name="quadra5.bin" size="8192" crc="ef2c7744" sha1="a4c14915f8aad1540168ffe84aa9c5cdcb473884" />
+				<rom name="quadra6.bin" size="8192" crc="d333e1e3" sha1="99e5108899d02ce50ca23dfdaaa5ddaf5d47e6fc" />
+				<rom name="quadra7.bin" size="8192" crc="97c70ffa" sha1="f1bc962f782b78dd2fcc688e8f9a160e858006e3" />
 			</dataarea>
 		</part>
 	</software>
@@ -964,7 +965,7 @@
 		<publisher>Hanson</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="rainbow2.bin" size="2048" crc="3883484a" sha1="888d0de155b53606466393560119ea355edd11ce" offset="0" />
+				<rom name="rainbow2.bin" size="2048" crc="3883484a" sha1="888d0de155b53606466393560119ea355edd11ce" />
 			</dataarea>
 		</part>
 	</software>
@@ -975,7 +976,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="redbaron.bin" size="4096" crc="a1c7e129" sha1="e0602c7485f511d6aa29d669967b101de79ddb15" offset="0" />
+				<rom name="redbaron.bin" size="4096" crc="a1c7e129" sha1="e0602c7485f511d6aa29d669967b101de79ddb15" />
 			</dataarea>
 		</part>
 	</software>
@@ -987,7 +988,7 @@
 		<publisher>Esoterica and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="roadtoad.bin" size="8192" crc="f74385ee" sha1="3c7016eb90e9e2fca97f002581880f560c312db3" offset="0" />
+				<rom name="roadtoad.bin" size="8192" crc="f74385ee" sha1="3c7016eb90e9e2fca97f002581880f560c312db3" />
 			</dataarea>
 		</part>
 	</software>
@@ -998,7 +999,7 @@
 		<publisher>L&amp;M Software</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="seadevil.bin" size="4096" crc="960b6f86" sha1="09efab90ff6a8cdea18fa0fa16dd4996c1feaa9b" offset="0" />
+				<rom name="seadevil.bin" size="4096" crc="960b6f86" sha1="09efab90ff6a8cdea18fa0fa16dd4996c1feaa9b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1009,7 +1010,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="seawolf.bin" size="2048" crc="a021735e" sha1="4c2ca46ab5a00dc2eb252ee900b2760b758a2162" offset="0" />
+				<rom name="seawolf.bin" size="2048" crc="a021735e" sha1="4c2ca46ab5a00dc2eb252ee900b2760b758a2162" />
 			</dataarea>
 		</part>
 	</software>
@@ -1020,7 +1021,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="sheloves.bin" size="4096" crc="7b360d3f" sha1="e4e42c1c2975af264b2b6954ebef177e8c1eefb9" offset="0" />
+				<rom name="sheloves.bin" size="4096" crc="7b360d3f" sha1="e4e42c1c2975af264b2b6954ebef177e8c1eefb9" />
 			</dataarea>
 		</part>
 	</software>
@@ -1032,7 +1033,7 @@
 		<publisher>Brett Bilbrey, Joe Borrello, and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="simgolf.bin" size="8192" crc="a982c37a" sha1="039e27c227d40aca81a6c990ae5cfe1634dc3862" offset="0" />
+				<rom name="simgolf.bin" size="8192" crc="a982c37a" sha1="039e27c227d40aca81a6c990ae5cfe1634dc3862" />
 			</dataarea>
 		</part>
 	</software>
@@ -1044,7 +1045,7 @@
 		<publisher>New Image and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="sloshed.bin" size="8192" crc="a33ced19" sha1="8ca7110ba93844fa2715ed4f6d3742dbe81ab29e" offset="0" />
+				<rom name="sloshed.bin" size="8192" crc="a33ced19" sha1="8ca7110ba93844fa2715ed4f6d3742dbe81ab29e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1055,7 +1056,7 @@
 		<publisher>New Image</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="sneaky.bin" size="4096" crc="3e9f4f0d" sha1="cc8a23e8e782561fc4eee2c13417367cf30028c5" offset="0" />
+				<rom name="sneaky.bin" size="4096" crc="3e9f4f0d" sha1="cc8a23e8e782561fc4eee2c13417367cf30028c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1067,7 +1068,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="soccer.bin" size="8192" crc="56d28b62" sha1="12f1f59d79188b41b39fee40dd4f12cc236b4126" offset="0" />
+				<rom name="soccer.bin" size="8192" crc="56d28b62" sha1="12f1f59d79188b41b39fee40dd4f12cc236b4126" />
 			</dataarea>
 		</part>
 	</software>
@@ -1078,7 +1079,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="soccerp.bin" size="8192" crc="7de08d9a" sha1="955b138b4db95e8a7c35ff958724440bd75d5fc2" offset="0" />
+				<rom name="soccerp.bin" size="8192" crc="7de08d9a" sha1="955b138b4db95e8a7c35ff958724440bd75d5fc2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1090,7 +1091,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="soccera.bin" size="4096" crc="fd633ca9" sha1="39ac51f18eb6ceb8e1f766f4d13d4c0ed7af1f85" offset="0" />
+				<rom name="soccera.bin" size="4096" crc="fd633ca9" sha1="39ac51f18eb6ceb8e1f766f4d13d4c0ed7af1f85" />
 			</dataarea>
 		</part>
 	</software>
@@ -1102,7 +1103,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="soccera2.bin" size="8192" crc="7c2858dd" sha1="a6fd25d85124e4c3f005f25c067a0b60a7a617c3" offset="0" />
+				<rom name="soccera2.bin" size="8192" crc="7c2858dd" sha1="a6fd25d85124e4c3f005f25c067a0b60a7a617c3" />
 			</dataarea>
 		</part>
 	</software>
@@ -1113,7 +1114,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="soccera3.bin" size="8192" crc="5cb41426" sha1="a6cee6a0bc7a7bfe506b1089b431629e8b57dc04" offset="0" />
+				<rom name="soccera3.bin" size="8192" crc="5cb41426" sha1="a6cee6a0bc7a7bfe506b1089b431629e8b57dc04" />
 			</dataarea>
 		</part>
 	</software>
@@ -1124,7 +1125,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="soccera4.bin" size="8192" crc="4f5e93d5" sha1="5ea2b708df06b09abd63b58e03229efecb98d464" offset="0" />
+				<rom name="soccera4.bin" size="8192" crc="4f5e93d5" sha1="5ea2b708df06b09abd63b58e03229efecb98d464" />
 			</dataarea>
 		</part>
 	</software>
@@ -1135,7 +1136,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scnquer.bin" size="8192" crc="d15ce025" sha1="3185285687a1b4f643329bea94cba398e1b3ed4b" offset="0" />
+				<rom name="scnquer.bin" size="8192" crc="d15ce025" sha1="3185285687a1b4f643329bea94cba398e1b3ed4b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1146,7 +1147,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scquer28.bin" size="8192" crc="0709b022" sha1="90900ec2c1fb9d476db22fd479400a6315230f9f" offset="0" />
+				<rom name="scquer28.bin" size="8192" crc="0709b022" sha1="90900ec2c1fb9d476db22fd479400a6315230f9f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1157,7 +1158,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scquer39.bin" size="8192" crc="8612cc7a" sha1="eba87f0296ff0759eb25a094ea98fd05d9eb91b6" offset="0" />
+				<rom name="scquer39.bin" size="8192" crc="8612cc7a" sha1="eba87f0296ff0759eb25a094ea98fd05d9eb91b6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1169,7 +1170,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scquerp.bin" size="8192" crc="4a229478" sha1="99139da1e5b8a52251033de6902b537d3f9ab6bc" offset="0" />
+				<rom name="scquerp.bin" size="8192" crc="4a229478" sha1="99139da1e5b8a52251033de6902b537d3f9ab6bc" />
 			</dataarea>
 		</part>
 	</software>
@@ -1180,7 +1181,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="songs.bin" size="4096" crc="fe6182b3" sha1="a269b21309b7849b6a3e248417be9316db31e4e6" offset="0" />
+				<rom name="songs.bin" size="4096" crc="fe6182b3" sha1="a269b21309b7849b6a3e248417be9316db31e4e6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1191,7 +1192,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="songs (19xx)(bally mfg. corp.)(proto)[a].bin" size="8192" crc="36a3d077" sha1="892720fb69a1d7bb158d857176374c113ab545ca" offset="0" />
+				<rom name="songs (19xx)(bally mfg. corp.)(proto)[a].bin" size="8192" crc="36a3d077" sha1="892720fb69a1d7bb158d857176374c113ab545ca" />
 			</dataarea>
 		</part>
 	</software>
@@ -1203,7 +1204,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="songsu.bin" size="8192" crc="16326f8c" sha1="c2f980f59367f4ff80c96fc173c83c0b29c1bc8f" offset="0" />
+				<rom name="songsu.bin" size="8192" crc="16326f8c" sha1="c2f980f59367f4ff80c96fc173c83c0b29c1bc8f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1214,7 +1215,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="spacefrt.bin" size="4096" crc="519cc707" sha1="d1d4527128cad5446cdd4d4f0dfa7194cb50aaef" offset="0" />
+				<rom name="spacefrt.bin" size="4096" crc="519cc707" sha1="d1d4527128cad5446cdd4d4f0dfa7194cb50aaef" />
 			</dataarea>
 		</part>
 	</software>
@@ -1225,7 +1226,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="space fortress (1981)(astrocade inc.)(proto).bin" size="2048" crc="cf5012bd" sha1="08510e05c81192908bb62330dc825e1f63052584" offset="0" />
+				<rom name="space fortress (1981)(astrocade inc.)(proto).bin" size="2048" crc="cf5012bd" sha1="08510e05c81192908bb62330dc825e1f63052584" />
 			</dataarea>
 		</part>
 	</software>
@@ -1236,7 +1237,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="invaders.bin" size="4096" crc="52964c1f" sha1="aecaa45ed1d74ebf882120da75c006ae502e94c1" offset="0" />
+				<rom name="invaders.bin" size="4096" crc="52964c1f" sha1="aecaa45ed1d74ebf882120da75c006ae502e94c1" />
 			</dataarea>
 		</part>
 	</software>
@@ -1247,7 +1248,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="space invaders (197x)(bally mfg. corp.)(proto).bin" size="2048" crc="a542f4b2" sha1="46b2396ce3223a8e709a819e674726e6bf0d026e" offset="0" />
+				<rom name="space invaders (197x)(bally mfg. corp.)(proto).bin" size="2048" crc="a542f4b2" sha1="46b2396ce3223a8e709a819e674726e6bf0d026e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1258,7 +1259,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="spedmath.bin" size="2048" crc="7d30312a" sha1="8f500f1e2144169bb94214eaa2863dcf6590b926" offset="0" />
+				<rom name="spedmath.bin" size="2048" crc="7d30312a" sha1="8f500f1e2144169bb94214eaa2863dcf6590b926" />
 			</dataarea>
 		</part>
 	</software>
@@ -1269,7 +1270,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="starbttl.bin" size="2048" crc="d54a74c8" sha1="00f8c65ed73f6ce134c1e4e0af7c5aa91a287951" offset="0" />
+				<rom name="starbttl.bin" size="2048" crc="d54a74c8" sha1="00f8c65ed73f6ce134c1e4e0af7c5aa91a287951" />
 			</dataarea>
 		</part>
 	</software>
@@ -1281,7 +1282,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="stweek.bin" size="2048" crc="e4f3766a" sha1="a8170dba7126ff6acb56686a46362bb36bebd799" offset="0" />
+				<rom name="stweek.bin" size="2048" crc="e4f3766a" sha1="a8170dba7126ff6acb56686a46362bb36bebd799" />
 			</dataarea>
 		</part>
 	</software>
@@ -1293,7 +1294,7 @@
 		<publisher>Esoterica and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="sslope.bin" size="4096" crc="df6b2304" sha1="e0793194497631f427581b951f5b0569cc7be398" offset="0" />
+				<rom name="sslope.bin" size="4096" crc="df6b2304" sha1="e0793194497631f427581b951f5b0569cc7be398" />
 			</dataarea>
 		</part>
 	</software>
@@ -1305,7 +1306,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="tests.bin" size="4096" crc="49df19eb" sha1="581f592845ffca65f1336b521d03c57309a6f91c" offset="0" />
+				<rom name="tests.bin" size="4096" crc="49df19eb" sha1="581f592845ffca65f1336b521d03c57309a6f91c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1317,7 +1318,7 @@
 		<publisher>WaveMakers and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="gateesc.bin" size="8192" crc="d89abb30" sha1="a9dca8ae5410a8e5d375f1a36f1ee282aadb7eda" offset="0" />
+				<rom name="gateesc.bin" size="8192" crc="d89abb30" sha1="a9dca8ae5410a8e5d375f1a36f1ee282aadb7eda" />
 			</dataarea>
 		</part>
 	</software>
@@ -1328,7 +1329,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="wizard.bin" size="8192" crc="1395b130" sha1="da366390c91e24206b5034bc525e98f2a3ce5f86" offset="0" />
+				<rom name="wizard.bin" size="8192" crc="1395b130" sha1="da366390c91e24206b5034bc525e98f2a3ce5f86" />
 			</dataarea>
 		</part>
 	</software>
@@ -1340,7 +1341,7 @@
 		<publisher>Astrocade</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="wizardp.bin" size="8192" crc="a0cba256" sha1="262c731967b193ece4e1d395e7cb3e8ce9c4fc2c" offset="0" status="baddump"/>
+				<rom name="wizardp.bin" size="8192" crc="a0cba256" sha1="262c731967b193ece4e1d395e7cb3e8ce9c4fc2c" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1351,7 +1352,7 @@
 		<publisher>Bally</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="baseball.bin" size="4096" crc="5be548cc" sha1="4dda98d6cf257652fd179eca137b69b67e38b8c6" offset="0" />
+				<rom name="baseball.bin" size="4096" crc="5be548cc" sha1="4dda98d6cf257652fd179eca137b69b67e38b8c6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1362,7 +1363,7 @@
 		<publisher>Esoterica</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="treasure.bin" size="8192" crc="1447f854" sha1="3c2a01b0b73664be5b332db2a0d7a91bdee2fdab" offset="0" />
+				<rom name="treasure.bin" size="8192" crc="1447f854" sha1="3c2a01b0b73664be5b332db2a0d7a91bdee2fdab" />
 			</dataarea>
 		</part>
 	</software>
@@ -1374,7 +1375,7 @@
 		<publisher>Esoterica</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="treasurp.bin" size="4096" crc="5379aabf" sha1="640c4a70ebaa937f8d9c532f6cd9cb67f34be037" offset="0" />
+				<rom name="treasurp.bin" size="4096" crc="5379aabf" sha1="640c4a70ebaa937f8d9c532f6cd9cb67f34be037" />
 			</dataarea>
 		</part>
 	</software>
@@ -1386,7 +1387,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="vidstory.bin" size="8192" crc="2cc8cc3c" sha1="c6688c73175a850865973f5a8423de539497c5f2" offset="0" />
+				<rom name="vidstory.bin" size="8192" crc="2cc8cc3c" sha1="c6688c73175a850865973f5a8423de539497c5f2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1398,7 +1399,7 @@
 		<publisher>Alternative Engineering</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="viperb.bin" size="8192" crc="770143c5" sha1="2dca771d2da1f562c69f838fe96c93ccf9aebeff" offset="0" />
+				<rom name="viperb.bin" size="8192" crc="770143c5" sha1="2dca771d2da1f562c69f838fe96c93ccf9aebeff" />
 			</dataarea>
 		</part>
 	</software>
@@ -1410,7 +1411,7 @@
 		<publisher>Alternative Engineering</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="viperbp.bin" size="8192" crc="4cd1ee10" sha1="1d0d0ebf38b89ab9da95540d8c797c05388777e7" offset="0" />
+				<rom name="viperbp.bin" size="8192" crc="4cd1ee10" sha1="1d0d0ebf38b89ab9da95540d8c797c05388777e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -1421,7 +1422,7 @@
 		<publisher>Riff Raff Games</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="war (2012)(riff raff games)[second printing].bin" size="7931" crc="c1faf1bf" sha1="bca64e756b1f1c23a6b78d90a14541e44161371b" offset="0" />
+				<rom name="war (2012)(riff raff games)[second printing].bin" size="7931" crc="c1faf1bf" sha1="bca64e756b1f1c23a6b78d90a14541e44161371b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1433,7 +1434,7 @@
 		<publisher>Bob Wiseman, Dave Carson, and Mike White</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="yahtgold.bin" size="8192" crc="7d56aa59" sha1="e1c41607cc3fd222002aebb3340e0c8e33be0782" offset="0" />
+				<rom name="yahtgold.bin" size="8192" crc="7d56aa59" sha1="e1c41607cc3fd222002aebb3340e0c8e33be0782" />
 			</dataarea>
 		</part>
 	</software>
@@ -1445,7 +1446,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="yesternv.bin" size="2048" crc="f400e5d4" sha1="9608f05556461ee4da7a7eda74bd6ac6683e874e" offset="0" />
+				<rom name="yesternv.bin" size="2048" crc="f400e5d4" sha1="9608f05556461ee4da7a7eda74bd6ac6683e874e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1456,7 +1457,7 @@
 		<publisher>Richard Degler and George Moses</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="yesterv.bin" size="2048" crc="a4edba84" sha1="a55d9ead5f921dba2c1aeb2608f5fb4ab93e5667" offset="0" />
+				<rom name="yesterv.bin" size="2048" crc="a4edba84" sha1="a55d9ead5f921dba2c1aeb2608f5fb4ab93e5667" />
 			</dataarea>
 		</part>
 	</software>

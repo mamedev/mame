@@ -47,22 +47,27 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class egghunt_state : public driver_device
 {
 public:
-	egghunt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	egghunt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_atram(*this, "atram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void egghunt(machine_config &config);
+
+private:
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
 	uint8_t     m_vidram_bank;
@@ -97,7 +102,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void egghunt(machine_config &config);
 	void egghunt_map(address_map &map);
 	void io_map(address_map &map);
 	void sound_map(address_map &map);
@@ -223,7 +227,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
 
 WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -238,33 +242,36 @@ WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
-ADDRESS_MAP_START(egghunt_state::egghunt_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_SHARE("atram")
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(egghunt_bgram_r, egghunt_bgram_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void egghunt_state::egghunt_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc800, 0xcfff).ram().w(FUNC(egghunt_state::egghunt_atram_w)).share("atram");
+	map(0xd000, 0xdfff).rw(FUNC(egghunt_state::egghunt_bgram_r), FUNC(egghunt_state::egghunt_bgram_w));
+	map(0xe000, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(egghunt_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(egghunt_vidram_bank_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(egghunt_gfx_banking_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE(egghunt_soundlatch_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("UNK") AM_WRITENOP
-	AM_RANGE(0x07, 0x07) AM_WRITENOP
-ADDRESS_MAP_END
+void egghunt_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1").w(FUNC(egghunt_state::egghunt_vidram_bank_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(egghunt_state::egghunt_gfx_banking_w));
+	map(0x02, 0x02).portr("P1");
+	map(0x03, 0x03).portr("P2").w(FUNC(egghunt_state::egghunt_soundlatch_w));
+	map(0x04, 0x04).portr("DSW2");
+	map(0x06, 0x06).portr("UNK").nopw();
+	map(0x07, 0x07).nopw();
+}
 
-ADDRESS_MAP_START(egghunt_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(egghunt_okibanking_r, egghunt_okibanking_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void egghunt_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe001, 0xe001).rw(FUNC(egghunt_state::egghunt_okibanking_r), FUNC(egghunt_state::egghunt_okibanking_w));
+	map(0xe004, 0xe004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf000, 0xffff).ram();
+}
 
 
 static INPUT_PORTS_START( egghunt )
@@ -401,7 +408,7 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( egghunt )
+static GFXDECODE_START( gfx_egghunt )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 64 )
 GFXDECODE_END
@@ -421,40 +428,38 @@ void egghunt_state::machine_reset()
 	m_vidram_bank = 0;
 }
 
-MACHINE_CONFIG_START(egghunt_state::egghunt)
-
+void egghunt_state::egghunt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz ?*/
-	MCFG_CPU_PROGRAM_MAP(egghunt_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", egghunt_state,  irq0_line_hold) // or 2 like mitchell.c?
+	Z80(config, m_maincpu, 12000000/2);      /* 6 MHz ?*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &egghunt_state::egghunt_map);
+	m_maincpu->set_addrmap(AS_IO, &egghunt_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(egghunt_state::irq0_line_hold)); // or 2 like mitchell.cpp?
 
-	MCFG_CPU_ADD("audiocpu", Z80,12000000/2)         /* 6 MHz ?*/
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 12000000/2);         /* 6 MHz ?*/
+	m_audiocpu->set_addrmap(AS_PROGRAM, &egghunt_state::sound_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, 56*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(egghunt_state::screen_update_egghunt));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", egghunt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_egghunt);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 ROM_START( egghunt )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -479,4 +484,4 @@ ROM_START( egghunt )
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(f03589bc) SHA1(4d9c8422ac3c4c3ecba3bcf0ed47b8c7d5903f8c) )
 ROM_END
 
-GAME( 1995, egghunt, 0, egghunt, egghunt, egghunt_state, 0, ROT0, "Invi Image", "Egg Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, egghunt, 0, egghunt, egghunt, egghunt_state, empty_init, ROT0, "Invi Image", "Egg Hunt", MACHINE_SUPPORTS_SAVE )

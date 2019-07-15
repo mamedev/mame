@@ -13,16 +13,6 @@
 
 #define K054539_CB_MEMBER(_name)   void _name(double left, double right)
 
-#define MCFG_K054539_APAN_CB(_class, _method) \
-		k054539_device::set_analog_callback(*device, k054539_device::cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K054539_REGION_OVERRRIDE(_region) \
-		k054539_device::set_override(*device, "^" _region);
-
-#define MCFG_K054539_TIMER_HANDLER(_devcb) \
-		devcb = &k054539_device::set_timer_handler(*device, DEVCB_##_devcb);
-
-
 class k054539_device : public device_t,
 						public device_sound_interface,
 						public device_rom_interface
@@ -41,13 +31,21 @@ public:
 	// construction/destruction
 	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_analog_callback(device_t &device, cb_delegate &&cb) { downcast<k054539_device &>(device).m_apan_cb = std::move(cb); }
-	template <class Object> static devcb_base &set_timer_handler(device_t &device, Object &&cb) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto timer_handler() { return m_timer_handler.bind(); }
 
+	void set_analog_callback(cb_delegate callback) { m_apan_cb = callback; }
+	template <class FunctionClass> void set_analog_callback(const char *devname, void (FunctionClass::*callback)(double, double), const char *name)
+	{
+		set_analog_callback(cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_analog_callback(void (FunctionClass::*callback)(double, double), const char *name)
+	{
+		set_analog_callback(cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 	void init_flags(int flags);
 
@@ -67,6 +65,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

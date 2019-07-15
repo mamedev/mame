@@ -7,36 +7,19 @@
 
 #include "mapledev.h"
 
-#define MCFG_DC_CONTROLLER_ADD(_tag, _host_tag, _host_port, d0, d1, a0, a1, a2, a3, a4, a5) \
-	MCFG_MAPLE_DEVICE_ADD(_tag, DC_CONTROLLER, 0, _host_tag, _host_port) \
-	dc_controller_device::static_set_port_tag(*device, 0, d0); \
-	dc_controller_device::static_set_port_tag(*device, 1, d1); \
-	dc_controller_device::static_set_port_tag(*device, 2, a0); \
-	dc_controller_device::static_set_port_tag(*device, 3, a1); \
-	dc_controller_device::static_set_port_tag(*device, 4, a2); \
-	dc_controller_device::static_set_port_tag(*device, 5, a3); \
-	dc_controller_device::static_set_port_tag(*device, 6, a4); \
-	dc_controller_device::static_set_port_tag(*device, 7, a5);
 
-#define MCFG_DC_CONTROLLER_SET_ID(id) \
-	dc_controller_device::static_set_id(*device, id);
-
-#define MCFG_DC_CONTROLLER_SET_LICENSE(license) \
-	dc_controller_device::static_set_license(*device, license);
-
-#define MCFG_DC_CONTROLLER_SET_VERSIONS(versions) \
-	dc_controller_device::static_set_versions(*device, versions);
-
-class dc_controller_device : public maple_device
+class dc_common_device : public maple_device
 {
 public:
 	// construction/destruction
-	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_port_tag(device_t &device, int port, const char *tag);
-	static void static_set_id(device_t &device, const char *id);
-	static void static_set_license(device_t &device, const char *license);
-	static void static_set_versions(device_t &device, const char *versions);
+	template <uint8_t Which, typename T>
+	void set_port_tag(T &&port_tag) { port[Which].set_tag(std::forward<T>(port_tag)); }
+	// TODO: we probably don't need these setters
+	void set_model(const char *new_id) { model = new_id; }
+	void set_license(const char *new_license) { license = new_license; }
+	void set_versions(const char *new_versions) { versions = new_versions; }
 
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 
@@ -44,17 +27,62 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	const char *model, *license, *versions;
+	uint32_t id;
+	uint32_t electric_current;
+	uint32_t region;
+
+	optional_ioport_array<8> port;
+
+	virtual void fixed_status(uint32_t *dest) = 0;
+	virtual void free_status(uint32_t *dest) = 0;
+	virtual void read(uint32_t *dest) = 0;
+};
+
+class dc_controller_device : public dc_common_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
+		: dc_controller_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(host_tag));
+		set_host_port(host_port);
+	}
+
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 private:
-	void fixed_status(uint32_t *dest);
-	void free_status(uint32_t *dest);
-	void read(uint32_t *dest);
+	void fixed_status(uint32_t *dest) override;
+	void free_status(uint32_t *dest) override;
+	void read(uint32_t *dest) override;
+};
 
-	const char *port_tag[8];
-	const char *id, *license, *versions;
 
-	ioport_port *port[8];
+class dc_keyboard_device : public dc_common_device
+{
+public:
+	// construction/destruction
+	template <typename T>
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
+		: dc_keyboard_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(host_tag));
+		set_host_port(host_port);
+	}
+
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+//protected:
+
+private:
+	void fixed_status(uint32_t *dest) override;
+	void free_status(uint32_t *dest) override;
+	void read(uint32_t *dest) override;
 };
 
 DECLARE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device)
+DECLARE_DEVICE_TYPE(DC_KEYBOARD, dc_keyboard_device)
 
 #endif // MAME_MACHINE_DC_CTRL_H

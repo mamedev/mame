@@ -15,31 +15,31 @@
 
 
 ******************************************************************************/
-PALETTE_INIT_MEMBER(pastelg_state, pastelg)
+void pastelg_state::pastelg_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	int bit0, bit1, bit2, bit3, r, g, b;
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int bit0, bit1, bit2, bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		bit3 = BIT(color_prom[0], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[0], 4);
+		bit1 = BIT(color_prom[0], 5);
+		bit2 = BIT(color_prom[0], 6);
+		bit3 = BIT(color_prom[0], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[palette.entries()], 0);
+		bit1 = BIT(color_prom[palette.entries()], 1);
+		bit2 = BIT(color_prom[palette.entries()], 2);
+		bit3 = BIT(color_prom[palette.entries()], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -144,7 +144,7 @@ void pastelg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case TIMER_BLITTER:
-		m_nb1413m3->m_busyflag = 1;
+		m_nb1413m3->busyflag_w(1);
 		break;
 	default:
 		assert_always(false, "Unknown id in pastelg_state::device_timer");
@@ -271,7 +271,7 @@ void pastelg_state::pastelg_gfxdraw()
 		y += incy;
 	}
 
-	m_nb1413m3->m_busyflag = 0;
+	m_nb1413m3->busyflag_w(0);
 	m_blitter_timer->adjust(attotime::from_hz(400000) * m_nb1413m3->m_busyctr);
 }
 
@@ -298,7 +298,7 @@ void pastelg_state::video_start()
 	save_item(NAME(m_blitter_direction_x));
 	save_item(NAME(m_blitter_direction_y));
 	save_item(NAME(m_palbank));
-	save_pointer(NAME(m_videoram.get()), width*height);
+	save_pointer(NAME(m_videoram), width*height);
 	save_item(NAME(m_flipscreen_old));
 }
 

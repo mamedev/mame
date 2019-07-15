@@ -197,35 +197,37 @@ WRITE8_MEMBER(vball_state::scrollx_lo_w)
 
 
 //Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)
-ADDRESS_MAP_START(vball_state::main_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("P3")
-	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P4")
-	AM_RANGE(0x1008, 0x1008) AM_WRITE(scrollx_hi_w)
-	AM_RANGE(0x1009, 0x1009) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x100a, 0x100b) AM_WRITE(irq_ack_w)  /* is there a scanline counter here? */
-	AM_RANGE(0x100c, 0x100c) AM_WRITE(scrollx_lo_w)
-	AM_RANGE(0x100d, 0x100d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_SHARE("scrolly_lo")
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(attrib_w) AM_SHARE("attribram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void vball_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x08ff).ram().share("spriteram");
+	map(0x1000, 0x1000).portr("P1");
+	map(0x1001, 0x1001).portr("P2");
+	map(0x1002, 0x1002).portr("SYSTEM");
+	map(0x1003, 0x1003).portr("DSW1");
+	map(0x1004, 0x1004).portr("DSW2");
+	map(0x1005, 0x1005).portr("P3");
+	map(0x1006, 0x1006).portr("P4");
+	map(0x1008, 0x1008).w(FUNC(vball_state::scrollx_hi_w));
+	map(0x1009, 0x1009).w(FUNC(vball_state::bankswitch_w));
+	map(0x100a, 0x100b).w(FUNC(vball_state::irq_ack_w));  /* is there a scanline counter here? */
+	map(0x100c, 0x100c).w(FUNC(vball_state::scrollx_lo_w));
+	map(0x100d, 0x100d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x100e, 0x100e).writeonly().share("scrolly_lo");
+	map(0x2000, 0x2fff).w(FUNC(vball_state::videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).w(FUNC(vball_state::attrib_w)).share("attribram");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(vball_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void vball_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9803).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( vball )
@@ -388,49 +390,49 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( vb )
+static GFXDECODE_START( gfx_vb )
 	GFXDECODE_ENTRY( "fg_tiles", 0, charlayout,     0, 8 )  /* 8x8 chars */
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 128, 8 )  /* 16x16 sprites */
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(vball_state::vball)
-
+void vball_state::vball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* 2 MHz - measured by guru but it makes the game far far too slow ?! */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vball_state, vball_scanline, "screen", 0, 1)
+	M6502(config, m_maincpu, CPU_CLOCK);   /* 2 MHz - measured by guru but it makes the game far far too slow ?! */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vball_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(vball_state::vball_scanline), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 3579545);  /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &vball_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   /* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248);   /* based on ddragon driver */
+	m_screen->set_screen_update(FUNC(vball_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vb)
-	MCFG_PALETTE_ADD("palette", 256)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vb);
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	// The sound system comes all but verbatim from Double Dragon
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.60);
+	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
@@ -558,7 +560,7 @@ ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom 
 ROM_END
 
 
-GAME( 1988, vball,    0,     vball,    vball,    vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vballb,   vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball,    0,     vball,    vball,    vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vballb,   vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )

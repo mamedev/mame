@@ -10,18 +10,6 @@
 typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
 
-#define MCFG_K052109_CB(_class, _method) \
-	k052109_device::set_k052109_callback(*device, k052109_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K052109_CHARRAM(_ram) \
-	k052109_device::set_ram(*device, _ram);
-
-#define MCFG_K052109_SCREEN_TAG(_tag) \
-	k052109_device::set_screen_tag(*device, "^" _tag);
-
-#define MCFG_K052109_IRQ_HANDLER(_devcb) \
-	devcb = &k052109_device::set_irq_handler(*device, DEVCB_##_devcb);
-
 
 class k052109_device : public device_t, public device_gfx_interface
 {
@@ -34,12 +22,10 @@ public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<k052109_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	static void set_k052109_callback(device_t &device, k052109_cb_delegate callback) { downcast<k052109_device &>(device).m_k052109_cb = callback; }
-	static void set_ram(device_t &device, bool ram);
-	static void set_screen_tag(device_t &device, const char *tag);
+	auto irq_handler() { return m_irq_handler.bind(); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb = k052109_cb_delegate(std::forward<T>(args)...); }
+	void set_char_ram(bool ram);
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	/*
 	The callback is passed:
@@ -56,12 +42,10 @@ public:
 	chip so it must not be set by the callback.
 	*/
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_READ16_MEMBER( lsb_r );
-	DECLARE_WRITE16_MEMBER( lsb_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u16 word_r(offs_t offset);
+	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_rmrd_line(int state);
 	int get_rmrd_line();
@@ -76,6 +60,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state

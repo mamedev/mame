@@ -20,8 +20,6 @@
 #include "emu.h"
 #include "irem.h"
 
-#include "cpu/m6502/m6502.h"
-
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
 #else
@@ -130,7 +128,7 @@ void nes_h3001_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -168,7 +166,7 @@ void nes_h3001_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_lrog017_device::write_h)
+void nes_lrog017_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lrog017 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -187,7 +185,7 @@ WRITE8_MEMBER(nes_lrog017_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_holydivr_device::write_h)
+void nes_holydivr_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("holy diver write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -211,7 +209,7 @@ WRITE8_MEMBER(nes_holydivr_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_tam_s1_device::write_h)
+void nes_tam_s1_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("tam s1 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -235,7 +233,7 @@ WRITE8_MEMBER(nes_tam_s1_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_g101_device::write_h)
+void nes_g101_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("g101 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -294,14 +292,14 @@ void nes_h3001_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
 			}
 		}
 	}
 }
 
-WRITE8_MEMBER(nes_h3001_device::write_h)
+void nes_h3001_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("h3001 write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -317,12 +315,12 @@ WRITE8_MEMBER(nes_h3001_device::write_h)
 
 		case 0x1003:
 			m_irq_enable = data & 0x80;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		case 0x1004:
 			m_irq_count = m_irq_count_latch;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		case 0x1005:

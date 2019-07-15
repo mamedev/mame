@@ -33,7 +33,7 @@
 
 #define IBM8514_LINE_LENGTH (m_vga->offset())
 
-#define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
+#define VGA_CH_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
 #define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
 #define TEXT_START_ADDRESS (vga.crtc.start_addr<<3)
@@ -72,7 +72,7 @@ void cirrus_gd5428_device::device_start()
 
 	int i;
 	for (i = 0; i < 0x100; i++)
-		m_palette->set_pen_color(i, 0, 0, 0);
+		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
@@ -1263,7 +1263,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	if(vga.sequencer.data[4] & 4)
 	{
 		int data;
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			vga.gc.latch[0]=vga.memory[(offset+addr) % vga.svga_intf.vram_size];
 			vga.gc.latch[1]=vga.memory[((offset+addr)+0x10000) % vga.svga_intf.vram_size];

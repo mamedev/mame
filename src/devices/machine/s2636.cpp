@@ -416,7 +416,7 @@ READ8_MEMBER( s2636_device::read_data )
 	{
 	case REG_COL_BG_CMPL:
 	case REG_VBL_COL_OBJ:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			m_registers[offset] = 0x00; // collision/completion/VRESET flags reset on read
 		break;
 	}
@@ -436,7 +436,7 @@ WRITE8_MEMBER( s2636_device::write_data )
 
 WRITE_LINE_MEMBER( s2636_device::write_intack )
 {
-	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state) || (PULSE_LINE == state));
+	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state));
 
 	// pretend interrupt acknowledge is handled instantaneously
 	m_intack = state;

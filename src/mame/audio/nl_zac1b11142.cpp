@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// copyright-holders:Vas Crabb, Couriersud
 
 #include "audio/nl_zac1b11142.h"
 #include "netlist/devices/net_lib.h"
@@ -9,6 +9,7 @@
 
 #endif
 
+#define USE_FRONTIERS 1
 
 NETLIST_START(zac1b11142_schematics)
 
@@ -69,8 +70,8 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(R104.2, U5C3.OUT, R105.1)
 	NET_C(R102.1, U5C3.PLUS)
 	NET_C(R103.2, R102.2, R84.1)
-	NET_C(VCC, R126.1, R103.1, U5C1.VP, U5C2.VP, U5C3.VP)
-	NET_C(GND, R133.2, C63.2, R132.2, R120.2, R129.2, R127.2, R121.2, C61.2, R84.2, U5C1.VM, U5C2.VM, U5C3.VM)
+	NET_C(VCC, R126.1, R103.1, U5C1.VCC, U5C2.VCC, U5C3.VCC)
+	NET_C(GND, R133.2, C63.2, R132.2, R120.2, R129.2, R127.2, R121.2, C61.2, R84.2, U5C1.GND, U5C2.GND, U5C3.GND)
 	ALIAS(RULLANTE, R124.2)
 	ALIAS(CASSA, R105.2)
 
@@ -110,8 +111,8 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(C45.2, R85.2, U5C4.OUT, R106.1)
 	NET_C(R86.1, U5C4.PLUS)
 	NET_C(R87.2, R86.2, R88.1)
-	NET_C(VCC, R101.1, R87.1, U5B4.VP, U5C4.VP)
-	NET_C(GND, R46.2, R100.2, C54.2, R88.2, U5B4.VM, U5C4.VM)
+	NET_C(VCC, R101.1, R87.1, U5B4.VCC, U5C4.VCC)
+	NET_C(GND, R46.2, R100.2, C54.2, R88.2, U5B4.GND, U5C4.GND)
 	ALIAS(BASSO, R106.2)
 
 
@@ -170,8 +171,8 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(C49.2, R107.2, U5B2.OUT, R90.1)
 	NET_C(R93.1, U5B2.PLUS)
 	NET_C(R92.2, R93.2, R91.1)
-	NET_C(VCC, R92.1, U5B2.VP)
-	NET_C(GND, R78.2, R91.2, U5B2.VM)
+	NET_C(VCC, R92.1, U5B2.VCC)
+	NET_C(GND, R78.2, R91.2, U5B2.GND)
 	ALIAS(PIANO, R90.2)
 
 
@@ -212,8 +213,8 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(R112.2, U5D.1, C50.1, R113.1, U5B1.MINUS)
 	NET_C(R95.2, U5B1.PLUS)
 	NET_C(U5D.2, C50.2, R113.2, U5B1.OUT, R96.1)
-	NET_C(VCC, R64.1, R65.1, R94.1, R110.1, U5B1.VP)
-	NET_C(GND, R66.2, C28.2, R40.2, T6.E, C37.2, R108.2, R111.2, U5B1.VM, U4A1.GND)
+	NET_C(VCC, R64.1, R65.1, R94.1, R110.1, U5B1.VCC)
+	NET_C(GND, R66.2, C28.2, R40.2, T6.E, C37.2, R108.2, R111.2, U5B1.GND, U4A1.GND)
 	ALIAS(TROMBA, R96.2)
 
 
@@ -242,13 +243,7 @@ NETLIST_START(zac1b11142_schematics)
 	TTL_74156_DIP(U4B) // FIXME: should be a 74LS156 (lower sink capability)
 	LM3900(U5B3)
 
-#if 0
 	NET_C(RULLANTE, CASSA, BASSO, R82.2, /*R80.2,*/ PIANO, C40.1, R77.1)
-#else
-	// cassa swamps the other instruments if it's connected - just ground it for now
-	NET_C(GND, CASSA)
-	NET_C(RULLANTE, BASSO, R82.2, /*R80.2,*/ PIANO, C40.1, R77.1)
-#endif
 	NET_C(C40.2, R97.1)
 	NET_C(TROMBA, R97.2, R41.2, R42.2, R43.2, R44.2, R73.2, R74.2, R75.2, R76.2)
 	NET_C(IOA2, U4B.13)
@@ -270,34 +265,102 @@ NETLIST_START(zac1b11142_schematics)
 	NET_C(R45.2, T7.C)
 	NET_C(T7.B, R68.1)
 	NET_C(R68.2, LEVEL)
-	NET_C(VCC, R119.1, U4B.16, U5B3.VP)
+	NET_C(VCC, R119.1, U4B.16, U5B3.VCC)
 	NET_C(GND, P1.3, T7.E, R117.1, U4B.2, U4B.8, U4B.14)
-	NET_C(GND, U5B3.VM)
+	NET_C(GND, U5B3.GND)
 
 NETLIST_END()
 
+NETLIST_START(zac1b11142_schematics_speech)
+
+	CS(I_SP, 0) // Fed through stream ...
+
+	LM3900(U5D4)
+	CAP(C31, CAP_U(0.22))
+	CAP(C33, CAP_P(470))
+	CAP(C30, CAP_P(47))
+	CAP(C8,  CAP_U(0.1))
+	RES(R63, RES_K(2.2))
+	RES(R62, RES_K(220))
+	RES(R61, RES_K(860))
+	RES(R50, RES_K(820))
+	RES(R49, RES_K(820))
+	RES(R11, RES_K(2.2))
+	RES(R4,  RES_K(10))
+	POT(P2,  RES_K(10))
+
+	NET_C(GND, C31.2, R63.2, R50.2, P2.3, U5D4.GND)
+	NET_C(VCC, U5D4.VCC, I_SP.1)
+
+	NET_C(C31.1, I_SP.2, R63.1, R62.1)
+	NET_C(R62.2, C33.1)
+	NET_C(C33.2, R61.1)
+	NET_C(R61.2, R49.1, C30.1, U5D4.MINUS)
+	NET_C(R50.1, U5D4.PLUS)
+	NET_C(R49.2, C30.2, R11.1, U5D4.OUT)
+	NET_C(R11.2, P2.1)
+	NET_C(P2.2, R4.1)
+	NET_C(R4.2, C8.1)
+
+	NET_C(C8.2, R1.1)
+
+NETLIST_END()
+
+NETLIST_START(zac1b11142_schematics_dac)
+
+	CS(I_DAC, 0)    // Fed through stream ...
+
+	QBJT_EB(T4, "2N4401")
+
+	CAP(C20, CAP_U(0.01))
+	CAP(C21, CAP_U(0.1))
+	RES(R13, RES_M(3.3))
+	RES(R15, RES_K(3.3))
+	RES(R16, RES_K(2.2))
+	RES(R17, RES_K(3.3))
+	RES(R18, RES_K(10))
+	POT(P3,  RES_K(10))
+
+	NET_C(GND, T4.B, R17.2, C20.2, P3.3)
+	NET_C(VCC, R15.1)
+	NET_C(I_M5, R13.1, I_DAC.2)
+	NET_C(I_DAC.1, T4.E, R13.2)
+	NET_C(T4.C, R15.2, R17.1, C20.1, R16.2)
+	NET_C(R16.1, P3.1)
+	NET_C(P3.2, R18.1)
+	NET_C(R18.2, C21.1)
+	NET_C(C21.2, C8.2)
+NETLIST_END()
 
 NETLIST_START(zac1b11142)
 
 	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-10)
+	#if (USE_FRONTIERS)
+	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.NR_LOOPS, 300)
+	PARAM(Solver.METHOD, "MAT_CR")
+	PARAM(Solver.PARALLEL, 4)
+	PARAM(Solver.DYNAMIC_TS, 0)
+	#else
+	PARAM(Solver.ACCURACY, 1e-6)
 	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.METHOD, "MAT_CR")
 	PARAM(Solver.PARALLEL, 0)
 	PARAM(Solver.DYNAMIC_TS, 0)
-	PARAM(Solver.DYNAMIC_LTE, 5e-4)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
-
+	PARAM(Solver.DYNAMIC_LTE, 5e-1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-6)
+	#endif
 	LOCAL_SOURCE(zac1b11142_schematics)
+	LOCAL_SOURCE(zac1b11142_schematics_speech)
+	LOCAL_SOURCE(zac1b11142_schematics_dac)
 
 	ANALOG_INPUT(I_P12, 11.3) // +12V dropped with a 1N4004
 	ANALOG_INPUT(I_P5, 5)
-	//ANALOG_INPUT(I_V0, 0)
 	ANALOG_INPUT(I_M5, -5)
 	ALIAS(VCC, I_P5.Q)
 	ALIAS(I_V0.Q, GND)
 
-	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=4.95 ORL=100.0 ORH=0.5k)")
+	NET_MODEL("AY8910PORT FAMILY(OVL=0.05 OVH=0.05 ORL=100.0 ORH=0.5k)")
 
 	// AY-3-8910 4G/4H digital outputs
 	LOGIC_INPUT(I_IOA0,   1, "AY8910PORT")
@@ -333,5 +396,38 @@ NETLIST_START(zac1b11142)
 	ALIAS(ANAL6, R_AY4H_C.2)
 
 	INCLUDE(zac1b11142_schematics)
+	INCLUDE(zac1b11142_schematics_speech)
+	INCLUDE(zac1b11142_schematics_dac)
 
+	RES(R1, RES_K(100))
+	RES(R3, RES_K(10))
+	CAP(C7, CAP_U(0.1))
+
+	NET_C(P1.2, R3.1)
+	NET_C(R3.2, C7.1)
+	NET_C(C7.2, R1.1)   // Connect to Pin 2 - also other sounds are mixed in here <- sound out
+	NET_C(R1.2, GND)    // Actually connected to ~6V from pin 3 of TDA1510
+
+	#if (USE_FRONTIERS)
+	OPTIMIZE_FRONTIER(R124.1, RES_K(39), 50)
+	OPTIMIZE_FRONTIER(R105.1, RES_K(56), 50)
+	OPTIMIZE_FRONTIER(R106.1, RES_K(68), 50)
+	// R80 not connected
+	//OPTIMIZE_FRONTIER(R80.1,  RES_K(10), 50)
+
+	OPTIMIZE_FRONTIER(R90.1, RES_K(68), 50)
+	OPTIMIZE_FRONTIER(R96.1, RES_K(4.7), 50)
+	#endif
+
+	/* -----------------------------------------------------------------------
+	 * Power terminals
+	 * -----------------------------------------------------------------------*/
+
+	NET_C(VCC, U3A.14)
+	NET_C(GND, U3A.7)
+
+	// Reverse so that volume raises with raising percentage in ui
+	PARAM(P1.REVERSE, 1)
+	PARAM(P2.REVERSE, 1)
+	PARAM(P3.REVERSE, 1)
 NETLIST_END()

@@ -13,46 +13,6 @@
 
 #pragma once
 
-// i/o pins
-
-// L pins: 8-bit bi-directional
-#define MCFG_COP400_READ_L_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_read_l_callback(*device, DEVCB_##_devcb);
-#define MCFG_COP400_WRITE_L_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_write_l_callback(*device, DEVCB_##_devcb);
-// output state when pins are in tri-state, default 0
-#define MCFG_COP400_READ_L_TRISTATE_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_read_l_tristate_callback(*device, DEVCB_##_devcb);
-
-// G pins: 4-bit bi-directional
-#define MCFG_COP400_READ_G_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_read_g_callback(*device, DEVCB_##_devcb);
-#define MCFG_COP400_WRITE_G_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
-
-// D outputs: 4-bit general purpose output
-#define MCFG_COP400_WRITE_D_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
-
-// IN inputs: 4-bit general purpose input
-#define MCFG_COP400_READ_IN_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_read_in_callback(*device, DEVCB_##_devcb);
-
-// SI/SO lines: serial in/out or counter/gen.purpose
-#define MCFG_COP400_READ_SI_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_read_si_callback(*device, DEVCB_##_devcb);
-#define MCFG_COP400_WRITE_SO_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_write_so_callback(*device, DEVCB_##_devcb);
-
-// SK output line: logic-controlled clock or gen.purpose
-#define MCFG_COP400_WRITE_SK_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_write_sk_callback(*device, DEVCB_##_devcb);
-
-// CKI/CKO lines: only CKO input here
-#define MCFG_COP400_READ_CKO_CB(_devcb) \
-	devcb = &cop400_cpu_device::set_read_cko_callback(*device, DEVCB_##_devcb);
-
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -110,34 +70,48 @@ enum cop400_cko_bond {
 	COP400_CKO_GENERAL_PURPOSE_INPUT
 };
 
-
-#define MCFG_COP400_CONFIG(_cki, _cko, _microbus) \
-	cop400_cpu_device::set_cki(*device, _cki); \
-	cop400_cpu_device::set_cko(*device, _cko); \
-	cop400_cpu_device::set_microbus(*device, _microbus);
-
-
 class cop400_cpu_device : public cpu_device
 {
 public:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_l.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_l_tristate_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_l_tristate.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_l.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_g_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_g.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_g.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_in_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_in.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_si_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_si.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_so_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_so.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_sk_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_sk.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_cko_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_cko.set_callback(object); }
+	// L pins: 8-bit bi-directional
+	auto read_l() { return m_read_l.bind(); }
+	auto write_l() { return m_write_l.bind(); }
 
-	static void set_cki(device_t &device, cop400_cki_bond cki) { downcast<cop400_cpu_device &>(device).m_cki = cki; }
-	static void set_cko(device_t &device, cop400_cko_bond cko) { downcast<cop400_cpu_device &>(device).m_cko = cko; }
-	static void set_microbus(device_t &device, bool has_microbus) { downcast<cop400_cpu_device &>(device).m_has_microbus = has_microbus; }
+	// output state when pins are in tri-state, default 0
+	auto read_l_tristate() { return m_read_l_tristate.bind(); }
+
+	// G pins: 4-bit bi-directional
+	auto read_g() { return m_read_g.bind(); }
+	auto write_g() { return m_write_g.bind(); }
+
+	// D outputs: 4-bit general purpose output
+	auto write_d() { return m_write_d.bind(); }
+
+	// IN inputs: 4-bit general purpose input
+	auto read_in() { return m_read_in.bind(); }
+
+	// SI/SO lines: serial in/out or counter/gen.purpose
+	auto read_si() { return m_read_si.bind(); }
+	auto write_so() { return m_write_so.bind(); }
+
+	// SK output line: logic-controlled clock or gen.purpose
+	auto write_sk() { return m_write_sk.bind(); }
+
+	// CKI/CKO lines: only CKO input here
+	auto read_cko() { return m_read_cko.bind(); }
+
+	void set_config(cop400_cki_bond cki, cop400_cko_bond cko, bool has_microbus)
+	{
+		set_cki(cki);
+		set_cko(cko);
+		set_microbus(has_microbus);
+	}
+
+	void set_cki(cop400_cki_bond cki) { m_cki = cki; }
+	void set_cko(cop400_cko_bond cko) { m_cko = cko; }
+	void set_microbus(bool has_microbus) { m_has_microbus = has_microbus; }
 
 	DECLARE_READ8_MEMBER( microbus_rd );
 	DECLARE_WRITE8_MEMBER( microbus_wr );
@@ -171,7 +145,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -211,7 +185,7 @@ protected:
 	bool m_has_inil;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 
 	uint8_t m_featuremask;

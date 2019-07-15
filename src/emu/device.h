@@ -41,10 +41,6 @@
 //**************************************************************************
 
 // configure devices
-#define MCFG_DEVICE_CLOCK(_clock) \
-	device_t::static_set_clock(*device, _clock);
-#define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
-	device_t::static_set_input_default(*device, DEVICE_INPUT_DEFAULTS_NAME(_config));
 
 #define DECLARE_READ_LINE_MEMBER(name)      int  name()
 #define READ_LINE_MEMBER(name)              int  name()
@@ -70,30 +66,61 @@ static const char DEVICE_SELF_OWNER[] = "^";
 
 namespace emu { namespace detail {
 
-class device_type_impl;
+class device_type_impl_base;
+
+
+template <typename T> struct is_device_implementation
+{
+	static constexpr bool value = std::is_base_of<device_t, T>::value;
+};
+
+template <typename T> struct is_device_interface
+{
+	static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value;
+};
 
 
 struct device_feature
 {
 	enum type : u32
 	{
+		// Functionality-related
 		PROTECTION  = u32(1) <<  0,
-		PALETTE     = u32(1) <<  1,
+		TIMING      = u32(1) <<  1,
+
+		// Graphics
 		GRAPHICS    = u32(1) <<  2,
-		SOUND       = u32(1) <<  3,
-		CONTROLS    = u32(1) <<  4,
-		KEYBOARD    = u32(1) <<  5,
-		MOUSE       = u32(1) <<  6,
+		PALETTE     = u32(1) <<  3,
+
+		// Sound
+		SOUND       = u32(1) <<  4,
+
+		// Capture/Media Output
+		CAPTURE     = u32(1) <<  5,
+		CAMERA      = u32(1) <<  6,
 		MICROPHONE  = u32(1) <<  7,
-		CAMERA      = u32(1) <<  8,
-		DISK        = u32(1) <<  9,
-		PRINTER     = u32(1) << 10,
-		LAN         = u32(1) << 11,
-		WAN         = u32(1) << 12,
-		TIMING      = u32(1) << 13,
+
+		// Controls/HID
+		CONTROLS    = u32(1) <<  8,
+		KEYBOARD    = u32(1) <<  9,
+		MOUSE       = u32(1) << 10,
+
+		// Media Output
+		MEDIA       = u32(1) << 11,
+		DISK        = u32(1) << 12,
+		PRINTER     = u32(1) << 13,
+		TAPE        = u32(1) << 14,
+		PUNCH       = u32(1) << 15,
+		DRUM        = u32(1) << 16,
+		ROM         = u32(1) << 17,
+
+		// Comms/Network
+		COMMS       = u32(1) << 18,
+		LAN         = u32(1) << 19,
+		WAN         = u32(1) << 20,
 
 		NONE        = u32(0),
-		ALL         = (u32(1) << 14) - 1U
+		ALL         = (u32(1) << 21) - 1U
 	};
 };
 
@@ -110,9 +137,9 @@ public:
 	{
 	public:
 		typedef std::ptrdiff_t difference_type;
-		typedef device_type_impl value_type;
-		typedef device_type_impl *pointer;
-		typedef device_type_impl &reference;
+		typedef device_type_impl_base value_type;
+		typedef device_type_impl_base *pointer;
+		typedef device_type_impl_base &reference;
 		typedef std::forward_iterator_tag iterator_category;
 
 		const_iterator() = default;
@@ -141,15 +168,15 @@ public:
 	const_iterator cend() const;
 
 private:
-	friend class device_type_impl;
+	friend class device_type_impl_base;
 
 	class const_iterator_helper : public const_iterator
 	{
 	public:
-		const_iterator_helper(device_type_impl *type) { m_type = type; }
+		const_iterator_helper(device_type_impl_base *type) { m_type = type; }
 	};
 
-	static device_type_impl *register_device(device_type_impl &type);
+	static device_type_impl_base *register_device(device_type_impl_base &type);
 };
 
 
@@ -163,26 +190,26 @@ auto device_tag_func() { return device_tag_struct<DeviceClass, ShortName, FullNa
 template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
 auto driver_tag_func() { return driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>{ }; };
 
-class device_type_impl
+class device_type_impl_base
 {
 private:
 	friend class device_registrar;
 
-	typedef std::unique_ptr<device_t> (*create_func)(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	typedef std::unique_ptr<device_t> (*create_func)(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	device_type_impl(device_type_impl const &) = delete;
-	device_type_impl(device_type_impl &&) = delete;
-	device_type_impl &operator=(device_type_impl const &) = delete;
-	device_type_impl &operator=(device_type_impl &&) = delete;
+	device_type_impl_base(device_type_impl_base const &) = delete;
+	device_type_impl_base(device_type_impl_base &&) = delete;
+	device_type_impl_base &operator=(device_type_impl_base const &) = delete;
+	device_type_impl_base &operator=(device_type_impl_base &&) = delete;
 
 	template <typename DeviceClass>
-	static std::unique_ptr<device_t> create_device(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	static std::unique_ptr<device_t> create_device(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	{
 		return make_unique_clear<DeviceClass>(mconfig, tag, owner, clock);
 	}
 
 	template <typename DriverClass>
-	static std::unique_ptr<device_t> create_driver(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	static std::unique_ptr<device_t> create_driver(device_type_impl_base const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	{
 		assert(!owner);
 		assert(!clock);
@@ -198,10 +225,12 @@ private:
 	device_feature::type const m_unemulated_features;
 	device_feature::type const m_imperfect_features;
 
-	device_type_impl *m_next;
+	device_type_impl_base *m_next;
 
 public:
-	device_type_impl(std::nullptr_t)
+	using exposed_type = device_t;
+
+	device_type_impl_base(std::nullptr_t)
 		: m_creator(nullptr)
 		, m_type(typeid(std::nullptr_t))
 		, m_shortname(nullptr)
@@ -214,7 +243,7 @@ public:
 	}
 
 	template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
-	device_type_impl(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
+	device_type_impl_base(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
 		, m_shortname(ShortName)
@@ -227,7 +256,7 @@ public:
 	}
 
 	template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
-	device_type_impl(driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect> (*)())
+	device_type_impl_base(driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect> (*)())
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
 		, m_shortname(ShortName)
@@ -246,14 +275,36 @@ public:
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
 
-	std::unique_ptr<device_t> operator()(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
+	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
 		return m_creator(*this, mconfig, tag, owner, clock);
 	}
 
 	explicit operator bool() const { return bool(m_creator); }
-	bool operator==(device_type_impl const &that) const { return &that == this; }
-	bool operator!=(device_type_impl const &that) const { return &that != this; }
+	bool operator==(device_type_impl_base const &that) const { return &that == this; }
+	bool operator!=(device_type_impl_base const &that) const { return &that != this; }
+};
+
+
+template <class DeviceClass>
+class device_type_impl : public device_type_impl_base
+{
+public:
+	using exposed_type = DeviceClass;
+
+	using device_type_impl_base::device_type_impl_base;
+	using device_type_impl_base::create;
+
+	template <typename... Params>
+	std::unique_ptr<DeviceClass> create(machine_config &mconfig, char const *tag, device_t *owner, Params &&... args) const
+	{
+		return make_unique_clear<DeviceClass>(mconfig, tag, owner, std::forward<Params>(args)...);
+	}
+
+	template <typename... Params> DeviceClass &operator()(machine_config &mconfig, char const *tag, Params &&... args) const;
+	template <typename Exposed, bool Required, typename... Params> DeviceClass &operator()(machine_config &mconfig, device_finder<Exposed, Required> &finder, Params &&... args) const;
+	template <typename... Params> DeviceClass &operator()(machine_config_replace replace, char const *tag, Params &&... args) const;
+	template <typename Exposed, bool Required, typename... Params> DeviceClass &operator()(machine_config_replace replace, device_finder<Exposed, Required> &finder, Params &&... args) const;
 };
 
 
@@ -263,7 +314,7 @@ inline device_registrar::const_iterator &device_registrar::const_iterator::opera
 
 
 // device types
-typedef emu::detail::device_type_impl const &device_type;
+typedef emu::detail::device_type_impl_base const &device_type;
 typedef std::add_pointer_t<device_type> device_type_ptr;
 extern emu::detail::device_registrar const registered_device_types;
 
@@ -284,13 +335,13 @@ template <
 constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>;
 
 #define DECLARE_DEVICE_TYPE(Type, Class) \
-		extern device_type const Type; \
 		class Class; \
+		extern emu::detail::device_type_impl<Class> const &Type; \
 		extern template class device_finder<Class, false>; \
 		extern template class device_finder<Class, true>;
 
 #define DECLARE_DEVICE_TYPE_NS(Type, Namespace, Class) \
-		extern device_type const Type; \
+		extern emu::detail::device_type_impl<Namespace::Class> const &Type; \
 		extern template class device_finder<Namespace::Class, false>; \
 		extern template class device_finder<Namespace::Class, true>;
 
@@ -299,16 +350,23 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
 		} \
-		device_type const Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		emu::detail::device_type_impl<Class> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
 		template class device_finder<Class, false>; \
 		template class device_finder<Class, true>;
+
+#define DEFINE_DEVICE_TYPE_PRIVATE(Type, Base, Class, ShortName, FullName) \
+		namespace { \
+			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+		} \
+		emu::detail::device_type_impl<Base> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>;
 
 #define DEFINE_DEVICE_TYPE_NS(Type, Namespace, Class, ShortName, FullName) \
 		namespace { \
 			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
 		} \
-		device_type const Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		emu::detail::device_type_impl<Namespace::Class> const &Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
 		template class device_finder<Namespace::Class, false>; \
 		template class device_finder<Namespace::Class, true>;
 
@@ -330,6 +388,7 @@ class device_t : public delegate_late_bind
 	friend class simple_list<device_t>;
 	friend class running_machine;
 	friend class finder_base;
+	friend class devcb_base;
 
 	class subdevice_list
 	{
@@ -453,15 +512,15 @@ public:
 	const std::vector<rom_entry> &rom_region_vector() const;
 	const tiny_rom_entry *rom_region() const { return device_rom_region(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
-	u8 default_bios() const { return m_default_bios; }
+	std::string const &get_default_bios_tag() const { return m_default_bios_tag; }
+	u8 default_bios() const { assert(configured()); return m_default_bios; }
 	u8 system_bios() const { return m_system_bios; }
-	const std::string &default_bios_tag() const { return m_default_bios_tag; }
 
 	// interface helpers
 	interface_list &interfaces() { return m_interfaces; }
 	const interface_list &interfaces() const { return m_interfaces; }
-	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != nullptr); }
-	template<class _DeviceClass> bool interface(_DeviceClass *&intf) const { intf = dynamic_cast<const _DeviceClass *>(this); return (intf != nullptr); }
+	template<class DeviceClass> bool interface(DeviceClass *&intf) { intf = dynamic_cast<DeviceClass *>(this); return (intf != nullptr); }
+	template<class DeviceClass> bool interface(DeviceClass *&intf) const { intf = dynamic_cast<const DeviceClass *>(this); return (intf != nullptr); }
 
 	// specialized helpers for common core interfaces
 	bool interface(device_execute_interface *&intf) { intf = m_interfaces.m_execute; return (intf != nullptr); }
@@ -479,24 +538,24 @@ public:
 	const subdevice_list &subdevices() const { return m_subdevices; }
 
 	// device-relative tag lookups
-	std::string subtag(const char *tag) const;
-	std::string siblingtag(const char *tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : std::string(tag); }
-	memory_region *memregion(const char *tag) const;
-	memory_share *memshare(const char *tag) const;
-	memory_bank *membank(const char *tag) const;
-	ioport_port *ioport(const char *tag) const;
+	std::string subtag(std::string tag) const;
+	std::string siblingtag(std::string tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : tag; }
+	memory_region *memregion(std::string tag) const;
+	memory_share *memshare(std::string tag) const;
+	memory_bank *membank(std::string tag) const;
+	ioport_port *ioport(std::string tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
-	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) const { return downcast<_DeviceClass *>(subdevice(tag)); }
-	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) const { return downcast<_DeviceClass *>(siblingdevice(tag)); }
+	template<class DeviceClass> DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
+	template<class DeviceClass> DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
-	void add_machine_configuration(machine_config &config) { device_add_mconfig(config); }
-	static void static_set_clock(device_t &device, u32 clock);
-	static void static_set_clock(device_t &device, const XTAL &xtal) { static_set_clock(device, xtal.value()); }
-	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
-	static void static_set_default_bios_tag(device_t &device, const char *tag) { device.m_default_bios_tag = tag; }
+	void add_machine_configuration(machine_config &config);
+	void set_clock(u32 clock);
+	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
+	void set_input_default(const input_device_default *config) { m_input_defaults = config; }
+	template <typename... Params> void set_default_bios_tag(Params &&... args) { assert(!configured()); m_default_bios_tag.assign(std::forward<Params>(args)...); }
 
 	// state helpers
 	void config_complete();
@@ -522,19 +581,16 @@ public:
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 
 	// state saving interfaces
-	template<typename _ItemType>
-	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
-	template<typename _ItemType>
-	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
+	template<typename ItemType>
+	void ATTR_COLD save_item(ItemType &&value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), valname); }
+	template<typename ItemType>
+	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
-	offs_t safe_pc() const;
-	offs_t safe_pcbase() const;
 
-	void set_default_bios(u8 bios) { m_default_bios = bios; }
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
-	bool findit(bool pre_map, bool isvalidation) const;
+	bool findit(bool isvalidation) const;
 
 	// misc
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
@@ -552,6 +608,7 @@ protected:
 	void post_load();
 	void notify_clock_changed();
 	finder_base *register_auto_finder(finder_base &autodev);
+	void register_callback(devcb_base &callback);
 
 	//------------------- begin derived class overrides
 
@@ -613,6 +670,7 @@ private:
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
 	mutable std::vector<rom_entry>  m_rom_entries;
+	std::list<devcb_base *> m_callbacks;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
@@ -897,7 +955,7 @@ private:
 
 // helper class to find devices with a given interface in the device hierarchy
 // also works for finding devices derived from a given subclass
-template<class _InterfaceClass>
+template<class InterfaceClass>
 class device_interface_iterator
 {
 public:
@@ -913,8 +971,8 @@ public:
 		}
 
 		// getters returning specified interface type
-		_InterfaceClass *current() const { return m_interface; }
-		_InterfaceClass &operator*() const { assert(m_interface != nullptr); return *m_interface; }
+		InterfaceClass *current() const { return m_interface; }
+		InterfaceClass &operator*() const { assert(m_interface != nullptr); return *m_interface; }
 
 		// search for devices with the specified interface
 		const auto_iterator &operator++() { advance(); find_interface(); return *this; }
@@ -933,7 +991,7 @@ private:
 		}
 
 		// private state
-		_InterfaceClass *m_interface;
+		InterfaceClass *m_interface;
 	};
 
 public:
@@ -946,13 +1004,13 @@ public:
 	auto_iterator end() const { return auto_iterator(nullptr, 0, m_maxdepth); }
 
 	// return first item
-	_InterfaceClass *first() const { return begin().current(); }
+	InterfaceClass *first() const { return begin().current(); }
 
 	// return the number of items available
 	int count() const
 	{
 		int result = 0;
-		for (_InterfaceClass &item : *this)
+		for (InterfaceClass &item : *this)
 		{
 			(void)&item;
 			result++;
@@ -961,10 +1019,10 @@ public:
 	}
 
 	// return the index of a given item in the virtual list
-	int indexof(_InterfaceClass &intrf) const
+	int indexof(InterfaceClass &intrf) const
 	{
 		int index = 0;
-		for (_InterfaceClass &item : *this)
+		for (InterfaceClass &item : *this)
 		{
 			if (&item == &intrf)
 				return index;
@@ -975,9 +1033,9 @@ public:
 	}
 
 	// return the indexed item in the list
-	_InterfaceClass *byindex(int index) const
+	InterfaceClass *byindex(int index) const
 	{
-		for (_InterfaceClass &item : *this)
+		for (InterfaceClass &item : *this)
 			if (index-- == 0)
 				return &item;
 		return nullptr;

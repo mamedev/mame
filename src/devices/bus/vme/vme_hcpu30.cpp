@@ -53,22 +53,23 @@
 
 DEFINE_DEVICE_TYPE(VME_HCPU30, vme_hcpu30_card_device, "hcpu30", "Besta HCPU30 CPU board")
 
-ADDRESS_MAP_START(vme_hcpu30_card_device::hcpu30_mem)
-	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_WRITE(bootvect_w)   /* After first write we act as RAM */
-	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_READ(bootvect_r)   /* ROM mirror just during reset */
-	AM_RANGE(0x00000008, 0x001fffff) AM_RAM // local bus DRAM, 4MB
-	AM_RANGE(0x00200000, 0x00201fff) AM_RAM // AM_SHARE("iocpu")
-	AM_RANGE(0xff000000, 0xff007fff) AM_ROM AM_MIRROR(0x8000) AM_REGION("user1", 0)
-	AM_RANGE(0xff020000, 0xff027fff) AM_RAM AM_MIRROR(0x8000) // SRAM 32KB
-	AM_RANGE(0xffff8000, 0xffff8fff) AM_UNMAP // shared memory with iocpu
-	AM_RANGE(0xffff9000, 0xffff9fff) AM_RAM   // SRAM, optional: battery-backed
-	AM_RANGE(0xfffff100, 0xfffff11f) AM_UNMAP // VME bus configuration (accessed after DIP switch read)
-	AM_RANGE(0xfffff120, 0xfffff123) AM_READ_PORT("SA1")
-	AM_RANGE(0xfffff200, 0xfffff2ff) AM_UNMAP
-	AM_RANGE(0xfffff300, 0xfffff3ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff)
-	AM_RANGE(0xfffff600, 0xfffff6ff) AM_UNMAP
-	AM_RANGE(0xfffff700, 0xfffff7ff) AM_UNMAP
-ADDRESS_MAP_END
+void vme_hcpu30_card_device::hcpu30_mem(address_map &map)
+{
+	map(0x00000000, 0x00000007).ram().w(FUNC(vme_hcpu30_card_device::bootvect_w));   /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(FUNC(vme_hcpu30_card_device::bootvect_r));   /* ROM mirror just during reset */
+	map(0x00000008, 0x001fffff).ram(); // local bus DRAM, 4MB
+	map(0x00200000, 0x00201fff).ram(); // AM_SHARE("iocpu")
+	map(0xff000000, 0xff007fff).rom().mirror(0x8000).region("user1", 0);
+	map(0xff020000, 0xff027fff).ram().mirror(0x8000); // SRAM 32KB
+	map(0xffff8000, 0xffff8fff).unmaprw(); // shared memory with iocpu
+	map(0xffff9000, 0xffff9fff).ram();   // SRAM, optional: battery-backed
+	map(0xfffff100, 0xfffff11f).unmaprw(); // VME bus configuration (accessed after DIP switch read)
+	map(0xfffff120, 0xfffff123).portr("SA1");
+	map(0xfffff200, 0xfffff2ff).unmaprw();
+	map(0xfffff300, 0xfffff3ff).rw("duscc", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write));
+	map(0xfffff600, 0xfffff6ff).unmaprw();
+	map(0xfffff700, 0xfffff7ff).unmaprw();
+}
 
 static INPUT_PORTS_START(hcpu30)
 	PORT_START("SA1")
@@ -121,27 +122,29 @@ ioport_constructor vme_hcpu30_card_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vme_hcpu30_card_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
-	MCFG_CPU_PROGRAM_MAP(hcpu30_mem)
+void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
+{
+	M68030(config, m_maincpu, 2*16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_hcpu30_card_device::hcpu30_mem);
 
-	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0)
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-//  MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE()
+	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);
+	m_dusccterm->configure_channels(0, 0, 0, 0);
+	m_dusccterm->out_txda_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtra_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsa_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
+	m_dusccterm->out_txdb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtrb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_rts));
+//  m_dusccterm->out_int_callback(),set(FUNC());
 
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsa_w))
+	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
+	rs232p1.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxa_w));
+	rs232p1.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsa_w));
 
-	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232p2(RS232_PORT(config, RS232P2_TAG, default_rs232_devices, nullptr));
+	rs232p2.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
+	rs232p2.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
+}
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset */
 READ32_MEMBER(vme_hcpu30_card_device::bootvect_r)

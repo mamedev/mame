@@ -11,28 +11,14 @@
     20 ... 2f, 40 ... 4f or 60 ... 6f.
 
 **********************************************************************/
-
 #ifndef MAME_MACHINE_RA17XX_H
 #define MAME_MACHINE_RA17XX_H
+
+#pragma once
 
 #include "device.h"
 #include "cpu/pps4/pps4.h"
 
-/*************************************
- *
- *  Device configuration macros
- *
- *************************************/
-
-// Set the read line handler
-#define MCFG_RA17XX_READ(devcb) \
-		ra17xx_device::set_iord(*device, DEVCB_##devcb);
-// Set the write line handler
-#define MCFG_RA17XX_WRITE(devcb) \
-		ra17xx_device::set_iowr(*device, DEVCB_##devcb);
-
-#define MCFG_RA17XX_CPU(tag) \
-		ra17xx_device::set_cpu_tag(*device, "^" tag);
 
 class ra17xx_device : public device_t
 {
@@ -42,9 +28,9 @@ public:
 	DECLARE_READ8_MEMBER ( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
-	template <class Object> static devcb_base &set_iord(device_t &device, Object &&cb) { return downcast<ra17xx_device &>(device).m_iord.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_iowr(device_t &device, Object &&cb) { return downcast<ra17xx_device &>(device).m_iowr.set_callback(std::forward<Object>(cb)); }
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<ra17xx_device &>(device).m_cpu.set_tag(tag); }
+	auto iord_cb() { return m_iord.bind(); }
+	auto iowr_cb() { return m_iowr.bind(); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// device-level overrides

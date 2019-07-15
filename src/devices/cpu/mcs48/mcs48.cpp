@@ -5,7 +5,7 @@
     - EA pin - defined by architecture, must implement:
       1 means external access, bypassing internal ROM
       reimplement as a push, not a pull
-    - add CMOS devices, 1 new opcode (01 HALT)
+    - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
     - make timer update cleaner:
       timer is updated on S4 while I/O happens on S5
@@ -13,6 +13,7 @@
       right now this is implemented with a hack in the mov_a_t handler
       in theory it should also be possible to see the timer flag before the interrupt is taken
       mov_t_a should also update the T register after it's incremented
+    - IRQ timing is similarly hacked due to WY-100 needing to take JNI branch before servicing interrupt
 */
 
 /***************************************************************************
@@ -34,6 +35,7 @@
     Chip   RAM  ROM  I/O
     ----   ---  ---  ---
     8021    64   1k   21  (ROM, reduced instruction set)
+    8022    64   2k   26  (ROM, reduced instruction set, analog comparator)
 
     8035    64    0   27  (external ROM)
     8048    64   1k   27  (ROM)
@@ -46,6 +48,9 @@
     8049   128   2k   27  (ROM)
     8749   128   2k   27  (EPROM)
     M58715 128    0       (external ROM)
+
+    8040   256   4k   27  (external ROM)
+    8050   256   4k   27  (ROM)
 
 ****************************************************************************
 
@@ -72,12 +77,17 @@
 
     Chip   RAM  ROM  I/O
     ----   ---  ---  ---
-    8041   128   1k
-    8741   128   1k       (EPROM)
+    8041A   64   1k       (ROM)
+    8041AH 128   1k       (ROM)
+    8641A   64   1k       (OTPROM)
+    8741A   64   1k       (EPROM)
+    8741AH 128   1k       (EPROM)
 
-    8042   256   2k
-    8242   256   2k
-    8242   256   2k
+    8042   128   2k       (ROM)
+    8042AH 256   2k       (ROM)
+    8642   128   2k       (OTPROM)
+    8742   128   2k       (EPROM)
+    8742AH 256   2k       (EPROM)
 
 ***************************************************************************/
 
@@ -141,25 +151,28 @@
 
 
 
-DEFINE_DEVICE_TYPE(I8021,  i8021_device,  "i8021",  "I8021")
-DEFINE_DEVICE_TYPE(I8022,  i8022_device,  "i8022",  "I8022")
-DEFINE_DEVICE_TYPE(I8035,  i8035_device,  "i8035",  "I8035")
-DEFINE_DEVICE_TYPE(I8048,  i8048_device,  "i8048",  "I8048")
-DEFINE_DEVICE_TYPE(I8648,  i8648_device,  "i8648",  "I8648")
-DEFINE_DEVICE_TYPE(I8748,  i8748_device,  "i8748",  "I8748")
-DEFINE_DEVICE_TYPE(I8039,  i8039_device,  "i8039",  "I8039")
-DEFINE_DEVICE_TYPE(I8049,  i8049_device,  "i8049",  "I8049")
-DEFINE_DEVICE_TYPE(I8749,  i8749_device,  "i8749",  "I8749")
-DEFINE_DEVICE_TYPE(I8040,  i8040_device,  "i8040",  "I8040")
-DEFINE_DEVICE_TYPE(I8050,  i8050_device,  "i8050",  "I8050")
-DEFINE_DEVICE_TYPE(I8041,  i8041_device,  "i8041",  "I8041")
-DEFINE_DEVICE_TYPE(I8741,  i8741_device,  "i8741",  "I8741")
-DEFINE_DEVICE_TYPE(I8042,  i8042_device,  "i8042",  "I8042")
-DEFINE_DEVICE_TYPE(I8242,  i8242_device,  "i8242",  "I8242")
-DEFINE_DEVICE_TYPE(I8742,  i8742_device,  "i8742",  "I8742")
-DEFINE_DEVICE_TYPE(MB8884, mb8884_device, "mb8884", "MB8884")
-DEFINE_DEVICE_TYPE(N7751,  n7751_device,  "n7751",  "N7751")
-DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
+DEFINE_DEVICE_TYPE(I8021,   i8021_device,   "i8021",   "Intel 8021")
+DEFINE_DEVICE_TYPE(I8022,   i8022_device,   "i8022",   "Intel 8022")
+DEFINE_DEVICE_TYPE(I8035,   i8035_device,   "i8035",   "Intel 8035")
+DEFINE_DEVICE_TYPE(I8048,   i8048_device,   "i8048",   "Intel 8048")
+DEFINE_DEVICE_TYPE(I8648,   i8648_device,   "i8648",   "Intel 8648")
+DEFINE_DEVICE_TYPE(I8748,   i8748_device,   "i8748",   "Intel 8748")
+DEFINE_DEVICE_TYPE(I8039,   i8039_device,   "i8039",   "Intel 8039")
+DEFINE_DEVICE_TYPE(I8049,   i8049_device,   "i8049",   "Intel 8049")
+DEFINE_DEVICE_TYPE(I8749,   i8749_device,   "i8749",   "Intel 8749")
+DEFINE_DEVICE_TYPE(I8040,   i8040_device,   "i8040",   "Intel 8040")
+DEFINE_DEVICE_TYPE(I8050,   i8050_device,   "i8050",   "Intel 8050")
+DEFINE_DEVICE_TYPE(I8041A,  i8041a_device,  "i8041a",  "Intel 8041A")
+DEFINE_DEVICE_TYPE(I8741A,  i8741a_device,  "i8741a",  "Intel 8741A")
+DEFINE_DEVICE_TYPE(I8041AH, i8041ah_device, "i8041ah", "Intel 8041AH")
+DEFINE_DEVICE_TYPE(I8741AH, i8741ah_device, "i8741ah", "Intel 8741AH")
+DEFINE_DEVICE_TYPE(I8042,   i8042_device,   "i8042",   "Intel 8042")
+DEFINE_DEVICE_TYPE(I8742,   i8742_device,   "i8742",   "Intel 8742")
+DEFINE_DEVICE_TYPE(I8042AH, i8042ah_device, "i8042ah", "Intel 8042AH")
+DEFINE_DEVICE_TYPE(I8742AH, i8742ah_device, "i8742ah", "Intel 8742AH")
+DEFINE_DEVICE_TYPE(MB8884,  mb8884_device,  "mb8884",  "MB8884")
+DEFINE_DEVICE_TYPE(N7751,   n7751_device,   "n7751",   "N7751")
+DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "M58715")
 
 
 /***************************************************************************
@@ -167,29 +180,35 @@ DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 ***************************************************************************/
 
 /* FIXME: the memory maps should probably support rom banking for EA */
-ADDRESS_MAP_START(mcs48_cpu_device::program_10bit)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_11bit)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_12bit)
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_12bit(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_6bit)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram().share("data");
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_7bit)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram().share("data");
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_8bit)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_8bit(address_map &map)
+{
+	map(0x00, 0xff).ram().share("data");
+}
 
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
@@ -207,6 +226,7 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	, m_t0_clk_func()
 	, m_prog_out_cb(*this)
 	, m_psw(0)
+	, m_dataptr(*this, "data")
 	, m_feature_mask(feature_mask)
 	, m_int_rom_size(rom_size)
 	, m_opcode_table(opcode_table)
@@ -298,28 +318,43 @@ upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type ty
 {
 }
 
-i8041_device::i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8041, tag, owner, clock, 1024, 128)
+i8041a_device::i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upi41_cpu_device(mconfig, I8041A, tag, owner, clock, 1024, 64)
 {
 }
 
-i8741_device::i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8741, tag, owner, clock, 1024, 128)
+i8741a_device::i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upi41_cpu_device(mconfig, I8741A, tag, owner, clock, 1024, 64)
+{
+}
+
+i8041ah_device::i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upi41_cpu_device(mconfig, I8041AH, tag, owner, clock, 1024, 128)
+{
+}
+
+i8741ah_device::i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upi41_cpu_device(mconfig, I8741AH, tag, owner, clock, 1024, 128)
 {
 }
 
 i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8042, tag, owner, clock, 2048, 256)
-{
-}
-
-i8242_device::i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8242, tag, owner, clock, 2048, 256)
+	: upi41_cpu_device(mconfig, I8042, tag, owner, clock, 2048, 128)
 {
 }
 
 i8742_device::i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8742, tag, owner, clock, 2048, 256)
+	: upi41_cpu_device(mconfig, I8742, tag, owner, clock, 2048, 128)
+{
+}
+
+i8042ah_device::i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upi41_cpu_device(mconfig, I8042AH, tag, owner, clock, 2048, 256)
+{
+}
+
+i8742ah_device::i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upi41_cpu_device(mconfig, I8742AH, tag, owner, clock, 2048, 256)
 {
 }
 
@@ -338,9 +373,9 @@ device_memory_interface::space_config_vector mcs48_cpu_device::memory_space_conf
 		};
 }
 
-util::disasm_interface *mcs48_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mcs48_cpu_device::create_disassembler()
 {
-	return new mcs48_disassembler((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
+	return std::make_unique<mcs48_disassembler>((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
 }
 
 /***************************************************************************
@@ -355,7 +390,7 @@ uint8_t mcs48_cpu_device::opcode_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -368,7 +403,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 {
 	uint16_t address = m_pc;
 	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
-	return m_direct->read_byte(address);
+	return m_cache->read_byte(address);
 }
 
 
@@ -379,7 +414,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 
 void mcs48_cpu_device::update_regptr()
 {
-	m_regptr = (uint8_t *)m_data->get_write_ptr((m_psw & B_FLAG) ? 24 : 0);
+	m_regptr = &m_dataptr[(m_psw & B_FLAG) ? 24 : 0];
 }
 
 
@@ -525,19 +560,25 @@ uint8_t mcs48_cpu_device::p2_mask()
 
 void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 {
-	/* put opcode/data on low 4 bits of P2 */
+	// put opcode on low 4 bits of P2 (overwriting latch)
 	port_w(2, m_p2 = (m_p2 & 0xf0) | (uint8_t(operation) << 2) | (port & 3));
 
-	/* generate high-to-low transition on PROG line */
+	// generate high-to-low transition on PROG line
 	prog_w(0);
 
-	/* put data on low 4 bits of P2 */
+	// transfer data on low 4 bits of P2
 	if (operation != EXPANDER_OP_READ)
 		port_w(2, m_p2 = (m_p2 & 0xf0) | (m_a & 0x0f));
 	else
-		m_a = port_r(2) | 0x0f;
+	{
+		// place P20-P23 in input mode
+		port_w(2, m_p2 |= 0x0f);
 
-	/* generate low-to-high transition on PROG line */
+		// input data to lower 4 bits of A (upper 4 bits are cleared)
+		m_a = port_r(2) & 0x0f;
+	}
+
+	// generate low-to-high transition on PROG line
 	prog_w(1);
 }
 
@@ -714,8 +755,8 @@ OPHANDLER( jc )             { execute_jcc((m_psw & C_FLAG) != 0); return 2; }
 OPHANDLER( jf0 )            { execute_jcc((m_psw & F_FLAG) != 0); return 2; }
 OPHANDLER( jf1 )            { execute_jcc((m_sts & STS_F1) != 0); return 2; }
 OPHANDLER( jnc )            { execute_jcc((m_psw & C_FLAG) == 0); return 2; }
-OPHANDLER( jni )            { execute_jcc(m_irq_state != 0); return 2; }
-OPHANDLER( jnibf )          { execute_jcc((m_sts & STS_IBF) == 0); return 2; }
+OPHANDLER( jni )            { m_irq_polled = (m_irq_state == 0); execute_jcc(m_irq_state != 0); return 2; }
+OPHANDLER( jnibf )          { m_irq_polled = (m_sts & STS_IBF) != 0; execute_jcc((m_sts & STS_IBF) == 0); return 2; }
 OPHANDLER( jnt_0 )          { execute_jcc(test_r(0) == 0); return 2; }
 OPHANDLER( jnt_1 )          { execute_jcc(test_r(1) == 0); return 2; }
 OPHANDLER( jnz )            { execute_jcc(m_a != 0); return 2; }
@@ -1067,12 +1108,13 @@ void mcs48_cpu_device::device_start()
 	m_dbbi = 0;
 	m_dbbo = 0;
 	m_irq_state = 0;
+	m_irq_polled = 0;
 
 	/* FIXME: Current implementation suboptimal */
 	m_ea = (m_int_rom_size ? 0 : 1);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = (m_feature_mask & EXT_BUS_FEATURE) != 0 ? &space(AS_IO) : nullptr;
 
@@ -1093,7 +1135,7 @@ void mcs48_cpu_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
 		state_add(STATE_GENSP,     "GENSP",     m_psw).mask(0x7).noshow();
-		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%10s");
+		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
 		state_add(MCS48_A,         "A",         m_a);
 		state_add(MCS48_TC,        "TC",        m_timer);
 		state_add(MCS48_TPRE,      "TPRE",      m_prescaler).mask(0x1f);
@@ -1138,6 +1180,7 @@ void mcs48_cpu_device::device_start()
 	save_item(NAME(m_dbbo));
 
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_polled));
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_timer_overflow));
 	save_item(NAME(m_timer_flag));
@@ -1149,7 +1192,7 @@ void mcs48_cpu_device::device_start()
 
 	save_item(NAME(m_a11));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1199,6 +1242,10 @@ int mcs48_cpu_device::check_irqs()
 	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
 		m_irq_in_progress = true;
+
+		// force JNI to be taken (hack)
+		if (m_irq_polled)
+			m_pc = ((m_pc - 1) & 0xf00) | m_cache->read_byte(m_pc - 1);
 
 		/* transfer to location 0x03 */
 		push_pc_psw();
@@ -1293,7 +1340,8 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		m_irq_polled = false;
+		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 
 		/* process opcode and count cycles */
@@ -1366,17 +1414,6 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
-}
-
-
-READ8_MEMBER(mcs48_cpu_device::p1_r)
-{
-	return m_p1;
-}
-
-READ8_MEMBER(mcs48_cpu_device::p2_r)
-{
-	return m_p2;
 }
 
 

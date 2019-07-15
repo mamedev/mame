@@ -824,17 +824,6 @@ int discrete_device::same_module_index(const discrete_base_node &node)
 //**************************************************************************
 
 //-------------------------------------------------
-//  static_set_intf - configuration helper to set
-//  the interface
-//-------------------------------------------------
-
-void discrete_device::static_set_intf(device_t &device, const discrete_block *intf)
-{
-	discrete_device &disc = downcast<discrete_device &>(device);
-	disc.m_intf = intf;
-}
-
-//-------------------------------------------------
 //  discrete_device - constructor
 //-------------------------------------------------
 
@@ -1101,7 +1090,7 @@ void discrete_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-READ8_MEMBER( discrete_device::read )
+uint8_t discrete_device::read(offs_t offset)
 {
 	const discrete_base_node *node = discrete_find_node(offset);
 
@@ -1125,7 +1114,7 @@ READ8_MEMBER( discrete_device::read )
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-WRITE8_MEMBER( discrete_device::write )
+void discrete_device::write(offs_t offset, uint8_t data)
 {
 	const discrete_base_node *node = discrete_find_node(offset);
 

@@ -141,17 +141,12 @@ READ8_MEMBER(h8_sci_device::tdr_r)
 
 WRITE8_MEMBER(h8_sci_device::ssr_w)
 {
-	cpu->synchronize();
-
 	if(!(scr & SCR_TE)) {
 		data |= SSR_TDRE;
 		ssr |= SSR_TDRE;
 	}
 	if((ssr & SSR_TDRE) && !(data & SSR_TDRE))
-	{
 		ssr &= ~SSR_TEND;
-		scr &= ~SCR_TIE;
-	}
 	ssr = ((ssr & ~SSR_MPBT) | (data & SSR_MPBT)) & (data | (SSR_TEND|SSR_MPB|SSR_MPBT));
 	if(V>=2) logerror("ssr_w %02x -> %02x (%06x)\n", data, ssr, cpu->pc());
 
@@ -611,7 +606,7 @@ void h8_sci_device::tx_dropped_edge()
 		tx_bit = 0;
 		clock_stop(CLK_TX);
 		tx_cb(1);
-		ssr |= SSR_TEND|SSR_TDRE;
+		ssr |= SSR_TEND;
 		if(scr & SCR_TEIE)
 			intc->internal_interrupt(tei_int);
 		break;

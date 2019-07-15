@@ -99,13 +99,13 @@ void tiki100_bus_device::add_card(device_tiki100bus_card_interface *card)
 //  mrq_r - memory read
 //-------------------------------------------------
 
-uint8_t tiki100_bus_device::mrq_r(address_space &space, offs_t offset, uint8_t data, bool &mdis)
+uint8_t tiki100_bus_device::mrq_r(offs_t offset, uint8_t data, bool &mdis)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		data &= entry->mrq_r(space, offset, data, mdis);
+		data &= entry->mrq_r(offset, data, mdis);
 		entry = entry->next();
 	}
 
@@ -117,13 +117,13 @@ uint8_t tiki100_bus_device::mrq_r(address_space &space, offs_t offset, uint8_t d
 //  mrq_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( tiki100_bus_device::mrq_w )
+void tiki100_bus_device::mrq_w(offs_t offset, uint8_t data)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		entry->mrq_w(space, offset, data);
+		entry->mrq_w(offset, data);
 		entry = entry->next();
 	}
 }
@@ -133,13 +133,13 @@ WRITE8_MEMBER( tiki100_bus_device::mrq_w )
 //  iorq_r - I/O read
 //-------------------------------------------------
 
-uint8_t tiki100_bus_device::iorq_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t tiki100_bus_device::iorq_r(offs_t offset, uint8_t data)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		data &= entry->iorq_r(space, offset, data);
+		data &= entry->iorq_r(offset, data);
 		entry = entry->next();
 	}
 
@@ -151,13 +151,13 @@ uint8_t tiki100_bus_device::iorq_r(address_space &space, offs_t offset, uint8_t 
 //  iorq_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( tiki100_bus_device::iorq_w )
+void tiki100_bus_device::iorq_w(offs_t offset, uint8_t data)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		entry->iorq_w(space, offset, data);
+		entry->iorq_w(offset, data);
 		entry = entry->next();
 	}
 }
@@ -204,7 +204,8 @@ device_tiki100bus_card_interface::device_tiki100bus_card_interface(const machine
 #include "8088.h"
 #include "hdc.h"
 
-SLOT_INTERFACE_START( tiki100_cards )
-	SLOT_INTERFACE("8088", TIKI100_8088)
-	SLOT_INTERFACE("hdc", TIKI100_HDC)
-SLOT_INTERFACE_END
+void tiki100_cards(device_slot_interface &device)
+{
+	device.option_add("8088", TIKI100_8088);
+	device.option_add("hdc", TIKI100_HDC);
+}

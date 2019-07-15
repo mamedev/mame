@@ -23,54 +23,74 @@ ICS GENDAC ICS5342-3
 some logic
 clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 
+TODO:
+- program ROM is read via parallel port (for offset write, encrypted) and game port!?
+
 */
 
 #include "emu.h"
 
-#define ENABLE_VGA 0
+#define TAITOWLF_ENABLE_VGA 0
 
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
-#if ENABLE_VGA
+#if TAITOWLF_ENABLE_VGA
 #include "video/pc_vga.h"
 #endif
+#include "emupal.h"
 #include "screen.h"
 
 class taitowlf_state : public pcat_base_state
 {
 public:
-	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
+	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pcat_base_state(mconfig, type, tag),
 		m_bootscreen_rom(*this, "bootscreen"),
 		m_bank1(*this, "bank1"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
+
+	void taitowlf(machine_config &config);
+
+	void init_taitowlf();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_region_ptr<uint8_t> m_bootscreen_rom;
+	required_memory_bank m_bank1;
+	optional_device<palette_device> m_palette;
+	DECLARE_WRITE32_MEMBER(pnp_config_w);
+	DECLARE_WRITE32_MEMBER(pnp_data_w);
+	DECLARE_WRITE32_MEMBER(bios_ram_w);
+
+#if !TAITOWLF_ENABLE_VGA
+	void taitowlf_palette(palette_device &palette) const;
+#endif
+	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void intel82439tx_init();
+	void taitowlf_io(address_map &map);
+	void taitowlf_map(address_map &map);
+
+	uint8_t mtxc_config_r(int function, int reg);
+	void mtxc_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint8_t piix4_config_r(int function, int reg);
+	void piix4_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
-
-	required_region_ptr<uint8_t> m_bootscreen_rom;
-	required_memory_bank m_bank1;
-	required_device<palette_device> m_palette;
-	DECLARE_WRITE32_MEMBER(pnp_config_w);
-	DECLARE_WRITE32_MEMBER(pnp_data_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(taitowlf);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	#if !ENABLE_VGA
-	DECLARE_PALETTE_INIT(taitowlf);
-	#endif
-	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void intel82439tx_init();
-	void taitowlf(machine_config &config);
-	void taitowlf_io(address_map &map);
-	void taitowlf_map(address_map &map);
 };
 
-#if !ENABLE_VGA
+#if !TAITOWLF_ENABLE_VGA
 uint32_t taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
@@ -101,18 +121,16 @@ uint32_t taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rg
 
 // Intel 82439TX System Controller (MTXC)
 
-static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t taitowlf_state::mtxc_config_r(int function, int reg)
 {
-	taitowlf_state *state = busdevice->machine().driver_data<taitowlf_state>();
 //  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
 
-	return state->m_mtxc_config_reg[reg];
+	return m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void taitowlf_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-	taitowlf_state *state = busdevice->machine().driver_data<taitowlf_state>();
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 
 	switch(reg)
 	{
@@ -120,17 +138,17 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
-				state->m_bank1->set_entry(1);
+				m_bank1->set_entry(1);
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->m_bank1->set_entry(0);
+				m_bank1->set_entry(0);
 			}
 			break;
 		}
 	}
 
-	state->m_mtxc_config_reg[reg] = data;
+	m_mtxc_config_reg[reg] = data;
 }
 
 void taitowlf_state::intel82439tx_init()
@@ -143,104 +161,84 @@ void taitowlf_state::intel82439tx_init()
 	m_mtxc_config_reg[0x65] = 0x02;
 }
 
-static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t taitowlf_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
-	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
-	}
+		r |= mtxc_config_r(function, reg + 3) << 24;
+
 	if (ACCESSING_BITS_16_23)
-	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 2) << 16;
-	}
+		r |= mtxc_config_r(function, reg + 2) << 16;
+
 	if (ACCESSING_BITS_8_15)
-	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 1) << 8;
-	}
+		r |= mtxc_config_r(function, reg + 1) << 8;
+
 	if (ACCESSING_BITS_0_7)
-	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 0) << 0;
-	}
+		r |= mtxc_config_r(function, reg + 0) << 0;
+
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void taitowlf_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
-	{
-		mtxc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
-	}
+		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
+
 	if (ACCESSING_BITS_16_23)
-	{
-		mtxc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
-	}
+		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
+
 	if (ACCESSING_BITS_8_15)
-	{
-		mtxc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
-	}
+		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
+
 	if (ACCESSING_BITS_0_7)
-	{
-		mtxc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
-	}
+		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 
-static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t taitowlf_state::piix4_config_r(int function, int reg)
 {
-	taitowlf_state *state = busdevice->machine().driver_data<taitowlf_state>();
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return state->m_piix4_config_reg[function][reg];
+	return m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void taitowlf_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-	taitowlf_state *state = busdevice->machine().driver_data<taitowlf_state>();
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
-	state->m_piix4_config_reg[function][reg] = data;
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+	m_piix4_config_reg[function][reg] = data;
 }
 
-static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t taitowlf_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
-	{
-		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
-	}
+		r |= piix4_config_r(function, reg + 3) << 24;
+
 	if (ACCESSING_BITS_16_23)
-	{
-		r |= piix4_config_r(busdevice, device, function, reg + 2) << 16;
-	}
+		r |= piix4_config_r(function, reg + 2) << 16;
+
 	if (ACCESSING_BITS_8_15)
-	{
-		r |= piix4_config_r(busdevice, device, function, reg + 1) << 8;
-	}
+		r |= piix4_config_r(function, reg + 1) << 8;
+
 	if (ACCESSING_BITS_0_7)
-	{
-		r |= piix4_config_r(busdevice, device, function, reg + 0) << 0;
-	}
+		r |= piix4_config_r(function, reg + 0) << 0;
+
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void taitowlf_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
-	{
-		piix4_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
-	}
+		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
+
 	if (ACCESSING_BITS_16_23)
-	{
-		piix4_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
-	}
+		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
+
 	if (ACCESSING_BITS_8_15)
-	{
-		piix4_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
-	}
+		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
+
 	if (ACCESSING_BITS_0_7)
-	{
-		piix4_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
-	}
+		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
 }
 
 // ISA Plug-n-Play
@@ -271,41 +269,44 @@ WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 }
 
 
-ADDRESS_MAP_START(taitowlf_state::taitowlf_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	#if ENABLE_VGA
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	#else
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
-	#endif
-	#if ENABLE_VGA
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-	#else
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_NOP
-	#endif
-	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
+void taitowlf_state::taitowlf_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+#if TAITOWLF_ENABLE_VGA
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+#else
+	map(0x000a0000, 0x000bffff).ram();
+#endif
+#if TAITOWLF_ENABLE_VGA
+	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
+#else
+	map(0x000c0000, 0x000c7fff).noprw();
+#endif
+	map(0x000e0000, 0x000effff).ram();
+	map(0x000f0000, 0x000fffff).bankr("bank1");
+	map(0x000f0000, 0x000fffff).w(FUNC(taitowlf_state::bios_ram_w));
+	map(0x00100000, 0x01ffffff).ram();
 //  AM_RANGE(0xf8000000, 0xf83fffff) AM_ROM AM_REGION("user3", 0)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)   /* System BIOS */
-ADDRESS_MAP_END
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);   /* System BIOS */
+}
 
-ADDRESS_MAP_START(taitowlf_state::taitowlf_io)
-	AM_IMPORT_FROM(pcat32_io_common)
+void taitowlf_state::taitowlf_io(address_map &map)
+{
+	pcat32_io_common(map);
 
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x0300, 0x03af) AM_NOP
-	AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
-	#if ENABLE_VGA
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	#endif
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
+	map(0x00e8, 0x00eb).noprw();
+	map(0x0300, 0x03af).noprw();
+	map(0x0278, 0x027b).w(FUNC(taitowlf_state::pnp_config_w));
+#if TAITOWLF_ENABLE_VGA
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+#else
+	map(0x03b0, 0x03df).noprw();
+#endif
+	map(0x0a78, 0x0a7b).w(FUNC(taitowlf_state::pnp_data_w));
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+}
 
 /*****************************************************************************/
 
@@ -356,50 +357,51 @@ void taitowlf_state::machine_reset()
 }
 
 
-#if !ENABLE_VGA
+#if !TAITOWLF_ENABLE_VGA
 /* debug purpose*/
-PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
+void taitowlf_state::taitowlf_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0x70,rgb_t(0xff,0xff,0xff));
-	palette.set_pen_color(0x71,rgb_t(0xff,0xff,0xff));
-	palette.set_pen_color(0x01,rgb_t(0x55,0x00,0x00));
-	palette.set_pen_color(0x10,rgb_t(0xaa,0x00,0x00));
-	palette.set_pen_color(0x00,rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(0x70, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(0x71, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(0x01, rgb_t(0x55, 0x00, 0x00));
+	palette.set_pen_color(0x10, rgb_t(0xaa, 0x00, 0x00));
+	palette.set_pen_color(0x00, rgb_t(0x00, 0x00, 0x00));
 }
 #endif
 
-MACHINE_CONFIG_START(taitowlf_state::taitowlf)
-
+void taitowlf_state::taitowlf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)
-	MCFG_CPU_PROGRAM_MAP(taitowlf_map)
-	MCFG_CPU_IO_MAP(taitowlf_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM(config, m_maincpu, 200000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitowlf_state::taitowlf_map);
+	m_maincpu->set_addrmap(AS_IO, &taitowlf_state::taitowlf_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (0, FUNC(taitowlf_state::intel82439tx_pci_r), this);
+	pcibus.set_device_write(0, FUNC(taitowlf_state::intel82439tx_pci_w), this);
+	pcibus.set_device_read (7, FUNC(taitowlf_state::intel82371ab_pci_r), this);
+	pcibus.set_device_write(7, FUNC(taitowlf_state::intel82371ab_pci_w), this);
 
 	pcat_common(config);
 
 	/* video hardware */
-	#if ENABLE_VGA
+#if TAITOWLF_ENABLE_VGA
 	pcvideo_vga(config);
-	#else
+#else
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitowlf_state, screen_update_taitowlf)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(taitowlf_state, taitowlf)
-	#endif
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(taitowlf_state::screen_update_taitowlf));
+	PALETTE(config, m_palette, FUNC(taitowlf_state::taitowlf_palette), 256);
+#endif
+}
 
-DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
+void taitowlf_state::init_taitowlf()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 
@@ -414,11 +416,11 @@ ROM_START(pf2012)
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
 
-	#if ENABLE_VGA
+#if TAITOWLF_ENABLE_VGA
 	ROM_REGION( 0x8000, "video_bios", 0 ) // debug
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
-	#endif
+#endif
 
 	ROM_REGION(0x400000, "user3", 0)       // Program ROM disk
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
@@ -451,4 +453,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(1997, pf2012, 0,   taitowlf, pc_keyboard, taitowlf_state, taitowlf,    ROT0,   "Taito",  "Psychic Force 2012", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1997, pf2012, 0,   taitowlf, pc_keyboard, taitowlf_state, init_taitowlf, ROT0, "Taito",  "Psychic Force 2012", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

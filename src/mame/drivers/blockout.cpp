@@ -95,53 +95,56 @@ WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(blockout_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
-	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
-	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM /* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram")
-	AM_RANGE(0x208000, 0x21ffff) AM_RAM /* ??? */
-	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void blockout_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100001).portr("P1");
+	map(0x100002, 0x100003).portr("P2");
+	map(0x100004, 0x100005).portr("SYSTEM");
+	map(0x100006, 0x100007).portr("DSW1");
+	map(0x100008, 0x100009).portr("DSW2");
+	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
+	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
+	map(0x200000, 0x207fff).ram().share("frontvideoram");
+	map(0x208000, 0x21ffff).ram(); /* ??? */
+	map(0x280002, 0x280003).w(FUNC(blockout_state::frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
 
-ADDRESS_MAP_START(blockout_state::agress_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
-	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
-	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM /* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram")
-	AM_RANGE(0x208000, 0x21ffff) AM_RAM /* ??? */
-	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void blockout_state::agress_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100001).portr("P1");
+	map(0x100002, 0x100003).portr("P2");
+	map(0x100004, 0x100005).portr("SYSTEM");
+	map(0x100006, 0x100007).portr("DSW1");
+	map(0x100008, 0x100009).portr("DSW2");
+	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
+	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
+	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
+	map(0x200000, 0x207fff).ram().share("frontvideoram");
+	map(0x208000, 0x21ffff).ram(); /* ??? */
+	map(0x280002, 0x280003).w(FUNC(blockout_state::frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
 
-ADDRESS_MAP_START(blockout_state::audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void blockout_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /*************************************
@@ -270,7 +273,7 @@ INPUT_PORTS_END
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(blockout_state::irq_handler)
 {
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }
 
 
@@ -294,55 +297,54 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 250) // vblank-out irq
+	if (scanline == 250) // vblank-out irq
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 
-	if(scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
+	if (scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(blockout_state::blockout)
-
+void blockout_state::blockout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", blockout_state, blockout_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, MAIN_CLOCK);       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockout_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(blockout_state::blockout_scanline), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-
+	Z80(config, m_audiocpu, AUDIO_CLOCK);  /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* assume same as ddragon3 with adjusted visible display area */
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250)
-	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
+	m_screen->set_screen_update(FUNC(blockout_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 513)
-
+	PALETTE(config, m_palette).set_format(2, &blockout_state::blockout_xBGR_444, 513);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_YM2151_ADD("ymsnd", AUDIO_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(blockout_state,irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", AUDIO_CLOCK));
+	ymsnd.irq_handler().set(FUNC(blockout_state::irq_handler));
+	ymsnd.add_route(0, "lspeaker", 0.60);
+	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
-MACHINE_CONFIG_START(blockout_state::agress)
+void blockout_state::agress(machine_config &config)
+{
 	blockout(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(agress_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockout_state::agress_map);
+}
 
 /*************************************
  *
@@ -433,7 +435,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blockout_state,agress)
+void blockout_state::init_agress()
 {
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
@@ -448,13 +450,13 @@ DRIVER_INIT_MEMBER(blockout_state,agress)
 	 * For now let's use D and just patch the TRACE exception that causes the bogus mirror check
 	 */
 
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	u16 *rom = (u16 *)memregion("maincpu")->base();
 
 	rom[0x82/2] = 0x2700;
 }
 
-GAME( 1989, blockout, 0,        blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockout2,blockout, blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, agress,   0,        agress,   agress,    blockout_state, agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout,  0,        blockout, blockout,  blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout2, blockout, blockout, blockout,  blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockoutj, blockout, blockout, blockoutj, blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agress,    0,        agress,   agress,    blockout_state, init_agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2003, agressb,   agress,   agress,   agress,    blockout_state, init_agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )

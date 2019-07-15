@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Lukasz Markowski
-
 #ifndef MAME_INCLUDES_CXHUMAX_H
 #define MAME_INCLUDES_CXHUMAX_H
+
+#pragma once
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -10,34 +11,33 @@
 #include "machine/i2cmem.h"
 #include "machine/terminal.h"
 
-#define MAX_CX_TIMERS   16
-
-struct cx_timer_t
-{
-	uint32_t value;
-	uint32_t limit;
-	uint32_t mode;
-	uint32_t timebase;
-	emu_timer *timer;
-};
-
-struct cx_timer_regs_t
-{
-	cx_timer_t timer[MAX_CX_TIMERS];
-	uint32_t timer_irq;
-};
-
-#define TERMINAL_TAG "terminal"
 
 class cxhumax_state : public driver_device
 {
 public:
-	cxhumax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	static constexpr unsigned MAX_CX_TIMERS = 16;
+
+	struct cx_timer_t
+	{
+		uint32_t value;
+		uint32_t limit;
+		uint32_t mode;
+		uint32_t timebase;
+		emu_timer *timer;
+	};
+
+	struct cx_timer_regs_t
+	{
+		cx_timer_t timer[MAX_CX_TIMERS];
+		uint32_t timer_irq;
+	};
+
+	cxhumax_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "flash"),
 		m_ram(*this, "ram"),
-		m_terminal(*this, TERMINAL_TAG),
+		m_terminal(*this, "terminal"),
 		m_i2cmem(*this, "eeprom")
 	{
 	}

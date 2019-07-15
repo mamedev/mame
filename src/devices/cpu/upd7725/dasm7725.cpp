@@ -19,7 +19,7 @@ u32 necdsp_disassembler::opcode_alignment() const
 
 offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t opcode = opcodes.r32(pc);
+	uint32_t opcode = opcodes.r32(pc) >> 8;
 	uint32_t type = (opcode >> 22);
 
 //  printf("dasm: PC %x opcode %08x\n", pc, opcode);

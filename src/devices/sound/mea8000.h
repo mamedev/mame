@@ -13,19 +13,15 @@
 
 #pragma once
 
-#define MCFG_MEA8000_REQ_CALLBACK(_write) \
-	devcb = &mea8000_device::set_reqwr_callback(*device, DEVCB_##_write);
-
 /* define to use double instead of int (slow but useful for debugging) */
 #undef MEA8000_FLOAT_MODE
-
 
 class mea8000_device : public device_t, public device_sound_interface
 {
 public:
 	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_req_wr_callback(device_t &device, Object &&cb) { return downcast<mea8000_device &>(device).m_write_req.set_callback(std::forward<Object>(cb)); }
+	auto req() { return m_write_req.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -46,7 +42,7 @@ private:
 	enum class mea8000_state : u8
 	{
 		STOPPED,    /* nothing to do, timer disabled */
-		WAIT_FIRST, /* received pitch, wait for first full trame, timer disabled */
+		WAIT_FIRST, /* received pitch, wait for first full frame, timer disabled */
 		STARTED,    /* playing a frame, timer on */
 		SLOWING     /* repeating last frame with decreasing amplitude, timer on */
 	};
@@ -55,7 +51,7 @@ private:
 	{
 #ifdef MEA8000_FLOAT_MODE
 		double fm, last_fm;         /* frequency, in Hz */
-		double bw, last_bw;         /* band-width, in Hz */
+		double bw, last_bw;         /* bandwidth, in Hz */
 		double output, last_output; /* filter state */
 #else
 		uint16_t fm, last_fm;

@@ -6,46 +6,36 @@
 #pragma once
 
 
-#define MCFG_Y8950_IRQ_HANDLER(cb) \
-		devcb = &y8950_device::set_irq_handler(*device, (DEVCB_##cb));
-
-#define MCFG_Y8950_KEYBOARD_READ_HANDLER(cb) \
-		devcb = &y8950_device::set_keyboard_read_handler(*device, (DEVCB_##cb));
-
-#define MCFG_Y8950_KEYBOARD_WRITE_HANDLER(cb) \
-		devcb = &y8950_device::set_keyboard_write_handler(*device, (DEVCB_##cb));
-
-#define MCFG_Y8950_IO_READ_HANDLER(cb) \
-		devcb = &y8950_device::set_io_read_handler(*device, (DEVCB_##cb));
-
-#define MCFG_Y8950_IO_WRITE_HANDLER(cb) \
-		devcb = &y8950_device::set_io_write_handler(*device, (DEVCB_##cb));
-
-class y8950_device : public device_t, public device_sound_interface
+class y8950_device : public device_t,
+	public device_sound_interface,
+	public device_rom_interface
 {
 public:
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<y8950_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_keyboard_read_handler(device_t &device, Object &&cb) { return downcast<y8950_device &>(device).m_keyboard_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_keyboard_write_handler(device_t &device, Object &&cb) { return downcast<y8950_device &>(device).m_keyboard_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_io_read_handler(device_t &device, Object &&cb) { return downcast<y8950_device &>(device).m_io_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_io_write_handler(device_t &device, Object &&cb) { return downcast<y8950_device &>(device).m_io_write_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq() { return m_irq_handler.bind(); }
+	auto keyboard_read() { return m_keyboard_read_handler.bind(); }
+	auto keyboard_write() { return m_keyboard_write_handler.bind(); }
+	auto io_read() { return m_io_read_handler.bind(); }
+	auto io_write() { return m_io_write_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( status_port_r );
-	DECLARE_READ8_MEMBER( read_port_r );
-	DECLARE_WRITE8_MEMBER( control_port_w );
-	DECLARE_WRITE8_MEMBER( write_port_w );
+	u8 status_port_r();
+	u8 read_port_r();
+	void control_port_w(u8 data);
+	void write_port_w(u8 data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+
+	virtual void rom_bank_updated() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -61,6 +51,9 @@ private:
 	void port_handler_w(unsigned char data) { m_io_write_handler(offs_t(0), data); }
 	unsigned char keyboard_handler_r() { return m_keyboard_read_handler(0); }
 	void keyboard_handler_w(unsigned char data) { m_keyboard_write_handler(offs_t(0), data); }
+
+	static uint8_t static_read_byte(device_t *param, offs_t offset) { return downcast<y8950_device *>(param)->read_byte(offset); }
+	static void static_write_byte(device_t *param, offs_t offset, uint8_t data) { return downcast<y8950_device *>(param)->space().write_byte(offset, data); }
 
 	static void static_irq_handler(device_t *param, int irq) { downcast<y8950_device *>(param)->irq_handler(irq); }
 	static void static_timer_handler(device_t *param, int c, const attotime &period) { downcast<y8950_device *>(param)->timer_handler(c, period); }
@@ -80,7 +73,6 @@ private:
 	devcb_write8 m_keyboard_write_handler;
 	devcb_read8 m_io_read_handler;
 	devcb_write8 m_io_write_handler;
-	required_memory_region m_region;
 };
 
 DECLARE_DEVICE_TYPE(Y8950, y8950_device)

@@ -60,7 +60,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 			res_x = x + xi;
 			res_y = y;
 
-			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x20000)];
+			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x40000)];
 
 			bitmap.pix32(res_y, res_x) = palette[pen + 0x20];
 		}
@@ -167,7 +167,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					int res_x,res_y;
 
 					res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
-					res_y = y+yi - (m_txt_scroll_reg[3] & 0xf);
+					res_y = y+yi - (m_txt_scroll_reg[3] % 20);
 
 					if(!m_screen->visible_area().contains(res_x, res_y))
 						continue;
@@ -214,7 +214,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 						tile_data^=0xff;
 
 					if(blink && m_screen->frame_number() & 0x10)
-						tile_data^=0xff;
+						tile_data = 0;
 
 					if(yi >= char_size)
 						pen = -1;
@@ -321,7 +321,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 		{
 			case 0x00:
 			case 0x02:
-				return m_hgdc2->read(space, (offset & 2) >> 1);
+				return m_hgdc2->read((offset & 2) >> 1);
 			/* TODO: double check these two */
 			case 0x04:
 				return m_vram_disp & 1;
@@ -366,7 +366,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 		{
 			case 0x00:
 			case 0x02:
-				m_hgdc2->write(space, (offset & 2) >> 1,data);
+				m_hgdc2->write((offset & 2) >> 1,data);
 				return;
 			case 0x04:
 				m_vram_disp = data & 1;
@@ -402,10 +402,10 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 		switch((offset & 0xe) + 1)
 		{
 			case 0x01:
-				m_font_addr = (data & 0xff) | (m_font_addr & 0x7f00);
+				m_font_addr = (data & 0xff) | (m_font_addr & 0xff00);
 				return;
 			case 0x03:
-				m_font_addr = ((data & 0x7f) << 8) | (m_font_addr & 0xff);
+				m_font_addr = ((data & 0xff) << 8) | (m_font_addr & 0xff);
 				return;
 			case 0x05:
 				//logerror("%02x\n",data);
@@ -416,7 +416,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 			{
 				uint32_t pcg_offset;
 
-				pcg_offset = m_font_addr << 5;
+				pcg_offset = (m_font_addr & 0x7fff) << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 				//logerror("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
@@ -491,7 +491,7 @@ READ16_MEMBER(pc9801_state::upd7220_grcg_r)
 {
 	uint16_t res = 0;
 
-	if(!(m_grcg.mode & 0x80) || machine().side_effect_disabled())
+	if(!(m_grcg.mode & 0x80) || machine().side_effects_disabled())
 		res = m_video_ram_2[offset];
 	else if(m_ex_video_ff[2])
 		res = egc_blit_r(offset, mem_mask);

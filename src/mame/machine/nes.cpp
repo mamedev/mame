@@ -55,18 +55,18 @@ void nes_state::machine_start()
 	if (m_cartslot && m_cartslot->m_cart)
 	{
 		// Set up memory handlers
-		space.install_read_handler(0x4100, 0x5fff, read8_delegate(FUNC(nes_cart_slot_device::read_l), (nes_cart_slot_device *)m_cartslot));
-		space.install_write_handler(0x4100, 0x5fff, write8_delegate(FUNC(nes_cart_slot_device::write_l), (nes_cart_slot_device *)m_cartslot));
-		space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(nes_cart_slot_device::read_m), (nes_cart_slot_device *)m_cartslot));
-		space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(nes_cart_slot_device::write_m), (nes_cart_slot_device *)m_cartslot));
+		space.install_read_handler(0x4100, 0x5fff, read8sm_delegate(FUNC(nes_cart_slot_device::read_l), (nes_cart_slot_device *)m_cartslot));
+		space.install_write_handler(0x4100, 0x5fff, write8sm_delegate(FUNC(nes_cart_slot_device::write_l), (nes_cart_slot_device *)m_cartslot));
+		space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(FUNC(nes_cart_slot_device::read_m), (nes_cart_slot_device *)m_cartslot));
+		space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(FUNC(nes_cart_slot_device::write_m), (nes_cart_slot_device *)m_cartslot));
 		space.install_read_bank(0x8000, 0x9fff, "prg0");
 		space.install_read_bank(0xa000, 0xbfff, "prg1");
 		space.install_read_bank(0xc000, 0xdfff, "prg2");
 		space.install_read_bank(0xe000, 0xffff, "prg3");
-		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(nes_cart_slot_device::write_h), (nes_cart_slot_device *)m_cartslot));
+		space.install_write_handler(0x8000, 0xffff, write8sm_delegate(FUNC(nes_cart_slot_device::write_h), (nes_cart_slot_device *)m_cartslot));
 
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
-		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::nt_w),m_cartslot->m_cart));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8sm_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
+		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(FUNC(device_nes_cart_interface::nt_r),m_cartslot->m_cart), write8sm_delegate(FUNC(device_nes_cart_interface::nt_w),m_cartslot->m_cart));
 		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),m_cartslot->m_cart));
 		m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
 		m_ppu->set_latch(ppu2c0x_device::latch_delegate(FUNC(device_nes_cart_interface::ppu_latch),m_cartslot->m_cart));
@@ -82,20 +82,20 @@ void nes_state::machine_start()
 			|| m_cartslot->get_pcb_id() == BMC_70IN1 || m_cartslot->get_pcb_id() == BMC_800IN1)
 		{
 			logerror("read_h installed!\n");
-			space.install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(nes_cart_slot_device::read_h), (nes_cart_slot_device *)m_cartslot));
+			space.install_read_handler(0x8000, 0xffff, read8sm_delegate(FUNC(nes_cart_slot_device::read_h), (nes_cart_slot_device *)m_cartslot));
 		}
 
 		if (m_cartslot->get_pcb_id() == BTL_SMB2JB || m_cartslot->get_pcb_id() == UNL_AC08 || m_cartslot->get_pcb_id() == UNL_SMB2J || m_cartslot->get_pcb_id() == BTL_09034A)
 		{
 			logerror("write_ex installed!\n");
-			space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)m_cartslot));
+			space.install_write_handler(0x4020, 0x40ff, write8sm_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)m_cartslot));
 		}
 
 		if (m_cartslot->get_pcb_id() == KAISER_KS7017 || m_cartslot->get_pcb_id() == UNL_603_5052 || m_cartslot->get_pcb_id() == STD_DISKSYS)
 		{
 			logerror("write_ex & read_ex installed!\n");
-			space.install_read_handler(0x4020, 0x40ff, read8_delegate(FUNC(nes_cart_slot_device::read_ex), (nes_cart_slot_device *)m_cartslot));
-			space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)m_cartslot));
+			space.install_read_handler(0x4020, 0x40ff, read8sm_delegate(FUNC(nes_cart_slot_device::read_ex), (nes_cart_slot_device *)m_cartslot));
+			space.install_write_handler(0x4020, 0x40ff, write8sm_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)m_cartslot));
 		}
 
 		m_cartslot->pcb_start(m_ciram.get());
@@ -104,7 +104,7 @@ void nes_state::machine_start()
 
 	// register saves
 	save_item(NAME(m_last_frame_flip));
-	save_pointer(NAME(m_ciram.get()), 0x800);
+	save_pointer(NAME(m_ciram), 0x800);
 }
 
 
@@ -182,27 +182,11 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 }
 
 
-DRIVER_INIT_MEMBER(nes_state,famicom)
+void nes_state::init_famicom()
 {
 	// setup alt input handlers for additional FC input devices
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler(0x4016, 0x4016, read8_delegate(FUNC(nes_state::fc_in0_r), this));
 	space.install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(nes_state::fc_in0_w), this));
 	space.install_read_handler(0x4017, 0x4017, read8_delegate(FUNC(nes_state::fc_in1_r), this));
-}
-
-NESCTRL_BRIGHTPIXEL_CB(nes_state::bright_pixel)
-{
-	// get the pixel at the gun position
-	uint32_t pix = m_ppu->get_pixel(x, y);
-
-	// get the color base from the ppu
-	uint32_t color_base = m_ppu->get_colorbase();
-
-	// check if the cursor is over a bright pixel
-	if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
-		(pix == color_base + 0x33) || (pix == color_base + 0x34))
-		return true;
-	else
-		return false;
 }

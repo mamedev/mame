@@ -9,8 +9,6 @@
 #include "emu.h"
 #include "compiskb.h"
 
-#include "cpu/mcs48/mcs48.h"
-
 #include "speaker.h"
 
 
@@ -55,20 +53,20 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL(4'032'000)/2 ???
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(compis_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(compis_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(compis_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(compis_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(NOOP) // ???
-	MCFG_MCS48_PORT_T1_IN_CB(NOOP) // ???
+void compis_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8748(config, m_maincpu, 2016000); // XTAL(4'032'000)/2 ???
+	m_maincpu->bus_in_cb().set(FUNC(compis_keyboard_device::bus_r));
+	m_maincpu->bus_out_cb().set(FUNC(compis_keyboard_device::bus_w));
+	m_maincpu->p1_in_cb().set(FUNC(compis_keyboard_device::p1_r));
+	m_maincpu->p2_in_cb().set(FUNC(compis_keyboard_device::p2_r));
+	m_maincpu->t0_in_cb().set_constant(0); // ???
+	m_maincpu->t1_in_cb().set_constant(0); // ???
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 //-------------------------------------------------
@@ -174,7 +172,7 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("START-STOP") PORT_CODE(KEYCODE_PAUSE) PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(a_RING " " A_RING) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
@@ -228,7 +226,7 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 		m_y(*this, "Y%u", 1),
 		m_special(*this, "SPECIAL"),
 		m_out_tx_handler(*this),
-		m_bus(0xff),
+		m_led_caps(*this, "led_caps"),
 		m_keylatch(0)
 {
 }
@@ -243,6 +241,9 @@ void compis_keyboard_device::device_start()
 	// resolve callbacks
 	m_out_tx_handler.resolve_safe();
 	m_out_tx_handler(1);
+
+	// resolve output finder
+	m_led_caps.resolve();
 }
 
 
@@ -297,7 +298,7 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 	m_speaker->level_w(BIT(data, 5));
 
 	// LEDs
-	machine().output().set_led_value(LED_CAPS, BIT(data, 6));
+	m_led_caps = BIT(data, 6);
 
 	// serial data out
 	m_out_tx_handler(BIT(data, 7));

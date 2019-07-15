@@ -5490,11 +5490,11 @@ inline void tms3203x_device::execute_delayed(uint32_t newpc)
 	}
 	else
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		execute_one();
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		execute_one();
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		execute_one();
 	}
 

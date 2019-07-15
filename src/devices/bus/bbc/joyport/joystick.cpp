@@ -16,6 +16,10 @@
 DEFINE_DEVICE_TYPE(BBCMC_JOYSTICK, bbcmc_joystick_device, "bbcmc_joystick", "Master Compact Joystick")
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( joystick )
+//-------------------------------------------------
+
 static INPUT_PORTS_START( joystick )
 	PORT_START("JOY")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Fire")
@@ -73,11 +77,6 @@ void bbcmc_joystick_device::device_reset()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
-
-uint8_t bbcmc_joystick_device::cb_r()
-{
-	return 0xff;
-}
 
 uint8_t bbcmc_joystick_device::pb_r()
 {

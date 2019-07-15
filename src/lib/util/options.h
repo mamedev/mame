@@ -130,6 +130,7 @@ public:
 		virtual void set_default_value(std::string &&newvalue);
 		void set_description(const char *description) { m_description = description; }
 		void set_value_changed_handler(std::function<void(const char *)> &&handler) { m_value_changed_handler = std::move(handler); }
+		virtual void revert(int priority_hi, int priority_lo) { }
 
 	protected:
 		virtual void internal_set_value(std::string &&newvalue) = 0;
@@ -171,6 +172,7 @@ public:
 	void set_description(const char *name, const char *description);
 	void remove_entry(entry &delentry);
 	void set_value_changed_handler(const std::string &name, std::function<void(const char *)> &&handler);
+	void revert(int priority_hi = OPTION_PRIORITY_MAXIMUM, int priority_lo = OPTION_PRIORITY_DEFAULT);
 
 	// parsing/input
 	void parse_command_line(const std::vector<std::string> &args, int priority, bool ignore_unknown_options = false);
@@ -217,6 +219,7 @@ private:
 		virtual const char *minimum() const override;
 		virtual const char *maximum() const override;
 		virtual const std::string &default_value() const override;
+		virtual void revert(int priority_hi, int priority_lo) override;
 
 		virtual void set_default_value(std::string &&newvalue) override;
 

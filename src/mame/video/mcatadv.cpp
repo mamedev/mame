@@ -14,40 +14,19 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 #include "includes/mcatadv.h"
 #include "screen.h"
 
-TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
+#include <algorithm>
+
+template<int Chip>
+TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info)
 {
-	int tileno = m_videoram1[tile_index * 2 + 1];
-	int colour = (m_videoram1[tile_index * 2] & 0x3f00) >> 8;
-	int pri = (m_videoram1[tile_index * 2] & 0xc000) >> 14;
+	int tileno = m_vram[Chip][tile_index * 2 + 1];
+	int colour = (m_vram[Chip][tile_index * 2] & 0x3f00) >> 8;
+	int pri = (m_vram[Chip][tile_index * 2] & 0xc000) >> 14;
 
 	pri |= 0x8;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour + m_palette_bank1 * 0x40, 0);
+	SET_TILE_INFO_MEMBER(Chip,tileno,colour + m_palette_bank[Chip] * 0x40, 0);
 	tileinfo.category = pri;
-}
-
-WRITE16_MEMBER(mcatadv_state::mcatadv_videoram1_w)
-{
-	COMBINE_DATA(&m_videoram1[offset]);
-	m_tilemap1->mark_tile_dirty(offset / 2);
-}
-
-TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info2)
-{
-	int tileno = m_videoram2[tile_index * 2 + 1];
-	int colour = (m_videoram2[tile_index * 2] & 0x3f00) >> 8;
-	int pri = (m_videoram2[tile_index * 2] & 0xc000) >> 14;
-
-	pri |= 0x8;
-
-	SET_TILE_INFO_MEMBER(1, tileno, colour + m_palette_bank2 * 0x40, 0);
-	tileinfo.category = pri;
-}
-
-WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
-{
-	COMBINE_DATA(&m_videoram2[offset]);
-	m_tilemap2->mark_tile_dirty(offset / 2);
 }
 
 
@@ -61,8 +40,7 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 	uint16_t *destline;
 	uint8_t *priline;
-	uint8_t *sprdata = memregion("gfx1")->base();
-	int sprmask = memregion("gfx1")->bytes()-1;
+	int sprmask = m_sprdata.bytes()-1;
 
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;
@@ -136,10 +114,9 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 						{
 							int pridata = priline[drawxpos];
 
-
 							if (!(pridata & 0x10)) // if we haven't already drawn a sprite pixel here (sprite masking)
 							{
-								pix = sprdata[(offset / 2)&sprmask];
+								pix = m_sprdata[(offset / 2)&sprmask];
 
 								if (offset & 1)
 									pix = pix >> 4;
@@ -155,7 +132,6 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 							}
 						}
-
 						offset++;
 					}
 				}
@@ -169,7 +145,7 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, uint16_t* current_scroll, uint16_t* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, int layer, int i, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int flip;
 	uint32_t drawline;
@@ -185,31 +161,31 @@ void mcatadv_state::mcatadv_draw_tilemap_part( screen_device &screen, uint16_t* 
 		clip.min_y = drawline;
 		clip.max_y = drawline;
 
-		scrollx = (current_scroll[0] & 0x1ff) - 0x194;
-		scrolly = (current_scroll[1] & 0x1ff) - 0x1df;
+		scrollx = (m_scroll[layer][0] & 0x1ff) - 0x194;
+		scrolly = (m_scroll[layer][1] & 0x1ff) - 0x1df;
 
-		if ((current_scroll[1] & 0x4000) == 0x4000)
+		if ((m_scroll[layer][1] & 0x4000) == 0x4000)
 		{
-			int rowselect = current_videoram1[0x1000 / 2 + (((drawline + scrolly) & 0x1ff) * 2) + 1];
+			int rowselect = m_vram[layer][0x1000 / 2 + (((drawline + scrolly) & 0x1ff) * 2) + 1];
 			scrolly = rowselect - drawline;
 		}
 
-		if ((current_scroll[0] & 0x4000) == 0x4000)
+		if ((m_scroll[layer][0] & 0x4000) == 0x4000)
 		{
-			int rowscroll = current_videoram1[0x1000 / 2 + (((drawline + scrolly) & 0x1ff) * 2) + 0];
+			int rowscroll = m_vram[layer][0x1000 / 2 + (((drawline + scrolly) & 0x1ff) * 2) + 0];
 			scrollx += rowscroll;
 		}
 
 		/* Global Flip */
-		if (!(current_scroll[0] & 0x8000)) scrollx -= 0x19;
-		if (!(current_scroll[1] & 0x8000)) scrolly -= 0x141;
-		flip = ((current_scroll[0] & 0x8000) ? 0 : TILEMAP_FLIPX) | ((current_scroll[1] & 0x8000) ? 0 : TILEMAP_FLIPY);
+		if (!(m_scroll[layer][0] & 0x8000)) scrollx -= 0x19;
+		if (!(m_scroll[layer][1] & 0x8000)) scrolly -= 0x141;
+		flip = ((m_scroll[layer][0] & 0x8000) ? 0 : TILEMAP_FLIPX) | ((m_scroll[layer][1] & 0x8000) ? 0 : TILEMAP_FLIPY);
 
-		current_tilemap->set_scrollx(0, scrollx);
-		current_tilemap->set_scrolly(0, scrolly);
-		current_tilemap->set_flip(flip);
+		m_tilemap[layer]->set_scrollx(0, scrollx);
+		m_tilemap[layer]->set_scrolly(0, scrolly);
+		m_tilemap[layer]->set_flip(flip);
 
-		current_tilemap->draw(screen, bitmap, clip, i, i);
+		m_tilemap[layer]->draw(screen, bitmap, clip, i, i);
 	}
 }
 
@@ -220,16 +196,16 @@ uint32_t mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind1
 	bitmap.fill(0x3f0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	if (m_scroll1[2] != m_palette_bank1)
+	if (m_scroll[0][2] != m_palette_bank[0])
 	{
-		m_palette_bank1 = m_scroll1[2]&0xf;
-		m_tilemap1->mark_all_dirty();
+		m_palette_bank[0] = m_scroll[0][2]&0xf;
+		m_tilemap[0]->mark_all_dirty();
 	}
 
-	if (m_scroll2[2] != m_palette_bank2)
+	if (m_scroll[1][2] != m_palette_bank[1])
 	{
-		m_palette_bank2 = m_scroll2[2]&0xf;
-		m_tilemap2->mark_all_dirty();
+		m_palette_bank[1] = m_scroll[1][2]&0xf;
+		m_tilemap[1]->mark_all_dirty();
 	}
 
 /*
@@ -245,14 +221,14 @@ uint32_t mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind1
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_Q))
 	#endif
-			if (!(m_scroll1[2]&0x10))
-				mcatadv_draw_tilemap_part(screen, m_scroll1,  m_videoram1, i|0x8, m_tilemap1, bitmap, cliprect);
+			if (!(m_scroll[0][2]&0x10))
+				mcatadv_draw_tilemap_part(screen, 0, i|0x8, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_W))
 	#endif
-			if (!(m_scroll2[2]&0x10)) // tilemap flicker effect on large shadow, nost level 7
-				mcatadv_draw_tilemap_part(screen, m_scroll2, m_videoram2, i|0x8, m_tilemap2, bitmap, cliprect);
+			if (!(m_scroll[1][2]&0x10)) // tilemap flicker effect on large shadow, nost level 7
+				mcatadv_draw_tilemap_part(screen, 1, i|0x8, bitmap, cliprect);
 	}
 
 	g_profiler.start(PROFILER_USER1);
@@ -266,20 +242,19 @@ uint32_t mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind1
 
 void mcatadv_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap1->set_transparent_pen(0);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0]->set_transparent_pen(0);
 
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap2->set_transparent_pen(0);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1]->set_transparent_pen(0);
 
 	m_spriteram_old = make_unique_clear<uint16_t[]>(m_spriteram.bytes() / 2);
-	m_vidregs_old = std::make_unique<uint16_t[]>((0x0f + 1) / 2);
+	m_vidregs_old = std::make_unique<uint16_t[]>(m_vidregs.bytes() / 2);
 
-	m_palette_bank1 = 0;
-	m_palette_bank2 = 0;
+	m_palette_bank[0] = m_palette_bank[1] = 0;
 
-	save_pointer(NAME(m_spriteram_old.get()), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_vidregs_old.get()), (0x0f + 1) / 2);
+	save_pointer(NAME(m_spriteram_old), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_vidregs_old), m_vidregs.bytes() / 2);
 }
 
 WRITE_LINE_MEMBER(mcatadv_state::screen_vblank_mcatadv)
@@ -287,7 +262,7 @@ WRITE_LINE_MEMBER(mcatadv_state::screen_vblank_mcatadv)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spriteram_old.get(), m_spriteram, m_spriteram.bytes());
-		memcpy(m_vidregs_old.get(), m_vidregs, 0xf);
+		std::copy(&m_spriteram[0], &m_spriteram[m_spriteram.bytes() / 2], &m_spriteram_old[0]);
+		std::copy(&m_vidregs[0], &m_vidregs[m_vidregs.bytes() / 2], &m_vidregs_old[0]);
 	}
 }

@@ -138,8 +138,13 @@ SW8 Control if the PORT displays echo the 7-segment displays (high), or just act
 
 
 ToDo
-- Hook up reset key and dipswitch
+- MMD1 cassette uart ports 0x12/13 (possibly 8251), and circuits to convert to tones
+- MMD1 tty uart ports 0x10/11 (possibly 8251), and rs232 interface
+- MMD2 Hook up WE0-3
+- MMD2 cassette is hooked up but not tested
+- MMD2 tty rs232 interface
 - Add interrupt module (INTE LED is always on atm)
+- Need software
 - Lots of other things
 
 ****************************************************************************/
@@ -147,6 +152,8 @@ ToDo
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8279.h"
+#include "imagedev/cassette.h"
+#include "speaker.h"
 #include "mmd1.lh"
 #include "mmd2.lh"
 
@@ -155,13 +162,27 @@ class mmd1_state : public driver_device
 {
 public:
 	mmd1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_io_keyboard(*this, "X%u", 0)
+		, m_digits(*this, "digit%u", 0U)
+		, m_mmd2(false)
+		{ }
 
+	void mmd1(machine_config &config);
+	void mmd2(machine_config &config);
+
+	void init_mmd2();
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port2_w);
 	DECLARE_READ8_MEMBER(mmd1_keyboard_r);
+	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(mmd2_01_r);
 	DECLARE_READ8_MEMBER(mmd2_bank_r);
 	DECLARE_READ8_MEMBER(mmd2_kbd_r);
@@ -169,18 +190,22 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	uint8_t m_return_code;
-	uint8_t m_digit;
-	DECLARE_DRIVER_INIT(mmd2);
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
-	required_device<cpu_device> m_maincpu;
-	void mmd1(machine_config &config);
-	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
+	void reset_banks();
+
+	uint8_t m_return_code;
+	uint8_t m_digit;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<i8080_cpu_device> m_maincpu;
+	optional_device<cassette_image_device> m_cass;
+	optional_ioport_array<4> m_io_keyboard;
+	output_finder<9> m_digits;
+	bool m_mmd2;
 };
 
 
@@ -249,40 +274,49 @@ READ8_MEMBER( mmd1_state::mmd1_keyboard_r )
 		return m_return_code;
 }
 
-ADDRESS_MAP_START(mmd1_state::mmd1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x00ff ) AM_ROM // Main ROM
-	AM_RANGE( 0x0100, 0x01ff ) AM_ROM // Expansion slot
-	AM_RANGE( 0x0200, 0x02ff ) AM_RAM
-	AM_RANGE( 0x0300, 0x03ff ) AM_RAM
-ADDRESS_MAP_END
+void mmd1_state::mmd1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).rom(); // Main ROM
+	map(0x0100, 0x01ff).rom(); // Expansion slot
+	map(0x0200, 0x02ff).ram();
+	map(0x0300, 0x03ff).ram();
+}
 
-ADDRESS_MAP_START(mmd1_state::mmd1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE( 0x00, 0x00 ) AM_READWRITE(mmd1_keyboard_r, mmd1_port0_w)
-	AM_RANGE( 0x01, 0x01 ) AM_WRITE(mmd1_port1_w)
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(mmd1_port2_w)
-ADDRESS_MAP_END
+void mmd1_state::mmd1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x07);
+	map(0x00, 0x00).rw(FUNC(mmd1_state::mmd1_keyboard_r), FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).w(FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
+	//map(0x10, 0x11).rw  TTY UART
+	//map(0x12, 0x13).rw  CASS UART
+}
 
-ADDRESS_MAP_START(mmd1_state::mmd2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x0400, 0x0fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
-	AM_RANGE(0xd800, 0xe3ff) AM_READ_BANK("bank5") AM_WRITE_BANK("bank6")
-	AM_RANGE(0xe400, 0xe7ff) AM_READ_BANK("bank7") AM_WRITE_BANK("bank8")
-	AM_RANGE(0xfc00, 0xfcff) AM_RAM // Scratchpad
-ADDRESS_MAP_END
+void mmd1_state::mmd2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).bankr("bank1").bankw("bank2");
+	map(0x0400, 0x0fff).bankr("bank3").bankw("bank4");
+	map(0xd800, 0xe3ff).bankr("bank5").bankw("bank6");
+	map(0xe400, 0xe7ff).bankr("bank7").bankw("bank8");
+	map(0xfc00, 0xfcff).ram(); // Scratchpad
+}
 
-ADDRESS_MAP_START(mmd1_state::mmd2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(mmd1_port0_w)
-	AM_RANGE( 0x01, 0x01 ) AM_READWRITE(mmd2_01_r,mmd1_port1_w)
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE(mmd1_port2_w)
-	AM_RANGE( 0x03, 0x03 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
-	AM_RANGE( 0x04, 0x04 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
-	AM_RANGE( 0x05, 0x07 ) AM_READ(mmd2_bank_r)
-ADDRESS_MAP_END
+void mmd1_state::mmd2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).w(FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).rw(FUNC(mmd1_state::mmd2_01_r), FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
+	map(0x03, 0x03).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
+	map(0x04, 0x04).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0x05, 0x07).r(FUNC(mmd1_state::mmd2_bank_r));
+	map(0x05, 0x05).w(FUNC(mmd1_state::cass_w));
+	//map(0x09, 0x09).w  PUP signal
+	//map(0x0a, 0x0a).w  Eprom programmer
+}
 
 
 /* Input ports */
@@ -306,16 +340,15 @@ static INPUT_PORTS_START( mmd1 )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 	PORT_START("LINE3")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, mmd1_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mmd2 )
 	PORT_START("DSW")
-	PORT_BIT( 0x87, 0x00, IPT_UNUSED )
 	PORT_DIPNAME( 0x20, 0x00, "Sw6") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, "Hex")
 	PORT_DIPSETTING(    0x00, "Octal")
-	PORT_DIPNAME( 0x10, 0x00, "Sw7") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x10, 0x10, "Sw7") PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x10, "PUP")
 	PORT_DIPSETTING(    0x00, "Reset")
 	PORT_DIPNAME( 0x08, 0x08, "Sw8") PORT_DIPLOCATION("SW1:3")
@@ -359,8 +392,15 @@ static INPUT_PORTS_START( mmd2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STORE") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PREV") PORT_CODE(KEYCODE_DOWN)
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, mmd1_state, reset_button, nullptr)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(mmd1_state::reset_button)
+{
+	if (newval && m_mmd2)
+		reset_banks();
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 /*
 Keyboard
@@ -386,10 +426,17 @@ READ8_MEMBER( mmd1_state::mmd2_bank_r )
 
 READ8_MEMBER( mmd1_state::mmd2_01_r )
 {
-	// need to add cassin, ttyin bits
-	uint8_t data = 0x87;
+	// need to add ttyin bit 0
+	uint8_t data = 0x84;
 	data |= ioport("DSW")->read();
+	data |= (m_cass->input() < 0.02) ? 0 : 2;
 	return data;
+}
+
+WRITE8_MEMBER( mmd1_state::cass_w )
+{
+	// need to add ttyout bit 0
+	m_cass->output(BIT(data, 2) ? -1.0 : +1.0);
 }
 
 WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
@@ -400,7 +447,7 @@ WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
 WRITE8_MEMBER( mmd1_state::mmd2_digit_w )
 {
 	if (m_digit < 9)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 }
 
 READ8_MEMBER( mmd1_state::mmd2_kbd_r )
@@ -408,11 +455,8 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 	uint8_t data = 0xff;
 
 	if (m_digit < 4)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",m_digit);
-		data = ioport(kbdrow)->read();
-	}
+		data = m_io_keyboard[m_digit]->read();
+
 	return data;
 }
 
@@ -438,6 +482,11 @@ MACHINE_RESET_MEMBER(mmd1_state,mmd1)
 
 MACHINE_RESET_MEMBER(mmd1_state,mmd2)
 {
+	reset_banks();
+}
+
+void mmd1_state::reset_banks()
+{
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
 	membank("bank3")->set_entry(0);
@@ -448,7 +497,7 @@ MACHINE_RESET_MEMBER(mmd1_state,mmd2)
 	membank("bank8")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(mmd1_state,mmd2)
+void mmd1_state::init_mmd2()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
@@ -479,42 +528,50 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank8")->configure_entry(0, &p_ram[0xe400]);
 	membank("bank8")->configure_entry(1, &p_ram[0x8000]);
 	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
+	m_mmd2 = true;
 }
 
-MACHINE_CONFIG_START(mmd1_state::mmd1)
+void mmd1_state::mmd1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
-	MCFG_CPU_PROGRAM_MAP(mmd1_mem)
-	MCFG_CPU_IO_MAP(mmd1_io)
+	I8080(config, m_maincpu, 6750000 / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mmd1_state::mmd1_mem);
+	m_maincpu->set_addrmap(AS_IO, &mmd1_state::mmd1_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd1)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_mmd1);
+}
 
-MACHINE_CONFIG_START(mmd1_state::mmd2)
+void mmd1_state::mmd2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
-	MCFG_CPU_PROGRAM_MAP(mmd2_mem)
-	MCFG_CPU_IO_MAP(mmd2_io)
-	MCFG_I8085A_STATUS(WRITE8(mmd1_state, mmd2_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(mmd1_state, mmd2_inte_callback))
+	I8080(config, m_maincpu, 6750000 / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mmd1_state::mmd2_mem);
+	m_maincpu->set_addrmap(AS_IO, &mmd1_state::mmd2_io);
+	m_maincpu->out_status_func().set(FUNC(mmd1_state::mmd2_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(mmd1_state::mmd2_inte_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mmd2)
+	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(mmd1_state, mmd2_scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(mmd1_state, mmd2_digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(mmd1_state, mmd2_kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kbdc(I8279(config, "i8279", 400000));             // based on divider
+	kbdc.out_sl_callback().set(FUNC(mmd1_state::mmd2_scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(mmd1_state::mmd2_digit_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(mmd1_state::mmd2_kbd_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                       // Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+
+	/* Cassette */
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 /* ROM definition */
 ROM_START( mmd1 )
@@ -532,6 +589,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME  FLAGS
-COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, 0,    "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
-COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd1_state, mmd2, "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME  FLAGS
+COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, empty_init, "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
+COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd1_state, init_mmd2,  "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )

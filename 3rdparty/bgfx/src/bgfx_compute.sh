@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -50,6 +50,15 @@
 #define BUFFER_WR(_name, _type, _reg) __BUFFER_XX(_name, _type, _reg, writeonly)
 
 #define NUM_THREADS(_x, _y, _z) layout (local_size_x = _x, local_size_y = _y, local_size_z = _z) in;
+
+#define atomicFetchAndAdd(_mem, _data, _original)                    _original = atomicAdd(_mem, _data)
+#define atomicFetchAndAnd(_mem, _data, _original)                    _original = atomicAnd(_mem, _data)
+#define atomicFetchAndMax(_mem, _data, _original)                    _original = atomicMax(_mem, _data)
+#define atomicFetchAndMin(_mem, _data, _original)                    _original = atomicMin(_mem, _data)
+#define atomicFetchAndOr(_mem, _data, _original)                     _original = atomicOr(_mem, _data)
+#define atomicFetchAndXor(_mem, _data, _original)                    _original = atomicXor(_mem, _data)
+#define atomicFetchAndExchange(_mem, _data, _original)               _original = atomicExchange(_mem, _data)
+#define atomicFetchCompareExchange(_mem, _compare, _data, _original) _original = atomicCompSwap(_mem,_compare, _data)
 
 #else
 
@@ -251,79 +260,63 @@ __IMAGE_IMPL_A(r32ui,       x,    uvec4, xxxx)
 __IMAGE_IMPL_A(rg32ui,      xy,   uvec4, xyyy)
 __IMAGE_IMPL_A(rgba32ui,    xyzw, uvec4, xyzw)
 
-#define __ATOMIC_IMPL_TYPE(_genType, _glFunc, _dxFunc)            \
-			_genType _glFunc(inout _genType _mem, _genType _data) \
-			{                                                     \
-				_genType result;                                  \
-				_dxFunc(_mem, _data, result);                     \
-				return result;                                    \
-			}
-
-#define __ATOMIC_IMPL(_glFunc, _dxFunc)                \
-			__ATOMIC_IMPL_TYPE(int,  _glFunc, _dxFunc) \
-			__ATOMIC_IMPL_TYPE(uint, _glFunc, _dxFunc)
-
-__ATOMIC_IMPL(atomicAdd,      InterlockedAdd);
-__ATOMIC_IMPL(atomicAnd,      InterlockedAnd);
-__ATOMIC_IMPL(atomicExchange, InterlockedExchange);
-__ATOMIC_IMPL(atomicMax,      InterlockedMax);
-__ATOMIC_IMPL(atomicMin,      InterlockedMin);
-__ATOMIC_IMPL(atomicOr,       InterlockedOr);
-__ATOMIC_IMPL(atomicXor,      InterlockedXor);
-
-int atomicCompSwap(inout int _mem, int _compare, int _data)
-{
-	int result;
-	InterlockedCompareExchange(_mem, _compare, _data, result);
-	return result;
-}
-
-uint atomicCompSwap(inout uint _mem, uint _compare, uint _data)
-{
-	uint result;
-	InterlockedCompareExchange(_mem, _compare, _data, result);
-	return result;
-}
+#define atomicAdd(_mem, _data)                                       InterlockedAdd(_mem, _data)
+#define atomicAnd(_mem, _data)                                       InterlockedAnd(_mem, _data)
+#define atomicMax(_mem, _data)                                       InterlockedMax(_mem, _data)
+#define atomicMin(_mem, _data)                                       InterlockedMin(_mem, _data)
+#define atomicOr(_mem, _data)                                        InterlockedOr(_mem, _data)
+#define atomicXor(_mem, _data)                                       InterlockedXor(_mem, _data)
+#define atomicFetchAndAdd(_mem, _data, _original)                    InterlockedAdd(_mem, _data, _original)
+#define atomicFetchAndAnd(_mem, _data, _original)                    InterlockedAnd(_mem, _data, _original)
+#define atomicFetchAndMax(_mem, _data, _original)                    InterlockedMax(_mem, _data, _original)
+#define atomicFetchAndMin(_mem, _data, _original)                    InterlockedMin(_mem, _data, _original)
+#define atomicFetchAndOr(_mem, _data, _original)                     InterlockedOr(_mem, _data, _original)
+#define atomicFetchAndXor(_mem, _data, _original)                    InterlockedXor(_mem, _data, _original)
+#define atomicFetchAndExchange(_mem, _data, _original)               InterlockedExchange(_mem, _data, _original)
+#define atomicFetchCompareExchange(_mem, _compare, _data, _original) InterlockedCompareExchange(_mem,_compare, _data, _original)
 
 // InterlockedCompareStore
 
 #define barrier()                    GroupMemoryBarrierWithGroupSync()
 #define memoryBarrier()              GroupMemoryBarrierWithGroupSync()
 #define memoryBarrierAtomicCounter() GroupMemoryBarrierWithGroupSync()
-#define memoryBarrierBuffer()        GroupMemoryBarrierWithGroupSync()
+#define memoryBarrierBuffer()        AllMemoryBarrierWithGroupSync()
 #define memoryBarrierImage()         GroupMemoryBarrierWithGroupSync()
 #define memoryBarrierShared()        GroupMemoryBarrierWithGroupSync()
 #define groupMemoryBarrier()         GroupMemoryBarrierWithGroupSync()
 
 #endif // BGFX_SHADER_LANGUAGE_GLSL
 
-#define dispatchIndirect(_buffer \
-			, _offset            \
-			, _numX              \
-			, _numY              \
-			, _numZ              \
-			)                    \
-			_buffer[_offset*2+0] = uvec4(_numX, _numY, _numZ, 0u)
+#define dispatchIndirect( \
+	  _buffer             \
+	, _offset             \
+	, _numX               \
+	, _numY               \
+	, _numZ               \
+	)                     \
+	_buffer[_offset*2+0] = uvec4(_numX, _numY, _numZ, 0u)
 
-#define drawIndirect(_buffer \
-			, _offset        \
-			, _numVertices   \
-			, _numInstances  \
-			, _startVertex   \
-			, _startInstance \
-			)                \
-			_buffer[_offset*2+0] = uvec4(_numVertices, _numInstances, _startVertex, _startInstance)
+#define drawIndirect( \
+	  _buffer         \
+	, _offset         \
+	, _numVertices    \
+	, _numInstances   \
+	, _startVertex    \
+	, _startInstance  \
+	)                 \
+	_buffer[_offset*2+0] = uvec4(_numVertices, _numInstances, _startVertex, _startInstance)
 
-#define drawIndexedIndirect(_buffer \
-			, _offset               \
-			, _numIndices           \
-			, _numInstances         \
-			, _startIndex           \
-			, _startVertex          \
-			, _startInstance        \
-			)                       \
-			_buffer[_offset*2+0] = uvec4(_numIndices, _numInstances, _startIndex, _startVertex); \
-			_buffer[_offset*2+1] = uvec4(_startInstance, 0u, 0u, 0u)
+#define drawIndexedIndirect( \
+	  _buffer                \
+	, _offset                \
+	, _numIndices            \
+	, _numInstances          \
+	, _startIndex            \
+	, _startVertex           \
+	, _startInstance         \
+	)                        \
+	_buffer[_offset*2+0] = uvec4(_numIndices, _numInstances, _startIndex, _startVertex); \
+	_buffer[_offset*2+1] = uvec4(_startInstance, 0u, 0u, 0u)
 
 #endif // __cplusplus
 

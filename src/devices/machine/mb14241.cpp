@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /***************************************************************************
 
-    Midway 8080-based black and white hardware
+    MB14241 shifter IC emulation
 
 ****************************************************************************/
 

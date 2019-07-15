@@ -39,9 +39,10 @@ public:
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(caprcyc_state::caprcyc_map) // TODO...
-	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
-ADDRESS_MAP_END
+void caprcyc_state::caprcyc_map(address_map &map)
+{ // TODO...
+	map(0x00000000, 0x0003ffff).rom();
+}
 
 
 
@@ -62,17 +63,17 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(caprcyc_state::caprcyc)
-
+void caprcyc_state::caprcyc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, 100000000) // cpu configuration is unknown
-	MCFG_CPU_PROGRAM_MAP(caprcyc_map)
+	VR4300BE(config, m_maincpu, 100000000); // cpu configuration is unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &caprcyc_state::caprcyc_map);
 
 	/* no video! */
 
 	/* sound hardware */
 	//..
-MACHINE_CONFIG_END
+}
 
 
 
@@ -94,4 +95,4 @@ ROM_START( caprcyc )
 ROM_END
 
 
-GAME (1999, caprcyc, 0, caprcyc, caprcyc, caprcyc_state, 0, ROT0, "Taito", "Capriccio Cyclone", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1999, caprcyc, 0, caprcyc, caprcyc, caprcyc_state, empty_init, ROT0, "Taito", "Capriccio Cyclone", MACHINE_IS_SKELETON_MECHANICAL )

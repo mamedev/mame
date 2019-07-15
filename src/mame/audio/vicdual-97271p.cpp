@@ -86,15 +86,16 @@ s97271p_device::s97271p_device(const machine_config &mconfig, const char *tag, d
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(s97271p_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+void s97271p_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
 
 	/* samples */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(13)
-	MCFG_SAMPLES_NAMES(nsub_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(13);
+	m_samples->set_samples_names(nsub_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

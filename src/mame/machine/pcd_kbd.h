@@ -5,15 +5,13 @@
 
 #pragma once
 
-#define MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &pcd_keyboard_device::set_out_tx_handler(*device, DEVCB_##_devcb);
 
 class pcd_keyboard_device : public device_t
 {
 public:
 	pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<pcd_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
+	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( t0_w );
 

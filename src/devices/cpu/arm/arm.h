@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Phil Stroffolino
+
 #ifndef MAME_CPU_ARM_ARM_H
 #define MAME_CPU_ARM_ARM_H
 
@@ -16,10 +17,6 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
-#define MCFG_ARM_COPRO(_type) \
-	arm_cpu_device::set_copro_type(*device, arm_cpu_device::copro_type::_type);
-
-
 class arm_cpu_device : public cpu_device
 {
 public:
@@ -32,7 +29,7 @@ public:
 	// construction/destruction
 	arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_copro_type(device_t &device, copro_type type) { downcast<arm_cpu_device &>(device).m_copro_type = type; }
+	void set_copro_type(copro_type type) { m_copro_type = type; }
 
 protected:
 	enum
@@ -64,7 +61,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -74,7 +71,7 @@ protected:
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u32 (offs_t)> m_pr32;
 	endianness_t m_endian;
 	copro_type m_copro_type;
 

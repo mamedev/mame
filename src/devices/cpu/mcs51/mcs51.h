@@ -32,18 +32,12 @@
 #pragma once
 
 
-#define MCFG_MCS51_SERIAL_RX_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_serial_rx_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_MCS51_SERIAL_TX_CB(_devcb) \
-	devcb = &mcs51_cpu_device::set_serial_tx_cb(*device, DEVCB_##_devcb);
-
-
 enum
 {
-	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPTR, MCS51_DPH, MCS51_DPL, MCS51_IE,
+	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPTR, MCS51_DPH, MCS51_DPL, MCS51_IE, MCS51_IP,
 	MCS51_P0, MCS51_P1, MCS51_P2, MCS51_P3,
-	MCS51_R0, MCS51_R1, MCS51_R2, MCS51_R3, MCS51_R4, MCS51_R5, MCS51_R6, MCS51_R7, MCS51_RB
+	MCS51_R0, MCS51_R1, MCS51_R2, MCS51_R3, MCS51_R4, MCS51_R5, MCS51_R6, MCS51_R7, MCS51_RB,
+	MCS51_TCON, MCS51_TMOD, MCS51_TL0, MCS51_TL1, MCS51_TH0, MCS51_TH1
 };
 
 enum
@@ -59,40 +53,22 @@ enum
 	DS5002FP_PFI_LINE       /* DS5002FP Power fail interrupt */
 };
 
-/* special I/O space ports */
-
-enum
-{
-	MCS51_PORT_P0   = 0x20000,
-	MCS51_PORT_P1   = 0x20001,
-	MCS51_PORT_P2   = 0x20002,
-	MCS51_PORT_P3   = 0x20003,
-	MCS51_PORT_TX   = 0x20004   /* P3.1 */
-};
-
-/* At least CMOS devices may be forced to read from ports configured as output.
- * All you need is a low impedance output connect to the port.
- */
-
-#define MCFG_MCS51_PORT1_CONFIG(_forced_inputs) \
-	mcs51_cpu_device::set_port_forced_input(*device, 1, _forced_inputs);
-#define MCFG_MCS51_PORT2_CONFIG(_forced_inputs) \
-	mcs51_cpu_device::set_port_forced_input(*device, 2, _forced_inputs);
-#define MCFG_MCS51_PORT3_CONFIG(_forced_inputs) \
-	mcs51_cpu_device::set_port_forced_input(*device, 3, _forced_inputs);
 
 class mcs51_cpu_device : public cpu_device
 {
 public:
-	// configuration helpers
-	static void set_port_forced_input(device_t &device, uint8_t port, uint8_t forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
-	template<class _Object> static devcb_base & set_serial_rx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_rx_cb.set_callback(object); }
-	template<class _Object> static devcb_base & set_serial_tx_cb(device_t &device, _Object object) { return downcast<mcs51_cpu_device &>(device).m_serial_tx_cb.set_callback(object); }
+	/* At least CMOS devices may be forced to read from ports configured as output.
+	 * All you need is a low impedance output connect to the port.
+	 */
+	void set_port_forced_input(uint8_t port, uint8_t forced_input) { m_forced_inputs[port] = forced_input; }
 
-	void data_7bit(address_map &map);
-	void data_8bit(address_map &map);
-	void program_12bit(address_map &map);
-	void program_13bit(address_map &map);
+	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
+	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
+	auto serial_rx_cb() { return m_serial_rx_cb.bind(); }
+	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
+
+	void program_internal(address_map &map);
+	void data_internal(address_map &map);
 protected:
 	// construction/destruction
 	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
@@ -107,7 +83,6 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 20; }
 	virtual uint32_t execute_input_lines() const override { return 6; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -115,12 +90,10 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 protected:
 	address_space_config m_program_config;
@@ -134,6 +107,7 @@ protected:
 	uint8_t   m_rwm;            //Signals that the current instruction is a read/write/modify instruction
 
 	int     m_inst_cycles;        /* cycles for the current instruction */
+	const uint32_t m_rom_size;    /* size (in bytes) of internal program ROM/EPROM */
 	int     m_ram_mask;           /* second ram bank for indirect access available ? */
 	int     m_num_interrupts;     /* number of interrupts supported */
 	int     m_recalc_parity;      /* recalculate parity before next instruction */
@@ -147,6 +121,10 @@ protected:
 	uint8_t   m_irq_prio[8];        /* interrupt priority */
 
 	uint8_t   m_forced_inputs[4];   /* allow read even if configured as output */
+
+	// JB-related hacks
+	uint8_t m_last_op;
+	uint8_t m_last_bit;
 
 	int     m_icount;
 
@@ -171,9 +149,12 @@ protected:
 
 	/* Memory spaces */
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
+
+	devcb_read8 m_port_in_cb[4];
+	devcb_write8 m_port_out_cb[4];
 
 	/* Serial Port TX/RX Callbacks */
 	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
@@ -346,9 +327,11 @@ DECLARE_DEVICE_TYPE(I8032, i8032_device)
 /* variants 4k internal rom and 128 byte internal memory */
 DECLARE_DEVICE_TYPE(I8051, i8051_device)
 DECLARE_DEVICE_TYPE(I8751, i8751_device)
+/* variants 8k internal rom and 128 byte internal memory (no 8052 features) */
+DECLARE_DEVICE_TYPE(AM8753, am8753_device)
 /* variants 8k internal rom and 256 byte internal memory and more registers */
 DECLARE_DEVICE_TYPE(I8052, i8052_device)
-DECLARE_DEVICE_TYPE(I8752, i8751_device)
+DECLARE_DEVICE_TYPE(I8752, i8752_device)
 /* cmos variants */
 DECLARE_DEVICE_TYPE(I80C31, i80c31_device)
 DECLARE_DEVICE_TYPE(I80C51, i80c51_device)
@@ -356,6 +339,9 @@ DECLARE_DEVICE_TYPE(I87C51, i87c51_device)
 DECLARE_DEVICE_TYPE(I80C32, i80c32_device)
 DECLARE_DEVICE_TYPE(I80C52, i80c52_device)
 DECLARE_DEVICE_TYPE(I87C52, i87c52_device)
+DECLARE_DEVICE_TYPE(I80C51GB, i80c51gb_device)
+DECLARE_DEVICE_TYPE(AT89C52, at89c52_device)
+DECLARE_DEVICE_TYPE(AT89S52, at89s52_device)
 /* 4k internal perom and 128 internal ram and 2 analog comparators */
 DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
 
@@ -383,6 +369,13 @@ public:
 	i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class am8753_device : public mcs51_cpu_device
+{
+public:
+	// construction/destruction
+	am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 class i8052_device : public mcs51_cpu_device
 {
@@ -393,7 +386,7 @@ public:
 protected:
 	i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;
@@ -421,7 +414,7 @@ public:
 	i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -434,7 +427,7 @@ public:
 protected:
 	i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 class i87c51_device : public i80c51_device
@@ -454,7 +447,7 @@ public:
 protected:
 	i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;
@@ -473,6 +466,30 @@ class i87c52_device : public i80c52_device
 public:
 	// construction/destruction
 	i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i80c51gb_device : public i80c52_device
+{
+public:
+	// construction/destruction
+	i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+class at89c52_device : public i80c52_device
+{
+public:
+	// construction/destruction
+	at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class at89s52_device : public i80c52_device
+{
+public:
+	// construction/destruction
+	at89s52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class at89c4051_device : public i80c51_device
@@ -515,9 +532,9 @@ public:
 	// construction/destruction
 	ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_mcon(device_t &device, uint8_t mcon) { downcast<ds5002fp_device &>(device).m_ds5002fp.mcon = mcon; }
-	static void set_rpctl(device_t &device, uint8_t rpctl) { downcast<ds5002fp_device &>(device).m_ds5002fp.rpctl = rpctl; }
-	static void set_crc(device_t &device, uint8_t crc) { downcast<ds5002fp_device &>(device).m_ds5002fp.crc = crc; }
+	void set_mcon(uint8_t mcon) { m_ds5002fp.mcon = mcon; }
+	void set_rpctl(uint8_t rpctl) { m_ds5002fp.rpctl = rpctl; }
+	void set_crc(uint8_t crc) { m_ds5002fp.crc = crc; }
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -525,7 +542,7 @@ public:
 	virtual void nvram_write( emu_file &file ) override;
 
 protected:
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;

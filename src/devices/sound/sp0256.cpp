@@ -85,7 +85,7 @@ void sp0256_device::device_start()
 	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
 	/* -------------------------------------------------------------------- */
 	m_scratch = std::make_unique<int16_t[]>(SCBUF_SIZE);
-	save_pointer(NAME(m_scratch.get()), SCBUF_SIZE);
+	save_pointer(NAME(m_scratch), SCBUF_SIZE);
 
 	m_sc_head = m_sc_tail = 0;
 
@@ -1141,7 +1141,7 @@ void sp0256_device::micro()
 
 
 
-WRITE8_MEMBER( sp0256_device::ald_w )
+void sp0256_device::ald_w(uint8_t data)
 {
 	/* ---------------------------------------------------------------- */
 	/*  Drop writes to the ALD register if we're busy.                  */
@@ -1180,7 +1180,7 @@ READ_LINE_MEMBER( sp0256_device::sby_r )
 	return m_sby_line;
 }
 
-READ16_MEMBER( sp0256_device::spb640_r )
+uint16_t sp0256_device::spb640_r(offs_t offset)
 {
 	/* -------------------------------------------------------------------- */
 	/*  Offset 0 returns the SP0256 LRQ status on bit 15.                   */
@@ -1204,11 +1204,11 @@ READ16_MEMBER( sp0256_device::spb640_r )
 	return 0x00ff;
 }
 
-WRITE16_MEMBER( sp0256_device::spb640_w )
+void sp0256_device::spb640_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0)
 	{
-		ald_w(space, 0, data & 0xff);
+		ald_w(data & 0xff);
 		return;
 	}
 

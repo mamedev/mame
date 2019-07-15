@@ -17,7 +17,7 @@ sub sound functions
 WRITE8_MEMBER(subs_state::noise_reset_w)
 {
 	/* Pulse noise reset */
-	m_discrete->write(space, SUBS_NOISE_RESET, 0);
+	m_discrete->write(SUBS_NOISE_RESET, 0);
 }
 
 
@@ -48,7 +48,7 @@ static const discrete_lfsr_desc subs_lfsr =
 #define SUBS_CRASH_SND      NODE_14
 #define SUBS_EXPLODE_SND    NODE_15
 
-DISCRETE_SOUND_START(subs)
+DISCRETE_SOUND_START(subs_discrete)
 	/************************************************/
 	/* subs  Effects Relataive Gain Table           */
 	/*                                              */

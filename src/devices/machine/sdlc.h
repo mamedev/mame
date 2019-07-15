@@ -10,19 +10,6 @@
 #include <utility>
 
 
-#define MCFG_SDLC_LOGGER_DATA_NRZL \
-		downcast<sdlc_logger_device &>(*device).clock_active(0);
-
-#define MCFG_SDLC_LOGGER_DATA_NRZI \
-		downcast<sdlc_logger_device &>(*device).clock_active(1);
-
-#define MCFG_SDLC_LOGGER_CLOCK_ACTIVE_RISING \
-		downcast<sdlc_logger_device &>(*device).clock_active(1);
-
-#define MCFG_SDLC_LOGGER_CLOCK_ACTIVE_FALLING \
-		downcast<sdlc_logger_device &>(*device).clock_active(0);
-
-
 class device_sdlc_consumer_interface : public device_interface
 {
 public:

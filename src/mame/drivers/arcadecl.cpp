@@ -8,7 +8,7 @@
 
     Games supported:
         * Arcade Classics (1992)
-        * Sparkz (1982)
+        * Sparkz (1992)
 
     Known bugs:
         * none at this time
@@ -75,6 +75,7 @@
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/atarimo.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -87,17 +88,17 @@
  *
  *************************************/
 
-void arcadecl_state::update_interrupts()
+void sparkz_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void arcadecl_state::scanline_update(screen_device &screen, int scanline)
+void sparkz_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		scanline_int_gen(*m_maincpu);
+		scanline_int_write_line(1);
 }
 
 
@@ -108,7 +109,7 @@ void arcadecl_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
+void sparkz_state::machine_reset()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
@@ -122,7 +123,7 @@ MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
  *
  *************************************/
 
-WRITE16_MEMBER(arcadecl_state::latch_w)
+WRITE16_MEMBER(sparkz_state::latch_w)
 {
 	/* bit layout in this register:
 
@@ -146,28 +147,29 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(arcadecl_state::main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
-	AM_RANGE(0x3effc0, 0x3effff) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x640000, 0x640001) AM_READ_PORT("PLAYER1")
-	AM_RANGE(0x640002, 0x640003) AM_READ_PORT("PLAYER2")
-	AM_RANGE(0x640010, 0x640011) AM_READ_PORT("STATUS")
-	AM_RANGE(0x640012, 0x640013) AM_READ_PORT("COIN")
-	AM_RANGE(0x640020, 0x640021) AM_READ_PORT("TRACKX2")
-	AM_RANGE(0x640022, 0x640023) AM_READ_PORT("TRACKY2")
-	AM_RANGE(0x640024, 0x640025) AM_READ_PORT("TRACKX1")
-	AM_RANGE(0x640026, 0x640027) AM_READ_PORT("TRACKY1")
-	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
-	AM_RANGE(0x640060, 0x64006f) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x641000, 0x641fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x646000, 0x646fff) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0x647000, 0x647fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-ADDRESS_MAP_END
+void sparkz_state::main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("bitmap");
+	map(0x3c0000, 0x3c07ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0x3e0000, 0x3e07ff).ram().share("mob");
+	map(0x3e0800, 0x3effbf).ram();
+	map(0x3effc0, 0x3effff).ram().share("mob:slip");
+	map(0x640000, 0x640001).portr("PLAYER1");
+	map(0x640002, 0x640003).portr("PLAYER2");
+	map(0x640010, 0x640011).portr("STATUS");
+	map(0x640012, 0x640013).portr("COIN");
+	map(0x640020, 0x640021).portr("TRACKX2");
+	map(0x640022, 0x640023).portr("TRACKY2");
+	map(0x640024, 0x640025).portr("TRACKX1");
+	map(0x640026, 0x640027).portr("TRACKY1");
+	map(0x640040, 0x64004f).w(FUNC(sparkz_state::latch_w));
+	map(0x640060, 0x64006f).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x641000, 0x641fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x642000, 0x642000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x646000, 0x646fff).w(FUNC(sparkz_state::scanline_int_ack_w));
+	map(0x647000, 0x647fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+}
 
 
 
@@ -299,14 +301,14 @@ static const gfx_layout molayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4
 };
 
 
-static GFXDECODE_START( arcadecl )
+static GFXDECODE_START( gfx_arcadecl )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
 GFXDECODE_END
 
@@ -318,50 +320,44 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(arcadecl_state::arcadecl)
-
+void sparkz_state::sparkz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
+	M68000(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sparkz_state::main_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(arcadecl_state,arcadecl)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_arcadecl);
+	palette_device &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::IRGB_1555, 512);
+	palette.set_membits(8);
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(arcadecl_state, screen_update_arcadecl)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(arcadecl_state,arcadecl)
+	m_screen->set_raw(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(sparkz_state::screen_update));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(sparkz_state::video_int_write_line));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/4/3, PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, MASTER_CLOCK/4/3, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(arcadecl_state::sparkz)
-	arcadecl(config);
-	MCFG_DEVICE_REMOVE("mob")
-MACHINE_CONFIG_END
+void arcadecl_state::arcadecl(machine_config &config)
+{
+	sparkz(config);
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, arcadecl_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+}
 
 
 
@@ -389,8 +385,7 @@ ROM_START( sparkz )
 	ROM_LOAD16_BYTE( "sparkzpg.0", 0x00000, 0x80000, CRC(a75c331c) SHA1(855ed44bd23c1dd0ca64926cacc8be62aca82fe2) )
 	ROM_LOAD16_BYTE( "sparkzpg.1", 0x00001, 0x80000, CRC(1af1fc04) SHA1(6d92edb1a881ba6b63e0144c9c3e631b654bf8ae) )
 
-	ROM_REGION( 0x20, "gfx1", ROMREGION_ERASE00 )
-	/* empty */
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 ) // Unknown size, Unpopulated
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sparkzsn",      0x00000, 0x80000, CRC(87097ce2) SHA1(dc4d199b5af692d111c087af3edc01e2ac0287a8) )
@@ -404,5 +399,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, sparkz,   sparkz,   arcadecl_state, 0, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, empty_init, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, sparkz,   sparkz,   sparkz_state,   empty_init, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )

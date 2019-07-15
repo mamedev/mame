@@ -11,18 +11,23 @@ class ym2413_device : public device_t, public device_sound_interface
 public:
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, u8 data);
 
-	DECLARE_WRITE8_MEMBER( register_port_w );
-	DECLARE_WRITE8_MEMBER( data_port_w );
+	void register_port_w(u8 data);
+	void data_port_w(u8 data);
 
 protected:
+	ym2413_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	uint8_t m_inst_table[19][8];
 
 private:
 	struct OPLL_SLOT
@@ -105,13 +110,13 @@ private:
 	static const double ksl_tab[8*16];
 	static const uint32_t ksl_shift[4];
 	static const uint32_t sl_tab[16];
-	static const unsigned char eg_inc[15*RATE_STEPS];
-	static const unsigned char eg_rate_select[16+64+16];
-	static const unsigned char eg_rate_shift[16+64+16];
+	static const uint8_t eg_inc[15*RATE_STEPS];
+	static const uint8_t eg_rate_select[16+64+16];
+	static const uint8_t eg_rate_shift[16+64+16];
 	static const uint8_t mul_tab[16];
 	static const uint8_t lfo_am_table[LFO_AM_TAB_ELEMENTS];
 	static const int8_t lfo_pm_table[8*8];
-	static const unsigned char table[19][8];
+	static const uint8_t table[19][8];
 
 	int tl_tab[TL_TAB_LEN];
 
@@ -183,5 +188,16 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(YM2413, ym2413_device)
+
+class vrc7snd_device : public ym2413_device
+{
+public:
+	vrc7snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	static const uint8_t vrc7_table[19][8];
+};
+
+DECLARE_DEVICE_TYPE(VRC7, vrc7snd_device)
 
 #endif // MAME_SOUND_YM2413_H

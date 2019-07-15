@@ -11,6 +11,6 @@
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN(neogeo_cart);
+void neogeo_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_NEOGEO_CARTS_H

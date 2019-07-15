@@ -71,17 +71,9 @@ void avigo_state::video_start()
 	m_screen_column = 0;
 
 	/* allocate video memory */
-	m_video_memory = machine().memory().region_alloc( "videoram", (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1, 1, ENDIANNESS_LITTLE )->base();
-	memset(m_video_memory, 0, (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1);
+	m_video_memory = make_unique_clear<uint8_t[]>((AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1);
 
 	save_pointer(NAME(m_video_memory), (AVIGO_SCREEN_WIDTH>>3) * AVIGO_SCREEN_HEIGHT + 1);
-}
-
-/* Initialise the palette */
-PALETTE_INIT_MEMBER(avigo_state, avigo)
-{
-	m_palette->set_pen_color(0,rgb_t(0xff,0xff,0xff)); /* white  */
-	m_palette->set_pen_color(1,rgb_t(0x00,0x00,0x00)); /* black  */
 }
 
 uint32_t avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -94,7 +86,7 @@ uint32_t avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	for (y=0; y<AVIGO_SCREEN_HEIGHT; y++)
 	{
 		int by;
-		uint8_t *line_ptr = m_video_memory + (y*(AVIGO_SCREEN_WIDTH>>3));
+		uint8_t *line_ptr = &m_video_memory[y*(AVIGO_SCREEN_WIDTH>>3)];
 
 		x = 0;
 		for (by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)

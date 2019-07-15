@@ -13,9 +13,6 @@
 #pragma once
 
 
-#define MCFG_VOTRAX_SC01_REQUEST_CB(_devcb) \
-	devcb = &downcast<votrax_sc01_device *>(device)->set_ar_callback(DEVCB_##_devcb);
-
 class votrax_sc01_device :  public device_t,
 							public device_sound_interface
 {
@@ -25,10 +22,10 @@ public:
 	// construction/destruction
 	votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_ar_callback(Object &&cb) { return m_ar_cb.set_callback(std::forward<Object>(cb)); }
+	auto ar_callback() { return m_ar_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(inflection_w);
+	void write(uint8_t data);
+	void inflection_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(request) { m_stream->update(); return m_ar_state; }
 
 protected:

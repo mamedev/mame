@@ -5,6 +5,11 @@
     Asterix
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ASTERIX_H
+#define MAME_INCLUDES_ASTERIX_H
+
+#pragma once
+
 #include "video/k053251.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053244_k053245.h"
@@ -18,13 +23,14 @@ public:
 		TIMER_NMI
 	};
 
-	asterix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	asterix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k056832(*this, "k056832"),
 		m_k053244(*this, "k053244"),
-		m_k053251(*this, "k053251") { }
+		m_k053251(*this, "k053251")
+	{ }
 
 	/* video-related */
 	int         m_sprite_colorbase;
@@ -49,7 +55,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_WRITE16_MEMBER(asterix_spritebank_w);
-	DECLARE_DRIVER_INIT(asterix);
+	void init_asterix();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,3 +70,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_ASTERIX_H

@@ -5,7 +5,7 @@
 Heavy Unit
 Kaneko/Taito 1988
 
-Driver based on djboy.c / airbustr.c
+Driver based on djboy.cpp / airbustr.cpp
 
 This game runs on Kaneko hardware. The game is similar to R-Type.
 
@@ -66,6 +66,7 @@ To Do:
 #include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "video/kan_pand.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -81,25 +82,32 @@ class hvyunit_state : public driver_device
 {
 public:
 	hvyunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mastercpu(*this, "master"),
-		m_slavecpu(*this, "slave"),
-		m_mermaid(*this, "mermaid"),
-		m_soundcpu(*this, "soundcpu"),
-		m_pandora(*this, "pandora"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_mermaidlatch(*this, "mermaidlatch"),
-		m_slavelatch(*this, "slavelatch"),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_mastercpu(*this, "master")
+		, m_slavecpu(*this, "slave")
+		, m_mermaid(*this, "mermaid")
+		, m_soundcpu(*this, "soundcpu")
+		, m_pandora(*this, "pandora")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_mermaidlatch(*this, "mermaidlatch")
+		, m_slavelatch(*this, "slavelatch")
+		, m_masterbank(*this, "master_bank")
+		, m_slavebank(*this, "slave_bank")
+		, m_soundbank(*this, "sound_bank")
+		, m_videoram(*this, "videoram")
+		, m_colorram(*this, "colorram")
+	{
+	}
 
+	void hvyunit(machine_config &config);
+
+private:
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
-	required_device<cpu_device> m_mermaid;
+	required_device<i80c51_device> m_mermaid;
 	required_device<cpu_device> m_soundcpu;
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -107,6 +115,10 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mermaidlatch;
 	required_device<generic_latch_8_device> m_slavelatch;
+
+	required_memory_bank m_masterbank;
+	required_memory_bank m_slavebank;
+	required_memory_bank m_soundbank;
 
 	/* Video */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -122,12 +134,11 @@ public:
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
 	DECLARE_READ8_MEMBER(mermaid_status_r);
-	DECLARE_WRITE8_MEMBER(trigger_nmi_on_sound_cpu2);
-	DECLARE_WRITE8_MEMBER(hu_videoram_w);
-	DECLARE_WRITE8_MEMBER(hu_colorram_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(hu_scrollx_w);
-	DECLARE_WRITE8_MEMBER(hu_scrolly_w);
+	DECLARE_WRITE8_MEMBER(scrollx_w);
+	DECLARE_WRITE8_MEMBER(scrolly_w);
 	DECLARE_WRITE8_MEMBER(coin_count_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_READ8_MEMBER(mermaid_p0_r);
@@ -149,10 +160,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void hvyunit(machine_config &config);
 	void master_io(address_map &map);
 	void master_memory(address_map &map);
-	void mcu_io(address_map &map);
 	void slave_io(address_map &map);
 	void slave_memory(address_map &map);
 	void sound_io(address_map &map);
@@ -168,9 +177,9 @@ public:
 
 void hvyunit_state::machine_start()
 {
-	membank("master_bank")->configure_entries(0, 8, memregion("master")->base(), 0x4000);
-	membank("slave_bank")->configure_entries(0, 4, memregion("slave")->base(), 0x4000);
-	membank("sound_bank")->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
+	m_masterbank->configure_entries(0, 8, memregion("master")->base(), 0x4000);
+	m_slavebank->configure_entries(0, 4, memregion("slave")->base(), 0x4000);
+	m_soundbank->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
 
 	save_item(NAME(m_mermaid_p));
 }
@@ -236,12 +245,12 @@ WRITE_LINE_MEMBER(hvyunit_state::screen_vblank)
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 {
-	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
 {
-	membank("master_bank")->set_entry(data & 7);
+	m_masterbank->set_entry(data & 7);
 }
 
 READ8_MEMBER(hvyunit_state::mermaid_status_r)
@@ -256,19 +265,13 @@ READ8_MEMBER(hvyunit_state::mermaid_status_r)
  *
  *************************************/
 
-WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
-{
-	m_soundlatch->write(space, 0, data);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-WRITE8_MEMBER(hvyunit_state::hu_videoram_w)
+WRITE8_MEMBER(hvyunit_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
+WRITE8_MEMBER(hvyunit_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -277,15 +280,15 @@ WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
 WRITE8_MEMBER(hvyunit_state::slave_bankswitch_w)
 {
 	m_port0_data = data;
-	membank("slave_bank")->set_entry(data & 3);
+	m_slavebank->set_entry(data & 3);
 }
 
-WRITE8_MEMBER(hvyunit_state::hu_scrollx_w)
+WRITE8_MEMBER(hvyunit_state::scrollx_w)
 {
 	m_scrollx = data;
 }
 
-WRITE8_MEMBER(hvyunit_state::hu_scrolly_w)
+WRITE8_MEMBER(hvyunit_state::scrolly_w)
 {
 	m_scrolly = data;
 }
@@ -305,7 +308,7 @@ WRITE8_MEMBER(hvyunit_state::coin_count_w)
 
 WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
 {
-	membank("sound_bank")->set_entry(data & 3);
+	m_soundbank->set_entry(data & 3);
 }
 
 
@@ -324,10 +327,10 @@ READ8_MEMBER(hvyunit_state::mermaid_p0_r)
 WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
-		m_slavelatch->write(space, 0, m_mermaid_p[1]);
+		m_slavelatch->write(m_mermaid_p[1]);
 
 	if (BIT(data, 0) == 0)
-		m_mermaid_p[1] = m_mermaidlatch->read(space, 0);
+		m_mermaid_p[1] = m_mermaidlatch->read();
 
 	m_mermaid_p[0] = data;
 }
@@ -388,69 +391,68 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(hvyunit_state::master_memory)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("master_bank")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void hvyunit_state::master_memory(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("master_bank");
+	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(hvyunit_state::master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(master_bankswitch_w) // correct?
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_slave_cpu)
-ADDRESS_MAP_END
+void hvyunit_state::master_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(hvyunit_state::master_bankswitch_w));
+	map(0x01, 0x01).w(FUNC(hvyunit_state::master_bankswitch_w)); // correct?
+	map(0x02, 0x02).w(FUNC(hvyunit_state::trigger_nmi_on_slave_cpu));
+}
 
 
-ADDRESS_MAP_START(hvyunit_state::slave_memory)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slave_bank")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
+void hvyunit_state::slave_memory(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("slave_bank");
+	map(0xc000, 0xc3ff).ram().w(FUNC(hvyunit_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).ram().w(FUNC(hvyunit_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd200, 0xd7ff).ram();
+	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xda00, 0xdfff).ram();
+	map(0xe000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(hvyunit_state::slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("slavelatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mermaidlatch", generic_latch_8_device, write)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hu_scrolly_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(hu_scrollx_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
+void hvyunit_state::slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(hvyunit_state::slave_bankswitch_w));
+	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read));
+	map(0x04, 0x04).w(m_mermaidlatch, FUNC(generic_latch_8_device::write));
+	map(0x06, 0x06).w(FUNC(hvyunit_state::scrolly_w));
+	map(0x08, 0x08).w(FUNC(hvyunit_state::scrollx_w));
+	map(0x0c, 0x0c).r(FUNC(hvyunit_state::mermaid_status_r));
+	map(0x0e, 0x0e).w(FUNC(hvyunit_state::coin_count_w));
 
 //  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
 //  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(hvyunit_state::sound_memory)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sound_bank")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void hvyunit_state::sound_memory(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("sound_bank");
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(hvyunit_state::sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(hvyunit_state::mcu_io)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(mermaid_p0_r, mermaid_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(mermaid_p1_r, mermaid_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(mermaid_p2_r, mermaid_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mermaid_p3_r, mermaid_p3_w)
-ADDRESS_MAP_END
+void hvyunit_state::sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(hvyunit_state::sound_bankswitch_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /*************************************
@@ -586,7 +588,7 @@ static const gfx_layout tile_layout =
 	4*8*32
 };
 
-static GFXDECODE_START( hvyunit )
+static GFXDECODE_START( gfx_hvyunit )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
@@ -604,11 +606,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 /*************************************
@@ -617,57 +619,63 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
  *
  *************************************/
 
-MACHINE_CONFIG_START(hvyunit_state::hvyunit)
+void hvyunit_state::hvyunit(machine_config &config)
+{
+	Z80(config, m_mastercpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_mastercpu->set_addrmap(AS_PROGRAM, &hvyunit_state::master_memory);
+	m_mastercpu->set_addrmap(AS_IO, &hvyunit_state::master_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(hvyunit_state::scanline), "screen", 0, 1);
 
-	MCFG_CPU_ADD("master", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(master_memory)
-	MCFG_CPU_IO_MAP(master_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hvyunit_state, scanline, "screen", 0, 1)
+	Z80(config, m_slavecpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_slavecpu->set_addrmap(AS_PROGRAM, &hvyunit_state::slave_memory);
+	m_slavecpu->set_addrmap(AS_IO, &hvyunit_state::slave_io);
+	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("slave", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(slave_memory)
-	MCFG_CPU_IO_MAP(slave_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
+	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
+	m_soundcpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(sound_memory)
-	MCFG_CPU_IO_MAP(sound_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
+	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
+	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
+	m_mermaid->port_out_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_w));
+	m_mermaid->port_in_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_r));
+	m_mermaid->port_out_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_w));
+	m_mermaid->port_in_cb<2>().set(FUNC(hvyunit_state::mermaid_p2_r));
+	m_mermaid->port_out_cb<2>().set(FUNC(hvyunit_state::mermaid_p2_w));
+	m_mermaid->port_in_cb<3>().set(FUNC(hvyunit_state::mermaid_p3_r));
+	m_mermaid->port_out_cb<3>().set(FUNC(hvyunit_state::mermaid_p3_w));
 
-	MCFG_CPU_ADD("mermaid", I80C51, 6000000)
-	MCFG_CPU_IO_MAP(mcu_io)
+	GENERIC_LATCH_8(config, m_mermaidlatch);
+	m_mermaidlatch->data_pending_callback().set_inputline(m_mermaid, INPUT_LINE_IRQ0);
 
-	MCFG_GENERIC_LATCH_8_ADD("mermaidlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mermaid", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, m_slavelatch);
 
-	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 240-1);
+	screen.set_screen_update(FUNC(hvyunit_state::screen_update));
+	screen.screen_vblank().set(FUNC(hvyunit_state::screen_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hvyunit_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvyunit)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80); /* 3MHz verified on PCB */
+}
 
 
 
@@ -793,7 +801,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, hvyunit, 0,        hvyunit, hvyunit,  hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitjo,hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitu, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunit,   0,       hvyunit, hvyunit,  hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitj,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitjo, hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitu,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

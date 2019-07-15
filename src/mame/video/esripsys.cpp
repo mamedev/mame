@@ -133,13 +133,13 @@ void esripsys_state::video_start()
 	}
 
 	/* Register stuff for state saving */
-	save_pointer(NAME(line_buffer[0].colour_buf.get()), 512);
-	save_pointer(NAME(line_buffer[0].intensity_buf.get()), 512);
-	save_pointer(NAME(line_buffer[0].priority_buf.get()), 512);
+	save_pointer(NAME(line_buffer[0].colour_buf), 512);
+	save_pointer(NAME(line_buffer[0].intensity_buf), 512);
+	save_pointer(NAME(line_buffer[0].priority_buf), 512);
 
-	save_pointer(NAME(line_buffer[1].colour_buf.get()), 512);
-	save_pointer(NAME(line_buffer[1].intensity_buf.get()), 512);
-	save_pointer(NAME(line_buffer[1].priority_buf.get()), 512);
+	save_pointer(NAME(line_buffer[1].colour_buf), 512);
+	save_pointer(NAME(line_buffer[1].intensity_buf), 512);
+	save_pointer(NAME(line_buffer[1].priority_buf), 512);
 
 	save_item(NAME(m_video_firq));
 	save_item(NAME(m_bg_intensity));

@@ -111,33 +111,6 @@ enum
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PSX_DMA_CHANNEL_READ( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_read_handler( channel, handler );
-
-#define MCFG_PSX_DMA_CHANNEL_WRITE( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
-
-#define MCFG_PSX_GPU_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_read_handler(*device, DEVCB_##_devcb);
-#define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_write_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PSX_SPU_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_spu_read_handler(*device, DEVCB_##_devcb);
-#define MCFG_PSX_SPU_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_spu_write_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PSX_CD_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_cd_read_handler(*device, DEVCB_##_devcb);
-#define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_cd_write_handler(*device, DEVCB_##_devcb);
-#define MCFG_PSX_DISABLE_ROM_BERR \
-	downcast<psxcpu_device *>(device)->set_disable_rom_berr(true);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -146,13 +119,13 @@ enum
 class psxcpu_device : public cpu_device, psxcpu_disassembler::config
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_gpu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gpu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_spu_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_spu_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_read_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_write_handler(device_t &device, Object &&cb) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto gpu_read() { return m_gpu_read_handler.bind(); }
+	auto gpu_write() { return m_gpu_write_handler.bind(); }
+	auto spu_read() { return m_spu_read_handler.bind(); }
+	auto spu_write() { return m_spu_write_handler.bind(); }
+	auto cd_read() { return m_cd_read_handler.bind(); }
+	auto cd_write() { return m_cd_write_handler.bind(); }
 
 	// public interfaces
 	DECLARE_WRITE32_MEMBER( berr_w );
@@ -187,7 +160,7 @@ public:
 	DECLARE_WRITE32_MEMBER( com_delay_w );
 	DECLARE_READ32_MEMBER( com_delay_r );
 
-	static psxcpu_device *getcpu( device_t &device, const char *cputag );
+	static psxcpu_device *getcpu( device_t &device, const char *cputag ) { return downcast<psxcpu_device *>( device.subdevice( cputag ) ); }
 	void set_disable_rom_berr(bool mode);
 
 	void psxcpu_internal_map(address_map &map);
@@ -220,7 +193,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// CPU registers
 	uint32_t m_pc;
@@ -235,7 +208,7 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	// other internal states
 	int m_icount;

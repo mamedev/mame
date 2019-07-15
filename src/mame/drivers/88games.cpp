@@ -9,13 +9,13 @@
 #include "emu.h"
 #include "includes/88games.h"
 
-#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -26,10 +26,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(_88games_state::k88games_interrupt)
+WRITE_LINE_MEMBER(_88games_state::vblank_irq)
 {
-	if (m_k052109->is_irq_enabled())
-		irq0_line_hold(device);
+	if (state && m_k052109->is_irq_enabled())
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(_88games_state::bankedram_r)
@@ -39,9 +39,9 @@ READ8_MEMBER(_88games_state::bankedram_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_k051316->rom_r(offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->read(offset);
 	}
 }
 
@@ -50,7 +50,7 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 	if (m_videobank)
 		m_ram[offset] = data;
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->write(offset, data);
 }
 
 WRITE8_MEMBER(_88games_state::k88games_5f84_w)
@@ -69,24 +69,21 @@ WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 
 WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
 WRITE8_MEMBER(_88games_state::speech_control_w)
 {
-	m_speech_chip = (data & 4) ? 1 : 0;
-	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
+	m_speech_chip = BIT(data, 2);
 
-	upd->reset_w(data & 2);
-	upd->start_w(data & 1);
+	m_upd7759[m_speech_chip]->reset_w(BIT(data, 1));
+	m_upd7759[m_speech_chip]->start_w(BIT(data, 0));
 }
 
 WRITE8_MEMBER(_88games_state::speech_msg_w)
 {
-	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
-
-	upd->port_w(space, 0, data);
+	m_upd7759[m_speech_chip]->port_w(data);
 }
 
 /* special handlers to combine 052109 & 051960 */
@@ -95,24 +92,24 @@ READ8_MEMBER(_88games_state::k052109_051960_r)
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(_88games_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 /*************************************
@@ -121,35 +118,37 @@ WRITE8_MEMBER(_88games_state::k052109_051960_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(_88games_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank0000") /* banked ROM */
-	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("bank1000") /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
-	AM_RANGE(0x5f88, 0x5f88) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5f8c, 0x5f8c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
-	AM_RANGE(0x5f94, 0x5f94) AM_READ_PORT("IN0")
-	AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
-	AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
-	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
-	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void _88games_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).bankr("bank0000"); /* banked ROM */
+	map(0x1000, 0x1fff).bankr("bank1000"); /* banked ROM + palette RAM */
+	map(0x1000, 0x1fff).w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x2000, 0x2fff).ram();
+	map(0x3000, 0x37ff).ram().share("nvram");
+	map(0x3800, 0x3fff).rw(FUNC(_88games_state::bankedram_r), FUNC(_88games_state::bankedram_w)).share("ram");
+	map(0x4000, 0x7fff).rw(FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
+	map(0x5f84, 0x5f84).w(FUNC(_88games_state::k88games_5f84_w));
+	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x5f8c, 0x5f8c).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x5f90, 0x5f90).w(FUNC(_88games_state::k88games_sh_irqtrigger_w));
+	map(0x5f94, 0x5f94).portr("IN0");
+	map(0x5f95, 0x5f95).portr("IN1");
+	map(0x5f96, 0x5f96).portr("IN2");
+	map(0x5f97, 0x5f97).portr("DSW1");
+	map(0x5f9b, 0x5f9b).portr("DSW2");
+	map(0x5fc0, 0x5fcf).w(m_k051316, FUNC(k051316_device::ctrl_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(_88games_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
-ADDRESS_MAP_END
+void _88games_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(FUNC(_88games_state::speech_msg_w));
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe000, 0xe000).w(FUNC(_88games_state::speech_control_w));
+}
 
 
 
@@ -261,7 +260,7 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( _88games_state::banking_callback )
 {
-	logerror("%04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
+	logerror("%s: bank select %02x\n", machine().describe_context(), data);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */
@@ -302,62 +301,56 @@ void _88games_state::machine_reset()
 	m_k88games_priority = 0;
 }
 
-MACHINE_CONFIG_START(_88games_state::_88games)
-
+void _88games_state::_88games(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _88games_state,  k88games_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(_88games_state, banking_callback))
+	KONAMI(config, m_maincpu, 3000000); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_88games_state::main_map);
+	m_maincpu->line().set(FUNC(_88games_state::banking_callback));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 3579545);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_88games_state::sound_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(_88games_state, screen_update_88games)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(_88games_state::screen_update_88games));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(_88games_state::vblank_irq));
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(_88games_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(_88games_state, sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_CB(_88games_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette("palette");
+	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback), this);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
-	MCFG_SOUND_ROUTE(0, "mono", 0.75)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "mono", 0.75).add_route(1, "mono", 0.75);
 
-	MCFG_SOUND_ADD("upd1", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	UPD7759(config, m_upd7759[0]).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_SOUND_ADD("upd2", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759[1]).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 
@@ -536,6 +529,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, 88games,  0,       _88games, 88games, _88games_state, 0, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, konami88, 88games, _88games, 88games, _88games_state, 0, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hypsptsp, 88games, _88games, 88games, _88games_state, 0, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 88games,  0,       _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )

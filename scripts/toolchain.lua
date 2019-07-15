@@ -16,13 +16,14 @@ newoption {
 	description = "Choose GCC flavor",
 	allowed = {
 		{ "android-arm",   "Android - ARM"          },
-		{ "android-arm64", "Android - ARM64"          },
+		{ "android-arm64", "Android - ARM64"        },
 		{ "android-mips",  "Android - MIPS"         },
 		{ "android-mips64","Android - MIPS64"       },
 		{ "android-x86",   "Android - x86"          },
 		{ "android-x64",   "Android - x64"          },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
+		{ "freebsd-clang", "FreeBSD (clang compiler)"},
 		{ "linux-gcc",     "Linux (GCC compiler)"   },
 		{ "linux-clang",   "Linux (Clang compiler)" },
 		{ "ios-arm",       "iOS - ARM"              },
@@ -31,6 +32,7 @@ newoption {
 		{ "mingw64-gcc",   "MinGW64"                },
 		{ "mingw-clang",   "MinGW (clang compiler)" },
 		{ "netbsd",        "NetBSD"                },
+		{ "netbsd-clang",  "NetBSD (clang compiler)"},
 		{ "openbsd",       "OpenBSD"                },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
@@ -92,11 +94,11 @@ function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
 
-	local androidPlatform = "android-21"
+	local androidPlatform = "android-24"
 	if _OPTIONS["with-android"] then
 		androidPlatform = "android-" .. _OPTIONS["with-android"]
 	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
-		androidPlatform = "android-21"
+		androidPlatform = "android-24"
 	end
 
 	local iosPlatform = ""
@@ -168,8 +170,16 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-freebsd")
 		end
 
+		if "freebsd-clang" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-freebsd-clang")
+		end
+
 		if "netbsd" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-netbsd")
+		end
+
+		if "netbsd-clang" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-netbsd-clang")
 		end
 
 		if "openbsd" == _OPTIONS["gcc"] then
@@ -837,6 +847,7 @@ function toolchain(_buildDir, _subDir)
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
+			"$(ANDROID_NDK_ROOT)/sysroot/usr/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
@@ -854,9 +865,11 @@ function toolchain(_buildDir, _subDir)
 			"log",
 			"c++_static",
 			"c++abi",
-			"android_support",
 			"stdc++",
 			"gcc",
+		}
+		buildoptions_c {
+			"-Wno-strict-prototypes",
 		}
 		buildoptions {
 			"-fpic",
@@ -870,6 +883,8 @@ function toolchain(_buildDir, _subDir)
 			"-Wno-cast-align",
 			"-Wno-unknown-attributes",
 			"-Wno-macro-redefined",
+			"-DASIO_HAS_STD_STRING_VIEW",
+			"-Wno-unused-function",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -883,11 +898,10 @@ function toolchain(_buildDir, _subDir)
 	configuration { "android-arm" }
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
-				"$(ANDROID_NDK_ARM)/lib/gcc/arm-linux-androideabi/4.9.x/armv7-a",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
 			}
 			includedirs {
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/include",
+				"$(ANDROID_NDK_ROOT)/sysroot/usr/include/arm-linux-androideabi",
 			}
 			buildoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
@@ -916,7 +930,7 @@ function toolchain(_buildDir, _subDir)
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/lib64",
 			}
 			includedirs {
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm64/usr/include",
+				"$(ANDROID_NDK_ROOT)/sysroot/usr/include/aarch64-linux-android",
 			}
 			buildoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM64)",
@@ -930,53 +944,13 @@ function toolchain(_buildDir, _subDir)
 				"-target aarch64-none-linux-android",
 			}
 
-	configuration { "android-mips" }
-		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/",
-		}
-		includedirs {
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/include",
-		}
-		buildoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
-			"-target mipsel-none-linux-android",
-		}
-		linkoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
-			"-target mipsel-none-linux-android",
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtend_so.o",
-		}
-
-	configuration { "android-mips64" }
-		libdirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips64",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/",
-		}
-		includedirs {
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/include",
-		}
-		buildoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS64)",
-			"-target mips64el-none-linux-android",
-		}
-		linkoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS64)",
-			"-target mips64el-none-linux-android",
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips64/usr/lib64/crtend_so.o",
-		}
-
 	configuration { "android-x86" }
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/include",
+			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/i686-linux-android",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_X86)",
@@ -998,7 +972,7 @@ function toolchain(_buildDir, _subDir)
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/lib64",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86_64/usr/include",
+			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/x86_64-linux-android",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_X64)",
@@ -1077,7 +1051,7 @@ function toolchain(_buildDir, _subDir)
 	configuration { "osx*", "x64" }
 		objdir (_buildDir .. "osx_clang" .. "/obj")
 		buildoptions {
-			"-m64",
+			"-m64", "-DHAVE_IMMINTRIN_H=1",
 		}
 
 	configuration { "osx*", "x64", "Release" }

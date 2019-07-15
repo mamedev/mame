@@ -27,37 +27,41 @@
 
 
 // uCOM-43 products: 2000x8 ROM, 96x4 RAM, supports full instruction set
-DEFINE_DEVICE_TYPE(NEC_D546,  upd546_cpu_device,  "upd546",  "NEC uPD546") // 42-pin PMOS, 35 pins for I/O
-DEFINE_DEVICE_TYPE(NEC_D553,  upd553_cpu_device,  "upd553",  "NEC uPD553") // 42-pin PMOS, 35 pins for I/O, high voltage
-DEFINE_DEVICE_TYPE(NEC_D557L, upd557l_cpu_device, "upd557l", "NEC uPD557L") // 28-pin PMOS, 21 pins for I/O
-DEFINE_DEVICE_TYPE(NEC_D650,  upd650_cpu_device,  "upd650",  "NEC uPD650") // 42-pin CMOS, 35 pins for I/O
+DEFINE_DEVICE_TYPE(NEC_D546,  upd546_cpu_device,  "upd546",  "NEC uPD546") // 42-pin PMOS, 35 pins for I/O, max rated 440kHz
+DEFINE_DEVICE_TYPE(NEC_D553,  upd553_cpu_device,  "upd553",  "NEC uPD553") // 42-pin PMOS, 35 pins for I/O, high voltage, max rated 440kHz
+DEFINE_DEVICE_TYPE(NEC_D557L, upd557l_cpu_device, "upd557l", "NEC uPD557L") // 28-pin PMOS, 21 pins for I/O, max rated 180kHz
+DEFINE_DEVICE_TYPE(NEC_D650,  upd650_cpu_device,  "upd650",  "NEC uPD650") // 42-pin CMOS, 35 pins for I/O, max rated 440kHz
 
 // uCOM-44 products: 1000x8 ROM, 64x4 RAM, 1-level stack, does not support external interrupt
-DEFINE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device,  "upd552",  "NEC uPD552") // 42-pin PMOS, 35 pins for I/O, high voltage
+DEFINE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device,  "upd552",  "NEC uPD552") // 42-pin PMOS, 35 pins for I/O, high voltage, max rated 440kHz
 
 // uCOM-45 products: 1000x8 or 640x8 ROM, 32x4 RAM, 1-level stack
 //..
 
 
 // internal memory maps
-ADDRESS_MAP_START(ucom4_cpu_device::program_1k)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void ucom4_cpu_device::program_1k(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+}
 
-ADDRESS_MAP_START(ucom4_cpu_device::program_2k)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void ucom4_cpu_device::program_2k(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
-ADDRESS_MAP_START(ucom4_cpu_device::data_64x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void ucom4_cpu_device::data_64x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(ucom4_cpu_device::data_96x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x40, 0x4f) AM_RAM
-	AM_RANGE(0x70, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void ucom4_cpu_device::data_96x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x40, 0x4f).ram();
+	map(0x70, 0x7f).ram();
+}
 
 
 // device definitions
@@ -137,9 +141,9 @@ void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-util::disasm_interface *ucom4_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ucom4_cpu_device::create_disassembler()
 {
-	return new ucom4_disassembler;
+	return std::make_unique<ucom4_disassembler>();
 }
 
 
@@ -155,7 +159,7 @@ enum
 
 void ucom4_cpu_device::device_start()
 {
-	assert(NEC_UCOM4_PORTA == 0);
+	assert(PORTA == 0);
 
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
@@ -224,7 +228,7 @@ void ucom4_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_carry_f).formatstr("%5s").noshow(); // dummy
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -247,7 +251,7 @@ void ucom4_cpu_device::device_reset()
 	m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
 
 	// clear i/o
-	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
+	for (int i = PORTC; i <= PORTI; i++)
 		output_w(i, 0);
 }
 
@@ -267,10 +271,10 @@ u8 ucom4_cpu_device::input_r(int index)
 
 	switch (index)
 	{
-		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff); break;
-		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff); break;
-		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff) | m_port_out[index]; break;
-		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
+		case PORTA: inp = m_read_a(index, 0xff); break;
+		case PORTB: inp = m_read_b(index, 0xff); break;
+		case PORTC: inp = m_read_c(index, 0xff) | m_port_out[index]; break;
+		case PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
 
 		default:
 			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
@@ -287,13 +291,13 @@ void ucom4_cpu_device::output_w(int index, u8 data)
 
 	switch (index)
 	{
-		case NEC_UCOM4_PORTC: m_write_c(index, data, 0xff); break;
-		case NEC_UCOM4_PORTD: m_write_d(index, data, 0xff); break;
-		case NEC_UCOM4_PORTE: m_write_e(index, data, 0xff); break;
-		case NEC_UCOM4_PORTF: m_write_f(index, data, 0xff); break;
-		case NEC_UCOM4_PORTG: m_write_g(index, data, 0xff); break;
-		case NEC_UCOM4_PORTH: m_write_h(index, data, 0xff); break;
-		case NEC_UCOM4_PORTI: m_write_i(index, data & 7, 0xff); break;
+		case PORTC: m_write_c(index, data, 0xff); break;
+		case PORTD: m_write_d(index, data, 0xff); break;
+		case PORTE: m_write_e(index, data, 0xff); break;
+		case PORTF: m_write_f(index, data, 0xff); break;
+		case PORTG: m_write_g(index, data, 0xff); break;
+		case PORTH: m_write_h(index, data, 0xff); break;
+		case PORTI: m_write_i(index, data & 7, 0xff); break;
 
 		default:
 			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
@@ -310,7 +314,7 @@ u8 upd557l_cpu_device::input_r(int index)
 {
 	index &= 0xf;
 
-	if (index == NEC_UCOM4_PORTB)
+	if (index == PORTB)
 		logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
 	else
 		return ucom4_cpu_device::input_r(index);
@@ -323,12 +327,12 @@ void upd557l_cpu_device::output_w(int index, u8 data)
 	index &= 0xf;
 	data &= 0xf;
 
-	if (index == NEC_UCOM4_PORTH || index == NEC_UCOM4_PORTI)
+	if (index == PORTH || index == PORTI)
 		logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
 	else
 	{
 		// only G0 for port G
-		if (index == NEC_UCOM4_PORTG)
+		if (index == PORTG)
 			data &= 1;
 
 		ucom4_cpu_device::output_w(index, data);
@@ -409,7 +413,7 @@ void ucom4_cpu_device::execute_run()
 		m_prev_pc = m_pc;
 
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_icount--;
 		m_op = m_program->read_byte(m_pc);
 		m_bitmask = 1 << (m_op & 0x03);

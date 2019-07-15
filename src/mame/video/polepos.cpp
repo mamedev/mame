@@ -27,10 +27,9 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(polepos_state,polepos)
+void polepos_state::polepos_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i, j;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	/*******************************************************
 	 * Color PROMs
@@ -51,32 +50,32 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 * below the pixel or not. That would be tricky to emulate, and it's
 	 * not needed because of course the two banks are the same.
 	 *******************************************************/
-	for (i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		/* Sheet 15B: 136014-0137 red component */
-		bit0 = (color_prom[0x000 + i] >> 0) & 1;
-		bit1 = (color_prom[0x000 + i] >> 1) & 1;
-		bit2 = (color_prom[0x000 + i] >> 2) & 1;
-		bit3 = (color_prom[0x000 + i] >> 3) & 1;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// Sheet 15B: 136014-0137 red component
+		bit0 = BIT(color_prom[0x000 + i], 0);
+		bit1 = BIT(color_prom[0x000 + i], 1);
+		bit2 = BIT(color_prom[0x000 + i], 2);
+		bit3 = BIT(color_prom[0x000 + i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* Sheet 15B: 136014-0138 green component */
-		bit0 = (color_prom[0x100 + i] >> 0) & 1;
-		bit1 = (color_prom[0x100 + i] >> 1) & 1;
-		bit2 = (color_prom[0x100 + i] >> 2) & 1;
-		bit3 = (color_prom[0x100 + i] >> 3) & 1;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// Sheet 15B: 136014-0138 green component
+		bit0 = BIT(color_prom[0x100 + i], 0);
+		bit1 = BIT(color_prom[0x100 + i], 1);
+		bit2 = BIT(color_prom[0x100 + i], 2);
+		bit3 = BIT(color_prom[0x100 + i], 3);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* Sheet 15B: 136014-0139 blue component */
-		bit0 = (color_prom[0x200 + i] >> 0) & 1;
-		bit1 = (color_prom[0x200 + i] >> 1) & 1;
-		bit2 = (color_prom[0x200 + i] >> 2) & 1;
-		bit3 = (color_prom[0x200 + i] >> 3) & 1;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// Sheet 15B: 136014-0139 blue component
+		bit0 = BIT(color_prom[0x200 + i], 0);
+		bit1 = BIT(color_prom[0x200 + i], 1);
+		bit2 = BIT(color_prom[0x200 + i], 2);
+		bit3 = BIT(color_prom[0x200 + i], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/*******************************************************
@@ -84,9 +83,9 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 * Sheet 15B: top left, 136014-140
 	 * Inputs: SHFT0, SHFT1 and CHA8* ... CHA13*
 	 *******************************************************/
-	for (i = 0; i < 64*4; i++)
+	for (int i = 0; i < 64*4; i++)
 	{
-		int color = color_prom[0x300 + i];
+		int const color = color_prom[0x300 + i];
 		palette.set_pen_indirect(0x0000 + i, (color != 15) ? (0x020 + color) : 0x2f);
 		palette.set_pen_indirect(0x0100 + i, (color != 15) ? (0x060 + color) : 0x2f);
 	}
@@ -97,9 +96,9 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 * Inputs: SHFT2, SHFT3 and CHA8 ... CHA13
 	 * The background is only in the top half of the screen
 	 *******************************************************/
-	for (i = 0; i < 64*4; i++)
+	for (int i = 0; i < 64*4; i++)
 	{
-		int color = color_prom[0x400 + i];
+		int const color = color_prom[0x400 + i];
 		palette.set_pen_indirect(0x0200 + i, 0x000 + color);
 	}
 
@@ -108,9 +107,9 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 * Sheet 14B: right, 136014-146
 	 * Inputs: CUSTOM0 ... CUSTOM3 and DATA0 ... DATA5
 	 *******************************************************/
-	for (i = 0; i < 64*16; i++)
+	for (int i = 0; i < 64*16; i++)
 	{
-		int color = color_prom[0xc00 + i];
+		int const color = color_prom[0xc00 + i];
 		palette.set_pen_indirect(0x0300 + i, (color != 15) ? (0x010 + color) : 0x1f);
 		palette.set_pen_indirect(0x0700 + i, (color != 15) ? (0x050 + color) : 0x1f);
 	}
@@ -121,16 +120,16 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	 * Inputs: R1 ... R6 and CHA0 ... CHA3
 	 * The road is only in the bottom half of the screen
 	 *******************************************************/
-	for (i = 0; i < 64*16; i++)
+	for (int i = 0; i < 64*16; i++)
 	{
-		int color = color_prom[0x800 + i];
+		int const color = color_prom[0x800 + i];
 		palette.set_pen_indirect(0x0b00 + i, 0x040 + color);
 	}
 
 	/* 136014-142, 136014-143, 136014-144 Vertical position modifiers */
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		j = color_prom[0x500 + i] + (color_prom[0x600 + i] << 4) + (color_prom[0x700 + i] << 8);
+		int const j = color_prom[0x500 + i] + (color_prom[0x600 + i] << 4) + (color_prom[0x700 + i] << 8);
 		m_vertical_position_modifier[i] = j;
 	}
 }
@@ -187,12 +186,16 @@ TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(polepos_state,polepos)
+void polepos_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polepos_state::bg_get_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,16);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polepos_state::tx_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x2f);
+
+	save_item(NAME(m_road16_vscroll));
+	save_item(NAME(m_chacl));
+	save_item(NAME(m_scroll));
 }
 
 
@@ -202,22 +205,12 @@ VIDEO_START_MEMBER(polepos_state,polepos)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_sprite16_r)
-{
-	return m_sprite16_memory[offset];
-}
-
-WRITE16_MEMBER(polepos_state::polepos_sprite16_w)
-{
-	COMBINE_DATA(&m_sprite16_memory[offset]);
-}
-
-READ8_MEMBER(polepos_state::polepos_sprite_r)
+READ8_MEMBER(polepos_state::sprite_r)
 {
 	return m_sprite16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_sprite_w)
+WRITE8_MEMBER(polepos_state::sprite_w)
 {
 	m_sprite16_memory[offset] = (m_sprite16_memory[offset] & 0xff00) | data;
 }
@@ -229,27 +222,17 @@ WRITE8_MEMBER(polepos_state::polepos_sprite_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_road16_r)
-{
-	return m_road16_memory[offset];
-}
-
-WRITE16_MEMBER(polepos_state::polepos_road16_w)
-{
-	COMBINE_DATA(&m_road16_memory[offset]);
-}
-
-READ8_MEMBER(polepos_state::polepos_road_r)
+READ8_MEMBER(polepos_state::road_r)
 {
 	return m_road16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_road_w)
+WRITE8_MEMBER(polepos_state::road_w)
 {
 	m_road16_memory[offset] = (m_road16_memory[offset] & 0xff00) | data;
 }
 
-WRITE16_MEMBER(polepos_state::polepos_road16_vscroll_w)
+WRITE16_MEMBER(polepos_state::road16_vscroll_w)
 {
 	COMBINE_DATA(&m_road16_vscroll);
 }
@@ -261,43 +244,35 @@ WRITE16_MEMBER(polepos_state::polepos_road16_vscroll_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_view16_r)
-{
-	return m_view16_memory[offset];
-}
-
-WRITE16_MEMBER(polepos_state::polepos_view16_w)
+WRITE16_MEMBER(polepos_state::view16_w)
 {
 	COMBINE_DATA(&m_view16_memory[offset]);
 	if (offset < 0x400)
 		m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(polepos_state::polepos_view_r)
+READ8_MEMBER(polepos_state::view_r)
 {
 	return m_view16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_view_w)
+WRITE8_MEMBER(polepos_state::view_w)
 {
 	m_view16_memory[offset] = (m_view16_memory[offset] & 0xff00) | data;
 	if (offset < 0x400)
 		m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(polepos_state::polepos_view16_hscroll_w)
+WRITE16_MEMBER(polepos_state::view16_hscroll_w)
 {
 	COMBINE_DATA(&m_scroll);
 	m_bg_tilemap->set_scrollx(0,m_scroll);
 }
 
-WRITE8_MEMBER(polepos_state::polepos_chacl_w)
+WRITE_LINE_MEMBER(polepos_state::chacl_w)
 {
-	if (m_chacl != (data & 1))
-	{
-		m_chacl = data & 1;
-		m_tx_tilemap->mark_all_dirty();
-	}
+	m_chacl = state;
+	m_tx_tilemap->mark_all_dirty();
 }
 
 
@@ -307,23 +282,18 @@ WRITE8_MEMBER(polepos_state::polepos_chacl_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_alpha16_r)
-{
-	return m_alpha16_memory[offset];
-}
-
-WRITE16_MEMBER(polepos_state::polepos_alpha16_w)
+WRITE16_MEMBER(polepos_state::alpha16_w)
 {
 	COMBINE_DATA(&m_alpha16_memory[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(polepos_state::polepos_alpha_r)
+READ8_MEMBER(polepos_state::alpha_r)
 {
 	return m_alpha16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_alpha_w)
+WRITE8_MEMBER(polepos_state::alpha_w)
 {
 	m_alpha16_memory[offset] = (m_alpha16_memory[offset] & 0xff00) | data;
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -342,10 +312,9 @@ void polepos_state::draw_road(bitmap_ind16 &bitmap)
 	const uint8_t *road_control = memregion("gfx5")->base();
 	const uint8_t *road_bits1 = road_control + 0x2000;
 	const uint8_t *road_bits2 = road_control + 0x4000;
-	int x, y, i;
 
 	/* loop over the lower half of the screen */
-	for (y = 128; y < 256; y++)
+	for (int y = 128; y < 256; y++)
 	{
 		int xoffs, yoffs, xscroll, roadpal;
 		uint16_t scanline[256 + 8];
@@ -370,14 +339,14 @@ void polepos_state::draw_road(bitmap_ind16 &bitmap)
 		xoffs &= ~7;
 
 		/* loop over 8-pixel chunks */
-		for (x = 0; x < 256 / 8 + 1; x++, xoffs += 8)
+		for (int x = 0; x < 256 / 8 + 1; x++, xoffs += 8)
 		{
 			/* if the 0x200 bit of the xoffset is set, a special pin on the custom */
 			/* chip is set and the /CE and /OE for the road chips is disabled */
 			if (xoffs & 0x200)
 			{
 				/* in this case, it looks like we just fill with 0 */
-				for (i = 0; i < 8; i++)
+				for (int i = 0; i < 8; i++)
 					*dest++ = pen_base | 0;
 			}
 
@@ -397,7 +366,7 @@ void polepos_state::draw_road(bitmap_ind16 &bitmap)
 				int carin = control >> 7;
 
 				/* draw this 8-pixel chunk */
-				for (i = 8; i > 0; i--)
+				for (int i = 8; i > 0; i--)
 				{
 					int bits = BIT(bits1,i) + (BIT(bits2,i) << 1);
 					if (!carin && bits) bits++;
@@ -421,11 +390,10 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 	uint8_t *scaling_rom = memregion("gfx6")->base();
 	uint32_t transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
 	int coloroffs = gfx->colorbase() + color * gfx->granularity();
-	int x,y;
 
 	if (flipx) flipx = big ? 0x1f : 0x0f;
 
-	for (y = 0;y <= sizey;y++)
+	for (int y = 0;y <= sizey;y++)
 	{
 		int yy = (sy + y) & 0x1ff;
 
@@ -441,7 +409,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 			if (!big) dy >>= 1;
 			src = gfxdata + dy * gfx->rowbytes();
 
-			for (x = (big ? 0x40 : 0x20);x > 0;x--)
+			for (int x = (big ? 0x40 : 0x20);x > 0;x--)
 			{
 				if (xx < 0x100)
 				{
@@ -467,9 +435,8 @@ void polepos_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 	uint16_t *posmem = &m_sprite16_memory[0x380];
 	uint16_t *sizmem = &m_sprite16_memory[0x780];
-	int i;
 
-	for (i = 0; i < 64; i++, posmem += 2, sizmem += 2)
+	for (int i = 0; i < 64; i++, posmem += 2, sizmem += 2)
 	{
 		int sx = (posmem[1] & 0x3ff) - 0x40 + 4;
 		int sy = 512 - (posmem[0] & 0x1ff) + 1; // sprites are buffered and delayed by one scanline
@@ -492,7 +459,7 @@ void polepos_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-uint32_t polepos_state::screen_update_polepos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t polepos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip = cliprect;
 	clip.max_y = 127;

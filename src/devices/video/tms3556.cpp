@@ -57,9 +57,11 @@ DEFINE_DEVICE_TYPE(TMS3556, tms3556_device, "tms3556", "Texas Instruments TMS355
 
 
 // default address map
-ADDRESS_MAP_START(tms3556_device::tms3556)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tms3556_device::tms3556(address_map &map)
+{
+	if (!has_configured_map(0))
+		map(0x0000, 0xffff).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of
@@ -109,7 +111,8 @@ inline void tms3556_device::writebyte(offs_t address, uint8_t data)
 tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS3556, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(tms3556_device::tms3556), this)),
+		device_video_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(tms3556_device::tms3556), this)),
 		m_reg(0), m_reg2(0),
 		m_reg_access_phase(0),
 		m_row_col_written(0),
@@ -159,7 +162,7 @@ void tms3556_device::device_start()
 	save_item(NAME(m_char_line_counter));
 	save_item(NAME(m_dbl_h_phase));
 
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 }
 
 
@@ -664,7 +667,7 @@ void tms3556_device::interrupt_start_vblank(void)
 //  interrupt - scanline handler
 //-------------------------------------------------
 
-void tms3556_device::interrupt(running_machine &machine)
+void tms3556_device::interrupt()
 {
 	/* check for start of vblank */
 	if (m_scanline == 310)  /*no idea what the real value is*/

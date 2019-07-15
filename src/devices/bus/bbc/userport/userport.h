@@ -33,20 +33,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BBC_USERPORT_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BBC_USERPORT_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_BBC_USERPORT_CB1_HANDLER(_devcb) \
-	devcb = &bbc_userport_slot_device::set_cb1_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_BBC_USERPORT_CB2_HANDLER(_devcb) \
-	devcb = &bbc_userport_slot_device::set_cb2_handler(*device, DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -59,19 +45,27 @@ class bbc_userport_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_userport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	bbc_userport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: bbc_userport_slot_device(mconfig, tag, owner)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+	bbc_userport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
-	template <class Object> static devcb_base &set_cb1_handler(device_t &device, Object &&cb)
-	{ return downcast<bbc_userport_slot_device &>(device).m_cb1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cb2_handler(device_t &device, Object &&cb)
-	{ return downcast<bbc_userport_slot_device &>(device).m_cb2_handler.set_callback(std::forward<Object>(cb)); }
+	auto cb1_handler() { return m_cb1_handler.bind(); }
+	auto cb2_handler() { return m_cb2_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
 
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pb_w);
+	uint8_t pb_r();
+	void pb_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -94,8 +88,8 @@ public:
 	// construction/destruction
 	virtual ~device_bbc_userport_interface();
 
-	virtual DECLARE_READ8_MEMBER(pb_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(pb_w) { }
+	virtual uint8_t pb_r() { return 0xff; }
+	virtual void pb_w(uint8_t data) { }
 
 protected:
 	device_bbc_userport_interface(const machine_config &mconfig, device_t &device);
@@ -108,7 +102,7 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_USERPORT_SLOT, bbc_userport_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( bbc_userport_devices );
+void bbc_userport_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_USERPORT_USERPORT_H

@@ -15,16 +15,18 @@
 #pragma once
 
 
-
-#define MCFG_EF9340_1_ADD(_tag, _clock, _screen_tag) \
-	MCFG_DEVICE_ADD(_tag, EF9340_1, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag)
-
 class ef9340_1_device : public device_t,
 						public device_video_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: ef9340_1_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+
 	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }
@@ -37,6 +39,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	inline uint16_t ef9340_get_c_addr(uint8_t x, uint8_t y);
 	inline void ef9340_inc_c();
@@ -50,6 +53,8 @@ protected:
 	static constexpr device_timer_id TIMER_LINE = 0;
 
 	emu_timer *m_line_timer;
+
+	required_region_ptr<uint8_t> m_charset;
 
 	bitmap_ind16 m_tmp_bitmap;
 

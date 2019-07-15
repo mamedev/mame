@@ -22,32 +22,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_AKIKO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AKIKO, 0)
-
-#define MCFG_AKIKO_MEM_READ_CB(_devcb) \
-	devcb = &akiko_device::set_mem_r_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AKIKO_MEM_WRITE_CB(_devcb) \
-	devcb = &akiko_device::set_mem_w_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AKIKO_INT_CB(_devcb) \
-	devcb = &akiko_device::set_int_w_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AKIKO_SCL_HANDLER(_devcb) \
-	devcb = &akiko_device::set_scl_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_AKIKO_SDA_READ_HANDLER(_devcb) \
-	devcb = &akiko_device::set_sda_read_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_AKIKO_SDA_WRITE_HANDLER(_devcb) \
-	devcb = &akiko_device::set_sda_write_handler(*device, DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -59,23 +33,12 @@ public:
 	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> static devcb_base &set_mem_r_callback(device_t &device, Object &&cb)
-	{ return downcast<akiko_device &>(device).m_mem_r.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_mem_w_callback(device_t &device, Object &&cb)
-	{ return downcast<akiko_device &>(device).m_mem_w.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_int_w_callback(device_t &device, Object &&cb)
-	{ return downcast<akiko_device &>(device).m_int_w.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_scl_handler(device_t &device, Object &&cb)
-	{ return downcast<akiko_device &>(device).m_scl_w.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_sda_read_handler(device_t &device, Object &&cb)
-	{ return downcast<akiko_device &>(device).m_sda_r.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_sda_write_handler(device_t &device, Object &&cb)
-	{ return downcast<akiko_device &>(device).m_sda_w.set_callback(std::forward<Object>(cb)); }
+	auto mem_r_callback() { return m_mem_r.bind(); }
+	auto mem_w_callback() { return m_mem_w.bind(); }
+	auto int_callback() { return m_int_w.bind(); }
+	auto scl_callback() { return m_scl_w.bind(); }
+	auto sda_r_callback() { return m_sda_r.bind(); }
+	auto sda_w_callback() { return m_sda_w.bind(); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );

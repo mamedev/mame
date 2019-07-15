@@ -32,60 +32,57 @@ public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~deco16ic_device() {}
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void set_bank1_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank1_cb = callback; }
-	static void set_bank2_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank2_cb = callback; }
-	static void set_split(device_t &device, int split) { downcast<deco16ic_device &>(device).m_split = split; }
-	static void set_pf1_size(device_t &device, int size) { downcast<deco16ic_device &>(device).m_pf1_size = size; }
-	static void set_pf2_size(device_t &device, int size) { downcast<deco16ic_device &>(device).m_pf2_size = size; }
-	static void set_pf1_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_trans_mask = mask; }
-	static void set_pf2_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_trans_mask = mask; }
-	static void set_pf1_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_colourmask = mask; }
-	static void set_pf2_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_colourmask = mask; }
-	static void set_pf1_col_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf1_colour_bank = bank; }
-	static void set_pf2_col_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf2_colour_bank = bank; }
-	static void set_pf12_8x8_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_8x8_gfx_bank = bank; }
-	static void set_pf12_16x16_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_16x16_gfx_bank = bank; }
+	// configuration
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+//  void set_palette_tag(const char *tag);
+	template <typename... T> void set_bank1_callback(T &&... args) { m_bank1_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_bank2_callback(T &&... args) { m_bank2_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
+	void set_pf1_size(int size) { m_pf1_size = size; }
+	void set_pf2_size(int size) { m_pf2_size = size; }
+	void set_pf1_trans_mask(int mask) { m_pf1_trans_mask = mask; }
+	void set_pf2_trans_mask(int mask) { m_pf2_trans_mask = mask; }
+	void set_pf1_col_mask(int mask) { m_pf1_colourmask = mask; }
+	void set_pf2_col_mask(int mask) { m_pf2_colourmask = mask; }
+	void set_pf1_col_bank(int bank) { m_pf1_colour_bank = bank; }
+	void set_pf2_col_bank(int bank) { m_pf2_colour_bank = bank; }
+	void set_pf12_8x8_bank(int bank) { m_pf12_8x8_gfx_bank = bank; }
+	void set_pf12_16x16_bank(int bank) { m_pf12_16x16_gfx_bank = bank; }
 
 
-	DECLARE_WRITE16_MEMBER( pf1_data_w );
-	DECLARE_WRITE16_MEMBER( pf2_data_w );
+	void pf1_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void pf2_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( pf1_data_r );
-	DECLARE_READ16_MEMBER( pf2_data_r );
+	u16 pf1_data_r(offs_t offset);
+	u16 pf2_data_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER( pf_control_w );
+	void pf_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pf_control_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER( pf_control_r );
+	void pf1_data_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void pf2_data_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( pf1_data_dword_w );
-	DECLARE_WRITE32_MEMBER( pf2_data_dword_w );
+	u32 pf1_data_dword_r(offs_t offset);
+	u32 pf2_data_dword_r(offs_t offset);
 
-	DECLARE_READ32_MEMBER( pf1_data_dword_r );
-	DECLARE_READ32_MEMBER( pf2_data_dword_r );
-
-	DECLARE_WRITE32_MEMBER( pf_control_dword_w );
-
-	DECLARE_READ32_MEMBER( pf_control_dword_r );
+	void pf_control_dword_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pf_control_dword_r(offs_t offset);
 
 	void print_debug_info(bitmap_ind16 &bitmap);
 
-	void pf_update(const uint16_t *rowscroll_1_ptr, const uint16_t *rowscroll_2_ptr);
+	void pf_update(const u16 *rowscroll_1_ptr, const u16 *rowscroll_2_ptr);
 
 	template<class _BitmapClass>
-	void tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
 	template<class _BitmapClass>
-	void tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
-	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
-	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
-	void tilemap_2_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
-	void tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	void tilemap_2_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
+	void tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, u8 pmask = 0xff);
 
 	/* used by boogwing, nitrobal */
-	void tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo = false);
-	void tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo = false);
+	void tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u8 priority, int is_tattoo = false, u8 pmask = 0xff);
+	void tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, u8 priority, int is_tattoo = false, u8 pmask = 0xff);
 
 	/* used by robocop2 */
 	void set_tilemap_colour_mask(int tmap, int mask);
@@ -93,6 +90,9 @@ public:
 
 	/* used by captaven */
 	void set_pf1_8bpp_mode(int mode);
+
+	/* used by cninja */
+	void set_transmask(int tmap, int group, u32 fgmask, u32 bgmask);
 
 	/* used by stoneage */
 	void set_scrolldx(int tmap, int size, int dx, int dx_if_flipped);
@@ -109,17 +109,18 @@ public:
 	tilemap_t *tilemap0_16x16,
 	tilemap_t *tilemap1_8x8,
 	tilemap_t *tilemap1_16x16,
-	const uint16_t *rowscroll_ptr,
-	const uint16_t scrollx,
-	const uint16_t scrolly,
-	const uint16_t control0,
-	const uint16_t control1,
+	const u16 *rowscroll_ptr,
+	const u16 scrollx,
+	const u16 scrolly,
+	const u16 control0,
+	const u16 control1,
 	int combine_mask,
 	int combine_shift,
 	int trans_mask,
 	int flags,
-	uint32_t priority,
-	int is_tattoo
+	u8 priority,
+	int is_tattoo,
+	u8 pmask = 0xff
 	);
 
 protected:
@@ -129,11 +130,11 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint16_t[]> m_pf1_data;
-	std::unique_ptr<uint16_t[]> m_pf2_data;
-	std::unique_ptr<uint16_t[]> m_pf12_control;
+	std::unique_ptr<u16[]> m_pf1_data;
+	std::unique_ptr<u16[]> m_pf2_data;
+	std::unique_ptr<u16[]> m_pf12_control;
 
-	const uint16_t *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
+	const u16 *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
 
 	tilemap_t *m_pf1_tilemap_16x16, *m_pf2_tilemap_16x16;
 	tilemap_t *m_pf1_tilemap_8x8, *m_pf2_tilemap_8x8;
@@ -146,7 +147,6 @@ private:
 	int m_pf12_last_small, m_pf12_last_big;
 	int m_pf1_8bpp_mode;
 
-	int m_split;
 	int m_pf1_size;
 	int m_pf2_size;
 	int m_pf1_trans_mask, m_pf2_trans_mask;
@@ -169,50 +169,6 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-#define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
-
-#define MCFG_DECO16IC_BANK1_CB(_class, _method) \
-	deco16ic_device::set_bank1_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_DECO16IC_BANK2_CB(_class, _method) \
-	deco16ic_device::set_bank2_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_DECO16IC_SPLIT(_split) \
-	deco16ic_device::set_split(*device, _split);
-
-#define MCFG_DECO16IC_PF1_SIZE(_size) \
-	deco16ic_device::set_pf1_size(*device, _size);
-
-#define MCFG_DECO16IC_PF2_SIZE(_size) \
-	deco16ic_device::set_pf2_size(*device, _size);
-
-#define MCFG_DECO16IC_PF1_TRANS_MASK(_mask) \
-	deco16ic_device::set_pf1_trans_mask(*device, _mask);
-
-#define MCFG_DECO16IC_PF2_TRANS_MASK(_mask) \
-	deco16ic_device::set_pf2_trans_mask(*device, _mask);
-
-#define MCFG_DECO16IC_PF1_COL_MASK(_mask) \
-	deco16ic_device::set_pf1_col_mask(*device, _mask);
-
-#define MCFG_DECO16IC_PF2_COL_MASK(_mask) \
-	deco16ic_device::set_pf2_col_mask(*device, _mask);
-
-#define MCFG_DECO16IC_PF1_COL_BANK(_bank) \
-	deco16ic_device::set_pf1_col_bank(*device, _bank);
-
-#define MCFG_DECO16IC_PF2_COL_BANK(_bank) \
-	deco16ic_device::set_pf2_col_bank(*device, _bank);
-
-#define MCFG_DECO16IC_PF12_8X8_BANK(_bank) \
-	deco16ic_device::set_pf12_8x8_bank(*device, _bank);
-
-#define MCFG_DECO16IC_PF12_16X16_BANK(_bank) \
-	deco16ic_device::set_pf12_16x16_bank(*device, _bank);
-
-#define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
-	deco16ic_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)

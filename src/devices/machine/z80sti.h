@@ -34,42 +34,9 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
+#include "diserial.h"
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_Z80STI_RXCLOCK(_clock) \
-	z80sti_device::set_rx_clock(*device, _clock);
-
-#define MCFG_Z80STI_TXCLOCK(_clock) \
-	z80sti_device::set_tx_clock(*device, _clock);
-
-#define MCFG_Z80STI_OUT_INT_CB(_devcb) \
-	devcb = &z80sti_device::set_out_int_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80STI_IN_GPIO_CB(_devcb) \
-	devcb = &z80sti_device::set_in_gpio_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80STI_OUT_GPIO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_gpio_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80STI_OUT_SO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_so_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80STI_OUT_TAO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tao_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80STI_OUT_TBO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tbo_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80STI_OUT_TCO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tco_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80STI_OUT_TDO_CB(_devcb) \
-	devcb = &z80sti_device::set_out_tdo_callback(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -85,17 +52,17 @@ public:
 	// construction/destruction
 	z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_gpio_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_in_gpio_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_gpio_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_gpio_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_so_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_so_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tao_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tao_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tbo_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tbo_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tco_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tco_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_tdo_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tdo_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_int_cb() { return m_out_int_cb.bind(); }
+	auto in_gpio_cb() { return m_in_gpio_cb.bind(); }
+	auto out_gpio_cb() { return m_out_gpio_cb.bind(); }
+	auto out_so_cb() { return m_out_so_cb.bind(); }
+	auto out_tao_cb() { return m_out_tao_cb.bind(); }
+	auto out_tbo_cb() { return m_out_tbo_cb.bind(); }
+	auto out_tco_cb() { return m_out_tco_cb.bind(); }
+	auto out_tdo_cb() { return m_out_tdo_cb.bind(); }
 
-	static void set_rx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_rx_clock = clock; }
-	static void set_tx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_tx_clock = clock; }
+	void set_rx_clock(int clock) { m_rx_clock = clock; }
+	void set_tx_clock(int clock) { m_tx_clock = clock; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

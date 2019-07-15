@@ -210,6 +210,11 @@ void i82371ab_device::pci_write(pci_bus_device *pcibus, int function, int offset
 	}
 }
 
+void i82371ab_device::remap(int space_id, offs_t start, offs_t end)
+{
+	m_isabus->remap(space_id, start, end);
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

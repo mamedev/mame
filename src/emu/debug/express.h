@@ -15,6 +15,7 @@
 
 #include "emucore.h"
 
+#include <deque>
 #include <functional>
 #include <unordered_map>
 
@@ -293,7 +294,7 @@ private:
 		bool right_to_left() const { assert(m_type == OPERATOR); return ((m_flags & TIN_RIGHT_TO_LEFT_MASK) != 0); }
 		expression_space memory_space() const { assert(m_type == OPERATOR || m_type == MEMORY); return expression_space((m_flags & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT); }
 		int memory_size() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT; }
-		bool memory_side_effect() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_SIDE_EFFECT_MASK) >> TIN_SIDE_EFFECT_SHIFT; }
+		bool memory_side_effects() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_SIDE_EFFECT_MASK) >> TIN_SIDE_EFFECT_SHIFT; }
 
 		// setters
 		parse_token &set_offset(int offset) { m_offset = offset; return *this; }
@@ -310,7 +311,7 @@ private:
 		parse_token &set_right_to_left() { assert(m_type == OPERATOR); m_flags |= TIN_RIGHT_TO_LEFT_MASK; return *this; }
 		parse_token &set_memory_space(expression_space space) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SPACE_MASK) | ((space << TIN_MEMORY_SPACE_SHIFT) & TIN_MEMORY_SPACE_MASK); return *this; }
 		parse_token &set_memory_size(int log2ofbits) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SIZE_MASK) | ((log2ofbits << TIN_MEMORY_SIZE_SHIFT) & TIN_MEMORY_SIZE_MASK); return *this; }
-		parse_token &set_memory_side_effect(bool disable_se) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = disable_se ? m_flags | TIN_SIDE_EFFECT_MASK : m_flags & ~TIN_SIDE_EFFECT_MASK; return *this; }
+		parse_token &set_memory_side_effects(bool disable_se) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = disable_se ? m_flags | TIN_SIDE_EFFECT_MASK : m_flags & ~TIN_SIDE_EFFECT_MASK; return *this; }
 		parse_token &set_memory_source(const char *string) { assert(m_type == OPERATOR || m_type == MEMORY); m_string = string; return *this; }
 
 		// access
@@ -366,7 +367,6 @@ private:
 	// execution helpers
 	void push_token(parse_token &token);
 	void pop_token(parse_token &token);
-	parse_token *peek_token(int count);
 	void pop_token_lval(parse_token &token);
 	void pop_token_rval(parse_token &token);
 	u64 execute_tokens();
@@ -374,15 +374,13 @@ private:
 
 	// constants
 	static const int MAX_FUNCTION_PARAMS = 16;
-	static const int MAX_STACK_DEPTH = 16;
 
 	// internal state
 	symbol_table *      m_symtable;                     // symbol table
 	std::string         m_original_string;              // original string (prior to parsing)
 	simple_list<parse_token> m_tokenlist;               // token list
 	simple_list<expression_string> m_stringlist;        // string list
-	int                 m_token_stack_ptr;              // stack pointer (used during execution)
-	parse_token         m_token_stack[MAX_STACK_DEPTH]; // token stack (used during execution)
+	std::deque<parse_token> m_token_stack;              // token stack (used during execution)
 };
 
 #endif // MAME_EMU_DEBUG_EXPRESS_H

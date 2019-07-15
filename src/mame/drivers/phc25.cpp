@@ -119,30 +119,32 @@ WRITE_LINE_MEMBER( phc25_state::write_centronics_busy )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(phc25_state::phc25_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void phc25_state::phc25_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5fff).rom().region(Z80_TAG, 0);
+	map(0x6000, 0x77ff).ram().share("video_ram");
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(phc25_state::phc25_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(port40_r, port40_w)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY0")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("KEY1")
-	AM_RANGE(0x82, 0x82) AM_READ_PORT("KEY2")
-	AM_RANGE(0x83, 0x83) AM_READ_PORT("KEY3")
-	AM_RANGE(0x84, 0x84) AM_READ_PORT("KEY4")
-	AM_RANGE(0x85, 0x85) AM_READ_PORT("KEY5")
-	AM_RANGE(0x86, 0x86) AM_READ_PORT("KEY6")
-	AM_RANGE(0x87, 0x87) AM_READ_PORT("KEY7")
-	AM_RANGE(0x88, 0x88) AM_READ_PORT("KEY8")
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-ADDRESS_MAP_END
+void phc25_state::phc25_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).rw(FUNC(phc25_state::port40_r), FUNC(phc25_state::port40_w));
+	map(0x80, 0x80).portr("KEY0");
+	map(0x81, 0x81).portr("KEY1");
+	map(0x82, 0x82).portr("KEY2");
+	map(0x83, 0x83).portr("KEY3");
+	map(0x84, 0x84).portr("KEY4");
+	map(0x85, 0x85).portr("KEY5");
+	map(0x86, 0x86).portr("KEY6");
+	map(0x87, 0x87).portr("KEY7");
+	map(0x88, 0x88).portr("KEY8");
+	map(0xc0, 0xc0).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xc1, 0xc1).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+}
 
 /* Input Ports */
 
@@ -306,65 +308,69 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(phc25_state::phc25)
+void phc25_state::phc25(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(phc25_mem)
-	MCFG_CPU_IO_MAP(phc25_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &phc25_state::phc25_mem);
+	m_maincpu->set_addrmap(AS_IO, &phc25_state::phc25_io);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 1996750)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &psg(AY8910(config, AY8910_TAG, 1996750));
+	psg.port_a_read_callback().set_ioport("JOY0");
+	psg.port_b_read_callback().set_ioport("JOY1");
+	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(phc25_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("phc25_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(phc25_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_cassette->set_interface("phc25_cass");
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(phc25_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(phc25_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("phc25_cass");
+}
 
-MACHINE_CONFIG_START(phc25_state::pal)
+void phc25_state::pal(machine_config &config)
+{
 	phc25(config);
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT)
+	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	m_vdg->set_screen("screen");
+	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
+	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
+	m_vdg->set_get_char_rom(FUNC(phc25_state::pal_char_rom_r));
+	m_vdg->set_get_fixed_mode(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT);
 	// other lines not connected
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(phc25_state::ntsc)
+void phc25_state::ntsc(machine_config &config)
+{
 	phc25(config);
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT)
+	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	m_vdg->set_screen("screen");
+	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
+	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
+	m_vdg->set_get_char_rom(FUNC(phc25_state::ntsc_char_rom_r));
+	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT);
 	// other lines not connected
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 
@@ -391,6 +397,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY   FULLNAME            FLAGS
-COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state,  0,    "Sanyo",  "PHC-25 (Europe)",  MACHINE_NO_SOUND )
-COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state,  0,    "Sanyo",  "PHC-25 (Japan)",   MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY  FULLNAME           FLAGS
+COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state, empty_init, "Sanyo", "PHC-25 (Europe)", MACHINE_NO_SOUND )
+COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state, empty_init, "Sanyo", "PHC-25 (Japan)",  MACHINE_NO_SOUND )

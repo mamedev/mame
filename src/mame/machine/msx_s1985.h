@@ -10,10 +10,6 @@
 DECLARE_DEVICE_TYPE(MSX_S1985, msx_s1985_device)
 
 
-#define MCFG_MSX_S1985_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MSX_S1985, 0)
-
-
 class msx_s1985_device : public device_t,
 	public msx_switched_interface,
 	public device_nvram_interface

@@ -37,7 +37,6 @@ void msm5232_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate);
 
 	/* register with the save state system */
-	machine().save().register_postload(save_prepost_delegate(FUNC(msm5232_device::postload), this));
 	save_item(NAME(m_EN_out16));
 	save_item(NAME(m_EN_out8));
 	save_item(NAME(m_EN_out4));
@@ -128,17 +127,16 @@ void msm5232_device::device_stop()
 #endif
 }
 
-void msm5232_device::static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8)
+void msm5232_device::set_capacitors(double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8)
 {
-	msm5232_device &msm = downcast<msm5232_device &>(device);
-	msm.m_external_capacity[0] = cap1;
-	msm.m_external_capacity[1] = cap2;
-	msm.m_external_capacity[2] = cap3;
-	msm.m_external_capacity[3] = cap4;
-	msm.m_external_capacity[4] = cap5;
-	msm.m_external_capacity[5] = cap6;
-	msm.m_external_capacity[6] = cap7;
-	msm.m_external_capacity[7] = cap8;
+	m_external_capacity[0] = cap1;
+	m_external_capacity[1] = cap2;
+	m_external_capacity[2] = cap3;
+	m_external_capacity[3] = cap4;
+	m_external_capacity[4] = cap5;
+	m_external_capacity[5] = cap6;
+	m_external_capacity[6] = cap7;
+	m_external_capacity[7] = cap8;
 }
 
 /* Default chip clock is 2119040 Hz */
@@ -710,7 +708,7 @@ void msm5232_device::TG_group_advance(int groupidx)
 
 
 /* MAME Interface */
-void msm5232_device::postload()
+void msm5232_device::device_post_load()
 {
 	init_tables();
 }

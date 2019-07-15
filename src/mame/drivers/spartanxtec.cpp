@@ -25,6 +25,7 @@ probably an original bug?
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,8 +33,8 @@ probably an original bug?
 class spartanxtec_state : public driver_device
 {
 public:
-	spartanxtec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spartanxtec_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_m62_tileram(*this, "m62_tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_scroll_lo(*this, "scroll_lo"),
@@ -45,6 +46,26 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void spartanxtec(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void spartanxtec_palette(palette_device &palette) const;
+
+	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
+	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
+	DECLARE_WRITE8_MEMBER(a801_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack);
+	DECLARE_WRITE8_MEMBER(irq_ack);
+
+	void spartanxtec_map(address_map &map);
+	void spartanxtec_sound_io(address_map &map);
+	void spartanxtec_sound_map(address_map &map);
+
 	required_shared_ptr<uint8_t> m_m62_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll_lo;
@@ -55,23 +76,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(spartanxtec);
-
 	tilemap_t*             m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
-	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(a801_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack);
-	DECLARE_WRITE8_MEMBER(irq_ack);
-	void spartanxtec(machine_config &config);
-	void spartanxtec_map(address_map &map);
-	void spartanxtec_sound_io(address_map &map);
-	void spartanxtec_sound_map(address_map &map);
 };
 
 
@@ -177,29 +182,30 @@ WRITE8_MEMBER(spartanxtec_state::irq_ack)
 }
 
 
-ADDRESS_MAP_START(spartanxtec_state::spartanxtec_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("spriteram")
+void spartanxtec_state::spartanxtec_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc400, 0xc7ff).ram().share("spriteram");
 
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	map(0x8000, 0x8000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8102, 0x8102) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8103, 0x8103) AM_READ_PORT("P1")
+	map(0x8100, 0x8100).portr("DSW1");
+	map(0x8101, 0x8101).portr("DSW2");
+	map(0x8102, 0x8102).portr("SYSTEM");
+	map(0x8103, 0x8103).portr("P1");
 
-	AM_RANGE(0x8200, 0x8200) AM_WRITE(irq_ack)
+	map(0x8200, 0x8200).w(FUNC(spartanxtec_state::irq_ack));
 
-	AM_RANGE(0xA801, 0xA801) AM_WRITE(a801_w)
+	map(0xA801, 0xA801).w(FUNC(spartanxtec_state::a801_w));
 
-	AM_RANGE(0xa900, 0xa903) AM_RAM AM_SHARE("scroll_lo")
-	AM_RANGE(0xa980, 0xa983) AM_RAM AM_SHARE("scroll_hi")
+	map(0xa900, 0xa903).ram().share("scroll_lo");
+	map(0xa980, 0xa983).ram().share("scroll_hi");
 
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(kungfum_tileram_w) AM_SHARE("m62_tileram")
+	map(0xd000, 0xdfff).ram().w(FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
 
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+	map(0xe000, 0xefff).ram();
 
-ADDRESS_MAP_END
+}
 
 
 
@@ -209,27 +215,29 @@ WRITE8_MEMBER(spartanxtec_state::sound_irq_ack)
 }
 
 
-ADDRESS_MAP_START(spartanxtec_state::spartanxtec_sound_map)
+void spartanxtec_state::spartanxtec_sound_map(address_map &map)
+{
 
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	map(0x0000, 0x0fff).rom();
+	map(0x8000, 0x83ff).ram();
 
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(spartanxtec_state::spartanxtec_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE( sound_irq_ack )
+void spartanxtec_state::spartanxtec_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).w(FUNC(spartanxtec_state::sound_irq_ack));
 
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8912_device, data_r)
+	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
+	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));
 
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
-	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8912_device, data_r)
+	map(0x0014, 0x0015).w("ay1", FUNC(ay8912_device::address_data_w));
+	map(0x0014, 0x0014).r("ay1", FUNC(ay8912_device::data_r));
 
-	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
-	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8912_device, data_r)
-ADDRESS_MAP_END
+	map(0x0018, 0x0019).w("ay2", FUNC(ay8912_device::address_data_w));
+	map(0x0018, 0x0018).r("ay2", FUNC(ay8912_device::data_r));
+}
 
 
 
@@ -320,7 +328,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( news )
+static GFXDECODE_START( gfx_news )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 32 )
 GFXDECODE_END
@@ -335,66 +343,61 @@ void spartanxtec_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
+void spartanxtec_state::spartanxtec_palette(palette_device &palette) const
 {
-	// todo, proper weights for this bootleg PCB
-	const uint8_t *color_prom = memregion("cprom")->base();
+	// TODO proper weights for this bootleg PCB
+	uint8_t const *const color_prom = memregion("cprom")->base();
 	for (int i = 0; i < 0x200; i++)
 	{
-		int r, g, b;
+		int const b = pal4bit(color_prom[i + 0x000] & 0x0f);
+		int const g = pal4bit(color_prom[i + 0x200] & 0x0f);
+		int const r = pal4bit(color_prom[i + 0x400] & 0x0f);
 
-		b = (color_prom[i+0x000]&0x0f)<<4;
-		g = (color_prom[i+0x200]&0x0f)<<4;
-		r = (color_prom[i+0x400]&0x0f)<<4;
-
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 
 
-MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
-
+void spartanxtec_state::spartanxtec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spartanxtec_state::irq0_line_assert));
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
-	MCFG_CPU_IO_MAP(spartanxtec_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &spartanxtec_state::spartanxtec_sound_io);
+	m_audiocpu->set_periodic_int(FUNC(spartanxtec_state::irq0_line_assert), attotime::from_hz(1000)); // controls speed of music
+//  m_audiocpu->set_vblank_int("screen", FUNC(spartanxtec_state::irq0_line_hold));
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16);
+	screen.set_screen_update(FUNC(spartanxtec_state::screen_update_spartanxtec));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(spartanxtec_state,spartanxtec)
+	PALETTE(config, m_palette, FUNC(spartanxtec_state::spartanxtec_palette), 0x200);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", news)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_news);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay1", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-MACHINE_CONFIG_END
+	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	AY8912(config, "ay3", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -427,18 +430,18 @@ ROM_START( spartanxtec )
 
 	ROM_REGION( 0x600, "cprom", 0 )
 	// first half of all of these is empty
-	ROM_LOAD( "4_MCM7643_82s137.BIN", 0x0000, 0x0200, CRC(548a0ab1) SHA1(e414b61feba73bcc1a53e17c848aceea3b8100e7) ) ROM_CONTINUE(0x0000,0x0200)
-	ROM_LOAD( "5_MCM7643_82s137.BIN", 0x0200, 0x0200, CRC(a678480e) SHA1(515fa2b09c666a46dc145313eda3c465afff4451) ) ROM_CONTINUE(0x0200,0x0200)
-	ROM_LOAD( "6_MCM7643_82s137.BIN", 0x0400, 0x0200, CRC(5a707f85) SHA1(35932daf453787780550464b78465581e1ef35e1) ) ROM_CONTINUE(0x0400,0x0200)
+	ROM_LOAD( "4_mcm7643_82s137.bin", 0x0000, 0x0200, CRC(548a0ab1) SHA1(e414b61feba73bcc1a53e17c848aceea3b8100e7) ) ROM_CONTINUE(0x0000,0x0200)
+	ROM_LOAD( "5_mcm7643_82s137.bin", 0x0200, 0x0200, CRC(a678480e) SHA1(515fa2b09c666a46dc145313eda3c465afff4451) ) ROM_CONTINUE(0x0200,0x0200)
+	ROM_LOAD( "6_mcm7643_82s137.bin", 0x0400, 0x0200, CRC(5a707f85) SHA1(35932daf453787780550464b78465581e1ef35e1) ) ROM_CONTINUE(0x0400,0x0200)
 
 	ROM_REGION( 0x18000, "timing", 0 ) // i think
-	ROM_LOAD( "7_82s147.BIN", 0x0000, 0x0200, CRC(54a9e294) SHA1(d44d21ab8141bdfe697fd303cdc1b5c4177909bc) )
+	ROM_LOAD( "7_82s147.bin", 0x0000, 0x0200, CRC(54a9e294) SHA1(d44d21ab8141bdfe697fd303cdc1b5c4177909bc) )
 
 	ROM_REGION( 0x18000, "unkprom", 0 ) // just linear increasing value
-	ROM_LOAD( "1_tbp24s10_82s129.BIN", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
-	ROM_LOAD( "2_tbp24s10_82s129.BIN", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
+	ROM_LOAD( "1_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
+	ROM_LOAD( "2_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
 ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state, empty_init, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

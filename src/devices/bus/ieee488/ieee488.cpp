@@ -93,6 +93,13 @@ void ieee488_slot_device::device_start()
 }
 
 
+void ieee488_slot_device::add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
+{
+	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag, 0));
+	cbm_ieee488_devices(slot);
+	slot.set_default_option(_def_slot);
+	slot.set_address(_address);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -112,6 +119,7 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 	m_write_srq(*this),
 	m_write_atn(*this),
 	m_write_ren(*this),
+	m_write_dio(*this),
 	m_dio(0xff)
 {
 	for (auto & elem : m_line)
@@ -136,6 +144,7 @@ void ieee488_device::device_start()
 	m_write_srq.resolve_safe();
 	m_write_atn.resolve_safe();
 	m_write_ren.resolve_safe();
+	m_write_dio.resolve_safe();
 }
 
 
@@ -320,11 +329,16 @@ int ieee488_device::get_signal(int signal)
 
 void ieee488_device::set_data(device_t *device, uint8_t data)
 {
+	bool changed = false;
+	uint8_t old_state = get_data();
+
 	if (device == this)
 	{
 		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag(), data);
-
-		m_dio = data;
+		if (m_dio != data) {
+			m_dio = data;
+			changed = true;
+		}
 	}
 	else
 	{
@@ -338,11 +352,21 @@ void ieee488_device::set_data(device_t *device, uint8_t data)
 				{
 					if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), device->tag(), data);
 					entry->m_dio = data;
+					changed = true;
 				}
 			}
 
 			entry = entry->next();
 		}
+	}
+
+	if (!changed) {
+		return;
+	}
+
+	uint8_t new_state = get_data();
+	if (old_state != new_state) {
+		m_write_dio(new_state);
 	}
 }
 
@@ -383,30 +407,46 @@ uint8_t ieee488_device::get_data()
 #include "shark.h"
 #include "softbox.h"
 
-SLOT_INTERFACE_START( cbm_ieee488_devices )
-	SLOT_INTERFACE("c2040", C2040)
-	SLOT_INTERFACE("c3040", C3040)
-	SLOT_INTERFACE("c4040", C4040)
-	SLOT_INTERFACE("c8050", C8050)
-	SLOT_INTERFACE("c8250", C8250)
-	SLOT_INTERFACE("sfd1001", SFD1001)
-	SLOT_INTERFACE("c2031", C2031)
-	SLOT_INTERFACE("c8280", C8280)
-	SLOT_INTERFACE("d9060", D9060)
-	SLOT_INTERFACE("d9090", D9090)
-	SLOT_INTERFACE("softbox", SOFTBOX)
-	SLOT_INTERFACE("hardbox", HARDBOX)
-	SLOT_INTERFACE("shark", MSHARK)
-	SLOT_INTERFACE("c4023", C4023)
-SLOT_INTERFACE_END
+void cbm_ieee488_devices(device_slot_interface &device)
+{
+	device.option_add("c2040", C2040);
+	device.option_add("c3040", C3040);
+	device.option_add("c4040", C4040);
+	device.option_add("c8050", C8050);
+	device.option_add("c8250", C8250);
+	device.option_add("sfd1001", SFD1001);
+	device.option_add("c2031", C2031);
+	device.option_add("c8280", C8280);
+	device.option_add("d9060", D9060);
+	device.option_add("d9090", D9090);
+	device.option_add("softbox", SOFTBOX);
+	device.option_add("hardbox", HARDBOX);
+	device.option_add("shark", MSHARK);
+	device.option_add("c4023", C4023);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( hp_ieee488_devices )
 //-------------------------------------------------
 
 // slot devices
+#include "hp9122c.h"
 #include "hp9895.h"
 
-SLOT_INTERFACE_START(hp_ieee488_devices)
-	SLOT_INTERFACE("hp9895", HP9895)
-SLOT_INTERFACE_END
+void hp_ieee488_devices(device_slot_interface &device)
+{
+	device.option_add("hp9122c", HP9122C);
+	device.option_add("hp9895", HP9895);
+}
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( remote488_devices )
+//-------------------------------------------------
+
+// slot devices
+#include "remote488.h"
+
+void remote488_devices(device_slot_interface &device)
+{
+	device.option_add("remote488", REMOTE488);
+}

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    jagdasm.c
+    jagdasm.cpp
     Disassembler for the portable Jaguar DSP emulator.
     Written by Aaron Giles
 
@@ -15,7 +15,7 @@
     STATIC VARIABLES
 ***************************************************************************/
 
-const uint8_t jaguar_disassembler::convert_zero[32] =
+const u8 jaguar_disassembler::convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
 
 const char *const jaguar_disassembler::condition[32] =
@@ -71,10 +71,10 @@ std::string jaguar_disassembler::signed_16bit(int16_t val)
 
 offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t flags = 0;
-	int op = opcodes.r16(pc);
-	int reg1 = (op >> 5) & 31;
-	int reg2 = op & 31;
+	u32 flags = 0;
+	const u16 op = opcodes.r16(pc);
+	const u8 reg1 = (op >> 5) & 31;
+	const u8 reg2 = op & 31;
 	int size = 2;
 
 	pc += 2;
@@ -113,12 +113,12 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case 30:    util::stream_format(stream, "cmp     r%d,r%d", reg1, reg2);                 break;
 		case 31:    util::stream_format(stream, "cmpq    %s,r%d", signed_16bit((int16_t)(reg1 << 11) >> 11), reg2);break;
 
-		case 32:    if (m_variant == JAGUAR_VARIANT_GPU)
+		case 32:    if (m_variant == variant::GPU)
 					util::stream_format(stream, "sat8    r%d", reg2);
 					else
 					util::stream_format(stream, "subqmod $%x,r%d", convert_zero[reg1], reg2);
 					break;
-		case 33:    if (m_variant == JAGUAR_VARIANT_GPU)
+		case 33:    if (m_variant == variant::GPU)
 					util::stream_format(stream, "sat16   r%d", reg2);
 					else
 					util::stream_format(stream, "sat16s  r%d", reg2);
@@ -131,7 +131,7 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case 39:    util::stream_format(stream, "loadb   (r%d),r%d", reg1, reg2);                   break;
 		case 40:    util::stream_format(stream, "loadw   (r%d),r%d", reg1, reg2);                   break;
 		case 41:    util::stream_format(stream, "load    (r%d),r%d", reg1, reg2);                   break;
-		case 42:    if (m_variant == JAGUAR_VARIANT_GPU)
+		case 42:    if (m_variant == variant::GPU)
 					util::stream_format(stream, "loadp   (r%d),r%d", reg1, reg2);
 					else
 					util::stream_format(stream, "sat32s  r%d", reg2);
@@ -141,7 +141,7 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case 45:    util::stream_format(stream, "storeb  r%d,(r%d)", reg2, reg1);               break;
 		case 46:    util::stream_format(stream, "storew  r%d,(r%d)", reg2, reg1);               break;
 		case 47:    util::stream_format(stream, "store   r%d,(r%d)", reg2, reg1);                   break;
-		case 48:    if (m_variant == JAGUAR_VARIANT_GPU)
+		case 48:    if (m_variant == variant::GPU)
 					util::stream_format(stream, "storep  r%d,(r%d)", reg2, reg1);
 					else
 					util::stream_format(stream, "mirror  r%d", reg2);
@@ -150,7 +150,7 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case 50:    util::stream_format(stream, "store   r%d,(r15+$%x)", reg2, convert_zero[reg1]*4);break;
 		case 51:    util::stream_format(stream, "move    pc,r%d", reg2);                            break;
 		case 52:    util::stream_format(stream, "jump    %s(r%d)", condition[reg2], reg1);          break;
-		case 53:    util::stream_format(stream, "jr      %s%08X", condition[reg2], pc + ((int8_t)(reg1 << 3) >> 2)); break;
+		case 53:    util::stream_format(stream, "jr      %s%08X", condition[reg2], pc + ((s8)(reg1 << 3) >> 2)); break;
 		case 54:    util::stream_format(stream, "mmult   r%d,r%d", reg1, reg2);                 break;
 		case 55:    util::stream_format(stream, "mtoi    r%d,r%d", reg1, reg2);                 break;
 		case 56:    util::stream_format(stream, "normi   r%d,r%d", reg1, reg2);                 break;
@@ -159,12 +159,12 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case 59:    util::stream_format(stream, "load    (r15+r%d),r%d", reg1, reg2);               break;
 		case 60:    util::stream_format(stream, "store   r%d,(r14+r%d)", reg2, reg1);               break;
 		case 61:    util::stream_format(stream, "store   r%d,(r15+r%d)", reg2, reg1);               break;
-		case 62:    if (m_variant == JAGUAR_VARIANT_GPU)
+		case 62:    if (m_variant == variant::GPU)
 					util::stream_format(stream, "sat24   r%d", reg2);
 					else
 					util::stream_format(stream, "illegal");
 					break;
-		case 63:    if (m_variant == JAGUAR_VARIANT_GPU)
+		case 63:    if (m_variant == variant::GPU)
 					util::stream_format(stream, reg1 ?
 									"unpack  r%d" :
 									"pack    r%d", reg2);
@@ -176,11 +176,11 @@ offs_t jaguar_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	return size | flags | SUPPORTED;
 }
 
-jaguar_disassembler::jaguar_disassembler(u32 variant) : m_variant(variant)
+jaguar_disassembler::jaguar_disassembler(variant var) : m_variant(var)
 {
 }
 
-uint32_t jaguar_disassembler::opcode_alignment() const
+u32 jaguar_disassembler::opcode_alignment() const
 {
 	return 2;
 }

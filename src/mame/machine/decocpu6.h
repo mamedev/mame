@@ -28,7 +28,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 DECLARE_DEVICE_TYPE(DECO_CPU6, deco_cpu6_device)

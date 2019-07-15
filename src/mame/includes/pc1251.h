@@ -12,61 +12,70 @@
 #define MAME_INCLUDES_PC1251_H
 
 #include "pocketc.h"
-#include "cpu/sc61860/sc61860.h"
-#include "machine/nvram.h"
-
-#define PC1251_CONTRAST (ioport("DSW0")->read() & 0x07)
-
 
 class pc1251_state : public pocketc_state
 {
 public:
-	enum
-	{
-		TIMER_POWER_UP
-	};
-
 	pc1251_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pocketc_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: pocketc_state(mconfig, type, tag)
+		, m_keys(*this, "KEY%u", 0U)
+		, m_mode(*this, "MODE")
+	{ }
 
-	uint8_t m_outa;
-	uint8_t m_outb;
-	int m_power;
-	uint8_t m_reg[0x100];
+	void init_pc1251();
 
-	DECLARE_DRIVER_INIT(pc1251);
-	uint32_t screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(pc1251_outa);
-	DECLARE_WRITE8_MEMBER(pc1251_outb);
-	DECLARE_WRITE8_MEMBER(pc1251_outc);
-
-	DECLARE_READ_LINE_MEMBER(pc1251_reset);
-	DECLARE_READ_LINE_MEMBER(pc1251_brk);
-	DECLARE_READ8_MEMBER(pc1251_ina);
-	DECLARE_READ8_MEMBER(pc1251_inb);
-	DECLARE_READ8_MEMBER(pc1251_lcd_read);
-	DECLARE_WRITE8_MEMBER(pc1251_lcd_write);
-	virtual void machine_start() override;
-	DECLARE_MACHINE_START(pc1260);
-	required_device<sc61860_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	void pc1261(machine_config &config);
-	void pc1260(machine_config &config);
 	void pc1255(machine_config &config);
 	void pc1251(machine_config &config);
 	void pc1250(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void pc1250_mem(address_map &map);
 	void pc1251_mem(address_map &map);
 	void pc1255_mem(address_map &map);
 	void pc1260_mem(address_map &map);
 	void pc1261_mem(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(out_b_w);
+	DECLARE_WRITE8_MEMBER(out_c_w);
+
+	DECLARE_READ_LINE_MEMBER(reset_r);
+	DECLARE_READ8_MEMBER(in_a_r);
+	DECLARE_READ8_MEMBER(in_b_r);
+	DECLARE_READ8_MEMBER(lcd_read);
+	DECLARE_WRITE8_MEMBER(lcd_write);
+
+private:
+	required_ioport_array<10> m_keys;
+	required_ioport m_mode;
+
+	uint8_t m_reg[0x100];
+
+	static const char *const s_def[5];
+	static const char *const s_shift[5];
+	static const char *const s_de[5];
+	static const char *const s_g[5];
+	static const char *const s_rad[5];
+	static const char *const s_run[5];
+	static const char *const s_pro[5];
+	static const char *const s_rsv[5];
+};
+
+class pc1260_state : public pc1251_state
+{
+public:
+	pc1260_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc1251_state(mconfig, type, tag)
+	{ }
+
+	void pc1260(machine_config &config);
+	void pc1261(machine_config &config);
+
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
 };
 
 #endif // MAME_INCLUDES_PC1251_H

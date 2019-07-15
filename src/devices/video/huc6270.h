@@ -12,25 +12,19 @@
 #pragma once
 
 
-#define MCFG_HUC6270_VRAM_SIZE(_size) \
-	huc6270_device::set_vram_size(*device, _size);
-
-#define MCFG_HUC6270_IRQ_CHANGED_CB(_devcb) \
-	devcb = &huc6270_device::set_irq_changed_callback(*device, DEVCB_##_devcb);
-
 class huc6270_device : public device_t
 {
 public:
 	// construction/destruction
 	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_vram_size(device_t &device, uint32_t vram_size) { downcast<huc6270_device &>(device).m_vram_size = vram_size; }
-	template <class Object> static devcb_base &set_irq_changed_callback(device_t &device, Object &&cb) { return downcast<huc6270_device &>(device).m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
+	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
+	auto irq() { return m_irq_changed_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( next_pixel );
-	inline DECLARE_READ16_MEMBER( time_until_next_event )
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u16 next_pixel();
+	inline u16 time_until_next_event()
 	{
 		return m_horz_to_go * 8 + m_horz_steps;
 	}

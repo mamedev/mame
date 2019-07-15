@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -207,7 +207,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 					, mem
 					);
 			}
-			else
+			else if (bgfx::isTextureValid(0, false, imageContainer->m_numLayers, bgfx::TextureFormat::Enum(imageContainer->m_format), _flags) )
 			{
 				handle = bgfx::createTexture2D(
 					  uint16_t(imageContainer->m_width)
@@ -220,7 +220,10 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 					);
 			}
 
-			bgfx::setName(handle, _filePath);
+			if (bgfx::isValid(handle) )
+			{
+				bgfx::setName(handle, _filePath);
+			}
 
 			if (NULL != _info)
 			{
@@ -552,9 +555,9 @@ struct Mesh
 		if (BGFX_STATE_MASK == _state)
 		{
 			_state = 0
-				| BGFX_STATE_RGB_WRITE
-				| BGFX_STATE_ALPHA_WRITE
-				| BGFX_STATE_DEPTH_WRITE
+				| BGFX_STATE_WRITE_RGB
+				| BGFX_STATE_WRITE_A
+				| BGFX_STATE_WRITE_Z
 				| BGFX_STATE_DEPTH_TEST_LESS
 				| BGFX_STATE_CULL_CCW
 				| BGFX_STATE_MSAA
@@ -676,7 +679,7 @@ Args::Args(int _argc, const char* const* _argv)
 	{
 		m_type = bgfx::RendererType::Noop;
 	}
-	else if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
+	else if (BX_ENABLED(BX_PLATFORM_WINDOWS|BX_PLATFORM_WINRT|BX_PLATFORM_XBOXONE) )
 	{
 		if (cmdLine.hasArg("d3d9") )
 		{

@@ -11,18 +11,6 @@
 #include "machine/eepromser.h"
 #include "machine/jvshost.h"
 
-#define MCFG_MIE_ADD(_tag, _clock, _host_tag, _host_port, g0, g1, g2, g3, g4, g5, g6, g7) \
-	MCFG_MAPLE_DEVICE_ADD(_tag "_maple", MIE, _clock, _host_tag, _host_port) \
-	mie_device::static_set_gpio_name(*device, 0, g0);   \
-	mie_device::static_set_gpio_name(*device, 1, g1);   \
-	mie_device::static_set_gpio_name(*device, 2, g2);   \
-	mie_device::static_set_gpio_name(*device, 3, g3);   \
-	mie_device::static_set_gpio_name(*device, 4, g4);   \
-	mie_device::static_set_gpio_name(*device, 5, g5);   \
-	mie_device::static_set_gpio_name(*device, 6, g6);   \
-	mie_device::static_set_gpio_name(*device, 7, g7); \
-	mie_device::static_set_jvs_name(*device, _tag); \
-	MCFG_DEVICE_ADD(_tag, MIE_JVS, _clock)
 
 class mie_jvs_device;
 
@@ -31,10 +19,19 @@ class mie_jvs_device;
 class mie_device : public maple_device
 {
 public:
+	template <typename T, typename U>
+	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port, U &&jvs_tag)
+		: mie_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(host_tag));
+		set_host_port(host_port);
+		jvs.set_tag(std::forward<U>(jvs_tag));
+	}
+
 	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_gpio_name(device_t &device, int entry, const char *name);
-	static void static_set_jvs_name(device_t &device, const char *name);
+	template <uint8_t Which, typename T>
+	void set_gpio_name(T &&gpio_port_tag) { gpio_port[Which].set_tag(std::forward<T>(gpio_port_tag)); }
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -74,9 +71,6 @@ public:
 	void mie_map(address_map &map);
 	void mie_port(address_map &map);
 protected:
-	const char *gpio_name[8];
-	const char *jvs_name;
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -103,10 +97,10 @@ private:
 	};
 
 	// internal state
-	z80_device *cpu;
+	required_device<cpu_device> cpu;
 	emu_timer *timer;
-	mie_jvs_device *jvs;
-	ioport_port *gpio_port[8];
+	required_device<mie_jvs_device> jvs;
+	optional_ioport_array<8> gpio_port;
 
 	uint32_t tbuf[TBUF_SIZE];
 	uint32_t control, lreg, jvs_rpos;

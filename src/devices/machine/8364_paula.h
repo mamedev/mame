@@ -43,18 +43,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PAULA_MEM_READ_CB(_devcb) \
-	devcb = &paula_8364_device::set_mem_r_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_PAULA_INT_CB(_devcb) \
-	devcb = &paula_8364_device::set_int_w_callback(*device, DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -67,11 +55,8 @@ public:
 	paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> static devcb_base &set_mem_r_callback(device_t &device, Object &&cb)
-	{ return downcast<paula_8364_device &>(device).m_mem_r.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_int_w_callback(device_t &device, Object &&cb)
-	{ return downcast<paula_8364_device &>(device).m_int_w.set_callback(std::forward<Object>(cb)); }
+	auto mem_read_cb() { return m_mem_r.bind(); }
+	auto int_cb() { return m_int_w.bind(); }
 
 	DECLARE_READ16_MEMBER(reg_r);
 	DECLARE_WRITE16_MEMBER(reg_w);

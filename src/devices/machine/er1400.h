@@ -32,7 +32,7 @@ class er1400_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// line handlers
 	DECLARE_WRITE_LINE_MEMBER(data_w);
@@ -45,6 +45,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -52,10 +53,21 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
+	enum
+	{
+		PROPAGATION_TIMER
+	};
+
+	// logging helper
+	std::string address_binary_format() const;
+
 	// internal helpers
 	void read_data();
 	void write_data();
 	void erase_data();
+
+	// optional default data
+	optional_region_ptr<u16> m_default_data;
 
 	// nonvolatile data
 	std::unique_ptr<u16[]> m_data_array;
@@ -69,6 +81,7 @@ private:
 	// timing
 	attotime m_write_time;
 	attotime m_erase_time;
+	emu_timer *m_data_propagation_timer;
 
 	// internal registers
 	u16 m_data_register;

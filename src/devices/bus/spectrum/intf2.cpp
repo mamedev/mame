@@ -54,14 +54,14 @@ ioport_constructor spectrum_intf2_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(spectrum_intf2_device::device_add_mconfig)
+void spectrum_intf2_device::device_add_mconfig(machine_config &config)
+{
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "spectrum_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(spectrum_intf2_device, spectrum_cart)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "spectrum_cart", "bin,rom");
+	m_cart->set_device_load(FUNC(spectrum_intf2_device::cart_load), this);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "spectrum_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("spectrum_cart");
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -72,11 +72,11 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 spectrum_intf2_device::spectrum_intf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SPECTRUM_INTF2, tag, owner, clock),
-		device_spectrum_expansion_interface(mconfig, *this),
-	m_cart(*this, "cartslot"),
-	m_exp_line3(*this, "LINE3"),
-	m_exp_line4(*this, "LINE4")
+	: device_t(mconfig, SPECTRUM_INTF2, tag, owner, clock)
+	, device_spectrum_expansion_interface(mconfig, *this)
+	, m_cart(*this, "cartslot")
+	, m_exp_line3(*this, "LINE3")
+	, m_exp_line4(*this, "LINE4")
 {
 }
 
@@ -86,15 +86,6 @@ spectrum_intf2_device::spectrum_intf2_device(const machine_config &mconfig, cons
 
 void spectrum_intf2_device::device_start()
 {
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void spectrum_intf2_device::device_reset()
-{
 }
 
 
@@ -102,7 +93,7 @@ void spectrum_intf2_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device, spectrum_cart)
+DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -126,7 +117,7 @@ READ_LINE_MEMBER(spectrum_intf2_device::romcs)
 		return 0;
 }
 
-READ8_MEMBER(spectrum_intf2_device::mreq_r)
+uint8_t spectrum_intf2_device::mreq_r(offs_t offset)
 {
 	if (m_cart && m_cart->exists())
 		return m_cart->get_rom_base()[offset & 0x3fff];
@@ -134,17 +125,20 @@ READ8_MEMBER(spectrum_intf2_device::mreq_r)
 		return 0xff;
 }
 
-READ8_MEMBER(spectrum_intf2_device::port_fe_r)
+uint8_t spectrum_intf2_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	uint8_t lines = offset >> 8;
+	switch (offset & 0xff)
+	{
+	case 0xfe:
+		if (((offset >> 8) & 8) == 0)
+			data = m_exp_line3->read() | (0xff ^ 0x1f);
 
-	if ((lines & 8) == 0)
-		data = m_exp_line3->read() | (0xff ^ 0x1f);
-
-	if ((lines & 16) == 0)
-		data = m_exp_line4->read() | (0xff ^ 0x1f);
+		if (((offset >> 8) & 16) == 0)
+			data = m_exp_line4->read() | (0xff ^ 0x1f);
+		break;
+	}
 
 	return data;
 }

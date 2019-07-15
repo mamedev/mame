@@ -89,18 +89,14 @@ enum
 #define SUPERFX_CFGR_MS0    0x20    // MS0
 
 
-#define MCFG_SUPERFX_OUT_IRQ(_devcb) \
-	devcb = &superfx_device::set_out_irq_func(*device, DEVCB_##_devcb);
-
-
 class superfx_device :  public cpu_device, public superfx_disassembler::config
 {
 public:
 	// construction/destruction
 	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_out_irq_func(device_t &device, Object &&cb) { return downcast<superfx_device &>(device).m_out_irq_func.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq() { return m_out_irq_func.bind(); }
 
 	uint8_t mmio_read(uint32_t addr);
 	void mmio_write(uint32_t addr, uint8_t data);
@@ -129,7 +125,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;

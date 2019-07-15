@@ -625,7 +625,7 @@ mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, d
 void mos6526_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_flag = 1;
 	m_cnt = 1;
@@ -788,14 +788,14 @@ void mos6526_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6526_device::read )
+uint8_t mos6526_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
 	switch (offset & 0x0f)
 	{
 	case PRA:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		if (m_ddra != 0xff)
@@ -806,7 +806,7 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case PRB:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		if (m_ddrb != 0xff)
@@ -860,7 +860,7 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case TOD_10THS:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		data = read_tod(0);
@@ -869,21 +869,21 @@ READ8_MEMBER( mos6526_device::read )
 		break;
 
 	case TOD_SEC:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		data = read_tod(1);
 		break;
 
 	case TOD_MIN:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		data = read_tod(2);
 		break;
 
 	case TOD_HR:
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return 0xff;
 
 		if (!m_tod_latched)
@@ -902,7 +902,7 @@ READ8_MEMBER( mos6526_device::read )
 	case ICR:
 		data = (m_ir1 << 7) | m_icr;
 
-		if (machine().side_effect_disabled())
+		if (machine().side_effects_disabled())
 			return data;
 
 		m_icr_read = true;
@@ -926,7 +926,7 @@ READ8_MEMBER( mos6526_device::read )
 	return data;
 }
 
-READ8_MEMBER( mos8520_device::read )
+uint8_t mos8520_device::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -947,7 +947,7 @@ READ8_MEMBER( mos8520_device::read )
 		break;
 
 	default:
-		data = mos6526_device::read(space, offset);
+		data = mos6526_device::read(offset);
 	}
 
 	return data;
@@ -957,7 +957,7 @@ READ8_MEMBER( mos8520_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6526_device::write )
+void mos6526_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{
@@ -1099,12 +1099,12 @@ WRITE8_MEMBER( mos6526_device::write )
 	}
 }
 
-WRITE8_MEMBER( mos8520_device::write )
+void mos8520_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{
 	default:
-		mos6526_device::write(space, offset, data);
+		mos6526_device::write(offset, data);
 		break;
 
 	case TOD_MIN:

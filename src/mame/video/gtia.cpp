@@ -118,10 +118,11 @@ DEFINE_DEVICE_TYPE(ATARI_GTIA, gtia_device, "gtia", "Atari GTIA")
 //  upd7220_device - constructor
 //-------------------------------------------------
 
-gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ATARI_GTIA, tag, owner, clock),
-	m_read_cb(*this),
-	m_write_cb(*this)
+gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ATARI_GTIA, tag, owner, clock)
+	, m_region(GTIA_NTSC)
+	, m_read_cb(*this)
+	, m_write_cb(*this)
 {
 }
 
@@ -284,7 +285,7 @@ void gtia_device::device_reset()
 
 int gtia_device::is_ntsc()
 {
-	return ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) > 55;
+	return m_region == GTIA_NTSC;
 }
 
 void gtia_device::button_interrupt(int button_count, uint8_t button_port)

@@ -26,6 +26,7 @@
 DEFINE_DEVICE_TYPE(A2BUS_DISKII,    a2bus_diskii_device,    "a2diskii",   "Apple Disk II controller")
 DEFINE_DEVICE_TYPE(A2BUS_IWM_FDC,   a2bus_iwmflop_device,   "a2iwm_flop", "Apple IWM floppy card")
 DEFINE_DEVICE_TYPE(A2BUS_AGAT7_FDC, a2bus_agat7flop_device, "agat7_flop", "Agat-7 140K floppy card")
+DEFINE_DEVICE_TYPE(A2BUS_AGAT9_FDC, a2bus_agat9flop_device, "agat9_flop", "Agat-9 140K floppy card")
 
 #define DISKII_ROM_REGION  "diskii_rom"
 #define FDC_TAG            "diskii_fdc"
@@ -57,19 +58,28 @@ ROM_START( agat7 )
 	ROM_LOAD( "shugart7.rom", 0x0000, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34) )
 ROM_END
 
+ROM_START( agat9 )
+	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
+	ROM_LOAD( "shugart9.rom", 0x0000, 0x0100, CRC(964a0ce2) SHA1(bf955189ebffe874c20ef649a3db8177dc16af61) )
+ROM_END
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_floppy_device::device_add_mconfig)
-	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-MACHINE_CONFIG_END
+void a2bus_floppy_device::device_add_mconfig(machine_config &config)
+{
+	APPLEFDC(config, m_fdc, &fdc_interface);
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+}
 
-MACHINE_CONFIG_START(a2bus_iwmflop_device::device_add_mconfig)
-	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-MACHINE_CONFIG_END
+void a2bus_iwmflop_device::device_add_mconfig(machine_config &config)
+{
+	IWM(config, m_fdc, &fdc_interface);
+	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
+	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -83,6 +93,11 @@ const tiny_rom_entry *a2bus_floppy_device::device_rom_region() const
 const tiny_rom_entry *a2bus_agat7flop_device::device_rom_region() const
 {
 	return ROM_NAME( agat7 );
+}
+
+const tiny_rom_entry *a2bus_agat9flop_device::device_rom_region() const
+{
+	return ROM_NAME( agat9 );
 }
 
 //**************************************************************************
@@ -108,6 +123,11 @@ a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const 
 
 a2bus_agat7flop_device::a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_floppy_device(mconfig, A2BUS_AGAT7_FDC, tag, owner, clock)
+{
+}
+
+a2bus_agat9flop_device::a2bus_agat9flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_floppy_device(mconfig, A2BUS_AGAT9_FDC, tag, owner, clock)
 {
 }
 

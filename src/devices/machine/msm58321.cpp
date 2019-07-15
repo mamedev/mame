@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder,Sven Schnelle
 /**********************************************************************
 
     OKI MSM58321RS Real Time Clock/Calendar emulation
@@ -10,9 +10,7 @@
 
     TODO:
 
-    - leap year
-    - test
-    - reference registers
+    - non gregorian leap year
 
 */
 
@@ -105,21 +103,13 @@ inline int msm58321_device::read_counter(int counter)
 		{
 			data += (h10 & 3) * 10;
 		}
+		else if (h10 & H10_PM)
+		{
+			data += 12 + (h10 & 1) * 10;
+		}
 		else
 		{
 			data += (h10 & 1) * 10;
-
-			if (h10 & H10_PM)
-			{
-				if (data != 12)
-				{
-					data += 12;
-				}
-			}
-			else if (data == 12)
-			{
-				data = 0;
-			}
 		}
 	}
 	else
@@ -151,10 +141,8 @@ inline void msm58321_device::write_counter(int address, int data)
 				flag = H10_PM;
 			}
 
-			if (data == 0)
-			{
+			if ((m_reg[REGISTER_H10] & H10_PM) && data == 0)
 				data = 12;
-			}
 		}
 		break;
 
@@ -173,8 +161,8 @@ inline void msm58321_device::write_counter(int address, int data)
 //  msm58321_device - constructor
 //-------------------------------------------------
 
-msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSM58321, tag, owner, clock),
+msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MSM58321, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_year0(0),
@@ -200,9 +188,9 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 	m_stop(0),
 	m_test(0),
 	m_cs1(0),
-	m_address(0xf)
+	m_address(0xf),
+	m_reg{}
 {
-	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
 
@@ -221,10 +209,15 @@ void msm58321_device::device_start()
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	m_clock_timer->adjust(clocks_to_attotime(32768/1024), 0, clocks_to_attotime(32768/1024));
 
+	// busy signal active period is approximately 427 µs
 	m_busy_timer = timer_alloc(TIMER_BUSY);
-	m_busy_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
+	m_busy_timer->adjust(clocks_to_attotime(32768 - 14), 0, clocks_to_attotime(32768));
+
+	// standard signal active period is approximately 122 µs
+	m_standard_timer = timer_alloc(TIMER_STANDARD);
+	m_standard_timer->adjust(clocks_to_attotime(32768-4), 0, clocks_to_attotime(32768));
 
 	// state saving
 	save_item(NAME(m_cs2));
@@ -257,20 +250,64 @@ void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	switch (id)
 	{
 	case TIMER_CLOCK:
-		if (!m_stop)
-			advance_seconds();
+
+		if (m_khz_ctr & 1)
+		{
+			m_reg[REGISTER_REF0] |= 1;
+			m_reg[REGISTER_REF1] |= 1;
+		}
+		else
+		{
+			m_reg[REGISTER_REF0] &= ~1;
+			m_reg[REGISTER_REF1] &= ~1;
+		}
+
+		if (++m_khz_ctr >= 1024)
+		{
+			m_khz_ctr = 0;
+			if (!m_stop)
+			{
+				advance_seconds();
+			}
+
+			if (!m_busy)
+			{
+				m_busy = 1;
+				m_busy_handler(m_busy);
+			}
+		}
 		break;
 
 	case TIMER_BUSY:
 		if (!m_cs1 || !m_cs2 || !m_write || m_address != REGISTER_RESET)
 		{
-			m_busy = !m_busy;
+			m_busy = 0;
 			m_busy_handler(m_busy);
 		}
+		break;
+	case TIMER_STANDARD:
+		m_reg[REGISTER_REF0] = 0x0e;
+		m_reg[REGISTER_REF1] = 0x0e;
 		break;
 	}
 }
 
+void msm58321_device::update_standard()
+{
+	uint8_t reg = 0;
+
+	if (m_reg[REGISTER_S1] == 0)
+		reg |= 1 << 1;
+
+	if (m_reg[REGISTER_MI1] == 0)
+		reg |= 1 << 2;
+
+	if (m_reg[REGISTER_H1] == 0)
+		reg |= 1 << 3;
+
+	m_reg[REGISTER_REF0] = (reg ^ 0x0e) | (m_khz_ctr & 1);
+	m_reg[REGISTER_REF1] = m_reg[REGISTER_REF0];
+}
 
 //-------------------------------------------------
 //  rtc_clock_updated -
@@ -285,7 +322,7 @@ void msm58321_device::rtc_clock_updated(int year, int month, int day, int day_of
 	write_counter(REGISTER_H1, hour);
 	write_counter(REGISTER_MI1, minute);
 	write_counter(REGISTER_S1, second);
-
+	update_standard();
 	update_output();
 }
 
@@ -313,7 +350,7 @@ void msm58321_device::nvram_default()
 
 void msm58321_device::nvram_read(emu_file &file)
 {
-	file.read(m_reg, sizeof(m_reg));
+	file.read(m_reg.data(), m_reg.size());
 
 	clock_updated();
 }
@@ -326,7 +363,7 @@ void msm58321_device::nvram_read(emu_file &file)
 
 void msm58321_device::nvram_write(emu_file &file)
 {
-	file.write(m_reg, sizeof(m_reg));
+	file.write(m_reg.data(), m_reg.size());
 }
 
 //-------------------------------------------------
@@ -344,13 +381,9 @@ void msm58321_device::update_output()
 		case REGISTER_RESET:
 			data = 0;
 			break;
-
-		case REGISTER_REF0:
-		case REGISTER_REF1:
-			// TODO: output reference values
-			data = 0;
+		case REGISTER_W:
+			data = m_reg[m_address] - 1;
 			break;
-
 		default:
 			data = m_reg[m_address];
 			break;
@@ -428,15 +461,17 @@ void msm58321_device::update_input()
 
 			default:
 				LOG("MSM58321 Register Write %s (%01x): %01x\n", reg_name(m_address), m_address, data);
-
+				m_khz_ctr = 0;
 				switch (m_address)
 				{
 				case REGISTER_S10:
 				case REGISTER_MI10:
-				case REGISTER_W:
+
 					m_reg[m_address] = data & 7;
 					break;
-
+				case REGISTER_W:
+					m_reg[m_address] = (data & 7) + 1;
+					break;
 				case REGISTER_H10:
 					if (data & H10_24)
 					{

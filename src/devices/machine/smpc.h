@@ -17,51 +17,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SMPC_HLE_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), SMPC_HLE, (clock))
-
-#define MCFG_SMPC_HLE_PDR1_IN_CB(_devcb) \
-	devcb = &smpc_hle_device::set_pdr1_in_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_PDR2_IN_CB(_devcb) \
-	devcb = &smpc_hle_device::set_pdr2_in_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_PDR1_OUT_CB(_devcb) \
-	devcb = &smpc_hle_device::set_pdr1_out_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_PDR2_OUT_CB(_devcb) \
-	devcb = &smpc_hle_device::set_pdr2_out_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_MASTER_RESET_CB(_devcb) \
-	devcb = &smpc_hle_device::set_master_reset_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_MASTER_NMI_CB(_devcb) \
-	devcb = &smpc_hle_device::set_master_nmi_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_SLAVE_RESET_CB(_devcb) \
-	devcb = &smpc_hle_device::set_slave_reset_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_SOUND_RESET_CB(_devcb) \
-	devcb = &smpc_hle_device::set_sound_reset_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_SYSTEM_RESET_CB(_devcb) \
-	devcb = &smpc_hle_device::set_system_reset_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_SYSTEM_HALT_CB(_devcb) \
-	devcb = &smpc_hle_device::set_system_halt_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SMPC_HLE_DOT_SELECT_CB(_devcb) \
-	devcb = &smpc_hle_device::set_dot_select_handler(*device, DEVCB_##_devcb);
-
-// set_irq_handler doesn't work in Saturn driver???
-#define MCFG_SMPC_HLE_IRQ_HANDLER_CB(_devcb) \
-	devcb = &smpc_hle_device::set_interrupt_handler(*device, DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -82,30 +37,48 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi_r );
 
 	void m68k_reset_trigger();
+
 	bool get_iosel(bool which);
+
 	uint8_t get_ddr(bool which);
 
 //  system delegation
-	template <class Object> static devcb_base &set_master_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshres.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_master_nmi_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_mshnmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_slave_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_sshres.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sound_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_sndres.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_system_reset_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_sysres.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_system_halt_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_syshalt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dot_select_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_dotsel.set_callback(std::forward<Object>(cb)); }
+	auto master_reset_handler() { return m_mshres.bind(); }
+
+	auto master_nmi_handler() { return m_mshnmi.bind(); }
+
+	auto slave_reset_handler() { return m_sshres.bind(); }
+
+	auto sound_reset_handler() { return m_sndres.bind(); }
+
+	auto system_reset_handler() { return m_sysres.bind(); }
+
+	auto system_halt_handler() { return m_syshalt.bind(); }
+
+	auto dot_select_handler() { return m_dotsel.bind(); }
 
 
 //  PDR delegation
-	template <class Object> static devcb_base &set_pdr1_in_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr1_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pdr2_in_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr2_read.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pdr1_out_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr1_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pdr2_out_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_pdr2_write.set_callback(std::forward<Object>(cb)); }
+	auto pdr1_in_handler() { return m_pdr1_read.bind(); }
 
-	// interrupt handler
-	template <class Object> static devcb_base &set_interrupt_handler(device_t &device, Object &&cb) { return downcast<smpc_hle_device &>(device).m_irq_line.set_callback(std::forward<Object>(cb)); }
+	auto pdr2_in_handler() { return m_pdr2_read.bind(); }
 
-	static void static_set_region_code(device_t &device, uint8_t rgn);
-	static void static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2);
+	auto pdr1_out_handler() { return m_pdr1_write.bind(); }
+
+	auto pdr2_out_handler() { return m_pdr2_write.bind(); }
+
+	// interrupt handler, doesn't work in Saturn driver???
+	auto interrupt_handler() { return m_irq_line.bind(); }
+
+	void set_region_code(uint8_t rgn) { m_region_code = rgn; }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename T, typename U> void set_control_port_tags(T &&tag1, U &&tag2)
+	{
+		m_ctrl1.set_tag(std::forward<T>(tag1));
+		m_ctrl2.set_tag(std::forward<U>(tag2));
+		// TODO: checking against nullptr still returns a device!?
+		m_has_ctrl_ports = true;
+	}
 
 protected:
 	// device-level overrides
@@ -130,8 +103,6 @@ private:
 	emu_timer *m_rtc_timer;
 	emu_timer *m_intback_timer;
 	emu_timer *m_sndres_timer;
-	const char *m_ctrl1_tag;
-	const char *m_ctrl2_tag;
 	bool m_has_ctrl_ports;
 
 	bool m_sf;
@@ -199,10 +170,10 @@ private:
 	devcb_write8 m_pdr1_write;
 	devcb_write8 m_pdr2_write;
 	devcb_write_line m_irq_line;
-	saturn_control_port_device *m_ctrl1;
-	saturn_control_port_device *m_ctrl2;
+	optional_device<saturn_control_port_device> m_ctrl1;
+	optional_device<saturn_control_port_device> m_ctrl2;
 
-	screen_device *m_screen;
+	required_device<screen_device> m_screen;
 
 	void smpc_regs(address_map &map);
 

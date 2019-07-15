@@ -7,16 +7,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ICS2115_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, ICS2115, _clock)
-
-#define MCFG_ICS2115_IRQ_CB(_devcb) \
-	devcb = &ics2115_device::set_irq_callback(*device, DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -26,76 +16,78 @@ class ics2115_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<ics2115_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_irq_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	//uint8_t read(offs_t offset);
-	//void write(offs_t offset, uint8_t data);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+
+	// 16-bit read / write handlers (when /IOCS16 is low)
+	u16 word_r(offs_t offset, u16 mem_mask);
+	void word_w(offs_t offset, u16 data, u16 mem_mask);
 	TIMER_CALLBACK_MEMBER(timer_cb_0);
 	TIMER_CALLBACK_MEMBER(timer_cb_1);
 
 protected:
-	static constexpr uint16_t revision = 0x1;
+	static constexpr u16 revision = 0x1;
 
 	struct ics2115_voice {
 		struct {
-			int32_t left;
-			uint32_t acc, start, end;
-			uint16_t fc;
-			uint8_t ctl, saddr;
+			s32 left;
+			u32 acc, start, end;
+			u16 fc;
+			u8 ctl, saddr;
 		} osc;
 
 		struct {
-			int32_t left;
-			uint32_t add;
-			uint32_t start, end;
-			uint32_t acc;
-			uint16_t regacc;
-			uint8_t incr;
-			uint8_t pan, mode;
+			s32 left;
+			u32 add;
+			u32 start, end;
+			u32 acc;
+			u16 regacc;
+			u8 incr;
+			u8 pan, mode;
 		} vol;
 
 		union {
 			struct {
-				uint8_t ulaw       : 1;
-				uint8_t stop       : 1;   //stops wave + vol envelope
-				uint8_t eightbit   : 1;
-				uint8_t loop       : 1;
-				uint8_t loop_bidir : 1;
-				uint8_t irq        : 1;
-				uint8_t invert     : 1;
-				uint8_t irq_pending: 1;
+				u8 ulaw       : 1;
+				u8 stop       : 1;   //stops wave + vol envelope
+				u8 eightbit   : 1;
+				u8 loop       : 1;
+				u8 loop_bidir : 1;
+				u8 irq        : 1;
+				u8 invert     : 1;
+				u8 irq_pending: 1;
 				//IRQ on variable?
 			} bitflags;
-			uint8_t value;
+			u8 value;
 		} osc_conf;
 
 		union {
 			struct {
-				uint8_t done       : 1;   //indicates ramp has stopped
-				uint8_t stop       : 1;   //stops the ramp
-				uint8_t rollover   : 1;   //rollover (TODO)
-				uint8_t loop       : 1;
-				uint8_t loop_bidir : 1;
-				uint8_t irq        : 1;   //enable IRQ generation
-				uint8_t invert     : 1;   //invert direction
-				uint8_t irq_pending: 1;   //(read only) IRQ pending
+				u8 done       : 1;   //indicates ramp has stopped
+				u8 stop       : 1;   //stops the ramp
+				u8 rollover   : 1;   //rollover (TODO)
+				u8 loop       : 1;
+				u8 loop_bidir : 1;
+				u8 irq        : 1;   //enable IRQ generation
+				u8 invert     : 1;   //invert direction
+				u8 irq_pending: 1;   //(read only) IRQ pending
 				//noenvelope == (done | disable)
 			} bitflags;
-			uint8_t value;
+			u8 value;
 		} vol_ctrl;
 
 		//Possibly redundant state. => improvements of wavetable logic
 		//may lead to its elimination.
 		union {
 			struct {
-				uint8_t on         : 1;
-				uint8_t ramp       : 7;       // 100 0000 = 0x40 maximum
+				u8 on         : 1;
+				u8 ramp       : 7;       // 100 0000 = 0x40 maximum
 			} bitflags;
-			uint8_t value;
+			u8 value;
 		} state;
 
 		bool playing();
@@ -112,8 +104,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	//internal register helper functions
-	uint16_t reg_read();
-	void reg_write(uint8_t data, bool msb);
+	u16 reg_read();
+	void reg_write(u16 data, u16 mem_mask);
 	void recalc_timer(int timer);
 	void keyon();
 	void recalc_irq();
@@ -125,29 +117,29 @@ protected:
 	sound_stream *m_stream;
 
 	// internal state
-	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<u8> m_rom;
 	devcb_write_line m_irq_cb;
 
-	int16_t m_ulaw[256];
-	uint16_t m_volume[4096];
+	s16 m_ulaw[256];
+	u16 m_volume[4096];
 	static const int volume_bits = 15;
 
 	ics2115_voice m_voice[32];
 	struct {
-		uint8_t scale, preset;
+		u8 scale, preset;
 		emu_timer *timer;
-		uint64_t period;  /* in nsec */
+		u64 period;  /* in nsec */
 	} m_timer[2];
 
-	uint8_t m_active_osc;
-	uint8_t m_osc_select;
-	uint8_t m_reg_select;
-	uint8_t m_irq_enabled, m_irq_pending;
+	u8 m_active_osc;
+	u8 m_osc_select;
+	u8 m_reg_select;
+	u8 m_irq_enabled, m_irq_pending;
 	bool m_irq_on;
 
 	//Unknown variable, seems to be effected by 0x12. Further investigation
 	//Required.
-	uint8_t m_vmode;
+	u8 m_vmode;
 };
 
 

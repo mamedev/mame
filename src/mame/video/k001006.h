@@ -13,9 +13,9 @@ public:
 	k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k001006_device() {}
 
-	// static configuration
-	static void set_gfx_region(device_t &device, const char *tag) { downcast<k001006_device &>(device).m_gfx_region = tag; }
-	static void set_tex_layout(device_t &device, int layout) { downcast<k001006_device &>(device).m_tex_layout = layout; }
+	// configuration
+	template <typename T> void set_gfx_region(T &&tag) { m_gfxrom.set_tag(std::forward<T>(tag)); }
+	void set_tex_layout(int layout) { m_tex_layout = layout; }
 
 	uint32_t fetch_texel(int page, int pal_index, int u, int v);
 	void preprocess_texture_data(uint8_t *dst, uint8_t *src, int length, int gticlub);
@@ -39,8 +39,7 @@ private:
 
 	std::unique_ptr<uint32_t[]>     m_palette;
 
-	const char * m_gfx_region;
-	uint8_t *      m_gfxrom;
+	required_region_ptr<uint8_t> m_gfxrom;
 	//int m_tex_width;
 	//int m_tex_height;
 	//int m_tex_mirror_x;
@@ -50,12 +49,5 @@ private:
 
 
 DECLARE_DEVICE_TYPE(K001006, k001006_device)
-
-
-#define MCFG_K001006_GFX_REGION(_tag) \
-	k001006_device::set_gfx_region(*device, _tag);
-
-#define MCFG_K001006_TEX_LAYOUT(x) \
-	k001006_device::set_tex_layout(*device, x);
 
 #endif // MAME_VIDEO_K001006_H

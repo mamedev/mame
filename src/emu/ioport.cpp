@@ -815,6 +815,8 @@ std::string ioport_field::key_name(int which) const
 	case UCHAR_MAMEKEY(TAB_PAD): return "Keypad Tab";
 	case UCHAR_MAMEKEY(00_PAD): return "Keypad 00";
 	case UCHAR_MAMEKEY(000_PAD): return "Keypad 000";
+	case UCHAR_MAMEKEY(COMMA_PAD): return "Keypad ,";
+	case UCHAR_MAMEKEY(EQUALS_PAD): return "Keypad =";
 	case UCHAR_MAMEKEY(PRTSCR): return "Print Screen";
 	case UCHAR_MAMEKEY(PAUSE): return "Pause";
 	case UCHAR_MAMEKEY(LSHIFT): return "Left Shift";
@@ -1455,7 +1457,7 @@ ioport_field *ioport_port::field(ioport_value mask) const
 {
 	// if we got the port, look for the field
 	for (ioport_field &field : fields())
-		if ((field.mask() & mask) != 0)
+		if ((field.mask() & mask) != 0 && field.enabled())
 			return &field;
 	return nullptr;
 }

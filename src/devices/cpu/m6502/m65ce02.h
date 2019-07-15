@@ -18,7 +18,7 @@ class m65ce02_device : public m65c02_device {
 public:
 	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 

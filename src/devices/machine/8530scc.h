@@ -11,9 +11,6 @@
 #ifndef MAME_MACHINE_8530SCC_H
 #define MAME_MACHINE_8530SCC_H
 
-#define MCFG_Z8530_INTRQ_CALLBACK(_write) \
-	devcb = &scc8530_t::set_intrq_wr_callback(*device, DEVCB_##_write);
-
 class scc8530_t : public device_t
 {
 public:
@@ -31,7 +28,7 @@ public:
 
 	scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<scc8530_t &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
+	auto intrq_callback() { return intrq_cb.bind(); }
 
 	uint8_t get_reg_a(int reg);
 	uint8_t get_reg_b(int reg);

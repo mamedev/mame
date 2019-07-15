@@ -28,24 +28,26 @@ the behaviour.
 
 Game                      Year  MCU
 ------------------------  ----  ----
-Shougi                    1982? 8201 (pcb)
-Shougi 2                  1982? 8201 (pcb)
-Talbot                    1982  8201?
-Champion Base Ball        1983  8201 (schematics)
-Exciting Soccer           1983  8302 (pcb)
-Champion Base Ball II     1983  8302 (pcb, unofficial schematics)
-Exciting Soccer II        1984  8303 (uses 8303+ opcodes)
-Equites                   1984  8303 (post)
-Bull Fighter              1984  8303 (post)
-Splendor Blast            1985  8303 (post)
-Gekisou                   1985  8304 (post)
-The Koukouyakyuh          1985  8304 (post)
-High Voltage              1985  8404?(post says 8404, but readme says 8304)
+Shougi                    1982?  8201 (pcb)
+Shougi 2                  1982?  8201 (pcb)
+Talbot                    1982   8201?
+Champion Base Ball        1983   8201 (schematics)
+Exciting Soccer           1983   8302 (pcb)
+Champion Base Ball II     1983   8302 (pcb, unofficial schematics)
+Exciting Soccer II        1984   8303 (uses 8303+ opcodes)
+Equites                   1984   8303 (post)
+Bull Fighter              1984   8303 (post)
+Splendor Blast            1985   8303 (post)
+Gekisou                   1985   8304 (post)
+The Koukou Yakyuu         1985   8304 (post)
+High Voltage              1985   8304?(post says 8404, but readme says 8304)
+unknown CLS bingo game    1986   8505
 
-alpha8201: "44801A75" -> HD44801 , ROM code = A75
-ALPHA8302: "44801B35" -> HD44801 , ROM code = B35
-ALPHA8303: "44801B42" -> HD44801 , ROM code = B42
-ALPHA8304: ?
+ALPHA-8201: "44801A75" -> HD44801, ROM code = A75
+ALPHA-8302: "44801B35" -> HD44801, ROM code = B35
+ALPHA-8303: "44801B42" -> HD44801, ROM code = B42
+ALPHA-8304: ?
+ALPHA-8505: "44801C57" -> HD44801, ROM code = C57
 
 
     Notes :
@@ -394,7 +396,7 @@ const alpha8201_cpu_device::s_opcode alpha8201_cpu_device::opcode_8301[256]=
 void alpha8201_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).callimport().mask(0x3ff).formatstr("%03X");
 	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");
@@ -440,7 +442,7 @@ void alpha8201_cpu_device::device_start()
 	save_item(NAME(m_savec));
 	save_item(NAME(m_savez));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -665,7 +667,7 @@ osd_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
 
 		/* run */
 		m_PREVPC = m_pc.w.l;
-		debugger_instruction_hook(this, m_pc.w.l);
+		debugger_instruction_hook(m_pc.w.l);
 		opcode =M_RDOP(m_pc.w.l);
 #if TRACE_PC
 osd_printf_debug("alpha8201:  PC = %03x,  opcode = %02x\n", m_pc.w.l, opcode);
@@ -690,7 +692,7 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-util::disasm_interface *alpha8201_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> alpha8201_cpu_device::create_disassembler()
 {
-	return new alpha8201_disassembler;
+	return std::make_unique<alpha8201_disassembler>();
 }

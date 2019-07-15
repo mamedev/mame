@@ -496,19 +496,19 @@ static uint32_t apple2_get_track_size(floppy_image_legacy *floppy, int head, int
 LEGACY_FLOPPY_OPTIONS_START( apple2 )
 	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",  "Apple ][ DOS order disk image",    apple2_dsk_identify,    apple2_do_construct, nullptr,
 		HEADS([1])
-		TRACKS([35])
+		TRACKS([APPLE2_TRACK_COUNT])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",  "Apple ][ ProDOS order disk image", apple2_dsk_identify,    apple2_po_construct, nullptr,
 		HEADS([1])
-		TRACKS([35])
+		TRACKS([APPLE2_TRACK_COUNT])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",    "Apple ][ Nibble order disk image", apple2_nib_identify,    apple2_nib_construct, nullptr,
 		HEADS([1])
-		TRACKS([35])
+		TRACKS([APPLE2_TRACK_COUNT])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
@@ -562,10 +562,11 @@ bool a2_16sect_format::supports_save() const
 int a2_16sect_format::identify(io_generic *io, uint32_t form_factor)
 {
 		uint64_t size = io_generic_size(io);
-		uint32_t expected_size = 35 * 16 * 256;
+		//uint32_t expected_size = 35 * 16 * 256;
+		uint32_t expected_size = APPLE2_TRACK_COUNT * 16 * 256;
 
 		// check standard size plus some oddball sizes in our softlist
-		if ((size == expected_size) || (size == 143403) || (size == 143363) || (size == 143358))
+		if ((size == expected_size) || (size == 35 * 16 * 256) || (size == 143403) || (size == 143363) || (size == 143358))
 		{
 			return 50;
 		}
@@ -605,10 +606,13 @@ const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
 
 bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
+	uint64_t size = io_generic_size(io);
+
 	m_prodos_order = false;
+	m_tracks = (size == (40 * 16 * 256)) ? 40 : 35;
 
 	int fpos = 0;
-	for(int track=0; track < 35; track++) {
+	for(int track=0; track < m_tracks; track++) {
 		std::vector<uint32_t> track_data;
 		uint8_t sector_data[256*16];
 		static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
@@ -617,6 +621,7 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 		static const unsigned char sos_block1[4] = { 0xc9, 0x20, 0xf0, 0x3e };
 		static const unsigned char a3a2emul_block1[6] = { 0x8d, 0xd0, 0x03, 0x4c, 0xc7, 0xa4 };
 		static const unsigned char cpm22_block1[8] = { 0xa2, 0x55, 0xa9, 0x00, 0x9d, 0x00, 0x0d, 0xca };
+		static const unsigned char subnod_block1[8] = { 0x63, 0xaa, 0xf0, 0x76, 0x8d, 0x63, 0xaa, 0x8e };
 
 		io_generic_read(io, sector_data, fpos, 256*16);
 
@@ -662,6 +667,10 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 				m_prodos_order = true;
 			}   // check for CP/M disks in ProDOS order
 			else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
+			{
+				m_prodos_order = true;
+			}   // check for subnodule disk
+			else if (!memcmp(subnod_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;
 			}
@@ -754,7 +763,7 @@ void a2_16sect_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 {
 		int g_tracks, g_heads;
-		int visualgrid[16][35]; // visualizer grid, cleared/initialized below
+		int visualgrid[16][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
 
 // lenient addr check: if unset, only accept an addr mark if the checksum was good
 // if set, accept an addr mark if the track and sector values are both sane
@@ -775,7 +784,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 // data postamble is good
 #define DATAPOST 16
 		for (auto & elem : visualgrid) {
-			for (int j = 0; j < 35; j++) {
+			for (int j = 0; j < m_tracks; j++) {
 				elem[j] = 0;
 			}
 		}
@@ -785,7 +794,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 
 		int pos_data = 0;
 
-		for(int track=0; track < 35; track++) {
+		for(int track=0; track < m_tracks; track++) {
 				uint8_t sectdata[(256)*16];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 16;
@@ -957,7 +966,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 		// display a little table of which sectors decoded ok
 		#ifdef VERBOSE_SAVE
 		int total_good = 0;
-		for (int j = 0; j < 35; j++) {
+		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 			printf("T%2d: ",j);
 			for (int i = 0; i < 16; i++) {
 				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
@@ -1032,7 +1041,7 @@ bool a2_rwts18_format::supports_save() const
 int a2_rwts18_format::identify(io_generic *io, uint32_t form_factor)
 {
 		uint64_t size = io_generic_size(io);
-		uint32_t expected_size = 35 * 16 * 256;
+		uint32_t expected_size = APPLE2_TRACK_COUNT * 16 * 256;
 		return size == expected_size;
 }
 
@@ -1079,7 +1088,7 @@ bool a2_rwts18_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 
         int head_count = 1;
 
-        for(int track=0; track < 35; track++) {
+        for(int track=0; track < APPLE2_TRACK_COUNT; track++) {
                 for(int head=0; head < head_count; head++) {
                         for(int si=0; si<16; si++) {
                                 uint8_t *data = sector_data + (256)*si;
@@ -1119,7 +1128,7 @@ void a2_rwts18_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 {
 		int g_tracks, g_heads;
-		int visualgrid[18][35]; // visualizer grid, cleared/initialized below
+		int visualgrid[18][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
 // lenient addr check: if unset, only accept an addr mark if the checksum was good
 // if set, accept an addr mark if the track and sector values are both sane
 #undef LENIENT_ADDR_CHECK
@@ -1141,7 +1150,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 // data postamble is good
 #define DATAPOST 16
 		for (auto & elem : visualgrid) {
-			for (int j = 0; j < 35; j++) {
+			for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 				elem[j] = 0;
 			}
 		}
@@ -1500,7 +1509,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 		}
 		// display a little table of which sectors decoded ok
 		int total_good = 0;
-		for (int j = 0; j < 35; j++) {
+		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 			printf("T%2d: ",j);
 			for (int i = 0; i < (j==0?16:6); i++) {
 				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
@@ -1542,7 +1551,7 @@ const char *a2_edd_format::extensions() const
 
 bool a2_edd_format::supports_save() const
 {
-	return true;
+	return false;
 }
 
 int a2_edd_format::identify(io_generic *io, uint32_t form_factor)
@@ -1640,3 +1649,159 @@ bool a2_edd_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 }
 
 const floppy_format_type FLOPPY_EDD_FORMAT = &floppy_image_format_creator<a2_edd_format>;
+
+
+a2_woz_format::a2_woz_format() : floppy_image_format_t()
+{
+}
+
+const char *a2_woz_format::name() const
+{
+	return "a2_woz";
+}
+
+const char *a2_woz_format::description() const
+{
+	return "Apple II WOZ Image";
+}
+
+const char *a2_woz_format::extensions() const
+{
+	return "woz";
+}
+
+bool a2_woz_format::supports_save() const
+{
+	return false;
+}
+
+const uint8_t a2_woz_format::signature[8] = { 0x57, 0x4f, 0x5a, 0x31, 0xff, 0x0a, 0x0d, 0x0a };
+const uint8_t a2_woz_format::signature2[8] = { 0x57, 0x4f, 0x5a, 0x32, 0xff, 0x0a, 0x0d, 0x0a };
+
+int a2_woz_format::identify(io_generic *io, uint32_t form_factor)
+{
+	uint8_t header[8];
+	io_generic_read(io, header, 0, 8);
+	if (!memcmp(header, signature, 8)) return 100;
+	if (!memcmp(header, signature2, 8)) return 100;
+	return 0;
+}
+
+bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+{
+	std::vector<uint8_t> img(io_generic_size(io));
+	io_generic_read(io, &img[0], 0, img.size());
+
+	// Check signature
+	if ((memcmp(&img[0], signature, 8)) && (memcmp(&img[0], signature2, 8)))
+		return false;
+
+	uint32_t woz_vers = 1;
+	if (!memcmp(&img[0], signature2, 8)) woz_vers = 2;
+
+	// Check integrity
+	uint32_t crc = crc32r(&img[12], img.size() - 12);
+	if(crc != r32(img, 8))
+		return false;
+
+	uint32_t off_info = find_tag(img, 0x4f464e49);
+	uint32_t off_tmap = find_tag(img, 0x50414d54);
+	uint32_t off_trks = find_tag(img, 0x534b5254);
+//  uint32_t off_writ = find_tag(img, 0x54495257);
+
+	if(!off_info || !off_tmap || !off_trks)
+		return false;
+
+	uint32_t info_vers = r8(img, off_info + 0);
+
+	if ((info_vers != 1) && (info_vers != 2))
+		return false;
+
+	bool is_35 = r8(img, off_info + 1) == 2;
+	if((form_factor == floppy_image::FF_35 && !is_35) || (form_factor == floppy_image::FF_525 && is_35))
+		return false;
+
+	unsigned int limit = is_35 ? 160 : 141;
+
+	if (woz_vers == 1) {
+		for (unsigned int trkid = 0; trkid != limit; trkid++) {
+			int head = is_35 && trkid >= 80 ? 1 : 0;
+			int track = is_35 ? trkid % 80 : trkid / 4;
+			int subtrack = is_35 ? 0 : trkid & 3;
+
+			uint8_t idx = r8(img, off_tmap + trkid);
+			if(idx != 0xff) {
+				uint32_t boff = off_trks + 6656*idx;
+				if (r16(img, boff + 6648) == 0)
+					return false;
+				generate_track_from_bitstream(track, head, &img[boff], r16(img, boff + 6648), image, subtrack, r16(img, boff + 6650));
+			}
+		}
+	} else if (woz_vers == 2) {
+		for (unsigned int trkid = 0; trkid != limit; trkid++) {
+			int head = is_35 && trkid & 1 ? 1 : 0;
+			int track = is_35 ? trkid >> 1 : trkid / 4;
+			int subtrack = is_35 ? 0 : trkid & 3;
+
+			uint8_t idx = r8(img, off_tmap + trkid);
+			if(idx != 0xff) {
+				uint32_t trks_off = off_trks + (idx * 8);
+
+				uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
+
+				if (r16(img, trks_off + 4) == 0)
+					return false;
+
+				// TODO: when write capability is added, use the WRIT chunk data if it's present
+				generate_track_from_bitstream(track, head, &img[boff], r16(img, trks_off + 4), image, subtrack, 0xffff);
+			}
+		}
+	}
+	else return false;
+
+	return true;
+}
+
+uint32_t a2_woz_format::find_tag(const std::vector<uint8_t> &data, uint32_t tag)
+{
+	uint32_t offset = 12;
+	do {
+		if(r32(data, offset) == tag)
+			return offset + 8;
+		offset += r32(data, offset+4) + 8;
+	} while(offset < data.size() - 8);
+	return 0;
+}
+
+uint32_t a2_woz_format::r32(const std::vector<uint8_t> &data, uint32_t offset)
+{
+	return data[offset] | (data[offset+1] << 8) | (data[offset+2] << 16) | (data[offset+3] << 24);
+}
+
+uint16_t a2_woz_format::r16(const std::vector<uint8_t> &data, uint32_t offset)
+{
+	return data[offset] | (data[offset+1] << 8);
+}
+
+uint8_t a2_woz_format::r8(const std::vector<uint8_t> &data, uint32_t offset)
+{
+	return data[offset];
+}
+
+uint32_t a2_woz_format::crc32r(const uint8_t *data, uint32_t size)
+{
+	// Reversed crc32
+	uint32_t crc = 0xffffffff;
+	for(uint32_t i=0; i != size; i++) {
+		crc = crc ^ data[i];
+		for(int j=0; j<8; j++)
+			if(crc & 1)
+				crc = (crc >> 1) ^ 0xedb88320;
+			else
+				crc = crc >> 1;
+	}
+	return ~crc;
+}
+
+
+const floppy_format_type FLOPPY_WOZ_FORMAT = &floppy_image_format_creator<a2_woz_format>;

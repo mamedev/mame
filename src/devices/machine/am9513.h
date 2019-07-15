@@ -35,25 +35,6 @@
 #pragma once
 
 //**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_AM9513_OUT1_CALLBACK(_devcb) \
-	devcb = &am9513_device::set_out_cb(*device, 0, DEVCB_##_devcb);
-#define MCFG_AM9513_OUT2_CALLBACK(_devcb) \
-	devcb = &am9513_device::set_out_cb(*device, 1, DEVCB_##_devcb);
-#define MCFG_AM9513_OUT3_CALLBACK(_devcb) \
-	devcb = &am9513_device::set_out_cb(*device, 2, DEVCB_##_devcb);
-#define MCFG_AM9513_OUT4_CALLBACK(_devcb) \
-	devcb = &am9513_device::set_out_cb(*device, 3, DEVCB_##_devcb);
-#define MCFG_AM9513_OUT5_CALLBACK(_devcb) \
-	devcb = &am9513_device::set_out_cb(*device, 4, DEVCB_##_devcb);
-#define MCFG_AM9513_FOUT_CALLBACK(_devcb) \
-	devcb = &am9513_device::set_fout_cb(*device, DEVCB_##_devcb);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -66,18 +47,20 @@ public:
 	am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration
-	template<class Object> static devcb_base &set_out_cb(device_t &device, int c, Object &&cb)
-	{ assert(c >= 0 && c < 5); return downcast<am9513_device &>(device).m_out_cb[c].set_callback(std::forward<Object>(cb)); }
-	template<class Object> static devcb_base &set_fout_cb(device_t &device, Object &&cb)
-	{ return downcast<am9513_device &>(device).m_fout_cb.set_callback(std::forward<Object>(cb)); }
+	auto out1_cb() { return m_out_cb[0].bind(); }
+	auto out2_cb() { return m_out_cb[1].bind(); }
+	auto out3_cb() { return m_out_cb[2].bind(); }
+	auto out4_cb() { return m_out_cb[3].bind(); }
+	auto out5_cb() { return m_out_cb[4].bind(); }
+	auto fout_cb() { return m_fout_cb.bind(); }
 
 	// 8-bit data bus interface
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_WRITE8_MEMBER(write8);
+	u8 read8(offs_t offset);
+	void write8(offs_t offset, u8 data);
 
 	// 16-bit data bus interface
-	DECLARE_READ16_MEMBER(read16);
-	DECLARE_WRITE16_MEMBER(write16);
+	u16 read16(offs_t offset);
+	void write16(offs_t offset, u16 data);
 
 	// Source N inputs
 	DECLARE_WRITE_LINE_MEMBER(source1_w) { write_source(0, state); }

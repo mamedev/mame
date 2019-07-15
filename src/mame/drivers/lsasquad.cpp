@@ -170,63 +170,66 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 	/* other bits unknown */
 }
 
-ADDRESS_MAP_START(lsasquad_state::lsasquad_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
-	AM_RANGE(0xe803, 0xe803) AM_READ(lsasquad_mcu_status_r) /* COIN + 68705 status */
-	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
-	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
-	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
-	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-ADDRESS_MAP_END
+void lsasquad_state::lsasquad_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); /* SRAM */
+	map(0xc000, 0xdfff).ram().share("videoram");    /* SCREEN RAM */
+	map(0xe000, 0xe3ff).ram().share("scrollram");   /* SCROLL RAM */
+	map(0xe400, 0xe5ff).ram().share("spriteram");   /* OBJECT RAM */
+	map(0xe800, 0xe800).portr("DSWA");
+	map(0xe801, 0xe801).portr("DSWB");
+	map(0xe802, 0xe802).portr("DSWC");
+	map(0xe803, 0xe803).r(FUNC(lsasquad_state::lsasquad_mcu_status_r)); /* COIN + 68705 status */
+	map(0xe804, 0xe804).portr("P1");
+	map(0xe805, 0xe805).portr("P2");
+	map(0xe806, 0xe806).portr("START");
+	map(0xe807, 0xe807).portr("SERVICE");
+	map(0xea00, 0xea00).w(FUNC(lsasquad_state::lsasquad_bankswitch_w));
+	map(0xec00, 0xec00).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0xec00, 0xec00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xec01, 0xec01).r(FUNC(lsasquad_state::lsasquad_sound_status_r));
+	map(0xee00, 0xee00).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+}
 
-ADDRESS_MAP_START(lsasquad_state::lsasquad_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xe000, 0xefff) AM_ROM     /* space for diagnostic ROM? */
-ADDRESS_MAP_END
+void lsasquad_state::lsasquad_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd000, 0xd000).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xd400, 0xd400).w(FUNC(lsasquad_state::lsasquad_sh_nmi_disable_w));
+	map(0xd800, 0xd800).w(FUNC(lsasquad_state::lsasquad_sh_nmi_enable_w));
+	map(0xd800, 0xd800).r(FUNC(lsasquad_state::lsasquad_sound_status_r));
+	map(0xe000, 0xefff).rom();     /* space for diagnostic ROM? */
+}
 
 
 
-ADDRESS_MAP_START(lsasquad_state::storming_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
-	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("COINS")
-	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
-	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
-	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
-	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-ADDRESS_MAP_END
+void lsasquad_state::storming_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); /* SRAM */
+	map(0xc000, 0xdfff).ram().share("videoram");    /* SCREEN RAM */
+	map(0xe000, 0xe3ff).ram().share("scrollram");   /* SCROLL RAM */
+	map(0xe400, 0xe5ff).ram().share("spriteram");   /* OBJECT RAM */
+	map(0xe800, 0xe800).portr("DSWA");
+	map(0xe801, 0xe801).portr("DSWB");
+	map(0xe802, 0xe802).portr("DSWC");
+	map(0xe803, 0xe803).portr("COINS");
+	map(0xe804, 0xe804).portr("P1");
+	map(0xe805, 0xe805).portr("P2");
+	map(0xe806, 0xe806).portr("START");
+	map(0xe807, 0xe807).portr("SERVICE");
+	map(0xea00, 0xea00).w(FUNC(lsasquad_state::lsasquad_bankswitch_w));
+	map(0xec00, 0xec00).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0xec00, 0xec00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xec01, 0xec01).r(FUNC(lsasquad_state::lsasquad_sound_status_r));
+}
 
 
 static INPUT_PORTS_START( lsasquad )
@@ -302,8 +305,8 @@ static INPUT_PORTS_START( lsasquad )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("MCU")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 68705 ready to receive cmd */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 0 = 68705 has sent result */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 68705 ready to receive cmd */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 0 = 68705 has sent result */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -371,36 +374,38 @@ INPUT_PORTS_END
 
 /* DAIKAIJU */
 
-ADDRESS_MAP_START(lsasquad_state::daikaiju_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM /* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")    /* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")   /* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")   /* OBJECT RAM */
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r) /* COIN + 68705 status */
-	AM_RANGE(0xe804, 0xe804) AM_READ_PORT("P1")
-	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
-	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
-	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-ADDRESS_MAP_END
+void lsasquad_state::daikaiju_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); /* SRAM */
+	map(0xc000, 0xdfff).ram().share("videoram");    /* SCREEN RAM */
+	map(0xe000, 0xe3ff).ram().share("scrollram");   /* SCROLL RAM */
+	map(0xe400, 0xe7ff).ram().share("spriteram");   /* OBJECT RAM */
+	map(0xe800, 0xe800).portr("DSWA");
+	map(0xe801, 0xe801).portr("DSWB");
+	map(0xe803, 0xe803).r(FUNC(lsasquad_state::daikaiju_mcu_status_r)); /* COIN + 68705 status */
+	map(0xe804, 0xe804).portr("P1");
+	map(0xe805, 0xe805).portr("P2");
+	map(0xe806, 0xe806).portr("START");
+	map(0xe807, 0xe807).portr("SERVICE");
+	map(0xea00, 0xea00).w(FUNC(lsasquad_state::lsasquad_bankswitch_w));
+	map(0xec00, 0xec00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xee00, 0xee00).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+}
 
-ADDRESS_MAP_START(lsasquad_state::daikaiju_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(daikaiju_sound_status_r, lsasquad_sh_nmi_enable_w)
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP
-	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM? */
-ADDRESS_MAP_END
+void lsasquad_state::daikaiju_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xd400, 0xd400).w(FUNC(lsasquad_state::lsasquad_sh_nmi_disable_w));
+	map(0xd800, 0xd800).rw(FUNC(lsasquad_state::daikaiju_sound_status_r), FUNC(lsasquad_state::lsasquad_sh_nmi_enable_w));
+	map(0xdc00, 0xdc00).nopw();
+	map(0xe000, 0xefff).rom(); /* space for diagnostic ROM? */
+}
 
 static INPUT_PORTS_START( daikaiju )
 	PORT_START("DSWA")
@@ -453,8 +458,8 @@ static INPUT_PORTS_START( daikaiju )
 
 
 	PORT_START("MCU")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 68705 ready to receive cmd */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 0 = 68705 has sent result */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 68705 ready to receive cmd */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 0 = 68705 has sent result */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -528,7 +533,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( lsasquad )
+static GFXDECODE_START( gfx_lsasquad )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -550,127 +555,122 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 }
 
 /* Note: lsasquad clock values are not verified */
-MACHINE_CONFIG_START(lsasquad_state::lsasquad)
-
+void lsasquad_state::lsasquad(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_CPU_PROGRAM_MAP(lsasquad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::lsasquad_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lsasquad_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(lsasquad_sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lsasquad_state::lsasquad_sound_map);
 								/* IRQs are triggered by the YM2203 */
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
+	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_lsasquad)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lsasquad_state::screen_update_lsasquad));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lsasquad_state, unk))
-	MCFG_SOUND_ROUTE(0, "mono", 0.12)
-	MCFG_SOUND_ROUTE(1, "mono", 0.12)
-	MCFG_SOUND_ROUTE(2, "mono", 0.12)
-	MCFG_SOUND_ROUTE(3, "mono", 0.63)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.port_b_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.add_route(0, "mono", 0.12);
+	ymsnd.add_route(1, "mono", 0.12);
+	ymsnd.add_route(2, "mono", 0.12);
+	ymsnd.add_route(3, "mono", 0.63);
+}
 
-MACHINE_CONFIG_START(lsasquad_state::storming)
+void lsasquad_state::storming(machine_config &config)
+{
 	lsasquad(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(storming_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::storming_map);
 
-	MCFG_DEVICE_REMOVE("bmcu")
+	config.device_remove("bmcu");
 
-	MCFG_SOUND_REPLACE("aysnd", AY8910, MASTER_CLOCK / 8) // AY-3-8910A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
-MACHINE_CONFIG_END
+	AY8910(config.replace(), "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12); // AY-3-8910A
+}
 
-MACHINE_CONFIG_START(lsasquad_state::daikaiju)
-
+void lsasquad_state::daikaiju(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_CPU_PROGRAM_MAP(daikaiju_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lsasquad_state::daikaiju_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lsasquad_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(daikaiju_sound_map)
+	Z80(config, m_audiocpu, MASTER_CLOCK / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lsasquad_state::daikaiju_sound_map);
 	/* IRQs are triggered by the YM2203 */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
+	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
+	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lsasquad_state::screen_update_daikaiju));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lsasquad);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lsasquad_state, unk))
-	MCFG_SOUND_ROUTE(0, "mono", 0.12)
-	MCFG_SOUND_ROUTE(1, "mono", 0.12)
-	MCFG_SOUND_ROUTE(2, "mono", 0.12)
-	MCFG_SOUND_ROUTE(3, "mono", 0.63)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.port_b_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.add_route(0, "mono", 0.12);
+	ymsnd.add_route(1, "mono", 0.12);
+	ymsnd.add_route(2, "mono", 0.12);
+	ymsnd.add_route(3, "mono", 0.63);
+}
 
 
 /***************************************************************************
@@ -794,6 +794,6 @@ ROM_START( daikaiju )
 ROM_END
 
 
-GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad_state, 0, ROT270, "Taito",   "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, storming, lsasquad, storming, storming, lsasquad_state, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, lsasquad_state, 0, ROT270, "Taito",   "Daikaiju no Gyakushu",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad_state, empty_init, ROT270, "Taito",   "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, storming, lsasquad, storming, storming, lsasquad_state, empty_init, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, lsasquad_state, empty_init, ROT270, "Taito",   "Daikaiju no Gyakushu",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

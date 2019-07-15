@@ -33,6 +33,6 @@ protected:
 
 
 // device type definition
-extern const device_type NEOGEO_MSLUGX_CART;
+DECLARE_DEVICE_TYPE(NEOGEO_MSLUGX_CART, neogeo_mslugx_cart_device)
 
 #endif // MAME_BUS_NEOGEO_MSLUGX_H

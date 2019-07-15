@@ -15,7 +15,7 @@
 #include "m4510.h"
 #include "m4510d.h"
 
-DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "M4510")
+DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "CSG M4510")
 
 m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m65ce02_device(mconfig, M4510, tag, owner, clock),
@@ -30,14 +30,14 @@ m4510_device::m4510_device(const machine_config &mconfig, const char *tag, devic
 	sprogram_config.m_page_shift = 13;
 }
 
-util::disasm_interface *m4510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m4510_device::create_disassembler()
 {
-	return new m4510_disassembler;
+	return std::make_unique<m4510_disassembler>();
 }
 
 void m4510_device::device_start()
 {
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_4510_nd>(this);
 	else
 		mintf = std::make_unique<mi_4510_normal>(this);
@@ -82,12 +82,12 @@ uint8_t m4510_device::mi_4510_normal::read(uint16_t adr)
 
 uint8_t m4510_device::mi_4510_normal::read_sync(uint16_t adr)
 {
-	return sdirect->read_byte(base->map(adr));
+	return scache->read_byte(base->map(adr));
 }
 
 uint8_t m4510_device::mi_4510_normal::read_arg(uint16_t adr)
 {
-	return direct->read_byte(base->map(adr));
+	return cache->read_byte(base->map(adr));
 }
 
 void m4510_device::mi_4510_normal::write(uint16_t adr, uint8_t val)

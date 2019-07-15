@@ -14,20 +14,7 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "video/huc6271.h"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_HUC6272_ADD(tag, freq) \
-		MCFG_DEVICE_ADD((tag), HUC6272, (freq))
-
-#define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
-		devcb = &huc6272_device::set_irq_changed_callback(*device, (DEVCB_##cb));
-
-#define MCFG_HUC6272_RAINBOW(tag) \
-		huc6272_device::set_rainbow_tag(*device, (tag));
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -43,15 +30,22 @@ public:
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_changed_callback(device_t &device, Object &&cb) { return downcast<huc6272_device &>(device).m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_rainbow_tag(device_t &device, const char *tag) { downcast<huc6272_device &>(device).m_huc6271_tag = tag; }
+	auto irq_changed_callback() { return m_irq_changed_cb.bind(); }
+	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
-	void kram_map(address_map &map);
-	void microprg_map(address_map &map);
+	// ADPCM operations
+	DECLARE_READ8_MEMBER( adpcm_update_0 );
+	DECLARE_READ8_MEMBER( adpcm_update_1 );
+
+	// CD-DA operations
+	DECLARE_WRITE8_MEMBER( cdda_update );
+
+	static void cdrom_config(device_t *device);
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -61,9 +55,9 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	const char *m_huc6271_tag;
-
-	huc6271_device *m_huc6271;
+	required_device<huc6271_device> m_huc6271;
+	required_device<speaker_device> m_cdda_l;
+	required_device<speaker_device> m_cdda_r;
 
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;
@@ -94,6 +88,21 @@ private:
 		uint8_t ctrl;
 	}m_micro_prg;
 
+	struct{
+		uint8_t rate;
+		uint32_t status;
+		int interrupt;
+		uint8_t playing[2];
+		uint8_t control[2];
+		uint32_t start[2];
+		uint32_t end[2];
+		uint32_t imm[2];
+		uint32_t input[2];
+		int nibble[2];
+		uint32_t pos[2];
+		uint32_t addr[2];
+	}m_adpcm;
+
 	const address_space_config      m_program_space_config;
 	const address_space_config      m_data_space_config;
 	required_shared_ptr<uint16_t>   m_microprg_ram;
@@ -110,6 +119,12 @@ private:
 	uint32_t read_dword(offs_t address);
 	void write_dword(offs_t address, uint32_t data);
 	void write_microprg_data(offs_t address, uint16_t data);
+
+	uint8_t adpcm_update(int chan);
+	void interrupt_update();
+
+	void kram_map(address_map &map);
+	void microprg_map(address_map &map);
 };
 
 // device type definition

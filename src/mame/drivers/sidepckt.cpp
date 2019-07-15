@@ -197,37 +197,40 @@ WRITE8_MEMBER(sidepckt_state::i8751_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(sidepckt_state::sidepckt_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x400) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2100, 0x24ff) AM_WRITENOP // ??? (Unused spriteram? The game writes some values at boot, but never read)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3004, 0x3004) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x300c, 0x300c) AM_READWRITE(scroll_y_r, scroll_y_w)
-	AM_RANGE(0x3014, 0x3014) AM_READ(i8751_r)
-	AM_RANGE(0x3018, 0x3018) AM_WRITE(i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sidepckt_state::sidepckt_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x13ff).mirror(0x400).ram().w(FUNC(sidepckt_state::videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).mirror(0x400).ram().w(FUNC(sidepckt_state::colorram_w)).share("colorram");
+	map(0x2000, 0x20ff).ram().share("spriteram");
+	map(0x2100, 0x24ff).nopw(); // ??? (Unused spriteram? The game writes some values at boot, but never read)
+	map(0x3000, 0x3000).portr("P1");
+	map(0x3001, 0x3001).portr("P2");
+	map(0x3002, 0x3002).portr("DSW1");
+	map(0x3003, 0x3003).portr("DSW2");
+	map(0x3004, 0x3004).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x300c, 0x300c).rw(FUNC(sidepckt_state::scroll_y_r), FUNC(sidepckt_state::scroll_y_w));
+	map(0x3014, 0x3014).r(FUNC(sidepckt_state::i8751_r));
+	map(0x3018, 0x3018).w(FUNC(sidepckt_state::i8751_w));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(sidepckt_state::sidepcktb_map)
-	AM_IMPORT_FROM( sidepckt_map )
-	AM_RANGE(0x3014, 0x3014) AM_READNOP
-	AM_RANGE(0x3018, 0x3018) AM_WRITENOP
-ADDRESS_MAP_END
+void sidepckt_state::sidepcktb_map(address_map &map)
+{
+	sidepckt_map(map);
+	map(0x3014, 0x3014).nopr();
+	map(0x3018, 0x3018).nopw();
+}
 
 
-ADDRESS_MAP_START(sidepckt_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sidepckt_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1001).w("ym1", FUNC(ym2203_device::write));
+	map(0x2000, 0x2001).w("ym2", FUNC(ym3526_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /******************************************************************************/
@@ -350,7 +353,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( sidepckt )
+static GFXDECODE_START( gfx_sidepckt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   128,  4 ) /* colors 128-159 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 ) /* colors   0-127 */
 GFXDECODE_END
@@ -366,50 +369,49 @@ void sidepckt_state::machine_reset()
 	m_scroll_y      = 0;
 }
 
-MACHINE_CONFIG_START(sidepckt_state::sidepckt)
-
+void sidepckt_state::sidepckt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(sidepckt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidepckt_state, nmi_line_pulse)
+	MC6809E(config, m_maincpu, 2000000); /* MC68B09EP, 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepckt_map);
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* 1.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	M6502(config, m_audiocpu, 1500000); /* 1.5 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58) /* VERIFY: May be 55 or 56 */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58); /* VERIFY: May be 55 or 56 */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sidepckt_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidepckt)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidepckt);
+	PALETTE(config, m_palette, FUNC(sidepckt_state::sidepckt_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(sidepckt_state::sidepcktb)
+void sidepckt_state::sidepcktb(machine_config &config)
+{
 	sidepckt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sidepcktb_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepcktb_map);
+}
 
 
 /***************************************************************************
@@ -492,7 +494,7 @@ ROM_START( sidepcktb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
+void sidepckt_state::init_sidepckt()
 {
 	m_prot_table[0] = sidepckt_prot_table_1;
 	m_prot_table[1] = sidepckt_prot_table_2;
@@ -506,7 +508,7 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 	save_item(NAME(m_scroll_y));
 }
 
-DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
+void sidepckt_state::init_sidepcktj()
 {
 	m_prot_table[0] = sidepcktj_prot_table_1;
 	m_prot_table[1] = sidepcktj_prot_table_2;
@@ -521,6 +523,6 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 }
 
 
-GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, 0,         ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, init_sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, init_sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, empty_init,     ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )

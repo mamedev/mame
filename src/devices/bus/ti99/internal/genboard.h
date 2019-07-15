@@ -32,8 +32,7 @@ enum
 
 enum
 {
-	GENEVE_098 = 0,
-	GENEVE_100,
+	GENEVE_EPROM = 0,
 	GENEVE_PFM512,
 	GENEVE_PFM512A
 };
@@ -63,7 +62,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
 	uint8_t get_recent_key();
 
-	template <class Object> static devcb_base &static_set_int_callback(device_t &device, Object &&cb) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(std::forward<Object>(cb)); }
+	auto int_cb() { return m_interrupt.bind(); }
 
 protected:
 	void               device_start() override;
@@ -108,15 +107,13 @@ private:
 	emu_timer*      m_timer;
 };
 
-#define MCFG_GENEVE_KBINT_HANDLER( _intcallb ) \
-	devcb = &bus::ti99::internal::geneve_keyboard_device::static_set_int_callback( *device, DEVCB_##_intcallb );
-
 /*****************************************************************************/
 
 class geneve_mapper_device : public device_t
 {
 public:
 	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	void set_geneve_mode(bool geneve);
 	void set_direct_mode(bool direct);
 	void set_cartridge_size(int size);
@@ -124,9 +121,9 @@ public:
 	void set_video_waitstates(bool wait);
 	void set_extra_waitstates(bool wait);
 
-	DECLARE_READ8_MEMBER( readm );
-	DECLARE_WRITE8_MEMBER( writem );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	uint8_t readm(offs_t offset);
+	void writem(offs_t offset, uint8_t data);
+	void setaddress(offs_t offset, uint8_t busctrl);
 
 	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
 
@@ -138,39 +135,31 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
 	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
 
-	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb) { return downcast<geneve_mapper_device &>(device).m_ready.set_callback(std::forward<Object>(cb)); }
+	auto ready_cb() { return m_ready.bind(); }
 
 protected:
+	geneve_mapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	void    device_start() override;
-	void    device_reset() override;
+	virtual void device_reset() override;
+	void    common_reset();
 
-private:
 	// GROM simulation
 	bool    m_gromwaddr_LSB;
 	bool    m_gromraddr_LSB;
 	int     m_grom_address;
-	DECLARE_READ8_MEMBER( read_grom );
-	DECLARE_WRITE8_MEMBER( write_grom );
+	uint8_t read_grom(offs_t offset);
+	void write_grom(offs_t offset, uint8_t data);
 
 	// wait states
-	void        set_wait(int min);
-	void        set_ext_wait(int min);
-	bool        m_video_waitstates;
-	bool        m_extra_waitstates;
-	bool        m_ready_asserted;
+	void    set_wait(int min);
+	void    set_video_waitcount(int min);
+	bool    m_video_waitstates;
+	bool    m_extra_waitstates;
+	bool    m_ready_asserted;
 
-	bool        m_read_mode;
+	bool    m_read_mode;
 
-	bool        m_debug_no_ws;
-
-	// Mapper function
-	typedef struct
-	{
-		int     function;
-		offs_t  offset;
-		offs_t  physaddr;
-	} decdata;
-
+	bool    m_debug_no_ws;
 	bool    m_geneve_mode;
 	bool    m_direct_mode;
 	int     m_cartridge_size;
@@ -179,21 +168,101 @@ private:
 	bool    m_cartridge7_writable;
 	int     m_map[8];
 
-	void    decode(address_space& space, offs_t offset, bool read_mode, decdata* dec);
+	/*
+	Constants for mapper decoding. Naming scheme:
+	M=Mapper, L=Logical space; P=Physical space
+	*/
+	typedef enum
+	{
+		MUNDEF=0,
+
+		MLVIDEO,
+		MLMAPPER,
+		MLKEY,
+		MLSOUND,
+		MLCLOCK,
+		MLGROM,
+
+		MPDRAM,
+		MPEXP,
+		MPEPROM,
+		MPSRAM,
+
+		MBOX
+	} decfunct_t;
+
+	// Mapper function
+	typedef struct
+	{
+		int     function;       // must be a fundamental type to be saveable
+		offs_t  offset;         // Logical address
+		offs_t  physaddr;       // Physical address
+		int     wait;           // Wait states
+	} decdata;
+
+	// The result of decoding
 	decdata m_decoded;
 
-	// Genmod modifications
-	bool    m_turbo;
-	bool    m_genmod;
-	bool    m_timode;
+	// Static decoder entry for the logical space
+	// Not all entries apply for native mode, e.g. there is no GROM in native
+	// mode. In that case the base and mask are 0000, and the entry must be
+	// skipped. Speech is accessible in the physical space in native mode.
+	// All entries have a wait state count of 1.
+	typedef struct
+	{
+		offs_t      genbase;       // Base address in native mode
+		int         genmask;       // Bits that also match this entry
+		offs_t      tibase;        // Base address in TI mode
+		int         timask;        // Bits that also match this entry
+		int         writeoff;      // Additional offset in TI mode for writing
+		decfunct_t  function;      // Decoded function
+		const char* description;   // Good for logging
+	} logentry_t;
+
+	logentry_t m_logmap[7] =
+	{
+		{ 0xf100, 0x000e, 0x8800, 0x03fe, 0x0400, MLVIDEO,  "video" },
+		{ 0xf110, 0x0007, 0x8000, 0x0007, 0x0000, MLMAPPER, "mapper" },
+		{ 0xf118, 0x0007, 0x8008, 0x0007, 0x0000, MLKEY,    "keyboard" },
+		{ 0xf120, 0x000e, 0x8400, 0x03fe, 0x0000, MLSOUND,  "sound" },
+		{ 0xf130, 0x000f, 0x8010, 0x000f, 0x0000, MLCLOCK,  "clock" },
+		{ 0x0000, 0x0000, 0x9000, 0x03fe, 0x0400, MBOX,     "speech (in P-Box)" },
+		{ 0x0000, 0x0000, 0x9800, 0x03fe, 0x0400, MLGROM,   "GROM" },
+	};
+
+	// Static decoder entry for the physical space
+	// There are no differences between native mode and TI mode.
+	typedef struct
+	{
+		offs_t      base;           // Base address
+		int         mask;           // Bits that also match this entry
+		decfunct_t  function;       // Decoded function
+		int         wait;           // Wait states
+		const char* description;    // Good for logging
+	} physentry_t;
+
+	physentry_t m_physmap[4] =
+	{
+		{ 0x000000, 0x07ffff, MPDRAM,  1, "DRAM" },
+		{ 0x080000, 0x07ffff, MPEXP,   1, "on-board expansion" },
+		{ 0x1e0000, 0x01ffff, MPEPROM, 0, "EPROM" },
+		{ 0x180000, 0x07ffff, MPSRAM,  0, "SRAM" }
+	};
+
+	void    decode_logical(bool reading, decdata* dec);
+	void    map_address(bool reading, decdata* dec);
+	void    decode_physical(decdata* dec);
+	// This is the hook for Genmod. The normal Geneve just does nothing here.
+	virtual void decode_mod(decdata* dec) { };
 
 	// PFM mod (0 = none, 1 = AT29C040, 2 = AT29C040A)
-	DECLARE_READ8_MEMBER( read_from_pfm );
-	DECLARE_WRITE8_MEMBER( write_to_pfm );
-	void    set_boot_rom(int selection);
-	int     m_pfm_mode;
+	uint8_t boot_rom(offs_t offset);
+	void write_to_pfm(offs_t offset, uint8_t data);
+	int     m_boot_rom;
 	int     m_pfm_bank;
 	bool    m_pfm_output_enable;
+
+	int     m_pbox_prefix;
 
 	// SRAM access
 	int     m_sram_mask;
@@ -204,7 +273,7 @@ private:
 
 	// Counter for the wait states.
 	int     m_waitcount;
-	int     m_ext_waitcount;
+	int     m_video_waitcount;
 
 	// Devices
 	required_device<mm58274c_device>     m_clock;
@@ -221,12 +290,24 @@ private:
 	required_device<ram_device> m_dram;
 };
 
-#define MCFG_GENEVE_READY_HANDLER( _intcallb ) \
-	devcb = &bus::ti99::internal::geneve_mapper_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
+class genmod_mapper_device : public geneve_mapper_device
+{
+public:
+	genmod_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void decode_mod(decdata* dec) override;
+	void device_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER( setgm_changed );
+
+private:
+	// Genmod modifications
+	bool    m_gm_timode;
+	bool    m_turbo;
+};
 
 } } } // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(GENEVE_KEYBOARD, bus::ti99::internal, geneve_keyboard_device)
 DECLARE_DEVICE_TYPE_NS(GENEVE_MAPPER,   bus::ti99::internal, geneve_mapper_device)
+DECLARE_DEVICE_TYPE_NS(GENMOD_MAPPER,   bus::ti99::internal, genmod_mapper_device)
 
 #endif // MAME_BUS_TI99_INTERNAL_GENBOARD_H

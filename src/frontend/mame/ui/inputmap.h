@@ -53,12 +53,12 @@ protected:
 		const input_seq *   defseq;             /* pointer to the default sequence */
 		const char *        name;               /* pointer to the base name of the item */
 		const char *        owner_name;         /* pointer to the name of the owner of the item */
-		uint32_t              sortorder;          /* sorting information */
+		ioport_group        group;              /* group type */
 		uint8_t               type;               /* type of port */
 		bool                is_optional;        /* true if this input is considered optional */
 	};
 
-	void populate_and_sort(struct input_item_data *itemlist);
+	void populate_sorted(std::vector<input_item_data *> &&itemarray);
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 
 	const void *        pollingref;
@@ -66,14 +66,12 @@ protected:
 	input_item_data *   pollingitem;
 
 private:
-	uint32_t            last_sortorder;
+	input_item_data *   lastitem;
 	bool                record_next;
 	input_seq           starting_seq;
 
 	virtual void handle() override;
 	virtual void update_input(struct input_item_data *seqchangeditem) = 0;
-
-	static int compare_items(const void *i1, const void *i2);
 };
 
 class menu_input_general : public menu_input

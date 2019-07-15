@@ -24,7 +24,6 @@
 #include "emu.h"
 #include "taito.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 
@@ -173,7 +172,7 @@ void nes_x1_017_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_tc0190fmc_device::tc0190fmc_write)
+void nes_tc0190fmc_device::tc0190fmc_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("tc0190fmc_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -237,11 +236,11 @@ void nes_tc0190fmc_pal16r4_device::hblank_irq( int scanline, int vblank, int bla
 			m_irq_count--;
 
 		if (m_irq_enable && !blanked && (m_irq_count == 0) && prior_count)
-			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
-WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
+void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("tc0190fmc pal16r4 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -257,7 +256,7 @@ WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
 		case 0x2001:
 		case 0x2002:
 		case 0x2003:
-			tc0190fmc_write(space, offset, data, mem_mask);
+			tc0190fmc_write(offset, data);
 			break;
 		case 0x4000:
 			m_irq_count_latch = (0x100 - data) & 0xff;
@@ -270,7 +269,7 @@ WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
 			break;
 		case 0x4003:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x6000:
 			set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -292,7 +291,7 @@ WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_x1_005_device::write_m)
+void nes_x1_005_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("x1_005 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -356,14 +355,14 @@ WRITE8_MEMBER(nes_x1_005_device::write_m)
 		m_x1_005_ram[offset & 0x7f] = data;
 }
 
-READ8_MEMBER(nes_x1_005_device::read_m)
+uint8_t nes_x1_005_device::read_m(offs_t offset)
 {
 	LOG_MMC(("x1_005 read_m, offset: %04x\n", offset));
 
 	if (offset >= 0x1f00 && m_latch == 0xa3)
 		return m_x1_005_ram[offset & 0x7f];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 /*-------------------------------------------------
@@ -400,7 +399,7 @@ void nes_x1_017_device::set_chr()
 	chr1_x(7 ^ m_latch, m_mmc_vrom_bank[5], CHRROM);
 }
 
-WRITE8_MEMBER(nes_x1_017_device::write_m)
+void nes_x1_017_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("x1017 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -454,7 +453,7 @@ WRITE8_MEMBER(nes_x1_017_device::write_m)
 		m_x1_017_ram[0x1000 + (offset & 0x3ff)] = data;
 }
 
-READ8_MEMBER(nes_x1_017_device::read_m)
+uint8_t nes_x1_017_device::read_m(offs_t offset)
 {
 	LOG_MMC(("x1017 read_m, offset: %04x\n", offset));
 
@@ -466,5 +465,5 @@ READ8_MEMBER(nes_x1_017_device::read_m)
 	if (offset < 0x1400 && m_reg[2] == 0x84)
 		return m_x1_017_ram[0x1000 + (offset & 0x3ff)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }

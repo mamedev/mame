@@ -115,9 +115,9 @@ void pet_expansion_slot_device::device_reset()
 //  norom_r - NO ROM read
 //-------------------------------------------------
 
-int pet_expansion_slot_device::norom_r(address_space &space, offs_t offset, int sel)
+int pet_expansion_slot_device::norom_r(offs_t offset, int sel)
 {
-	return m_card ? m_card->pet_norom_r(space, offset, sel) : 1;
+	return m_card ? m_card->pet_norom_r(offset, sel) : 1;
 }
 
 
@@ -125,11 +125,11 @@ int pet_expansion_slot_device::norom_r(address_space &space, offs_t offset, int 
 //  read - buffered data read
 //-------------------------------------------------
 
-uint8_t pet_expansion_slot_device::read(address_space &space, offs_t offset, uint8_t data, int &sel)
+uint8_t pet_expansion_slot_device::read(offs_t offset, uint8_t data, int &sel)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->pet_bd_r(space, offset, data, sel);
+		data = m_card->pet_bd_r(offset, data, sel);
 	}
 
 	return data;
@@ -140,11 +140,11 @@ uint8_t pet_expansion_slot_device::read(address_space &space, offs_t offset, uin
 //  write - buffered data write
 //-------------------------------------------------
 
-void pet_expansion_slot_device::write(address_space &space, offs_t offset, uint8_t data, int &sel)
+void pet_expansion_slot_device::write(offs_t offset, uint8_t data, int &sel)
 {
 	if (m_card != nullptr)
 	{
-		m_card->pet_bd_w(space, offset, data, sel);
+		m_card->pet_bd_w(offset, data, sel);
 	}
 }
 
@@ -208,9 +208,10 @@ int pet_expansion_slot_device::phi2()
 #include "hsg.h"
 #include "superpet.h"
 
-SLOT_INTERFACE_START( pet_expansion_cards )
-	SLOT_INTERFACE("64k", PET_64K)
-	SLOT_INTERFACE("hsga", CBM8000_HSG_A)
-	SLOT_INTERFACE("hsgb", CBM8000_HSG_B)
-	SLOT_INTERFACE("superpet", SUPERPET)
-SLOT_INTERFACE_END
+void pet_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("64k", PET_64K);
+	device.option_add("hsga", CBM8000_HSG_A);
+	device.option_add("hsgb", CBM8000_HSG_B);
+	device.option_add("superpet", SUPERPET);
+}

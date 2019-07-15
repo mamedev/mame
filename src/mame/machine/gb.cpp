@@ -150,8 +150,7 @@ void gb_state::gb_init_regs()
 
 void gb_state::gb_init()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_apu->sound_w(space, 0x16, 0x00);       /* Initialize sound hardware */
+	m_apu->sound_w(0x16, 0x00);       /* Initialize sound hardware */
 
 	m_divcount = 8;
 	m_internal_serial_clock = 0;
@@ -196,7 +195,7 @@ void gb_state::machine_reset()
 {
 	gb_init();
 
-	/* Enable BIOS rom */
+	// Enable BIOS ROM
 	m_bios_disable = false;
 }
 
@@ -663,15 +662,15 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 
  ****************************************************************************/
 
-MACHINE_START_MEMBER(megaduck_state,megaduck)
+void megaduck_state::machine_start()
 {
-	save_gb_base();
+	gb_state::machine_start();
 }
 
-MACHINE_RESET_MEMBER(megaduck_state,megaduck)
+void megaduck_state::machine_reset()
 {
-	/* We may have to add some more stuff here, if not then it can be merged back into gb */
-	gb_init();
+	// We may have to add some more stuff here, if not then it can be merged back into gb
+	gb_state::machine_reset();
 
 	m_bios_disable = true;
 }
@@ -747,14 +746,14 @@ static const uint8_t megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 {
 	if ((offset == 0x01) || (offset == 0x07))
-		m_apu->sound_w(space, megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
+		m_apu->sound_w(megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
 	else
-		m_apu->sound_w(space, megaduck_sound_offsets[offset], data);
+		m_apu->sound_w(megaduck_sound_offsets[offset], data);
 }
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 {
-	uint8_t data = m_apu->sound_r(space, megaduck_sound_offsets[offset]);
+	uint8_t data = m_apu->sound_r(megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x07))
 		return ((data & 0x0f)<<4) | ((data & 0xf0)>>4);
 	else
@@ -764,14 +763,14 @@ READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 {
 	if ((offset == 0x01) || (offset == 0x02))
-		m_apu->sound_w(space, 0x10 + megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
+		m_apu->sound_w(0x10 + megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
 	else
-		m_apu->sound_w(space, 0x10 + megaduck_sound_offsets[offset], data);
+		m_apu->sound_w(0x10 + megaduck_sound_offsets[offset], data);
 }
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r2)
 {
-	uint8_t data = m_apu->sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
+	uint8_t data = m_apu->sound_r(0x10 + megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x02))
 		return ((data & 0x0f)<<4) | ((data & 0xf0)>>4);
 	else

@@ -1,36 +1,33 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 #include "emu.h"
 #include "includes/scotrsht.h"
 
 
-/* Similar as Iron Horse */
-PALETTE_INIT_MEMBER(scotrsht_state, scotrsht)
+// Similar as Iron Horse
+void scotrsht_state::scotrsht_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i | 0x000]);
+		int const g = pal4bit(color_prom[i | 0x100]);
+		int const b = pal4bit(color_prom[i | 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* characters use colors 0x80-0xff, sprites use colors 0-0x7f */
-	for (i = 0; i < 0x200; i++)
+	// characters use colors 0x80-0xff, sprites use colors 0-0x7f
+	for (int i = 0; i < 0x200; i++)
 	{
-		int j;
-
-		for (j = 0; j < 8; j++)
+		for (int j = 0; j < 8; j++)
 		{
-			uint8_t ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
+			uint8_t const ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
 			palette.set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
@@ -56,7 +53,7 @@ WRITE8_MEMBER(scotrsht_state::charbank_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	/* other bits unknown */
+	// other bits unknown
 }
 
 WRITE8_MEMBER(scotrsht_state::palettebank_w)

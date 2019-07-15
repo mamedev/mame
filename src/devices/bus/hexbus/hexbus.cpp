@@ -128,6 +128,11 @@
     By default, instances of "hexbus_chained_device" own an outbound
     hexbus slot as a subdevice; this may be overwritten by subclasses.
 
+        Line state received via the Hexbus
+    +------+------+------+------+------+------+------+------+
+    | ADB3 | ADB2 |  -   | HSK* |  0   | BAV* | ADB1 | ADB0 |
+    +------+------+------+------+------+------+------+------+
+
     References
     ----------
 
@@ -145,8 +150,14 @@
 // Devices
 #include "hx5102.h"
 
+#define LOG_WRITE          (1U<<1)   // Write operation
+
+#define VERBOSE ( LOG_GENERAL )
+
+#include "logmacro.h"
+
 // Hexbus instance
-DEFINE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device,  "hexbus",  "Hexbus")
+DEFINE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device,  "hexbus",  "Hexbus connector")
 
 namespace bus { namespace hexbus {
 
@@ -226,24 +237,20 @@ void hexbus_chained_device::hexbus_write(uint8_t data)
 {
 	m_myvalue = data;
 
-	uint8_t inbound_value = 0xff;
-	uint8_t outbound_value = 0xff;
-
-	// Determine the current bus level from the values of the
-	// other devices left and right from us
-	if (m_hexbus_inbound != nullptr)
-		inbound_value = m_hexbus_inbound->read(INBOUND);
-
-	if (m_hexbus_outbound != nullptr)
-		outbound_value = m_hexbus_outbound->read(OUTBOUND);
+	uint8_t otherval = hexbus_get_levels();
+	// LOGMASKED(LOG_WRITE, ".. otherval=%02x\n", otherval);
 
 	// What is the new bus level?
-	uint8_t newvalue = inbound_value & outbound_value & m_myvalue;
+	// The data lines are not supposed to be set by multiple devices
+	// We assume that sending data overrides all data line levels.
+	// This is emulated by pulling the data lines to ones.
+	uint8_t newvalue = (otherval | 0xc3) & m_myvalue;
 
-	// If it changed, propagate to both directions.
-	if (newvalue != m_current_bus_value)
+	// If it changed (with respect to HSK* or BAV*), propagate to both directions.
+	if ((newvalue & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)) != (m_current_bus_value & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)))
 	{
-		hexbus_value_changed(newvalue);
+		LOGMASKED(LOG_WRITE, "Trying to write %02x, actually: %02x (current=%02x)\n", data, newvalue, m_current_bus_value);
+
 		m_current_bus_value = newvalue;
 
 		if (m_hexbus_inbound != nullptr)
@@ -251,7 +258,27 @@ void hexbus_chained_device::hexbus_write(uint8_t data)
 
 		if (m_hexbus_outbound != nullptr)
 			m_hexbus_outbound->write(OUTBOUND, m_current_bus_value);
+
 	}
+	else LOGMASKED(LOG_WRITE, "No change on hexbus\n");
+}
+
+/*
+    Get levels from other devices (without changing anything).
+*/
+uint8_t hexbus_chained_device::hexbus_get_levels()
+{
+	uint8_t inbound_value = 0xff;
+	uint8_t outbound_value = 0xff;
+
+	// other devices left and right from us
+	if (m_hexbus_inbound != nullptr)
+		inbound_value = m_hexbus_inbound->read(INBOUND);
+
+	if (m_hexbus_outbound != nullptr)
+		outbound_value = m_hexbus_outbound->read(OUTBOUND);
+
+	return (inbound_value & outbound_value);
 }
 
 /*
@@ -284,26 +311,39 @@ void hexbus_chained_device::bus_write(int dir, uint8_t data)
 {
 	hexbus_device* hexbuscont = (dir == INBOUND)? m_hexbus_inbound : m_hexbus_outbound;
 
-	// Notify device
-	if (data != m_current_bus_value)
-		hexbus_value_changed(data);
-
-	m_current_bus_value = data;
-
-	// Propagate
+	// Propagate this value first
 	if (hexbuscont != nullptr)
 		hexbuscont->write(dir, data);
+
+	uint8_t oldvalue = m_current_bus_value;
+	m_current_bus_value = data;
+
+	// Notify device
+	// Caution: Calling hexbus_value_changed may cause further activities that change the bus again
+	// Data changes alone shall not trigger the callback
+	if ((data & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)) != (oldvalue & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)))
+	{
+		LOGMASKED(LOG_WRITE, "Hexbus value changed: %02x -> %02x\n", oldvalue, data);
+		hexbus_value_changed(data);
+	}
 }
 
-MACHINE_CONFIG_START(hexbus_chained_device::device_add_mconfig)
-	MCFG_HEXBUS_ADD("hexbus")
-MACHINE_CONFIG_END
+/*
+    Convenience function to calculate the bus value. Used by subclasses.
+*/
+uint8_t hexbus_chained_device::to_line_state(uint8_t data, bool bav, bool hsk)
+{
+	uint8_t lines = ((data & 0x0c)<<4) | (data & 0x03);
+	if (!bav) lines |= 0x04;
+	if (!hsk) lines |= 0x10;
+	return lines;
+}
 
 // ------------------------------------------------------------------------
 
 }   }   // end namespace bus::hexbus
 
-SLOT_INTERFACE_START( hexbus_conn )
-	SLOT_INTERFACE("hx5102", HX5102)
-SLOT_INTERFACE_END
-
+void hexbus_options(device_slot_interface &device)
+{
+	device.option_add("hx5102", HX5102);
+}

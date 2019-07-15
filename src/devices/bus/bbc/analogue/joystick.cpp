@@ -130,5 +130,5 @@ uint8_t bbc_joystick_device::ch_r(int channel)
 
 uint8_t bbc_joystick_device::pb_r()
 {
-	return m_buttons->read();
+	return m_buttons->read() & 0x30;
 }

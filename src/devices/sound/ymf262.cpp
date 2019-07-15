@@ -1351,7 +1351,7 @@ static void OPL3_initalize(OPL3 *chip)
 	/* logerror("YMF262: freqbase=%f\n", chip->freqbase); */
 
 	/* Timer base time */
-	chip->TimerBase = attotime::from_hz(chip->clock) * (8*36);
+	chip->TimerBase = chip->clock ? attotime::from_hz(chip->clock) * (8 * 36) : attotime::zero;
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -1399,6 +1399,15 @@ static void OPL3_initalize(OPL3 *chip)
 	chip->eg_timer_overflow = ( 1 ) * (1<<EG_SH);
 	/*logerror("YMF262init eg_timer_add=%8x eg_timer_overflow=%8x\n", chip->eg_timer_add, chip->eg_timer_overflow);*/
 
+}
+
+static void OPL3_clock_changed(OPL3 *chip, int clock, int rate)
+{
+	chip->clock = clock;
+	chip->rate  = rate;
+
+	/* init global tables */
+	OPL3_initalize(chip);
 }
 
 static inline void FM_KEYON(OPL3_SLOT *SLOT, uint32_t key_set)
@@ -2360,11 +2369,7 @@ static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type)
 
 	chip->device = device;
 	chip->type  = type;
-	chip->clock = clock;
-	chip->rate  = rate;
-
-	/* init global tables */
-	OPL3_initalize(chip);
+	OPL3_clock_changed(chip, clock, rate);
 
 	/* reset chip */
 	OPL3ResetChip(chip);
@@ -2518,9 +2523,14 @@ static void OPL3_save_state(OPL3 *chip, device_t *device) {
 	device->save_item(NAME(chip->OPL3_mode));
 	device->save_item(NAME(chip->rhythm));
 
+	device->save_item(NAME(chip->T));
+	device->save_item(NAME(chip->st));
+
 	device->save_item(NAME(chip->address));
 	device->save_item(NAME(chip->status));
 	device->save_item(NAME(chip->statusmask));
+
+	device->save_item(NAME(chip->nts));
 }
 
 void * ymf262_init(device_t *device, int clock, int rate)
@@ -2529,6 +2539,11 @@ void * ymf262_init(device_t *device, int clock, int rate)
 	OPL3_save_state((OPL3 *)chip, device);
 
 	return chip;
+}
+
+void ymf262_clock_changed(void *chip, int clock, int rate)
+{
+	OPL3_clock_changed((OPL3 *)chip, clock, rate);
 }
 
 void ymf262_post_load(void *chip) {

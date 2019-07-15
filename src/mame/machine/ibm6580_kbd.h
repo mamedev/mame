@@ -5,24 +5,16 @@
 
 #pragma once
 
-
-#define MCFG_DW_KEYBOARD_OUT_DATA_HANDLER(_devcb) \
-	devcb = &dw_keyboard_device::set_out_data_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DW_KEYBOARD_OUT_CLOCK_HANDLER(_devcb) \
-	devcb = &dw_keyboard_device::set_out_clock_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DW_KEYBOARD_OUT_STROBE_HANDLER(_devcb) \
-	devcb = &dw_keyboard_device::set_out_strobe_handler(*device, DEVCB_##_devcb);
+#include "cpu/mcs48/mcs48.h"
 
 class dw_keyboard_device :  public device_t
 {
 public:
 	dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_data_handler(device_t &device, Object &&cb) { return downcast<dw_keyboard_device &>(device).m_out_data.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_clock_handler(device_t &device, Object &&cb) { return downcast<dw_keyboard_device &>(device).m_out_clock.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_strobe_handler(device_t &device, Object &&cb) { return downcast<dw_keyboard_device &>(device).m_out_strobe.set_callback(std::forward<Object>(cb)); }
+	auto out_data_handler() { return m_out_data.bind(); }
+	auto out_clock_handler() { return m_out_clock.bind(); }
+	auto out_strobe_handler() { return m_out_strobe.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	DECLARE_WRITE_LINE_MEMBER(ack_w);
@@ -46,7 +38,7 @@ private:
 	devcb_write_line m_out_data;
 	devcb_write_line m_out_clock;
 	devcb_write_line m_out_strobe;
-	required_device<cpu_device> m_mcu;
+	required_device<i8049_device> m_mcu;
 
 	DECLARE_WRITE8_MEMBER(bus_w);
 	DECLARE_READ8_MEMBER(bus_r);

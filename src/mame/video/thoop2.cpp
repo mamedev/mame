@@ -38,22 +38,11 @@
       1  | x------- -------- | flip y
 */
 
-TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen0)
+template<int Layer>
+TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info)
 {
-	int data = m_videoram[tile_index << 1];
-	int data2 = m_videoram[(tile_index << 1) + 1];
-	int code = ((data & 0xfffc) >> 2) | ((data & 0x0003) << 14);
-
-	tileinfo.category = (data2 >> 6) & 0x03;
-
-	SET_TILE_INFO_MEMBER(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
-}
-
-
-TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen1)
-{
-	int data = m_videoram[(0x1000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(0x1000/2) + (tile_index << 1) + 1];
+	int data = m_videoram[(Layer * 0x1000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(Layer * 0x1000/2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2) | ((data & 0x0003) << 14);
 
 	tileinfo.category = (data2 >> 6) & 0x03;
@@ -81,15 +70,15 @@ WRITE16_MEMBER(thoop2_state::vram_w)
 
 void thoop2_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
 	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 	m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 
 	for (int i = 0; i < 5; i++){
 		m_sprite_table[i] = std::make_unique<int[]>(512);
-		save_pointer(NAME(m_sprite_table[i].get()), 512, i);
+		save_pointer(NAME(m_sprite_table[i]), 512, i);
 	}
 
 	save_item(NAME(m_sprite_count));

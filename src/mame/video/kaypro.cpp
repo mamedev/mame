@@ -13,11 +13,11 @@
 
 ************************************************************/
 
-PALETTE_INIT_MEMBER(kaypro_state,kaypro)
+void kaypro_state::kaypro_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, rgb_t(0, 220, 0)); /* green */
-	palette.set_pen_color(2, rgb_t(0, 110, 0)); /* low intensity green */
+	palette.set_pen_color(1, rgb_t(0, 220, 0)); // green
+	palette.set_pen_color(2, rgb_t(0, 110, 0)); // low intensity green
 }
 
 uint32_t kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -247,7 +247,7 @@ void kaypro_state::mc6845_screen_configure()
 
 	/* Resize the screen */
 	if ((width < 640) && (height < 400) && (bytes < 0x800)) /* bounds checking to prevent an assert or violation */
-		machine().first_screen()->set_visible_area(0, width, 0, height);
+		m_screen->set_visible_area(0, width, 0, height);
 }
 
 
@@ -257,13 +257,13 @@ READ8_MEMBER( kaypro_state::kaypro484_status_r )
 {
 /* Need bit 7 high or computer hangs */
 
-	return 0x80 | m_crtc->register_r(space, 0);
+	return 0x80 | m_crtc->register_r();
 }
 
 WRITE8_MEMBER( kaypro_state::kaypro484_index_w )
 {
 	m_mc6845_ind = data & 0x1f;
-	m_crtc->address_w( space, 0, data );
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
@@ -275,7 +275,7 @@ WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
 	else
 		m_mc6845_reg[m_mc6845_ind] = data;
 
-	m_crtc->register_w( space, 0, data );
+	m_crtc->register_w(data);
 
 	if ((m_mc6845_ind == 1) || (m_mc6845_ind == 6) || (m_mc6845_ind == 9))
 		mc6845_screen_configure();          /* adjust screen size */

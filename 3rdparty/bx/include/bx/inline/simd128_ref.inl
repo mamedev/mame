@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,6 +9,9 @@
 
 namespace bx
 {
+	BX_CONST_FUNC float sqrt(float);
+	BX_CONST_FUNC float rsqrt(float);
+
 #define ELEMx 0
 #define ELEMy 1
 #define ELEMz 2
@@ -364,10 +367,10 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd_sqrt(simd128_ref_t _a)
 	{
 		simd128_ref_t result;
-		result.fxyzw[0] = fsqrt(_a.fxyzw[0]);
-		result.fxyzw[1] = fsqrt(_a.fxyzw[1]);
-		result.fxyzw[2] = fsqrt(_a.fxyzw[2]);
-		result.fxyzw[3] = fsqrt(_a.fxyzw[3]);
+		result.fxyzw[0] = sqrt(_a.fxyzw[0]);
+		result.fxyzw[1] = sqrt(_a.fxyzw[1]);
+		result.fxyzw[2] = sqrt(_a.fxyzw[2]);
+		result.fxyzw[3] = sqrt(_a.fxyzw[3]);
 		return result;
 	}
 
@@ -375,10 +378,10 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd_rsqrt_est(simd128_ref_t _a)
 	{
 		simd128_ref_t result;
-		result.fxyzw[0] = 1.0f / fsqrt(_a.fxyzw[0]);
-		result.fxyzw[1] = 1.0f / fsqrt(_a.fxyzw[1]);
-		result.fxyzw[2] = 1.0f / fsqrt(_a.fxyzw[2]);
-		result.fxyzw[3] = 1.0f / fsqrt(_a.fxyzw[3]);
+		result.fxyzw[0] = rsqrt(_a.fxyzw[0]);
+		result.fxyzw[1] = rsqrt(_a.fxyzw[1]);
+		result.fxyzw[2] = rsqrt(_a.fxyzw[2]);
+		result.fxyzw[3] = rsqrt(_a.fxyzw[3]);
 		return result;
 	}
 

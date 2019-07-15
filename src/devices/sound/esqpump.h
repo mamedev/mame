@@ -16,10 +16,11 @@
 class esq_5505_5510_pump_device : public device_t, public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	esq_5505_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_otis(es5505_device *otis) { m_otis = otis; }
-	void set_esp(es5510_device *esp) { m_esp = esp; }
+	template <typename T> void set_esp(T &&tag) { m_esp.set_tag(std::forward<T>(tag)); }
 	void set_esp_halted(bool esp_halted) {
 		m_esp_halted = esp_halted;
 		logerror("ESP-halted -> %d\n", m_esp_halted);
@@ -71,6 +72,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -86,11 +88,8 @@ private:
 	// per-sample timer
 	emu_timer *m_timer;
 
-	// OTIS sound generator
-	es5505_device *m_otis;
-
 	// ESP signal processor
-	es5510_device *m_esp;
+	required_device<es5510_device> m_esp;
 
 	// Is the ESP halted by the CPU?
 	bool m_esp_halted;
@@ -112,7 +111,7 @@ private:
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	int16_t e[0x4000];
+	std::unique_ptr<int16_t[]> e;
 	int ei;
 #endif
 };

@@ -70,6 +70,4 @@ protected:
 DECLARE_DEVICE_TYPE(HP_OPTROM_SLOT, hp_optrom_slot_device)
 DECLARE_DEVICE_TYPE(HP_OPTROM_CART, hp_optrom_cart_device)
 
-SLOT_INTERFACE_EXTERN(hp_optrom_slot_device);
-
 #endif // MAME_BUS_HP_OPTROMS_HP_OPTROM_H

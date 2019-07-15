@@ -45,19 +45,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_7474_OUTPUT_CB(_devcb) \
-	devcb = &ttl7474_device::set_output_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7474_COMP_OUTPUT_CB(_devcb) \
-	devcb = &ttl7474_device::set_comp_output_cb(*device, DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -71,8 +58,8 @@ public:
 	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_output_cb(device_t &device, Object &&cb) { return downcast<ttl7474_device &>(device).m_output_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_comp_output_cb(device_t &device, Object &&cb) { return downcast<ttl7474_device &>(device).m_comp_output_func.set_callback(std::forward<Object>(cb)); }
+	auto output_cb() { return m_output_func.bind(); }
+	auto comp_output_cb() { return m_comp_output_func.bind(); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( clear_w );

@@ -19,12 +19,6 @@
 /* if DOUBLE_WIDTH set, the horizontal resolution is doubled */
 #define TMS3556_DOUBLE_WIDTH 0
 
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_TMS3556_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TMS3556, 0)
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -33,8 +27,7 @@
 
 // ======================> tms3556_device
 
-class tms3556_device :  public device_t,
-						public device_memory_interface
+class tms3556_device : public device_t, public device_memory_interface, public device_video_interface
 {
 public:
 	static constexpr unsigned TOP_BORDER = 1;
@@ -45,7 +38,7 @@ public:
 	static constexpr unsigned TOTAL_HEIGHT = 250 + TOP_BORDER + BOTTOM_BORDER;
 
 	// construction/destruction
-	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
@@ -53,11 +46,10 @@ public:
 	DECLARE_WRITE8_MEMBER( reg_w );
 	DECLARE_READ8_MEMBER( initptr_r );
 
-	void interrupt(running_machine &machine);
+	void interrupt();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void tms3556(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,6 +57,7 @@ protected:
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+private:
 	// address space configurations
 	const address_space_config      m_space_config;
 
@@ -80,7 +73,8 @@ protected:
 	void draw_line(bitmap_ind16 &bmp, int line);
 	void interrupt_start_vblank(void);
 
-private:
+	void tms3556(address_map &map);
+
 	enum dma_mode_tt : u8 { dma_read, dma_write };
 
 	static constexpr uint8_t MODE_OFF    = 0;

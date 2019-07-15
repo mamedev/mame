@@ -9,16 +9,12 @@
 
 #pragma once
 
-#define MCFG_K007232_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &k007232_device::set_port_write_handler(*device, DEVCB_##_devcb);
-
-
 class k007232_device : public device_t, public device_sound_interface
 {
 public:
 	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(std::forward<Object>(cb)); }
+	auto port_write() { return m_port_write_handler.bind(); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );

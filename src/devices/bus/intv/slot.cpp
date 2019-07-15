@@ -488,10 +488,10 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
  read_ay
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_cart_slot_device::read_ay)
+uint16_t intv_cart_slot_device::read_ay(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ay(space, offset, mem_mask);
+		return m_cart->read_ay(offset);
 	else
 		return 0xffff;
 }
@@ -500,20 +500,20 @@ READ16_MEMBER(intv_cart_slot_device::read_ay)
  write_ay
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_cart_slot_device::write_ay)
+void intv_cart_slot_device::write_ay(offs_t offset, uint16_t data)
 {
 	if (m_cart)
-		m_cart->write_ay(space, offset, data, mem_mask);
+		m_cart->write_ay(offset, data);
 }
 
 /*-------------------------------------------------
  read_speech
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_cart_slot_device::read_speech)
+uint16_t intv_cart_slot_device::read_speech(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_speech(space, offset, mem_mask);
+		return m_cart->read_speech(offset);
 	else
 		return 0xffff;
 }
@@ -522,10 +522,10 @@ READ16_MEMBER(intv_cart_slot_device::read_speech)
  write_speech
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_cart_slot_device::write_speech)
+void intv_cart_slot_device::write_speech(offs_t offset, uint16_t data)
 {
 	if (m_cart)
-		m_cart->write_speech(space, offset, data, mem_mask);
+		m_cart->write_speech(offset, data);
 }
 
 
@@ -535,12 +535,13 @@ WRITE16_MEMBER(intv_cart_slot_device::write_speech)
 //#include "bus/intv/keycomp.h"
 #include "bus/intv/voice.h"
 
-SLOT_INTERFACE_START(intv_cart)
-	SLOT_INTERFACE_INTERNAL("intv_rom",     INTV_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("intv_ram",     INTV_ROM_RAM)
-	SLOT_INTERFACE_INTERNAL("intv_gfact",   INTV_ROM_GFACT)
-	SLOT_INTERFACE_INTERNAL("intv_wsmlb",   INTV_ROM_WSMLB)
-	SLOT_INTERFACE_INTERNAL("intv_voice",   INTV_ROM_VOICE)
-	SLOT_INTERFACE_INTERNAL("intv_ecs",     INTV_ROM_ECS)
-//  SLOT_INTERFACE_INTERNAL("intv_keycomp", INTV_ROM_KEYCOMP)
-SLOT_INTERFACE_END
+void intv_cart(device_slot_interface &device)
+{
+	device.option_add_internal("intv_rom",     INTV_ROM_STD);
+	device.option_add_internal("intv_ram",     INTV_ROM_RAM);
+	device.option_add_internal("intv_gfact",   INTV_ROM_GFACT);
+	device.option_add_internal("intv_wsmlb",   INTV_ROM_WSMLB);
+	device.option_add_internal("intv_voice",   INTV_ROM_VOICE);
+	device.option_add_internal("intv_ecs",     INTV_ROM_ECS);
+//  device.option_add_internal("intv_keycomp", INTV_ROM_KEYCOMP);
+}

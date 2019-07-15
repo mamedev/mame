@@ -168,8 +168,6 @@ void speaker_sound_device::device_start()
 	save_item(NAME(m_last_update_time));
 	save_item(NAME(m_prevx));
 	save_item(NAME(m_prevy));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(speaker_sound_device::speaker_postload), this));
 }
 
 void speaker_sound_device::device_reset()
@@ -193,7 +191,7 @@ void speaker_sound_device::device_reset()
 	m_prevx = m_prevy = 0.0;
 }
 
-void speaker_sound_device::speaker_postload()
+void speaker_sound_device::device_post_load()
 {
 	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
 	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);

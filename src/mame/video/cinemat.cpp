@@ -7,25 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/ccpu/ccpu.h"
 #include "includes/cinemat.h"
-
-
-/*************************************
- *
- *  Constants
- *
- *************************************/
-
-enum
-{
-	COLOR_BILEVEL,
-	COLOR_16LEVEL,
-	COLOR_64LEVEL,
-	COLOR_RGB,
-	COLOR_QB3
-};
-
 
 
 /*************************************
@@ -40,10 +22,10 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
 	int intensity = 0xff;
 
 	/* adjust for slop */
-	sx = sx - visarea.min_x;
-	ex = ex - visarea.min_x;
-	sy = sy - visarea.min_y;
-	ey = ey - visarea.min_y;
+	sx -= visarea.left();
+	ex -= visarea.left();
+	sy -= visarea.top();
+	ey -= visarea.top();
 
 	/* point intensity is determined by the shift value */
 	if (sx == ex && sy == ey)
@@ -71,124 +53,85 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
 
 WRITE_LINE_MEMBER(cinemat_state::vector_control_w)
 {
-	int r, g, b, i;
-	cpu_device *cpu = m_maincpu;
+	/* color is either bright or dim, selected by the value sent to the port */
+	m_vector_color = state ? rgb_t(0x80,0x80,0x80) : rgb_t(0xff,0xff,0xff);
+}
 
-	switch (m_color_mode)
+
+WRITE_LINE_MEMBER(cinemat_16level_state::vector_control_w)
+{
+	/* on the rising edge of the data value, latch bits 0-3 of the */
+	/* X register as the intensity */
+	if (state)
 	{
-		case COLOR_BILEVEL:
-			/* color is either bright or dim, selected by the value sent to the port */
-			m_vector_color = state ? rgb_t(0x80,0x80,0x80) : rgb_t(0xff,0xff,0xff);
-			break;
-
-		case COLOR_16LEVEL:
-			/* on the rising edge of the data value, latch bits 0-3 of the */
-			/* X register as the intensity */
-			if (state)
-			{
-				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X) & 0x0f;
-				i = (xval + 1) * 255 / 16;
-				m_vector_color = rgb_t(i,i,i);
-			}
-			break;
-
-		case COLOR_64LEVEL:
-			/* on the rising edge of the data value, latch bits 2-7 of the */
-			/* X register as the intensity */
-			if (state)
-			{
-				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X);
-				xval = (~xval >> 2) & 0x3f;
-				i = (xval + 1) * 255 / 64;
-				m_vector_color = rgb_t(i,i,i);
-			}
-			break;
-
-		case COLOR_RGB:
-			/* on the rising edge of the data value, latch the X register */
-			/* as 4-4-4 BGR values */
-			if (state)
-			{
-				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X);
-				r = (~xval >> 0) & 0x0f;
-				r = r * 255 / 15;
-				g = (~xval >> 4) & 0x0f;
-				g = g * 255 / 15;
-				b = (~xval >> 8) & 0x0f;
-				b = b * 255 / 15;
-				m_vector_color = rgb_t(r,g,b);
-			}
-			break;
-
-		case COLOR_QB3:
-			{
-				/* on the falling edge of the data value, remember the original X,Y values */
-				/* they will be restored on the rising edge; this is to simulate the fact */
-				/* that the Rockola color hardware did not overwrite the beam X,Y position */
-				/* on an IV instruction if data == 0 here */
-				if (!state)
-				{
-					m_qb3_lastx = cpu->state_int(ccpu_cpu_device::CCPU_X);
-					m_qb3_lasty = cpu->state_int(ccpu_cpu_device::CCPU_Y);
-				}
-
-				/* on the rising edge of the data value, latch the Y register */
-				/* as 2-3-3 BGR values */
-				if (state)
-				{
-					int yval = cpu->state_int(ccpu_cpu_device::CCPU_Y);
-					r = (~yval >> 0) & 0x07;
-					r = r * 255 / 7;
-					g = (~yval >> 3) & 0x07;
-					g = g * 255 / 7;
-					b = (~yval >> 6) & 0x03;
-					b = b * 255 / 3;
-					m_vector_color = rgb_t(r,g,b);
-
-					/* restore the original X,Y values */
-					cpu->set_state_int(ccpu_cpu_device::CCPU_X, m_qb3_lastx);
-					cpu->set_state_int(ccpu_cpu_device::CCPU_Y, m_qb3_lasty);
-				}
-			}
-			break;
+		int xval = m_maincpu->state_int(ccpu_cpu_device::CCPU_X) & 0x0f;
+		int i = (xval + 1) * 255 / 16;
+		m_vector_color = rgb_t(i,i,i);
 	}
 }
 
 
-
-/*************************************
- *
- *  Video startup
- *
- *************************************/
-
-void cinemat_state::video_start()
+WRITE_LINE_MEMBER(cinemat_64level_state::vector_control_w)
 {
-	m_color_mode = COLOR_BILEVEL;
+	/* on the rising edge of the data value, latch bits 2-7 of the */
+	/* X register as the intensity */
+	if (state)
+	{
+		int xval = m_maincpu->state_int(ccpu_cpu_device::CCPU_X);
+		xval = (~xval >> 2) & 0x3f;
+		int i = (xval + 1) * 255 / 64;
+		m_vector_color = rgb_t(i, i, i);
+	}
 }
 
 
-VIDEO_START_MEMBER(cinemat_state,cinemat_16level)
+WRITE_LINE_MEMBER(cinemat_color_state::vector_control_w)
 {
-	m_color_mode = COLOR_16LEVEL;
+	/* on the rising edge of the data value, latch the X register */
+	/* as 4-4-4 BGR values */
+	if (state)
+	{
+		int xval = m_maincpu->state_int(ccpu_cpu_device::CCPU_X);
+		int r = (~xval >> 0) & 0x0f;
+		r = r * 255 / 15;
+		int g = (~xval >> 4) & 0x0f;
+		g = g * 255 / 15;
+		int b = (~xval >> 8) & 0x0f;
+		b = b * 255 / 15;
+		m_vector_color = rgb_t(r,g,b);
+	}
 }
 
 
-VIDEO_START_MEMBER(cinemat_state,cinemat_64level)
+WRITE_LINE_MEMBER(qb3_state::vector_control_w)
 {
-	m_color_mode = COLOR_64LEVEL;
-}
+	/* on the falling edge of the data value, remember the original X,Y values */
+	/* they will be restored on the rising edge; this is to simulate the fact */
+	/* that the Rockola color hardware did not overwrite the beam X,Y position */
+	/* on an IV instruction if data == 0 here */
+	if (!state)
+	{
+		m_qb3_lastx = m_maincpu->state_int(ccpu_cpu_device::CCPU_X);
+		m_qb3_lasty = m_maincpu->state_int(ccpu_cpu_device::CCPU_Y);
+	}
 
+	/* on the rising edge of the data value, latch the Y register */
+	/* as 2-3-3 BGR values */
+	if (state)
+	{
+		int yval = m_maincpu->state_int(ccpu_cpu_device::CCPU_Y);
+		int r = (~yval >> 0) & 0x07;
+		r = r * 255 / 7;
+		int g = (~yval >> 3) & 0x07;
+		g = g * 255 / 7;
+		int b = (~yval >> 6) & 0x03;
+		b = b * 255 / 3;
+		m_vector_color = rgb_t(r,g,b);
 
-VIDEO_START_MEMBER(cinemat_state,cinemat_color)
-{
-	m_color_mode = COLOR_RGB;
-}
-
-
-VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
-{
-	m_color_mode = COLOR_QB3;
+		/* restore the original X,Y values */
+		m_maincpu->set_state_int(ccpu_cpu_device::CCPU_X, m_qb3_lastx);
+		m_maincpu->set_state_int(ccpu_cpu_device::CCPU_Y, m_qb3_lasty);
+	}
 }
 
 
@@ -219,20 +162,20 @@ uint32_t cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb3
 
 uint32_t cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int sw_option = ioport("INPUTS")->read();
+	int sw_option = ~m_inputs->read();
 
 	screen_update_cinemat(screen, bitmap, cliprect);
 
 	/* set the state of the artwork */
-	output().set_value("pressed3", (~sw_option >> 0) & 1);
-	output().set_value("pressed8", (~sw_option >> 1) & 1);
-	output().set_value("pressed4", (~sw_option >> 2) & 1);
-	output().set_value("pressed9", (~sw_option >> 3) & 1);
-	output().set_value("pressed1", (~sw_option >> 4) & 1);
-	output().set_value("pressed6", (~sw_option >> 5) & 1);
-	output().set_value("pressed2", (~sw_option >> 6) & 1);
-	output().set_value("pressed7", (~sw_option >> 7) & 1);
-	output().set_value("pressed5", (~sw_option >> 10) & 1);
-	output().set_value("pressed0", (~sw_option >> 11) & 1);
+	m_pressed[3] = BIT(sw_option, 0);
+	m_pressed[8] = BIT(sw_option, 1);
+	m_pressed[4] = BIT(sw_option, 2);
+	m_pressed[9] = BIT(sw_option, 3);
+	m_pressed[1] = BIT(sw_option, 4);
+	m_pressed[6] = BIT(sw_option, 5);
+	m_pressed[2] = BIT(sw_option, 6);
+	m_pressed[7] = BIT(sw_option, 7);
+	m_pressed[5] = BIT(sw_option, 10);
+	m_pressed[0] = BIT(sw_option, 11);
 	return 0;
 }

@@ -15,16 +15,6 @@
 #include "video/huc6272.h"
 
 
-#define MCFG_HUC6261_VDC1(_tag) \
-	huc6261_device::set_vdc1_tag(*device, _tag);
-
-#define MCFG_HUC6261_VDC2(_tag) \
-	huc6261_device::set_vdc2_tag(*device, _tag);
-
-#define MCFG_HUC6261_KING(_tag) \
-	huc6261_device::set_king_tag(*device, _tag);
-
-
 class huc6261_device :  public device_t,
 						public device_video_interface
 {
@@ -36,9 +26,9 @@ public:
 	// construction/destruction
 	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_vdc1_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_a_tag = tag; }
-	static void set_vdc2_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_b_tag = tag; }
-	static void set_king_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6272_tag = tag; }
+	template <typename T> void set_vdc1_tag(T &&tag) { m_huc6270_a.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_vdc2_tag(T &&tag) { m_huc6270_b.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_king_tag(T &&tag) { m_huc6272.set_tag(std::forward<T>(tag)); }
 
 	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( read );
@@ -51,13 +41,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	const char *m_huc6270_a_tag;
-	const char *m_huc6270_b_tag;
-	const char *m_huc6272_tag;
-
-	huc6270_device *m_huc6270_a;
-	huc6270_device *m_huc6270_b;
-	huc6272_device *m_huc6272;
+	required_device<huc6270_device> m_huc6270_a;
+	required_device<huc6270_device> m_huc6270_b;
+	required_device<huc6272_device> m_huc6272;
 	int     m_last_h;
 	int     m_last_v;
 	int     m_height;

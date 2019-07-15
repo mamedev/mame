@@ -362,7 +362,6 @@ void skns_state::video_start()
 	m_gfxdecode->gfx(2)->set_granularity(256);
 	m_gfxdecode->gfx(3)->set_granularity(256);
 
-
 	save_item(NAME(m_depthA));
 	save_item(NAME(m_depthB));
 	save_item(NAME(m_use_spc_bright));
@@ -404,7 +403,6 @@ void skns_state::draw_a( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const 
 	int enable_a  = (m_v3_regs[0x10/4] >> 0) & 0x0001;
 	int nowrap_a = (m_v3_regs[0x10/4] >> 0) & 0x0004;
 
-
 	uint32_t startx,starty;
 	int incxx,incxy,incyx,incyy;
 	int columnscroll;
@@ -434,7 +432,6 @@ void skns_state::draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const 
 	int enable_b  = (m_v3_regs[0x34/4] >> 0) & 0x0001;
 	int nowrap_b = (m_v3_regs[0x34/4] >> 0) & 0x0004;
 
-
 	uint32_t startx,starty;
 	int incxx,incxy,incyx,incyy;
 	int columnscroll;
@@ -451,11 +448,11 @@ void skns_state::draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const 
 		incxy  = m_v3_regs[0x4c/4];
 		incxx  = m_v3_regs[0x48/4]&0x7ffff;
 		if (incxx&0x40000) incxx = incxx-0x80000;
+
 		columnscroll = (m_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
+
 		draw_roz(bitmap,bitmap_flags, cliprect, m_tilemap_B, startx << 8,starty << 8,   incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &m_v3slc_ram[0x1000/4]);
-
 		//popmessage("%08x %08x %08x %08x %08x %08x", startx, starty, incxx, incyy, incxy, incyx);
-
 	}
 }
 
@@ -493,8 +490,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			const pen_t *clut = &m_palette->pen(0);
 //          int drawpri;
 
-
-			for (y=0;y<240;y++)
+			for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 			{
 				src = &m_tilemap_bitmap_lower.pix16(y);
 				srcflags = &m_tilemap_bitmapflags_lower.pix8(y);
@@ -506,8 +502,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 				dst = &bitmap.pix32(y);
 
-
-				for (x=0;x<320;x++)
+				for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 				{
 					uint16_t pendata  = src[x]&0x7fff;
 					uint16_t pendata2 = src2[x]&0x7fff;
@@ -542,7 +537,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 						else
 						{
 							bgpendata = pendata2&0x7fff;
-							bgpri = 0;;
+							bgpri = 0;
 						}
 					}
 					else
@@ -560,7 +555,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 						else
 						{
 							bgpendata = 0;
-							bgpri = 0;;
+							bgpri = 0;
 						}
 					}
 
@@ -603,10 +598,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 								if (b>255) b = 255;
 
 								dst[x] = (r << 0) | (g << 8) | (b << 16);
-
-
 							}
-
 							else
 							{
 								coldat = clut[pendata3];
@@ -624,17 +616,13 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 						coldat = clut[bgpendata];
 						dst[x] = coldat;
 					}
-
 				}
 			}
 		}
 	}
 
-	m_sprite_bitmap.fill(0x0000, cliprect);
-
 	if (m_alt_enable_sprites)
-		m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_spc_regs );
-
+		m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_spc_regs ); // TODO : not all 0x4000 of the sprite RAM area can be displayed on real hardware
 
 	return 0;
 }

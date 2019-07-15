@@ -79,7 +79,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 {
 	m_misc = data & 0x7f;
 	/* Multi Player Start */
-	output().set_led_value(1, !((data >> 6) & 0x01));
+	m_leds[1] = BIT(~data, 6);
 }
 
 
@@ -90,28 +90,29 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(copsnrob_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0500, 0x0507) AM_DEVWRITE("latch", f9334_device, write_d0)
-	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_SHARE("trucky")
-	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_SHARE("truckram")
-	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x0900, 0x0903) AM_WRITEONLY AM_SHARE("carimage")
-	AM_RANGE(0x0a00, 0x0a03) AM_WRITEONLY AM_SHARE("cary")
-	AM_RANGE(0x0b00, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(copsnrob_misc2_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("CTRL1")
-	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("CTRL2")
-	AM_RANGE(0x100a, 0x100a) AM_READ_PORT("CTRL3")
-	AM_RANGE(0x100e, 0x100e) AM_READ_PORT("CTRL4")
-	AM_RANGE(0x1012, 0x1012) AM_READ_PORT("DSW")
-	AM_RANGE(0x1016, 0x1016) AM_READ_PORT("IN1")
-	AM_RANGE(0x101a, 0x101a) AM_READ_PORT("IN2")
-	AM_RANGE(0x1200, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void copsnrob_state::main_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0500, 0x0507).w("latch", FUNC(f9334_device::write_d0));
+	map(0x0600, 0x0600).writeonly().share("trucky");
+	map(0x0700, 0x07ff).writeonly().share("truckram");
+	map(0x0800, 0x08ff).ram().share("bulletsram");
+	map(0x0900, 0x0903).writeonly().share("carimage");
+	map(0x0a00, 0x0a03).writeonly().share("cary");
+	map(0x0b00, 0x0bff).ram();
+	map(0x0c00, 0x0fff).ram().share("videoram");
+	map(0x1000, 0x1000).r(FUNC(copsnrob_state::copsnrob_misc_r));
+	map(0x1000, 0x1000).w(FUNC(copsnrob_state::copsnrob_misc2_w));
+	map(0x1002, 0x1002).portr("CTRL1");
+	map(0x1006, 0x1006).portr("CTRL2");
+	map(0x100a, 0x100a).portr("CTRL3");
+	map(0x100e, 0x100e).portr("CTRL4");
+	map(0x1012, 0x1012).portr("DSW");
+	map(0x1016, 0x1016).portr("IN1");
+	map(0x101a, 0x101a).portr("IN2");
+	map(0x1200, 0x1fff).rom();
+}
 
 
 
@@ -219,7 +220,7 @@ static const gfx_layout trucklayout =
 };
 
 
-static GFXDECODE_START( copsnrob )
+static GFXDECODE_START( gfx_copsnrob )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, carlayout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, trucklayout, 0, 1 )
@@ -237,6 +238,7 @@ void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_ic_h3_data));
 	save_item(NAME(m_misc));
+	m_leds.resolve();
 }
 
 void copsnrob_state::machine_reset()
@@ -246,26 +248,26 @@ void copsnrob_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(copsnrob_state::copsnrob)
-
+void copsnrob_state::copsnrob(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, 14318180/16);      /* 894886.25 kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &copsnrob_state::main_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(copsnrob_state, screen_update_copsnrob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 26*8-1);
+	m_screen->set_screen_update(FUNC(copsnrob_state::screen_update_copsnrob));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", copsnrob)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_copsnrob);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	copsnrob_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -313,4 +315,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob_state, 0, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_copsnrob )
+GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob_state, empty_init, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_copsnrob )

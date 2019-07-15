@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu, AJR
 /***************************************************************************
 
         DEC VT100 keyboard emulation
@@ -11,17 +11,10 @@
 
 #pragma once
 
-#include "machine/timer.h"
+#include "machine/ay31015.h"
+#include "machine/ripple_counter.h"
 #include "sound/beep.h"
 #include "speaker.h"
-
-
-//**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VT100_KEYBOARD_INT_CALLBACK(_devcb) \
-	devcb = &vt100_keyboard_device::set_int_callback(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -36,34 +29,69 @@ public:
 	// construction/destruction
 	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	template <class Object> static devcb_base &set_int_callback(device_t &device, Object &&cb) { return downcast<vt100_keyboard_device &>(device).m_int_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration
+	auto signal_out_callback() { return m_signal_out_cb.bind(); }
 
-	// accessors (for now)
-	void control_w(u8 data);
-	u8 key_code_r();
+	DECLARE_WRITE_LINE_MEMBER(signal_line_w);
 
 protected:
+	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual bool scan_enabled() const { return m_uart->tbmt_r(); }
+	virtual void scan_start() { }
+
 private:
 	// internal helpers
-	static u8 bit_sel(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(signal_out_w);
+	DECLARE_WRITE_LINE_MEMBER(scan_disable_w);
+	DECLARE_WRITE8_MEMBER(key_scan_w);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scan_callback);
+	devcb_write_line m_signal_out_cb;
 
-	devcb_write_line m_int_cb;
-
+	required_device<ay31015_device> m_uart;
 	required_device<beep_device> m_speaker;
+	required_device<ripple_counter_device> m_scan_counter;
 	required_ioport_array<16> m_key_row;
-	bool m_key_scan;
-	u8 m_key_code;
+
+	output_finder<> m_online_led;
+	output_finder<> m_local_led;
+	output_finder<> m_locked_led;
+	output_finder<4> m_ln_led;
+
+	bool m_signal_line;
+	attotime m_last_signal_change;
+	u8 m_last_scan;
 };
 
-// device type definition
+// ======================> ms7002_device
+
+class ms7002_device : public vt100_keyboard_device
+{
+public:
+	// construction/destruction
+	ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	virtual bool scan_enabled() const override { return m_scan_enable; }
+	virtual void scan_start() override { m_scan_enable = true; }
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(scan_disable_w);
+
+	bool m_scan_enable;
+};
+
+// device type definitions
 DECLARE_DEVICE_TYPE(VT100_KEYBOARD, vt100_keyboard_device)
+DECLARE_DEVICE_TYPE(MS7002, ms7002_device)
 
 #endif // MAME_MACHINE_VT100_KBD_H

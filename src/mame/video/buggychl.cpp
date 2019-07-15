@@ -4,11 +4,11 @@
 #include "includes/buggychl.h"
 
 
-PALETTE_INIT_MEMBER(buggychl_state, buggychl)
+void buggychl_state::buggychl_palette(palette_device &palette) const
 {
-	/* arbitrary blue shading for the sky, estimation */
+	// arbitrary blue shading for the sky, estimation
 	for (int i = 0; i < 128; i++)
-		palette.set_pen_color(i + 128, rgb_t(0, 240-i, 255));
+		palette.set_pen_color(i + 128, rgb_t(0, 240 - i, 255));
 }
 
 void buggychl_state::video_start()
@@ -64,7 +64,7 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
 	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
 
 	machine().bookkeeping().coin_lockout_global_w((~data & 0x40) >> 6);
-	output().set_led_value(0, ~data & 0x80);
+	m_led[0] = BIT(~data, 7);
 }
 
 WRITE8_MEMBER(buggychl_state::buggychl_bg_scrollx_w)

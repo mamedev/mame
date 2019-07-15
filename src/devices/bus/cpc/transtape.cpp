@@ -45,7 +45,7 @@ ioport_constructor cpc_transtape_device::device_input_ports() const
 cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_TRANSTAPE, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
-	m_slot(nullptr), m_cpu(nullptr), m_space(nullptr), m_ram(nullptr),
+	m_slot(nullptr), m_space(nullptr), m_ram(nullptr),
 	m_rom_active(false),
 	m_romen(true),
 	m_output(0)
@@ -59,8 +59,7 @@ cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const 
 void cpc_transtape_device::device_start()
 {
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
-	m_cpu = static_cast<cpu_device*>(machine().device("maincpu"));
-	m_space = &m_cpu->space(AS_IO);
+	m_space = &m_slot->cpu().space(AS_IO);
 
 	m_ram = make_unique_clear<uint8_t[]>(0x2000);
 
@@ -103,7 +102,7 @@ INPUT_CHANGED_MEMBER(cpc_transtape_device::button_red_w)
 	{
 		m_output |= 0x1f;
 		map_enable();
-		m_cpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_slot->cpu().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -114,7 +113,7 @@ INPUT_CHANGED_MEMBER(cpc_transtape_device::button_black_w)
 	{
 		m_output |= 0x1f;
 		map_enable();
-		m_cpu->set_pc(0);
+		m_slot->cpu().set_pc(0);
 	}
 }
 

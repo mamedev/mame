@@ -10,13 +10,13 @@
 //#define LOG_NV2A
 #define DEBUG_CHECKS // enable for debugging
 
-const char *vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
-const char *vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
-const int vertex_program_disassembler::scapar2[] = { 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-const char *vertex_program_disassembler::vecops[] = { "NOP", "MOV", "MUL", "ADD", "MAD", "DP3", "DPH", "DP4", "DST", "MIN", "MAX", "SLT", "SGE", "ARL", "???", "???", "???" };
-const int vertex_program_disassembler::vecpar2[] = { 0, 4, 6, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 4, 0, 0, 0 };
-const char *vertex_program_disassembler::vecouts[] = { "oPos", "???", "???", "oD0", "oD1", "oFog", "oPts", "oB0", "oB1", "oT0", "oT1", "oT2", "oT3" };
-const char vertex_program_disassembler::compchar[] = { 'x', 'y', 'z', 'w' };
+char const *const vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
+char const *const vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
+int const vertex_program_disassembler::scapar2[] = { 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+char const *const vertex_program_disassembler::vecops[] = { "NOP", "MOV", "MUL", "ADD", "MAD", "DP3", "DPH", "DP4", "DST", "MIN", "MAX", "SLT", "SGE", "ARL", "???", "???", "???" };
+int const vertex_program_disassembler::vecpar2[] = { 0, 4, 6, 5, 7, 6, 6, 6, 6, 6, 6, 6, 6, 4, 0, 0, 0 };
+char const *const vertex_program_disassembler::vecouts[] = { "oPos", "???", "???", "oD0", "oD1", "oFog", "oPts", "oB0", "oB1", "oT0", "oT1", "oT2", "oT3" };
+char const vertex_program_disassembler::compchar[] = { 'x', 'y', 'z', 'w' };
 
 /*
 Each vertex program instruction is a 128 bit word made of the fields:
@@ -4852,10 +4852,14 @@ void nv2a_renderer::savestate_items()
 {
 }
 
+void nv2a_renderer::set_ram_base(void *base)
+{
+	basemempointer = (uint8_t*)base;
+	topmempointer = basemempointer + 512 * 1024 * 1024 - 1;
+}
+
 void nv2a_renderer::start(address_space *cpu_space)
 {
-	basemempointer = (uint8_t *)cpu_space->get_read_ptr(0);
-	topmempointer = basemempointer + 512 * 1024 * 1024 - 1;
 	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nv2a_renderer::puller_timer_work), this), (void *)"NV2A Puller Timer");
 	puller_timer->enable(false);
 }

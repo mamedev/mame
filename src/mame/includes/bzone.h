@@ -5,10 +5,16 @@
     Atari Battle Zone hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_BZONE_H
+#define MAME_INCLUDES_BZONE_H
+
+#pragma once
 
 #include "audio/redbaron.h"
+#include "machine/er2055.h"
 #include "machine/mathbox.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 #define BZONE_MASTER_CLOCK (XTAL(12'096'000))
 #define BZONE_CLOCK_3KHZ   (BZONE_MASTER_CLOCK / 4096)
@@ -16,36 +22,71 @@
 class bzone_state : public driver_device
 {
 public:
-	bzone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bzone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
 		m_discrete(*this, "discrete"),
-		m_redbaronsound(*this, "custom")
-		{ }
+		m_screen(*this, "screen"),
+		m_startled(*this, "startled")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	void init_bradley();
+	void bzone(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(bzone_coin_counter_w);
+	DECLARE_READ8_MEMBER(analog_data_r);
+	DECLARE_WRITE8_MEMBER(analog_select_w);
+	virtual void machine_start() override;
+	INTERRUPT_GEN_MEMBER(bzone_interrupt);
+	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
+
+	void bzone_base(machine_config &config);
+	void bzone_audio(machine_config &config);
+	void bzone_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	optional_device<discrete_device> m_discrete;
-	optional_device<redbaron_sound_device> m_redbaronsound;
+	required_device<screen_device> m_screen;
+	output_finder<> m_startled;
 
+private:
 	uint8_t m_analog_data;
-	uint8_t m_rb_input_select;
-	DECLARE_WRITE8_MEMBER(bzone_coin_counter_w);
-	DECLARE_READ8_MEMBER(analog_data_r);
-	DECLARE_WRITE8_MEMBER(analog_select_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+};
+
+
+class redbaron_state : public bzone_state
+{
+public:
+	redbaron_state(const machine_config &mconfig, device_type type, const char *tag) :
+		bzone_state(mconfig, type, tag),
+		m_earom(*this, "earom"),
+		m_redbaronsound(*this, "custom"),
+		m_fake_ports(*this, "FAKE%u", 1U)
+	{ }
+
+	void redbaron(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(redbaron_joy_r);
 	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
-	DECLARE_DRIVER_INIT(bradley);
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
+
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(redbaron);
-	INTERRUPT_GEN_MEMBER(bzone_interrupt);
-	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
-	void bzone_base(machine_config &config);
-	void redbaron(machine_config &config);
-	void bzone(machine_config &config);
-	void bzone_audio(machine_config &config);
-	void bzone_map(address_map &map);
+	virtual void machine_reset() override;
+
 	void redbaron_map(address_map &map);
+
+private:
+	required_device<er2055_device> m_earom;
+	required_device<redbaron_sound_device> m_redbaronsound;
+	required_ioport_array<2> m_fake_ports;
+	uint8_t m_rb_input_select;
 };
+
+#endif // MAME_INCLUDES_BZONE_H

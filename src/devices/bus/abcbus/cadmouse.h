@@ -24,7 +24,7 @@ public:
 
 protected:
 	void abc_cadmouse_mem(address_map &map);
-	void abc_cadmouse_io(address_map &map);	
+	void abc_cadmouse_io(address_map &map);
 
 	// device-level overrides
 	virtual void device_start() override;

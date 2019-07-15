@@ -52,7 +52,7 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 		m_cb2_handler(*this),
 		m_irqa_handler(*this),
 		m_irqb_handler(*this), m_in_a(0),
-		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_out_ca2(0), m_port_a_z_mask(0), m_ddr_a(0),
+		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_out_ca2(0), m_ddr_a(0),
 		m_ctl_a(0), m_irq_a1(0), m_irq_a2(0),
 		m_irq_a_state(0), m_in_b(0),
 		m_in_cb1(0), m_in_cb2(0), m_out_b(0), m_out_cb2(0), m_last_out_cb2_z(0), m_ddr_b(0),
@@ -90,7 +90,6 @@ void pia6821_device::device_start()
 	save_item(NAME(m_in_ca2));
 	save_item(NAME(m_out_a));
 	save_item(NAME(m_out_ca2));
-	save_item(NAME(m_port_a_z_mask));
 	save_item(NAME(m_ddr_a));
 	save_item(NAME(m_ctl_a));
 	save_item(NAME(m_irq_a1));
@@ -137,7 +136,6 @@ void pia6821_device::device_reset()
 	m_in_ca2 = true;
 	m_out_a = 0;
 	m_out_ca2 = 0;
-	m_port_a_z_mask = 0;
 	m_ddr_a = 0;
 	m_ctl_a = 0;
 	m_irq_a1 = 0;
@@ -226,8 +224,8 @@ uint8_t pia6821_device::get_in_a_value()
 		}
 		else
 		{
-			// mark all pins disconnected
-			m_port_a_z_mask = 0xff;
+			// assume pins are disconnected and simulate the internal pullups.
+			port_a_data = 0xff;
 
 			if (!m_logged_port_a_not_connected && (m_ddr_a != 0xff))
 			{
@@ -237,12 +235,12 @@ uint8_t pia6821_device::get_in_a_value()
 		}
 	}
 
-	// - connected pins are always read
-	// - disconnected pins read the output buffer in output mode
-	// - disconnected pins are HI in input mode
-	ret = (~m_port_a_z_mask             & port_a_data) |
-			( m_port_a_z_mask &  m_ddr_a & m_out_a) |
-			( m_port_a_z_mask & ~m_ddr_a);
+	// For port A, when the port is in output mode other devices can drive the
+	// pins too. If the device pulls the voltage on the lines enough,a read of
+	// the output register will show the external device value on the driven pins.
+	ret = (~m_ddr_a & port_a_data)  // input pins
+		| (m_ddr_a & m_out_a & ~m_a_input_overrides_output_mask)  // normal output pins
+		| (m_ddr_a & port_a_data & m_a_input_overrides_output_mask);  // overridden output pins
 
 	return ret;
 }
@@ -576,7 +574,7 @@ uint8_t pia6821_device::control_b_r()
 //  read
 //-------------------------------------------------
 
-uint8_t pia6821_device::reg_r(uint8_t offset)
+uint8_t pia6821_device::read(offs_t offset)
 {
 	uint8_t ret;
 
@@ -846,7 +844,7 @@ void pia6821_device::control_b_w(uint8_t data)
 //  write
 //-------------------------------------------------
 
-void pia6821_device::reg_w(uint8_t offset, uint8_t data)
+void pia6821_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{
@@ -888,25 +886,38 @@ void pia6821_device::reg_w(uint8_t offset, uint8_t data)
 //  set_a_input
 //-------------------------------------------------
 
-void pia6821_device::set_a_input(uint8_t data, uint8_t z_mask)
+void pia6821_device::set_a_input(uint8_t data)
 {
-	assert_always(m_in_a_handler.isnull(), "pia6821_porta_w() called when in_a_func implemented");
+	assert_always(m_in_a_handler.isnull(), "pia6821_device::set_a_input() called when m_in_a_handler set");
 
 	LOG("Set PIA input port A = %02X\n", data);
 
 	m_in_a = data;
-	m_port_a_z_mask = z_mask;
 	m_in_a_pushed = true;
 }
 
 
 //-------------------------------------------------
-//  pia6821_porta_w
+//  write_porta
 //-------------------------------------------------
 
-void pia6821_device::porta_w(uint8_t data)
+void pia6821_device::write_porta(uint8_t data)
 {
-	set_a_input(data, 0);
+	set_a_input(data);
+}
+
+
+//-------------------------------------------------
+//  write_porta_line
+//-------------------------------------------------
+
+void pia6821_device::write_porta_line(int line, bool state)
+{
+	uint8_t mask = 1 << line;
+	if (state)
+		set_a_input(m_in_a | mask);
+	else
+		set_a_input(m_in_a & ~mask);
 }
 
 
@@ -1008,10 +1019,10 @@ bool pia6821_device::ca2_output_z()
 
 
 //-------------------------------------------------
-//  portb_w
+//  write_portb
 //-------------------------------------------------
 
-void pia6821_device::portb_w(uint8_t data)
+void pia6821_device::write_portb(uint8_t data)
 {
 	assert_always(m_in_b_handler.isnull(), "pia_set_input_b() called when in_b_func implemented");
 
@@ -1019,6 +1030,21 @@ void pia6821_device::portb_w(uint8_t data)
 
 	m_in_b = data;
 	m_in_b_pushed = true;
+}
+
+
+//-------------------------------------------------
+//  write_portb_line
+//-------------------------------------------------
+
+void pia6821_device::write_portb_line(int line, bool state)
+{
+	uint8_t mask = 1 << line;
+
+	if (state)
+		write_portb(m_in_b | mask);
+	else
+		write_portb(m_in_b & ~mask);
 }
 
 

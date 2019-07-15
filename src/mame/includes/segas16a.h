@@ -29,33 +29,58 @@ class segas16a_state : public sega_16bit_common_base
 public:
 	// construction/destruction
 	segas16a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_mcu(*this, "mcu"),
-			m_i8255(*this, "i8255"),
-			m_ymsnd(*this, "ymsnd"),
-			m_n7751(*this, "n7751"),
-			m_n7751_i8243(*this, "n7751_8243"),
-			m_nvram(*this, "nvram"),
-			m_watchdog(*this, "watchdog"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_soundlatch(*this, "soundlatch"),
-			m_sprites(*this, "sprites"),
-			m_cxdio(*this, "cxdio"),
-			m_workram(*this, "nvram"),
-			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
-			m_video_control(0),
-			m_mcu_control(0),
-			m_n7751_command(0),
-			m_n7751_rom_address(0),
-			m_last_buttons1(0),
-			m_last_buttons2(0),
-			m_read_port(0),
-			m_mj_input_num(0),
-			m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_mcu(*this, "mcu")
+		, m_i8255(*this, "i8255")
+		, m_ymsnd(*this, "ymsnd")
+		, m_n7751(*this, "n7751")
+		, m_n7751_i8243(*this, "n7751_8243")
+		, m_nvram(*this, "nvram")
+		, m_watchdog(*this, "watchdog")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_soundlatch(*this, "soundlatch")
+		, m_sprites(*this, "sprites")
+		, m_cxdio(*this, "cxdio")
+		, m_workram(*this, "nvram")
+		, m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+		, m_video_control(0)
+		, m_mcu_control(0)
+		, m_n7751_command(0)
+		, m_n7751_rom_address(0)
+		, m_last_buttons1(0)
+		, m_last_buttons2(0)
+		, m_read_port(0)
+		, m_mj_input_num(0)
+		, m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void system16a_no7751(machine_config &config);
+	void system16a(machine_config &config);
+	void system16a_fd1089a_no7751(machine_config &config);
+	void system16a_fd1089b_no7751(machine_config &config);
+	void system16a_fd1089a(machine_config &config);
+	void system16a_fd1094(machine_config &config);
+	void system16a_no7751p(machine_config &config);
+	void system16a_fd1094_no7751(machine_config &config);
+	void system16a_i8751(machine_config &config);
+	void system16a_fd1089b(machine_config &config);
+	void aceattaca_fd1094(machine_config &config);
+
+	// game-specific driver init
+	void init_generic();
+	void init_dumpmtmt();
+	void init_quartet();
+	void init_fantzonep();
+	void init_sjryukoa();
+	void init_aceattaca();
+	void init_passsht16a();
+	void init_mjleague();
+	void init_sdi();
+
+private:
 	// PPI read/write callbacks
 	DECLARE_WRITE8_MEMBER( misc_control_w );
 	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
@@ -70,7 +95,7 @@ public:
 	DECLARE_READ8_MEMBER( sound_data_r );
 	DECLARE_WRITE8_MEMBER( n7751_command_w );
 	DECLARE_WRITE8_MEMBER( n7751_control_w );
-	DECLARE_WRITE8_MEMBER( n7751_rom_offset_w );
+	template<int Shift> void n7751_rom_offset_w(uint8_t data);
 
 	// N7751 sound generator CPU read/write handlers
 	DECLARE_READ8_MEMBER( n7751_rom_r );
@@ -83,34 +108,11 @@ public:
 	DECLARE_READ8_MEMBER( mcu_io_r );
 
 	// I8751-related VBLANK interrupt handlers
-	INTERRUPT_GEN_MEMBER( mcu_irq_assert );
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
-
-	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(dumpmtmt);
-	DECLARE_DRIVER_INIT(quartet);
-	DECLARE_DRIVER_INIT(fantzonep);
-	DECLARE_DRIVER_INIT(sjryukoa);
-	DECLARE_DRIVER_INIT(aceattaca);
-	DECLARE_DRIVER_INIT(passsht16a);
-	DECLARE_DRIVER_INIT(mjleague);
-	DECLARE_DRIVER_INIT(sdi);
+	DECLARE_WRITE_LINE_MEMBER(i8751_main_cpu_vblank_w);
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void system16a_no7751(machine_config &config);
-	void system16a(machine_config &config);
-	void system16a_fd1089a_no7751(machine_config &config);
-	void system16a_fd1089b_no7751(machine_config &config);
-	void system16a_fd1089a(machine_config &config);
-	void system16a_fd1094(machine_config &config);
-	void system16a_no7751p(machine_config &config);
-	void system16a_fd1094_no7751(machine_config &config);
-	void system16a_i8751(machine_config &config);
-	void system16a_fd1089b(machine_config &config);
-	void aceattaca_fd1094(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void sound_decrypted_opcodes_map(address_map &map);
@@ -118,7 +120,7 @@ public:
 	void sound_no7751_portmap(address_map &map);
 	void sound_portmap(address_map &map);
 	void system16a_map(address_map &map);
-protected:
+
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
@@ -132,6 +134,7 @@ protected:
 
 	// driver overrides
 	virtual void video_start() override;
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -183,6 +186,7 @@ protected:
 	uint8_t                   m_read_port;
 	uint8_t                   m_mj_input_num;
 	optional_ioport_array<6> m_mj_inputs;
+	output_finder<2> m_lamps;
 };
 
 class afighter_16a_analog_state : public segas16a_state
@@ -199,7 +203,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
 
-	protected:
+private:
 	required_ioport     m_accel;
 	required_ioport     m_steer;
 };

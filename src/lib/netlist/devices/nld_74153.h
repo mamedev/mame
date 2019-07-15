@@ -45,19 +45,21 @@
 #ifndef NLD_74153_H_
 #define NLD_74153_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
-#define TTL_74153(name, cC0, cC1, cC2, cC3, cA, cB, cG)                         \
-		NET_REGISTER_DEV(TTL_74153, name)                                       \
-		NET_CONNECT(name, C0, cC0)                                              \
-		NET_CONNECT(name, C1, cC1)                                              \
-		NET_CONNECT(name, C2, cC2)                                              \
-		NET_CONNECT(name, C3, cC3)                                              \
-		NET_CONNECT(name, A, cA)                                                \
-		NET_CONNECT(name, B, cB)                                                \
+#define TTL_74153(name, cC0, cC1, cC2, cC3, cA, cB, cG)                        \
+		NET_REGISTER_DEV(TTL_74153, name)                                      \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, C0, cC0)                                             \
+		NET_CONNECT(name, C1, cC1)                                             \
+		NET_CONNECT(name, C2, cC2)                                             \
+		NET_CONNECT(name, C3, cC3)                                             \
+		NET_CONNECT(name, A, cA)                                               \
+		NET_CONNECT(name, B, cB)                                               \
 		NET_CONNECT(name, G, cG)
 
-#define TTL_74153_DIP(name)                                                     \
+#define TTL_74153_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74153_DIP, name)
 
 #endif /* NLD_74153_H_ */

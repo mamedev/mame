@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -20,10 +21,12 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void segapm(machine_config &config);
+
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_segapm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void segapm(machine_config &config);
 	void segapm_map(address_map &map);
 };
 
@@ -39,14 +42,15 @@ uint32_t segapm_state::screen_update_segapm(screen_device &screen, bitmap_ind16 
 
 
 
-ADDRESS_MAP_START(segapm_state::segapm_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void segapm_state::segapm_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
 	// A15100
 
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM
+	map(0xe00000, 0xe7ffff).ram();
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( segapm )
 INPUT_PORTS_END
@@ -54,33 +58,32 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(segapm_state::segapm)
-
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??
-	MCFG_CPU_PROGRAM_MAP(segapm_map)
+void segapm_state::segapm(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000); // ??
+	m_maincpu->set_addrmap(AS_PROGRAM, &segapm_state::segapm_map);
 
 	// + 2 sh2s on 32x board
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segapm_state, screen_update_segapm)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(segapm_state::screen_update_segapm));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+}
 
 
 
 ROM_START( segapm ) // was more than one cartridge available? if so softlist them?
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD( "picture magic boot cart (j) [!].bin", 0x00000, 0x80000, CRC(c9ab4e60) SHA1(9c4d4ab3e59c8acde86049a1ba3787aa03b549a3) ) // internal header is GOUSEI HENSYUU
+	ROM_LOAD( "picture magic boot cart.bin", 0x00000, 0x80000, CRC(c9ab4e60) SHA1(9c4d4ab3e59c8acde86049a1ba3787aa03b549a3) ) // internal header is GOUSEI HENSYUU
 
 	// todo, sh2 bios roms etc.
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS           INIT  COMPANY  FULLNAME         FLAGS
-CONS( 1996, segapm, 0,      0,      segapm, segapm, segapm_state,   0,    "Sega",  "Picture Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME         FLAGS
+CONS( 1996, segapm, 0,      0,      segapm,  segapm, segapm_state, empty_init, "Sega",  "Picture Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

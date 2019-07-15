@@ -22,48 +22,25 @@ void clock_device::device_start()
 
 void clock_device::device_clock_changed()
 {
-	update_timer();
-}
+	if (!m_signal_handler.isnull() && m_clock > 0)
+	{
+		if (m_timer == nullptr)
+			m_timer = timer_alloc(0);
 
-attotime clock_device::period()
-{
-	if (m_clock > 0)
-		return attotime::from_hz(m_clock * 2);
+		const attotime period(attotime::from_hz(m_clock * 2));
 
-	return attotime::never;
+		attotime next = period - m_timer->elapsed();
+		if (next < attotime::zero)
+			next = attotime::zero;
+
+		m_timer->adjust(next, 0, period);
+	}
+	else if (m_timer != nullptr)
+		m_timer->adjust(attotime::never);
 }
 
 void clock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_signal = !m_signal;
 	m_signal_handler(m_signal);
-
-	m_timer->adjust(period());
-}
-
-void clock_device::update_timer()
-{
-	if (!m_signal_handler.isnull() && m_clock > 0)
-	{
-		if (m_timer == nullptr)
-		{
-			m_timer = timer_alloc(0);
-			m_timer->adjust(period());
-		}
-		else
-		{
-			attotime next = period() - m_timer->elapsed();
-
-			if (next < attotime::zero)
-			{
-				next = attotime::zero;
-			}
-
-			m_timer->adjust(next);
-		}
-	}
-	else if (m_timer != nullptr)
-	{
-		m_timer->adjust(attotime::never);
-	}
 }

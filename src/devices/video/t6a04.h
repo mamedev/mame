@@ -23,11 +23,10 @@ public:
 	// construction/destruction
 	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_size(device_t &device, int w, int h)
+	void set_size(int w, int h)
 	{
-		t6a04_device &dev = downcast<t6a04_device &>(device);
-		dev.m_width = w;
-		dev.m_height = h;
+		m_width = w;
+		m_height = h;
 	}
 
 	// device interface
@@ -65,8 +64,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(T6A04, t6a04_device)
-
-#define MCFG_T6A04_SIZE(_width, _height) \
-	t6a04_device::set_size(*device, _width, _height);
 
 #endif // MAME_VIDEO_T6A04_H

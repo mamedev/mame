@@ -26,84 +26,76 @@
 
 ***************************************************************************/
 
-void _1942_state::create_palette()
+void _1942_state::create_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
+		int bit0, bit1, bit2, bit3;
 
-		/* red component */
+		// red component
 		bit0 = (color_prom[i + 0 * 256] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0 * 256] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0 * 256] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0 * 256] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// green component
 		bit0 = (color_prom[i + 1 * 256] >> 0) & 0x01;
 		bit1 = (color_prom[i + 1 * 256] >> 1) & 0x01;
 		bit2 = (color_prom[i + 1 * 256] >> 2) & 0x01;
 		bit3 = (color_prom[i + 1 * 256] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
 		bit0 = (color_prom[i + 2 * 256] >> 0) & 0x01;
 		bit1 = (color_prom[i + 2 * 256] >> 1) & 0x01;
 		bit2 = (color_prom[i + 2 * 256] >> 2) & 0x01;
 		bit3 = (color_prom[i + 2 * 256] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		m_palette->set_indirect_color(i,rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(_1942_state,1942)
+void _1942_state::_1942_palette(palette_device &palette) const
 {
-	create_palette();
+	create_palette(palette);
 
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i, colorbase;
 	color_prom += 3 * 256;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
 
 	/* characters use palette entries 128-143 */
-	colorbase = 0;
-	for (i = 0; i < 64 * 4; i++)
-	{
-		m_palette->set_pen_indirect(colorbase + i, 0x80 | *color_prom++);
-	}
-	colorbase += 64 * 4;
+	int colorbase = 0;
+	for (int i = 0; i < 64 * 4; i++)
+		palette.set_pen_indirect(colorbase + i, 0x80 | *color_prom++);
 
-	/* background tiles use palette entries 0-63 in four banks */
-	for (i = 0; i < 32 * 8; i++)
+	// background tiles use palette entries 0-63 in four banks
+	colorbase += 64 * 4;
+	for (int i = 0; i < 32 * 8; i++)
 	{
-		m_palette->set_pen_indirect(colorbase + 0 * 32 * 8 + i, 0x00 | *color_prom);
-		m_palette->set_pen_indirect(colorbase + 1 * 32 * 8 + i, 0x10 | *color_prom);
-		m_palette->set_pen_indirect(colorbase + 2 * 32 * 8 + i, 0x20 | *color_prom);
-		m_palette->set_pen_indirect(colorbase + 3 * 32 * 8 + i, 0x30 | *color_prom);
+		palette.set_pen_indirect(colorbase + 0 * 32 * 8 + i, 0x00 | *color_prom);
+		palette.set_pen_indirect(colorbase + 1 * 32 * 8 + i, 0x10 | *color_prom);
+		palette.set_pen_indirect(colorbase + 2 * 32 * 8 + i, 0x20 | *color_prom);
+		palette.set_pen_indirect(colorbase + 3 * 32 * 8 + i, 0x30 | *color_prom);
 		color_prom++;
 	}
-	colorbase += 4 * 32 * 8;
 
-	/* sprites use palette entries 64-79 */
-	for (i = 0; i < 16 * 16; i++)
-		m_palette->set_pen_indirect(colorbase + i, 0x40 | *color_prom++);
+	// sprites use palette entries 64-79
+	colorbase += 4 * 32 * 8;
+	for (int i = 0; i < 16 * 16; i++)
+		palette.set_pen_indirect(colorbase + i, 0x40 | *color_prom++);
 }
 
-PALETTE_INIT_MEMBER(_1942_state,1942p)
+void _1942p_state::_1942p_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 0x400; i++)
-	{
 		palette.set_pen_indirect(i, i);
-	}
 
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x100; i++)
-	{
-		palette.set_pen_indirect(i+0x400, color_prom[i]| 0x240);
-	}
+		palette.set_pen_indirect(i + 0x400, color_prom[i] | 0x240);
 }
 
 
@@ -154,7 +146,7 @@ void _1942_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-void _1942_state::video_start_c1942p()
+void _1942p_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1942_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_1942_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
@@ -169,20 +161,20 @@ void _1942_state::video_start_c1942p()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(_1942_state::c1942_fgvideoram_w)
+WRITE8_MEMBER(_1942_state::_1942_fgvideoram_w)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(_1942_state::c1942_bgvideoram_w)
+WRITE8_MEMBER(_1942_state::_1942_bgvideoram_w)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
 
 
-WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
+WRITE8_MEMBER(_1942_state::_1942_palette_bank_w)
 {
 	if (m_palette_bank != data)
 	{
@@ -191,14 +183,14 @@ WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
 	}
 }
 
-WRITE8_MEMBER(_1942_state::c1942_scroll_w)
+WRITE8_MEMBER(_1942_state::_1942_scroll_w)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
 }
 
 
-WRITE8_MEMBER(_1942_state::c1942_c804_w)
+WRITE8_MEMBER(_1942_state::_1942_c804_w)
 {
 	/* bit 7: flip screen
 	   bit 4: cpu B reset
@@ -218,7 +210,7 @@ WRITE8_MEMBER(_1942_state::c1942_c804_w)
 
 ***************************************************************************/
 
-void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -259,7 +251,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 }
 
-uint32_t _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _1942_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -268,24 +260,19 @@ uint32_t _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int i, code, col, sx, sy, dir;
-
-		code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
-				+ 2 * (m_spriteram[offs] & 0x80);
-		col = m_spriteram[offs + 3] & 0x0f;
+		int code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
+					+ 2 * (m_spriteram[offs] & 0x80);
+		int col = m_spriteram[offs + 3] & 0x0f;
 
 
-		sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
-		sy = m_spriteram[offs + 1];
+		int sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
+		int sy = m_spriteram[offs + 1];
 
-
-
+		int dir;
 		if (flip_screen())
 		{
 			sx = 240 - sx;
@@ -298,7 +285,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 		/* handle double / quadruple height */
-		i = (m_spriteram[offs + 3] & 0xc0) >> 6;
+		int i = (m_spriteram[offs + 3] & 0xc0) >> 6;
 		if (i == 2)
 			i = 3;
 
@@ -315,13 +302,4 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 		} while (i >= 0);
 	}
 
-
-}
-
-uint32_t _1942_state::screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites_p(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
 }

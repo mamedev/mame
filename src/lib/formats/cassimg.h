@@ -7,13 +7,18 @@
     Cassette tape image abstraction code
 
 *********************************************************************/
+#ifndef MAME_FORMATS_CASSIMG_H
+#define MAME_FORMATS_CASSIMG_H
 
-#ifndef CASSIMG_H
-#define CASSIMG_H
+#pragma once
+
+#include "ioprocs.h"
 
 #include "osdcore.h"
 #include "coretmpl.h"
-#include "ioprocs.h"
+
+#include <string>
+#include <vector>
 
 #ifndef LOG_FORMATS
 #define LOG_FORMATS if (0) printf
@@ -181,17 +186,17 @@ uint64_t cassette_image_size(cassette_image *cassette);
 
 /* waveform accesses */
 cassette_image::error cassette_get_samples(cassette_image *cassette, int channel,
-	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
+	double time_index, double sample_period, size_t sample_count, size_t sample_spacing,
 	void *samples, int waveform_flags);
 cassette_image::error cassette_put_samples(cassette_image *cassette, int channel,
-	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
+	double time_index, double sample_period, size_t sample_count, size_t sample_spacing,
 	const void *samples, int waveform_flags);
 cassette_image::error cassette_get_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, int32_t *sample);
 cassette_image::error cassette_put_sample(cassette_image *cassette, int channel,
 	double time_index, double sample_period, int32_t sample);
 
-/* waveform accesses to/from the raw image */
+/* waveform accesses to/from the raw image - these are only used by lib\formats\wavfile.cpp */
 cassette_image::error cassette_read_samples(cassette_image *cassette, int channels, double time_index,
 	double sample_period, size_t sample_count, uint64_t offset, int waveform_flags);
 cassette_image::error cassette_write_samples(cassette_image *cassette, int channels, double time_index,
@@ -224,4 +229,4 @@ cassette_image::error cassette_legacy_identify(cassette_image *cassette, struct 
 cassette_image::error cassette_legacy_construct(cassette_image *cassette,
 	const struct CassetteLegacyWaveFiller *legacy_args);
 
-#endif /* CASSIMG_H */
+#endif // MAME_FORMATS_CASSIMG_H

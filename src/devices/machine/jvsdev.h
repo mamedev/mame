@@ -5,18 +5,11 @@
 
 #pragma once
 
-
-#define MCFG_JVS_DEVICE_ADD(_tag, _type, _host) \
-	MCFG_DEVICE_ADD(_tag, _type, 0) \
-	jvs_device::static_set_jvs_host_tag(*device, _host);
-
-class jvs_host;
+#include "jvshost.h"
 
 class jvs_device : public device_t
 {
 public:
-	static void static_set_jvs_host_tag(device_t &device, const char *jvs_host_tag);
-
 	void chain(jvs_device *dev);
 	void message(uint8_t dest, const uint8_t *send_buffer, uint32_t send_size, uint8_t *recv_buffer, uint32_t &recv_size);
 	bool get_address_set_line();
@@ -45,8 +38,9 @@ protected:
 	virtual bool swoutputs(uint8_t count, const uint8_t *vals);
 	virtual bool swoutputs(uint8_t id, uint8_t val);
 
+	required_device<jvs_host> host;
+
 private:
-	const char *jvs_host_tag;
 	jvs_device *next_device;
 	uint8_t jvs_address;
 	uint32_t jvs_reset_counter;

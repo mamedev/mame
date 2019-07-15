@@ -1,73 +1,62 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-// TODO: dump 8049 mcu; key repeat; LEDs
+// TODO: LEDs
 
 #include "emu.h"
 #include "machine/qx10kbd.h"
-
-#include "machine/keyboard.ipp"
+#include "cpu/mcs48/mcs48.h"
 
 
 qx10_keyboard_device::qx10_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: buffered_rs232_device(mconfig, QX10_KEYBOARD, tag, owner, 0)
-	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF")
+	: device_t(mconfig, QX10_KEYBOARD, tag, owner, clock)
+	, device_rs232_port_interface(mconfig, *this)
+	, m_rows(*this, "LINE%X", 0U)
+	, m_mcu(*this, "mcu")
 {
 }
 
+ROM_START(qx10kbd)
+	ROM_REGION(0x0800, "mcu", 0)
+	ROM_LOAD("mbl8049h.5a", 0x0000, 0x0800, CRC(8615e159) SHA1(26b7f447acfe2c605dbe0fc98e6c777f0fa8a94d))
+ROM_END
 
-void qx10_keyboard_device::device_reset()
+tiny_rom_entry const *qx10_keyboard_device::device_rom_region() const
 {
-	buffered_rs232_device::device_reset();
-
-	reset_key_state();
-	clear_fifo();
-
-	set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
-	set_rate(1'200);
-	receive_register_reset();
-	transmit_register_reset();
-
-	output_dcd(0);
-	output_dsr(0);
-	output_cts(0);
-	output_rxd(1);
-
-	start_processing(attotime::from_hz(2'400));
+	return ROM_NAME(qx10kbd);
 }
 
-
-void qx10_keyboard_device::key_make(uint8_t row, uint8_t column)
+void qx10_keyboard_device::device_start()
 {
-	transmit_byte((column << 4) | row);
+	m_bit_timer = timer_alloc();
+	m_bit_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
+	m_clk_state = 0;
 }
 
-
-void qx10_keyboard_device::received_byte(uint8_t data)
+WRITE_LINE_MEMBER(qx10_keyboard_device::input_txd)
 {
-	switch (data & 0xe0)
-	{
-	case 0x00: // set repeat start
-		break;
-	case 0x20: // set repeat interval
-		break;
-	case 0x40: // set LED
-		break;
-	case 0x60: // get LED
-		transmit_byte(0);
-		break;
-	case 0x80: // get SW
-		break;
-	case 0xa0: // set repeat
-		break;
-	case 0xc0: // enable keyboard
-		break;
-	case 0xe0:
-		if (!(data & 1))
-			transmit_byte(0);
-		break;
-	}
+	m_rxd = state;
 }
 
+void qx10_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_clk_state = !m_clk_state;
+}
+
+WRITE8_MEMBER(qx10_keyboard_device::mcu_p1_w)
+{
+	m_row = data & 0xf;
+	output_rxd(BIT(data, 7));
+}
+
+void qx10_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	auto &mcu(I8049(config, "mcu", 11_MHz_XTAL));
+	mcu.p1_out_cb().set(FUNC(qx10_keyboard_device::mcu_p1_w));
+	mcu.p2_out_cb().set([](u8 data) { /* leds */ });
+	mcu.bus_in_cb().set([this]() { return m_rows[m_row]->read(); });
+	mcu.t1_in_cb().set([this]() { return m_rxd; });
+	mcu.t0_in_cb().set([this]() { return m_clk_state; });
+}
 
 static INPUT_PORTS_START( qx10_keyboard )
 	PORT_START("LINE0")

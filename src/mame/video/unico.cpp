@@ -53,27 +53,14 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(unico_state::unico_palette_w)
+rgb_t unico_state::unico_R6G6B6X(uint32_t raw)
 {
-	uint16_t data1, data2;
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	data1 = m_generic_paletteram_16[offset & ~1];
-	data2 = m_generic_paletteram_16[offset |  1];
-	m_palette->set_pen_color( offset/2,
-			(data1 >> 8) & 0xFC,
-			(data1 >> 0) & 0xFC,
-			(data2 >> 8) & 0xFC );
-}
+	int const red   = (raw >> 24) & 0xfc;
+	int const green = (raw >> 16) & 0xfc;
+	int const blue  = (raw >>  8) & 0xfc;
 
-WRITE32_MEMBER(unico_state::unico_palette32_w)
-{
-	uint32_t rgb0 = COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	m_palette->set_pen_color( offset,
-			(rgb0 >> 24) & 0xFC,
-			(rgb0 >> 16) & 0xFC,
-			(rgb0 >>  8) & 0xFC );
+	return rgb_t(red | (red >> 6), green | (green >> 6), blue | (blue >> 6));
 }
-
 
 /***************************************************************************
 
@@ -98,22 +85,20 @@ TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
-READ16_MEMBER(unico_state::unico_vram_r) { return m_vram[offset]; }
+READ16_MEMBER(unico_state::vram_r) { return m_vram[offset]; }
 
-WRITE16_MEMBER(unico_state::unico_vram_w)
+WRITE16_MEMBER(unico_state::vram_w)
 {
-	uint16_t *vram = m_vram.get();
 	int tile = ((offset / 0x2000) + 1) % 3;
-	COMBINE_DATA(&vram[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 	m_tilemap[tile]->mark_tile_dirty((offset & 0x1fff)/2);
 }
 
 
-READ16_MEMBER(unico_state::unico_scroll_r) { return m_scroll[offset]; }
-WRITE16_MEMBER(unico_state::unico_scroll_w) { COMBINE_DATA(&m_scroll[offset]); }
-READ16_MEMBER(unico_state::unico_spriteram_r) { return m_spriteram[offset]; }
-WRITE16_MEMBER(unico_state::unico_spriteram_w)  { COMBINE_DATA(&m_spriteram[offset]); }
-
+READ16_MEMBER(unico_state::scroll_r) { return m_scroll[offset]; }
+WRITE16_MEMBER(unico_state::scroll_w) { COMBINE_DATA(&m_scroll[offset]); }
+READ16_MEMBER(unico_state::spriteram_r) { return m_spriteram[offset]; }
+WRITE16_MEMBER(unico_state::spriteram_w)  { COMBINE_DATA(&m_spriteram[offset]); }
 
 
 /***************************************************************************
@@ -125,16 +110,8 @@ WRITE16_MEMBER(unico_state::unico_spriteram_w)  { COMBINE_DATA(&m_spriteram[offs
 ***************************************************************************/
 
 
-VIDEO_START_MEMBER(unico_state,unico)
+void unico_state::video_start()
 {
-	m_vram   = make_unique_clear<uint16_t[]>(0xc000 / 2);
-	m_scroll = make_unique_clear<uint16_t[]>(0x18 / 2);
-	m_spriteram = make_unique_clear<uint16_t[]>(0x800 / 2);
-
-	save_pointer(NAME(m_vram.get()), 0xc000/2);
-	save_pointer(NAME(m_scroll.get()), 0x18/2);
-	save_pointer(NAME(m_spriteram.get()), 0x800/2);
-
 	m_tilemap[0] = &machine().tilemap().create(
 			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 			16,16,  0x40, 0x40);
@@ -168,8 +145,6 @@ VIDEO_START_MEMBER(unico_state,unico)
 }
 
 
-
-
 /***************************************************************************
 
                                 Sprites Drawing
@@ -192,9 +167,8 @@ VIDEO_START_MEMBER(unico_state,unico)
 
 ***************************************************************************/
 
-void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void unico_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint16_t *spriteram16 = m_spriteram.get();
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
@@ -202,10 +176,10 @@ void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		int x, startx, endx, incx;
 
-		int sx          =   spriteram16[ offs + 0 ];
-		int sy          =   spriteram16[ offs + 1 ];
-		int code        =   spriteram16[ offs + 2 ];
-		int attr        =   spriteram16[ offs + 3 ];
+		int sx          =   m_spriteram[ offs + 0 ];
+		int sy          =   m_spriteram[ offs + 1 ];
+		int code        =   m_spriteram[ offs + 2 ];
+		int attr        =   m_spriteram[ offs + 3 ];
 
 		int flipx       =   attr & 0x020;
 		int flipy       =   attr & 0x040;   // not sure
@@ -255,7 +229,7 @@ void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-uint32_t unico_state::screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unico_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -289,7 +263,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	if (layers_ctrl & 4)    m_tilemap[2]->draw(screen, bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)    unico_draw_sprites(screen,bitmap,cliprect);
+	if (layers_ctrl & 8)    draw_sprites(screen,bitmap,cliprect);
 
 	return 0;
 }

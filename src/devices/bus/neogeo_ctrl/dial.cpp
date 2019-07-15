@@ -40,6 +40,11 @@ static INPUT_PORTS_START( neogeo_dial )
 
 	PORT_START("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_PLAYER(2)
+
+	PORT_START("START")
+	PORT_BIT( 0xfa, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
 
@@ -67,7 +72,8 @@ neogeo_dial_device::neogeo_dial_device(const machine_config &mconfig, const char
 	m_joy1(*this, "JOY1"),
 	m_joy2(*this, "JOY2"),
 	m_dial1(*this, "DIAL1"),
-	m_dial2(*this, "DIAL2")
+	m_dial2(*this, "DIAL2"),
+	m_ss(*this, "START")
 {
 }
 
@@ -129,4 +135,13 @@ READ8_MEMBER(neogeo_dial_device::in1_r)
 void neogeo_dial_device::write_ctrlsel(uint8_t data)
 {
 	m_ctrl_sel = data;
+}
+
+//-------------------------------------------------
+//  read_start_sel
+//-------------------------------------------------
+
+uint8_t neogeo_dial_device::read_start_sel()
+{
+	return m_ss->read();
 }

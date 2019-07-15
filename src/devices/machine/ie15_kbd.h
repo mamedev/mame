@@ -5,18 +5,6 @@
 
 #pragma once
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_IE15_KEYBOARD_CB(_devcb) \
-	devcb = &ie15_keyboard_device::set_keyboard_callback(*device, DEVCB_##_devcb);
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
 class ie15_keyboard_device : public device_t
 {
 public:
@@ -47,7 +35,7 @@ public:
 
 	ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_keyboard_callback(device_t &device, Object &&cb) { return downcast<ie15_keyboard_device &>(device).m_keyboard_cb.set_callback(std::forward<Object>(cb)); }
+	auto keyboard_cb() { return m_keyboard_cb.bind(); }
 
 protected:
 	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

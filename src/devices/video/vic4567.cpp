@@ -149,6 +149,7 @@ DEFINE_DEVICE_TYPE(VIC3, vic3_device, "vic3", "CSG 4567 VIC-III")
 
 vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIC3, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_type(vic3_type::NTSC)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
@@ -160,7 +161,6 @@ vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_
 	, m_lightpen_x_cb(*this)
 	, m_lightpen_y_cb(*this)
 	, m_c64_mem_r_cb(*this)
-	, m_palette(*this, "palette")
 {
 }
 
@@ -354,9 +354,12 @@ void vic3_device::device_reset()
 
 	memset(m_shift, 0, ARRAY_LENGTH(m_shift));
 	memset(m_multi_collision, 0, ARRAY_LENGTH(m_multi_collision));
-	memset(m_palette_red, 0, ARRAY_LENGTH(m_palette_red));
-	memset(m_palette_green, 0, ARRAY_LENGTH(m_palette_green));
-	memset(m_palette_blue, 0, ARRAY_LENGTH(m_palette_blue));
+
+	for (int i = 0; i < 256; i++)
+	{
+		m_palette_red[i] = m_palette_green[i] = m_palette_blue[i] = 0;
+		set_pen_color(i, rgb_t::black());
+	}
 
 	m_palette_dirty = 0;
 }
@@ -1903,25 +1906,25 @@ void vic3_device::draw_bitplanes()
 
 	if (XPOS > 0)
 	{
-		vis.set(0, XPOS - 1, 0, visarea.max_y);
+		vis.set(0, XPOS - 1, 0, visarea.bottom());
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
-	if (XPOS + VIC3_BITPLANES_WIDTH < visarea.max_x)
+	if (XPOS + VIC3_BITPLANES_WIDTH < visarea.right())
 	{
-		vis.set(XPOS + VIC3_BITPLANES_WIDTH, visarea.max_x, 0, visarea.max_y);
+		vis.set(XPOS + VIC3_BITPLANES_WIDTH, visarea.right(), 0, visarea.bottom());
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (YPOS > 0)
 	{
-		vis.set(0, visarea.max_x, 0, YPOS - 1);
+		vis.set(0, visarea.right(), 0, YPOS - 1);
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
-	if (YPOS + VIC3_LINES < visarea.max_y)
+	if (YPOS + VIC3_LINES < visarea.bottom())
 	{
-		vis.set(0, visarea.max_x, YPOS + VIC3_LINES, visarea.max_y);
+		vis.set(0, visarea.right(), YPOS + VIC3_LINES, visarea.bottom());
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 }
@@ -1937,7 +1940,7 @@ void vic3_device::raster_interrupt_gen()
 		m_rasterline = 0;
 		if (m_palette_dirty)
 			for (i = 0; i < 256; i++)
-				m_palette->set_pen_color(i, m_palette_red[i] << 4, m_palette_green[i] << 4, m_palette_blue[i] << 4);
+				set_pen_color(i, m_palette_red[i] << 4, m_palette_green[i] << 4, m_palette_blue[i] << 4);
 
 		if (m_palette_dirty)
 		{
@@ -2041,11 +2044,3 @@ uint32_t vic3_device::video_update( bitmap_ind16 &bitmap, const rectangle &clipr
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(vic3_device::device_add_mconfig)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
-MACHINE_CONFIG_END

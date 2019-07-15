@@ -4,24 +4,21 @@
 #define MAME_SOUND_3812INTF_H
 
 
-#define MCFG_YM3812_IRQ_HANDLER(cb) \
-		devcb = &ym3812_device::set_irq_handler(*device, (DEVCB_##cb));
-
 class ym3812_device : public device_t, public device_sound_interface
 {
 public:
 	ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym3812_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( status_port_r );
-	DECLARE_READ8_MEMBER( read_port_r );
-	DECLARE_WRITE8_MEMBER( control_port_w );
-	DECLARE_WRITE8_MEMBER( write_port_w );
+	u8 status_port_r();
+	u8 read_port_r();
+	void control_port_w(u8 data);
+	void write_port_w(u8 data);
 
 protected:
 	// device-level overrides
@@ -36,6 +33,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	enum
+	{
+		TIMER_A,
+		TIMER_B,
+		TIMER_IRQ_SYNC
+	};
+
 	void irq_handler(int irq);
 	void timer_handler(int c, const attotime &period);
 	void update_request() { m_stream->update(); }
@@ -47,7 +51,7 @@ private:
 	static void static_update_request(device_t *param, int interval) { downcast<ym3812_device *>(param)->update_request(); }
 
 	sound_stream *  m_stream;
-	emu_timer *     m_timer[2];
+	emu_timer *     m_timer[3];
 	void *          m_chip;
 	devcb_write_line m_irq_handler;
 };

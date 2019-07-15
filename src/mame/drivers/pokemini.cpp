@@ -15,70 +15,28 @@ The LCD is likely to be a SSD1828 LCD.
 #include "sound/spkrdev.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-struct PRC
-{
-	uint8_t       colors_inverted;
-	uint8_t       background_enabled;
-	uint8_t       sprites_enabled;
-	uint8_t       copy_enabled;
-	uint8_t       map_size;
-	uint8_t       map_size_x;
-	uint8_t       frame_count;
-	uint8_t       max_frame_count;
-	uint32_t      bg_tiles;
-	uint32_t      spr_tiles;
-	uint8_t       count;
-	emu_timer   *count_timer;
-};
-
-
-struct TIMERS
-{
-	emu_timer   *seconds_timer;
-	emu_timer   *hz256_timer;
-	emu_timer   *timer1;                /* Timer 1 low or 16bit */
-	emu_timer   *timer1_hi;             /* Timer 1 hi */
-	emu_timer   *timer2;                /* Timer 2 low or 16bit */
-	emu_timer   *timer2_hi;             /* Timer 2 high */
-	emu_timer   *timer3;                /* Timer 3 low or 16bit */
-	emu_timer   *timer3_hi;             /* Timer 3 high */
-};
 
 
 class pokemini_state : public driver_device
 {
 public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_p_ram(*this, "p_ram"),
-		m_speaker(*this, "speaker"),
-		m_i2cmem(*this, "i2cmem"),
-		m_cart(*this, "cartslot"),
-		m_inputs(*this, "INPUTS")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_p_ram(*this, "p_ram")
+		, m_speaker(*this, "speaker")
+		, m_i2cmem(*this, "i2cmem")
+		, m_cart(*this, "cartslot")
+		, m_inputs(*this, "INPUTS")
 	{ }
 
-	uint8_t m_pm_reg[0x100];
-	PRC m_prc;
-	TIMERS m_timers;
-	bitmap_ind16 m_bitmap;
-	virtual void video_start() override;
-	virtual void machine_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(pokemini);
-	DECLARE_WRITE8_MEMBER(hwreg_w);
-	DECLARE_READ8_MEMBER(hwreg_r);
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
-
 	void pokemini(machine_config &config);
-	void pokemini_mem_map(address_map &map);
+
 protected:
 	enum
 	{
@@ -95,12 +53,60 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	virtual void video_start() override;
+	virtual void machine_start() override;
+
+private:
+	struct PRC
+	{
+		uint8_t       colors_inverted;
+		uint8_t       background_enabled;
+		uint8_t       sprites_enabled;
+		uint8_t       copy_enabled;
+		uint8_t       map_size;
+		uint8_t       map_size_x;
+		uint8_t       frame_count;
+		uint8_t       max_frame_count;
+		uint32_t      bg_tiles;
+		uint32_t      spr_tiles;
+		uint8_t       count;
+		emu_timer   *count_timer;
+	};
+
+
+	struct TIMERS
+	{
+		emu_timer   *seconds_timer;
+		emu_timer   *hz256_timer;
+		emu_timer   *timer1;                // Timer 1 low or 16bit
+		emu_timer   *timer1_hi;             // Timer 1 hi
+		emu_timer   *timer2;                // Timer 2 low or 16bit
+		emu_timer   *timer2_hi;             // Timer 2 high
+		emu_timer   *timer3;                // Timer 3 low or 16bit
+		emu_timer   *timer3_hi;             // Timer 3 high
+	};
+
+	uint8_t m_pm_reg[0x100];
+	PRC m_prc;
+	TIMERS m_timers;
+	bitmap_ind16 m_bitmap;
+
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pokemini_palette(palette_device &palette) const;
+	DECLARE_WRITE8_MEMBER(hwreg_w);
+	DECLARE_READ8_MEMBER(hwreg_r);
+	DECLARE_READ8_MEMBER(rom_r);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	void pokemini_mem_map(address_map &map);
 
 	void check_irqs();
 	void update_sound();
@@ -120,15 +126,16 @@ protected:
 READ8_MEMBER( pokemini_state::rom_r )
 {
 	offset += 0x2100;
-	return m_cart->read_rom(space, offset & 0x1fffff);
+	return m_cart->read_rom(offset & 0x1fffff);
 }
 
-ADDRESS_MAP_START(pokemini_state::pokemini_mem_map)
-	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
-	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */
-	AM_RANGE( 0x002100, 0x1fffff )  AM_READ(rom_r)                    /* cartridge area */
-ADDRESS_MAP_END
+void pokemini_state::pokemini_mem_map(address_map &map)
+{
+	map(0x000000, 0x000fff).rom();                            /* bios */
+	map(0x001000, 0x001fff).ram().share("p_ram");          /* VRAM/RAM */
+	map(0x002000, 0x0020ff).rw(FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
+	map(0x002100, 0x1fffff).r(FUNC(pokemini_state::rom_r));                    /* cartridge area */
+}
 
 
 static INPUT_PORTS_START( pokemini )
@@ -144,7 +151,7 @@ static INPUT_PORTS_START( pokemini )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(pokemini_state, pokemini)
+void pokemini_state::pokemini_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0xff, 0xfb, 0x87));
 	palette.set_pen_color(1, rgb_t(0xb1, 0xae, 0x4e));
@@ -297,7 +304,7 @@ void pokemini_state::check_irqs()
 	{
 		//logerror("Triggering IRQ with vector %02x\n", vector );
 		/* Trigger interrupt and set vector */
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector );
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector ); // MINX
 	}
 	else
 	{
@@ -1502,7 +1509,7 @@ READ8_MEMBER(pokemini_state::hwreg_r)
 	return data;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1744,7 +1751,7 @@ static const int16_t speaker_levels[] = {-32768, 0, 32767};
 
 void pokemini_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 
@@ -1755,43 +1762,38 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-MACHINE_CONFIG_START(pokemini_state::pokemini)
+void pokemini_state::pokemini(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MINX, 4000000)
-	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)
+	MINX(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pokemini_state::pokemini_mem_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
+	I2CMEM(config, m_i2cmem, 0).set_data_size(0x2000);
 
 	/* This still needs to be improved to actually match the hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_UPDATE_DRIVER(pokemini_state, screen_update)
-	MCFG_SCREEN_SIZE( 96, 64 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
-	MCFG_SCREEN_REFRESH_RATE( 72 )
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_screen_update(FUNC(pokemini_state::screen_update));
+	m_screen->set_size(96, 64);
+	m_screen->set_visarea(0, 95, 0, 63);
+	m_screen->set_refresh_hz(72);
+	m_screen->set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)
+	PALETTE(config, "palette", FUNC(pokemini_state::pokemini_palette), 4);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SPEAKER_LEVELS(3, speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(3, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pokemini_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,min")
-	MCFG_GENERIC_LOAD(pokemini_state, pokemini_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min").set_device_load(FUNC(pokemini_state::cart_load), this);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pokemini")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("pokemini");
+}
 
 ROM_START( pokemini )
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -1799,4 +1801,4 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, empty_init, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

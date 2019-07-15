@@ -22,27 +22,24 @@ class zt8802_state : public driver_device
 public:
 	zt8802_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void zt8802(machine_config &config);
+	void zt8802(machine_config &config);
 private:
-//  required_device<cpu_device> m_maincpu;
+	//  required_device<cpu_device> m_maincpu;
 };
-
-//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zt8802_state )
-//  AM_RANGE(0x80000,0xfffff) AM_ROM AM_REGION("roms", 0)
-//ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zt8802 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(zt8802_state::zt8802)
-MACHINE_CONFIG_END
+void zt8802_state::zt8802(machine_config &config)
+{
+}
 
 ROM_START( zt8802 )
 	ROM_REGION( 0x80000, "roms", 0 )
 	ROM_LOAD( "c103207-218 a.rom", 0x00000, 0x80000, CRC(fc1c6e99) SHA1(cfbb2f0c9927bac5abc85c12d2b82f7da46cab03) )
 ROM_END
 
-COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, 0, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )
+COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )

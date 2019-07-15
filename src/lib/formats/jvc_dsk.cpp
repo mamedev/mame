@@ -6,10 +6,101 @@
 
     Disk image format
 
-    Named after its creator, Jeff Vavasour
+    Used by Jeff Vavasour's CoCo Emulators
+
+     Documentation taken from Tim Linder's web site:
+         http://tlindner.macmess.org/?page_id=86
+
+     A. Header length
+         The header length is determined by the file length modulo 256:
+             headerSize = fileLength % 256;
+         This means that the header is variable length and the minimum size
+         is zero bytes, and the maximum size of 255 bytes.
+
+    B. Header
+         Here is a description of the header bytes:
+             Byte Offset     Description            Default
+             -----------     -----------            -------
+                       0     Sectors per track      18
+                       1     Side count              1
+                       2     Sector size code        1
+                       3     First sector ID         1
+                       4     Sector attribute flag   0
+
+     If the sector attribute flag is zero then the track count is determined
+     by the formula:
+
+         (fileLength - headerSize) / (sectorsPerTrack * (128 <<
+             sectorSizeCode)) / sideCount
+
+     If the sector attribute flag is non zero then the track count is
+     determined by the more complex formula:
+
+         (fileLength - headerSize) / (sectorsPerTrack * ((128 <<
+             sectorSizeCode) + 1) ) / sideCount
+
+     If the length of the header is to short to contain the geometry desired,
+     then the default values are assumed. If the header length is zero the all
+     of the geometry is assumed. When creating disk images it is desirable to
+     make the header length as short as possible. The header should only be
+     used to deviate from the default values.
+
+     The sector data begins immediately after the header. If the header length
+     is zero then the sector data is at the beginning file.
+
+     C. Sectors per track
+         This is the number of sectors per track (ones based). A value of 18
+         means there are 18 sectors per track
+
+     D. Side Count
+         This is the number of sides in the disk image. Values of 1 or 2 are
+         acceptable. If there are two sides then the tracks are interleaved.
+         The first track in the image file is track zero side 1, the second
+         track in the image file is track zero side 2.
+
+     E. Sector size
+         The is the same value that is stored in the wd179x ID field to
+         determine sector size:
+
+             0x00         128 bytes
+             0x01         256 bytes
+             0x02         512 bytes
+             0x03        1024 bytes
+
+     Other values are undefined. Every sector in the disk image must be the
+     same size.
+
+     F. First sector ID
+         This determines the first sector ID for each track. Each successive
+         sector adds one to the previous ID. If the first sector ID is 1, then
+         the second sector has an ID of 2, and the third has an ID of 3.
+
+     G. Sector Attribute Flag
+         If this byte is non zero, then each sector contains an additional
+         byte prepended to the sector data. If the attribute flag is zero then
+         there are no extra bytes in front of the sector data.
+
+     H. Sector attribute byte
+         This byte is put at the beginning of every sector if the header flag
+         is turned on. The information this byte contains is the same as the
+         status register (of the wd179x) would contain when a 'Read Sector'
+         command was issued. The bit fields are defined as:
+
+         Bit position:
+         ---------------
+         7 6 5 4 3 2 1 0
+         | | | | | | | |
+         | | | | | | | +--- Not used. Set to zero.
+         | | | | | | +----- Not used. Set to zero.
+         | | | | | +------- Not used. Set to zero.
+         | | | | +--------- Set on CRC error.
+         | | | +----------- Set if sector not found.
+         | | +------------- Record type: 1 - Deleted Data Mark, 0 - Data Mark.
+         | +--------------- Not Used. Set to zero.
+         +----------------- Not Used. Set to zero.
 
     TODO:
-    - Support writing unusal formats?
+    - Support writing unusual formats?
 
 ***************************************************************************/
 
@@ -73,34 +164,6 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 		break;
 	}
 
-	// os-9 format disk images often don't have a header, but can contain
-	// various geometries. we try to open the file as os-9 image here and
-	// see if the values we get make sense
-	if (header_size == 0 && size > 0x20)
-	{
-		uint8_t os9_header[0x20];
-		io_generic_read(io, os9_header, 0, 0x20);
-
-		int os9_total_sectors = pick_integer_be(os9_header, 0x00, 3);
-		int os9_heads = BIT(os9_header[0x10], 0) ? 2 : 1;
-		int os9_sectors = pick_integer_be(os9_header, 0x11, 2);
-
-		if (os9_total_sectors > 0 && os9_heads > 0 && os9_sectors > 0)
-		{
-			int os9_tracks = os9_total_sectors / os9_sectors / os9_heads;
-
-			// now let's see if we have valid info
-			if ((os9_tracks * os9_heads * os9_sectors * 256) == size)
-			{
-				tracks = os9_tracks;
-				heads = os9_heads;
-				sectors = os9_sectors;
-
-				osd_printf_verbose("OS-9 format disk image detected.\n");
-			}
-		}
-	}
-
 	osd_printf_verbose("Floppy disk image geometry: %d tracks, %d head(s), %d sectors with %d bytes.\n", tracks, heads, sectors, sector_size);
 
 	return tracks * heads * sectors * sector_size == (size - header_size);
@@ -132,19 +195,20 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			desc_pc_sector sectors[256];
 			uint8_t sector_data[10000];
 			int sector_offset = 0;
-
+			// standard RS-DOS interleave
+			static constexpr int interleave[18] = { 0, 11, 4, 15, 8, 1, 12, 5, 16, 9, 2, 13, 6, 17, 10, 3, 14, 7 };
 			for (int i = 0; i < sector_count; i++)
 			{
-				sectors[i].track = track;
-				sectors[i].head = head;
-				sectors[i].sector = sector_base_id + i;
-				sectors[i].actual_size = sector_size;
-				sectors[i].size = sector_size >> 8;
-				sectors[i].deleted = false;
-				sectors[i].bad_crc = false;
-				sectors[i].data = &sector_data[sector_offset];
+				sectors[interleave[i]].track = track;
+				sectors[interleave[i]].head = head;
+				sectors[interleave[i]].sector = sector_base_id + i;
+				sectors[interleave[i]].actual_size = sector_size;
+				sectors[interleave[i]].size = sector_size >> 8;
+				sectors[interleave[i]].deleted = false;
+				sectors[interleave[i]].bad_crc = false;
+				sectors[interleave[i]].data = &sector_data[sector_offset];
 
-				io_generic_read(io, sectors[i].data, file_offset, sector_size);
+				io_generic_read(io, sectors[interleave[i]].data, file_offset, sector_size);
 
 				sector_offset += sector_size;
 				file_offset += sector_size;

@@ -19,7 +19,7 @@
 
 #include "rsp_dasm.h"
 
-DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "RSP")
+DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "Nintendo & SGI Reality Signal Processor RSP")
 
 
 #define LOG_INSTRUCTION_EXECUTION       0
@@ -144,6 +144,10 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+rsp_device::~rsp_device()
+{
+}
+
 device_memory_interface::space_config_vector rsp_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -151,9 +155,9 @@ device_memory_interface::space_config_vector rsp_device::memory_space_config() c
 	};
 }
 
-util::disasm_interface *rsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> rsp_device::create_disassembler()
 {
-	return new rsp_disassembler;
+	return std::make_unique<rsp_disassembler>();
 }
 
 void rsp_device::rsp_add_imem(uint32_t *base)
@@ -378,25 +382,20 @@ void rsp_device::device_start()
 		m_exec_output = fopen("rsp_execute.txt", "wt");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_pcache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 	resolve_cb();
 
 	if (m_isdrc)
-	{
-		m_cop2 = std::make_unique<rsp_cop2_drc>(*this, machine());
-	}
+		m_cop2 = std::make_unique<cop2_drc>(*this, machine());
 	else
-	{
-		m_cop2 = std::make_unique<rsp_cop2>(*this, machine());
-	}
+		m_cop2 = std::make_unique<cop2>(*this, machine());
+
 	m_cop2->init();
 	m_cop2->start();
 
 	// RSP registers should power on to a random state
-	for(int regIdx = 0; regIdx < 32; regIdx++ )
-	{
+	for (int regIdx = 0; regIdx < 32; regIdx++)
 		m_rsp_state->r[regIdx] = 0;
-	}
 
 	m_sr = RSP_STATUS_HALT;
 	m_step_count = 0;
@@ -421,7 +420,7 @@ void rsp_device::device_start()
 	m_drcuml->symbol_add(&m_numcycles, sizeof(m_numcycles), "numcycles");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<rsp_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -507,7 +506,7 @@ void rsp_device::device_start()
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 	state_add( STATE_GENSP, "GENSP", m_rsp_state->r[31]).noshow();
 
-	m_icountptr = &m_rsp_state->icount;
+	set_icountptr(m_rsp_state->icount);
 }
 
 void rsp_device::state_import(const device_state_entry &entry)
@@ -631,7 +630,7 @@ void rsp_device::execute_run()
 	while (m_rsp_state->icount > 0)
 	{
 		m_ppc = m_rsp_state->pc;
-		debugger_instruction_hook(this, m_rsp_state->pc);
+		debugger_instruction_hook(m_rsp_state->pc);
 
 		uint32_t op = ROPCODE(m_rsp_state->pc);
 		if (m_nextpc != ~0)

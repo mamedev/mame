@@ -25,19 +25,12 @@
 
 
 
-void wave_device::static_set_cassette_tag(device_t &device, const char *cassette_tag)
-{
-	wave_device &wave = downcast<wave_device &>(device);
-	wave.m_cassette_tag = cassette_tag;
-}
-
-DEFINE_DEVICE_TYPE(WAVE, wave_device, "wave", "Wave")
+DEFINE_DEVICE_TYPE(WAVE, wave_device, "wave", "Cassette Sound")
 
 wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WAVE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_cassette_tag(nullptr)
-	, m_cass(nullptr)
+	, m_cass(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -53,7 +46,6 @@ void wave_device::device_start()
 		machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 	else
 		machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
-	m_cass = owner()->subdevice<cassette_image_device>(m_cassette_tag);
 }
 
 //-------------------------------------------------

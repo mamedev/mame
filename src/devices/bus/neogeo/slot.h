@@ -30,6 +30,7 @@ enum
 	NEOGEO_GAROU,
 	NEOGEO_GAROUH,
 	NEOGEO_MSLUG3,
+	NEOGEO_MSLUG3A,
 	NEOGEO_KOF2K,
 	NEOGEO_MSLUG4,
 	NEOGEO_MSLUG4P,
@@ -189,6 +190,15 @@ class neogeo_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	neogeo_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: neogeo_cart_slot_device(mconfig, tag, owner, (uint16_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 	virtual ~neogeo_cart_slot_device();
 
@@ -336,16 +346,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NEOGEO_CART_SLOT, neogeo_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-
-#define MCFG_NEOGEO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, NEOGEO_CART_SLOT, 0)  \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 
 #endif // MAME_BUS_NEOGEO_SLOT_H

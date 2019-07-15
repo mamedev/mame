@@ -22,14 +22,11 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
+void blueprnt_state::blueprnt_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		uint8_t pen;
-		int r, g, b;
 
 		if (i < 0x200)
 			/* characters */
@@ -40,9 +37,9 @@ PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
 			/* sprites */
 			pen = i - 0x200;
 
-		r = ((pen >> 0) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
-		g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
-		b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		int const r = ((pen >> 0) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		int const g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		int const b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

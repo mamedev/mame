@@ -49,7 +49,8 @@ ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_con
 	, m_write_irq(*this)
 	, m_write_nmi(*this)
 	, m_write_wait(*this)
-	, m_dave(*this, finder_base::DUMMY_TAG)
+	, m_program_space(*this, finder_base::DUMMY_TAG, -1)
+	, m_io_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_card(nullptr)
 {
 }
@@ -101,6 +102,7 @@ void ep64_expansion_bus_slot_device::device_reset()
 // slot devices
 #include "exdos.h"
 
-SLOT_INTERFACE_START( ep64_expansion_bus_cards )
-	SLOT_INTERFACE("exdos", EP64_EXDOS)
-SLOT_INTERFACE_END
+void ep64_expansion_bus_cards(device_slot_interface &device)
+{
+	device.option_add("exdos", EP64_EXDOS);
+}

@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(COCO_PAK, coco_pak_device, "cocopak", "CoCo Program PAK")
 coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
-	, m_cart(nullptr), m_autostart(*this, CART_AUTOSTART_TAG)
+	, m_cart(nullptr), m_eprom(*this, CARTSLOT_TAG), m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
@@ -95,6 +95,15 @@ const tiny_rom_entry *coco_pak_device::device_rom_region() const
 	return ROM_NAME( coco_pak );
 }
 
+//-------------------------------------------------
+//  get_cart_size
+//-------------------------------------------------
+
+uint32_t coco_pak_device::get_cart_size()
+{
+	return 0x8000;
+}
+
 /*-------------------------------------------------
     device_reset - device-specific startup
 -------------------------------------------------*/
@@ -118,8 +127,31 @@ void coco_pak_device::device_reset()
 
 uint8_t* coco_pak_device::get_cart_base()
 {
-	return memregion(CARTSLOT_TAG)->base();
+	return m_eprom->base();
 }
+
+/*-------------------------------------------------
+    get_cart_memregion
+-------------------------------------------------*/
+
+memory_region* coco_pak_device::get_cart_memregion()
+{
+	return m_eprom;
+}
+
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_pak_device::cts_read)
+{
+	if (offset < m_eprom->bytes())
+		return m_eprom->base()[offset];
+	else
+		return 0x00;
+}
+
+
 
 /***************************************************************************
     BANKED CARTRIDGES
@@ -178,7 +210,6 @@ void coco_pak_banked_device::device_reset()
 	coco_pak_device::device_reset();
 
 	m_pos = 0;
-	cart_base_changed();
 }
 
 //-------------------------------------------------
@@ -187,10 +218,7 @@ void coco_pak_banked_device::device_reset()
 
 uint8_t *coco_pak_banked_device::get_cart_base()
 {
-	uint8_t *rom = memregion(CARTSLOT_TAG)->base();
-	uint32_t rom_length = memregion(CARTSLOT_TAG)->bytes();
-
-	return &rom[(m_pos * 0x4000) % rom_length];
+	return m_eprom->base() + (m_pos * 0x4000) % m_eprom->bytes();
 }
 
 //-------------------------------------------------
@@ -200,6 +228,15 @@ uint8_t *coco_pak_banked_device::get_cart_base()
 uint32_t coco_pak_banked_device::get_cart_size()
 {
 	return 0x4000;
+}
+
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_pak_banked_device::cts_read)
+{
+	return m_eprom->base()[(m_pos * 0x4000) % m_eprom->bytes() | offset];
 }
 
 //-------------------------------------------------

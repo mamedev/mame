@@ -11,11 +11,12 @@
 
 
 #undef G65816_CALL_DEBUGGER
-#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(this, x)
+#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(x)
 
-#define g65816_read_8(addr)             m_program->read_byte(addr)
-#define g65816_write_8(addr,data)       m_program->write_byte(addr,data)
-#define g65816_read_8_immediate(A)      m_program->read_byte(A)
+#define g65816_read_8(addr)             m_data_space->read_byte(addr)
+#define g65816_write_8(addr,data)       m_data_space->write_byte(addr,data)
+#define g65816_read_8_immediate(A)      m_program_cache->read_byte(A)
+#define g65816_read_8_opcode(A)         m_opcode_cache->read_byte(A)
 #define g65816_jumping(A)
 #define g65816_branching(A)
 
@@ -75,7 +76,6 @@
 #define LINE_NMI        m_line_nmi  /* Status of the NMI line */
 #define REGISTER_IR     m_ir        /* Instruction Register */
 #define INT_ACK         m_int_ack   /* Interrupt Acknowledge function pointer */
-#define READ_VECTOR     m_read_vector   /* Vector reading override */
 #define CLOCKS          m_ICount        /* Clock cycles remaining */
 #define IRQ_DELAY       m_irq_delay /* Delay 1 instruction before checking IRQ */
 #define CPU_STOPPED         m_stopped   /* Stopped status of the CPU */

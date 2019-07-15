@@ -60,41 +60,13 @@
 
 #pragma once
 
-
-#define MCFG_7404_Y1_CB(_devcb) \
-	devcb = &ttl7404_device::set_y1_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7404_Y2_CB(_devcb) \
-	devcb = &ttl7404_device::set_y2_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7404_Y3_CB(_devcb) \
-	devcb = &ttl7404_device::set_y3_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7404_Y4_CB(_devcb) \
-	devcb = &ttl7404_device::set_y4_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7404_Y5_CB(_devcb) \
-	devcb = &ttl7404_device::set_y5_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7404_Y6_CB(_devcb) \
-	devcb = &ttl7404_device::set_y6_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7404_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL7404, 0)
-
 class ttl7404_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl7404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl7404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_y1_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y1_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y2_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y2_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y3_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y3_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y4_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y4_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y5_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y5_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y6_cb(device_t &device, Object &&cb) { return downcast<ttl7404_device &>(device).m_y6_func.set_callback(std::forward<Object>(cb)); }
+	template <std::size_t Bit> auto y_cb() { return m_y_func[Bit].bind(); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( a1_w );
@@ -120,16 +92,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void init();
 	void update();
 
 	// callbacks
-	devcb_write_line m_y1_func;
-	devcb_write_line m_y2_func;
-	devcb_write_line m_y3_func;
-	devcb_write_line m_y4_func;
-	devcb_write_line m_y5_func;
-	devcb_write_line m_y6_func;
+	devcb_write_line m_y_func[6];
 
 	// inputs
 	uint8_t m_a;        // pins 1,3,5,9,11,13

@@ -98,17 +98,17 @@
 #define CHECK_SCD_LV5_INTERRUPT \
 	if (segacd_irq_mask & 0x20) \
 	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
+		m_68k->set_input_line(5, HOLD_LINE); \
 	}
 #define CHECK_SCD_LV4_INTERRUPT \
 	if (segacd_irq_mask & 0x10) \
 	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
+		m_68k->set_input_line(4, HOLD_LINE); \
 	}
 #define CHECK_SCD_LV4_INTERRUPT_A \
 	if (segacd_irq_mask & 0x10) \
 	{ \
-		machine().device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
+		m_68k->set_input_line(4, HOLD_LINE); \
 	}
 
 
@@ -135,6 +135,9 @@ DEFINE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device, "lc89510_temp", "lc89510_t
 
 lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LC89510_TEMP, tag, owner, clock)
+	, m_cdrom(*this, finder_base::DUMMY_TAG)
+	, m_cdda(*this, "cdda")
+	, m_68k(*this, finder_base::DUMMY_TAG)
 {
 	segacd_dma_callback =  segacd_dma_delegate(FUNC(lc89510_temp_device::Fake_CDC_Do_DMA), this);
 	type1_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
@@ -161,36 +164,6 @@ void lc89510_temp_device::dummy_interrupt_callback(void)
 {
 }
 
-void lc89510_temp_device::set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.segacd_dma_callback = new_segacd_dma_callback;
-}
-
-void lc89510_temp_device::set_type1_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.type1_interrupt_callback = interrupt_callback;
-}
-
-void lc89510_temp_device::set_type2_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.type2_interrupt_callback = interrupt_callback;
-}
-
-void lc89510_temp_device::set_type3_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.type3_interrupt_callback = interrupt_callback;
-}
-
-void lc89510_temp_device::set_is_neoCD(device_t &device, bool is_neoCD)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.is_neoCD = is_neoCD;
-}
-
 // HACK for DMA handling, this gets replaced
 void lc89510_temp_device::Fake_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination )
 {
@@ -203,8 +176,6 @@ void lc89510_temp_device::device_start()
 	type1_interrupt_callback.bind_relative_to(*owner());
 	type2_interrupt_callback.bind_relative_to(*owner());
 	type3_interrupt_callback.bind_relative_to(*owner());
-
-	m_cdda = (cdda_device*)subdevice("cdda");
 }
 
 void lc89510_temp_device::device_reset()
@@ -1135,16 +1106,12 @@ void lc89510_temp_device::reset_cd(void)
 	lc89510_Reset();
 
 	{
-		cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
-		if ( cddevice )
+		segacd.cd = m_cdrom->get_cdrom_file();
+		if ( segacd.cd )
 		{
-			segacd.cd = cddevice->get_cdrom_file();
-			if ( segacd.cd )
-			{
-				segacd.toc = cdrom_get_toc( segacd.cd );
-				m_cdda->set_cdrom(segacd.cd);
-				m_cdda->stop_audio(); //stop any pending CD-DA
-			}
+			segacd.toc = cdrom_get_toc( segacd.cd );
+			m_cdda->set_cdrom(segacd.cd);
+			m_cdda->stop_audio(); //stop any pending CD-DA
 		}
 	}
 
@@ -1184,13 +1151,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 }
 
 
-MACHINE_CONFIG_START(lc89510_temp_device::device_add_mconfig)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("hock_timer", lc89510_temp_device, segacd_access_timer_callback, attotime::from_hz(75))
+void lc89510_temp_device::device_add_mconfig(machine_config &config)
+{
+	TIMER(config, "hock_timer").configure_periodic(FUNC(lc89510_temp_device::segacd_access_timer_callback), attotime::from_hz(75));
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 ) // TODO: accurate volume balance
-	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
-MACHINE_CONFIG_END
+	cdda_device &cdda(CDDA(config, "cdda"));
+	cdda.add_route(0, ":lspeaker", 0.50); // TODO: accurate volume balance
+	cdda.add_route(1, ":rspeaker", 0.50);
+}
 
 
 

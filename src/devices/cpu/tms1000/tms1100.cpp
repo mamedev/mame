@@ -15,20 +15,22 @@
 #include "debugger.h"
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
-DEFINE_DEVICE_TYPE(TMS1100, tms1100_cpu_device, "tms1100", "TMS1100") // 28-pin DIP, 11 R pins
-DEFINE_DEVICE_TYPE(TMS1170, tms1170_cpu_device, "tms1170", "TMS1170") // high voltage version
-DEFINE_DEVICE_TYPE(TMS1300, tms1300_cpu_device, "tms1300", "TMS1300") // 40-pin DIP, 16 R pins
-DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "TMS1370") // high voltage version, also seen in 28-pin package(some O/R pins unavailable)
+DEFINE_DEVICE_TYPE(TMS1100, tms1100_cpu_device, "tms1100", "Texas Instruments TMS1100") // 28-pin DIP, 11 R pins
+DEFINE_DEVICE_TYPE(TMS1170, tms1170_cpu_device, "tms1170", "Texas Instruments TMS1170") // high voltage version
+DEFINE_DEVICE_TYPE(TMS1300, tms1300_cpu_device, "tms1300", "Texas Instruments TMS1300") // 40-pin DIP, 16 R pins
+DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "Texas Instruments TMS1370") // high voltage version, also seen in 28-pin package(some O/R pins unavailable)
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1100_cpu_device::program_11bit_8)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void tms1100_cpu_device::program_11bit_8(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(tms1100_cpu_device::data_128x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void tms1100_cpu_device::data_128x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
 
 // device definitions
@@ -59,9 +61,9 @@ tms1370_cpu_device::tms1370_cpu_device(const machine_config &mconfig, const char
 
 
 // disasm
-util::disasm_interface *tms1100_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms1100_cpu_device::create_disassembler()
 {
-	return new tms1100_disassembler;
+	return std::make_unique<tms1100_disassembler>();
 }
 
 // device_reset

@@ -121,58 +121,56 @@ WRITE8_MEMBER(hexion_state::ccu_int_time_w)
 	m_ccu_int_time = data;
 }
 
-ADDRESS_MAP_START(hexion_state::hexion_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(bankedram_r, bankedram_w)
-	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(bankctrl_w)
-	AM_RANGE(0xe000, 0xe000) AM_NOP
-	AM_RANGE(0xe800, 0xe87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0xe8e0, 0xe8ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
-	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")
-	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
-	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
-	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-ADDRESS_MAP_END
+void hexion_state::hexion_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
+	map(0xe000, 0xe000).noprw();
+	map(0xe800, 0xe8ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
+	map(0xf200, 0xf200).w("oki", FUNC(okim6295_device::write));
+	map(0xf400, 0xf400).portr("DSW1");
+	map(0xf401, 0xf401).portr("DSW2");
+	map(0xf402, 0xf402).portr("P1");
+	map(0xf403, 0xf403).portr("P2");
+	map(0xf440, 0xf440).portr("DSW3");
+	map(0xf441, 0xf441).portr("SYSTEM");
+	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
+	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
-ADDRESS_MAP_START(hexion_state::hexionb_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(bankedram_r, bankedram_w)
-	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(bankctrl_w)
-	AM_RANGE(0xe000, 0xe000) AM_NOP
-	AM_RANGE(0xe800, 0xe87f) AM_NOP // all the code to use the k051649 is still present
-	AM_RANGE(0xe880, 0xe889) AM_NOP // but the bootleg has an additional M6295 @ 0xf5c0 instead
-	AM_RANGE(0xe88a, 0xe88e) AM_NOP
-	AM_RANGE(0xe88f, 0xe88f) AM_NOP
-	AM_RANGE(0xe8e0, 0xe8ff) AM_NOP
-	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
-	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")
-	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
-	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
-	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0xf5c0, 0xf5c0) AM_DEVWRITE("oki2", okim6295_device, write)
-ADDRESS_MAP_END
+void hexion_state::hexionb_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
+	map(0xe000, 0xe000).noprw();
+	map(0xe800, 0xe87f).noprw(); // all the code to use the k051649 is still present
+	map(0xe880, 0xe889).noprw(); // but the bootleg has an additional M6295 @ 0xf5c0 instead
+	map(0xe88a, 0xe88e).noprw();
+	map(0xe88f, 0xe88f).noprw();
+	map(0xe8e0, 0xe8ff).noprw();
+	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
+	map(0xf200, 0xf200).w("oki", FUNC(okim6295_device::write));
+	map(0xf400, 0xf400).portr("DSW1");
+	map(0xf401, 0xf401).portr("DSW2");
+	map(0xf402, 0xf402).portr("P1");
+	map(0xf403, 0xf403).portr("P2");
+	map(0xf440, 0xf440).portr("DSW3");
+	map(0xf441, 0xf441).portr("SYSTEM");
+	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
+	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xf5c0, 0xf5c0).w("oki2", FUNC(okim6295_device::write));
+}
 
 static INPUT_PORTS_START( hexion )
 	PORT_START("DSW1")
@@ -210,7 +208,7 @@ static INPUT_PORTS_START( hexion )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 052591? game waits for it to be 0 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 052591? game waits for it to be 0 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -230,7 +228,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( hexion )
+static GFXDECODE_START( gfx_hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -253,52 +251,51 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 	}
 }
 
-
-MACHINE_CONFIG_START(hexion_state::hexion)
-
+void hexion_state::hexion(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
-	MCFG_CPU_PROGRAM_MAP(hexion_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hexion_state::hexion_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(hexion_state::scanline), "screen", 0, 1);
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(hexion_state, ccu_int_time_w))
+	K053252(config, m_k053252, XTAL(24'000'000)/2); /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
+	m_k053252->int1_ack().set(FUNC(hexion_state::irq_ack_w));
+	m_k053252->int2_ack().set(FUNC(hexion_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(hexion_state::ccu_int_time_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 36*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(hexion_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hexion);
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	/* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_K051649_ADD("k051649", XTAL(24'000'000)/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	/* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
+	K051649(config, "k051649", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(hexion_state::hexionb)
+void hexion_state::hexionb(machine_config &config)
+{
 	hexion(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hexionb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hexion_state::hexionb_map);
 
-	MCFG_DEVICE_REMOVE("k051649")
+	config.device_remove("k051649");
 
-	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	// clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
+	OKIM6295(config, "oki2", 1056000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 /***************************************************************************
@@ -354,5 +351,5 @@ ROM_START( hexionb )
 	//PAL20L10 @U31
 ROM_END
 
-GAME( 1992, hexion, 0,      hexion, hexion, hexion_state, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
-GAME( 1992, hexionb,hexion, hexionb,hexion, hexion_state, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA
+GAME( 1992, hexion,  0,      hexion,  hexion, hexion_state, empty_init, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
+GAME( 1992, hexionb, hexion, hexionb, hexion, hexion_state, empty_init, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA

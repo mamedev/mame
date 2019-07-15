@@ -5,27 +5,18 @@
 
 #pragma once
 
-
-#define MCFG_HCD62121_KOL_CB(_devcb) devcb = &hcd62121_cpu_device::set_kol_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_KOH_CB(_devcb) devcb = &hcd62121_cpu_device::set_koh_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_PORT_CB(_devcb) devcb = &hcd62121_cpu_device::set_port_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_OPT_CB(_devcb) devcb = &hcd62121_cpu_device::set_opt_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_KI_CB(_devcb) devcb = &hcd62121_cpu_device::set_ki_callback(*device, DEVCB_##_devcb);
-#define MCFG_HCD62121_IN0_CB(_devcb) devcb = &hcd62121_cpu_device::set_in0_callback(*device, DEVCB_##_devcb);
-
-
 class hcd62121_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
 	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_kol_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_kol_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_koh_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_koh_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_port_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_opt_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_opt_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ki_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_ki_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in0_callback(device_t &device, Object &&cb) { return downcast<hcd62121_cpu_device &>(device).m_in0_cb.set_callback(std::forward<Object>(cb)); }
+	auto kol_cb() { return m_kol_cb.bind(); }
+	auto koh_cb() { return m_koh_cb.bind(); }
+	auto port_cb() { return m_port_cb.bind(); }
+	auto opt_cb() { return m_opt_cb.bind(); }
+	auto ki_cb() { return m_ki_cb.bind(); }
+	auto in0_cb() { return m_in0_cb.bind(); }
 
 protected:
 	enum
@@ -61,7 +52,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	u8 read_op();

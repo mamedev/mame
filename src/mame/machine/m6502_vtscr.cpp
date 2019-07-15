@@ -5,16 +5,16 @@
     m6502_vtscr.cpp
 
     6502 with VRT VTxx instruction scrambling
-    
+
     Scrambling in newer NES-based VTxx systems (FC pocket, etc) seems to be
     enabled with a write of 5 to 0x411E, then is activated at the next jump?
     When enabled, opcodes are to be XORed with 0xA1
-    
-    Another form of scrambling is used in the VRT VT1682, this is not yet 
+
+    Another form of scrambling is used in the VRT VT1682, this is not yet
     implemented at all in MAME (it's used for the MiWi2 and InterAct consoles).
     This is simpler, permanently activated and consists of swapping opcode bits
     7 and 2.
-    
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -59,12 +59,12 @@ bool m6502_vtscr::mi_decrypt::toggle_scramble(uint8_t op) {
 
 uint8_t m6502_vtscr::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = direct->read_byte(adr);
+	uint8_t res = cache->read_byte(adr);
 	if(m_scramble_en)
 	{
 		res = descramble(res);
 	}
-	
+
 	if(toggle_scramble(res))
 	{
 		m_scramble_en = m_next_scramble;
@@ -77,9 +77,9 @@ uint8_t m6502_vtscr::mi_decrypt::descramble(uint8_t op)
 	return op ^ 0xA1;
 }
 
-util::disasm_interface *m6502_vtscr::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6502_vtscr::create_disassembler()
 {
-	return new disassembler(downcast<mi_decrypt *>(mintf.get()));
+	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
 }
 
 m6502_vtscr::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)

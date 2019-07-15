@@ -30,8 +30,12 @@ void msx_cart_holy_quran_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_decrypt));
+}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_holy_quran_device::restore_banks), this));
+
+void msx_cart_holy_quran_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -64,7 +68,7 @@ void msx_cart_holy_quran_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_holy_quran_device::read_cart)
+uint8_t msx_cart_holy_quran_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -77,7 +81,7 @@ READ8_MEMBER(msx_cart_holy_quran_device::read_cart)
 
 		// The decryption should actually start working after the first M1 cycle executing something
 		// from the cartridge.
-		if (offset == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effect_disabled())
+		if (offset == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effects_disabled())
 		{
 			m_decrypt = true;
 		}
@@ -88,7 +92,7 @@ READ8_MEMBER(msx_cart_holy_quran_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_holy_quran_device::write_cart)
+void msx_cart_holy_quran_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

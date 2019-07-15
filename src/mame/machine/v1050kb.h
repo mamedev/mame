@@ -15,16 +15,6 @@
 #include "sound/discrete.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &v1050_keyboard_device::set_out_tx_handler(*device, DEVCB_##_devcb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -40,7 +30,7 @@ public:
 	// device flags
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
-	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
+	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 
@@ -54,10 +44,11 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8049_device> m_maincpu;
 	required_device<discrete_sound_device> m_discrete;
 	required_ioport_array<12> m_y;
 	devcb_write_line   m_out_tx_handler;
+	output_finder<> m_led;
 
 	uint8_t m_keylatch;
 

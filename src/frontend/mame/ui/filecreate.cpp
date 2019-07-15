@@ -182,7 +182,7 @@ void menu_file_create::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Create"), "", 0, ITEMREF_CREATE);
 
-	customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 

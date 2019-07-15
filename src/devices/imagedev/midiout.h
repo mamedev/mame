@@ -8,17 +8,12 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_MIDIOUT_H
-#define MAME_DEVICES_IMAGEDEV_MIDIOUT_H
+#ifndef MAME_IMAGEDEV_MIDIOUT_H
+#define MAME_IMAGEDEV_MIDIOUT_H
 
+#pragma once
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-
-#define MCFG_MIDIOUT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDIOUT, 0)
+#include "diserial.h"
 
 
 /***************************************************************************
@@ -67,4 +62,4 @@ DECLARE_DEVICE_TYPE(MIDIOUT, midiout_device)
 // device iterator
 typedef device_type_iterator<midiout_device> midiout_device_iterator;
 
-#endif // MAME_DEVICES_IMAGEDEV_MIDIOUT_H
+#endif // MAME_IMAGEDEV_MIDIOUT_H

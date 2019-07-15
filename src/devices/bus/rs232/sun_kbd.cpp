@@ -22,13 +22,14 @@ sun_keyboard_adaptor_device::~sun_keyboard_adaptor_device()
 }
 
 
-MACHINE_CONFIG_START(sun_keyboard_adaptor_device::device_add_mconfig)
-	MCFG_SUNKBD_PORT_ADD("keyboard", default_sun_keyboard_devices, nullptr)
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(sun_keyboard_adaptor_device, output_rxd))
-MACHINE_CONFIG_END
+void sun_keyboard_adaptor_device::device_add_mconfig(machine_config &config)
+{
+	SUNKBD_PORT(config, m_keyboard_port, default_sun_keyboard_devices, nullptr);
+	m_keyboard_port->rxd_handler().set(FUNC(sun_keyboard_adaptor_device::output_rxd));
+}
 
 
-WRITE_LINE_MEMBER( sun_keyboard_adaptor_device::input_txd )
+WRITE_LINE_MEMBER(sun_keyboard_adaptor_device::input_txd)
 {
 	m_keyboard_port->write_txd(state);
 }

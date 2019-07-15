@@ -6,14 +6,14 @@
     Front-end for SHARC recompiler
 
 ******************************************************************************/
+#ifndef MAME_CPU_SHARC_SHARCFE_H
+#define MAME_CPU_SHARC_SHARCFE_H
 
 #pragma once
 
 #include "sharc.h"
 #include "cpu/drcfe.h"
 
-#ifndef __SHARCFE_H__
-#define __SHARCFE_H__
 
 class sharc_frontend : public drc_frontend
 {
@@ -78,4 +78,4 @@ private:
 	std::unique_ptr<LOOP_ENTRY[]> m_loopmap;
 };
 
-#endif /* __SHARCFE_H__ */
+#endif // MAME_CPU_SHARC_SHARCFE_H

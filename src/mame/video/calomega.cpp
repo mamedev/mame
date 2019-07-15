@@ -53,16 +53,14 @@ void calomega_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(calomega_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 31);
 }
 
-uint32_t calomega_state::screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t calomega_state::screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(calomega_state, calomega)
+void calomega_state::calomega_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-
 /*  the proms are 256x4 bit, but the games only seem to need the first 128 entries,
     and the rest of the PROM data looks like junk rather than valid colors
 
@@ -78,27 +76,29 @@ PALETTE_INIT_MEMBER(calomega_state, calomega)
 	// TODO: hook pots up as PORT_ADJUSTERs instead of hard coding them here
 
 	// let's make the BG a little darker than FG blue
-	const int r_pot = 0x00;
-	const int g_pot = 0x00;
-	const int b_pot = 0xc0;
+	constexpr int r_pot = 0x00;
+	constexpr int g_pot = 0x00;
+	constexpr int b_pot = 0xc0;
 
-	/* 00000BGR */
-	if (color_prom == nullptr) return;
+	// 00000BGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (int i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int nibble = color_prom[i];
+		int const nibble = color_prom[i];
 
-		int fg = BIT(nibble, 3);
+		int const fg = BIT(nibble, 3);
 
-		/* red component */
-		int r = BIT(nibble, 0) * (fg ? 0xff : r_pot);
+		// red component
+		int const r = BIT(nibble, 0) * (fg ? 0xff : r_pot);
 
-		/* green component */
-		int g = BIT(nibble, 1) * (fg ? 0xff : g_pot);
+		// green component
+		int const g = BIT(nibble, 1) * (fg ? 0xff : g_pot);
 
-		/* blue component */
-		int b = BIT(nibble, 2) * (fg ? 0xff : b_pot);
+		// blue component
+		int const b = BIT(nibble, 2) * (fg ? 0xff : b_pot);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

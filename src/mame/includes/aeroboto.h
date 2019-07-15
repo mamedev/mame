@@ -5,12 +5,18 @@
     Aeroboto
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_AEROBOTO_H
+#define MAME_INCLUDES_AEROBOTO_H
+
+#pragma once
+
+#include "emupal.h"
 
 class aeroboto_state : public driver_device
 {
 public:
-	aeroboto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	aeroboto_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_hscroll(*this, "hscroll"),
@@ -21,8 +27,10 @@ public:
 		m_stary(*this, "stary"),
 		m_bgcolor(*this, "bgcolor"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
@@ -64,12 +72,15 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_aeroboto(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(aeroboto_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void formatz(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AEROBOTO_H

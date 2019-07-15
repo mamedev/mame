@@ -28,25 +28,6 @@
 
 #include "dirtc.h"
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_HD64610_OUT_IRQ_CB(_devcb) \
-	devcb = &hd64610_device::set_out_irq_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_HD64610_OUT_1HZ_CB(_devcb) \
-	devcb = &hd64610_device::set_out_1hz_callback(*device, DEVCB_##_devcb);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> hd64610_device
-
 class hd64610_device :  public device_t,
 						public device_rtc_interface,
 						public device_nvram_interface
@@ -55,8 +36,8 @@ public:
 	// construction/destruction
 	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_1hz_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_out_irq_cb.bind(); }
+	auto clkout() { return m_out_1hz_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -78,26 +59,23 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
-	inline void set_irq_line();
-	inline uint8_t read_counter(int counter);
-	inline void write_counter(int counter, uint8_t value);
-	inline void check_alarm();
+	void set_irq_line();
+	uint8_t read_counter(int counter);
+	void write_counter(int counter, uint8_t value);
+	void check_alarm();
 
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
 	devcb_write_line        m_out_irq_cb;
 	devcb_write_line        m_out_1hz_cb;
 
-	uint8_t   m_regs[0x10];       // Internal registers
-	int     m_hline_state;      // H-Start/Stop line
-	int     m_irq_out;          // alarm output
+	uint8_t m_regs[0x10];   // Internal registers
+	int     m_hline_state;  // H-Start/Stop line
+	int     m_irq_out;      // alarm output
 
-	// timers
 	emu_timer *m_counter_timer;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(HD64610, hd64610_device)
 
 #endif // MAME_MACHINE_HD64610_H

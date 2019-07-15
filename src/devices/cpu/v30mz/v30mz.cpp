@@ -95,7 +95,7 @@ enum BREGS {
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "V30MZ")
+DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "NEC V30MZ")
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -147,7 +147,7 @@ device_memory_interface::space_config_vector v30mz_cpu_device::memory_space_conf
 void v30mz_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));
@@ -191,7 +191,7 @@ void v30mz_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%05X");
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).callimport().callexport().formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -319,7 +319,7 @@ inline void v30mz_cpu_device::write_port(uint16_t port, uint8_t data)
 
 inline uint8_t v30mz_cpu_device::fetch_op()
 {
-	uint8_t data = m_direct->read_byte( pc() );
+	uint8_t data = m_cache->read_byte( pc() );
 	m_ip++;
 	return data;
 }
@@ -327,7 +327,7 @@ inline uint8_t v30mz_cpu_device::fetch_op()
 
 inline uint8_t v30mz_cpu_device::fetch()
 {
-	uint8_t data = m_direct->read_byte( pc() );
+	uint8_t data = m_cache->read_byte( pc() );
 	m_ip++;
 	return data;
 }
@@ -1305,9 +1305,9 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 }
 
 
-util::disasm_interface *v30mz_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v30mz_cpu_device::create_disassembler()
 {
-	return new nec_disassembler;
+	return std::make_unique<nec_disassembler>();
 }
 
 
@@ -1361,7 +1361,7 @@ void v30mz_cpu_device::execute_run()
 			}
 		}
 
-		debugger_instruction_hook( this, pc() );
+		debugger_instruction_hook( pc() );
 
 		uint8_t op = fetch_op();
 

@@ -10,10 +10,6 @@
 #define MAME_SOUND_UPD1771_H
 
 
-#define MCFG_UPD1771_ACK_HANDLER(_devcb) \
-	devcb = &upd1771c_device::set_ack_handler(*device, DEVCB_##_devcb);
-
-
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
@@ -24,7 +20,7 @@ class upd1771c_device : public device_t,
 public:
 	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_ack_handler(device_t &device, Object &&cb) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(std::forward<Object>(cb)); }
+	auto ack_handler() { return m_ack_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

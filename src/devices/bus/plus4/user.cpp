@@ -17,7 +17,8 @@
 #include "diag264_lb_user.h"
 #include "bus/vic20/vic1011.h"
 
-SLOT_INTERFACE_START( plus4_user_port_cards )
-	SLOT_INTERFACE("diag264", DIAG264_USER_PORT_LOOPBACK)
-	SLOT_INTERFACE("rs232", VIC1011)
-SLOT_INTERFACE_END
+void plus4_user_port_cards(device_slot_interface &device)
+{
+	device.option_add("diag264", DIAG264_USER_PORT_LOOPBACK);
+	device.option_add("rs232", VIC1011);
+}

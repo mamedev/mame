@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -23,14 +24,15 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void neptunp2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(test_r);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void neptunp2(machine_config &config);
 	void neptunp2_io(address_map &map);
 	void neptunp2_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -54,25 +56,27 @@ READ8_MEMBER( neptunp2_state::test_r )
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(neptunp2_state::neptunp2_map)
-	AM_RANGE(0x00000, 0xbffff) AM_ROM
-	AM_RANGE(0xe0000, 0xeffff) AM_RAM
+void neptunp2_state::neptunp2_map(address_map &map)
+{
+	map(0x00000, 0xbffff).rom();
+	map(0xe0000, 0xeffff).ram();
 
-	AM_RANGE(0xd0000, 0xd7fff) AM_RAM //videoram
-	AM_RANGE(0xdb004, 0xdb007) AM_RAM
-	AM_RANGE(0xdb00c, 0xdb00f) AM_RAM
+	map(0xd0000, 0xd7fff).ram(); //videoram
+	map(0xdb004, 0xdb007).ram();
+	map(0xdb00c, 0xdb00f).ram();
 
-	AM_RANGE(0xff806, 0xff806) AM_READ(test_r)
-	AM_RANGE(0xff810, 0xff810) AM_READ(test_r)
-	AM_RANGE(0xff812, 0xff812) AM_READ(test_r)
+	map(0xff806, 0xff806).r(FUNC(neptunp2_state::test_r));
+	map(0xff810, 0xff810).r(FUNC(neptunp2_state::test_r));
+	map(0xff812, 0xff812).r(FUNC(neptunp2_state::test_r));
 
-	AM_RANGE(0xff980, 0xff980) AM_WRITENOP
+	map(0xff980, 0xff980).nopw();
 
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(neptunp2_state::neptunp2_io)
-ADDRESS_MAP_END
+void neptunp2_state::neptunp2_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( neptunp2 )
@@ -91,34 +95,33 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( neptunp2 )
+static GFXDECODE_START( gfx_neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(neptunp2_state::neptunp2)
-
+void neptunp2_state::neptunp2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
-	MCFG_CPU_PROGRAM_MAP(neptunp2_map)
-	MCFG_CPU_IO_MAP(neptunp2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
+	I80188(config, m_maincpu, 20000000); // N80C188-20 AMD
+	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::neptunp2_map);
+	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::neptunp2_io);
+	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(neptunp2_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(neptunp2_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", neptunp2)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_neptunp2);
+	PALETTE(config, "palette").set_entries(512);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+}
 
 /***************************************************************************
 
@@ -142,4 +145,4 @@ ROM_START( neptunp2 )
 ROM_END
 
 
-GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

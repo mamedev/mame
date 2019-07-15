@@ -10,7 +10,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A570 Utilities" />
 			<dataarea name="flop" size="901120">
-				<rom name="370132_a570_utilities.adf" size="901120" crc="30097474" sha1="958b97674e3e99fb9b0e3117009f27d4e7a9220b" offset="0"/>
+				<rom name="370132_a570_utilities.adf" size="901120" crc="30097474" sha1="958b97674e3e99fb9b0e3117009f27d4e7a9220b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23,7 +23,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A590 Setup Disk 1.1 (SCSI Harddisk)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317734-01_a590_scsi.adf" size="901120" crc="a560a938" sha1="9c6136c6580779a948cd1c0b50cb229512af415c" offset="0"/>
+				<rom name="317734-01_a590_scsi.adf" size="901120" crc="a560a938" sha1="9c6136c6580779a948cd1c0b50cb229512af415c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38,7 +38,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A590 Setup Disk 1.23 (Western Digital Harddisk)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317734-03_a590_wd.adf" size="901120" crc="a88fda41" sha1="7424f8645e1903e3e4ec8bb824186868319be1f3" offset="0"/>
+				<rom name="317734-03_a590_wd.adf" size="901120" crc="a88fda41" sha1="7424f8645e1903e3e4ec8bb824186868319be1f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,7 +50,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A590 Setup Disk (Seagate Harddisk)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317734-04_a590_seagate.adf" size="901120" status="nodump" offset="0"/>
+				<rom name="317734-04_a590_seagate.adf" size="901120" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A590 RAM Test Software" />
 			<dataarea name="flop" size="901120">
-				<rom name="317830-01_a590_ram_test.adf" size="901120" crc="6583d1d0" sha1="7779b825b8555956d341ff7e909ab71d89e2321c" offset="0"/>
+				<rom name="317830-01_a590_ram_test.adf" size="901120" crc="6583d1d0" sha1="7779b825b8555956d341ff7e909ab71d89e2321c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A2024 JumpStart" />
 			<dataarea name="flop" size="901120">
-				<rom name="317809-01_a2024_jumpstart.adf" size="901120" crc="dad46588" sha1="30c2c1f1d98bd008b2c67f3b23480181935d4b01" offset="0"/>
+				<rom name="317809-01_a2024_jumpstart.adf" size="901120" crc="dad46588" sha1="30c2c1f1d98bd008b2c67f3b23480181935d4b01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -88,7 +88,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A2091 Setup Disk 1.30" />
 			<dataarea name="flop" size="901120">
-				<rom name="317806-04_a2091_setup.adf" size="901120" crc="122c8f93" sha1="603e106c1a44a209171610af8d48bc35ad31c9bc" offset="0"/>
+				<rom name="317806-04_a2091_setup.adf" size="901120" crc="122c8f93" sha1="603e106c1a44a209171610af8d48bc35ad31c9bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A2058 RAM Test Disk" />
 			<dataarea name="flop" size="901120">
-				<rom name="317719-01_a2058_ram_test.adf" size="901120" crc="5dba7fc3" sha1="76fbce4bef7df0f6042c85376d9bdfd4d4911e74" offset="0"/>
+				<rom name="317719-01_a2058_ram_test.adf" size="901120" crc="5dba7fc3" sha1="76fbce4bef7df0f6042c85376d9bdfd4d4911e74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A2232 Install" />
 			<dataarea name="flop" size="901120">
-				<rom name="317769-01_a2232_install.adf" size="901120" crc="3caa21b7" sha1="24f47f6f88712f046303b8812a598043440a5e6d" offset="0"/>
+				<rom name="317769-01_a2232_install.adf" size="901120" crc="3caa21b7" sha1="24f47f6f88712f046303b8812a598043440a5e6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A2300 Genlock Demo" />
 			<dataarea name="flop" size="901120">
-				<rom name="317718-02_a2300_genlock_demo.adf" size="901120" crc="464ff0f6" sha1="26b94e8d52d35e2746b74610bb9b65eb2f899297" offset="0"/>
+				<rom name="317718-02_a2300_genlock_demo.adf" size="901120" crc="464ff0f6" sha1="26b94e8d52d35e2746b74610bb9b65eb2f899297"/>
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="A2232 Test / Demo" />
 			<dataarea name="flop" size="901120">
-				<rom name="317210-01_a2320_test_demo.adf" size="901120" crc="cff98aae" sha1="f46f7de0d908ed68abfd784d84b964cbce7dc503" offset="0"/>
+				<rom name="317210-01_a2320_test_demo.adf" size="901120" crc="cff98aae" sha1="f46f7de0d908ed68abfd784d84b964cbce7dc503"/>
 			</dataarea>
 		</part>
 	</software>

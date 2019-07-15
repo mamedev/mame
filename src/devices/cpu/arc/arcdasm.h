@@ -21,10 +21,10 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const char *const basic[0x20];
-	static const char *conditions[0x20];
-	static const char *delaytype[0x4];
-	static const char *regnames[0x40];
+	static char const *const basic[0x20];
+	static char const *const conditions[0x20];
+	static char const *const delaytype[0x4];
+	static char const *const regnames[0x40];
 
 };
 

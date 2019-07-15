@@ -15,20 +15,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SG1000_EXPANSION_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, SG1000_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-#define MCFG_SG1000_EXPANSION_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -41,7 +27,17 @@ class sg1000_expansion_slot_device : public device_t, public device_slot_interfa
 {
 public:
 	// construction/destruction
-	sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	sg1000_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
+		: sg1000_expansion_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
+
+	sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sg1000_expansion_slot_device();
 
 	DECLARE_READ8_MEMBER(read);
@@ -84,7 +80,7 @@ protected:
 DECLARE_DEVICE_TYPE(SG1000_EXPANSION_SLOT, sg1000_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( sg1000_expansion_devices );
+void sg1000_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SG1000_EXP_SG1000EXP_H

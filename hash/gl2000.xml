@@ -11,7 +11,7 @@
 		<info name="serial" value="80-2215" />
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-5585-00" size="0x20000" crc="e583cee5" sha1="9ae1c0fc5327ae3abb8e37a6cf979cba1250d9aa" offset="0" />
+				<rom name="27-5585-00" size="0x20000" crc="e583cee5" sha1="9ae1c0fc5327ae3abb8e37a6cf979cba1250d9aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 		<info name="serial" value="80-2496" />
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-5775-01" size="0x20000" crc="2d1c0575" sha1="b5c2c3655d650c3901b6f966fd3af9fde1c06b2c" offset="0" />
+				<rom name="27-5775-01" size="0x20000" crc="2d1c0575" sha1="b5c2c3655d650c3901b6f966fd3af9fde1c06b2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@
 		<info name="serial" value="80-12074" />
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-5919-00" size="0x20000" crc="40f8908d" sha1="c27c842e806233aa27baa586837e4f24e367bd1a" offset="0" />
+				<rom name="27-5919-00" size="0x20000" crc="40f8908d" sha1="c27c842e806233aa27baa586837e4f24e367bd1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<info name="serial" value="80-2232" />
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-5775-00" size="0x20000" crc="04d231af" sha1="1dc39539b212336a64721e0f353678d00c5be250" offset="0" />
+				<rom name="27-5775-00" size="0x20000" crc="04d231af" sha1="1dc39539b212336a64721e0f353678d00c5be250"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,8 +67,8 @@
 		<info name="serial" value="80-1587" />
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="80-1587" size="0x10000" crc="55eef702" sha1="52923c2b337a49a006affbd30f953c406dc745c6" offset="0" />
-				<rom size="0x10000" offset="0" loadflag="continue"/>
+				<rom name="80-1587" size="0x10000" crc="55eef702" sha1="52923c2b337a49a006affbd30f953c406dc745c6"/>
+				<rom size="0x10000" loadflag="continue"/>
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@
 		<publisher>Video Technology</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="80-1587" size="0x20000" crc="55eef702" sha1="52923c2b337a49a006affbd30f953c406dc745c6" offset="0" />
+				<rom name="80-1587" size="0x20000" crc="55eef702" sha1="52923c2b337a49a006affbd30f953c406dc745c6"/>
 			</dataarea>
 		</part>
 	</software>

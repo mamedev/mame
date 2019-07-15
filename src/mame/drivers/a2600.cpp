@@ -17,6 +17,7 @@ TODO:
 
 #include "includes/a2600.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -29,21 +30,22 @@ TODO:
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
-ADDRESS_MAP_START(a2600_state::a2600_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
+void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
+{
+	map(0x0000, 0x007f).mirror(0x0f00).rw(m_tia, FUNC(tia_video_device::read), FUNC(tia_video_device::write));
+	map(0x0080, 0x00ff).mirror(0x0d00).ram().share("riot_ram");
 #if USE_NEW_RIOT
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVICE("riot", mos6532_t, io_map)
+	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_t::io_map));
 #else
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
+	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
-	// AM_RANGE(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
-ADDRESS_MAP_END
+	// map(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
+}
 
 
 READ8_MEMBER(a2600_state::cart_over_all_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_cart->write_bank(space, offset, 0);
 
 	int masked_offset = offset &~ 0x0d00;
@@ -113,7 +115,7 @@ WRITE8_MEMBER(a2600_state::cart_over_all_w)
 	/* 0x300 - 0x3ff already masked out */
 }
 
-WRITE8_MEMBER(a2600_state::switch_A_w)
+WRITE8_MEMBER(a2600_base_state::switch_A_w)
 {
 	/* Left controller port */
 	m_joy1->joy_w( data >> 4 );
@@ -124,59 +126,59 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 //  switch( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
 //  {
 //  case 0x0a:  /* KidVid voice module */
-//      m_cassette->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+//      m_cassette->change_state(( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : (CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), CASSETTE_MOTOR_DISABLED );
 //      break;
 //  }
 }
 
-READ8_MEMBER(a2600_state::switch_A_r)
+READ8_MEMBER(a2600_base_state::switch_A_r)
 {
 	uint8_t val = 0;
 
-	/* Left controller port PINs 1-4 ( 4321 ) */
-	val |= ( m_joy1->joy_r() & 0x0F ) << 4;
+	// Left controller port PINs 1-4 ( 4321 )
+	val |= (m_joy1->read_joy() & 0x0f) << 4;
 
-	/* Right controller port PINs 1-4 ( 4321 ) */
-	val |= m_joy2->joy_r() & 0x0F;
+	// Right controller port PINs 1-4 ( 4321 )
+	val |= m_joy2->read_joy() & 0x0f;
 
 	return val;
 }
 
-WRITE8_MEMBER(a2600_state::switch_B_w)
+WRITE8_MEMBER(a2600_base_state::switch_B_w)
 {
 }
 
-WRITE_LINE_MEMBER(a2600_state::irq_callback)
+WRITE_LINE_MEMBER(a2600_base_state::irq_callback)
 {
 }
 
-READ8_MEMBER(a2600_state::riot_input_port_8_r)
+READ8_MEMBER(a2600_base_state::riot_input_port_8_r)
 {
 	return m_swb->read();
 }
 
 
-READ16_MEMBER(a2600_state::a2600_read_input_port)
+READ16_MEMBER(a2600_base_state::a2600_read_input_port)
 {
-	switch( offset )
+	switch (offset)
 	{
-	case 0: /* Left controller port PIN 5 */
-		return m_joy1->pot_x_r();
+	case 0: // Left controller port PIN 5
+		return m_joy1->read_pot_x();
 
-	case 1: /* Left controller port PIN 9 */
-		return m_joy1->pot_y_r();
+	case 1: // Left controller port PIN 9
+		return m_joy1->read_pot_y();
 
-	case 2: /* Right controller port PIN 5 */
-		return m_joy2->pot_x_r();
+	case 2: // Right controller port PIN 5
+		return m_joy2->read_pot_x();
 
-	case 3: /* Right controller port PIN 9 */
-		return m_joy2->pot_y_r();
+	case 3: // Right controller port PIN 9
+		return m_joy2->read_pot_y();
 
-	case 4: /* Left controller port PIN 6 */
-		return ( m_joy1->joy_r() & 0x20 ) ? 0xff : 0x7f;
+	case 4: // Left controller port PIN 6
+		return (m_joy1->read_joy() & 0x20) ? 0xff : 0x7f;
 
-	case 5: /* Right controller port PIN 6 */
-		return ( m_joy2->joy_r() & 0x20 ) ? 0xff : 0x7f;
+	case 5: // Right controller port PIN 6
+		return (m_joy2->read_joy() & 0x20) ? 0xff : 0x7f;
 	}
 	return 0xff;
 }
@@ -190,7 +192,7 @@ READ16_MEMBER(a2600_state::a2600_read_input_port)
    Q-Bert's Qubes (NTSC,F6) at 0x1594
    Berzerk at 0xF093.
 */
-READ8_MEMBER(a2600_state::a2600_get_databus_contents)
+READ8_MEMBER(a2600_base_state::a2600_get_databus_contents)
 {
 	uint16_t  last_address, prev_address;
 	uint8_t   last_byte, prev_byte;
@@ -228,7 +230,7 @@ static const rectangle visarea[4] = {
 };
 #endif
 
-WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
+WRITE16_MEMBER(a2600_base_state::a2600_tia_vsync_callback)
 {
 	int i;
 
@@ -245,7 +247,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
 	}
 }
 
-WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
+WRITE16_MEMBER(a2600_base_state::a2600_tia_vsync_callback_pal)
 {
 	int i;
 
@@ -265,7 +267,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 // TODO: is this the correct behavior for the real hardware?!?
 READ8_MEMBER(a2600_state::cart_over_riot_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_cart->write_bank(space, offset, 0);
 	return m_riot_ram[0x20 + offset];
 }
@@ -284,76 +286,81 @@ WRITE8_MEMBER(a2600_state::cart_over_tia_w)
 	m_tia->write(space, offset, data);
 }
 
-MACHINE_START_MEMBER(a2600_state,a2600)
+void a2600_base_state::machine_start()
 {
 	m_current_screen_height = m_screen->height();
 	memset(m_riot_ram, 0x00, 0x80);
 
+	save_item(NAME(m_current_screen_height));
+}
+
+void a2600_state::machine_start()
+{
+	a2600_base_state::machine_start();
+
 	switch (m_cart->get_cart_type())
 	{
-		case A26_2K:
-		case A26_4K:
-		case A26_F4:
-		case A26_F8:
-		case A26_F8SW:
-		case A26_FA:
-		case A26_E0:
-		case A26_E7:
-		case A26_CV:
-		case A26_DC:
-		case A26_FV:
-		case A26_8IN1:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_F6:
-		case A26_DPC:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_FE:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x01fe, 0x01ff, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_3E:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
-			break;
-		case A26_3F:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
-			break;
-		case A26_UA:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200, 0x27f, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_JVP:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			// to verify the actual behavior...
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfa0, 0xfc0, read8_delegate(FUNC(a2600_state::cart_over_riot_r), this), write8_delegate(FUNC(a2600_state::cart_over_riot_w), this));
-			break;
-		case A26_4IN1:
-		case A26_32IN1:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_SS:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_CM:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
-			break;
-		case A26_X07:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(a2600_state::cart_over_all_r), this), write8_delegate(FUNC(a2600_state::cart_over_all_w), this));
-			break;
-		case A26_HARMONY:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			break;
+	case A26_2K:
+	case A26_4K:
+	case A26_F4:
+	case A26_F8:
+	case A26_F8SW:
+	case A26_FA:
+	case A26_E0:
+	case A26_E7:
+	case A26_CV:
+	case A26_DC:
+	case A26_FV:
+	case A26_8IN1:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_F6:
+	case A26_DPC:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_FE:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x01fe, 0x01ff, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_3E:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
+		break;
+	case A26_3F:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x00, 0x3f, write8_delegate(FUNC(a2600_state::cart_over_tia_w), this));
+		break;
+	case A26_UA:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200, 0x27f, read8_delegate(FUNC(vcs_cart_slot_device::read_bank),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_JVP:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		// to verify the actual behavior...
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfa0, 0xfc0, read8_delegate(FUNC(a2600_state::cart_over_riot_r), this), write8_delegate(FUNC(a2600_state::cart_over_riot_w), this));
+		break;
+	case A26_4IN1:
+	case A26_32IN1:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_SS:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_CM:
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart));
+		break;
+	case A26_X07:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(a2600_state::cart_over_all_r), this), write8_delegate(FUNC(a2600_state::cart_over_all_w), this));
+		break;
+	case A26_HARMONY:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
+		break;
 	}
 
-	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
+	// Banks may have changed, reset the cpu so it uses the correct reset vector
 	m_maincpu->reset();
-
-	save_item(NAME(m_current_screen_height));
 }
 
 
@@ -361,18 +368,21 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
 unsigned a2600_state::long detect_2600controllers()
 {
-#define JOYS 0x001
-#define PADD 0x002
-#define KEYP 0x004
-#define LGUN 0x008
-#define INDY 0x010
-#define BOOS 0x020
-#define KVID 0x040
-#define CMTE 0x080
-#define MLNK 0x100
-#define AMSE 0x200
-#define CX22 0x400
-#define CX80 0x800
+	enum
+	{
+		JOYS = 0x001,
+		PADD = 0x002,
+		KEYP = 0x004,
+		LGUN = 0x008,
+		INDY = 0x010,
+		BOOS = 0x020,
+		KVID = 0x040,
+		CMTE = 0x080,
+		MLNK = 0x100,
+		AMSE = 0x200,
+		CX22 = 0x400,
+		CX80 = 0x800
+	};
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
@@ -457,139 +467,136 @@ static INPUT_PORTS_START( a2600 )
 INPUT_PORTS_END
 
 
-static SLOT_INTERFACE_START(a2600_cart)
-	SLOT_INTERFACE_INTERNAL("a26_2k",    A26_ROM_2K)
-	SLOT_INTERFACE_INTERNAL("a26_4k",    A26_ROM_4K)
-	SLOT_INTERFACE_INTERNAL("a26_f4",    A26_ROM_F4)
-	SLOT_INTERFACE_INTERNAL("a26_f6",    A26_ROM_F6)
-	SLOT_INTERFACE_INTERNAL("a26_f8",    A26_ROM_F8)
-	SLOT_INTERFACE_INTERNAL("a26_f8sw",  A26_ROM_F8_SW)
-	SLOT_INTERFACE_INTERNAL("a26_fa",    A26_ROM_FA)
-	SLOT_INTERFACE_INTERNAL("a26_fe",    A26_ROM_FE)
-	SLOT_INTERFACE_INTERNAL("a26_3e",    A26_ROM_3E)
-	SLOT_INTERFACE_INTERNAL("a26_3f",    A26_ROM_3F)
-	SLOT_INTERFACE_INTERNAL("a26_e0",    A26_ROM_E0)
-	SLOT_INTERFACE_INTERNAL("a26_e7",    A26_ROM_E7)
-	SLOT_INTERFACE_INTERNAL("a26_ua",    A26_ROM_UA)
-	SLOT_INTERFACE_INTERNAL("a26_cv",    A26_ROM_CV)
-	SLOT_INTERFACE_INTERNAL("a26_dc",    A26_ROM_DC)
-	SLOT_INTERFACE_INTERNAL("a26_fv",    A26_ROM_FV)
-	SLOT_INTERFACE_INTERNAL("a26_jvp",   A26_ROM_JVP)
-	SLOT_INTERFACE_INTERNAL("a26_cm",    A26_ROM_COMPUMATE)
-	SLOT_INTERFACE_INTERNAL("a26_ss",    A26_ROM_SUPERCHARGER)
-	SLOT_INTERFACE_INTERNAL("a26_dpc",   A26_ROM_DPC)
-	SLOT_INTERFACE_INTERNAL("a26_4in1",  A26_ROM_4IN1)
-	SLOT_INTERFACE_INTERNAL("a26_8in1",  A26_ROM_8IN1)
-	SLOT_INTERFACE_INTERNAL("a26_32in1", A26_ROM_32IN1)
-	SLOT_INTERFACE_INTERNAL("a26_x07",    A26_ROM_X07)
-	SLOT_INTERFACE_INTERNAL("a26_harmony",   A26_ROM_HARMONY)
-SLOT_INTERFACE_END
+static void a2600_cart(device_slot_interface &device)
+{
+	device.option_add_internal("a26_2k",    A26_ROM_2K);
+	device.option_add_internal("a26_4k",    A26_ROM_4K);
+	device.option_add_internal("a26_f4",    A26_ROM_F4);
+	device.option_add_internal("a26_f6",    A26_ROM_F6);
+	device.option_add_internal("a26_f8",    A26_ROM_F8);
+	device.option_add_internal("a26_f8sw",  A26_ROM_F8_SW);
+	device.option_add_internal("a26_fa",    A26_ROM_FA);
+	device.option_add_internal("a26_fe",    A26_ROM_FE);
+	device.option_add_internal("a26_3e",    A26_ROM_3E);
+	device.option_add_internal("a26_3f",    A26_ROM_3F);
+	device.option_add_internal("a26_e0",    A26_ROM_E0);
+	device.option_add_internal("a26_e7",    A26_ROM_E7);
+	device.option_add_internal("a26_ua",    A26_ROM_UA);
+	device.option_add_internal("a26_cv",    A26_ROM_CV);
+	device.option_add_internal("a26_dc",    A26_ROM_DC);
+	device.option_add_internal("a26_fv",    A26_ROM_FV);
+	device.option_add_internal("a26_jvp",   A26_ROM_JVP);
+	device.option_add_internal("a26_cm",    A26_ROM_COMPUMATE);
+	device.option_add_internal("a26_ss",    A26_ROM_SUPERCHARGER);
+	device.option_add_internal("a26_dpc",   A26_ROM_DPC);
+	device.option_add_internal("a26_4in1",  A26_ROM_4IN1);
+	device.option_add_internal("a26_8in1",  A26_ROM_8IN1);
+	device.option_add_internal("a26_32in1", A26_ROM_32IN1);
+	device.option_add_internal("a26_x07",   A26_ROM_X07);
+	device.option_add_internal("a26_harmony",   A26_ROM_HARMONY);
+}
 
-MACHINE_CONFIG_START(a2600_state::a2600_cartslot)
-	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, nullptr)
+void a2600_state::a2600_cartslot(machine_config &config)
+{
+	VCS_CART_SLOT(config, "cartslot", a2600_cart, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","a2600")
-	MCFG_SOFTWARE_LIST_ADD("cass_list","a2600_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("a2600");
+	SOFTWARE_LIST(config, "cass_list").set_original("a2600_cass");
+}
 
-MACHINE_CONFIG_START(a2600_state::a2600)
+void a2600_state::a2600(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
-	MCFG_M6502_DISABLE_DIRECT()
-	MCFG_CPU_PROGRAM_MAP(a2600_mem)
-
-	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
+	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
+	m_maincpu->disable_cache();
+	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
-	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback))
+	TIA_NTSC_VIDEO(config, m_tia, 0, "tia");
+	m_tia->read_input_port_callback().set(FUNC(a2600_state::a2600_read_input_port));
+	m_tia->databus_contents_callback().set(FUNC(a2600_state::a2600_get_databus_contents));
+	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
-	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-	MCFG_SCREEN_PALETTE("tia_video:palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
+	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_NTSC/114)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	SPEAKER(config, "mono").front_center();
+	TIA(config, "tia", MASTER_CLOCK_NTSC/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
 #if USE_NEW_RIOT
-	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_NTSC / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MOS6532_NEW(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->pb_rd_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_NTSC / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	RIOT6532(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->in_pb_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
+	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);
 
 	a2600_cartslot(config);
-	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
-MACHINE_CONFIG_END
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
+}
 
 
-MACHINE_CONFIG_START(a2600_state::a2600p)
+void a2600_state::a2600p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
-	MCFG_CPU_PROGRAM_MAP(a2600_mem)
-	MCFG_M6502_DISABLE_DIRECT()
-
-	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
+	M6507(config, m_maincpu, MASTER_CLOCK_PAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
+	m_maincpu->disable_cache();
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
-	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback_pal))
+	TIA_PAL_VIDEO(config, m_tia, 0, "tia");
+	m_tia->read_input_port_callback().set(FUNC(a2600_state::a2600_read_input_port));
+	m_tia->databus_contents_callback().set(FUNC(a2600_state::a2600_get_databus_contents));
+	m_tia->vsync_callback().set(FUNC(a2600_state::a2600_tia_vsync_callback_pal));
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
-	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-	MCFG_SCREEN_PALETTE("tia_video:palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31);
+	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+	m_screen->set_palette("tia_video:palette");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	SPEAKER(config, "mono").front_center();
+	TIA(config, "tia", MASTER_CLOCK_PAL/114).add_route(ALL_OUTPUTS, "mono", 0.90);
 
 	/* devices */
 #if USE_NEW_RIOT
-	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_PAL / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MOS6532_NEW(config, m_riot, MASTER_CLOCK_PAL / 3);
+	m_riot->pa_rd_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->pa_wr_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->pb_rd_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->pb_wr_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_wr_callback().set(FUNC(a2600_state::irq_callback));
 #else
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
+	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->in_pb_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
+	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
+	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);
 
 	a2600_cartslot(config);
-	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
-MACHINE_CONFIG_END
+	subdevice<software_list_device>("cart_list")->set_filter("PAL");
+}
 
 
 ROM_START( a2600 )
@@ -598,6 +605,6 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,  a2600, a2600_state, 0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
-CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, a2600_state, 0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME */
+CONS( 1977, a2600,  0,      0,      a2600,   a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )

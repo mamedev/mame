@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mac_hdflop" description="Macintosh High Density Disk images">
+
+	<!-- S/N: Z93350-001A -->
+	<software name="clarisw" supported="no">
+		<description>ClarisWorks (Swedish)</description>
+		<year>1993</year>
+		<publisher>Claris</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 2.0 (swe) (disk 1).img" size="1474560" crc="25da86b7" sha1="99e9fa57e0d7d03fb89611745bd04b4d7c4af998" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 2.0 (swe) (disk 2).img" size="1474560" crc="76e73be8" sha1="46921d446169d949b37879f6cbbdfb802323b7ef" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 2.0 (swe) (disk 3).img" size="1474560" crc="8e2dbabc" sha1="6b2b982348874be31899b6b2bace55518e5e9477" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 2.0 (swe) (disk 4).img" size="1474560" crc="9ad039ef" sha1="18777ffd48cb9a016b169e38cf867f81367271b0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 2.0 (swe) (disk 5).img" size="1474560" crc="f74f6289" sha1="b60aae3606fec538dc60ba15bbec47e3da607a65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -28,15 +28,7 @@
 #define MC68HC11_IRQ_LINE           0
 #define MC68HC11_TOC1_LINE          1
 
-
 DECLARE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device)
-
-
-#define MCFG_MC68HC11_CONFIG(_has_extended_io, _internal_ram_size, _init_value) \
-	mc68hc11_cpu_device::set_has_extended_io(*device, _has_extended_io); \
-	mc68hc11_cpu_device::set_internal_ram_size(*device, _internal_ram_size); \
-	mc68hc11_cpu_device::set_init_value(*device, _init_value);
-
 
 class mc68hc11_cpu_device : public cpu_device
 {
@@ -44,11 +36,18 @@ public:
 	// construction/destruction
 	mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_config(int has_extended_io, int internal_ram_size, int init_value)
+	{
+		set_has_extended_io(has_extended_io);
+		set_internal_ram_size(internal_ram_size);
+		set_init_value(init_value);
+	}
+
 	// I/O enable flag
-	static void set_has_extended_io(device_t &device, int has_extended_io) { downcast<mc68hc11_cpu_device &>(device).m_has_extended_io = has_extended_io; }
-	static void set_internal_ram_size(device_t &device, int internal_ram_size) { downcast<mc68hc11_cpu_device &>(device).m_internal_ram_size = internal_ram_size; }
+	void set_has_extended_io(int has_extended_io) { m_has_extended_io = has_extended_io; }
+	void set_internal_ram_size(int internal_ram_size) { m_internal_ram_size = internal_ram_size; }
 	// default value for INIT register
-	static void set_init_value(device_t &device, int init_value) { downcast<mc68hc11_cpu_device &>(device).m_init_value = init_value; }
+	void set_init_value(int init_value) { m_init_value = init_value; }
 
 protected:
 	// device-level overrides
@@ -59,7 +58,6 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 41; }
 	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -70,7 +68,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -100,7 +98,7 @@ private:
 	int m_ad_channel;
 
 	uint8_t m_irq_state[2];
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_program;
 	address_space *m_io;
 	int m_icount;

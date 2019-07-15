@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
-    IBM PC AT compatibles 8042 keyboard controller
+    IBM PC/AT and PS/2 keyboard controllers
 
 ***************************************************************************/
-
 #ifndef MAME_MACHINE_AT_KEYBC_H
 #define MAME_MACHINE_AT_KEYBC_H
 
@@ -15,92 +14,153 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
+//  KEYBOARD CONTROLLER DEVICE BASE
 //**************************************************************************
 
-#define MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(_devcb) \
-	devcb = &at_keyboard_controller_device::set_system_reset_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(_devcb) \
-	devcb = &at_keyboard_controller_device::set_gate_a20_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(_devcb) \
-	devcb = &at_keyboard_controller_device::set_input_buffer_full_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_OUTPUT_BUFFER_EMPTY_CB(_devcb) \
-	devcb = &at_keyboard_controller_device::set_output_buffer_empty_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(_devcb) \
-	devcb = &at_keyboard_controller_device::set_keyboard_clock_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(_devcb) \
-	devcb = &at_keyboard_controller_device::set_keyboard_data_callback(*device, DEVCB_##_devcb);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> at_keyboard_controller_device
-
-class at_keyboard_controller_device : public device_t
+class at_kbc_device_base : public device_t
 {
 public:
-	// construction/destruction
-	at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// outputs to host
+	auto hot_res() { return m_hot_res_cb.bind(); }
+	auto gate_a20() { return m_gate_a20_cb.bind(); }
+	auto kbd_irq() { return m_kbd_irq_cb.bind(); }
 
-	template <class Object> static devcb_base &set_system_reset_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_system_reset_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gate_a20_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_gate_a20_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_input_buffer_full_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_input_buffer_full_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_output_buffer_empty_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_output_buffer_empty_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_keyboard_clock_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_clock_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_keyboard_data_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_data_cb.set_callback(std::forward<Object>(cb)); }
+	// outputs to keyboard
+	auto kbd_clk() { return m_kbd_clk_cb.bind(); } // open collector with 10kΩ pull-up
+	auto kbd_data() { return m_kbd_data_cb.bind(); } // open collector with 10kΩ pull-up
 
-	// interface to the host pc
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( command_w );
+	// host interface
+	virtual uint8_t data_r();
+	virtual uint8_t status_r();
+	void data_w(uint8_t data);
+	void command_w(uint8_t data);
 
-	// interface to the keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
+	// inputs from keyboard
+	DECLARE_WRITE_LINE_MEMBER(kbd_clk_w);
+	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// trampoline constructor
+	at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	// device_t implementation
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+
+	// host outputs - use 1 = asserted, 0 = deasserted
+	void set_hot_res(u8 state);
+	void set_gate_a20(u8 state);
+	void set_kbd_irq(u8 state);
+
+	// keyboard line drive - use 1 = pulled up, 0 = driven low
+	void set_kbd_clk_out(u8 state);
+	void set_kbd_data_out(u8 state);
+	u8 kbd_clk_r() const;
+	u8 kbd_data_r() const;
+
+	required_device<upi41_cpu_device> m_mcu;
 
 private:
-	// internal 8042 interface
-	DECLARE_READ_LINE_MEMBER( t0_r );
-	DECLARE_READ_LINE_MEMBER( t1_r );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	// internal sync helpers
+	TIMER_CALLBACK_MEMBER(write_data);
+	TIMER_CALLBACK_MEMBER(write_command);
+	TIMER_CALLBACK_MEMBER(set_kbd_clk_in);
+	TIMER_CALLBACK_MEMBER(set_kbd_data_in);
 
-	// internal state
-	upi41_cpu_device *m_cpu;
+	devcb_write_line m_hot_res_cb, m_gate_a20_cb, m_kbd_irq_cb;
+	devcb_write_line m_kbd_clk_cb, m_kbd_data_cb;
 
-	// interface to the host pc
-	devcb_write_line    m_system_reset_cb;
-	devcb_write_line    m_gate_a20_cb;
-	devcb_write_line    m_input_buffer_full_cb;
-	devcb_write_line    m_output_buffer_empty_cb;
-
-	// interface to the keyboard
-	devcb_write_line    m_keyboard_clock_cb;
-	devcb_write_line    m_keyboard_data_cb;
-
-	uint8_t m_clock_signal;
-	uint8_t m_data_signal;
+	u8 m_hot_res, m_gate_a20, m_kbd_irq;
+	u8 m_kbd_clk_in, m_kbd_clk_out, m_kbd_data_in, m_kbd_data_out;
 };
 
 
-// device type definition
+//**************************************************************************
+//  PC/AT KEYBOARD CONTROLLER DEVICE
+//**************************************************************************
+
+class at_keyboard_controller_device : public at_kbc_device_base
+{
+public:
+	// standard constructor
+	at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
+	// MCU I/O handlers
+	void p2_w(uint8_t data);
+};
+
+
+//**************************************************************************
+//  PS/2 KEYBOARD/MOUSE CONTROLLER DEVICE
+//**************************************************************************
+
+class ps2_keyboard_controller_device : public at_kbc_device_base
+{
+public:
+	// outputs to host
+	auto aux_irq() { return m_aux_irq_cb.bind(); }
+
+	// outputs to aux
+	auto aux_clk() { return m_aux_clk_cb.bind(); } // open collector with 10kΩ pull-up
+	auto aux_data() { return m_aux_data_cb.bind(); } // open collector with 10kΩ pull-up
+
+	// host interface
+	virtual uint8_t data_r() override;
+	virtual uint8_t status_r() override;
+
+	// inputs from aux
+	DECLARE_WRITE_LINE_MEMBER(aux_clk_w);
+	DECLARE_WRITE_LINE_MEMBER(aux_data_w);
+
+	// standard constructor
+	ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+
+private:
+	// host outputs - use 1 = asserted, 0 = deasserted
+	void set_aux_irq(u8 state);
+
+	// mouse line drive - use 1 = pulled up, 0 = driven low
+	void set_aux_clk_out(u8 state);
+	void set_aux_data_out(u8 state);
+	u8 aux_clk_r() const;
+	u8 aux_data_r() const;
+
+	// internal sync helpers
+	TIMER_CALLBACK_MEMBER(set_aux_clk_in);
+	TIMER_CALLBACK_MEMBER(set_aux_data_in);
+
+	// MCU I/O handlers
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
+
+	devcb_write_line m_aux_irq_cb;
+	devcb_write_line m_aux_clk_cb, m_aux_data_cb;
+
+	u8 m_aux_irq;
+	u8 m_aux_clk_in, m_aux_clk_out, m_aux_data_in, m_aux_data_out;
+	u8 m_p2_data;
+};
+
+
+//**************************************************************************
+//  DEVICE TYPES
+//**************************************************************************
+
 DECLARE_DEVICE_TYPE(AT_KEYBOARD_CONTROLLER, at_keyboard_controller_device)
+DECLARE_DEVICE_TYPE(PS2_KEYBOARD_CONTROLLER, ps2_keyboard_controller_device)
 
 #endif // MAME_MACHINE_AT_KEYBC_H

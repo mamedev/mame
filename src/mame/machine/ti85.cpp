@@ -155,24 +155,24 @@ void ti85_state::update_ti83p_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well almost
+	m_membank[0]->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well almost
 
 	if (m_ti83p_port4 & 1)
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1 & 0xfe);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1 & 0xfe);
 
-		m_membank3->set_bank(m_ti8x_memory_page_1);
+		m_membank[2]->set_bank(m_ti8x_memory_page_1);
 
-		m_membank4->set_bank(m_ti8x_memory_page_2);
+		m_membank[3]->set_bank(m_ti8x_memory_page_2);
 
 	}
 	else
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1);
 
-		m_membank3->set_bank(m_ti8x_memory_page_2);
+		m_membank[2]->set_bank(m_ti8x_memory_page_2);
 
-		m_membank4->set_bank(0x40); //Always first ram page
+		m_membank[3]->set_bank(0x40); //Always first ram page
 
 	}
 }
@@ -181,25 +181,25 @@ void ti85_state::update_ti83pse_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_membank1->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
+	m_membank[0]->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
 
 	if (m_ti83p_port4 & 1)
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1 & 0xfe);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1 & 0xfe);
 
-		m_membank3->set_bank(m_ti8x_memory_page_1 | 1);
+		m_membank[2]->set_bank(m_ti8x_memory_page_1 | 1);
 
-		m_membank4->set_bank(m_ti8x_memory_page_2);
+		m_membank[3]->set_bank(m_ti8x_memory_page_2);
 
 
 	}
 	else
 	{
-		m_membank2->set_bank(m_ti8x_memory_page_1);
+		m_membank[1]->set_bank(m_ti8x_memory_page_1);
 
-		m_membank3->set_bank(m_ti8x_memory_page_2);
+		m_membank[2]->set_bank(m_ti8x_memory_page_2);
 
-		m_membank4->set_bank(m_ti8x_memory_page_3 + 0x80);
+		m_membank[3]->set_bank(m_ti8x_memory_page_3 + 0x80);
 
 	}
 }
@@ -267,6 +267,49 @@ void ti85_state::machine_start()
 MACHINE_RESET_MEMBER(ti85_state,ti85)
 {
 	m_PCR = 0xc0;
+}
+
+uint8_t ti85_state::ti83p_membank2_r(offs_t offset)
+{
+	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
+	/// should only trigger when fetching opcodes
+	if (m_booting && !machine().side_effects_disabled())
+	{
+		m_booting = false;
+
+		if (m_model == TI83P)
+		{
+			update_ti83p_memory();
+		}
+		else
+		{
+			update_ti83pse_memory();
+		}
+	}
+
+	return m_membank[1]->read8(offset);
+}
+
+uint8_t ti85_state::ti83p_membank3_r(offs_t offset)
+{
+	/// http://wikiti.brandonw.net/index.php?title=83Plus:State_of_the_calculator_at_boot
+	/// should only trigger when fetching opcodes
+	/// should be using port 6 instead of 4
+	if (m_booting && (m_ti83p_port4 & 1) && !machine().side_effects_disabled())
+	{
+		m_booting = false;
+
+		if (m_model == TI83P)
+		{
+			update_ti83p_memory();
+		}
+		else
+		{
+			update_ti83pse_memory();
+		}
+	}
+
+	return m_membank[2]->read8(offset);
 }
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
@@ -427,7 +470,7 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	membank("bank2")->set_base(m_bios + 0x04000);
 
 	membank("bank4")->set_base(m_ti8x_ram.get());
-	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
+	subdevice<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
 	m_ti85_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback), this));
 	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
@@ -1173,7 +1216,7 @@ void ti85_state::ti86_setup_snapshot (uint8_t * data)
 	m_interrupt_speed = 0x03;
 }
 
-SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
+SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
 {
 	int expected_snapshot_size = 0;
 	std::vector<uint8_t> ti8x_snapshot_data;

@@ -155,11 +155,11 @@ std::string cbm2_expansion_slot_device::get_default_card_software(get_default_ca
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t cbm2_expansion_slot_device::read(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+uint8_t cbm2_expansion_slot_device::read(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->cbm2_bd_r(space, offset, data, csbank1, csbank2, csbank3);
+		data = m_card->cbm2_bd_r(offset, data, csbank1, csbank2, csbank3);
 	}
 
 	return data;
@@ -170,11 +170,11 @@ uint8_t cbm2_expansion_slot_device::read(address_space &space, offs_t offset, ui
 //  write - cartridge data write
 //-------------------------------------------------
 
-void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+void cbm2_expansion_slot_device::write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (m_card != nullptr)
 	{
-		m_card->cbm2_bd_w(space, offset, data, csbank1, csbank2, csbank3);
+		m_card->cbm2_bd_w(offset, data, csbank1, csbank2, csbank3);
 	}
 }
 
@@ -188,9 +188,10 @@ void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, uint
 #include "hrg.h"
 #include "std.h"
 
-SLOT_INTERFACE_START( cbm2_expansion_cards )
-	SLOT_INTERFACE("24k", CBM2_24K)
-	SLOT_INTERFACE("hrga", CBM2_HRG_A)
-	SLOT_INTERFACE("hrgb", CBM2_HRG_B)
-	SLOT_INTERFACE_INTERNAL("standard", CBM2_STD)
-SLOT_INTERFACE_END
+void cbm2_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("24k", CBM2_24K);
+	device.option_add("hrga", CBM2_HRG_A);
+	device.option_add("hrgb", CBM2_HRG_B);
+	device.option_add_internal("standard", CBM2_STD);
+}

@@ -45,38 +45,45 @@ class segajw_state : public driver_device
 {
 public:
 	segajw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	void segajw(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+
+private:
 	DECLARE_READ8_MEMBER(coin_counter_r);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(coinlockout_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
-	void segajw(machine_config &config);
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void ramdac_map(address_map &map);
 	void segajw_audiocpu_io_map(address_map &map);
 	void segajw_audiocpu_map(address_map &map);
 	void segajw_hd63484_map(address_map &map);
 	void segajw_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<16> m_lamps;
+	output_finder<3> m_towerlamps;
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint64_t      m_coin_start_cycles;
 	uint64_t      m_hopper_start_cycles;
 	uint8_t       m_coin_counter;
@@ -101,21 +108,21 @@ WRITE8_MEMBER(segajw_state::hopper_w)
 WRITE8_MEMBER(segajw_state::lamps1_w)
 {
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, BIT(data, i));
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segajw_state::lamps2_w)
 {
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(8 + i, BIT(data, i));
+		m_lamps[8 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segajw_state::coinlockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 
-	for(int i=0; i<3; i++)
-		output().set_indexed_value("towerlamp", i, BIT(data, 3 + i));
+	for (int i = 0; i < 3; i++)
+		m_towerlamps[i] = BIT(data, 3 + i);
 }
 
 INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
@@ -166,44 +173,48 @@ CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
 	return data;
 }
 
-ADDRESS_MAP_START(segajw_state::segajw_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void segajw_state::segajw_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
+	map(0x080000, 0x080001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x080002, 0x080003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
-	AM_RANGE(0x180004, 0x180005) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("DSW3")
-	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("DSW2")
+	map(0x180000, 0x180001).portr("DSW0");
+	map(0x180005, 0x180005).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0x180008, 0x180009).portr("DSW1");
+	map(0x18000a, 0x18000b).portr("DSW3");
+	map(0x18000c, 0x18000d).portr("DSW2");
 
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE8("io1a", sega_315_5296_device, read, write, 0x00ff)
+	map(0x1a0000, 0x1a001f).rw("io1a", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE8("io1c", sega_315_5296_device, read, write, 0x00ff)
+	map(0x1c0000, 0x1c001f).rw("io1c", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x280002, 0x280003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x280004, 0x280005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	map(0x280001, 0x280001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x280003, 0x280003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x280005, 0x280005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_audiocpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segajw_state::segajw_audiocpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_audiocpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void segajw_state::segajw_audiocpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_hd63484_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0x80000, 0xbffff) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void segajw_state::segajw_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0x80000, 0xbffff).rom().region("gfx1", 0);
+}
 
 
 static INPUT_PORTS_START( segajw )
@@ -230,13 +241,13 @@ static INPUT_PORTS_START( segajw )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Last Game")   PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("M-Door")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("D-Door")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )       PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, hopper_sensors_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )       PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, hopper_sensors_r, nullptr)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Full")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Fill")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, coin_sensors_r, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segajw_state, coin_sensors_r, nullptr)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
@@ -338,6 +349,9 @@ INPUT_PORTS_END
 
 void segajw_state::machine_start()
 {
+	m_lamps.resolve();
+	m_towerlamps.resolve();
+
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_start_cycles));
 	save_item(NAME(m_coin_counter));
@@ -351,64 +365,68 @@ void segajw_state::machine_reset()
 	m_coin_counter = 0xff;
 }
 
-ADDRESS_MAP_START(segajw_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void segajw_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
-MACHINE_CONFIG_START(segajw_state::segajw)
+void segajw_state::segajw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,8000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segajw_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segajw_state, irq4_line_hold)
+	M68000(config, m_maincpu, 8000000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segajw_state::irq4_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(segajw_audiocpu_map)
-	MCFG_CPU_IO_MAP(segajw_audiocpu_io_map)
+	Z80(config, m_audiocpu, 4000000); // unknown clock
+	m_audiocpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_audiocpu_map);
+	m_audiocpu->set_addrmap(AS_IO, &segajw_state::segajw_audiocpu_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2000))
+	config.m_minimum_quantum = attotime::from_hz(2000);
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	MCFG_DEVICE_ADD("io1a", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(segajw_state, coin_counter_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(segajw_state, lamps1_w))
-	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segajw_state, lamps2_w))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segajw_state, hopper_w))
-	MCFG_315_5296_IN_PORTF_CB(READ8(segajw_state, coin_counter_r))
+	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a", 0)); // unknown clock
+	io1a.out_pa_callback().set(FUNC(segajw_state::coin_counter_w));
+	io1a.out_pb_callback().set(FUNC(segajw_state::lamps1_w));
+	io1a.out_pc_callback().set(FUNC(segajw_state::lamps2_w));
+	io1a.out_pd_callback().set(FUNC(segajw_state::hopper_w));
+	io1a.in_pf_callback().set(FUNC(segajw_state::coin_counter_r));
 
-	MCFG_DEVICE_ADD("io1c", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_315_5296_IN_PORTD_CB(IOPORT("IN3"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(segajw_state, coinlockout_w))
+	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c", 0)); // unknown clock
+	io1c.in_pa_callback().set_ioport("IN0");
+	io1c.in_pb_callback().set_ioport("IN1");
+	io1c.in_pc_callback().set_ioport("IN2");
+	io1c.in_pd_callback().set_ioport("IN3");
+	io1c.out_pg_callback().set(FUNC(segajw_state::coinlockout_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_SIZE(720, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 448-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	screen.set_size(720, 480);
+	screen.set_visarea(0, 720-1, 0, 448-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, "palette").set_entries(16);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
-	MCFG_HD63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
+	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));
+	hd63484.set_addrmap(0, &segajw_state::segajw_hd63484_map); // unknown clock
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, 8000000)   // unknown clock
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 5))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 8000000));   // unknown clock
+	ymsnd.irq_handler().set_inputline("maincpu", 5);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /***************************************************************************
 
@@ -429,4 +447,4 @@ ROM_START( segajw )
 ROM_END
 
 
-GAMEL( 1991, segajw,  0,   segajw,  segajw, segajw_state,  0, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )
+GAMEL( 1991, segajw, 0, segajw,  segajw, segajw_state, empty_init, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )

@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(IM6402, im6402_device, "im6402", "Intersil IM6402 USART")
+DEFINE_DEVICE_TYPE(IM6402, im6402_device, "im6402", "Intersil IM6402 UART")
 
 
 

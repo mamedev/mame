@@ -29,6 +29,7 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_auto_configure_screen(true),
+	m_external_skew(0),
 	m_ar(0),
 	m_sr(0),
 	m_fifo_ptr(-1),
@@ -525,11 +526,12 @@ inline void hd63484_device::recompute_parameters()
 	int ppw = 16 / get_bpp();
 	int ppmc = ppw * (1 << gai) / acm;  // TODO: GAI > 3
 	int vbstart = m_vds + m_sp[1];
+	int hbend = (m_hsw + m_hds + m_external_skew) * ppmc;
 	if (BIT(m_dcr, 13)) vbstart += m_sp[0];
 	if (BIT(m_dcr, 11)) vbstart += m_sp[2];
 
 	rectangle visarea = screen().visible_area();
-	visarea.set((m_hsw + m_hds) * ppmc, (m_hsw + m_hds + m_hdw) * ppmc - 1, m_vds, vbstart - 1);
+	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
 	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
 	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
 }
@@ -1827,6 +1829,7 @@ void hd63484_device::video_registers_w(int offset)
 			break;
 
 		case 0x04:
+			logerror("OMR: %04x\n", vreg_data);
 			m_omr = vreg_data;
 			break;
 
@@ -2052,12 +2055,12 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	int bpp = get_bpp();
 	int ppw = 16 / bpp;
 	uint32_t mask = (1 << bpp) - 1;
-	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n];
-	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3];
+	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n] + m_external_skew;
+	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3] + m_external_skew;
 	int step = (m_omr & 0x08) ? 2 : 1;
 	int gai = (m_omr>>4) & 0x07;
 	int ppmc = ppw * (1 << gai) / step;  // TODO: GAI > 3
-	int ws = m_hsw + m_hws;
+	int ws = m_hsw + m_hws + m_external_skew;
 
 	if (m_omr & 0x08)
 	{

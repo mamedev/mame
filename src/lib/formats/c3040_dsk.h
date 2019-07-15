@@ -7,9 +7,10 @@
     Commodore 3040 sector disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_C3040_DSK_H
+#define MAME_FORMATS_C3040_DSK_H
 
-#ifndef C3040_DSK_H_
-#define C3040_DSK_H_
+#pragma once
 
 #include "d64_dsk.h"
 
@@ -35,6 +36,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_C3040_FORMAT;
 
-
-
-#endif
+#endif // MAME_FORMATS_C3040_DSK_H

@@ -11,11 +11,10 @@
 
 #pragma once
 
-
 class mb14241_device : public device_t
 {
 public:
-	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE8_MEMBER( shift_count_w );
 	DECLARE_WRITE8_MEMBER( shift_data_w );
@@ -34,13 +33,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MB14241, mb14241_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_MB14241_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MB14241, 0)
 
 #endif // MAME_MACHINE_MB14241_H

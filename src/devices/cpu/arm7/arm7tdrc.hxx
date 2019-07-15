@@ -155,7 +155,7 @@ const arm7_cpu_device::arm7thumb_drcophandler arm7_cpu_device::drcthumb_handler[
 
 	/* Shift operations */
 
-void arm7_cpu_device::drctg00_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Shift left */
+void arm7_cpu_device::drctg00_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Shift left */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -182,7 +182,7 @@ void arm7_cpu_device::drctg00_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg00_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Shift right */
+void arm7_cpu_device::drctg00_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Shift right */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -216,7 +216,7 @@ void arm7_cpu_device::drctg00_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Arithmetic */
 
-void arm7_cpu_device::drctg01_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg01_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -260,7 +260,7 @@ void arm7_cpu_device::drctg01_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg01_10(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg01_10(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
@@ -270,7 +270,7 @@ void arm7_cpu_device::drctg01_10(drcuml_block *block, compiler_state *compiler, 
 	DRCHandleThumbALUAddFlags(DRC_REG(rd), DRC_REG(rs), DRC_REG(rn));
 }
 
-void arm7_cpu_device::drctg01_11(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* SUB Rd, Rs, Rn */
+void arm7_cpu_device::drctg01_11(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* SUB Rd, Rs, Rn */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
@@ -280,7 +280,7 @@ void arm7_cpu_device::drctg01_11(drcuml_block *block, compiler_state *compiler, 
 	DRCHandleThumbALUSubFlags(DRC_REG(rd), DRC_REG(rs), DRC_REG(rn));
 }
 
-void arm7_cpu_device::drctg01_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ADD Rd, Rs, #imm */
+void arm7_cpu_device::drctg01_12(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ADD Rd, Rs, #imm */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t imm = (op & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
@@ -290,7 +290,7 @@ void arm7_cpu_device::drctg01_12(drcuml_block *block, compiler_state *compiler, 
 	DRCHandleThumbALUAddFlags(DRC_REG(rd), DRC_REG(rs), imm);
 }
 
-void arm7_cpu_device::drctg01_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* SUB Rd, Rs, #imm */
+void arm7_cpu_device::drctg01_13(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* SUB Rd, Rs, #imm */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t imm = (op & THUMB_ADDSUB_RNIMM) >> THUMB_ADDSUB_RNIMM_SHIFT;
@@ -302,7 +302,7 @@ void arm7_cpu_device::drctg01_13(drcuml_block *block, compiler_state *compiler, 
 
 	/* CMP / MOV */
 
-void arm7_cpu_device::drctg02_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg02_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT;
@@ -314,7 +314,7 @@ void arm7_cpu_device::drctg02_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg02_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg02_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT;
@@ -326,7 +326,7 @@ void arm7_cpu_device::drctg02_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* ADD/SUB immediate */
 
-void arm7_cpu_device::drctg03_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ADD Rd, #Offset8 */
+void arm7_cpu_device::drctg03_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ADD Rd, #Offset8 */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT;
@@ -336,7 +336,7 @@ void arm7_cpu_device::drctg03_0(drcuml_block *block, compiler_state *compiler, c
 	DRCHandleThumbALUAddFlags(DRC_REG(rd), DRC_REG(rn), op2);
 }
 
-void arm7_cpu_device::drctg03_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* SUB Rd, #Offset8 */
+void arm7_cpu_device::drctg03_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* SUB Rd, #Offset8 */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT;
@@ -348,7 +348,7 @@ void arm7_cpu_device::drctg03_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Rd & Rm instructions */
 
-void arm7_cpu_device::drctg04_00_00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* AND Rd, Rs */
+void arm7_cpu_device::drctg04_00_00(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* AND Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -360,7 +360,7 @@ void arm7_cpu_device::drctg04_00_00(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* EOR Rd, Rs */
+void arm7_cpu_device::drctg04_00_01(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* EOR Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -372,7 +372,7 @@ void arm7_cpu_device::drctg04_00_01(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_02(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* LSL Rd, Rs */
+void arm7_cpu_device::drctg04_00_02(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* LSL Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -385,11 +385,11 @@ void arm7_cpu_device::drctg04_00_02(drcuml_block *block, compiler_state *compile
 	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(Z_MASK | N_MASK | C_MASK));
 
 	UML_CMP(block, uml::I1, 0);
-	UML_JMPc(block, uml::COND_E, skip = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_E, skip = compiler.labelnum++);
 
 	UML_CMP(block, uml::I1, 32);
-	UML_JMPc(block, uml::COND_A, offsg32 = compiler->labelnum++);
-	UML_JMPc(block, uml::COND_E, offs32 = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_A, offsg32 = compiler.labelnum++);
+	UML_JMPc(block, uml::COND_E, offs32 = compiler.labelnum++);
 
 	UML_SHL(block, DRC_REG(rd), DRC_REG(rd), uml::I1);
 	UML_SUB(block, uml::I1, uml::I1, 1);
@@ -419,7 +419,7 @@ void arm7_cpu_device::drctg04_00_02(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_03(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* LSR Rd, Rs */
+void arm7_cpu_device::drctg04_00_03(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* LSR Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -431,11 +431,11 @@ void arm7_cpu_device::drctg04_00_03(drcuml_block *block, compiler_state *compile
 	UML_AND(block, uml::I1, DRC_REG(rs), 0xff);
 	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(Z_MASK | N_MASK | C_MASK));
 	UML_CMP(block, uml::I1, 0);
-	UML_JMPc(block, uml::COND_E, skip = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_E, skip = compiler.labelnum++);
 
 	UML_CMP(block, uml::I1, 32);
-	UML_JMPc(block, uml::COND_A, offsg32 = compiler->labelnum++);
-	UML_JMPc(block, uml::COND_E, offs32 = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_A, offsg32 = compiler.labelnum++);
+	UML_JMPc(block, uml::COND_E, offs32 = compiler.labelnum++);
 
 	UML_SHR(block, DRC_REG(rd), DRC_REG(rd), uml::I1);
 	UML_SUB(block, uml::I1, uml::I1, 1);  // WP: TODO, Check this used to be "block, I1, 1"
@@ -464,20 +464,19 @@ void arm7_cpu_device::drctg04_00_03(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_04(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ASR Rd, Rs */
+void arm7_cpu_device::drctg04_00_04(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ASR Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	uml::code_label skip;
-	uml::code_label offsg32;
 	uml::code_label offs32;
 
 	UML_MOV(block, uml::I0, DRC_REG(rd));
 	UML_AND(block, uml::I1, DRC_REG(rs), 0xff);
 	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(Z_MASK | N_MASK | C_MASK));
 	UML_CMP(block, uml::I1, 0);
-	UML_JMPc(block, uml::COND_E, skip = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_E, skip = compiler.labelnum++);
 
 	UML_SHR(block, uml::I2, uml::I0, uml::I1);
 	UML_SUB(block, uml::I1, 32, uml::I1);
@@ -486,7 +485,7 @@ void arm7_cpu_device::drctg04_00_04(drcuml_block *block, compiler_state *compile
 	UML_MOVc(block, uml::COND_NZ, DRC_REG(rd), uml::I1);
 	UML_MOVc(block, uml::COND_Z, DRC_REG(rd), 0);
 	UML_OR(block, DRC_REG(rd), DRC_REG(rd), uml::I2);
-	UML_JMPc(block, uml::COND_B, offs32 = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_B, offs32 = compiler.labelnum++);
 
 	UML_TEST(block, uml::I0, 0x80000000);
 	UML_MOVc(block, uml::COND_NZ, DRC_REG(rd), ~0);
@@ -512,7 +511,7 @@ void arm7_cpu_device::drctg04_00_04(drcuml_block *block, compiler_state *compile
 
 }
 
-void arm7_cpu_device::drctg04_00_05(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ADC Rd, Rs */
+void arm7_cpu_device::drctg04_00_05(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ADC Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -526,7 +525,7 @@ void arm7_cpu_device::drctg04_00_05(drcuml_block *block, compiler_state *compile
 	UML_MOV(block, DRC_REG(rd), uml::I3);
 }
 
-void arm7_cpu_device::drctg04_00_06(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* SBC Rd, Rs */
+void arm7_cpu_device::drctg04_00_06(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* SBC Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -540,7 +539,7 @@ void arm7_cpu_device::drctg04_00_06(drcuml_block *block, compiler_state *compile
 	UML_MOV(block, DRC_REG(rd), uml::I3);
 }
 
-void arm7_cpu_device::drctg04_00_07(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ROR Rd, Rs */
+void arm7_cpu_device::drctg04_00_07(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ROR Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -562,7 +561,7 @@ void arm7_cpu_device::drctg04_00_07(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_08(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* TST Rd, Rs */
+void arm7_cpu_device::drctg04_00_08(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* TST Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -574,7 +573,7 @@ void arm7_cpu_device::drctg04_00_08(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_09(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* NEG Rd, Rs */
+void arm7_cpu_device::drctg04_00_09(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* NEG Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -584,7 +583,7 @@ void arm7_cpu_device::drctg04_00_09(drcuml_block *block, compiler_state *compile
 	DRCHandleThumbALUSubFlags(DRC_REG(rd), 0, uml::I3);
 }
 
-void arm7_cpu_device::drctg04_00_0a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* CMP Rd, Rs */
+void arm7_cpu_device::drctg04_00_0a(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* CMP Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -593,7 +592,7 @@ void arm7_cpu_device::drctg04_00_0a(drcuml_block *block, compiler_state *compile
 	DRCHandleThumbALUSubFlags(uml::I3, DRC_REG(rd), DRC_REG(rs));
 }
 
-void arm7_cpu_device::drctg04_00_0b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* CMN Rd, Rs - check flags, add dasm */
+void arm7_cpu_device::drctg04_00_0b(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* CMN Rd, Rs - check flags, add dasm */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -602,7 +601,7 @@ void arm7_cpu_device::drctg04_00_0b(drcuml_block *block, compiler_state *compile
 	DRCHandleThumbALUAddFlags(uml::I3, DRC_REG(rd), DRC_REG(rs));
 }
 
-void arm7_cpu_device::drctg04_00_0c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ORR Rd, Rs */
+void arm7_cpu_device::drctg04_00_0c(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ORR Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -614,7 +613,7 @@ void arm7_cpu_device::drctg04_00_0c(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_0d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* MUL Rd, Rs */
+void arm7_cpu_device::drctg04_00_0d(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* MUL Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -626,7 +625,7 @@ void arm7_cpu_device::drctg04_00_0d(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_0e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* BIC Rd, Rs */
+void arm7_cpu_device::drctg04_00_0e(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* BIC Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -639,7 +638,7 @@ void arm7_cpu_device::drctg04_00_0e(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_00_0f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* MVN Rd, Rs */
+void arm7_cpu_device::drctg04_00_0f(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* MVN Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -654,14 +653,14 @@ void arm7_cpu_device::drctg04_00_0f(drcuml_block *block, compiler_state *compile
 
 	/* ADD Rd, Rs group */
 
-void arm7_cpu_device::drctg04_01_00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg04_01_00(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: G4-1-0 Undefined Thumb instruction: %04x %x\n", pc, op, (op & THUMB_HIREG_H) >> THUMB_HIREG_H_SHIFT);
 }
 
-void arm7_cpu_device::drctg04_01_01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ADD Rd, HRs */
+void arm7_cpu_device::drctg04_01_01(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ADD Rd, HRs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -674,7 +673,7 @@ void arm7_cpu_device::drctg04_01_01(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_01_02(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ADD HRd, Rs */
+void arm7_cpu_device::drctg04_01_02(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ADD HRd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -687,7 +686,7 @@ void arm7_cpu_device::drctg04_01_02(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_01_03(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Add HRd, HRs */
+void arm7_cpu_device::drctg04_01_03(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Add HRd, HRs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -705,7 +704,7 @@ void arm7_cpu_device::drctg04_01_03(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_01_10(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* CMP Rd, Rs */
+void arm7_cpu_device::drctg04_01_10(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* CMP Rd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -714,7 +713,7 @@ void arm7_cpu_device::drctg04_01_10(drcuml_block *block, compiler_state *compile
 	DRCHandleThumbALUSubFlags(uml::I3, DRC_REG(rd), DRC_REG(rs));
 }
 
-void arm7_cpu_device::drctg04_01_11(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* CMP Rd, Hs */
+void arm7_cpu_device::drctg04_01_11(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* CMP Rd, Hs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -723,7 +722,7 @@ void arm7_cpu_device::drctg04_01_11(drcuml_block *block, compiler_state *compile
 	DRCHandleThumbALUSubFlags(uml::I3, DRC_REG(rd), DRC_REG(rs+8));
 }
 
-void arm7_cpu_device::drctg04_01_12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* CMP Hd, Rs */
+void arm7_cpu_device::drctg04_01_12(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* CMP Hd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -732,7 +731,7 @@ void arm7_cpu_device::drctg04_01_12(drcuml_block *block, compiler_state *compile
 	DRCHandleThumbALUSubFlags(uml::I3, DRC_REG(rd+8), DRC_REG(rs));
 }
 
-void arm7_cpu_device::drctg04_01_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* CMP Hd, Hs */
+void arm7_cpu_device::drctg04_01_13(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* CMP Hd, Hs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -743,7 +742,7 @@ void arm7_cpu_device::drctg04_01_13(drcuml_block *block, compiler_state *compile
 
 	/* MOV group */
 
-void arm7_cpu_device::drctg04_01_20(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* MOV Rd, Rs (undefined) */
+void arm7_cpu_device::drctg04_01_20(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* MOV Rd, Rs (undefined) */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -752,7 +751,7 @@ void arm7_cpu_device::drctg04_01_20(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_01_21(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* MOV Rd, Hs */
+void arm7_cpu_device::drctg04_01_21(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* MOV Rd, Hs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -765,7 +764,7 @@ void arm7_cpu_device::drctg04_01_21(drcuml_block *block, compiler_state *compile
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg04_01_22(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* MOV Hd, Rs */
+void arm7_cpu_device::drctg04_01_22(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* MOV Hd, Rs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -782,7 +781,7 @@ void arm7_cpu_device::drctg04_01_22(drcuml_block *block, compiler_state *compile
 	}
 }
 
-void arm7_cpu_device::drctg04_01_23(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* MOV Hd, Hs */
+void arm7_cpu_device::drctg04_01_23(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* MOV Hd, Hs */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
@@ -803,7 +802,7 @@ void arm7_cpu_device::drctg04_01_23(drcuml_block *block, compiler_state *compile
 
 }
 
-void arm7_cpu_device::drctg04_01_30(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg04_01_30(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uml::code_label switch_state;
@@ -811,9 +810,9 @@ void arm7_cpu_device::drctg04_01_30(drcuml_block *block, compiler_state *compile
 	uint32_t rs = (op & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
 	UML_MOV(block, uml::I0, DRC_REG(rs));
 	UML_TEST(block, uml::I0, 1);
-	UML_JMPc(block, uml::COND_Z, switch_state = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_Z, switch_state = compiler.labelnum++);
 	UML_AND(block, uml::I0, uml::I0, ~1);
-	UML_JMP(block, done = compiler->labelnum++);
+	UML_JMP(block, done = compiler.labelnum++);
 
 	UML_LABEL(block, switch_state);
 	UML_AND(block, DRC_CPSR, DRC_CPSR, ~T_MASK);
@@ -826,7 +825,7 @@ void arm7_cpu_device::drctg04_01_30(drcuml_block *block, compiler_state *compile
 	UML_MOV(block, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg04_01_31(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg04_01_31(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uml::code_label switch_state;
@@ -838,9 +837,9 @@ void arm7_cpu_device::drctg04_01_31(drcuml_block *block, compiler_state *compile
 		UML_ADD(block, uml::I0, uml::I0, 2);
 	}
 	UML_TEST(block, uml::I0, 1);
-	UML_JMPc(block, uml::COND_Z, switch_state = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_Z, switch_state = compiler.labelnum++);
 	UML_AND(block, uml::I0, uml::I0, ~1);
-	UML_JMP(block, done = compiler->labelnum++);
+	UML_JMP(block, done = compiler.labelnum++);
 
 	UML_LABEL(block, switch_state);
 	UML_AND(block, DRC_CPSR, DRC_CPSR, ~T_MASK);
@@ -853,21 +852,21 @@ void arm7_cpu_device::drctg04_01_31(drcuml_block *block, compiler_state *compile
 	UML_MOV(block, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg04_01_32(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg04_01_32(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: G4-3 Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg04_01_33(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg04_01_33(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: G4-3 Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg04_0203(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg04_0203(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT;
@@ -881,7 +880,7 @@ void arm7_cpu_device::drctg04_0203(drcuml_block *block, compiler_state *compiler
 
 	/* LDR* STR* group */
 
-void arm7_cpu_device::drctg05_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* STR Rd, [Rn, Rm] */
+void arm7_cpu_device::drctg05_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* STR Rd, [Rn, Rm] */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -893,7 +892,7 @@ void arm7_cpu_device::drctg05_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg05_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* STRH Rd, [Rn, Rm] */
+void arm7_cpu_device::drctg05_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* STRH Rd, [Rn, Rm] */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -905,7 +904,7 @@ void arm7_cpu_device::drctg05_1(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg05_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* STRB Rd, [Rn, Rm] */
+void arm7_cpu_device::drctg05_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* STRB Rd, [Rn, Rm] */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -917,7 +916,7 @@ void arm7_cpu_device::drctg05_2(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg05_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* LDSB Rd, [Rn, Rm] todo, add dasm */
+void arm7_cpu_device::drctg05_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* LDSB Rd, [Rn, Rm] todo, add dasm */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -929,7 +928,7 @@ void arm7_cpu_device::drctg05_3(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg05_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* LDR Rd, [Rn, Rm] */
+void arm7_cpu_device::drctg05_4(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* LDR Rd, [Rn, Rm] */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -941,7 +940,7 @@ void arm7_cpu_device::drctg05_4(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg05_5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* LDRH Rd, [Rn, Rm] */
+void arm7_cpu_device::drctg05_5(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* LDRH Rd, [Rn, Rm] */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -953,7 +952,7 @@ void arm7_cpu_device::drctg05_5(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg05_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* LDRB Rd, [Rn, Rm] */
+void arm7_cpu_device::drctg05_6(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* LDRB Rd, [Rn, Rm] */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -965,7 +964,7 @@ void arm7_cpu_device::drctg05_6(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg05_7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* LDSH Rd, [Rn, Rm] */
+void arm7_cpu_device::drctg05_7(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* LDSH Rd, [Rn, Rm] */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rm = (op & THUMB_GROUP5_RM) >> THUMB_GROUP5_RM_SHIFT;
@@ -979,7 +978,7 @@ void arm7_cpu_device::drctg05_7(drcuml_block *block, compiler_state *compiler, c
 
 	/* Word Store w/ Immediate Offset */
 
-void arm7_cpu_device::drctg06_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Store */
+void arm7_cpu_device::drctg06_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Store */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -991,7 +990,7 @@ void arm7_cpu_device::drctg06_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg06_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Load */
+void arm7_cpu_device::drctg06_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Load */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -1005,7 +1004,7 @@ void arm7_cpu_device::drctg06_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Byte Store w/ Immeidate Offset */
 
-void arm7_cpu_device::drctg07_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Store */
+void arm7_cpu_device::drctg07_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Store */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -1017,7 +1016,7 @@ void arm7_cpu_device::drctg07_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg07_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* Load */
+void arm7_cpu_device::drctg07_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* Load */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rn = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
@@ -1031,7 +1030,7 @@ void arm7_cpu_device::drctg07_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Load/Store Halfword */
 
-void arm7_cpu_device::drctg08_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Store */
+void arm7_cpu_device::drctg08_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Store */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t offs = (op & THUMB_HALFOP_OFFS) >> THUMB_HALFOP_OFFS_SHIFT;
@@ -1043,7 +1042,7 @@ void arm7_cpu_device::drctg08_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg08_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Load */
+void arm7_cpu_device::drctg08_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Load */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t offs = (op & THUMB_HALFOP_OFFS) >> THUMB_HALFOP_OFFS_SHIFT;
@@ -1057,7 +1056,7 @@ void arm7_cpu_device::drctg08_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Stack-Relative Load/Store */
 
-void arm7_cpu_device::drctg09_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Store */
+void arm7_cpu_device::drctg09_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Store */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_STACKOP_RD) >> THUMB_STACKOP_RD_SHIFT;
@@ -1068,7 +1067,7 @@ void arm7_cpu_device::drctg09_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg09_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Load */
+void arm7_cpu_device::drctg09_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Load */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_STACKOP_RD) >> THUMB_STACKOP_RD_SHIFT;
@@ -1081,7 +1080,7 @@ void arm7_cpu_device::drctg09_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Get relative address */
 
-void arm7_cpu_device::drctg0a_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)  /* ADD Rd, PC, #nn */
+void arm7_cpu_device::drctg0a_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)  /* ADD Rd, PC, #nn */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_RELADDR_RD) >> THUMB_RELADDR_RD_SHIFT;
@@ -1092,7 +1091,7 @@ void arm7_cpu_device::drctg0a_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg0a_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ADD Rd, SP, #nn */
+void arm7_cpu_device::drctg0a_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ADD Rd, SP, #nn */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_RELADDR_RD) >> THUMB_RELADDR_RD_SHIFT;
@@ -1103,7 +1102,7 @@ void arm7_cpu_device::drctg0a_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Stack-Related Opcodes */
 
-void arm7_cpu_device::drctg0b_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* ADD SP, #imm */
+void arm7_cpu_device::drctg0b_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* ADD SP, #imm */
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t addr = (op & THUMB_INSN_IMM);
@@ -1113,28 +1112,28 @@ void arm7_cpu_device::drctg0b_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg0b_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* PUSH {Rlist} */
+void arm7_cpu_device::drctg0b_4(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* PUSH {Rlist} */
 {
 	uint32_t op = desc->opptr.l[0];
 	for (int32_t offs = 7; offs >= 0; offs--)
@@ -1150,7 +1149,7 @@ void arm7_cpu_device::drctg0b_4(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg0b_5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* PUSH {Rlist}{LR} */
+void arm7_cpu_device::drctg0b_5(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* PUSH {Rlist}{LR} */
 {
 	uint32_t op = desc->opptr.l[0];
 	UML_SUB(block, DRC_REG(13), DRC_REG(13), 4);
@@ -1170,49 +1169,49 @@ void arm7_cpu_device::drctg0b_5(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg0b_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_6(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_7(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_8(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_9(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_a(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_b(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* POP {Rlist} */
+void arm7_cpu_device::drctg0b_c(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* POP {Rlist} */
 {
 	uint32_t op = desc->opptr.l[0];
 	for (int32_t offs = 0; offs < 8; offs++)
@@ -1228,7 +1227,7 @@ void arm7_cpu_device::drctg0b_c(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg0b_d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* POP {Rlist}{PC} */
+void arm7_cpu_device::drctg0b_d(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* POP {Rlist}{PC} */
 {
 	uint32_t op = desc->opptr.l[0];
 	uml::code_label arch5up;
@@ -1247,13 +1246,13 @@ void arm7_cpu_device::drctg0b_d(drcuml_block *block, compiler_state *compiler, c
 	UML_MOV(block, uml::I0, DRC_REG(13));
 	UML_CALLH(block, *m_impstate.read32);
 	UML_CMP(block, uml::mem(&m_archRev), 4);
-	UML_JMPc(block, uml::COND_A, arch5up = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_A, arch5up = compiler.labelnum++);
 	UML_AND(block, DRC_PC, uml::I0, ~1);
 
 	UML_LABEL(block, arch5up);
 
 	UML_TEST(block, uml::I0, 1);
-	UML_JMPc(block, uml::COND_Z, switch_mode = compiler->labelnum++);
+	UML_JMPc(block, uml::COND_Z, switch_mode = compiler.labelnum++);
 
 	UML_AND(block, uml::I0, uml::I0, ~1);
 	UML_MOV(block, DRC_PC, uml::I0);
@@ -1271,14 +1270,14 @@ void arm7_cpu_device::drctg0b_d(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_REG(13), DRC_REG(13), 4);
 }
 
-void arm7_cpu_device::drctg0b_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_e(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Gb Undefined Thumb instruction: %04x\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0b_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0b_f(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
@@ -1293,7 +1292,7 @@ void arm7_cpu_device::drctg0b_f(drcuml_block *block, compiler_state *compiler, c
 // GBA "BB Ball" performs an unaligned read with A[1:0] = 2 and expects A[1] not to be ignored [BP 800B90A,(R4&3)!=0]
 // GBA "Gadget Racers" performs an unaligned read with A[1:0] = 1 and expects A[0] to be ignored [BP B72,(R0&3)!=0]
 
-void arm7_cpu_device::drctg0c_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Store */
+void arm7_cpu_device::drctg0c_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Store */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
@@ -1312,7 +1311,7 @@ void arm7_cpu_device::drctg0c_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg0c_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* Load */
+void arm7_cpu_device::drctg0c_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* Load */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t rd = (op & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
@@ -1336,7 +1335,7 @@ void arm7_cpu_device::drctg0c_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* Conditional Branch */
 
-void arm7_cpu_device::drctg0d_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_EQ:
+void arm7_cpu_device::drctg0d_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_EQ:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1346,7 +1345,7 @@ void arm7_cpu_device::drctg0d_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_NE:
+void arm7_cpu_device::drctg0d_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_NE:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1356,7 +1355,7 @@ void arm7_cpu_device::drctg0d_1(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_CS:
+void arm7_cpu_device::drctg0d_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_CS:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1366,7 +1365,7 @@ void arm7_cpu_device::drctg0d_2(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_CC:
+void arm7_cpu_device::drctg0d_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_CC:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1376,7 +1375,7 @@ void arm7_cpu_device::drctg0d_3(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_MI:
+void arm7_cpu_device::drctg0d_4(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_MI:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1386,7 +1385,7 @@ void arm7_cpu_device::drctg0d_4(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_PL:
+void arm7_cpu_device::drctg0d_5(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_PL:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1396,7 +1395,7 @@ void arm7_cpu_device::drctg0d_5(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_VS:
+void arm7_cpu_device::drctg0d_6(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_VS:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1406,7 +1405,7 @@ void arm7_cpu_device::drctg0d_6(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_VC:
+void arm7_cpu_device::drctg0d_7(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_VC:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1416,7 +1415,7 @@ void arm7_cpu_device::drctg0d_7(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_HI:
+void arm7_cpu_device::drctg0d_8(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_HI:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1433,7 +1432,7 @@ void arm7_cpu_device::drctg0d_8(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_LS:
+void arm7_cpu_device::drctg0d_9(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_LS:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1450,7 +1449,7 @@ void arm7_cpu_device::drctg0d_9(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_GE:
+void arm7_cpu_device::drctg0d_a(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_GE:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1466,7 +1465,7 @@ void arm7_cpu_device::drctg0d_a(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_LT:
+void arm7_cpu_device::drctg0d_b(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_LT:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1482,7 +1481,7 @@ void arm7_cpu_device::drctg0d_b(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_GT:
+void arm7_cpu_device::drctg0d_c(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_GT:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1505,7 +1504,7 @@ void arm7_cpu_device::drctg0d_c(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_LE:
+void arm7_cpu_device::drctg0d_d(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_LE:
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = ((int8_t)(op & THUMB_INSN_IMM) << 1) + 4;
@@ -1528,14 +1527,14 @@ void arm7_cpu_device::drctg0d_d(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, uml::I0);
 }
 
-void arm7_cpu_device::drctg0d_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // COND_AL:
+void arm7_cpu_device::drctg0d_e(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // COND_AL:
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t pc = desc->pc;
 	fatalerror("%08x: Undefined Thumb instruction: %04x (ARM9 reserved)\n", pc, op);
 }
 
-void arm7_cpu_device::drctg0d_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // SWI (this is sort of a "hole" in the opcode encoding)
+void arm7_cpu_device::drctg0d_f(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) // SWI (this is sort of a "hole" in the opcode encoding)
 {
 	UML_MOV(block, uml::mem(&m_pendingSwi), 1);
 	UML_CALLH(block, *m_impstate.check_irq);
@@ -1543,7 +1542,7 @@ void arm7_cpu_device::drctg0d_f(drcuml_block *block, compiler_state *compiler, c
 
 	/* B #offs */
 
-void arm7_cpu_device::drctg0e_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0e_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	int32_t offs = (op & THUMB_BRANCH_OFFS) << 1;
@@ -1554,7 +1553,7 @@ void arm7_cpu_device::drctg0e_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, offs + 4);
 }
 
-void arm7_cpu_device::drctg0e_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0e_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t offs = (op & THUMB_BLOP_OFFS) << 1;
@@ -1568,7 +1567,7 @@ void arm7_cpu_device::drctg0e_1(drcuml_block *block, compiler_state *compiler, c
 
 	/* BL */
 
-void arm7_cpu_device::drctg0f_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+void arm7_cpu_device::drctg0f_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t addr = (op & THUMB_BLOP_OFFS) << 12;
@@ -1581,7 +1580,7 @@ void arm7_cpu_device::drctg0f_0(drcuml_block *block, compiler_state *compiler, c
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 }
 
-void arm7_cpu_device::drctg0f_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) /* BL */
+void arm7_cpu_device::drctg0f_1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc) /* BL */
 {
 	uint32_t op = desc->opptr.l[0];
 	uint32_t addr = (op & THUMB_BLOP_OFFS) << 1;

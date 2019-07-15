@@ -22,94 +22,38 @@
 #include "imagedev/harddriv.h"
 #include "image.h"
 
-enum
-{
-	SASI_PHASE_BUSFREE = 0,
-	SASI_PHASE_ARBITRATION,
-	SASI_PHASE_SELECTION,
-	SASI_PHASE_RESELECTION,
-	SASI_PHASE_COMMAND,
-	SASI_PHASE_DATA,
-	SASI_PHASE_STATUS,
-	SASI_PHASE_MESSAGE,
-	SASI_PHASE_READ,
-	SASI_PHASE_WRITE
-};
-
-// SASI commands, based on the SASI standard
-enum
-{
-	// Class 0 (6-byte) commands
-	SASI_CMD_TEST_UNIT_READY = 0,
-	SASI_CMD_REZERO_UNIT,
-	SASI_CMD_RESERVED_02,
-	SASI_CMD_REQUEST_SENSE,
-	SASI_CMD_FORMAT_UNIT,
-	SASI_CMD_RESERVED_05,
-	SASI_CMD_FORMAT_UNIT_06,  // the X68000 uses command 0x06 for Format Unit, despite the SASI specs saying 0x04
-	SASI_CMD_RESERVED_07,
-	SASI_CMD_READ,
-	SASI_CMD_RESERVED_09,
-	SASI_CMD_WRITE,
-	SASI_CMD_SEEK,
-	SASI_CMD_RESERVED_0C,
-	SASI_CMD_RESERVED_0D,
-	SASI_CMD_RESERVED_0E,
-	SASI_CMD_WRITE_FILE_MARK,
-	SASI_CMD_INVALID_10,
-	SASI_CMD_INVALID_11,
-	SASI_CMD_RESERVE_UNIT,
-	SASI_CMD_RELEASE_UNIT,
-	SASI_CMD_INVALID_14,
-	SASI_CMD_INVALID_15,
-	SASI_CMD_READ_CAPACITY,
-	SASI_CMD_INVALID_17,
-	SASI_CMD_INVALID_18,
-	SASI_CMD_INVALID_19,
-	SASI_CMD_READ_DIAGNOSTIC,
-	SASI_CMD_WRITE_DIAGNOSTIC,
-	SASI_CMD_INVALID_1C,
-	SASI_CMD_INVALID_1D,
-	SASI_CMD_INVALID_1E,
-	SASI_CMD_INQUIRY,
-	// Class 1 commands  (yes, just the one)
-	SASI_CMD_RESERVED_20,
-	SASI_CMD_RESERVED_21,
-	SASI_CMD_RESERVED_22,
-	SASI_CMD_SET_BLOCK_LIMITS = 0x28,
-	// Class 2 commands
-	SASI_CMD_EXTENDED_ADDRESS_READ = 0x48,
-	SASI_CMD_INVALID_49,
-	SASI_CMD_EXTENDED_ADDRESS_WRITE,
-	SASI_CMD_WRITE_AND_VERIFY = 0x54,
-	SASI_CMD_VERIFY,
-	SASI_CMD_INVALID_56,
-	SASI_CMD_SEARCH_DATA_HIGH,
-	SASI_CMD_SEARCH_DATA_EQUAL,
-	SASI_CMD_SEARCH_DATA_LOW,
-	// controller-specific commands
-	SASI_CMD_SPECIFY = 0xc2
-};
+ALLOW_SAVE_TYPE(x68k_hdc_image_device::sasi_phase);
 
 DEFINE_DEVICE_TYPE(X68KHDC, x68k_hdc_image_device, "x68k_hdc_image", "SASI Hard Disk")
 
-x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, X68KHDC, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 {
 }
 
-void x68k_hdc_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(x68k_hdc_image_device::req_timer_callback)
 {
-	m_req = 1;
-	m_status_port |= 0x01;
+	m_status_port |= SASI_STATUS_REQ;
 }
 
 void x68k_hdc_image_device::device_start()
 {
 	m_status = 0x00;
 	m_status_port = 0x00;
-	m_phase = SASI_PHASE_BUSFREE;
+	m_phase = sasi_phase::BUSFREE;
+	m_req_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_hdc_image_device::req_timer_callback), this));
+
+	save_item(NAME(m_phase));
+	save_item(NAME(m_status_port));
+	save_item(NAME(m_status));
+	save_item(NAME(m_command));
+	save_item(NAME(m_sense));
+	save_item(NAME(m_command_byte_count));
+	save_item(NAME(m_command_byte_total));
+	save_item(NAME(m_current_command));
+	save_item(NAME(m_transfer_byte_count));
+	save_item(NAME(m_transfer_byte_total));
 }
 
 image_init_result x68k_hdc_image_device::call_create(int format_type, util::option_resolution *format_options)
@@ -137,7 +81,7 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 	switch(offset)
 	{
 	case 0x00:  // data I/O
-		if(m_phase == SASI_PHASE_WRITE)
+		if(m_phase == sasi_phase::WRITE)
 		{
 			if(m_transfer_byte_count == 0)
 			{
@@ -163,9 +107,8 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 			{
 				if(!exists())
 				{
-					m_phase = SASI_PHASE_STATUS;
-					m_io = 1;  // Output
-					m_status_port |= 0x04;  // C/D remains the same
+					m_phase = sasi_phase::STATUS;
+					m_status_port |= SASI_STATUS_IO;  // Output (C/D remains the same)
 					m_status = 0x02;
 					logerror("SASI: No HD connected.\n");
 				}
@@ -175,22 +118,19 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 				}
 			}
 
-			m_req = 0;
-			m_status_port &= ~0x01;
-			timer_set(attotime::from_nsec(450));
+			m_status_port &= ~SASI_STATUS_REQ;
+			m_req_timer->adjust(attotime::from_nsec(450));
 			m_transfer_byte_count++;
 			if(m_transfer_byte_count >= m_transfer_byte_total)
 			{
 				// End of transfer
-				m_phase = SASI_PHASE_STATUS;
-				m_io = 1;
-				m_status_port |= 0x04;
-				m_cd = 1;
-				m_status_port |= 0x08;
+				m_phase = sasi_phase::STATUS;
+				m_status_port |= SASI_STATUS_IO;
+				m_status_port |= SASI_STATUS_CD;
 				logerror("SASI: Write transfer complete\n");
 			}
 		}
-		if(m_phase == SASI_PHASE_COMMAND)
+		if(m_phase == sasi_phase::COMMAND)
 		{
 			if(m_command_byte_count == 0)
 			{
@@ -213,9 +153,8 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 			}
 			m_command[m_command_byte_count] = data;
 			// reset REQ temporarily
-			m_req = 0;
-			m_status_port &= ~0x01;
-			timer_set(attotime::from_nsec(450));
+			m_status_port &= ~SASI_STATUS_REQ;
+			m_req_timer->adjust(attotime::from_nsec(450));
 
 			m_command_byte_count++;
 			if(m_command_byte_count >= m_command_byte_total)
@@ -225,27 +164,23 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 				switch(m_command[0])
 				{
 				case SASI_CMD_REZERO_UNIT:
-					m_phase = SASI_PHASE_STATUS;
-					m_io = 1;  // Output
-					m_status_port |= 0x04;  // C/D remains the same
+					m_phase = sasi_phase::STATUS;
+					m_status_port |= SASI_STATUS_IO;  // Output
+					// C/D remains the same
 					logerror("SASI: REZERO UNIT\n");
 					break;
 				case SASI_CMD_REQUEST_SENSE:
-					m_phase = SASI_PHASE_READ;
-					m_io = 1;
-					m_status_port |= 0x04;
-					m_cd = 0;
-					m_status_port &= ~0x08;
+					m_phase = sasi_phase::READ;
+					m_status_port |= SASI_STATUS_IO;
+					m_status_port &= ~SASI_STATUS_CD;
 					m_transfer_byte_count = 0;
 					m_transfer_byte_total = 0;
 					logerror("SASI: REQUEST SENSE\n");
 					break;
 				case SASI_CMD_SPECIFY:
-					m_phase = SASI_PHASE_WRITE;
-					m_io = 0;
-					m_status_port &= ~0x04;
-					m_cd = 0;  // Data
-					m_status_port &= ~0x08;
+					m_phase = sasi_phase::WRITE;
+					m_status_port &= ~SASI_STATUS_IO;
+					m_status_port &= ~SASI_STATUS_CD;  // Data
 					m_transfer_byte_count = 0;
 					m_transfer_byte_total = 0;
 					logerror("SASI: SPECIFY\n");
@@ -253,21 +188,17 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 				case SASI_CMD_READ:
 					if(!exists())
 					{
-						m_phase = SASI_PHASE_STATUS;
-						m_io = 1;  // Output
-						m_status_port |= 0x04;  // C/D remains the same
-						m_cd = 1;
-						m_status_port |= 0x08;
+						m_phase = sasi_phase::STATUS;
+						m_status_port |= SASI_STATUS_IO;  // Output
+						m_status_port |= SASI_STATUS_CD;
 						m_status = 0x02;
 						logerror("SASI: No HD connected\n");
 					}
 					else
 					{
-						m_phase = SASI_PHASE_READ;
-						m_io = 1;
-						m_status_port |= 0x04;
-						m_cd = 0;
-						m_status_port &= ~0x08;
+						m_phase = sasi_phase::READ;
+						m_status_port |= SASI_STATUS_IO;
+						m_status_port &= ~SASI_STATUS_CD;
 						m_transfer_byte_count = 0;
 						m_transfer_byte_total = 0;
 						lba = m_command[3];
@@ -280,21 +211,17 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 				case SASI_CMD_WRITE:
 					if(!exists())
 					{
-						m_phase = SASI_PHASE_STATUS;
-						m_io = 1;  // Output
-						m_status_port |= 0x04;  // C/D remains the same
-						m_cd = 1;
-						m_status_port |= 0x08;
+						m_phase = sasi_phase::STATUS;
+						m_status_port |= SASI_STATUS_IO;  // Output
+						m_status_port |= SASI_STATUS_CD;
 						m_status = 0x02;
 						logerror("SASI: No HD connected\n");
 					}
 					else
 					{
-						m_phase = SASI_PHASE_WRITE;
-						m_io = 0;
-						m_status_port &= ~0x04;
-						m_cd = 0;
-						m_status_port &= ~0x08;
+						m_phase = sasi_phase::WRITE;
+						m_status_port &= ~SASI_STATUS_IO;
+						m_status_port &= ~SASI_STATUS_CD;
 						m_transfer_byte_count = 0;
 						m_transfer_byte_total = 0;
 						lba = m_command[3];
@@ -305,11 +232,9 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 					}
 					break;
 				case SASI_CMD_SEEK:
-						m_phase = SASI_PHASE_STATUS;
-						m_io = 1;  // Output
-						m_status_port |= 0x04;  // C/D remains the same
-						m_cd = 1;
-						m_status_port |= 0x08;
+						m_phase = sasi_phase::STATUS;
+						m_status_port |= SASI_STATUS_IO;  // Output
+						m_status_port |= SASI_STATUS_CD;
 						logerror("SASI: SEEK (LBA 0x%06x)\n",lba);
 					break;
 				case SASI_CMD_FORMAT_UNIT:
@@ -323,11 +248,9 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 					    4 |   ??  (usually 0x01)
 					    5 |   ??
 					*/
-						m_phase = SASI_PHASE_STATUS;
-						m_io = 1;  // Output
-						m_status_port |= 0x04;  // C/D remains the same
-						m_cd = 1;
-						m_status_port |= 0x08;
+						m_phase = sasi_phase::STATUS;
+						m_status_port |= SASI_STATUS_IO;  // Output
+						m_status_port |= SASI_STATUS_CD;
 						lba = m_command[3];
 						lba |= m_command[2] << 8;
 						lba |= (m_command[1] & 0x1f) << 16;
@@ -339,9 +262,8 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 						logerror("SASI: FORMAT UNIT (LBA 0x%06x)\n",lba);
 					break;
 				default:
-					m_phase = SASI_PHASE_STATUS;
-					m_io = 1;  // Output
-					m_status_port |= 0x04;  // C/D remains the same
+					m_phase = sasi_phase::STATUS;
+					m_status_port |= SASI_STATUS_IO;  // Output (C/D remains the same)
 					m_status = 0x02;
 					logerror("SASI: Invalid or unimplemented SASI command (0x%02x) received.\n",m_command[0]);
 				}
@@ -351,15 +273,14 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 	case 0x01:
 		if(data == 0)
 		{
-			if(m_phase == SASI_PHASE_SELECTION)
+			if(m_phase == sasi_phase::SELECTION)
 			{
 				// Go to Command phase
-				m_phase = SASI_PHASE_COMMAND;
-				m_cd = 1;   // data port expects a command or status
-				m_status_port |= 0x08;
+				m_phase = sasi_phase::COMMAND;
+				m_status_port |= SASI_STATUS_CD;   // data port expects a command or status
 				m_command_byte_count = 0;
 				m_command_byte_total = 0;
-				timer_set(attotime::from_nsec(45));
+				m_req_timer->adjust(attotime::from_nsec(45));
 			}
 		}
 		break;
@@ -368,12 +289,11 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 	case 0x03:
 		if(data != 0)
 		{
-			if(m_phase == SASI_PHASE_BUSFREE)
+			if(m_phase == sasi_phase::BUSFREE)
 			{
 				// Go to Selection phase
-				m_phase = SASI_PHASE_SELECTION;
-				m_bsy = 1;  // HDC is now busy
-				m_status_port |= 0x02;
+				m_phase = sasi_phase::SELECTION;
+				m_status_port |= SASI_STATUS_BSY;  // HDC is now busy
 			}
 		}
 		break;
@@ -389,31 +309,24 @@ READ16_MEMBER( x68k_hdc_image_device::hdc_r )
 	switch(offset)
 	{
 	case 0x00:
-		if(m_phase == SASI_PHASE_MESSAGE)
+		if(m_phase == sasi_phase::MESSAGE)
 		{
-			m_phase = SASI_PHASE_BUSFREE;
-			m_msg = 0;
-			m_cd = 0;
-			m_io = 0;
-			m_bsy = 0;
-			m_req = 0;
+			m_phase = sasi_phase::BUSFREE;
 			m_status = 0;
 			m_status_port = 0;  // reset all status bits to 0
 			return 0x00;
 		}
-		if(m_phase == SASI_PHASE_STATUS)
+		if(m_phase == sasi_phase::STATUS)
 		{
-			m_phase = SASI_PHASE_MESSAGE;
-			m_msg = 1;
-			m_status_port |= 0x10;
+			m_phase = sasi_phase::MESSAGE;
+			m_status_port |= SASI_STATUS_MSG;
 			// reset REQ temporarily
-			m_req = 0;
-			m_status_port &= ~0x01;
-			timer_set(attotime::from_nsec(450));
+			m_status_port &= ~SASI_STATUS_REQ;
+			m_req_timer->adjust(attotime::from_nsec(450));
 
 			return m_status;
 		}
-		if(m_phase == SASI_PHASE_READ)
+		if(m_phase == sasi_phase::READ)
 		{
 			if(m_transfer_byte_count == 0)
 			{
@@ -448,9 +361,8 @@ READ16_MEMBER( x68k_hdc_image_device::hdc_r )
 			case SASI_CMD_READ:
 				if(!exists())
 				{
-					m_phase = SASI_PHASE_STATUS;
-					m_io = 1;  // Output
-					m_status_port |= 0x04;  // C/D remains the same
+					m_phase = sasi_phase::STATUS;
+					m_status_port |= SASI_STATUS_IO;  // Output (C/D remains the same)
 					m_status = 0x02;
 					logerror("SASI: No HD connected.\n");
 				}
@@ -465,18 +377,15 @@ READ16_MEMBER( x68k_hdc_image_device::hdc_r )
 				retval = 0;
 			}
 
-			m_req = 0;
-			m_status_port &= ~0x01;
-			timer_set(attotime::from_nsec(450));
+			m_status_port &= ~SASI_STATUS_REQ;
+			m_req_timer->adjust(attotime::from_nsec(450));
 			m_transfer_byte_count++;
 			if(m_transfer_byte_count >= m_transfer_byte_total)
 			{
 				// End of transfer
-				m_phase = SASI_PHASE_STATUS;
-				m_io = 1;
-				m_status_port |= 0x04;
-				m_cd = 1;
-				m_status_port |= 0x08;
+				m_phase = sasi_phase::STATUS;
+				m_status_port |= SASI_STATUS_IO;
+				m_status_port |= SASI_STATUS_CD;
 				logerror("SASI: Read transfer complete\n");
 			}
 

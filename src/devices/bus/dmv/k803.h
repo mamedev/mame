@@ -31,8 +31,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 
 	void update_int();
 

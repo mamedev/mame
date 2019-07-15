@@ -5,16 +5,21 @@
     Fire Trap
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_FIRETRAP_H
+#define MAME_INCLUDES_FIRETRAP_H
+
+#pragma once
 
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class firetrap_state : public driver_device
 {
 public:
-	firetrap_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	firetrap_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_bg2videoram(*this, "bg2videoram"),
 		m_fgvideoram(*this, "fgvideoram"),
@@ -25,8 +30,15 @@ public:
 		m_adpcm_select(*this, "adpcm_select"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void firetrapbl(machine_config &config);
+	void firetrap(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bg1videoram;
 	required_shared_ptr<uint8_t> m_bg2videoram;
@@ -77,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER(firetrap_bg1_scrolly_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrolly_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILEMAP_MAPPER_MEMBER(get_fg_memory_offset);
 	TILEMAP_MAPPER_MEMBER(get_bg_memory_offset);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -86,16 +97,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(firetrap);
+	void firetrap_palette(palette_device &palette) const;
 	uint32_t screen_update_firetrap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firetrap_irq);
 	inline void get_bg_tile_info(tile_data &tileinfo, int tile_index, uint8_t *bgvideoram, int gfx_region);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(firetrap_adpcm_int);
-	void firetrapbl(machine_config &config);
-	void firetrap(machine_config &config);
 	void firetrap_base_map(address_map &map);
 	void firetrap_bootleg_map(address_map &map);
 	void firetrap_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FIRETRAP_H

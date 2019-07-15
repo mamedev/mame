@@ -6,13 +6,11 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 
 DECLARE_DEVICE_TYPE(STFIGHT_VIDEO, stfight_video_device)
-
-#define MCFG_STFIGHT_VIDEO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, STFIGHT_VIDEO, 0)
-
 
 class stfight_video_device :  public device_t
 {

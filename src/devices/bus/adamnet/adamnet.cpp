@@ -257,10 +257,11 @@ WRITE_LINE_MEMBER( adamnet_device::reset_w )
 #include "printer.h"
 #include "spi.h"
 
-SLOT_INTERFACE_START( adamnet_devices )
-	SLOT_INTERFACE("ddp", ADAM_DDP)
-	SLOT_INTERFACE("fdc", ADAM_FDC)
-	SLOT_INTERFACE("kb", ADAM_KB)
-	SLOT_INTERFACE("prn", ADAM_PRN)
-	SLOT_INTERFACE("spi", ADAM_SPI)
-SLOT_INTERFACE_END
+void adamnet_devices(device_slot_interface &device)
+{
+	device.option_add("ddp", ADAM_DDP);
+	device.option_add("fdc", ADAM_FDC);
+	device.option_add("kb", ADAM_KB);
+	device.option_add("prn", ADAM_PRN);
+	device.option_add("spi", ADAM_SPI);
+}

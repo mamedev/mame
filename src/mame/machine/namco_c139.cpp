@@ -8,6 +8,7 @@
     TODO:
     - Make this to actually work!
     - Is RAM shared with a specific CPU other than master/slave?
+    - is this another MCU with internal ROM?
 
 ***************************************************************************/
 
@@ -28,17 +29,19 @@ DEFINE_DEVICE_TYPE(NAMCO_C139, namco_c139_device, "namco_c139", "Namco C139 Seri
 //  LIVE DEVICE
 //**************************************************************************
 
-ADDRESS_MAP_START(namco_c139_device::data_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("sharedram")
-ADDRESS_MAP_END
+void namco_c139_device::data_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("sharedram");
+}
 
-ADDRESS_MAP_START(namco_c139_device::regs_map)
-	AM_RANGE(0x00, 0x01) AM_READ(status_r) // WRITE clears flags
-	AM_RANGE(0x02, 0x03) AM_NOP // settings?
+void namco_c139_device::regs_map(address_map &map)
+{
+	map(0x00, 0x01).r(FUNC(namco_c139_device::status_r)); // WRITE clears flags
+	map(0x02, 0x03).noprw(); // settings?
 //  AM_RANGE(0x0a, 0x0b) // WRITE tx_w
 //  AM_RANGE(0x0c, 0x0d) // READ rx_r
 //  AM_RANGE(0x0e, 0x0f) //
-ADDRESS_MAP_END
+}
 
 //-------------------------------------------------
 //  namco_c139_device - constructor

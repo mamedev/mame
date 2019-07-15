@@ -21,7 +21,21 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		<info name="serial" value="DP 2002" />
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="exidy standard basic v1.rom" size="8192" crc="3468d561" sha1="d9e6d50b97b6777720ca32c31760ed3d62dbe3fd" offset="0" />
+				<rom name="exidy standard basic v1.rom" size="8192" crc="3468d561" sha1="d9e6d50b97b6777720ca32c31760ed3d62dbe3fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic11">
+		<description>Exidy Standard Basic v1.1</description>
+		<year>1980</year>
+		<publisher>Exidy</publisher>
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="basic11a.rom" size="2048" crc="795c6b54" sha1="7984560f202d935af7ea72bfb2129609675caa21" offset="0x0000" />
+				<rom name="basic11b.rom" size="2048" crc="1068a3f8" sha1="6395f2c9829d537d68b75a750acbf27145f1bbad" offset="0x0800" />
+				<rom name="basic11c.rom" size="2048" crc="84a9bfe6" sha1="33132660ea52de7d5b17757a6a1f99508475a069" offset="0x1000" />
+				<rom name="basic11d.rom" size="2048" crc="91446784" sha1="2467f007a8e55b0e37edd026df74ebff7db01089" offset="0x1800" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +47,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		<info name="serial" value="DP 2003" />
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="exidy z80 development pac.rom" size="8192" crc="dc738618" sha1="fe5290c4e8a5fd40f5d7263f7a32c67159904723" offset="0" />
+				<rom name="exidy z80 development pac.rom" size="8192" crc="dc738618" sha1="fe5290c4e8a5fd40f5d7263f7a32c67159904723"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +59,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		<info name="serial" value="DP 2004" />
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="exidy word processor pack.rom" size="8192" crc="da999745" sha1="6acd340b4030c42f2292568a097aea11c7f17152" offset="0" />
+				<rom name="exidy word processor pack.rom" size="8192" crc="da999745" sha1="6acd340b4030c42f2292568a097aea11c7f17152"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +71,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		<publisher>Software Source</publisher>
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="basic mod v.101.rom" size="8192" crc="638ee239" sha1="cc21fddcccc7005f1a4390448897f7250a965f62" offset="0" />
+				<rom name="basic mod v.101.rom" size="8192" crc="638ee239" sha1="cc21fddcccc7005f1a4390448897f7250a965f62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +83,21 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="basic rev.b.rom" size="8192" crc="792ce8ad" sha1="ebf00fdcf028ce9131ca62d81b8fd80a9055d114" offset="0" />
+				<rom name="basic rev.b.rom" size="8192" crc="792ce8ad" sha1="ebf00fdcf028ce9131ca62d81b8fd80a9055d114"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssbasic">
+		<description>System Software Basic v1.1</description>
+		<year>1982</year>
+		<publisher>System Software</publisher>
+		<part name="cart" interface="sorcerer_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="ssbasic1.bin" size="2048" crc="46f00e0d" sha1="9fff640a3bc1737815cdfa81ced73f4ff961817e" offset="0x0000" />
+				<rom name="ssbasic2.bin" size="2048" crc="28b30777" sha1="34fecf68ee18ef897405313eb74eb7dc6ca28278" offset="0x0800" />
+				<rom name="ssbasic3.bin" size="2048" crc="1601f617" sha1="1c4d24cfade2920820ba89bae05b9b5b969b96ee" offset="0x1000" />
+				<rom name="ssbasic4.bin" size="2048" crc="486fdee7" sha1="c98b0fc5146c17b43086461e7c290a178ede796b" offset="0x1800" />
 			</dataarea>
 		</part>
 	</software>

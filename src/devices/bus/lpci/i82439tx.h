@@ -16,12 +16,6 @@
 #include "pci.h"
 #include "northbridge.h"
 
-#define MCFG_I82439TX_CPU( _tag ) \
-	i82439tx_device::static_set_cpu(*device, _tag);
-
-#define MCFG_I82439TX_REGION( _tag ) \
-	i82439tx_device::static_set_region(*device, _tag);
-
 // ======================> i82439tx_device
 
 class i82439tx_device : public northbridge_device, public pci_device_interface
@@ -30,11 +24,13 @@ public:
 	// construction/destruction
 	i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_cpu(device_t &device, const char *tag) { dynamic_cast<i82439tx_device &>(device).m_cpu_tag = tag; }
-	static void static_set_region(device_t &device, const char *tag) { dynamic_cast<i82439tx_device &>(device).m_region_tag = tag; }
+	void set_cpu(const char *tag) { m_cpu_tag = tag; }
+	void set_region(const char *tag) { m_region_tag = tag; }
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
+
+	DECLARE_WRITE_LINE_MEMBER(smi_act_w);
 
 protected:
 	// device-level overrides
@@ -42,6 +38,7 @@ protected:
 	virtual void device_reset() override;
 
 	void i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end);
+	void update_smram_mappings();
 
 private:
 	const char *m_cpu_tag;
@@ -52,9 +49,25 @@ private:
 
 	uint32_t m_regs[8*256];
 	uint32_t m_bios_ram[0x40000 / 4];
+
+	// system management ram setup
+	struct {
+		int tseg_en;
+		int tseg_sz;
+		int e_smerr;
+		int h_smrame;
+		int c_base_seg;
+		int g_smrame;
+		int d_lck;
+		int d_cls;
+		int d_open;
+		int smiact_n;
+		int tseg_size;
+		int mapping;
+	} m_smram;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(I82439TX, i82439tx_device)
+DECLARE_DEVICE_TYPE(I82439TX_LEGACY, i82439tx_device)
 
 #endif // MAME_BUS_LPCI_I82439TX_H

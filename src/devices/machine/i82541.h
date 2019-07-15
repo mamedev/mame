@@ -7,11 +7,13 @@
 
 #include "pci.h"
 
-#define MCFG_I82541PI_ADD(_tag, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, I82541, 0x8086107c, 0x05, 0x020000, _subdevice_id)
-
 class i82541_device : public pci_device {
 public:
+	i82541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
+		: i82541_device(mconfig, tag, owner, clock)
+	{
+		set_ids(0x8086107c, 0x05, 0x020000, subdevice_id);
+	}
 	i82541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

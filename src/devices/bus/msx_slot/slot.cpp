@@ -13,24 +13,12 @@ pages; and multiple pieces of rom/ram/components can occur in a single slot.
 #include "emu.h"
 #include "slot.h"
 
-msx_internal_slot_interface::msx_internal_slot_interface()
-	: m_start_address(0)
+msx_internal_slot_interface::msx_internal_slot_interface(const machine_config &mconfig, device_t &device)
+	: m_mem_space(device, finder_base::DUMMY_TAG, -1)
+	, m_io_space(device, finder_base::DUMMY_TAG, -1)
+	, m_start_address(0)
 	, m_size(0)
 	, m_end_address(0)
 {
-}
-
-void msx_internal_slot_interface::set_start_address(device_t &device, uint32_t start_address)
-{
-	msx_internal_slot_interface &dev = dynamic_cast<msx_internal_slot_interface &>(device);
-	dev.m_start_address = start_address;
-	dev.m_end_address = dev.m_start_address + dev.m_size;
-}
-
-void msx_internal_slot_interface::set_size(device_t &device, uint32_t size)
-{
-	msx_internal_slot_interface &dev = dynamic_cast<msx_internal_slot_interface &>(device);
-
-	dev.m_size = size;
-	dev.m_end_address = dev.m_start_address + dev.m_size;
+	(void)mconfig;
 }

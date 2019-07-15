@@ -13,18 +13,15 @@
 #pragma once
 
 
-extern const device_type PSX_IRQ;
-
-#define MCFG_PSX_IRQ_HANDLER(_devcb) \
-	devcb = &psxirq_device::set_irq_handler(*device, DEVCB_##_devcb);
+DECLARE_DEVICE_TYPE(PSX_IRQ, psxirq_device)
 
 class psxirq_device : public device_t
 {
 public:
 	psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<psxirq_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq() { return m_irq_handler.bind(); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );

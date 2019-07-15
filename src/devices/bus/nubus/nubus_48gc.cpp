@@ -39,15 +39,16 @@ DEFINE_DEVICE_TYPE(NUBUS_824GC, nubus_824gc_device, "nb_824gc", "Apple 8*24 vide
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(jmfb_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-//  MCFG_SCREEN_SIZE(1152, 870)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
-//  MCFG_SCREEN_REFRESH_RATE(75)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-MACHINE_CONFIG_END
+void jmfb_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, GC48_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(jmfb_device::screen_update));
+	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+//  screen.set_size(1152, 870);
+//  screen.set_visarea(0, 1152-1, 0, 870-1);
+//  screen.set_refresh_hz(75);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -76,10 +77,9 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
 	m_screen(nullptr), m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0), m_count(0), m_clutoffs(0), m_xres(0), m_yres(0),
-	m_is824(is824),
-	m_assembled_tag(util::string_format("%s:%s", tag, GC48_SCREEN_NAME))
+	m_is824(is824)
 {
-	static_set_screen(*this, m_assembled_tag.c_str());
+	set_screen(*this, GC48_SCREEN_NAME);
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -100,8 +100,6 @@ void jmfb_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, GC48_ROM_REGION);
 
 	slotspace = get_slotspace();
@@ -111,7 +109,7 @@ void jmfb_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_48gc", &m_vram[0]);
 
-	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
+	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_screen = nullptr;    // can we look this up now?
@@ -347,7 +345,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 
 READ32_MEMBER( jmfb_device::mac_48gc_r )
 {
-//  printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, m_maincpu->safe_pc());
+//  printf("%s 48gc_r: @ %x, mask %08x\n", machine().describe_context().c_str(), offset, mem_mask);
 
 	switch (offset)
 	{

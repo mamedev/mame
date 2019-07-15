@@ -198,11 +198,11 @@ lcak 3  18 1 n
 	lcak %i
 	ca = %i;
 
-ldpk 2a 44 1 n f
+ldpk 2b 44 1 n f
 	ldpk 0
 	st1 &= ~ST1_DBP;
 
-ldpk 2a 45 1 n f
+ldpk 2b 45 1 n f
 	ldpk 1
 	st1 |= ST1_DBP;
 
@@ -219,20 +219,20 @@ lirk 3  20 1 n
 
 lmhc 1  33 1 n
 	lmhc %c
-	macc = ((int64_t)(int32_t)%c) << 16;
+	macc_write = macc = ((int64_t)(int32_t)%c) << 16;
 
 lmhd 1  31 1 n
 	lmhd %d
-	macc = ((int64_t)(int32_t)%d) << 16;
+	macc_write = macc = ((int64_t)(int32_t)%d) << 16;
 
 lmld 1  32 1 n
 	lmld %d
-	macc = (macc & ~0xffffffULL) | %d24;
+	macc_write = macc = (macc & ~0xffffffULL) | %d24;
 
-lpc  2b 31 1 n
+lpc  2a 31 1 n
 	lpc %c
 	if(sti & S_HOST)
-	break;
+	return;
 	c = %c;
 	host[0] = c >> 24;
 	host[1] = c >> 16;
@@ -240,8 +240,9 @@ lpc  2b 31 1 n
 	host[3] = c;
 	hidx = 0;
 	sti |= S_HOST;
+	update_dready();
 
-lpd  2b 30 1 n
+lpd  2a 30 1 n
 	lpd %d
 
 mac  1  24 1 y
@@ -255,6 +256,12 @@ mac  1  24 1 y
 
 mac  1  25 1 y
 	mac a,%d
+	d = %d24;
+	if(d & 0x00800000)
+	d |= 0xff000000;
+	creg = c = %a;
+	r = (int64_t)(int32_t)c * (int64_t)(int32_t)d;
+	macc = %ml + (r >> 7);
 
 mac  1  26 1 y
 	mac %c,a
@@ -309,6 +316,7 @@ mpyu 1  28 1 y
 
 neg  1  02 1 n
 	neg
+	%wa(-(int64_t)%a);
 
 or   1  17 1 n
 	or %d,a
@@ -330,7 +338,7 @@ raov 2a 38 1 n
 rde  1  39 1 n
 	rde %c
 	if(sti & (S_READ|S_WRITE))
-	break;
+	return;
 	xoa = %c;
 	xm_init();
 	sti |= S_READ;
@@ -339,43 +347,43 @@ ref  2a 0e 1 n
 	ref
 	/* nothing to do */
 
-rmom 2a 40 1 n f
+rmom 2b 40 1 n f
 	rmom
 	st1 &= ~ST1_MOVM;
 
-rmov 2a 3a 1 n
+rmov 2b 3a 1 n
 	rmov
 	st1 &= ~ST1_MOV;
 
-rnd  2a 68 1 n f
+rnd  2b 68 1 n f
 	rnd 48
 	st1 = (st1 & ~ST1_RND) | (0 << ST1_RND_SHIFT);
 
-rnd  2a 69 1 n f
+rnd  2b 69 1 n f
 	rnd 32
 	st1 = (st1 & ~ST1_RND) | (1 << ST1_RND_SHIFT);
 
-rnd  2a 6a 1 n f
+rnd  2b 6a 1 n f
 	rnd 24
 	st1 = (st1 & ~ST1_RND) | (2 << ST1_RND_SHIFT);
 
-rnd  2a 6b 1 n f
+rnd  2b 6b 1 n f
 	rnd 20
 	st1 = (st1 & ~ST1_RND) | (3 << ST1_RND_SHIFT);
 
-rnd  2a 6c 1 n f
+rnd  2b 6c 1 n f
 	rnd 16
 	st1 = (st1 & ~ST1_RND) | (4 << ST1_RND_SHIFT);
 
-rnd  2a 6d 1 n f
+rnd  2b 6d 1 n f
 	rnd <5>
 	st1 = (st1 & ~ST1_RND) | (5 << ST1_RND_SHIFT);
 
-rnd  2a 6e 1 n f
+rnd  2b 6e 1 n f
 	rnd <6>
 	st1 = (st1 & ~ST1_RND) | (6 << ST1_RND_SHIFT);
 
-rnd  2a 6f 1 n f
+rnd  2b 6f 1 n f
 	rnd <7>
 	st1 = (st1 & ~ST1_RND) | (7 << ST1_RND_SHIFT);
 
@@ -391,19 +399,19 @@ sacd 2a 02 1 y
 	sacd %d
 	%wd(%a >> 8);
 
-scrm 2a 48 1 n f
+scrm 2b 48 1 n f
 	scrm 32
 	st1 = (st1 & ~ST1_CRM) | (0 << ST1_CRM_SHIFT);
 
-scrm 2a 49 1 n f
+scrm 2b 49 1 n f
 	scrm 16h
 	st1 = (st1 & ~ST1_CRM) | (1 << ST1_CRM_SHIFT);
 
-scrm 2a 4a 1 n f
+scrm 2b 4a 1 n f
 	scrm 16l
 	st1 = (st1 & ~ST1_CRM) | (2 << ST1_CRM_SHIFT);
 
-scrm 2a 4b 1 n f
+scrm 2b 4b 1 n f
 	scrm <3>
 	st1 = (st1 & ~ST1_CRM) | (3 << ST1_CRM_SHIFT);
 
@@ -415,13 +423,13 @@ sfai 2b 55 1 n f
 	sfai -1
 	st1 |= ST1_SFAI;
 
-sfao 2a 50 1 n f
+sfao 2b 50 1 n f
 	sfao 0
 	st1 &= ~ST1_SFAO;
 
-sfao 2a 51 1 n f
+sfao 2b 51 1 n f
 	sfao 7
-	st1 |= ST1_SFAI;
+	st1 |= ST1_SFAO;
 
 sfma 2b 58 1 n f
 	sfma 0
@@ -443,19 +451,19 @@ sfml 1  34 1 y
 	sfml
 	macc = (macc & 0x8000000000000ULL) | ((macc << 1) & 0x7ffffffffffffULL);
 
-sfmo 2a 60 1 n f
+sfmo 2b 60 1 n f
 	sfmo 0
 	st1 = (st1 & ~ST1_SFMO) | (0 << ST1_SFMO_SHIFT);
 
-sfmo 2a 61 1 n f
+sfmo 2b 61 1 n f
 	sfmo 2
 	st1 = (st1 & ~ST1_SFMO) | (1 << ST1_SFMO_SHIFT);
 
-sfmo 2a 62 1 n f
+sfmo 2b 62 1 n f
 	sfmo 4
 	st1 = (st1 & ~ST1_SFMO) | (2 << ST1_SFMO_SHIFT);
 
-sfmo 2a 63 1 n f
+sfmo 2b 63 1 n f
 	sfmo -8
 	st1 = (st1 & ~ST1_SFMO) | (3 << ST1_SFMO_SHIFT);
 
@@ -482,7 +490,7 @@ smhd 2a 03 1 y
 smld 2a 04 1 y
 	smld %d
 
-smom 2a 41 1 n f
+smom 2b 41 1 n f
 	smom
 	st1 |= ST1_MOVM;
 
@@ -503,9 +511,12 @@ sub  1  0a 1 y
 
 sub  1  0b 1 y
 	sub %d,m
+	%sfai(d, %d);
+	%wa((int64_t)(int32_t)d - (%mo >> 16));
 
 sub  1  0c 1 y
 	sub %c,m
+	%wa((int64_t)(int32_t)%c - (%mo >> 16));
 
 sub  1  0d 1 y
 	sub %d,%c
@@ -514,7 +525,7 @@ sub  1  0d 1 y
 wre  1  38 1 n
 	wre %d,%c
 	if(sti & (S_READ|S_WRITE))
-	break;
+	return;
 	xwr = %d24;
 	xoa = %c;
 	xm_init();
@@ -534,3 +545,13 @@ zacc 1  10 1 n
 
 zmac 1  30 1 n
 	zmac
+
+raom 2b 3c 1 n f
+	raom
+	/* Undocumented instruction, reset ALU saturation flag */
+	st1 &= ~ST1_AOVM;
+
+saom 2b 3d 1 n f
+	saom
+	/* Undocumented instruction, sets ALU saturation flag */
+	st1 |= ST1_AOVM;

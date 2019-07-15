@@ -117,8 +117,8 @@ void zeus2_device::device_start()
 	save_item(NAME(zeus_quad_size));
 	save_item(NAME(m_useZOffset));
 	save_pointer(NAME(waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / 4);
-	save_pointer(NAME(m_frameColor.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	save_pointer(NAME(m_frameDepth.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_pointer(NAME(m_frameColor), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_pointer(NAME(m_frameDepth), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	save_item(NAME(m_pal_table));
 	// m_ucode
 	save_item(NAME(m_curUCodeSrc));
@@ -351,7 +351,7 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 	}
 
 	if (logit)
-		logerror("%08X:zeus2_r(%02X) = %08X\n", machine().device("maincpu")->safe_pc(), offset, result);
+		logerror("%s:zeus2_r(%02X) = %08X\n", machine().describe_context(), offset, result);
 
 	return result;
 }
@@ -374,7 +374,7 @@ WRITE32_MEMBER( zeus2_device::zeus2_w )
 		);
 	logit &= LOG_REGS;
 	if (logit)
-		logerror("%08X:zeus2_w", machine().device("maincpu")->safe_pc());
+		logerror("%s:zeus2_w", machine().describe_context());
 	zeus2_register32_w(offset, data, logit);
 }
 

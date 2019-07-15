@@ -5,19 +5,26 @@
     City Connection
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CITYCON_H
+#define MAME_INCLUDES_CITYCON_H
+
+#pragma once
+
+#include "emupal.h"
 
 class citycon_state : public driver_device
 {
 public:
-	citycon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	citycon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_linecolor(*this, "linecolor"),
 		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -40,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(citycon_videoram_w);
 	DECLARE_WRITE8_MEMBER(citycon_linecolor_w);
 	DECLARE_WRITE8_MEMBER(citycon_background_w);
-	DECLARE_DRIVER_INIT(citycon);
+	void init_citycon();
 	TILEMAP_MAPPER_MEMBER(citycon_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -54,3 +61,5 @@ public:
 	void citycon_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CITYCON_H

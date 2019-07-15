@@ -14,40 +14,6 @@
 DECLARE_DEVICE_TYPE(HDC9224, hdc9224_device)
 DECLARE_DEVICE_TYPE(HDC9234, hdc9234_device)
 
-//===================================================================
-
-/* Interrupt line. To be connected with the controller PCB. */
-#define MCFG_HDC92X4_INTRQ_CALLBACK(_write) \
-	devcb = &hdc92x4_device::set_intrq_wr_callback(*device, DEVCB_##_write);
-
-/* DMA request line. To be connected with the controller PCB. */
-#define MCFG_HDC92X4_DMARQ_CALLBACK(_write) \
-	devcb = &hdc92x4_device::set_dmarq_wr_callback(*device, DEVCB_##_write);
-
-/* DMA in progress line. To be connected with the controller PCB. */
-#define MCFG_HDC92X4_DIP_CALLBACK(_write) \
-	devcb = &hdc92x4_device::set_dip_wr_callback(*device, DEVCB_##_write);
-
-/* Auxiliary Bus. These 8 lines need to be connected to external latches
-   and to a counter circuitry which works together with the external RAM.
-   We use the S0/S1 lines as address lines. */
-#define MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(_write) \
-	devcb = &hdc92x4_device::set_auxbus_wr_callback(*device, DEVCB_##_write);
-
-/* Callback to read the contents of the external RAM via the data bus.
-   Note that the address must be set and automatically increased
-   by external circuitry. */
-#define MCFG_HDC92X4_DMA_IN_CALLBACK(_read) \
-	devcb = &hdc92x4_device::set_dma_rd_callback(*device, DEVCB_##_read);
-
-/* Callback to write the contents of the external RAM via the data bus.
-   Note that the address must be set and automatically increased
-   by external circuitry. */
-#define MCFG_HDC92X4_DMA_OUT_CALLBACK(_write) \
-	devcb = &hdc92x4_device::set_dma_wr_callback(*device, DEVCB_##_write);
-
-//===================================================================
-
 class hdc92x4_device : public device_t
 {
 public:
@@ -79,18 +45,18 @@ public:
 	};
 
 	// Accessors from the CPU side
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( reset );
 	DECLARE_WRITE_LINE_MEMBER( dmaack );
 
 	// Callbacks
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<hdc92x4_device &>(device).m_out_intrq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dmarq_wr_callback(device_t &device, Object &&cb) { return downcast<hdc92x4_device &>(device).m_out_dmarq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dip_wr_callback(device_t &device, Object &&cb) { return downcast<hdc92x4_device &>(device).m_out_dip.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_auxbus_wr_callback(device_t &device, Object &&cb) { return downcast<hdc92x4_device &>(device).m_out_auxbus.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_rd_callback(device_t &device, Object &&cb) { return downcast<hdc92x4_device &>(device).m_in_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_wr_callback(device_t &device, Object &&cb) { return downcast<hdc92x4_device &>(device).m_out_dma.set_callback(std::forward<Object>(cb)); }
+	auto intrq_cb() { return m_out_intrq.bind(); }
+	auto dmarq_cb() { return m_out_dmarq.bind(); }
+	auto dip_cb() { return m_out_dip.bind(); }
+	auto auxbus_cb() { return m_out_auxbus.bind(); }
+	auto dmain_cb() { return m_in_dma.bind(); }
+	auto dmaout_cb() { return m_out_dma.bind(); }
 
 	// auxbus_in is intended to read events from the drives
 	// In the real chip the status is polled; to avoid unnecessary load

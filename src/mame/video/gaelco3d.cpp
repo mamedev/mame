@@ -25,7 +25,7 @@
 #define IS_POLYEND(x)       (((x) ^ ((x) >> 1)) & 0x4000)
 
 
-gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
+gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
 		m_state(state),
 		m_screenbits(state.m_screen->width(), state.m_screen->height()),
@@ -75,8 +75,8 @@ void gaelco3d_state::video_start()
 
 	/* save states */
 
-	save_pointer(NAME(m_palette.get()), 32768);
-	save_pointer(NAME(m_polydata_buffer.get()), MAX_POLYDATA);
+	save_pointer(NAME(m_palette), 32768);
+	save_pointer(NAME(m_polydata_buffer), MAX_POLYDATA);
 	save_item(NAME(m_polydata_count));
 	save_item(NAME(m_lastscan));
 }
@@ -110,7 +110,7 @@ void gaelco3d_state::video_start()
     (repeat these two for each additional point in the fan)
 */
 
-void gaelco3d_renderer::render_poly(screen_device &screen, uint32_t *polydata)
+void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint32_t *polydata)
 {
 	float midx = screen.width() / 2;
 	float midy = screen.height() / 2;
@@ -201,7 +201,7 @@ void gaelco3d_renderer::render_poly(screen_device &screen, uint32_t *polydata)
 
 
 
-void gaelco3d_renderer::render_noz_noperspective(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
+void gaelco3d_state::gaelco3d_renderer::render_noz_noperspective(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
 {
 	float zbase = recip_approx(object.ooz_base);
 	float uoz_step = object.uoz_dx * zbase;
@@ -240,7 +240,7 @@ void gaelco3d_renderer::render_noz_noperspective(int32_t scanline, const extent_
 }
 
 
-void gaelco3d_renderer::render_normal(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
+void gaelco3d_state::gaelco3d_renderer::render_normal(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
 {
 	float ooz_dx = object.ooz_dx;
 	float uoz_dx = object.uoz_dx;
@@ -290,7 +290,7 @@ void gaelco3d_renderer::render_normal(int32_t scanline, const extent_t &extent, 
 }
 
 
-void gaelco3d_renderer::render_alphablend(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
+void gaelco3d_state::gaelco3d_renderer::render_alphablend(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
 {
 	float ooz_dx = object.ooz_dx;
 	float uoz_dx = object.uoz_dx;
@@ -425,7 +425,7 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_paletteram_020_w)
  *
  *************************************/
 
-uint32_t gaelco3d_state::screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gaelco3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int ret;
 

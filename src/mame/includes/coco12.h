@@ -48,6 +48,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	DECLARE_WRITE_LINE_MEMBER( field_sync );
 
+	void coco2bh(machine_config &config);
+	void coco2h(machine_config &config);
+	void cocoeh(machine_config &config);
+	void cocoh(machine_config &config);
 	void coco2b(machine_config &config);
 	void cd6809(machine_config &config);
 	void coco2(machine_config &config);
@@ -57,17 +61,17 @@ public:
 	void coco(machine_config &config);
 protected:
 	virtual void device_start() override;
-	virtual void update_cart_base(uint8_t *cart_base) override;
 
 	// PIA1
 	virtual void pia1_pb_changed(uint8_t data) override;
 
 	sam6883_device &sam() { return *m_sam; }
+	required_device<sam6883_device> m_sam;
 
 private:
 	void configure_sam(void);
 
-	required_device<sam6883_device> m_sam;
+protected:
 	required_device<mc6847_base_device> m_vdg;
 };
 

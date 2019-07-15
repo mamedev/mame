@@ -8,14 +8,12 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_MIDIIN_H
-#define MAME_DEVICES_IMAGEDEV_MIDIIN_H
+#ifndef MAME_IMAGEDEV_MIDIIN_H
+#define MAME_IMAGEDEV_MIDIIN_H
 
 #pragma once
 
-
-#define MCFG_MIDIIN_INPUT_CB(_devcb) \
-	devcb = &midiin_device::set_input_callback(*device, DEVCB_##_devcb);
+#include "diserial.h"
 
 
 /***************************************************************************
@@ -30,7 +28,7 @@ public:
 	// construction/destruction
 	midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<midiin_device &>(device).m_input_cb.set_callback(object); }
+	auto input_callback() { return m_input_cb.bind(); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -76,4 +74,4 @@ DECLARE_DEVICE_TYPE(MIDIIN, midiin_device)
 // device iterator
 typedef device_type_iterator<midiin_device> midiin_device_iterator;
 
-#endif // MAME_DEVICES_IMAGEDEV_MIDIIN_H
+#endif // MAME_IMAGEDEV_MIDIIN_H

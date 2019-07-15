@@ -12,16 +12,14 @@
 #include "includes/kchamp.h"
 
 
-PALETTE_INIT_MEMBER(kchamp_state, kchamp)
+void kchamp_state::kchamp_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i, red, green, blue;
-
-	for (i = 0; i < palette.entries(); i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		red = color_prom[i];
-		green = color_prom[palette.entries() + i];
-		blue = color_prom[2 * palette.entries() + i];
+		int const red = color_prom[i];
+		int const green = color_prom[palette.entries() + i];
+		int const blue = color_prom[2 * palette.entries() + i];
 
 		palette.set_pen_color(i, pal4bit(red), pal4bit(green), pal4bit(blue));
 	}

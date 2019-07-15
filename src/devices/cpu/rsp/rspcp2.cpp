@@ -19,7 +19,7 @@
 #if USE_SIMD
 #include <emmintrin.h>
 
-const rsp_cop2::vec_helpers_t rsp_cop2::m_vec_helpers = {
+const rsp_device::cop2::vec_helpers_t rsp_device::cop2::m_vec_helpers = {
 	{ 0 },
 	{ // logic_mask
 		{  0,  0,  0,  0,  0,  0,  0,  0 },
@@ -236,7 +236,7 @@ static inline rsp_vec_t sse2_pshufb(rsp_vec_t v, const uint16_t *keys)
 	return _mm_loadu_si128((rsp_vec_t *) dest);
 }
 
-rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const uint16_t* src, uint32_t element)
+rsp_vec_t rsp_device::cop2::vec_load_and_shuffle_operand(const uint16_t* src, uint32_t element)
 {
 	if (element >= 8) // element => 0w ... 7w
 	{
@@ -280,7 +280,7 @@ rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const uint16_t* src, uint32_t e
 	return vec_load_unshuffled_operand(src);
 }
 #else
-rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const uint16_t* src, uint32_t element)
+rsp_vec_t rsp_device::cop2::vec_load_and_shuffle_operand(const uint16_t* src, uint32_t element)
 {
 	rsp_vec_t operand = _mm_load_si128((rsp_vec_t*) src);
 	rsp_vec_t key = _mm_load_si128((rsp_vec_t*) m_vec_helpers.shuffle_keys[element]);
@@ -297,7 +297,7 @@ rsp_vec_t rsp_cop2::vec_load_and_shuffle_operand(const uint16_t* src, uint32_t e
 //       wraparound. Do we just discard the data, as below, or does the
 //       data effectively get rotated around the edge of the vector?
 //
-void rsp_cop2::vec_load_group1(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm)
+void rsp_device::cop2::vec_load_group1(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm)
 {
 	uint32_t offset = addr & 0x7;
 	uint32_t ror = offset - element;
@@ -354,7 +354,7 @@ void rsp_cop2::vec_load_group1(uint32_t addr, uint32_t element, uint16_t *regp, 
 //
 // TODO: Reverse-engineer what happens when element != 0.
 //
-void rsp_cop2::vec_load_group2(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
+void rsp_device::cop2::vec_load_group2(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
 	uint32_t offset = addr & 0x7;
 	rsp_vec_t data;
 
@@ -402,7 +402,7 @@ void rsp_cop2::vec_load_group2(uint32_t addr, uint32_t element, uint16_t *regp, 
 //       must wraparound (i.e., the address offset is small, starting
 //       element is large).
 //
-void rsp_cop2::vec_load_group4(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type)
+void rsp_device::cop2::vec_load_group4(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type)
 {
 	uint32_t aligned_addr = addr & 0xFF0;
 	uint32_t offset = addr & 0xF;
@@ -454,7 +454,7 @@ void rsp_cop2::vec_load_group4(uint32_t addr, uint32_t element, uint16_t *regp, 
 //       must wraparound. Do we just stop storing the data, or do we
 //       continue storing from the front of the vector, as below?
 //
-void rsp_cop2::vec_store_group1(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm)
+void rsp_device::cop2::vec_store_group1(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm)
 {
 	uint32_t offset = addr & 0x7;
 	uint32_t ror = element - offset;
@@ -528,7 +528,7 @@ void rsp_cop2::vec_store_group1(uint32_t addr, uint32_t element, uint16_t *regp,
 //
 // TODO: Reverse-engineer what happens when element != 0.
 //
-void rsp_cop2::vec_store_group2(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
+void rsp_device::cop2::vec_store_group2(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
 	// "Pack" the data.
 	if (request_type != RSP_MEM_REQUEST_PACK)
 	{
@@ -553,7 +553,7 @@ void rsp_cop2::vec_store_group2(uint32_t addr, uint32_t element, uint16_t *regp,
 // SSE3+ accelerated stores for group IV. Byteswap 2-byte little-endian
 // vector back to big-endian. Stop storing at quadword boundaries.
 //
-void rsp_cop2::vec_store_group4(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
+void rsp_device::cop2::vec_store_group4(uint32_t addr, uint32_t element, uint16_t *regp, rsp_vec_t reg, rsp_vec_t dqm, rsp_mem_request_type request_type) {
 	uint32_t aligned_addr = addr & 0xFF0;
 	uint32_t offset = addr & 0xF;
 	uint32_t rol = offset;
@@ -691,7 +691,7 @@ static const int vector_elements_2[16][8] =
 };
 #endif
 
-rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
+rsp_device::cop2::cop2(rsp_device &rsp, running_machine &machine)
 	: m_rsp(rsp)
 	, m_machine(machine)
 	, m_reciprocal_res(0)
@@ -711,11 +711,11 @@ rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
 	m_rspcop2_state = (internal_rspcop2_state *)rsp.m_cache.alloc_near(sizeof(internal_rspcop2_state));
 }
 
-rsp_cop2::~rsp_cop2()
+rsp_device::cop2::~cop2()
 {
 }
 
-void rsp_cop2::init()
+void rsp_device::cop2::init()
 {
 	CLEAR_CARRY_FLAGS();
 	CLEAR_COMPARE_FLAGS();
@@ -724,7 +724,7 @@ void rsp_cop2::init()
 	CLEAR_CLIP2_FLAGS();
 }
 
-void rsp_cop2::start()
+void rsp_device::cop2::start()
 {
 	for(auto & elem : m_v)
 	{
@@ -747,7 +747,7 @@ void rsp_cop2::start()
 	}
 }
 
-void rsp_cop2::state_string_export(const int index, std::string &str) const
+void rsp_device::cop2::state_string_export(const int index, std::string &str) const
 {
 	switch (index)
 	{
@@ -854,7 +854,7 @@ void rsp_cop2::state_string_export(const int index, std::string &str) const
     Vector Load Instructions
 ***************************************************************************/
 
-void rsp_cop2::handle_lwc2(uint32_t op)
+void rsp_device::cop2::handle_lwc2(uint32_t op)
 {
 	int base = (op >> 21) & 0x1f;
 #if !USE_SIMD
@@ -1201,7 +1201,7 @@ void rsp_cop2::handle_lwc2(uint32_t op)
     Vector Store Instructions
 ***************************************************************************/
 
-void rsp_cop2::handle_swc2(uint32_t op)
+void rsp_device::cop2::handle_swc2(uint32_t op)
 {
 	int base = (op >> 21) & 0x1f;
 #if !USE_SIMD
@@ -1572,7 +1572,7 @@ void rsp_cop2::handle_swc2(uint32_t op)
     Vector Accumulator Helpers
 ***************************************************************************/
 
-uint16_t rsp_cop2::SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint16_t positive)
+uint16_t rsp_device::cop2::SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint16_t positive)
 {
 	if ((int16_t)ACCUM_H(accum) < 0)
 	{
@@ -1632,7 +1632,7 @@ uint16_t rsp_cop2::SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint1
     Vector Opcodes
 ***************************************************************************/
 
-void rsp_cop2::handle_vector_ops(uint32_t op)
+void rsp_device::cop2::handle_vector_ops(uint32_t op)
 {
 #if !USE_SIMD
 	int i;
@@ -3767,7 +3767,7 @@ void rsp_cop2::handle_vector_ops(uint32_t op)
     Vector Flag Reading/Writing
 ***************************************************************************/
 
-void rsp_cop2::handle_cop2(uint32_t op)
+void rsp_device::cop2::handle_cop2(uint32_t op)
 {
 	switch ((op >> 21) & 0x1f)
 	{
@@ -3979,7 +3979,7 @@ void rsp_cop2::handle_cop2(uint32_t op)
 	//dump(op);
 }
 
-inline void rsp_cop2::mfc2()
+inline void rsp_device::cop2::mfc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
@@ -3989,7 +3989,7 @@ inline void rsp_cop2::mfc2()
 	if (RTREG) RTVAL = (int32_t)(int16_t)((b1 << 8) | (b2));
 }
 
-inline void rsp_cop2::cfc2()
+inline void rsp_device::cop2::cfc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	if (RTREG)
@@ -4048,7 +4048,7 @@ inline void rsp_cop2::cfc2()
 	}
 }
 
-inline void rsp_cop2::mtc2()
+inline void rsp_device::cop2::mtc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
@@ -4056,7 +4056,7 @@ inline void rsp_cop2::mtc2()
 	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
 }
 
-inline void rsp_cop2::ctc2()
+inline void rsp_device::cop2::ctc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	switch(RDREG)
@@ -4155,7 +4155,7 @@ inline void rsp_cop2::ctc2()
 	}
 }
 
-void rsp_cop2::log_instruction_execution()
+void rsp_device::cop2::log_instruction_execution()
 {
 	static VECTOR_REG prev_vecs[32];
 
@@ -4171,7 +4171,7 @@ void rsp_cop2::log_instruction_execution()
 	}
 }
 
-void rsp_cop2::dump(uint32_t op)
+void rsp_device::cop2::dump(uint32_t op)
 {
 	printf("%08x ", op);
 	for (int i = 0; i < 32; i++)
@@ -4206,7 +4206,7 @@ void rsp_cop2::dump(uint32_t op)
 #endif
 }
 
-void rsp_cop2::dump_dmem()
+void rsp_device::cop2::dump_dmem()
 {
 	uint8_t* dmem = m_rsp.get_dmem();
 	printf("\n");

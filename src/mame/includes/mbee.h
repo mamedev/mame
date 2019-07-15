@@ -5,16 +5,18 @@
  * includes/mbee.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_MBEE_H
 #define MAME_INCLUDES_MBEE_H
+
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
 #include "machine/8530scc.h"
@@ -24,28 +26,22 @@
 #include "machine/z80pio.h"
 
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
 class mbee_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_MBEE_NEWKB
-	};
-
 	mbee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
@@ -63,6 +59,32 @@ public:
 		, m_io_config(*this, "CONFIG")
 		, m_screen(*this, "screen")
 	{ }
+
+	void mbee56(machine_config &config);
+	void mbeeppc(machine_config &config);
+	void mbee128(machine_config &config);
+	void mbee256(machine_config &config);
+	void mbee(machine_config &config);
+	void mbeett(machine_config &config);
+	void mbeeic(machine_config &config);
+	void mbeepc(machine_config &config);
+	void mbee128p(machine_config &config);
+
+	void init_mbeepc85();
+	void init_mbee256();
+	void init_mbee56();
+	void init_mbeett();
+	void init_mbeeppc();
+	void init_mbee();
+	void init_mbeepc();
+	void init_mbeeic();
+	void init_mbee128();
+
+private:
+	enum
+	{
+		TIMER_MBEE_NEWKB
+	};
 
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
@@ -92,29 +114,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_READ8_MEMBER(fdc_status_r);
 	DECLARE_WRITE8_MEMBER(fdc_motor_w);
-	DECLARE_DRIVER_INIT(mbeepc85);
-	DECLARE_DRIVER_INIT(mbee256);
-	DECLARE_DRIVER_INIT(mbee56);
-	DECLARE_DRIVER_INIT(mbeett);
-	DECLARE_DRIVER_INIT(mbeeppc);
-	DECLARE_DRIVER_INIT(mbee);
-	DECLARE_DRIVER_INIT(mbeepc);
-	DECLARE_DRIVER_INIT(mbeeic);
-	DECLARE_DRIVER_INIT(mbee128);
 	DECLARE_MACHINE_RESET(mbee);
 	DECLARE_VIDEO_START(mono);
 	DECLARE_VIDEO_START(standard);
 	DECLARE_VIDEO_START(premium);
-	DECLARE_PALETTE_INIT(standard);
-	DECLARE_PALETTE_INIT(premium);
+	void standard_palette(palette_device &palette) const;
+	void premium_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(mbee56);
 	DECLARE_MACHINE_RESET(mbee128);
 	DECLARE_MACHINE_RESET(mbee256);
 	DECLARE_MACHINE_RESET(mbeett);
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_newkb);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee_z80bin);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bee);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bin);
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);
@@ -122,15 +135,6 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	required_device<palette_device> m_palette;
-	void mbee56(machine_config &config);
-	void mbeeppc(machine_config &config);
-	void mbee128(machine_config &config);
-	void mbee256(machine_config &config);
-	void mbee(machine_config &config);
-	void mbeett(machine_config &config);
-	void mbeeic(machine_config &config);
-	void mbeepc(machine_config &config);
-	void mbee128p(machine_config &config);
 	void mbee128_io(address_map &map);
 	void mbee256_io(address_map &map);
 	void mbee256_mem(address_map &map);
@@ -146,7 +150,7 @@ public:
 	void mbeeppc_mem(address_map &map);
 	void mbeett_io(address_map &map);
 	void mbeett_mem(address_map &map);
-private:
+
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_gfxram;
 	uint8_t *m_p_colorram;
@@ -176,10 +180,9 @@ private:
 	void oldkb_matrix_r(uint16_t offs);
 	void machine_reset_common();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
-	required_device<wave_device> m_wave;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;

@@ -23,17 +23,17 @@ Some older LCD displays used a native resolution of 1280x1024 and were a 5:4 asp
 Getting Started with BGFX
 -------------------------
 
-You will need to have followed the initial MAME setup instructions elsewhere in this manual before beginning. Official MAME distributions include BGFX as of 172, so you don't need to download any additional files.
+You will need to have followed the initial MAME setup instructions elsewhere in this manual before beginning. Official MAME distributions include BGFX as of MAME 0.172, so you don't need to download any additional files.
 
-Open your MAME.INI in your text editor of choice (e.g. Notepad), and make sure the following options are set correctly:
+Open your ``mame.ini`` in your text editor of choice (e.g. Notepad), and make sure the following options are set correctly:
 
-* **video bgfx**
+* ``video bgfx``
 
 Now, you may want to take a moment to look below at the Configuration Settings section to see how to set up these next options.
 
-As referenced in :ref:`advanced-multi-CFG`, MAME has a order in which it processes INI files. The BGFX settings can be edited in MAME.INI, but to take full advantage of the power of MAME's config files, you'll want to copy the BGFX settings from MAME.INI to one of the other config files and make changes there.)
+As referenced in :ref:`advanced-multi-CFG`, MAME has a order in which it processes INI files. The BGFX settings can be edited in ``mame.ini``, but to take full advantage of the power of MAME's config files, you'll want to copy the BGFX settings from ``mame.ini`` to one of the other config files and make changes there.)
 
-In particular, you will want the **bgfx_screen_chains** to be specific to each game.
+In particular, you will want the ``bgfx_screen_chains`` to be specific to each game.
 
 Save your .INI file(s) and you're ready to begin.
 
@@ -41,31 +41,31 @@ Configuration Settings
 ----------------------
 
 | **bgfx_path**
-| 
+|
 | 	This is where your BGFX shader files are stored. By default, this will be the BGFX folder in your MAME installation.
 |
 | **bgfx_backend**
 |
-|	Selects a rendering backend for BGFX to use. Possible choices include **d3d9**, **d3d11**, **opengl**, and **metal**. The default is **auto**, which will let MAME choose the best selection for you.
+|	Selects a rendering backend for BGFX to use. Possible choices include ``d3d9``, ``d3d11``, ``opengl``, and ``metal``. The default is ``**auto**``, which will let MAME choose the best selection for you.
 |
-|	**d3d9** -- Direct3D 9.0 Renderer (Requires Windows XP or higher)
-|	**d3d11** -- Direct3D 11.0 Renderer (Requires Windows Vista with D3D11 update or Windows 7 or higher)
-|	**opengl** -- OpenGL Renderer (Requires OpenGL drivers, may work better on some poorly designed video cards, supported on Linux/Mac OS X)
-|	**metal** -- Metal Apple Graphics API (Requires OS X 10.11 El Capitan or newer)
+|	``d3d9`` -- Direct3D 9.0 Renderer (Requires Windows XP or higher)
+|	``d3d11`` -- Direct3D 11.0 Renderer (Requires Windows Vista with D3D11 update or Windows 7 or higher)
+|	``opengl`` -- OpenGL Renderer (Requires OpenGL drivers, may work better on some poorly designed video cards, supported on Linux/Mac OS X)
+|	``metal`` -- Metal Apple Graphics API (Requires OS X 10.11 El Capitan or newer)
 |
 | **bgfx_debug**
-| 
+|
 |	Enables BGFX debugging features. Most users will not need to use this.
 |
 | **bgfx_screen_chains**
 |
-|	This dictates how to handle BGFX rendering on a per-display basis. Possible choices include **hlsl**, **unfiltered**, and **default**.
+|	This dictates how to handle BGFX rendering on a per-display basis. Possible choices include ``hlsl``, ``unfiltered``, and ``default``.
 |
-|	**default** -- default bilinear filterered output
-|	**unfiltered** -- nearest neighbor unfiltered output
-|	**hlsl** -- HLSL display simulation through shaders
+|	``default`` -- **default** bilinear filterered output
+|	``unfiltered`` -- nearest neighbor unfiltered output
+|	``hlsl`` -- HLSL display simulation through shaders
 |
-|	We make a distinction between emulated device screens (which we'll call a **screen**) and physical displays (which we'll call a **window**, set by **-numscreens**) here. We use colons (:) to seperate windows, and commas (,) to seperate screens. Commas always go on the outside of the chain (see House Mannequin example)
+|	We make a distinction between emulated device screens (which we'll call a **screen**) and physical displays (which we'll call a **window**, set by ``-numscreens``) here. We use colons (:) to seperate windows, and commas (,) to seperate screens. Commas always go on the outside of the chain (see House Mannequin example)
 |
 |	On a combination of a single window, single screen case, such as Pac-Man on one physical PC monitor, you can specify one entry like:
 |
@@ -75,17 +75,17 @@ Configuration Settings
 |
 |	On a single window, multiple screen game, such as Darius on one physical PC monitor, specify multiple entries (one per window) like:
 |
-|		**bgfx_screen_chains hlsl,hlsl,hlsl**
+|		bgfx_screen_chains hlsl,hlsl,hlsl
 |
 |	This also works with single screen games where you are mirroring the output to more than one physical display. For instance, you could set up Pac-Man to have one unfiltered output for use with video broadcasting while a second display is set up HLSL for playing on.
 |
 |	On a mulitple window, multiple screen game, such as Darius on three physical PC monitors, specify multiple entries (one per window) like:
 |
-|		**bgfx_screen_chains hlsl:hlsl:hlsl**
+|		``bgfx_screen_chains hlsl:hlsl:hlsl``
 |
 |	Another example game would be Taisen Hot Gimmick, which used two CRTs to show individual player hands to just that player. If using two windows (two physical displays):
 |
-|		**bgfx_screen_chains hlsl:hlsl**
+|		``bgfx_screen_chains hlsl:hlsl``
 |
 |	One more special case is that Nichibutsu had a special cocktail mahjongg cabinet that used a CRT in the middle along with two LCD displays to show each player their hand. We would want the LCDs to be unfiltered and untouched as they were, while the CRT would be improved through HLSL. Since we want to give each player their own full screen display (two physical monitors) along with the LCD, we'll go with:
 |
@@ -95,14 +95,14 @@ Configuration Settings
 |
 |	If using only one window (one display), keep in mind the game still has three screens, so we would use:
 |
-|		**bgfx_screen_chains hlsl,unfiltered,unfiltered**
+|		``bgfx_screen_chains hlsl,unfiltered,unfiltered``
 |
 |
 |	Note that the commas are on the outside edges, and any colons are in the middle.
 |
-| **bgfx_shadow_mask**
+| ``bgfx_shadow_mask``
 |
-|	This specifies the shadow mask effect PNG file. By default this is **slot-mask.png**.
+|	This specifies the shadow mask effect PNG file. By default this is ``**slot-mask.png**``.
 |
 |
 

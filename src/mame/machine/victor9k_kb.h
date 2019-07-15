@@ -17,17 +17,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VICTOR9K_KBRDY_HANDLER(_devcb) \
-	devcb = &victor_9000_keyboard_device::set_kbrdy_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_VICTOR9K_KBDATA_HANDLER(_devcb) \
-	devcb = &victor_9000_keyboard_device::set_kbdata_cb(*device, DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -39,8 +28,8 @@ public:
 	// construction/destruction
 	victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_kbrdy_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_device &>(device).m_kbrdy_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_kbdata_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_device &>(device).m_kbdata_cb.set_callback(object); }
+	auto kbrdy_handler() { return m_kbrdy_cb.bind(); }
+	auto kbdata_handler() { return m_kbdata_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( kback_w );
 
@@ -53,7 +42,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8021_device> m_maincpu;
 	required_ioport_array<13> m_y;
 
 	devcb_write_line   m_kbrdy_cb;
@@ -76,7 +65,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VICTOR9K_KEYBOARD, victor_9000_keyboard_device)
-
-
 
 #endif // MAME_MACHINE_VICTOR9K_KB_H

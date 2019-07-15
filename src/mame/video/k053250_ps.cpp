@@ -49,13 +49,6 @@ k053250ps_device::k053250ps_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void k053250ps_device::static_set_offsets(device_t &device, int offx, int offy)
-{
-	k053250ps_device &dev = downcast<k053250ps_device &>(device);
-	dev.m_offx = offx;
-	dev.m_offy = offy;
-}
-
 void k053250ps_device::unpack_nibbles()
 {
 	m_unpacked_rom.resize(m_rom.length()*2);
@@ -563,7 +556,7 @@ READ_LINE_MEMBER(k053250ps_device::dmairq_r)
 WRITE16_MEMBER(k053250ps_device::reg_w)
 {
 #if 0
-	static const char * regnames[] =
+	static char const *const regnames[] =
 	{
 		"SCROLL_X_L",
 		"SCROLL_X_H",

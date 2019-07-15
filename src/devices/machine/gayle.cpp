@@ -47,16 +47,6 @@ gayle_device::gayle_device(const machine_config &mconfig, const char *tag, devic
 }
 
 //-------------------------------------------------
-//  set_id - set gayle id
-//-------------------------------------------------
-
-void gayle_device::set_id(device_t &device, uint8_t id)
-{
-	gayle_device &gayle = downcast<gayle_device &>(device);
-	gayle.m_gayle_id = id;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -68,6 +58,9 @@ void gayle_device::device_start()
 	m_cs0_write.resolve_safe();
 	m_cs1_read.resolve_safe(0xffff);
 	m_cs1_write.resolve_safe();
+
+	save_item(NAME(m_gayle_id_count));
+	save_item(NAME(m_gayle_reg));
 }
 
 //-------------------------------------------------

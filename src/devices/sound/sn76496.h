@@ -13,23 +13,19 @@ DECLARE_DEVICE_TYPE(SN76489,  sn76489_device)
 DECLARE_DEVICE_TYPE(SN76489A, sn76489a_device)
 DECLARE_DEVICE_TYPE(SN76494,  sn76494_device)
 DECLARE_DEVICE_TYPE(SN94624,  sn94624_device)
-DECLARE_DEVICE_TYPE(NCR7496,  ncr7496_device)
+DECLARE_DEVICE_TYPE(NCR8496,  ncr8496_device)
+DECLARE_DEVICE_TYPE(PSSJ3,    pssj3_device)
 DECLARE_DEVICE_TYPE(GAMEGEAR, gamegear_device)
 DECLARE_DEVICE_TYPE(SEGAPSG,  segapsg_device)
 
 
-#define MCFG_SN76496_READY_HANDLER(cb) \
-		devcb = &sn76496_base_device::set_ready_handler(*device, (DEVCB_##cb));
-
 class sn76496_base_device : public device_t, public device_sound_interface
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_ready_handler(device_t &device, Object &&cb) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(std::forward<Object>(cb)); }
+	auto ready_cb() { return m_ready_handler.bind(); }
 
-	DECLARE_WRITE8_MEMBER( stereo_w );
-	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER( write );
+	void stereo_w(u8 data);
+	void write(u8 data);
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
 
 protected:
@@ -43,11 +39,13 @@ protected:
 			bool negate,
 			bool stereo,
 			int clockdivider,
+			bool ncr,
 			bool sega,
 			device_t *owner,
 			uint32_t clock);
 
 	virtual void    device_start() override;
+	virtual void    device_clock_changed() override;
 	virtual void    sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
@@ -67,7 +65,8 @@ private:
 	const bool      m_negate;           // output negate flag
 	const bool      m_stereo;           // whether we're dealing with stereo or not
 	const int32_t     m_clock_divider;    // clock divider
-	const bool      m_sega_style_psg;   // flag for if frequency zero acts as if it is one more than max (0x3ff+1) or if it acts like 0; AND if the initial register is pointing to 0x3 instead of 0x0 AND if the volume reg is preloaded with 0xF instead of 0x0
+	const bool      m_ncr_style_psg;    // flag to ignore writes to regs 1,3,5,6,7 with bit 7 low
+	const bool      m_sega_style_psg;   // flag to make frequency zero acts as if it is one more than max (0x3ff+1) or if it acts like 0; the initial register is pointing to 0x3 instead of 0x0; the volume reg is preloaded with 0xF instead of 0x0
 
 	int32_t           m_vol_table[16];    // volume table (for 4-bit to db conversion)
 	int32_t           m_register[8];      // registers
@@ -131,11 +130,18 @@ public:
 	sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-// NCR7496 not verified; info from smspower wiki
-class ncr7496_device : public sn76496_base_device
+// NCR8496 whitenoise verified, phase verified; verified by ValleyBell & NewRisingSun
+class ncr8496_device : public sn76496_base_device
 {
 public:
-	ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// PSSJ-3 whitenoise verified, phase verified; verified by ValleyBell & NewRisingSun
+class pssj3_device : public sn76496_base_device
+{
+public:
+	pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // Verified by Justin Kerk

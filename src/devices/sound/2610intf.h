@@ -11,31 +11,29 @@
 struct ssg_callbacks;
 
 
-#define MCFG_YM2610_IRQ_HANDLER(cb) \
-		devcb = &ym2610_device::set_irq_handler(*device, (DEVCB_##cb));
-
-class ym2610_device : public ay8910_device
+class ym2610_device : public ay8910_device,
+	public device_memory_interface
 {
 public:
 	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2610_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	virtual space_config_vector memory_space_config() const override;
+
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// update request from fm.cpp
 	static void update_request(device_t *param) { downcast<ym2610_device *>(param)->update_request(); }
-
-	static char const *const YM2610_TAG;
-	static char const *const YM2610_DELTAT_TAG;
 
 protected:
 	ym2610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_post_load() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
@@ -51,14 +49,21 @@ private:
 	void timer_handler(int c, int count, int clock);
 	void update_request() { m_stream->update(); }
 
+	static uint8_t static_adpcm_a_read_byte(device_t *param, offs_t offset) { return downcast<ym2610_device *>(param)->space(0).read_byte(offset); }
+	static uint8_t static_adpcm_b_read_byte(device_t *param, offs_t offset) { return downcast<ym2610_device *>(param)->space(1).read_byte(offset); }
+
 	static void static_irq_handler(device_t *param, int irq) { downcast<ym2610_device *>(param)->irq_handler(irq); }
 	static void static_timer_handler(device_t *param, int c, int count, int clock) { downcast<ym2610_device *>(param)->timer_handler(c, count, clock); }
 
 	// internal state
+	const address_space_config m_adpcm_a_config;
+	const address_space_config m_adpcm_b_config;
 	sound_stream *  m_stream;
 	emu_timer *     m_timer[2];
 	devcb_write_line m_irq_handler;
-	required_memory_region m_region;
+	const std::string m_adpcm_b_region_name;
+	optional_memory_region m_adpcm_a_region;
+	optional_memory_region m_adpcm_b_region;
 
 	static const ssg_callbacks psgintf;
 };

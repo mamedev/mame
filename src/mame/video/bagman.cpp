@@ -44,41 +44,40 @@ WRITE8_MEMBER(bagman_state::colorram_w)
   bit 0 -- 1  kohm resistor  -- /
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(bagman_state,bagman)
+void bagman_state::bagman_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
+
 	double weights_r[3], weights_g[3], weights_b[2];
-
-
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistances_rg, weights_r,  470,    0,
 			3,  resistances_rg, weights_g,  470,    0,
 			2,  resistances_b,  weights_b,  470,    0);
 
-
-	for (i = 0; i < palette.entries(); i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(weights_g, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(weights_b, bit0, bit1);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -115,14 +114,15 @@ void bagman_state::video_start()
 
 void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	// Spriteram is at the start of the colorram
+	for (int offs = 0x20 - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
-		sx = m_spriteram[offs + 3];
-		sy = 256 - m_spriteram[offs + 2] - 16;
-		flipx = m_spriteram[offs] & 0x40;
-		flipy = m_spriteram[offs] & 0x80;
+		sx = m_colorram[offs + 3];
+		sy = 256 - m_colorram[offs + 2] - 16;
+		flipx = m_colorram[offs] & 0x40;
+		flipy = m_colorram[offs] & 0x80;
 		if (flip_screen())
 		{
 			sx = 256 - sx - 15;
@@ -131,11 +131,11 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		if (m_spriteram[offs + 2] && m_spriteram[offs + 3])
+		if (m_colorram[offs + 2] && m_colorram[offs + 3])
 			m_gfxdecode->gfx(1)->transpen(bitmap,
 					cliprect,
-					(m_spriteram[offs] & 0x3f) + 2 * (m_spriteram[offs + 1] & 0x20),
-					m_spriteram[offs + 1] & 0x1f,
+					(m_colorram[offs] & 0x3f) + 2 * (m_colorram[offs + 1] & 0x20),
+					m_colorram[offs + 1] & 0x1f,
 					flipx,flipy,
 					sx,sy,0);
 	}

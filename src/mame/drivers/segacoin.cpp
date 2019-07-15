@@ -19,7 +19,10 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "sound/2612intf.h"
+#include "machine/315_5338a.h"
+#include "machine/pit8253.h"
+#include "sound/2612intf.h"
+#include "speaker.h"
 
 
 class segacoin_state : public driver_device
@@ -31,9 +34,11 @@ public:
 		m_audiocpu(*this, "audiocpu")
 	{ }
 
+	void westdrm(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	void westdrm(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 	void sound_map(address_map &map);
@@ -49,26 +54,36 @@ public:
 
 /* Memory maps */
 
-ADDRESS_MAP_START(segacoin_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segacoin_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segacoin_state::main_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segacoin_state::main_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw(); // watchdog?
+	map(0x10, 0x13).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x20, 0x2f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
+}
 
 
-ADDRESS_MAP_START(segacoin_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segacoin_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segacoin_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segacoin_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ym0", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x40, 0x43).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x80, 0x83).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+}
 
 
 
@@ -109,22 +124,39 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(segacoin_state::westdrm)
-
+void segacoin_state::westdrm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000) // clock frequency unknown
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	Z80(config, m_maincpu, 8000000); // clock frequency unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &segacoin_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &segacoin_state::main_portmap);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000) // clock frequency unknown
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<2>(1000000); // clock frequency unknown
+
+	SEGA_315_5338A(config, "io", 0);
+
+	Z80(config, m_audiocpu, 8000000); // clock frequency unknown
+	m_audiocpu->set_addrmap(AS_PROGRAM, &segacoin_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &segacoin_state::sound_portmap);
 
 	/* no video! */
 
 	/* sound hardware */
-	//..
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+
+	ym3438_device &ym0(YM3438(config, "ym0", 8000000)); // clock frequency unknown
+	ym0.add_route(0, "mono", 0.40);
+	ym0.add_route(1, "mono", 0.40);
+
+	ym3438_device &ym1(YM3438(config, "ym1", 8000000)); // clock frequency unknown
+	ym1.add_route(0, "mono", 0.40);
+	ym1.add_route(1, "mono", 0.40);
+
+	ym3438_device &ym2(YM3438(config, "ym2", 8000000)); // clock frequency unknown
+	ym2.add_route(0, "mono", 0.40);
+	ym2.add_route(1, "mono", 0.40);
+}
 
 
 
@@ -144,4 +176,4 @@ ROM_START( westdrm )
 ROM_END
 
 
-GAME (1992, westdrm, 0, westdrm, westdrm, segacoin_state, 0, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, westdrm, 0, westdrm, westdrm, segacoin_state, empty_init, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )

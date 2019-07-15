@@ -19,20 +19,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I8089_DATA_WIDTH(_data_width) \
-	i8089_device::set_data_width(*device, _data_width);
-
-#define MCFG_I8089_SINTR1(_sintr1) \
-	devcb = &downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
-
-#define MCFG_I8089_SINTR2(_sintr2) \
-	devcb = &downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -50,11 +36,11 @@ public:
 	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_sintr1_callback(Object &&sintr1) { return m_write_sintr1.set_callback(std::forward<Object>(sintr1)); }
-	template <class Object> devcb_base &set_sintr2_callback(Object &&sintr2) { return m_write_sintr2.set_callback(std::forward<Object>(sintr2)); }
+	auto sintr1() { return m_write_sintr1.bind(); }
+	auto sintr2() { return m_write_sintr2.bind(); }
 
-	// static configuration helpers
-	static void set_data_width(device_t &device, uint8_t data_width) { downcast<i8089_device &>(device).m_data_width = data_width; }
+	// configuration helpers
+	void set_data_width(uint8_t data_width) { m_data_width = data_width; }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( ca_w );
@@ -82,7 +68,7 @@ protected:
 	address_space_config m_io_config;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;

@@ -139,22 +139,22 @@ void ss50_interface_port_device::device_start()
 //  read - interface read access (pre-decoded)
 //-------------------------------------------------
 
-READ8_MEMBER(ss50_interface_port_device::read)
+u8 ss50_interface_port_device::read(offs_t offset)
 {
 	if (m_card == nullptr)
 	{
 		logerror("%s: Read from unspecified interface (RS = %X)\n", machine().describe_context(), offset);
-		return space.unmap();
+		return 0xff;
 	}
 
-	return m_card->register_read(space, offset);
+	return m_card->register_read(offset);
 }
 
 //-------------------------------------------------
 //  write - interface write access (pre-decoded)
 //-------------------------------------------------
 
-WRITE8_MEMBER(ss50_interface_port_device::write)
+void ss50_interface_port_device::write(offs_t offset, u8 data)
 {
 	if (m_card == nullptr)
 	{
@@ -162,7 +162,7 @@ WRITE8_MEMBER(ss50_interface_port_device::write)
 		return;
 	}
 
-	m_card->register_write(space, offset, data);
+	m_card->register_write(offset, data);
 }
 
 //-------------------------------------------------
@@ -203,6 +203,9 @@ WRITE_LINE_MEMBER(ss50_interface_port_device::f600_1200_w)
 //  SS-50 CARD INTERFACE
 //**************************************************************************
 
+template class device_finder<ss50_card_interface, false>;
+template class device_finder<ss50_card_interface, true>;
+
 //-------------------------------------------------
 //  ss50_card_interface - construction
 //-------------------------------------------------
@@ -213,10 +216,11 @@ ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t
 {
 }
 
-SLOT_INTERFACE_START(ss50_default_2rs_devices)
-	SLOT_INTERFACE("mpc", SS50_MPC)
-	//SLOT_INTERFACE("mpl", SS50_MPL)
-	//SLOT_INTERFACE("mpn", SS50_MPN)
-	SLOT_INTERFACE("mps", SS50_MPS)
-	//SLOT_INTERFACE("mpt", SS50_MPT)
-SLOT_INTERFACE_END
+void ss50_default_2rs_devices(device_slot_interface &device)
+{
+	device.option_add("mpc", SS50_MPC);
+	//device.option_add("mpl", SS50_MPL);
+	//device.option_add("mpn", SS50_MPN);
+	device.option_add("mps", SS50_MPS);
+	//device.option_add("mpt", SS50_MPT);
+}

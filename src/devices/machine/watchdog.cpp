@@ -29,33 +29,8 @@ watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, cons
 	: device_t(mconfig, WATCHDOG_TIMER, tag, owner, clock)
 	, m_vblank_count(0)
 	, m_time(attotime::zero)
-	, m_screen_tag(nullptr)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_vblank_count - configuration helper
-//  to set the number of VBLANKs
-//-------------------------------------------------
-
-void watchdog_timer_device::static_set_vblank_count(device_t &device, const char *screen_tag, int32_t count)
-{
-	watchdog_timer_device &watchdog = downcast<watchdog_timer_device &>(device);
-	watchdog.m_screen_tag = screen_tag;
-	watchdog.m_vblank_count = count;
-}
-
-
-//-------------------------------------------------
-//  static_set_time - configuration helper to set
-//  the time until reset
-//-------------------------------------------------
-
-void watchdog_timer_device::static_set_time(device_t &device, attotime time)
-{
-	watchdog_timer_device &watchdog = downcast<watchdog_timer_device &>(device);
-	watchdog.m_time = time;
 }
 
 
@@ -68,9 +43,10 @@ void watchdog_timer_device::device_validity_check(validity_checker &valid) const
 {
 	if (m_vblank_count != 0)
 	{
-		screen_device *screen = dynamic_cast<screen_device *>(siblingdevice(m_screen_tag));
-		if (screen == nullptr)
-			osd_printf_error("Invalid screen tag specified\n");
+		if (m_screen.finder_tag() == finder_base::DUMMY_TAG)
+			osd_printf_error("VBLANK count set without setting screen tag\n");
+		else if (!m_screen)
+			osd_printf_error("Screen device %s not found\n", m_screen.finder_tag());
 	}
 }
 
@@ -89,9 +65,8 @@ void watchdog_timer_device::device_start()
 	if (m_vblank_count != 0)
 	{
 		// fetch the screen
-		screen_device *screen = siblingdevice<screen_device>(m_screen_tag);
-		if (screen != nullptr)
-			screen->register_vblank_callback(vblank_state_delegate(&watchdog_timer_device::watchdog_vblank, this));
+		if (m_screen)
+			m_screen->register_vblank_callback(vblank_state_delegate(&watchdog_timer_device::watchdog_vblank, this));
 	}
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_counter));
@@ -205,21 +180,21 @@ void watchdog_timer_device::watchdog_vblank(screen_device &screen, bool vblank_s
 //  8-bit reset read/write handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER( watchdog_timer_device::reset_w ) { watchdog_reset(); }
-READ8_MEMBER( watchdog_timer_device::reset_r ) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset_w(u8 data) { watchdog_reset(); }
+u8 watchdog_timer_device::reset_r(address_space &space) { watchdog_reset(); return space.unmap(); }
 
 
 //-------------------------------------------------
 //  16-bit reset read/write handlers
 //-------------------------------------------------
 
-WRITE16_MEMBER( watchdog_timer_device::reset16_w ) { watchdog_reset(); }
-READ16_MEMBER( watchdog_timer_device::reset16_r ) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset16_w(u16 data) { watchdog_reset(); }
+u16 watchdog_timer_device::reset16_r(address_space &space) { watchdog_reset(); return space.unmap(); }
 
 
 //-------------------------------------------------
 //  32-bit reset read/write handlers
 //-------------------------------------------------
 
-WRITE32_MEMBER( watchdog_timer_device::reset32_w ) { watchdog_reset(); }
-READ32_MEMBER( watchdog_timer_device::reset32_r ) { watchdog_reset(); return space.unmap(); }
+void watchdog_timer_device::reset32_w(u32 data) { watchdog_reset(); }
+u32 watchdog_timer_device::reset32_r(address_space &space) { watchdog_reset(); return space.unmap(); }

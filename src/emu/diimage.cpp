@@ -12,6 +12,7 @@
 
 #include "emuopts.h"
 #include "drivenum.h"
+#include "romload.h"
 #include "ui/uimain.h"
 #include "zippath.h"
 #include "softlist.h"
@@ -85,19 +86,19 @@ image_device_format::~image_device_format()
 //-------------------------------------------------
 
 device_image_interface::device_image_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "image"),
-		m_err(),
-		m_file(),
-		m_mame_file(),
-		m_software_part_ptr(nullptr),
-		m_supported(0),
-		m_readonly(false),
-		m_created(false),
-		m_create_format(0),
-		m_create_args(nullptr),
-		m_user_loadable(true),
-		m_is_loading(false),
-		m_is_reset_and_loading(false)
+	: device_interface(device, "image")
+	, m_err()
+	, m_file()
+	, m_mame_file()
+	, m_software_part_ptr(nullptr)
+	, m_supported(0)
+	, m_readonly(false)
+	, m_created(false)
+	, m_create_format(0)
+	, m_create_args(nullptr)
+	, m_user_loadable(true)
+	, m_is_loading(false)
+	, m_is_reset_and_loading(false)
 {
 }
 
@@ -430,7 +431,7 @@ const std::string &device_image_interface::working_directory()
 
 const software_info *device_image_interface::software_entry() const
 {
-	return (m_software_part_ptr == nullptr) ? nullptr : &m_software_part_ptr->info();
+	return !m_software_part_ptr ? nullptr : &m_software_part_ptr->info();
 }
 
 
@@ -465,9 +466,9 @@ u32 device_image_interface::get_software_region_length(const char *tag)
 //  image_get_feature
 //-------------------------------------------------
 
-const char *device_image_interface::get_feature(const char *feature_name)
+const char *device_image_interface::get_feature(const char *feature_name) const
 {
-	return (m_software_part_ptr == nullptr) ? nullptr : m_software_part_ptr->feature(feature_name);
+	return !m_software_part_ptr ? nullptr : m_software_part_ptr->feature(feature_name);
 }
 
 
@@ -669,6 +670,10 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 void device_image_interface::battery_save(const void *buffer, int length)
 {
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	if (!device().machine().options().nvram_save())
+		return;
+
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
 	// try to open the battery file and write it out, if possible

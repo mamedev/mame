@@ -27,7 +27,7 @@
     512Kbyte/1Mega main RAM
 
  Games dumped
-  1998 - Hidden Catch (pcb ver 3.03)
+  1998 - Hidden Catch (pcb ver 3.03 and 3.02)
   1998 - Iron Fortress
   1998 - Puzzle King (Dance & Puzzle)
   1998 - Raccoon World
@@ -43,7 +43,6 @@
   2001 - Fortress 2 Blue Arcade (v. 1.00 / pcb ver 3.05)
 
  Known games not dumped
- - Hidden Catch (pcb ver 3.02)
  - Fortress 2 Blue Arcade (v. 1.02)
  - Ribbon (Step1. Mild Mind) (c) 1999 - Alt title Penfan girls is dumped
 
@@ -106,6 +105,7 @@
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 
 #include "speaker.h"
 
@@ -115,6 +115,11 @@
  *  Control
  *
  *************************************/
+
+void eolith_state::machine_start()
+{
+	m_led.resolve();
+}
 
 READ32_MEMBER(eolith_state::eolith_custom_r)
 {
@@ -135,38 +140,21 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 {
 	m_buffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
-	output().set_led_value(0, data & 1);
+	m_led = BIT(data, 0);
 
 	m_eepromoutport->write(data, 0xff);
 
 	// bit 0x100 and 0x040 ?
 }
 
-READ32_MEMBER(eolith_state::hidctch3_pen1_r)
+template<int Player>
+READ32_MEMBER(eolith_state::hidctch3_pen_r)
 {
 	//320 x 240
-	int xpos = m_penx1port->read();
-	int ypos = m_peny1port->read();
+	int xpos = m_penxport[Player]->read();
+	int ypos = m_penyport[Player]->read();
 
 	return xpos + (ypos*168*2);
-}
-
-READ32_MEMBER(eolith_state::hidctch3_pen2_r)
-{
-	//320 x 240
-	int xpos = m_penx2port->read();
-	int ypos = m_peny2port->read();
-
-	return xpos + (ypos*168*2);
-}
-
-WRITE32_MEMBER( eolith_state::sound_w )
-{
-//  printf("CPU Command: %x\n", m_sound_data);
-	m_sound_data = data;
-	m_soundcpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 
@@ -175,12 +163,6 @@ WRITE32_MEMBER( eolith_state::sound_w )
  *  Sound CPU
  *
  *************************************/
-
-READ8_MEMBER( eolith_state::sound_cmd_r )
-{
-	m_soundcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-	return m_sound_data;
-}
 
 WRITE8_MEMBER( eolith_state::sound_p1_w )
 {
@@ -239,18 +221,28 @@ WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
  *
  *************************************/
 
-ADDRESS_MAP_START(eolith_state::eolith_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
-	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
-	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE(eolith_vram_r, eolith_vram_w)
-	AM_RANGE(0xfc000000, 0xfc000003) AM_READ(eolith_custom_r)
-	AM_RANGE(0xfc400000, 0xfc400003) AM_WRITE(systemcontrol_w)
-	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(sound_w)
-	AM_RANGE(0xfca00000, 0xfca00003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfcc00000, 0xfcc0005b) AM_WRITENOP // crt registers ?
-	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void eolith_state::eolith_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram(); // fort2b wants ram here
+	map(0x40000000, 0x401fffff).ram();
+	map(0x90000000, 0x9003ffff).rw(FUNC(eolith_state::eolith_vram_r), FUNC(eolith_state::eolith_vram_w));
+	map(0xfc000000, 0xfc000003).r(FUNC(eolith_state::eolith_custom_r));
+	map(0xfc400000, 0xfc400003).w(FUNC(eolith_state::systemcontrol_w));
+	map(0xfc800000, 0xfc800003).w("soundlatch", FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0xfca00000, 0xfca00003).portr("DSW1");
+	map(0xfcc00000, 0xfcc0005b).nopw(); // crt registers ?
+	map(0xfd000000, 0xfeffffff).rom().region("maindata", 0);
+	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
+}
+
+void eolith_state::hidctch3_map(address_map &map)
+{
+	eolith_map(map);
+	map(0xfc200000, 0xfc200003).nopw(); // this generates pens vibration
+	// It is not clear why the first reads are needed too
+	map(0xfce00000, 0xfce00003).mirror(0x00080000).r(FUNC(eolith_state::hidctch3_pen_r<0>));
+	map(0xfcf00000, 0xfcf00003).mirror(0x00080000).r(FUNC(eolith_state::hidctch3_pen_r<1>));
+}
 
 
 /*************************************
@@ -259,15 +251,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(eolith_state::sound_prg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void eolith_state::sound_prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(eolith_state::sound_io_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("sound_bank")
-	AM_RANGE(0x8000, 0x8000) AM_READ(sound_cmd_r)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(sound_p1_w)
-ADDRESS_MAP_END
+void eolith_state::sound_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("sound_bank");
+	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 
 /*************************************
@@ -281,10 +274,10 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, nullptr)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -387,11 +380,11 @@ static INPUT_PORTS_START( ironfort )
 	PORT_DIPSETTING(          0x00000080, DEF_STR( Easy ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ironfortj )
+static INPUT_PORTS_START( ironfortc )
 	PORT_INCLUDE(ironfort)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x00000002, 0x00000000, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW4:2")
 	PORT_DIPSETTING(          0x00000002, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x00000030, 0x00000030, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW3:1,2")
@@ -522,7 +515,7 @@ static INPUT_PORTS_START( stealsee )
 	PORT_INCLUDE(common)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, stealsee_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, stealsee_speedup_getvblank, nullptr)
 INPUT_PORTS_END
 
 
@@ -544,62 +537,73 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(eolith_state::eolith45)
-	MCFG_CPU_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
-	MCFG_CPU_PROGRAM_MAP(eolith_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
+void eolith_state::eolith45(machine_config &config)
+{
+	E132N(config, m_maincpu, 45000000);         /* 45 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::eolith_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", I8032, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_prg_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
+	I8032(config, m_soundcpu, XTAL(12'000'000));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
+	m_soundcpu->set_addrmap(AS_IO, &eolith_state::sound_io_map);
+	m_soundcpu->port_out_cb<1>().set(FUNC(eolith_state::sound_p1_w));
+	m_soundcpu->serial_tx_cb().set(FUNC(eolith_state::soundcpu_to_qs1000)); // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))
+	EEPROM_93C66_8BIT(config, "eeprom")
+		.erase_time(attotime::from_usec(250))
+		.write_time(attotime::from_usec(250));
 
 //  for testing sound sync
-//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
-//  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+//  config.m_perfect_cpu_quantum = subtag("maincpu");
+//  config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(eolith_state, screen_update_eolith)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(512, 262);
+	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_screen_update(FUNC(eolith_state::screen_update_eolith));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
-	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(eolith_state, qs1000_p1_r))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(eolith_state, qs1000_p1_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, MCS51_INT0_LINE);
 
-MACHINE_CONFIG_START(eolith_state::eolith50)
+	qs1000_device &qs1000(QS1000(config, "qs1000", XTAL(24'000'000)));
+	qs1000.set_external_rom(true);
+	qs1000.p1_in().set(FUNC(eolith_state::qs1000_p1_r));
+	qs1000.p1_out().set(FUNC(eolith_state::qs1000_p1_w));
+	qs1000.add_route(0, "lspeaker", 1.0);
+	qs1000.add_route(1, "rspeaker", 1.0);
+}
+
+void eolith_state::eolith50(machine_config &config)
+{
 	eolith45(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(50000000)         /* 50 MHz */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(50000000);         /* 50 MHz */
+}
 
-MACHINE_CONFIG_START(eolith_state::ironfort)
+void eolith_state::ironfort(machine_config &config)
+{
 	eolith45(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(44900000); /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+}
+
+void eolith_state::hidctch3(machine_config &config)
+{
+	eolith50(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::hidctch3_map);
+}
 
 
 /*************************************
@@ -667,7 +671,7 @@ ROM_START( ironfort )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43", 0x00000, 0x80000, CRC(29f55825) SHA1(e048ec0f5d83d4b64aa48d706fa0947afcdc1a3d) ) /* 27C040 eprom with no label */
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "if00-00.u39", 0x0000000, 0x400000, CRC(63b74601) SHA1(c111ecf55359e9005a3ec1fe1202a34624f8b242) )
 	ROM_LOAD32_WORD_SWAP( "if00-01.u34", 0x0000002, 0x400000, CRC(890470b3) SHA1(57df122ab01744b47ebd38554eb6a7d780977be2) )
 	ROM_LOAD32_WORD_SWAP( "if00-02.u40", 0x0800000, 0x400000, CRC(63b5cca5) SHA1(4ec8b813c7e465f659a4a2361ddfbad763bf6e6a) )
@@ -687,11 +691,14 @@ ROM_START( ironfort )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-ROM_START( ironfortj )
+// 鋼鐵要塞 Iron Fortress (Gong3tit3 Jiu3coi3)
+// Eolith
+// 卓任有限公司 Excellent Competence Ltd.
+ROM_START( ironfortc )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43.bin", 0x00000, 0x80000, CRC(f1f19c9a) SHA1(98531ecedd1277e6d10395794a66d615df7ddbd6) ) /* 27C040 eprom with no label */
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "if00-00.u39", 0x0000000, 0x400000, CRC(63b74601) SHA1(c111ecf55359e9005a3ec1fe1202a34624f8b242) )
 	ROM_LOAD32_WORD_SWAP( "if00-01.u34", 0x0000002, 0x400000, CRC(890470b3) SHA1(57df122ab01744b47ebd38554eb6a7d780977be2) )
 	ROM_LOAD32_WORD_SWAP( "if00-02.u40", 0x0800000, 0x400000, CRC(63b5cca5) SHA1(4ec8b813c7e465f659a4a2361ddfbad763bf6e6a) )
@@ -717,7 +724,7 @@ ROM_START( linkypip )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43.bin", 0x00000, 0x80000, CRC(9ef937de) SHA1(b121d683898311baaa1e2aba199dec0c1d59f55a) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "lp00.u39", 0x0000000, 0x400000, CRC(c1e71bbc) SHA1(f54b374b05ce6044944ba10ba8a634eb661b092d) )
 	ROM_LOAD32_WORD_SWAP( "lp01.u34", 0x0000002, 0x400000, CRC(30780c08) SHA1(15d7bf1397c25eb813c79fc9cea88ac427b1d9c7) )
 	ROM_LOAD32_WORD_SWAP( "lp02.u40", 0x0800000, 0x400000, CRC(3381bd2c) SHA1(78b30f3940e5c9887ab4ad398bde356671deabb5) )
@@ -743,7 +750,34 @@ ROM_START( hidnctch )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "hc_u43.bin", 0x00000, 0x80000, CRC(635b4478) SHA1(31ea4a9725e0c329447c7d221c22494c905f6940) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "hc0_u39.bin", 0x0000000, 0x400000, CRC(eefb6add) SHA1(a0f6f2cf86699a666be0647274d8c9381782640d) )
+	ROM_LOAD32_WORD_SWAP( "hc1_u34.bin", 0x0000002, 0x400000, CRC(482f3e52) SHA1(7a527c6af4c80e10cc25219a04ccf7c7ea1b23af) )
+	ROM_LOAD32_WORD_SWAP( "hc2_u40.bin", 0x0800000, 0x400000, CRC(914a1544) SHA1(683cb007ace50d1ba88253da6ad71dc3a395299d) )
+	ROM_LOAD32_WORD_SWAP( "hc3_u35.bin", 0x0800002, 0x400000, CRC(80c59133) SHA1(66ca4c2c014c4a1c87c46a3971732f0a2be95408) )
+	ROM_LOAD32_WORD_SWAP( "hc4_u41.bin", 0x1000000, 0x400000, CRC(9a9e2203) SHA1(a90f5842b63696753e6c16114b1893bbeb91e45c) )
+	ROM_LOAD32_WORD_SWAP( "hc5_u36.bin", 0x1000002, 0x400000, CRC(74b1719d) SHA1(fe2325259117598ad7c23217426ac9c28440e3a0) )
+	// 0x1800000 - 0x1ffffff empty
+
+	ROM_REGION( 0x008000, "soundcpu", 0 )  /* Sound (80c301) CPU Code */
+	ROM_LOAD( "hc_u111.bin", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+
+	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
+	ROM_LOAD( "hc_u108.bin", 0x00000, 0x80000, CRC(2bae46cb) SHA1(7c43f1002dfc20b9c1bb1647f7261dfa7ed2b4f9) )
+
+	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
+	ROM_LOAD( "hc_u107.bin", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
+
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
+	ROM_LOAD( "hc_u97.bin",  0x00000, 0x80000, CRC(ebf9f77b) SHA1(5d472aeb84fc011e19b9e61d34aeddfe7d6ac216) )
+	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
+ROM_START( hidnctcha )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "3.02.u43", 0x00000, 0x80000, CRC(9bb260a8) SHA1(d58982ca0cf4cbb064e10c144ac6098d6567b880) )
+
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "hc0_u39.bin", 0x0000000, 0x400000, CRC(eefb6add) SHA1(a0f6f2cf86699a666be0647274d8c9381782640d) )
 	ROM_LOAD32_WORD_SWAP( "hc1_u34.bin", 0x0000002, 0x400000, CRC(482f3e52) SHA1(7a527c6af4c80e10cc25219a04ccf7c7ea1b23af) )
 	ROM_LOAD32_WORD_SWAP( "hc2_u40.bin", 0x0800000, 0x400000, CRC(914a1544) SHA1(683cb007ace50d1ba88253da6ad71dc3a395299d) )
@@ -813,7 +847,7 @@ ROM_START( nhidctch )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43",        0x00000, 0x80000, CRC(44296fdb) SHA1(1faf7061342d4c86f6ca416d922cb98ffb72f250) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "hc000.u39",   0x0000000, 0x400000, CRC(eefb6add) SHA1(a0f6f2cf86699a666be0647274d8c9381782640d) )
 	ROM_LOAD32_WORD_SWAP( "hc001.u34",   0x0000002, 0x400000, CRC(482f3e52) SHA1(7a527c6af4c80e10cc25219a04ccf7c7ea1b23af) )
 	ROM_LOAD32_WORD_SWAP( "hc002.u40",   0x0800000, 0x400000, CRC(914a1544) SHA1(683cb007ace50d1ba88253da6ad71dc3a395299d) )
@@ -886,7 +920,7 @@ ROM_START( hidctch2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43",        0x00000, 0x80000, CRC(326d1dbc) SHA1(b33434cd263dc40ee2b6562f72a87a0439a9833e) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00", 0x0000000, 0x200000, CRC(c6b1bc84) SHA1(205d1dc5079562b11cef72fef25a3c570eaecf78) )
 	ROM_LOAD32_WORD_SWAP( "01", 0x0000002, 0x200000, CRC(5a1c1ab3) SHA1(3c07a98f9ea8b30bac5a260403e688314fd12abb) )
 	ROM_LOAD32_WORD_SWAP( "02", 0x0400000, 0x200000, CRC(3f7815aa) SHA1(ed46cbe03fde5cab15e004812036b0aaa00fc628) )
@@ -923,7 +957,7 @@ ROM_START( hidctch2a )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "hc2j.u43",        0x00000, 0x80000, CRC(8d3b8394) SHA1(29093ee13eb3609abc670d6722f3095f03045af6) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00", 0x0000000, 0x200000, CRC(c6b1bc84) SHA1(205d1dc5079562b11cef72fef25a3c570eaecf78) )
 	ROM_LOAD32_WORD_SWAP( "01", 0x0000002, 0x200000, CRC(5a1c1ab3) SHA1(3c07a98f9ea8b30bac5a260403e688314fd12abb) )
 	ROM_LOAD32_WORD_SWAP( "02", 0x0400000, 0x200000, CRC(3f7815aa) SHA1(ed46cbe03fde5cab15e004812036b0aaa00fc628) )
@@ -960,7 +994,7 @@ ROM_START( hidnc2k )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "27c040.u43",        0x00000, 0x80000, CRC(05063136) SHA1(9c1b3066a571b1e52d57cfe790a55257b37d5b89) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "hc2000-0.u39", 0x0000000, 0x400000, CRC(10d4fd9a) SHA1(8ecbc0708a41d27ddd5fa1b01eed6411a4f3e6ec) )
 	ROM_LOAD32_WORD_SWAP( "hc2000-1.u34", 0x0000002, 0x400000, CRC(6e029c0a) SHA1(e217f6269e1c2a38f414c7220005e8bb6c636c57) )
 	ROM_LOAD32_WORD_SWAP( "hc2000-2.u40", 0x0800000, 0x400000, CRC(1dc3fb7f) SHA1(c0cc5cac0be5e4e01fa1eaa9dc30f652431263ce) )
@@ -1057,7 +1091,7 @@ ROM_START( raccoon )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "racoon-u.43", 0x00000, 0x80000, CRC(711ee026) SHA1(c55dfaa24cbaa7a613657cfb25e7f0085f1e4cbf) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "racoon.u10", 0x0000000, 0x200000, CRC(f702390e) SHA1(47520ba0e6d3f044136a517ebbec7426a66ce33d) )
 	ROM_LOAD32_WORD_SWAP( "racoon.u1",  0x0000002, 0x200000, CRC(49775125) SHA1(2b8ee9dd767465999c828d65bb02b8aaad94177c) )
 	ROM_LOAD32_WORD_SWAP( "racoon.u11", 0x0400000, 0x200000, CRC(3f23f368) SHA1(eb1ea51def2cde5e7e4f334888294b794aa03dfc) )
@@ -1086,7 +1120,7 @@ ROM_START( landbrk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom3.u43", 0x00000, 0x80000, CRC(8429189a) SHA1(f38e4792426ca2c138c44053a6c7525906281dff) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00.bin", 0x0000000, 0x200000, CRC(a803aace) SHA1(52a9e27b4f400767a953aa01321a9fa7cdbf3976) )
 	ROM_LOAD32_WORD_SWAP( "01.bin", 0x0000002, 0x200000, CRC(439c95cc) SHA1(18830024b2e43f0a89a7bd32841fbcb574e50fc6) )
 	ROM_LOAD32_WORD_SWAP( "02.bin", 0x0400000, 0x200000, CRC(a0c2828c) SHA1(967dc467d25f093749aa0146ebf54959c9803b92) )
@@ -1123,7 +1157,7 @@ ROM_START( landbrka )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "lb_1.u43", 0x00000, 0x80000, CRC(f8bbcf44) SHA1(ad85a890ae2f921cd08c1897b4d9a230ccf9e072) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "lb2-000.u39", 0x0000000, 0x400000, CRC(b37faf7a) SHA1(30e9af3957ada7c72d85f55add221c2e9b3ea823) )
 	ROM_LOAD32_WORD_SWAP( "lb2-001.u34", 0x0000002, 0x400000, CRC(07e620c9) SHA1(19f95316208fb4e52cef78f18c5d93460a644566) )
 	ROM_LOAD32_WORD_SWAP( "lb2-002.u40", 0x0800000, 0x400000, CRC(3bb4bca6) SHA1(115029be4a4e322549a35f3ae5093ec161e9a421) )
@@ -1152,7 +1186,7 @@ ROM_START( landbrkb )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "lb_040.u43", 0x00000, 0x80000, CRC(a81d681b) SHA1(e92b0217a86271dd1e51bef75f5b4fda7a8415ed) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "lb2-000.u39", 0x0000000, 0x400000, CRC(b37faf7a) SHA1(30e9af3957ada7c72d85f55add221c2e9b3ea823) )
 	ROM_LOAD32_WORD_SWAP( "lb2-001.u34", 0x0000002, 0x400000, CRC(07e620c9) SHA1(19f95316208fb4e52cef78f18c5d93460a644566) )
 	ROM_LOAD32_WORD_SWAP( "lb2-002.u40", 0x0800000, 0x400000, CRC(3bb4bca6) SHA1(115029be4a4e322549a35f3ae5093ec161e9a421) )
@@ -1182,7 +1216,7 @@ ROM_START( penfan )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "pfg.u43", 0x00000, 0x80000, CRC(84977191) SHA1(2566bcbf0815e02d27cad6f2118eb3a1ed7e9ebc) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00.u5", 0x0000000, 0x200000, CRC(77ce2855) SHA1(715d12db11871750b886406673a6f3934b0b1a57) )
 	ROM_LOAD32_WORD_SWAP( "01.u1", 0x0000002, 0x200000, CRC(a7d7299d) SHA1(e0c4d399ac0d2525d80249d908c72a51b701e9b0) )
 	ROM_LOAD32_WORD_SWAP( "02.u6", 0x0400000, 0x200000, CRC(79b05a66) SHA1(8e6ffa751267147679fde84b5c8b9ef954e4a1d0) )
@@ -1219,7 +1253,7 @@ ROM_START( penfana )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "27c040.u43", 0x00000, 0x80000, CRC(a7637f8b) SHA1(aadfaa03b43cd325ddbc04fe7b60ca704a9891a5) ) /* no rom label or sticker */
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00.u5", 0x0000000, 0x200000, CRC(77ce2855) SHA1(715d12db11871750b886406673a6f3934b0b1a57) )
 	ROM_LOAD32_WORD_SWAP( "01.u1", 0x0000002, 0x200000, CRC(a7d7299d) SHA1(e0c4d399ac0d2525d80249d908c72a51b701e9b0) )
 	ROM_LOAD32_WORD_SWAP( "02.u6", 0x0400000, 0x200000, CRC(79b05a66) SHA1(8e6ffa751267147679fde84b5c8b9ef954e4a1d0) )
@@ -1257,7 +1291,7 @@ ROM_START( stealsee )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "ss.u43", 0x00000, 0x80000, CRC(b0a1a965) SHA1(e13f336035a266da66ca8f95b92cac7295323989) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00.u5", 0x0000000, 0x200000, CRC(59d247a7) SHA1(a206cbb27f8054baca76dc72e6f45be4c9a914b1) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 	ROM_LOAD32_WORD_SWAP( "01.u1", 0x0000002, 0x200000, CRC(255764f2) SHA1(b1d25898961ddbed9865620269cb0cd0ab506cd9) )
 	ROM_LOAD32_WORD_SWAP( "02.u6", 0x0400000, 0x200000, CRC(ebc33180) SHA1(7f59263754e9e2c32a5942daed60770dc4d4f6b5) )
@@ -1295,7 +1329,7 @@ ROM_START( candy )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "cc.u43", 0x00000, 0x80000, CRC(837c9967) SHA1(ccb38ec986d7cd598a48ee1c3806566c360fd783) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASEFF ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00.u5", 0x0000000, 0x200000, CRC(04bc53e4) SHA1(093651c4d4148dc36260d7a6cd8c322ba9a63195) )
 	ROM_LOAD32_WORD_SWAP( "01.u1", 0x0000002, 0x200000, CRC(288229f1) SHA1(56e3ae101f8acc5d1e9bcc28b74ee48aa456bf28) )
 	ROM_LOAD32_WORD_SWAP( "02.u6", 0x0400000, 0x200000, CRC(5d3b130c) SHA1(e247d0dd3a1909296c2a754733f10170d264825c) )
@@ -1332,7 +1366,7 @@ ROM_START( fort2b )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "1.u43",        0x00000, 0x80000, CRC(b2279485) SHA1(022591b260be28820f04a1c1fdd61cb9b68d6703) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00.u5", 0x0000000, 0x200000, CRC(4437b595) SHA1(b87518110955947264d93b1f377289f1741ce5dc) )
 	ROM_LOAD32_WORD_SWAP( "01.u1", 0x0000002, 0x200000, CRC(2a410aed) SHA1(def822ead339180aa3e0ebb266b6a6eb1271a2ae) )
 	ROM_LOAD32_WORD_SWAP( "02.u6", 0x0400000, 0x200000, CRC(12f0e4c0) SHA1(fa1e1c3510af61b4058507f1aca801377cafffb4) )
@@ -1369,7 +1403,7 @@ ROM_START( fort2ba )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "ftii012.u43", 0x00000, 0x80000, CRC(6424e05f) SHA1(2f02f103de180561e372ce897f8410a11c4cb58d) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "ftii000.u39", 0x0000000, 0x400000, CRC(be74121d) SHA1(ee072044f84e11c48537d79bd9766bf8cc28f002) )
 	ROM_LOAD32_WORD_SWAP( "ftii004.u34", 0x0000002, 0x400000, CRC(d4399f98) SHA1(88f5a1097f44d2070cfc96c9cd83342d1975dcfe) )
 	ROM_LOAD32_WORD_SWAP( "ftii001.u40", 0x0800000, 0x400000, CRC(35c396ff) SHA1(d05dee021e1a93e224b05949c18a5107e0aceb4d) )
@@ -1399,7 +1433,7 @@ ROM_START( puzzlekg )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43.bin",      0x00000, 0x80000, CRC(c3db7424) SHA1(5ee2be0f06fddb0c74fc6e82679b275cc4e86bcc) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "u10.bin", 0x0000000, 0x200000, CRC(c9c3064b) SHA1(10a46d4674c1ef64e50dfcb5eb44953206fe6163) )
 	ROM_LOAD32_WORD_SWAP( "u1.bin",  0x0000002, 0x200000, CRC(6b4b369d) SHA1(3f528e557f2846d7c50afa332797e8bc541eeba8) )
 	ROM_LOAD32_WORD_SWAP( "u11.bin", 0x0400000, 0x200000, CRC(92615236) SHA1(dc602cb4c2a3d671cc60b075b399cf3efb67d3d3) )
@@ -1485,7 +1519,7 @@ ROM_START( hidctch3 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43",        0x00000, 0x80000, CRC(7b861339) SHA1(fca7d47d7d538774ec6462deebc0a367ac073b67) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00", 0x0000000, 0x200000, CRC(7fe5cd46) SHA1(8190614a1cf1df6472590b43036200a1075bfe58) )
 	ROM_LOAD32_WORD_SWAP( "01", 0x0000002, 0x200000, CRC(09463ec9) SHA1(0287da2e65521a61c06ad927e913243d023f0d72) )
 	ROM_LOAD32_WORD_SWAP( "02", 0x0400000, 0x200000, CRC(e5a08ebf) SHA1(0ce2414b547a027710ee4ea8f890cc2fa23dff9a) )
@@ -1523,21 +1557,19 @@ MACHINE_RESET_MEMBER(eolith_state,eolith)
 	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(eolith_state,eolith)
+void eolith_state::init_eolith()
 {
 	init_speedup();
 
 	// Configure the sound ROM banking
-	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
-
-	save_item(NAME(m_sound_data));
+	m_sndbank->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrk)
+void eolith_state::init_landbrk()
 {
 	m_coin_counter_bit = 0x1000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 /*
@@ -1558,47 +1590,32 @@ void eolith_state::patch_mcu_protection(uint32_t address)
 	rombase[address/4] = (rombase[address/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrka)
+void eolith_state::init_landbrka()
 {
 	patch_mcu_protection(0x14f00);
 	m_coin_counter_bit = 0x2000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrkb)
+void eolith_state::init_landbrkb()
 {
 	patch_mcu_protection(0x14da8);
 	m_coin_counter_bit = 0x2000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,hidctch2)
+void eolith_state::init_hidctch2()
 {
 	patch_mcu_protection(0x0bcc8);
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
+void eolith_state::init_hidnc2k()
 {
 	patch_mcu_protection(0x17b2c);
-	DRIVER_INIT_CALL(eolith);
-}
-
-DRIVER_INIT_MEMBER(eolith_state,hidctch3)
-{
-	m_maincpu->space(AS_PROGRAM).nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
-
-	// It is not clear why the first reads are needed too
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfce00000, 0xfce00003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfce80000, 0xfce80003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
-
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 /* Eolith Speedup Handling */
@@ -1615,7 +1632,7 @@ void eolith_state::speedup_read()
 {
 	/* for debug */
 	//if ((m_maincpu->pc()!=m_speedup_address) && (m_speedup_vblank!=1) )
-	//    printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), m_speedup_vblank);
+	//    printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
 	if (m_speedup_vblank==0 && m_speedup_scanline < m_speedup_resume_scanline)
 	{
@@ -1637,11 +1654,12 @@ static const struct
 
 } eolith_speedup_table[] =
 {
-	/* eolith.c */
+	/* eolith.cpp */
 	{ "linkypip", 0x4000825c, -1,/*0x4000ABAE,*/ 240 }, // 2nd address is used on the planet cutscene between but idle skipping between levels, but seems too aggressive
 	{ "ironfort", 0x40020854, -1, 240 },
-	{ "ironfortj",0x40020234, -1, 240 },
+	{ "ironfortc",0x40020234, -1, 240 },
 	{ "hidnctch", 0x4000bba0, -1, 240 },
+	{ "hidnctcha",0x4000bba0, -1, 240 },
 	{ "raccoon",  0x40008204, -1, 240 },
 	{ "puzzlekg", 0x40029458, -1, 240 },
 	{ "hidctch2", 0x40009524, -1, 240 },
@@ -1657,9 +1675,9 @@ static const struct
 	{ "penfana",  0x4001FAb6, -1, 240 },
 	{ "candy",    0x4001990C, -1, 240 },
 	{ "hidnc2k",  0x40016824, -1, 240 },
-	/* eolith16.c */
+	/* eolith16.cpp */
 	{ "klondkp",  0x0001a046, -1, 240 },
-	/* vegaeo.c */
+	/* vegaeo.cpp */
 	{ "crazywar", 0x00008cf8, -1, 240 },
 	{ nullptr, 0, 0 }
 };
@@ -1735,23 +1753,24 @@ CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
  *
  *************************************/
 
-GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, eolith,   ROT0, "Eolith", "Linky Pipe", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith_state, eolith,   ROT0, "Eolith", "Iron Fortress (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidctch2a, hidctch2, eolith50, hidctch2,  eolith_state, eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidnc2k,   0,        eolith50, hidctch2,  eolith_state, hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, landbrk,   0,        eolith45, landbrk,   eolith_state, landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrkb,  landbrk,  eolith45, landbrk,   eolith_state, landbrkb, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 1.0) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or New Teurrin Geurim Chajgi '98
-GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // alt title of Ribbon
-GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, eolith,   ROT0, "Moov Generation / Eolith", "Steal See",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hidctch3,  0,        eolith50, hidctch3,  eolith_state, hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (World) (ver 1.01 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Language selection is greyed out in Service Mode
-GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (Korea) (ver 1.00 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, init_eolith,   ROT0, "Eolith", "Linky Pipe", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, init_eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, init_eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
+GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, hidnctcha, hidnctch, eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, init_eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, init_eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, init_hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidctch2a, hidctch2, eolith50, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidnc2k,   0,        eolith50, hidctch2,  eolith_state, init_hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, landbrk,   0,        eolith45, landbrk,   eolith_state, init_landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrkb,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrkb, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 1.0) (AT89c52 protected)",  MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", MACHINE_SUPPORTS_SAVE ) // or New Teurrin Geurim Chajgi '98
+GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  MACHINE_SUPPORTS_SAVE ) // alt title of Ribbon
+GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, init_eolith,   ROT0, "Moov Generation / Eolith", "Steal See",  MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hidctch3,  0,        hidctch3, hidctch3,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (World) (ver 1.01 / pcb ver 3.05)",  MACHINE_SUPPORTS_SAVE ) // Language selection is greyed out in Service Mode
+GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (Korea) (ver 1.00 / pcb ver 3.05)",  MACHINE_SUPPORTS_SAVE ) // ^^

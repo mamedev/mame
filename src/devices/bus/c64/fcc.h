@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, hap
 /**********************************************************************
 
     Tasc Final ChessCard cartridge emulation
@@ -13,6 +13,7 @@
 
 #include "exp.h"
 #include "cpu/m6502/m65sc02.h"
+#include "machine/gen_latch.h"
 
 
 
@@ -36,7 +37,6 @@ protected:
 	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -46,17 +46,21 @@ protected:
 	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
 
 	// device_c64_expansion_card_interface overrides
-	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
-	virtual void c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 
 private:
 	required_device<m65sc02_device> m_maincpu;
+	required_device<generic_latch_8_device> m_mainlatch;
+	required_device<generic_latch_8_device> m_sublatch;
 
 	uint8_t m_bank;
-	int m_ramen;
+	int m_hidden;
 
-	DECLARE_READ8_MEMBER( nvram_r );
-	DECLARE_WRITE8_MEMBER( nvram_w );
+	DECLARE_WRITE_LINE_MEMBER(mainlatch_int) { m_slot->nmi_w(state); }
+	DECLARE_READ8_MEMBER(rom_r) { return m_romx[offset]; } // cartridge cpu rom
+	DECLARE_READ8_MEMBER(nvram_r) { return m_nvram[offset & m_nvram.mask()]; }
+	DECLARE_WRITE8_MEMBER(nvram_w) { m_nvram[offset & m_nvram.mask()] = data; }
 
 	void c64_fcc_map(address_map &map);
 };

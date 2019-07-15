@@ -26,18 +26,11 @@ TODO:
 
 #pragma once
 
-#include "cdrom.h"
+#include "imagedev/chd_cd.h"
+#include "machine/scc68070.h"
 #include "sound/cdda.h"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDICDIC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_CDICDIC, 0)
-#define MCFG_CDICDIC_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDICDIC, 0)
+#include "sound/dmadac.h"
+#include "cdrom.h"
 
 
 //**************************************************************************
@@ -52,6 +45,12 @@ public:
 	// construction/destruction
 	cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_clock2(uint32_t clock) { m_clock2 = clock; }
+	void set_clock2(const XTAL &xtal) { set_clock2(xtal.value()); }
+	uint32_t clock2() const { return m_clock2; }
+
+	auto intreq_callback() { return m_intreq_callback.bind(); }
+
 	// non-static internal members
 	void sample_trigger();
 	void process_delayed_command();
@@ -61,9 +60,11 @@ public:
 	DECLARE_READ16_MEMBER( ram_r );
 	DECLARE_WRITE16_MEMBER( ram_w );
 
+	uint8_t intack_r();
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -72,6 +73,56 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
+	enum
+	{
+		CDIC_SECTOR_SYNC        = 0,
+
+		CDIC_SECTOR_HEADER      = 12,
+
+		CDIC_SECTOR_MODE        = 15,
+
+		CDIC_SECTOR_FILE1       = 16,
+		CDIC_SECTOR_CHAN1       = 17,
+		CDIC_SECTOR_SUBMODE1    = 18,
+		CDIC_SECTOR_CODING1     = 19,
+
+		CDIC_SECTOR_FILE2       = 20,
+		CDIC_SECTOR_CHAN2       = 21,
+		CDIC_SECTOR_SUBMODE2    = 22,
+		CDIC_SECTOR_CODING2     = 23,
+
+		CDIC_SECTOR_DATA        = 24,
+
+		CDIC_SECTOR_SIZE        = 2352,
+
+		CDIC_SECTOR_DATASIZE    = 2048,
+		CDIC_SECTOR_AUDIOSIZE   = 2304,
+		CDIC_SECTOR_VIDEOSIZE   = 2324,
+
+		CDIC_SUBMODE_EOF        = 0x80,
+		CDIC_SUBMODE_RT         = 0x40,
+		CDIC_SUBMODE_FORM       = 0x20,
+		CDIC_SUBMODE_TRIG       = 0x10,
+		CDIC_SUBMODE_DATA       = 0x08,
+		CDIC_SUBMODE_AUDIO      = 0x04,
+		CDIC_SUBMODE_VIDEO      = 0x02,
+		CDIC_SUBMODE_EOR        = 0x01
+	};
+
+	int is_valid_sample_buf(uint16_t addr) const;
+	double sample_buf_freq(uint16_t addr) const;
+	int sample_buf_size(uint16_t addr) const;
+
+	devcb_write_line m_intreq_callback;
+
+	required_address_space m_memory_space;
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
+	required_device<scc68070_device> m_scc;
+	required_device<cdda_device> m_cdda;
+	optional_device<cdrom_image_device> m_cdrom_dev;
+
+	uint32_t m_clock2;
+
 	// internal state
 	uint16_t m_command;           // CDIC Command Register            (0x303c00)
 	uint32_t m_time;              // CDIC Time Register               (0x303c02)
@@ -115,6 +166,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(MACHINE_CDICDIC, cdicdic_device)
+DECLARE_DEVICE_TYPE(CDI_CDIC, cdicdic_device)
 
 #endif // MAME_MACHINE_CDICDIC_H

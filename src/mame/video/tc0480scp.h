@@ -5,52 +5,47 @@
 
 #pragma once
 
-class tc0480scp_device : public device_t
+enum
+{
+	TC0480SCP_LAYOUT_COMMON = 0, // default layout
+	TC0480SCP_LAYOUT_BOOTLEG // bootleg layout (footchmpbl need this)
+};
+
+class tc0480scp_device : public device_t, public device_gfx_interface
 {
 public:
-	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0480scp_device &>(device).m_gfxnum = gfxregion; }
-	static void set_tx_region(device_t &device, int txregion) { downcast<tc0480scp_device &>(device).m_txnum = txregion; }
-	static void set_col_base(device_t &device, int col) { downcast<tc0480scp_device &>(device).m_col_base = col; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	// configuration
+	void set_gfxlayout(int gfxlayout) { m_gfxlayout = gfxlayout; }
+	void set_col_base(int col) { m_col_base = col; }
+	void set_offsets(int x_offset, int y_offset)
 	{
-		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
-		dev.m_x_offset = x_offset;
-		dev.m_y_offset = y_offset;
+		m_x_offset = x_offset;
+		m_y_offset = y_offset;
 	}
-	static void set_offsets_tx(device_t &device, int x_offset, int y_offset)
+	void set_offsets_tx(int x_offset, int y_offset)
 	{
-		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
-		dev.m_text_xoffs = x_offset;
-		dev.m_text_yoffs = y_offset;
+		m_text_xoffs = x_offset;
+		m_text_yoffs = y_offset;
 	}
-	static void set_offsets_flip(device_t &device, int x_offset, int y_offset)
+	void set_offsets_flip(int x_offset, int y_offset)
 	{
-		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
-		dev.m_flip_xoffs = x_offset;
-		dev.m_flip_yoffs = y_offset;
+		m_flip_xoffs = x_offset;
+		m_flip_yoffs = y_offset;
 	}
 
 	/* When writing a driver, pass zero for the text and flip offsets initially:
 	then tweak them once you have the 4 bg layer positions correct. Col_base
 	may be needed when tilemaps use a palette area from sprites. */
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_READ16_MEMBER( ctrl_word_r );
-	DECLARE_WRITE16_MEMBER( ctrl_word_w );
-
-	/* Functions for use with 68020 (Super-Z system) */
-	DECLARE_READ32_MEMBER( long_r );
-	DECLARE_WRITE32_MEMBER( long_w );
-	DECLARE_READ32_MEMBER( ctrl_long_r );
-	DECLARE_WRITE32_MEMBER( ctrl_long_w );
+	u16 ram_r(offs_t offset);
+	void ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ctrl_r(offs_t offset);
+	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
 
 	/* Returns the priority order of the bg tilemaps set in the internal
 	register. The order in which the four layers should be drawn is
@@ -58,81 +53,49 @@ public:
 	int get_bg_priority();
 
 	/* Undrfire needs to read this for a sprite/tile priority hack */
-	DECLARE_READ8_MEMBER( pri_reg_r );
-
-	void postload();
+	u8 pri_reg_r();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
-	uint16_t           m_ctrl[0x18];
+	u16                m_ctrl[0x18];
 
-	std::vector<uint16_t>   m_ram;
-	uint16_t *         m_bg_ram[4];
-	uint16_t *         m_tx_ram;
-	uint16_t *         m_char_ram;
-	uint16_t *         m_bgscroll_ram[4];
-	uint16_t *         m_rowzoom_ram[4];
-	uint16_t *         m_bgcolumn_ram[4];
-	int              m_bgscrollx[4];
-	int              m_bgscrolly[4];
-	int              m_pri_reg;
+	std::vector<u16>   m_ram;
+	u16 *              m_bgscroll_ram[4];
+	u16 *              m_rowzoom_ram[4];
+	u16 *              m_bgcolumn_ram[4];
+	int                m_bgscrollx[4];
+	int                m_bgscrolly[4];
+	int                m_pri_reg;
+
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_default);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_bootleg);
 
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
-	tilemap_t        *m_tilemap[5][2];
-	int32_t            m_dblwidth;
+	tilemap_t          *m_tilemap[5][2];
+	s32                m_dblwidth;
 
-	int              m_gfxnum;
-	int              m_txnum;
-	int              m_x_offset, m_y_offset;
-	int              m_text_xoffs, m_text_yoffs;
-	int              m_flip_xoffs, m_flip_yoffs;
+	int                m_gfxlayout;
+	int                m_x_offset, m_y_offset;
+	int                m_text_xoffs, m_text_yoffs;
+	int                m_flip_xoffs, m_flip_yoffs;
 
-	int              m_col_base;
+	int                m_col_base;
 
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
-	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
-
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	void dirty_tilemaps();
 	void set_layer_ptrs();
-	void bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority );
-	void bg23_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority );
+	void bg01_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
+	void bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
 };
 
 DECLARE_DEVICE_TYPE(TC0480SCP, tc0480scp_device)
-
-
-#define MCFG_TC0480SCP_GFX_REGION(_region) \
-	tc0480scp_device::set_gfx_region(*device, _region);
-
-#define MCFG_TC0480SCP_TX_REGION(_region) \
-	tc0480scp_device::set_tx_region(*device, _region);
-
-#define MCFG_TC0480SCP_OFFSETS(_xoffs, _yoffs) \
-	tc0480scp_device::set_offsets(*device, _xoffs, _yoffs);
-
-#define MCFG_TC0480SCP_OFFSETS_TX(_xoffs, _yoffs) \
-	tc0480scp_device::set_offsets_tx(*device, _xoffs, _yoffs);
-
-#define MCFG_TC0480SCP_OFFSETS_FLIP(_xoffs, _yoffs) \
-	tc0480scp_device::set_offsets_flip(*device, _xoffs, _yoffs);
-
-#define MCFG_TC0480SCP_COL_BASE(_col) \
-	tc0480scp_device::set_col_base(*device, _col);
-
-#define MCFG_TC0480SCP_GFXDECODE(_gfxtag) \
-	tc0480scp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif // MAME_VIDEO_TC0480SCP_H

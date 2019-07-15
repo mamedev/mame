@@ -175,22 +175,25 @@ Added Multiple Coin Feature:
 class pipedrm_state : public fromance_state
 {
 public:
-	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fromance_state(mconfig, type, tag),
+	pipedrm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		fromance_state(mconfig, type, tag),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void pipedrm(machine_config &config);
+	void hatris(machine_config &config);
+
+	void init_pipedrm();
+	void init_hatris();
+
+private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_MACHINE_START(pipedrm);
 	DECLARE_MACHINE_RESET(pipedrm);
-	DECLARE_DRIVER_INIT(pipedrm);
-	DECLARE_DRIVER_INIT(hatris);
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
-	void pipedrm(machine_config &config);
-	void hatris(machine_config &config);
 	void hatris_sound_portmap(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
@@ -252,26 +255,28 @@ READ8_MEMBER(pipedrm_state::pending_command_r )
  *
  *************************************/
 
-ADDRESS_MAP_START(pipedrm_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void pipedrm_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd000, 0xffff).rw(FUNC(pipedrm_state::fromance_videoram_r), FUNC(pipedrm_state::fromance_videoram_w)).share("videoram");
+}
 
 
-ADDRESS_MAP_START(pipedrm_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE(pipedrm_bankswitch_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("DSW1")
-	AM_RANGE(0x23, 0x23) AM_READ_PORT("DSW2")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x25, 0x25) AM_READ(pending_command_r)
-ADDRESS_MAP_END
+void pipedrm_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
+	map(0x20, 0x20).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x21, 0x21).portr("P2").w(FUNC(pipedrm_state::pipedrm_bankswitch_w));
+	map(0x22, 0x25).w(FUNC(pipedrm_state::fromance_scroll_w));
+	map(0x22, 0x22).portr("DSW1");
+	map(0x23, 0x23).portr("DSW2");
+	map(0x24, 0x24).portr("SYSTEM");
+	map(0x25, 0x25).r(FUNC(pipedrm_state::pending_command_r));
+}
 
 
 
@@ -281,28 +286,31 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(pipedrm_state::sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
-ADDRESS_MAP_END
+void pipedrm_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank2");
+}
 
 
-ADDRESS_MAP_START(pipedrm_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x16, 0x16) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void pipedrm_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x04, 0x04).w(FUNC(pipedrm_state::sound_bankswitch_w));
+	map(0x16, 0x16).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x17, 0x17).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 
-ADDRESS_MAP_START(pipedrm_state::hatris_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x05, 0x05) AM_READ(pending_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+void pipedrm_state::hatris_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x08).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x05, 0x05).r(FUNC(pipedrm_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+}
 
 
 
@@ -524,14 +532,14 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( pipedrm )
+static GFXDECODE_START( gfx_pipedrm )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, splayout, 1024, 32 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( hatris )
+static GFXDECODE_START( gfx_hatris )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 GFXDECODE_END
@@ -571,111 +579,106 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(pipedrm_state::pipedrm)
-
+void pipedrm_state::pipedrm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipedrm_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pipedrm_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(pipedrm_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("sub", Z80,14318000/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	Z80(config, m_subcpu, 14318000/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &pipedrm_state::sound_map);
+	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::sound_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
 	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_pipedrm)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(44*8, 30*8);
+	m_screen->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(pipedrm_state::screen_update_pipedrm));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipedrm)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pipedrm);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
-
-	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR2_SET_OFFSETS(-13, -6)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(3)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old, 0);
+	m_spr_old->set_gfx_region(2);
+	m_spr_old->set_offsets(-13, -6);
+	m_spr_old->set_pritype(3);
+	m_spr_old->set_gfxdecode_tag(m_gfxdecode);
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("sub", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline("sub", 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(pipedrm_state::hatris)
-
+void pipedrm_state::hatris(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipedrm_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pipedrm_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(pipedrm_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("sub", Z80,14318000/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(hatris_sound_portmap)
+	Z80(config, m_subcpu, 14318000/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &pipedrm_state::sound_map);
+	m_subcpu->set_addrmap(AS_IO, &pipedrm_state::hatris_sound_portmap);
 
 	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
 	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_fromance)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(44*8, 30*8);
+	m_screen->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(pipedrm_state::screen_update_fromance));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hatris)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hatris);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->set_separate_acknowledge(true);
 	// Hatris polls commands *and* listens to the NMI; this causes it to miss
 	// sound commands. It's possible the NMI isn't really hooked up on the YM2608
 	// sound board.
-	//MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	//m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("sub", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2608_device &ym2608(YM2608(config, "ymsnd", 8000000));
+	ym2608.irq_handler().set_inputline("sub", 0);
+	ym2608.add_route(0, "mono", 0.50);
+	ym2608.add_route(1, "mono", 1.0);
+	ym2608.add_route(2, "mono", 1.0);
+}
 
 
 
@@ -875,7 +878,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::init_pipedrm()
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
@@ -884,7 +887,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 }
 
 
-DRIVER_INIT_MEMBER(pipedrm_state,hatris)
+void pipedrm_state::init_hatris()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));
 }
@@ -897,9 +900,9 @@ DRIVER_INIT_MEMBER(pipedrm_state,hatris)
  *
  *************************************/
 
-GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatris,   0,       hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (US)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatris,   0,       hatris,  hatris,  pipedrm_state, init_hatris,  ROT0, "Video System Co.", "Hatris (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  pipedrm_state, init_hatris,  ROT0, "Video System Co.", "Hatris (Japan)",      MACHINE_SUPPORTS_SAVE )

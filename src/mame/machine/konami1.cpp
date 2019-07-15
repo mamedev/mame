@@ -37,7 +37,7 @@ konami1_device::mi_konami1::mi_konami1(uint16_t adr)
 
 uint8_t konami1_device::mi_konami1::read_opcode(uint16_t adr)
 {
-	uint8_t val = m_sdirect->read_byte(adr);
+	uint8_t val = m_scache->read_byte(adr);
 	if(adr < m_boundary)
 		return val;
 	switch(adr & 0xa) {

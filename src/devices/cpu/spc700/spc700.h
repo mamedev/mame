@@ -21,6 +21,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 2; }
 	virtual uint32_t execute_max_cycles() const override { return 8; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -33,7 +34,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;

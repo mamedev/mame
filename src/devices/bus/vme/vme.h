@@ -57,12 +57,8 @@
 
 #define VME_BUS_TAG        "vme"
 
-// Callbacks to the board from the VME bus comes through here
-#define MCFG_VME_J1_CB(_devcb) \
-	devcb = &vme_slot_device::static_set_vme_j1_callback(*device, DEVCB_##_devcb);
-
-//SLOT_INTERFACE_EXTERN(vme_slot1); // Disabled until we know how to combine a board driver and a slot device.
-SLOT_INTERFACE_EXTERN(vme_slots);
+//void vme_slot1(device_slot_interface &device); // Disabled until we know how to combine a board driver and a slot device.
+void vme_slots(device_slot_interface &device);
 
 class device_vme_card_interface; // This interface is standardized
 
@@ -89,12 +85,25 @@ public:
 	};
 
 	// construction/destruction
+	template <typename T>
+	vme_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, uint32_t slot_nbr, char const *bus_tag)
+		: vme_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_vme_slot(bus_tag, tag);
+		update_vme_chains(slot_nbr);
+	}
+
 	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &static_set_vme_j1_callback(device_t &device, Object &&cb)  { return downcast<vme_slot_device &>(device).m_vme_j1_callback.set_callback(std::forward<Object>(cb)); }
+	// Callbacks to the board from the VME bus comes through here
+	auto vme_j1_callback()  { return m_vme_j1_callback.bind(); }
 
-	static void static_set_vme_slot(device_t &device, const char *tag, const char *slottag);
-	static void static_update_vme_chains(device_t &device, uint32_t slot_nbr);
+	void set_vme_slot(const char *tag, const char *slottag);
+	void update_vme_chains(uint32_t slot_nbr);
 
 	virtual DECLARE_READ8_MEMBER(read8);
 	virtual DECLARE_WRITE8_MEMBER(write8);
@@ -116,18 +125,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(VME, vme_device)
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VME_DEVICE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, VME, 0)
-
-#define MCFG_VME_CPU(_cputag) \
-	vme_device::static_set_cputag(*device, _cputag);
-
-#define MCFG_VME_BUS_OWNER_SPACES() \
-	vme_device::static_use_owner_spaces(*device);
 
 class vme_card_interface;
 
@@ -139,8 +136,8 @@ public:
 	~vme_device();
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_use_owner_spaces(device_t &device);
+	void set_cputag(const char *tag) { m_cputag = tag; }
+	void use_owner_spaces();
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -185,6 +182,8 @@ public:
 		AMOD_STANDARD_SUPERVIS_BLK  = 0x3F
 	};
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask);
+	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler, uint32_t mask);
+	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler, uint32_t mask);
 	//  void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask);
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask);
@@ -219,7 +218,7 @@ class device_vme_card_interface : public device_slot_card_interface
 	template <class ElementType> friend class simple_list;
 public:
 	// inline configuration
-	static void static_set_vme_tag(device_t &device, const char *tag, const char *slottag);
+	void set_vme_tag(const char *tag, const char *slottag);
 
 	// construction/destruction
 	virtual ~device_vme_card_interface();
@@ -240,16 +239,5 @@ protected:
 private:
 	device_vme_card_interface *m_next;
 };
-
-#define MCFG_VME_SLOT_ADD(_tag, _slotnbr, _slot_intf,_def_slot)            \
-	{   std::string stag = "slot" + std::to_string(_slotnbr);              \
-		MCFG_DEVICE_ADD(stag.c_str(), VME_SLOT, 0);                        \
-		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);          \
-		vme_slot_device::static_set_vme_slot(*device, _tag, stag.c_str()); \
-		vme_slot_device::static_update_vme_chains(*device, _slotnbr);      \
-	}
-
-#define MCFG_VME_SLOT_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
 
 #endif // MAME_BUS_VME_VME_H

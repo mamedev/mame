@@ -264,15 +264,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 TODO:
 -----
 
-- With the correct clock speed of 12MHz for the 68000, garbage graphics remain
-  over the Taito logo on startup. This seems to be a bug in the original which
-  would have no effect if our timing was 100% right. The interrupt handling
-  should be quite correct, it's derived straight from the schematics and PAL
-  dump.
-  The current workaround is to make the 68000 run at 13MHz. Lowering below
-  12MHz would work as well, and possibly be closer to the real reason (wait
-  states slowing the CPU down?)
-
 - The "FIRE!" arrows pointing to padlocks are not in perfect sync with the
   background scrolling. Should they?
 
@@ -291,6 +282,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -302,45 +294,30 @@ TODO:
                 INTERRUPTS
 ***********************************************************/
 
-void othunder_state::update_irq()
-{
-	m_maincpu->set_input_line(6, m_ad_irq ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(5, m_vblank_irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE16_MEMBER(othunder_state::irq_ack_w)
+void othunder_state::irq_ack_w(offs_t offset, u16 data)
 {
 	switch (offset)
 	{
 		case 0:
-			m_vblank_irq = 0;
+			m_maincpu->set_input_line(5, CLEAR_LINE);
 			break;
 
 		case 1:
-			m_ad_irq = 0;
+			m_maincpu->set_input_line(6, CLEAR_LINE);
 			break;
 	}
-
-	update_irq();
 }
 
-INTERRUPT_GEN_MEMBER(othunder_state::vblank_interrupt)
+WRITE_LINE_MEMBER( othunder_state::vblank_w )
 {
-	m_vblank_irq = 1;
-	update_irq();
+	if (state)
+		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-void othunder_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER( othunder_state::adc_eoc_w )
 {
-	switch (id)
-	{
-	case TIMER_AD_INTERRUPT:
-		m_ad_irq = 1;
-		update_irq();
-		break;
-	default:
-		assert_always(false, "Unknown id in othunder_state::device_timer");
-	}
+	if (state)
+		m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
 
@@ -352,7 +329,7 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-WRITE8_MEMBER(othunder_state::eeprom_w)
+void othunder_state::eeprom_w(u8 data)
 {
 
 /*              0000000x    SOL-1 (gun solenoid)
@@ -376,7 +353,7 @@ WRITE8_MEMBER(othunder_state::eeprom_w)
 	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(othunder_state::coins_w)
+void othunder_state::coins_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -385,59 +362,16 @@ WRITE8_MEMBER(othunder_state::coins_w)
 }
 
 
-/**********************************************************
-            GAME INPUTS
-**********************************************************/
-
-#define P1X_PORT_TAG     "P1X"
-#define P1Y_PORT_TAG     "P1Y"
-#define P2X_PORT_TAG     "P2X"
-#define P2Y_PORT_TAG     "P2Y"
-#define ROTARY_PORT_TAG  "ROTARY"
-
-READ16_MEMBER(othunder_state::lightgun_r)
-{
-	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return ioport(portname[offset])->read();
-}
-
-WRITE16_MEMBER(othunder_state::lightgun_w)
-{
-	/* A write starts the A/D conversion. An interrupt will be triggered when
-	   the conversion is complete.
-	   The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
-	   cycles, so would end in a maximum of 15.625us. We'll use 10. */
-
-	m_ad_interrupt_timer->adjust(attotime::from_usec(10));
-}
-
-
 /*****************************************
             SOUND
 *****************************************/
 
-WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
+void othunder_state::sound_bankswitch_w(u8 data)
 {
-	membank("z80bank")->set_entry(data & 3);
+	m_z80bank->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(othunder_state::sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-}
-
-READ16_MEMBER(othunder_state::sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
-	else
-		return 0;
-}
-
-WRITE8_MEMBER(othunder_state::tc0310fam_w)
+void othunder_state::tc0310fam_w(offs_t offset, u8 data)
 {
 	/* there are two TC0310FAM, one for CH1 and one for CH2 from the YM2610. The
 	   PSG output is routed to both chips. */
@@ -470,37 +404,40 @@ WRITE8_MEMBER(othunder_state::tc0310fam_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(othunder_state::othunder_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
+void othunder_state::othunder_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08ffff).ram();
+	map(0x090000, 0x09000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
-	AM_RANGE(0x100000, 0x100007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_rbswap_word_w)   /* palette */
-	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
-	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x300000, 0x300003) AM_READWRITE(sound_r, sound_w)
-	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE(lightgun_r, lightgun_w)
-	AM_RANGE(0x600000, 0x600003) AM_WRITE(irq_ack_w)
-ADDRESS_MAP_END
+	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
+	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x300001, 0x300001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x300003, 0x300003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x400000, 0x4005ff).ram().share("spriteram");
+	map(0x500000, 0x500007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
+	map(0x600000, 0x600003).w(FUNC(othunder_state::irq_ack_w));
+}
 
 
 /***************************************************************************/
 
-ADDRESS_MAP_START(othunder_state::z80_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(tc0310fam_w) /* pan */
-	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
-	AM_RANGE(0xea00, 0xea00) AM_READ_PORT(ROTARY_PORT_TAG)  /* rotary input */
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void othunder_state::z80_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xe400, 0xe403).w(FUNC(othunder_state::tc0310fam_w)); /* pan */
+	map(0xe600, 0xe600).nopw(); /* ? */
+	map(0xea00, 0xea00).portr("ROTARY");  /* rotary input */
+	map(0xee00, 0xee00).nopw(); /* ? */
+	map(0xf000, 0xf000).nopw(); /* ? */
+	map(0xf200, 0xf200).w(FUNC(othunder_state::sound_bankswitch_w));
+}
 
 
 
@@ -567,20 +504,20 @@ static INPUT_PORTS_START( othunder )
 	   enough and being accurate enough not to miss targets. 20 is too
 	   inaccurate, and 10 is too slow. */
 
-	PORT_START(P1X_PORT_TAG)
+	PORT_START("P1X")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START(P1Y_PORT_TAG)
+	PORT_START("P1Y")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, -0.057, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_PLAYER(1)
 
-	PORT_START(P2X_PORT_TAG)
+	PORT_START("P2X")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START(P2Y_PORT_TAG)
+	PORT_START("P2Y")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, -0.057, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_PLAYER(2)
 
 	/* rotary volume control */
-	PORT_START(ROTARY_PORT_TAG)
+	PORT_START("ROTARY")
 	PORT_CONFNAME( 0x07, 0x07, "Stereo Separation" )
 	PORT_CONFSETTING(    0x07, "Maximum" )
 	PORT_CONFSETTING(    0x03, DEF_STR( High ) )
@@ -618,26 +555,14 @@ static const gfx_layout tile16x8_layout =
 	16,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+	{ STEP4(0,16) },
+	{ STEP16(0,1) },
+	{ STEP8(0,16*4) },
 	64*8
 };
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static GFXDECODE_START( othunder )
-	GFXDECODE_ENTRY( "gfx2", 0, tile16x8_layout, 0, 256 )   /* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 256 )   /* sprites & playfield */
+static GFXDECODE_START( gfx_othunder )
+	GFXDECODE_ENTRY( "sprites", 0, tile16x8_layout, 0, 256 )   /* sprite parts */
 GFXDECODE_END
 
 
@@ -647,96 +572,79 @@ GFXDECODE_END
 
 void othunder_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_ad_interrupt_timer = timer_alloc(TIMER_AD_INTERRUPT);
-
-	save_item(NAME(m_vblank_irq));
-	save_item(NAME(m_ad_irq));
 	save_item(NAME(m_pan));
 }
 
-void othunder_state::machine_reset()
+void othunder_state::othunder(machine_config &config)
 {
-	m_vblank_irq = 0;
-	m_ad_irq = 0;
-}
-
-MACHINE_CONFIG_START(othunder_state::othunder)
-
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
-	MCFG_CPU_ADD("maincpu", M68000, 13000000 )  /* fixes garbage graphics on startup */
-	MCFG_CPU_PROGRAM_MAP(othunder_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", othunder_state, vblank_interrupt)
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &othunder_state::othunder_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/2/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &othunder_state::z80_sound_map);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
+	adc0808_device &adc(ADC0808(config, "adc", 16_MHz_XTAL/2/2/8));
+	adc.eoc_callback().set(FUNC(othunder_state::adc_eoc_w));
+	adc.in_callback<0>().set_ioport("P1X");
+	adc.in_callback<1>().set_ioport("P1Y");
+	adc.in_callback<2>().set_ioport("P2X");
+	adc.in_callback<3>().set_ioport("P2Y");
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(othunder_state, eeprom_w))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(othunder_state, coins_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	TC0220IOC(config, m_tc0220ioc, 0);
+	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0220ioc->read_2_callback().set_ioport("IN0");
+	m_tc0220ioc->read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	m_tc0220ioc->write_3_callback().set(FUNC(othunder_state::eeprom_w));
+	m_tc0220ioc->write_4_callback().set(FUNC(othunder_state::coins_w));
+	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(othunder_state::screen_update));
+	screen.set_palette(m_tc0110pcr);
+	screen.screen_vblank().set(FUNC(othunder_state::vblank_w));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_othunder);
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_OFFSETS(4, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_offsets(4, 0);
+	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	MCFG_TC0110PCR_ADD("tc0110pcr")
-	MCFG_TC0110PCR_PALETTE("palette")
+	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "2610.0l", 0.25)
-	MCFG_SOUND_ROUTE(0, "2610.0r", 0.25)
-	MCFG_SOUND_ROUTE(1, "2610.1l", 1.0)
-	MCFG_SOUND_ROUTE(1, "2610.1r", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2l", 1.0)
-	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "2610.0l", 0.25);
+	ymsnd.add_route(0, "2610.0r", 0.25);
+	ymsnd.add_route(1, "2610.1l", 1.0);
+	ymsnd.add_route(1, "2610.1r", 1.0);
+	ymsnd.add_route(2, "2610.2l", 1.0);
+	ymsnd.add_route(2, "2610.2r", 1.0);
 
-	MCFG_FILTER_VOLUME_ADD("2610.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.1l").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.1r").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
-
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_maincpu);
+	m_tc0140syt->set_slave_tag(m_audiocpu);
+}
 
 
 /***************************************************************************
@@ -753,16 +661,16 @@ ROM_START( othunder )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD64_WORD_SWAP( "b67-02.ic2", 0x00002, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD64_WORD_SWAP( "b67-03.ic3", 0x00004, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD64_WORD_SWAP( "b67-04.ic4", 0x00006, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -791,16 +699,16 @@ ROM_START( othundero )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD64_WORD_SWAP( "b67-02.ic2", 0x00002, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD64_WORD_SWAP( "b67-03.ic3", 0x00004, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD64_WORD_SWAP( "b67-04.ic4", 0x00006, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -829,16 +737,16 @@ ROM_START( othunderu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD64_WORD_SWAP( "b67-02.ic2", 0x00002, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD64_WORD_SWAP( "b67-03.ic3", 0x00004, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD64_WORD_SWAP( "b67-04.ic4", 0x00006, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -867,16 +775,16 @@ ROM_START( othunderuo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD64_WORD_SWAP( "b67-02.ic2", 0x00002, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD64_WORD_SWAP( "b67-03.ic3", 0x00004, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD64_WORD_SWAP( "b67-04.ic4", 0x00006, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -905,16 +813,16 @@ ROM_START( othunderj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD64_WORD_SWAP( "b67-02.ic2", 0x00002, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD64_WORD_SWAP( "b67-03.ic3", 0x00004, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD64_WORD_SWAP( "b67-04.ic4", 0x00006, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -943,16 +851,16 @@ ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a small
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
-	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
-	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
-	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD64_WORD_SWAP( "b67-02.ic2", 0x00002, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD64_WORD_SWAP( "b67-03.ic3", 0x00004, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD64_WORD_SWAP( "b67-04.ic4", 0x00006, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -971,9 +879,9 @@ ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a small
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
-GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

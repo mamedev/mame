@@ -7,14 +7,16 @@
     Commodore 1541/1571 GCR disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_G64_DSK_H
+#define MAME_FORMATS_G64_DSK_H
 
-#ifndef G64_DSK_H_
-#define G64_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 #include "imageutl.h"
 
-class g64_format : public floppy_image_format_t {
+class g64_format : public floppy_image_format_t
+{
 public:
 	g64_format();
 
@@ -50,4 +52,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_G64_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_G64_DSK_H

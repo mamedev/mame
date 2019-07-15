@@ -29,15 +29,14 @@ DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_svga_et4k_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", tseng_vga_device, screen_update)
+void isa8_svga_et4k_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(tseng_vga_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
-	MCFG_DEVICE_ADD("vga", TSENG_VGA, 0)
-MACHINE_CONFIG_END
+	TSENG_VGA(config, "vga", 0).set_screen("screen");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -74,13 +73,9 @@ void isa8_svga_et4k_device::device_start()
 
 	m_vga = subdevice<tseng_vga_device>("vga");
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000", "et4000");
-
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(tseng_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(tseng_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(tseng_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03d0_w),m_vga));
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(tseng_vga_device::mem_r),m_vga), write8_delegate(FUNC(tseng_vga_device::mem_w),m_vga));
+	map_io();
+	map_ram();
+	map_rom();
 }
 
 //-------------------------------------------------
@@ -89,4 +84,37 @@ void isa8_svga_et4k_device::device_start()
 
 void isa8_svga_et4k_device::device_reset()
 {
+}
+
+//-------------------------------------------------
+//  remap - remap ram/io since something
+//  could have unmapped it
+//-------------------------------------------------
+
+void isa8_svga_et4k_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		map_ram();
+		map_rom();
+	}
+	else if (space_id == AS_IO)
+		map_io();
+}
+
+void isa8_svga_et4k_device::map_io()
+{
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(tseng_vga_device::port_03b0_r), m_vga), write8_delegate(FUNC(tseng_vga_device::port_03b0_w), m_vga));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(tseng_vga_device::port_03c0_r), m_vga), write8_delegate(FUNC(tseng_vga_device::port_03c0_w), m_vga));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(tseng_vga_device::port_03d0_r), m_vga), write8_delegate(FUNC(tseng_vga_device::port_03d0_w), m_vga));
+}
+
+void isa8_svga_et4k_device::map_ram()
+{
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(tseng_vga_device::mem_r), m_vga), write8_delegate(FUNC(tseng_vga_device::mem_w), m_vga));
+}
+
+void isa8_svga_et4k_device::map_rom()
+{
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000", "et4000");
 }

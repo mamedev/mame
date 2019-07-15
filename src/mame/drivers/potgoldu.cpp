@@ -28,17 +28,21 @@ class potgold_state : public driver_device
 {
 public:
 	potgold_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-		required_device<cpu_device> m_maincpu;
+	void potgold(machine_config &config);
 
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	void potgold(machine_config &config);
+
 	void potgold_map(address_map &map);
+
+	required_device<tms34010_device> m_maincpu;
 };
 
 
@@ -64,32 +68,33 @@ void potgold_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(potgold_state::potgold_map)
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void potgold_state::potgold_map(address_map &map)
+{
+	map(0xff000000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 static INPUT_PORTS_START( potgold )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(potgold_state::potgold)
-
+void potgold_state::potgold(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(potgold_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(potgold_state, scanline_update)  /* scanline callback (rgb32) */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &potgold_state::potgold_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(potgold_state::scanline_update));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	/* YM2413 */
-MACHINE_CONFIG_END
+}
 
 ROM_START( potgoldu )
 	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
@@ -110,16 +115,16 @@ ROM_END
 ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAMDAC + SC28L198A1A UART + EPM7192SQC160-10 CPLD
 	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* 34010 code */
 
-	ROM_LOAD16_BYTE( "POG_580F.U4", 0x180000, 0x80000, CRC(087704d2) SHA1(915c0c57d014d04d5016099915b754e7592cbb0d) )
-	ROM_LOAD16_BYTE( "POG_580F.U7", 0x180001, 0x80000, CRC(4b76499b) SHA1(3d377107a201607d63f802f54771ae562b60ae27) )
+	ROM_LOAD16_BYTE( "pog_580f.u4", 0x180000, 0x80000, CRC(087704d2) SHA1(915c0c57d014d04d5016099915b754e7592cbb0d) )
+	ROM_LOAD16_BYTE( "pog_580f.u7", 0x180001, 0x80000, CRC(4b76499b) SHA1(3d377107a201607d63f802f54771ae562b60ae27) )
 
-	ROM_LOAD16_BYTE( "POG_580F.U5", 0x280000, 0x80000, CRC(64c3b488) SHA1(30564feee544f7b4d1d48c68dbfcd6ae0ae1b220) )
-	ROM_LOAD16_BYTE( "POG_580F.U8", 0x280001, 0x80000, CRC(cca108a4) SHA1(edd46df79bd8835ca61b5d48277de4a70a83e2a0) )
+	ROM_LOAD16_BYTE( "pog_580f.u5", 0x280000, 0x80000, CRC(64c3b488) SHA1(30564feee544f7b4d1d48c68dbfcd6ae0ae1b220) )
+	ROM_LOAD16_BYTE( "pog_580f.u8", 0x280001, 0x80000, CRC(cca108a4) SHA1(edd46df79bd8835ca61b5d48277de4a70a83e2a0) )
 
 	// Dumper's note: Not included is the "Security" chip needed to run the game. However from what I can tell the chip only collates the bins, dumps them to ram, and keeps settings.
 	ROM_REGION( 0x2000, "mcu", 0 )  /* 68H705 (68hc705??) microcontroller */
 	ROM_LOAD( "mc68h705",     0x0000, 0x2000, NO_DUMP ) // not sure which type of mcu this is, size is a guess
 ROM_END
 
-GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
-GAME( 200?, potgoldu580, potgoldu, potgold,   potgold, potgold_state,   0, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu580, potgoldu, potgold,   potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )

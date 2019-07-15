@@ -143,9 +143,9 @@ void galpani2_state::machine_reset()
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
-static void galpani2_write_kaneko(device_t *device)
+static void galpani2_write_kaneko(cpu_device *cpu)
 {
-	address_space &dstspace = device->memory().space(AS_PROGRAM);
+	address_space &dstspace = cpu->space(AS_PROGRAM);
 	int i,x,tpattidx;
 	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
 
@@ -347,54 +347,56 @@ WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 }
 
 
-ADDRESS_MAP_START(galpani2_state::galpani2_mem1)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("ram")     // Work RAM
-	AM_RANGE(0x110000, 0x11000f) AM_RAM                                             // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
-	AM_RANGE(0x300000, 0x301fff) AM_RAM                                             // ?
-	AM_RANGE(0x302000, 0x303fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x304000, 0x30401f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-//  AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
-//  AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
-	AM_RANGE(0x310000, 0x3101ff) AM_RAM_DEVWRITE("bg8palette", palette_device, write16) AM_SHARE("bg8palette")    // ?
-	AM_RANGE(0x314000, 0x314001) AM_WRITENOP                                        // ? flip backgrounds ?
-	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w) // EEPROM
-	AM_RANGE(0x380000, 0x387fff) AM_RAM                                             // Palette?
-	AM_RANGE(0x388000, 0x38ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
-//  AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
+void galpani2_state::galpani2_mem1(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                  // ROM
+	map(0x100000, 0x10ffff).ram().share("ram");                     // Work RAM
+	map(0x110000, 0x11000f).ram();                                  // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
+	map(0x300000, 0x301fff).ram();                                  // ?
+	map(0x302000, 0x303fff).ram().share("spriteram");               // Sprites
+	map(0x304000, 0x30401f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::regs_r), FUNC(kaneko16_sprite_device::regs_w));
+//  map(0x308000, 0x308001).nopw();                                 // ? 0 at startup
+	map(0x30c000, 0x30c001).nopw();                                 // ? hblank effect ?
+	map(0x310000, 0x3101ff).ram().w(m_bg8palette, FUNC(palette_device::write16)).share("bg8palette");    // ?
+	map(0x314000, 0x314001).nopw();                                 // ? flip backgrounds ?
+	map(0x318000, 0x318001).rw(FUNC(galpani2_state::galpani2_eeprom_r), FUNC(galpani2_state::galpani2_eeprom_w)); // EEPROM
+	// TODO: writes fadeout palettes for gal select after selection!?
+	map(0x380000, 0x387fff).ram();                                  // Palette?
+	map(0x388000, 0x38ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
+//  map(0x390000, 0x3901ff).nopw();                                 // ? at startup of service mode
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("bg8.0")    // Background 0
-	AM_RANGE(0x440000, 0x440001) AM_RAM AM_SHARE("bg8_scrolly.0")           // Background 0 Scroll Y
-	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg8_scrollx.0")           // Background 0 Scroll X
-//  AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("bg8.1")    // Background 1
-	AM_RANGE(0x540000, 0x540001) AM_RAM AM_SHARE("bg8_scrolly.1")           // Background 1 Scroll Y
-	AM_RANGE(0x580000, 0x580001) AM_RAM AM_SHARE("bg8_scrollx.1")           // Background 1 Scroll X
-//  AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP                                        // ? 0 at startup only
+	map(0x400000, 0x43ffff).ram().share("bg8.0");                   // Background 0
+	map(0x440000, 0x440001).ram().share("bg8_scrolly.0");           // Background 0 Scroll Y
+	map(0x480000, 0x480001).ram().share("bg8_scrollx.0");           // Background 0 Scroll X
+//  map(0x4c0000, 0x4c0001).nopw();                                 // ? 0 at startup only
+	map(0x500000, 0x53ffff).ram().share("bg8.1");                   // Background 1
+	map(0x540000, 0x540001).ram().share("bg8_scrolly.1");           // Background 1 Scroll Y
+	map(0x580000, 0x580001).ram().share("bg8_scrollx.1");           // Background 1 Scroll X
+//  map(0x5c0000, 0x5c0001).nopw();                                 // ? 0 at startup only
 
-	AM_RANGE(0x540572, 0x540573) AM_READNOP                                         // ? galpani2 at F0A4
-	AM_RANGE(0x54057a, 0x54057b) AM_READNOP                                         // ? galpani2 at F148
-	AM_RANGE(0x54059a, 0x54059b) AM_READNOP                                         // ? galpani2 at F0A4
-	AM_RANGE(0x5405a2, 0x5405a3) AM_READNOP                                         // ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405aa, 0x5405ab) AM_READNOP                                         // ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405b2, 0x5405b3) AM_READNOP                                         // ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405ba, 0x5405bb) AM_READNOP                                         // ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405c2, 0x5405c3) AM_READNOP                                         // ? galpani2 at F0A4 and F148
-	AM_RANGE(0x5405ca, 0x5405cb) AM_READNOP                                         // ? galpani2 at F148
+	map(0x540572, 0x540573).nopr();                                         // ? galpani2 at F0A4
+	map(0x54057a, 0x54057b).nopr();                                         // ? galpani2 at F148
+	map(0x54059a, 0x54059b).nopr();                                         // ? galpani2 at F0A4
+	map(0x5405a2, 0x5405a3).nopr();                                         // ? galpani2 at F0A4 and F148
+	map(0x5405aa, 0x5405ab).nopr();                                         // ? galpani2 at F0A4 and F148
+	map(0x5405b2, 0x5405b3).nopr();                                         // ? galpani2 at F0A4 and F148
+	map(0x5405ba, 0x5405bb).nopr();                                         // ? galpani2 at F0A4 and F148
+	map(0x5405c2, 0x5405c3).nopr();                                         // ? galpani2 at F0A4 and F148
+	map(0x5405ca, 0x5405cb).nopr();                                         // ? galpani2 at F148
 
-	AM_RANGE(0x600000, 0x600001) AM_NOP                                        // Watchdog
-	AM_RANGE(0x640000, 0x640001) AM_WRITE8(galpani2_mcu_init_w, 0x00ff          )   // ? 0 before resetting and at startup, Reset mcu ?
-	AM_RANGE(0x680000, 0x680001) AM_WRITE8(galpani2_mcu_nmi1_w, 0x00ff)             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
-	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE8(galpani2_coin_lockout_w, 0xff00      )   // Coin + Card Lockout
-	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("DSW1_P1")
-	AM_RANGE(0x780002, 0x780003) AM_READ_PORT("DSW2_P2")
-	AM_RANGE(0x780004, 0x780005) AM_READ_PORT("SPECIAL")
-	AM_RANGE(0x780006, 0x780007) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff  )   // 2 x OKIM6295
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff  )   //
-	AM_RANGE(0xc80000, 0xc80001) AM_WRITE8(galpani2_oki1_bank_w, 0x00ff         )   //
-	AM_RANGE(0xcc0000, 0xcc0001) AM_WRITE8(galpani2_oki2_bank_w, 0x00ff         )   //
-ADDRESS_MAP_END
+	map(0x600000, 0x600001).noprw();                                        // Watchdog
+	map(0x640001, 0x640001).w(FUNC(galpani2_state::galpani2_mcu_init_w));   // ? 0 before resetting and at startup, Reset mcu ?
+	map(0x680001, 0x680001).w(FUNC(galpani2_state::galpani2_mcu_nmi1_w));             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
+	map(0x6c0000, 0x6c0000).w(FUNC(galpani2_state::galpani2_coin_lockout_w));   // Coin + Card Lockout
+	map(0x780000, 0x780001).portr("DSW1_P1");
+	map(0x780002, 0x780003).portr("DSW2_P2");
+	map(0x780004, 0x780005).portr("SPECIAL");
+	map(0x780006, 0x780007).portr("SERVICE");
+	map(0xc00001, 0xc00001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // 2 x OKIM6295
+	map(0xc40001, 0xc40001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   //
+	map(0xc80001, 0xc80001).w(FUNC(galpani2_state::galpani2_oki1_bank_w));   //
+	map(0xcc0001, 0xcc0001).w(FUNC(galpani2_state::galpani2_oki2_bank_w));   //
+}
 
 
 /***************************************************************************
@@ -415,20 +417,21 @@ WRITE16_MEMBER(galpani2_state::subdatabank_select_w)
 }
 
 
-ADDRESS_MAP_START(galpani2_state::galpani2_mem2)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                             // ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("ram2")                                        // Work RAM
-	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_SHARE("bg15")  // bg15
-//  AM_RANGE(0x600000, 0x600001) AM_NOP // ? 0 at startup only
-//  AM_RANGE(0x640000, 0x640001) AM_WRITENOP                                // ? 0 at startup only
-//  AM_RANGE(0x680000, 0x680001) AM_WRITENOP                                // ? 0 at startup only
-//  AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP                                // ? 0 at startup only
-	AM_RANGE(0x700000, 0x700001) AM_NOP                                 // Watchdog
-//  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
-	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)             // ? 0 -> 1 -> 0 (lev 5)
-	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(subdatabank_select_w)   // Rom Bank
-	AM_RANGE(0x800000, 0xffffff) AM_ROMBANK("subdatabank")
-ADDRESS_MAP_END
+void galpani2_state::galpani2_mem2(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                                                             // ROM
+	map(0x100000, 0x13ffff).ram().share("ram2");                                        // Work RAM
+	map(0x400000, 0x5fffff).ram().share("bg15");  // bg15
+//  map(0x600000, 0x600001).noprw();                               // ? 0 at startup only
+//  map(0x640000, 0x640001).nopw();                                // ? 0 at startup only
+//  map(0x680000, 0x680001).nopw();                                // ? 0 at startup only
+//  map(0x6c0000, 0x6c0001).nopw();                                // ? 0 at startup only
+	map(0x700000, 0x700001).noprw();                               // Watchdog
+//  map(0x740000, 0x740001).nopw();                                // ? Reset mcu
+	map(0x780001, 0x780001).w(FUNC(galpani2_state::galpani2_mcu_nmi2_w));    // ? 0 -> 1 -> 0 (lev 5)
+	map(0x7c0000, 0x7c0001).w(FUNC(galpani2_state::subdatabank_select_w));   // Rom Bank
+	map(0x800000, 0xffffff).bankr("subdatabank");
+}
 
 /***************************************************************************
 
@@ -517,9 +520,9 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD full
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD full
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD empty
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD full
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD full
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD empty
 
 	PORT_START("SERVICE")   /* 780006.w */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -548,33 +551,6 @@ static INPUT_PORTS_START( gp2se )
 
 	//missing "test" input
 INPUT_PORTS_END
-
-/***************************************************************************
-
-
-                                Graphics Layouts
-
-
-***************************************************************************/
-
-/*
-    16x16x8 made of four 8x8x8 tiles arranged like: 01
-                                                    23
-*/
-static const gfx_layout layout_16x16x8 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8),   STEP8(8*8*8*1,8)   },
-	{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
-	16*16*8
-};
-
-static GFXDECODE_START( galpani2 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0,  0x40    ) // [0] Sprites
-GFXDECODE_END
 
 /***************************************************************************
 
@@ -619,53 +595,45 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 		m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(galpani2_state::galpani2)
-
+void galpani2_state::galpani2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(27'000'000)/2)       /* Confirmed on galpani2i PCB */
-	MCFG_CPU_PROGRAM_MAP(galpani2_mem1)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("m_scantimer", galpani2_state, galpani2_interrupt1, "screen", 0, 1)
-	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	M68000(config, m_maincpu, XTAL(27'000'000)/2);       /* Confirmed on galpani2i PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galpani2_state::galpani2_mem1);
+	TIMER(config, "m_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt1), "screen", 0, 1);
+	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(27'000'000)/2)           /* Confirmed on galpani2i PCB */
-	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
+	M68000(config, m_subcpu, XTAL(27'000'000)/2);           /* Confirmed on galpani2i PCB */
+	m_subcpu->set_addrmap(AS_PROGRAM, &galpani2_state::galpani2_mem2);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt2), "screen", 0, 1);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 0, 256-1-16);
+	screen.set_screen_update(FUNC(galpani2_state::screen_update_galpani2));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpani2)
-	MCFG_PALETTE_ADD("palette", 0x4000)    // sprites
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000); // sprites
+	PALETTE(config, m_bg8palette).set_format(palette_device::xGRB_555, 0x200 / 2); // bg8
+	PALETTE(config, m_bg15palette, palette_device::GRB_555); // 32768 static colors for the bg
 
-	MCFG_PALETTE_ADD("bg8palette", 0x200/2) // bg8
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-
-	MCFG_PALETTE_ADD("bgpalette", 32768) /* 32768 static colors for the bg */
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	MCFG_PALETTE_INIT_OWNER(galpani2_state,galpani2)
-
-	MCFG_DEVICE_ADD_KC002_SPRITES
-	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x16c0 + 0xc00, 0);
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
-
+	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_offsets(0x10000 - 0x16c0 + 0xc00, 0);
+	m_kaneko_spr->set_palette(m_palette);
+	m_kaneko_spr->set_color_base(0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(20'000'000)/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	OKIM6295(config, "oki1", XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "lspeaker", 1.0);    /* Confirmed on galpani2i PCB */
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(20'000'000)/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "rspeaker", 1.0);    /* Confirmed on galpani2i PCB */
+}
 
 
 /***************************************************************************
@@ -765,7 +733,7 @@ ROM_START( galpani2 )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -811,7 +779,7 @@ ROM_START( galpani2e )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -858,7 +826,7 @@ ROM_START( galpani2i )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -907,7 +875,7 @@ ROM_START( galpani2gs ) // basically the same as the Italy set but with differen
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -957,7 +925,7 @@ ROM_START( galpani2g )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -1009,7 +977,7 @@ ROM_START( galpani2e2 )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -1059,7 +1027,7 @@ ROM_START( galpani2t )
 	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
 	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
 	ROM_CONTINUE(            0x000000, 0x080000             )
 	ROM_LOAD( "gp2-201.047", 0x180000, 0x080000, CRC(2f6392b4) SHA1(67446974c00481a7a806f4bc5b10eb6e442a1186) )
@@ -1117,7 +1085,7 @@ ROM_START( galpani2j )
 	ROM_LOAD16_BYTE( "gp2-303a.179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
 	ROM_LOAD16_BYTE( "gp2-303b.180", 0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200j.189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
 	ROM_LOAD( "gp2-201j.171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
 	ROM_LOAD16_BYTE( "g204j0.169", 0x400000, 0x040000, CRC(212d8aab) SHA1(459f556978ef9a103279cf633fcc1cacb367ea61) )
@@ -1152,7 +1120,7 @@ ROM_START( gp2se )
 	ROM_LOAD16_BYTE( "g305aj4.u160", 0x900000, 0x080000, CRC(2d4a8fbb) SHA1(8a00e6ba4e061678da4c41446df7278c9b4f26c2) )
 	ROM_LOAD16_BYTE( "g305bj4.u161", 0x900001, 0x080000, CRC(53d13974) SHA1(29ca4d36f2a8153228c2eec8e9ef6a6bf712cb59) )
 
-	ROM_REGION( 0x500000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
 	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
 	ROM_LOAD16_BYTE( "g204aj4.u169", 0x400000, 0x080000, CRC(e5e32820) SHA1(9bdc0717feb8983c0d6d5edaa08bcebad4baace0) )
@@ -1185,7 +1153,7 @@ ROM_START( gp2quiz )
 	ROM_LOAD16_BYTE( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
 	ROM_LOAD16_BYTE( "gp2-303b-0064.u180", 0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
 
-	ROM_REGION( 0x500000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
 	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
 	ROM_LOAD16_BYTE( "g204a3.u169-3", 0x400000, 0x080000, CRC(92a837b7) SHA1(f581e1f7754f1fb20255c6c55ffc4e486d867111) )
@@ -1200,15 +1168,15 @@ ROM_START( gp2quiz )
 	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
 ROM_END
 
-GAME( 1993, galpani2,  0,        galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2e, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2e2,galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2g, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2i, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2gs,galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2t, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2j, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
+GAME( 1993, galpani2,   0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2e,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2e2, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2g,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2i,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2gs, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2t,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Taiwan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2j,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
-GAME( 1993, gp2quiz,   0,        galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
+GAME( 1993, gp2quiz,    0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
 
-GAME( 1994, gp2se,     0,        galpani2, gp2se,    galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gp2se,      0,        galpani2, gp2se,    galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

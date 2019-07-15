@@ -57,7 +57,6 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_out_int_func(0);
 }
 
-
 void pic8259_device::set_irq_line(int irq, int state)
 {
 	uint8_t mask = (1 << irq);
@@ -65,7 +64,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 	if (state)
 	{
 		/* setting IRQ line */
-		LOG("pic8259_set_irq_line(): PIC set IRQ line #%d\n", irq);
+		LOG("set_irq_line(): PIC set IRQ line #%d\n", irq);
 
 		if(m_level_trig_mode || (!m_level_trig_mode && !(m_irq_lines & mask)))
 		{
@@ -76,7 +75,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 	else
 	{
 		/* clearing IRQ line */
-		LOG("pic8259_device::set_irq_line(): PIC cleared IRQ line #%d\n", irq);
+		LOG("set_irq_line(): PIC cleared IRQ line #%d\n", irq);
 
 		m_irq_lines &= ~mask;
 		m_irr &= ~mask;
@@ -94,14 +93,16 @@ uint32_t pic8259_device::acknowledge()
 		/* is this IRQ pending and enabled? */
 		if ((m_irr & mask) && !(m_imr & mask))
 		{
-			LOG("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
-			if (!m_level_trig_mode)
-				m_irr &= ~mask;
+			if (!machine().side_effects_disabled()) {
+				LOG("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
+				if (!m_level_trig_mode)
+					m_irr &= ~mask;
 
-			if (!m_auto_eoi)
-				m_isr |= mask;
+				if (!m_auto_eoi)
+					m_isr |= mask;
 
-			set_timer();
+				set_timer();
+			}
 
 			if ((m_cascade!=0) && (m_master!=0) && (mask & m_slave))
 			{
@@ -110,7 +111,7 @@ uint32_t pic8259_device::acknowledge()
 			}
 			else
 			{
-				if (m_is_x86)
+				if (is_x86())
 				{
 					/* For x86 mode*/
 					return irq + m_base;
@@ -123,8 +124,9 @@ uint32_t pic8259_device::acknowledge()
 			}
 		}
 	}
-	logerror("Spurious IRQ\n");
-	if (m_is_x86)
+	if (!machine().side_effects_disabled())
+		logerror("Spurious IRQ\n");
+	if (is_x86())
 		return m_base + 7;
 	else
 		return 0xcd0000 + (m_vector_addr_high << 8) + m_vector_addr_low + (7 << (3-m_vector_size));
@@ -137,7 +139,7 @@ IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
 }
 
 
-READ8_MEMBER( pic8259_device::read )
+uint8_t pic8259_device::read(offs_t offset)
 {
 	/* NPW 18-May-2003 - Changing 0xFF to 0x00 as per Ruslan */
 	uint8_t data = 0x00;
@@ -187,7 +189,7 @@ READ8_MEMBER( pic8259_device::read )
 }
 
 
-WRITE8_MEMBER( pic8259_device::write )
+void pic8259_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -333,16 +335,26 @@ WRITE8_MEMBER( pic8259_device::write )
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void pic8259_device::device_start()
+void pic8259_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_out_int_func.resolve_safe();
 	m_in_sp_func.resolve_safe(1);
 	m_read_slave_ack_func.resolve_safe(0);
+}
 
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pic8259_device::device_start()
+{
 	// Register save state items
 	save_item(NAME(m_state));
 	save_item(NAME(m_isr));
@@ -399,14 +411,25 @@ void pic8259_device::device_reset()
 }
 
 DEFINE_DEVICE_TYPE(PIC8259, pic8259_device, "pic8259", "Intel 8259 PIC")
+DEFINE_DEVICE_TYPE(V5X_ICU, v5x_icu_device, "v5x_icu", "NEC V5X ICU")
 
-pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PIC8259, tag, owner, clock)
+pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_func(*this)
 	, m_in_sp_func(*this)
 	, m_read_slave_ack_func(*this)
 	, m_irr(0)
 	, m_irq_lines(0)
 	, m_level_trig_mode(0)
+{
+}
+
+pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic8259_device(mconfig, PIC8259, tag, owner, clock)
+{
+}
+
+v5x_icu_device::v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic8259_device(mconfig, V5X_ICU, tag, owner, clock)
 {
 }

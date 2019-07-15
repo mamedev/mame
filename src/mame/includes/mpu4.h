@@ -14,6 +14,7 @@
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
+#include "emupal.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
@@ -100,34 +101,160 @@ class mpu4_state : public driver_device
 {
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_vfd(*this, "vfd"),
-			m_6840ptm(*this, "ptm_ic2"),
-			m_pia3(*this, "pia_ic3"),
-			m_pia4(*this, "pia_ic4"),
-			m_pia5(*this, "pia_ic5"),
-			m_pia6(*this, "pia_ic6"),
-			m_pia7(*this, "pia_ic7"),
-			m_pia8(*this, "pia_ic8"),
-			m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"}),
-			m_aux1_port(*this, "AUX1"),
-			m_aux2_port(*this, "AUX2"),
-			m_bank1(*this, "bank1"),
-			m_msm6376(*this, "msm6376"),
-			m_reel0(*this, "reel0"),
-			m_reel1(*this, "reel1"),
-			m_reel2(*this, "reel2"),
-			m_reel3(*this, "reel3"),
-			m_reel4(*this, "reel4"),
-			m_reel5(*this, "reel5"),
-			m_reel6(*this, "reel6"),
-			m_reel7(*this, "reel7"),
-			m_palette(*this, "palette"),
-			m_meters(*this, "meters")
-	{}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_vfd(*this, "vfd")
+		, m_6840ptm(*this, "ptm_ic2")
+		, m_ptm_ic3ss(*this, "ptm_ic3ss")
+		, m_pia3(*this, "pia_ic3")
+		, m_pia4(*this, "pia_ic4")
+		, m_pia5(*this, "pia_ic5")
+		, m_pia6(*this, "pia_ic6")
+		, m_pia7(*this, "pia_ic7")
+		, m_pia8(*this, "pia_ic8")
+		, m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"})
+		, m_aux1_port(*this, "AUX1")
+		, m_aux2_port(*this, "AUX2")
+		, m_bank1(*this, "bank1")
+		, m_msm6376(*this, "msm6376")
+		, m_reel(*this, "reel%u", 0U)
+		, m_palette(*this, "palette")
+		, m_meters(*this, "meters")
+		, m_ym2413(*this, "ym2413")
+		, m_ay8913(*this, "ay8913")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_mpu4leds(*this, "mpu4led%u", 0U)
+		, m_digits(*this, "digit%u", 0U)
+		, m_triacs(*this, "triac%u", 0U)
+	 { }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	void init_m4default_alt();
+	void init_crystali();
+	void init_m4tst2();
+	void init_crystal();
+	void init_m_frkstn();
+	void init_m4default_big();
+	void init_m4default();
+	void init_m4default_banks();
+	void init_m4default_reels();
+	void init_m4_low_volt_alt();
+	void init_m4_aux1_invert();
+	void init_m4_aux2_invert();
+	void init_m4_door_invert();
+	void init_m4_five_reel_std();
+	void init_m4_five_reel_rev();
+	void init_m4_five_reel_alt();
+	void init_m4_six_reel_std();
+	void init_m4_six_reel_alt();
+	void init_m4_seven_reel();
+	void init_m4_small_extender();
+	void init_m4_large_extender_a();
+	void init_m4_large_extender_b();
+	void init_m4_large_extender_c();
+	void init_m4_hopper_tubes();
+	void init_m4_hopper_duart_a();
+	void init_m4_hopper_duart_b();
+	void init_m4_hopper_duart_c();
+	void init_m4_hopper_nonduart_a();
+	void init_m4_hopper_nonduart_b();
+	void init_m4_led_a();
+	void init_m4_led_b();
+	void init_m4_led_c();
+	void init_m4_andycp10c();
+	void init_m_blsbys();
+	void init_m_oldtmr();
+	void init_m4tst();
+	void init_m_ccelbr();
+	void init_m4gambal();
+	void init_m4debug();
+	void init_m4_showstring();
+	void init_m4_showstring_mod4yam();
+	void init_m4_debug_mod4yam();
+	void init_m4_showstring_mod2();
+	void init_m4_showstring_big();
+	void init_connect4();
+	void init_m4altreels();//legacy, will be removed once things are sorted out
+	void init_m_grtecp();//legacy, will be removed once things are sorted out RE: CHR
+	void init_m4tenten();
+	void init_m4actbnk();
+	void init_m4actclb();
+	void init_m4actpak();
+	void init_m4addr();
+	void init_m4aao();
+	void init_m4alladv();
+	void init_m4alpha();
+	void init_m4andycp();
+	void init_m4andybt();
+	void init_m4andyfh();
+	void init_m4andyge();
+	void init_m4apachg();
+
+	void bwboki(machine_config &config);
+	void mod2(machine_config &config);
+	void mod2_alt(machine_config &config);
+	void mod4oki(machine_config &config);
+	void mod4oki_5r(machine_config &config);
+	void mod4oki_alt(machine_config &config);
+	void mod4yam(machine_config &config);
+	void mpu4_common(machine_config &config);
+	void mpu4_common2(machine_config &config);
+	void mpu4crys(machine_config &config);
+	void mpu4_std_3reel(machine_config &config);
+	void mpu4_type2_3reel(machine_config &config);
+	void mpu4_type3_3reel(machine_config &config);
+	void mpu4_type4_3reel(machine_config &config);
+	void mpu4_bwb_3reel(machine_config &config);
+	void mpu4_std_4reel(machine_config &config);
+	void mpu4_type2_4reel(machine_config &config);
+	void mpu4_type3_4reel(machine_config &config);
+	void mpu4_type4_4reel(machine_config &config);
+	void mpu4_bwb_4reel(machine_config &config);
+	void mpu4_std_5reel(machine_config &config);
+	void mpu4_type2_5reel(machine_config &config);
+	void mpu4_type3_5reel(machine_config &config);
+	void mpu4_type4_5reel(machine_config &config);
+	void mpu4_bwb_5reel(machine_config &config);
+	void mpu4_std_6reel(machine_config &config);
+	void mpu4_type2_6reel(machine_config &config);
+	void mpu4_type3_6reel(machine_config &config);
+	void mpu4_type4_6reel(machine_config &config);
+	void mpu4_bwb_6reel(machine_config &config);
+	void mpu4_std_7reel(machine_config &config);
+	void mpu4_type2_7reel(machine_config &config);
+	void mpu4_type3_7reel(machine_config &config);
+	void mpu4_type4_7reel(machine_config &config);
+	void mpu4_bwb_7reel(machine_config &config);
+	void mpu4base(machine_config &config);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	void mpu4_6809_map(address_map &map);
+	void mpu4_memmap(address_map &map);
+	void lamp_extend_small(int data);
+	void lamp_extend_large(int data,int column,int active);
+	void led_write_latch(int latch, int data, int column);
+	void update_meters();
+	void ic23_update();
+	void ic24_output(int data);
+	void ic24_setup();
+	void update_ay(device_t *device);
+	void mpu4_install_mod4yam_space(address_space &space);
+	void mpu4_install_mod4oki_space(address_space &space);
+	void mpu4_install_mod4bwb_space(address_space &space);
+	void mpu4_config_common();
+	DECLARE_MACHINE_START(mod2);
+	DECLARE_MACHINE_RESET(mpu4);
+	DECLARE_MACHINE_START(mpu4yam);
+	DECLARE_MACHINE_START(mpu4oki);
+	DECLARE_MACHINE_START(mpu4oki_alt);
+	DECLARE_MACHINE_START(mod4oki_5r);
+	DECLARE_MACHINE_START(mod2_alt);
+	DECLARE_MACHINE_START(mpu4bwb);
+	DECLARE_MACHINE_START(mpu4cry);
+	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+		uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
@@ -181,142 +308,11 @@ public:
 	DECLARE_READ8_MEMBER(pia_gb_portb_r);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
-	DECLARE_DRIVER_INIT(m4default_alt);
-	DECLARE_DRIVER_INIT(crystali);
-	DECLARE_DRIVER_INIT(m4tst2);
-	DECLARE_DRIVER_INIT(crystal);
-	DECLARE_DRIVER_INIT(m_frkstn);
-	DECLARE_DRIVER_INIT(m4default_big);
-	DECLARE_DRIVER_INIT(m4default);
-	DECLARE_DRIVER_INIT(m4default_banks);
-	DECLARE_DRIVER_INIT(m4default_reels);
-	DECLARE_DRIVER_INIT(m4_low_volt_alt);
-	DECLARE_DRIVER_INIT(m4_aux1_invert);
-	DECLARE_DRIVER_INIT(m4_aux2_invert);
-	DECLARE_DRIVER_INIT(m4_door_invert);
-	DECLARE_DRIVER_INIT(m4_five_reel_std);
-	DECLARE_DRIVER_INIT(m4_five_reel_rev);
-	DECLARE_DRIVER_INIT(m4_five_reel_alt);
-	DECLARE_DRIVER_INIT(m4_six_reel_std);
-	DECLARE_DRIVER_INIT(m4_six_reel_alt);
-	DECLARE_DRIVER_INIT(m4_seven_reel);
-	DECLARE_DRIVER_INIT(m4_small_extender);
-	DECLARE_DRIVER_INIT(m4_large_extender_a);
-	DECLARE_DRIVER_INIT(m4_large_extender_b);
-	DECLARE_DRIVER_INIT(m4_large_extender_c);
-	DECLARE_DRIVER_INIT(m4_hopper_tubes);
-	DECLARE_DRIVER_INIT(m4_hopper_duart_a);
-	DECLARE_DRIVER_INIT(m4_hopper_duart_b);
-	DECLARE_DRIVER_INIT(m4_hopper_duart_c);
-	DECLARE_DRIVER_INIT(m4_hopper_nonduart_a);
-	DECLARE_DRIVER_INIT(m4_hopper_nonduart_b);
-	DECLARE_DRIVER_INIT(m4_led_a);
-	DECLARE_DRIVER_INIT(m4_led_b);
-	DECLARE_DRIVER_INIT(m4_led_c);
-	DECLARE_DRIVER_INIT(m4_andycp10c);
-	DECLARE_DRIVER_INIT(m_blsbys);
-	DECLARE_DRIVER_INIT(m_oldtmr);
-	DECLARE_DRIVER_INIT(m4tst);
-	DECLARE_DRIVER_INIT(m_ccelbr);
-	DECLARE_DRIVER_INIT(m4gambal);
-	DECLARE_DRIVER_INIT(m4debug);
-	DECLARE_DRIVER_INIT(m4_showstring);
-	DECLARE_DRIVER_INIT(m4_showstring_mod4yam);
-	DECLARE_DRIVER_INIT(m4_debug_mod4yam);
-	DECLARE_DRIVER_INIT(m4_showstring_mod2);
-	DECLARE_DRIVER_INIT(m4_showstring_big);
-	DECLARE_DRIVER_INIT(connect4);
-	DECLARE_DRIVER_INIT(m4altreels);//legacy, will be removed once things are sorted out
-	DECLARE_DRIVER_INIT(m_grtecp);//legacy, will be removed once things are sorted out RE: CHR
-	DECLARE_DRIVER_INIT(m4tenten);
-	DECLARE_DRIVER_INIT(m4actbnk);
-	DECLARE_DRIVER_INIT(m4actclb);
-	DECLARE_DRIVER_INIT(m4actpak);
-	DECLARE_DRIVER_INIT(m4addr);
-	DECLARE_DRIVER_INIT(m4aao);
-	DECLARE_DRIVER_INIT(m4alladv);
-	DECLARE_DRIVER_INIT(m4alpha);
-	DECLARE_DRIVER_INIT(m4andycp);
-	DECLARE_DRIVER_INIT(m4andybt);
-	DECLARE_DRIVER_INIT(m4andyfh);
-	DECLARE_DRIVER_INIT(m4andyge);
-	DECLARE_DRIVER_INIT(m4apachg);
-	DECLARE_MACHINE_START(mod2);
-	DECLARE_MACHINE_RESET(mpu4);
-	DECLARE_MACHINE_START(mpu4yam);
-	DECLARE_MACHINE_START(mpu4oki);
-	DECLARE_MACHINE_START(mpu4oki_alt);
-	DECLARE_MACHINE_START(mod4oki_5r);
-	DECLARE_MACHINE_START(mod2_alt);
-	DECLARE_MACHINE_START(mpu4bwb);
-	DECLARE_MACHINE_START(mpu4cry);
-	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
-	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
-	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
-	void bwboki(machine_config &config);
-	void mod2(machine_config &config);
-	void mod2_alt(machine_config &config);
-	void mod4oki(machine_config &config);
-	void mod4oki_5r(machine_config &config);
-	void mod4oki_alt(machine_config &config);
-	void mod4yam(machine_config &config);
-	void mpu4_common(machine_config &config);
-	void mpu4_common2(machine_config &config);
-	void mpu4crys(machine_config &config);
-	void mpu4_std_3reel(machine_config &config);
-	void mpu4_type2_3reel(machine_config &config);
-	void mpu4_type3_3reel(machine_config &config);
-	void mpu4_type4_3reel(machine_config &config);
-	void mpu4_bwb_3reel(machine_config &config);
-	void mpu4_std_4reel(machine_config &config);
-	void mpu4_type2_4reel(machine_config &config);
-	void mpu4_type3_4reel(machine_config &config);
-	void mpu4_type4_4reel(machine_config &config);
-	void mpu4_bwb_4reel(machine_config &config);
-	void mpu4_std_5reel(machine_config &config);
-	void mpu4_type2_5reel(machine_config &config);
-	void mpu4_type3_5reel(machine_config &config);
-	void mpu4_type4_5reel(machine_config &config);
-	void mpu4_bwb_5reel(machine_config &config);
-	void mpu4_std_6reel(machine_config &config);
-	void mpu4_type2_6reel(machine_config &config);
-	void mpu4_type3_6reel(machine_config &config);
-	void mpu4_type4_6reel(machine_config &config);
-	void mpu4_bwb_6reel(machine_config &config);
-	void mpu4_std_7reel(machine_config &config);
-	void mpu4_type2_7reel(machine_config &config);
-	void mpu4_type3_7reel(machine_config &config);
-	void mpu4_type4_7reel(machine_config &config);
-	void mpu4_bwb_7reel(machine_config &config);
-	void mpu4base(machine_config &config);
-
-	void mpu4_6809_map(address_map &map);
-	void mpu4_memmap(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	void lamp_extend_small(int data);
-	void lamp_extend_large(int data,int column,int active);
-	void led_write_latch(int latch, int data, int column);
-	void update_meters();
-	void ic23_update();
-	void ic24_output(int data);
-	void ic24_setup();
-	void update_ay(device_t *device);
-	void mpu4_install_mod4yam_space(address_space &space);
-	void mpu4_install_mod4oki_space(address_space &space);
-	void mpu4_install_mod4bwb_space(address_space &space);
-	void mpu4_config_common();
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<roc10937_device> m_vfd;
+	optional_device<rocvfd_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
+	optional_device<ptm6840_device> m_ptm_ic3ss;
 	optional_device<pia6821_device> m_pia3;
 	optional_device<pia6821_device> m_pia4;
 	optional_device<pia6821_device> m_pia5;
@@ -328,16 +324,34 @@ protected:
 	required_ioport m_aux2_port;
 	optional_memory_bank m_bank1;
 	optional_device<okim6376_device> m_msm6376;
-	optional_device<stepper_device> m_reel0;
-	optional_device<stepper_device> m_reel1;
-	optional_device<stepper_device> m_reel2;
-	optional_device<stepper_device> m_reel3;
-	optional_device<stepper_device> m_reel4;
-	optional_device<stepper_device> m_reel5;
-	optional_device<stepper_device> m_reel6;
-	optional_device<stepper_device> m_reel7;
+	optional_device_array<stepper_device, 8> m_reel;
 	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
+	optional_device<ym2413_device> m_ym2413;
+	optional_device<ay8913_device> m_ay8913;
+
+	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
+
+	// 0-63 are on PIA IC3 port A (always present)
+	// 64-127 are on PIA IC3 port B (always present)
+	// 128-132 136-140 144-148 152-156 160-164 168-172 176-180 184-188 are on small lamp extender
+	// 128-255 are on large lamp externders
+	output_finder<256> m_lamps;
+
+	// 0-63 are on PIA IC4 port A (always present)
+	// 0-143 are on card B (possibly incorrectly mapped?)
+	// 64-127 are on card C
+	// 0-127 are on large card B
+	output_finder<144> m_mpu4leds;
+
+	// 0-7 are on PIA IC4 port A with no LED extender
+	// 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136 are on card B (possible incorrectly mapped?)
+	// 8-15 are on card C
+	// 8-9 are mapped to lamp lines for Connect 4
+	// 0-15 are on large card B
+	output_finder<144> m_digits;
+
+	output_finder<8> m_triacs;
 
 	enum
 	{

@@ -16,7 +16,7 @@
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(special_state,special)
+void special_state::init_special()
 {
 	/* set initialy ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -27,14 +27,10 @@ DRIVER_INIT_MEMBER(special_state,special)
 
 READ8_MEMBER( special_state::specialist_8255_porta_r )
 {
-	if (m_io_line0->read()!=0xff) return 0xfe;
-	if (m_io_line1->read()!=0xff) return 0xfd;
-	if (m_io_line2->read()!=0xff) return 0xfb;
-	if (m_io_line3->read()!=0xff) return 0xf7;
-	if (m_io_line4->read()!=0xff) return 0xef;
-	if (m_io_line5->read()!=0xff) return 0xdf;
-	if (m_io_line6->read()!=0xff) return 0xbf;
-	if (m_io_line7->read()!=0xff) return 0x7f;
+	for (int i = 0; i < 8; i++)
+		if (m_io_line[i]->read() != 0xff)
+			return (1 << i) ^ 0xff;
+
 	return 0xff;
 }
 
@@ -42,21 +38,16 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 {
 	uint8_t dat = 0xff;
 
-	if ((m_specialist_8255_porta & 0x01)==0) dat &= m_io_line0->read();
-	if ((m_specialist_8255_porta & 0x02)==0) dat &= m_io_line1->read();
-	if ((m_specialist_8255_porta & 0x04)==0) dat &= m_io_line2->read();
-	if ((m_specialist_8255_porta & 0x08)==0) dat &= m_io_line3->read();
-	if ((m_specialist_8255_porta & 0x10)==0) dat &= m_io_line4->read();
-	if ((m_specialist_8255_porta & 0x20)==0) dat &= m_io_line5->read();
-	if ((m_specialist_8255_porta & 0x40)==0) dat &= m_io_line6->read();
-	if ((m_specialist_8255_porta & 0x80)==0) dat &= m_io_line7->read();
-	if ((m_specialist_8255_portc & 0x01)==0) dat &= m_io_line8->read();
-	if ((m_specialist_8255_portc & 0x02)==0) dat &= m_io_line9->read();
-	if ((m_specialist_8255_portc & 0x04)==0) dat &= m_io_line10->read();
-	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
+	for (int i = 0; i < 8; i++)
+		if (!BIT(m_specialist_8255_porta, i))
+			dat &= m_io_line[i]->read();
+
+	for (int i = 0; i < 4; i++)
+		if (!BIT(m_specialist_8255_portc, i))
+			dat &= m_io_line[8 + i]->read();
 
 	// shift key
-	if (BIT(~m_io_line12->read(), 0))
+	if (BIT(~m_io_line[12]->read(), 0))
 		dat &= 0xfd;
 
 	// cassette
@@ -73,21 +64,16 @@ READ8_MEMBER( special_state::specimx_8255_portb_r )
 {
 	uint8_t dat = 0xff;
 
-	if ((m_specialist_8255_porta & 0x01)==0) dat &= m_io_line0->read();
-	if ((m_specialist_8255_porta & 0x02)==0) dat &= m_io_line1->read();
-	if ((m_specialist_8255_porta & 0x04)==0) dat &= m_io_line2->read();
-	if ((m_specialist_8255_porta & 0x08)==0) dat &= m_io_line3->read();
-	if ((m_specialist_8255_porta & 0x10)==0) dat &= m_io_line4->read();
-	if ((m_specialist_8255_porta & 0x20)==0) dat &= m_io_line5->read();
-	if ((m_specialist_8255_porta & 0x40)==0) dat &= m_io_line6->read();
-	if ((m_specialist_8255_porta & 0x80)==0) dat &= m_io_line7->read();
-	if ((m_specialist_8255_portc & 0x01)==0) dat &= m_io_line8->read();
-	if ((m_specialist_8255_portc & 0x02)==0) dat &= m_io_line9->read();
-	if ((m_specialist_8255_portc & 0x04)==0) dat &= m_io_line10->read();
-	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
+	for (int i = 0; i < 8; i++)
+		if (!BIT(m_specialist_8255_porta, i))
+			dat &= m_io_line[i]->read();
+
+	for (int i = 0; i < 4; i++)
+		if (!BIT(m_specialist_8255_portc, i))
+			dat &= m_io_line[8 + i]->read();
 
 	// shift key
-	if (BIT(~m_io_line12->read(), 0))
+	if (BIT(~m_io_line[12]->read(), 0))
 		dat &= 0xfd;
 
 	// cassette
@@ -99,10 +85,10 @@ READ8_MEMBER( special_state::specimx_8255_portb_r )
 
 READ8_MEMBER( special_state::specialist_8255_portc_r )
 {
-	if (m_io_line8->read()!=0xff) return 0x0e;
-	if (m_io_line9->read()!=0xff) return 0x0d;
-	if (m_io_line10->read()!=0xff) return 0x0b;
-	if (m_io_line11->read()!=0xff) return 0x07;
+	for (int i = 0; i < 4; i++)
+		if (m_io_line[8 + i]->read() != 0xff)
+			return (1 << i) ^ 0x0f;
+
 	return 0x0f;
 }
 
@@ -244,9 +230,8 @@ WRITE_LINE_MEMBER( special_state::fdc_drq )
 
 WRITE8_MEMBER( special_state::specimx_disk_ctrl_w )
 {
-	static const char *names[] = { "fd0", "fd1"};
 	floppy_image_device *floppy = nullptr;
-	floppy_connector *con = machine().device<floppy_connector>(names[m_drive & 1]);
+	floppy_connector *con = m_fdd[m_drive & 1].target();
 	if(con)
 		floppy = con->get_device();
 
@@ -338,12 +323,12 @@ void special_state::erik_set_bank()
 			m_bank4->set_base(mem + 0x1c000);
 			space.unmap_write(0xf000, 0xf7ff);
 			space.nop_read(0xf000, 0xf7ff);
-			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, 0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
+			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, 0, read8sm_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8sm_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
 			break;
 	}
 }
 
-DRIVER_INIT_MEMBER(special_state,erik)
+void special_state::init_erik()
 {
 	m_erik_color_1 = 0;
 	m_erik_color_2 = 0;

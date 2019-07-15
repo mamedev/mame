@@ -12,11 +12,14 @@
 class kaneko_hit_device : public device_t
 {
 public:
+	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: kaneko_hit_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_type(device_t &device, int hittype);
-
-	int m_hittype;
+	void set_type(int hittype) { m_hittype = hittype; }
 
 	DECLARE_READ16_MEMBER(kaneko_hit_r);
 	DECLARE_WRITE16_MEMBER(kaneko_hit_w);
@@ -56,7 +59,7 @@ private:
 		uint16_t mode;
 	};
 
-
+	int m_hittype;
 
 	required_device<watchdog_timer_device> m_watchdog;
 

@@ -9,10 +9,13 @@
 #ifndef MAME_INCLUDES_ARCHIMEDES_H
 #define MAME_INCLUDES_ARCHIMEDES_H
 
+#include "cpu/arm/arm.h"
+#include "imagedev/floppy.h"
 #include "machine/aakart.h"
-#include "sound/dac.h"
 #include "machine/i2cmem.h"
 #include "machine/wd_fdc.h"
+#include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade
@@ -98,7 +101,7 @@ public:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<arm_cpu_device> m_maincpu;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<wd1772_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
@@ -107,7 +110,7 @@ protected:
 	required_memory_region m_region_vram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device_array<dac_word_interface, 8> m_dac;
+	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
 
 private:
 

@@ -98,23 +98,27 @@ enum
 	ADDON_Z80GB
 };
 
+class base_sns_cart_slot_device;
+
 // ======================> device_sns_cart_interface
 
 class device_sns_cart_interface : public device_slot_card_interface
 {
+	friend class base_sns_cart_slot_device;
+
 public:
 	// construction/destruction
 	virtual ~device_sns_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // ROM access in range [00-7f]
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }   // ROM access in range [80-ff]
-	virtual DECLARE_READ8_MEMBER(read_ram) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
-	virtual DECLARE_WRITE8_MEMBER(write_l) { }   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_h) { }   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
-	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(chip_write) { }
+	virtual uint8_t read_l(offs_t offset) { return 0xff; }   // ROM access in range [00-7f]
+	virtual uint8_t read_h(offs_t offset) { return 0xff; }   // ROM access in range [80-ff]
+	virtual uint8_t read_ram(offs_t offset) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
+	virtual void write_l(offs_t offset, uint8_t data) { }   // used by carts with subslots
+	virtual void write_h(offs_t offset, uint8_t data) { }   // used by carts with subslots
+	virtual void write_ram(offs_t offset, uint8_t data) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
+	virtual uint8_t chip_read(offs_t offset) { return 0xff; }
+	virtual void chip_write(offs_t offset, uint8_t data) { }
 	virtual void speedup_addon_bios_access() {}
 
 	void rom_alloc(uint32_t size, const char *tag);
@@ -137,6 +141,9 @@ public:
 protected:
 	device_sns_cart_interface(const machine_config &mconfig, device_t &device);
 
+	DECLARE_WRITE_LINE_MEMBER(write_irq);
+	uint8_t read_open_bus();
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -145,6 +152,8 @@ protected:
 	std::vector<uint8_t> m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
 
 	uint8_t rom_bank_map[256];    // 32K chunks of rom
+
+	base_sns_cart_slot_device *m_slot;
 };
 
 
@@ -157,6 +166,10 @@ class base_sns_cart_slot_device : public device_t,
 public:
 	// construction/destruction
 	virtual ~base_sns_cart_slot_device();
+
+	// configuration
+	auto irq_callback() { return m_irq_callback.bind(); }
+	auto open_bus_callback() { return m_open_bus_callback.bind(); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -187,14 +200,17 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	uint8_t read_l(offs_t offset);
+	uint8_t read_h(offs_t offset);
+	uint8_t read_ram(offs_t offset);
+	void write_l(offs_t offset, uint8_t data);
+	void write_h(offs_t offset, uint8_t data);
+	void write_ram(offs_t offset, uint8_t data);
+	uint8_t chip_read(offs_t offset);
+	void chip_write(offs_t offset, uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
+	uint8_t read_open_bus() { return m_open_bus_callback(); }
 
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we
 	// check if the required data is present and update bank map accordingly
@@ -214,6 +230,10 @@ public:
 
 protected:
 	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	devcb_write_line m_irq_callback;
+	devcb_read8 m_open_bus_callback;
 };
 
 // ======================> sns_cart_slot_device
@@ -222,6 +242,15 @@ class sns_cart_slot_device : public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: sns_cart_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "snes_cart"; }
 	virtual const char *file_extensions() const override { return "sfc"; }
@@ -233,6 +262,15 @@ class sns_sufami_cart_slot_device : public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sns_sufami_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "st_cart"; }
 	virtual const char *file_extensions() const override { return "st"; }
@@ -245,6 +283,15 @@ class sns_bsx_cart_slot_device :  public base_sns_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: sns_bsx_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "bspack"; }
 	virtual const char *file_extensions() const override { return "bs"; }
@@ -263,19 +310,6 @@ DECLARE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device)
  ***************************************************************************/
 
 #define SNSSLOT_ROM_REGION_TAG ":cart:rom"
-
-
-#define MCFG_SNS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SNS_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_SNS_SUFAMI_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SNS_SUFAMI_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_SNS_BSX_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, SNS_BSX_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 #endif // MAME_BUS_SNES_SNES_SLOT_H

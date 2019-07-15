@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef THOM_DSK
-#define THOM_DSK
+#ifndef MAME_FORMATS_THOM_DSK_H
+#define MAME_FORMATS_THOM_DSK_H
+
+#pragma once
 
 #include "flopimg.h"
 
@@ -13,4 +15,4 @@
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(thomson);
 
-#endif
+#endif // MAME_FORMATS_THOM_DSK_H

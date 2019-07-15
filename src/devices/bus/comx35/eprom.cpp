@@ -30,10 +30,10 @@ DEFINE_DEVICE_TYPE(COMX_EPR, comx_epr_device, "comx_epr", "COMX-35 F&M EPROM Swi
 
 ROM_START( comx_epr )
 	ROM_REGION( 0x800, "f800", 0 )
-	ROM_LOAD( "f&m.eprom.board.1.1.bin", 0x0000, 0x0800, CRC(a042a31a) SHA1(13831a1350aa62a87988bfcc99c4b7db8ef1cf62) )
+	ROM_LOAD( "f+m.eprom.board.1.1.bin", 0x0000, 0x0800, CRC(a042a31a) SHA1(13831a1350aa62a87988bfcc99c4b7db8ef1cf62) )
 
 	ROM_REGION( 0x10000, "eprom", 0 )
-	ROM_LOAD( "f&m.basic.bin",      0x0000, 0x2000, CRC(22ab7b61) SHA1(68b5770bca37b1ba94083f944086884e612b5a1b) )
+	ROM_LOAD( "f+m.basic.bin",      0x0000, 0x2000, CRC(22ab7b61) SHA1(68b5770bca37b1ba94083f944086884e612b5a1b) )
 	ROM_LOAD( "disk.utilities.bin", 0x2000, 0x2000, CRC(2576c945) SHA1(e80481054c6997a5f418d8a5872ac0110ae7b75a) )
 	ROM_LOAD( "tennismania.bin",    0x4000, 0x2000, CRC(a956cc74) SHA1(8bc914f52f0dd2cf792da74ec4e9e333365619ef) )
 ROM_END
@@ -91,7 +91,7 @@ void comx_epr_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_epr_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0;
 
@@ -113,7 +113,7 @@ uint8_t comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *ex
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_epr_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
+void comx_epr_device::comx_io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{

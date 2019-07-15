@@ -3,43 +3,24 @@
 #include "emu.h"
 #include "dc-ctrl.h"
 
-DEFINE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device, "dcctrl", "Dreamcast Controller")
+/*******************************
+ *
+ * Common abstract class
+ *
+ ******************************/
 
-void dc_controller_device::static_set_port_tag(device_t &device, int port, const char *tag)
+dc_common_device::dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	maple_device(mconfig, type, tag, owner, clock)
+	, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 {
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.port_tag[port] = tag;
 }
 
-void dc_controller_device::static_set_id(device_t &device, const char *id)
+void dc_common_device::device_start()
 {
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.id = id;
+	maple_device::device_start();
 }
 
-void dc_controller_device::static_set_license(device_t &device, const char *license)
-{
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.license = license;
-}
-
-void dc_controller_device::static_set_versions(device_t &device, const char *versions)
-{
-	dc_controller_device &ctrl = downcast<dc_controller_device &>(device);
-	ctrl.versions = versions;
-}
-
-dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	maple_device(mconfig, DC_CONTROLLER, tag, owner, clock)
-{
-	memset(port_tag, 0, sizeof(port_tag));
-
-	id = "Dreamcast Controller";
-	license = "Produced By or Under License From SEGA ENTERPRISES,LTD.";
-	versions = "Version 1.010,1998/09/28,315-6211-AB   ,Analog Module : The 4th Edition.5/8  +DF";
-}
-
-void dc_controller_device::maple_w(const uint32_t *data, uint32_t in_size)
+void dc_common_device::maple_w(const uint32_t *data, uint32_t in_size)
 {
 	switch(data[0] & 0xff) {
 	case 0x01: // Device request
@@ -70,24 +51,43 @@ void dc_controller_device::maple_w(const uint32_t *data, uint32_t in_size)
 	}
 }
 
+/*******************************
+ *
+ * Dreamcast Controller
+ *
+ ******************************/
+
+DEFINE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device, "dcctrl", "Dreamcast Controller")
+
+dc_controller_device::dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dc_common_device(mconfig, DC_CONTROLLER, tag, owner, clock)
+{
+	model = "Dreamcast Controller";
+	license = "Produced By or Under License From SEGA ENTERPRISES,LTD.";
+	versions = "Version 1.000,1998/05/11,315-6215-AB   ,Analog Module: The 4th Edition. 05/08";
+	id = 0x01000000; // Controller
+	electric_current = 0x01f401ae; // max 50mA, standby 43mA
+	region = 0x00ff;
+}
+
 void dc_controller_device::fixed_status(uint32_t *dest)
 {
-	dest[0] = 0x20000000; // Controller
+	dest[0] = id;
 	dest[1] =
-		((port[2] != nullptr) ? 0x010000 : 0) |
-		((port[3] != nullptr) ? 0x020000 : 0) |
-		((port[4] != nullptr) ? 0x040000 : 0) |
-		((port[5] != nullptr) ? 0x080000 : 0) |
-		((port[6] != nullptr) ? 0x100000 : 0) |
-		((port[7] != nullptr) ? 0x200000 : 0) |
-		((port[0] ? port[0]->active() : 0) << 8) |
-		(port[1] ? port[1]->active() : 0); // 1st function - controller
+		((port[2] != nullptr) ? 0x0100 : 0) |
+		((port[3] != nullptr) ? 0x0200 : 0) |
+		((port[4] != nullptr) ? 0x0400 : 0) |
+		((port[5] != nullptr) ? 0x0800 : 0) |
+		((port[6] != nullptr) ? 0x1000 : 0) |
+		((port[7] != nullptr) ? 0x2000 : 0) |
+		((port[0] ? port[0]->active() : 0) << 24) |
+		((port[1] ? port[1]->active() : 0) << 16); // 1st function - controller
 	dest[2] = 0; // No 2nd function
 	dest[3] = 0; // No 3rd function
-	dest[4] = 0x00ff; // Every region, no expansion
-	copy_with_spaces(((uint8_t *)dest) + 18, id, 30);
+	dest[4] = region; // Every region, no expansion
+	copy_with_spaces(((uint8_t *)dest) + 18, model, 30);
 	copy_with_spaces(((uint8_t *)dest) + 48, license, 60);
-	dest[27] = 0x01f401ae; // standby 43mA, max 50mA
+	dest[27] = electric_current;
 }
 
 void dc_controller_device::free_status(uint32_t *dest)
@@ -97,7 +97,7 @@ void dc_controller_device::free_status(uint32_t *dest)
 
 void dc_controller_device::read(uint32_t *dest)
 {
-	dest[0] = 0x21000000; // Controller
+	dest[0] = id; // Controller
 	dest[1] =
 		(port[0] ? port[0]->read() : 0xff) |
 		((port[1] ? port[1]->read() : 0xff) << 8) |
@@ -110,12 +110,55 @@ void dc_controller_device::read(uint32_t *dest)
 		((port[7] ? port[7]->read() : 0x80) << 24);
 }
 
-void dc_controller_device::device_start()
-{
-	maple_device::device_start();
+/*******************************
+ *
+ * Dreamcast Keyboard
+ *
+ ******************************/
 
-	for (int i = 0; i < 8; i++)
-	{
-		port[i] = ioport(port_tag[i]);
-	}
+DEFINE_DEVICE_TYPE(DC_KEYBOARD, dc_keyboard_device, "dckb", "Dreamcast Keyboard")
+
+dc_keyboard_device::dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dc_common_device(mconfig, DC_KEYBOARD, tag, owner, clock)
+{
+	model = "92key Keyboard for JPN";
+	license = "Produced By or Under License From SEGA ENTERPRISES,LTD.";
+	versions = "Version 1.000,1998/06/12,315-6215-AD   ,Key Scan Module: The 1st Edition. 05/20";
+	id = 0x40000000; // Keyboard
+	electric_current = 0x0190015e; // max 40mA, standby 35mA
+	region = 0x0002; // Japan region, no expansion
 }
+
+void dc_keyboard_device::fixed_status(uint32_t *dest)
+{
+	dest[0] = id; // Keyboard
+	dest[1] = 0x00201000; // 1st function
+	dest[2] = 0x00000008; // No 2nd function (doc returns 8 here tho?)
+	dest[3] = 0x00000000; // No 3rd function
+	dest[4] = region;
+	copy_with_spaces(((uint8_t *)dest) + 18, model, 30);
+	copy_with_spaces(((uint8_t *)dest) + 48, license, 60);
+	dest[27] = electric_current;
+}
+
+void dc_keyboard_device::free_status(uint32_t *dest)
+{
+	copy_with_spaces((uint8_t *)dest, versions, 80);
+}
+
+void dc_keyboard_device::read(uint32_t *dest)
+{
+	dest[0] = id;
+	// key code
+	dest[1] =
+		(port[0] ? port[0]->read() : 0) |
+		((port[1] ? port[1]->read() : 0) << 8) |
+		((port[2] ? port[2]->read() : 0) << 16) |
+		((port[3] ? port[3]->read() : 0) << 24);
+	dest[2] =
+		(port[4] ? port[4]->read() : 0) |
+		((port[5] ? port[5]->read() : 0) << 8) |
+		((port[6] ? port[6]->read() : 0) << 16) |
+		((port[7] ? port[7]->read() : 0) << 24);
+}
+

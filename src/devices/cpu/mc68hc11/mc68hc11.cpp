@@ -40,7 +40,7 @@ enum
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
 
-DEFINE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device, "mc68hc11", "MC68HC11")
+DEFINE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device, "mc68hc11", "Motorola MC68HC11")
 
 
 mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -62,9 +62,9 @@ device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_c
 	};
 }
 
-util::disasm_interface *mc68hc11_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mc68hc11_cpu_device::create_disassembler()
 {
-	return new hc11_disassembler;
+	return std::make_unique<hc11_disassembler>();
 }
 
 
@@ -307,13 +307,13 @@ void mc68hc11_cpu_device::hc11_regs_w(uint32_t address, uint8_t value)
 
 uint8_t mc68hc11_cpu_device::FETCH()
 {
-	return m_direct->read_byte(m_pc++);
+	return m_cache->read_byte(m_pc++);
 }
 
 uint16_t mc68hc11_cpu_device::FETCH16()
 {
 	uint16_t w;
-	w = (m_direct->read_byte(m_pc) << 8) | (m_direct->read_byte(m_pc+1));
+	w = m_cache->read_word(m_pc);
 	m_pc += 2;
 	return w;
 }
@@ -397,7 +397,7 @@ void mc68hc11_cpu_device::device_start()
 	m_internal_ram.resize(m_internal_ram_size);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_pc));
@@ -452,7 +452,7 @@ void mc68hc11_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -599,7 +599,7 @@ void mc68hc11_cpu_device::execute_run()
 		check_irq_lines();
 
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		op = FETCH();
 		(this->*hc11_optable[op])();

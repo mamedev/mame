@@ -14,16 +14,6 @@
 
 
 //**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-#define VERBOSE         (0)
-
-#define VPRINTF(x)      do { if (VERBOSE) osd_printf_debug x; } while (0)
-
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -66,20 +56,6 @@ speaker_device::~speaker_device()
 	if (m_max_sample > 0)
 		osd_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
 #endif
-}
-
-
-//-------------------------------------------------
-//  static_set_position - configuration helper to
-//  set the speaker position
-//-------------------------------------------------
-
-void speaker_device::static_set_position(device_t &device, double x, double y, double z)
-{
-	speaker_device &speaker = downcast<speaker_device &>(device);
-	speaker.m_x = x;
-	speaker.m_y = y;
-	speaker.m_z = z;
 }
 
 

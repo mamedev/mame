@@ -21,9 +21,9 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
+TILE_GET_INFO_MEMBER(cyberbal_base_state::get_alpha_tile_info)
 {
-	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
+	uint16_t data = m_alpha->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
@@ -32,16 +32,16 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
 {
-	uint16_t data = m_alpha2_tilemap->basemem_read(tile_index);
+	uint16_t data = m_alpha2->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
 }
 
 
-TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield_tile_info)
+TILE_GET_INFO_MEMBER(cyberbal_base_state::get_playfield_tile_info)
 {
-	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
+	uint16_t data = m_playfield->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield_tile_info)
 
 TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
 {
-	uint16_t data = m_playfield2_tilemap->basemem_read(tile_index);
+	uint16_t data = m_playfield2->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
  *
  *************************************/
 
-const atari_motion_objects_config cyberbal_state::s_mob_config =
+const atari_motion_objects_config cyberbal_base_state::s_mob_config =
 {
 	1,                  /* index to which gfx system */
 	1,                  /* number of motion object banks */
@@ -99,19 +99,10 @@ const atari_motion_objects_config cyberbal_state::s_mob_config =
 	0,                  /* resulting value to indicate "special" */
 };
 
-void cyberbal_state::video_start_common(int screens)
+void cyberbal_base_state::video_start()
 {
-	if (screens == 2)
-	{
-		palette_device *rpalette = subdevice<palette_device>("rpalette");
-		m_playfield2_tilemap->set_palette(*rpalette);
-		m_alpha2_tilemap->set_palette(*rpalette);
-	}
-
 	/* initialize the motion objects */
 	m_mob->set_slipram(&m_current_slip[0]);
-	if (screens == 2)
-		m_mob2->set_slipram(&m_current_slip[1]);
 
 	/* save states */
 	save_item(NAME(m_current_slip));
@@ -121,9 +112,14 @@ void cyberbal_state::video_start_common(int screens)
 }
 
 
-VIDEO_START_MEMBER(cyberbal_state,cyberbal)
+void cyberbal_state::video_start()
 {
-	video_start_common(2);
+	m_playfield2->set_palette(*m_rpalette);
+	m_alpha2->set_palette(*m_rpalette);
+
+	cyberbal_base_state::video_start();
+
+	m_mob2->set_slipram(&m_current_slip[1]);
 
 	/* adjust the sprite positions */
 	m_mob->set_xscroll(4);
@@ -131,9 +127,9 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal)
 }
 
 
-VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal2p_state::video_start()
 {
-	video_start_common(1);
+	cyberbal_base_state::video_start();
 
 	/* adjust the sprite positions */
 	m_mob->set_xscroll(5);
@@ -147,72 +143,74 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
  *
  *************************************/
 
+void cyberbal_base_state::scanline_update_one(screen_device &screen, int scanline, int i, tilemap_t &curplayfield, tilemap_device &curalpha)
+{
+	/* keep in range */
+	int offset = ((scanline - 8) / 8) * 64 + 47;
+	if (offset < 0)
+		offset += 0x800;
+	else if (offset >= 0x800)
+		return;
+
+	/* update the current parameters */
+	uint16_t word = curalpha.basemem_read(offset + 3);
+	if (!(word & 1))
+	{
+		if (((word >> 1) & 7) != m_playfield_palette_bank[i])
+		{
+			if (scanline > 0)
+				screen.update_partial(scanline - 1);
+			m_playfield_palette_bank[i] = (word >> 1) & 7;
+			curplayfield.set_palette_offset(m_playfield_palette_bank[i] << 8);
+		}
+	}
+	word = curalpha.basemem_read(offset + 4);
+	if (!(word & 1))
+	{
+		int newscroll = 2 * (((word >> 7) + 4) & 0x1ff);
+		if (newscroll != m_playfield_xscroll[i])
+		{
+			if (scanline > 0)
+				screen.update_partial(scanline - 1);
+			curplayfield.set_scrollx(0, newscroll);
+			m_playfield_xscroll[i] = newscroll;
+		}
+	}
+	word = curalpha.basemem_read(offset + 5);
+	if (!(word & 1))
+	{
+		/* a new vscroll latches the offset into a counter; we must adjust for this */
+		int newscroll = ((word >> 7) - (scanline)) & 0x1ff;
+		if (newscroll != m_playfield_yscroll[i])
+		{
+			if (scanline > 0)
+				screen.update_partial(scanline - 1);
+			curplayfield.set_scrolly(0, newscroll);
+			m_playfield_yscroll[i] = newscroll;
+		}
+	}
+	word = curalpha.basemem_read(offset + 7);
+	if (!(word & 1))
+	{
+		if (m_current_slip[i] != word)
+		{
+			if (scanline > 0)
+				screen.update_partial(scanline - 1);
+			m_current_slip[i] = word;
+		}
+	}
+	i++;
+}
+
 void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 {
-	/* loop over screens */
-	int i = 0;
-	for (screen_device &update_screen : screen_device_iterator(*this))
-	{
-		/* need explicit target() because one is optional_device and other is required_device */
-		tilemap_t *curplayfield = i ? m_playfield2_tilemap.target() : m_playfield_tilemap.target();
-		tilemap_device *curalpha = i ? m_alpha2_tilemap.target() : m_alpha_tilemap.target();
+	scanline_update_one(*m_lscreen, scanline, 0, *m_playfield, *m_alpha);
+	scanline_update_one(*m_rscreen, scanline, 1, *m_playfield2, *m_alpha2);
+}
 
-		/* keep in range */
-		int offset = ((scanline - 8) / 8) * 64 + 47;
-		if (offset < 0)
-			offset += 0x800;
-		else if (offset >= 0x800)
-			return;
-
-		/* update the current parameters */
-		uint16_t word = curalpha->basemem_read(offset + 3);
-		if (!(word & 1))
-		{
-			if (((word >> 1) & 7) != m_playfield_palette_bank[i])
-			{
-				if (scanline > 0)
-					update_screen.update_partial(scanline - 1);
-				m_playfield_palette_bank[i] = (word >> 1) & 7;
-				curplayfield->set_palette_offset(m_playfield_palette_bank[i] << 8);
-			}
-		}
-		word = curalpha->basemem_read(offset + 4);
-		if (!(word & 1))
-		{
-			int newscroll = 2 * (((word >> 7) + 4) & 0x1ff);
-			if (newscroll != m_playfield_xscroll[i])
-			{
-				if (scanline > 0)
-					update_screen.update_partial(scanline - 1);
-				curplayfield->set_scrollx(0, newscroll);
-				m_playfield_xscroll[i] = newscroll;
-			}
-		}
-		word = curalpha->basemem_read(offset + 5);
-		if (!(word & 1))
-		{
-			/* a new vscroll latches the offset into a counter; we must adjust for this */
-			int newscroll = ((word >> 7) - (scanline)) & 0x1ff;
-			if (newscroll != m_playfield_yscroll[i])
-			{
-				if (scanline > 0)
-					update_screen.update_partial(scanline - 1);
-				curplayfield->set_scrolly(0, newscroll);
-				m_playfield_yscroll[i] = newscroll;
-			}
-		}
-		word = curalpha->basemem_read(offset + 7);
-		if (!(word & 1))
-		{
-			if (m_current_slip[i] != word)
-			{
-				if (scanline > 0)
-					update_screen.update_partial(scanline - 1);
-				m_current_slip[i] = word;
-			}
-		}
-		i++;
-	}
+void cyberbal2p_state::scanline_update(screen_device &screen, int scanline)
+{
+	scanline_update_one(*m_screen, scanline, 0, *m_playfield, *m_alpha);
 }
 
 
@@ -223,24 +221,22 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-uint32_t cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
+uint32_t cyberbal_base_state::update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, atari_motion_objects_device &curmob, tilemap_t &curplayfield, tilemap_t &curalpha)
 {
 	// start drawing
-	atari_motion_objects_device *curmob = index ? m_mob2.target() : m_mob.target();
-	curmob->draw_async(cliprect);
+	curmob.draw_async(cliprect);
 
 	/* draw the playfield */
-	tilemap_t *curplayfield = index ? m_playfield2_tilemap.target() : m_playfield_tilemap.target();
-	curplayfield->draw(screen, bitmap, cliprect, 0, 0);
+	curplayfield.draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw and merge the MO */
-	bitmap_ind16 &mobitmap = curmob->bitmap();
-	for (const sparse_dirty_rect *rect = curmob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+	bitmap_ind16 &mobitmap = curmob.bitmap();
+	for (const sparse_dirty_rect *rect = curmob.first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
 					/* not verified: logic is all controlled in a PAL
@@ -250,23 +246,22 @@ uint32_t cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &
 		}
 
 	/* add the alpha on top */
-	tilemap_t *curalpha = index ? m_alpha2_tilemap.target() : m_alpha_tilemap.target();
-	curalpha->draw(screen, bitmap, cliprect, 0, 0);
+	curalpha.draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
 uint32_t cyberbal_state::screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return update_one_screen(screen, bitmap, cliprect, 0);
+	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield, *m_alpha);
 }
 
 uint32_t cyberbal_state::screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return update_one_screen(screen, bitmap, cliprect, 1);
+	return update_one_screen(screen, bitmap, cliprect, *m_mob2, *m_playfield2, *m_alpha2);
 }
 
-uint32_t cyberbal_state::screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cyberbal2p_state::screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return update_one_screen(screen, bitmap, cliprect, 0);
+	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield, *m_alpha);
 }

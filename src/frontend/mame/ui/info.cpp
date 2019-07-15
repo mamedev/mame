@@ -14,6 +14,7 @@
 #include "ui/ui.h"
 
 #include "drivenum.h"
+#include "romload.h"
 #include "softlist.h"
 #include "emuopts.h"
 
@@ -27,20 +28,27 @@ constexpr machine_flags::type MACHINE_WARNINGS  = machine_flags::NO_COCKTAIL | m
 constexpr machine_flags::type MACHINE_BTANB     = machine_flags::NO_SOUND_HW | machine_flags::IS_INCOMPLETE;
 
 constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
-		{ device_t::feature::PROTECTION,    __("protection")    },
-		{ device_t::feature::PALETTE,       __("color palette") },
-		{ device_t::feature::GRAPHICS,      __("graphics")      },
-		{ device_t::feature::SOUND,         __("sound")         },
-		{ device_t::feature::CONTROLS,      __("controls")      },
-		{ device_t::feature::KEYBOARD,      __("keyboard")      },
-		{ device_t::feature::MOUSE,         __("mouse")         },
-		{ device_t::feature::MICROPHONE,    __("microphone")    },
-		{ device_t::feature::CAMERA,        __("camera")        },
-		{ device_t::feature::DISK,          __("disk")          },
-		{ device_t::feature::PRINTER,       __("printer")       },
-		{ device_t::feature::LAN,           __("LAN")           },
-		{ device_t::feature::WAN,           __("WAN")           },
-		{ device_t::feature::TIMING,        __("timing")        } };
+		{ device_t::feature::PROTECTION,    __("protection")            },
+		{ device_t::feature::TIMING,        __("timing")                },
+		{ device_t::feature::GRAPHICS,      __("graphics")              },
+		{ device_t::feature::PALETTE,       __("color palette")         },
+		{ device_t::feature::SOUND,         __("sound")                 },
+		{ device_t::feature::CAPTURE,       __("capture hardware")      },
+		{ device_t::feature::CAMERA,        __("camera")                },
+		{ device_t::feature::MICROPHONE,    __("microphone")            },
+		{ device_t::feature::CONTROLS,      __("controls")              },
+		{ device_t::feature::KEYBOARD,      __("keyboard")              },
+		{ device_t::feature::MOUSE,         __("mouse")                 },
+		{ device_t::feature::MEDIA,         __("media")                 },
+		{ device_t::feature::DISK,          __("disk")                  },
+		{ device_t::feature::PRINTER,       __("printer")               },
+		{ device_t::feature::TAPE,          __("magnetic tape")         },
+		{ device_t::feature::PUNCH,         __("punch tape")            },
+		{ device_t::feature::DRUM,          __("magnetic drum")         },
+		{ device_t::feature::ROM,           __("solid state storage")   },
+		{ device_t::feature::COMMS,         __("communications")        },
+		{ device_t::feature::LAN,           __("LAN")                   },
+		{ device_t::feature::WAN,           __("WAN")                   } };
 
 } // anonymous namespace
 
@@ -50,18 +58,19 @@ constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
 //  machine_static_info - constructors
 //-------------------------------------------------
 
-machine_static_info::machine_static_info(machine_config const &config)
-	: machine_static_info(config, nullptr)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config)
+	: machine_static_info(options, config, nullptr)
 {
 }
 
-machine_static_info::machine_static_info(machine_config const &config, ioport_list const &ports)
-	: machine_static_info(config, &ports)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const &ports)
+	: machine_static_info(options, config, &ports)
 {
 }
 
-machine_static_info::machine_static_info(machine_config const &config, ioport_list const *ports)
-	: m_flags(config.gamedrv().flags)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports)
+	: m_options(options)
+	, m_flags(config.gamedrv().flags)
 	, m_unemulated_features(config.gamedrv().type.unemulated_features())
 	, m_imperfect_features(config.gamedrv().type.imperfect_features())
 	, m_has_bioses(false)
@@ -146,7 +155,7 @@ rgb_t machine_static_info::warnings_color() const
 	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
 	else
-		return UI_BACKGROUND_COLOR;
+		return m_options.background_color();
 }
 
 
@@ -156,7 +165,7 @@ rgb_t machine_static_info::warnings_color() const
 //-------------------------------------------------
 
 machine_info::machine_info(running_machine &machine)
-	: machine_static_info(machine.config(), machine.ioport().ports())
+	: machine_static_info(dynamic_cast<mame_ui_manager *>(&machine.ui())->options(), machine.config(), machine.ioport().ports())
 	, m_machine(machine)
 {
 }
@@ -384,8 +393,8 @@ std::string machine_info::game_info_string() const
 				const rectangle &visarea = screen.visible_area();
 				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz",
 						visarea.width(), visarea.height(),
-						(m_machine.system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
+						(screen.orientation() & ORIENTATION_SWAP_XY) ? "V" : "H",
+						screen.frame_period().as_hz());
 			}
 
 			util::stream_format(buf,

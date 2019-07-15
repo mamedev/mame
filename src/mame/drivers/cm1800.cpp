@@ -36,6 +36,7 @@ to be a save command.
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -48,9 +49,7 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
+	DECLARE_READ8_MEMBER(uart_status_r);
 
 	void cm1800(machine_config &config);
 	void io_map(address_map &map);
@@ -61,35 +60,24 @@ private:
 	required_device<ay31015_device> m_uart;
 };
 
-WRITE8_MEMBER( cm1800_state::port00_w )
+READ8_MEMBER(cm1800_state::uart_status_r)
 {
-	m_uart->set_transmit_data(data);
+	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }
 
-READ8_MEMBER( cm1800_state::port01_r )
+void cm1800_state::mem_map(address_map &map)
 {
-	return (m_uart->get_output_pin(AY31015_DAV)) | (m_uart->get_output_pin(AY31015_TBMT) << 2);
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0xffff).ram();
 }
 
-READ8_MEMBER( cm1800_state::port00_r )
+void cm1800_state::io_map(address_map &map)
 {
-	m_uart->set_input_pin(AY31015_RDAV, 0);
-	u8 result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
-	return result;
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x01, 0x01).r(FUNC(cm1800_state::uart_status_r));
 }
-
-ADDRESS_MAP_START(cm1800_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x0800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(cm1800_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READWRITE(port00_r,port00_w)
-	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
-ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( cm1800 )
@@ -98,32 +86,37 @@ INPUT_PORTS_END
 
 void cm1800_state::machine_reset()
 {
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	m_uart->set_input_pin(AY31015_NP, 1);
-	m_uart->set_input_pin(AY31015_TSB, 0);
-	m_uart->set_input_pin(AY31015_NB1, 1);
-	m_uart->set_input_pin(AY31015_NB2, 1);
-	m_uart->set_input_pin(AY31015_EPS, 1);
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
+	m_uart->write_swe(0);
+	m_uart->write_np(1);
+	m_uart->write_tsb(0);
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_eps(1);
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
-MACHINE_CONFIG_START(cm1800_state::cm1800)
+void cm1800_state::cm1800(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	I8080(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cm1800_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cm1800_state::io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // exact uart type is unknown
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-MACHINE_CONFIG_END
+	AY51013(config, m_uart); // exact uart type is unknown
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->set_auto_rdav(true);
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart, FUNC(ay31015_device::write_rcp));
+
+	RS232_PORT(config, "rs232", default_rs232_devices, "terminal");
+}
 
 /* ROM definition */
 ROM_START( cm1800 )
@@ -133,5 +126,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY      FULLNAME   FLAGS */
-COMP( 1981, cm1800,  0,      0,       cm1800,    cm1800, cm1800_state,  0,    "<unknown>", "CM-1800", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME   FLAGS */
+COMP( 1981, cm1800, 0,      0,      cm1800,  cm1800, cm1800_state, empty_init, "<unknown>", "CM-1800", MACHINE_NO_SOUND_HW)

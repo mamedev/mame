@@ -19,16 +19,6 @@ DECLARE_DEVICE_TYPE(ZACCARIA_1B11107, zac1b11107_audio_device)
 DECLARE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device)
 
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ZACCARIA_1B11142_SET_ACS_CALLBACK(_devcb) \
-	devcb = &zac1b11142_audio_device::static_set_acs_cb(*device, DEVCB_##_devcb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -65,7 +55,7 @@ protected:
 class zac1b11107_audio_device : public zac1b111xx_melody_base
 {
 public:
-	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -84,10 +74,9 @@ protected:
 class zac1b11142_audio_device : public zac1b111xx_melody_base
 {
 public:
-	template <class Object> static devcb_base &static_set_acs_cb(device_t &device, Object &&cb)
-	{ return downcast<zac1b11142_audio_device &>(device).m_acs_cb.set_callback(std::forward<Object>(cb)); }
+	auto acs_cb() { return m_acs_cb.bind(); }
 
-	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(hs_w);

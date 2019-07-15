@@ -1,21 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
+#ifndef MAME_INCLUDES_CIRCUS_H
+#define MAME_INCLUDES_CIRCUS_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
 
 class circus_state : public driver_device
 {
 public:
-	circus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	circus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -29,7 +35,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -40,10 +46,10 @@ public:
 	DECLARE_WRITE8_MEMBER(circus_clown_x_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_y_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_z_w);
-	DECLARE_DRIVER_INIT(ripcord);
-	DECLARE_DRIVER_INIT(circus);
-	DECLARE_DRIVER_INIT(robotbwl);
-	DECLARE_DRIVER_INIT(crash);
+	void init_ripcord();
+	void init_circus();
+	void init_robotbwl();
+	void init_crash();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -69,10 +75,12 @@ public:
 };
 /*----------- defined in audio/circus.c -----------*/
 
-DISCRETE_SOUND_EXTERN( circus );
-DISCRETE_SOUND_EXTERN( robotbwl );
-DISCRETE_SOUND_EXTERN( crash );
+DISCRETE_SOUND_EXTERN( circus_discrete );
+DISCRETE_SOUND_EXTERN( robotbwl_discrete );
+DISCRETE_SOUND_EXTERN( crash_discrete );
 extern const char *const circus_sample_names[];
 extern const char *const crash_sample_names[];
 extern const char *const ripcord_sample_names[];
 extern const char *const robotbwl_sample_names[];
+
+#endif // MAME_INCLUDES_CIRCUS_H

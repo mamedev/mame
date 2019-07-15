@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Paul Priest
+// copyright-holders:David Haywood,Paul Priest, Luca Elia
 /* Jaleco MegaSystem 32 Video Hardware */
 
 /* The Video Hardware is Similar to the Non-MS32 Version of Tetris Plus 2 */
@@ -131,6 +131,7 @@ void ms32_state::update_color(int color)
 	   affecting bg & sprites, not fg.
 	   The second brightness control might apply to shadows, see gametngk.
 	 */
+	// TODO : p47aces : brightness are disabled sometimes, see https://youtu.be/PQsefFtqAwA
 	if (~color & 0x4000)
 	{
 		r = ((m_palram[color*2] & 0xff00) >>8 ) * m_brt_r / 0x100;

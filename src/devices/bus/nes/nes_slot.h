@@ -166,19 +166,19 @@ public:
 	virtual ~device_nes_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ex) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex) { }
+	virtual uint8_t read_l(offs_t offset);
+	virtual uint8_t read_m(offs_t offset);
+	virtual uint8_t read_h(offs_t offset) { return 0xff; }
+	virtual uint8_t read_ex(offs_t offset) { return 0xff; }
+	virtual void write_l(offs_t offset, uint8_t data);
+	virtual void write_m(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data);
+	virtual void write_ex(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_WRITE8_MEMBER(chr_w);
-	virtual DECLARE_READ8_MEMBER(nt_r);
-	virtual DECLARE_WRITE8_MEMBER(nt_w);
+	virtual uint8_t chr_r(offs_t offset);
+	virtual void chr_w(offs_t offset, uint8_t data);
+	virtual uint8_t nt_r(offs_t offset);
+	virtual void nt_w(offs_t offset, uint8_t data);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
@@ -200,23 +200,26 @@ public:
 
 	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
+	void set_n163_vol(int vol) { m_n163_vol = vol; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
+	uint8_t get_open_bus() { return m_open_bus; }
 	void set_open_bus(uint8_t val) { m_open_bus = val; }
 
-	uint8_t* get_prg_base() { return m_prg; }
-	uint8_t* get_prgram_base() { return &m_prgram[0]; }
-	uint8_t* get_vrom_base() { return m_vrom; }
-	uint8_t* get_vram_base() { return &m_vram[0]; }
-	uint8_t* get_battery_base() { return &m_battery[0]; }
-	uint8_t* get_mapper_sram_base() { return m_mapper_sram; }
+	uint8_t *get_prg_base() { return m_prg; }
+	uint8_t *get_prgram_base() { return &m_prgram[0]; }
+	uint8_t *get_vrom_base() { return m_vrom; }
+	uint8_t *get_vram_base() { return &m_vram[0]; }
+	uint8_t *get_ciram_base() { return m_ciram; }
+	uint8_t *get_battery_base() { return &m_battery[0]; }
+	uint8_t *get_mapper_sram_base() { return m_mapper_sram; }
 
-	uint32_t get_prg_size() { return m_prg_size; }
-	uint32_t get_prgram_size() { return m_prgram.size(); }
-	uint32_t get_vrom_size() { return m_vrom_size; }
-	uint32_t get_vram_size() { return m_vram.size(); }
-	uint32_t get_battery_size() { return m_battery.size(); }
-	uint32_t get_mapper_sram_size() { return m_mapper_sram_size; }
+	uint32_t get_prg_size() const { return m_prg_size; }
+	uint32_t get_prgram_size() const { return m_prgram.size(); }
+	uint32_t get_vrom_size() const { return m_vrom_size; }
+	uint32_t get_vram_size() const { return m_vram.size(); }
+	uint32_t get_battery_size() const { return m_battery.size(); }
+	uint32_t get_mapper_sram_size() const { return m_mapper_sram_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
 	virtual void hblank_irq(int scanline, int vblank, int blanked) {}
@@ -233,6 +236,11 @@ public:
 protected:
 	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
+	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
+	void hold_irq_line();
+	void reset_cpu();
+	void poke(offs_t offset, uint8_t data);
+
 	// internal state
 	uint8_t *m_prg;
 	uint8_t *m_vrom;
@@ -243,10 +251,12 @@ protected:
 	uint32_t m_prg_size;
 	uint32_t m_vrom_size;
 
+private:
 	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
 	// main NES CPU here, even if it does not belong to this device.
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
+protected:
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
 	uint8_t *m_mapper_sram;
@@ -258,13 +268,16 @@ protected:
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
+	int m_n163_vol;
 
 	int m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
 	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
 	bool m_bus_conflict;
+private:
 	uint8_t m_open_bus;
 
+public:
 	// PRG
 	inline int prg_8k_bank_num(int bank);
 	inline void update_prg_banks(int prg_bank_start, int prg_bank_end);
@@ -339,6 +352,15 @@ class nes_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: nes_cart_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_cart_slot_device();
 
@@ -372,14 +394,14 @@ public:
 	int nes_get_pcb_id(const char *slot);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ex);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex);
+	virtual uint8_t read_l(offs_t offset);
+	virtual uint8_t read_m(offs_t offset);
+	virtual uint8_t read_h(offs_t offset);
+	virtual uint8_t read_ex(offs_t offset);
+	virtual void write_l(offs_t offset, uint8_t data);
+	virtual void write_m(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data);
+	virtual void write_ex(offs_t offset, uint8_t data);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }
@@ -412,20 +434,5 @@ DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 #define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
 #define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
-
-
-#define MCFG_NES_CARTRIDGE_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, NES_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
-	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(false);
-
-
-// Hacky configuration to add a slot with fixed disksys interface
-#define MCFG_DISKSYS_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, NES_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
-	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
 #endif // MAME_BUS_NES_NES_SLOT_H

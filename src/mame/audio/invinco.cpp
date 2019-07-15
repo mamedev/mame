@@ -94,11 +94,11 @@ WRITE8_MEMBER( vicdual_state::invinco_audio_w )
 }
 
 
-MACHINE_CONFIG_START(vicdual_state::invinco_audio)
-
+void vicdual_state::invinco_audio(machine_config &config)
+{
 	/* samples */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(invinco_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(invinco_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}

@@ -110,16 +110,6 @@ typedef int16_t SWORD68K;
 #define BYTE68K_MAX 255
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MCD212_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_MCD212, 0)
-#define MCFG_MCD212_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACHINE_MCD212, 0)
-#define MCFG_MCD212_SET_SCREEN MCFG_VIDEO_SET_SCREEN
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -129,17 +119,32 @@ class mcd212_device : public device_t,
 						public device_video_interface
 {
 public:
+	typedef device_delegate<void (int)> scanline_callback_delegate;
+
 	// construction/destruction
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto int_callback() { return m_int_callback.bind(); }
+
+	template <typename Object> void set_scanline_callback(Object &&cb) { m_scanline_callback = std::forward<Object>(cb); }
+	void set_scanline_callback(scanline_callback_delegate callback) { m_scanline_callback = callback; }
+	template <class FunctionClass> void set_scanline_callback(const char *devname, void (FunctionClass::*callback)(int), const char *name)
+	{
+		set_scanline_callback(scanline_callback_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_scanline_callback(void (FunctionClass::*callback)(int), const char *name)
+	{
+		set_scanline_callback(scanline_callback_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// device members
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );
 	TIMER_CALLBACK_MEMBER( perform_scan );
 
-	void ab_init();
-
 	bitmap_rgb32& get_bitmap() { return m_bitmap; }
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct channel_t
 	{
@@ -206,10 +211,19 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	// interrupt callbacks
+	devcb_write_line m_int_callback;
+
+	scanline_callback_delegate m_scanline_callback;
+
+	required_shared_ptr<uint16_t> m_planea;
+	required_shared_ptr<uint16_t> m_planeb;
+
 	// internal state
 	channel_t m_channel[2];
 	emu_timer *m_scan_timer;
@@ -245,10 +259,10 @@ private:
 	void draw_cursor(uint32_t *scanline, int y);
 	void draw_scanline(int y);
 
-	void draw_lcd(int y);
+	void ab_init();
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(MACHINE_MCD212, mcd212_device)
+DECLARE_DEVICE_TYPE(MCD212, mcd212_device)
 
 #endif // MAME_VIDEO_MCD212_H

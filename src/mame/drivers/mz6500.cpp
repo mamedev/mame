@@ -10,8 +10,10 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mz6500_state : public driver_device
@@ -25,6 +27,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
+	void mz6500(machine_config &config);
+
+private:
 	required_device<upd7220_device> m_hgdc;
 	required_device<upd765a_device> m_fdc;
 	DECLARE_READ8_MEMBER(mz6500_vram_r);
@@ -37,7 +42,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void mz6500(machine_config &config);
 	void mz6500_io(address_map &map);
 	void mz6500_map(address_map &map);
 	void upd7220_map(address_map &map);
@@ -80,26 +84,28 @@ WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
 	m_video_ram[offset] |= data << mask;
 }
 
-ADDRESS_MAP_START(mz6500_state::mz6500_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x9ffff) AM_RAM
+void mz6500_state::mz6500_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x9ffff).ram();
 //  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
-	AM_RANGE(0xc0000,0xeffff) AM_READWRITE8(mz6500_vram_r,mz6500_vram_w,0xffff)
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
+	map(0xfc000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(mz6500_state::mz6500_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void mz6500_state::mz6500_io(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x0000, 0x000f) i8237 dma
 //  AM_RANGE(0x0010, 0x001f) i8255
-	AM_RANGE(0x0020, 0x0021) AM_MIRROR(0xe) AM_DEVICE8("upd765", upd765a_device, map, 0xffff)
+	map(0x0020, 0x0021).mirror(0xe).m(m_fdc, FUNC(upd765a_device::map));
 //  AM_RANGE(0x0030, 0x003f) i8259 master
 //  AM_RANGE(0x0040, 0x004f) i8259 slave
 //  AM_RANGE(0x0050, 0x0050) segment byte for DMA
 //  AM_RANGE(0x0060, 0x0060) system port A
 //  AM_RANGE(0x0070, 0x0070) system port C
 //  AM_RANGE(0x00cd, 0x00cd) MZ-1R32
-	AM_RANGE(0x0100, 0x0103) AM_MIRROR(0xc) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff)
+	map(0x0100, 0x0103).mirror(0xc).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x0110, 0x011f) video address / data registers (priority)
 //  AM_RANGE(0x0120, 0x012f) video registers
 //  AM_RANGE(0x0130, 0x013f) video register
@@ -111,7 +117,7 @@ ADDRESS_MAP_START(mz6500_state::mz6500_io)
 //  AM_RANGE(0x0240, 0x0240) z80ctc vector ack
 //  AM_RANGE(0x0250, 0x0250) z80sio vector ack
 //  AM_RANGE(0x0270, 0x0270) system port B
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mz6500 )
@@ -132,40 +138,43 @@ void mz6500_state::fdc_drq(bool state)
 	//printf("%02x DRQ\n",state);
 }
 
-static SLOT_INTERFACE_START( mz6500_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void mz6500_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
-ADDRESS_MAP_START(mz6500_state::upd7220_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void mz6500_state::upd7220_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram().share("video_ram");
+}
 
 
-MACHINE_CONFIG_START(mz6500_state::mz6500)
+void mz6500_state::mz6500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000) //unk clock
-	MCFG_CPU_PROGRAM_MAP(mz6500_map)
-	MCFG_CPU_IO_MAP(mz6500_io)
+	I8086(config, m_maincpu, 8000000); //unk clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz6500_state::mz6500_map);
+	m_maincpu->set_addrmap(AS_IO, &mz6500_state::mz6500_io);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_PALETTE_ADD("palette", 8)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	PALETTE(config, "palette").set_entries(8);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz6500_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc, 8000000/6); // unk clock
+	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
+	m_hgdc->set_display_pixels(FUNC(mz6500_state::hgdc_display_pixels));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	UPD765A(config, m_fdc, 8000000, true, true);
+	FLOPPY_CONNECTOR(config, "upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats);
+}
 
 /* ROM definition */
 ROM_START( mz6500 )
@@ -181,5 +190,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE            INIT   COMPANY    FULLNAME   FLAGS
-COMP( 198?, mz6500,  0,      0,       mz6500,    mz6500, mz6500_state,    0,     "Sharp",   "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 198?, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

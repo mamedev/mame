@@ -13,33 +13,64 @@
 #include "includes/warpwarp.h"
 
 
-static const rgb_t geebee_palette[] =
+static constexpr rgb_t geebee_pens[] =
 {
 	rgb_t(0x00,0x00,0x00), /* black */
 	rgb_t(0xff,0xff,0xff), /* white */
 	rgb_t(0x7f,0x7f,0x7f)  /* grey  */
 };
 
-PALETTE_INIT_MEMBER(warpwarp_state,geebee)
+void warpwarp_state::geebee_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, geebee_palette[0]);
-	palette.set_pen_color(1, geebee_palette[1]);
-	palette.set_pen_color(2, geebee_palette[1]);
-	palette.set_pen_color(3, geebee_palette[0]);
-	palette.set_pen_color(4, geebee_palette[0]);
-	palette.set_pen_color(5, geebee_palette[2]);
-	palette.set_pen_color(6, geebee_palette[2]);
-	palette.set_pen_color(7, geebee_palette[0]);
+	palette.set_pen_color(0, geebee_pens[0]);
+	palette.set_pen_color(1, geebee_pens[1]);
+	palette.set_pen_color(2, geebee_pens[1]);
+	palette.set_pen_color(3, geebee_pens[0]);
+	palette.set_pen_color(4, geebee_pens[0]);
+	palette.set_pen_color(5, geebee_pens[2]);
+	palette.set_pen_color(6, geebee_pens[2]);
+	palette.set_pen_color(7, geebee_pens[0]);
 }
 
-PALETTE_INIT_MEMBER(warpwarp_state,navarone)
+void warpwarp_state::navarone_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, geebee_palette[0]);
-	palette.set_pen_color(1, geebee_palette[1]);
-	palette.set_pen_color(2, geebee_palette[1]);
-	palette.set_pen_color(3, geebee_palette[0]);
+	palette.set_pen_color(0, geebee_pens[0]);
+	palette.set_pen_color(1, geebee_pens[1]);
+	palette.set_pen_color(2, geebee_pens[1]);
+	palette.set_pen_color(3, geebee_pens[0]);
 }
 
+MACHINE_RESET_MEMBER(warpwarp_state,kaitei)
+{
+	// Some PCB videos/images shows a b&w arrangement, others a full colorized one.
+	// This is due of the monitor type used, cfr. http://news.livedoor.com/article/detail/5604337/
+
+	// We change color palette at reset time, according to the configuration switch.
+	if (m_in_config->read() & 1) // color
+	{
+		m_palette->set_pen_color(0, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(1, rgb_t(0x00,0xff,0xff));
+		m_palette->set_pen_color(2, rgb_t(0x00,0xff,0xff));
+		m_palette->set_pen_color(3, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(4, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(5, rgb_t(0x00,0xff,0x00));
+		m_palette->set_pen_color(6, rgb_t(0x00,0xff,0x00));
+		m_palette->set_pen_color(7, rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(8, rgb_t(0xff,0x00,0x00)); // ball pen
+	}
+	else // b & w
+	{
+		m_palette->set_pen_color(0, geebee_pens[0]);
+		m_palette->set_pen_color(1, geebee_pens[1]);
+		m_palette->set_pen_color(2, geebee_pens[1]);
+		m_palette->set_pen_color(3, geebee_pens[0]);
+		m_palette->set_pen_color(4, geebee_pens[0]);
+		m_palette->set_pen_color(5, geebee_pens[1]);
+		m_palette->set_pen_color(6, geebee_pens[1]);
+		m_palette->set_pen_color(7, geebee_pens[0]);
+		m_palette->set_pen_color(8, geebee_pens[1]); // ball pen
+	}
+}
 
 /***************************************************************************
 
@@ -61,14 +92,13 @@ PALETTE_INIT_MEMBER(warpwarp_state,navarone)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
+void warpwarp_state::warpwarp_palette(palette_device &palette) const
 {
-	static const int resistances_tiles_rg[] = { 1600, 820, 390 };
-	static const int resistances_tiles_b[]  = { 820, 390 };
-	static const int resistance_ball[]      = { 220 };
+	static constexpr int resistances_tiles_rg[] = { 1600, 820, 390 };
+	static constexpr int resistances_tiles_b[]  = { 820, 390 };
+	static constexpr int resistance_ball[]      = { 220 };
 
 	double weights_tiles_rg[3], weights_tiles_b[2], weight_ball[1];
-
 	compute_resistor_weights(0, 0xff, -1.0,
 								3, resistances_tiles_rg, weights_tiles_rg, 150, 0,
 								2, resistances_tiles_b,  weights_tiles_b,  150, 0,
@@ -77,27 +107,26 @@ PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 	for (int i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2;
-		int r,g,b;
 
-		/* red component */
-		bit0 = (i >> 0) & 0x01;
-		bit1 = (i >> 1) & 0x01;
-		bit2 = (i >> 2) & 0x01;
-		r = combine_3_weights(weights_tiles_rg, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(i, 0);
+		bit1 = BIT(i, 1);
+		bit2 = BIT(i, 2);
+		int const r = combine_weights(weights_tiles_rg, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (i >> 3) & 0x01;
-		bit1 = (i >> 4) & 0x01;
-		bit2 = (i >> 5) & 0x01;
-		g = combine_3_weights(weights_tiles_rg, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(i, 3);
+		bit1 = BIT(i, 4);
+		bit2 = BIT(i, 5);
+		int const g = combine_weights(weights_tiles_rg, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (i >> 6) & 0x01;
-		bit1 = (i >> 7) & 0x01;
-		b = combine_2_weights(weights_tiles_b, bit0, bit1);
+		// blue component
+		bit0 = BIT(i, 6);
+		bit1 = BIT(i, 7);
+		int const b = combine_weights(weights_tiles_b, bit0, bit1);
 
-		palette.set_pen_color((i * 2) + 0, rgb_t::black());
-		palette.set_pen_color((i * 2) + 1, rgb_t(r, g, b));
+		palette.set_pen_color((i << 1) | 0, rgb_t::black());
+		palette.set_pen_color((i << 1) | 1, rgb_t(r, g, b));
 	}
 
 	palette.set_pen_color(0x200, rgb_t(weight_ball[0], weight_ball[0], weight_ball[0]));
@@ -217,14 +246,8 @@ void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,p
 	{
 		int x,y,i,j;
 
-		if (flip_screen() & 1) {
-			x = 376 - m_ball_h;
-			y = 280 - m_ball_v;
-		}
-		else {
-			x = 264 - m_ball_h;
-			y = 240 - m_ball_v;
-		}
+		x = 264 - m_ball_h;
+		y = 240 - m_ball_v;
 
 		for (i = m_ball_sizey;i > 0;i--)
 			for (j = m_ball_sizex;j > 0;j--)

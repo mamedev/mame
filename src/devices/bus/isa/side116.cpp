@@ -22,10 +22,11 @@ DEFINE_DEVICE_TYPE(ISA8_SIDE116, side116_device, "side116", "Acculogic sIDE-1/16
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(side116_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(side116_device, ide_interrupt))
-MACHINE_CONFIG_END
+void side116_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	m_ata->irq_handler().set(FUNC(side116_device::ide_interrupt));
+}
 
 
 //-------------------------------------------------

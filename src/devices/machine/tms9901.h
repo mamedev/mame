@@ -16,7 +16,7 @@
 #define MAME_MACHINE_TMS9901_H
 
 
-extern const device_type TMS9901;
+DECLARE_DEVICE_TYPE(TMS9901, tms9901_device)
 
 /***************************************************************************
     MACROS
@@ -29,50 +29,65 @@ extern const device_type TMS9901;
 class tms9901_device : public device_t
 {
 public:
-	// Masks for the interrupts levels available on TMS9901
-	static constexpr int INT1 = 0x0002;
-	static constexpr int INT2 = 0x0004;
-	static constexpr int INT3 = 0x0008;     // overridden by the timer interrupt
-	static constexpr int INT4 = 0x0010;
-	static constexpr int INT5 = 0x0020;
-	static constexpr int INT6 = 0x0040;
-	static constexpr int INT7 = 0x0080;
-	static constexpr int INT8 = 0x0100;
-	static constexpr int INT9 = 0x0200;
-	static constexpr int INTA = 0x0400;
-	static constexpr int INTB = 0x0800;
-	static constexpr int INTC = 0x1000;
-	static constexpr int INTD = 0x2000;
-	static constexpr int INTE = 0x4000;
-	static constexpr int INTF = 0x8000;
-
+	// I/O pins
 	enum
 	{
-		CB_INT7 = 0,
-		INT8_INT15 = 1,
-		P0_P7 = 2,
-		P8_P15 = 3
-	};
+		INT1=1,
+		INT2,
+		INT3,
+		INT4,
+		INT5,
+		INT6,
+		INT7_P15,
+		INT8_P14,
+		INT9_P13,
+		INT10_P12,
+		INT11_P11,
+		INT12_P10,
+		INT13_P9,
+		INT14_P8,
+		INT15_P7,
+		P0,
+		P1,
+		P2,
+		P3,
+		P4,
+		P5,
+		P6
+	} pins;
 
 	tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_single_int(int pin_number, int state);
+	void set_int_line(int pin_number, int state);
 
 	DECLARE_WRITE_LINE_MEMBER( rst1_line );
+
+	// Synchronous clock input
+	DECLARE_WRITE_LINE_MEMBER( phi_line );
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	template <class Object> static devcb_base &static_set_readblock_callback(device_t &device, Object &&cb)  { return downcast<tms9901_device &>(device).m_read_block.set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> static devcb_base &static_set_p_callback(device_t &device, Object &&cb)  { return downcast<tms9901_device &>(device).m_write_p[N].set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_intlevel_callback(device_t &device, Object &&cb)  { return downcast<tms9901_device &>(device).m_interrupt.set_callback(std::forward<Object>(cb)); }
+	auto p_out_cb(int n) { return m_write_p[n].bind(); }
+	auto read_cb() { return m_read_port.bind(); }
+	auto intreq_cb() { return m_interrupt.bind(); }
+
+	// Pins IC3...IC0
+	// When no interrupt is active, the IC lines are all set to 1
+	// The difference to /INT15 is that INTREQ is cleared.
+	int get_int_level() { return m_int_pending? m_int_level : 15; }
+
+	// Return PIO all outputs; ports configured as inputs return 1
+	// Used by si5500
+	uint16_t pio_outputs() const { return m_pio_output | ~m_pio_direction; }
+
+	void set_poll_int_lines(bool poll) { m_poll_lines = poll; }
 
 private:
 	static constexpr device_timer_id DECREMENTER = 0;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void timer_reload();
-	void field_interrupts();
+	void soft_reset();
 
 	void device_start() override;
 	void device_stop() override;
@@ -81,115 +96,77 @@ private:
 	// Common method for device_reset and rst1_line
 	void do_reset();
 
+	// Common clock handling
+	void timer_clock_in(line_state clk);
+
+	// Direction and value of P pins
+	bool is_output(int p);
+	bool output_value(int p);
+	void set_and_latch_output(int p, bool val);
+	void set_bit(uint16_t& bitfield, int pos, bool val);
+
+	int m_int_level;
+	int m_last_level;
+
 	// State of the INT1-INT15 lines (must be inverted when queried)
 	// Note that the levels must also be delivered when reading the pins, which
-	// may require to latch the int levels.
-	int m_int_state;
-	int m_old_int_state;        // stores the previous value to avoid useless INT line assertions
-	int m_enabled_ints;         // interrupt enable mask
+	// may require to latch the int levels on the caller's side.
+	uint16_t m_int_line;
+	uint16_t m_int_mask;
+	bool m_int_pending;
+	bool m_poll_lines;
 
-	bool m_int_pending;         // status of the int* pin (connected to TMS9900)
-	bool m_timer_int_pending;   // timer int pending (overrides int3 pin if timer enabled)
+	// Find the interrupt with the lowest level (most important)
+	void prioritize_interrupts();
 
-	// PIO registers
-	int m_pio_direction;        // direction register for PIO
+	// Outgoing INTREQ* line
+	void signal_int();
 
-	// current PIO output (to be masked with pio_direction)
-	int m_pio_output;
+	// Sample the interrupt inputs.
+	void sample_interrupt_inputs();
 
-	// mirrors used for INT7*-INT15*
-	int m_pio_direction_mirror;
-	int m_pio_output_mirror;
+	// P15..P0; 1=output H, 0=output L
+	uint16_t m_pio_output;
+
+	// For P15..P0; 1=output, 0=input
+	// Once set to 1, a reset is necessary to return the pin to input
+	uint16_t m_pio_direction;
 
 	// =======================================================================
 
 	// TMS9901 clock mode
-	// false = so-called interrupt mode (read interrupt state, write interrupt enable mask)
+	// false = interrupt mode (read interrupt state, write interrupt enable mask)
 	// true = clock mode (read/write clock interval)
 	bool m_clock_mode;
 
-	// MESS timer, used to emulate the decrementer register
+	// Clock divider
+	int  m_clockdiv;
+
+	// Clock has reached 0
+	bool m_timer_int_pending;
+
+	// Timer, used to emulate the decrementer register
 	emu_timer *m_decrementer;
 
-	// clock interval, loaded in decrementer when it reaches 0.
-	// 0 means decrementer off
-	int m_clock_register;
+	// Clock interval, loaded in decrementer when it reaches 0.
+	uint16_t m_clock_register;
 
 	// Current decrementer value
-	int m_decrementer_value;
+	uint16_t m_decrementer_value;
 
 	// when we go into timer mode, the decrementer is copied there to allow to read it reliably
-	int m_clock_read_register;
+	uint16_t m_clock_read_register;
 
 	// =======================================================================
 
 	// Read callback.
-	devcb_read8        m_read_block;
+	devcb_read8        m_read_port;
 
 	// I/O lines, used for output. When used as inputs, the levels are delivered via the m_read_block
 	devcb_write_line   m_write_p[16];
 
-	// The invocation corresponds to the INTREQ signal (with the level passed as data)
-	// and the address delivers the interrupt level (0-15)
-	devcb_write8       m_interrupt;
+	// INTREQ pin
+	devcb_write_line   m_interrupt;
 };
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_TMS9901_READBLOCK_HANDLER( _read ) \
-	devcb = &tms9901_device::static_set_readblock_callback( *device, DEVCB_##_read );
-
-#define MCFG_TMS9901_P0_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<0>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P1_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<1>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P2_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<2>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P3_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<3>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P4_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<4>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P5_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<5>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P6_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<6>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P7_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<7>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P8_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<8>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P9_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<9>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P10_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<10>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P11_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<11>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P12_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<12>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P13_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<13>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P14_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<14>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_P15_HANDLER( _write ) \
-	devcb = &tms9901_device::static_set_p_callback<15>( *device, DEVCB_##_write );
-
-#define MCFG_TMS9901_INTLEVEL_HANDLER( _intlevel ) \
-	devcb = &tms9901_device::static_set_intlevel_callback( *device, DEVCB_##_intlevel );
 
 #endif // MAME_MACHINE_TMS9901_H

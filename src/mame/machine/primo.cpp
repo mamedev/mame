@@ -27,10 +27,10 @@
 
 *******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(primo_state::primo_vblank_interrupt)
+WRITE_LINE_MEMBER(primo_state::vblank_irq)
 {
-	if (m_nmi)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /*******************************************************************************
@@ -78,7 +78,7 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	// bit 7, 6 - not used
 
 	// bit 5 - VBLANK
-	data |= (machine().first_screen()->vblank()) ? 0x20 : 0x00;
+	data |= m_screen->vblank() ? 0x20 : 0x00;
 
 	// bit 4 - I4 (external bus)
 
@@ -167,18 +167,18 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	m_iec->clk_w(!BIT(data, 5));
+	m_iec->host_clk_w(!BIT(data, 5));
 
 	// bit 4 - SDATA
-	m_iec->data_w(!BIT(data, 4));
+	m_iec->host_data_w(!BIT(data, 4));
 
 	// bit 3 - not used
 
 	// bit 2 - SRQ
-	m_iec->srq_w(!BIT(data, 2));
+	m_iec->host_srq_w(!BIT(data, 2));
 
 	// bit 1 - ATN
-	m_iec->atn_w(!BIT(data, 1));
+	m_iec->host_atn_w(!BIT(data, 1));
 
 	// bit 0 - not used
 
@@ -205,19 +205,19 @@ void primo_state::primo_common_driver_init (primo_state *state)
 	m_port_FD = 0x00;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo32)
+void primo_state::init_primo32()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0x6800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo48)
+void primo_state::init_primo48()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xa800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo64)
+void primo_state::init_primo64()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xe800;
@@ -229,12 +229,12 @@ DRIVER_INIT_MEMBER(primo_state,primo64)
 
 *******************************************************************************/
 
-void primo_state::primo_common_machine_init ()
+void primo_state::primo_common_machine_init()
 {
-	if (ioport("MEMORY_EXPANSION")->read())
+	if (m_mem_exp_port->read())
 		m_port_FD = 0x00;
 	primo_update_memory();
-	machine().device("maincpu")->set_clock_scale(ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
+	m_maincpu->set_clock_scale(m_clock_port->read() ? 1.5 : 1.0);
 }
 
 void primo_state::machine_start()
@@ -296,7 +296,7 @@ void primo_state::primo_setup_pss (uint8_t* snapshot_data, uint32_t snapshot_siz
 		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, snapshot_data[i + 38]);
 }
 
-SNAPSHOT_LOAD_MEMBER( primo_state, primo )
+SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot_data(snapshot_size);
 
@@ -338,7 +338,7 @@ void primo_state::primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_siz
 	logerror ("Quickload .pp l: %04x r: %04x s: %04x\n", load_addr, start_addr, quickload_size-4);
 }
 
-QUICKLOAD_LOAD_MEMBER( primo_state, primo )
+QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
 {
 	std::vector<uint8_t> quickload_data(quickload_size);
 

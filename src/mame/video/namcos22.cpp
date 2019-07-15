@@ -1,43 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, hap, R. Belmont
-/**
- * video hardware for Namco System22
- *
- * TODO:
- *
- * - emulate slave dsp!
- * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
- *       it used to be much worse with the legacy_poly_manager
- * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
- *       airco22b may have a similar problem. (is this related to dsp? or cpu?)
- * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
- * - improve ss22 fogging:
- *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
- *       + 100% fog if you start dirtdash at the hill level
- * - improve ss22 lighting, eg. mountains in alpinr2b selection screen
- * - improve ss22 spot:
- *       + dirtdash spotlight is opaque for a short time when exiting the jungle level
- *       + dirtdash speedometer has wrong colors when in the jungle level
- *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level (possibly just a game bug?)
- * - add layer enable in system 22, see bugs in cybrcomm and victlapw
- * - window clipping is wrong in acedrvrw, victlapw
- * - ridgerac waving flag title screen is missing, just an empty beach scenery instead
- * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
- * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
- * - alpinr2b skiier selection screen should have mirrored models (easiest to see with cursor on the red pants guy). specular reflection?
- * - propcycl scoreboard sprite part should fade out in attract mode and just before game over, fader or fog related?
- * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
- *       czram contents is rather odd here and partly cleared (probably the cause?):
- *        $0000-$0d7f   - gradual increase from $00-$7c
- *        $0d80-$0fff   - $73, huh, why lower?
- *        $1000-$19ff   - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
- *        $1a00-$0dff   - $77
- *        $1e00-$1fff   - $78
- *
- * - lots of smaller issues
- *
- *
- *******************************/
+/*
+
+     Namco System22 + System Super22 video hardware emulation
+
+*/
 
 #include "emu.h"
 #include "includes/namcos22.h"
@@ -47,21 +14,16 @@
 namcos22_renderer::namcos22_renderer(namcos22_state &state)
 	: poly_manager<float, namcos22_object_data, 4, 8000>(state.machine()),
 		m_state(state)
-	{ }
+	{
+		init();
+	}
 
-void namcos22_renderer::reset()
+void namcos22_renderer::init()
 {
 	memset(&m_scenenode_root, 0, sizeof(m_scenenode_root));
 	m_scenenode_cur = nullptr;
-
-	m_clipx = 320;
-	m_clipy = 240;
-	m_cliprect.set(0, 639, 0, 479);
 }
 
-
-
-/*********************************************************************************************/
 
 // poly scanline callbacks
 void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
@@ -76,7 +38,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	float di = extent.param[3].dpdx;
 	int bn = extra.bn * 0x1000;
 	const pen_t *pens = extra.pens;
-	const uint8_t *czram = extra.czram;
+	const u8 *czram = extra.czram;
 	int cz_adjust = extra.cz_adjust;
 	int cz_sdelta = extra.cz_sdelta;
 	int zfog_enabled = extra.zfog_enabled;
@@ -90,12 +52,12 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	int penmask = 0xff;
 	int penshift = 0;
 	int prioverchar = extra.prioverchar;
-	uint32_t *dest = &extra.destbase->pix32(scanline);
-	uint8_t *primap = &extra.primap->pix8(scanline);
-	uint16_t *ttmap = m_state.m_texture_tilemap;
-	uint8_t *ttattr = m_state.m_texture_tileattr.get();
-	uint8_t *ttdata = m_state.m_texture_tiledata;
-	uint8_t *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
+	u32 *dest = &extra.destbase->pix32(scanline);
+	u8 *primap = &extra.primap->pix8(scanline);
+	u16 *ttmap = m_state.m_texture_tilemap;
+	u8 *ttattr = m_state.m_texture_tileattr.get();
+	u8 *ttdata = m_state.m_texture_tiledata;
+	u8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
 
 	if (extra.cmode & 4)
 	{
@@ -111,23 +73,23 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	}
 
 	// slight differences between super and non-super, do the branch here for optimization
-	// normal: 1 fader, no alpha, shading after fog
+	// normal: no alpha, shading after fog, global fader
 	// super:  2 faders, alpha, shading before fog
 	if (m_state.m_is_ss22)
 	{
 		for (int x = extent.startx; x < extent.stopx; x++)
 		{
 			float ooz = 1.0f / z;
-			int32_t tx = (int)(u * ooz);
-			int32_t ty = (int)(v * ooz) + bn;
-			int32_t to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
-			int32_t pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
+			int tx = (int)(u * ooz);
+			int ty = (int)(v * ooz) + bn;
+			int to = ((ty & 0xfff0) << 4) | ((tx & 0xff0) >> 4);
+			int pen = ttdata[(ttmap[to] << 8) | tt_ayx_to_pixel[ttattr[to] << 8 | (ty << 4 & 0xf0) | (tx & 0xf)]];
 			// pen = 0x55; // debug: disable textures
 
 			rgbaint_t rgb(pens[pen >> penshift & penmask]);
 
 			// apply shading before fog
-			int32_t shade = i*ooz;
+			int shade = i*ooz;
 			rgb.scale_imm_and_clamp(shade << 2);
 
 			// per-z distance fogging
@@ -135,7 +97,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 			{
 				int cz = ooz + cz_adjust;
 				// discard low byte and clamp to 0-1fff
-				if ((uint32_t)cz < 0x200000) cz >>= 8;
+				if ((u32)cz < 0x200000) cz >>= 8;
 				else cz = (cz < 0) ? 0 : 0x1fff;
 				fogfactor = czram[cz] + cz_sdelta;
 				if (fogfactor > 0)
@@ -165,7 +127,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 			}
 
 			dest[x] = rgb.to_rgba();
-			primap[x] |= prioverchar;
+			primap[x] = (primap[x] & ~1) | prioverchar;
 
 			u += du;
 			v += dv;
@@ -191,7 +153,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 			{
 				int cz = ooz + cz_adjust;
 				// discard low byte and clamp to 0-1fff
-				if ((uint32_t)cz < 0x200000) cz >>= 8;
+				if ((u32)cz < 0x200000) cz >>= 8;
 				else cz = (cz < 0) ? 0 : 0x1fff;
 				fogfactor = czram[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ cz];
 				if (fogfactor != 0)
@@ -208,13 +170,8 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 			int shade = i*ooz;
 			rgb.scale_imm_and_clamp(shade << 2);
 
-			if (polyfade_enabled)
-			{
-				rgb.scale_and_clamp(polycolor);
-			}
-
 			dest[x] = rgb.to_rgba();
-			primap[x] |= prioverchar;
+			primap[x] = (primap[x] & ~1) | prioverchar;
 
 			u += du;
 			v += dv;
@@ -237,9 +194,9 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 	int fadefactor = 0xff - extra.fadefactor;
 	rgbaint_t fogcolor(extra.fogcolor);
 	rgbaint_t fadecolor(extra.fadecolor);
-	uint8_t *source = (uint8_t *)extra.source + y_index * extra.line_modulo;
-	uint32_t *dest = &extra.destbase->pix32(scanline);
-	uint8_t *primap = &extra.primap->pix8(scanline);
+	u8 *source = (u8 *)extra.source + y_index * extra.line_modulo;
+	u32 *dest = &extra.destbase->pix32(scanline);
+	u8 *primap = &extra.primap->pix8(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -264,7 +221,7 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 			}
 
 			dest[x] = rgb.to_rgba();
-			primap[x] |= prioverchar;
+			primap[x] = (primap[x] & ~1) | prioverchar;
 		}
 		x_index += dx;
 	}
@@ -276,42 +233,19 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 
 void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node)
 {
-	namcos22_object_data &extra = object_data_alloc();
 	vertex_t v[4];
 	vertex_t clipv[6];
 	int clipverts;
 	int vertnum;
-
 	int direct = node->data.quad.direct;
-	int flags = node->data.quad.flags;
-	int color = node->data.quad.color;
-	int cz_adjust = node->data.quad.cz_adjust;
-
-	extra.destbase = &bitmap;
-	extra.pfade_enabled = 0;
-	extra.zfog_enabled = 0;
-	extra.fadefactor = 0;
-	extra.fogfactor = 0;
-
-	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
-	extra.primap = &screen.priority();
-	extra.bn = node->data.quad.texturebank;
-	extra.flags = flags;
-	extra.cz_adjust = cz_adjust;
-	extra.cmode = node->data.quad.cmode;
-	extra.prioverchar = ((node->data.quad.cmode & 7) == 1) ? 1 : 0;
-	extra.prioverchar |= m_state.m_is_ss22 ? 2 : 0;
 
 	// scene clip
-	int cx = 320 + node->data.quad.vx;
-	int cy = 240 + node->data.quad.vy;
+	float cx = 320.0f + node->data.quad.vx;
+	float cy = 240.0f + node->data.quad.vy;
 	m_clipx = cx;
 	m_clipy = cy;
-	m_cliprect.set(cx + node->data.quad.vw, cx - node->data.quad.vw, cy + node->data.quad.vh, cy - node->data.quad.vh);
-	if (m_cliprect.min_x < 0)   m_cliprect.min_x = 0;
-	if (m_cliprect.max_x > 639) m_cliprect.max_x = 639;
-	if (m_cliprect.min_y < 0)   m_cliprect.min_y = 0;
-	if (m_cliprect.max_y > 479) m_cliprect.max_y = 479;
+	m_cliprect.set(cx + node->data.quad.vl, cx - node->data.quad.vr, cy + node->data.quad.vu, cy - node->data.quad.vd);
+	m_cliprect &= screen.visible_area();
 
 	// non-direct case: project and z-clip
 	if (!direct)
@@ -359,6 +293,26 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
+	namcos22_object_data &extra = object_data_alloc();
+	int flags = node->data.quad.flags;
+	int color = node->data.quad.color;
+	int cz_adjust = node->data.quad.cz_adjust;
+
+	extra.destbase = &bitmap;
+	extra.pfade_enabled = 0;
+	extra.zfog_enabled = 0;
+	extra.fadefactor = 0;
+	extra.fogfactor = 0;
+
+	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
+	extra.primap = &screen.priority();
+	extra.bn = node->data.quad.texturebank;
+	extra.flags = flags;
+	extra.cz_adjust = cz_adjust;
+	extra.cmode = node->data.quad.cmode;
+	extra.prioverchar = ((node->data.quad.cmode & 7) == 1) ? 1 : 0;
+	extra.prioverchar |= m_state.m_is_ss22 ? 2 : 0;
+
 	if (m_state.m_is_ss22)
 	{
 		// global fade
@@ -372,83 +326,29 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		extra.pfade_enabled = m_state.m_poly_fade_enabled;
 		extra.polycolor.set(0, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
 
-		/* poly fog (not completely accurate yet)
-
-		czram contents, it's basically a big cz compare table
-
-		testmode:
-		    o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
-		    czram[0] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f .... 00ff 00df 00bf 009f 007f 005f 003f 001f
-		    czram[1] = 0000 0000 0000 0001 0002 0003 0005 0007 .... 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
-		    czram[2] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 .... 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
-		    czram[3] = 0000 001f 003f 005f 007f 009f 00bf 00df .... 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
-
-		airco22b demo mode, fog color: 76 9a c3
-		    o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
-		    czram[0] = 0000 00e4 0141 0189 01c6 01fb 022c 0258 .... 13bb 13c4 13cd 13d6 13df 13e7 13f0 13f9
-
-		alpinerd (1st course), fog color: c8 c8 c8
-		    o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
-		    czram[0] = 00c8 00ca 00cc 00ce 00d0 00d2 00d4 00d6 .... 02a0 02a2 02a4 02a6 02a8 1fff 1fff ....
-
-		alpinr2b (1st course), fog color: ff ff ff
-		alpinr2b start of race: - gets gradually filled from left to right, initial contents filled with 1fff? - game should be foggy here
-		    o_16          0    1    2    3    4    5    6    7 <  >   67   68   69   6a   6b   6c   6d - ff
-		    czram[0] = 01cd 01d7 01e1 01eb 01f5 01ff 0209 0213 .... 05d3 05dd 05e7 05f1 05fb 1fff 1fff ....
-		    other banks unused, zerofilled
-		alpinr2b mid race: - gets gradually filled from right to left, initial contents above - game should not be foggy here
-		    o_16          0    1    2    3    4    5    6    7 <  >   ec   ed   ee   ef   f0   f1   f2 - ff
-		    czram[0] = 1ffe 1fff 1fff 1fff 1fff 1fff 1fff 1fff .... 1fff 1fff 1fff 1fff 1fff 1fff 1fff 1fff
-
-		cybrcycc (1st course), fog color: 80 80 c0 - 2nd course has same cz table, but fog color 00 00 00
-		    o_16          0    1    2    3    4    5    6    7 <  >   d4   d5   d6   d7   d8   d9   da - ff
-		    czram[0] = 0000 0011 0021 0031 0041 0051 0060 0061 .... 04e0 04e4 04e7 04eb 04ee 1fff 1fff ....
-
-		tokyowar, fog color: 80 c0 ff - it uses cztype 1 too by accident? (becomes fogfactor 0)
-		    o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
-		    czram[0] = 0000 01c5 0244 029f 02e7 0325 035b 038b .... 0eaf 0ec7 0ee0 0efc 0f1b 0f3f 0f6a 0faa
-		    czram[1] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
-		    czram[2] = 0000 0000 0000 0000 0000 0000 0000 0000 .... 0000 0000 0000 0000 0000 0000 0000 0000
-		    czram[3] = 0000 00e8 0191 0206 0265 02b7 0301 0345 .... 1c7e 1cbc 1d00 1d4a 1d9c 1dfb 1e70 1f19
-
-		*/
-
-		/*  czattr: - assumed that it's write-only
-		       0    2    4    6    8    a    c    e
-		    ^^^^ ^^^^ ^^^^ ^^^^                        cz offset, signed16 per cztype 0,1,2,3
-		                        ^^^^                   flags, nybble per cztype 3,2,1,0 - 4 probably means enable
-		                             ^^^^              maincpu ram access bank
-		                                  ^^^^         flags, nybble per cztype 3,2,1,0 - ?
-		                                       ^^^^    ? (only set sometimes in timecris)
-		    0000 0000 0000 0000 7555 0000 00e4 0000 // testmode normal - 0=white to black(mid), 1=white to black(weak), 2=white to black(strong), 3=black to white(mid, reverse of 0)
-		    7fff 8000 7fff 8000 7555 0000 00e4 0000 // testmode offset - 0=black, 1=white, 2=black, 3=white
-		    0000 0000 0000 0000 3111 0000 00e4 0000 // testmode off    - 0=white, 1=white, 2=white, 3=white
-		    0000 0000 0000 0000 4444 0000 0000 0000 // propcycl solitar
-		    0004 0004 0004 0004 4444 0000 0000 0000 // propcycl out pool
-		    00a4 00a4 00a4 00a4 4444 0000 0000 0000 // propcycl in pool
-		    ff80 ff80 ff80 ff80 4444 0000 0000 0000 // propcycl ending
-		    ff80 ff80 ff80 ff80 0000 0000 0000 0000 // propcycl hs entry
-		    0000 0000 0000 0000 0b6c 0000 00e4 0000 // cybrcycc
-		    0000 0000 0000 0000 5554 0000 00e4 0000 // airco22b
-		    ff01 ff01 0000 0000 4444 0000 0000 0000 // alpinerd
-		    0000 0000 0000 0000 4455 0000 000a 0000 // alpinr2b
-		    8001 8001 0000 0000 1111 0000 5555 0000 // aquajet (reg 8 is either 1111 or 5555, reg c is usually interlaced)
-		    0000 0000 0000 0000 5554 0000 0000 0000 // tokyowar
-		*/
+		// poly fog
 		if (~color & 0x80)
 		{
 			int cztype = flags & 3;
-			if (nthword(m_state.m_czattr, 4) & (4 << (cztype * 4)))
+			int bank = m_state.m_czattr[6] >> (cztype * 2) & 3;
+			int bank_enabled = m_state.m_czattr[4] >> (bank * 4) & 4;
+
+			if (bank_enabled)
 			{
-				int delta = (int16_t)nthword(m_state.m_czattr, cztype);
+				s16 delta = m_state.m_czattr[bank];
+				// sign-extend
+				if (delta < 0) delta |= 0xff00;
+				else delta &= 0x00ff;
+
 				extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
+
 				if (direct)
 				{
 					int cz = ((flags & 0x1fff00) + cz_adjust) >> 8;
 					if (cz < 0) cz = 0;
 					else if (cz > 0x1fff) cz = 0x1fff;
 
-					int fogfactor = m_state.m_recalc_czram[cztype][cz] + delta;
+					int fogfactor = m_state.m_recalc_czram[bank][cz] + delta;
 					if (fogfactor > 0)
 					{
 						if (fogfactor > 0xff) fogfactor = 0xff;
@@ -459,7 +359,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 				{
 					extra.zfog_enabled = 1;
 					extra.cz_sdelta = delta;
-					extra.czram = m_state.m_recalc_czram[cztype].get();
+					extra.czram = m_state.m_recalc_czram[bank].get();
 				}
 			}
 		}
@@ -467,13 +367,6 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 
 	else
 	{
-		// global fade
-		if (m_state.m_mixer_flags & 1)
-		{
-			extra.pfade_enabled = m_state.m_poly_fade_enabled;
-			extra.polycolor.set(0, m_state.m_poly_fade_r, m_state.m_poly_fade_g, m_state.m_poly_fade_b);
-		}
-
 		// poly fog
 		if (~color & 0x80)
 		{
@@ -492,7 +385,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			else
 			{
 				extra.zfog_enabled = 1;
-				extra.czram = (uint8_t*)&m_state.m_czram[cztype << (13-2)];
+				extra.czram = (u8*)&m_state.m_czram[cztype << (13-2)];
 			}
 		}
 	}
@@ -504,13 +397,14 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 void namcos22_renderer::poly3d_drawsprite(
 	screen_device &screen,
 	bitmap_rgb32 &dest_bmp,
-	uint32_t code,
-	uint32_t color,
+	u32 code,
+	u32 color,
 	int flipx, int flipy,
 	int sx, int sy,
 	int scalex, int scaley,
 	int cz_factor,
 	int prioverchar,
+	int fade_enabled,
 	int alpha
 )
 {
@@ -561,16 +455,15 @@ void namcos22_renderer::poly3d_drawsprite(
 		vert[3].p[1] = fheight;
 
 		// global fade
-		if (m_state.m_mixer_flags & 2)
+		if (m_state.m_mixer_flags & 2 || fade_enabled)
 		{
 			extra.fadefactor = m_state.m_screen_fade_factor;
 			extra.fadecolor.set(0, m_state.m_screen_fade_r, m_state.m_screen_fade_g, m_state.m_screen_fade_b);
 		}
 
-		// fog, 0xfe is a special case for sprite priority over textlayer
-		if (~color & 0x80 && cz_factor > 0 && cz_factor != 0xfe)
+		// sprite fog
+		if (~color & 0x80 && cz_factor > 0)
 		{
-			// or does it fetch from poly-cz ram? that will break timecris though
 			extra.fogfactor = cz_factor;
 			extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 		}
@@ -579,15 +472,11 @@ void namcos22_renderer::poly3d_drawsprite(
 	}
 }
 
-
 void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node)
 {
 	// scene clip
 	m_cliprect.set(node->data.sprite.cx_min, node->data.sprite.cx_max, node->data.sprite.cy_min, node->data.sprite.cy_max);
-	if (m_cliprect.min_x < 0)   m_cliprect.min_x = 0;
-	if (m_cliprect.max_x > 639) m_cliprect.max_x = 639;
-	if (m_cliprect.min_y < 0)   m_cliprect.min_y = 0;
-	if (m_cliprect.max_y > 479) m_cliprect.max_y = 479;
+	m_cliprect &= screen.visible_area();
 
 	int offset = 0;
 
@@ -613,7 +502,8 @@ void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitma
 				(node->data.sprite.sizex << 16) / 32,
 				(node->data.sprite.sizey << 16) / 32,
 				node->data.sprite.cz,
-				node->data.sprite.pri,
+				node->data.sprite.prioverchar,
+				node->data.sprite.fade_enabled,
 				0xff - node->data.sprite.translucency
 			);
 			offset++;
@@ -646,7 +536,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 	return node;
 }
 
-struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &machine, uint32_t zsort, namcos22_scenenode_type type)
+struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &machine, u32 zsort, namcos22_scenenode_type type)
 {
 	struct namcos22_scenenode *node = &m_scenenode_root;
 	struct namcos22_scenenode *prev = nullptr;
@@ -731,10 +621,6 @@ void namcos22_renderer::render_scene(screen_device &screen, bitmap_rgb32 &bitmap
 		node->data.nonleaf.next[i] = nullptr;
 	}
 
-	m_clipx = 320;
-	m_clipy = 240;
-	m_cliprect.set(0, 639, 0, 479);
-
 	wait("render_scene");
 }
 
@@ -744,9 +630,9 @@ void namcos22_renderer::render_scene(screen_device &screen, bitmap_rgb32 &bitmap
 
 // slave dsp render
 
-float namcos22_state::dspfloat_to_nativefloat(uint32_t val)
+float namcos22_state::dspfloat_to_nativefloat(u32 val)
 {
-	int16_t mantissa = (int16_t)val;
+	s16 mantissa = (s16)val;
 	float result = mantissa;//?((float)mantissa):((float)0x10000);
 	int exponent = (val >> 16) & 0xff;
 	while (exponent < 0x2e)
@@ -757,12 +643,12 @@ float namcos22_state::dspfloat_to_nativefloat(uint32_t val)
 	return result;
 }
 
-/* modal rendering properties */
+// model rendering properties
 void namcos22_state::matrix3d_multiply(float a[4][4], float b[4][4])
 {
-	float temp[4][4];
+	float result[4][4];
 
-	for (int row = 0; row < 4;  row++)
+	for (int row = 0; row < 4; row++)
 	{
 		for (int col = 0; col < 4; col++)
 		{
@@ -771,22 +657,38 @@ void namcos22_state::matrix3d_multiply(float a[4][4], float b[4][4])
 			{
 				sum += a[row][i] * b[i][col];
 			}
-			temp[row][col] = sum;
+			result[row][col] = sum;
 		}
 	}
 
-	memcpy(a, temp, sizeof(temp));
+	memcpy(a, result, sizeof(result));
 }
 
 void namcos22_state::matrix3d_identity(float m[4][4])
 {
-	for (int r = 0; r < 4; r++)
+	for (int row = 0; row < 4; row++)
 	{
-		for (int c = 0; c < 4; c++)
+		for (int col = 0; col < 4; col++)
 		{
-			m[r][c] = (r == c) ? 1.0 : 0.0;
+			m[row][col] = (row == col) ? 1.0f : 0.0f;
 		}
 	}
+}
+
+void namcos22_state::matrix3d_apply_reflection(float m[4][4])
+{
+	if (!m_reflection)
+		return;
+
+	float r[4][4];
+	matrix3d_identity(r);
+
+	if (m_reflection & 0x10)
+		r[0][0] = -1.0f;
+	if (m_reflection & 0x20)
+		r[1][1] = -1.0f;
+
+	matrix3d_multiply(m, r);
 }
 
 void namcos22_state::transform_point(float *vx, float *vy, float *vz, float m[4][4])
@@ -811,7 +713,7 @@ void namcos22_state::transform_normal(float *nx, float *ny, float *nz, float m[4
 	*nz = m[0][2]*x + m[1][2]*y + m[2][2]*z;
 }
 
-void namcos22_state::register_normals(int32_t addr, float m[4][4])
+void namcos22_state::register_normals(int addr, float m[4][4])
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -830,7 +732,7 @@ void namcos22_state::register_normals(int32_t addr, float m[4][4])
 }
 
 
-void namcos22_state::draw_direct_poly(const uint16_t *src)
+void namcos22_state::draw_direct_poly(const u16 *src)
 {
 	if (machine().video().skip_this_frame())
 		return;
@@ -862,13 +764,12 @@ void namcos22_state::draw_direct_poly(const uint16_t *src)
 	*    xx-- ---- // BRI
 	*    --xx xxxx // zpos
 	*/
-	uint32_t zsort = ((src[1] & 0xfff) << 12) | (src[0] & 0xfff);
+	u32 zsort = ((src[1] & 0xfff) << 12) | (src[0] & 0xfff);
 	struct namcos22_scenenode *node = m_poly->new_scenenode(machine(), zsort, NAMCOS22_SCENENODE_QUAD);
 	int cztype = src[3] & 3;
 
 	if (m_is_ss22)
 	{
-		cztype ^= 3; // ? not sure, but this makes testmode look like on a pcb (only 1 pcb checked)
 		node->data.quad.cmode = (src[2] & 0x00f0) >> 4;
 		node->data.quad.texturebank = (src[2] & 0x000f);
 	}
@@ -896,7 +797,7 @@ void namcos22_state::draw_direct_poly(const uint16_t *src)
 			p->v = src[1] & 0x0fff;
 		}
 
-		int mantissa = (int16_t)src[5];
+		int mantissa = (s16)src[5];
 		float zf = (float)mantissa;
 		int exponent = (src[4]) & 0xff;
 		if (mantissa)
@@ -923,8 +824,8 @@ void namcos22_state::draw_direct_poly(const uint16_t *src)
 			p->z = 1.0f / zf;
 		}
 
-		p->x = (int16_t)src[2];
-		p->y = -(int16_t)src[3];
+		p->x = (s16)src[2];
+		p->y = -(s16)src[3];
 		p->bri = src[4] >> 8;
 		src += 6;
 	}
@@ -932,8 +833,10 @@ void namcos22_state::draw_direct_poly(const uint16_t *src)
 	node->data.quad.direct = 1;
 	node->data.quad.vx = 0;
 	node->data.quad.vy = 0;
-	node->data.quad.vw = -320;
-	node->data.quad.vh = -240;
+	node->data.quad.vu = -240;
+	node->data.quad.vd = -240;
+	node->data.quad.vl = -320;
+	node->data.quad.vr = -320;
 }
 
 /**
@@ -969,10 +872,10 @@ void namcos22_state::draw_direct_poly(const uint16_t *src)
  *    0x07350 - guardrail
  *    0x061a8 - red car
  */
-void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint32_t addr, float m[4][4], int32_t polyshift, int flags, int packetformat)
+void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int polyshift, int flags, int packetformat)
 {
 	int absolute_priority = m_absolute_priority;
-	int32_t zsort;
+	int zsort;
 	float zmin = 0.0f;
 	float zmax = 0.0f;
 	namcos22_polyvertex v[4];
@@ -988,16 +891,19 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 	}
 
 	/* backface cull one-sided polygons */
-	if (flags & 0x0020 &&
-		(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
-		(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
-		(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y))) >= 0 &&
-
-		(v[0].x*((v[2].z*v[3].y)-(v[2].y*v[3].z)))+
-		(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
-		(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y))) >= 0)
+	if (flags & 0x0020)
 	{
-		return;
+		float c1 =
+			(v[2].x*((v[0].z*v[1].y)-(v[0].y*v[1].z)))+
+			(v[2].y*((v[0].x*v[1].z)-(v[0].z*v[1].x)))+
+			(v[2].z*((v[0].y*v[1].x)-(v[0].x*v[1].y)));
+		float c2 =
+			(v[0].x*((v[2].z*v[3].y)-(v[2].y*v[3].z)))+
+			(v[0].y*((v[2].x*v[3].z)-(v[2].z*v[3].x)))+
+			(v[0].z*((v[2].y*v[3].x)-(v[2].x*v[3].y)));
+
+		if ((m_cullflip && c1 <= 0.0f && c2 <= 0.0f) || (!m_cullflip && c1 >= 0.0f && c2 >= 0.0f))
+			return;
 	}
 
 	for (i = 0; i < 4; i++)
@@ -1015,15 +921,18 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 		{
 			// lighting (prelim)
 			bri = m_LitSurfaceInfo[m_LitSurfaceIndex % m_LitSurfaceCount];
+
 			if (m_SurfaceNormalFormat == 0x6666)
 			{
 				if (i == 3)
 					m_LitSurfaceIndex++;
 			}
 			else if (m_SurfaceNormalFormat == 0x4000)
+			{
 				m_LitSurfaceIndex++;
+			}
 			else
-				logerror("unknown normal format: 0x%x\n", m_SurfaceNormalFormat);
+				logerror("blit_single_quad:unknown normal format: 0x%x\n", m_SurfaceNormalFormat);
 		}
 		else if (packetformat & 0x40)
 		{
@@ -1045,15 +954,15 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 	switch (flags & 0x300)
 	{
 		case 0x000:
-			zsort = (int32_t)zmin;
+			zsort = (int)zmin;
 			break;
 
 		case 0x100:
-			zsort = (int32_t)zmax;
+			zsort = (int)zmax;
 			break;
 
 		default:
-			zsort = (int32_t)((zmin + zmax) / 2.0f);
+			zsort = (int)((zmin + zmax) / 2.0f);
 			break;
 	}
 
@@ -1105,19 +1014,17 @@ void namcos22_state::blit_single_quad(bitmap_rgb32 &bitmap, uint32_t color, uint
 	node->data.quad.direct = 0;
 	node->data.quad.vx = m_camera_vx;
 	node->data.quad.vy = m_camera_vy;
-	node->data.quad.vw = m_camera_vw;
-	node->data.quad.vh = m_camera_vh;
+	node->data.quad.vu = m_camera_vu;
+	node->data.quad.vd = m_camera_vd;
+	node->data.quad.vl = m_camera_vl;
+	node->data.quad.vr = m_camera_vr;
 }
 
 
-void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4], int32_t base)
+void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 {
-//  int additionalnormals = 0;
-	int chunklength = point_read(addr++);
-	int finish = addr + chunklength;
-
-	if (chunklength > 0x100)
-		fatalerror("bad packet length\n");
+	//int additionalnormals = 0;
+	int finish = addr + len;
 
 	while (addr < finish)
 	{
@@ -1149,7 +1056,7 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4
 				flags = point_read(addr + 1);
 				color = point_read(addr + 2);
 				bias = 0;
-				blit_single_quad(bitmap, color, addr + 3, m, bias, flags, packetformat);
+				blit_single_quad(color, addr + 3, m, bias, flags, packetformat);
 				break;
 
 			case 0x18:
@@ -1162,7 +1069,7 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4
 				flags = point_read(addr + 1);
 				color = point_read(addr + 2);
 				bias  = point_read(addr + 3);
-				blit_single_quad(bitmap, color, addr + 4, m, bias, flags, packetformat);
+				blit_single_quad(color, addr + 4, m, bias, flags, packetformat);
 				break;
 
 			case 0x10: /* vertex lighting */
@@ -1174,7 +1081,7 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4
 				000000  000000  007fff // normal vector
 				000000  000000  007fff // normal vector
 				*/
-//              additionalnormals = point_read(addr+2);
+				//additionalnormals = point_read(addr+2);
 				m_SurfaceNormalFormat = point_read(addr + 3);
 				m_LitSurfaceCount = 0;
 				m_LitSurfaceIndex = 0;
@@ -1193,24 +1100,53 @@ void namcos22_state::blit_quads(bitmap_rgb32 &bitmap, int32_t addr, float m[4][4
 				break;
 
 			default:
-				break;
+				logerror("blit_quads unknown packet length: addr=0x%06x len=0x%x format=0x%x\n", addr-1, packetlength, packetformat);
+				return;
 		}
 		addr += packetlength;
 	}
 }
 
-void namcos22_state::blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][4])
+void namcos22_state::blit_polyobject(int code, float m[4][4])
 {
-	uint32_t addr1 = point_read(code);
+	// list start address, code 5 is special case for pointram
+	int list_addr;
+	bool pointram = (code == 0x5);
+	if (pointram)
+		list_addr = (m_is_ss22) ? 0xf80000 : 0xf00000;
+	else
+		list_addr = point_read(code);
+
 	m_LitSurfaceCount = 0;
 	m_LitSurfaceIndex = 0;
 
 	for (;;)
 	{
-		int32_t addr2 = point_read(addr1++);
-		if (addr2 < 0)
+		int object_addr = point_read(list_addr++);
+
+		if (object_addr < 0)
+		{
+			if (object_addr == -1)
+			{
+				// 0xffffff is end-of-list marker
+				break;
+			}
+			else if (!pointram)
+			{
+				logerror("blit_polyobject unexpected end: addr=0x%06x\n", list_addr-1);
+				break;
+			}
+			object_addr &= 0x00ffffff;
+		}
+
+		u32 chunklength = point_read(object_addr++);
+		if (chunklength > 0x100)
+		{
+			logerror("blit_polyobject bad chunk length: addr=0x%06x len=0x%x\n", object_addr-1, chunklength);
 			break;
-		blit_quads(bitmap, addr2, m, code);
+		}
+
+		blit_quads(object_addr, chunklength, m);
 	}
 }
 
@@ -1246,21 +1182,13 @@ void namcos22_state::blit_polyobject(bitmap_rgb32 &bitmap, int code, float m[4][
 
 /*******************************************************************************/
 
-/**
- * 0xfffd
- * 0x0: transform
- * 0x1
- * 0x2
- * 0x5: transform
- * >=0x45: draw primitive
- */
-void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
+void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 {
 	/*
 	    bb0003 or 3b0003
 
 	    14.00c8            light.ambient     light.power
-	    01.0000            ?                 light.dx
+	    01.0000            reflection,?      light.dx
 	    06.5a82            window priority   light.dy
 	    00.a57e            ?                 light.dz
 
@@ -1282,11 +1210,29 @@ void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
 	m_absolute_priority = src[0x3] >> 16;
-	m_camera_vx = (int16_t)(src[5] >> 16);
-	m_camera_vy = (int16_t)(src[5] & 0xffff);
-	m_camera_zoom = dspfloat_to_nativefloat(src[6]);
-	m_camera_vw = dspfloat_to_nativefloat(src[7]) * m_camera_zoom;
-	m_camera_vh = dspfloat_to_nativefloat(src[9]) * m_camera_zoom;
+	m_camera_vx = (s16)(src[0x5] >> 16);
+	m_camera_vy = (s16)(src[0x5] & 0xffff);
+	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
+	m_camera_vl = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
+	m_camera_vr = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
+	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom + 0.5f;
+	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom + 0.5f;
+
+	m_reflection = src[0x2] >> 16 & 0x30; // z too?
+	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
+
+	if (m_reflection & 0x10)
+	{
+		float vl = m_camera_vl;
+		m_camera_vl = m_camera_vr;
+		m_camera_vr = vl;
+	}
+	if (m_reflection & 0x20)
+	{
+		float vu = m_camera_vu;
+		m_camera_vu = m_camera_vd;
+		m_camera_vd = vu;
+	}
 
 	m_viewmatrix[0][0] = dspfixed_to_nativefloat(src[0x0c]);
 	m_viewmatrix[1][0] = dspfixed_to_nativefloat(src[0x0d]);
@@ -1300,12 +1246,22 @@ void namcos22_state::slavesim_handle_bb0003(const int32_t *src)
 	m_viewmatrix[1][2] = dspfixed_to_nativefloat(src[0x13]);
 	m_viewmatrix[2][2] = dspfixed_to_nativefloat(src[0x14]);
 
+	matrix3d_apply_reflection(m_viewmatrix);
 	transform_normal(&m_camera_lx, &m_camera_ly, &m_camera_lz, m_viewmatrix);
 }
 
-void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t *src)
+void namcos22_state::slavesim_handle_200002(const s32 *src, int code)
 {
-	if (m_PrimitiveID >= 0x45)
+	/**
+	* 0xfffd
+	* 0x0: transform
+	* 0x1
+	* 0x2
+	* 0x5: draw primitive(RAM)
+	* >=0x45: draw primitive(ROM)
+	*/
+
+	if (code == 0x5 || code >= 0x45)
 	{
 		float m[4][4]; /* row major */
 
@@ -1328,16 +1284,15 @@ void namcos22_state::slavesim_handle_200002(bitmap_rgb32 &bitmap, const int32_t 
 		m[3][2] = src[0xc]; /* zpos */
 
 		matrix3d_multiply(m, m_viewmatrix);
-		blit_polyobject(bitmap, m_PrimitiveID, m);
+		blit_polyobject(code, m);
 	}
-	else if (m_PrimitiveID != 0 && m_PrimitiveID != 2)
+	else if (code != 0 && code != 2)
 	{
-		logerror("slavesim_handle_200002:unk code=0x%x\n", m_PrimitiveID);
-		// ridgerac title screen waving flag: 0x5
+		logerror("slavesim_handle_200002:unknown code=0x%x\n", code);
 	}
 }
 
-void namcos22_state::slavesim_handle_300000(const int32_t *src)
+void namcos22_state::slavesim_handle_300000(const s32 *src)
 {
 	m_viewmatrix[0][0] = dspfixed_to_nativefloat(src[1]);
 	m_viewmatrix[1][0] = dspfixed_to_nativefloat(src[2]);
@@ -1350,9 +1305,11 @@ void namcos22_state::slavesim_handle_300000(const int32_t *src)
 	m_viewmatrix[0][2] = dspfixed_to_nativefloat(src[7]);
 	m_viewmatrix[1][2] = dspfixed_to_nativefloat(src[8]);
 	m_viewmatrix[2][2] = dspfixed_to_nativefloat(src[9]);
+
+	matrix3d_apply_reflection(m_viewmatrix);
 }
 
-void namcos22_state::slavesim_handle_233002(const int32_t *src)
+void namcos22_state::slavesim_handle_233002(const s32 *src)
 {
 	/*
 	00233002
@@ -1368,16 +1325,13 @@ void namcos22_state::slavesim_handle_233002(const int32_t *src)
 	m_objectshift = src[2];
 }
 
-void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
+void namcos22_state::simulate_slavedsp()
 {
-	const int32_t *src = 0x300 + (int32_t *)m_polygonram.target();
-	int16_t len;
-
-	matrix3d_identity(m_viewmatrix);
+	const s32 *src = 0x300 + (s32 *)m_polygonram.target();
 
 	if (m_is_ss22)
 	{
-		src += 4; /* FFFE 0400 */
+		src += 4; // FFFE 0400
 	}
 	else
 	{
@@ -1386,59 +1340,113 @@ void namcos22_state::simulate_slavedsp(bitmap_rgb32 &bitmap)
 
 	for (;;)
 	{
-		int16_t next;
-		m_PrimitiveID = *src++;
-		len  = (int16_t)*src++;
+		// hackery! commands should be streamed, not parsed here
+		u16 code = *src++;
+		u16 len = *src++;
+		s32 index = src - (s32 *)m_polygonram.target();
+
+		// alpinr2b titlescreen includes commands to modify pointram on the fly
+		if (m_gametype == NAMCOS22_ALPINE_RACER_2 && code == 0xfff8)
+		{
+			pdp_handle_commands(index - 2);
+
+			// skip to end for now
+			src += 0x56;
+			continue;
+		}
+		else if ((index + len) >= 0x7fff)
+		{
+			logerror("simulate_slavedsp buffer overflow: len=0x%x code=0x%x addr=0x%x\n", len, code, index);
+			return;
+		}
 
 		switch (len)
 		{
 			case 0x15:
-				slavesim_handle_bb0003(src); /* define viewport */
+				slavesim_handle_bb0003(src); // define viewport
 				break;
 
 			case 0x10:
-				slavesim_handle_233002(src); /* set modal rendering options */
+				slavesim_handle_233002(src); // set model rendering options
 				break;
 
 			case 0x0a:
-				slavesim_handle_300000(src); /* modify view transform */
+				slavesim_handle_300000(src); // modify view transform
 				break;
 
 			case 0x0d:
-				slavesim_handle_200002(bitmap, src); /* render primitive */
+				slavesim_handle_200002(src, code); // render primitive
 				break;
 
 			default:
-				logerror("unk 3d data(%d) addr=0x%x!", len, (int)(src-(int32_t*)m_polygonram.target()));
+			{
+				std::string polydata;
+				int i = 0;
+				for (; i < len && i < 0x20; i++)
 				{
-					int i;
-					for (i = 0; i < len; i++)
-					{
-						logerror(" %06x", src[i] & 0xffffff);
-					}
-					logerror("\n");
+					char h[8];
+					sprintf(h, " %06x", src[i] & 0xffffff);
+					polydata += h;
 				}
+				if (i < len)
+					polydata += " (...)";
+				logerror("simulate_slavedsp unknown 3d data: len=0x%x code=0x%x addr=0x%x!%s\n", len, code, index, polydata);
 				return;
+			}
 		}
 
-		/* hackery! commands should be streamed, not parsed here */
 		src += len;
-		src++; /* always 0xffff */
-		next = (int16_t)*src++; /* link to next command */
-		if ((next & 0x7fff) != (src - (int32_t *)m_polygonram.target()))
+		src++; // should be 0xffff (GOTO command)
+		u16 next = *src++ & 0x7fff; // link to next command
+		if (next != (index + len + 1 + 1))
 		{
-			/* end of list */
-			break;
+			// end of list, normally with a "goto self"
+			if (next != (index + len))
+				logerror("simulate_slavedsp unexpected end: addr=0x%x, next=0x%x\n", index+len, next);
+
+			return;
+		}
+		else if (next == 0x7fff)
+		{
+			logerror("simulate_slavedsp buffer overflow: next=0x7fff\n");
+			return;
 		}
 	}
 }
 
-void namcos22_state::draw_polygons(bitmap_rgb32 &bitmap)
+
+void namcos22_state::draw_polygons()
 {
-	if (m_slave_simulation_active)
+	if (m_pdp_render_done && m_slave_simulation_active)
 	{
-		simulate_slavedsp(bitmap);
+		simulate_slavedsp();
 		m_poly->wait("draw_polygons");
+	}
+}
+
+void namcos22_state::render_frame_active()
+{
+	/**
+	* Since pdp_begin and simulate_slavedsp are basically the same thing, when PDP is inactive,
+	* the parser here needs to be inactive too. However, propcycl attract mode(during the pauses)
+	* doesn't trigger the PDP and still expects polygons to be shown. It doesn't overwrite the PDP
+	* loop address, so it must be drawing the previous framebuffer, it's not known exactly where/how
+	* this is controlled.
+	*/
+	if (m_screen->frame_number() > m_pdp_frame && m_render_refresh)
+		m_pdp_render_done = false;
+
+	m_render_refresh = false;
+}
+
+WRITE_LINE_MEMBER(namcos22_state::screen_vblank)
+{
+	if (state)
+	{
+		// still need to determine active state if frame was skipped
+		if (m_skipped_this_frame)
+			render_frame_active();
+		m_skipped_this_frame = machine().video().skip_this_frame();
 	}
 }
 
@@ -1446,7 +1454,7 @@ void namcos22_state::draw_polygons(bitmap_rgb32 &bitmap)
 
 /*********************************************************************************************/
 
-void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *src, const uint32_t *attr, int num_sprites, int deltax, int deltay, int y_lowres)
+void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_sprites, int deltax, int deltay, int y_lowres)
 {
 	for (int i = 0; i < num_sprites; i++)
 	{
@@ -1460,10 +1468,10 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 		    ----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y size
 
 		src[2]
-		    xxxx.x---.----.---- | ----.----.----.----  no function
+		    xxxx.x---.----.---- | ----.----.----.----  unused
 		    ----.-xxx.----.---- | ----.----.----.----  clip target
 		    ----.----.xxxx.xxxx | ----.----.----.----  linktype
-		    ----.----.----.---- | xxxx.xx--.----.----  no function(?) - set in airco22b
+		    ----.----.----.---- | xxxx.xx--.----.----  no function(?) - 0x400 set in airco22b(invisible sprite)
 		    ----.----.----.---- | ----.--x-.----.----  right justify
 		    ----.----.----.---- | ----.---x.----.----  bottom justify
 		    ----.----.----.---- | ----.----.x---.----  flipx
@@ -1474,17 +1482,17 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 		src[3]
 		    xxxx.xxxx.xxxx.xxxx | ----.----.----.----  tile number
 		    ----.----.----.---- | xxxx.xxxx.----.----  translucency
-		    ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris
+		    ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris when increasing translucency, it's probably not 16bit
 
 		attr[0]
-		    xxxx.xxxx.----.---- | ----.----.----.----  no function
+		    xxxx.xxxx.----.---- | ----.----.----.----  unused
 		    ----.----.xxxx.xxxx | xxxx.xxxx.xxxx.xxxx  z pos
 
 		attr[1]
-		    xxxx.xxxx.----.---- | ----.----.----.----  no function
+		    xxxx.xxxx.----.---- | ----.----.----.----  unused
 		    ----.----.x---.---- | ----.----.----.----  cz enable
 		    ----.----.-xxx.xxxx | ----.----.----.----  color
-		    ----.----.----.---- | xxxx.xxxx.----.----  no function(?) - set in airco22b, propcycl
+		    ----.----.----.---- | xxxx.xxxx.----.----  unknown flags? - set in airco22b(0x7/0x1, invisible sprite), propcycl score hinge(0xff), cybrcycc at boot(0x2b)
 		    ----.----.----.---- | ----.----.xxxx.xxxx  cz factor (fog aka depth cueing)
 		*/
 		int xpos = (src[0] >> 16) - deltax;
@@ -1496,32 +1504,36 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 		int linktype = (src[2] & 0x00ff0000) >> 16;
 		int flipx = (src[2] >> 7) & 0x1;
 		int cols = (src[2] >> 4) & 0x7;
-		uint32_t code = src[3];
+		u32 code = src[3];
 		int tile = code >> 16;
 		int translucency = (code & 0xff00) >> 8;
 
-		uint32_t zcoord = attr[0] & 0x00ffffff;
-		int color = attr[1] >> 16;
+		u32 zcoord = attr[0] & 0x00ffffff;
+		int color = attr[1] >> 16 & 0xff;
 		int cz = attr[1] & 0xff;
 
+		// one of these is to override global fade setting?
+		// eg. propcycl time over, where global fade affects score hinge, but not "TIME"
+		int fade_enabled = (attr[1] & 0x8000) ? 1 : 0;
+
 		// priority over textlayer, trusted by testmode and timecris
-		int pri = ((attr[1] & 0xffff) == 0x00fe);
+		int prioverchar = (cz == 0xfe) ? 1 : 0;
 
 		// set window clipping
 		int clip = src[2] >> 23 & 0xe;
-		int cx_min = -deltax + (int16_t)(m_spriteram[0x80|clip] >> 16);
-		int cx_max = -deltax + (int16_t)(m_spriteram[0x80|clip] & 0xffff);
-		int cy_min = -deltay + (int16_t)(m_spriteram[0x81|clip] >> 16);
-		int cy_max = -deltay + (int16_t)(m_spriteram[0x81|clip] & 0xffff);
+		int cx_min = -deltax + (s16)(m_spriteram[0x80|clip] >> 16);
+		int cx_max = -deltax + (s16)(m_spriteram[0x80|clip] & 0xffff);
+		int cy_min = -deltay + (s16)(m_spriteram[0x81|clip] >> 16);
+		int cy_max = -deltay + (s16)(m_spriteram[0x81|clip] & 0xffff);
 
 		if (rows == 0) rows = 8;
 		if (cols == 0) cols = 8;
 
-		/* right justify */
+		// right justify
 		if (src[2] & 0x0200)
 			xpos -= sizex * cols - 1;
 
-		/* bottom justify */
+		// bottom justify
 		if (src[2] & 0x0100)
 			ypos -= sizey * rows - 1;
 
@@ -1564,17 +1576,19 @@ void namcos22_state::draw_sprite_group(bitmap_rgb32 &bitmap, const rectangle &cl
 			node->data.sprite.translucency = translucency;
 			node->data.sprite.color = color;
 			node->data.sprite.cz = cz;
-			node->data.sprite.pri = pri;
+			node->data.sprite.prioverchar = prioverchar;
+			node->data.sprite.fade_enabled = fade_enabled;
 		}
+
 		src += 4;
 		attr += 2;
 	}
 }
 
-void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void namcos22_state::draw_sprites()
 {
-	const uint32_t *src;
-	const uint32_t *attr;
+	const u32 *src;
+	const u32 *attr;
 
 #if 0 // show reg contents
 	int i;
@@ -1642,7 +1656,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		src = &m_spriteram[0x04000/4 + base*4];
 		attr = &m_spriteram[0x20000/4 + base*2];
-		draw_sprite_group(bitmap, cliprect, src, attr, num_sprites, deltax, deltay, y_lowres);
+		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
 
 	/* VICS RAM provides two additional banks (also many unknown regs here) */
@@ -1676,7 +1690,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		src = &m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4];
 		attr = &m_vics_data[(m_vics_control[0x58/4] & 0xffff)/4];
-		draw_sprite_group(bitmap, cliprect, src, attr, num_sprites, deltax, deltay, y_lowres);
+		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
 
 	num_sprites = m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
@@ -1692,13 +1706,13 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		src = &m_vics_data[(m_vics_control[0x68/4] & 0xffff)/4];
 		attr = &m_vics_data[(m_vics_control[0x78/4] & 0xffff)/4];
-		draw_sprite_group(bitmap, cliprect, src, attr, num_sprites, deltax, deltay, y_lowres);
+		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
 }
 
-READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
+READ32_MEMBER(namcos22s_state::namcos22s_vics_control_r)
 {
-	uint32_t ret = m_vics_control[offset];
+	u32 ret = m_vics_control[offset];
 
 	switch (offset*4)
 	{
@@ -1720,7 +1734,7 @@ READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
 	return ret;
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_vics_control_w)
+WRITE32_MEMBER(namcos22s_state::namcos22s_vics_control_w)
 {
 	COMBINE_DATA(&m_vics_control[offset]);
 }
@@ -1731,7 +1745,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_vics_control_w)
 
 TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 {
-	uint16_t data = nthword(m_textram, tile_index);
+	u16 data = nthword(m_textram, tile_index);
 	/**
 	* xxxx.----.----.---- palette select
 	* ----.xx--.----.---- flip
@@ -1742,34 +1756,93 @@ TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 
 WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
 {
+	u32 prev = m_textram[offset];
 	COMBINE_DATA(&m_textram[offset]);
-	m_bgtilemap->mark_tile_dirty(offset * 2);
-	m_bgtilemap->mark_tile_dirty(offset * 2 + 1);
+	if (prev != m_textram[offset])
+	{
+		m_bgtilemap->mark_tile_dirty(offset * 2);
+		m_bgtilemap->mark_tile_dirty(offset * 2 + 1);
+	}
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
 {
+	u32 prev = m_cgram[offset];
 	COMBINE_DATA(&m_cgram[offset]);
-	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
+	if (prev != m_cgram[offset])
+		m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
-READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
+void namcos22_state::posirq_update()
+{
+	int scanline = 2 * m_tilemapattr[4];
+
+	// schedule next timeout
+	if (scanline < m_screen->height())
+	{
+		scanline = (scanline + 480) % m_screen->height(); // 0 = vblank start
+		m_posirq_timer->adjust(m_screen->time_until_pos(scanline));
+	}
+	else
+		m_posirq_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(namcos22_state::posirq_callback)
+{
+	// hblank irq line differs between s22/ss22 (see syscon)
+	int line = (m_is_ss22) ? 1 : 0;
+
+	if (m_irq_enabled & (1 << line))
+	{
+		// driver doesn't support partial updates yet
+		// partial updates here should apply to the text layer only, not the 3D framebuffer
+		//m_screen->update_partial(m_screen->vpos());
+
+		m_irq_state |= (1 << line);
+		m_maincpu->set_input_line(m_syscontrol[line] & 7, ASSERT_LINE);
+	}
+
+	posirq_update();
+}
+
+WRITE16_MEMBER(namcos22_state::namcos22_tilemapattr_w)
+{
+	/*
+	0: R/W - x offset
+	1: R/W - y offset
+	2: R/W - ??? always 0x006e?
+	3: ?   - unused?
+	4: R/W - posirq scanline
+	5: R   - current scanline?
+	6: ?   - unused?
+	7: R   - ???
+	*/
+	COMBINE_DATA(&m_tilemapattr[offset]);
+
+	switch (offset)
+	{
+		case 4:
+			posirq_update();
+			break;
+
+		default:
+			break;
+	}
+}
+
+READ16_MEMBER(namcos22_state::namcos22_tilemapattr_r)
 {
 	switch (offset)
 	{
-		case 2:
+		case 5:
 		{
-			uint16_t lo, hi = (m_tilemapattr[offset] & 0xffff0000) >> 16;
-			// assume current scanline, 0x1ff if in vblank (used in alpinesa)
-			// or maybe relative to posirq?
-			if (m_screen->vblank()) lo = 0x1ff;
-			else lo = m_screen->vpos() >> 1;
+			// unknown, maybe posirq related
 			// dirtdash has slowdowns if high bit is clear, why??
-			return hi << 16 | lo | 0x8000;
+			return 0x8000;
 		}
 
-		case 3:
-			// don't know, maybe also scanline related
+		case 7:
+			// unknown
 			// timecris reads it everytime the gun triggers and will decline if it's 0xffff
 			return 0;
 
@@ -1780,25 +1853,10 @@ READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
 	return m_tilemapattr[offset];
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_tilemapattr_w)
-{
-	/*
-	0.hiword    R/W     x offset
-	0.loword    R/W     y offset, bit 9 for interlacing?(cybrcomm, tokyowar)
-	1.hiword    R/W     ??? always 0x006e?
-	1.loword    ?       unused?
-	2.hiword    R/W     posirq scanline? - not hooked up yet
-	2.loword    R       assume current scanline
-	3.hiword    ?       unused?
-	3.loword    R       ???
-	*/
-	COMBINE_DATA(&m_tilemapattr[offset]);
-//  popmessage("%08x\n%08x\n%08x\n%08x\n",m_tilemapattr[0],m_tilemapattr[1],m_tilemapattr[2],m_tilemapattr[3]);
-}
 
 
 /**
- * Spot RAM affects how the text layer is blended with the scene, it is not yet known exactly how.
+ * Spot RAM affects how the text layer is blended with the scene.
  * It isn't directly memory mapped, but rather ports are used to populate and poll it.
  *
  * See Time Crisis "SPOT RAM" self test for sample use, maybe also used in-game, but where?
@@ -1810,84 +1868,77 @@ WRITE32_MEMBER(namcos22_state::namcos22_tilemapattr_w)
  * 0x860006: enable
 */
 
-// tokyowar and timecris test ram 000-4ff, but the only practically usable part seems to be 000-3ff
-#define SPOTRAM_SIZE (0x800)
-
 /*
 RAM looks like it is a 256 * 4 words table
 testmode:
  offs: 0000 0001 0002 0003 - 03f4 03f5 03f6 03f7 03f8 03f9 03fa 03fb 03fc 03fd 03fe 03ff
  data: 00fe 00fe 00fe 00fe - 0001 0001 0001 0001 0000 0000 0000 0000 ffff ffff ffff ffff
 
-is the high byte of each word used? it's usually 00, and in dirtdash always 02
-
-low byte of each word:
- byte 0 looks like a blend factor
- bytes 1,2,3 a secondary brightness factor per rgb channel(?)
+tokyowar and timecris test ram 000-4ff, but the only practically usable part seems to be 000-3ff
+low byte is indirect pen, high byte is shift amount when spot is in alpha blend mode(pens 0x80-0xff)
 
 */
 
-READ32_MEMBER(namcos22_state::namcos22s_spotram_r)
+READ16_MEMBER(namcos22s_state::spotram_r)
 {
-	if (offset == 1)
+	if (offset == 2)
 	{
 		// read
-		if (m_spot_read_address >= SPOTRAM_SIZE)
-		{
-			m_spot_read_address = 0;
-		}
-		return m_spotram[m_spot_read_address++] << 16;
+		u16 ret = m_spotram[m_spotram_address >> 1 & 0x7ff];
+
+		if (!machine().side_effects_disabled())
+			m_spotram_address += 2;
+
+		return ret;
 	}
+
 	return 0;
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_spotram_w)
+WRITE16_MEMBER(namcos22s_state::spotram_w)
 {
-	if (offset == 0)
+	switch (offset)
 	{
-		if (ACCESSING_BITS_16_31)
-		{
+		case 0:
 			// set address
-			m_spot_read_address  = data >> (16 + 1);
-			m_spot_write_address = data >> (16 + 1);
-		}
-		else
-		{
+			COMBINE_DATA(&m_spotram_address);
+			break;
+
+		case 1:
 			// write
-			if (m_spot_write_address >= SPOTRAM_SIZE)
-			{
-				m_spot_write_address = 0;
-			}
-			m_spotram[m_spot_write_address++] = data;
-		}
-	}
-	else
-	{
-		if (ACCESSING_BITS_0_15)
-		{
+			COMBINE_DATA(&m_spotram[m_spotram_address >> 1 & 0x7ff]);
+			m_spotram_address += 2;
+			break;
+
+		case 3:
 			// enable
-			m_spot_enable = data & 1;
-		}
+			COMBINE_DATA(&m_spotram_enable);
+			break;
+
+		default:
+			// 2=read-only
+			break;
 	}
 }
 
-void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
+void namcos22s_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
 {
 	const pen_t *pens = m_palette->pens();
-	uint16_t *src;
-	uint32_t *dest;
-	uint8_t *pri;
+	u8 pen = 0;
+	rgbaint_t rgb;
 
 	// prepare alpha
-	uint8_t alpha_check12 = nthbyte(m_mixer, 0x12);
-	uint8_t alpha_check13 = nthbyte(m_mixer, 0x13);
-	uint8_t alpha_mask    = nthbyte(m_mixer, 0x14);
-	uint8_t alpha_factor  = nthbyte(m_mixer, 0x15);
+	u8 alpha_check12 = nthbyte(m_mixer, 0x12);
+	u8 alpha_check13 = nthbyte(m_mixer, 0x13);
+	u8 alpha_mask    = nthbyte(m_mixer, 0x14) & 0xf;
+	u8 alpha_factor  = nthbyte(m_mixer, 0x15);
 
 	// prepare spot
-	int spot_flags = m_mixer_flags >> 16;
-	bool spot_enabled = (spot_flags & 1) && (spot_flags & 0xc);
-	int spot_limit = (spot_flags & 2) ? m_spot_limit : 0xff;
+	bool spot_enabled = (m_spotram_enable & 1) && (m_chipselect & 0xc000);
+	int spot_factor = (m_spot_factor < 0x100) ? 0 : m_spot_factor & 0xff;
+	rgbaint_t spot_color(0, spot_factor, spot_factor, spot_factor);
+	int spot_palbase = m_text_palbase >> 8 & 3; // src[x] >> 8 & 3
+	int spot_shift = 0;
 
 	// prepare fader
 	bool fade_enabled = (m_mixer_flags & 2) && m_screen_fade_factor;
@@ -1895,51 +1946,47 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 	rgbaint_t fade_color(0, m_screen_fade_r, m_screen_fade_g, m_screen_fade_b);
 
 	// mix textlayer with poly/sprites
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		src = &m_mix_bitmap->pix16(y);
-		dest = &bitmap.pix32(y);
-		pri = &screen.priority().pix8(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		u16 *src = &m_mix_bitmap->pix16(y);
+		u32 *dest = &bitmap.pix32(y);
+		u8 *pri = &screen.priority().pix8(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// skip if transparent or under poly/sprite
 			if (pri[x] == prival)
 			{
-				rgbaint_t rgb(pens[src[x]]);
-
-				// apply alpha
-				if (alpha_factor)
-				{
-					uint8_t pen = src[x] & 0xff;
-					if ((pen & 0xf) == alpha_mask || pen == alpha_check12 || pen == alpha_check13)
-					{
-						rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
-					}
-				}
-
-				// apply spot
 				if (spot_enabled)
 				{
-					uint8_t pen = src[x] & 0xff;
-					rgbaint_t mix(dest[x]);
-					if (spot_flags & 8)
-					{
-						// mix with per-channel brightness
-						rgbaint_t shade(0, (0xff - (m_spotram[pen << 2 | 1] & 0xff)) << 2, (0xff - (m_spotram[pen << 2 | 2] & 0xff)) << 2, (0xff - (m_spotram[pen << 2 | 3] & 0xff)) << 2);
-						mix.scale_and_clamp(shade);
-					}
+					// remap pen
+					int spot_data = m_spotram[(src[x] << 2 | spot_palbase) & 0x3ff];
+					pen = spot_data;
 
-					int spot_factor = 0xff - (m_spotram[pen << 2] & 0xff);
-					if (spot_factor < spot_limit)
+					if (pen >= 0x80)
 					{
-						rgb.blend(mix, spot_factor);
+						spot_shift = spot_data >> 8 & 7;
+						rgb.set(spot_color);
 					}
+					else
+						rgb.set(pens[pen | m_text_palbase]);
 				}
-
-				if (fade_enabled)
+				else
 				{
-					rgb.blend(fade_color, fade_factor);
+					rgb.set(pens[src[x]]);
+					pen = src[x];
 				}
+
+				// apply fade
+				if (fade_enabled)
+					rgb.blend(fade_color, fade_factor);
+
+				// spot pen becomes brightness factor
+				if (spot_enabled && pen >= 0x80)
+					rgb.blend(rgbaint_t(dest[x]), (~pen & 0x7f) >> spot_shift);
+
+				// otherwise apply alpha
+				else if (alpha_factor && ((pen & 0xf) == alpha_mask || (pen >= alpha_check12 && pen <= alpha_check13)))
+					rgb.blend(rgbaint_t(dest[x]), 0xff - alpha_factor);
 
 				dest[x] = rgb.to_rgba();
 			}
@@ -1950,70 +1997,67 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
-	uint16_t *src;
-	uint32_t *dest;
-	uint8_t *pri;
-
-	const uint8_t *rlut = &m_gamma_proms[0x000];
-	const uint8_t *glut = &m_gamma_proms[0x100];
-	const uint8_t *blut = &m_gamma_proms[0x200];
+	const u8 *rlut = &m_gamma_proms[0x000];
+	const u8 *glut = &m_gamma_proms[0x100];
+	const u8 *blut = &m_gamma_proms[0x200];
 
 	// prepare fader and shadow factor
-	bool fade_enabled = m_mixer_flags & 2 && m_poly_fade_enabled;
+	bool fade_enabled = (m_screen_fade_r != 0x100 || m_screen_fade_g != 0x100 || m_screen_fade_b != 0x100);
+	u32 fade_r_add = (m_screen_fade_r > 0x100) ? (1 << 16) : 0;
+	u32 fade_g_add = (m_screen_fade_g > 0x100) ? (1 << 8) : 0;
+	u32 fade_b_add = (m_screen_fade_b > 0x100) ? 1 : 0;
+	bool fade_white = fade_r_add || fade_g_add || fade_b_add;
+
 	bool shadow_enabled = (m_mixer_flags & 0x100) != 0; // ? (ridgerac is the only game not using shadow)
 
-	rgbaint_t fade_color(0, m_poly_fade_r, m_poly_fade_g, m_poly_fade_b);
+	rgbaint_t fade_color(0, m_screen_fade_r, m_screen_fade_g, m_screen_fade_b);
 	rgbaint_t rgb_mix[3] = {
 		rgbaint_t(0, nthbyte(m_mixer, 0x08), nthbyte(m_mixer, 0x09), nthbyte(m_mixer, 0x0a)), // pen c
 		rgbaint_t(0, nthbyte(m_mixer, 0x0b), nthbyte(m_mixer, 0x0c), nthbyte(m_mixer, 0x0d)), // pen d
 		rgbaint_t(0, nthbyte(m_mixer, 0x0e), nthbyte(m_mixer, 0x0f), nthbyte(m_mixer, 0x10))  // pen e
 	};
 
-	// mix textlayer with poly/sprites
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	// mix textlayer with polys + do final mix
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		src = &m_mix_bitmap->pix16(y);
-		dest = &bitmap.pix32(y);
-		pri = &screen.priority().pix8(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		u16 *src = &m_mix_bitmap->pix16(y);
+		u32 *dest = &bitmap.pix32(y);
+		u8 *pri = &screen.priority().pix8(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint32_t pixel = dest[x];
+			u32 pixel = dest[x];
 
 			// skip if transparent or under poly
 			if (pri[x] == 2)
 			{
 				// apply shadow
-				rgbaint_t rgb;
-				switch (src[x] & 0xff)
+				u8 pen = src[x];
+				if (shadow_enabled && pen >= 0xfc && pen <= 0xfe)
 				{
-					case 0xfc:
-					case 0xfd:
-					case 0xfe:
-						if (shadow_enabled)
-						{
-							rgb.set(pixel);
-							rgb.scale_and_clamp(rgb_mix[(src[x] & 0xf) - 0xc]);
-							break;
-						}
-						// (fall through)
-					default:
-						rgb.set(pens[src[x]]);
-						break;
+					rgbaint_t rgb(pixel);
+					rgb.scale_and_clamp(rgb_mix[pen - 0xfc]);
+					pixel = rgb.to_rgba();
 				}
+				else
+					pixel = pens[src[x]];
+			}
 
-				if (fade_enabled)
+			// apply global fade
+			if (fade_enabled)
+			{
+				if (fade_white)
 				{
-					rgb.scale_and_clamp(fade_color);
+					// need to make sure that blacks can scale up
+					if (!(pixel & 0xff0000)) pixel += fade_r_add;
+					if (!(pixel & 0x00ff00)) pixel += fade_g_add;
+					if (!(pixel & 0x0000ff)) pixel += fade_b_add;
 				}
-
-				// BTANB note: fading to white does not affect color channels set to 00,
-				// eg. a rr-gg-bb of 3f-7f-00 will fade to ff-ff-00 and not ff-ff-ff
-				// seen in victlapw attract mode
-
+				rgbaint_t rgb(pixel);
+				rgb.scale_and_clamp(fade_color);
 				pixel = rgb.to_rgba();
 			}
 
-			// final mix gamma here
+			// apply gamma
 			dest[x] = (rlut[(pixel >> 16) & 0xff] << 16) | (glut[(pixel >> 8) & 0xff] << 8) | blut[pixel & 0xff];
 		}
 	}
@@ -2021,23 +2065,28 @@ void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32
 
 void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int scroll_x = (m_tilemapattr[0] >> 16) - 0x35c;
-	int scroll_y = m_tilemapattr[0] & 0xffff;
+	int scroll_x = m_tilemapattr[0] - 0x35c;
+	int scroll_y = m_tilemapattr[1];
 
 	m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff);
 	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
-	m_bgtilemap->set_palette_offset(m_text_palbase * 256);
+	m_bgtilemap->set_palette_offset(m_text_palbase);
 
-	if (m_is_ss22)
-	{
-		m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 4, 4);
-		namcos22s_mix_text_layer(screen, bitmap, cliprect, 4);
-	}
-	else
-	{
-		m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 2, 3);
-		namcos22_mix_text_layer(screen, bitmap, cliprect);
-	}
+	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 2, 3);
+	namcos22_mix_text_layer(screen, bitmap, cliprect);
+}
+
+void namcos22s_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int scroll_x = m_tilemapattr[0] - 0x35c;
+	int scroll_y = m_tilemapattr[1];
+
+	m_bgtilemap->set_scrollx(0, scroll_x & 0x3ff);
+	m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff);
+	m_bgtilemap->set_palette_offset(m_text_palbase);
+
+	m_bgtilemap->draw(screen, *m_mix_bitmap, cliprect, 0, 4, 4);
+	namcos22s_mix_text_layer(screen, bitmap, cliprect, 4);
 }
 
 
@@ -2046,8 +2095,10 @@ void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap
 
 WRITE32_MEMBER(namcos22_state::namcos22_paletteram_w)
 {
+	u32 prev = m_paletteram[offset];
 	COMBINE_DATA(&m_paletteram[offset]);
-	m_dirtypal[offset & (0x7fff/4)] = 1;
+	if (prev != m_paletteram[offset])
+		m_dirtypal[offset & (0x7fff/4)] = 1;
 }
 
 void namcos22_state::update_palette()
@@ -2070,83 +2121,128 @@ void namcos22_state::update_palette()
 }
 
 
-WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
+WRITE16_MEMBER(namcos22s_state::namcos22s_czattr_w)
 {
-	int bank = nthword(m_czattr, 0xa/2) & 3;
-	uint32_t prev = (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
-	uint32_t temp = prev;
-	COMBINE_DATA(&temp);
-	data = temp;
-	m_banked_czram[bank][offset * 2] = data >> 16;
-	m_banked_czram[bank][offset * 2 + 1] = data & 0xffff;
-	m_cz_was_written[bank] |= (prev ^ data);
+	/*
+	       0    1    2    3    4    5    6    7
+	    ^^^^ ^^^^ ^^^^ ^^^^                        cz offset, 8-bit(+high bit for sign) per czbank 0,1,2,3
+	                        ^^^^                   flags, nybble per czbank 3,2,1,0 - 8=?, 4=enable in-game, 2=reverse compare, 1=ram write enable if 0
+	                             ^^^^              maincpu ram bank on read
+	                                  ^^^^         bank select for in-game, 2 bits per cztype 3,2,1,0 (0xe4 = 3,2,1,0)
+	                                       ^^^^    ? (only set sometimes in timecris)
+	    0000 0000 0000 0000 7555 0000 00e4 0000 // testmode normal - 0=white to black(mid), 1=white to black(weak), 2=white to black(strong), 3=black to white(mid, reverse of 0)
+	    7fff 8000 7fff 8000 7555 0000 00e4 0000 // testmode offset - 0=black, 1=white, 2=black, 3=white
+	    0000 0000 0000 0000 3111 0000 00e4 0000 // testmode off    - 0=white, 1=white, 2=white, 3=white
+	    8001 8001 0000 0000 5555 0000 5555 0000 // aquajet (reg 6 is usually interlaced for double buffering)
+	    0000 0000 0000 0000 0b6c 0000 00e4 0000 // cybrcycc
+	    00a4 00a4 00a4 00a4 4444 0000 0000 0000 // propcycl in pool
+	    ff80 ff80 ff80 ff80 4444 0000 0000 0000 // propcycl ending
+	*/
+	u16 prev = m_czattr[offset];
+	COMBINE_DATA(&m_czattr[offset]);
+
+	if (offset == 4)
+	{
+		// invalidate if compare function changed
+		u16 changed = prev ^ m_czattr[offset];
+		for (int bank = 0; bank < 4; bank++)
+			m_cz_was_written[bank] |= changed >> (bank * 4) & 2;
+	}
 }
 
-READ32_MEMBER(namcos22_state::namcos22s_czram_r)
+READ16_MEMBER(namcos22s_state::namcos22s_czattr_r)
 {
-	int bank = nthword(m_czattr, 0xa/2) & 3;
+	return m_czattr[offset];
+}
+
+WRITE32_MEMBER(namcos22s_state::namcos22s_czram_w)
+{
+	/*
+	czram contents, it's basically a big cz compare table
+
+	testmode:
+	    o_16          0    1    2    3    4    5    6    7 <  >   f8   f9   fa   fb   fc   fd   fe   ff
+	    czram[0] = 0000 001f 003f 005f 007f 009f 00bf 00df .... 1eff 1f1f 1f3f 1f5f 1f7f 1f9f 1fbf 1fdf
+	    czram[1] = 003f 007f 00be 00fd 013c 017b 01b9 01f7 .... 1ff9 1ffb 1ffc 1ffd 1ffe 1fff 1fff 1fff
+	    czram[2] = 0000 0000 0000 0001 0002 0003 0005 0007 .... 1e45 1e83 1ec2 1f01 1f40 1f7f 1fbf 1fff
+	    czram[3] = 1fff 1fdf 1fbf 1f9f 1f7f 1f5f 1f3f 1f1f .... 00ff 00df 00bf 009f 007f 005f 003f 001f
+	*/
+	for (int bank = 0; bank < 4; bank++)
+	{
+		// write enable bit
+		if (~m_czattr[4] >> (bank * 4) & 1)
+		{
+			u32 prev = (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
+			u32 temp = prev;
+			COMBINE_DATA(&temp);
+			m_banked_czram[bank][offset * 2] = temp >> 16;
+			m_banked_czram[bank][offset * 2 + 1] = temp & 0xffff;
+			m_cz_was_written[bank] |= (prev ^ temp);
+		}
+	}
+}
+
+READ32_MEMBER(namcos22s_state::namcos22s_czram_r)
+{
+	int bank = m_czattr[5] & 3;
 	return (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
 }
 
-void namcos22_state::recalc_czram()
+void namcos22s_state::recalc_czram()
 {
-	for (int table = 0; table < 4; table++)
+	for (int bank = 0; bank < 4; bank++)
 	{
 		// as documented above, ss22 czram is 'just' a big compare table
 		// this is very slow when emulating, so let's recalculate it to a simpler lookup table
-		if (m_cz_was_written[table])
+		if (m_cz_was_written[bank])
 		{
+			int reverse = (m_czattr[4] >> (bank * 4) & 2) ? 0xff : 0;
 			int small_val = 0x2000;
-			int small_offset = 0;
+			int small_offset = reverse;
 			int large_val = 0;
-			int large_offset = 0;
-			int prev = 0x2000;
+			int large_offset = reverse ^ 0xff;
+			int prev = 0;
 
 			for (int i = 0; i < 0x100; i++)
 			{
-				int val = m_banked_czram[table][i];
-
-				// discard if larger than 1fff
-				if (val > 0x1fff) val = prev;
-				if (prev > 0x1fff)
-				{
-					prev = val;
-					continue;
-				}
-
+				int factor = i ^ reverse;
+				int val = std::min<u16>(m_banked_czram[bank][factor], 0x2000);
 				int start = prev;
 				int end = val;
-				if (start > end)
-				{
-					start = val;
-					end = prev;
-				}
-				prev = val;
 
-				// fill range
-				for (int j = start; j < end; j++)
-					m_recalc_czram[table][j] = i;
+				if (i > 0)
+				{
+					// discard if compare function doesn't match
+					if (start >= end)
+						continue;
+
+					// fill range
+					for (int j = start; j < end; j++)
+						m_recalc_czram[bank][j] = factor;
+				}
 
 				// remember largest/smallest for later
 				if (val < small_val)
 				{
 					small_val = val;
-					small_offset = i;
+					small_offset = factor;
 				}
 				if (val > large_val)
 				{
 					large_val = val;
-					large_offset = i;
+					large_offset = factor;
 				}
+
+				prev = val;
 			}
 
 			// fill possible leftover ranges
 			for (int j = 0; j < small_val; j++)
-				m_recalc_czram[table][j] = small_offset;
+				m_recalc_czram[bank][j] = small_offset;
 			for (int j = large_val; j < 0x2000; j++)
-				m_recalc_czram[table][j] = large_offset;
+				m_recalc_czram[bank][j] = large_offset;
 
-			m_cz_was_written[table] = 0;
+			m_cz_was_written[bank] = 0;
 		}
 	}
 }
@@ -2154,12 +2250,11 @@ void namcos22_state::recalc_czram()
 
 void namcos22_state::update_mixer()
 {
-	int i;
 	m_poly->wait("update_mixer");
 #if 0 // show reg contents
 	char msg1[0x1000] = {0}, msg2[0x1000] = {0};
 	int st = 0x000 / 16;
-	for (i = st; i < (st+3); i++)
+	for (int i = st; i < (st+3); i++)
 	{
 		sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
 		strcat(msg1,msg2);
@@ -2194,8 +2289,7 @@ void namcos22_state::update_mixer()
     08,09,0a        background color
     0b
     0c
-    0d              spot factor limit value
-    0e              enable spot factor limit
+    0d,0e           spot factor
     0f
     10
     11              global polygon alpha factor
@@ -2217,19 +2311,14 @@ void namcos22_state::update_mixer()
 		m_fog_r              = nthbyte(m_mixer, 0x05);
 		m_fog_g              = nthbyte(m_mixer, 0x06);
 		m_fog_b              = nthbyte(m_mixer, 0x07);
-		m_spot_limit         = nthbyte(m_mixer, 0x0d);
+		m_spot_factor        = nthbyte(m_mixer, 0x0e) << 8 | nthbyte(m_mixer, 0x0d);
 		m_poly_translucency  = nthbyte(m_mixer, 0x11);
 		m_screen_fade_r      = nthbyte(m_mixer, 0x16);
 		m_screen_fade_g      = nthbyte(m_mixer, 0x17);
 		m_screen_fade_b      = nthbyte(m_mixer, 0x18);
 		m_screen_fade_factor = nthbyte(m_mixer, 0x19);
 		m_mixer_flags        = nthbyte(m_mixer, 0x1a);
-		m_text_palbase       = nthbyte(m_mixer, 0x1b) & 0x7f;
-
-		// put spot-specific flags into high word
-		m_mixer_flags |= m_spot_enable << 16;
-		m_mixer_flags |= (nthbyte(m_mixer, 0x0e) & 1) << 17;
-		m_mixer_flags |= (m_chipselect & 0xc000) << 4;
+		m_text_palbase       = nthbyte(m_mixer, 0x1b) << 8 & 0x7f00;
 	}
 	else
 	{
@@ -2245,7 +2334,7 @@ void namcos22_state::update_mixer()
     00,01           display flags
     02
     03
-    04
+    04              bgcolor palette base?
     05
     06
     07              textlayer palette base?
@@ -2261,24 +2350,23 @@ void namcos22_state::update_mixer()
     102,182,202     fog rgb 2
     103,183,203     fog rgb 3
 */
-		m_mixer_flags        = nthbyte(m_mixer, 0x00) << 8 | nthbyte(m_mixer, 0x01);
-		m_poly_fade_r        = nthbyte(m_mixer, 0x11) << 8 | nthbyte(m_mixer, 0x12); // 0x0100 = 1.0
-		m_poly_fade_g        = nthbyte(m_mixer, 0x13) << 8 | nthbyte(m_mixer, 0x14);
-		m_poly_fade_b        = nthbyte(m_mixer, 0x15) << 8 | nthbyte(m_mixer, 0x16);
-		m_poly_fade_enabled  = (m_poly_fade_r == 0x100 && m_poly_fade_g == 0x100 && m_poly_fade_b == 0x100) ? 0 : 1;
+		m_mixer_flags         = nthbyte(m_mixer, 0x00) << 8 | nthbyte(m_mixer, 0x01);
+		m_bg_palbase          = nthbyte(m_mixer, 0x04) << 8 & 0x7f00;
+		m_text_palbase        = nthbyte(m_mixer, 0x07) << 8 & 0x7f00;
+		m_screen_fade_r       = nthbyte(m_mixer, 0x11) << 8 | nthbyte(m_mixer, 0x12); // 0x0100 = 1.0
+		m_screen_fade_g       = nthbyte(m_mixer, 0x13) << 8 | nthbyte(m_mixer, 0x14);
+		m_screen_fade_b       = nthbyte(m_mixer, 0x15) << 8 | nthbyte(m_mixer, 0x16);
 
 		// raveracw is the only game using multiple fog colors (city smog, cars under tunnels, brake disc in attract mode)
-		m_fog_colormask      = m_mixer[0x84/4];
+		m_fog_colormask       = m_mixer[0x84/4];
 
 		// fog color per cz type
-		for (i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			m_fog_r_per_cztype[i] = nthbyte(m_mixer, 0x0100+i);
 			m_fog_g_per_cztype[i] = nthbyte(m_mixer, 0x0180+i);
 			m_fog_b_per_cztype[i] = nthbyte(m_mixer, 0x0200+i);
 		}
-
-		m_text_palbase = 0x7f;
 	}
 }
 
@@ -2286,8 +2374,9 @@ void namcos22_state::update_mixer()
 
 /*********************************************************************************************/
 
-uint32_t namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 namcos22s_state::screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	render_frame_active();
 	update_mixer();
 	update_palette();
 	recalc_czram();
@@ -2303,21 +2392,21 @@ uint32_t namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_r
 	bitmap.fill(bg_color.to_rgba(), cliprect);
 
 	// layers
-	uint8_t layer = nthbyte(m_mixer, 0x1f);
+	u8 layer = nthbyte(m_mixer, 0x1f);
 	if (layer & 4) draw_text_layer(screen, bitmap, cliprect);
-	if (layer & 2) draw_sprites(bitmap, cliprect);
-	if (layer & 1) draw_polygons(bitmap);
+	if (layer & 2) draw_sprites();
+	if (layer & 1) draw_polygons();
 	m_poly->render_scene(screen, bitmap);
 	if (layer & 4) namcos22s_mix_text_layer(screen, bitmap, cliprect, 6);
 
 	// apply gamma
-	const uint8_t *rlut = (const uint8_t *)&m_mixer[0x100/4];
-	const uint8_t *glut = (const uint8_t *)&m_mixer[0x200/4];
-	const uint8_t *blut = (const uint8_t *)&m_mixer[0x300/4];
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	const u8 *rlut = (const u8 *)&m_mixer[0x100/4];
+	const u8 *glut = (const u8 *)&m_mixer[0x200/4];
+	const u8 *blut = (const u8 *)&m_mixer[0x300/4];
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t *dest = &bitmap.pix32(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		u32 *dest = &bitmap.pix32(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int rgb = dest[x];
 			int r = rlut[NATIVE_ENDIAN_VALUE_LE_BE(3, 0) ^ ((rgb >> 16) & 0xff)];
@@ -2330,19 +2419,21 @@ uint32_t namcos22_state::screen_update_namcos22s(screen_device &screen, bitmap_r
 	return 0;
 }
 
-uint32_t namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	render_frame_active();
 	update_mixer();
 	update_palette();
 	screen.priority().fill(0, cliprect);
 
 	// background color
-	bitmap.fill(m_palette->pen(0x7fff), cliprect);
+	int bg_color = m_bg_palbase | 0xff;
+	bitmap.fill(m_palette->pen(bg_color), cliprect);
 
 	// layers
-	draw_polygons(bitmap);
+	draw_polygons();
 	m_poly->render_scene(screen, bitmap);
-	draw_text_layer(screen, bitmap, cliprect); // text layer + final mix(gamma)
+	draw_text_layer(screen, bitmap, cliprect); // text layer + final mix
 
 	return 0;
 }
@@ -2353,51 +2444,46 @@ uint32_t namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rg
 
 void namcos22_state::init_tables()
 {
-	m_dirtypal = std::make_unique<uint8_t[]>(0x8000/4);
+	m_dirtypal = std::make_unique<u8[]>(0x8000/4);
+	save_pointer(NAME(m_dirtypal), 0x8000/4);
 	memset(m_dirtypal.get(), 1, 0x8000/4);
 	memset(m_paletteram, 0, 0x8000);
 
+	matrix3d_identity(m_viewmatrix);
 	memset(m_polygonram, 0xcc, m_polygonram.bytes());
 
-	// init spotram (super22 only)
-	if (m_is_ss22)
-		m_spotram = make_unique_clear<uint16_t[]>(SPOTRAM_SIZE);
-
-	// init czram tables (super22 only)
-	if (m_is_ss22)
+	if (!m_is_ss22)
 	{
-		for (int table = 0; table < 4; table++)
-		{
-			m_banked_czram[table] = make_unique_clear<uint16_t[]>(0x100);
-			m_recalc_czram[table] = make_unique_clear<uint8_t[]>(0x2000);
-			m_cz_was_written[table] = 1;
-		}
+		save_item(NAME(m_fog_r_per_cztype));
+		save_item(NAME(m_fog_g_per_cztype));
+		save_item(NAME(m_fog_b_per_cztype));
 	}
 
 	// init pointrom
 	m_pointrom_size = memregion("pointrom")->bytes()/3;
-	m_pointrom = auto_alloc_array(machine(), int32_t, m_pointrom_size);
-	uint8_t* pointrom_low = memregion("pointrom")->base();
-	uint8_t* pointrom_mid = pointrom_low + m_pointrom_size;
-	uint8_t* pointrom_high = pointrom_mid + m_pointrom_size;
+	m_pointrom = auto_alloc_array(machine(), s32, m_pointrom_size);
+	u8* pointrom_low = memregion("pointrom")->base();
+	u8* pointrom_mid = pointrom_low + m_pointrom_size;
+	u8* pointrom_high = pointrom_mid + m_pointrom_size;
 	for (int i = 0; i < m_pointrom_size; i++)
 	{
 		m_pointrom[i] = signed24(pointrom_high[i] << 16 | pointrom_mid[i] << 8 | pointrom_low[i]);
 	}
 
-	m_pointram = make_unique_clear<uint32_t[]>(0x20000);
+	m_pointram = make_unique_clear<u32[]>(0x20000);
+	save_pointer(NAME(m_pointram), 0x20000);
 
 	// force all texture tiles to be decoded now
 	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
 		m_gfxdecode->gfx(1)->get_data(i);
 
-	m_texture_tilemap = (uint16_t *)memregion("textilemap")->base();
-	m_texture_tiledata = (uint8_t *)m_gfxdecode->gfx(1)->get_data(0);
-	m_texture_tileattr = std::make_unique<uint8_t[]>(0x080000*2);
+	m_texture_tilemap = (u16 *)memregion("textilemap")->base();
+	m_texture_tiledata = (u8 *)m_gfxdecode->gfx(1)->get_data(0);
+	m_texture_tileattr = std::make_unique<u8[]>(0x080000*2);
 
 	// unpack textures
-	uint8_t *packed_tileattr = 0x200000 + (uint8_t *)memregion("textilemap")->base();
-	uint8_t *unpacked_tileattr = m_texture_tileattr.get();
+	u8 *packed_tileattr = 0x200000 + (u8 *)memregion("textilemap")->base();
+	u8 *unpacked_tileattr = m_texture_tileattr.get();
 	for (int i = 0; i < 0x80000; i++)
 	{
 		*unpacked_tileattr++ = (*packed_tileattr) >> 4;
@@ -2406,7 +2492,7 @@ void namcos22_state::init_tables()
 	}
 
 	// make attr/y/x lookup table
-	m_texture_ayx_to_pixel = std::make_unique<uint8_t[]>(16*16*16);
+	m_texture_ayx_to_pixel = std::make_unique<u8[]>(16*16*16);
 	for (int attr = 0; attr < 16; attr++)
 	{
 		for (int y = 0; y < 16; y++)
@@ -2433,7 +2519,7 @@ void namcos22_state::init_tables()
 		}
 	}
 
-	// following setup is Namco System 22 specific
+	// following setup is System22 specific
 	switch (m_gametype)
 	{
 		case NAMCOS22_RIDGE_RACER:
@@ -2459,17 +2545,41 @@ void namcos22_state::init_tables()
 	}
 }
 
+void namcos22s_state::init_tables()
+{
+	namcos22_state::init_tables();
+
+	// init spotram (super22 only)
+	m_spotram = make_unique_clear<u16[]>(0x800);
+	save_pointer(NAME(m_spotram), 0x800);
+
+	// init czram tables (super22 only)
+	for (int bank = 0; bank < 4; bank++)
+	{
+		m_banked_czram[bank] = make_unique_clear<u16[]>(0x100);
+		m_recalc_czram[bank] = make_unique_clear<u8[]>(0x2000);
+		m_cz_was_written[bank] = 1;
+
+		save_pointer(NAME(m_banked_czram[bank]), 0x100, bank);
+		save_pointer(NAME(m_recalc_czram[bank]), 0x2000, bank);
+	}
+
+	save_item(NAME(m_czattr));
+	save_item(NAME(m_cz_was_written));
+}
 
 void namcos22_state::video_start()
 {
 	m_is_ss22 = (m_iomcu == nullptr);
 	init_tables();
 
+	m_posirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::posirq_callback),this));
+
 	m_mix_bitmap = std::make_unique<bitmap_ind16>(640, 480);
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos22_state::get_text_tile_info), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 
-	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_cgram.target());
+	m_gfxdecode->gfx(0)->set_source((u8 *)m_cgram.target());
 
 	m_poly = auto_alloc(machine(), namcos22_renderer(*this));
 }

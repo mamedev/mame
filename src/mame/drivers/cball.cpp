@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -19,13 +20,14 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	cball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram") { }
+		m_video_ram(*this, "video_ram")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -51,7 +53,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cball);
+	void cball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -138,7 +140,7 @@ void cball_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(cball_state, cball)
+void cball_state::cball_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
@@ -162,31 +164,31 @@ WRITE8_MEMBER(cball_state::wram_w)
 
 
 
-ADDRESS_MAP_START(cball_state::cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+void cball_state::cpu_map(address_map &map)
+{
+	map.global_mask(0x7fff);
 
-	AM_RANGE(0x0000, 0x03ff) AM_READ(wram_r) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_READONLY
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("1001")
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("1003")
-	AM_RANGE(0x1020, 0x1020) AM_READ_PORT("1020")
-	AM_RANGE(0x1040, 0x1040) AM_READ_PORT("1040")
-	AM_RANGE(0x1060, 0x1060) AM_READ_PORT("1060")
-	AM_RANGE(0x2000, 0x2001) AM_NOP
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")
+	map(0x0000, 0x03ff).r(FUNC(cball_state::wram_r)).mask(0x7f);
+	map(0x1001, 0x1001).portr("1001");
+	map(0x1003, 0x1003).portr("1003");
+	map(0x1020, 0x1020).portr("1020");
+	map(0x1040, 0x1040).portr("1040");
+	map(0x1060, 0x1060).portr("1060");
+	map(0x2000, 0x2001).noprw();
+	map(0x2800, 0x2800).portr("2800");
 
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(wram_w) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(vram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x1800, 0x1800) AM_NOP /* watchdog? */
-	AM_RANGE(0x1810, 0x1811) AM_NOP
-	AM_RANGE(0x1820, 0x1821) AM_NOP
-	AM_RANGE(0x1830, 0x1831) AM_NOP
-	AM_RANGE(0x1840, 0x1841) AM_NOP
-	AM_RANGE(0x1850, 0x1851) AM_NOP
-	AM_RANGE(0x1870, 0x1871) AM_NOP
+	map(0x0000, 0x03ff).w(FUNC(cball_state::wram_w)).mask(0x7f);
+	map(0x0400, 0x07ff).ram().w(FUNC(cball_state::vram_w)).share("video_ram");
+	map(0x1800, 0x1800).noprw(); /* watchdog? */
+	map(0x1810, 0x1811).noprw();
+	map(0x1820, 0x1821).noprw();
+	map(0x1830, 0x1831).noprw();
+	map(0x1840, 0x1841).noprw();
+	map(0x1850, 0x1851).noprw();
+	map(0x1870, 0x1871).noprw();
 
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+	map(0x7000, 0x7fff).rom();
+}
 
 
 static INPUT_PORTS_START( cball )
@@ -255,33 +257,33 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( cball )
+static GFXDECODE_START( gfx_cball )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 4, 1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(cball_state::cball)
-
+void cball_state::cball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(12'096'000) / 16) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	M6800(config, m_maincpu, XTAL(12'096'000) / 16); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cball_state::cpu_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(0, 255, 0, 223);
+	m_screen->set_screen_update(FUNC(cball_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cball)
-	MCFG_PALETTE_ADD("palette", 6)
-	MCFG_PALETTE_INIT_OWNER(cball_state, cball)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cball);
+
+	PALETTE(config, m_palette, FUNC(cball_state::cball_palette), 6);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( cball )
@@ -306,4 +308,4 @@ ROM_START( cball )
 ROM_END
 
 
-GAME( 1976, cball, 0, cball, cball, cball_state, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, cball, 0, cball, cball, cball_state, empty_init, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/samcoupe.h"
-#include "screen.h"
 
 /***************************************************************************
     CONSTANTS
@@ -297,7 +296,7 @@ void samcoupe_state::machine_start()
 
 	/* schedule our video updates */
 	m_video_update_timer = timer_alloc(TIMER_VIDEO_UPDATE);
-	m_video_update_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_video_update_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
 /***************************************************************************

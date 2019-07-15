@@ -27,50 +27,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ADC0844_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ADC0844, 0)
-
-#define MCFG_ADC0844_INTR_CB(_devcb) \
-	devcb = &adc0844_device::set_intr_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0844_CH1_CB(_devcb) \
-	devcb = &adc0844_device::set_ch1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0844_CH2_CB(_devcb) \
-	devcb = &adc0844_device::set_ch2_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0844_CH3_CB(_devcb) \
-	devcb = &adc0844_device::set_ch3_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0844_CH4_CB(_devcb) \
-	devcb = &adc0844_device::set_ch4_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0848_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ADC0848, 0)
-
-#define MCFG_ADC0848_INTR_CB MCFG_ADC0844_INTR_CB
-#define MCFG_ADC0848_CH1_CB  MCFG_ADC0844_CH1_CB
-#define MCFG_ADC0848_CH2_CB  MCFG_ADC0844_CH2_CB
-#define MCFG_ADC0848_CH3_CB  MCFG_ADC0844_CH3_CB
-#define MCFG_ADC0848_CH4_CB  MCFG_ADC0844_CH4_CB
-
-#define MCFG_ADC0848_CH5_CB(_devcb) \
-	devcb = &adc0848_device::set_ch5_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0848_CH6_CB(_devcb) \
-	devcb = &adc0848_device::set_ch6_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0848_CH7_CB(_devcb) \
-	devcb = &adc0848_device::set_ch7_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ADC0848_CH8_CB(_devcb) \
-	devcb = &adc0848_device::set_ch8_callback(*device, DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -78,26 +34,17 @@ class adc0844_device : public device_t
 {
 public:
 	// construction/destruction
-	adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	template <class Object> static devcb_base &set_intr_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	auto intr_callback() { return m_intr_cb.bind(); }
+	auto ch1_callback() { return m_ch1_cb.bind(); }
+	auto ch2_callback() { return m_ch2_cb.bind(); }
+	auto ch3_callback() { return m_ch3_cb.bind(); }
+	auto ch4_callback() { return m_ch4_cb.bind(); }
 
-	template <class Object> static devcb_base &set_ch1_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_ch1_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ch2_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_ch2_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ch3_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_ch3_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ch4_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_ch4_cb.set_callback(std::forward<Object>(cb)); }
-
-	DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	u8 read();
+	virtual void write(u8 data);
 
 protected:
 	adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -123,22 +70,15 @@ class adc0848_device : public adc0844_device
 {
 public:
 	// construction/destruction
-	adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	template <class Object> static devcb_base &set_ch5_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0848_device &>(device).m_ch5_cb.set_callback(std::forward<Object>(cb)); }
+	auto ch5_callback() { return m_ch5_cb.bind(); }
+	auto ch6_callback() { return m_ch6_cb.bind(); }
+	auto ch7_callback() { return m_ch7_cb.bind(); }
+	auto ch8_callback() { return m_ch8_cb.bind(); }
 
-	template <class Object> static devcb_base &set_ch6_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0848_device &>(device).m_ch6_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ch7_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0848_device &>(device).m_ch7_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ch8_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0848_device &>(device).m_ch8_cb.set_callback(std::forward<Object>(cb)); }
-
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual void write(u8 data) override;
 
 protected:
 	// device-level overrides

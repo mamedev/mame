@@ -47,50 +47,56 @@
 DEFINE_DEVICE_TYPE(ABC1600_MOVER, abc1600_mover_device, "abc1600mover", "ABC 1600 Mover")
 
 
-ADDRESS_MAP_START(abc1600_mover_device::vram_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(video_ram_r, video_ram_w)
-ADDRESS_MAP_END
+void abc1600_mover_device::vram_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rw(FUNC(abc1600_mover_device::video_ram_r), FUNC(abc1600_mover_device::video_ram_w));
+}
 
-ADDRESS_MAP_START(abc1600_mover_device::crtc_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfe) AM_DEVREADWRITE(SY6845E_TAG, mc6845_device, status_r, address_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xfe) AM_DEVREADWRITE(SY6845E_TAG, mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+void abc1600_mover_device::crtc_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xfe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x01, 0x01).mirror(0xfe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
-ADDRESS_MAP_START(abc1600_mover_device::iowr0_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(iord0_r)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf8) AM_WRITE(ldsx_hb_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xf8) AM_WRITE(ldsx_lb_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xf8) AM_WRITE(ldsy_hb_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xf8) AM_WRITE(ldsy_lb_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xf8) AM_WRITE(ldtx_hb_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf8) AM_WRITE(ldtx_lb_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0xf8) AM_WRITE(ldty_hb_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf8) AM_WRITE(ldty_lb_w)
-ADDRESS_MAP_END
+void abc1600_mover_device::iowr0_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).r(FUNC(abc1600_mover_device::iord0_r));
+	map(0x00, 0x00).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsx_hb_w));
+	map(0x01, 0x01).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsx_lb_w));
+	map(0x02, 0x02).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsy_hb_w));
+	map(0x03, 0x03).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsy_lb_w));
+	map(0x04, 0x04).mirror(0xf8).w(FUNC(abc1600_mover_device::ldtx_hb_w));
+	map(0x05, 0x05).mirror(0xf8).w(FUNC(abc1600_mover_device::ldtx_lb_w));
+	map(0x06, 0x06).mirror(0xf8).w(FUNC(abc1600_mover_device::ldty_hb_w));
+	map(0x07, 0x07).mirror(0xf8).w(FUNC(abc1600_mover_device::ldty_lb_w));
+}
 
-ADDRESS_MAP_START(abc1600_mover_device::iowr1_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READNOP
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf8) AM_WRITE(ldfx_hb_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xf8) AM_WRITE(ldfx_lb_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xf8) AM_WRITE(ldfy_hb_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xf8) AM_WRITE(ldfy_lb_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf8) AM_WRITE(wrml_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf8) AM_WRITE(wrdl_w)
-ADDRESS_MAP_END
+void abc1600_mover_device::iowr1_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).nopr();
+	map(0x00, 0x00).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfx_hb_w));
+	map(0x01, 0x01).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfx_lb_w));
+	map(0x02, 0x02).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfy_hb_w));
+	map(0x03, 0x03).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfy_lb_w));
+	map(0x05, 0x05).mirror(0xf8).w(FUNC(abc1600_mover_device::wrml_w));
+	map(0x07, 0x07).mirror(0xf8).w(FUNC(abc1600_mover_device::wrdl_w));
+}
 
-ADDRESS_MAP_START(abc1600_mover_device::iowr2_map)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READNOP
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf8) AM_WRITE(wrmask_strobe_hb_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xf8) AM_WRITE(wrmask_strobe_lb_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xf8) AM_WRITE(enable_clocks_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xf8) AM_WRITE(flag_strobe_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xf8) AM_WRITE(endisp_w)
-ADDRESS_MAP_END
+void abc1600_mover_device::iowr2_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).nopr();
+	map(0x00, 0x00).mirror(0xf8).w(FUNC(abc1600_mover_device::wrmask_strobe_hb_w));
+	map(0x01, 0x01).mirror(0xf8).w(FUNC(abc1600_mover_device::wrmask_strobe_lb_w));
+	map(0x02, 0x02).mirror(0xf8).w(FUNC(abc1600_mover_device::enable_clocks_w));
+	map(0x03, 0x03).mirror(0xf8).w(FUNC(abc1600_mover_device::flag_strobe_w));
+	map(0x04, 0x04).mirror(0xf8).w(FUNC(abc1600_mover_device::endisp_w));
+}
 
 
-ADDRESS_MAP_START(abc1600_mover_device::mover_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void abc1600_mover_device::mover_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
 
 
 //-------------------------------------------------
@@ -193,21 +199,23 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc1600_mover_device::device_add_mconfig)
-	MCFG_DEFAULT_LAYOUT(layout_abc1600)
+void abc1600_mover_device::device_add_mconfig(machine_config &config)
+{
+	config.set_default_layout(layout_abc1600);
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(abc1600_mover_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(FUNC(abc1600_mover_device::screen_update));
+	screen.set_raw(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL(64'000'000)/32)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(32)
-	MCFG_MC6845_UPDATE_ROW_CB(abc1600_mover_device, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(abc1600_mover_device, crtc_update)
-MACHINE_CONFIG_END
+	SY6845E(config, m_crtc, XTAL(64'000'000)/32);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(32);
+	m_crtc->set_update_row_callback(FUNC(abc1600_mover_device::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(abc1600_mover_device::crtc_update), this);
+}
 
 
 //**************************************************************************

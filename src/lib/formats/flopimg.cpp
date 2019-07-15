@@ -1038,6 +1038,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 		type == SIZE_ID ||
 		type == OFFSET_ID_O ||
 		type == OFFSET_ID_E ||
+		type == OFFSET_ID_FM ||
 		type == SECTOR_ID_O ||
 		type == SECTOR_ID_E ||
 		type == REMAIN_O ||
@@ -1521,6 +1522,14 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_half_w(buffer, 6, track*2+head);
 			break;
 
+		case OFFSET_ID_FM:
+			fm_w(buffer, 8, track*2+head);
+			break;
+
+		case OFFSET_ID:
+			mfm_w(buffer, 8, track*2+head);
+			break;
+
 		case SECTOR_ID_O:
 			mfm_half_w(buffer, 7, sector_idx);
 			break;
@@ -1650,6 +1659,37 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			break;
 		}
 
+		case SECTOR_DATA_MX: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			uint16_t cksum = 0, data;
+			for(int i=0; i < csect->size; i+=2)
+			{
+				data = csect->data[i+1];
+				fm_w(buffer, 8, data);
+				data = (data << 8) | csect->data[i];
+				fm_w(buffer, 8, csect->data[i]);
+				cksum += data;
+			}
+			fm_w(buffer, 16, cksum);
+			break;
+		}
+
+		case SECTOR_DATA_DS9: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			uint8_t data;
+			int cksum = 0;
+			for(int i=0; i != csect->size; i++)
+			{
+				if (cksum > 255) { cksum++; cksum &= 255; }
+				data = csect->data[i];
+				mfm_w(buffer, 8, data);
+				cksum += data;
+			}
+			cksum &= 255;
+			mfm_w(buffer, 8, cksum);
+			break;
+		}
+
 		default:
 			printf("%d.%d.%d (%d) unhandled\n", desc[index].type, desc[index].p1, desc[index].p2, index);
 			break;
@@ -1679,27 +1719,46 @@ void floppy_image_format_t::normalize_times(std::vector<uint32_t> &buffer)
 	}
 }
 
-void floppy_image_format_t::generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack)
+void floppy_image_format_t::generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack, int splice)
 {
-	// Maximal number of cells which happens when the buffer is all 1
 	std::vector<uint32_t> &dest = image->get_buffer(track, head, subtrack);
 	dest.clear();
+
+	// If the bitstream has an odd number of inversions, one needs to be added.
+	// Put in in the middle of the half window after the center inversion, where
+	// any fdc ignores it.
+
+	int inversions = 0;
+	for(int i=0; i != track_size; i++)
+		if(trackbuf[i >> 3] & (0x80 >> (i & 7)))
+			inversions++;
+	bool need_flux = inversions & 1;
 
 	uint32_t cbit = floppy_image::MG_A;
 	uint32_t count = 0;
 	for(int i=0; i != track_size; i++)
 		if(trackbuf[i >> 3] & (0x80 >> (i & 7))) {
-			dest.push_back(cbit | (count+1));
+			dest.push_back(cbit | (count+2));
 			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-			count = 1;
+			if(need_flux) {
+				need_flux = false;
+				dest.push_back(cbit | 1);
+				cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
+				count = 1;
+			} else
+				count = 2;
 		} else
-			count += 2;
+			count += 4;
 
 	if(count)
 		dest.push_back(cbit | count);
 
 	normalize_times(dest);
-	image->set_write_splice_position(track, head, 0, subtrack);
+
+	if(splice >= 0 || splice < track_size) {
+		int splpos = uint64_t(200000000) * splice / track_size;
+		image->set_write_splice_position(track, head, splpos, subtrack);
+	}
 }
 
 void floppy_image_format_t::generate_track_from_levels(int track, int head, std::vector<uint32_t> &trackbuf, int splice_pos, floppy_image *image)

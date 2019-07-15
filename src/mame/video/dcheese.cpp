@@ -17,8 +17,8 @@
  *
  *************************************/
 
-#define DSTBITMAP_WIDTH     512
-#define DSTBITMAP_HEIGHT    512
+static constexpr u32 DSTBITMAP_WIDTH  = 512;
+static constexpr u32 DSTBITMAP_HEIGHT = 512;
 
 
 /*************************************
@@ -27,16 +27,11 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dcheese_state, dcheese)
+void dcheese_state::dcheese_palette(palette_device &palette) const
 {
-	const uint16_t *src = (uint16_t *)memregion("user1")->base();
-	int i;
-
-	/* really 65536 colors, but they don't use the later ones so we can stay */
-	/* within MAME's limits */
-	for (i = 0; i < 65534; i++)
+	for (int i = 0; i < 65536; i++)
 	{
-		int data = *src++;
+		u16 const data = m_palrom[i];
 		palette.set_pen_color(i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
 	}
 }
@@ -54,16 +49,13 @@ void dcheese_state::update_scanline_irq()
 	/* if not in range, don't bother */
 	if (m_blitter_vidparam[0x22/2] <= m_blitter_vidparam[0x1e/2])
 	{
-		int effscan;
-		attotime time;
-
 		/* compute the effective scanline of the interrupt */
-		effscan = m_blitter_vidparam[0x22/2] - m_blitter_vidparam[0x1a/2];
+		int effscan = m_blitter_vidparam[0x22/2] - m_blitter_vidparam[0x1a/2];
 		if (effscan < 0)
 			effscan += m_blitter_vidparam[0x1e/2];
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
-		time = m_screen->time_until_pos(effscan);
+		attotime time = m_screen->time_until_pos(effscan);
 		if (time < m_screen->scan_period())
 			time += m_screen->frame_period();
 		m_blitter_timer->adjust(time);
@@ -76,11 +68,11 @@ void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case TIMER_BLITTER_SCANLINE:
-		dcheese_signal_irq(3);
+		signal_irq(3);
 		update_scanline_irq();
 		break;
 	case TIMER_SIGNAL_IRQ:
-		dcheese_signal_irq(param);
+		signal_irq(param);
 		break;
 	default:
 		assert_always(false, "Unknown id in dcheese_state::device_timer");
@@ -119,17 +111,15 @@ void dcheese_state::video_start()
  *
  *************************************/
 
-uint32_t dcheese_state::screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dcheese_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	/* update the pixels */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-		uint16_t *src = &m_dstbitmap->pix16((y + m_blitter_vidparam[0x28/2]) % DSTBITMAP_HEIGHT);
+		u16 *dest = &bitmap.pix16(y);
+		u16 *src = &m_dstbitmap->pix16((y + m_blitter_vidparam[0x28/2]) & 0x1ff);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			dest[x] = src[x];
 	}
 	return 0;
@@ -143,64 +133,60 @@ uint32_t dcheese_state::screen_update_dcheese(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-void dcheese_state::do_clear(  )
+void dcheese_state::do_clear()
 {
-	int y;
-
 	/* clear the requested scanlines */
-	for (y = m_blitter_vidparam[0x2c/2]; y < m_blitter_vidparam[0x2a/2]; y++)
-		memset(&m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT), 0, DSTBITMAP_WIDTH * 2);
+	for (int y = m_blitter_vidparam[0x2c/2]; y < m_blitter_vidparam[0x2a/2]; y++)
+		memset(&m_dstbitmap->pix16(y & 0x1ff), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
 	m_signal_irq_timer->adjust(m_screen->scan_period(), 1);
 }
 
 
-void dcheese_state::do_blit(  )
+void dcheese_state::do_blit()
 {
-	int32_t srcminx = m_blitter_xparam[0] << 12;
-	int32_t srcmaxx = m_blitter_xparam[1] << 12;
-	int32_t srcminy = m_blitter_yparam[0] << 12;
-	int32_t srcmaxy = m_blitter_yparam[1] << 12;
-	int32_t srcx = ((m_blitter_xparam[2] & 0x0fff) | ((m_blitter_xparam[3] & 0x0fff) << 12)) << 7;
-	int32_t srcy = ((m_blitter_yparam[2] & 0x0fff) | ((m_blitter_yparam[3] & 0x0fff) << 12)) << 7;
-	int32_t dxdx = (int32_t)(((m_blitter_xparam[4] & 0x0fff) | ((m_blitter_xparam[5] & 0x0fff) << 12)) << 12) >> 12;
-	int32_t dxdy = (int32_t)(((m_blitter_xparam[6] & 0x0fff) | ((m_blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	int32_t dydx = (int32_t)(((m_blitter_yparam[4] & 0x0fff) | ((m_blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
-	int32_t dydy = (int32_t)(((m_blitter_yparam[6] & 0x0fff) | ((m_blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	uint8_t *src = memregion("gfx1")->base();
-	uint32_t pagemask = (memregion("gfx1")->bytes() - 1) / 0x40000;
-	int xstart = m_blitter_xparam[14];
-	int xend = m_blitter_xparam[15] + 1;
-	int ystart = m_blitter_yparam[14];
-	int yend = m_blitter_yparam[15];
-	int color = (m_blitter_color[0] << 8) & 0xff00;
-	int mask = (m_blitter_color[0] >> 8) & 0x00ff;
-	int opaque = (dxdx | dxdy | dydx | dydy) == 0;  /* bit of a hack for fredmem */
-	int x, y;
+	s32 const srcminx = m_blitter_xparam[0] << 12;
+	s32 const srcmaxx = m_blitter_xparam[1] << 12;
+	s32 const srcminy = m_blitter_yparam[0] << 12;
+	s32 const srcmaxy = m_blitter_yparam[1] << 12;
+	s32 const srcx = ((m_blitter_xparam[2] & 0x0fff) | ((m_blitter_xparam[3] & 0x0fff) << 12)) << 7;
+	s32 const srcy = ((m_blitter_yparam[2] & 0x0fff) | ((m_blitter_yparam[3] & 0x0fff) << 12)) << 7;
+	s32 const dxdx = (s32)(((m_blitter_xparam[4] & 0x0fff) | ((m_blitter_xparam[5] & 0x0fff) << 12)) << 12) >> 12;
+	s32 const dxdy = (s32)(((m_blitter_xparam[6] & 0x0fff) | ((m_blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
+	s32 const dydx = (s32)(((m_blitter_yparam[4] & 0x0fff) | ((m_blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
+	s32 const dydy = (s32)(((m_blitter_yparam[6] & 0x0fff) | ((m_blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
+	u32 const pagemask = m_gfxrom.mask() >> 18;
+	int const xstart = m_blitter_xparam[14];
+	int const xend = m_blitter_xparam[15] + 1;
+	int const ystart = m_blitter_yparam[14];
+	int const yend = m_blitter_yparam[15];
+	u32 const color = (m_blitter_color[0] << 8) & 0xff00;
+	u8 const mask = (m_blitter_color[0] >> 8) & 0x00ff;
+	bool const opaque = (dxdx | dxdy | dydx | dydy) == 0;  /* bit of a hack for fredmem */
 
 	/* loop over target rows */
-	for (y = ystart; y <= yend; y++)
+	for (int y = ystart; y <= yend; y++)
 	{
-		uint16_t *dst = &m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT);
+		u16 *dst = &m_dstbitmap->pix16(y & 0x1ff);
 
 		/* loop over target columns */
-		for (x = xstart; x <= xend; x++)
+		for (int x = xstart; x <= xend; x++)
 		{
 			/* compute current X/Y positions */
-			int sx = (srcx + dxdx * (x - xstart) + dxdy * (y - ystart)) & 0xffffff;
-			int sy = (srcy + dydx * (x - xstart) + dydy * (y - ystart)) & 0xffffff;
+			int const sx = (srcx + dxdx * (x - xstart) + dxdy * (y - ystart)) & 0xffffff;
+			int const sy = (srcy + dydx * (x - xstart) + dydy * (y - ystart)) & 0xffffff;
 
 			/* clip to source cliprect */
 			if (sx >= srcminx && sx <= srcmaxx && sy >= srcminy && sy <= srcmaxy)
 			{
 				/* page comes from bit 22 of Y and bit 21 of X */
-				int page = (((sy >> 21) & 2) | ((sx >> 21) & 1) | ((sx >> 20) & 4)) & pagemask;
-				int pix = src[0x40000 * page + ((sy >> 12) & 0x1ff) * 512 + ((sx >> 12) & 0x1ff)];
+				u32 const page = (((sy >> 21) & 2) | ((sx >> 21) & 1) | ((sx >> 20) & 4)) & pagemask;
+				u8 const pix = m_gfxrom[(page << 18) | (((sy >> 12) & 0x1ff) << 9) | ((sx >> 12) & 0x1ff)];
 
 				/* only non-zero pixels get written */
 				if (pix | opaque)
-					dst[x % DSTBITMAP_WIDTH] = (pix & mask) | color;
+					dst[x & 0x1ff] = (pix & mask) | color;
 			}
 		}
 	}
@@ -234,25 +220,25 @@ void dcheese_state::do_blit(  )
  *
  *************************************/
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_color_w)
+WRITE16_MEMBER(dcheese_state::blitter_color_w)
 {
 	COMBINE_DATA(&m_blitter_color[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_xparam_w)
+WRITE16_MEMBER(dcheese_state::blitter_xparam_w)
 {
 	COMBINE_DATA(&m_blitter_xparam[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_yparam_w)
+WRITE16_MEMBER(dcheese_state::blitter_yparam_w)
 {
 	COMBINE_DATA(&m_blitter_yparam[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_vidparam_w)
+WRITE16_MEMBER(dcheese_state::blitter_vidparam_w)
 {
 	COMBINE_DATA(&m_blitter_vidparam[offset]);
 
@@ -296,20 +282,20 @@ WRITE16_MEMBER(dcheese_state::madmax_blitter_vidparam_w)
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_unknown_w)
+WRITE16_MEMBER(dcheese_state::blitter_unknown_w)
 {
 	/* written to just before the blitter command register is written */
 	logerror("%06X:write to %06X = %04X & %04X\n", m_maincpu->pc(), 0x300000 + 2 * offset, data, mem_mask);
 }
 
 
-READ16_MEMBER(dcheese_state::madmax_blitter_vidparam_r)
+READ16_MEMBER(dcheese_state::blitter_vidparam_r)
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)
-		return ioport("2a0002")->read();
+		return m_2a0002_io->read();
 	if (offset == 0x0e/2)
-		return ioport("2a000e")->read();
+		return m_2a000e_io->read();
 
 	/* early code polls on this bit, wants it to be 0 */
 	if (offset == 0x36/2)

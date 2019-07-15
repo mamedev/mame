@@ -6,19 +6,16 @@
 #pragma once
 
 
-#define MCFG_YM2612_IRQ_HANDLER(cb) \
-		devcb = &ym2612_device::set_irq_handler(*device, (DEVCB_##cb));
-
 class ym2612_device : public device_t, public device_sound_interface
 {
 public:
 	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2612_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// update request from fm.cpp
 	static void update_request(device_t *param) { downcast<ym2612_device *>(param)->update_request(); }

@@ -7,8 +7,8 @@
 
 #include "bus/adam/exp.h"
 #include "bus/adamnet/adamnet.h"
-#include "bus/coleco/ctrl.h"
-#include "bus/coleco/exp.h"
+#include "bus/coleco/controller/ctrl.h"
+#include "bus/coleco/cartridge/exp.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/coleco.h"
@@ -52,7 +52,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_netcpu;
+	required_device<m6801_cpu_device> m_netcpu;
 	required_device<tms9928a_device> m_vdc;
 	required_device<sn76489a_device> m_psg;
 	required_device<ram_device> m_ram;
@@ -115,7 +115,6 @@ public:
 	void adam(machine_config &config);
 	void adam_io(address_map &map);
 	void adam_mem(address_map &map);
-	void m6801_io(address_map &map);
 	void m6801_mem(address_map &map);
 };
 

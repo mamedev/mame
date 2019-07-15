@@ -85,27 +85,6 @@
 
 
 
-//***************************************************************************
-// DEVICE CONFIGURATION MACROS
-//***************************************************************************
-
-#define MCFG_MOS6566_CPU(_tag) \
-	mos6566_device::static_set_cpu_tag(*device, "^" _tag);
-
-#define MCFG_MOS6566_IRQ_CALLBACK(_write) \
-	devcb = &mos6566_device::set_irq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS6566_BA_CALLBACK(_write) \
-	devcb = &mos6566_device::set_ba_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS6566_AEC_CALLBACK(_write) \
-	devcb = &mos6566_device::set_aec_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS8564_K_CALLBACK(_write) \
-	devcb = &mos6566_device::set_k_wr_callback(*device, DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -212,16 +191,16 @@ public:
 	// construction/destruction
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ba_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_ba.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_aec_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_k_wr_callback(device_t &device, Object &&cb) { return downcast<mos6566_device &>(device).m_write_k.set_callback(std::forward<Object>(cb)); }
+	template <class T> void set_cpu(T &&tag) { m_cpu.set_tag(tag); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto ba_callback() { return m_write_ba.bind(); }
+	auto aec_callback() { return m_write_aec.bind(); }
+	auto k_callback() { return m_write_k.bind(); }
 
 	virtual space_config_vector memory_space_config() const override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( lp_w );
 
@@ -233,8 +212,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mos6566_colorram_map(address_map &map);
-	void mos6566_videoram_map(address_map &map);
 protected:
 	enum
 	{
@@ -282,6 +259,9 @@ protected:
 	inline void draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3 );
 	void draw_graphics();
 	void draw_sprites();
+
+	void mos6566_colorram_map(address_map &map);
+	void mos6566_videoram_map(address_map &map);
 
 	int m_icount;
 	const int m_variant;

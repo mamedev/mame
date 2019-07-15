@@ -46,33 +46,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define SPECTRUM_EXPANSION_SLOT_TAG      "exp"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SPECTRUM_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, SPECTRUM_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_SPECTRUM_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_SPECTRUM_EXPANSION_SLOT_ADD(SPECTRUM_EXPANSION_SLOT_TAG, spectrum_expansion_devices, nullptr) \
-	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w)) \
-	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
-
-#define MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &spectrum_expansion_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &spectrum_expansion_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -84,19 +57,27 @@ class spectrum_expansion_slot_device : public device_t, public device_slot_inter
 {
 public:
 	// construction/destruction
-	spectrum_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~spectrum_expansion_slot_device();
+	template <typename T>
+	spectrum_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: spectrum_expansion_slot_device(mconfig, tag, owner)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+	spectrum_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<spectrum_expansion_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<spectrum_expansion_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
-
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( port_fe_r );
+	void opcode_fetch(offs_t offset);
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 	DECLARE_READ_LINE_MEMBER( romcs );
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
@@ -122,17 +103,17 @@ class device_spectrum_expansion_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	virtual ~device_spectrum_expansion_interface();
+	device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(mreq_r) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(mreq_w) { }
-	virtual DECLARE_READ8_MEMBER(port_fe_r) { return 0xff; }
+	virtual void opcode_fetch(offs_t offset) { };
+	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
+	virtual void mreq_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t iorq_r(offs_t offset) { return 0xff; }
+	virtual void iorq_w(offs_t offset, uint8_t data) { }
 	virtual DECLARE_READ_LINE_MEMBER(romcs) { return 0; }
 
 protected:
-	device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device);
-
 	spectrum_expansion_slot_device *m_slot;
 };
 
@@ -140,9 +121,9 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_EXPANSION_SLOT, spectrum_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( spectrum_expansion_devices );
-SLOT_INTERFACE_EXTERN( spec128_expansion_devices );
-SLOT_INTERFACE_EXTERN( specpls3_expansion_devices );
+void spectrum_expansion_devices(device_slot_interface &device);
+void spec128_expansion_devices(device_slot_interface &device);
+void specpls3_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SPECTRUM_EXP_H

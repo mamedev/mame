@@ -101,6 +101,8 @@
 
 #include "hxchfe_dsk.h"
 
+#define HFE_FORMAT_HEADER   "HXCPICFE"
+
 #define HEADER_LENGTH 512
 #define TRACK_TABLE_LENGTH 1024
 
@@ -177,8 +179,18 @@ bool hfe_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 	if (drivecyl < m_cylinders)
 	{
-		osd_printf_error("hxchfe: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
-		return false;
+		if (m_cylinders - drivecyl > DUMP_THRESHOLD)
+		{
+			osd_printf_error("hxchfe: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
+			return false;
+		}
+		else
+		{
+			// Some dumps has a few excess tracks to be safe,
+			// lets be nice and just skip those tracks
+			osd_printf_warning("hxchfe: Floppy disk has a slight excess of tracks for this drive that will be discarded (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
+			m_cylinders = drivecyl;
+		}
 	}
 
 	if (m_cylinders <= drivecyl/2)
@@ -403,7 +415,10 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 bool hfe_format::save(io_generic *io, floppy_image *image)
 {
 	std::vector<uint8_t> cylbuf;
-	cylbuf.resize(0x6200);
+
+	// Create a buffer that is big enough to handle HD formats. We don't
+	// know the track length until we generate the HFE bitstream.
+	cylbuf.resize(0x10000);
 
 	uint8_t header[HEADER_LENGTH];
 	uint8_t track_table[TRACK_TABLE_LENGTH];
@@ -544,11 +559,12 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 		bool mfm_recording = false;
 		int time0 = 0;
 		int minflux = 4000;
+		int fluxlen = 0;
 		// Skip the beginning (may have a short cell)
 		for (int i=2; (i < tbuf.size()-1) && (time0 < 2000000) && !mfm_recording; i++)
 		{
-			int time0 = tbuf[i] & floppy_image::TIME_MASK;
-			int fluxlen = (tbuf[i+1] & floppy_image::TIME_MASK) - time0;
+			time0 = tbuf[i] & floppy_image::TIME_MASK;
+			fluxlen = (tbuf[i+1] & floppy_image::TIME_MASK) - time0;
 			if ((fluxlen < 3500) || (fluxlen > 5500 && fluxlen < 6500))
 				mfm_recording = true;
 			if (fluxlen < minflux) minflux = fluxlen;

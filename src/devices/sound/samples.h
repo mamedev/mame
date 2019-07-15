@@ -21,26 +21,11 @@
 // device type definition
 DECLARE_DEVICE_TYPE(SAMPLES, samples_device)
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SAMPLES_CHANNELS(_channels) \
-	samples_device::static_set_channels(*device, _channels);
-
-#define MCFG_SAMPLES_NAMES(_names) \
-	samples_device::static_set_samples_names(*device, _names);
-
-#define SAMPLES_START_CB_MEMBER(_name) void _name()
-
-#define MCFG_SAMPLES_START_CB(_class, _method) \
-	samples_device::set_samples_start_callback(*device, samples_device::start_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+#define SAMPLES_START_CB_MEMBER(_name) void _name()
 
 // ======================> samples_device
 
@@ -51,12 +36,22 @@ public:
 	typedef device_delegate<void ()> start_cb_delegate;
 
 	// construction/destruction
-	samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// static configuration helpers
-	static void static_set_channels(device_t &device, uint8_t channels) { downcast<samples_device &>(device).m_channels = channels; }
-	static void static_set_samples_names(device_t &device, const char *const *names) { downcast<samples_device &>(device).m_names = names; }
-	static void set_samples_start_callback(device_t &device, start_cb_delegate &&cb) { downcast<samples_device &>(device).m_samples_start_cb = std::move(cb); }
+	// configuration helpers
+	void set_channels(uint8_t channels) { m_channels = channels; }
+	void set_samples_names(const char *const *names) { m_names = names; }
+
+	// start callback helpers
+	void set_samples_start_callback(start_cb_delegate callback) { m_samples_start_cb = callback; }
+	template <class FunctionClass> void set_samples_start_callback(const char *devname, void (FunctionClass::*callback)(), const char *name)
+	{
+		set_samples_start_callback(start_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_samples_start_callback(void (FunctionClass::*callback)(), const char *name)
+	{
+		set_samples_start_callback(start_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// getters
 	bool playing(uint8_t channel) const;

@@ -26,7 +26,7 @@
 
 // tables are xored by table at $1998dc
 // tables are the same as drgw3 and drgw2
-static const uint8_t m_olds_source_data[8][0xec] = // table addresses $2951CA
+static const u8 m_olds_source_data[8][0xec] = // table addresses $2951CA
 {
 	{ // region 0, unused...
 		0,
@@ -152,31 +152,31 @@ static const uint8_t m_olds_source_data[8][0xec] = // table addresses $2951CA
 	}
 };
 
-MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::machine_reset()
 {
-	int region = (ioport(":Region")->read()) & 0xff;
+	const int region = (ioport(":Region")->read()) & 0xff;
 
 	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00900000 | region;
 
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	pgm_state::machine_reset();
 }
 
-DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::init_olds()
 {
 	pgm_basic_init();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::olds_w), (igs025_device*)m_igs025));
 	m_igs028->m_sharedprotram = m_sharedprotram;
 	m_igs025->m_kb_source_data = m_olds_source_data;
-
 }
 
-ADDRESS_MAP_START(pgm_028_025_state::olds_mem)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
-ADDRESS_MAP_END
+void pgm_028_025_state::olds_mem(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x3fffff).bankr("bank1"); /* Game ROM */
+	map(0x400000, 0x403fff).ram().share("sharedprotram"); // Shared with protection device
+}
 
 void pgm_028_025_state::igs025_to_igs028_callback( void )
 {
@@ -185,19 +185,17 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 }
 
 
-MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
+void pgm_028_025_state::pgm_028_025_ol(machine_config &config)
+{
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(olds_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_028_025_state::olds_mem);
 
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_028_025_state, igs025_to_igs028_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
 
-	MCFG_DEVICE_ADD("igs028", IGS028, 0)
-
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_028_025_state,olds)
-MACHINE_CONFIG_END
+	IGS028(config, m_igs028, 0);
+}
 
 
 INPUT_PORTS_START( olds )

@@ -74,5 +74,6 @@ void cbm2_user_port_device::device_start()
 //  SLOT_INTERFACE( cbm2_user_port_cards )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( cbm2_user_port_cards )
-SLOT_INTERFACE_END
+void cbm2_user_port_cards(device_slot_interface &device)
+{
+}

@@ -17,9 +17,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="MODE">
 			<bounds left="0.1" top="0.35" right="0.9" bottom="0.65" />
@@ -32,13 +36,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
 		</rect>
 		<text string="TRAP">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -55,13 +67,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
 		</rect>
 		<text string="ARM">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -78,13 +98,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
 		</rect>
 		<text string="RESET">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -101,13 +129,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
 		</rect>
 		<text string="MNE">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -124,13 +160,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
 		</rect>
 		<text string="HARD">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -147,13 +191,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
 		</rect>
 		<text string="TRACE">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -170,13 +222,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="0.4" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.27" green="0.67" blue="0.67" />
 		</rect>
 		<text string="REL">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -193,13 +253,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
 		</rect>
 		<text string="REC">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -216,13 +284,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
 		</rect>
 		<text string="SOFT">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -239,13 +315,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
 		</rect>
 		<text string="DISP">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -262,13 +346,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
 		</rect>
 		<text string="STEP">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -285,9 +377,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="←">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -304,9 +400,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="→">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -323,13 +423,21 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
 			<color red="1.0" green="1.0" blue="0.3" />
 		</rect>
-		<rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.5" />
+			<color red="0.67" green="0.67" blue="0.2" />
+		</rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
 			<color red="1.0" green="0.8" blue="0.7" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.5" right="0.95" bottom="0.95" />
+			<color red="0.67" green="0.53" blue="0.47" />
 		</rect>
 		<text string="X">
 			<bounds left="0.1" top="0.125" right="0.9" bottom="0.425" />
@@ -346,9 +454,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="ENTER">
 			<bounds left="0.1" top="0.35" right="0.9" bottom="0.65" />
@@ -361,9 +473,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="C">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -380,9 +496,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="D">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -399,9 +519,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="E">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -418,9 +542,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="F">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -437,9 +565,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="8">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -456,9 +588,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="9">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -475,9 +611,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="A">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -494,9 +634,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="B">
 			<bounds left="0.0" top="0.2" right="0.8" bottom="1.0" />
@@ -513,9 +657,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="4">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -528,9 +676,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="5">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -543,9 +695,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="6">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -558,9 +714,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="7">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -573,9 +733,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="0">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -588,9 +752,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="1">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -603,9 +771,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="2">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -618,9 +790,13 @@ Westinghouse Test Console Serial #5 layout
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
-		<rect>
+		<rect state="0">
 			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
 			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+		<rect state="1">
+			<bounds left="0.05" top="0.05" right="0.95" bottom="0.95" />
+			<color red="0.6" green="0.6" blue="0.6" />
 		</rect>
 		<text string="3">
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
@@ -637,165 +813,35 @@ Westinghouse Test Console Serial #5 layout
 
 	<view name="Default Layout">
 
-		<bezel element="backdrop">
+		<element ref="backdrop">
 			<bounds left="0" top="0" right="960" bottom="520" />
-		</bezel>
+		</element>
 
-		<bezel name="digit15" element="char">
-			<bounds left="10" top="10" right="50" bottom="70" />
-		</bezel>
-		<bezel name="digit14" element="char">
-			<bounds left="70" top="10" right="110" bottom="70" />
-		</bezel>
-		<bezel name="digit13" element="char">
-			<bounds left="130" top="10" right="170" bottom="70" />
-		</bezel>
-		<bezel name="digit12" element="char">
-			<bounds left="190" top="10" right="230" bottom="70" />
-		</bezel>
+		<repeat count="16">
+			<param name="digitno" start="15" increment="-1" />
+			<param name="x" start="10" increment="60" />
+			<element name="digit~digitno~" ref="char">
+				<bounds x="~x~" y="10" width="40" height="60" />
+			</element>
+		</repeat>
 
-		<bezel name="digit11" element="char">
-			<bounds left="250" top="10" right="290" bottom="70" />
-		</bezel>
-		<bezel name="digit10" element="char">
-			<bounds left="310" top="10" right="350" bottom="70" />
-		</bezel>
-		<bezel name="digit9" element="char">
-			<bounds left="370" top="10" right="410" bottom="70" />
-		</bezel>
-		<bezel name="digit8" element="char">
-			<bounds left="430" top="10" right="470" bottom="70" />
-		</bezel>
-
-		<bezel name="digit7" element="char">
-			<bounds left="490" top="10" right="530" bottom="70" />
-		</bezel>
-		<bezel name="digit6" element="char">
-			<bounds left="550" top="10" right="590" bottom="70" />
-		</bezel>
-		<bezel name="digit5" element="char">
-			<bounds left="610" top="10" right="650" bottom="70" />
-		</bezel>
-		<bezel name="digit4" element="char">
-			<bounds left="670" top="10" right="710" bottom="70" />
-		</bezel>
-
-		<bezel name="digit3" element="char">
-			<bounds left="730" top="10" right="770" bottom="70" />
-		</bezel>
-		<bezel name="digit2" element="char">
-			<bounds left="790" top="10" right="830" bottom="70" />
-		</bezel>
-		<bezel name="digit1" element="char">
-			<bounds left="850" top="10" right="890" bottom="70" />
-		</bezel>
-		<bezel name="digit0" element="char">
-			<bounds left="910" top="10" right="950" bottom="70" />
-		</bezel>
-
-		<bezel name="btn00" element="btn00" inputtag="row0" inputmask="0x01">
-			<bounds left="10" top="100" right="90" bottom="180" />
-		</bezel>
-		<bezel name="btn01" element="btn01" inputtag="row0" inputmask="0x02">
-			<bounds left="120" top="100" right="200" bottom="180" />
-		</bezel>
-		<bezel name="btn02" element="btn02" inputtag="row0" inputmask="0x04">
-			<bounds left="230" top="100" right="310" bottom="180" />
-		</bezel>
-		<bezel name="btn03" element="btn03" inputtag="row0" inputmask="0x08">
-			<bounds left="340" top="100" right="420" bottom="180" />
-		</bezel>
-
-		<bezel name="btn10" element="btn10" inputtag="row1" inputmask="0x01">
-			<bounds left="10" top="210" right="90" bottom="290" />
-		</bezel>
-		<bezel name="btn11" element="btn11" inputtag="row1" inputmask="0x02">
-			<bounds left="120" top="210" right="200" bottom="290" />
-		</bezel>
-		<bezel name="btn12" element="btn12" inputtag="row1" inputmask="0x04">
-			<bounds left="230" top="210" right="310" bottom="290" />
-		</bezel>
-		<bezel name="btn13" element="btn13" inputtag="row1" inputmask="0x08">
-			<bounds left="340" top="210" right="420" bottom="290" />
-		</bezel>
-
-		<bezel name="btn20" element="btn20" inputtag="row2" inputmask="0x01">
-			<bounds left="10" top="320" right="90" bottom="400" />
-		</bezel>
-		<bezel name="btn21" element="btn21" inputtag="row2" inputmask="0x02">
-			<bounds left="120" top="320" right="200" bottom="400" />
-		</bezel>
-		<bezel name="btn22" element="btn22" inputtag="row2" inputmask="0x04">
-			<bounds left="230" top="320" right="310" bottom="400" />
-		</bezel>
-		<bezel name="btn23" element="btn23" inputtag="row2" inputmask="0x08">
-			<bounds left="340" top="320" right="420" bottom="400" />
-		</bezel>
-
-		<bezel name="btn30" element="btn30" inputtag="row3" inputmask="0x01">
-			<bounds left="10" top="430" right="90" bottom="510" />
-		</bezel>
-		<bezel name="btn31" element="btn31" inputtag="row3" inputmask="0x02">
-			<bounds left="120" top="430" right="200" bottom="510" />
-		</bezel>
-		<bezel name="btn32" element="btn32" inputtag="row3" inputmask="0x04">
-			<bounds left="230" top="430" right="310" bottom="510" />
-		</bezel>
-		<bezel name="btn33" element="btn33" inputtag="row3" inputmask="0x08">
-			<bounds left="340" top="430" right="420" bottom="510" />
-		</bezel>
-
-		<bezel name="btn04" element="btn04" inputtag="row0" inputmask="0x10">
-			<bounds left="540" top="100" right="620" bottom="180" />
-		</bezel>
-		<bezel name="btn05" element="btn05" inputtag="row0" inputmask="0x20">
-			<bounds left="650" top="100" right="730" bottom="180" />
-		</bezel>
-		<bezel name="btn06" element="btn06" inputtag="row0" inputmask="0x40">
-			<bounds left="760" top="100" right="840" bottom="180" />
-		</bezel>
-		<bezel name="btn07" element="btn07" inputtag="row0" inputmask="0x80">
-			<bounds left="870" top="100" right="950" bottom="180" />
-		</bezel>
-
-		<bezel name="btn14" element="btn14" inputtag="row1" inputmask="0x10">
-			<bounds left="540" top="210" right="620" bottom="290" />
-		</bezel>
-		<bezel name="btn15" element="btn15" inputtag="row1" inputmask="0x20">
-			<bounds left="650" top="210" right="730" bottom="290" />
-		</bezel>
-		<bezel name="btn16" element="btn16" inputtag="row1" inputmask="0x40">
-			<bounds left="760" top="210" right="840" bottom="290" />
-		</bezel>
-		<bezel name="btn17" element="btn17" inputtag="row1" inputmask="0x80">
-			<bounds left="870" top="210" right="950" bottom="290" />
-		</bezel>
-
-		<bezel name="btn24" element="btn24" inputtag="row2" inputmask="0x10">
-			<bounds left="540" top="320" right="620" bottom="400" />
-		</bezel>
-		<bezel name="btn25" element="btn25" inputtag="row2" inputmask="0x20">
-			<bounds left="650" top="320" right="730" bottom="400" />
-		</bezel>
-		<bezel name="btn26" element="btn26" inputtag="row2" inputmask="0x40">
-			<bounds left="760" top="320" right="840" bottom="400" />
-		</bezel>
-		<bezel name="btn27" element="btn27" inputtag="row2" inputmask="0x80">
-			<bounds left="870" top="320" right="950" bottom="400" />
-		</bezel>
-
-		<bezel name="btn34" element="btn34" inputtag="row3" inputmask="0x10">
-			<bounds left="540" top="430" right="620" bottom="510" />
-		</bezel>
-		<bezel name="btn35" element="btn35" inputtag="row3" inputmask="0x20">
-			<bounds left="650" top="430" right="730" bottom="510" />
-		</bezel>
-		<bezel name="btn36" element="btn36" inputtag="row3" inputmask="0x40">
-			<bounds left="760" top="430" right="840" bottom="510" />
-		</bezel>
-		<bezel name="btn37" element="btn37" inputtag="row3" inputmask="0x80">
-			<bounds left="870" top="430" right="950" bottom="510" />
-		</bezel>
+		<repeat count="2">
+			<param name="group" start="0" increment="4" />
+			<param name="padx" start="10" increment="530" />
+			<param name="mask" start="0x01" lshift="4" />
+			<repeat count="4">
+				<param name="row" start="0" increment="1" />
+				<param name="y" start="100" increment="110" />
+				<repeat count="4">
+					<param name="col" start="~group~" increment="1" />
+					<param name="btnx" start="~padx~" increment="110" />
+					<param name="mask" start="~mask~" lshift="1" />
+					<element ref="btn~row~~col~" inputtag="row~row~" inputmask="~mask~">
+						<bounds x="~btnx~" y="~y~" width="80" height="80" />
+					</element>
+				</repeat>
+			</repeat>
+		</repeat>
 
 	</view>
 </mamelayout>

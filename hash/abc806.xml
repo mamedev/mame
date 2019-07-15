@@ -2,52 +2,52 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="abc806" description="Luxor ABC 806 diskettes">
 
-	<software name="graf806">
+	<software name="graf806" supported="no">
 		<description>Graf806</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="199707">
-				<rom name="graf806.td0" size="199707" crc="96e86f58" sha1="187bb2528b7cbccc9dcf96c2824b4f9cff394064" offset="0" />
+				<rom name="graf806.td0" size="199707" crc="96e86f58" sha1="187bb2528b7cbccc9dcf96c2824b4f9cff394064" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cpm30">
-		<description>CP/M Plus v3.0 - MYAB BIOS v0.9</description>
+		<description>CP/M Plus v3.0 (v0.9)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="297216">
-				<rom name="cpm30.td0" size="297216" crc="ccf77a0c" sha1="2563cc8c93c101f616f39620b3d7759a5062f97b" offset="0" />
+				<rom name="cpm30.td0" size="297216" crc="ccf77a0c" sha1="2563cc8c93c101f616f39620b3d7759a5062f97b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cpmplus3">
-		<description>CP/M Plus v3.0</description>
+	<software name="cpm30_12" cloneof="cpm30">
+		<description>CP/M Plus v3.0 (v1.2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="502129">
-				<rom name="cpmplus3.td0" size="502129" crc="8274028c" sha1="004366ef05c8bd617433ff63df72086096ded1ce" offset="0" />
+				<rom name="cpmplus3.td0" size="502129" crc="8274028c" sha1="004366ef05c8bd617433ff63df72086096ded1ce" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ufd631">
-		<description>Systemskiva v6.31 för UFD-DOS (Swe)</description>
-		<year>198?</year>
-		<publisher>Luxor</publisher>
-		<info name="serial" value="68 29251-51" />
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+	<!-- https://www.youtube.com/watch?v=w6LsIeLsUFw -->
+	<software name="colorful" supported="no">
+		<description>Colorful Animals</description>
+		<year>2018</year>
+		<publisher>Genesis Project</publisher>
+		<info name="usage" value="BYE, A" />
 
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="140772">
-				<rom name="ufd631.td0" size="140772" crc="c767e073" sha1="42fb39f3a9fe5020d339d6b00c13170898a6059e" offset="0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="colorful_animals.dsk" size="163840" crc="ba6ba9a1" sha1="36f9a0b814b222eb5664a87f3b52c0268dfd18c1" />
 			</dataarea>
 		</part>
 	</software>

@@ -7,13 +7,15 @@
     Archimedes Protected Disk Image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_APD_DSK_H
+#define MAME_FORMATS_APD_DSK_H
 
-#ifndef APD_DSK_H_
-#define APD_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
-class apd_format : public floppy_image_format_t {
+class apd_format : public floppy_image_format_t
+{
 public:
 	apd_format();
 
@@ -28,4 +30,4 @@ public:
 
 extern const floppy_format_type FLOPPY_APD_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_APD_DSK_H

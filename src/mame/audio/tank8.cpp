@@ -113,7 +113,7 @@ static const discrete_dac_r1_ladder tank8_dac =
 #define TANK8_A2_LINE       NODE_26
 
 
-DISCRETE_SOUND_START(tank8)
+DISCRETE_SOUND_START(tank8_discrete)
 	/************************************************/
 	/* Tank8 sound system: 10 Sound Sources         */
 	/*    Motor 1-8                                 */

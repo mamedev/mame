@@ -67,7 +67,7 @@ TILEMAP_MAPPER_MEMBER(atarigx2_state::atarigx2_playfield_scan)
  *
  *************************************/
 
-VIDEO_START_MEMBER(atarigx2_state,atarigx2)
+void atarigx2_state::video_start()
 {
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
@@ -182,10 +182,10 @@ uint32_t atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_in
 	/* copy the motion objects on top */
 	{
 		bitmap_ind16 &mo_bitmap = m_rle->vram(0);
-		int left    = cliprect.min_x;
-		int top     = cliprect.min_y;
-		int right   = cliprect.max_x + 1;
-		int bottom  = cliprect.max_y + 1;
+		int left    = cliprect.left();
+		int top     = cliprect.top();
+		int right   = cliprect.right() + 1;
+		int bottom  = cliprect.bottom() + 1;
 		int x, y;
 
 		/* now blend with the playfield */

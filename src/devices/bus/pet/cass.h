@@ -31,18 +31,6 @@
 #define PET_DATASSETTE_PORT2_TAG     "tape2"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _slot_intf, _def_slot, _devcb) \
-	MCFG_DEVICE_ADD(_tag, PET_DATASSETTE_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	devcb = &pet_datassette_port_device::set_read_handler(*device, DEVCB_##_devcb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -54,12 +42,21 @@ class device_pet_datassette_port_interface;
 class pet_datassette_port_device : public device_t, public device_slot_interface
 {
 public:
-	// construction/destruction
+	template <typename T>
+	pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: pet_datassette_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pet_datassette_port_device();
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_read_handler(device_t &device, Object &&cb) { return downcast<pet_datassette_port_device &>(device).m_read_handler.set_callback(std::forward<Object>(cb)); }
+	auto read_handler() { return m_read_handler.bind(); }
 
 	// computer interface
 	DECLARE_READ_LINE_MEMBER( read );
@@ -105,6 +102,6 @@ protected:
 DECLARE_DEVICE_TYPE(PET_DATASSETTE_PORT, pet_datassette_port_device)
 
 
-SLOT_INTERFACE_EXTERN( cbm_datassette_devices );
+void cbm_datassette_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_PET_CASS_H

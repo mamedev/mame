@@ -23,22 +23,6 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TTL153_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL153, 0)
-
-#define MCFG_TTL153_ZA_CB(_devcb) \
-	devcb = &ttl153_device::set_za_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TTL153_ZB_CB(_devcb) \
-	devcb = &ttl153_device::set_zb_callback(*device, DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -47,14 +31,11 @@ class ttl153_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	template <class Object> static devcb_base &set_za_callback(device_t &device, Object &&cb)
-	{ return downcast<ttl153_device &>(device).m_za_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_zb_callback(device_t &device, Object &&cb)
-	{ return downcast<ttl153_device &>(device).m_zb_cb.set_callback(std::forward<Object>(cb)); }
+	auto za_cb() { return m_za_cb.bind(); }
+	auto zb_cb() { return m_zb_cb.bind(); }
 
 	// select
 	DECLARE_WRITE_LINE_MEMBER(s0_w);

@@ -31,8 +31,14 @@ DEFINE_DEVICE_TYPE(DS2401, ds2401_device, "ds2401", "DS2401 Silicon Serial Numbe
 
 ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS2401, tag, owner, clock)
-	, m_state(0), m_bit(0), m_shift(0), m_byte(0), m_rx(false), m_tx(false)
-	, m_timer_main(nullptr), m_timer_reset(nullptr)
+	, m_state(0)
+	, m_bit(0)
+	, m_shift(0)
+	, m_byte(0)
+	, m_rx(false)
+	, m_tx(false)
+	, m_timer_main(nullptr)
+	, m_timer_reset(nullptr)
 {
 }
 

@@ -10,6 +10,7 @@
 #include "segaic16.h"
 #include "video/resnet.h"
 
+#include <algorithm>
 
 //**************************************************************************
 //  DEBUGGING
@@ -43,12 +44,12 @@ DEFINE_DEVICE_TYPE(SEGA_315_5250_COMPARE_TIMER, sega_315_5250_compare_timer_devi
 //-------------------------------------------------
 
 sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
-		m_open_bus_recurse(false),
-		m_palette_entries(0),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+	: driver_device(mconfig, type, tag)
+	, m_paletteram(*this, "paletteram")
+	, m_open_bus_recurse(false)
+	, m_palette_entries(0)
+	, m_screen(*this, "screen")
+	, m_palette(*this, "palette")
 {
 	palette_init();
 }
@@ -59,7 +60,7 @@ sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, de
 //  unmapped address
 //-------------------------------------------------
 
-READ16_MEMBER( sega_16bit_common_base::open_bus_r )
+u16 sega_16bit_common_base::open_bus_r(address_space &space)
 {
 	// Unmapped memory returns the last word on the data bus, which is almost always the opcode
 	// of the next instruction due to prefetch; however, since we may be encrypted, we actually
@@ -70,14 +71,18 @@ READ16_MEMBER( sega_16bit_common_base::open_bus_r )
 	// return the prefetched value.
 
 	// prevent recursion
-	if (m_open_bus_recurse)
-		return 0xffff;
+	if (!machine().side_effects_disabled())
+	{
+		if (m_open_bus_recurse)
+			return 0xffff;
 
-	// read original encrypted memory at that address
-	m_open_bus_recurse = true;
-	uint16_t result = space.read_word(space.device().safe_pc());
-	m_open_bus_recurse = false;
-	return result;
+		// read original encrypted memory at that address
+		m_open_bus_recurse = true;
+		const u16 result = space.read_word(space.device().state().pc());
+		m_open_bus_recurse = false;
+		return result;
+	}
+	return 0xffff;
 }
 
 
@@ -124,14 +129,14 @@ void sega_16bit_common_base::palette_init()
 	// compute R, G, B for each weight
 	for (int value = 0; value < 32; value++)
 	{
-		int i4 = (value >> 4) & 1;
-		int i3 = (value >> 3) & 1;
-		int i2 = (value >> 2) & 1;
-		int i1 = (value >> 1) & 1;
-		int i0 = (value >> 0) & 1;
-		m_palette_normal[value] = combine_6_weights(weights_normal, i0, i1, i2, i3, i4, 0);
-		m_palette_shadow[value] = combine_6_weights(weights_sh, i0, i1, i2, i3, i4, 0);
-		m_palette_hilight[value] = combine_6_weights(weights_sh, i0, i1, i2, i3, i4, 1);
+		const u8 i4 = (value >> 4) & 1;
+		const u8 i3 = (value >> 3) & 1;
+		const u8 i2 = (value >> 2) & 1;
+		const u8 i1 = (value >> 1) & 1;
+		const u8 i0 = (value >> 0) & 1;
+		m_palette_normal[value] = combine_weights(weights_normal, i0, i1, i2, i3, i4, 0);
+		m_palette_shadow[value] = combine_weights(weights_sh, i0, i1, i2, i3, i4, 0);
+		m_palette_hilight[value] = combine_weights(weights_sh, i0, i1, i2, i3, i4, 1);
 	}
 }
 
@@ -147,18 +152,44 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 		m_palette_entries = memshare("paletteram")->bytes() / 2;
 
 	// get the new value
-	uint16_t newval = m_paletteram[offset];
+	u16 newval = m_paletteram[offset];
 	COMBINE_DATA(&newval);
 	m_paletteram[offset] = newval;
 
 	//     byte 0    byte 1
 	//  sBGR BBBB GGGG RRRR
 	//  x000 4321 4321 4321
-	int r = ((newval >> 12) & 0x01) | ((newval << 1) & 0x1e);
-	int g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
-	int b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
+	const u8 r = ((newval >> 12) & 0x01) | ((newval << 1) & 0x1e);
+	const u8 g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
+	const u8 b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
 
-	// normal colors
+	// shadow / hilight toggle bit in palette RAM
+	rgb_t effects = (newval & 0x8000) ?
+				rgb_t(m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]) :
+				rgb_t(m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, effects);
+}
+
+WRITE16_MEMBER( sega_16bit_common_base::hangon_paletteram_w )
+{
+	// compute the number of entries
+	if (m_palette_entries == 0)
+		m_palette_entries = memshare("paletteram")->bytes() / 2;
+
+	// get the new value
+	u16 newval = m_paletteram[offset];
+	COMBINE_DATA(&newval);
+	m_paletteram[offset] = newval;
+
+	//     byte 0    byte 1
+	//  xBGR BBBB GGGG RRRR
+	//  x000 4321 4321 4321
+	const u8 r = ((newval >> 12) & 0x01) | ((newval << 1) & 0x1e);
+	const u8 g = ((newval >> 13) & 0x01) | ((newval >> 3) & 0x1e);
+	const u8 b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
+
+	// hangon has external shadow / hilight toggle bit
 	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
 	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
 	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
@@ -171,21 +202,23 @@ WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
 		m_palette_entries = memshare("paletteram")->bytes() / 2;
 
 	// get the new value
-	uint16_t newval = m_paletteram[offset];
+	u16 newval = m_paletteram[offset];
 	COMBINE_DATA(&newval);
 	m_paletteram[offset] = newval;
 
 	//     byte 0    byte 1
 	//  sRRR RRGG GGGB BBBB
 	//  x432 1043 2104 3210
-	int b = (newval >> 0) & 0x1f;
-	int g = (newval >> 5) & 0x1f;
-	int r = (newval >> 10) & 0x1f;
+	const u8 b = (newval >> 0) & 0x1f;
+	const u8 g = (newval >> 5) & 0x1f;
+	const u8 r = (newval >> 10) & 0x1f;
 
-	// normal colors
+	// shadow / hilight toggle bit in palette RAM
+	rgb_t effects = (newval & 0x8000) ?
+				rgb_t(m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]) :
+				rgb_t(m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
 	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
-	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
-	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, effects);
 }
 
 
@@ -198,52 +231,18 @@ WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
 //  sega_315_5195_mapper_device - constructor
 //-------------------------------------------------
 
-sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_cpuregion(*this, finder_base::DUMMY_TAG)
+	, m_pbf_callback(*this)
+	, m_mcu_int_callback(*this)
 	, m_space(nullptr)
 	, m_decrypted_space(nullptr)
 	, m_curregion(0)
+	, m_to_sound(0)
+	, m_from_sound(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_cputag - configuration helper
-//  to set the tag of the CPU device
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_cputag(device_t &device, const char *cpu)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_cpu.set_tag(cpu);
-	mapper.m_cpuregion.set_tag(cpu);
-}
-
-
-//-------------------------------------------------
-//  static_set_mapper - configuration helper
-//  to set the mapper function
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_mapper(device_t &device, mapper_delegate callback)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_mapper = callback;
-}
-
-
-//-------------------------------------------------
-//  static_set_sound_readwrite - configuration
-//  helper to set the sound read/write callbacks
-//-------------------------------------------------
-
-void sega_315_5195_mapper_device::static_set_sound_readwrite(device_t &device, sound_read_delegate read, sound_write_delegate write)
-{
-	sega_315_5195_mapper_device &mapper = downcast<sega_315_5195_mapper_device &>(device);
-	mapper.m_sound_read = read;
-	mapper.m_sound_write = write;
 }
 
 
@@ -259,7 +258,7 @@ WRITE8_MEMBER( sega_315_5195_mapper_device::write )
 if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 
 	// remember the previous value and swap in the new one
-	uint8_t oldval = m_regs[offset];
+	const u8 oldval = m_regs[offset];
 	m_regs[offset] = data;
 
 	// switch off the offset
@@ -278,8 +277,7 @@ if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 
 		case 0x03:
 			// write through to the sound chip
-			if (!m_sound_write.isnull())
-				m_sound_write(data);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5195_mapper_device::write_to_sound), this), data);
 			break;
 
 		case 0x04:
@@ -295,13 +293,13 @@ if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 			//   02 - read data into latches 00,01 from 2 * (address in 07,08,09)
 			if (data == 0x01)
 			{
-				offs_t addr = (m_regs[0x0a] << 17) | (m_regs[0x0b] << 9) | (m_regs[0x0c] << 1);
+				const offs_t addr = (m_regs[0x0a] << 17) | (m_regs[0x0b] << 9) | (m_regs[0x0c] << 1);
 				m_space->write_word(addr, (m_regs[0x00] << 8) | m_regs[0x01]);
 			}
 			else if (data == 0x02)
 			{
-				offs_t addr = (m_regs[0x07] << 17) | (m_regs[0x08] << 9) | (m_regs[0x09] << 1);
-				uint16_t result = m_space->read_word(addr);
+				const offs_t addr = (m_regs[0x07] << 17) | (m_regs[0x08] << 9) | (m_regs[0x09] << 1);
+				const u16 result = m_space->read_word(addr);
 				m_regs[0x00] = result >> 8;
 				m_regs[0x01] = result;
 			}
@@ -364,15 +362,15 @@ READ8_MEMBER( sega_315_5195_mapper_device::read )
 
 		case 0x03:
 			// this returns data that the sound CPU writes
-			if (!m_sound_read.isnull())
-				return m_sound_read();
-			return 0xff;
+			if (!m_mcu_int_callback.isnull() && !machine().side_effects_disabled())
+				m_mcu_int_callback(CLEAR_LINE);
+			return m_from_sound;
 
 		default:
 			logerror("Unknown memory_mapper_r from address %02X\n", offset);
 			break;
 	}
-	return (space.data_width() == 8) ? 0xff : machine().driver_data<sega_16bit_common_base>()->open_bus_r(space, 0, 0xffff);
+	return (space.data_width() == 8) ? 0xff : machine().driver_data<sega_16bit_common_base>()->open_bus_r(space);
 }
 
 
@@ -380,7 +378,7 @@ READ8_MEMBER( sega_315_5195_mapper_device::read )
 //  map_as_rom - map a region as ROM data
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::map_as_rom(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler)
+void sega_315_5195_mapper_device::map_as_rom(u32 offset, u32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler)
 {
 	// determine parameters
 	region_info info;
@@ -393,7 +391,7 @@ void sega_315_5195_mapper_device::map_as_rom(uint32_t offset, uint32_t length, o
 	}
 
 	// don't map if the start is past the end of the ROM region
-	offs_t romsize = m_cpuregion->bytes();
+	const offs_t romsize = m_cpuregion->bytes();
 	if (rgnoffset < romsize)
 	{
 		// clamp the end to the ROM size
@@ -409,7 +407,7 @@ void sega_315_5195_mapper_device::map_as_rom(uint32_t offset, uint32_t length, o
 		// configure the bank
 		memory_bank *bank = owner()->membank(bank_name);
 		memory_bank *decrypted_bank = owner()->membank(decrypted_bank_name);
-		uint8_t *memptr = m_cpuregion->base() + rgnoffset;
+		u8 *memptr = m_cpuregion->base() + rgnoffset;
 		bank->set_base(memptr);
 
 		// remember this bank, and decrypt if necessary
@@ -433,7 +431,7 @@ void sega_315_5195_mapper_device::map_as_rom(uint32_t offset, uint32_t length, o
 //  optional write handler
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::map_as_ram(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_share_name, write16_delegate whandler)
+void sega_315_5195_mapper_device::map_as_ram(u32 offset, u32 length, offs_t mirror, const char *bank_share_name, write16_delegate whandler)
 {
 	// determine parameters
 	region_info info;
@@ -468,7 +466,7 @@ void sega_315_5195_mapper_device::map_as_ram(uint32_t offset, uint32_t length, o
 //  read write handlers
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::map_as_handler(uint32_t offset, uint32_t length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
+void sega_315_5195_mapper_device::map_as_handler(u32 offset, u32 length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
 {
 	// determine parameters
 	region_info info;
@@ -497,7 +495,7 @@ void sega_315_5195_mapper_device::map_as_handler(uint32_t offset, uint32_t lengt
 //  memory map
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::configure_explicit(const uint8_t *map_data)
+void sega_315_5195_mapper_device::configure_explicit(const u8 *map_data)
 {
 	memcpy(&m_regs[0x10], map_data, 0x10);
 	update_mapping();
@@ -509,11 +507,58 @@ void sega_315_5195_mapper_device::configure_explicit(const uint8_t *map_data)
 //  of state changes
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::fd1094_state_change(uint8_t state)
+void sega_315_5195_mapper_device::fd1094_state_change(u8 state)
 {
 	// iterate over regions and set the decrypted address of any ROM banks
 	for (auto & elem : m_banks)
 		elem.update();
+}
+
+
+//-------------------------------------------------
+//  write_to_sound - write data for the sound CPU
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_to_sound)
+{
+	m_to_sound = param;
+	if (!m_pbf_callback.isnull())
+		m_pbf_callback(ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  write_from_sound - handle writes from the
+//  sound CPU
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(sega_315_5195_mapper_device::write_from_sound)
+{
+	m_from_sound = param;
+	if (!m_mcu_int_callback.isnull())
+		m_mcu_int_callback(ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  pread - sound CPU read handler
+//-------------------------------------------------
+
+READ8_MEMBER(sega_315_5195_mapper_device::pread)
+{
+	if (!m_pbf_callback.isnull() && !machine().side_effects_disabled())
+		m_pbf_callback(CLEAR_LINE);
+	return m_to_sound;
+}
+
+
+//-------------------------------------------------
+//  pwrite - sound CPU write handler
+//-------------------------------------------------
+
+WRITE8_MEMBER(sega_315_5195_mapper_device::pwrite)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5195_mapper_device::write_from_sound), this), data);
 }
 
 
@@ -525,8 +570,8 @@ void sega_315_5195_mapper_device::device_start()
 {
 	// bind our handlers
 	m_mapper.bind_relative_to(*owner());
-	m_sound_read.bind_relative_to(*owner());
-	m_sound_write.bind_relative_to(*owner());
+	m_pbf_callback.resolve();
+	m_mcu_int_callback.resolve();
 
 	// if we are mapping an FD1089, tell all the banks
 	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu.target());
@@ -552,6 +597,8 @@ void sega_315_5195_mapper_device::device_start()
 
 	// register for saves
 	save_item(NAME(m_regs));
+	save_item(NAME(m_to_sound));
+	save_item(NAME(m_from_sound));
 }
 
 
@@ -565,11 +612,18 @@ void sega_315_5195_mapper_device::device_reset()
 	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// clear registers and recompute the memory mapping
-	memset(m_regs, 0, sizeof(m_regs));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	update_mapping();
 
 	// release the CPU
 	m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+
+	m_to_sound = 0;
+	m_from_sound = 0;
+	if (!m_pbf_callback.isnull())
+		m_pbf_callback(CLEAR_LINE);
+	if (!m_mcu_int_callback.isnull())
+		m_mcu_int_callback(CLEAR_LINE);
 }
 
 
@@ -579,7 +633,7 @@ void sega_315_5195_mapper_device::device_reset()
 //  actual underlying bus connections
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::compute_region(region_info &info, uint8_t index, uint32_t length, uint32_t mirror, uint32_t offset)
+void sega_315_5195_mapper_device::compute_region(region_info &info, u8 index, u32 length, u32 mirror, u32 offset)
 {
 	static const offs_t region_size_map[4] = { 0x00ffff, 0x01ffff, 0x07ffff, 0x1fffff };
 	info.size_mask = region_size_map[m_regs[0x10 + 2 * index] & 3];
@@ -600,6 +654,7 @@ void sega_315_5195_mapper_device::update_mapping()
 	if (LOG_MEMORY_MAP) osd_printf_debug("----\nRemapping:\n");
 
 	// first reset everything back to the beginning
+	m_space->unmap_readwrite(0x000000, 0xffffff);
 	m_space->install_readwrite_handler(0x000000, 0xffffff, read8_delegate(FUNC(sega_315_5195_mapper_device::read), this), write8_delegate(FUNC(sega_315_5195_mapper_device::write), this), 0x00ff);
 
 	// loop over the regions
@@ -612,7 +667,6 @@ void sega_315_5195_mapper_device::update_mapping()
 }
 
 
-
 //**************************************************************************
 //  DECRYPT BANK HELPER CLASS
 //**************************************************************************
@@ -622,13 +676,13 @@ void sega_315_5195_mapper_device::update_mapping()
 //-------------------------------------------------
 
 sega_315_5195_mapper_device::decrypt_bank::decrypt_bank()
-	: m_bank(nullptr),
-		m_decrypted_bank(nullptr),
-		m_start(0),
-		m_end(0),
-		m_rgnoffs(~0),
-		m_srcptr(nullptr),
-		m_fd1089(nullptr)
+	: m_bank(nullptr)
+	, m_decrypted_bank(nullptr)
+	, m_start(0)
+	, m_end(0)
+	, m_rgnoffs(~0)
+	, m_srcptr(nullptr)
+	, m_fd1089(nullptr)
 {
 	// invalidate all states
 	reset();
@@ -674,7 +728,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd109
 //  a change
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, uint8_t *src)
+void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, u8 *src)
 {
 	// ignore if not encrypted
 	if (m_fd1089 == nullptr && m_fd1094_cache == nullptr)
@@ -719,7 +773,7 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 	if (m_fd1089 != nullptr)
 	{
 		m_fd1089_decrypted.resize((m_end + 1 - m_start) / 2);
-		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<uint16_t *>(m_srcptr));
+		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<u16 *>(m_srcptr));
 		m_decrypted_bank->set_base(&m_fd1089_decrypted[0]);
 	}
 
@@ -738,7 +792,7 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 //  sega_315_5248_multiplier_device - constructor
 //-------------------------------------------------
 
-sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, tag, owner, clock)
 {
 }
@@ -748,7 +802,7 @@ sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_c
 //  read - read the registers
 //-------------------------------------------------
 
-READ16_MEMBER( sega_315_5248_multiplier_device::read )
+u16 sega_315_5248_multiplier_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{
@@ -757,8 +811,8 @@ READ16_MEMBER( sega_315_5248_multiplier_device::read )
 		case 1: return m_regs[1];
 
 		// if bit 1 is 1, return ther results
-		case 2: return (int16_t(m_regs[0]) * int16_t(m_regs[1])) >> 16;
-		case 3: return (int16_t(m_regs[0]) * int16_t(m_regs[1])) & 0xffff;
+		case 2: return (s16(m_regs[0]) * s16(m_regs[1])) >> 16;
+		case 3: return (s16(m_regs[0]) * s16(m_regs[1])) & 0xffff;
 	}
 
 	// should never get here
@@ -770,7 +824,7 @@ READ16_MEMBER( sega_315_5248_multiplier_device::read )
 //  write - write to the registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_315_5248_multiplier_device::write )
+void sega_315_5248_multiplier_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	// only low bit matters
 	COMBINE_DATA(&m_regs[offset & 1]);
@@ -793,9 +847,8 @@ void sega_315_5248_multiplier_device::device_start()
 
 void sega_315_5248_multiplier_device::device_reset()
 {
-	memset(m_regs, 0, sizeof(m_regs));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
-
 
 
 //**************************************************************************
@@ -806,7 +859,7 @@ void sega_315_5248_multiplier_device::device_reset()
 //  sega_315_5249_divider_device - constructor
 //-------------------------------------------------
 
-sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGA_315_5249_DIVIDER, tag, owner, clock)
 {
 }
@@ -816,7 +869,7 @@ sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config 
 //  read - read the registers
 //-------------------------------------------------
 
-READ16_MEMBER( sega_315_5249_divider_device::read )
+u16 sega_315_5249_divider_device::read(offs_t offset)
 {
 	// 8 effective read registers
 	switch (offset & 7)
@@ -836,7 +889,7 @@ READ16_MEMBER( sega_315_5249_divider_device::read )
 //  write - write to the registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_315_5249_divider_device::write )
+void sega_315_5249_divider_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (LOG_DIVIDE) logerror("divide_w(%X) = %04X\n", offset, data);
 
@@ -871,7 +924,7 @@ void sega_315_5249_divider_device::device_start()
 
 void sega_315_5249_divider_device::device_reset()
 {
-	memset(m_regs, 0, sizeof(m_regs));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 
@@ -888,14 +941,14 @@ void sega_315_5249_divider_device::execute(int mode)
 	if (mode == 0)
 	{
 		// perform signed divide
-		int32_t dividend = int32_t((m_regs[0] << 16) | m_regs[1]);
-		int32_t divisor = int16_t(m_regs[2]);
-		int32_t quotient;
+		const s32 dividend = s32((m_regs[0] << 16) | m_regs[1]);
+		const s32 divisor = s16(m_regs[2]);
+		s32 quotient;
 
 		// check for divide by 0, signal if we did
 		if (divisor == 0)
 		{
-			quotient = dividend;//((int32_t)(dividend ^ divisor) < 0) ? 0x8000 : 0x7fff;
+			quotient = dividend;//((s32)(dividend ^ divisor) < 0) ? 0x8000 : 0x7fff;
 			m_regs[6] |= 0x4000;
 		}
 		else
@@ -914,17 +967,17 @@ void sega_315_5249_divider_device::execute(int mode)
 		}
 
 		// store quotient and remainder
-		m_regs[4] = int16_t(quotient);
-		m_regs[5] = int16_t(dividend - quotient * divisor);
+		m_regs[4] = s16(quotient);
+		m_regs[5] = s16(dividend - quotient * divisor);
 	}
 
 	// mode 1: unsigned divide, 32-bit quotient only
 	else
 	{
 		// perform unsigned divide
-		uint32_t dividend = uint32_t((m_regs[0] << 16) | m_regs[1]);
-		uint32_t divisor = uint16_t(m_regs[2]);
-		uint32_t quotient;
+		const u32 dividend = u32((m_regs[0] << 16) | m_regs[1]);
+		const u32 divisor = u16(m_regs[2]);
+		u32 quotient;
 
 		// check for divide by 0, signal if we did
 		if (divisor == 0)
@@ -951,55 +1004,52 @@ void sega_315_5249_divider_device::execute(int mode)
 //  constructor
 //-------------------------------------------------
 
-sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, tag, owner, clock)
+	, m_68kint_callback(*this)
+	, m_zint_callback(*this)
+	, m_exck(false)
 {
 }
 
 
 //-------------------------------------------------
-//  static_set_timer_ack - configuration helper
-//  to set the timer acknowledge function
+//  exck_w - clock the timer
 //-------------------------------------------------
 
-void sega_315_5250_compare_timer_device::static_set_timer_ack(device_t &device, timer_ack_delegate callback)
+WRITE_LINE_MEMBER(sega_315_5250_compare_timer_device::exck_w)
 {
-	sega_315_5250_compare_timer_device &timer = downcast<sega_315_5250_compare_timer_device &>(device);
-	timer.m_timer_ack = callback;
-}
+	if (m_exck == bool(state))
+		return;
 
+	// update on rising edge
+	m_exck = bool(state);
+	if (!m_exck)
+		return;
 
-//-------------------------------------------------
-//  static_set_sound_readwrite - configuration
-//  helper to set the sound read/write callbacks
-//-------------------------------------------------
-
-void sega_315_5250_compare_timer_device::static_set_sound_write(device_t &device, sound_write_delegate write)
-{
-	sega_315_5250_compare_timer_device &timer = downcast<sega_315_5250_compare_timer_device &>(device);
-	timer.m_sound_write = write;
-}
-
-
-//-------------------------------------------------
-//  clock - clock the timer
-//-------------------------------------------------
-
-bool sega_315_5250_compare_timer_device::clock()
-{
 	// if we're enabled, clock the upcounter
-	int old_counter = m_counter;
+	const int old_counter = m_counter;
 	if (m_regs[10] & 1)
 		m_counter++;
 
 	// regardless of the enable, a value of 0xfff will generate the IRQ
-	bool result = false;
 	if (old_counter == 0xfff)
 	{
-		result = true;
+		if (!m_68kint_callback.isnull())
+			m_68kint_callback(ASSERT_LINE);
 		m_counter = m_regs[8] & 0xfff;
 	}
-	return result;
+}
+
+
+//-------------------------------------------------
+//  interrupt_ack - acknowledge timer interrupt
+//-------------------------------------------------
+
+void sega_315_5250_compare_timer_device::interrupt_ack()
+{
+	if (!m_68kint_callback.isnull())
+		m_68kint_callback(CLEAR_LINE);
 }
 
 
@@ -1007,7 +1057,7 @@ bool sega_315_5250_compare_timer_device::clock()
 //  read - read the registers
 //-------------------------------------------------
 
-READ16_MEMBER( sega_315_5250_compare_timer_device::read )
+u16 sega_315_5250_compare_timer_device::read(offs_t offset)
 {
 	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, m_regs[offset]);
 	switch (offset & 15)
@@ -1021,7 +1071,7 @@ READ16_MEMBER( sega_315_5250_compare_timer_device::read )
 		case 0x6:   return m_regs[2];
 		case 0x7:   return m_regs[7];
 		case 0x9:
-		case 0xd:   interrupt_ack(); break;
+		case 0xd:   if (!machine().side_effects_disabled()) interrupt_ack(); break;
 	}
 	return 0xffff;
 }
@@ -1031,7 +1081,7 @@ READ16_MEMBER( sega_315_5250_compare_timer_device::read )
 //  write - write to the registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
+void sega_315_5250_compare_timer_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
 	switch (offset & 15)
@@ -1049,9 +1099,7 @@ WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
 		case 0xe:   COMBINE_DATA(&m_regs[10]); break;
 		case 0xb:
 		case 0xf:
-			COMBINE_DATA(&m_regs[11]);
-			if (!m_sound_write.isnull())
-				m_sound_write(m_regs[11]);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5250_compare_timer_device::write_to_sound), this), data & 0xff);
 			break;
 	}
 }
@@ -1064,13 +1112,14 @@ WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
 void sega_315_5250_compare_timer_device::device_start()
 {
 	// bind our handlers
-	m_timer_ack.bind_relative_to(*owner());
-	m_sound_write.bind_relative_to(*owner());
+	m_68kint_callback.resolve();
+	m_zint_callback.resolve();
 
 	// save states
 	save_item(NAME(m_regs));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_bit));
+	save_item(NAME(m_exck));
 }
 
 
@@ -1080,9 +1129,38 @@ void sega_315_5250_compare_timer_device::device_start()
 
 void sega_315_5250_compare_timer_device::device_reset()
 {
-	memset(m_regs, 0, sizeof(m_regs));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	m_counter = 0;
 	m_bit = 0;
+
+	interrupt_ack();
+	if (!m_zint_callback.isnull())
+		m_zint_callback(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  write_to_sound - write data for the sound CPU
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(sega_315_5250_compare_timer_device::write_to_sound)
+{
+	m_regs[11] = param;
+	if (!m_zint_callback.isnull())
+		m_zint_callback(ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  zread - read data from sound CPU bus
+//-------------------------------------------------
+
+u8 sega_315_5250_compare_timer_device::zread()
+{
+	if (!m_zint_callback.isnull() && !machine().side_effects_disabled())
+		m_zint_callback(CLEAR_LINE);
+
+	return m_regs[11];
 }
 
 
@@ -1092,12 +1170,12 @@ void sega_315_5250_compare_timer_device::device_reset()
 
 void sega_315_5250_compare_timer_device::execute(bool update_history)
 {
-	int16_t bound1 = int16_t(m_regs[0]);
-	int16_t bound2 = int16_t(m_regs[1]);
-	int16_t value = int16_t(m_regs[2]);
+	const s16 bound1 = s16(m_regs[0]);
+	const s16 bound2 = s16(m_regs[1]);
+	const s16 value = s16(m_regs[2]);
 
-	int16_t min = (bound1 < bound2) ? bound1 : bound2;
-	int16_t max = (bound1 > bound2) ? bound1 : bound2;
+	const s16 min = (bound1 < bound2) ? bound1 : bound2;
+	const s16 max = (bound1 > bound2) ? bound1 : bound2;
 
 	if (value < min)
 	{

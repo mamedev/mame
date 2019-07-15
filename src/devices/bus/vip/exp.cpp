@@ -80,13 +80,13 @@ void vip_expansion_slot_device::device_start()
 //  program_r - program read
 //-------------------------------------------------
 
-uint8_t vip_expansion_slot_device::program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
+uint8_t vip_expansion_slot_device::program_r(offs_t offset, int cs, int cdef, int *minh)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
-		data = m_card->vip_program_r(space, offset, cs, cdef, minh);
+		data = m_card->vip_program_r(offset, cs, cdef, minh);
 	}
 
 	return data;
@@ -97,11 +97,11 @@ uint8_t vip_expansion_slot_device::program_r(address_space &space, offs_t offset
 //  program_w - program write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
+void vip_expansion_slot_device::program_w(offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vip_program_w(space, offset, data, cdef, minh);
+		m_card->vip_program_w(offset, data, cdef, minh);
 	}
 }
 
@@ -110,13 +110,13 @@ void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, u
 //  io_r - io read
 //-------------------------------------------------
 
-uint8_t vip_expansion_slot_device::io_r(address_space &space, offs_t offset)
+uint8_t vip_expansion_slot_device::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
-		data = m_card->vip_io_r(space, offset);
+		data = m_card->vip_io_r(offset);
 	}
 
 	return data;
@@ -127,11 +127,11 @@ uint8_t vip_expansion_slot_device::io_r(address_space &space, offs_t offset)
 //  io_w - io write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8_t data)
+void vip_expansion_slot_device::io_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vip_io_w(space, offset, data);
+		m_card->vip_io_w(offset, data);
 	}
 }
 
@@ -140,13 +140,13 @@ void vip_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8_
 //  dma_r - dma read
 //-------------------------------------------------
 
-uint8_t vip_expansion_slot_device::dma_r(address_space &space, offs_t offset)
+uint8_t vip_expansion_slot_device::dma_r(offs_t offset)
 {
 	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
-		data = m_card->vip_dma_r(space, offset);
+		data = m_card->vip_dma_r(offset);
 	}
 
 	return data;
@@ -157,11 +157,11 @@ uint8_t vip_expansion_slot_device::dma_r(address_space &space, offs_t offset)
 //  dma_w - dma write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::dma_w(address_space &space, offs_t offset, uint8_t data)
+void vip_expansion_slot_device::dma_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vip_dma_w(space, offset, data);
+		m_card->vip_dma_w(offset, data);
 	}
 }
 
@@ -182,12 +182,53 @@ uint32_t vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 	return value;
 }
 
-READ_LINE_MEMBER( vip_expansion_slot_device::ef1_r ) { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef1_r(); return state; }
-READ_LINE_MEMBER( vip_expansion_slot_device::ef3_r ) { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef3_r(); return state; }
-READ_LINE_MEMBER( vip_expansion_slot_device::ef4_r ) { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef4_r(); return state; }
-void vip_expansion_slot_device::sc_w(int data) { if (m_card != nullptr) m_card->vip_sc_w(data); }
-WRITE_LINE_MEMBER( vip_expansion_slot_device::q_w ) { if (m_card != nullptr) m_card->vip_q_w(state); }
-WRITE_LINE_MEMBER( vip_expansion_slot_device::run_w ) { if (m_card != nullptr) m_card->vip_run_w(state); }
+READ_LINE_MEMBER(vip_expansion_slot_device::ef1_r)
+{
+	int state = CLEAR_LINE;
+	if (m_card != nullptr)
+		state = m_card->vip_ef1_r();
+	return state;
+}
+
+READ_LINE_MEMBER(vip_expansion_slot_device::ef3_r)
+{
+	int state = CLEAR_LINE;
+	if (m_card != nullptr)
+		state = m_card->vip_ef3_r();
+	return state;
+}
+
+READ_LINE_MEMBER(vip_expansion_slot_device::ef4_r)
+{
+	int state = CLEAR_LINE;
+	if (m_card != nullptr)
+		state = m_card->vip_ef4_r();
+	return state;
+}
+
+void vip_expansion_slot_device::sc_w(offs_t offset, uint8_t data)
+{
+	if (m_card != nullptr)
+		m_card->vip_sc_w(offset, data);
+}
+
+WRITE_LINE_MEMBER(vip_expansion_slot_device::q_w)
+{
+	if (m_card != nullptr)
+		m_card->vip_q_w(state);
+}
+
+WRITE_LINE_MEMBER(vip_expansion_slot_device::tpb_w)
+{
+	if (m_card != nullptr)
+		m_card->vip_tpb_w(state);
+}
+
+WRITE_LINE_MEMBER(vip_expansion_slot_device::run_w)
+{
+	if (m_card != nullptr)
+		m_card->vip_run_w(state);
+}
 
 
 
@@ -204,15 +245,16 @@ WRITE_LINE_MEMBER( vip_expansion_slot_device::run_w ) { if (m_card != nullptr) m
 #include "vp595.h"
 #include "vp700.h"
 
-SLOT_INTERFACE_START( vip_expansion_cards )
-	SLOT_INTERFACE("super", VP550)
-	//SLOT_INTERFACE("eprom", VP560)
-	//SLOT_INTERFACE("eprommer", VP565)
-	SLOT_INTERFACE("ram", VP570)
-	SLOT_INTERFACE("exp", VP575)
-	//SLOT_INTERFACE("exp2", VP576_EXP)
-	SLOT_INTERFACE("keypad", VP585)
-	SLOT_INTERFACE("color", VP590)
-	SLOT_INTERFACE("simple", VP595)
-	SLOT_INTERFACE("basic", VP700)
-SLOT_INTERFACE_END
+void vip_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("super", VP550);
+	//device.option_add("eprom", VP560);
+	//device.option_add("eprommer", VP565);
+	device.option_add("ram", VP570);
+	device.option_add("exp", VP575);
+	//device.option_add("exp2", VP576_EXP);
+	device.option_add("keypad", VP585);
+	device.option_add("color", VP590);
+	device.option_add("simple", VP595);
+	device.option_add("basic", VP700);
+}

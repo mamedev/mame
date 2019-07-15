@@ -88,7 +88,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_pia_1(*this, PIA1_TAG),
 	m_dac(*this, "dac"),
 	m_sbs(*this, "sbs"),
-	m_wave(*this, WAVE_TAG),
+	m_screen(*this, SCREEN_TAG),
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
 	m_cassette(*this, "cassette"),
@@ -273,17 +273,17 @@ uint8_t coco_state::floating_bus_read()
 		uint16_t pc = m_maincpu->pc();
 
 		// get the byte; and skip over header bytes
-		uint8_t byte = cpu_address_space().read_byte(prev_pc);
+		uint8_t byte = m_maincpu->space().read_byte(prev_pc);
 		if ((byte == 0x10) || (byte == 0x11))
-			byte = cpu_address_space().read_byte(++prev_pc);
+			byte = m_maincpu->space().read_byte(++prev_pc);
 
 		// check to see if the opcode specifies the indexed addressing mode, and the secondary byte
 		// specifies no-offset
 		bool is_nooffset_indexed = (((byte & 0xF0) == 0x60) || ((byte & 0xF0) == 0xA0) || ((byte & 0xF0) == 0xE0))
-			&& ((cpu_address_space().read_byte(prev_pc + 1) & 0xBF) == 0x84);
+			&& ((m_maincpu->space().read_byte(prev_pc + 1) & 0xBF) == 0x84);
 
 		// finally read the byte
-		result = cpu_address_space().read_byte(is_nooffset_indexed ? pc : 0xFFFF);
+		result = m_maincpu->space().read_byte(is_nooffset_indexed ? pc : 0xFFFF);
 
 		// we're done reading
 		m_in_floating_bus_read = false;
@@ -304,7 +304,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 	//
 	// Most of the time, the read below will result in floating_bus_read() being
 	// invoked
-	return m_floating->read8(m_floating->space(0), offset);
+	return m_floating->read8(offset);
 }
 
 
@@ -314,7 +314,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 
 void coco_state::floating_space_write(offs_t offset, uint8_t data)
 {
-	m_floating->write8(m_floating->space(0), offset, data);
+	m_floating->write8(offset, data);
 }
 
 
@@ -335,7 +335,7 @@ void coco_state::floating_space_write(offs_t offset, uint8_t data)
 
 READ8_MEMBER( coco_state::ff00_read )
 {
-	return pia_0().read(space, offset, mem_mask);
+	return pia_0().read(offset);
 }
 
 
@@ -346,7 +346,7 @@ READ8_MEMBER( coco_state::ff00_read )
 
 WRITE8_MEMBER( coco_state::ff00_write )
 {
-	pia_0().write(space, offset, data, mem_mask);
+	pia_0().write(offset, data);
 }
 
 
@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 
 READ8_MEMBER( coco_state::ff20_read )
 {
-	return pia_1().read(space, offset, mem_mask);
+	return pia_1().read(offset);
 }
 
 
@@ -457,7 +457,7 @@ READ8_MEMBER( coco_state::ff20_read )
 WRITE8_MEMBER( coco_state::ff20_write )
 {
 	/* write to the PIA */
-	pia_1().write(space, offset, data, mem_mask);
+	pia_1().write(offset, data);
 
 	/* we have to do this to do something that approximates the cartridge Q line behavior */
 	m_cococart->twiddle_q_lines();
@@ -619,7 +619,7 @@ void coco_state::recalculate_irq(void)
 	bool line = irq_get_line();
 	if (LOG_INTERRUPTS)
 		logerror("recalculate_irq():  line=%d\n", line ? 1 : 0);
-	maincpu().set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -645,7 +645,7 @@ void coco_state::recalculate_firq(void)
 	bool line = firq_get_line();
 	if (LOG_INTERRUPTS)
 		logerror("recalculate_firq():  line=%d\n", line ? 1 : 0);
-	maincpu().set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -837,7 +837,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			/* get the vertical position of the lightgun */
 			dclg_vpos = analog->input(joystick, 1);
 
-			if (machine().first_screen()->vpos() == dclg_vpos)
+			if (m_screen->vpos() == dclg_vpos)
 			{
 				/* if gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				m_dclg_output_h |= 0x02;
@@ -849,7 +849,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			if (m_dclg_state == 7)
 			{
 				/* while in state 7, prepare to check next video frame for a hit */
-				attotime dclg_time = machine().first_screen()->time_until_pos(dclg_vpos, 0);
+				attotime dclg_time = m_screen->time_until_pos(dclg_vpos, 0);
 				m_diecom_lightgun_timer->adjust(dclg_time);
 			}
 			break;
@@ -873,10 +873,8 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 void coco_state::poll_keyboard(void)
 {
 	uint8_t pia0_pb = pia_0().b_output();
-	uint8_t pia0_pb_z = pia_0().port_b_z_mask();
 
 	uint8_t pia0_pa = 0x7F;
-	uint8_t pia0_pa_z = 0x7F;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
 	for (unsigned i = 0; i < m_keyboard.size(); i++)
@@ -885,10 +883,6 @@ void coco_state::poll_keyboard(void)
 		if ((value | pia0_pb) != 0xFF)
 		{
 			pia0_pa &= ~(0x01 << i);
-		}
-		if ((value | pia0_pb_z) != 0xFF)
-		{
-			pia0_pa_z &= ~(0x01 << i);
 		}
 	}
 
@@ -905,10 +899,9 @@ void coco_state::poll_keyboard(void)
 
 	/* mask out the buttons */
 	pia0_pa &= ~buttons;
-	pia0_pa_z &= ~buttons;
 
 	/* and write the result to PIA0 */
-	update_keyboard_input(pia0_pa, pia0_pa_z);
+	update_keyboard_input(pia0_pa);
 }
 
 
@@ -918,9 +911,9 @@ void coco_state::poll_keyboard(void)
 //  on the CoCo 3 controls a GIME input
 //-------------------------------------------------
 
-void coco_state::update_keyboard_input(uint8_t value, uint8_t z)
+void coco_state::update_keyboard_input(uint8_t value)
 {
-	pia_0().set_a_input(value, z);
+	pia_0().set_a_input(value);
 }
 
 
@@ -1108,7 +1101,7 @@ void coco_state::poll_hires_joystick(void)
 			double value = m_joystick.input(joystick_index, axis) / 255.0;
 			value *= is_cocomax3 ? 2500.0 : 4160.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
-			attotime duration = maincpu().clocks_to_attotime((uint64_t) value) * 2;
+			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)

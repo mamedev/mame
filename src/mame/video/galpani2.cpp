@@ -34,7 +34,7 @@ inline uint16_t galpani2_state::galpani2_bg8_regs_r(address_space &space, offs_t
 	{
 		case 0x16:  return machine().rand() & 1;
 		default:
-			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",space.cpu->safe_pc(),_n_,offset*2);
+			logerror("%s: Warning, bg8 #%d screen reg %04X read\n",machine().describe_context(),_n_,offset*2);
 	}
 	return m_bg8_regs[_n_][offset];
 }
@@ -58,29 +58,6 @@ WRITE16_MEMBER( galpani2_bg8_regs_0_w ) { galpani2_bg8_regs_w(space, offset, dat
 WRITE16_MEMBER( galpani2_bg8_regs_1_w ) { galpani2_bg8_regs_w(space, offset, data, mem_mask, 1); }
 #endif
 
-
-
-/***************************************************************************
-
-
-                            Video Init Functions
-
-
-***************************************************************************/
-
-PALETTE_INIT_MEMBER(galpani2_state, galpani2)
-{
-	int i;
-	/* first $4200 colors are dynamic */
-
-	/* initialize 555 RGB lookup */
-	for (i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
-}
-
-void galpani2_state::video_start()
-{
-}
 
 
 /***************************************************************************
@@ -163,6 +140,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	if (layers_ctrl & 0x1) copybg15(screen, bitmap, cliprect);
 	if (layers_ctrl & 0x2) copybg8(screen, bitmap, cliprect, 0);
 	if (layers_ctrl & 0x4) copybg8(screen, bitmap, cliprect, 1);
-	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(bitmap, cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
+	if (layers_ctrl & 0x8) m_kaneko_spr->render_sprites(bitmap, cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }

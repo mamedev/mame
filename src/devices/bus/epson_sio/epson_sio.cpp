@@ -111,7 +111,8 @@ WRITE_LINE_MEMBER( epson_sio_device::pout_w )
 //  SLOT INTERFACE
 //**************************************************************************
 
-SLOT_INTERFACE_START( epson_sio_devices )
-	SLOT_INTERFACE("pf10", EPSON_PF10)
-	SLOT_INTERFACE("tf20", EPSON_TF20)
-SLOT_INTERFACE_END
+void epson_sio_devices(device_slot_interface &device)
+{
+	device.option_add("pf10", EPSON_PF10);
+	device.option_add("tf20", EPSON_TF20);
+}

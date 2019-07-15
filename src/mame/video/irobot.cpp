@@ -39,21 +39,20 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(irobot_state, irobot)
+void irobot_state::irobot_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* convert the color prom for the text palette */
-	for (i = 0; i < 32; i++)
+	// convert the color prom for the text palette
+	for (unsigned i = 0; i < 32; i++)
 	{
-		int intensity = color_prom[i] & 0x03;
+		int const intensity = color_prom[i] & 0x03;
 
-		int r = 28 * ((color_prom[i] >> 6) & 0x03) * intensity;
-		int g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
-		int b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
+		int const r = 28 * ((color_prom[i] >> 6) & 0x03) * intensity;
+		int const g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
+		int const b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
 
-		int swapped_i = bitswap<8>(i,7,6,5,4,3,0,1,2);
+		int const swapped_i = bitswap<8>(i,7,6,5,4,3,0,1,2);
 
 		palette.set_pen_color(swapped_i + 64, rgb_t(r, g, b));
 	}
@@ -78,7 +77,7 @@ WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
 }
 
 
-void irobot_state::_irobot_poly_clear(uint8_t *bitmap_base)
+void irobot_state::irobot_poly_clear(uint8_t *bitmap_base)
 {
 	memset(bitmap_base, 0, BITMAP_WIDTH * m_screen->height());
 }
@@ -86,7 +85,7 @@ void irobot_state::_irobot_poly_clear(uint8_t *bitmap_base)
 void irobot_state::irobot_poly_clear()
 {
 	uint8_t *bitmap_base = m_bufsel ? m_polybitmap2.get() : m_polybitmap1.get();
-	_irobot_poly_clear(bitmap_base);
+	irobot_poly_clear(bitmap_base);
 }
 
 
@@ -103,8 +102,8 @@ void irobot_state::video_start()
 	m_polybitmap2 = std::make_unique<uint8_t[]>(BITMAP_WIDTH * height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
-	_irobot_poly_clear(m_polybitmap1.get());
-	_irobot_poly_clear(m_polybitmap2.get());
+	irobot_poly_clear(m_polybitmap1.get());
+	irobot_poly_clear(m_polybitmap2.get());
 
 	/* Set clipping */
 	m_ir_xmin = m_ir_ymin = 0;
@@ -352,7 +351,7 @@ uint32_t irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 
 	int x, y, offs;
 
 	/* copy the polygon bitmap */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], nullptr);
 
 	/* redraw the non-zero characters in the alpha layer */

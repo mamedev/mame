@@ -598,7 +598,7 @@ int data_node::get_attribute_int(const char *attribute, int defvalue) const
 		stream >> std::hex >> uvalue;
 		result = int(uvalue);
 	}
-	else if (string[0] == '0' && string[1] == 'x')
+	else if ((string[0] == '0') && ((string[1] == 'x') || (string[1] == 'X')))
 	{
 		stream.str(&string[2]);
 		unsigned uvalue;

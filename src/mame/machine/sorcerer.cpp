@@ -13,7 +13,7 @@
 
 /* timer for sorcerer serial chip transmit and receive */
 
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
+TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
 	Transmit and receive clocks are connected to the same clock. */
@@ -22,8 +22,8 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 	if (BIT(m_fe, 7))
 	{
 		/* connect to rs232 */
-		m_rs232->write_txd(m_uart->get_output_pin(AY31015_SO));
-		m_uart->set_input_pin(AY31015_SI, m_rs232->rxd_r());
+		m_rs232->write_txd(m_uart->so_r());
+		m_uart->write_si(m_rs232->rxd_r());
 	}
 }
 
@@ -33,10 +33,10 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_SERIAL:
-		sorcerer_serial_tc(ptr, param);
+		serial_tc(ptr, param);
 		break;
 	case TIMER_CASSETTE:
-		sorcerer_cassette_tc(ptr, param);
+		cassette_tc(ptr, param);
 		break;
 	case TIMER_RESET:
 		sorcerer_reset(ptr, param);
@@ -49,7 +49,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 /* timer to read cassette waveforms */
 
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
+TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 {
 	uint8_t cass_ws = 0;
 	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
@@ -68,7 +68,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 				m_cass_data.input.level = cass_ws;
 				m_cass_data.input.bit = ((m_cass_data.input.length < 0x6) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
 				m_cass_data.input.length = 0;
-				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
+				m_uart->write_si(m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
@@ -77,7 +77,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 0x1f))
 			{
-				cass_ws = m_uart->get_output_pin(AY31015_SO);
+				cass_ws = m_uart->so_r();
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -109,7 +109,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 					m_cass_data.input.length = 0;
 					m_cass_data.input.level = cass_ws;
 				}
-				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
+				m_uart->write_si(m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
@@ -117,7 +117,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 7))
 			{
-				cass_ws = m_uart->get_output_pin(AY31015_SO);
+				cass_ws = m_uart->so_r();
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -144,26 +144,88 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
 	membank("boot")->set_entry(0);
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fc_w)
+
+// The floppy sector has been read. Enable CPU.
+WRITE_LINE_MEMBER(sorcerer_state::intrq_w)
 {
-	m_uart->set_transmit_data(data);
+	m_intrq_off = state ? false : true;
+	if (state)
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		m_wait = false;
+	}
+	else
+	if (BIT(m_2c, 0) && m_drq_off && !m_wait)
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_wait = true;
+	}
 }
 
+// The next byte from floppy is available. Enable CPU so it can get the byte.
+WRITE_LINE_MEMBER(sorcerer_state::drq_w)
+{
+	m_drq_off = state ? false : true;
+	if (state)
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		m_wait = false;
+	}
+	else
+	if (BIT(m_2c, 0) && m_intrq_off && !m_wait)
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_wait = true;
+	}
+}
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
+// Port 2C control signals for the video/disk unit's floppy disks
+// Signals are unknown so guess
+// It outputs 24 or 25 when booting, so suppose that
+// bit 0 = enable wait generator, bit 2 = drive 0 select, bit 5 = ??
+WRITE8_MEMBER(sorcerer_state::port_2c_w)
+{
+	m_2c = data;
+
+	if (BIT(data, 0))
+	{
+		if (!m_wait && m_drq_off && m_intrq_off)
+		{
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_wait = true;
+		}
+	}
+
+	floppy_image_device *floppy = nullptr;
+
+	if (BIT(data, 2)) floppy = m_floppy20->get_device();
+	if (BIT(data, 3)) floppy = m_floppy21->get_device();
+
+	m_fdc2->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(0);     // assume side 0 ? // BIT(data, 4));
+	}
+
+	m_fdc2->dden_w(0);   // assume double density ? //!BIT(data, 0));
+}
+
+WRITE8_MEMBER(sorcerer_state::port_fd_w)
 {
 	/* Translate data to control signals */
 
-	m_uart->set_input_pin(AY31015_CS, 0);
-	m_uart->set_input_pin(AY31015_NB1, BIT(data, 0));
-	m_uart->set_input_pin(AY31015_NB2, BIT(data, 1));
-	m_uart->set_input_pin(AY31015_TSB, BIT(data, 2));
-	m_uart->set_input_pin(AY31015_EPS, BIT(data, 3));
-	m_uart->set_input_pin(AY31015_NP,  BIT(data, 4));
-	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->write_cs(0);
+	m_uart->write_nb1(BIT(data, 0));
+	m_uart->write_nb2(BIT(data, 1));
+	m_uart->write_tsb(BIT(data, 2));
+	m_uart->write_eps(BIT(data, 3));
+	m_uart->write_np(BIT(data, 4));
+	m_uart->write_cs(1);
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
+WRITE8_MEMBER(sorcerer_state::port_fe_w)
 {
 	uint8_t changed_bits = (m_fe ^ data) & 0xf0;
 	m_fe = data;
@@ -210,12 +272,11 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 	// bit 6 baud rate */
 	if (BIT(changed_bits, 6))
 	{
-		m_uart->set_receiver_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
-		m_uart->set_transmitter_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
+		m_uart_clock->set_unscaled_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
 	}
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
+WRITE8_MEMBER(sorcerer_state::port_ff_w)
 {
 	/// TODO: create a sorcerer parallel slot with a 7 bit and 8 bit centronics adapter as two of the options
 	/// TODO: figure out what role FE plays http://www.trailingedge.com/exidy/exidych7.html
@@ -245,31 +306,23 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 	}
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
-{
-	uint8_t data = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 0);
-	m_uart->set_input_pin(AY31015_RDAV, 1);
-	return data;
-}
-
-READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
+READ8_MEMBER(sorcerer_state::port_fd_r)
 {
 	/* set unused bits high */
 	uint8_t data = 0xe0;
 
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x01 : 0;
-	data |= m_uart->get_output_pin(AY31015_DAV ) ? 0x02 : 0;
-	data |= m_uart->get_output_pin(AY31015_OR  ) ? 0x04 : 0;
-	data |= m_uart->get_output_pin(AY31015_FE  ) ? 0x08 : 0;
-	data |= m_uart->get_output_pin(AY31015_PE  ) ? 0x10 : 0;
-	m_uart->set_input_pin(AY31015_SWE, 1);
+	m_uart->write_swe(0);
+	data |= m_uart->tbmt_r() ? 0x01 : 0;
+	data |= m_uart->dav_r( ) ? 0x02 : 0;
+	data |= m_uart->or_r(  ) ? 0x04 : 0;
+	data |= m_uart->fe_r(  ) ? 0x08 : 0;
+	data |= m_uart->pe_r(  ) ? 0x10 : 0;
+	m_uart->write_swe(1);
 
 	return data;
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
+READ8_MEMBER(sorcerer_state::port_fe_r)
 {
 	/* bits 6..7
 	 - hardware handshakes from user port
@@ -291,7 +344,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
+SNAPSHOT_LOAD_MEMBER(sorcerer_state::snapshot_cb)
 {
 	uint8_t *RAM = memregion(m_maincpu->tag())->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -364,7 +417,7 @@ void sorcerer_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 MACHINE_START_MEMBER(sorcerer_state,sorcererd)
@@ -392,7 +445,7 @@ MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 	}
 
 	if (m_cart->exists())
-		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void sorcerer_state::machine_reset()
@@ -405,8 +458,12 @@ void sorcerer_state::machine_reset()
 	m_cass_data.input.length = 0;
 	m_cass_data.input.bit = 1;
 
+	m_drq_off = true;
+	m_intrq_off = true;
+	m_wait = false;
 	m_fe = 0xff;
-	sorcerer_fe_w(space, 0, 0, 0xff);
+	m_2c = 0;
+	port_fe_w(space, 0, 0, 0xff);
 
 	membank("boot")->set_entry(1);
 	timer_set(attotime::from_usec(10), TIMER_RESET);
@@ -417,7 +474,7 @@ void sorcerer_state::machine_reset()
     QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
+QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 {
 	uint16_t execute_address, start_address, end_address;
 	int autorun;
@@ -430,7 +487,7 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 	/* is this file executable? */
 	if (execute_address != 0xffff)
 	{
-		/* check to see if autorun is on (I hate how this works) */
+		/* check to see if autorun is on */
 		autorun = m_iop_config->read() & 1;
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))

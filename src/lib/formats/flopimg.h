@@ -7,14 +7,17 @@
     Floppy disk image abstraction code
 
 *********************************************************************/
+#ifndef MAME_FORMATS_FLOPIMG_H
+#define MAME_FORMATS_FLOPIMG_H
 
-#ifndef FLOPIMG_H
-#define FLOPIMG_H
+#pragma once
 
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "opresolv.h"
 #include "coretmpl.h"
+
+#include <vector>
 
 #ifndef LOG_FORMATS
 #define LOG_FORMATS if (0) printf
@@ -154,7 +157,6 @@ LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 #define INTERLEAVE(range)       "I" #range
 #define FIRST_SECTOR_ID(range)  "F" #range
 
-
 /***************************************************************************
 
     Prototypes
@@ -170,8 +172,7 @@ floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct Flo
 void floppy_close(floppy_image_legacy *floppy);
 
 /* useful for identifying a floppy image */
-floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *extension,
-	const struct FloppyFormat *formats, int *identified_format);
+floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *extension, const struct FloppyFormat *formats, int *identified_format);
 
 /* functions useful within format constructors */
 void *floppy_tag(floppy_image_legacy *floppy);
@@ -292,7 +293,8 @@ protected:
 	//! Optional, you can always do things by hand, but useful nevertheless.
 	//! A vector of these structures describes one track.
 
-	struct desc_e {
+	struct desc_e
+	{
 		int type,   //!< An opcode
 			p1,     //!< first param
 			p2;     //!< second param
@@ -331,6 +333,8 @@ protected:
 		SECTOR_INFO_GCR6,       //!< Sector info byte, gcr6-encoded
 		OFFSET_ID_O,            //!< Offset (track*2+head) byte, odd bits, mfm-encoded
 		OFFSET_ID_E,            //!< Offset (track*2+head) byte, even bits, mfm-encoded
+		OFFSET_ID_FM,           //!< Offset (track*2+head) byte, fm-encoded
+		OFFSET_ID,              //!< Offset (track*2+head) byte, mfm-encoded
 		SECTOR_ID_O,            //!< Sector id byte, odd bits, mfm-encoded
 		SECTOR_ID_E,            //!< Sector id byte, even bits, mfm-encoded
 		REMAIN_O,               //!< Remaining sector count, odd bits, mfm-encoded, total sector count in p1
@@ -343,6 +347,8 @@ protected:
 		SECTOR_DATA_GCR5,       //!< Sector data to gcr5-encode, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_MAC,        //!< Transformed sector data + checksum, mac style, id in p1, -1 for the current one per the sector id
 		SECTOR_DATA_8N1,        //!< Sector data to 8N1-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_MX,         //!< Sector data to MX-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_DS9,        //!< Sector data to DS9-encode, which in p1, -1 for the current one per the sector id
 
 		CRC_CCITT_START,        //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
 		CRC_CCITT_FM_START,     //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
@@ -361,7 +367,8 @@ protected:
 	};
 
 	//! Sector data description
-	struct desc_s {
+	struct desc_s
+	{
 		int size;          //!< Sector size, int bytes
 		const uint8_t *data; //!< Sector data
 		uint8_t sector_id;   //!< Sector ID
@@ -386,8 +393,10 @@ protected:
 	    @param trackbuf track input buffer.
 	    @param track_size in cells, not bytes.
 	    @param image
+	    @param subtrack subtrack index, 0-3
+	    @param splice write splice position
 	*/
-	void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack = 0);
+	void generate_track_from_bitstream(int track, int head, const uint8_t *trackbuf, int track_size, floppy_image *image, int subtrack = 0, int splice = 0);
 
 	//! @brief Generate a track from cell level values (0/1/W/D/N).
 
@@ -487,14 +496,16 @@ protected:
 	void generate_bitstream_from_track(int track, int head, int cell_size, uint8_t *trackbuf, int &track_size, floppy_image *image, int subtrack = 0);
 
 	//! Defines a standard sector for extracting.
-	struct desc_xs {
+	struct desc_xs
+	{
 		int track,  //!< Track for this sector
 			head,   //!< Head for this sector
 			size;   //!< Size of this sector
 		const uint8_t *data; //!< Data within this sector
 	};
 
-	struct desc_pc_sector {
+	struct desc_pc_sector
+	{
 		uint8_t track, head, sector, size;
 		int actual_size;
 		uint8_t *data;
@@ -581,12 +592,16 @@ protected:
 	uint8_t sbyte_mfm_r(const uint8_t *bitstream, int &pos, int track_size);
 	uint8_t sbyte_gcr5_r(const uint8_t *bitstream, int &pos, int track_size);
 
+	//! Max number of excess tracks to be discarded from disk image to fit floppy drive
+	enum { DUMP_THRESHOLD = 2 };
+
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
 	enum { MAX_CRC_COUNT = 64 };
 
 	//! Holds data used internally for generating CRCs.
-	struct gen_crc_info {
+	struct gen_crc_info
+	{
 		int type, //!< Type of CRC
 			start, //!< Start position
 			end, //!< End position
@@ -733,7 +748,7 @@ public:
 	  @param head head number
 	  @return a pointer to the data buffer for this track and head
 	*/
-	std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].cell_data; }
+	std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].cell_data; }
 
 	//! Sets the write splice position.
 	//! The "track splice" information indicates where to start writing
@@ -747,9 +762,9 @@ public:
 	    @param head
 	    @param pos the position
 	*/
-	void set_write_splice_position(int track, int head, uint32_t pos, int subtrack = 0) { track_array[track*4+subtrack][head].write_splice = pos; }
+	void set_write_splice_position(int track, int head, uint32_t pos, int subtrack = 0) { assert(track < tracks && head < heads); track_array[track*4+subtrack][head].write_splice = pos; }
 	//! @return the current write splice position.
-	uint32_t get_write_splice_position(int track, int head, int subtrack = 0) const { return track_array[track*4+subtrack][head].write_splice; }
+	uint32_t get_write_splice_position(int track, int head, int subtrack = 0) const { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].write_splice; }
 	//! @return the maximal geometry supported by this format.
 	void get_maximal_geometry(int &tracks, int &heads) const;
 
@@ -770,7 +785,8 @@ private:
 
 	uint32_t form_factor, variant;
 
-	struct track_info {
+	struct track_info
+	{
 		std::vector<uint32_t> cell_data;
 		uint32_t write_splice;
 
@@ -782,4 +798,4 @@ private:
 	std::vector<std::vector<track_info> > track_array;
 };
 
-#endif /* FLOPIMG_H */
+#endif // MAME_FORMATS_FLOPIMG_H

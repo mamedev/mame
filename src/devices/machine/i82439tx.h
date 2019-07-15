@@ -9,16 +9,19 @@
 
 #include "pci.h"
 
-#define MCFG_I82439TX_ADD(_tag, _cpu_tag, _ram_size)    \
-	MCFG_PCI_HOST_ADD(_tag, I82439TX_NEW, 0x80867100, 0x03, 0x00000000) \
-	downcast<i82439tx_host_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<i82439tx_host_device *>(device)->set_ram_size(_ram_size);
-
 class i82439tx_host_device : public pci_host_device {
 public:
+	template <typename T>
+	i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
+		: i82439tx_host_device(mconfig, tag, owner, clock)
+	{
+		set_ids_host(0x80867100, 0x03, 0x00000000);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
 	i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu_tag(const char *tag);
+	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
 
 protected:
@@ -33,9 +36,8 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	const char *cpu_tag;
 	int ram_size;
-	cpu_device *cpu;
+	required_device<device_memory_interface> cpu;
 	std::vector<uint32_t> ram;
 
 	uint8_t pcon, cc, dramec, dramc, dramt;
@@ -69,6 +71,6 @@ private:
 	DECLARE_READ8_MEMBER (errsyn_r);
 };
 
-DECLARE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device)
+DECLARE_DEVICE_TYPE(I82439TX, i82439tx_host_device)
 
 #endif // MAME_MACHINE_I82439TX_H

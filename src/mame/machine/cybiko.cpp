@@ -25,26 +25,26 @@
 // DRIVER INIT & EXIT //
 ////////////////////////
 
-DRIVER_INIT_MEMBER(cybiko_state,cybiko)
+void cybiko_state::init_cybiko()
 {
 	_logerror( 0, ("init_cybikov1\n"));
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
 }
 
-DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
+void cybiko_state::init_cybikoxt()
 {
 	_logerror( 0, ("init_cybikoxt\n"));
 	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, m_ram->pointer());
 }
 
-QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
+QUICKLOAD_LOAD_MEMBER(cybiko_state::quickload_cybiko)
 {
 	image.fread(m_flash1->get_ptr(), std::min(image.length(), uint64_t(0x84000)));
 
 	return image_init_result::PASS;
 }
 
-QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
+QUICKLOAD_LOAD_MEMBER(cybiko_state::quickload_cybikoxt)
 {
 	address_space &dest = m_maincpu->space(AS_PROGRAM);
 	uint32_t size = std::min(image.length(), uint64_t(RAMDISK_SIZE));

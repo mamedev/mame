@@ -2,10 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
--->
-
-<!--
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -26,203 +22,208 @@ Language:
 *******15 = Norway
 *******?? = Finland
 
-+========+===================+============================================================================+
-|        | 80-084000(US)     | Action Mania                                                               |
-|        |          (IT)     | ?????                                                                      |
-|        | 80-084002(NL)     | Sports Games                                                               |
-|        | 80-084003(UK)     | Action Mania                                                               |
-|        | 80-084004(GE)     | Sportskanone                                                               |
-|        | 80-084005(FR)     | Sporti Folies                                                              |
-|        | 80-084006(PT)     | Action Mania (84016 on cart)                                               |
-|        | 80-084007(SP)     | Action Mania                                                               |
-+========+===================+============================================================================+
-|        | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                |
-|        | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version)               |
-|        | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                            |
-|        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                |
-|   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                            |
-|        | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mecano              |
-|        | 80-084026(PT)     | Dora : em busca das pecas perdidas                                         |
-|        | 80-084027(SP)     | Dora : La Aventura arregla-todo de Dora                                    |
-+========+===================+============================================================================+
-|        | 80-084040(US)     | Scooby-Doo! - Funland Frenzy                                               |
-|        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy                                               |
-|        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark                                                  |
-|        | 80-084045(FR)     | Scooby-Doo - Panique A Funland                                             |
-|        | 80-084047(SP)     | Scooby-Doo - Misterio en el Parque                                         |
-+========+===================+============================================================================+
-|        | 80-084060(US)     | Thomas and Friends - Engines Working Together                              |
-|        | 80-084063(UK)     | Thomas and Friends - Engines Working Together                              |
-|        | 80-084064(GE)     | Thomas - Freunde halten zusammen                                           |
-+========+===================+============================================================================+
-|        | 80-084080(US)     | Wall-E                                                                     |
-|        | 80-084083(UK)     | Wall-E                                                                     |
-|        | 80-084084(GE)     | Wall-E                                                                     |
-|        | 80-084085(FR)     | Wall-E                                                                     |
-|        | 80-084087(SP)     | Wall-E                                                                     |
-+========+===================+============================================================================+
-|        | 80-084100(US)     | Wonder Pets - Save the Animals!                                            |
-|        | 80-084103(UK)     | Wonder Pets - Save the Animals!                                            |
-+========+===================+============================================================================+
-|        | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                          |
-|        | 80-084123(UK)     | Kung Fu Panda - Path of the Panda                                          |
-|   XX   | 80-084124(GE)     | Kung Fu Panda - Der Weg des Panda                                          |
-|        | 80-084125(FR)     | Kung Fu Panda - La mission de Po                                           |
-+========+===================+============================================================================+
-|        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)
-|        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                     |
-|        | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                   |
-|        | 80-084145(FR)     | Spider-Man and ses amis - Missions Secretes                                |
-|        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas  (no # on label)                    |
-+========+===================+============================================================================+
-|        | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball                          |
-|        | 80-084163(UK)     | Disney's Little Einsteins: The Glass Slipper Ball                          |
-|   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball                          |
-|        | 80-084167(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal               |
-+========+===================+============================================================================+
-|        | 80-084180(US)     | Mickey Mouse Clubhouse                                                     |
-|        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                     |
-|        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                     |
-|        | 80-084184(GE)     | Micky Maus Wunderhaus                                                      |
-|        | 80-084185(FR)     | La Maison de Mickey                                                        |
-|        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                     |
-|        | 80-084187(SP)     | La Casa de Mickey Mouse                                                    |
-+========+===================+============================================================================+
-|        | 80-084200(US)     | Nascar Academy - Race Car Superstar                                        |
-+========+===================+============================================================================+
-|        | 80-084220(US)     | Snow Park Challenge                                                        |
-|        | 80-084222(NL)     | Wintersport Games                                                          |
-|        | 80-084223(UK)     | Snow Park Challenge                                                        |
-|        | 80-084224(GE)     | Wintersport                                                                |
-|        | 80-084225(FR)     | ?????? picture too fuzzy for positve confirm                               |
-+========+===================+============================================================================+
-|        | 80-084240(US)     | Ni Hao Kai Lan                                                             |
-|        | 80-084245(FR)     | Ni Hao Kai Lan                                                             |
-+========+===================+============================================================================+
-|        | 80-084260(US)     | My Pet Puppy (unreleased in USA?? UK version plays AOK on NTSC console)    |
-|        | 80-084262(NL)     | Mijn Puppy!                                                                |
-|        | 80-084263(UK)     | My Pet Puppy                                                               |
-|        | 80-084264(GE)     | Mein erster Hund                                                           |
-|        | 80-084265(FR)     | Mon Youtou Tout Fou!                                                       |
-|        | 80-084267(SP)     | Dakota y su Mascota                                                        |
-+========+===================+============================================================================+
-|        | 80-084280(US)     | Wild Waves                                                                 |
-|        | 80-084282(NL)     | Water-sport Games                                                          |
-|        | 80-084283(UJ)     | Wild Waves                                                                 |
-|        | 80-084284(GE)     | Dolphis Wasser-abenteuer                                                   |
-|        | 80-084285(FR)     | Martin le Dauphin                                                          |
-+========+===================+============================================================================+
-|        | 80-084300(US)     | Soccer Challenge                                                           |
-|        | 80-084303(UK)     | Football Challenge                                                         |
-|        | 80-084304(GE)     | Fussball Meisterschaft                                                     |
-|        | 80-084305(FR)     | Football Challenge                                                         |
-|        | 80-084306(PT)     | Football Challenge  (cart#??)                                              |
-|        | 80-084307(SP)     | Campeonato de Futbol                                                       |
-+========+===================+============================================================================+
-|        | 80-084320(US)     | Disney Fairies: TinkerBell                                                 |
-|        | 80-084321(US)     | Disney Fairies: TinkerBell (pocket version)                                |
-|        | 80-084322(NL)     | TinkerBell                                                                 |
-|        | 80-084323(UK)     | TinkerBell                                                                 |
-|   XX   | 80-084324(GE)     | TinkerBell                                                                 |
-|        | 80-084325(FR)     | La fee Clochette                                                           |
-|        | 80-084326(PT)     | Sininho (84336 on cart)                                                    |
-|        | 80-084327(SP)     | Campanilla                                                                 |
-+========+===================+============================================================================+
-|        | 80-084340(US)     | Up!                                                                        |
-|        | 80-084342(NL)     | Up!                                                                        |
-|        | 80-084344(GE)     | Oben                                                                       |
-|        | 80-084345(FR)     | La-Haut                                                                    |
-|        | 80-084347(SP)     | Up!                                                                        |
-|        | 80-084347-022(SP) | Up!  (-022 is odd for SP)                                                  |
-+========+===================+============================================================================+
-|        | 80-084360(US)     | Handy Manny                                                                |
-|        | 80-084362(NL)     | Handy Manny                                                                |
-|        | 80-084363(UK)     | Handy Manny                                                                |
-|        | 80-084364(GE)     | Meister Manny's Werkzeugkiste                                              |
-|        | 80-084365(FR)     | Manny Et Ses Outils                                                        |
-|        | 80-084366(PT)     | Manny Maozinhas (84376 on cart)                                            |
-|        | 80-084367(SP)     | Manny Manitas                                                              |
-+========+===================+============================================================================+
-|        | 80-084380(US)     | Winnie the Pooh - The Honey Hunt                                           |
-|        |          (IT)     | Winnie the Pooh - e la caccia al miele  ???                                |
-|        | 80-084383(UK)     | Winnie the Pooh - The Honey Hunt                                           |
-|   XX   | 80-084384(GE)     | Winnie Puuh - Die Honigjagd                                                |
-|        | 80-084385(FR)     | Winnie Rourson - La Chasse au miel de Winnie                               |
-|        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)                                   |
-|        | 80-084387(SP)     | Winnie the Pooh - En busca de la miel                                      |
-+========+===================+============================================================================+
-|        | 80-084400(US)     | Cars: Rev It Up in Radiator Springs                                        |
-|        | 80-084402(NL)     | Cars: Spektakel in Radiator Springs                                        |
-|        | 80-084403(UK)     | Cars: Rev it up in Radiator Springs                                        |
-|        | 80-084404(GE)     | Cars: Vollgas in Radiator Springs                                          |
-|        | 80-084405(FR)     | Cars: Quatre Roues                                                         |
-|        | 80-084406(PT)     | Cars: Aventura Em Radiator Springs (84416 on cart)                         |
-|        | 80-084407(SP)     | Cars: Acelera el Motor en Radiador Springs                                 |
-+========+===================+============================================================================+
-|        | 80-084420(US)     | Toy Story 3                                                                |
-|        | 80-084421(US)     | Toy Story 3 (pocket version)                                               |
-|        |          (IT)     | Toy Story 3 (EAN 8033836704196) GP470419?                                  |
-|        | 80-084422(NL)     | Toy Story 3                                                                |
-|        | 80-084423(UK)     | Toy Story 3                                                                |
-|        | 80-084424(GE)     | Toy Story 3                                                                |
-|        | 80-084425(FR)     | Toy Story 3                                                                |
-|        | 80-084427(SP)     | Toy Story 3                                                                |
-+========+===================+============================================================================+
-|        | 80-084440(US)     | Monsters vs. Aliens                                                        |
-|        | 80-084442(NL)     | Monsters vs. Aliens                                                        |
-|        | 80-084443(UK)     | Monsters vs. Aliens                                                        |
-|        | 80-084444(GE)     | Monsters vs. Aliens                                                        |
-|        | 80-084445(FR)     | Monsters vs. Aliens                                                        |
-|        | 80-084447(SP)     | Monstruos contra Alienigenas                                               |
-+========+===================+============================================================================+
-|        | 80-084460(US)     | Noddy - Detective for a Day (unreleased in USA??) see 80-092540            |
-|        | 80-084463(UK)     | Noddy - Detective for a Day                                                |
-|        | 80-084465(FR)     | Oui-Oui - Detective d'un jour                                              |
-|        | 80-084467(SP)     | Noddy - Detective por un Dia                                               |
-+========+===================+============================================================================+
-|        | 80-084480(US)     | The Princess and the Frog  (motion version)                                |
-|        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                |
-|        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                    |
-|        | 80-084483(UK)     | The Princess and the Frog                                                  |
-|        | 80-084484(GE)     | Kuess den Frosch                                                           |
-|        | 80-084485(FR)     | La Princesse Et La Grenouille                                              |
-|        | 80-084487(SP)     | Tiana y el sapo - El gran Sueno de Tiana                                   |
-+========+===================+============================================================================+
-|        | 80-084500(US)     | Shrek Forever After                                                        |
-|        | 80-084502(NL)     | Sjrek voor eeuwig en altijd                                                |
-|        | 80-084503(UK)     | Shrek Forever After                                                        |
-|        | 80-084504(GE)     | Fuer immer Shrek                                                           |
-|        | 80-084505(FR)     | Shrek 4 - Il Etait une Fin                                                 |
-|        | 80-084507(SP)     | Shrek Felices para siempre                                                 |
-+========+===================+============================================================================+
-|        | 80-084520(US)     | <Unknown>                                                                  |
-+========+===================+============================================================================+
-|        | 80-084540(US)     | Super Why to the Rescue! The Beach Day Mystery                             |
-|        | 80-084541(US)     | Super Why to the Rescue! The Beach Day Mystery   (pocket version)          |
-+========+===================+============================================================================+
-|        | 80-084560(US)     | <Unknown>                                                                  |
-+========+===================+============================================================================+
-|        | 80-084580(US)     | Cars 2  (motion version)                                                   |
-|        | 80-084581(US)     | Cars 2  (pocket version)                                                   |
-|        | 80-084583(UK)     | Cars 2                                                                     |
-|        | 80-084584(GE)     | Cars 2                                                                     |
-|        | 80-084585(FR)     | Cars 2                                                                     |
-|        | 80-084587(SP)     | Cars 2                                                                     |
-+========+===================+============================================================================+
-|        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)|
-|        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes                                     |
-|   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland                                        |
-|        | 80-084605(FR)     | Cendrillon - ?????                                                         |
-+========+===================+============================================================================+
-|        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                          |
-|        | 80-084624(GE)     | Findet Nemo - Nemos Unterwasserabenteuer                                   |
-|        | 80-084625(FR)     | Le Monde de Nemo - Nemo a la decourverte de l'ocean                        |
-|        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                              |
-+========+===================+============================================================================+
-|        | 80-084640(US)     | <Unknown> (Should be Orange colored Spongebob)                             |
-|        | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                               |
-|        | 80-084647(SP)     | Bob Epsonja - Un dia en la vida de una esponja                             |
-+========+===================+============================================================================+
++========+===================+===========================================================================================+
+|   XX   | 80-084000(US)     | Action Mania (Rev, 4?)                                                                    |
+|   XX   | 80-084000(US)     | Action Mania (Rev, 6?)                                                                    |
+|        |          (IT)     | ?????                                                                                     |
+|        | 80-084002(NL)     | Sports Games                                                                              |
+|        | 80-084003(UK)     | Action Mania                                                                              |
+|        | 80-084004(GE)     | Sportskanone                                                                              |
+|        | 80-084005(FR)     | Sporti Folies                                                                             |
+|        | 80-084006(PT)     | Action Mania (84016 on cart)                                                              |
+|   XX   | 80-084007(SP)     | Action Manía                                                                              |
++========+===================+===========================================================================================+
+|   XX   | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                                |
+|   **   | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version, same ROM as 80-084020(US))    |
+|        | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                                           |
+|        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                                |
+|   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                                           |
+|   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer (Rev. 2)                                                  |
+|        | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mecano                             |
+|        | 80-084026(PT)     | Dora : em busca das pecas perdidas                                                        |
+|        | 80-084027(SP)     | Dora : La Aventura arregla-todo de Dora                                                   |
++========+===================+===========================================================================================+
+|        | 80-084040(US)     | Scooby-Doo! - Funland Frenzy                                                              |
+|        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy                                                              |
+|        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark                                                                 |
+|        | 80-084045(FR)     | Scooby-Doo - Panique A Funland                                                            |
+|        | 80-084047(SP)     | Scooby-Doo - Misterio en el Parque                                                        |
++========+===================+===========================================================================================+
+|        | 80-084060(US)     | Thomas and Friends - Engines Working Together                                             |
+|        | 80-084063(UK)     | Thomas and Friends - Engines Working Together                                             |
+|   XX   | 80-084064(GE)     | Thomas - Freunde halten zusammen                                                          |
++========+===================+===========================================================================================+
+|        | 80-084080(US)     | Wall-E                                                                                    |
+|        | 80-084083(UK)     | Wall-E                                                                                    |
+|        | 80-084084(GE)     | Wall-E                                                                                    |
+|        | 80-084085(FR)     | Wall-E                                                                                    |
+|        | 80-084087(SP)     | Wall-E                                                                                    |
++========+===================+===========================================================================================+
+|        | 80-084100(US)     | Wonder Pets - Save the Animals!                                                           |
+|        | 80-084103(UK)     | Wonder Pets - Save the Animals!                                                           |
++========+===================+===========================================================================================+
+|        | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                                         |
+|        | 80-084123(UK)     | Kung Fu Panda - Path of the Panda                                                         |
+|   XX   | 80-084124(GE)     | Kung Fu Panda - Der Weg des Panda                                                         |
+|        | 80-084125(FR)     | Kung Fu Panda - La mission de Po                                                          |
++========+===================+===========================================================================================+
+|        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)|
+|        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                                    |
+|   XX   | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                  |
+|        | 80-084145(FR)     | Spider-Man and ses amis - Missions Secretes                                               |
+|        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas  (no # on label)                                   |
++========+===================+===========================================================================================+
+|   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 2?)                               |
+|   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 5?)                               |
+|        | 80-084163(UK)     | Disney's Little Einsteins: The Glass Slipper Ball                                         |
+|   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball                                         |
+|   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball (Rev. 2?)                               |
+|        | 80-084167(SP)     | Little Einsteins de Disney: El Baile del Zapatito de Cristal                              |
++========+===================+===========================================================================================+
+|   XX   | 80-084180(US)     | Mickey Mouse Clubhouse                                                                    |
+|        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                                    |
+|        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                                    |
+|        | 80-084184(GE)     | Micky Maus Wunderhaus                                                                     |
+|        | 80-084185(FR)     | La Maison de Mickey                                                                       |
+|        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                                    |
+|        | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
++========+===================+===========================================================================================+
+|   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar                                                       |
++========+===================+===========================================================================================+
+|        | 80-084220(US)     | Snow Park Challenge                                                                       |
+|        | 80-084222(NL)     | Wintersport Games                                                                         |
+|        | 80-084223(UK)     | Snow Park Challenge                                                                       |
+|   XX   | 80-084224(GE)     | Wintersport                                                                               |
+|        | 80-084225(FR)     | ?????? picture too fuzzy for positive confirm                                             |
++========+===================+===========================================================================================+
+|   XX   | 80-084240(US)     | Ni Hao Kai Lan                                                                            |
+|        | 80-084245(FR)     | Ni Hao Kai Lan                                                                            |
++========+===================+===========================================================================================+
+|        | 80-084260(US)     | My Pet Puppy (unreleased in USA?? UK version plays AOK on NTSC console)                   |
+|        | 80-084262(NL)     | Mijn Puppy!                                                                               |
+|        | 80-084263(UK)     | My Pet Puppy                                                                              |
+|   XX   | 80-084264(GE)     | Mein erster Hund                                                                          |
+|        | 80-084265(FR)     | Mon Youtou Tout Fou!                                                                      |
+|        | 80-084267(SP)     | Dakota y su Mascota                                                                       |
++========+===================+===========================================================================================+
+|        | 80-084280(US)     | Wild Waves                                                                                |
+|        | 80-084282(NL)     | Water-sport Games                                                                         |
+|        | 80-084283(UJ)     | Wild Waves                                                                                |
+|        | 80-084284(GE)     | Dolphis Wasser-abenteuer                                                                  |
+|        | 80-084285(FR)     | Martin le Dauphin                                                                         |
++========+===================+===========================================================================================+
+|        | 80-084300(US)     | Soccer Challenge                                                                          |
+|        | 80-084303(UK)     | Football Challenge                                                                        |
+|        | 80-084304(GE)     | Fussball Meisterschaft                                                                    |
+|        | 80-084305(FR)     | Football Challenge                                                                        |
+|        | 80-084306(PT)     | Football Challenge  (cart#??)                                                             |
+|        | 80-084307(SP)     | Campeonato de Fútbol                                                                      |
++========+===================+===========================================================================================+
+|        | 80-084320(US)     | Disney Fairies: TinkerBell                                                                |
+|        | 80-084321(US)     | Disney Fairies: TinkerBell (pocket version)                                               |
+|        | 80-084322(NL)     | TinkerBell                                                                                |
+|        | 80-084323(UK)     | TinkerBell                                                                                |
+|   XX   | 80-084324(GE)     | TinkerBell                                                                                |
+|        | 80-084325(FR)     | La fee Clochette                                                                          |
+|        | 80-084326(PT)     | Sininho (84336 on cart)                                                                   |
+|        | 80-084327(SP)     | Campanilla                                                                                |
++========+===================+===========================================================================================+
+|        | 80-084340(US)     | Up!                                                                                       |
+|        | 80-084342(NL)     | Up!                                                                                       |
+|        | 80-084344(GE)     | Oben                                                                                      |
+|        | 80-084345(FR)     | La-Haut                                                                                   |
+|        | 80-084347(SP)     | Up!                                                                                       |
+|        | 80-084347-022(SP) | Up!  (-022 is odd for SP)                                                                 |
++========+===================+===========================================================================================+
+|   XX   | 80-084360(US)     | Handy Manny                                                                               |
+|        | 80-084362(NL)     | Handy Manny                                                                               |
+|        | 80-084363(UK)     | Handy Manny                                                                               |
+|        | 80-084364(GE)     | Meister Manny's Werkzeugkiste                                                             |
+|        | 80-084365(FR)     | Manny Et Ses Outils                                                                       |
+|        | 80-084366(PT)     | Manny Maozinhas (84376 on cart)                                                           |
+|        | 80-084367(SP)     | Manny Manitas                                                                             |
++========+===================+===========================================================================================+
+|        | 80-084380(US)     | Winnie the Pooh - The Honey Hunt                                                          |
+|        |          (IT)     | Winnie the Pooh - e la caccia al miele  ???                                               |
+|        | 80-084383(UK)     | Winnie the Pooh - The Honey Hunt                                                          |
+|   XX   | 80-084384(GE)     | Winnie Puuh - Die Honigjagd                                                               |
+|        | 80-084385(FR)     | Winnie Rourson - La Chasse au miel de Winnie                                              |
+|        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)                                                  |
+|        | 80-084387(SP)     | Winnie the Pooh - En Busca de la Miel                                                     |
++========+===================+===========================================================================================+
+|        | 80-084400(US)     | Cars: Rev It Up in Radiator Springs                                                       |
+|        | 80-084402(NL)     | Cars: Spektakel in Radiator Springs                                                       |
+|        | 80-084403(UK)     | Cars: Rev it up in Radiator Springs                                                       |
+|   XX   | 80-084404(GE)     | Cars: Vollgas in Radiator Springs                                                         |
+|        | 80-084405(FR)     | Cars: Quatre Roues                                                                        |
+|        | 80-084406(PT)     | Cars: Aventura Em Radiator Springs (84416 on cart)                                        |
+|        | 80-084407(SP)     | Cars: Acelera el Motor en Radiador Springs                                                |
++========+===================+===========================================================================================+
+|        | 80-084420(US)     | Toy Story 3                                                                               |
+|        | 80-084421(US)     | Toy Story 3 (pocket version)                                                              |
+|        |          (IT)     | Toy Story 3 (EAN 8033836704196, GP470419?)                                                |
+|        | 80-084422(NL)     | Toy Story 3                                                                               |
+|        | 80-084423(UK)     | Toy Story 3                                                                               |
+|   XX   | 80-084424(GE)     | Toy Story 3                                                                               |
+|        | 80-084425(FR)     | Toy Story 3                                                                               |
+|        | 80-084427(SP)     | Toy Story 3                                                                               |
++========+===================+===========================================================================================+
+|   XX   | 80-084440(US)     | Monsters vs. Aliens                                                                       |
+|        | 80-084442(NL)     | Monsters vs. Aliens                                                                       |
+|        | 80-084443(UK)     | Monsters vs. Aliens                                                                       |
+|        | 80-084444(GE)     | Monsters vs. Aliens                                                                       |
+|        | 80-084445(FR)     | Monsters vs. Aliens                                                                       |
+|        | 80-084447(SP)     | Monstruos contra Alienígenas                                                              |
++========+===================+===========================================================================================+
+|        | 80-084460(US)     | Noddy - Detective for a Day (unreleased in USA??) see 80-092540                           |
+|        | 80-084463(UK)     | Noddy - Detective for a Day                                                               |
+|        | 80-084465(FR)     | Oui-Oui - Detective d'un jour                                                             |
+|        | 80-084467(SP)     | Noddy - Detective por un día                                                              |
++========+===================+===========================================================================================+
+|        | 80-084480(US)     | The Princess and the Frog  (motion version)                                               |
+|        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                               |
+|        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                                   |
+|        | 80-084483(UK)     | The Princess and the Frog                                                                 |
+|   XX   | 80-084484(GE)     | Kuess den Frosch                                                                          |
+|        | 80-084485(FR)     | La Princesse Et La Grenouille                                                             |
+|        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                                  |
++========+===================+===========================================================================================+
+|   XX   | 80-084500(US)     | Shrek Forever After                                                                       |
+|        | 80-084502(NL)     | Sjrek voor eeuwig en altijd                                                               |
+|        | 80-084503(UK)     | Shrek Forever After                                                                       |
+|   XX   | 80-084504(GE)     | Fuer immer Shrek                                                                          |
+|        | 80-084505(FR)     | Shrek 4 - Il Etait une Fin                                                                |
+|        | 80-084507(SP)     | Shrek Felices para siempre                                                                |
++========+===================+===========================================================================================+
+|        | 80-084520(US)     | <Unknown>                                                                                 |
++========+===================+===========================================================================================+
+|        | 80-084540(US)     | Super Why to the Rescue! The Beach Day Mystery                                            |
+|        | 80-084541(US)     | Super Why to the Rescue! The Beach Day Mystery   (pocket version)                         |
++========+===================+===========================================================================================+
+|        | 80-084560(US)     | <Unknown>                                                                                 |
++========+===================+===========================================================================================+
+|        | 80-084580(US)     | Cars 2  (motion version)                                                                  |
+|        | 80-084581(US)     | Cars 2  (pocket version)                                                                  |
+|        | 80-084583(UK)     | Cars 2                                                                                    |
+|   XX   | 80-084584(GE)     | Cars 2                                                                                    |
+|        | 80-084585(FR)     | Cars 2                                                                                    |
+|        | 80-084587(SP)     | Cars 2                                                                                    |
++========+===================+===========================================================================================+
+|        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)               |
+|        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes                                                    |
+|   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland                                                       |
+|   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland (Rev. 2?)                                             |
+|        | 80-084605(FR)     | Cendrillon - ?????                                                                        |
++========+===================+===========================================================================================+
+|        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                                         |
+|        | 80-084624(GE)     | Findet Nemo - Nemos Unterwasserabenteuer                                                  |
+|        | 80-084625(FR)     | Le Monde de Nemo - Nemo a la decourverte de l'ocean                                       |
+|        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                                             |
++========+===================+===========================================================================================+
+|        | 80-084640(US)     | <Unknown> (Should be Orange colored Spongebob)                                            |
+|   XX   | 80-084644(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                              |
+|        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                                            |
++========+===================+===========================================================================================+
 
 V.Smile Smartbooks
 Smartbooks currently have no dumps available, hence they are temporarily listed here.
@@ -241,12 +242,86 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 
 <softwarelist name="vsmilem_cart" description="VTech V.Smile Motion cartridges">
 
-	<software name="cinderla" supported="no">
-		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
+	<software name="actnmniam" supported="no">
+		<description>Action Mania (US, Rev. 4?)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84000-4.bin" size="8388608" crc="9732d6c4" sha1="6973e473fc9b274fe8e1151a27bdd02df67a23eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnmniama" cloneof="actnmniam" supported="no">
+		<description>Action Mania (US, Rev. 6?)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84000-6.bin" size="8388608" crc="ea4aeb1a" sha1="74807f9306ccc691735acdca66588a80467bebbd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnmniams" cloneof="actnmniam" supported="no">
+		<description>Action Manía (Sp)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084007(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84007 G.u1" size="8388608" crc="c14a04d2" sha1="6db09fd90f88773aafd5d95c4ea403dacddc9e58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsmg" supported="no">
+		<description>Cars: Vollgas in Radiator Springs (Ger)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084404(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="A84404(2).u1" size="8388608" crc="beaa1b6a" sha1="c6e68da7935642035e13cc7922b0193cc6e5272c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2mg" supported="no">
+		<description>Disney/Pixar Cars 2 (Ger)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084404(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x1000000">
+				<rom name="cars2_low.bin" size="0x0800000" crc="8d5eeb71" sha1="f53867b360464c12d905ca90aaf03855ca5fa455" offset="0x0000000" />
+				<rom name="cars2_high.bin" size="0x0800000" crc="7a5b9ead" sha1="8c01a52ed392b50f2a7e91ae628ae4f6f06a5fc3" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlamg" supported="no">
+		<description>Disneys Princess Cinderella - Lernen im Märchenland (Ger)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084604(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
@@ -256,12 +331,24 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kfpanda" supported="no">
+	<software name="cinderlam2g" cloneof="cinderlamg" supported="no">
+		<description>Disneys Princess Cinderella - Lernen im Märchenland (Ger, Rev. 2?)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084604(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084604.bin" size="8388608" crc="9170597a" sha1="2c3235e7e8986b1c62af6b218a8ba49bb3571345" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kfpandamg" supported="no">
 		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Ger)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084124(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
@@ -271,12 +358,25 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="dora" supported="no">
+	<software name="doram" supported="no">
+		<description>Nickelodeon Dora the Explorer: Dora's Fix It Adventure (US, Rev. 3?)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084020(US)" /> <!-- Same ROM as 084021(US) -->
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84020-3.bin" size="8388608" crc="73a3c852" sha1="8ca7255ab3e45ef670d09cfb4959bc8769415dc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doramg" cloneof="doram" supported="no">
 		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger)</description>
-		<year>2009?</year>
+		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084024(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
@@ -286,24 +386,269 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kleinstn" supported="no">
-		<description>Kleine Einsteins (Ger)</description>
+	<software name="doramg2" cloneof="doram" supported="no">
+		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger, Rev. 2)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084024(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84024 OK.u1" size="8388608" crc="7848fa93" sha1="567a337f27cc5ff0ce832afa903efafc8a305f17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hmannym" cloneof="doram" supported="no">
+		<description>Disney Handy Manny (US, Rev. 2?)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084360(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84360-2.bin" size="8388608" crc="a6ee705b" sha1="50a94ca17efbeb3a69decab948c945df272f9c69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltleinstnm" supported="no">
+		<description>Disney's Little Einsteins (US, Rev. 2?)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084160(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84160-2.bin" size="8388608" crc="add7cc23" sha1="561e496ecbbc1e387ec343069ac19ae9aa2f234e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltleinstnma" cloneof="ltleinstnm" supported="no">
+		<description>Disney's Little Einsteins (US, Rev. 5?)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084160(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84160-5.bin" size="8388608" crc="e81159c9" sha1="dc96120d27de83e37edae6620ac40ab11b56d871" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltleinstnmg" cloneof="ltleinstnm" supported="no">
+		<description>Disney's Kleine Einsteins (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084164(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tinker" supported="no">
+	<software name="ltleinstnm2g" cloneof="ltleinstnm" supported="no">
+		<description>Disney's Kleine Einsteins (Ger, Rev. 2?)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084164(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084164.bin" size="8388608" crc="6bb78a9b" sha1="341d773b774af3153e2490605d8d3d9d88fb6903" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeychm" supported="no">
+		<description>Disney Mickey Mouse Clubhouse (US)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084180(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84180.bin" size="8388608" crc="2538c1d2" sha1="481af1fe5de995854068329aabf08ae9c197d175" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monvsalienm" supported="no">
+		<description>DreamWorks Monsters vs. Aliens (US, Rev. 3?)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084440(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84440-3.bin" size="8388608" crc="81f7affb" sha1="3208b5f2d6616396b2bd3a5446bd4e3ee277dc9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppymg" supported="no">
+		<description>Mein erster Hund (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084264(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84264.u1" size="8388608" crc="ca98e437" sha1="8c4964a671c6c3d3c8bd5859b14143b901d54021" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nascarm" supported="no">
+		<description>NASCAR Academy - Race Car Superstar (US)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084200(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84200.bin" size="8388608" crc="55db5a32" sha1="8345985019ceaeb26bad1d0fa1236807ba054fac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nihaoklm" supported="no">
+		<description>Nickelodeon Ni Hao Kai Lan - Happy Chinese New Year! (US)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084240(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84240.bin" size="8388608" crc="3c3ddb1a" sha1="1a37f28f8893e130f55e6cae964490a9b3a60528" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohmg" supported="no">
+		<description>Winnie Puuh - Die Honigjagd (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084384(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prinfrogmg" supported="no">
+		<description>Küss den Frosch - Tianas großer Traum (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084484(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="C84484.bin" size="8388608" crc="8abc088c" sha1="3637de0af0371a4bb473ae28b35141b10bbb047f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekfam" supported="no">
+		<description>Shrek Forever After (US)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084500(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="84500 E" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vsmile84500.blob1.bin" size="0x0800000" crc="175117f1" sha1="48231caf853e27856eb033d14937b7eb7e74198c" offset="0x0000000" />
+				<rom name="vsmile84500.blob2.bin" size="0x0800000" crc="5dc681ea" sha1="1a3a2ff08bd52ad74183b09059082b492000e571" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrekfamg" cloneof="shrekfam" supported="no">
+		<description>Für immer Shrek (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084504(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="710654-1" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vsmile84504.blob1.bin" size="0x0800000" crc="3f1c79e2" sha1="1b12b9b379dd942356e6ee6594c8b80dbb9db781" offset="0x0000000" />
+				<rom name="vsmile84504.blob2.bin" size="0x0800000" crc="78cf731b" sha1="9b1d1eed7bd216f4feca3160c31912b7c81e4efd" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermnmg" supported="no">
+		<description>Marvel Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084144(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84144.u1" size="8388608" crc="93d129ef" sha1="8e67e2ad36104c34b6fd944e25bbfbf0313a1d7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongebmg" supported="no">
+		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084644(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84644.u1" size="8388608" crc="c89d9c51" sha1="11836295ebfd0a8c62e0d5f482a3c7dc18b71d1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasmg" supported="no">
+		<description>Thomas - Freunde halten zusammen (Ger)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084064(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084064.bin" size="8388608" crc="40b28ac8" sha1="ed67e92e25dbc64c78a6e0d28c9632e9b57bd60b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinkerm" supported="no">
+		<description>TinkerBell (US, Rev. 2?)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084320(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="vsmile84320-2.bin" size="8388608" crc="fa8d9640" sha1="23a69fbc2b70658b827f1b8196ee55e3efd85ef5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinkermg" cloneof="tinkerm" supported="no">
 		<description>TinkerBell (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084324(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
@@ -313,17 +658,45 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="pooh" supported="no">
-		<description>Winnie Puuh - Die Honigjagd (Ger)</description>
+	<software name="toystor3mg" supported="no">
+		<description>Toy Story 3 (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084424(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="710654-2" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x1000000">
+				<rom name="vsmile84424.blob1.bin" size="0x0800000" crc="845bbb46" sha1="1b11bb1a119715073560b40d65b77894043dd67a" offset="0x0000000" />
+				<rom name="vsmile84424.blob2.bin" size="0x0800000" crc="c006e9b6" sha1="2f4b32ba578117caa53bb0bf9db717d8d9dd8a13" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallem" supported="no">
+		<description>Disney/Pixar Wall-E (USA, Rev. 2?)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084080(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="vsmile84080-2.bin" size="0x0800000" crc="63b0ae95" sha1="0ae362c743e690175d07b61822f897fc16094eb9" offset="0x0000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wintrsptmg" supported="no">
+		<description>Wintersport (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084384(GE)" />
-		<part name="cart" interface="vsmilem_cart">
-			<feature name="pcb" value="708201" />
-			<feature name="pcb_model" value="708201-4" />
-			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+		<info name="serial" value="80-084224(GE)" />
+		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" offset="0" />
+				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" offset="0" />
 			</dataarea>
 		</part>
 	</software>

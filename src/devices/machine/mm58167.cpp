@@ -180,11 +180,11 @@ void mm58167_device::update_rtc()
 	m_milliseconds = (bcd_to_integer(m_regs[R_CNT_HUNDTENTHS]) * 10) + (bcd_to_integer(m_regs[R_CNT_MILLISECONDS] >> 4) % 10);
 }
 
-READ8_MEMBER(mm58167_device::read)
+uint8_t mm58167_device::read(offs_t offset)
 {
 //  printf("read reg %x = %02x\n", offset, m_regs[offset]);
 
-	if (offset == R_CTL_IRQSTATUS && !machine().side_effect_disabled())
+	if (offset == R_CTL_IRQSTATUS && !machine().side_effects_disabled())
 	{
 		// reading the IRQ status clears IRQ line and IRQ status
 		uint8_t data = m_regs[offset];
@@ -196,7 +196,7 @@ READ8_MEMBER(mm58167_device::read)
 	return m_regs[offset];
 }
 
-WRITE8_MEMBER(mm58167_device::write)
+void mm58167_device::write(offs_t offset, uint8_t data)
 {
 //  printf("%02x to reg %x\n", data, offset);
 

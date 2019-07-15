@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    57002dsm.c
+    57002dsm.h
 
     TMS57002 "DASP" emulator.
 
@@ -23,7 +23,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static std::string get_memadr(uint32_t opcode, char type);
+	static std::string get_memadr(u32 opcode, char type);
 
 };
 

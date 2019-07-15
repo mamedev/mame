@@ -61,10 +61,10 @@ Taito pc090oj
 
 #include "emu.h"
 #include "pc090oj.h"
+#include "screen.h"
 
-#define PC090OJ_RAM_SIZE 0x4000
-#define PC090OJ_ACTIVE_RAM_SIZE 0x800
-
+static constexpr u32 PC090OJ_RAM_SIZE        = 0x4000;
+static constexpr u32 PC090OJ_ACTIVE_RAM_SIZE = 0x800;
 
 
 /*****************************************************************************
@@ -74,40 +74,28 @@ Taito pc090oj
 
 DEFINE_DEVICE_TYPE(PC090OJ, pc090oj_device, "pc090oj", "Taito PC090OJ")
 
-pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC090OJ, tag, owner, clock),
-	m_ctrl(0),
-	m_sprite_ctrl(0),
-	m_ram(nullptr),
-	m_ram_buffered(nullptr),
-	m_gfxnum(0),
-	m_x_offset(0),
-	m_y_offset(0),
-	m_use_buffer(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG)
+pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, PC090OJ, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr)
+	, m_ctrl(0)
+	, m_sprite_ctrl(0)
+	, m_ram(nullptr)
+	, m_ram_buffered(nullptr)
+	, m_x_offset(0)
+	, m_y_offset(0)
+	, m_use_buffer(false)
 {
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
-void pc090oj_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<pc090oj_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void pc090oj_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<pc090oj_device &>(device).m_palette.set_tag(tag);
-}
+GFXDECODE_MEMBER(pc090oj_device::gfxinfo)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, gfx_16x16x4_packed_msb, 0, 1)
+GFXDECODE_END
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -115,11 +103,14 @@ void pc090oj_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void pc090oj_device::device_start()
 {
-	m_ram = make_unique_clear<uint16_t[]>(PC090OJ_RAM_SIZE / 2);
-	m_ram_buffered = make_unique_clear<uint16_t[]>(PC090OJ_RAM_SIZE / 2);
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colors(palette().entries() / 16);
 
-	save_pointer(NAME(m_ram.get()), PC090OJ_RAM_SIZE / 2);
-	save_pointer(NAME(m_ram_buffered.get()), PC090OJ_RAM_SIZE / 2);
+	m_ram = make_unique_clear<u16[]>(PC090OJ_RAM_SIZE / 2);
+	m_ram_buffered = make_unique_clear<u16[]>(PC090OJ_RAM_SIZE / 2);
+
+	save_pointer(NAME(m_ram), PC090OJ_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram_buffered), PC090OJ_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_sprite_ctrl));  // should this be set in intf?!?
 }
@@ -137,17 +128,17 @@ void pc090oj_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void pc090oj_device::set_sprite_ctrl( uint16_t sprctrl )
+void pc090oj_device::sprite_ctrl_w(u16 data)
 {
-	m_sprite_ctrl = sprctrl;
+	m_sprite_ctrl = data;
 }
 
-READ16_MEMBER( pc090oj_device::word_r )
+u16 pc090oj_device::word_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( pc090oj_device::word_w )
+void pc090oj_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 
@@ -166,50 +157,37 @@ WRITE16_MEMBER( pc090oj_device::word_w )
 	}
 }
 
-void pc090oj_device::eof_callback( )
+void pc090oj_device::eof_callback()
 {
 	if (m_use_buffer)
 	{
-		int i;
-		for (i = 0; i < PC090OJ_ACTIVE_RAM_SIZE / 2; i++)
+		for (int i = 0; i < PC090OJ_ACTIVE_RAM_SIZE / 2; i++)
 			m_ram_buffered[i] = m_ram[i];
 	}
 }
 
 
-void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_type )
+void pc090oj_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs, priority = 0;
-	int sprite_colbank = (m_sprite_ctrl & 0xf) << 4; /* top nibble */
+	const bool priority = !m_colpri_cb.isnull();
+	u32 sprite_colbank = 0, pri_mask = 0;
+	if (priority)
+		m_colpri_cb(sprite_colbank, pri_mask, m_sprite_ctrl);
 
-	switch (pri_type)
+	int start, end, inc;
+	if (priority) { start =                                 0; end = PC090OJ_ACTIVE_RAM_SIZE / 2; inc =  4; }
+	else          { start = (PC090OJ_ACTIVE_RAM_SIZE / 2) - 4; end =                          -4; inc = -4; }
+
+	for (int offs = start; offs != end; offs += inc)
 	{
-		case 0x00:
-			priority = 0;   /* sprites over top bg layer */
-			break;
+		const u16 data = m_ram_buffered[offs];
+		int flipy = (data & 0x8000) >> 15;
+		int flipx = (data & 0x4000) >> 14;
+		const u32 color = (data & 0x000f) | sprite_colbank;
 
-		case 0x01:
-			priority = 1;   /* sprites under top bg layer */
-			break;
-
-		case 0x02:
-			priority = m_sprite_ctrl >> 15;  /* variable sprite/tile priority */
-	}
-
-	for (offs = 0; offs < PC090OJ_ACTIVE_RAM_SIZE / 2; offs += 4)
-	{
-		int flipx, flipy;
-		int x, y;
-		int data, code, color;
-
-		data = m_ram_buffered[offs];
-		flipy = (data & 0x8000) >> 15;
-		flipx = (data & 0x4000) >> 14;
-		color = (data & 0x000f) | sprite_colbank;
-
-		code = m_ram_buffered[offs + 2] & 0x1fff;
-		x = m_ram_buffered[offs + 3] & 0x1ff;   /* mask verified with Rainbowe board */
-		y = m_ram_buffered[offs + 1] & 0x1ff;   /* mask verified with Rainbowe board */
+		const u32 code = m_ram_buffered[offs + 2] & 0x1fff;
+		int x = m_ram_buffered[offs + 3] & 0x1ff;   /* mask verified with Rainbowe board */
+		int y = m_ram_buffered[offs + 1] & 0x1ff;   /* mask verified with Rainbowe board */
 
 		/* treat coords as signed */
 		if (x > 0x140) x -= 0x200;
@@ -226,12 +204,24 @@ void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		x += m_x_offset;
 		y += m_y_offset;
 
-		m_gfxdecode->gfx(m_gfxnum)->prio_transpen(bitmap,cliprect,
-				code,
-				color,
-				flipx,flipy,
-				x,y,
-				priority_bitmap,
-				priority ? 0xfc : 0xf0,0);
+		if (priority)
+		{
+			gfx(0)->prio_transpen(bitmap,cliprect,
+					code,
+					color,
+					flipx,flipy,
+					x,y,
+					screen.priority(),pri_mask,
+					0);
+		}
+		else
+		{
+			gfx(0)->transpen(bitmap,cliprect,
+					code,
+					color,
+					flipx,flipy,
+					x,y,
+					0);
+		}
 	}
 }

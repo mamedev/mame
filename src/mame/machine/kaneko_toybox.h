@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "machine/eepromser.h"
+
 class kaneko_toybox_device : public device_t
 {
 public:
@@ -15,10 +17,20 @@ public:
 	static constexpr int TABLE_NORMAL = 0;
 	static constexpr int TABLE_ALT = 1;
 
+	template <typename T, typename U, typename V, typename W>
+	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&eeprom_tag, U &&dsw_tag, V &&mcuram_tag, W &&mcudata_tag)
+		: kaneko_toybox_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		m_eeprom.set_tag(std::forward<T>(eeprom_tag));
+		m_dsw1.set_tag(std::forward<U>(dsw_tag));
+		m_mcuram.set_tag(std::forward<V>(mcuram_tag));
+		m_mcudata.set_tag(std::forward<W>(mcudata_tag));
+	}
+
 	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_table(device_t &device, int tabletype);
-	static void set_game_type(device_t &device, int gametype);
+	void set_table(int tabletype) { m_tabletype = tabletype; }
+	void set_game_type(int gametype) { m_gametype = gametype; }
 
 	DECLARE_WRITE16_MEMBER(mcu_com0_w);
 	DECLARE_WRITE16_MEMBER(mcu_com1_w);
@@ -31,7 +43,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_ioport m_dsw1;
 	required_shared_ptr<uint16_t> m_mcuram;
+	required_region_ptr<uint8_t> m_mcudata;
 	uint16_t m_mcu_com[4];
 	int m_gametype;
 	int m_tabletype;
@@ -45,11 +60,5 @@ private:
 
 
 DECLARE_DEVICE_TYPE(KANEKO_TOYBOX, kaneko_toybox_device)
-
-#define MCFG_TOYBOX_TABLE_TYPE(_type) \
-	kaneko_toybox_device::set_table(*device, kaneko_toybox_device::TABLE_##_type);
-
-#define MCFG_TOYBOX_GAME_TYPE(_type) \
-	kaneko_toybox_device::set_game_type(*device, kaneko_toybox_device::GAME_##_type);
 
 #endif // MAME_MACHINE_KANEKO_TOYBOX_H

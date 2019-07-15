@@ -54,8 +54,13 @@ class xtom3d_state : public pcat_base_state
 public:
 	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
-			{ }
+		, m_pcibus(*this, "pcibus")
+	{
+	}
 
+	void xtom3d(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
@@ -78,24 +83,33 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void xtom3d(machine_config &config);
+
 	void xtom3d_io(address_map &map);
 	void xtom3d_map(address_map &map);
+
+	uint8_t mtxc_config_r(int function, int reg);
+	void mtxc_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	uint8_t piix4_config_r(int function, int reg);
+	void piix4_config_w(int function, int reg, uint8_t data);
+	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
+	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+
+	required_device<pci_bus_legacy_device> m_pcibus;
 };
 
 // Intel 82439TX System Controller (MTXC)
 
-static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t xtom3d_state::mtxc_config_r(int function, int reg)
 {
-	xtom3d_state *state = busdevice->machine().driver_data<xtom3d_state>();
 //  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
 
-	return state->m_mtxc_config_reg[reg];
+	return m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void xtom3d_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-	xtom3d_state *state = busdevice->machine().driver_data<xtom3d_state>();
 	printf("MTXC: write %d, %02X, %02X\n",  function, reg, data);
 
 	/*
@@ -123,56 +137,56 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 		case 0x59: // PAM0
 		{
 			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
-				state->membank("bios_bank")->set_base(state->m_bios_ram.get());
+				membank("bios_bank")->set_base(m_bios_ram.get());
 			else                    // disable RAM access (reads go to BIOS ROM)
-				state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x10000);
+				membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
 			break;
 		}
 		case 0x5a: // PAM1
 		{
 			if (data & 0x1)
-				state->membank("video_bank1")->set_base(state->m_isa_ram1.get());
+				membank("video_bank1")->set_base(m_isa_ram1.get());
 			else
-				state->membank("video_bank1")->set_base(state->memregion("video_bios")->base() + 0);
+				membank("video_bank1")->set_base(memregion("video_bios")->base() + 0);
 
 			if (data & 0x10)
-				state->membank("video_bank2")->set_base(state->m_isa_ram2.get());
+				membank("video_bank2")->set_base(m_isa_ram2.get());
 			else
-				state->membank("video_bank2")->set_base(state->memregion("video_bios")->base() + 0x4000);
+				membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 
 			break;
 		}
 		case 0x5e: // PAM5
 		{
 			if (data & 0x1)
-				state->membank("bios_ext1")->set_base(state->m_bios_ext1_ram.get());
+				membank("bios_ext1")->set_base(m_bios_ext1_ram.get());
 			else
-				state->membank("bios_ext1")->set_base(state->memregion("bios")->base() + 0);
+				membank("bios_ext1")->set_base(memregion("bios")->base() + 0);
 
 			if (data & 0x10)
-				state->membank("bios_ext2")->set_base(state->m_bios_ext2_ram.get());
+				membank("bios_ext2")->set_base(m_bios_ext2_ram.get());
 			else
-				state->membank("bios_ext2")->set_base(state->memregion("bios")->base() + 0x4000);
+				membank("bios_ext2")->set_base(memregion("bios")->base() + 0x4000);
 
 			break;
 		}
 		case 0x5f: // PAM6
 		{
 			if (data & 0x1)
-				state->membank("bios_ext3")->set_base(state->m_bios_ext3_ram.get());
+				membank("bios_ext3")->set_base(m_bios_ext3_ram.get());
 			else
-				state->membank("bios_ext3")->set_base(state->memregion("bios")->base() + 0x8000);
+				membank("bios_ext3")->set_base(memregion("bios")->base() + 0x8000);
 
 			if (data & 0x10)
-				state->membank("bios_ext4")->set_base(state->m_bios_ext4_ram.get());
+				membank("bios_ext4")->set_base(m_bios_ext4_ram.get());
 			else
-				state->membank("bios_ext4")->set_base(state->memregion("bios")->base() + 0xc000);
+				membank("bios_ext4")->set_base(memregion("bios")->base() + 0xc000);
 
 			break;
 		}
 	}
 
-	state->m_mtxc_config_reg[reg] = data;
+	m_mtxc_config_reg[reg] = data;
 }
 
 void xtom3d_state::intel82439tx_init()
@@ -185,103 +199,101 @@ void xtom3d_state::intel82439tx_init()
 	m_mtxc_config_reg[0x65] = 0x02;
 }
 
-static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t xtom3d_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= mtxc_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= mtxc_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= mtxc_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= mtxc_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= mtxc_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void xtom3d_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mtxc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 
-static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+uint8_t xtom3d_state::piix4_config_r(int function, int reg)
 {
-	xtom3d_state *state = busdevice->machine().driver_data<xtom3d_state>();
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return state->m_piix4_config_reg[function][reg];
+	return m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
+void xtom3d_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-	xtom3d_state *state = busdevice->machine().driver_data<xtom3d_state>();
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
-	state->m_piix4_config_reg[function][reg] = data;
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+	m_piix4_config_reg[function][reg] = data;
 }
 
-static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t xtom3d_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
+		r |= piix4_config_r(function, reg + 3) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 2) << 16;
+		r |= piix4_config_r(function, reg + 2) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 1) << 8;
+		r |= piix4_config_r(function, reg + 1) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= piix4_config_r(busdevice, device, function, reg + 0) << 0;
+		r |= piix4_config_r(function, reg + 0) << 0;
 	}
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void xtom3d_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		piix4_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		piix4_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		piix4_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		piix4_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 
@@ -346,31 +358,33 @@ WRITE32_MEMBER(xtom3d_state::bios_ram_w)
 	}
 }
 
-ADDRESS_MAP_START(xtom3d_state::xtom3d_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c3fff) AM_ROMBANK("video_bank1") AM_WRITE(isa_ram1_w)
-	AM_RANGE(0x000c4000, 0x000c7fff) AM_ROMBANK("video_bank2") AM_WRITE(isa_ram2_w)
-	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_ext1") AM_WRITE(bios_ext1_ram_w)
-	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_ext2") AM_WRITE(bios_ext2_ram_w)
-	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_ext3") AM_WRITE(bios_ext3_ram_w)
-	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ext4") AM_WRITE(bios_ext4_ram_w)
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
-ADDRESS_MAP_END
+void xtom3d_state::xtom3d_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(FUNC(xtom3d_state::isa_ram1_w));
+	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(FUNC(xtom3d_state::isa_ram2_w));
+	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(FUNC(xtom3d_state::bios_ext1_ram_w));
+	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(FUNC(xtom3d_state::bios_ext2_ram_w));
+	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(FUNC(xtom3d_state::bios_ext3_ram_w));
+	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(FUNC(xtom3d_state::bios_ext4_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(xtom3d_state::bios_ram_w));
+	map(0x00100000, 0x01ffffff).ram();
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+}
 
-ADDRESS_MAP_START(xtom3d_state::xtom3d_io)
-	AM_IMPORT_FROM(pcat32_io_common)
+void xtom3d_state::xtom3d_io(address_map &map)
+{
+	pcat32_io_common(map);
 
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP
+	map(0x00e8, 0x00ef).noprw();
 
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+}
 
 
 void xtom3d_state::machine_start()
@@ -397,22 +411,25 @@ void xtom3d_state::machine_reset()
 	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
-MACHINE_CONFIG_START(xtom3d_state::xtom3d)
-	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
-	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
-	MCFG_CPU_IO_MAP(xtom3d_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void xtom3d_state::xtom3d(machine_config &config)
+{
+	PENTIUM2(config, m_maincpu, 450000000/16);  // actually Pentium II 450
+	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
+	m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
+	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
+	m_pcibus->set_device_read (0, FUNC(xtom3d_state::intel82439tx_pci_r), this);
+	m_pcibus->set_device_write(0, FUNC(xtom3d_state::intel82439tx_pci_w), this);
+	m_pcibus->set_device_read (7, FUNC(xtom3d_state::intel82371ab_pci_r), this);
+	m_pcibus->set_device_write(7, FUNC(xtom3d_state::intel82371ab_pci_w), this);
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( xtom3d )
@@ -434,4 +451,4 @@ ROM_START( xtom3d )
 ROM_END
 
 
-GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, 0, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)

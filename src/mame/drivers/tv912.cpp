@@ -62,7 +62,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define CHAR_WIDTH 14
+#define TV912_CH_WIDTH 14
 #define CHARSET_TEST 0
 
 class tv912_state : public driver_device
@@ -91,27 +91,26 @@ public:
 		, m_baudgen_timer(nullptr)
 	{ }
 
+	void tv912(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
+
+private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_READ8_MEMBER(uart_status_r);
-	DECLARE_READ8_MEMBER(uart_data_r);
-	DECLARE_WRITE8_MEMBER(uart_data_w);
-	DECLARE_WRITE_LINE_MEMBER(uart_reset_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(output_40c);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
-
-	void tv912(machine_config &config);
 	void bank_map(address_map &map);
 	void io_map(address_map &map);
 	void prog_map(address_map &map);
-private:
+
 	enum
 	{
 		TIMER_BAUDGEN
@@ -204,33 +203,15 @@ READ8_MEMBER(tv912_state::keyboard_r)
 
 READ8_MEMBER(tv912_state::uart_status_r)
 {
-	m_uart->set_input_pin(AY31015_SWE, 0);
-	u8 status = m_uart->get_output_pin(AY31015_DAV) << 0;
-	status |= m_uart->get_output_pin(AY31015_TBMT) << 1;
-	status |= m_uart->get_output_pin(AY31015_PE) << 2;
-	status |= m_uart->get_output_pin(AY31015_FE) << 3;
+	m_uart->write_swe(0);
+	u8 status = m_uart->dav_r() << 0;
+	status |= m_uart->tbmt_r() << 1;
+	status |= m_uart->pe_r() << 2;
+	status |= m_uart->fe_r() << 3;
 	status |= BIT(m_jumpers->read(), offset) << 4;
 	status |= m_option->read();
-	m_uart->set_input_pin(AY31015_SWE, 1);
+	m_uart->write_swe(1);
 	return status;
-}
-
-READ8_MEMBER(tv912_state::uart_data_r)
-{
-	m_uart->set_input_pin(AY31015_RDAV, 0);
-	u8 data = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
-	return data;
-}
-
-WRITE8_MEMBER(tv912_state::uart_data_w)
-{
-	m_uart->set_transmit_data(data);
-}
-
-WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
-{
-	m_uart->set_input_pin(AY31015_XR, state);
 }
 
 WRITE8_MEMBER(tv912_state::output_40c)
@@ -265,8 +246,8 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	switch (id)
 	{
 	case TIMER_BAUDGEN:
-		m_uart->set_input_pin(AY31015_RCP, param);
-		m_uart->set_input_pin(AY31015_TCP, param);
+		m_uart->write_rcp(param);
+		m_uart->write_tcp(param);
 
 		ioport_value sel = (m_lpt_select ? m_printer_baud : m_modem_baud)->read();
 		for (int b = 0; b < 10; b++)
@@ -274,7 +255,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			if (!BIT(sel, b))
 			{
 				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(XTAL(23'814'000) / 3.5 / divisor), !param);
+				m_baudgen_timer->adjust(attotime::from_hz(23.814_MHz_XTAL / 3.5 / divisor), !param);
 				break;
 			}
 		}
@@ -291,7 +272,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		return 0;
 	}
 
-	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	const u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
 
 	rectangle curs;
@@ -325,7 +306,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					dots ^= 0xff;
 			}
 
-			for (int d = 0; d < CHAR_WIDTH / 2; d++)
+			for (int d = 0; d < TV912_CH_WIDTH / 2; d++)
 			{
 				if (x >= cliprect.left() && x <= cliprect.right())
 					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
@@ -359,47 +340,50 @@ void tv912_state::machine_start()
 	save_item(NAME(m_lpt_select));
 	save_item(NAME(m_4hz_flasher));
 	save_item(NAME(m_keyboard_scan));
-	save_pointer(NAME(m_dispram.get()), 0x1000);
+	save_pointer(NAME(m_dispram), 0x1000);
 }
 
 void tv912_state::machine_reset()
 {
 	ioport_value uart_ctrl = m_uart_control->read();
-	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
-	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
-	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
-	m_uart->set_input_pin(AY31015_NB2, BIT(uart_ctrl, 1));
-	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
-	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->write_np(BIT(uart_ctrl, 4));
+	m_uart->write_tsb(BIT(uart_ctrl, 3));
+	m_uart->write_nb1(BIT(uart_ctrl, 2));
+	m_uart->write_nb2(BIT(uart_ctrl, 1));
+	m_uart->write_eps(BIT(uart_ctrl, 0));
+	m_uart->write_cs(1);
 }
 
-ADDRESS_MAP_START(tv912_state::prog_map)
-	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tv912_state::prog_map(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(tv912_state::io_map)
-	AM_RANGE(0x00, 0xff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void tv912_state::io_map(address_map &map)
+{
+	map(0x00, 0xff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(tv912_state::bank_map)
-	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_READ(uart_data_r)
-	AM_RANGE(0x408, 0x40b) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
-	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_WRITE(uart_data_w)
-	AM_RANGE(0x40c, 0x40f) AM_MIRROR(0x3f0) AM_READ(keyboard_r)
-	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f3) AM_WRITE(output_40c)
-	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
-ADDRESS_MAP_END
+void tv912_state::bank_map(address_map &map)
+{
+	map(0x000, 0x0ff).mirror(0x300).ram();
+	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
+	map(0x404, 0x404).mirror(0x3f3).r(m_uart, FUNC(ay51013_device::receive));
+	map(0x408, 0x40b).mirror(0x3f0).r(FUNC(tv912_state::uart_status_r));
+	map(0x408, 0x408).mirror(0x3f3).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x40c, 0x40f).mirror(0x3f0).r(FUNC(tv912_state::keyboard_r));
+	map(0x40c, 0x40c).mirror(0x3f3).w(FUNC(tv912_state::output_40c));
+	map(0x800, 0xfff).bankrw("dispram");
+}
 
 INPUT_CHANGED_MEMBER(tv912_state::uart_settings_changed)
 {
 	ioport_value uart_ctrl = m_uart_control->read();
-	m_uart->set_input_pin(AY31015_NP, BIT(uart_ctrl, 4));
-	m_uart->set_input_pin(AY31015_TSB, BIT(uart_ctrl, 3));
-	m_uart->set_input_pin(AY31015_NB1, BIT(uart_ctrl, 2));
-	m_uart->set_input_pin(AY31015_NB2, BIT(uart_ctrl, 1));
-	m_uart->set_input_pin(AY31015_EPS, BIT(uart_ctrl, 0));
+	m_uart->write_np(BIT(uart_ctrl, 4));
+	m_uart->write_tsb(BIT(uart_ctrl, 3));
+	m_uart->write_nb1(BIT(uart_ctrl, 2));
+	m_uart->write_nb2(BIT(uart_ctrl, 1));
+	m_uart->write_eps(BIT(uart_ctrl, 0));
 }
 
 static INPUT_PORTS_START( switches )
@@ -494,7 +478,7 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPNAME(0x03, 0x02, "DTR (RS232)") PORT_DIPLOCATION("S5:3,4")
 	PORT_DIPSETTING(0x02, "Tied to RTS")
 	PORT_DIPSETTING(0x01, "Pulled to +12V")
-ADDRESS_MAP_END
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( tv912b )
 	PORT_INCLUDE(switches)
@@ -512,7 +496,7 @@ static INPUT_PORTS_START( tv912b )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(',') PORT_CHAR('<') PORT_CODE(KEYCODE_COMMA) //PORT_CODE(KEYCODE_COMMA_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(',') PORT_CHAR('<') PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_COMMA_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16) PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -633,7 +617,7 @@ static INPUT_PORTS_START( tv912b )
 
 	PORT_START("KEY22")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('/') PORT_CHAR('?') PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('`') PORT_CHAR('@') PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('@') PORT_CHAR('`') PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -888,42 +872,44 @@ static INPUT_PORTS_START( tv912c )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tv912_state::tv912)
-	MCFG_CPU_ADD("maincpu", I8035, XTAL(23'814'000) / 4) // nominally +6MHz, actually 5.9535 MHz
-	MCFG_CPU_PROGRAM_MAP(prog_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tv912_state, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(tv912_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tv912_state, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("rs232", rs232_port_device, cts_r))
-	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("crtc", tms9927_device, bl_r)) MCFG_DEVCB_INVERT
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(tv912_state, uart_reset_w)) MCFG_DEVCB_INVERT
+void tv912_state::tv912(machine_config &config)
+{
+	i8035_device &maincpu(I8035(config, m_maincpu, 23.814_MHz_XTAL / 4)); // nominally +6MHz, actually 5.9535 MHz
+	maincpu.set_addrmap(AS_PROGRAM, &tv912_state::prog_map);
+	maincpu.set_addrmap(AS_IO, &tv912_state::io_map);
+	maincpu.p1_out_cb().set(FUNC(tv912_state::p1_w));
+	maincpu.p2_in_cb().set(FUNC(tv912_state::p2_r));
+	maincpu.p2_out_cb().set(FUNC(tv912_state::p2_w));
+	maincpu.t0_in_cb().set(m_rs232, FUNC(rs232_port_device::cts_r));
+	maincpu.t1_in_cb().set(m_crtc, FUNC(tms9927_device::bl_r)).invert();
+	maincpu.prog_out_cb().set(m_uart, FUNC(ay51013_device::write_xr)).invert();
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
+	ADDRESS_MAP_BANK(config, m_bankdev);
+	m_bankdev->set_addrmap(0, &tv912_state::bank_map);
+	m_bankdev->set_data_width(8);
+	m_bankdev->set_addr_width(12);
+	m_bankdev->set_stride(0x100);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000), 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(tv912_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(23.814_MHz_XTAL, 105 * TV912_CH_WIDTH, 0, 80 * TV912_CH_WIDTH, 270, 0, 240);
+	screen.set_screen_update(FUNC(tv912_state::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(23'814'000))
-	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
-	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS9927(config, m_crtc, 23.814_MHz_XTAL / TV912_CH_WIDTH);
+	m_crtc->set_char_width(TV912_CH_WIDTH);
+	m_crtc->vsyn_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	AY51013(config, m_uart);
+	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_uart->set_auto_rdav(true);
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "loopback")
+	RS232_PORT(config, m_rs232, default_rs232_devices, "loopback");
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, XTAL(23'814'000) / 7 / 11 / 256) // nominally 1200 Hz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 23.814_MHz_XTAL / 7 / 11 / 256); // nominally 1200 Hz
+	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /**************************************************************************************************************
 
@@ -950,5 +936,5 @@ ROM_START( tv912b )
 	ROM_LOAD( "televideo912b_rom_a3.bin", 0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) ) // AMI 8110QV (A3-2)
 ROM_END
 
-COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
-COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, 0, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
+COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, empty_init, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
+COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, empty_init, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated

@@ -33,28 +33,13 @@
  * Same as FLT_RC_HIGHPASS, but with standard frequency of 16 HZ
  * This filter may be setup just with
  *
- * MCFG_FILTER_RC_ADD("tag", 0)
- * MCFG_FILTER_RC_AC()
+ * FILTER_RC(config, "tag", 0).set_ac();
  *
  * Default behaviour:
  *
- * Without MCFG_FILTER_RC_AC, a disabled FLT_RC_LOWPASS is created
+ * Without set_ac(), a disabled FLT_RC_LOWPASS is created
  *
  */
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_FILTER_RC_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, FILTER_RC, _clock)
-
-#define MCFG_FILTER_RC_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, FILTER_RC, _clock)
-
-#define MCFG_FILTER_RC_AC() \
-	filter_rc_device::static_set_rc(*device, filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -72,12 +57,31 @@ public:
 		AC           = 2
 	};
 
-	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// static configuration
-	static void static_set_rc(device_t &device, int type, double R1, double R2, double R3, double C);
+	// configuration
+	filter_rc_device &set_rc(int type, double R1, double R2, double R3, double C)
+	{
+		m_type = type;
+		m_R1 = R1;
+		m_R2 = R2;
+		m_R3 = R3;
+		m_C = C;
+		return *this;
+	}
 
-	void filter_rc_set_RC(int type, double R1, double R2, double R3, double C);
+	filter_rc_device &filter_rc_set_RC(int type, double R1, double R2, double R3, double C)
+	{
+		m_stream->update();
+		set_rc(type, R1, R2, R3, C);
+		recalc();
+		return *this;
+	}
+
+	filter_rc_device &set_ac()
+	{
+		return set_rc(filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
+	}
 
 protected:
 	// device-level overrides

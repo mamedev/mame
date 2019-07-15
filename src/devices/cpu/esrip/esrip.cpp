@@ -193,7 +193,7 @@ void esrip_device::device_start()
 	m_ipt_ram.resize(IPT_RAM_SIZE/2);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-3>();
+	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
@@ -297,7 +297,7 @@ void esrip_device::device_start()
 	save_item(NAME(m_ipt_ram));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 }
 
@@ -377,9 +377,9 @@ void esrip_device::state_string_export(const device_state_entry &entry, std::str
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *esrip_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> esrip_device::create_disassembler()
 {
-	return new esrip_disassembler;
+	return std::make_unique<esrip_disassembler>();
 }
 
 /***************************************************************************
@@ -388,7 +388,7 @@ util::disasm_interface *esrip_device::create_disassembler()
 
 int esrip_device::get_hblank() const
 {
-	return machine().first_screen()->hblank();
+	return m_screen->hblank();
 }
 
 /* Return the state of the LBRM line (Y-scaling related) */
@@ -1669,12 +1669,13 @@ DEFINE_DEVICE_TYPE(ESRIP, esrip_device, "esrip", "Entertainment Sciences RIP")
 //-------------------------------------------------
 
 esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, ESRIP, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, 64, 9, -3),
-		m_fdt_r(*this),
-		m_fdt_w(*this),
-		m_status_in(*this),
-		m_lbrm_prom(nullptr)
+	: cpu_device(mconfig, ESRIP, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
+	, m_fdt_r(*this)
+	, m_fdt_w(*this)
+	, m_status_in(*this)
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_lbrm_prom(nullptr)
 {
 	// build the opcode table
 	for (int op = 0; op < 24; op++)
@@ -1878,7 +1879,7 @@ void esrip_device::execute_run()
 		m_pl7 = m_l7;
 
 		/* Latch instruction */
-		inst = m_direct->read_qword(RIP_PC);
+		inst = m_cache->read_qword(RIP_PC);
 
 		in_h = inst >> 32;
 		in_l = inst & 0xffffffff;
@@ -1952,7 +1953,7 @@ void esrip_device::execute_run()
 			m_ipt_cnt = (m_ipt_cnt + 1) & 0x1fff;
 
 		if (calldebugger)
-			debugger_instruction_hook(this, RIP_PC);
+			debugger_instruction_hook(RIP_PC);
 
 		m_pc = next_pc;
 		m_rip_pc = (m_pc | ((m_status_out & 1) << 8));

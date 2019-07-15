@@ -7,18 +7,6 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define KEYBOARDCB_PUT(cls, fnc)          generic_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, ((cls *)nullptr))
-#define KEYBOARDCB_DEVPUT(tag, cls, fnc)  generic_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), (tag), ((cls *)nullptr))
-
-#define MCFG_GENERIC_KEYBOARD_CB(cb) \
-		generic_keyboard_device::set_keyboard_callback(*device, (KEYBOARDCB_##cb));
-
-
-
-/***************************************************************************
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
@@ -61,6 +49,7 @@ protected:
 	virtual void key_repeat(u8 row, u8 column);
 	virtual void key_break(u8 row, u8 column);
 	virtual void will_scan_row(u8 row);
+	virtual void scan_complete();
 
 	bool are_all_keys_up();
 
@@ -90,7 +79,18 @@ public:
 			device_t *owner,
 			u32 clock);
 
-	template <class Object> static void set_keyboard_callback(device_t &device, Object &&cb) { downcast<generic_keyboard_device &>(device).m_keyboard_cb = std::forward<Object>(cb); }
+	template <class FunctionClass>
+	void set_keyboard_callback(void (FunctionClass::*callback)(u8 character), const char *name)
+	{
+		set_keyboard_callback(output_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	// FIXME: this should be aware of current device for resolving the tag
+	template <class FunctionClass>
+	void set_keyboard_callback(const char *devname, void (FunctionClass::*callback)(u8 character), const char *name)
+	{
+		set_keyboard_callback(output_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	void set_keyboard_callback(output_delegate callback) { m_keyboard_cb = callback; }
 
 	virtual ioport_constructor device_input_ports() const override;
 

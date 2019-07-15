@@ -103,7 +103,7 @@ bool msm6253_device::shift_out()
 	bool msb = BIT(m_shift_register, 7);
 
 	// shift the bit out, with zero coming in on the other end
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_shift_register <<= 1;
 
 	// return the bit

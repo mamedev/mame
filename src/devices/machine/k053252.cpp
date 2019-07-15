@@ -249,10 +249,3 @@ WRITE8_MEMBER( k053252_device::write )
 		case 0x0f: m_int2_ack_cb(1); break;
 	}
 }
-
-
-void k053252_device::static_set_slave_screen(device_t &device, const char *tag)
-{
-	k053252_device &dev = downcast<k053252_device &>(device);
-	dev.m_slave_screen.set_tag(tag);
-}

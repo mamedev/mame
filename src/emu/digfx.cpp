@@ -16,17 +16,21 @@
 //  DEVICE GFX INTERFACE
 //**************************************************************************
 
+GFXDECODE_START( device_gfx_interface::empty )
+GFXDECODE_END
+
 //-------------------------------------------------
 //  device_gfx_interface - constructor
 //-------------------------------------------------
 
-device_gfx_interface::device_gfx_interface(const machine_config &mconfig, device_t &device,
-										const gfx_decode_entry *gfxinfo, const char *palette_tag)
-	: device_interface(device, "gfx"),
-	m_palette(nullptr),
+device_gfx_interface::device_gfx_interface(
+		const machine_config &mconfig,
+		device_t &device,
+		const gfx_decode_entry *gfxinfo,
+		const char *palette_tag) :
+	device_interface(device, "gfx"),
+	m_palette(*this, palette_tag),
 	m_gfxdecodeinfo(gfxinfo),
-	m_palette_tag(palette_tag),
-	m_palette_is_sibling(palette_tag == nullptr),
 	m_palette_is_disabled(false),
 	m_decoded(false)
 {
@@ -38,37 +42,6 @@ device_gfx_interface::device_gfx_interface(const machine_config &mconfig, device
 
 device_gfx_interface::~device_gfx_interface()
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_info: configuration helper to set
-//  the gfxdecode info used by the device
-//-------------------------------------------------
-
-void device_gfx_interface::static_set_info(device_t &device, const gfx_decode_entry *gfxinfo)
-{
-	device_gfx_interface *gfx;
-	if (!device.interface(gfx))
-		throw emu_fatalerror("MCFG_GFX_INFO called on device '%s' with no gfx interface\n", device.tag());
-
-	gfx->m_gfxdecodeinfo = gfxinfo;
-}
-
-
-//-------------------------------------------------
-//  static_set_palette: configuration helper to
-//  set the palette used by the device
-//-------------------------------------------------
-
-void device_gfx_interface::static_set_palette(device_t &device, const char *tag)
-{
-	device_gfx_interface *gfx;
-	if (!device.interface(gfx))
-		throw emu_fatalerror("MCFG_GFX_PALETTE called on device '%s' with no gfx interface\n", device.tag());
-
-	gfx->m_palette_tag = tag;
-	gfx->m_palette_is_sibling = true;
 }
 
 
@@ -90,32 +63,25 @@ void device_gfx_interface::set_palette_disable(bool disable)
 
 void device_gfx_interface::interface_pre_start()
 {
-	if (!m_palette_is_disabled)
+	if (!m_palette_is_disabled && !m_palette)
 	{
-		if (m_palette_tag == nullptr)
-			fatalerror("No palette specified for device\n");
-
-		// find our palette device, either as a sibling device or subdevice
-		device_t *paldev;
-		if (m_palette_is_sibling)
-			paldev = device().owner()->subdevice(m_palette_tag);
+		std::pair<device_t &, char const *> const target(m_palette.finder_target());
+		if (target.second == finder_base::DUMMY_TAG)
+		{
+			fatalerror("No palette specified for device %s\n", device().tag());
+		}
 		else
-			paldev = device().subdevice(m_palette_tag);
-
-		if (paldev == nullptr)
-			fatalerror("Device '%s' specifies nonexistent %sdevice '%s' as palette\n",
-					   device().tag(),
-					   (m_palette_is_sibling ? "sibling " : "sub"),
-					   m_palette_tag);
-		if (!paldev->interface(m_palette))
-			fatalerror("Device '%s' specifies %sdevice '%s' as palette, but it has no palette interface\n",
-					   device().tag(),
-					   (m_palette_is_sibling ? "sibling " : "sub"),
-					   m_palette_tag);
+		{
+			fatalerror(
+					"Device '%s' specifies nonexistent device '%s' relative to '%s' as palette\n",
+					device().tag(),
+					target.second,
+					target.first.tag());
+		}
 	}
 
 	// if palette device isn't started, wait for it
-	// if (!m_palette->device().started())
+	// if (m_palette && !m_palette->device().started())
 	//  throw device_missing_dependencies();
 }
 
@@ -311,30 +277,20 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 
 void device_gfx_interface::interface_validity_check(validity_checker &valid) const
 {
-	if (!m_palette_is_disabled)
+	if (!m_palette_is_disabled && !m_palette)
 	{
-		// validate palette tag
-		if (m_palette_tag == nullptr)
+		std::pair<device_t &, char const *> const target(m_palette.finder_target());
+		if (target.second == finder_base::DUMMY_TAG)
+		{
 			osd_printf_error("No palette specified for device '%s'\n", device().tag());
+		}
 		else
 		{
-			device_t *paldev;
-			if (m_palette_is_sibling)
-				paldev = device().owner()->subdevice(m_palette_tag);
-			else
-				paldev = device().subdevice(m_palette_tag);
-			if (paldev == nullptr)
-				osd_printf_error("Nonexistent %sdevice '%s' specified as palette\n",
-								 (m_palette_is_sibling ? "sibling " : "sub"),
-								 m_palette_tag);
-			else
-				{
-					device_palette_interface *palintf;
-					if (!paldev->interface(palintf))
-						osd_printf_error("%sdevice '%s' specified as palette, but it has no palette interface\n",
-										 (m_palette_is_sibling ? "Sibling " : "Sub"),
-										 m_palette_tag);
-				}
+			osd_printf_error(
+					"Device '%s' specifies nonexistent device '%s' relative to '%s' as palette\n",
+					device().tag(),
+					target.second,
+					target.first.tag());
 		}
 	}
 

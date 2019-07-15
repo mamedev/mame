@@ -13,21 +13,6 @@
 
 #include "dirtc.h"
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDP1879_IRQ_CALLBACK(_cb) \
-	devcb = &cdp1879_device::set_irq_cb(*device, DEVCB_##_cb);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> cdp1879_device
-
 class cdp1879_device :  public device_t,
 						public device_rtc_interface
 {
@@ -38,9 +23,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<cdp1879_device &>(device).m_irq_w.set_callback(wr); }
-
-	devcb_write_line m_irq_w;
+	auto irq_callback() { return m_irq_w.bind(); }
 
 protected:
 	// device-level overrides
@@ -70,6 +53,8 @@ private:
 		R_ALM_MINUTES,
 		R_ALM_HOURS
 	};
+
+	devcb_write_line m_irq_w;
 
 	u8 m_regs[11];
 	bool m_comparator_state;

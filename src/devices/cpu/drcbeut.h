@@ -130,7 +130,7 @@ public:
 	void block_end(drcuml_block &block);
 
 	// get/set values
-	drccodeptr get_codeptr(uml::code_label label, drc_label_fixup_delegate fixup, void *param);
+	drccodeptr get_codeptr(uml::code_label label, drc_label_fixup_delegate const &fixup, void *param);
 	void set_codeptr(uml::code_label label, drccodeptr codeptr);
 
 private:

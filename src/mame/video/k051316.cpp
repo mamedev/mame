@@ -116,27 +116,25 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k051316_device::set_bpp(device_t &device, int bpp)
+void k051316_device::set_bpp(int bpp)
 {
-	k051316_device &dev = downcast<k051316_device &>(device);
-
 	switch(bpp)
 	{
 		case 4:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
-			dev.m_pixels_per_byte = 2;
+			set_info(gfxinfo);
+			m_pixels_per_byte = 2;
 			break;
 		case 7:
-			device_gfx_interface::static_set_info(dev, gfxinfo7);
-			dev.m_pixels_per_byte = 1;
+			set_info(gfxinfo7);
+			m_pixels_per_byte = 1;
 			break;
 		case 8:
-			device_gfx_interface::static_set_info(dev, gfxinfo8);
-			dev.m_pixels_per_byte = 1;
+			set_info(gfxinfo8);
+			m_pixels_per_byte = 1;
 			break;
 		case -4:
-			device_gfx_interface::static_set_info(dev, gfxinfo4_ram);
-			dev.m_pixels_per_byte = 2;
+			set_info(gfxinfo4_ram);
+			m_pixels_per_byte = 2;
 			break;
 		default:
 			fatalerror("Unsupported bpp\n");
@@ -191,19 +189,19 @@ void k051316_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k051316_device::read )
+u8 k051316_device::read(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( k051316_device::write )
+void k051316_device::write(offs_t offset, u8 data)
 {
 	m_ram[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-READ8_MEMBER( k051316_device::rom_r )
+u8 k051316_device::rom_r(offs_t offset)
 {
 	assert (m_zoom_rom.found());
 
@@ -224,7 +222,7 @@ READ8_MEMBER( k051316_device::rom_r )
 	}
 }
 
-WRITE8_MEMBER( k051316_device::ctrl_w )
+void k051316_device::ctrl_w(offs_t offset, u8 data)
 {
 	m_ctrlram[offset] = data;
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);

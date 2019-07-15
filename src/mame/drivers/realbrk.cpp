@@ -53,64 +53,64 @@ To Do:
 
 
 /* Read 4 ten bit dip switches */
-READ16_MEMBER(realbrk_state::realbrk_dsw_r)
+u16 realbrk_state::realbrk_dsw_r()
 {
-	uint16_t sel = ~m_dsw_select[0];
-	if (sel & 0x01) return  (ioport("SW1")->read() & 0x00ff) << 8;      // DSW1 low bits
-	if (sel & 0x02) return  (ioport("SW2")->read() & 0x00ff) << 8;      // DSW2 low bits
-	if (sel & 0x04) return  (ioport("SW3")->read() & 0x00ff) << 8;      // DSW3 low bits
-	if (sel & 0x08) return  (ioport("SW4")->read() & 0x00ff) << 8;      // DSW4 low bits
+	const u16 sel = ~m_dsw_select[0];
+	if (sel & 0x01) return  (m_dsw_io[0]->read() & 0x00ff) << 8;      // DSW1 low bits
+	if (sel & 0x02) return  (m_dsw_io[1]->read() & 0x00ff) << 8;      // DSW2 low bits
+	if (sel & 0x04) return  (m_dsw_io[2]->read() & 0x00ff) << 8;      // DSW3 low bits
+	if (sel & 0x08) return  (m_dsw_io[3]->read() & 0x00ff) << 8;      // DSW4 low bits
 
-	if (sel & 0x10) return  ((ioport("SW1")->read() & 0x0300) << 0) |   // DSWs high 2 bits
-							((ioport("SW2")->read() & 0x0300) << 2) |
-							((ioport("SW3")->read() & 0x0300) << 4) |
-							((ioport("SW4")->read() & 0x0300) << 6) ;
+	if (sel & 0x10) return  ((m_dsw_io[0]->read() & 0x0300) << 0) |   // DSWs high 2 bits
+							((m_dsw_io[1]->read() & 0x0300) << 2) |
+							((m_dsw_io[2]->read() & 0x0300) << 4) |
+							((m_dsw_io[3]->read() & 0x0300) << 6) ;
 
 	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",m_maincpu->pc(),m_dsw_select[0]);
 	return 0xffff;
 }
 
-READ16_MEMBER(realbrk_state::pkgnsh_input_r)
+u16 realbrk_state::pkgnsh_input_r(offs_t offset)
 {
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
 		case 0x02/2: return 0xffff;
-		case 0x04/2: return ioport("IN0")->read();      /*Service buttons*/
-		case 0x06/2: return ioport("SW1")->read();      /*DIP 2*/
-		case 0x08/2: return ioport("SW2")->read();      /*DIP 1*/
-		case 0x0a/2: return ioport("SW3")->read();      /*DIP 1+2 Hi-Bits*/
-		case 0x0c/2: return ioport("PADDLE1")->read();  /*Handle 1p*/
-		case 0x0e/2: return ioport("P1")->read();           /*Buttons 1p*/
-		case 0x10/2: return ioport("PADDLE2")->read();  /*Handle 2p*/
-		case 0x12/2: return ioport("P2")->read();           /*Buttons 2p*/
+		case 0x04/2: return m_in_io[0]->read();      /*Service buttons*/
+		case 0x06/2: return m_dsw_io[0]->read();      /*DIP 2*/
+		case 0x08/2: return m_dsw_io[1]->read();      /*DIP 1*/
+		case 0x0a/2: return m_dsw_io[2]->read();      /*DIP 1+2 Hi-Bits*/
+		case 0x0c/2: return m_paddle_io[0]->read();  /*Handle 1p*/
+		case 0x0e/2: return m_player_io[0]->read();           /*Buttons 1p*/
+		case 0x10/2: return m_paddle_io[1]->read();  /*Handle 2p*/
+		case 0x12/2: return m_player_io[1]->read();           /*Buttons 2p*/
 	}
 	return 0xffff;
 }
 
-READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
+u16 realbrk_state::pkgnshdx_input_r(offs_t offset)
 {
-	uint16_t sel = ~m_dsw_select[0];
+	const u16 sel = ~m_dsw_select[0];
 
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
-		case 0x02/2: return ioport("IN0")->read();  /*Service buttons*/
+		case 0x02/2: return m_in_io[0]->read();  /*Service buttons*/
 		/*DSW,same handling as realbrk*/
 		case 0x04/2:
-			if (sel & 0x01) return  (ioport("SW1")->read() & 0x00ff) << 8;      // DSW1 low bits
-			if (sel & 0x02) return  (ioport("SW2")->read() & 0x00ff) << 8;      // DSW2 low bits
-			if (sel & 0x04) return  (ioport("SW3")->read() & 0x00ff) << 8;      // DSW3 low bits
-			if (sel & 0x08) return  (ioport("SW4")->read() & 0x00ff) << 8;      // DSW4 low bits
+			if (sel & 0x01) return  (m_dsw_io[0]->read() & 0x00ff) << 8;      // DSW1 low bits
+			if (sel & 0x02) return  (m_dsw_io[1]->read() & 0x00ff) << 8;      // DSW2 low bits
+			if (sel & 0x04) return  (m_dsw_io[2]->read() & 0x00ff) << 8;      // DSW3 low bits
+			if (sel & 0x08) return  (m_dsw_io[3]->read() & 0x00ff) << 8;      // DSW4 low bits
 
-			if (sel & 0x10) return  ((ioport("SW1")->read() & 0x0300) << 0) |   // DSWs high 2 bits
-									((ioport("SW2")->read() & 0x0300) << 2) |
-									((ioport("SW3")->read() & 0x0300) << 4) |
-									((ioport("SW4")->read() & 0x0300) << 6) ;
+			if (sel & 0x10) return  ((m_dsw_io[0]->read() & 0x0300) << 0) |   // DSWs high 2 bits
+									((m_dsw_io[1]->read() & 0x0300) << 2) |
+									((m_dsw_io[2]->read() & 0x0300) << 4) |
+									((m_dsw_io[3]->read() & 0x0300) << 6) ;
 
 			return 0xffff;
-		case 0x06/2: return ioport("P2")->read();/*Buttons+Handle 2p*/
-		case 0x08/2: return ioport("P1")->read();/*Buttons+Handle 1p*/
+		case 0x06/2: return m_player_io[1]->read();/*Buttons+Handle 2p*/
+		case 0x08/2: return m_player_io[0]->read();/*Buttons+Handle 1p*/
 		case 0x0a/2: return 0xffff;
 		case 0x0c/2: return 0xffff;
 		case 0x0e/2: return 0xffff;
@@ -122,7 +122,7 @@ READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
 }
 
 
-READ16_MEMBER(realbrk_state::backup_ram_r)
+u16 realbrk_state::backup_ram_r(offs_t offset)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
@@ -133,7 +133,7 @@ READ16_MEMBER(realbrk_state::backup_ram_r)
 }
 
 
-READ16_MEMBER(realbrk_state::backup_ram_dx_r)
+u16 realbrk_state::backup_ram_dx_r(offs_t offset)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
@@ -143,9 +143,16 @@ READ16_MEMBER(realbrk_state::backup_ram_dx_r)
 		return m_backup_ram[offset];
 }
 
-WRITE16_MEMBER(realbrk_state::backup_ram_w)
+void realbrk_state::backup_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_backup_ram[offset]);
+}
+
+template<int Layer>
+void realbrk_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset/2);
 }
 
 /***************************************************************************
@@ -155,59 +162,63 @@ WRITE16_MEMBER(realbrk_state::backup_ram_w)
 ***************************************************************************/
 
 /*Basic memory map for this HW*/
-ADDRESS_MAP_START(realbrk_state::base_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                         // ROM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_SHARE("spriteram") // Sprites
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")  // Background   (0)
-	AM_RANGE(0x602000, 0x603fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")  // Background   (1)
-	AM_RANGE(0x604000, 0x604fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2")  // Text         (2)
-	AM_RANGE(0x605000, 0x61ffff) AM_RAM                                         //
-	AM_RANGE(0x606000, 0x60600f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")    // Scroll + Video Regs
-	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)   // YMZ280
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                         // RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
+void realbrk_state::base_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                         // ROM
+	map(0x200000, 0x203fff).ram().share("spriteram"); // Sprites
+	map(0x400000, 0x40ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
+	map(0x600000, 0x601fff).ram().w(FUNC(realbrk_state::vram_w<0>)).share("vram_0");  // Background   (0)
+	map(0x602000, 0x603fff).ram().w(FUNC(realbrk_state::vram_w<1>)).share("vram_1");  // Background   (1)
+	map(0x604000, 0x604fff).ram().w(FUNC(realbrk_state::vram_2_w)).share("vram_2");  // Text         (2)
+	map(0x605000, 0x605fff).ram();                                         //
+	map(0x606000, 0x60600f).ram().w(FUNC(realbrk_state::vregs_w)).share("vregs");    // Scroll + Video Regs
+	map(0x606010, 0x61ffff).ram();                                         //
+	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);   // YMZ280
+	map(0xfe0000, 0xfeffff).ram();                                         // RAM
+}
 
 /*realbrk specific memory map*/
-ADDRESS_MAP_START(realbrk_state::realbrk_mem)
-	AM_IMPORT_FROM(base_mem)
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")                            // P1 & P2 (Inputs)
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                            // Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_SHARE("dsw_select")  // DSW select
-	AM_RANGE(0xff0000, 0xfffbff) AM_RAM                                         // RAM
-ADDRESS_MAP_END
+void realbrk_state::realbrk_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
+	map(0xc00000, 0xc00001).portr("IN0");                            // P1 & P2 (Inputs)
+	map(0xc00002, 0xc00003).portr("IN1");                            // Coins
+	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
+	map(0xff0000, 0xfffbff).ram();                                         // RAM
+}
 
 /*pkgnsh specific memory map*/
-ADDRESS_MAP_START(realbrk_state::pkgnsh_mem)
-	AM_IMPORT_FROM(base_mem)
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)   // YM2413
-	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnsh_input_r             )   // P1 & P2 (Inputs)
-	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_r,backup_ram_w) AM_SHARE("backup_ram") // RAM
-ADDRESS_MAP_END
+void realbrk_state::pkgnsh_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);   // YM2413
+	map(0xc00000, 0xc00013).r(FUNC(realbrk_state::pkgnsh_input_r));   // P1 & P2 (Inputs)
+	map(0xff0000, 0xfffbff).rw(FUNC(realbrk_state::backup_ram_r), FUNC(realbrk_state::backup_ram_w)).share("backup_ram"); // RAM
+}
 
 /*pkgnshdx specific memory map*/
-ADDRESS_MAP_START(realbrk_state::pkgnshdx_mem)
-	AM_IMPORT_FROM(base_mem)
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
-	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r               )   // P1 & P2 (Inputs)
-	AM_RANGE(0xc00004, 0xc00005) AM_WRITEONLY AM_SHARE("dsw_select") // DSW select
-	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_dx_r,backup_ram_w) AM_SHARE("backup_ram")  // RAM
-ADDRESS_MAP_END
+void realbrk_state::pkgnshdx_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
+	map(0xc00000, 0xc00013).r(FUNC(realbrk_state::pkgnshdx_input_r));   // P1 & P2 (Inputs)
+	map(0xc00004, 0xc00005).writeonly().share("dsw_select"); // DSW select
+	map(0xff0000, 0xfffbff).rw(FUNC(realbrk_state::backup_ram_dx_r), FUNC(realbrk_state::backup_ram_w)).share("backup_ram");  // RAM
+}
 
 /*dai2kaku specific memory map*/
-ADDRESS_MAP_START(realbrk_state::dai2kaku_mem)
-	AM_IMPORT_FROM(base_mem)
-	AM_RANGE(0x605000, 0x6053ff) AM_RAM AM_SHARE("vram_0ras")   // rasterinfo   (0)
-	AM_RANGE(0x605400, 0x6057ff) AM_RAM AM_SHARE("vram_1ras")   // rasterinfo   (1)
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")                            // P1 & P2 (Inputs)
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                            // Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_SHARE("dsw_select")  // DSW select
-	AM_RANGE(0xff0000, 0xfffbff) AM_RAM                                         // RAM
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(dai2kaku_flipscreen_w             )   // Hack! Parallel port data register
-ADDRESS_MAP_END
+void realbrk_state::dai2kaku_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x605000, 0x6053ff).ram().share("vram_0ras");   // rasterinfo   (0)
+	map(0x605400, 0x6057ff).ram().share("vram_1ras");   // rasterinfo   (1)
+	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
+	map(0xc00000, 0xc00001).portr("IN0");                            // P1 & P2 (Inputs)
+	map(0xc00002, 0xc00003).portr("IN1");                            // Coins
+	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
+	map(0xff0000, 0xfffbff).ram();                                         // RAM
+}
 
 /***************************************************************************
 
@@ -724,14 +735,14 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( realbrk )
+static GFXDECODE_START( gfx_realbrk )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
 	GFXDECODE_ENTRY( "gfx4", 0, layout_16x16x4,     0, 0x800    )   // [3] Sprites (16 colors)
 GFXDECODE_END
 
-static GFXDECODE_START( dai2kaku )
+static GFXDECODE_START( gfx_dai2kaku )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
@@ -748,73 +759,71 @@ GFXDECODE_END
                         Billiard Academy Real Break
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(realbrk_state::interrupt)
+WRITE_LINE_MEMBER(realbrk_state::vblank_irq)
 {
 	/* VBlank is connected to INT1 (external interrupts pin 1) */
-	m_tmp68301->external_interrupt_1();
+	if (state)
+		m_maincpu->external_interrupt_1();
 }
 
-MACHINE_CONFIG_START(realbrk_state::realbrk)
-
+void realbrk_state::realbrk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(32'000'000) / 2)          /* !! TMP68301 !! */
-	MCFG_CPU_PROGRAM_MAP(realbrk_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
-
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(realbrk_state,realbrk_flipscreen_w))
+	TMP68301(config, m_maincpu, XTAL(32'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::realbrk_mem);
+	m_maincpu->out_parallel_callback().set(FUNC(realbrk_state::realbrk_flipscreen_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x140, 0xe0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(0x140, 0xe0);
+	m_screen->set_visarea(0, 0x140-1, 0, 0xe0-1);
+	m_screen->set_screen_update(FUNC(realbrk_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(realbrk_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", realbrk)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_realbrk);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(33'868'800) / 2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(33'868'800) / 2));
+	ymz.add_route(0, "lspeaker", 0.50);
+	ymz.add_route(1, "rspeaker", 0.50);
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
-MACHINE_CONFIG_START(realbrk_state::pkgnsh)
+void realbrk_state::pkgnsh(machine_config &config)
+{
 	realbrk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::pkgnsh_mem);
+	m_maincpu->out_parallel_callback().set_nop();
+}
 
-MACHINE_CONFIG_START(realbrk_state::pkgnshdx)
+void realbrk_state::pkgnshdx(machine_config &config)
+{
 	pkgnsh(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(realbrk_state::dai2kaku)
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::pkgnshdx_mem);
+}
+
+void realbrk_state::dai2kaku(machine_config &config)
+{
 	realbrk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dai2kaku)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_dai2kaku)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &realbrk_state::dai2kaku_mem);
+	m_maincpu->out_parallel_callback().set(FUNC(realbrk_state::dai2kaku_flipscreen_w));
+
+	m_gfxdecode->set_info(gfx_dai2kaku);
+	m_screen->set_screen_update(FUNC(realbrk_state::screen_update_dai2kaku));
+}
 
 
 /***************************************************************************
@@ -1281,13 +1290,13 @@ ROM_START( dai2kaku_alt_rom_size )
 ROM_END
 #endif
 
-GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   realbrk_state, empty_init, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, realbrk_state, empty_init, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, realbrk,  0,       realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrko, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrk,  0,       realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrko, realbrk, realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  realbrk_state, empty_init, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, realbrk_state, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, realbrk_state, empty_init, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -5,20 +5,16 @@
 
 #pragma once
 
-
-#define MCFG_YMF262_IRQ_HANDLER(cb) \
-		devcb = &ymf262_device::set_irq_handler(*device, (DEVCB_##cb));
-
 class ymf262_device : public device_t, public device_sound_interface
 {
 public:
 	ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ymf262_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -26,6 +22,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

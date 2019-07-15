@@ -217,7 +217,6 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
@@ -303,100 +302,103 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
 */
-	output().set_lamp_value(0, (data >> 0) & 1);
-	output().set_lamp_value(1, (data >> 1) & 1);
-	output().set_lamp_value(2, (data >> 2) & 1);
-	output().set_lamp_value(3, (data >> 3) & 1);
-	output().set_lamp_value(4, (data >> 4) & 1);
-	output().set_lamp_value(5, (data >> 5) & 1);
-	output().set_lamp_value(6, (data >> 6) & 1);
-	output().set_lamp_value(7, (data >> 7) & 1);
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
+	m_lamps[2] = BIT(data, 2);
+	m_lamps[3] = BIT(data, 3);
+	m_lamps[4] = BIT(data, 4);
+	m_lamps[5] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 
 //  popmessage("p1 lamps: %02X", data);
 }
 
 WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 {
-	output().set_lamp_value(8 + 0, (data >> 0) & 1);
-	output().set_lamp_value(8 + 1, (data >> 1) & 1);
-	output().set_lamp_value(8 + 2, (data >> 2) & 1);
-	output().set_lamp_value(8 + 3, (data >> 3) & 1);
-	output().set_lamp_value(8 + 4, (data >> 4) & 1);
-	output().set_lamp_value(8 + 5, (data >> 5) & 1);
-	output().set_lamp_value(8 + 6, (data >> 6) & 1);
-	output().set_lamp_value(8 + 7, (data >> 7) & 1);
+	m_lamps[8 + 0] = BIT(data, 0);
+	m_lamps[8 + 1] = BIT(data, 1);
+	m_lamps[8 + 2] = BIT(data, 2);
+	m_lamps[8 + 3] = BIT(data, 3);
+	m_lamps[8 + 4] = BIT(data, 4);
+	m_lamps[8 + 5] = BIT(data, 5);
+	m_lamps[8 + 6] = BIT(data, 6);
+	m_lamps[8 + 7] = BIT(data, 7);
 
 //  popmessage("p2 lamps: %02X", data);
 }
 
 
-ADDRESS_MAP_START(goldstar_state::goldstar_map)
-	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::goldstar_map(address_map &map)
+{
+	map(0x0000, 0xb7ff).rom();
+	map(0xb800, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).rom();
+	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
 
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")    /* Test Mode */
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
+	map(0xf800, 0xf800).portr("IN0");
+	map(0xf801, 0xf801).portr("IN1");    /* Test Mode */
+	map(0xf802, 0xf802).portr("DSW1");
 //  AM_RANGE(0xf803, 0xf803)
 //  AM_RANGE(0xf804, 0xf804)
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW4")   /* DSW 4 (also appears in 8910 port) */
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW7")   /* (don't know to which one of the */
-	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("UNK1")
-	AM_RANGE(0xf811, 0xf811) AM_READ_PORT("UNK2")
-	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf900, 0xf900) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
-	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
-ADDRESS_MAP_END
+	map(0xf805, 0xf805).portr("DSW4");   /* DSW 4 (also appears in 8910 port) */
+	map(0xf806, 0xf806).portr("DSW7");   /* (don't know to which one of the */
+	map(0xf810, 0xf810).portr("UNK1");
+	map(0xf811, 0xf811).portr("UNK2");
+	map(0xf820, 0xf820).portr("DSW2");
+	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf900, 0xf900).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xfa00, 0xfa00).w(FUNC(goldstar_state::goldstar_fa00_w));
+	map(0xfb00, 0xfb00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xfd00, 0xfdff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xfe00, 0xfe00).rw(FUNC(goldstar_state::protection_r), FUNC(goldstar_state::protection_w));
+}
 
-ADDRESS_MAP_START(goldstar_state::goldstar_readport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
-ADDRESS_MAP_END
+void goldstar_state::goldstar_readport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).portr("DSW6");
+}
 
 
-ADDRESS_MAP_START(sanghopm_state::star100_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void sanghopm_state::star100_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(fg_vidram_w) AM_SHARE("fg_vidram")    // videoram 1
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_atrram_w) AM_SHARE("fg_atrram")    // atrram 1
+	map(0xc800, 0xcfff).ram().w(FUNC(sanghopm_state::fg_vidram_w)).share("fg_vidram");    // videoram 1
+	map(0xd000, 0xd7ff).ram().w(FUNC(sanghopm_state::fg_atrram_w)).share("fg_atrram");    // atrram 1
 
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xd840, 0xd9ff) AM_RAM
-	AM_RANGE(0xda00, 0xda3f) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xda40, 0xdbff) AM_RAM
-	AM_RANGE(0xdc00, 0xdc3f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xdc40, 0xdfff) AM_RAM
+	map(0xd800, 0xd83f).ram().share("reel1_scroll");
+	map(0xd840, 0xd9ff).ram();
+	map(0xda00, 0xda3f).ram().share("reel2_scroll");
+	map(0xda40, 0xdbff).ram();
+	map(0xdc00, 0xdc3f).ram().share("reel3_scroll");
+	map(0xdc40, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe200, 0xe3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
+	map(0xe000, 0xe1ff).ram().w(FUNC(sanghopm_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe200, 0xe3ff).ram().w(FUNC(sanghopm_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe400, 0xe5ff).ram().w(FUNC(sanghopm_state::goldstar_reel3_ram_w)).share("reel3_ram");
 
-	AM_RANGE(0xe600, 0xe7ff) AM_RAM_WRITE(bg_vidram_w) AM_SHARE("bg_vidram")    // videoram 2
+	map(0xe600, 0xe7ff).ram().w(FUNC(sanghopm_state::bg_vidram_w)).share("bg_vidram");    // videoram 2
 
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xea00, 0xebff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xec00, 0xedff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
+	map(0xe800, 0xe9ff).ram().w(FUNC(sanghopm_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xea00, 0xebff).ram().w(FUNC(sanghopm_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xec00, 0xedff).ram().w(FUNC(sanghopm_state::reel3_attrram_w)).share("reel3_attrram");
 
-	AM_RANGE(0xee00, 0xefff) AM_RAM_WRITE(bg_atrram_w) AM_SHARE("bg_atrram")    // atrram 2
+	map(0xee00, 0xefff).ram().w(FUNC(sanghopm_state::bg_atrram_w)).share("bg_atrram");    // atrram 2
 
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
+	map(0xf000, 0xf7ff).ram().share("nvram");
+	map(0xf800, 0xffff).ram();
 
-ADDRESS_MAP_END
+}
 
 
 WRITE8_MEMBER(sanghopm_state::coincount_w)
@@ -423,34 +425,35 @@ WRITE8_MEMBER(sanghopm_state::enable_w)
 	m_enable_reg = data;
 }
 
-ADDRESS_MAP_START(sanghopm_state::star100_readport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void sanghopm_state::star100_readport(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	map(0x08, 0x08).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x0c, 0x0c).w("aysnd", FUNC(ay8910_device::address_w));
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("IN3")
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW1")
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x12, 0x12).portr("IN2");
+	map(0x13, 0x13).portr("IN3");
+	map(0x14, 0x14).portr("DSW1");
 
-	AM_RANGE(0x1c, 0x1c) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x1d ,0x1d) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x1e ,0x1e) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	map(0x1c, 0x1c).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x1d, 0x1d).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x1e, 0x1e).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW4-0")     // the first 4 bits map to DSW4 1 to 4.
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW4-1")     // the first 4 bits map to DSW4 5 to 8.
+	map(0x20, 0x20).portr("DSW4-0");     // the first 4 bits map to DSW4 1 to 4.
+	map(0x21, 0x21).portr("DSW4-1");     // the first 4 bits map to DSW4 5 to 8.
 
-	AM_RANGE(0x24, 0x24) AM_WRITE(coincount_w)      // coin counters.
+	map(0x24, 0x24).w(FUNC(sanghopm_state::coincount_w));      // coin counters.
 
-	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW2")
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW3")
+	map(0x25, 0x25).portr("DSW2");
+	map(0x26, 0x26).portr("DSW3");
 
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP                // Writing 0's and 1's constantly.  Watchdog feeder?
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(enable_w)         // enable/disable reels register.
+	map(0xe0, 0xe0).nopw();                // Writing 0's and 1's constantly.  Watchdog feeder?
+	map(0xe1, 0xe1).w(FUNC(sanghopm_state::enable_w));         // enable/disable reels register.
 
-ADDRESS_MAP_END
+}
 
 /*
   08:  W (3F)   AY8910 data
@@ -482,9 +485,10 @@ ADDRESS_MAP_END
   E1:  W    Reels enable/disable register
  */
 
-ADDRESS_MAP_START(goldstar_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void goldstar_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 /*
   RAMDAC written commands:
@@ -601,41 +605,74 @@ WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
 }
 
 
-ADDRESS_MAP_START(cb3_state::ncb3_map)
-	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("reel3_scroll") // moved compared to goldstar
+void cb3_state::ncb3_map(address_map &map)
+{
+	map(0x0000, 0xb7ff).rom();
+	map(0xb800, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).rom();
+	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
 
-	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
+	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf820, 0xf823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xf822, 0xf822).w(FUNC(cb3_state::goldstar_fa00_w)); // hack (connected to ppi output port?, needed for colour banking)
 
-	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf850, 0xf850) AM_WRITE(p1_lamps_w)       /* Control Set 1 lamps */
-	AM_RANGE(0xf860, 0xf860) AM_WRITE(p2_lamps_w)       /* Control Set 2 lamps */
-	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
-ADDRESS_MAP_END
+	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
+	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+}
 
-ADDRESS_MAP_START(goldstar_state::ncb3_readwriteport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void cb3_state::chryangla_map(address_map &map) // most to be verified when the game will show more than test screens only
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram().share("nvram");
+	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
+
+	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf820, 0xf823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xf822, 0xf822).w(FUNC(cb3_state::goldstar_fa00_w)); // hack (connected to ppi output port?, needed for colour banking)
+
+	map(0xf830, 0xf830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf840, 0xf840).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf850, 0xf850).w(FUNC(cb3_state::p1_lamps_w));       /* Control Set 1 lamps */
+	map(0xf860, 0xf860).w(FUNC(cb3_state::p2_lamps_w));       /* Control Set 2 lamps */
+	map(0xf870, 0xf870).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
+}
+
+void cb3_state::chryangla_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+	map(0xf800, 0xffff).ram();
+}
+
+void goldstar_state::ncb3_readwriteport(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set 1 is used...
 //  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set 2 is used...
 //  AM_RANGE(0x06, 0x06) AM_READ(ncb3_unkread_r)    // unknown...
 //  AM_RANGE(0x08, 0x08) AM_READ(ncb3_unkread_r)    // unknown...
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW5")   /* confirmed for ncb3 */
-	AM_RANGE(0x81, 0x81) AM_WRITE(ncb3_port81_w) // ---> large writes.
+	map(0x10, 0x10).portr("DSW5");   /* confirmed for ncb3 */
+	map(0x81, 0x81).w(FUNC(goldstar_state::ncb3_port81_w)); // ---> large writes.
 
-ADDRESS_MAP_END
+}
 
 /* ncb3 findings...
 
@@ -668,39 +705,40 @@ ADDRESS_MAP_END
 
 */
 
-
-ADDRESS_MAP_START(goldstar_state::wcherry_map)
-	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
+void goldstar_state::wcherry_map(address_map &map)
+{
+	map(0x0000, 0xb7ff).rom();
+	map(0xb800, 0xbfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).rom();
 
 	/* Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_SHARE("reel3_scroll")
+	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf040, 0xf07f).ram().share("reel1_scroll");
+	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
+	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
 
 	/* Not really PPI's... They are emulated/simulated inside the CPLDs */
-	AM_RANGE(0xf600, 0xf603) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf610, 0xf613) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xf620, 0xf623) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
+	map(0xf600, 0xf603).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf610, 0xf613).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xf620, 0xf623).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
 
-	AM_RANGE(0xf630, 0xf630) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xf640, 0xf640) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf650, 0xf650) AM_WRITENOP    // AM_WRITE(output_w)  // unknown register: 0x3e
-	AM_RANGE(0xf660, 0xf660) AM_WRITENOP    // AM_WRITE(output_w)  // unknown register: 0x3e
-	AM_RANGE(0xf670, 0xf670) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
+	map(0xf630, 0xf630).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xf640, 0xf640).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xf650, 0xf650).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
+	map(0xf660, 0xf660).nopw();    // AM_WRITE(output_w)  // unknown register: 0x3e
+	map(0xf670, 0xf670).w("snsnd", FUNC(sn76489_device::write));    /* guess... device is initialized, but doesn't seems to be used.*/
 
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(goldstar_state::wcherry_readwriteport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_END
+void goldstar_state::wcherry_readwriteport(address_map &map)
+{
+	map.global_mask(0xff);
+	}
 
 /* wcherry findings...
 
@@ -723,49 +761,51 @@ ADDRESS_MAP_START(goldstar_state::wcherry_readwriteport)
 */
 
 
-ADDRESS_MAP_START(goldstar_state::cm_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
+void goldstar_state::cm_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom().nopw();
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
 
-	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf880, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xfa7f) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xfa80, 0xfbff) AM_RAM
-	AM_RANGE(0xfc00, 0xfc7f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xfc80, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf880, 0xf9ff).ram();
+	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa80, 0xfbff).ram();
+	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc80, 0xffff).ram();
+}
 
 
-ADDRESS_MAP_START(goldstar_state::nfm_map)
-	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
+void goldstar_state::nfm_map(address_map &map)
+{
+	map(0x0000, 0xd7ff).rom().nopw();
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
+	map(0xd800, 0xdfff).ram().share("nvram");
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
 
-	AM_RANGE(0xf800, 0xf87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf880, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xfa7f) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xfa80, 0xfbff) AM_RAM
-	AM_RANGE(0xfc00, 0xfc7f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xfc80, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf880, 0xf9ff).ram();
+	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa80, 0xfbff).ram();
+	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc80, 0xffff).ram();
+}
 
 
 
@@ -789,137 +829,154 @@ WRITE8_MEMBER(goldstar_state::cm_coincount_w)
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  /* Counter 4 Coin D */
 	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* Counter 5 Payout */
 
-	if (data & 0x86)
-		popmessage("counters: %02X", data);
+//  if (data & 0x86) // triggered by fb2010
+//      popmessage("counters: %02X", data);
 }
 
-ADDRESS_MAP_START(cmaster_state::cm_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Inputs */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(girl_scroll_w)
-ADDRESS_MAP_END
+void cmaster_state::cm_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Inputs */
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
+	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
+}
+
+void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rom().share("decrypted_opcodes");
+	map(0xf800, 0xffff).ram();
+}
+
+void goldstar_state::pkrmast_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+
+	map(0x04, 0x04).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x08, 0x08).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x0c, 0x0c).w("aysnd", FUNC(ay8910_device::address_w));
+
+	map(0x10, 0x10).portr("IN0");
+	map(0x11, 0x11).portr("IN1");
+	map(0x12, 0x12).portr("IN2");
+
+	map(0x20, 0x20).portr("DSW3-0");
+	map(0x21, 0x21).portr("DSW3-1");
+	map(0x22, 0x22).w(FUNC(goldstar_state::p1_lamps_w));
+
+	map(0x24, 0x24).w(FUNC(goldstar_state::cm_coincount_w));
+	map(0x25, 0x25).portr("DSW1");
+	map(0x26, 0x26).portr("DSW2");
+
+	map(0xf0, 0xf0).nopw();    /* Writing 0's and 1's constantly.  Watchdog feeder? */
+}
 
 
-ADDRESS_MAP_START(goldstar_state::pkrmast_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
-
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW3-0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW3-1")
-	AM_RANGE(0x22, 0x22) AM_WRITE(p1_lamps_w)
-
-	AM_RANGE(0x24, 0x24) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW1")
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW2")
-
-	AM_RANGE(0xf0, 0xf0) AM_WRITENOP    /* Writing 0's and 1's constantly.  Watchdog feeder? */
-ADDRESS_MAP_END
+void goldstar_state::cmast91_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
 
-ADDRESS_MAP_START(goldstar_state::cmast91_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x21, 0x21) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void cmaster_state::amcoe1_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
+	map(0x20, 0x20).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void cmaster_state::amcoe2_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DIP switches */
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
+}
 
 
-ADDRESS_MAP_START(cmaster_state::amcoe1_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void goldstar_state::lucky8_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-ADDRESS_MAP_START(cmaster_state::amcoe2_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
+	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
+	map(0xf800, 0xffff).ram();
+}
 
+void goldstar_state::lucky8f_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(goldstar_state::lucky8_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::flaming7_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
-	AM_RANGE(0xc000, 0xf7ff) AM_ROM  // could be used by some sets like super972.
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(goldstar_state::flaming7_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
 //  AM_RANGE(0x9a00, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
 //  AM_RANGE(0xa200, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
 //  AM_RANGE(0xaa00, 0xafff) AM_RAM
 
 //  AM_RANGE(0xb000, 0xb03f) AM_RAM
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
 //  AM_RANGE(0xb0c0, 0xb0ff) AM_RAM
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xb180, 0xb7ff) AM_RAM
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0xb180, 0xb7ff).ram();
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports (92) */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports (9B) */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports (90) */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports (92) */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports (9B) */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports (90) */
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
 //  AM_RANGE(0xc000, 0xd3ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram();
+}
 /*
   W 9A00-B7FF FF
  RW B000-B7FF 00
@@ -948,29 +1005,30 @@ ADDRESS_MAP_END
 
     AY8910 ports are OK.
 */
-ADDRESS_MAP_START(goldstar_state::mbstar_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::mbstar_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
-	AM_RANGE(0xc000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  /* no sound... only use both ports for DSWs */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));    /* sound */
+	map(0xc000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
 
 WRITE8_MEMBER(wingco_state::magodds_outb850_w)
@@ -999,51 +1057,53 @@ WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
 	m_fl7w4_id->write((data >> 6) & 0x01);
 }
 
-ADDRESS_MAP_START(wingco_state::magodds_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void wingco_state::magodds_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa900, 0xaaff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram") // +0x100 compared to lucky8
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa900, 0xaaff).ram().w(FUNC(wingco_state::goldstar_reel3_ram_w)).share("reel3_ram"); // +0x100 compared to lucky8
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)             /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(magodds_outb850_w)                                /* lamps */
-	AM_RANGE(0xb860, 0xb860) AM_WRITE(magodds_outb860_w)                                /* watchdog */
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
+	map(0xb850, 0xb850).w(FUNC(wingco_state::magodds_outb850_w));                                /* lamps */
+	map(0xb860, 0xb860).w(FUNC(wingco_state::magodds_outb860_w));                                /* watchdog */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
+}
 
-ADDRESS_MAP_START(goldstar_state::kkotnoli_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM /* definitely no NVRAM */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::kkotnoli_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram(); /* definitely no NVRAM */
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input Port */
-	AM_RANGE(0xb830, 0xb830) AM_WRITENOP                                                /* no ay8910 */
-	AM_RANGE(0xb840, 0xb840) AM_WRITENOP                                                /* no ay8910 */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Port */
+	map(0xb830, 0xb830).nopw();                                                /* no ay8910 */
+	map(0xb840, 0xb840).nopw();                                                /* no ay8910 */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xf800, 0xffff).ram();
+}
 
 
 //WRITE8_MEMBER(goldstar_state::ladylinr_outport_w)
@@ -1062,77 +1122,80 @@ ADDRESS_MAP_END
 //  popmessage("Output: %02X", data);
 //}
 
-ADDRESS_MAP_START(goldstar_state::ladylinr_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::ladylinr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DSW bank */
-	AM_RANGE(0xb830, 0xb830) AM_DEVWRITE("aysnd", ay8910_device, address_w)             /* no sound... unused? */
-	AM_RANGE(0xb840, 0xb840) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb850, 0xb850) AM_WRITENOP                                                /* just turn off the lamps, if exist */
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* DSW bank */
+	map(0xb830, 0xb830).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... unused? */
+	map(0xb840, 0xb840).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb850, 0xb850).nopw();                                                /* just turn off the lamps, if exist */
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(goldstar_state::wcat3_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_SHARE("reel3_scroll")
+void goldstar_state::wcat3_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
-	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)             /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
-	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input/Output Ports */
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));             /* no sound... only use both ports for DSWs */
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));                /* sound */
 //  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)    /* Other PPI initialized? */
-	AM_RANGE(0xd000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xd000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
 
 /* newer / more capable hw */
-ADDRESS_MAP_START(unkch_state::unkch_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+void unkch_state::unkch_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xc000, 0xc1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc800, 0xc9ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
+	map(0xd000, 0xd7ff).ram().share("nvram");
 
-	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xd900, 0xd93f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xdfc0, 0xdfff) AM_RAM
+	map(0xd840, 0xd87f).ram().share("reel1_scroll");
+	map(0xd880, 0xd8bf).ram().share("reel2_scroll");
+	map(0xd900, 0xd93f).ram().share("reel3_scroll");
+	map(0xdfc0, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xfe00, 0xffff).ram();
+}
 
 
 WRITE8_MEMBER(unkch_state::coincount_w)
@@ -1176,13 +1239,15 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 	//popmessage("unkcm_0x02_w %02x", data);
 
 	m_vblank_irq_enable = data & 0x80;
+	if (!m_vblank_irq_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	output().set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* Info / Small / Stop 3 */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* Big */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* Bet-B / D-Up */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
+	m_lamps[0] = BIT(data, 0);  /* Bet-A / Stop 2 */
+	m_lamps[1] = BIT(data, 1);  /* Start / Stop All */
+	m_lamps[2] = BIT(data, 2);  /* Info / Small / Stop 3 */
+	m_lamps[3] = BIT(data, 3);  /* Big */
+	m_lamps[4] = BIT(data, 4);  /* Bet-B / D-Up */
+	m_lamps[5] = BIT(data, 5);  /* Take / Stop 1 */
 }
 
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
@@ -1195,47 +1260,49 @@ WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
 }
 
 
-ADDRESS_MAP_START(unkch_state::unkch_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void unkch_state::unkch_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 
-	AM_RANGE(0x01, 0x01) AM_WRITE(coincount_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(unkcm_0x03_w)
+	map(0x01, 0x01).w(FUNC(unkch_state::coincount_w));
+	map(0x02, 0x02).w(FUNC(unkch_state::unkcm_0x02_w));
+	map(0x03, 0x03).w(FUNC(unkch_state::unkcm_0x03_w));
 
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("IN0")
-	AM_RANGE(0x09, 0x09) AM_READ_PORT("IN1")
-	AM_RANGE(0x0a, 0x0a) AM_READ_PORT("DSW4")
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW3")
+	map(0x08, 0x08).portr("IN0");
+	map(0x09, 0x09).portr("IN1");
+	map(0x0a, 0x0a).portr("DSW4");
+	map(0x0b, 0x0b).portr("DSW3");
 
-	AM_RANGE(0x10, 0x10) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x11, 0x11) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+	map(0x10, 0x10).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x11, 0x11).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 
-ADDRESS_MAP_START(unkch_state::megaline_map)
+void unkch_state::megaline_map(address_map &map)
+{
 /* Reels stuff are there just as placeholder, and obviously in wrong offset */
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	map(0x0000, 0x9fff).rom();
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM //AM_SHARE("nvram")
+	map(0xd000, 0xd7ff).ram(); //AM_SHARE("nvram")
 
-	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xd900, 0xd93f) AM_RAM AM_SHARE("reel3_scroll")
-	AM_RANGE(0xdfc0, 0xdfff) AM_RAM
+	map(0xd840, 0xd87f).ram().share("reel1_scroll");
+	map(0xd880, 0xd8bf).ram().share("reel2_scroll");
+	map(0xd900, 0xd93f).ram().share("reel3_scroll");
+	map(0xdfc0, 0xdfff).ram();
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
-	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xfe00, 0xffff).ram();
+}
 
 /* unknown I/O byte R/W
 
@@ -1243,41 +1310,43 @@ ADDRESS_MAP_END
   AY8910?: 60 - 80
 
 */
-ADDRESS_MAP_START(goldstar_state::megaline_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("sn1", sn76489_device, write)                      /* SN76489 #1 */
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("sn2", sn76489_device, write)                      /* SN76489 #2 */
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("sn3", sn76489_device, write)                      /* SN76489 #3 */
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("aysnd", ay8910_device, address_w)                 /* AY8910 control? */
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)        /* AY8910 Input? */
+void goldstar_state::megaline_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xa0, 0xa0).w("sn1", FUNC(sn76489_device::write));                      /* SN76489 #1 */
+	map(0xc0, 0xc0).w("sn2", FUNC(sn76489_device::write));                      /* SN76489 #2 */
+	map(0xe0, 0xe0).w("sn3", FUNC(sn76489_device::write));                      /* SN76489 #3 */
+	map(0x60, 0x60).w("aysnd", FUNC(ay8910_device::address_w));                 /* AY8910 control? */
+	map(0x80, 0x80).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));        /* AY8910 Input? */
 //  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 //  AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(unkch_state::bonusch_map)
+void unkch_state::bonusch_map(address_map &map)
+{
 /* Reels stuff and RAM are there just as placeholder, and obviously in wrong offset */
 
-	AM_RANGE(0x0000, 0xbfff) AM_ROM     // ok
+	map(0x0000, 0xbfff).rom();     // ok
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM //AM_SHARE("nvram")
+	map(0xd800, 0xdfff).ram(); //AM_SHARE("nvram")
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
 
 /* just placeholders */
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
 
-	AM_RANGE(0xf640, 0xf67f) AM_RAM AM_SHARE("reel1_scroll")
-	AM_RANGE(0xf680, 0xf6bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf700, 0xf73f) AM_RAM AM_SHARE("reel3_scroll")
+	map(0xf640, 0xf67f).ram().share("reel1_scroll");
+	map(0xf680, 0xf6bf).ram().share("reel2_scroll");
+	map(0xf700, 0xf73f).ram().share("reel3_scroll");
 
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
-ADDRESS_MAP_END
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+}
 
 /* Bonus Chance W-8
 
@@ -1296,17 +1365,55 @@ ADDRESS_MAP_END
   60h = R
 
 */
-ADDRESS_MAP_START(goldstar_state::bonusch_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN1")
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("sn1", sn76489_device, write)      /* SN76489 #1 */
-	AM_RANGE(0x51, 0x51) AM_DEVWRITE("sn2", sn76489_device, write)      /* SN76489 #2 */
-	AM_RANGE(0x52, 0x52) AM_DEVWRITE("sn3", sn76489_device, write)      /* SN76489 #3 */
-	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn4", sn76489_device, write)      /* SN76489 #4 */
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN3")
-ADDRESS_MAP_END
+void goldstar_state::bonusch_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).portr("IN0");
+	map(0x20, 0x20).portr("IN1");
+	map(0x50, 0x50).w("sn1", FUNC(sn76489_device::write));      /* SN76489 #1 */
+	map(0x51, 0x51).w("sn2", FUNC(sn76489_device::write));      /* SN76489 #2 */
+	map(0x52, 0x52).w("sn3", FUNC(sn76489_device::write));      /* SN76489 #3 */
+	map(0x53, 0x53).w("sn4", FUNC(sn76489_device::write));      /* SN76489 #4 */
+	map(0x60, 0x60).portr("IN3");
+}
 
+void unkch_state::feverch_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+
+	map(0xc000, 0xc7ff).ram().w(FUNC(unkch_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0xc800, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().w(FUNC(unkch_state::goldstar_fg_vidram_w)).share("fg_vidram");
+
+	// placeholders to appease validation, should be 0x200 each.
+	map(0xe000, 0xe000).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe200, 0xe200).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe400, 0xe400).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+
+	// placeholders to appease validation, should be 0x40 each.
+	map(0xe640, 0xe640).ram().share("reel1_scroll");
+	map(0xe680, 0xe680).ram().share("reel2_scroll");
+	map(0xe700, 0xe700).ram().share("reel3_scroll");
+
+	// placeholders to appease validation, should be 0x200 each.
+	map(0xe800, 0xe800).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
+	map(0xea00, 0xea00).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
+	map(0xec00, 0xec00).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+
+	map(0xf800, 0xffff).ram();
+}
+
+void goldstar_state::feverch_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
+	map(0x28, 0x28).w("sn2", FUNC(sn76489_device::write));
+	map(0x30, 0x30).w("sn3", FUNC(sn76489_device::write));
+	//map(0x38, 0x3b)
+}
 
 static INPUT_PORTS_START( cmv4_player )
 	PORT_START("IN0")
@@ -4961,6 +5068,161 @@ static INPUT_PORTS_START( nfb96tx )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( fb2010 ) // hit 'start1' to init NVRAM for first time
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused coin switch */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All / Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Take / Select Card")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Ticket In")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused keyin? - causes counter errors */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused coin switch */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused keyout? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Double Up" ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Skill Spin" ) PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Show Odds / Title" ) PORT_DIPLOCATION("DSW5:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Show 'Game' Text" ) PORT_DIPLOCATION("DSW5:8") // causes corruption in D-Up game?
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( roypok96 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5607,7 +5869,7 @@ static INPUT_PORTS_START( unkch_controls )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  /* Trips "call attendant" state if activated while credited - something to do with hopper out? */
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("tickets", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tickets", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -6550,6 +6812,162 @@ static INPUT_PORTS_START( bonusch )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( feverch )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7") // if low "check voltage call attendant" message will appear
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( star100 )
 	PORT_START("IN0")
@@ -6940,7 +7358,7 @@ static INPUT_PORTS_START( cmpacman )
 
 	PORT_INCLUDE( cmv4_service )
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> PB0 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> PB0 */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown" )                   PORT_DIPLOCATION("DSW1:!1")     /* not checked */
@@ -7059,7 +7477,7 @@ static INPUT_PORTS_START( cmtetris )
 
 	PORT_INCLUDE( cmv4_service )
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> (PB0|PB1) */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> (PB0|PB1) */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:!1")  /* OK */
@@ -7153,7 +7571,7 @@ static INPUT_PORTS_START( flam7_w4 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "fl7w4_id", ds2401_device, read )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "fl7w4_id", ds2401_device, read )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")   /* b810 */
@@ -7303,7 +7721,7 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "fl7w4_id", ds2401_device, read )  // Same input, different device.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "fl7w4_id", ds2401_device, read )  // Same input, different device.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")   /* b810 */
@@ -7782,93 +8200,93 @@ static const gfx_layout flam7_tw_tilelayout =  // FIXME
 };
 
 
-static GFXDECODE_START( goldstar )
+static GFXDECODE_START( gfx_goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( bl )
+static GFXDECODE_START( gfx_bl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbl, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ml )
+static GFXDECODE_START( gfx_ml )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( goldfrui )
+static GFXDECODE_START( gfx_goldfrui )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_goldfrui,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbl, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( chry10 )
+static GFXDECODE_START( gfx_chry10 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_chry10,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_chry10, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( cb3c )
+static GFXDECODE_START( gfx_cb3c )
 	GFXDECODE_ENTRY( "gfx1", 0, cb3c_tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, cb3c_tiles8x32_layout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( cb3e )
+static GFXDECODE_START( gfx_cb3e )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_cb3e,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_cb3e, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ncb3 )
+static GFXDECODE_START( gfx_ncb3 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( bingownga )
+static GFXDECODE_START( gfx_bingownga )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( magodds )
+static GFXDECODE_START( gfx_magodds )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( cm )
+static GFXDECODE_START( gfx_cm )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
 GFXDECODE_END
 
-static GFXDECODE_START( cmbitmap )
+static GFXDECODE_START( gfx_cmbitmap )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
 	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( cmasterc )
+static GFXDECODE_START( gfx_cmasterc )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32x4alt_layout, 128+64, 4 )
 	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( cmast91 )
+static GFXDECODE_START( gfx_cmast91 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
 	GFXDECODE_ENTRY( "user1", 0, tiles256x128x4_layout, 128, 4 ) // wrong... FIXME.
 GFXDECODE_END
 
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
-static GFXDECODE_START( cmasterb )
+static GFXDECODE_START( gfx_cmasterb )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x5_layout, 0, 4 )
 GFXDECODE_END
 #endif
 
-static GFXDECODE_START( megaline )
+static GFXDECODE_START( gfx_megaline )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( sangho )
+static GFXDECODE_START( gfx_sangho )
 	GFXDECODE_ENTRY( "gfx1", 0, sangho_charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 128, 8 )
 /* 7*16,16 title girl in 1st color
@@ -7880,17 +8298,17 @@ static GFXDECODE_START( sangho )
 */
 GFXDECODE_END
 
-static GFXDECODE_START( super9 )
+static GFXDECODE_START( gfx_super9 )
 	GFXDECODE_ENTRY( "gfx1", 0, super9_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, super9_tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( flaming7 )  // gfx 2 still wrong...
+static GFXDECODE_START( gfx_flaming7 )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( flam7_tw )  // gfx 2 still wrong...
+static GFXDECODE_START( gfx_flam7_tw )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx1", 0, flam7_tw_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, flam7_tw_tilelayout, 104,  8 )
 GFXDECODE_END
@@ -7920,7 +8338,7 @@ static const gfx_layout tiles8x8_3bpp_layout =
 	8*8
 };
 
-static GFXDECODE_START( nfm )
+static GFXDECODE_START( gfx_nfm )
 	GFXDECODE_ENTRY( "tilegfx", 0, tiles8x8_3bpp_layout, 0, 16 )
 	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 0, 16 )
 GFXDECODE_END
@@ -7960,7 +8378,7 @@ static const gfx_layout tiles8x32x4alt2_layout =
 };
 
 
-static GFXDECODE_START( unkch )
+static GFXDECODE_START( gfx_unkch )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4alt_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4alt2_layout, 0, 16 )
 GFXDECODE_END
@@ -7976,7 +8394,7 @@ static const gfx_layout tilescherrys_layout =
 	32*32
 };
 
-static GFXDECODE_START(cherrys )
+static GFXDECODE_START( gfx_cherrys )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_miss1bpp_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilescherrys_layout, 128,  8 )
 GFXDECODE_END
@@ -7996,7 +8414,7 @@ static const gfx_layout tiles8x32x4pkr_layout =
 	8*32*4          /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( pkrmast )
+static GFXDECODE_START( gfx_pkrmast )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
 GFXDECODE_END
@@ -8026,7 +8444,7 @@ static const gfx_layout cm97_layout32 =
 	32*32
 };
 
-static GFXDECODE_START( cm97 )
+static GFXDECODE_START( gfx_cm97 )
 	GFXDECODE_ENTRY( "gfx", 0, cm97_layout,   0x0, 32 )
 	GFXDECODE_ENTRY( "gfx", 0, cm97_layout32, 0x0, 32 )
 GFXDECODE_END
@@ -8049,6 +8467,9 @@ WRITE8_MEMBER(wingco_state::system_outputc_w)
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
 	//popmessage("system_outputc_w %02x",data);
+
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(goldstar_state::ay8910_outputa_w)
@@ -8062,1110 +8483,1095 @@ WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 }
 
 
-MACHINE_CONFIG_START(goldstar_state::goldstar)
-
+void goldstar_state::goldstar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goldstar_map)
-	MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::goldstar_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldstar)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldstar);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::goldstbl)
-
+void goldstar_state::goldstbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goldstar_map)
-	MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::goldstar_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bl);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
-MACHINE_CONFIG_START(goldstar_state::moonlght)
+void goldstar_state::moonlght(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ml)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_ml);
+}
 
-MACHINE_CONFIG_START(goldstar_state::goldfrui)
+void goldstar_state::goldfrui(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", goldfrui)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_goldfrui);
+}
 
 
-MACHINE_CONFIG_START(sanghopm_state::star100)
-
+void sanghopm_state::star100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(star100_map)
-	MCFG_CPU_IO_MAP(star100_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sanghopm_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sanghopm_state::star100_map);
+	m_maincpu->set_addrmap(AS_IO, &sanghopm_state::star100_readport);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sanghopm_state, screen_update_sangho)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sanghopm_state::screen_update_sangho));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, m_palette).set_entries(0x100);
+	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sangho)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sangho);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(sanghopm_state, sangho)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW5"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW6"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW5");
+	aysnd.port_b_read_callback().set_ioport("DSW6");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::super9)
-
+void goldstar_state::super9(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goldstar_map)
-//  MCFG_CPU_PROGRAM_MAP(nfm_map)
-	MCFG_CPU_IO_MAP(goldstar_readport)
-//  MCFG_CPU_IO_MAP(unkch_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::goldstar_map);
+//  m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::nfm_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
+//  m_maincpu->set_addrmap(AS_IO, &goldstar_state::unkch_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super9)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_super9);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
-PALETTE_INIT_MEMBER(goldstar_state, cm)
+void goldstar_state::cm_palette(palette_device &palette) const
 {
-	/* BBGGGRRR */
-
-	int i;
-
-	for (i = 0; i < 0x100; i++)
+	// BBGGGRRR
+	uint8_t const *const proms = memregion("proms")->base();
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t data;
-		uint8_t*proms = memregion("proms")->base();
-
-		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
-
+		uint8_t const data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state, cmast91)
+void goldstar_state::cmast91_palette(palette_device &palette) const
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
+	uint8_t const *const proms = memregion("proms")->base();
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r,g,b;
-
-		uint8_t*proms = memregion("proms")->base();
-
-		b = proms[0x000 + i] << 4;
-		g = proms[0x100 + i] << 4;
-		r = proms[0x200 + i] << 4;
+		int const b = pal4bit(proms[0x000 + i]);
+		int const g = pal4bit(proms[0x100 + i]);
+		int const r = pal4bit(proms[0x200 + i]);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state, lucky8)
+void goldstar_state::lucky8_palette(palette_device &palette) const
 {
-	/* BBGGGRRR */
-
-	int i;
-	uint8_t data;
-	uint8_t *proms;
+	// BBGGGRRR
+	uint8_t const *proms;
 
 	proms = memregion("proms")->base();
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
-
+		uint8_t const data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
 	proms = memregion("proms2")->base();
-	for (i=0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
-		data = proms[i];
-
+		uint8_t const data = proms[i];
 		palette.set_pen_color(i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
 
-MACHINE_CONFIG_START(cb3_state::ncb3)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ncb3_map)
-	MCFG_CPU_IO_MAP(ncb3_readwriteport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))   //Player2 controls, confirmed
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cb3_state::cb3c)
-	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3c)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cb3_state::cb3e)
-	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3e)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cb3_state::chrygld)
-	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", chry10)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cb3_state::cherrys)
-	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cb3_state::cm97)
-	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(goldstar_state::wcherry)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wcherry_map)
-	MCFG_CPU_IO_MAP(wcherry_readwriteport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))   //Player2 controls, confirmed
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb3e)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(cmaster_state::cm)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(cm_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmbitmap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cmaster_state::cmasterc)
-	cm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(goldstar_state::cmast91)
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(cmast91_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmast91)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cmast91)
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
-
-INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
+void cb3_state::ncb3(machine_config &config)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	/* basic machine hardware */
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb3_state::ncb3_map);
+	m_maincpu->set_addrmap(AS_IO, &cb3_state::ncb3_readwriteport);
+
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN3");   //Player2 controls, confirmed
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN1");
+	m_ppi[1]->in_pb_callback().set_ioport("IN2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
+
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-MACHINE_CONFIG_START(wingco_state::lucky8)
+void cb3_state::cb3c(machine_config &config)
+{
+	ncb3(config);
+	m_gfxdecode->set_info(gfx_cb3c);
+}
 
+void cb3_state::cb3e(machine_config &config)
+{
+	ncb3(config);
+	m_gfxdecode->set_info(gfx_cb3e);
+}
+
+void cb3_state::chryangla(machine_config &config)
+{
+	ncb3(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb3_state::chryangla_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &cb3_state::chryangla_decrypted_opcodes_map);
+
+	m_palette->set_init(FUNC(goldstar_state::lucky8_palette));
+}
+
+void cb3_state::chrygld(machine_config &config)
+{
+	ncb3(config);
+	m_gfxdecode->set_info(gfx_chry10);
+}
+
+void cb3_state::cherrys(machine_config &config)
+{
+	ncb3(config);
+	m_gfxdecode->set_info(gfx_cherrys);
+}
+
+void cb3_state::cm97(machine_config &config)
+{
+	ncb3(config);
+	m_gfxdecode->set_info(gfx_cm97);
+}
+
+
+void goldstar_state::wcherry(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lucky8_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state, masked_irq)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::wcherry_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::wcherry_readwriteport);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN3");   //Player2 controls, confirmed
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN1");
+	m_ppi[1]->in_pb_callback().set_ioport("IN2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cb3e);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("aysnd", YM2149, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(wingco_state::bingowng)
 
+void cmaster_state::cm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lucky8_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state, masked_irq)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cm_portmap);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
+	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_bingowng)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmbitmap);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW5");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void cmaster_state::cmasterc(machine_config &config)
+{
+	cm(config);
+	m_gfxdecode->set_info(gfx_cmasterc);
+}
+
+void cmaster_state::chryangl(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
+}
+
+void goldstar_state::cmast91(machine_config &config)
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::cmast91_portmap);
+
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
+	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmast91);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cmast91_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW5");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+
+
+WRITE_LINE_MEMBER(wingco_state::masked_irq)
+{
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+void wingco_state::lucky8(machine_config &config)
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	//->m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
+
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN3");
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
+
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
+	m_ppi[2]->out_pa_callback().set(FUNC(wingco_state::system_outputa_w));
+	m_ppi[2]->out_pb_callback().set(FUNC(wingco_state::system_outputb_w));
+	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	ym2149_device &aysnd(YM2149(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW3");
+	aysnd.port_b_read_callback().set_ioport("DSW4");
+	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void wingco_state::lucky8f(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::lucky8f_decrypted_opcodes_map);
+}
+
+void wingco_state::bingowng(machine_config &config)
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
+
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN3");
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
+
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
+	m_ppi[2]->out_pa_callback().set(FUNC(wingco_state::system_outputa_w));
+	m_ppi[2]->out_pb_callback().set(FUNC(wingco_state::system_outputb_w));
+	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wingco_state::screen_update_bingowng));
+	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW3");
+	aysnd.port_b_read_callback().set_ioport("DSW4");
+	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(wingco_state::bingownga)
-	bingowng(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bingownga)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(wingco_state::flam7_w4)
-	lucky8(config);
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-
-	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
-
-	MCFG_DS2401_ADD("fl7w4_id")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(wingco_state::flaming7)
-	lucky8(config);
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
-
-	// to do serial protection.
-	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
-
-	MCFG_DS2401_ADD("fl7w4_id")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(wingco_state::flam7_tw)
-	lucky8(config);
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(flaming7_map)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", flam7_tw)
-
-	// to do serial protection.
-	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
-
-	MCFG_DS2401_ADD("fl7w4_id")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(wingco_state::mbstar)
-	lucky8(config);
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mbstar_map)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_mbstar)
-MACHINE_CONFIG_END
-
-
-
-PALETTE_INIT_MEMBER(wingco_state, magodds)
+void wingco_state::bingownga(machine_config &config)
 {
+	bingowng(config);
+	m_gfxdecode->set_info(gfx_bingownga);
+}
+
+
+void wingco_state::flam7_w4(machine_config &config)
+{
+	lucky8(config);
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
+
+	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
+
+	DS2401(config, m_fl7w4_id);
+}
+
+void wingco_state::flaming7(machine_config &config)
+{
+	lucky8(config);
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
+
+	m_gfxdecode->set_info(gfx_flaming7);
+
+	// to do serial protection.
+	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
+
+	DS2401(config, m_fl7w4_id);
+}
+
+void wingco_state::flam7_tw(machine_config &config)
+{
+	lucky8(config);
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
+
+	m_gfxdecode->set_info(gfx_flam7_tw);
+
+	// to do serial protection.
+	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
+
+	DS2401(config, m_fl7w4_id);
+}
+
+void wingco_state::mbstar(machine_config &config)
+{
+	lucky8(config);
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::mbstar_map);
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wingco_state::screen_update_mbstar));
+}
+
+
+
+void wingco_state::magodds_palette(palette_device &palette) const
+{
+	uint8_t const *const proms = memregion("proms")->base();
 	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t *proms = memregion("proms")->base();
-		uint8_t b = proms[0x000 + i] << 4;
-		uint8_t g = proms[0x100 + i] << 4;
-		uint8_t r = proms[0x200 + i] << 4;
+		uint8_t const b = pal4bit(proms[0x000 + i]);
+		uint8_t const g = pal4bit(proms[0x100 + i]);
+		uint8_t const r = pal4bit(proms[0x200 + i]);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-MACHINE_CONFIG_START(wingco_state::magodds)
-
+void wingco_state::magodds(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(magodds_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state, masked_irq)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::magodds_map);
+	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN3");
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
+	m_ppi[2]->out_pa_callback().set(FUNC(wingco_state::system_outputa_w));
+	m_ppi[2]->out_pb_callback().set(FUNC(wingco_state::system_outputb_w));
+	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_magical)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wingco_state::screen_update_magical));
+	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magodds)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wingco_state, magodds)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magodds);
+	PALETTE(config, m_palette, FUNC(wingco_state::magodds_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)  // shut up annoying whine
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.00);  // shut up annoying whine
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW3");
+	aysnd.port_b_read_callback().set_ioport("DSW4");
+	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::kkotnoli)
-
+void goldstar_state::kkotnoli(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kkotnoli_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, nmi_line_pulse)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::kkotnoli_map);
+	//m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN3");
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-MACHINE_CONFIG_END
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
-MACHINE_CONFIG_START(goldstar_state::ladylinr)
-
+void goldstar_state::ladylinr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ladylinr_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, nmi_line_pulse)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::ladylinr_map);
+	//m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK) // unused?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8930(config, "aysnd", AY_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50); // unused?
+}
 
 
-MACHINE_CONFIG_START(wingco_state::wcat3)
-
+void wingco_state::wcat3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wcat3_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, nmi_line_pulse)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::wcat3_map);
+	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN3");
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
+	m_ppi[2]->out_pa_callback().set(FUNC(wingco_state::system_outputa_w));
+	m_ppi[2]->out_pb_callback().set(FUNC(wingco_state::system_outputb_w));
+	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW3");
+	aysnd.port_b_read_callback().set_ioport("DSW4");
+	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /* diff with cm machine driver: gfxdecode, OKI & portmap */
-MACHINE_CONFIG_START(cmaster_state::amcoe1)
-
+void cmaster_state::amcoe1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(amcoe1_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::amcoe1_portmap);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
+	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW5");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
+}
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-MACHINE_CONFIG_START(cmaster_state::amcoe1a)
+void cmaster_state::amcoe1a(machine_config &config)
+{
 	amcoe1(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cmaster_state, screen_update_amcoe1a)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmaster_state::screen_update_amcoe1a));
+}
 
 
 /* diff with cm machine driver: gfxdecode, AY8910 volume & portmap */
-MACHINE_CONFIG_START(cmaster_state::amcoe2)
-
+void cmaster_state::amcoe2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(amcoe2_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::amcoe2_portmap);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
+	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) /* analyzed for clips */
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW5");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 2.00); /* analyzed for clips */
+}
 
-MACHINE_CONFIG_START(cmaster_state::nfm)
+void cmaster_state::nfm(machine_config &config)
+{
 	amcoe2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nfm_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::nfm_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", nfm)
-MACHINE_CONFIG_END
-
-
-INTERRUPT_GEN_MEMBER(unkch_state::vblank_irq)
-{
-	if (m_vblank_irq_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_gfxdecode->set_info(gfx_nfm);
 }
 
-MACHINE_CONFIG_START(unkch_state::unkch)
 
+WRITE_LINE_MEMBER(unkch_state::vblank_irq)
+{
+	if (state && m_vblank_irq_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+void unkch_state::unkch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(unkch_map)
-	MCFG_CPU_IO_MAP(unkch_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unkch_state, vblank_irq)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::unkch_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::unkch_portmap);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
+	screen.screen_vblank().set(FUNC(unkch_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unkch)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unkch);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* payout hardware */
-	MCFG_TICKET_DISPENSER_ADD("tickets", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+}
 
 
 
 // hw unknown - should be somewhat similar to cm
-MACHINE_CONFIG_START(goldstar_state::pkrmast)
-
+void goldstar_state::pkrmast(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(pkrmast_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::pkrmast_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkrmast)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkrmast);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW5");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(unkch_state::megaline)
-
+void unkch_state::megaline(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(megaline_map)
-	MCFG_CPU_IO_MAP(megaline_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::megaline_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::megaline_portmap);
 
-	//MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	//MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	//MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	//I8255A(config, m_ppi[0], 0);
+	//I8255A(config, m_ppi[1], 0);
+	//I8255A(config, m_ppi[2], 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
-//  MCFG_NVRAM_ADD_1FILL("nvram")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn1", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("sn2", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn2", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("sn3", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn3", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW3");
+	aysnd.port_b_read_callback().set_ioport("DSW4");
+	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(unkch_state::bonusch)
-
+void unkch_state::bonusch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(bonusch_map)
-	MCFG_CPU_IO_MAP(bonusch_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::bonusch_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::bonusch_portmap);
 
-	MCFG_CPU_ADD("mcu", I80C51, 12_MHz_XTAL)
-	MCFG_DEVICE_DISABLE()
+	I80C51(config, "mcu", 12_MHz_XTAL).set_disable();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn1", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("sn2", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn2", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("sn3", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn3", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("sn4", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn4", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_END
+void unkch_state::feverch(machine_config &config)
+{
+	Z80(config, m_maincpu, 12'000'000 / 2); // clock not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::feverch_map);
+	m_maincpu->set_addrmap(AS_IO, &unkch_state::feverch_portmap);
 
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN3");
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
+
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW4");
+	m_ppi[2]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[2]->in_pc_callback().set_ioport("DSW3");
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
+	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
+
+	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
+
+	SPEAKER(config, "mono").front_center();
+
+	SN76489A(config, "sn1", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
+
+	SN76489A(config, "sn2", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
+
+	SN76489A(config, "sn3", 12'000'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.80); // actually SN76489AN, clock not verified
+}
 
 /***************************************************************************
 
@@ -9301,6 +9707,26 @@ ROM_START( crazybon )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
 ROM_END
 
+ROM_START( crazybona )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_main.bin",  0x00000, 0x10000, CRC(61a5585d) SHA1(5fdcf80f62ed21c9e903da64cf67ed39ec55b8b9) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "crazy_h3.bin", 0x00000, 0x20000, CRC(6b3692b5) SHA1(ffdcd4e59d7c009fd76a65e8f87642da35f996f4) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "crazy_j3.bin", 0x00000, 0x20000, CRC(e375cd4b) SHA1(68888126ff9743cd589f3426205231bc3a896588) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+
+	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
+	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
+ROM_END
 
 /*
 Cherry Gold  (Cherry 10)
@@ -9341,27 +9767,27 @@ Note
 */
 ROM_START( chry10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ver.1h2.u20",  0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
+	ROM_LOAD( "ver.1h2.u20",       0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
 
 	ROM_REGION( 0x10000, "pic", 0 )
-	ROM_LOAD( "pic16f84.bad.dump",    0x00000, 0x014f4, BAD_DUMP CRC(876ff1ed) SHA1(fcd6892e2b8371030af15e4d8c9f4a351ce0551c) )
+	ROM_LOAD( "pic16f84.bad.dump", 0x00000, 0x014f4, BAD_DUMP CRC(876ff1ed) SHA1(fcd6892e2b8371030af15e4d8c9f4a351ce0551c) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "27c010.u1",      0x00000, 0x20000, CRC(05515cf8) SHA1(366dd44ae93bdc4cf456f97f38edac83441cbc89) )
+	ROM_LOAD( "27c010.u1",         0x00000, 0x20000, CRC(05515cf8) SHA1(366dd44ae93bdc4cf456f97f38edac83441cbc89) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
+	ROM_LOAD( "1.u3",              0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+	ROM_LOAD( "82s147.u2",         0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x02e5, "palgal", 0 )
-	ROM_LOAD( "palce20v8h.pl1.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
-	ROM_LOAD( "palce20v8h.pl2.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
-	ROM_LOAD( "palce16v8h.pl4.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "gal22v10b.pl5.bad.dump",     0x00000, 0x02e5, BAD_DUMP CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
-	ROM_LOAD( "palce16v8h.pl6.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
-	ROM_LOAD( "palce16v8h.pl7.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce20v8h.pl1",    0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl2",    0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl4",    0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal22v10b.pl5",     0x00000, 0x02e5, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl6",    0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl7",    0x00000, 0x0117, NO_DUMP )
 ROM_END
 
 
@@ -9405,24 +9831,24 @@ Note
 */
 ROM_START( chrygld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ol-v9.u20",  0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )
+	ROM_LOAD( "ol-v9.u20",       0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "ol-la.u1",      0x00000, 0x20000, CRC(c3c912f1) SHA1(a2131f092ae1971f79a11d6a18b031cd98529320) )
+	ROM_LOAD( "ol-la.u1",        0x00000, 0x20000, CRC(c3c912f1) SHA1(a2131f092ae1971f79a11d6a18b031cd98529320) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
+	ROM_LOAD( "1.u3",            0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+	ROM_LOAD( "82s147.u2",       0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x02dd, "palgal", 0 )
-	ROM_LOAD( "gal20v8.pl1.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(bf885908) SHA1(6cac1022172ee0c178fd3b9c187b1ffb4742898f) )
-	ROM_LOAD( "palce20v8h.pl2.bad.dump", 0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
-	ROM_LOAD( "palce16v8h.pl4.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "peel22cv10a.pl5.bad.dump",0x00000, 0x02dd, BAD_DUMP CRC(8e6075d9) SHA1(f2c1b6497a4d9e873d36b89771c135a2cd91d05f) )
-	ROM_LOAD( "palce16v8h.pl6.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
-	ROM_LOAD( "palce16v8h.pl7.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "gal20v8.pl1",     0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl2",  0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl4",  0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "peel22cv10a.pl5", 0x00000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl6",  0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl7",  0x00000, 0x0117, NO_DUMP )
 ROM_END
 
 
@@ -9829,6 +10255,49 @@ ROM_START( cmv801 )
 
 	ROM_REGION( 0x100, "proms2", 0 ) // something else?
 	ROM_LOAD( "prom1.287", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+/*
+Super Seven - 199? (>= 1995 since it cites an Italian law from 1995)
+Bootleg /licensed version of Cherry Master (Dyna CM-1 V1.01 at 0xd000 of the program ROM).
+
+PCB with a New Impeuropex sticker
+
+- Main cpu is a Z80B (Z8400B) clocked @3MHz (derived by a 12MHZ quartz)
+- Sound is generated by a AY-3-8910 clocked @1.5MHz (derived by the same 12MHZ quartz)
+- One 27C512 for storing program code
+- Two 27C010 for storing GFX data
+- One 82S191AN BPROM
+- One 82S137AN
+- Five PLDs (two PALCE16V8 and three GAL20V8)
+- One 3.6V lithium battery probably for storing high-scores
+*/
+
+ROM_START( super7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_1", 0x00000, 0x10000, CRC(ddfa6fe7) SHA1(0d86ec5029afd565e039fe84f7001b2dc77c919c) ) // first 0x8000 encrypted
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // very similar to most cmv4 sets, but differently arranged
+	ROM_LOAD( "27c010_2", 0x00000, 0x20000, CRC(9636d785) SHA1(8f851aae0b05ad909c48cf94142ab927145da464) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "27c010_3", 0x00000, 0x20000, CRC(a6db1162) SHA1(05019166526b0797e3eca8b72d90c325573b3d74) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // no girls ROM
+
+	ROM_REGION( 0x800, "proms", 0 ) // RGB generation
+	ROM_LOAD( "82s191an.bin",  0x000, 0x800, CRC(ec546abe) SHA1(1bd92c0715ec1821fa977a67499dc8971deec9c7) )
+
+	ROM_REGION( 0x400, "proms2", 0 )
+	ROM_LOAD( "82s137an.bin",  0x000, 0x400, CRC(92975789) SHA1(4a85d169db5e298ee201fe7d4b9964b1df16992e) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "palce16v8.bin", 0x000, 0x114, NO_DUMP )
+	ROM_LOAD( "palce16v8.bin", 0x000, 0x114, NO_DUMP )
+	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
+	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
+	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 ROM_END
 
 /*
@@ -10462,7 +10931,7 @@ ROM_END
 /* Cherry Master I (V1.10)
    Original Dyna upgrade for Cherry Master boards.
    The game runs in an original Dyna D9001 PCB.
-   It laks of STOP ALL button.
+   It lacks the STOP ALL button.
 
    From the owner (sic):
    - The reels cannot be stop, not exist all stop button or cannot be stop from small, big, double-up button.
@@ -10591,7 +11060,22 @@ ROM_END
 
 ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u18", 0x00000, 0x10000, CRC(e0e5328d) SHA1(fd02c65fecada69a0953372a39e520a80c744109) )
+	ROM_LOAD( "u18", 0x02000, 0x1000, CRC(e0e5328d) SHA1(fd02c65fecada69a0953372a39e520a80c744109) )
+	ROM_CONTINUE(0xf000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0xb000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000)
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x9000,0x1000)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "u64",   0x00000, 0x8000, CRC(2e593152) SHA1(ca0f587b26ed6e962e100d9178b6f79995a26fec) )
@@ -10675,23 +11159,43 @@ ROM_END
 // the program roms on these seem scrambled somehow
 ROM_START( jkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pid-515.u5",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_LOAD( "pid-515.u5",  0x4000, 0x4000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_CONTINUE(0xc000, 0x4000)
+	ROM_CONTINUE(0x8000, 0x4000)
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
-
-	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
 
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s147a.u13", 0x0000, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
-	ROM_LOAD( "n82s147a.u13", 0x0100, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
-
-	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x100, "proms2", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( jkrmasta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pid-513.u5",  0x4000, 0x4000, CRC(12fa7ea0) SHA1(71ee141fe01ae2ce9913620b52c54cf445fd0b00) )
+	ROM_CONTINUE(0x0000, 0x4000)
+	ROM_CONTINUE(0xc000, 0x4000)
+	ROM_CONTINUE(0x8000, 0x4000)
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s147a.u13", 0x0000, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
+ROM_END
 
 ROM_START( pkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -11036,8 +11540,8 @@ ROM_END
 
 ROM_START( lucky8d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "8-40%.bin",   0x0000, 0x4000, CRC(4c79db5a) SHA1(b959030856f54776841092c4c2bccc6565faa587) )
-	ROM_LOAD( "9-40%.bin",   0x4000, 0x4000, CRC(fb0d511f) SHA1(c2c1868339d4f20bf1f5d6b66802e8f8deed4611) )
+	ROM_LOAD( "8-40_.bin",   0x0000, 0x4000, CRC(4c79db5a) SHA1(b959030856f54776841092c4c2bccc6565faa587) )
+	ROM_LOAD( "9-40_.bin",   0x4000, 0x4000, CRC(fb0d511f) SHA1(c2c1868339d4f20bf1f5d6b66802e8f8deed4611) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "5",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
@@ -11156,6 +11660,37 @@ ROM_START( lucky8e )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+ROM_START( lucky8f ) // like the parent, but encrypted. Has an extra ROM (unverified purpose). Possibly bootleg? PCB has no Wing markings or stickers
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a2.ic85",   0x0000, 0x8000, CRC(b80f3c11) SHA1(6a4e1f986ef019d41d0236992faa17bdb2e095ad) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "a5.ic19",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "a4.ic18",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "a3.ic17",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "a9.ic23",   0x0000, 0x2000, CRC(4d41bc1f) SHA1(d5529c8e200d8fba2fe503fb20a7ad862c065c8c) )
+	ROM_LOAD( "a8.ic22",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "a7.ic21",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "a6.ic20",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.ic26", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "82s129.ic25", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "82s123.ic65", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.ic47", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "82s123.ic66", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION( 0x1000, "dec_table", 0 ) // possibly related to encryption? currently unused by the emulation
+	ROM_LOAD( "a1.ic91", 0x0000, 0x01000, CRC(8a660a97) SHA1(8d23e98886276824353c6c6572e3d93ddb40f0f0) )
+ROM_END
 
 /*
   New Lucky 8 Lines / New Super 8 Lines.
@@ -12014,12 +12549,10 @@ YM2203
 
 is this the original Magical Odds?
 */
-DRIVER_INIT_MEMBER(wingco_state, magoddsc)
+void wingco_state::init_magoddsc()
 {
-	int A;
 	uint8_t *ROM = memregion("maincpu")->base();
-
-	for (A = 0;A < 0x8000;A++)
+	for (int A = 0; A < 0x8000; A++)
 	{
 		if ((A & 4) == 4)
 			ROM[A] ^= 0x01;
@@ -13383,8 +13916,10 @@ ROM_START( fb2010 )
 	ROM_CONTINUE(0xd000, 0x1000)
 	ROM_CONTINUE(0xe000, 0x1000)
 	ROM_CONTINUE(0xf000, 0x1000)
+
 	ROM_REGION( 0x20000, "graphics", 0 )
-	ROM_LOAD( "gfx",  0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "high.bin", 0x00000, 0x10000, CRC(5950b5fb) SHA1(64441fdbd768e7765e20a33acd4002e69b868f09) )
+	ROM_LOAD( "low.bin",  0x10000, 0x10000, CRC(98b0454f) SHA1(91f7f4119a0cd591e68c87a9e716a8cd5233a4aa) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
@@ -13400,26 +13935,23 @@ ROM_START( fb2010 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
-	ROM_REGION( 0x200, "proms", 0 ) // palette
-	ROM_LOAD( "proms", 0x0000, 0x0200, NO_DUMP )
-
-	ROM_REGION( 0x80000, "oki", 0 ) // samples
-	ROM_LOAD( "samples", 0x00000, 0x20000, NO_DUMP )
+	ROM_REGION( 0x200, "proms", 0 ) // palette (taken from nfb96se, not verified)
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, BAD_DUMP CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, BAD_DUMP CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cmaster_state, fb2010)
+void cmaster_state::init_fb2010()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0;i < 0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 0x22)
+		switch (i & 0x22)
 		{
 			case 0x00: x = bitswap<8>(x^0x4c^0xff, 0,4,7,6,5,1,3,2); break;
-			case 0x02: x = bitswap<8>(x^0xc0^0xff, 7,6,0,5,3,2,1,4); break; //   67053214
+			case 0x02: x = bitswap<8>(x^0xc0^0xff, 7,6,0,5,3,2,1,4); break;
 			case 0x20: x = bitswap<8>(x^0x6b^0xff, 4,3,2,7,5,6,0,1); break;
 			case 0x22: x = bitswap<8>(x^0x23^0xff, 0,6,1,3,4,5,2,7); break;
 		}
@@ -13427,7 +13959,12 @@ DRIVER_INIT_MEMBER(cmaster_state, fb2010)
 		ROM[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(cmaster_state::fixedval82_r),this));
+	// some kind of protection? checks something in NVRAM after a few spins?
+	// TODO: work out how to handle this without a patch, doesn't seem 100% related to port read below like in other games?
+	ROM[0x10dc] = 0x00;
+	ROM[0x10dd] = 0x00;
+
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(cmaster_state::fixedval7d_r),this));
 }
 
 
@@ -13587,6 +14124,49 @@ ROM_START( nfb96seb )
 	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
 ROM_END
 
+ROM_START( nfb96sec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u34",0x00000, 0x1000, CRC(65e7a70d) SHA1(77b8b7e16e842d6debf9bb13d83dbf4289ab0bd4) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // Same data as other sets, arranged differently
+	ROM_LOAD( "u2", 0x00000, 0x08000, CRC(7d245ff8) SHA1(eebc3c0700aaa5e8d0be22d411f097607e179d5e) )
+	ROM_CONTINUE(   0x10000, 0x08000 )
+	ROM_CONTINUE(   0x08000, 0x08000 )
+	ROM_CONTINUE(   0x00000, 0x08000 )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // Same data as other sets, arranged differently
+	ROM_LOAD( "u35", 0x0000, 0x4000, CRC(ddd6b7cb) SHA1(ff5161d7d25b216fd507a43f9102cde1e1518593) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(    0x2000, 0x2000 )
+	ROM_CONTINUE(    0x0000, 0x2000 )
+	ROM_LOAD( "u1",  0x4000, 0x4000, CRC(fdbb5896) SHA1(edfcfcfbf6306ff40c517eeeb05f91b869ba40d2) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(    0x6000, 0x2000 )
+	ROM_CONTINUE(    0x4000, 0x2000 )
+
+	// taken from new fruit bonus '96, might be wrong
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "proms2", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+ROM_END
 
 // this contains elephants etc. instead of the usual symbols, maybe
 // it's meant to work with the above program roms?
@@ -14415,6 +14995,45 @@ ROM_START( bonusch )
 
 ROM_END
 
+/*
+Fever Chance
+Wing 19?? (1986 in ROM).
+
+Wing license seal but Eagle labeled ROMs
+
+1 x Z80
+3 x I8255A
+3 x SN76489AN
+1 x unknown at 8d (possibly battery backed RAM)
+*/
+
+ROM_START( feverch )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w9.c11", 0x00000, 0x8000, CRC(4dda18ef) SHA1(9a98a2f6996903b58d53e10b7b68c6ed1c34967a) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "cf18.7h", 0x00000, 0x08000, CRC(c63924fe) SHA1(7471d05c8688ba1fa6c0c3444de8883595c21776) )
+	ROM_LOAD( "cf19.8h", 0x08000, 0x08000, CRC(f0229490) SHA1(665d335cc030a0cbec0c11c685a6f1e2f9706989) )
+	ROM_LOAD( "cf20.10h", 0x10000, 0x08000, CRC(1d831a06) SHA1(42d235b8dd894d38579886940a3e13adb843e00d) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "cf1.1h", 0x00000, 0x02000, CRC(5f022073) SHA1(2e154837834cc9db452279b4933900234b568565) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x00000, 0x02000)
+	ROM_LOAD( "cf2.2h", 0x02000, 0x02000, CRC(e8f927b9) SHA1(29dec2f21a1bea250a4a2d75fab8d03a1fc70bcd) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x02000, 0x02000)
+	ROM_LOAD( "cf3.4h", 0x04000, 0x02000, CRC(79b06e00) SHA1(18f73527714914edb57e22909c95f2c764223900) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x04000, 0x02000)
+	ROM_LOAD( "cf4.5h", 0x06000, 0x02000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) ) // 1st and 2nd half identical
+	ROM_CONTINUE(0x06000, 0x02000)
+
+	// PROMs not dumped, taken from lucky8
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+ROM_END
 
 /*
   Win Cherry (ver 0.16 - 19990219)
@@ -14444,7 +15063,7 @@ ROM_END
 
 ROM_START( wcherry )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wc20%388.ic2",  0x00000, 0x10000, CRC(b1ea0e6a) SHA1(2dd3f2cfffc1e47b45c29daa9d7df7af956b599c) )
+	ROM_LOAD( "wc20_388.ic2",  0x00000, 0x10000, CRC(b1ea0e6a) SHA1(2dd3f2cfffc1e47b45c29daa9d7df7af956b599c) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "wincherryb.ic6",  0x00000, 0x20000, CRC(cace16f5) SHA1(a6caddc6ccd30901e2332a42f339a1da022de410) )
@@ -14456,6 +15075,67 @@ ROM_START( wcherry )
 	ROM_LOAD( "am27c29pc",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )    // borrowed from other game.
 ROM_END
 
+/*
+Taiwan Chess Legend
+Uniwang, 1995
+
+Preliminary driver by Tomasz Slanina
+
+PCB Layout
+----------
+
+|-----------------------------------------------|
+|  AY8930   DSW5  TCL.1E                        |
+|           DSW4  TCL.3E   TCL.3F  TCL.3H       |
+|           DSW3  TCL.4E   TCL.4F  TCL.4H       |
+|           DSW2  6116                          |
+|           DSW1  6116          6116            |
+|                               6116            |
+|  8255                               12MHz     |
+|                                               |
+|                                               |
+|                 TCL_PR3.9E                    |
+|                                               |
+|  8255                     PAL                 |
+|                                               |
+|                           PAL                 |
+|  BATTERY                    LATTICE           |
+|                       PAL   PLSI 1016 Z80 PAL |
+|           TCL_PR1.15C                     PAL |
+|  SW1      TCL_PR2.16C 6116      TCL.16F       |
+|-----------------------------------------------|
+
+Notes:
+      Z80 Clock: 3.000MHz
+          VSync: 60Hz
+          HSync: 15.15kHz
+
+ This appears to be based off a Blue Dyna Cherry Master board but with extra protection (the sub-board with CPU)
+
+*/
+
+ROM_START( tcl )
+	ROM_REGION( 0x10000*2, "maincpu", 0 )
+	ROM_LOAD( "tcl.16f",   0x00000, 0x20000, CRC(8e694a58) SHA1(7a3c20a7c740065b71fe66ec581edce0dd32f145) )
+
+	ROM_REGION( 0x8000*3, "gfx1", 0 )
+	ROM_LOAD( "tcl.1e",   0x00000, 0x8000, CRC(37edf9b8) SHA1(9225728116d6edfe8476e565a12e1f1e59766d26) )
+	ROM_LOAD( "tcl.3e",   0x08000, 0x8000, CRC(396298cf) SHA1(0ee306179a9d3dd84f7e5799527e6825d2979ddb) )
+	ROM_LOAD( "tcl.4e",   0x10000, 0x8000, CRC(f880101c) SHA1(8417410a7dcb304a88e98f9199f44a4df1ee3fb7) )
+
+	ROM_REGION( 0x2000*4, "gfx2", 0 ) /* ??? */
+	ROM_LOAD( "tcl.3f",   0x0000, 0x2000, CRC(c290c1eb) SHA1(00eb5ff46affe01f240081211b7f9a40e9f76bd8) )
+	ROM_LOAD( "tcl.4f",   0x2000, 0x2000, CRC(225e0148) SHA1(26d8db263b1957fc6b2204765c8aa1f10f44b591) )
+	ROM_LOAD( "tcl.3h",   0x4000, 0x2000, CRC(ee63d380) SHA1(c1d9ca4584bb2ef0fa85e2afb0876040b473a924) )
+	ROM_LOAD( "tcl.4h",   0x6000, 0x2000, CRC(6afa36a1) SHA1(a87423f01dbf9b1e69feb049d6ae3fd63321ee1a) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF ) // (girl bitmaps, not present)
+
+	ROM_REGION( 0x100*3, "proms", 0 )
+	ROM_LOAD( "tcl_pr1.15c",   0x000, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+	ROM_LOAD( "tcl_pr2.16c",   0x100, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "tcl_pr3.9e",    0x200, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
 
 /****************************** Stealth Sets ******************************/
 
@@ -15359,17 +16039,42 @@ ROM_END
 
 /*********************************************************************************************************************/
 
-DRIVER_INIT_MEMBER(goldstar_state,goldstar)
+void goldstar_state::init_goldstar()
 {
-	int A;
 	uint8_t *ROM = memregion("maincpu")->base();
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		if ((A & 0x30) == 0)
 			ROM[A] ^= 0x82;
 		else
 			ROM[A] ^= 0xcc;
+	}
+}
+
+void goldstar_state::init_jkrmast()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int A = 0; A < 0x8000; A++)
+	{
+		uint8_t x = ROM[A];
+		x = bitswap<8>(x ^ 0x0a, 5, 6, 1, 4, 7, 2, 3, 0);
+		ROM[A] = x;
+	}
+
+	uint8_t buf[0x8000];
+	memcpy(buf, ROM, 0x8000);
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		if ((i & 0x60) == 0x00)
+			ROM[i] = buf[i^0x08];
+		else if ((i & 0x60) == 0x60)
+			ROM[i] = buf[i^0x10];
+		else if ((i & 0x60) == 0x40)
+			ROM[i] = buf[i^0x18];
+		else if ((i & 0x60) == 0x20)
+			ROM[i] = buf[i];
 	}
 }
 
@@ -15442,15 +16147,11 @@ uint8_t cb3_state::chry10_decrypt(uint8_t cipherText)
 	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
 }
 
-DRIVER_INIT_MEMBER(cb3_state, chry10)
+void cb3_state::init_chry10()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	int start = 0;
-
-	int i;
-
-	for (i = start; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		ROM[i] = chry10_decrypt(ROM[i]);
 	}
@@ -15466,15 +16167,11 @@ DRIVER_INIT_MEMBER(cb3_state, chry10)
 	dump_to_file(ROM);
 }
 
-DRIVER_INIT_MEMBER(cb3_state, cb3)
+void cb3_state::init_cb3()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	int start = 0;
-
-	int i;
-
-	for (i = start; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		ROM[i] = cb3_decrypt(ROM[i], i);
 	}
@@ -15483,15 +16180,55 @@ DRIVER_INIT_MEMBER(cb3_state, cb3)
 	dump_to_file(ROM);
 }
 
-
-DRIVER_INIT_MEMBER(cb3_state, chrygld)
+void goldstar_state::init_chryangl()
 {
-	int A;
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x02, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0xa0, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0x82, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x02, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x08, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x80, 5, 6, 3, 4, 1, 2, 7, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = ROM[i];
+		switch (i & 0x83)
+		{
+			case 0x00: x = bitswap<8>(x ^ 0x22, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x01: x = bitswap<8>(x ^ 0x2a, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x82, 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x03: x = bitswap<8>(x ^ 0x2a, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x80: x = bitswap<8>(x ^ 0xa8, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x81: x = bitswap<8>(x ^ 0x88, 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x82: x = bitswap<8>(x ^ 0x22, 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x83: x = bitswap<8>(x ^ 0x88, 1, 6, 7, 4, 5, 2, 3, 0); break;
+		}
+
+		ROM[i] = x;
+	}
+}
+
+void cb3_state::init_chrygld()
+{
 	uint8_t *ROM = memregion("maincpu")->base();
 	do_blockswaps(ROM);
 
 	// a data bitswap
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		uint8_t dat = ROM[A];
 		dat =  bitswap<8>(dat, 5, 6, 3, 4, 7, 2, 1, 0);
@@ -15501,7 +16238,7 @@ DRIVER_INIT_MEMBER(cb3_state, chrygld)
 	dump_to_file(ROM);
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, cm)
+void cmaster_state::init_cm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -15512,7 +16249,7 @@ DRIVER_INIT_MEMBER(cmaster_state, cm)
 	ROM[0x0025] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, cmv4)
+void cmaster_state::init_cmv4()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -15523,7 +16260,7 @@ DRIVER_INIT_MEMBER(cmaster_state, cmv4)
 	ROM[0x020d] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(goldstar_state, cmast91)
+void goldstar_state::init_cmast91()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -15534,22 +16271,143 @@ DRIVER_INIT_MEMBER(goldstar_state, cmast91)
 	ROM[0x0a92] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(wingco_state, lucky8a)
+void wingco_state::init_lucky8a()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0010] = 0x21;
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96sea)
+void wingco_state::init_lucky8f() // TODO: simplify
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		uint8_t x = ROM[i];
-		switch(i & 7)
+
+		switch(i & 0x1249)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0x44, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0x51, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0008: x = bitswap<8>(x ^ 0x10, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0009: x = bitswap<8>(x ^ 0x54, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0040: x = bitswap<8>(x ^ 0x15, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0041: x = bitswap<8>(x ^ 0x14, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0048: x = bitswap<8>(x ^ 0x05, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0049: x = bitswap<8>(x ^ 0x55, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0200: x = bitswap<8>(x ^ 0x05, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0201: x = bitswap<8>(x ^ 0x51, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0208: x = bitswap<8>(x ^ 0x40, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0209: x = bitswap<8>(x ^ 0x54, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0240: x = bitswap<8>(x ^ 0x51, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0241: x = bitswap<8>(x ^ 0x41, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0248: x = bitswap<8>(x ^ 0x50, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0249: x = bitswap<8>(x ^ 0x55, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x1000: x = bitswap<8>(x ^ 0x41, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x54, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1008: x = bitswap<8>(x ^ 0x04, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1009: x = bitswap<8>(x ^ 0x54, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1040: x = bitswap<8>(x ^ 0x15, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1041: x = bitswap<8>(x ^ 0x14, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1048: x = bitswap<8>(x ^ 0x11, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1049: x = bitswap<8>(x ^ 0x55, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1200: x = bitswap<8>(x ^ 0x11, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1201: x = bitswap<8>(x ^ 0x54, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1208: x = bitswap<8>(x ^ 0x40, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1209: x = bitswap<8>(x ^ 0x51, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1240: x = bitswap<8>(x ^ 0x54, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1241: x = bitswap<8>(x ^ 0x41, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1248: x = bitswap<8>(x ^ 0x05, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1249: x = bitswap<8>(x ^ 0x55, 7, 0, 5, 6, 3, 4, 1, 2); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch(i & 0x5249)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0x01, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0x15, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0008: x = bitswap<8>(x ^ 0x04, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0009: x = bitswap<8>(x ^ 0x41, 7, 4, 5, 6, 3, 2, 1, 0); break;
+			case 0x0040: x = bitswap<8>(x ^ 0x00, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0041: x = bitswap<8>(x ^ 0x50, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0048: x = bitswap<8>(x ^ 0x41, 7, 2, 5, 4, 3, 6, 1, 0); break;
+			case 0x0049: x = bitswap<8>(x ^ 0x10, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0200: x = bitswap<8>(x ^ 0x40, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0201: x = bitswap<8>(x ^ 0x54, 7, 0, 5, 4, 3, 2, 1, 6); break;
+			case 0x0208: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0209: x = bitswap<8>(x ^ 0x05, 7, 6, 5, 2, 3, 4, 1, 0); break;
+			case 0x0240: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0241: x = bitswap<8>(x ^ 0x05, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0248: x = bitswap<8>(x ^ 0x14, 7, 6, 5, 0, 3, 2, 1, 4); break;
+			case 0x0249: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1000: x = bitswap<8>(x ^ 0x04, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x15, 7, 6, 5, 4, 3, 0, 1, 2); break;
+			case 0x1008: x = bitswap<8>(x ^ 0x10, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1009: x = bitswap<8>(x ^ 0x41, 7, 2, 5, 6, 3, 4, 1, 0); break;
+			case 0x1040: x = bitswap<8>(x ^ 0x00, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1041: x = bitswap<8>(x ^ 0x44, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1048: x = bitswap<8>(x ^ 0x41, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x1049: x = bitswap<8>(x ^ 0x40, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1200: x = bitswap<8>(x ^ 0x04, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1201: x = bitswap<8>(x ^ 0x45, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x1208: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1209: x = bitswap<8>(x ^ 0x05, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x1240: x = bitswap<8>(x ^ 0x00, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1241: x = bitswap<8>(x ^ 0x50, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1248: x = bitswap<8>(x ^ 0x14, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x1249: x = bitswap<8>(x ^ 0x01, 7, 4, 5, 0, 3, 6, 1, 2); break;
+			case 0x4000: x = bitswap<8>(x ^ 0x01, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x4001: x = bitswap<8>(x ^ 0x45, 7, 4, 5, 2, 3, 6, 1, 0); break;
+			case 0x4008: x = bitswap<8>(x ^ 0x01, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x4009: x = bitswap<8>(x ^ 0x44, 7, 4, 5, 6, 3, 0, 1, 2); break;
+			case 0x4040: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x4041: x = bitswap<8>(x ^ 0x11, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x4048: x = bitswap<8>(x ^ 0x14, 7, 6, 5, 0, 3, 4, 1, 2); break;
+			case 0x4049: x = bitswap<8>(x ^ 0x40, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x4200: x = bitswap<8>(x ^ 0x04, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x4201: x = bitswap<8>(x ^ 0x54, 7, 0, 5, 6, 3, 4, 1, 2); break;
+			case 0x4208: x = bitswap<8>(x ^ 0x40, 7, 4, 5, 0, 3, 6, 1, 2); break;
+			case 0x4209: x = bitswap<8>(x ^ 0x05, 7, 4, 5, 0, 3, 6, 1, 2); break;
+			case 0x4240: x = bitswap<8>(x ^ 0x00, 7, 0, 5, 4, 3, 6, 1, 2); break;
+			case 0x4241: x = bitswap<8>(x ^ 0x50, 7, 0, 5, 4, 3, 6, 1, 2); break;
+			case 0x4248: x = bitswap<8>(x ^ 0x44, 7, 0, 5, 4, 3, 6, 1, 2); break;
+			case 0x4249: x = bitswap<8>(x ^ 0x04, 7, 6, 5, 2, 3, 0, 1, 4); break;
+			case 0x5000: x = bitswap<8>(x ^ 0x10, 7, 6, 5, 2, 3, 0, 1, 4); break;
+			case 0x5001: x = bitswap<8>(x ^ 0x15, 7, 6, 5, 2, 3, 0, 1, 4); break;
+			case 0x5008: x = bitswap<8>(x ^ 0x01, 7, 2, 5, 6, 3, 0, 1, 4); break;
+			case 0x5009: x = bitswap<8>(x ^ 0x50, 7, 2, 5, 6, 3, 0, 1, 4); break;
+			case 0x5040: x = bitswap<8>(x ^ 0x00, 7, 0, 5, 6, 3, 2, 1, 4); break;
+			case 0x5041: x = bitswap<8>(x ^ 0x44, 7, 0, 5, 6, 3, 2, 1, 4); break;
+			case 0x5048: x = bitswap<8>(x ^ 0x14, 7, 0, 5, 6, 3, 2, 1, 4); break;
+			case 0x5049: x = bitswap<8>(x ^ 0x01, 7, 2, 5, 0, 3, 6, 1, 4); break;
+			case 0x5200: x = bitswap<8>(x ^ 0x10, 7, 2, 5, 0, 3, 6, 1, 4); break;
+			case 0x5201: x = bitswap<8>(x ^ 0x51, 7, 2, 5, 0, 3, 6, 1, 4); break;
+			case 0x5208: x = bitswap<8>(x ^ 0x40, 7, 0, 5, 2, 3, 6, 1, 4); break;
+			case 0x5209: x = bitswap<8>(x ^ 0x14, 7, 0, 5, 2, 3, 6, 1, 4); break;
+			case 0x5240: x = bitswap<8>(x ^ 0x00, 7, 4, 5, 2, 3, 0, 1, 6); break;
+			case 0x5241: x = bitswap<8>(x ^ 0x05, 7, 4, 5, 2, 3, 0, 1, 6); break;
+			case 0x5248: x = bitswap<8>(x ^ 0x41, 7, 4, 5, 2, 3, 0, 1, 6); break;
+			case 0x5249: x = bitswap<8>(x ^ 0x10, 7, 2, 5, 4, 3, 0, 1, 6); break;
+		}
+
+		ROM[i] = x;
+	}
+}
+
+void cmaster_state::init_nfb96sea()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t x = ROM[i];
+		switch (i & 7)
 		{
 			case 0: x = bitswap<8>(x ^ 0x80, 1, 6, 7, 4, 5, 2, 3, 0); break;
 			case 1: x = bitswap<8>(x ^ 0xa0, 5, 6, 3, 4, 1, 2, 7, 0); break;
@@ -15566,14 +16424,13 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96sea)
 }
 
 
-DRIVER_INIT_MEMBER(cmaster_state, schery97)
+void cmaster_state::init_schery97()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
-		switch(i & 0x12)
+		switch (i & 0x12)
 		{
 			case 0x00: x = bitswap<8>(x ^ 0x3e, 1, 0, 7, 6, 5, 4, 3, 2); break;
 			case 0x02: x = bitswap<8>(x ^ 0x4d, 0, 7, 6, 5, 4, 3, 2, 1); break;
@@ -15588,14 +16445,13 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97)
 	/* Oki 6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, schery97a)
+void cmaster_state::init_schery97a()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
-		switch(i & 6)
+		switch (i & 6)
 		{
 			case 0: x = bitswap<8>(x ^ 0xb9, 4, 0, 6, 7, 3, 1, 5, 2); break;
 			case 2: x = bitswap<8>(x ^ 0x8f, 6, 7, 4, 0, 3, 2, 1, 5); break;
@@ -15611,14 +16467,13 @@ DRIVER_INIT_MEMBER(cmaster_state, schery97a)
 	/* Oki 6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, skill98)
+void cmaster_state::init_skill98()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
-		switch(i & 0x12)
+		switch (i & 0x12)
 		{
 			case 0x00: x = bitswap<8>(x ^ 0x21, 2, 1, 0, 7, 6, 5, 4, 3); break;
 			case 0x02: x = bitswap<8>(x ^ 0x45, 2, 1, 0, 7, 6, 5, 4, 3); break;
@@ -15632,15 +16487,14 @@ DRIVER_INIT_MEMBER(cmaster_state, skill98)
 	/* Oki 6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_c1)
+void cmaster_state::init_nfb96_c1()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 0x12)
+		switch (i & 0x12)
 		{
 			case 0x00: x = bitswap<8>(x ^ 0xf5, 6, 4, 3, 7, 0, 1, 5, 2); break;
 			case 0x02: x = bitswap<8>(x ^ 0xe6, 4, 6, 3, 0, 7, 2, 1, 5); break;
@@ -15653,15 +16507,14 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c1)
 
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_c2)
+void cmaster_state::init_nfb96_c2()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 0x22)
+		switch (i & 0x22)
 		{
 			case 0x00: x = bitswap<8>(x ^ 0x5f, 6, 4, 3, 7, 0, 5, 2, 1); break;
 			case 0x02: x = bitswap<8>(x ^ 0xe7, 4, 6, 3, 0, 7, 5, 1, 2); break;
@@ -15674,15 +16527,14 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_c2)
 	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(FUNC(cmaster_state::fixedval58_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_d)
+void cmaster_state::init_nfb96_d()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 5)
+		switch (i & 5)
 		{
 			case 0: x = bitswap<8>(x ^ 0x6a, 2, 1, 0, 7, 6, 5, 4, 3); break;
 			case 1: x = bitswap<8>(x ^ 0xcc, 0, 7, 6, 5, 4, 3, 2, 1); break;
@@ -15701,15 +16553,14 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_d)
 }
 
 
-DRIVER_INIT_MEMBER(cmaster_state, nfb96_dk)
+void cmaster_state::init_nfb96_dk()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 5)
+		switch (i & 5)
 		{
 			case 0: x = bitswap<8>(x ^ 0xce, 1, 0, 7, 6, 5, 4, 3, 2); break;
 			case 1: x = bitswap<8>(x ^ 0x9e, 3, 2, 1, 0, 7, 6, 5, 4); break;
@@ -15722,15 +16573,14 @@ DRIVER_INIT_MEMBER(cmaster_state, nfb96_dk)
 
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp35)
+void cmaster_state::init_rp35()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 3)
+		switch (i & 3)
 		{
 			case 0: x = bitswap<8>(x ^ 0x2a, 0, 7, 6, 5, 4, 3, 2, 1); break;
 			case 1: x = bitswap<8>(x ^ 0x1c, 4, 3, 2, 1, 0, 7, 6, 5); break;
@@ -15744,15 +16594,14 @@ DRIVER_INIT_MEMBER(cmaster_state, rp35)
 	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(FUNC(cmaster_state::fixedval90_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp36)
+void cmaster_state::init_rp36()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 5)
+		switch (i & 5)
 		{
 			case 0: x = bitswap<8>(x ^ 0xee, 2, 1, 0, 7, 6, 5, 4, 3); break;
 			case 1: x = bitswap<8>(x ^ 0x9f, 3, 2, 1, 0, 7, 6, 5, 4); break;
@@ -15766,15 +16615,14 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36)
 	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
+void cmaster_state::init_rp36c3()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 0xa)
+		switch (i & 0xa)
 		{
 			case 0x0: x = bitswap<8>(x ^ 0xfd, 6, 4, 0, 7, 3, 1, 5, 2); break;
 			case 0x2: x = bitswap<8>(x ^ 0xee, 4, 6, 7, 0, 3, 2, 1, 5); break;
@@ -15788,15 +16636,14 @@ DRIVER_INIT_MEMBER(cmaster_state, rp36c3)
 	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(cmaster_state::fixedval48_r), this));
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
+void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 5)
+		switch (i & 5)
 		{
 			case 0: x = bitswap<8>(x ^ 0x6a, 7, 6, 5, 4, 3, 2, 1, 0); break;
 			case 1: x = bitswap<8>(x ^ 0xcc, 7, 6, 5, 4, 3, 2, 1, 0); break;
@@ -15811,15 +16658,14 @@ DRIVER_INIT_MEMBER(cmaster_state, rp96sub)  // 95 33 95 33 70 6C 70 6C... XORs s
 }
 
 
-DRIVER_INIT_MEMBER(cmaster_state, po33)
+void cmaster_state::init_po33()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 0x14)
+		switch (i & 0x14)
 		{
 			case 0x00: x = bitswap<8>(x ^ 0xde, 2, 1, 0, 7, 6, 5, 4, 3); break;
 			case 0x04: x = bitswap<8>(x ^ 0x3c, 0, 7, 6, 5, 4, 3, 2, 1); break;
@@ -15834,15 +16680,14 @@ DRIVER_INIT_MEMBER(cmaster_state, po33)
 	/* oki6295 at 0x20 */
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, match133)
+void cmaster_state::init_match133()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t x = ROM[i];
 
-		switch(i & 0x12)
+		switch (i & 0x12)
 		{
 			case 0x00: x = bitswap<8>(x ^ 0xde, 3, 2, 1, 0, 7, 6, 5, 4); break;
 			case 0x02: x = bitswap<8>(x ^ 0x3d, 1, 0, 7, 6, 5, 4, 3, 2); break;
@@ -15857,11 +16702,9 @@ DRIVER_INIT_MEMBER(cmaster_state, match133)
 	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(cmaster_state::fixedvale4_r), this));
 }
 
-DRIVER_INIT_MEMBER(cb3_state, cherrys)
+void cb3_state::init_cherrys()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
-
 	unsigned char rawData[256] = {
 		0xCC, 0xCD, 0xCE, 0xCF, 0xC8, 0xC9, 0xCA, 0xCB, 0xC4, 0xC5, 0xC6, 0xC7,
 		0xC0, 0xC1, 0xC2, 0xC3, 0xDC, 0xDD, 0xDE, 0xDF, 0xD8, 0xD9, 0xDA, 0xDB,
@@ -15887,7 +16730,7 @@ DRIVER_INIT_MEMBER(cb3_state, cherrys)
 		0x30, 0x31, 0x32, 0x33
 	};
 
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		ROM[i] = ROM[i] ^ rawData[i & 0xff];
 	}
@@ -15895,7 +16738,7 @@ DRIVER_INIT_MEMBER(cb3_state, cherrys)
 }
 
 /* todo: remove these patches! */
-DRIVER_INIT_MEMBER(unkch_state, unkch1)
+void unkch_state::init_unkch1()
 {
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
@@ -15905,7 +16748,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch1)
 	ROM[0x9d53] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(unkch_state, unkch3)
+void unkch_state::init_unkch3()
 {
 	// game stores $04 at ($D77F) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
@@ -15915,7 +16758,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch3)
 	ROM[0x9b87] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(unkch_state, unkch4)
+void unkch_state::init_unkch4()
 {
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
@@ -15925,7 +16768,7 @@ DRIVER_INIT_MEMBER(unkch_state, unkch4)
 	ROM[0x9a6f] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(cmaster_state, tonypok)
+void cmaster_state::init_tonypok()
 {
 	// the ppi doesn't seem to work properly, so just install the inputs directly
 	address_space &io = m_maincpu->space(AS_IO);
@@ -15935,11 +16778,10 @@ DRIVER_INIT_MEMBER(cmaster_state, tonypok)
 
 }
 
-DRIVER_INIT_MEMBER(goldstar_state, super9)
+void goldstar_state::init_super9()
 {
-	int i;
 	uint8_t *src = memregion("gfx1")->base();
-	for (i = 0; i < 0x20000; i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 //      src[i] = bitswap<8>(src[i], 7, 4, 2, 1, 6, 5, 3, 0);
 //      src[i] = bitswap<8>(src[i], 7, 3, 2, 6, 1, 5, 4, 0);
@@ -15947,7 +16789,7 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 	}
 
 	uint8_t *src2 = memregion("gfx2")->base();
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 //      src2[i] = bitswap<8>(src2[i], 7, 4, 2, 1, 6, 5, 3, 0);
 //      src2[i] = bitswap<8>(src2[i], 7, 3, 2, 6, 1, 5, 4, 0);
@@ -15956,14 +16798,13 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 
 }
 
-DRIVER_INIT_MEMBER(cb3_state, cb3e)
+void cb3_state::init_cb3e()
 {
 /*  program bitswap */
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	do_blockswaps(ROM);
 
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		uint8_t dat = ROM[i];
 		dat =  bitswap<8>(dat, 5, 6, 3, 4, 7, 2, 1, 0);
@@ -15971,34 +16812,32 @@ DRIVER_INIT_MEMBER(cb3_state, cb3e)
 	}
 
 /*  bank 1 graphics */
-//  int i;
 	uint8_t *src = memregion("gfx1")->base();
-	for (i = 0; i < 0x20000; i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	uint8_t *src2 = memregion("gfx2")->base();
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
 }
 
-DRIVER_INIT_MEMBER(goldstar_state, wcherry)
+void goldstar_state::init_wcherry()
 {
 /*  bank 1 graphics */
-	int i;
 	uint8_t *src = memregion("gfx1")->base();
-	for (i = 0; i < 0x20000; i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	uint8_t *src2 = memregion("gfx2")->base();
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
@@ -16011,19 +16850,18 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
   Original custom hardware graphics decryption.
 
 */
-DRIVER_INIT_MEMBER(wingco_state, flaming7)
+void wingco_state::init_flaming7()
 {
 /*  bank 1 graphics */
-	int i;
 	uint8_t *src = memregion("gfx1")->base();
-	for (i = 0; i < 0x20000; i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	uint8_t *src2 = memregion("gfx2")->base();
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
@@ -16045,209 +16883,301 @@ DRIVER_INIT_MEMBER(wingco_state, flaming7)
   Taiwanese custom hardware.
 
 */
-DRIVER_INIT_MEMBER(wingco_state, flam7_tw)
+void wingco_state::init_flam7_tw()
 {
 /*  Patch to bypass the iButton electronic serial number check.
 
     60B2: After last compare, code jumps to $60BC for the demo game.
           Just patched to jump to $60B9 (jmp $644E) where the check
-          is succesfull.
+          is successful.
 */
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x60b3] = 0x05;
 
 }
 
+void cmaster_state::init_tcl()
+{
+	/* only the first part is decrypted (and verified)*/
+
+	uint8_t *dest = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+	std::vector<uint8_t> src(len);
+
+	int idx=0;
+	memcpy(&src[0], dest, len);
+
+	auto const rol =
+		[] (int src, int n)
+		{
+			return bitswap<8>(src,(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7);
+		};
+
+	auto const writedest =
+		[dest, &idx] (int n)
+		{
+			dest[idx]=n;
+			dest[idx+0x10000]=n^0xff;
+			idx++;
+		};
+
+	for (int i = 0; i < 64*1024; i += 4)
+	{
+		if (i & 0x8000)
+		{
+			writedest(rol(src[idx]^0x44,4)); // abcdefgh -> aFghaBcd
+			writedest(rol(src[idx]^0x44,7)); // abcdefgh -> haBcdeFg
+			writedest(rol(src[idx]^0x44,2)); // abcdefgh -> cdeFghaB
+			writedest((src[idx]^0x44)^0xf0); // abcdefgh -> AbCEeFgh
+		}
+		else
+		{
+			writedest(rol(src[idx]^0x11,4)); // abcdefgh -> efgHabcD
+			writedest(rol(src[idx]^0x11,7)); // abcdefgh -> HabcDefg
+			writedest(rol(src[idx]^0x11,2)); // abcdefgh -> cDefgHab
+			writedest((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
+		}
+	}
+}
+
+void cmaster_state::init_super7()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int A = 0; A < 0x8000; A++)
+	{
+		ROM[A] = (ROM[A] << 1) | BIT(ROM[A], 7);
+	}
+}
+
+void wingco_state::init_luckylad()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x8000; i++)
+	{
+		uint8_t x = ROM[i];
+		switch (i & 0x1111) // preliminary, text in 0x3ab0-0x3c70, 0x4c00-0x5160 ranges seems mostly ok, seems similar to the one used in luckygrl (jangou.cpp).
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0010: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x0011: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x0100: x = bitswap<8>(x ^ 0x28, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x0101: x = bitswap<8>(x ^ 0x20, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0111: x = bitswap<8>(x ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1000: x = bitswap<8>(x ^ 0x20, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1010: x = bitswap<8>(x ^ 0xa0, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1011: x = bitswap<8>(x ^ 0x80, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1100: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x1101: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x1110: x = bitswap<8>(x ^ 0x80, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1111: x = bitswap<8>(x ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+		}
+
+		ROM[i] = x;
+	}
+}
 
 /*********************************************
 *                Game Drivers                *
 **********************************************
 
        YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT    COMPANY              FULLNAME                                      FLAGS              LAYOUT */
-GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
-GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, goldstar_state, 0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
-GAME(  199?, moonlght,  goldstar, moonlght, goldstar, goldstar_state, 0,         ROT0, "bootleg",           "Moon Light (v.0629, low program)",            0 )
-GAME(  199?, moonlghta, goldstar, moonlght, goldstar, goldstar_state, 0,         ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
-GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, goldstar_state, 0,         ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
-GAME(  199?, moonlghtc, goldstar, moonlght, goldstar, goldstar_state, 0,         ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
-GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                 layout_chrygld )
-GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
-GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, goldstar_state, 0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
-GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
-GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            MACHINE_NOT_WORKING )
-GAME(  199?, star100,   0,        star100,  star100,  sanghopm_state, 0,         ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    MACHINE_IMPERFECT_COLORS )
-
+GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, init_goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
+GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, goldstar_state, empty_init,     ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
+GAME(  199?, moonlght,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, low program)",            0 )
+GAME(  199?, moonlghta, goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
+GAME(  199?, moonlghtb, goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
+GAME(  199?, moonlghtc, goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", MACHINE_IMPERFECT_COLORS )  // need to check the odd palette value at 0xc780. should be black.
+GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      init_chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                 layout_chrygld )
+GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      init_chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
+GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
+GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       MACHINE_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
+GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, init_wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            MACHINE_NOT_WORKING )
+GAME(  199?, star100,   0,        star100,  star100,  sanghopm_state, empty_init,     ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    MACHINE_IMPERFECT_COLORS )
 
 // are these really dyna, or bootlegs?
-GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     cb3_state,      0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3a,      ncb3,     ncb3,     cb3a,     cb3_state,      0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3_state,      cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
-GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
-GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               MACHINE_NOT_WORKING)
-GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     cb3_state,      0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
-GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
-GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
+GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
+GAMEL( 199?, cb3a,      ncb3,     ncb3,     cb3a,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
+GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
+GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      init_cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
+GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               MACHINE_NOT_WORKING)
+GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
+GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
+GAMEL( 199?, chryglda,  ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
+GAME(  1994, chryangla, ncb3,     chryangla,ncb3,     cb3_state,      init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING ) // DYNA CB3  V1.40 string, decrypted but only test screens work
 
-GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  cb3_state,      0,         ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
+GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Master '97",                           MACHINE_NOT_WORKING) // fix prom decode
 
 // looks like a hack of Cherry Bonus 3
-GAME(  199?, chryangl,  ncb3,     cm,       chryangl, cmaster_state,  cmv4,      ROT0, "<unknown>",         "Cherry Angel",                                MACHINE_NOT_WORKING )
+GAME(  1994, chryangl,  ncb3,     chryangl, chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)",  "Cherry Angel",                                MACHINE_NOT_WORKING ) // SKY SUPERCB 1.0 string, decrypted but hangs when betting
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
-GAMEL( 198?, cmv801,    0,        cm,       cmv801,   cmaster_state,  cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0,                 layout_cmv4 ) /* says ED-96 where the manufacturer is on some games.. */
+GAMEL( 198?, cmv801,    0,        cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0,                 layout_cmv4 ) /* says ED-96 where the manufacturer is on some games.. */
 
 
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
 // the original, unmodified dyna versions is almost impossible due to lack of documentation from back in the day,
 // even original boards almost always run modified sets
-GAMEL( 1992, cmv4,      0,        cm,       cmv4,     cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",                0,                 layout_cmv4 )
-GAMEL( 1992, cmv4a,     cmv4,     cm,       cmv4,     cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                MACHINE_NOT_WORKING,  layout_cmv4 ) // stealth game?
-GAMEL( 199?, cmwm,      cmv4,     cm,       cmv4,     cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
-GAMEL( 1995, cmfun,     cmv4,     cm,       cmv4,     cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
-GAMEL( 1991, cmaster,   0,        cm,       cmaster,  cmaster_state,  0,         ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
-GAMEL( 1991, cmasterb,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmezspin,  cmaster,  cm,       cmezspin, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                 layout_cmezspin ) // CM Fruit Bonus 55 ver.2 bootleg/hack
-GAMEL( 1991, cmasterc,  cmaster,  cmasterc, cmasterc, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           0,                 layout_cmasterc )
-GAMEL( 1991, cmasterbv, cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 4, with Blitz Poker ROM?)", MACHINE_NOT_WORKING, layout_cmasterb ) // Cherry Master works, but no idea how to use the Blitz ROM
-GAMEL( 1991, cmasterd,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 5)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmastere,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
-GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
+GAMEL( 1992, cmv4,      0,        cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",                0,                 layout_cmv4 )
+GAMEL( 1992, cmv4a,     cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                MACHINE_NOT_WORKING,  layout_cmv4 ) // stealth game?
+GAMEL( 199?, cmwm,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
+GAMEL( 1995, cmfun,     cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
+GAMEL( 1991, cmaster,   0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
+GAMEL( 1991, cmasterb,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
+GAMEL( 1991, cmezspin,  cmaster,  cm,       cmezspin, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                 layout_cmezspin ) // CM Fruit Bonus 55 ver.2 bootleg/hack
+GAMEL( 1991, cmasterc,  cmaster,  cmasterc, cmasterc, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           0,                 layout_cmasterc )
+GAMEL( 1991, cmasterbv, cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 4, with Blitz Poker ROM?)", MACHINE_NOT_WORKING, layout_cmasterb ) // Cherry Master works, but no idea how to use the Blitz ROM
+GAMEL( 1991, cmasterd,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 5)",           0,                 layout_cmasterb )
+GAMEL( 1991, cmastere,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0,                 layout_cmasterb )
+GAMEL( 1991, cmasterf,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
+GAMEL( 1991, cmasterg,  cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
+GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
+GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
+
+GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
+GAME(  1999, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
+GAME(  1999, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master (V512)",                         MACHINE_NOT_WORKING ) // encryption broken, needs GFX and controls
+GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
+GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, empty_init,     ROT0, "<unknown>",         "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 
 
-GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
-GAME(  199?, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Joker Master",                                MACHINE_NOT_WORKING ) // encrypted?
-GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
-GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
+GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
+GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
+GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
+GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
+GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
 
-
-GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
-GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
-GAME(  1999, cmast99,   0,        cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
-GAME(  1999, cmast99b,  cmast99,  cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
-GAME(  1993, aplan,     0,        cm,       cmast99,  cmaster_state,  cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
-
+GAME(  1995, tcl,       0,        cm,       cmaster,  cmaster_state,  init_tcl,       ROT0, "Uniwang",           "Taiwan Chess Legend",                         MACHINE_NOT_WORKING ) // incomplete decryption
 
 // --- Wing W-4 hardware ---
-GAMEL( 1989, lucky8,    0,        lucky8,   lucky8,   wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  wingco_state,   lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8b,   lucky8,   lucky8,   lucky8b,  wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   wingco_state,   lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8d,   lucky8,   lucky8,   lucky8d,  wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   0,         ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
-GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
-GAME(  198?, chryangla, ncb3,     lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "Cherry Angel (encrypted, W-4 hardware)",                   MACHINE_NOT_WORKING )
-GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, 0,         ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
-GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, 0,         ROT0, "TAB Austria",       "Lady Liner",                                               0 )
-GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   0,         ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
+GAMEL( 1989, lucky8,    0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  wingco_state,   init_lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8b,   lucky8,   lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8d,   lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8f,   lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8f,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 7, W-4, encrypted)",                0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
+GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
+GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
+GAME(  198?, ladylinr,  0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner",                                               0 )
+GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
 
-GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
-GAME(  1991, megaline,  0,        megaline, megaline, unkch_state,    0,         ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )
+GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   init_luckylad,  ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
+GAME(  1991, megaline,  0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )
 
-GAMEL( 1993, bingowng,  0,        bingowng, bingowng, wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
-GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,wingco_state,   0,         ROT0, "Wing Co., Ltd.",    "Bingo (set 2)",                                            0,                     layout_bingowng )
+GAMEL( 1993, bingowng,  0,        bingowng, bingowng, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
+GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Bingo (set 2)",                                            0,                     layout_bingowng )
 
-GAME(  2002, mbs2euro,  0,        mbstar,   mbstar,   wingco_state,   0,         ROT0, "Auto-Data Graz",    "Mega Bonus Star II (Euro, Millennium Edition)",            MACHINE_NOT_WORKING )  // need more work in memory map, inputs, and reels alignment.
+GAME(  2002, mbs2euro,  0,        mbstar,   mbstar,   wingco_state,   empty_init,     ROT0, "Auto-Data Graz",    "Mega Bonus Star II (Euro, Millennium Edition)",            MACHINE_NOT_WORKING )  // need more work in memory map, inputs, and reels alignment.
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,  0,        flam7_w4, flam7_w4, wingco_state,   0,         ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
-GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_tw,    fl7_50,   flam7_tw, flaming7, wingco_state,   flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs proper reels gfx roms decryption.
+GAME(  199?, fl7_3121,  0,        flam7_w4, flam7_w4, wingco_state,   empty_init,     ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
+GAME(  199?, fl7_50,    0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_500,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_2000,  fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_2k16,  fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  199?, fl7_tw,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs proper reels gfx roms decryption.
+
+
+// --- Wing W-6 hardware ---
+GAME(  1986, feverch,   0,        feverch,  feverch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6)",                                       MACHINE_NOT_WORKING )  // inputs, reels, etc..
 
 
 // --- Wing W-8 hardware ---
-GAME(  1990, bonusch,   0,        bonusch,  bonusch,  unkch_state,    0,         ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8)",                                       MACHINE_NOT_WORKING )  // M80C51F MCU
+GAME(  1990, bonusch,   0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8)",                                       MACHINE_NOT_WORKING )  // M80C51F MCU
 
 
 // --- Magical Odds hardware ---
-GAME(  1992, magodds,   0,        magodds,  magodds,  wingco_state,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, magoddsa,  magodds,  magodds,  magodds,  wingco_state,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1992, magoddsb,  magodds,  magodds,  magodds,  wingco_state,   0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  1991, magoddsc,  magodds,  magodds,  magoddsc, wingco_state,   magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING |MACHINE_NO_SOUND)
-GAME(  1991, magoddsd,  magodds,  magodds,  magoddsc, wingco_state,   magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING |MACHINE_NO_SOUND)
+GAME(  1992, magodds,   0,        magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsa,  magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, magoddsb,  magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1991, magoddsc,  magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING |MACHINE_NO_SOUND)
+GAME(  1991, magoddsd,  magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING |MACHINE_NO_SOUND)
 
 
 /* --- Amcoe games --- */
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT       ROT    COMPANY    FULLNAME                                                       FLAGS              LAYOUT  */
-GAMEL( 1997, schery97,  0,        amcoe1,   schery97,  cmaster_state,  schery97,  ROT0, "Amcoe",   "Skill Cherry '97 (Talking ver. sc3.52)",                       0,                 layout_nfb96 )  /* running in CB hardware */
-GAMEL( 1997, schery97a, schery97, amcoe1,   schery97,  cmaster_state,  schery97a, ROT0, "Amcoe",   "Skill Cherry '97 (Talking ver. sc3.52c4)",                     0,                 layout_nfb96 )  /* running in C4 hardware */
-GAMEL( 1998, skill98,   0,        amcoe1,   schery97,  cmaster_state,  skill98,   ROT0, "Amcoe",   "Skill '98 (Talking ver. s98-1.33)",                            0,                 layout_skill98 )
-GAMEL( 1997, pokonl97,  0,        amcoe1,   pokonl97,  cmaster_state,  po33,      ROT0, "Amcoe",   "Poker Only '97 (Talking ver. 3.3)",                            0,                 layout_pokonl97 )
-GAME(  1998, match98,   0,        amcoe1a,  match98,   cmaster_state,  match133,  ROT0, "Amcoe",   "Match '98 (ver. 1.33)",                                        0 )
+GAMEL( 1997, schery97,  0,        amcoe1,   schery97,  cmaster_state,  init_schery97,  ROT0, "Amcoe",   "Skill Cherry '97 (Talking ver. sc3.52)",                       0,                 layout_nfb96 )  /* running in CB hardware */
+GAMEL( 1997, schery97a, schery97, amcoe1,   schery97,  cmaster_state,  init_schery97a, ROT0, "Amcoe",   "Skill Cherry '97 (Talking ver. sc3.52c4)",                     0,                 layout_nfb96 )  /* running in C4 hardware */
+GAMEL( 1998, skill98,   0,        amcoe1,   schery97,  cmaster_state,  init_skill98,   ROT0, "Amcoe",   "Skill '98 (Talking ver. s98-1.33)",                            0,                 layout_skill98 )
+GAMEL( 1997, pokonl97,  0,        amcoe1,   pokonl97,  cmaster_state,  init_po33,      ROT0, "Amcoe",   "Poker Only '97 (Talking ver. 3.3)",                            0,                 layout_pokonl97 )
+GAME(  1998, match98,   0,        amcoe1a,  match98,   cmaster_state,  init_match133,  ROT0, "Amcoe",   "Match '98 (ver. 1.33)",                                        0 )
 
 
 /* The Sub-PCB has a printed sticker denoting C1, C2, D or DK for the type of FPGA decryption chip used */
 /* There is known to be a special IOWA version running on the Texas C2 hardware with roms FB96P IA, FB96L IA & FB96H IA with a (c) 2000 Amcoe */
-GAMEL( 1996, nfb96,     0,        amcoe2,   nfb96,     cmaster_state,  nfb96_c1,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.63, C1 PCB)",          0,                 layout_nfb96 ) /* ver. 02-3.63 C1 Sub-PCB */
-GAMEL( 1996, nfb96a,    nfb96,    amcoe2,   nfb96,     cmaster_state,  nfb96_c1,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.62, C1 PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.62 C1 Sub-PCB */
-GAMEL( 1996, nfb96b,    nfb96,    amcoe2,   nfb96,     cmaster_state,  nfb96_d,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.54, D PCB)",           0,                 layout_nfb96 ) /* ver. 00-3.54 D Sub-PCB */
-GAMEL( 1996, nfb96c,    nfb96,    amcoe2,   nfb96,     cmaster_state,  nfb96_dk,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.62, DK PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.62 DK Sub-PCB */
-GAMEL( 2000, nfb96txt,  nfb96,    amcoe2,   nfb96tx,   cmaster_state,  nfb96_c2,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v1.22 Texas XT, C2 PCB)", 0,                 layout_nfb96 ) /* ver. tf1.22axt C2 Sub-PCB */
+GAMEL( 1996, nfb96,     0,        amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1, ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.63, C1 PCB)",          0,                 layout_nfb96 ) /* ver. 02-3.63 C1 Sub-PCB */
+GAMEL( 1996, nfb96a,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1, ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.62, C1 PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.62 C1 Sub-PCB */
+GAMEL( 1996, nfb96b,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.54, D PCB)",           0,                 layout_nfb96 ) /* ver. 00-3.54 D Sub-PCB */
+GAMEL( 1996, nfb96c,    nfb96,    amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk, ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.62, DK PCB)",          0,                 layout_nfb96 ) /* ver. 00-3.62 DK Sub-PCB */
+GAMEL( 2000, nfb96txt,  nfb96,    amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2, ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v1.22 Texas XT, C2 PCB)", 0,                 layout_nfb96 ) /* ver. tf1.22axt C2 Sub-PCB */
 
-GAMEL( 1996, nc96,      0,        amcoe2,   nfb96,     cmaster_state,  nfb96_c1,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.63, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
-GAMEL( 1996, nc96a,     nc96,     amcoe2,   nfb96,     cmaster_state,  nfb96_c1,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
-GAMEL( 1996, nc96b,     nc96,     amcoe2,   nfb96,     cmaster_state,  nfb96_c1,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.61, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
-GAMEL( 1996, nc96c,     nc96,     amcoe2,   nfb96,     cmaster_state,  nfb96_d,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.54, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
-GAMEL( 1996, nc96d,     nc96,     amcoe2,   nfb96,     cmaster_state,  nfb96_d,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.53, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
-GAMEL( 1996, nc96e,     nc96,     amcoe2,   nfb96,     cmaster_state,  nfb96_d,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.40, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
-GAMEL( 1996, nc96f,     nc96,     amcoe2,   nfb96,     cmaster_state,  nfb96_dk,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, DK PCB)",               0,                 layout_nfb96 ) /* DK Sub-PCB */
-GAMEL( 2000, nc96txt,   nc96,     amcoe2,   nfb96tx,   cmaster_state,  nfb96_c2,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) /* ver. tc1.32axt C2 Sub-PCB */
+GAMEL( 1996, nc96,      0,        amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.63, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
+GAMEL( 1996, nc96a,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
+GAMEL( 1996, nc96b,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_c1, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.61, C1 PCB)",               0,                 layout_nfb96 ) /* C1 Sub-PCB */
+GAMEL( 1996, nc96c,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.54, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
+GAMEL( 1996, nc96d,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.53, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
+GAMEL( 1996, nc96e,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_d,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.40, D PCB)",                0,                 layout_nfb96 ) /* D  Sub-PCB */
+GAMEL( 1996, nc96f,     nc96,     amcoe2,   nfb96,     cmaster_state,  init_nfb96_dk, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, DK PCB)",               0,                 layout_nfb96 ) /* DK Sub-PCB */
+GAMEL( 2000, nc96txt,   nc96,     amcoe2,   nfb96tx,   cmaster_state,  init_nfb96_c2, ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)",      0,                 layout_nfb96tx ) /* ver. tc1.32axt C2 Sub-PCB */
 
-GAME(  2009, fb2010,    0,        amcoe2,   nfb96tx,   cmaster_state,  fb2010,    ROT0, "Amcoe",   "Fruit Bonus 2010",                                             MACHINE_NOT_WORKING ) // no gfx dumped
+GAME(  2009, fb2010,    0,        amcoe2,   fb2010,    cmaster_state,  init_fb2010,   ROT0, "Amcoe",   "Fruit Bonus 2010",                                             0 )
 
-GAMEL( 1996, roypok96,  0,        amcoe2,   roypok96,  cmaster_state,  rp35,      ROT0, "Amcoe",   "Royal Poker '96 (set 1, v97-3.5)",                             0,                 layout_roypok96 )
-GAMEL( 1996, roypok96a, roypok96, amcoe2,   roypok96a, cmaster_state,  rp36,      ROT0, "Amcoe",   "Royal Poker '96 (set 2, v98-3.6)",                             0,                 layout_roypok96 )
-GAMEL( 1996, roypok96b, roypok96, amcoe2,   roypok96a, cmaster_state,  rp36c3,    ROT0, "Amcoe",   "Royal Poker '96 (set 3, v98-3.6?)",                            0,                 layout_roypok96 )
-GAME(  1996, roypok96c, roypok96, amcoe2,   roypok96a, cmaster_state,  rp96sub,   ROT0, "Amcoe",   "Royal Poker '96 (set 4, C3 board)",                            MACHINE_NOT_WORKING )
+GAMEL( 1996, roypok96,  0,        amcoe2,   roypok96,  cmaster_state,  init_rp35,     ROT0, "Amcoe",   "Royal Poker '96 (set 1, v97-3.5)",                             0,                 layout_roypok96 )
+GAMEL( 1996, roypok96a, roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp36,     ROT0, "Amcoe",   "Royal Poker '96 (set 2, v98-3.6)",                             0,                 layout_roypok96 )
+GAMEL( 1996, roypok96b, roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp36c3,   ROT0, "Amcoe",   "Royal Poker '96 (set 3, v98-3.6?)",                            0,                 layout_roypok96 )
+GAME(  1996, roypok96c, roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp96sub,  ROT0, "Amcoe",   "Royal Poker '96 (set 4, C3 board)",                            MACHINE_NOT_WORKING )
 
 
 /* these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
    some sets are messy and appear to have mismatched graphic roms, they need to be sorted out properly
 */
-/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT       ROT    COMPANY    FULLNAME                                                                   FLAGS  */
-GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl,   cmaster_state,  0,         ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
-GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  nfb96sea,  ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 2, v97-3.3c English)",    MACHINE_WRONG_COLORS ) // encrypted program
-GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  0,         ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 3, v97-3.3c Portuguese)", MACHINE_WRONG_COLORS )
-GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  0,         ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
-GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  0,         ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT            ROT    COMPANY    FULLNAME                                                                   FLAGS  */
+GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
+GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_nfb96sea,  ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 2, v97-3.3c English)",    MACHINE_WRONG_COLORS ) // encrypted program
+GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 3, v97-3.3c Portuguese)", MACHINE_WRONG_COLORS )
+GAME( 1996, nfb96sec,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 4, v97-3.3c English)",    MACHINE_WRONG_COLORS )
+GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
+GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
 
-GAME( 2003, nfm,       0,        nfm,      nfm,       cmaster_state,  0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",                    MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
+GAME( 2003, nfm,       0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",                    MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
 
 
 // super cherry master sets...
-GAMEL(1994, scmaster, 0,         unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
+GAMEL(1994, scmaster, 0,         unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99". probably hacks of a 1994 version of Super Cherry Master.
-GAMEL(1999, unkch1,   scmaster,  unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
-GAMEL(1999, unkch2,   scmaster,  unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           0,    layout_unkch )
-GAMEL(1999, unkch3,   scmaster,  unkch,    unkch3,    unkch_state,    unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
-GAMEL(1999, unkch4,   scmaster,  unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
+GAMEL(1999, unkch1,   scmaster,  unkch,    unkch,     unkch_state,    init_unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
+GAMEL(1999, unkch2,   scmaster,  unkch,    unkch,     unkch_state,    init_unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           0,    layout_unkch )
+GAMEL(1999, unkch3,   scmaster,  unkch,    unkch3,    unkch_state,    init_unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
+GAMEL(1999, unkch4,   scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
 
-GAME( 1996, cherry96, scmaster,  unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "New Cherry '96 (bootleg of New Fruit Bonus?)",                 MACHINE_NOT_WORKING ) // need to be moved to another machine...
+GAME( 1996, cherry96, scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (bootleg of New Fruit Bonus?)",                 MACHINE_NOT_WORKING ) // need to be moved to another machine...
 
 
 /* Stealth sets.
    These have hidden games inside that can be switched to avoid inspections, police or whatever purposes)... */
 
-/*    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT     ROT    COMPANY                FULLNAME                                                      FLAGS                     LAYOUT    */
-GAMEL( 198?, cmpacman,  0,        cm,       cmpacman, cmaster_state,  cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 1)", 0,                        layout_cmpacman ) // need to press K to switch between games...
-GAMEL( 198?, cmpacmana, cmpacman, cm,       cmpacman, cmaster_state,  cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 2)", 0,                        layout_cmpacman ) // need to press K to switch between games...
-GAMEL( 198?, cmtetris,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",              0,                        layout_cmpacman ) // need to press K/L to switch between games...
-GAMEL( 198?, cmtetrsa,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",              MACHINE_NOT_WORKING,      layout_cmpacman ) // seems banked...
-GAMEL( 198?, cmtetrsb,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",      MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
-GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, goldstar_state, 0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                                            MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+/*    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                FULLNAME                                                      FLAGS                     LAYOUT    */
+GAMEL( 198?, cmpacman,  0,        cm,       cmpacman, cmaster_state,  init_cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 1)", 0,                        layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmpacmana, cmpacman, cm,       cmpacman, cmaster_state,  init_cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 2)", 0,                        layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmtetris,  0,        cm,       cmtetris, cmaster_state,  init_cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",              0,                        layout_cmpacman ) // need to press K/L to switch between games...
+GAMEL( 198?, cmtetrsa,  0,        cm,       cmtetris, cmaster_state,  init_cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",              MACHINE_NOT_WORKING,      layout_cmpacman ) // seems banked...
+GAMEL( 198?, cmtetrsb,  0,        cm,       cmtetris, cmaster_state,  init_cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",      MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
+GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, goldstar_state, empty_init,   ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 1)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+GAMEL( 1997, crazybona, crazybon, pkrmast,  crazybon, goldstar_state, empty_init,   ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 2)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon )
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.

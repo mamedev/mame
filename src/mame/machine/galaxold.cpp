@@ -66,8 +66,7 @@ void galaxold_state::machine_reset_common(int line)
 	m_7474_9m_1->preset_w(0);
 
 	/* start a timer to generate interrupts */
-	timer_device *int_timer = machine().device<timer_device>("int_timer");
-	int_timer->adjust(m_screen->time_until_pos(0));
+	subdevice<timer_device>("int_timer")->adjust(m_screen->time_until_pos(0));
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,galaxold)
@@ -109,7 +108,7 @@ WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
 
 WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
 {
-	output().set_led_value(offset,data & 1);
+	m_leds[offset] = BIT(data, 0);
 }
 
 READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
@@ -151,14 +150,14 @@ CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,4in1)
+void galaxold_state::init_4in1()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	offs_t i, len = memregion("maincpu")->bytes();
+	const offs_t len = memregion("maincpu")->bytes();
 	uint8_t *RAM = memregion("maincpu")->base();
 
 	/* Decrypt Program Roms */
-	for (i = 0; i < len; i++)
+	for (offs_t i = 0; i < len; i++)
 		RAM[i] = RAM[i] ^ (i & 0xff);
 
 	/* games are banked at 0x0000 - 0x3fff */
@@ -174,25 +173,23 @@ INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)
+void galaxold_state::init_bullsdrtg()
 {
-	int i;
-
 	// patch char supposed to be space
 	uint8_t *gfxrom = memregion("gfx1")->base();
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		gfxrom[i] = 0;
 	}
 
 	// patch gfx for charset (seems to be 1bpp with bitplane data in correct rom)
-	for (i = 0*8; i < 27*8; i++)
+	for (int i = 0*8; i < 27*8; i++)
 	{
 		gfxrom[0x1000 + i] = 0;
 	}
 
 	// patch gfx for digits (seems to be 1bpp with bitplane data in correct rom)
-	for (i = 48*8; i < (48+10)*8; i++ )
+	for (int i = 48*8; i < (48+10)*8; i++ )
 	{
 		gfxrom[0x1000 + i] = 0;
 	}

@@ -1,5 +1,5 @@
-Castool - *A generic casette image manipulation tool for MAME*
-==============================================================
+Castool - *A generic cassette image manipulation tool for MAME*
+===============================================================
 
 
 

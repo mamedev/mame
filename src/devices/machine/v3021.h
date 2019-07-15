@@ -16,14 +16,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_V3021_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, V3021, XTAL(32'768))
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,7 +26,7 @@ class v3021_device : public device_t
 {
 public:
 	// construction/destruction
-	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

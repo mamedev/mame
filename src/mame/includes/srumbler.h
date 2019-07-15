@@ -3,6 +3,7 @@
 
 #include "machine/timer.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class srumbler_state : public driver_device
 {
@@ -16,6 +17,9 @@ public:
 		m_backgroundram(*this, "backgroundram"),
 		m_foregroundram(*this, "foregroundram") { }
 
+	void srumbler(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -44,7 +48,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	void srumbler(machine_config &config);
 	void srumbler_map(address_map &map);
 	void srumbler_sound_map(address_map &map);
 };

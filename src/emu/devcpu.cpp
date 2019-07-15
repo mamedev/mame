@@ -42,17 +42,6 @@ cpu_device::~cpu_device()
 
 
 //-------------------------------------------------
-//  static_set_force_no_drc - configuration helper
-//  to disable DRC
-//-------------------------------------------------
-
-void cpu_device::static_set_force_no_drc(device_t &device, bool value)
-{
-	downcast<cpu_device &>(device).m_force_no_drc = value;
-}
-
-
-//-------------------------------------------------
 //  allow_drc - return true if DRC is allowed
 //-------------------------------------------------
 

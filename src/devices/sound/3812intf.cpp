@@ -25,8 +25,7 @@
 
 void ym3812_device::irq_handler(int irq)
 {
-	if (!m_irq_handler.isnull())
-		m_irq_handler(irq);
+	m_timer[2]->adjust(attotime::zero, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -34,12 +33,17 @@ void ym3812_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch(id)
 	{
-	case 0:
+	case TIMER_A:
 		ym3812_timer_over(m_chip,0);
 		break;
 
-	case 1:
+	case TIMER_B:
 		ym3812_timer_over(m_chip,1);
+		break;
+
+	case TIMER_IRQ_SYNC:
+		if (!m_irq_handler.isnull())
+			m_irq_handler(param);
 		break;
 	}
 }
@@ -87,8 +91,9 @@ void ym3812_device::device_start()
 	ym3812_set_irq_handler   (m_chip, ym3812_device::static_irq_handler, this);
 	ym3812_set_update_handler(m_chip, ym3812_device::static_update_request, this);
 
-	m_timer[0] = timer_alloc(0);
-	m_timer[1] = timer_alloc(1);
+	m_timer[0] = timer_alloc(TIMER_A);
+	m_timer[1] = timer_alloc(TIMER_B);
+	m_timer[2] = timer_alloc(TIMER_IRQ_SYNC);
 }
 
 void ym3812_device::device_clock_changed()
@@ -126,20 +131,20 @@ void ym3812_device::device_reset()
 }
 
 
-READ8_MEMBER( ym3812_device::read )
+u8 ym3812_device::read(offs_t offset)
 {
 	return ym3812_read(m_chip, offset & 1);
 }
 
-WRITE8_MEMBER( ym3812_device::write )
+void ym3812_device::write(offs_t offset, u8 data)
 {
 	ym3812_write(m_chip, offset & 1, data);
 }
 
-READ8_MEMBER( ym3812_device::status_port_r ) { return read(space, 0); }
-READ8_MEMBER( ym3812_device::read_port_r ) { return read(space, 1); }
-WRITE8_MEMBER( ym3812_device::control_port_w ) { write(space, 0, data); }
-WRITE8_MEMBER( ym3812_device::write_port_w ) { write(space, 1, data); }
+u8 ym3812_device::status_port_r() { return read(0); }
+u8 ym3812_device::read_port_r() { return read(1); }
+void ym3812_device::control_port_w(u8 data) { write(0, data); }
+void ym3812_device::write_port_w(u8 data) { write(1, data); }
 
 
 DEFINE_DEVICE_TYPE(YM3812, ym3812_device, "ym3812", "YM3812 OPL2")

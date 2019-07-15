@@ -15,8 +15,6 @@
 #include "emu.h"
 #include "somari.h"
 
-#include "cpu/m6502/m6502.h"
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -159,7 +157,7 @@ void nes_somari_device::pcb_reset()
  -------------------------------------------------*/
 
 // MMC1 Mode emulation
-WRITE8_MEMBER(nes_somari_device::mmc1_w)
+void nes_somari_device::mmc1_w(offs_t offset, uint8_t data)
 {
 	assert(m_board_mode == 2);
 
@@ -193,7 +191,7 @@ WRITE8_MEMBER(nes_somari_device::mmc1_w)
 }
 
 // MMC3 Mode emulation
-WRITE8_MEMBER(nes_somari_device::mmc3_w)
+void nes_somari_device::mmc3_w(offs_t offset, uint8_t data)
 {
 	uint8_t mmc_helper, cmd;
 
@@ -236,13 +234,13 @@ WRITE8_MEMBER(nes_somari_device::mmc3_w)
 		case 0x2001: break;
 		case 0x4000: m_irq_count_latch = data; break;
 		case 0x4001: m_irq_count = 0; break;
-		case 0x6000: m_irq_enable = 0; m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); break;
+		case 0x6000: m_irq_enable = 0; set_irq_line(CLEAR_LINE); break;
 		case 0x6001: m_irq_enable = 1; break;
 	}
 }
 
 // VRC2 Mode emulation
-WRITE8_MEMBER(nes_somari_device::vrc2_w)
+void nes_somari_device::vrc2_w(offs_t offset, uint8_t data)
 {
 	uint8_t bank, shift;
 
@@ -383,15 +381,15 @@ void nes_somari_device::update_mirror()
 }
 
 
-WRITE8_MEMBER(nes_somari_device::write_h)
+void nes_somari_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("somari write_h, mode %d, offset: %04x, data: %02x\n", m_board_mode, offset, data));
 
 	switch (m_board_mode)
 	{
-		case SOMARI_VRC2_MODE: vrc2_w(space, offset, data, mem_mask); break;
-		case SOMARI_MMC3_MODE: mmc3_w(space, offset, data, mem_mask); break;
-		case SOMARI_MMC1_MODE: mmc1_w(space, offset, data, mem_mask); break;
+		case SOMARI_VRC2_MODE: vrc2_w(offset, data); break;
+		case SOMARI_MMC3_MODE: mmc3_w(offset, data); break;
+		case SOMARI_MMC1_MODE: mmc1_w(offset, data); break;
 	}
 }
 
@@ -411,7 +409,7 @@ void nes_somari_device::bank_update_switchmode()
 	update_chr();
 }
 
-WRITE8_MEMBER(nes_somari_device::write_m)
+void nes_somari_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("somari write_m, offset: %04x, data: %02x\n", offset, data));
 

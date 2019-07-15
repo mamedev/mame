@@ -10,7 +10,7 @@
 #include "includes/turbo.h"
 #include "video/resnet.h"
 
-static const uint32_t sprite_expand[16] =
+static constexpr uint32_t sprite_expand[16] =
 {
 	0x00000000, 0x00000001, 0x00000100, 0x00000101,
 	0x00010000, 0x00010001, 0x00010100, 0x00010101,
@@ -27,119 +27,84 @@ static const uint32_t sprite_expand[16] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(turbo_state,turbo)
+void turbo_state::turbo_palette(palette_device &palette) const
 {
-	static const int resistances[3] = { 1000, 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
-	int i;
+	static constexpr int resistances[3] = { 1000, 470, 220 };
 
 	/* compute the color output resistor weights */
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3,  &resistances[0], rweights, 470, 0,
 			3,  &resistances[0], gweights, 470, 0,
 			2,  &resistances[1], bweights, 470, 0);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < 256; i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		// red component
+		int const r = combine_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
 
-		/* red component */
-		bit0 = (i >> 0) & 1;
-		bit1 = (i >> 1) & 1;
-		bit2 = (i >> 2) & 1;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		// green component
+		int const g = combine_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
 
-		/* green component */
-		bit0 = (i >> 3) & 1;
-		bit1 = (i >> 4) & 1;
-		bit2 = (i >> 5) & 1;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
-
-		/* blue component */
-		bit0 = (i >> 6) & 1;
-		bit1 = (i >> 7) & 1;
-		b = combine_2_weights(bweights, bit0, bit1);
+		// blue component
+		int const b = combine_weights(bweights, BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 
-PALETTE_INIT_MEMBER(turbo_state,subroc3d)
+void turbo_state::subroc3d_palette(palette_device &palette) const
 {
-	static const int resistances[3] = { 1000, 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
-	int i;
+	static constexpr int resistances[3] = { 1000, 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3,  &resistances[0], rweights, 470, 0,
 			3,  &resistances[0], gweights, 470, 0,
 			2,  &resistances[1], bweights, 470, 0);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < 256; i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		// red component
+		int const r = combine_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
 
-		/* red component */
-		bit0 = (i >> 0) & 1;
-		bit1 = (i >> 1) & 1;
-		bit2 = (i >> 2) & 1;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		// green component
+		int const g = combine_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
 
-		/* green component */
-		bit0 = (i >> 3) & 1;
-		bit1 = (i >> 4) & 1;
-		bit2 = (i >> 5) & 1;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
-
-		/* blue component */
-		bit0 = (i >> 6) & 1;
-		bit1 = (i >> 7) & 1;
-		b = combine_2_weights(bweights, bit0, bit1);
+		// blue component
+		int const b = combine_weights(bweights, BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 
-PALETTE_INIT_MEMBER(turbo_state,buckrog)
+void turbo_state::buckrog_palette(palette_device &palette) const
 {
-	static const int resistances[4] = { 2200, 1000, 500, 250 };
+	static constexpr int resistances[4] = { 2200, 1000, 500, 250 };
+
+	// compute the color output resistor weights
 	double rweights[3], gweights[3], bweights[4];
-	int i;
-
-	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
 			3,  &resistances[1], rweights, 1000, 0,
 			3,  &resistances[1], gweights, 1000, 0,
 			4,  &resistances[0], bweights, 1000, 0);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < 1024; i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < 1024; i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
+		// red component
+		int const r = combine_weights(rweights, BIT(i, 0), BIT(i, 1), BIT(i, 2));
 
-		/* red component */
-		bit0 = (i >> 0) & 1;
-		bit1 = (i >> 1) & 1;
-		bit2 = (i >> 2) & 1;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		// green component
+		int const g = combine_weights(gweights, BIT(i, 3), BIT(i, 4), BIT(i, 5));
 
-		/* green component */
-		bit0 = (i >> 3) & 1;
-		bit1 = (i >> 4) & 1;
-		bit2 = (i >> 5) & 1;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
-
-		/* blue component - note the shuffled bits */
-		bit0 = (i >> 8) & 1;
-		bit1 = (i >> 9) & 1;
-		bit2 = (i >> 6) & 1;
-		bit3 = (i >> 7) & 1;
-		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+		// blue component - note the shuffled bits
+		int const b = combine_weights(bweights, BIT(i, 8), BIT(i, 9), BIT(i, 6), BIT(i, 7));
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -174,7 +139,7 @@ VIDEO_START_MEMBER(turbo_state,buckrog)
 
 	/* allocate the bitmap RAM */
 	m_buckrog_bitmap_ram = std::make_unique<uint8_t[]>(0xe000);
-	save_pointer(NAME(m_buckrog_bitmap_ram.get()), 0xe000);
+	save_pointer(NAME(m_buckrog_bitmap_ram), 0xe000);
 }
 
 

@@ -41,7 +41,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/romcmp.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -88,7 +87,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/chdman.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 	GEN_DIR .. "version.cpp",
 }
 
@@ -130,7 +128,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/jedutil.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -177,7 +174,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/unidasm.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -224,7 +220,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/ldresample.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -271,7 +266,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/ldverify.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -312,7 +306,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/regrep.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -353,7 +346,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/srcclean.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -394,7 +386,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/src2html.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -437,7 +428,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/split.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -478,7 +468,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/pngcmp.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -510,6 +499,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
+  MAME_DIR .. "src/lib/netlist",
 }
 
 files {
@@ -554,6 +544,7 @@ links {
 
 includedirs {
 	MAME_DIR .. "src/lib",
+  MAME_DIR .. "src/lib/netlist",
 }
 
 files {
@@ -611,7 +602,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/castool.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -657,7 +647,6 @@ includedirs {
 
 files {
 	MAME_DIR .. "src/tools/floptool.cpp",
-	MAME_DIR .. "src/emu/emucore.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -754,6 +743,7 @@ files {
 	MAME_DIR .. "src/tools/imgtool/modules/hp48.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/hp9845_tape.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/hp85_tape.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/rt11.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
@@ -803,4 +793,99 @@ if _OPTIONS["targetos"] == "macosx" then
 		configuration { }
 
 		strip()
+end
+
+--------------------------------------------------
+-- testkeys
+--------------------------------------------------
+
+if (_OPTIONS["osd"] == "sdl") then
+	project("testkeys")
+	uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
+	kind "ConsoleApp"
+
+	flags {
+		"Symbols", -- always include minimum symbols for executables
+	}
+
+	if _OPTIONS["SEPARATE_BIN"]~="1" then
+		targetdir(MAME_DIR)
+	end
+
+	links {
+		"ocore_" .. _OPTIONS["osd"],
+		ext_lib("utf8proc"),
+	}
+
+	if _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["with-bundled-sdl2"]~=nil then
+			configuration { "mingw*"}
+				links {
+					"SDL2",
+					"imm32",
+					"version",
+					"ole32",
+					"oleaut32",
+				}
+			configuration { "vs*" }
+				links {
+					"SDL2",
+					"imm32",
+					"version",
+				}
+			configuration { }
+		else
+			if _OPTIONS["USE_LIBSDL"]~="1" then
+				configuration { "mingw*"}
+					links {
+						"SDL2main",
+						"SDL2",
+					}
+				configuration { "vs*" }
+					links {
+						"SDL2",
+						"imm32",
+						"version",
+					}
+				configuration { }
+			else
+				local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
+				addlibfromstring(str)
+				addoptionsfromstring(str)
+			end
+			configuration { "x32", "vs*" }
+				libdirs {
+					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x86")
+				}
+			configuration { "x64", "vs*" }
+				libdirs {
+					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
+				}
+		end
+	end
+
+	if BASE_TARGETOS=="unix" then
+		if _OPTIONS["with-bundled-sdl2"]~=nil then
+			links {
+				"SDL2",
+			}
+		end
+	end
+
+	dofile("osd/sdl_cfg.lua")
+
+	includedirs {
+		MAME_DIR .. "src/osd",
+	}
+
+	files {
+		MAME_DIR .. "src/tools/testkeys.cpp",
+	}
+
+	configuration { "mingw*" or "vs*" }
+		targetextension ".exe"
+
+	configuration { }
+
+	strip()
 end

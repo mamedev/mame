@@ -23,6 +23,7 @@ scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *ta
 	m_data5_handler(*this),
 	m_data6_handler(*this),
 	m_data7_handler(*this),
+	m_slot(*this, "%u", 1U),
 	m_device_count(0),
 	m_bsy_in(0),
 	m_sel_in(0),
@@ -61,36 +62,19 @@ scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *ta
 {
 }
 
-MACHINE_CONFIG_START(scsi_port_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE1, SCSI_PORT_SLOT, 0 )
-	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE2, SCSI_PORT_SLOT, 0 )
-	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE3, SCSI_PORT_SLOT, 0 )
-	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE4, SCSI_PORT_SLOT, 0 )
-	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE5, SCSI_PORT_SLOT, 0 )
-	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE6, SCSI_PORT_SLOT, 0 )
-	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE7, SCSI_PORT_SLOT, 0 )
-MACHINE_CONFIG_END
+void scsi_port_device::device_add_mconfig(machine_config &config)
+{
+	for (int i = 0; i < 7; i++)
+		SCSI_PORT_SLOT(config, m_slot[i]);
+}
 
 void scsi_port_device::device_start()
 {
-	const char *deviceName[] =
-	{
-		SCSI_PORT_DEVICE1,
-		SCSI_PORT_DEVICE2,
-		SCSI_PORT_DEVICE3,
-		SCSI_PORT_DEVICE4,
-		SCSI_PORT_DEVICE5,
-		SCSI_PORT_DEVICE6,
-		SCSI_PORT_DEVICE7
-	};
-
 	m_device_count = 0;
 
 	for (int i = 0; i < 7; i++)
 	{
-		scsi_port_slot_device *slot = subdevice<scsi_port_slot_device>(deviceName[i]);
-		m_slot[i] = slot;
-
+		scsi_port_slot_device *slot = subdevice<scsi_port_slot_device>(m_slot[i].finder_tag());
 		if (slot != nullptr)
 			m_device_count = i + 1;
 	}
@@ -658,6 +642,31 @@ WRITE_LINE_MEMBER( scsi_port_device::write_data7 )
 		m_data7_in = state;
 		update_data7();
 	}
+}
+
+scsi_port_slot_device &scsi_port_device::slot(int index)
+{
+	assert(index >= 1 && index <= 7);
+	return *subdevice<scsi_port_slot_device>(m_slot[index-1].finder_tag());
+}
+
+void scsi_port_device::set_slot_device(int index, const char *option, const device_type &type, const input_device_default *id)
+{
+	slot(index).option_add(option, type);
+	slot(index).set_option_device_input_defaults(option, id);
+	slot(index).set_default_option(option);
+}
+
+void scsi_port_device::set_output_latch(output_latch_device &latch)
+{
+	latch.bit_handler<0>().set(*this, FUNC(scsi_port_device::write_data0));
+	latch.bit_handler<1>().set(*this, FUNC(scsi_port_device::write_data1));
+	latch.bit_handler<2>().set(*this, FUNC(scsi_port_device::write_data2));
+	latch.bit_handler<3>().set(*this, FUNC(scsi_port_device::write_data3));
+	latch.bit_handler<4>().set(*this, FUNC(scsi_port_device::write_data4));
+	latch.bit_handler<5>().set(*this, FUNC(scsi_port_device::write_data5));
+	latch.bit_handler<6>().set(*this, FUNC(scsi_port_device::write_data6));
+	latch.bit_handler<7>().set(*this, FUNC(scsi_port_device::write_data7));
 }
 
 DEFINE_DEVICE_TYPE(SCSI_PORT, scsi_port_device, "scsi", "SCSI Port")

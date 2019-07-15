@@ -67,7 +67,8 @@ void compis_graphics_slot_device::device_start()
 // slot devices
 #include "hrg.h"
 
-SLOT_INTERFACE_START( compis_graphics_cards )
-	SLOT_INTERFACE("hrg", COMPIS_HRG)
-	SLOT_INTERFACE("uhrg", COMPIS_UHRG)
-SLOT_INTERFACE_END
+void compis_graphics_cards(device_slot_interface &device)
+{
+	device.option_add("hrg", COMPIS_HRG);
+	device.option_add("uhrg", COMPIS_UHRG);
+}

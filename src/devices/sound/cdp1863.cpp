@@ -58,18 +58,6 @@ cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  static_set_clock2 - configuration helper
-//-------------------------------------------------
-
-void cdp1863_device::static_set_clock2(device_t &device, int clock2)
-{
-	cdp1863_device &cdp1863 = downcast<cdp1863_device &>(device);
-
-	cdp1863.m_clock2 = clock2;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -146,26 +134,6 @@ void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		m_incr = incr;
 		m_signal = signal;
 	}
-}
-
-
-//-------------------------------------------------
-//  str_w - latch write
-//-------------------------------------------------
-
-WRITE8_MEMBER( cdp1863_device::str_w )
-{
-	m_latch = data;
-}
-
-
-//-------------------------------------------------
-//  str_w - latch write
-//-------------------------------------------------
-
-void cdp1863_device::str_w(uint8_t data)
-{
-	m_latch = data;
 }
 
 

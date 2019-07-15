@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 class tecmo_mix_device : public device_t, public device_video_interface
 {
@@ -13,12 +15,37 @@ public:
 	tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device &palette, bitmap_ind16* bitmap_bg, bitmap_ind16* bitmap_fg, bitmap_ind16* bitmap_tx, bitmap_ind16* bitmap_sp);
-	static void set_mixer_shifts(device_t &device, int sprpri_shift, int sprbln_shift, int sprcol_shift);
-	static void set_blendcols(device_t &device, int bgblend_comp, int fgblend_comp, int txblend_comp, int spblend_comp);
-	static void set_regularcols(device_t &device, int bgregular_comp, int fgregular_comp, int txregular_comp, int spregular_comp);
-	static void set_blendsource(device_t &device, int spblend_source, int fgblend_source);
-	static void set_revspritetile(device_t &device);
-	static void set_bgpen(device_t &device, int bgpen);
+	void set_mixer_shifts(int sprpri_shift, int sprbln_shift, int sprcol_shift)
+	{
+		m_sprpri_shift = sprpri_shift;
+		m_sprbln_shift = sprbln_shift;
+		m_sprcol_shift = sprcol_shift;
+	}
+	void set_blendcols(int bgblend_comp, int fgblend_comp, int txblend_comp, int spblend_comp)
+	{
+		m_bgblend_comp = bgblend_comp;
+		m_fgblend_comp = fgblend_comp;
+		m_txblend_comp = txblend_comp;
+		m_spblend_comp = spblend_comp;
+	}
+	void set_regularcols(int bgregular_comp, int fgregular_comp, int txregular_comp, int spregular_comp)
+	{
+		m_bgregular_comp = bgregular_comp;
+		m_fgregular_comp = fgregular_comp;
+		m_txregular_comp = txregular_comp;
+		m_spregular_comp = spregular_comp;
+	}
+	void set_blendsource(int spblend_source, int fgblend_source)
+	{
+		m_spblend_source = spblend_source;
+		m_fgblend_source = fgblend_source;
+	}
+	void set_bgpen(int bgpen, int bgpen_blend)
+	{
+		m_bgpen       = bgpen;
+		m_bgpen_blend = bgpen_blend;
+	}
+	void set_revspritetile() { m_revspritetile = 3; }
 
 protected:
 	virtual void device_start() override;
@@ -44,8 +71,10 @@ protected:
 	int m_txregular_comp;
 	int m_spregular_comp;
 
-	int m_revspritetile;
 	int m_bgpen;
+	int m_bgpen_blend;
+
+	int m_revspritetile;
 
 private:
 	uint32_t sum_colors(const pen_t *pal, int c1_idx, int c2_idx);
@@ -54,23 +83,5 @@ private:
 DECLARE_DEVICE_TYPE(TECMO_MIXER, tecmo_mix_device)
 
 
-
-#define MCFG_TECMO_MIXER_SHIFTS(_sprpri_shift, _sprbln_shift, _sprcol_shift) \
-	tecmo_mix_device::set_mixer_shifts(*device, _sprpri_shift, _sprbln_shift, _sprcol_shift);
-
-#define MCFG_TECMO_MIXER_BLENDCOLS(_bgblend_comp, _fgblend_comp, _txblend_comp, _spblend_comp) \
-	tecmo_mix_device::set_blendcols(*device, _bgblend_comp, _fgblend_comp, _txblend_comp, _spblend_comp);
-
-#define MCFG_TECMO_MIXER_REGULARCOLS(_bgregular_comp, _fgregular_comp, _txregular_comp, _spregular_comp) \
-	tecmo_mix_device::set_regularcols(*device, _bgregular_comp, _fgregular_comp, _txregular_comp, _spregular_comp);
-
-#define MCFG_TECMO_MIXER_BLENDSOURCE(_spblend_source, _fgblend_source) \
-	tecmo_mix_device::set_blendsource(*device, _spblend_source, _fgblend_source);
-
-#define MCFG_TECMO_MIXER_REVSPRITETILE \
-	tecmo_mix_device::set_revspritetile(*device);
-
-#define MCFG_TECMO_MIXER_BGPEN(_bgpen) \
-	tecmo_mix_device::set_bgpen(*device, _bgpen);
 
 #endif // MAME_VIDEO_TECMO_MIX_H

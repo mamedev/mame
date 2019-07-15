@@ -51,7 +51,7 @@ Control registers
 
 DEFINE_DEVICE_TYPE(PC080SN, pc080sn_device, "pc080sn", "Taito PC080SN")
 
-pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PC080SN, tag, owner, clock),
 	m_ram(nullptr),
 	m_gfxnum(0),
@@ -71,16 +71,6 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 		m_bgscrollx[i] = 0;
 		m_bgscrolly[i] = 0;
 	}
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void pc080sn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<pc080sn_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -118,26 +108,33 @@ void pc080sn_device::device_start()
 		m_tilemap[1]->set_scroll_rows(512);
 	}
 
-	m_ram = make_unique_clear<uint16_t[]>(PC080SN_RAM_SIZE / 2);
+	m_ram = make_unique_clear<u16[]>(PC080SN_RAM_SIZE / 2);
 
 	m_bg_ram[0]       = m_ram.get() + 0x0000 /2;
 	m_bg_ram[1]       = m_ram.get() + 0x8000 /2;
 	m_bgscroll_ram[0] = m_ram.get() + 0x4000 /2;
 	m_bgscroll_ram[1] = m_ram.get() + 0xc000 /2;
 
-	save_pointer(NAME(m_ram.get()), PC080SN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram), PC080SN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
-	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_device::restore_scroll), this));
+}
 
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void pc080sn_device::device_post_load()
+{
+	restore_scroll();
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-void pc080sn_device::common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum )
+void pc080sn_device::common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int tile_index, u16 *ram, int gfxnum )
 {
-	uint16_t code, attr;
+	u16 code, attr;
 
 	if (!m_dblwidth)
 	{
@@ -161,9 +158,9 @@ TILE_GET_INFO_MEMBER(pc080sn_device::get_bg_tile_info)
 	common_get_pc080sn_bg_tile_info( tileinfo, tile_index, m_bg_ram[0], m_gfxnum );
 }
 
-void pc080sn_device::common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum )
+void pc080sn_device::common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int tile_index, u16 *ram, int gfxnum )
 {
-	uint16_t code,attr;
+	u16 code,attr;
 
 	if (!m_dblwidth)
 	{
@@ -301,7 +298,7 @@ void pc080sn_device::tilemap_update( )
 	if (!m_dblwidth)
 	{
 		for (j = 0; j < 256; j++)
-			m_tilemap[0]->set_scrollx((j + m_bgscrolly[0]) & 0x1ff,   m_bgscrollx[0] - m_bgscroll_ram[0][j]);
+			m_tilemap[0]->set_scrollx((j + m_bgscrolly[0]) & 0x1ff, m_bgscrollx[0] - m_bgscroll_ram[0][j]);
 
 		for (j = 0; j < 256; j++)
 			m_tilemap[1]->set_scrollx((j + m_bgscrolly[1]) & 0x1ff, m_bgscrollx[1] - m_bgscroll_ram[1][j]);
@@ -314,9 +311,9 @@ void pc080sn_device::tilemap_update( )
 }
 
 
-static uint16_t topspeed_get_road_pixel_color( uint16_t pixel, uint16_t color )
+static u16 topspeed_get_road_pixel_color( u16 pixel, u16 color )
 {
-	uint16_t road_body_color, off_road_color, pixel_type;
+	u16 road_body_color, off_road_color, pixel_type;
 
 	/* Color changes based on screenshots from game flyer */
 	pixel_type = (pixel % 0x10);
@@ -363,16 +360,16 @@ static uint16_t topspeed_get_road_pixel_color( uint16_t pixel, uint16_t color )
 }
 
 
-void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority, uint16_t *color_ctrl_ram )
+void pc080sn_device::topspeed_custom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u16 *color_ctrl_ram, u8 pmask)
 {
-	uint16_t *dst16, *src16;
-	uint8_t *tsrc;
-	uint16_t scanline[1024];  /* won't be called by a wide-screen game, but just in case... */
+	u16 *dst16, *src16;
+	u8 *tsrc;
+	u16 scanline[1024];  /* won't be called by a wide-screen game, but just in case... */
 
 	bitmap_ind16 &srcbitmap = m_tilemap[layer]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_tilemap[layer]->flagsmap();
 
-	uint16_t a, color;
+	u16 a, color;
 	int sx, x_index;
 	int y_index, src_y_index, row_index;
 
@@ -438,17 +435,17 @@ void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &
 			}
 		}
 
-		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
+		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? false : true, ROT0, screen.priority(), priority, pmask);
 		y_index++;
 	}
 }
 
-void pc080sn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority )
+void pc080sn_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask)
 {
-	m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority);
+	m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority, pmask);
 }
 
-void pc080sn_device::tilemap_draw_offset( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority, int x_offset, int y_offset )
+void pc080sn_device::tilemap_draw_offset(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, int x_offset, int y_offset, u8 pmask)
 {
 	int basedx = -16 - m_x_offset;
 	int basedxflip = -16 + m_x_offset;
@@ -457,14 +454,14 @@ void pc080sn_device::tilemap_draw_offset( screen_device &screen, bitmap_ind16 &b
 
 	m_tilemap[layer]->set_scrolldx(basedx + x_offset, basedxflip + x_offset);
 	m_tilemap[layer]->set_scrolldy(basedy + y_offset, basedyflip + y_offset);
-	m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority);
+	m_tilemap[layer]->draw(screen, bitmap, cliprect, flags, priority, pmask);
 	m_tilemap[layer]->set_scrolldx(basedx, basedxflip);
 	m_tilemap[layer]->set_scrolldy(basedy, basedyflip);
 }
 
-void pc080sn_device::tilemap_draw_special( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority, uint16_t *ram )
+void pc080sn_device::tilemap_draw_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u16 *ram, u8 pmask)
 {
-	pc080sn_device::topspeed_custom_draw(screen, bitmap, cliprect, layer, flags, priority, ram);
+	pc080sn_device::topspeed_custom_draw(screen, bitmap, cliprect, layer, flags, priority, ram, pmask);
 }
 
 

@@ -90,10 +90,18 @@ class z88cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~z88cart_slot_device();
+	template <typename T>
+	z88cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: z88cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> static devcb_base &set_out_flp_callback(device_t &device, Object &&cb) { return downcast<z88cart_slot_device &>(device).m_out_flp_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_flp_callback() { return m_out_flp_cb.bind(); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -125,21 +133,13 @@ protected:
 private:
 	static constexpr device_timer_id TIMER_FLP_CLEAR = 0;
 
-	devcb_write_line               m_out_flp_cb;
-	device_z88cart_interface*       m_cart;
-	emu_timer *                     m_flp_timer;
+	devcb_write_line            m_out_flp_cb;
+	device_z88cart_interface*   m_cart;
+	emu_timer *                 m_flp_timer;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_Z88CART_SLOT_OUT_FLP_CB(_devcb) \
-		devcb = &z88cart_slot_device::set_out_flp_callback(*device, DEVCB_##_devcb);
 
 #endif // MAME_BUS_Z88_Z88_H

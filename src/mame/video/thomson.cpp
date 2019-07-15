@@ -9,12 +9,12 @@
 **********************************************************************/
 
 #include "emu.h"
-#include <math.h>
 #include "includes/thomson.h"
 
+#include <math.h>
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /* One GPL is what is drawn in 1 us by the video system in the active window.
@@ -162,7 +162,7 @@ struct thom_vsignal thomson_state::thom_get_lightpen_vsignal( int xdec, int ydec
 
 void thomson_state::thom_set_lightpen_callback( int nb )
 {
-	LOG (( "%f thom_set_lightpen_callback called\n", machine().time().as_double()));
+	LOG("%f thom_set_lightpen_callback called\n", machine().time().as_double());
 	m_thom_lightpen_nb = nb;
 }
 
@@ -268,7 +268,7 @@ void thomson_state::thom_set_border_color( unsigned index )
 	assert( index < 16 );
 	if ( index != m_thom_border_index )
 	{
-		LOG (( "thom_set_border_color: %i at line %i col %i\n", index, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
+		LOG("thom_set_border_color: %i at line %i col %i\n", index, thom_video_elapsed() / 64, thom_video_elapsed() % 64);
 		m_thom_border_index = index;
 		thom_border_changed();
 	}
@@ -286,7 +286,7 @@ void thomson_state::thom_set_palette( unsigned index, uint16_t color )
 	if ( m_thom_pal[ index ] == color )
 		return;
 
-	LOG (( "thom_set_palette: %i to %03x at line %i col %i\n", index, color, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
+	LOG("thom_set_palette: %i to %03x at line %i col %i\n", index, color, thom_video_elapsed() / 64, thom_video_elapsed() % 64);
 
 	m_thom_pal[ index ] = color;
 	if ( index == m_thom_border_index )
@@ -303,7 +303,7 @@ void thomson_state::thom_set_video_mode( unsigned mode )
 
 	if ( mode != m_thom_vmode )
 	{
-		LOG (( "thom_set_video_mode: %i at line %i, col %i\n", mode, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
+		LOG("thom_set_video_mode: %i at line %i, col %i\n", mode, thom_video_elapsed() / 64, thom_video_elapsed() % 64);
 		m_thom_vmode = mode;
 		thom_gplinfo_changed();
 		m_thom_vstate_dirty = 1;
@@ -315,10 +315,11 @@ void thomson_state::thom_set_video_mode( unsigned mode )
 
 void thomson_state::thom_set_video_page( unsigned page )
 {
-	assert( page < THOM_NB_PAGES )
-		;
-	if ( page != m_thom_vpage ) {
-		LOG (( "thom_set_video_page: %i at line %i col %i\n", page, thom_video_elapsed() / 64, thom_video_elapsed() % 64  ));
+	assert( page < THOM_NB_PAGES );
+
+	if ( page != m_thom_vpage )
+	{
+		LOG("thom_set_video_page: %i at line %i col %i\n", page, thom_video_elapsed() / 64, thom_video_elapsed() % 64);
 		m_thom_vpage = page;
 		thom_gplinfo_changed();
 		m_thom_vstate_dirty = 1;
@@ -568,6 +569,41 @@ UPDATE_LOW( bitmap16 )
 END_UPDATE
 
 
+/* 160x200, 16-colors, no constraint, alternate encoding, undocumented, tested */
+
+static constexpr unsigned tbl_bit16[4][4] = {
+		{  0,  2,  8, 10 },
+		{  1,  3,  9, 11 },
+		{  4,  6, 12, 14 },
+		{  5,  7, 13, 15 } };
+
+UPDATE_HI( bitmap16alt )
+{
+	unsigned p0 = tbl_bit16[ramb >> 6][rama >> 6];
+	unsigned p1 = tbl_bit16[(ramb >> 4) & 3][(rama >> 4) & 3];
+	unsigned p2 = tbl_bit16[(ramb >> 2) & 3][(rama >> 2) & 3];
+	unsigned p3 = tbl_bit16[ramb & 3][rama & 3];
+	dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = pal[ p0 ];
+	dst[ 4] = dst[ 5] = dst[ 6] = dst[ 7] = pal[ p1 ];
+	dst[ 8] = dst[ 9] = dst[10] = dst[11] = pal[ p2 ];
+	dst[12] = dst[13] = dst[14] = dst[15] = pal[ p3 ];
+}
+END_UPDATE
+
+UPDATE_LOW( bitmap16alt )
+{
+	unsigned p0 = tbl_bit16[ramb >> 6][rama >> 6];
+	unsigned p1 = tbl_bit16[(ramb >> 4) & 3][(rama >> 4) & 3];
+	unsigned p2 = tbl_bit16[(ramb >> 2) & 3][(rama >> 2) & 3];
+	unsigned p3 = tbl_bit16[ramb & 3][rama & 3];
+	dst[0] = dst[1] = pal[ p0 ];
+	dst[2] = dst[3] = pal[ p1 ];
+	dst[4] = dst[5] = pal[ p2 ];
+	dst[6] = dst[7] = pal[ p3 ];
+}
+END_UPDATE
+
+
 
 /* 640x200 (80 text column), 2-colors, no constraint */
 
@@ -785,7 +821,8 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
 	FUN(to9), FUN(mode80_to9),
-		FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
+	FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
+	FUN(bitmap16alt)
 };
 
 
@@ -890,7 +927,7 @@ void thomson_state::thom_floppy_active( int write )
 	/* update icon */
 	fnew = FLOP_STATE;
 	if ( fold != fnew )
-		output().set_value( "floppy", fnew );
+		m_floppy_led = fnew;
 }
 
 
@@ -915,7 +952,7 @@ uint32_t thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &
 	rectangle lrect(0, xbleft - 1, 0, 0);
 	rectangle rrect(xbright, xright - 1, 0, 0);
 
-	//LOG (( "%f thom: video update called\n", machine().time().as_double()));
+	//LOG("%f thom: video update called\n", machine().time().as_double());
 
 	/* upper border */
 	for ( y = 0; y < THOM_BORDER_HEIGHT - m_thom_bheight; y++ )
@@ -1013,7 +1050,7 @@ uint32_t thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &
 TIMER_CALLBACK_MEMBER( thomson_state::thom_set_init )
 {
 	int init = param;
-	LOG (( "%f thom_set_init: %i, at line %i col %i\n", machine().time().as_double(), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
+	LOG("%f thom_set_init: %i, at line %i col %i\n", machine().time().as_double(), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64);
 
 	if ( m_thom_init_cb )
 		(this->*m_thom_init_cb)( init );
@@ -1032,7 +1069,7 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 		uint16_t b = 0;
 		struct thom_vsignal l = thom_get_lightpen_vsignal( 0, -1, 0 );
 
-		LOG (( "%f thom: video eof called\n", machine().time().as_double() ));
+		LOG("%f thom: video eof called\n", machine().time().as_double());
 
 		/* floppy indicator count */
 		if ( m_thom_floppy_wcount )
@@ -1041,7 +1078,7 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 			m_thom_floppy_rcount--;
 		fnew = FLOP_STATE;
 		if ( fnew != fold )
-			output().set_value( "floppy", fnew );
+			m_floppy_led = fnew;
 
 		/* prepare state for next frame */
 		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
@@ -1120,7 +1157,7 @@ static const uint16_t mo5_pal_init[16] =
 
 VIDEO_START_MEMBER( thomson_state, thom )
 {
-	LOG (( "thom: video start called\n" ));
+	LOG("thom: video start called\n");
 
 	/* scan-line state */
 	memset( m_thom_border_l, 0xff, sizeof( m_thom_border_l ) );
@@ -1160,7 +1197,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	m_thom_floppy_wcount = 0;
 	save_item(NAME(m_thom_floppy_wcount));
 	save_item(NAME(m_thom_floppy_rcount));
-	output().set_value( "floppy", 0 );
+	m_floppy_led.resolve();
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
@@ -1184,8 +1221,8 @@ VIDEO_START_MEMBER( thomson_state, thom )
 /* sets the fixed palette (for MO5,TO7,TO7/70) and gamma correction */
 void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, palette_device& palette)
 {
-	memcpy( m_thom_last_pal, pal, 32 );
-	memcpy( m_thom_pal, pal, 32 );
+	memcpy(m_thom_last_pal, pal, 32);
+	memcpy(m_thom_pal, pal, 32);
 
 	for ( int i = 0; i < 4097; i++ )
 	{
@@ -1198,31 +1235,31 @@ void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, pa
 }
 
 
-PALETTE_INIT_MEMBER(thomson_state, thom)
+void thomson_state::thom_palette(palette_device &palette)
 {
-	LOG (( "thom: palette init called\n" ));
+	LOG("thom: palette init called\n");
 
-		/* TO8 and later use an EF9369 color palette chip
-		   The spec shows a built-in gamma correction for gamma=2.8
-		   i.e., output is out = in ^ (1/2.8)
+	/* TO8 and later use an EF9369 color palette chip
+	   The spec shows a built-in gamma correction for gamma=2.8
+	   i.e., output is out = in ^ (1/2.8)
 
-		   For the TO7, the gamma correction is irrelevant.
+	   For the TO7, the gamma correction is irrelevant.
 
-		   For the TO7/70, we use the same palette and gamma has the TO8,
-		   which gives good results (but is not verified).
-		 */
-		thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
+	   For the TO7/70, we use the same palette and gamma has the TO8,
+	   which gives good results (but is not verified).
+	 */
+	thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
-PALETTE_INIT_MEMBER(thomson_state, mo5)
+void thomson_state::mo5_palette(palette_device &palette)
 {
-	LOG (( "thom: MO5 palette init called\n" ));
+	LOG("thom: MO5 palette init called\n");
 
-		/* The MO5 has a different fixed palette than the TO7/70.
-		   We use a smaller gamma correction which gives intutively better
-		   results (but is not verified).
-		 */
-		thom_configure_palette(1.0, mo5_pal_init, palette);
+	/* The MO5 has a different fixed palette than the TO7/70.
+	   We use a smaller gamma correction which gives intutively better
+	   results (but is not verified).
+	 */
+	thom_configure_palette(1.0, mo5_pal_init, palette);
 }
 
 

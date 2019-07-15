@@ -6,9 +6,9 @@
  */
 
 #include "pfunction.h"
+#include "pexception.h"
 #include "pfmtlog.h"
 #include "putil.h"
-#include "pexception.h"
 
 #include <cmath>
 #include <stack>
@@ -17,7 +17,7 @@ namespace plib {
 
 void pfunction::compile(const std::vector<pstring> &inputs, const pstring &expr)
 {
-	if (expr.startsWith("rpn:"))
+	if (plib::startsWith(expr, "rpn:"))
 		compile_postfix(inputs, expr.substr(4));
 	else
 		compile_infix(inputs, expr);
@@ -52,11 +52,13 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			{ rc.m_cmd = SIN; stk -= 0; }
 		else if (cmd == "cos")
 			{ rc.m_cmd = COS; stk -= 0; }
+		else if (cmd == "trunc")
+			{ rc.m_cmd = TRUNC; stk -= 0; }
 		else if (cmd == "rand")
 			{ rc.m_cmd = RAND; stk += 1; }
 		else
 		{
-			for (unsigned i = 0; i < inputs.size(); i++)
+			for (std::size_t i = 0; i < inputs.size(); i++)
 			{
 				if (inputs[i] == cmd)
 				{
@@ -68,27 +70,27 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			}
 			if (rc.m_cmd != PUSH_INPUT)
 			{
-				bool err = false;
 				rc.m_cmd = PUSH_CONST;
-				rc.m_param = cmd.as_double(&err);
+				bool err;
+				rc.m_param = plib::pstonum_ne<decltype(rc.m_param), true>(cmd, err);
 				if (err)
-					throw plib::pexception(plib::pfmt("nld_function: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
+					throw plib::pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 				stk += 1;
 			}
 		}
 		if (stk < 1)
-			throw plib::pexception(plib::pfmt("nld_function: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
+			throw plib::pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
 		m_precompiled.push_back(rc);
 	}
 	if (stk != 1)
-		throw plib::pexception(plib::pfmt("nld_function: stack count different to one on <{2}>")(expr));
+		throw plib::pexception(plib::pfmt("pfunction: stack count different to one on <{2}>")(expr));
 }
 
-static int get_prio(pstring v)
+static int get_prio(const pstring &v)
 {
 	if (v == "(" || v == ")")
 		return 1;
-	else if (v.left(1) >= "a" && v.left(1) <= "z")
+	else if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
 		return 0;
 	else if (v == "*" || v == "/")
 		return 20;
@@ -103,7 +105,7 @@ static int get_prio(pstring v)
 static pstring pop_check(std::stack<pstring> &stk, const pstring &expr)
 {
 	if (stk.size() == 0)
-		throw plib::pexception(plib::pfmt("nld_function: stack underflow during infix parsing of: <{1}>")(expr));
+		throw plib::pexception(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
 	pstring res = stk.top();
 	stk.pop();
 	return res;
@@ -113,12 +115,11 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 {
 	// Shunting-yard infix parsing
 	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
-	std::vector<pstring> sexpr(plib::psplit(expr.replace_all(" ",""), sep));
+	std::vector<pstring> sexpr(plib::psplit(plib::replace_all(expr, pstring(" "), pstring("")), sep));
 	std::stack<pstring> opstk;
 	std::vector<pstring> postfix;
 
-	//printf("dbg: %s\n", expr.c_str());
-	for (unsigned i = 0; i < sexpr.size(); i++)
+	for (std::size_t i = 0; i < sexpr.size(); i++)
 	{
 		pstring &s = sexpr[i];
 		if (s=="(")
@@ -182,14 +183,15 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 
 #define OP(OP, ADJ, EXPR) \
 case OP: \
-	ptr-=ADJ; \
-	stack[ptr-1] = EXPR; \
+	ptr-= (ADJ); \
+	stack[ptr-1] = (EXPR); \
 	break;
 
 double pfunction::evaluate(const std::vector<double> &values)
 {
-	double stack[20];
+	std::array<double, 20> stack = { 0 };
 	unsigned ptr = 0;
+	stack[0] = 0.0;
 	for (auto &rc : m_precompiled)
 	{
 		switch (rc.m_cmd)
@@ -199,8 +201,9 @@ double pfunction::evaluate(const std::vector<double> &values)
 			OP(SUB,  1, ST2 - ST1)
 			OP(DIV,  1, ST2 / ST1)
 			OP(POW,  1, std::pow(ST2, ST1))
-			OP(SIN,  0, std::sin(ST2));
-			OP(COS,  0, std::cos(ST2));
+			OP(SIN,  0, std::sin(ST2))
+			OP(COS,  0, std::cos(ST2))
+			OP(TRUNC,  0, std::trunc(ST2))
 			case RAND:
 				stack[ptr++] = lfsr_random();
 				break;
@@ -215,4 +218,4 @@ double pfunction::evaluate(const std::vector<double> &values)
 	return stack[ptr-1];
 }
 
-}
+} // namespace plib

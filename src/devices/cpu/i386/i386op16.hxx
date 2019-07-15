@@ -799,6 +799,7 @@ void i386_device::i386_iret16()            // Opcode 0xcf
 		i386_load_segment_descriptor(CS);
 		CHANGE_PC(m_eip);
 	}
+	m_auto_clear_RF = false;
 	CYCLES(CYCLES_IRET);
 }
 
@@ -1185,10 +1186,20 @@ void i386_device::i386_enter16()           // Opcode 0xc8
 
 	if(level > 0)
 	{
-		for(x=1;x<level-1;x++)
+		for(x=1;x<=level-1;x++)
 		{
-			REG16(BP) -= 2;
-			PUSH16(READ16(REG16(BP)));
+			uint32_t addr;
+			if(!STACK_32BIT)
+			{
+				REG16(BP) -= 2;
+				addr = REG16(BP);
+			}
+			else
+			{
+				REG32(EBP) -= 2;
+				addr = REG32(EBP);
+			}
+			PUSH16(READ16(i386_translate(SS, addr, 0)));
 		}
 		PUSH16(frameptr);
 	}
@@ -1671,9 +1682,9 @@ void i386_device::i386_pop_rm16()          // Opcode 0x8f
 		if( modrm >= 0xc0 ) {
 			STORE_RM16(modrm, value);
 		} else {
-			ea = GetEA(modrm,1);
 			try
 			{
+				ea = GetEA(modrm,1);
 				WRITE16(ea, value);
 			}
 			catch(uint64_t e)
@@ -1742,6 +1753,8 @@ void i386_device::i386_popf()              // Opcode 0x9d
 	else
 		FAULT(FAULT_SS,0)
 	CYCLES(CYCLES_POPF);
+
+	m_auto_clear_RF = false;
 }
 
 void i386_device::i386_push_ax()           // Opcode 0x50

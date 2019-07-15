@@ -74,28 +74,30 @@
 #define P_OUT(A,V)      TMS32010_Out(A,V)
 
 
-DEFINE_DEVICE_TYPE(TMS32010, tms32010_device, "tms32010", "TMS32010")
-DEFINE_DEVICE_TYPE(TMS32015, tms32015_device, "tms32015", "TMS32015")
-DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "TMS32016")
+DEFINE_DEVICE_TYPE(TMS32010, tms32010_device, "tms32010", "Texas Instruments TMS32010")
+DEFINE_DEVICE_TYPE(TMS32015, tms32015_device, "tms32015", "Texas Instruments TMS32015")
+DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "Texas Instruments TMS32016")
 
 
 /****************************************************************************
  *  TMS32010 Internal Memory Map
  ****************************************************************************/
 
-ADDRESS_MAP_START(tms32010_device::tms32010_ram)
-	AM_RANGE(0x00, 0x7f) AM_RAM     /* Page 0 */
-	AM_RANGE(0x80, 0x8f) AM_RAM     /* Page 1 */
-ADDRESS_MAP_END
+void tms32010_device::tms32010_ram(address_map &map)
+{
+	map(0x00, 0x7f).ram();     /* Page 0 */
+	map(0x80, 0x8f).ram();     /* Page 1 */
+}
 
 /****************************************************************************
  *  TMS32015/6 Internal Memory Map
  ****************************************************************************/
 
-ADDRESS_MAP_START(tms32010_device::tms32015_ram)
-	AM_RANGE(0x00, 0x7f) AM_RAM     /* Page 0 */
-	AM_RANGE(0x80, 0xff) AM_RAM     /* Page 1 */
-ADDRESS_MAP_END
+void tms32010_device::tms32015_ram(address_map &map)
+{
+	map(0x00, 0x7f).ram();     /* Page 0 */
+	map(0x80, 0xff).ram();     /* Page 1 */
+}
 
 
 tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -135,9 +137,9 @@ device_memory_interface::space_config_vector tms32010_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *tms32010_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
 {
-	return new tms32010_disassembler;
+	return std::make_unique<tms32010_disassembler>();
 }
 
 
@@ -212,7 +214,7 @@ util::disasm_interface *tms32010_device::create_disassembler()
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (m_direct->read_word(A))
+#define TMS32010_RDOP(A) (m_cache->read_word(A))
 
 
 /****************************************************************************
@@ -221,7 +223,7 @@ util::disasm_interface *tms32010_device::create_disassembler()
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (m_direct->read_word(A))
+#define TMS32010_RDOP_ARG(A) (m_cache->read_word(A))
 
 
 /************************************************************************
@@ -834,7 +836,7 @@ void tms32010_device::device_start()
 	save_item(NAME(m_addr_mask));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
@@ -871,7 +873,7 @@ void tms32010_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_STACK[3]).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_STR).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -965,7 +967,7 @@ void tms32010_device::execute_run()
 
 		m_PREVPC = m_PC;
 
-		debugger_instruction_hook(this, m_PC);
+		debugger_instruction_hook(m_PC);
 
 		m_opcode.d = M_RDOP(m_PC);
 		m_PC++;

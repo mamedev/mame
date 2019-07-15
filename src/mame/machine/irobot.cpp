@@ -67,15 +67,15 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 	logerror("write %2x ", data);
 	IR_CPU_STATE();
 
-	m_combase = m_comRAM[data >> 7];
-	m_combase_mb = m_comRAM[(data >> 7) ^ 1];
-	m_bufsel = data & 0x02;
-	if (((data & 0x01) == 0x01) && (m_vg_clear == 0))
+	m_combase = m_comRAM[BIT(data, 7)];
+	m_combase_mb = m_comRAM[BIT(data, 7) ^ 1];
+	m_bufsel = BIT(data, 1);
+	if (BIT(data, 0) && (m_vg_clear == 0))
 		irobot_poly_clear();
 
-	m_vg_clear = data & 0x01;
+	m_vg_clear = BIT(data, 0);
 
-	if ((data & 0x04) && !(m_statwr & 0x04))
+	if (BIT(data, 2) && !BIT(m_statwr, 2))
 	{
 		irobot_run_video();
 #if IR_TIMING
@@ -88,8 +88,11 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 #endif
 		m_irvg_running=1;
 	}
-	if ((data & 0x10) && !(m_statwr & 0x10))
+	if (BIT(data, 4) && !BIT(m_statwr, 4))
 		irmb_run();
+
+	m_novram->recall(!BIT(data, 6));
+
 	m_statwr = data;
 }
 
@@ -140,8 +143,8 @@ WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 			membank("bank1")->set_base(&RAM[0x1A000]);
 			break;
 	}
-	output().set_led_value(0,data & 0x10);
-	output().set_led_value(1,data & 0x20);
+	m_leds[0] = BIT(data, 4);
+	m_leds[1] = BIT(data, 5);
 }
 
 TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
@@ -157,7 +160,18 @@ TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
 	/* set a callback for the next 32-scanline increment */
 	scanline += 32;
 	if (scanline >= 256) scanline = 0;
-	machine().scheduler().timer_set(m_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this), scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+}
+
+void irobot_state::machine_start()
+{
+	m_leds.resolve();
+	m_vg_clear = 0;
+	m_statwr = 0;
+
+	/* set an initial timer to go off on scanline 0 */
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(irobot_state::scanline_callback), this));
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 void irobot_state::machine_reset()
@@ -172,33 +186,13 @@ void irobot_state::machine_reset()
 
 	m_irvg_vblank=0;
 	m_irvg_running = 0;
-	m_irvg_timer = machine().device<timer_device>("irvg_timer");
 	m_irmb_running = 0;
-	m_irmb_timer = machine().device<timer_device>("irmb_timer");
 
-	/* set an initial timer to go off on scanline 0 */
-	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this));
-
-	irobot_rom_banksel_w(m_maincpu->space(AS_PROGRAM),0,0);
-	irobot_out0_w(m_maincpu->space(AS_PROGRAM),0,0);
-	m_combase = m_comRAM[0];
-	m_combase_mb = m_comRAM[1];
+	address_space &space = machine().dummy_space();
+	irobot_rom_banksel_w(space, 0, 0);
+	irobot_out0_w(space, 0, 0);
+	irobot_statwr_w(space, 0, 0);
 	m_outx = 0;
-}
-
-WRITE8_MEMBER(irobot_state::irobot_control_w)
-{
-	m_control_num = offset & 0x03;
-}
-
-READ8_MEMBER(irobot_state::irobot_control_r)
-{
-	if (m_control_num == 0)
-		return ioport("AN0")->read();
-	else if (m_control_num == 1)
-		return ioport("AN1")->read();
-	return 0;
-
 }
 
 /*  we allow irmb_running and irvg_running to appear running before clearing
@@ -278,7 +272,7 @@ READ8_MEMBER(irobot_state::irobot_status_r)
 
 
 #if DISASSEMBLE_MB_ROM
-static void disassemble_instruction(irmb_ops *op);
+static void disassemble_instruction(irobot_state::irmb_ops const *op);
 #endif
 
 
@@ -391,15 +385,14 @@ void irobot_state::load_oproms()
 
 
 /* Init mathbox (only called once) */
-DRIVER_INIT_MEMBER(irobot_state,irobot)
+void irobot_state::init_irobot()
 {
-	int i;
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		m_irmb_stack[i] = &m_mbops[0];
 		m_irmb_regs[i] = 0;
 	}
-	m_irmb_latch=0;
+	m_irmb_latch = 0;
 	load_oproms();
 }
 
@@ -820,7 +813,7 @@ default:    case 0x3f:  IXOR(irmb_din(curop), 0);                            bre
 
 
 #if DISASSEMBLE_MB_ROM
-static void disassemble_instruction(irmb_ops *op)
+static void disassemble_instruction(irobot_state::irmb_ops const *op)
 {
 	int lp;
 
@@ -969,4 +962,4 @@ static void disassemble_instruction(irmb_ops *op)
 		if (op->jtype == 5) logerror("\n");
 	}
 }
-#endif
+#endif // DISASSEMBLE_MB_ROM

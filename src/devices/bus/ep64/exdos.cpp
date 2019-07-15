@@ -93,23 +93,25 @@ FLOPPY_FORMATS_MEMBER( ep64_exdos_device::floppy_formats )
 	FLOPPY_EP64_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ep64_exdos_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ep64_exdos_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ep64_exdos_device::device_add_mconfig)
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL(8'000'000))
+void ep64_exdos_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":2", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":3", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, ep64_exdos_floppies, nullptr, ep64_exdos_device::floppy_formats);
+}
 
 
 //**************************************************************************
@@ -142,7 +144,7 @@ void ep64_exdos_device::device_start()
 {
 	m_slot->program().install_rom(0x080000, 0x087fff, m_rom->base());
 
-	m_slot->io().install_readwrite_handler(0x10, 0x13, 0, 0x04, 0, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
+	m_slot->io().install_readwrite_handler(0x10, 0x13, 0, 0x04, 0, read8sm_delegate(FUNC(wd_fdc_device_base::read), m_fdc.target()), write8sm_delegate(FUNC(wd_fdc_device_base::write), m_fdc.target()));
 	m_slot->io().install_readwrite_handler(0x18, 0x18, 0, 0x04, 0, READ8_DELEGATE(ep64_exdos_device, read), WRITE8_DELEGATE(ep64_exdos_device, write));
 }
 

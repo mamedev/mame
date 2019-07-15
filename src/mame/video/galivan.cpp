@@ -54,58 +54,45 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galivan_state, galivan)
+void galivan_state::galivan_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* characters use colors 0-0x7f */
-	for (i = 0; i < 0x80; i++)
+	// characters use colors 0-0x7f
+	for (int i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* I think that */
-	/* background tiles use colors 0xc0-0xff in four banks */
-	/* the bottom two bits of the color code select the palette bank for */
-	/* pens 0-7; the top two bits for pens 8-15. */
-	for (i = 0; i < 0x100; i++)
+	// I think that background tiles use colors 0xc0-0xff in four banks
+	// the bottom two bits of the color code select the palette bank for pens 0-7;
+	// the top two bits for pens 8-15.
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry;
-
-		if (i & 0x08)
-			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0xc0) >> 2);
-		else
-			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0x30) >> 0);
+		uint8_t const ctabentry = 0xc0 | (i & 0x0f) | ((i >> ((i & 0x08) ? 2 : 0)) & 0x30);
 
 		palette.set_pen_indirect(0x80 + i, ctabentry);
 	}
 
-	/* sprites use colors 0x80-0xbf in four banks */
-	/* The lookup table tells which colors to pick from the selected bank */
-	/* the bank is selected by another PROM and depends on the top 7 bits of */
-	/* the sprite code. The PROM selects the bank *separately* for pens 0-7 and */
-	/* 8-15 (like for tiles). */
-	for (i = 0; i < 0x1000; i++)
+	// sprites use colors 0x80-0xbf in four banks
+	// The lookup table tells which colors to pick from the selected bank
+	// the bank is selected by another PROM and depends on the top 7 bits of the sprite code.
+	// The PROM selects the bank *separately* for pens 0-7 and 8-15 (like for tiles).
+	for (int i = 0; i < 0x1000; i++)
 	{
-		uint8_t ctabentry;
-		int i_swapped = ((i & 0x0f) << 8) | ((i & 0xff0) >> 4);
-
-		if (i & 0x80)
-			ctabentry = 0x80 | ((i & 0x0c) << 2) | (color_prom[i >> 4] & 0x0f);
-		else
-			ctabentry = 0x80 | ((i & 0x03) << 4) | (color_prom[i >> 4] & 0x0f);
+		uint8_t const ctabentry = 0x80 | ((i << ((i & 0x80) ? 2 : 4)) & 0x30) | (color_prom[i >> 4] & 0x0f);
+		int const i_swapped = ((i & 0x0f) << 8) | ((i & 0xff0) >> 4);
 
 		palette.set_pen_indirect(0x180 + i_swapped, ctabentry);
 	}
@@ -217,7 +204,7 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	/* bit 7 selects one of two ROM banks for c000-dfff */
 	membank("bank1")->set_entry((data & 0x80) >> 7);
 
-	/*  logerror("Address: %04X - port 40 = %02x\n", space.device().safe_pc(), data); */
+	/*  logerror("%s port 40 = %02x\n", machine().describe_context(), data); */
 }
 
 WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)

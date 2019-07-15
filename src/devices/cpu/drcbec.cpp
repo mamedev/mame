@@ -519,7 +519,8 @@ int drcbe_c::execute(code_handle &entry)
 				fatalerror("Unexpected opcode\n");
 
 			case MAKE_OPCODE_SHORT(OP_DEBUG, 4, 0):     // DEBUG   pc
-				debugger_instruction_hook(&m_device, PARAM0);
+				if (m_device.machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
+					m_device.debug()->instruction_hook(PARAM0);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_HASHJMP, 4, 0):   // HASHJMP mode,pc,handle
@@ -1082,13 +1083,13 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_BSWAP, 4, 0):     // BSWAP   dst,src
 				temp32 = PARAM1;
-				PARAM0 = flipendian_int32(temp32);
+				PARAM0 = swapendian_int32(temp32);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BSWAP, 4, 1):
 				temp32 = PARAM1;
 				flags = FLAGS32_NZ(temp32);
-				PARAM0 = flipendian_int32(temp32);
+				PARAM0 = swapendian_int32(temp32);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SHL, 4, 0):       // SHL     dst,src,count[,f]
@@ -1701,13 +1702,13 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_BSWAP, 8, 0):     // DBSWAP  dst,src
 				temp64 = DPARAM1;
-				DPARAM0 = flipendian_int64(temp64);
+				DPARAM0 = swapendian_int64(temp64);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_BSWAP, 8, 1):
 				temp64 = DPARAM1;
 				flags = FLAGS64_NZ(temp64);
-				DPARAM0 = flipendian_int64(temp64);
+				DPARAM0 = swapendian_int64(temp64);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_SHL, 8, 0):       // DSHL    dst,src,count[,f]

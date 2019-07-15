@@ -52,6 +52,9 @@ protected:
 	const u8 *m_lut_mnemonic;
 	bool m_opcode_9bits;
 	int m_pc_bits;
+
+	std::unique_ptr<u8[]> m_l2r;
+	std::unique_ptr<u8[]> m_r2l;
 };
 
 class tms1000_disassembler : public tms1000_base_disassembler

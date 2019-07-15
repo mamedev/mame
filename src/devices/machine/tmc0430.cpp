@@ -94,17 +94,21 @@
 #include "emu.h"
 #include "tmc0430.h"
 
-#define TRACE_ADDRESS 0
-#define TRACE_DETAIL 0
-#define TRACE_CLOCK 0
-#define TRACE_READY 0
-#define TRACE_LINE 0
+#define LOG_DETAIL      (1U<<1)     // More detail
+#define LOG_ADDRESS     (1U<<2)     // Address bus
+#define LOG_CLOCK       (1U<<3)     // Clock line
+#define LOG_READY       (1U<<4)     // Ready line
+#define LOG_LINES       (1U<<5)     // Select/mode lines
+
+#define VERBOSE ( LOG_GENERAL )
+
+#include "logmacro.h"
 
 /*
     Constructor.
 */
-tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMC0430, tag, owner, clock),
+tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TMC0430, tag, owner, clock),
 	m_gromready(*this),
 	m_current_clock_level(CLEAR_LINE),
 	m_current_ident(0),
@@ -134,7 +138,7 @@ tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, d
 WRITE_LINE_MEMBER( tmc0430_device::m_line )
 {
 	m_read_mode = (state==ASSERT_LINE);
-	if (TRACE_LINE) logerror("GROM %d dir %s\n", m_ident>>13, m_read_mode? "READ" : "WRITE");
+	LOGMASKED(LOG_LINES, "GROM %d dir %s\n", m_ident>>13, m_read_mode? "READ" : "WRITE");
 }
 
 /*
@@ -143,7 +147,7 @@ WRITE_LINE_MEMBER( tmc0430_device::m_line )
 WRITE_LINE_MEMBER( tmc0430_device::mo_line )
 {
 	m_address_mode = (state==ASSERT_LINE);
-	if (TRACE_LINE) logerror("GROM %d mode %s\n", m_ident>>13, m_address_mode? "ADDR" : "DATA");
+	LOGMASKED(LOG_LINES, "GROM %d mode %s\n", m_ident>>13, m_address_mode? "ADDR" : "DATA");
 }
 
 /*
@@ -153,7 +157,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gsq_line )
 {
 	if (state==ASSERT_LINE && !m_selected)      // check for edge
 	{
-		if (TRACE_READY) logerror("GROM %d selected, pulling down READY\n", m_ident>>13);
+		LOGMASKED(LOG_READY, "GROM %d selected, pulling down READY\n", m_ident>>13);
 		m_gromready(CLEAR_LINE);
 		m_phase = 4; // set for three full GROM clock ticks (and a fraction at the start)
 	}
@@ -162,25 +166,19 @@ WRITE_LINE_MEMBER( tmc0430_device::gsq_line )
 
 /*
     Combined select lines. Avoids separate calls to the chip.
-    Address:
-    0 -> MO=0, M=0
-    1 -> MO=0, M=1
-    2 -> MO=1, M=0
-    3 -> MO=1, M=1
-    Data: gsq line (ASSERT, CLEAR)
 */
-WRITE8_MEMBER( tmc0430_device::set_lines )
+void tmc0430_device::set_lines(line_state mline, line_state moline, line_state gsq)
 {
-	m_read_mode = ((offset & GROM_M_LINE)!=0);
-	m_address_mode = ((offset & GROM_MO_LINE)!=0);
+	m_read_mode = (mline==ASSERT_LINE);
+	m_address_mode = (moline==ASSERT_LINE);
 
-	if (data!=CLEAR_LINE && !m_selected)        // check for edge
+	if (gsq!=CLEAR_LINE && !m_selected)        // check for edge
 	{
-		if (TRACE_READY) logerror("GROM %d selected, pulling down READY\n", m_ident>>13);
+		LOGMASKED(LOG_READY, "GROM %d selected, pulling down READY\n", m_ident>>13);
 		m_gromready(CLEAR_LINE);
 		m_phase = 4; // set for three full GROM clock ticks (and a fraction at the start)
 	}
-	m_selected = (data!=CLEAR_LINE);
+	m_selected = (gsq!=CLEAR_LINE);
 }
 
 /*
@@ -211,7 +209,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
 	if ((m_current_clock_level==CLEAR_LINE) || (oldlevel==ASSERT_LINE))
 		return;
 
-	if (TRACE_CLOCK) logerror("GROMCLK in, phase=%d, m_add=%04x\n", m_phase, m_address);
+	LOGMASKED(LOG_CLOCK, "GROMCLK in, phase=%d, m_add=%04x\n", m_phase, m_address);
 
 	switch (m_phase)
 	{
@@ -230,8 +228,8 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
 		if (bank & 1) m_buffer  |= m_memptr[baddr | 0x0800];
 		if (bank & 2) m_buffer  |= m_memptr[baddr | 0x1000];
 
-		if (TRACE_ADDRESS) logerror("G>%04x\n", m_address);
-		if (TRACE_DETAIL) logerror("GROM %d preload %04x (bank %d) -> %02x\n", m_ident>>13, m_address, bank, m_buffer);
+		LOGMASKED(LOG_ADDRESS, "G>%04x\n", m_address);
+		LOGMASKED(LOG_DETAIL, "GROM %d preload %04x (bank %d) -> %02x\n", m_ident>>13, m_address, bank, m_buffer);
 		m_phase = 3;
 		break;
 	case 2: // Do nothing if other ident
@@ -240,7 +238,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
 	case 3:
 		// Increase counter
 		m_address = ((m_address + 1)&0x1fff) | m_current_ident;
-		if (TRACE_DETAIL) logerror("GROM %d increase address to %04x\n", m_ident>>13, m_address);
+		LOGMASKED(LOG_DETAIL, "GROM %d increase address to %04x\n", m_ident>>13, m_address);
 
 		// In read mode, READY must have already been raised; in write mode, the ready line is still low
 		m_phase = m_read_mode? 0 : 7;
@@ -256,7 +254,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
 		m_phase = 7;
 		break;
 	case 7:
-		if (TRACE_READY) logerror("GROM %d raising READY\n", m_ident>>13);
+		LOGMASKED(LOG_READY, "GROM %d raising READY\n", m_ident>>13);
 		m_gromready(ASSERT_LINE);
 		// m_address_mode = false;
 		// m_read = false;
@@ -269,7 +267,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
     Read operation. For MO=Address, delivers the address register (and destroys its contents).
     For MO=Data, delivers the byte inside the buffer and prefetches the next one.
 */
-READ8Z_MEMBER( tmc0430_device::readz )
+void tmc0430_device::readz(uint8_t *value)
 {
 	if (!m_selected) return;
 
@@ -279,7 +277,7 @@ READ8Z_MEMBER( tmc0430_device::readz )
 		*value = (m_address & 0xff00)>>8;
 		uint8_t lsb = (m_address & 0x00ff);
 		m_address = (lsb << 8) | lsb;       // see [1], section 2.5.3
-		if (TRACE_DETAIL) logerror("GROM %d return address %02x\n", m_ident>>13, *value);
+		LOGMASKED(LOG_DETAIL, "GROM %d return address %02x\n", m_ident>>13, *value);
 	}
 	else
 	{
@@ -306,7 +304,7 @@ READ8Z_MEMBER( tmc0430_device::readz )
     This operation occurs in parallel to phase 4. The real GROM will pick up
     the value from the data bus some phases later.
 */
-WRITE8_MEMBER( tmc0430_device::write )
+void tmc0430_device::write(uint8_t data)
 {
 	if (!m_selected) return;
 
@@ -314,7 +312,7 @@ WRITE8_MEMBER( tmc0430_device::write )
 	{
 		m_address = ((m_address << 8) | data);          // [1], section 2.5.7
 		m_current_ident = m_address & 0xe000;
-		if (TRACE_DETAIL) logerror("GROM %d new address %04x (%s)\n", m_ident>>13, m_address, m_address_lowbyte? "complete" : "incomplete");
+		LOGMASKED(LOG_DETAIL, "GROM %d new address %04x (%s)\n", m_ident>>13, m_address, m_address_lowbyte? "complete" : "incomplete");
 		// Toggle the lowbyte flag
 		m_address_lowbyte = !m_address_lowbyte;
 

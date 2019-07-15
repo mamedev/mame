@@ -297,7 +297,6 @@ void sdl_window_info::toggle_full_screen()
 	machine().ui().menu_reset();
 	// kill off the drawers
 	renderer_reset();
-//  set_platform_window(nullptr);
 	bool is_osx = false;
 #ifdef SDLMAME_MACOSX
 	// FIXME: This is weird behaviour and certainly a bug in SDL
@@ -310,6 +309,7 @@ void sdl_window_info::toggle_full_screen()
 		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 	SDL_DestroyWindow(platform_window());
+	set_platform_window(nullptr);
 
 	downcast<sdl_osd_interface &>(machine().osd()).release_keys();
 
@@ -356,7 +356,7 @@ void sdl_window_info::modify_prescale(int dir)
 
 void sdl_window_info::update_cursor_state()
 {
-#if (USE_XINPUT)
+#if (USE_XINPUT && USE_XINPUT_WII_LIGHTGUN_HACK)
 	// Hack for wii-lightguns:
 	// they stop working with a grabbed mouse;
 	// even a ShowCursor(SDL_DISABLE) already does this.
@@ -695,7 +695,7 @@ int sdl_window_info::complete_create()
 	 *
 	 */
 	osd_printf_verbose("Enter sdl_info::create\n");
-	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
+	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL) && !video_config.novideo)
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 

@@ -13,7 +13,6 @@
 
 #include "includes/slapstic.h"
 #include "cpu/m6502/m6502.h"
-#include "video/atarimo.h"
 #include "screen.h"
 
 
@@ -29,60 +28,8 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
+//  TYPE DEFINITIONS
 //**************************************************************************
-
-#define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
-	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
-	atari_sound_comm_device::static_set_sound_cpu(*device, _soundcpu); \
-	devcb = &atari_sound_comm_device::static_set_main_int_cb(*device, DEVCB_##_intcb);
-
-
-
-#define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
-	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
-	MCFG_VIDEO_SET_SCREEN(_screen) \
-	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB_##_intcb);
-
-#define MCFG_ATARI_VAD_PLAYFIELD(_class, _gfxtag, _getinfo) \
-	{ std::string fulltag(device->tag()); fulltag.append(":playfield"); device_t *device; \
-	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
-	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
-	MCFG_TILEMAP_TILE_SIZE(8,8) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) }
-
-#define MCFG_ATARI_VAD_PLAYFIELD2(_class, _gfxtag, _getinfo) \
-	{ std::string fulltag(device->tag()); fulltag.append(":playfield2"); device_t *device; \
-	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
-	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
-	MCFG_TILEMAP_TILE_SIZE(8,8) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
-
-#define MCFG_ATARI_VAD_ALPHA(_class, _gfxtag, _getinfo) \
-	{ std::string fulltag(device->tag()); fulltag.append(":alpha"); device_t *device; \
-	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
-	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
-	MCFG_TILEMAP_TILE_SIZE(8,8) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_ROWS, 64,32) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
-
-#define MCFG_ATARI_VAD_MOB(_config, _gfxtag) \
-	{ std::string fulltag(device->tag()); fulltag.append(":mob"); device_t *device; \
-	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag.c_str(), "^^screen", _config) \
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("^" _gfxtag) }
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
 #define PORT_ATARI_COMM_SOUND_TO_MAIN_READY(_tag) \
 	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_sound_comm_device, sound_to_main_ready)
@@ -100,28 +47,35 @@ class atari_sound_comm_device : public device_t
 {
 public:
 	// construction/destruction
-	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cputag)
+		: atari_sound_comm_device(mconfig, tag, owner, (u32)0)
+	{
+		m_sound_cpu.set_tag(std::forward<T>(cputag));
+	}
 
-	// static configuration helpers
-	static void static_set_sound_cpu(device_t &device, const char *cputag);
-	template<class _Object> static devcb_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
+	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// configuration helpers
+	auto int_callback() { return m_main_int_cb.bind(); }
 
 	// getters
 	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
 	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
 
 	// main cpu accessors (forward internally to the atari_sound_comm_device)
-	DECLARE_WRITE8_MEMBER(main_command_w);
-	DECLARE_READ8_MEMBER(main_response_r);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
+	void main_command_w(u8 data);
+	u8 main_response_r();
+	void sound_reset_w(u16 data = 0);
 
 	// sound cpu accessors
 	void sound_cpu_reset() { synchronize(TID_SOUND_RESET, 1); }
-	DECLARE_WRITE8_MEMBER(sound_response_w);
-	DECLARE_READ8_MEMBER(sound_command_r);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_READ8_MEMBER(sound_irq_ack_r);
+	void sound_response_w(u8 data);
+	u8 sound_command_r();
+	void sound_irq_ack_w(u8 data = 0);
+	u8 sound_irq_ack_r();
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
+	void sound_irq();
 
 	// additional helpers
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
@@ -148,99 +102,16 @@ private:
 	};
 
 	// configuration state
-	const char *        m_sound_cpu_tag;
 	devcb_write_line   m_main_int_cb;
 
 	// internal state
-	m6502_device *      m_sound_cpu;
-	bool                m_main_to_sound_ready;
-	bool                m_sound_to_main_ready;
-	uint8_t               m_main_to_sound_data;
-	uint8_t               m_sound_to_main_data;
-	uint8_t               m_timed_int;
-	uint8_t               m_ym2151_int;
-};
-
-
-
-// ======================> atari_vad_device
-
-// device type definition
-DECLARE_DEVICE_TYPE(ATARI_VAD, atari_vad_device)
-
-class atari_vad_device :    public device_t,
-							public device_video_interface
-{
-public:
-	// construction/destruction
-	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// static configuration helpers
-	template<class _Object> static devcb_base &static_set_scanline_int_cb(device_t &device, _Object object) { return downcast<atari_vad_device &>(device).m_scanline_int_cb.set_callback(object); }
-
-	// getters
-	tilemap_device &alpha() const { return *m_alpha_tilemap; }
-	tilemap_device &playfield() const { return *m_playfield_tilemap; }
-	tilemap_device &playfield2() const { return *m_playfield2_tilemap; }
-	atari_motion_objects_device &mob() const { return *m_mob; }
-
-	// read/write handlers
-	DECLARE_READ16_MEMBER(control_read);
-	DECLARE_WRITE16_MEMBER(control_write);
-
-	// playfield/alpha tilemap helpers
-	DECLARE_WRITE16_MEMBER(alpha_w);
-	DECLARE_WRITE16_MEMBER(playfield_upper_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_lsb_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_msb_w);
-	DECLARE_WRITE16_MEMBER(playfield2_latched_msb_w);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
-	// timer IDs
-	enum
-	{
-		TID_SCANLINE_INT,
-		TID_TILEROW_UPDATE,
-		TID_EOF
-	};
-
-	// internal helpers
-	void internal_control_write(offs_t offset, uint16_t newword);
-	void update_pf_xscrolls();
-	void update_parameter(uint16_t newword);
-	void update_tilerow(emu_timer &timer, int scanline);
-	void eof_update(emu_timer &timer);
-
-	// configuration state
-	devcb_write_line   m_scanline_int_cb;
-
-	// internal state
-	optional_device<tilemap_device> m_alpha_tilemap;
-	required_device<tilemap_device> m_playfield_tilemap;
-	optional_device<tilemap_device> m_playfield2_tilemap;
-	optional_device<atari_motion_objects_device> m_mob;
-	optional_shared_ptr<uint16_t> m_eof_data;
-
-	emu_timer *         m_scanline_int_timer;
-	emu_timer *         m_tilerow_update_timer;
-	emu_timer *         m_eof_timer;
-
-	uint32_t              m_palette_bank;            // which palette bank is enabled
-	//uint32_t              m_pf0_xscroll;             // playfield 1 xscroll
-	uint32_t              m_pf0_xscroll_raw;         // playfield 1 xscroll raw value
-	uint32_t              m_pf0_yscroll;             // playfield 1 yscroll
-	uint32_t              m_pf1_xscroll_raw;         // playfield 2 xscroll raw value
-	uint32_t              m_pf1_yscroll;             // playfield 2 yscroll
-	uint32_t              m_mo_xscroll;              // sprite xscroll
-	uint32_t              m_mo_yscroll;              // sprite xscroll
-
-	uint16_t              m_control[0x40/2];          // control data
+	required_device<m6502_device> m_sound_cpu;
+	bool             m_main_to_sound_ready;
+	bool             m_sound_to_main_ready;
+	u8               m_main_to_sound_data;
+	u8               m_sound_to_main_data;
+	u8               m_timed_int;
+	u8               m_ym2151_int;
 };
 
 
@@ -262,6 +133,7 @@ public:
 	// construction/destruction
 	atarigen_state(const machine_config &mconfig, device_type type, const char *tag);
 
+protected:
 	// users must call through to these
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -275,18 +147,13 @@ public:
 	// interrupt handling
 	void scanline_int_set(screen_device &screen, int scanline);
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
-	INTERRUPT_GEN_MEMBER(scanline_int_gen);
-	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
+	void scanline_int_ack_w(u16 data = 0);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
-	INTERRUPT_GEN_MEMBER(sound_int_gen);
-	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
-
-	INTERRUPT_GEN_MEMBER(video_int_gen);
-	DECLARE_WRITE16_MEMBER(video_int_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
+	void video_int_ack_w(u16 data = 0);
 
 	// slapstic helpers
-	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, uint8_t *mem);
+	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem);
 	void slapstic_update_bank(int bank);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
@@ -311,24 +178,23 @@ public:
 		TID_ATARIGEN_LAST
 	};
 
-	uint8_t               m_scanline_int_state;
-	uint8_t               m_sound_int_state;
-	uint8_t               m_video_int_state;
+	u8               m_scanline_int_state;
+	u8               m_video_int_state;
 
-	optional_shared_ptr<uint16_t> m_xscroll;
-	optional_shared_ptr<uint16_t> m_yscroll;
+	optional_shared_ptr<u16> m_xscroll;
+	optional_shared_ptr<u16> m_yscroll;
 
 	/* internal state */
-	uint8_t                   m_slapstic_num;
-	uint16_t *                m_slapstic;
-	uint8_t                   m_slapstic_bank;
-	std::vector<uint8_t>          m_slapstic_bank0;
-	offs_t                  m_slapstic_last_pc;
-	offs_t                  m_slapstic_last_address;
-	offs_t                  m_slapstic_base;
-	offs_t                  m_slapstic_mirror;
+	u8               m_slapstic_num;
+	u16 *            m_slapstic;
+	u8               m_slapstic_bank;
+	std::vector<u8>  m_slapstic_bank0;
+	offs_t           m_slapstic_last_pc;
+	offs_t           m_slapstic_last_address;
+	offs_t           m_slapstic_base;
+	offs_t           m_slapstic_mirror;
 
-	uint32_t                  m_scanlines_per_callback;
+	u32              m_scanlines_per_callback;
 
 
 	atarigen_screen_timer   m_screen_timer[2];
@@ -336,9 +202,10 @@ public:
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_device<atari_slapstic_device> m_slapstic_device;
+
+private:
+	static const atarigen_screen_timer *get_screen_timer(screen_device &screen);
 };
 
 
@@ -349,31 +216,31 @@ public:
 
     Atari 68000 list:
 
-    Driver      Pr? Up? VC? PF? P2? MO? AL? BM? PH?
-    ----------  --- --- --- --- --- --- --- --- ---
-    arcadecl.c       *               *       *
-    atarig1.c        *       *      rle  *
-    atarig42.c       *       *      rle  *
-    atarigt.c                *      rle  *
-    atarigx2.c               *      rle  *
-    atarisy1.c   *   *       *       *   *              270->260
-    atarisy2.c   *   *       *       *   *              150->120
-    badlands.c       *       *       *                  250->260
-    batman.c     *   *   *   *   *   *   *       *      200->160 ?
-    blstroid.c       *       *       *                  240->230
-    cyberbal.c       *       *       *   *              125->105 ?
-    eprom.c          *       *       *   *              170->170
-    gauntlet.c   *   *       *       *   *       *      220->250
-    klax.c       *   *       *       *                  480->440 ?
-    offtwall.c       *   *   *       *                  260->260
-    rampart.c        *               *       *          280->280
-    relief.c     *   *   *   *   *   *                  240->240
-    shuuz.c          *   *   *       *                  410->290 fix!
-    skullxbo.c       *       *       *   *              150->145
-    thunderj.c       *   *   *   *   *   *       *      180->180
-    toobin.c         *       *       *   *              140->115 fix!
-    vindictr.c   *   *       *       *   *       *      200->210
-    xybots.c     *   *       *       *   *              235->238
+    Driver        Pr? Up? VC? PF? P2? MO? AL? BM? PH?
+    ----------    --- --- --- --- --- --- --- --- ---
+    arcadecl.cpp       *               *       *
+    atarig1.cpp        *       *      rle  *
+    atarig42.cpp       *       *      rle  *
+    atarigt.cpp                *      rle  *
+    atarigx2.cpp               *      rle  *
+    atarisy1.cpp   *   *       *       *   *              270->260
+    atarisy2.cpp   *   *       *       *   *              150->120
+    badlands.cpp       *       *       *                  250->260
+    batman.cpp     *   *   *   *   *   *   *       *      200->160 ?
+    blstroid.cpp       *       *       *                  240->230
+    cyberbal.cpp       *       *       *   *              125->105 ?
+    eprom.cpp          *       *       *   *              170->170
+    gauntlet.cpp   *   *       *       *   *       *      220->250
+    klax.cpp       *   *       *       *                  480->440 ?
+    offtwall.cpp       *   *   *       *                  260->260
+    rampart.cpp        *               *       *          280->280
+    relief.cpp     *   *   *   *   *   *                  240->240
+    shuuz.cpp          *   *   *       *                  410->290 fix!
+    skullxbo.cpp       *       *       *   *              150->145
+    thunderj.cpp       *   *   *   *   *   *       *      180->180
+    toobin.cpp         *       *       *   *              140->115 fix!
+    vindictr.cpp   *   *       *       *   *       *      200->210
+    xybots.cpp     *   *       *       *   *              235->238
     ----------  --- --- --- --- --- --- --- --- ---
 
     Pr? - do we have verifiable proof on priorities?

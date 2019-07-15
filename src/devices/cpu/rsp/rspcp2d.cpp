@@ -12,9 +12,7 @@
 #include "emu.h"
 #include "rspcp2d.h"
 
-#include "rsp.h"
 #include "rsp_dasm.h"
-#include "rspcp2.h"
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -22,8 +20,6 @@
 
 #include "rspdefs.h"
 
-
-using namespace uml;
 
 /***************************************************************************
     Helpful Defines
@@ -51,11 +47,6 @@ using namespace uml;
 #define CLIP1       2
 #define ZERO        3
 #define CLIP2       4
-
-static void cfunc_mfc2(void *param);
-static void cfunc_cfc2(void *param);
-static void cfunc_mtc2(void *param);
-static void cfunc_ctc2(void *param);
 
 #define ACCUM_H(x)           (uint16_t)m_accum[x].w[3]
 #define ACCUM_M(x)           (uint16_t)m_accum[x].w[2]
@@ -134,7 +125,7 @@ static const int vector_elements_2[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },     // 7
 };
 
-void rsp_cop2_drc::cfunc_unimplemented_opcode()
+void rsp_device::cop2_drc::cfunc_unimplemented_opcode()
 {
 	const uint32_t ppc = m_rsp.m_ppc;
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
@@ -148,12 +139,7 @@ void rsp_cop2_drc::cfunc_unimplemented_opcode()
 	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", m_rspcop2_state->op >> 26, m_rspcop2_state->op, ppc);
 }
 
-static void unimplemented_opcode(void *param)
-{
-	((rsp_cop2 *)param)->cfunc_unimplemented_opcode();
-}
-
-void rsp_cop2_drc::state_string_export(const int index, std::string &str) const
+void rsp_device::cop2_drc::state_string_export(const int index, std::string &str) const
 {
 	switch (index)
 	{
@@ -270,7 +256,7 @@ void rsp_cop2_drc::state_string_export(const int index, std::string &str) const
 //
 // Load 1 byte to vector byte index
 
-void rsp_cop2_drc::lbv()
+void rsp_device::cop2_drc::lbv()
 {
 	uint32_t op = m_rspcop2_state->op;
 
@@ -288,11 +274,6 @@ void rsp_cop2_drc::lbv()
 	VREG_B(dest, index) = m_rsp.DM_READ8(ea);
 }
 
-static void cfunc_lbv(void *param)
-{
-	((rsp_cop2 *)param)->lbv();
-}
-
 
 // LSV
 //
@@ -303,7 +284,7 @@ static void cfunc_lbv(void *param)
 //
 // Loads 2 bytes starting from vector byte index
 
-void rsp_cop2_drc::lsv()
+void rsp_device::cop2_drc::lsv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -324,11 +305,6 @@ void rsp_cop2_drc::lsv()
 	}
 }
 
-static void cfunc_lsv(void *param)
-{
-	((rsp_cop2 *)param)->lsv();
-}
-
 
 // LLV
 //
@@ -339,7 +315,7 @@ static void cfunc_lsv(void *param)
 //
 // Loads 4 bytes starting from vector byte index
 
-void rsp_cop2_drc::llv()
+void rsp_device::cop2_drc::llv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	uint32_t ea;
@@ -363,11 +339,6 @@ void rsp_cop2_drc::llv()
 	}
 }
 
-static void cfunc_llv(void *param)
-{
-	((rsp_cop2 *)param)->llv();
-}
-
 
 // LDV
 //
@@ -378,7 +349,7 @@ static void cfunc_llv(void *param)
 //
 // Loads 8 bytes starting from vector byte index
 
-void rsp_cop2_drc::ldv()
+void rsp_device::cop2_drc::ldv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	uint32_t ea;
@@ -402,11 +373,6 @@ void rsp_cop2_drc::ldv()
 	}
 }
 
-static void cfunc_ldv(void *param)
-{
-	((rsp_cop2 *)param)->ldv();
-}
-
 
 // LQV
 //
@@ -417,7 +383,7 @@ static void cfunc_ldv(void *param)
 //
 // Loads up to 16 bytes starting from vector byte index
 
-void rsp_cop2_drc::lqv()
+void rsp_device::cop2_drc::lqv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -440,11 +406,6 @@ void rsp_cop2_drc::lqv()
 	}
 }
 
-static void cfunc_lqv(void *param)
-{
-	((rsp_cop2 *)param)->lqv();
-}
-
 
 // LRV
 //
@@ -455,7 +416,7 @@ static void cfunc_lqv(void *param)
 //
 // Stores up to 16 bytes starting from right side until 16-byte boundary
 
-void rsp_cop2_drc::lrv()
+void rsp_device::cop2_drc::lrv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -479,11 +440,6 @@ void rsp_cop2_drc::lrv()
 	}
 }
 
-static void cfunc_lrv(void *param)
-{
-	((rsp_cop2 *)param)->lrv();
-}
-
 
 // LPV
 //
@@ -494,7 +450,7 @@ static void cfunc_lrv(void *param)
 //
 // Loads a byte as the upper 8 bits of each element
 
-void rsp_cop2_drc::lpv()
+void rsp_device::cop2_drc::lpv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -514,11 +470,6 @@ void rsp_cop2_drc::lpv()
 	}
 }
 
-static void cfunc_lpv(void *param)
-{
-	((rsp_cop2 *)param)->lpv();
-}
-
 
 // LUV
 //
@@ -529,7 +480,7 @@ static void cfunc_lpv(void *param)
 //
 // Loads a byte as the bits 14-7 of each element
 
-void rsp_cop2_drc::luv()
+void rsp_device::cop2_drc::luv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -549,11 +500,6 @@ void rsp_cop2_drc::luv()
 	}
 }
 
-static void cfunc_luv(void *param)
-{
-	((rsp_cop2 *)param)->luv();
-}
-
 
 // LHV
 //
@@ -564,7 +510,7 @@ static void cfunc_luv(void *param)
 //
 // Loads a byte as the bits 14-7 of each element, with 2-byte stride
 
-void rsp_cop2_drc::lhv()
+void rsp_device::cop2_drc::lhv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -584,11 +530,6 @@ void rsp_cop2_drc::lhv()
 	}
 }
 
-static void cfunc_lhv(void *param)
-{
-	((rsp_cop2 *)param)->lhv();
-}
-
 
 // LFV
 // 31       25      20      15      10     6        0
@@ -598,7 +539,7 @@ static void cfunc_lhv(void *param)
 //
 // Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
 
-void rsp_cop2_drc::lfv()
+void rsp_device::cop2_drc::lfv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -623,11 +564,6 @@ void rsp_cop2_drc::lfv()
 	}
 }
 
-static void cfunc_lfv(void *param)
-{
-	((rsp_cop2 *)param)->lfv();
-}
-
 
 // LWV
 //
@@ -639,7 +575,7 @@ static void cfunc_lfv(void *param)
 // Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
 // after byte index 15
 
-void rsp_cop2_drc::lwv()
+void rsp_device::cop2_drc::lwv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -661,11 +597,6 @@ void rsp_cop2_drc::lwv()
 	}
 }
 
-static void cfunc_lwv(void *param)
-{
-	((rsp_cop2 *)param)->lwv();
-}
-
 
 // LTV
 //
@@ -676,7 +607,7 @@ static void cfunc_lwv(void *param)
 //
 // Loads one element to maximum of 8 vectors, while incrementing element index
 
-void rsp_cop2_drc::ltv()
+void rsp_device::cop2_drc::ltv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -707,13 +638,8 @@ void rsp_cop2_drc::ltv()
 	}
 }
 
-static void cfunc_ltv(void *param)
-{
-	((rsp_cop2 *)param)->ltv();
-}
 
-
-bool rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::cop2_drc::generate_lwc2(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	int offset = (op & 0x7f);
@@ -726,62 +652,62 @@ bool rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state
 	{
 		case 0x00:      /* LBV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lbv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lbv, this);
 			return true;
 
 		case 0x01:      /* LSV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lsv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lsv, this);
 			return true;
 
 		case 0x02:      /* LLV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_llv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_llv, this);
 			return true;
 
 		case 0x03:      /* LDV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_ldv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_ldv, this);
 			return true;
 
 		case 0x04:      /* LQV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lqv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lqv, this);
 			return true;
 
 		case 0x05:      /* LRV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lrv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lrv, this);
 			return true;
 
 		case 0x06:      /* LPV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lpv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lpv, this);
 			return true;
 
 		case 0x07:      /* LUV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_luv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_luv, this);
 			return true;
 
 		case 0x08:      /* LHV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lhv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lhv, this);
 			return true;
 
 		case 0x09:      /* LFV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lfv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lfv, this);
 			return true;
 
 		case 0x0a:      /* LWV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_lwv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_lwv, this);
 			return true;
 
 		case 0x0b:      /* LTV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [m_rspcop2_state->op],desc->opptr.l
-			UML_CALLC(block, cfunc_ltv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_ltv, this);
 			return true;
 
 		default:
@@ -803,7 +729,7 @@ bool rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state
 //
 // Stores 1 byte from vector byte index
 
-void rsp_cop2_drc::sbv()
+void rsp_device::cop2_drc::sbv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -819,11 +745,6 @@ void rsp_cop2_drc::sbv()
 	m_rsp.DM_WRITE8(ea, VREG_B(dest, index));
 }
 
-static void cfunc_sbv(void *param)
-{
-	((rsp_cop2 *)param)->sbv();
-}
-
 
 // SSV
 //
@@ -834,7 +755,7 @@ static void cfunc_sbv(void *param)
 //
 // Stores 2 bytes starting from vector byte index
 
-void rsp_cop2_drc::ssv()
+void rsp_device::cop2_drc::ssv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -856,11 +777,6 @@ void rsp_cop2_drc::ssv()
 	}
 }
 
-static void cfunc_ssv(void *param)
-{
-	((rsp_cop2 *)param)->ssv();
-}
-
 
 // SLV
 //
@@ -871,7 +787,7 @@ static void cfunc_ssv(void *param)
 //
 // Stores 4 bytes starting from vector byte index
 
-void rsp_cop2_drc::slv()
+void rsp_device::cop2_drc::slv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -893,11 +809,6 @@ void rsp_cop2_drc::slv()
 	}
 }
 
-static void cfunc_slv(void *param)
-{
-	((rsp_cop2 *)param)->slv();
-}
-
 
 // SDV
 //
@@ -908,7 +819,7 @@ static void cfunc_slv(void *param)
 //
 // Stores 8 bytes starting from vector byte index
 
-void rsp_cop2_drc::sdv()
+void rsp_device::cop2_drc::sdv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -929,11 +840,6 @@ void rsp_cop2_drc::sdv()
 	}
 }
 
-static void cfunc_sdv(void *param)
-{
-	((rsp_cop2 *)param)->sdv();
-}
-
 
 // SQV
 //
@@ -944,7 +850,7 @@ static void cfunc_sdv(void *param)
 //
 // Stores up to 16 bytes starting from vector byte index until 16-byte boundary
 
-void rsp_cop2_drc::sqv()
+void rsp_device::cop2_drc::sqv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -965,11 +871,6 @@ void rsp_cop2_drc::sqv()
 	}
 }
 
-static void cfunc_sqv(void *param)
-{
-	((rsp_cop2 *)param)->sqv();
-}
-
 
 // SRV
 //
@@ -980,7 +881,7 @@ static void cfunc_sqv(void *param)
 //
 // Stores up to 16 bytes starting from right side until 16-byte boundary
 
-void rsp_cop2_drc::srv()
+void rsp_device::cop2_drc::srv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -1005,11 +906,6 @@ void rsp_cop2_drc::srv()
 	}
 }
 
-static void cfunc_srv(void *param)
-{
-	((rsp_cop2 *)param)->srv();
-}
-
 
 // SPV
 //
@@ -1020,7 +916,7 @@ static void cfunc_srv(void *param)
 //
 // Stores upper 8 bits of each element
 
-void rsp_cop2_drc::spv()
+void rsp_device::cop2_drc::spv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -1048,11 +944,6 @@ void rsp_cop2_drc::spv()
 	}
 }
 
-static void cfunc_spv(void *param)
-{
-	((rsp_cop2 *)param)->spv();
-}
-
 
 // SUV
 //
@@ -1063,7 +954,7 @@ static void cfunc_spv(void *param)
 //
 // Stores bits 14-7 of each element
 
-void rsp_cop2_drc::suv()
+void rsp_device::cop2_drc::suv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -1091,11 +982,6 @@ void rsp_cop2_drc::suv()
 	}
 }
 
-static void cfunc_suv(void *param)
-{
-	((rsp_cop2 *)param)->suv();
-}
-
 
 // SHV
 //
@@ -1106,7 +992,7 @@ static void cfunc_suv(void *param)
 //
 // Stores bits 14-7 of each element, with 2-byte stride
 
-void rsp_cop2_drc::shv()
+void rsp_device::cop2_drc::shv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -1129,11 +1015,6 @@ void rsp_cop2_drc::shv()
 	}
 }
 
-static void cfunc_shv(void *param)
-{
-	((rsp_cop2 *)param)->shv();
-}
-
 
 // SFV
 //
@@ -1144,7 +1025,7 @@ static void cfunc_shv(void *param)
 //
 // Stores bits 14-7 of upper or lower quad, with 4-byte stride
 
-void rsp_cop2_drc::sfv()
+void rsp_device::cop2_drc::sfv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -1169,11 +1050,6 @@ void rsp_cop2_drc::sfv()
 	}
 }
 
-static void cfunc_sfv(void *param)
-{
-	((rsp_cop2 *)param)->sfv();
-}
-
 
 // SWV
 //
@@ -1185,7 +1061,7 @@ static void cfunc_sfv(void *param)
 // Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
 // after byte index 15
 
-void rsp_cop2_drc::swv()
+void rsp_device::cop2_drc::swv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -1209,11 +1085,6 @@ void rsp_cop2_drc::swv()
 	}
 }
 
-static void cfunc_swv(void *param)
-{
-	((rsp_cop2 *)param)->swv();
-}
-
 
 // STV
 //
@@ -1224,7 +1095,7 @@ static void cfunc_swv(void *param)
 //
 // Stores one element from maximum of 8 vectors, while incrementing element index
 
-void rsp_cop2_drc::stv()
+void rsp_device::cop2_drc::stv()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
@@ -1258,12 +1129,7 @@ void rsp_cop2_drc::stv()
 	}
 }
 
-static void cfunc_stv(void *param)
-{
-	((rsp_cop2 *)param)->stv();
-}
-
-bool rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::cop2_drc::generate_swc2(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	int offset = (op & 0x7f);
@@ -1276,62 +1142,62 @@ bool rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state
 	{
 		case 0x00:      /* SBV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_sbv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_sbv, this);
 			return true;
 
 		case 0x01:      /* SSV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_ssv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_ssv, this);
 			return true;
 
 		case 0x02:      /* SLV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_slv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_slv, this);
 			return true;
 
 		case 0x03:      /* SDV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_sdv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_sdv, this);
 			return true;
 
 		case 0x04:      /* SQV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_sqv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_sqv, this);
 			return true;
 
 		case 0x05:      /* SRV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_srv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_srv, this);
 			return true;
 
 		case 0x06:      /* SPV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_spv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_spv, this);
 			return true;
 
 		case 0x07:      /* SUV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_suv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_suv, this);
 			return true;
 
 		case 0x08:      /* SHV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_shv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_shv, this);
 			return true;
 
 		case 0x09:      /* SFV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_sfv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_sfv, this);
 			return true;
 
 		case 0x0a:      /* SWV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_swv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_swv, this);
 			return true;
 
 		case 0x0b:      /* STV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_stv, this);
+			UML_CALLC(block, &cop2_drc::cfunc_stv, this);
 			return true;
 
 		default:
@@ -1356,7 +1222,7 @@ bool rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state
 //
 // Multiplies signed integer by signed integer * 2
 
-void rsp_cop2_drc::vmulf()
+void rsp_device::cop2_drc::vmulf()
 {
 	CACHE_VALUES();
 
@@ -1383,11 +1249,6 @@ void rsp_cop2_drc::vmulf()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmulf(void *param)
-{
-	((rsp_cop2 *)param)->vmulf();
-}
-
 
 // VMULU
 //
@@ -1397,7 +1258,7 @@ static void cfunc_vmulf(void *param)
 // ------------------------------------------------------
 //
 
-void rsp_cop2_drc::vmulu()
+void rsp_device::cop2_drc::vmulu()
 {
 	CACHE_VALUES();
 
@@ -1429,11 +1290,6 @@ void rsp_cop2_drc::vmulu()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmulu(void *param)
-{
-	((rsp_cop2 *)param)->vmulu();
-}
-
 
 // VMUDL
 //
@@ -1446,7 +1302,7 @@ static void cfunc_vmulu(void *param)
 // The result is added into accumulator
 // The middle slice of accumulator is stored into destination element
 
-void rsp_cop2_drc::vmudl()
+void rsp_device::cop2_drc::vmudl()
 {
 	CACHE_VALUES();
 
@@ -1465,11 +1321,6 @@ void rsp_cop2_drc::vmudl()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmudl(void *param)
-{
-	((rsp_cop2 *)param)->vmudl();
-}
-
 
 // VMUDM
 //
@@ -1482,7 +1333,7 @@ static void cfunc_vmudl(void *param)
 // The result is stored into accumulator
 // The middle slice of accumulator is stored into destination element
 
-void rsp_cop2_drc::vmudm()
+void rsp_device::cop2_drc::vmudm()
 {
 	CACHE_VALUES();
 
@@ -1501,11 +1352,6 @@ void rsp_cop2_drc::vmudm()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmudm(void *param)
-{
-	((rsp_cop2 *)param)->vmudm();
-}
-
 
 // VMUDN
 //
@@ -1518,7 +1364,7 @@ static void cfunc_vmudm(void *param)
 // The result is stored into accumulator
 // The low slice of accumulator is stored into destination element
 
-void rsp_cop2_drc::vmudn()
+void rsp_device::cop2_drc::vmudn()
 {
 	CACHE_VALUES();
 
@@ -1539,11 +1385,6 @@ void rsp_cop2_drc::vmudn()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmudn(void *param)
-{
-	((rsp_cop2 *)param)->vmudn();
-}
-
 
 // VMUDH
 //
@@ -1556,7 +1397,7 @@ static void cfunc_vmudn(void *param)
 // The result is stored into highest 32 bits of accumulator, the low slice is zero
 // The highest 32 bits of accumulator is saturated into destination element
 
-void rsp_cop2_drc::vmudh()
+void rsp_device::cop2_drc::vmudh()
 {
 	CACHE_VALUES();
 
@@ -1579,11 +1420,6 @@ void rsp_cop2_drc::vmudh()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmudh(void *param)
-{
-	((rsp_cop2 *)param)->vmudh();
-}
-
 
 // VMACF
 //
@@ -1593,7 +1429,7 @@ static void cfunc_vmudh(void *param)
 // ------------------------------------------------------
 //
 
-void rsp_cop2_drc::vmacf()
+void rsp_device::cop2_drc::vmacf()
 {
 	CACHE_VALUES();
 
@@ -1612,11 +1448,6 @@ void rsp_cop2_drc::vmacf()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmacf(void *param)
-{
-	((rsp_cop2 *)param)->vmacf();
-}
-
 
 // VMACU
 //
@@ -1626,7 +1457,7 @@ static void cfunc_vmacf(void *param)
 // ------------------------------------------------------
 //
 
-void rsp_cop2_drc::vmacu()
+void rsp_device::cop2_drc::vmacu()
 {
 	CACHE_VALUES();
 
@@ -1666,11 +1497,6 @@ void rsp_cop2_drc::vmacu()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmacu(void *param)
-{
-	((rsp_cop2 *)param)->vmacu();
-}
-
 
 // VMADL
 //
@@ -1683,7 +1509,7 @@ static void cfunc_vmacu(void *param)
 // Adds the higher 16 bits of the 32-bit result to accumulator
 // The low slice of accumulator is stored into destination element
 
-void rsp_cop2_drc::vmadl()
+void rsp_device::cop2_drc::vmadl()
 {
 	CACHE_VALUES();
 
@@ -1702,16 +1528,11 @@ void rsp_cop2_drc::vmadl()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmadl(void *param)
-{
-	((rsp_cop2 *)param)->vmadl();
-}
-
 
 // VMADM
 //
 
-void rsp_cop2_drc::vmadm()
+void rsp_device::cop2_drc::vmadm()
 {
 	CACHE_VALUES();
 
@@ -1730,16 +1551,11 @@ void rsp_cop2_drc::vmadm()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmadm(void *param)
-{
-	((rsp_cop2 *)param)->vmadm();
-}
-
 
 // VMADN
 //
 
-void rsp_cop2_drc::vmadn()
+void rsp_device::cop2_drc::vmadn()
 {
 	CACHE_VALUES();
 
@@ -1758,11 +1574,6 @@ void rsp_cop2_drc::vmadn()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmadn(void *param)
-{
-	((rsp_cop2 *)param)->vmadn();
-}
-
 
 // VMADH
 //
@@ -1775,7 +1586,7 @@ static void cfunc_vmadn(void *param)
 // The result is added into highest 32 bits of accumulator, the low slice is zero
 // The highest 32 bits of accumulator is saturated into destination element
 
-void rsp_cop2_drc::vmadh()
+void rsp_device::cop2_drc::vmadh()
 {
 	CACHE_VALUES();
 
@@ -1794,11 +1605,6 @@ void rsp_cop2_drc::vmadh()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmadh(void *param)
-{
-	((rsp_cop2 *)param)->vmadh();
-}
-
 
 // VADD
 // 31       25  24     20      15      10      5        0
@@ -1808,7 +1614,7 @@ static void cfunc_vmadh(void *param)
 //
 // Adds two vector registers and carry flag, the result is saturated to 32767
 
-void rsp_cop2_drc::vadd()
+void rsp_device::cop2_drc::vadd()
 {
 	CACHE_VALUES();
 
@@ -1832,11 +1638,6 @@ void rsp_cop2_drc::vadd()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vadd(void *param)
-{
-	((rsp_cop2 *)param)->vadd();
-}
-
 
 // VSUB
 //
@@ -1848,7 +1649,7 @@ static void cfunc_vadd(void *param)
 // Subtracts two vector registers and carry flag, the result is saturated to -32768
 // TODO: check VS2REG == VDREG
 
-void rsp_cop2_drc::vsub()
+void rsp_device::cop2_drc::vsub()
 {
 	CACHE_VALUES();
 
@@ -1873,11 +1674,6 @@ void rsp_cop2_drc::vsub()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vsub(void *param)
-{
-	((rsp_cop2 *)param)->vsub();
-}
-
 
 // VABS
 //
@@ -1888,7 +1684,7 @@ static void cfunc_vsub(void *param)
 //
 // Changes the sign of source register 2 if source register 1 is negative and stores the result to destination register
 
-void rsp_cop2_drc::vabs()
+void rsp_device::cop2_drc::vabs()
 {
 	CACHE_VALUES();
 
@@ -1923,11 +1719,6 @@ void rsp_cop2_drc::vabs()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vabs(void *param)
-{
-	((rsp_cop2 *)param)->vabs();
-}
-
 
 // VADDC
 //
@@ -1939,7 +1730,7 @@ static void cfunc_vabs(void *param)
 // Adds two vector registers, the carry out is stored into carry register
 // TODO: check VS2REG = VDREG
 
-void rsp_cop2_drc::vaddc()
+void rsp_device::cop2_drc::vaddc()
 {
 	CACHE_VALUES();
 
@@ -1966,11 +1757,6 @@ void rsp_cop2_drc::vaddc()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vaddc(void *param)
-{
-	((rsp_cop2 *)param)->vaddc();
-}
-
 
 // VSUBC
 //
@@ -1982,7 +1768,7 @@ static void cfunc_vaddc(void *param)
 // Subtracts two vector registers, the carry out is stored into carry register
 // TODO: check VS2REG = VDREG
 
-void rsp_cop2_drc::vsubc()
+void rsp_device::cop2_drc::vsubc()
 {
 	CACHE_VALUES();
 
@@ -2013,11 +1799,6 @@ void rsp_cop2_drc::vsubc()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vsubc(void *param)
-{
-	((rsp_cop2 *)param)->vsubc();
-}
-
 
 // VADDB
 //
@@ -2028,7 +1809,7 @@ static void cfunc_vsubc(void *param)
 //
 // Adds two vector registers bytewise with rounding
 
-void rsp_cop2_drc::vaddb()
+void rsp_device::cop2_drc::vaddb()
 {
 	CACHE_VALUES();
 	const int round = (el == 0) ? 0 : (1 << (el - 1));
@@ -2067,11 +1848,6 @@ void rsp_cop2_drc::vaddb()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vaddb(void *param)
-{
-	((rsp_cop2 *)param)->vaddb();
-}
-
 
 // VSAW
 //
@@ -2082,7 +1858,7 @@ static void cfunc_vaddb(void *param)
 //
 // Stores high, middle or low slice of accumulator to destination vector
 
-void rsp_cop2_drc::vsaw()
+void rsp_device::cop2_drc::vsaw()
 {
 	const int op = m_rspcop2_state->op;
 	const int vdreg = VDREG;
@@ -2118,11 +1894,6 @@ void rsp_cop2_drc::vsaw()
 	}
 }
 
-static void cfunc_vsaw(void *param)
-{
-	((rsp_cop2 *)param)->vsaw();
-}
-
 
 // VLT
 //
@@ -2134,7 +1905,7 @@ static void cfunc_vsaw(void *param)
 // Sets compare flags if elements in VS1 are less than VS2
 // Moves the element in VS2 to destination vector
 
-void rsp_cop2_drc::vlt()
+void rsp_device::cop2_drc::vlt()
 {
 	CACHE_VALUES();
 
@@ -2176,11 +1947,6 @@ void rsp_cop2_drc::vlt()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vlt(void *param)
-{
-	((rsp_cop2 *)param)->vlt();
-}
-
 
 // VEQ
 //
@@ -2192,7 +1958,7 @@ static void cfunc_vlt(void *param)
 // Sets compare flags if elements in VS1 are equal with VS2
 // Moves the element in VS2 to destination vector
 
-void rsp_cop2_drc::veq()
+void rsp_device::cop2_drc::veq()
 {
 	CACHE_VALUES();
 
@@ -2223,11 +1989,6 @@ void rsp_cop2_drc::veq()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_veq(void *param)
-{
-	((rsp_cop2 *)param)->veq();
-}
-
 
 // VNE
 //
@@ -2239,7 +2000,7 @@ static void cfunc_veq(void *param)
 // Sets compare flags if elements in VS1 are not equal with VS2
 // Moves the element in VS2 to destination vector
 
-void rsp_cop2_drc::vne()
+void rsp_device::cop2_drc::vne()
 {
 	CACHE_VALUES();
 
@@ -2270,11 +2031,6 @@ void rsp_cop2_drc::vne()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vne(void *param)
-{
-	((rsp_cop2 *)param)->vne();
-}
-
 
 // VGE
 //
@@ -2286,7 +2042,7 @@ static void cfunc_vne(void *param)
 // Sets compare flags if elements in VS1 are greater or equal with VS2
 // Moves the element in VS2 to destination vector
 
-void rsp_cop2_drc::vge()
+void rsp_device::cop2_drc::vge()
 {
 	CACHE_VALUES();
 
@@ -2316,11 +2072,6 @@ void rsp_cop2_drc::vge()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vge(void *param)
-{
-	((rsp_cop2 *)param)->vge();
-}
-
 
 // VCL
 //
@@ -2331,7 +2082,7 @@ static void cfunc_vge(void *param)
 //
 // Vector clip low
 
-void rsp_cop2_drc::vcl()
+void rsp_device::cop2_drc::vcl()
 {
 	CACHE_VALUES();
 
@@ -2419,11 +2170,6 @@ void rsp_cop2_drc::vcl()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vcl(void *param)
-{
-	((rsp_cop2 *)param)->vcl();
-}
-
 
 // VCH
 //
@@ -2434,7 +2180,7 @@ static void cfunc_vcl(void *param)
 //
 // Vector clip high
 
-void rsp_cop2_drc::vch()
+void rsp_device::cop2_drc::vch()
 {
 	CACHE_VALUES();
 
@@ -2506,11 +2252,6 @@ void rsp_cop2_drc::vch()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vch(void *param)
-{
-	((rsp_cop2 *)param)->vch();
-}
-
 
 // VCR
 //
@@ -2521,7 +2262,7 @@ static void cfunc_vch(void *param)
 //
 // Vector clip reverse
 
-void rsp_cop2_drc::vcr()
+void rsp_device::cop2_drc::vcr()
 {
 	CACHE_VALUES();
 
@@ -2575,11 +2316,6 @@ void rsp_cop2_drc::vcr()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vcr(void *param)
-{
-	((rsp_cop2 *)param)->vcr();
-}
-
 
 // VMRG
 //
@@ -2590,7 +2326,7 @@ static void cfunc_vcr(void *param)
 //
 // Merges two vectors according to compare flags
 
-void rsp_cop2_drc::vmrg()
+void rsp_device::cop2_drc::vmrg()
 {
 	CACHE_VALUES();
 
@@ -2613,11 +2349,6 @@ void rsp_cop2_drc::vmrg()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vmrg(void *param)
-{
-	((rsp_cop2 *)param)->vmrg();
-}
-
 
 // VAND
 //
@@ -2628,7 +2359,7 @@ static void cfunc_vmrg(void *param)
 //
 // Bitwise AND of two vector registers
 
-void rsp_cop2_drc::vand()
+void rsp_device::cop2_drc::vand()
 {
 	CACHE_VALUES();
 
@@ -2643,11 +2374,6 @@ void rsp_cop2_drc::vand()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vand(void *param)
-{
-	((rsp_cop2 *)param)->vand();
-}
-
 
 // VNAND
 //
@@ -2658,7 +2384,7 @@ static void cfunc_vand(void *param)
 //
 // Bitwise NOT AND of two vector registers
 
-void rsp_cop2_drc::vnand()
+void rsp_device::cop2_drc::vnand()
 {
 	CACHE_VALUES();
 
@@ -2673,11 +2399,6 @@ void rsp_cop2_drc::vnand()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vnand(void *param)
-{
-	((rsp_cop2 *)param)->vnand();
-}
-
 
 // VOR
 //
@@ -2688,7 +2409,7 @@ static void cfunc_vnand(void *param)
 //
 // Bitwise OR of two vector registers
 
-void rsp_cop2_drc::vor()
+void rsp_device::cop2_drc::vor()
 {
 	CACHE_VALUES();
 
@@ -2703,11 +2424,6 @@ void rsp_cop2_drc::vor()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vor(void *param)
-{
-	((rsp_cop2 *)param)->vor();
-}
-
 
 // VNOR
 //
@@ -2718,7 +2434,7 @@ static void cfunc_vor(void *param)
 //
 // Bitwise NOT OR of two vector registers
 
-void rsp_cop2_drc::vnor()
+void rsp_device::cop2_drc::vnor()
 {
 	CACHE_VALUES();
 
@@ -2733,11 +2449,6 @@ void rsp_cop2_drc::vnor()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vnor(void *param)
-{
-	((rsp_cop2 *)param)->vnor();
-}
-
 
 // VXOR
 //
@@ -2748,7 +2459,7 @@ static void cfunc_vnor(void *param)
 //
 // Bitwise XOR of two vector registers
 
-void rsp_cop2_drc::vxor()
+void rsp_device::cop2_drc::vxor()
 {
 	CACHE_VALUES();
 
@@ -2763,11 +2474,6 @@ void rsp_cop2_drc::vxor()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vxor(void *param)
-{
-	((rsp_cop2 *)param)->vxor();
-}
-
 
 // VNXOR
 //
@@ -2778,7 +2484,7 @@ static void cfunc_vxor(void *param)
 //
 // Bitwise NOT XOR of two vector registers
 
-void rsp_cop2_drc::vnxor()
+void rsp_device::cop2_drc::vnxor()
 {
 	CACHE_VALUES();
 
@@ -2793,11 +2499,6 @@ void rsp_cop2_drc::vnxor()
 	WRITEBACK_RESULT();
 }
 
-static void cfunc_vnxor(void *param)
-{
-	((rsp_cop2 *)param)->vnxor();
-}
-
 
 // VRCP
 //
@@ -2808,7 +2509,7 @@ static void cfunc_vnxor(void *param)
 //
 // Calculates reciprocal
 
-void rsp_cop2_drc::vrcp()
+void rsp_device::cop2_drc::vrcp()
 {
 	CACHE_VALUES();
 
@@ -2858,11 +2559,6 @@ void rsp_cop2_drc::vrcp()
 	}
 }
 
-static void cfunc_vrcp(void *param)
-{
-	((rsp_cop2 *)param)->vrcp();
-}
-
 
 // VRCPL
 //
@@ -2873,7 +2569,7 @@ static void cfunc_vrcp(void *param)
 //
 // Calculates reciprocal low part
 
-void rsp_cop2_drc::vrcpl()
+void rsp_device::cop2_drc::vrcpl()
 {
 	CACHE_VALUES();
 
@@ -2943,11 +2639,6 @@ void rsp_cop2_drc::vrcpl()
 	}
 }
 
-static void cfunc_vrcpl(void *param)
-{
-	((rsp_cop2 *)param)->vrcpl();
-}
-
 
 // VRCPH
 //
@@ -2958,7 +2649,7 @@ static void cfunc_vrcpl(void *param)
 //
 // Calculates reciprocal high part
 
-void rsp_cop2_drc::vrcph()
+void rsp_device::cop2_drc::vrcph()
 {
 	CACHE_VALUES();
 
@@ -2973,11 +2664,6 @@ void rsp_cop2_drc::vrcph()
 	W_VREG_S(vdreg, vs1reg & 7) = (int16_t)(m_reciprocal_res >> 16);
 }
 
-static void cfunc_vrcph(void *param)
-{
-	((rsp_cop2 *)param)->vrcph();
-}
-
 
 // VMOV
 //
@@ -2988,7 +2674,7 @@ static void cfunc_vrcph(void *param)
 //
 // Moves element from vector to destination vector
 
-void rsp_cop2_drc::vmov()
+void rsp_device::cop2_drc::vmov()
 {
 	CACHE_VALUES();
 
@@ -2997,11 +2683,6 @@ void rsp_cop2_drc::vmov()
 	{
 		SET_ACCUM_L(VREG_S(vs2reg, VEC_EL_2(el, i)), i);
 	}
-}
-
-static void cfunc_vmov(void *param)
-{
-	((rsp_cop2 *)param)->vmov();
 }
 
 
@@ -3014,7 +2695,7 @@ static void cfunc_vmov(void *param)
 //
 // Calculates reciprocal square-root
 
-void rsp_cop2_drc::vrsq()
+void rsp_device::cop2_drc::vrsq()
 {
 	CACHE_VALUES();
 
@@ -3130,11 +2811,6 @@ void rsp_cop2_drc::vrsq()
 	}
 }
 
-static void cfunc_vrsq(void *param)
-{
-	((rsp_cop2 *)param)->vrsq();
-}
-
 
 // VRSQL
 //
@@ -3145,7 +2821,7 @@ static void cfunc_vrsq(void *param)
 //
 // Calculates reciprocal square-root low part
 
-void rsp_cop2_drc::vrsql()
+void rsp_device::cop2_drc::vrsql()
 {
 	CACHE_VALUES();
 
@@ -3216,11 +2892,6 @@ void rsp_cop2_drc::vrsql()
 	}
 }
 
-static void cfunc_vrsql(void *param)
-{
-	((rsp_cop2 *)param)->vrsql();
-}
-
 
 // VRSQH
 //
@@ -3231,7 +2902,7 @@ static void cfunc_vrsql(void *param)
 //
 // Calculates reciprocal square-root high part
 
-void rsp_cop2_drc::vrsqh()
+void rsp_device::cop2_drc::vrsqh()
 {
 	CACHE_VALUES();
 
@@ -3246,18 +2917,13 @@ void rsp_cop2_drc::vrsqh()
 	W_VREG_S(vdreg, vs1reg & 7) = (int16_t)(m_reciprocal_res >> 16);  // store high part
 }
 
-static void cfunc_vrsqh(void *param)
-{
-	((rsp_cop2 *)param)->vrsqh();
-}
-
 
 /*-------------------------------------------------
     generate_vector_opcode - generate code for a
     vector opcode
 -------------------------------------------------*/
 
-bool rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::cop2_drc::generate_vector_opcode(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	// Opcode legend:
@@ -3270,217 +2936,217 @@ bool rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compi
 	{
 		case 0x00:      /* VMULF */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmulf, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmulf, this);
 			return true;
 
 		case 0x01:      /* VMULU */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmulu, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmulu, this);
 			return true;
 
 		case 0x04:      /* VMUDL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmudl, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmudl, this);
 			return true;
 
 		case 0x05:      /* VMUDM */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmudm, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmudm, this);
 			return true;
 
 		case 0x06:      /* VMUDN */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmudn, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmudn, this);
 			return true;
 
 		case 0x07:      /* VMUDH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmudh, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmudh, this);
 			return true;
 
 		case 0x08:      /* VMACF */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmacf, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmacf, this);
 			return true;
 
 		case 0x09:      /* VMACU */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmacu, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmacu, this);
 			return true;
 
 		case 0x0c:      /* VMADL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmadl, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmadl, this);
 			return true;
 
 		case 0x0d:      /* VMADM */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmadm, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmadm, this);
 			return true;
 
 		case 0x0e:      /* VMADN */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmadn, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmadn, this);
 			return true;
 
 		case 0x0f:      /* VMADH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmadh, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmadh, this);
 			return true;
 
 		case 0x10:      /* VADD */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vadd, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vadd, this);
 			return true;
 
 		case 0x11:      /* VSUB */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vsub, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vsub, this);
 			return true;
 
 		case 0x13:      /* VABS */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vabs, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vabs, this);
 			return true;
 
 		case 0x14:      /* VADDC */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vaddc, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vaddc, this);
 			return true;
 
 		case 0x15:      /* VSUBC */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vsubc, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vsubc, this);
 			return true;
 
 		case 0x16:      /* VADDB */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vaddb, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vaddb, this);
 			return true;
 
 		case 0x17:      /* VSUBB (reserved, functionally identical to VADDB) */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vaddb, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vaddb, this);
 			return true;
 
 		case 0x18:      /* VACCB (reserved, functionally identical to VADDB) */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vaddb, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vaddb, this);
 			return true;
 
 		case 0x19:      /* VSUCB (reserved, functionally identical to VADDB) */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vaddb, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vaddb, this);
 			return true;
 
 		case 0x1d:      /* VSAW */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vsaw, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vsaw, this);
 			return true;
 
 		case 0x20:      /* VLT */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vlt, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vlt, this);
 			return true;
 
 		case 0x21:      /* VEQ */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_veq, this);
+			UML_CALLC(block, &cop2_drc::cfunc_veq, this);
 			return true;
 
 		case 0x22:      /* VNE */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vne, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vne, this);
 			return true;
 
 		case 0x23:      /* VGE */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vge, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vge, this);
 			return true;
 
 		case 0x24:      /* VCL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vcl, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vcl, this);
 			return true;
 
 		case 0x25:      /* VCH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vch, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vch, this);
 			return true;
 
 		case 0x26:      /* VCR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vcr, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vcr, this);
 			return true;
 
 		case 0x27:      /* VMRG */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmrg, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmrg, this);
 			return true;
 
 		case 0x28:      /* VAND */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vand, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vand, this);
 			return true;
 
 		case 0x29:      /* VNAND */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vnand, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vnand, this);
 			return true;
 
 		case 0x2a:      /* VOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vor, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vor, this);
 			return true;
 
 		case 0x2b:      /* VNOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vnor, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vnor, this);
 			return true;
 
 		case 0x2c:      /* VXOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vxor, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vxor, this);
 			return true;
 
 		case 0x2d:      /* VNXOR */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vnxor, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vnxor, this);
 			return true;
 
 		case 0x30:      /* VRCP */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vrcp, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vrcp, this);
 			return true;
 
 		case 0x31:      /* VRCPL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vrcpl, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vrcpl, this);
 			return true;
 
 		case 0x32:      /* VRCPH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vrcph, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vrcph, this);
 			return true;
 
 		case 0x33:      /* VMOV */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vmov, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vmov, this);
 			return true;
 
 		case 0x34:      /* VRSQ */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);         // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vrsq, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vrsq, this);
 			return true;
 
 		case 0x35:      /* VRSQL */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vrsql, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vrsql, this);
 			return true;
 
 		case 0x36:      /* VRSQH */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_vrsqh, this);
+			UML_CALLC(block, &cop2_drc::cfunc_vrsqh, this);
 			return true;
 
 		case 0x37:      /* VNOP */
@@ -3489,7 +3155,7 @@ bool rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compi
 
 		default:
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, unimplemented_opcode, &m_rsp);
+			UML_CALLC(block, &cop2_drc::unimplemented_opcode, &m_rsp);
 			return false;
 	}
 }
@@ -3499,7 +3165,7 @@ bool rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compi
     Vector Flag Reading/Writing
 ***************************************************************************/
 
-void rsp_cop2_drc::mfc2()
+void rsp_device::cop2_drc::mfc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
@@ -3509,12 +3175,7 @@ void rsp_cop2_drc::mfc2()
 	if (RTREG) RTVAL = (int32_t)(int16_t)((b1 << 8) | (b2));
 }
 
-static void cfunc_mfc2(void *param)
-{
-	((rsp_cop2 *)param)->mfc2();
-}
-
-void rsp_cop2_drc::cfc2()
+void rsp_device::cop2_drc::cfc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	if (RTREG)
@@ -3573,13 +3234,8 @@ void rsp_cop2_drc::cfc2()
 	}
 }
 
-static void cfunc_cfc2(void *param)
-{
-	((rsp_cop2 *)param)->cfc2();
-}
 
-
-void rsp_cop2_drc::mtc2()
+void rsp_device::cop2_drc::mtc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	int el = (op >> 7) & 0xf;
@@ -3587,13 +3243,8 @@ void rsp_cop2_drc::mtc2()
 	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
 }
 
-static void cfunc_mtc2(void *param)
-{
-	((rsp_cop2 *)param)->mtc2();
-}
 
-
-void rsp_cop2_drc::ctc2()
+void rsp_device::cop2_drc::ctc2()
 {
 	uint32_t op = m_rspcop2_state->op;
 	switch(RDREG)
@@ -3692,16 +3343,11 @@ void rsp_cop2_drc::ctc2()
 	}
 }
 
-static void cfunc_ctc2(void *param)
-{
-	((rsp_cop2 *)param)->ctc2();
-}
-
 /***************************************************************************
     COP2 Opcode Compilation
 ***************************************************************************/
 
-bool rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc)
+bool rsp_device::cop2_drc::generate_cop2(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc)
 {
 	uint32_t op = desc->opptr.l[0];
 	uint8_t opswitch = RSREG;
@@ -3712,7 +3358,7 @@ bool rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state
 			if (RTREG != 0)
 			{
 				UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_mfc2, this);             // callc   mfc2
+				UML_CALLC(block, &cop2_drc::cfunc_mfc2, this);             // callc   mfc2
 			}
 			return true;
 
@@ -3720,18 +3366,18 @@ bool rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state
 			if (RTREG != 0)
 			{
 				UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_cfc2, this);             // callc   cfc2
+				UML_CALLC(block, &cop2_drc::cfunc_cfc2, this);             // callc   cfc2
 			}
 			return true;
 
 		case 0x04:  /* MTCz */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_mtc2, this);             // callc   mtc2
+			UML_CALLC(block, &cop2_drc::cfunc_mtc2, this);             // callc   mtc2
 			return true;
 
 		case 0x06:  /* CTCz */
 			UML_MOV(block, mem(&m_rspcop2_state->op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_ctc2, this);             // callc   ctc2
+			UML_CALLC(block, &cop2_drc::cfunc_ctc2, this);             // callc   ctc2
 			return true;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:

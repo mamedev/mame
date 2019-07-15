@@ -148,9 +148,10 @@ static const uint8_t text_bitmap[0x40][7] =
 //  PR-8210 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-ADDRESS_MAP_START(pioneer_pr8210_device::pr8210_portmap)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(i8049_pia_r, i8049_pia_w)
-ADDRESS_MAP_END
+void pioneer_pr8210_device::pr8210_portmap(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(pioneer_pr8210_device::i8049_pia_r), FUNC(pioneer_pr8210_device::i8049_pia_w));
+}
 
 ROM_START( pr8210 )
 	ROM_REGION( 0x800, "pr8210", 0 )
@@ -372,15 +373,16 @@ const tiny_rom_entry *pioneer_pr8210_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pioneer_pr8210_device::device_add_mconfig)
-	MCFG_CPU_ADD("pr8210", I8049, XTAL(4'410'000))
-	MCFG_CPU_IO_MAP(pr8210_portmap)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pioneer_pr8210_device, i8049_bus_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pioneer_pr8210_device, i8049_port1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pioneer_pr8210_device, i8049_port2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pioneer_pr8210_device, i8049_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pioneer_pr8210_device, i8049_t1_r))
-MACHINE_CONFIG_END
+void pioneer_pr8210_device::device_add_mconfig(machine_config &config)
+{
+	I8049(config, m_i8049_cpu, XTAL(4'410'000));
+	m_i8049_cpu->set_addrmap(AS_IO, &pioneer_pr8210_device::pr8210_portmap);
+	m_i8049_cpu->bus_in_cb().set(FUNC(pioneer_pr8210_device::i8049_bus_r));
+	m_i8049_cpu->p1_out_cb().set(FUNC(pioneer_pr8210_device::i8049_port1_w));
+	m_i8049_cpu->p2_out_cb().set(FUNC(pioneer_pr8210_device::i8049_port2_w));
+	m_i8049_cpu->t0_in_cb().set(FUNC(pioneer_pr8210_device::i8049_t0_r));
+	m_i8049_cpu->t1_in_cb().set(FUNC(pioneer_pr8210_device::i8049_t1_r));
+}
 
 
 //-------------------------------------------------
@@ -837,9 +839,10 @@ void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, 
 //  SIMUTREK ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-ADDRESS_MAP_START(simutrek_special_device::simutrek_portmap)
-	AM_RANGE(0x00, 0xff) AM_READ(i8748_data_r)
-ADDRESS_MAP_END
+void simutrek_special_device::simutrek_portmap(address_map &map)
+{
+	map(0x00, 0xff).r(FUNC(simutrek_special_device::i8748_data_r));
+}
 
 
 ROM_START( simutrek )
@@ -999,15 +1002,16 @@ const tiny_rom_entry *simutrek_special_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(simutrek_special_device::device_add_mconfig)
-	MCFG_CPU_ADD("simutrek", I8748, XTAL(6'000'000))
-	MCFG_CPU_IO_MAP(simutrek_portmap)
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(simutrek_special_device, i8748_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(simutrek_special_device, i8748_port2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(simutrek_special_device, i8748_t0_r))
+void simutrek_special_device::device_add_mconfig(machine_config &config)
+{
+	i8748_device &special(I8748(config, "simutrek", XTAL(6'000'000)));
+	special.set_addrmap(AS_IO, &simutrek_special_device::simutrek_portmap);
+	special.p2_in_cb().set(FUNC(simutrek_special_device::i8748_port2_r));
+	special.p2_out_cb().set(FUNC(simutrek_special_device::i8748_port2_w));
+	special.t0_in_cb().set(FUNC(simutrek_special_device::i8748_t0_r));
 
 	pioneer_pr8210_device::device_add_mconfig(config);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

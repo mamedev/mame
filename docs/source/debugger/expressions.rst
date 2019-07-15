@@ -25,6 +25,36 @@ Expressions can be used anywhere a numeric parameter is expected. The syntax for
 |
 |
 
+Numbers
+-------
+
+Numbers are prefixed according to their bases:
+
+- Hexadecimal (base-16) numbers are prefixed with :code:`$` or :code:`0x`.
+
+- Decimal (base-10) numbers are prefixed with :code:`#`.
+
+- Octal (base-8) numbers are prefixed with :code:`0o`.
+
+- Binary (base-2) numbers are prefixed with :code:`0b`.
+
+- Unprefixed numbers are hexadecimal (base-16).
+
+Examples:
+
+- :code:`123` is 123 hexadecimal (291 decimal).
+
+- :code:`$123` is 123 hexadecimal (291 decimal).
+
+- :code:`0x123` is 123 hexadecimal (291 decimal).
+
+- :code:`#123` is 123 decimal.
+
+- :code:`0o123` is 123 octal (83 decimal).
+
+- :code:`0b1001` is 9 decimal.
+
+- :code:`0b123` is invalid.
 
 Differences from C Behaviors
 ----------------------------
@@ -45,4 +75,3 @@ Differences from C Behaviors
     The memory operators can be used as both lvalues and rvalues, so you can write **b\@100 = ff** to store a byte in memory. By default these operators read from the program memory space, but you can override that by prefixing them with a 'd' or an 'i'.
 
     As such, **dw\@300** refers to data memory word at address 300 and **id\@400** refers to an I/O memory dword at address 400.
-

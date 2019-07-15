@@ -6,23 +6,30 @@
 #pragma once
 
 
-SLOT_INTERFACE_EXTERN(msx_cart);
-SLOT_INTERFACE_EXTERN(msx_yamaha_60pin);   // 60 pin expansion slots as found in yamaha machines
+void msx_cart(device_slot_interface &device);
+void msx_yamaha_60pin(device_slot_interface &device);   // 60 pin expansion slots as found in yamaha machines
 
+
+class msx_slot_cartridge_device;
 
 class msx_cart_interface : public device_slot_card_interface
 {
-public:
-	template <class Object> void set_out_irq_cb(Object &&cb) { m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	friend class msx_slot_cartridge_device;
 
+public:
 	// This is called after loading cartridge contents and allows the cartridge
 	// implementation to perform some additional initialization based on the
 	// cartridge contents.
 	virtual void initialize_cartridge() { }
+	virtual void interface_pre_start() override { assert(m_exp != nullptr); }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_cart) { }
+	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
+	virtual void write_cart(offs_t offset, uint8_t data) { }
+
+	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	address_space &memory_space() const;
+	address_space &io_space() const;
 
 	// ROM/RAM/SRAM management
 	// Mainly used by the cartridge slot when loading images
@@ -43,13 +50,13 @@ public:
 protected:
 	msx_cart_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void interface_pre_start() override { m_out_irq_cb.resolve_safe(); }
-
 	std::vector<uint8_t> m_rom;
 	std::vector<uint8_t> m_ram;
 	std::vector<uint8_t> m_rom_vlm5030;
 	std::vector<uint8_t> m_sram;
-	devcb_write_line m_out_irq_cb;
+
+private:
+	msx_slot_cartridge_device *m_exp;
 };
 
 

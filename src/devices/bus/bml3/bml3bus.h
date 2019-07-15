@@ -16,33 +16,6 @@
 
 #define BML3BUS_MAX_SLOTS 6
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BML3BUS_CPU(_cputag) \
-	bml3bus_device::static_set_cputag(*device, "^" _cputag);
-
-#define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_BML3BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_irq_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_BML3BUS_OUT_FIRQ_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_firq_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_BML3BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BML3BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	bml3bus_slot_device::static_set_bml3bus_slot(*device, _nbtag, _tag);
-#define MCFG_BML3BUS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_BML3BUS_ONBOARD_ADD(_nbtag, _tag, _dev_type) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	device_bml3bus_card_interface::static_set_bml3bus_tag(*device, _nbtag, _tag);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -55,13 +28,24 @@ class bml3bus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	bml3bus_slot_device(machine_config const &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
+		: bml3bus_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_bml3bus_slot(nbtag, tag);
+	}
+
+	bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_bml3bus_slot(device_t &device, const char *tag, const char *slottag);
+	void set_bml3bus_slot(const char *tag, const char *slottag) { m_bml3bus_tag = tag; m_bml3bus_slottag = slottag; }
 
 protected:
 	bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -83,10 +67,10 @@ public:
 	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_firq_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_firq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_space(Object &&tag, int spacenum) { m_space.set_tag(std::forward<Object>(tag), spacenum); }
+	auto nmi_callback() { return m_out_nmi_cb.bind(); }
+	auto irq_callback() { return m_out_irq_cb.bind(); }
+	auto firq_callback() { return m_out_firq_cb.bind(); }
 
 	void add_bml3bus_card(int slot, device_bml3bus_card_interface *card);
 	device_bml3bus_card_interface *get_bml3bus_card(int slot);
@@ -99,7 +83,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( firq_w );
 
-	address_space &space() const { return m_maincpu->space(AS_PROGRAM); }
+	address_space &space() const { return *m_space; }
 
 protected:
 	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -109,14 +93,13 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
+	required_address_space m_space;
 
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_firq_cb;
 
 	device_bml3bus_card_interface *m_device_list[BML3BUS_MAX_SLOTS];
-	const char *m_cputag;
 };
 
 
@@ -145,7 +128,7 @@ public:
 	void lower_slot_firq() { m_bml3bus->set_firq_line(CLEAR_LINE); }
 
 	// inline configuration
-	static void static_set_bml3bus_tag(device_t &device, const char *tag, const char *slottag);
+	void set_bml3bus_tag(const char *tag, const char *slottag) { m_bml3bus_tag = tag; m_bml3bus_slottag = slottag; }
 
 protected:
 	device_bml3bus_card_interface(const machine_config &mconfig, device_t &device);

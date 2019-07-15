@@ -209,6 +209,10 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_write_vrtc(param);
 		m_vrtc = param;
 
+		update_vrtc_timer(param);
+		if(!(m_status & STATUS_VE))
+			break;
+
 		if (param && !m_me)
 		{
 			m_status |= STATUS_E;
@@ -216,8 +220,6 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 		else if(!param)
 			set_drq(1);
-
-		update_vrtc_timer(param);
 		break;
 
 	case TIMER_DRQ:

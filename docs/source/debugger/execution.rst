@@ -156,7 +156,7 @@ gtime
 -----
 
 |  **gt[ime] <milliseconds>**
-| 
+|
 | The gtime command resumes execution of the current code. Control will not be returned to the debugger until a specified delay has elapsed. The delay is in milliseconds.
 |
 | Example:
@@ -186,7 +186,7 @@ focus
 -----
 
 |  **focus <cpu>**
-| 
+|
 | Sets the debugger focus exclusively to the given <cpu>. This is equivalent to specifying 'ignore' on all other CPUs.
 |
 | Example:
@@ -257,13 +257,13 @@ trace
 
 |  **trace {<filename>|OFF}[,<cpu>[,[noloop|logerror][,<action>]]]**
 |
-| Starts or stops tracing of the execution of the specified <cpu>. If <cpu> is omitted, the currently active CPU is specified. 
+| Starts or stops tracing of the execution of the specified <cpu>. If <cpu> is omitted, the currently active CPU is specified.
 |
 | When enabling tracing, specify the filename in the <filename> parameter. To disable tracing, substitute the keyword 'off' for <filename>.
 |
-| <detectloops> should be either true or false. 
+| <detectloops> should be either true or false.
 |
-| If 'noloop' is omitted, the trace will have loops detected and condensed to a single line. If 'noloop' is specified, the trace will contain every opcode as it is executed. 
+| If 'noloop' is omitted, the trace will have loops detected and condensed to a single line. If 'noloop' is specified, the trace will contain every opcode as it is executed.
 |
 | If 'logerror' is specified, logerror output will augment the trace. If you wish to log additional information on each trace, you can append an <action> parameter which is a command that is executed before each trace is logged. Generally, this is used to include a 'tracelog' command. Note that you may need to embed the action within braces { } in order to prevent commas and semicolons from being interpreted as applying to the trace command itself.
 |
@@ -314,9 +314,9 @@ traceover
 |
 | Starts or stops tracing of the execution of the specified <cpu>.
 |
-| When tracing reaches a subroutine or call, tracing will skip over the subroutine. The same algorithm is used as is used in the step over command. This means that traceover will not work properly when calls are recursive or the return address is not immediately following the call instruction. 
+| When tracing reaches a subroutine or call, tracing will skip over the subroutine. The same algorithm is used as is used in the step over command. This means that traceover will not work properly when calls are recursive or the return address is not immediately following the call instruction.
 |
-| <detectloops> should be either true or false. If <detectloops> is *true or omitted*, the trace will have loops detected and condensed to a single line. If it is false, the trace will contain every opcode as it is executed. 
+| <detectloops> should be either true or false. If <detectloops> is *true or omitted*, the trace will have loops detected and condensed to a single line. If it is false, the trace will contain every opcode as it is executed.
 | If <cpu> is omitted, the currently active CPU is specified.
 | When enabling tracing, specify the filename in the <filename> parameter.
 | To disable tracing, substitute the keyword 'off' for <filename>.

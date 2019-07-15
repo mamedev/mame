@@ -17,18 +17,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BSMT2000_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, BSMT2000, _clock)
-#define MCFG_BSMT2000_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, BSMT2000, _clock)
-#define MCFG_BSMT2000_READY_CALLBACK(_class, _method) \
-	bsmt2000_device::static_set_ready_callback(*device, bsmt2000_device::ready_callback(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -46,7 +34,15 @@ public:
 	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_ready_callback(device_t &device, ready_callback &&callback);
+	void set_ready_callback(ready_callback callback) { m_ready_callback = callback; }
+	template <class FunctionClass> void set_ready_callback(const char *devname, void (FunctionClass::*callback)(), const char *name)
+	{
+		set_ready_callback(ready_callback(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_ready_callback(void (FunctionClass::*callback)(), const char *name)
+	{
+		set_ready_callback(ready_callback(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// public interface
 	uint16_t read_status();

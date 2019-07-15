@@ -111,36 +111,37 @@ CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 
 ******************************************************************************/
 
-ADDRESS_MAP_START(inufuku_state::inufuku_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM         // main rom
+void inufuku_state::inufuku_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();         // main rom
 
 //  AM_RANGE(0x100000, 0x100007) AM_WRITENOP    // ?
 
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P2")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P4")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
+	map(0x180000, 0x180001).portr("P1");
+	map(0x180002, 0x180003).portr("P2");
+	map(0x180004, 0x180005).portr("SYSTEM");
+	map(0x180006, 0x180007).portr("P4");
+	map(0x180008, 0x180009).portr("EXTRA");
+	map(0x18000a, 0x18000b).portr("P3");
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)   // sound command
+	map(0x200000, 0x200001).portw("EEPROMOUT");
+	map(0x280001, 0x280001).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")                        // palette ram
-	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")                                  // bg raster ram
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")     // bg ram
-	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")     // text ram
-	AM_RANGE(0x404000, 0x40ffff) AM_RAM // ?? mirror (3on3dunk)
-	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram1")                          // sprite table + sprite attribute
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("spriteram2")                                          // cell table
+	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                        // palette ram
+	map(0x380000, 0x3801ff).writeonly().share("bg_rasterram");                                  // bg raster ram
+	map(0x400000, 0x401fff).rw(FUNC(inufuku_state::inufuku_bg_videoram_r), FUNC(inufuku_state::inufuku_bg_videoram_w)).share("bg_videoram");     // bg ram
+	map(0x402000, 0x403fff).rw(FUNC(inufuku_state::inufuku_tx_videoram_r), FUNC(inufuku_state::inufuku_tx_videoram_w)).share("tx_videoram");     // text ram
+	map(0x404000, 0x40ffff).ram(); // ?? mirror (3on3dunk)
+	map(0x580000, 0x581fff).ram().share("spriteram1");                          // sprite table + sprite attribute
+	map(0x600000, 0x61ffff).ram().share("spriteram2");                                          // cell table
 
-	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w) // bg & text palettebank register
-	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)  // bg & text scroll register
+	map(0x780000, 0x780013).w(FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
+	map(0x7a0000, 0x7a0023).w(FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
 //  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
 
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM // data rom
-	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM // work ram
-ADDRESS_MAP_END
+	map(0x800000, 0xbfffff).rom(); // data rom
+	map(0xfd0000, 0xfdffff).ram(); // work ram
+}
 
 
 /******************************************************************************
@@ -149,18 +150,20 @@ ADDRESS_MAP_END
 
 ******************************************************************************/
 
-ADDRESS_MAP_START(inufuku_state::inufuku_sound_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void inufuku_state::inufuku_sound_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(inufuku_state::inufuku_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-ADDRESS_MAP_END
+void inufuku_state::inufuku_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(inufuku_state::inufuku_soundrombank_w));
+	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+}
 
 /******************************************************************************
 
@@ -218,8 +221,8 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, nullptr)    // pending sound command
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, nullptr)    // pending sound command
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 3on3dunk cares about something in here, possibly a vblank flag
 
 	PORT_START( "EEPROMOUT" )
@@ -284,13 +287,13 @@ static const gfx_layout spritelayout_alt =
 	128*8
 };
 
-static GFXDECODE_START( inufuku )
+static GFXDECODE_START( gfx_inufuku )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 256*16 )  // sprite
 GFXDECODE_END
 
-static GFXDECODE_START( _3on3dunk )
+static GFXDECODE_START( gfx_3on3dunk )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_alt,  0, 256*16 )  // sprite
@@ -330,61 +333,58 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-MACHINE_CONFIG_START(inufuku_state::inufuku)
-
+void inufuku_state::inufuku(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 32000000/2); /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &inufuku_state::inufuku_map);
+	m_maincpu->set_vblank_int("screen", FUNC(inufuku_state::irq1_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_sound_map)
-	MCFG_CPU_IO_MAP(inufuku_sound_io_map)
-								/* IRQs are triggered by the YM2610 */
+	Z80(config, m_audiocpu, 32000000/4);       /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inufuku_state::inufuku_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &inufuku_state::inufuku_sound_io_map); /* IRQs are triggered by the YM2610 */
 
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2300))
-	MCFG_SCREEN_SIZE(2048, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(inufuku_state, screen_vblank_inufuku))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300));
+	screen.set_size(2048, 256);
+	screen.set_visarea(0, 319, 0, 223);
+	screen.set_screen_update(FUNC(inufuku_state::screen_update_inufuku));
+	screen.screen_vblank().set(FUNC(inufuku_state::screen_vblank_inufuku));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	vsystem_spr_device::set_offsets(*device, 0,1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
-	vsystem_spr_device::set_pdraw(*device, true);
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_offsets(0, 1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
+	m_spr->set_pdraw(true);
+	m_spr->set_tile_indirect_cb(FUNC(inufuku_state::inufuku_tile_callback), this);
+	m_spr->set_gfx_region(2);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", inufuku)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_inufuku);
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 4096);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 32000000/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-
-MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
+void inufuku_state::_3on3dunk(machine_config &config)
+{
 	inufuku(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_3on3dunk);
+}
 
 
 
@@ -458,5 +458,5 @@ ROM_END
 
 ******************************************************************************/
 
-GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)
+GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)

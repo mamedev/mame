@@ -66,16 +66,6 @@ kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, cons
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<kaneko_pandora_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -91,7 +81,7 @@ void kaneko_pandora_device::device_start()
 	save_item(NAME(m_clear_bitmap));
 	save_item(NAME(m_bg_pen));
 	save_item(NAME(m_flip_screen));
-	save_pointer(NAME(m_spriteram.get()), 0x1000);
+	save_pointer(NAME(m_spriteram), 0x1000);
 	save_item(NAME(*m_sprites_bitmap));
 }
 

@@ -48,7 +48,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define VHDSTATUS_OK                    0x00
 #define VHDSTATUS_NO_VHD_ATTACHED       0x02
@@ -74,6 +74,7 @@ DEFINE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device, "coco_vhd_image", "CoCo Virt
 coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, COCO_VHD, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -94,7 +95,6 @@ coco_vhd_image_device::~coco_vhd_image_device()
 void coco_vhd_image_device::device_start()
 {
 	m_status = VHDSTATUS_NO_VHD_ATTACHED;
-	m_cpu = machine().device<cpu_device>(MAINCPU_TAG);
 	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 }
 

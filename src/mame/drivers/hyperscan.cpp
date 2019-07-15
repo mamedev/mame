@@ -55,7 +55,7 @@
 #include "emu.h"
 #include "cpu/score/score.h"
 #include "screen.h"
-
+#include "softlist_dev.h"
 
 #define LOG_SPG290_REGISTER_ACCESS  (1)
 
@@ -69,6 +69,9 @@ public:
 			m_maincpu(*this, "maincpu")
 		{ }
 
+	void hyperscan(machine_config &config);
+
+private:
 	required_device<score7_cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
@@ -88,9 +91,8 @@ public:
 	void spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 
-	void hyperscan(machine_config &config);
 	void spg290_mem(address_map &map);
-private:
+
 	static const device_timer_id TIMER_SPG290 = 0;
 	static const device_timer_id TIMER_I2C = 1;
 
@@ -226,7 +228,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
 	}
 #endif
@@ -389,7 +391,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
 	}
 #endif
@@ -537,7 +539,7 @@ void hyperscan_state::spg290_timers_update()
 					if (elem.control & 0x08000000)
 					{
 						elem.control |= 0x04000000;
-						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56);
+						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56); // SCORE7
 					}
 				}
 				else
@@ -556,12 +558,12 @@ WRITE_LINE_MEMBER(hyperscan_state::spg290_vblank_irq)
 	if (state && m_ppu.irq_control & 0x01)      // VBlanking Start IRQ
 	{
 		m_ppu.irq_status |= 0x01;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
 	}
 	else if (!state && m_ppu.irq_control & 0x02) // VBlanking End IRQ
 	{
 		m_ppu.irq_status |= 0x02;
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 53); // SCORE7
 	}
 }
 
@@ -579,21 +581,22 @@ void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int par
 			// TODO: replace with real I2C emulation
 			m_i2c.rdata = 0;
 
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 39);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 39); // SCORE7
 		}
 		break;
 	}
 }
 
-ADDRESS_MAP_START(hyperscan_state::spg290_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffffff)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_MIRROR(0x07000000)
-	AM_RANGE(0x08000000, 0x09ffffff) AM_READWRITE(spg290_regs_r, spg290_regs_w)
-	AM_RANGE(0x0a000000, 0x0a003fff) AM_RAM                         // internal SRAM
-	AM_RANGE(0x0b000000, 0x0b007fff) AM_ROM AM_REGION("spg290", 0)  // internal ROM
-	AM_RANGE(0x10000000, 0x100fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-	AM_RANGE(0x11000000, 0x110fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-ADDRESS_MAP_END
+void hyperscan_state::spg290_mem(address_map &map)
+{
+	map.global_mask(0x1fffffff);
+	map(0x00000000, 0x00ffffff).ram().mirror(0x07000000);
+	map(0x08000000, 0x09ffffff).rw(FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
+	map(0x0a000000, 0x0a003fff).ram();                         // internal SRAM
+	map(0x0b000000, 0x0b007fff).rom().region("spg290", 0);  // internal ROM
+	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0e000000);
+	map(0x11000000, 0x110fffff).rom().region("bios", 0).mirror(0x0e000000);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hyperscan )
@@ -618,20 +621,23 @@ void hyperscan_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(hyperscan_state::hyperscan)
+void hyperscan_state::hyperscan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
-	MCFG_CPU_PROGRAM_MAP(spg290_mem)
+	SCORE7(config, m_maincpu, XTAL(27'000'000) * 4);   // 108MHz S+core 7
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyperscan_state::spg290_mem);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("hyperscan");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperscan_state, spg290_vblank_irq))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(hyperscan_state::spg290_screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.screen_vblank().set(FUNC(hyperscan_state::spg290_vblank_irq));
+}
 
 
 /* ROM definition */
@@ -646,5 +652,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      STATE            INIT  COMPANY   FULLNAME     FLAGS
-COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, 0,    "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME     FLAGS
+COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, empty_init, "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -9,8 +9,8 @@
 class vs920a_text_tilemap_device : public device_t
 {
 public:
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int gfxregion);
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfx_region(int gfxregion) { m_gfx_region = gfxregion; }
 
 	vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -38,12 +38,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(VS920A, vs920a_text_tilemap_device)
-
-
-#define MCFG_VS920A_GFX_REGION(_region) \
-	vs920a_text_tilemap_device::set_gfx_region(*device, _region);
-
-#define MCFG_VS920A_GFXDECODE(_gfxtag) \
-	vs920a_text_tilemap_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif // MAME_VIDEO_VS920A_H

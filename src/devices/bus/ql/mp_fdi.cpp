@@ -26,7 +26,7 @@ ROM_START( micro_peripherals_floppy_disk_interface )
 	ROM_REGION( 0x2000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v53e")
 	ROM_SYSTEM_BIOS( 0, "v53e", "v5.3E" )
-	ROMX_LOAD( "microp_disk system_v5.3e_1985.rom", 0x0000, 0x2000, CRC(9a8d8fa7) SHA1(f9f5e5d55f3046f63b4eae59222b81290d626e72), ROM_BIOS(1) )
+	ROMX_LOAD( "microp_disk system_v5.3e_1985.rom", 0x0000, 0x2000, CRC(9a8d8fa7) SHA1(f9f5e5d55f3046f63b4eae59222b81290d626e72), ROM_BIOS(0) )
 ROM_END
 
 
@@ -69,7 +69,7 @@ void micro_peripherals_floppy_disk_interface_device::device_start()
 //  read -
 //-------------------------------------------------
 
-uint8_t micro_peripherals_floppy_disk_interface_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t micro_peripherals_floppy_disk_interface_device::read(offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -79,6 +79,6 @@ uint8_t micro_peripherals_floppy_disk_interface_device::read(address_space &spac
 //  write -
 //-------------------------------------------------
 
-void micro_peripherals_floppy_disk_interface_device::write(address_space &space, offs_t offset, uint8_t data)
+void micro_peripherals_floppy_disk_interface_device::write(offs_t offset, uint8_t data)
 {
 }

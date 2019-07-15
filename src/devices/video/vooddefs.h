@@ -2971,10 +2971,10 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t 
 		/* fetch texel data */
 		if (TEXMODE_FORMAT(TEXMODE) < 8)
 		{
-			texel0 = *(uint8_t *)&ram[(texbase + t + s)];
-			texel1 = *(uint8_t *)&ram[(texbase + t + s1)];
-			texel2 = *(uint8_t *)&ram[(texbase + t1 + s)];
-			texel3 = *(uint8_t *)&ram[(texbase + t1 + s1)];
+			texel0 = *(uint8_t *)&ram[(texbase + t + s) & mask];
+			texel1 = *(uint8_t *)&ram[(texbase + t + s1) & mask];
+			texel2 = *(uint8_t *)&ram[(texbase + t1 + s) & mask];
+			texel3 = *(uint8_t *)&ram[(texbase + t1 + s1) & mask];
 			texel0 = (LOOKUP)[texel0];
 			texel1 = (LOOKUP)[texel1];
 			texel2 = (LOOKUP)[texel2];
@@ -2982,10 +2982,10 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t 
 		}
 		else
 		{
-			texel0 = *(uint16_t *)&ram[(texbase + 2*(t + s))];
-			texel1 = *(uint16_t *)&ram[(texbase + 2*(t + s1))];
-			texel2 = *(uint16_t *)&ram[(texbase + 2*(t1 + s))];
-			texel3 = *(uint16_t *)&ram[(texbase + 2*(t1 + s1))];
+			texel0 = *(uint16_t *)&ram[(texbase + 2*(t + s)) & mask];
+			texel1 = *(uint16_t *)&ram[(texbase + 2*(t + s1)) & mask];
+			texel2 = *(uint16_t *)&ram[(texbase + 2*(t1 + s)) & mask];
+			texel3 = *(uint16_t *)&ram[(texbase + 2*(t1 + s1)) & mask];
 			if (TEXMODE_FORMAT(TEXMODE) >= 10 && TEXMODE_FORMAT(TEXMODE) <= 12)
 			{
 				texel0 = (LOOKUP)[texel0];

@@ -14,7 +14,10 @@
 
 #include <stdio.h>
 #include <ctype.h>
+
 #include <algorithm>
+#include <functional>
+#include <set>
 
 
 namespace {
@@ -24,9 +27,9 @@ namespace {
 //  integer value
 //-------------------------------------------------
 
-uint32_t parse_string(const char *s)
+u32 parse_string(const char *s)
 {
-	static const struct
+	static constexpr struct
 	{
 		const char *suffix;
 		unsigned multiple;
@@ -47,18 +50,16 @@ uint32_t parse_string(const char *s)
 	sscanf(s, "%u%7s", &ram, suffix);
 
 	// perform the lookup
-	auto iter = std::find_if(
-		std::begin(s_suffixes),
-		std::end(s_suffixes),
-		[&suffix](const auto &potential_suffix) { return !core_stricmp(suffix, potential_suffix.suffix); });
+	auto const iter(std::find_if(
+			std::begin(s_suffixes),
+			std::end(s_suffixes),
+			[&suffix](const auto &potential_suffix) { return !core_stricmp(suffix, potential_suffix.suffix); }));
 
 	// identify the multiplier (or 0 if not recognized, signalling a parse failure)
-	unsigned multiple = iter != std::end(s_suffixes)
-		? iter->multiple
-		: 0;
+	unsigned const multiplier((iter != std::end(s_suffixes)) ? iter->multiple : 0);
 
 	// return the result
-	return ram * multiple;
+	return ram * multiplier;
 }
 
 
@@ -66,17 +67,21 @@ uint32_t parse_string(const char *s)
 //  calculate_extra_options
 //-------------------------------------------------
 
-std::vector<uint32_t> calculate_extra_options(const char *extra_options_string, std::string *bad_option)
+ram_device::extra_option_vector calculate_extra_options(const char *extra_options_string, std::string *bad_option)
 {
-	std::vector<uint32_t> result;
-	std::string options(extra_options_string);
+	ram_device::extra_option_vector result;
+	std::string const options(extra_options_string);
 
-	bool done = false;
+	bool done(false);
 	for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
 	{
+		// ignore spaces
+		while ((end > start) && (options.length() > start) && ((' ' == options[start]) || ('\t' == options[start])))
+			++start;
+
 		// parse the option
-		const std::string ram_option_string = options.substr(start, (end == -1) ? -1 : end - start);
-		const uint32_t ram_option = parse_string(ram_option_string.c_str());
+		std::string ram_option_string(options.substr(start, (end == -1) ? -1 : end - start));
+		u32 const ram_option = parse_string(ram_option_string.c_str());
 		if (ram_option == 0)
 		{
 			if (bad_option)
@@ -85,8 +90,8 @@ std::vector<uint32_t> calculate_extra_options(const char *extra_options_string, 
 		}
 
 		// and add it to the results
-		result.push_back(ram_option);
-		done = end == std::string::npos;
+		result.emplace_back(std::move(ram_option_string), ram_option);
+		done = std::string::npos == end;
 	}
 	return result;
 }
@@ -106,7 +111,7 @@ DEFINE_DEVICE_TYPE(RAM, ram_device, "ram", "RAM")
 //  ram_device - constructor
 //-------------------------------------------------
 
-ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RAM, tag, owner, clock)
 	, m_size(0)
 	, m_default_size(0)
@@ -123,23 +128,25 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 void ram_device::device_start()
 {
 	// the device named 'ram' can get ram options from command line
+	u32 const defsize(default_size());
 	m_size = 0;
 	if (strcmp(tag(), ":" RAM_TAG) == 0)
 	{
-		const char *ramsize_string = machine().options().ram_size();
+		char const *const ramsize_string(machine().options().ram_size());
 		if (ramsize_string && *ramsize_string)
 		{
 			m_size = parse_string(ramsize_string);
 			if (!is_valid_size(m_size))
 			{
+				extra_option_vector::const_iterator found(std::find_if(m_extra_options.begin(), m_extra_options.end(), [defsize] (extra_option const &opt) { return opt.second == defsize; }));
 				std::ostringstream output;
-				util::stream_format(output, "Cannot recognize the RAM option %s", ramsize_string);
-				util::stream_format(output, " (valid options are %s", m_default_size);
-
-				if (m_extra_options_string)
-					util::stream_format(output, ",%s).\n", m_extra_options_string);
+				util::stream_format(output, "Cannot recognize the RAM option %s (valid options are ", ramsize_string);
+				if (!m_extra_options_string)
+					util::stream_format(output, "%s).\n", m_default_size);
+				else if (m_extra_options.end() != found)
+					util::stream_format(output, "%s).\n", m_extra_options_string);
 				else
-					util::stream_format(output, ").\n");
+					util::stream_format(output, "%s,%s).\n", m_default_size, m_extra_options_string);
 
 				osd_printf_error("%s", output.str().c_str());
 
@@ -152,15 +159,15 @@ void ram_device::device_start()
 
 	// if we didn't get a size yet, use the default
 	if (m_size == 0)
-		m_size = default_size();
+		m_size = defsize;
 
 	// allocate space for the ram
-	m_pointer.resize(m_size);
-	memset(&m_pointer[0], m_default_value, m_size);
+	m_pointer = std::make_unique<u8 []>(m_size);
+	std::fill_n(m_pointer.get(), m_size, m_default_value);
 
 	// register for state saving
 	save_item(NAME(m_size));
-	save_item(NAME(m_pointer));
+	save_pointer(NAME(m_pointer), m_size);
 }
 
 
@@ -176,14 +183,25 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid default RAM option: %s\n", m_default_size);
 
 	// calculate any extra options
-	std::vector<uint32_t> extra_options;
-	std::string bad_option;
 	if (m_extra_options_string)
-		extra_options = calculate_extra_options(m_extra_options_string, &bad_option);
+	{
+		std::string bad_option;
+		extra_option_vector const extras(calculate_extra_options(m_extra_options_string, &bad_option));
 
-	// report any errors
-	if (!bad_option.empty())
-		osd_printf_error("Invalid RAM option: %s\n", bad_option.c_str());
+		// report any errors
+		if (!bad_option.empty())
+			osd_printf_error("Invalid RAM option: %s\n", bad_option.c_str());
+
+		// report duplicates
+		using extra_option_ref_set = std::set<std::reference_wrapper<extra_option const>, bool (*)(extra_option const &, extra_option const &)>;
+		extra_option_ref_set sorted([] (extra_option const &a, extra_option const &b) { return a.second < b.second; });
+		for (extra_option const &opt : extras)
+		{
+			auto const ins(sorted.emplace(opt));
+			if (!ins.second)
+				osd_printf_error("Duplicate RAM options: %s == %s (%u)\n", ins.first->get().first.c_str(), opt.first.c_str(), opt.second);
+		}
+	}
 }
 
 
@@ -191,10 +209,10 @@ void ram_device::device_validity_check(validity_checker &valid) const
 //  is_valid_size
 //-------------------------------------------------
 
-bool ram_device::is_valid_size(uint32_t size) const
+bool ram_device::is_valid_size(u32 size) const
 {
 	return size == default_size()
-		|| std::find(extra_options().begin(), extra_options().end(), size) != extra_options().end();
+		|| std::find_if(extra_options().begin(), extra_options().end(), [size] (extra_option const &opt) { return opt.second == size; }) != extra_options().end();
 }
 
 
@@ -202,7 +220,7 @@ bool ram_device::is_valid_size(uint32_t size) const
 //  default_size
 //-------------------------------------------------
 
-uint32_t ram_device::default_size(void) const
+u32 ram_device::default_size() const
 {
 	return parse_string(m_default_size);
 }
@@ -212,7 +230,7 @@ uint32_t ram_device::default_size(void) const
 //  extra_options
 //-------------------------------------------------
 
-const std::vector<uint32_t> &ram_device::extra_options(void) const
+const ram_device::extra_option_vector &ram_device::extra_options() const
 {
 	if (m_extra_options_string && m_extra_options.empty())
 		m_extra_options = calculate_extra_options(m_extra_options_string, nullptr);

@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_MIKROPLUS, spectrum_mikroplus_device, "spectrum_mikr
 
 ROM_START( mikroplus )
 	ROM_REGION(0x4000, "rom", 0)
-	ROM_LOAD("ShadowOfTheUnicorn.rom", 0x0000, 0x4000, CRC(7085a0fd) SHA1(66cc823587b520af9636eed7a342d69d3dd15123))
+	ROM_LOAD("shadowoftheunicorn.rom", 0x0000, 0x4000, CRC(7085a0fd) SHA1(66cc823587b520af9636eed7a342d69d3dd15123))
 ROM_END
 
 
@@ -82,19 +82,6 @@ spectrum_mikroplus_device::spectrum_mikroplus_device(const machine_config &mconf
 
 void spectrum_mikroplus_device::device_start()
 {
-	address_space& spaceio = machine().device("maincpu")->memory().space(AS_IO);
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
-
-	spaceio.install_read_handler(0xdf, 0xdf, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_mikroplus_device::joystick_r), this));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void spectrum_mikroplus_device::device_reset()
-{
 }
 
 
@@ -102,9 +89,15 @@ void spectrum_mikroplus_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(spectrum_mikroplus_device::joystick_r)
+uint8_t spectrum_mikroplus_device::iorq_r(offs_t offset)
 {
-	return m_joy->read() | (0xff ^ 0x1f);
+	uint8_t data = 0xff;
+
+	if (offset == 0xdf)
+	{
+		data = m_joy->read() | (0xff ^ 0x1f);
+	}
+	return data;
 }
 
 READ_LINE_MEMBER(spectrum_mikroplus_device::romcs)
@@ -112,7 +105,7 @@ READ_LINE_MEMBER(spectrum_mikroplus_device::romcs)
 	return 1;
 }
 
-READ8_MEMBER(spectrum_mikroplus_device::mreq_r)
+uint8_t spectrum_mikroplus_device::mreq_r(offs_t offset)
 {
 	return m_rom->base()[offset & 0x3fff];
 }

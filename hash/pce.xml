@@ -33,9 +33,9 @@
 		<description>Adventure Island</description>
 		<year>1991</year>
 		<publisher>Hudson</publisher>
-		<info name="serial" value="アドベンチャーアイランド"/>
+		<info name="serial" value="HC91035"/>
 		<info name="release" value="19910419"/>
-		<info name="alt_title" value="HC91035"/>
+		<info name="alt_title" value="アドベンチャーアイランド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="adventure island (japan).pce" size="262144" crc="8e71d4f3" sha1="01ad5bbd7316740409e01917c19494cb26173ff5" offset="000000" />
@@ -324,9 +324,9 @@
 		<description>Blodia</description>
 		<year>1990</year>
 		<publisher>Hudson</publisher>
-		<info name="serial" value="ブロディア"/>
+		<info name="serial" value="HC90027"/>
 		<info name="release" value="19900223"/>
-		<info name="alt_title" value="HC90027"/>
+		<info name="alt_title" value="ブロディア"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="blodia (japan).pce" size="131072" crc="958bcd09" sha1="bcb3070f617059c9d0d781ece2aee9ae74951f6a" offset="000000" />
@@ -761,7 +761,7 @@
 	<software name="deadmoon">
 		<description>Dead Moon - Tsuki Sekai no Akumu</description>
 		<year>1990</year>
-		<publisher>B.S.S.</publisher>
+		<publisher>T.S.S.</publisher>
 		<info name="serial" value="TS91001"/>
 		<info name="release" value="19910222"/>
 		<info name="alt_title" value="デッドムーン 月世界の悪夢"/>
@@ -2221,7 +2221,7 @@
 	<software name="mizubaku">
 		<description>Mizubaku Dai Bouken</description>
 		<year>1992</year>
-		<publisher>Namcot</publisher>
+		<publisher>Taito</publisher>
 		<info name="serial" value="TP03020"/>
 		<info name="release" value="19920117"/>
 		<info name="alt_title" value="ミズバク大冒険"/>
@@ -2620,6 +2620,17 @@
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="obocchama kun (japan).pce" size="524288" crc="4d3b0bc9" sha1="f505c31aab43ac6fd4d88fd14ae03a9c418e7357" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offtwall">
+		<description>Off The Wall (prototype)</description>
+		<year>1992</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="pce_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="off the wall [proto 1].pce" size="524288" crc="8621ae02" sha1="eaf6083667104b427c2dc928a3aeae6edfc0005b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3455,7 +3466,7 @@
 	</software>
 
 	<software name="sidearms">
-		<description>Sidearms - Hyper Dyne</description>
+		<description>Side Arms - Hyper Dyne</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
 		<info name="serial" value="H54G-1004"/>

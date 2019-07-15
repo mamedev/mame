@@ -13,22 +13,6 @@
 /* usually 640000 for 8000 Hz sample rate or */
 /* usually 800000 for 10000 Hz sample rate.  */
 
-#define MCFG_TMS5110_M0_CB(_devcb) \
-	devcb = &tms5110_device::set_m0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS5110_M1_CB(_devcb) \
-	devcb = &tms5110_device::set_m1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS5110_ADDR_CB(_devcb) \
-	devcb = &tms5110_device::set_addr_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS5110_DATA_CB(_devcb) \
-	devcb = &tms5110_device::set_data_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS5110_ROMCLK_CB(_devcb) \
-	devcb = &tms5110_device::set_romclk_callback(*device, DEVCB_##_devcb);
-
-
 class tms5110_device : public device_t, public device_sound_interface
 {
 public:
@@ -51,11 +35,11 @@ public:
 
 	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_m0_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_m0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_m1_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_m1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_addr_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_addr_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_data_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_romclk_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_romclk_cb.set_callback(std::forward<Object>(cb)); }
+	auto m0() { return m_m0_cb.bind(); }
+	auto m1() { return m_m1_cb.bind(); }
+	auto addr() { return m_addr_cb.bind(); }
+	auto data() { return m_data_cb.bind(); }
+	auto romclk() { return m_romclk_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( ctl_w );
 	DECLARE_READ8_MEMBER( ctl_r );
@@ -277,17 +261,17 @@ class tmsprom_device : public device_t
 public:
 	tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_region(device_t &device, const char *region) { downcast<tmsprom_device &>(device).m_prom.set_tag(region); }
-	static void set_rom_size(device_t &device, uint32_t rom_size) { downcast<tmsprom_device &>(device).m_rom_size = rom_size; }
-	static void set_pdc_bit(device_t &device, uint8_t pdc_bit) { downcast<tmsprom_device &>(device).m_pdc_bit = pdc_bit; }
-	static void set_ctl1_bit(device_t &device, uint8_t ctl1_bit) { downcast<tmsprom_device &>(device).m_ctl1_bit = ctl1_bit; }
-	static void set_ctl2_bit(device_t &device, uint8_t ctl2_bit) { downcast<tmsprom_device &>(device).m_ctl2_bit = ctl2_bit; }
-	static void set_ctl4_bit(device_t &device, uint8_t ctl4_bit) { downcast<tmsprom_device &>(device).m_ctl4_bit = ctl4_bit; }
-	static void set_ctl8_bit(device_t &device, uint8_t ctl8_bit) { downcast<tmsprom_device &>(device).m_ctl8_bit = ctl8_bit; }
-	static void set_reset_bit(device_t &device, uint8_t reset_bit) { downcast<tmsprom_device &>(device).m_reset_bit = reset_bit; }
-	static void set_stop_bit(device_t &device, uint8_t stop_bit) { downcast<tmsprom_device &>(device).m_stop_bit = stop_bit; }
-	template<class _Object> static devcb_base &set_pdc_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_pdc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_ctl_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_ctl_cb.set_callback(object); }
+	void set_region(const char *region) { m_prom.set_tag(region); }
+	void set_rom_size(uint32_t rom_size) { m_rom_size = rom_size; }
+	void set_pdc_bit(uint8_t pdc_bit) { m_pdc_bit = pdc_bit; }
+	void set_ctl1_bit(uint8_t ctl1_bit) { m_ctl1_bit = ctl1_bit; }
+	void set_ctl2_bit(uint8_t ctl2_bit) { m_ctl2_bit = ctl2_bit; }
+	void set_ctl4_bit(uint8_t ctl4_bit) { m_ctl4_bit = ctl4_bit; }
+	void set_ctl8_bit(uint8_t ctl8_bit) { m_ctl8_bit = ctl8_bit; }
+	void set_reset_bit(uint8_t reset_bit) { m_reset_bit = reset_bit; }
+	void set_stop_bit(uint8_t stop_bit) { m_stop_bit = stop_bit; }
+	auto pdc() { return m_pdc_cb.bind(); }
+	auto ctl() { return m_ctl_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( m0_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
@@ -336,38 +320,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TMSPROM, tmsprom_device)
-
-#define MCFG_TMSPROM_REGION(_region) \
-	tmsprom_device::set_region(*device, "^" _region);
-
-#define MCFG_TMSPROM_ROM_SIZE(_size) \
-	tmsprom_device::set_rom_size(*device, _size);
-
-#define MCFG_TMSPROM_PDC_BIT(_bit) \
-	tmsprom_device::set_pdc_bit(*device, _bit);
-
-#define MCFG_TMSPROM_CTL1_BIT(_bit) \
-	tmsprom_device::set_ctl1_bit(*device, _bit);
-
-#define MCFG_TMSPROM_CTL2_BIT(_bit) \
-	tmsprom_device::set_ctl2_bit(*device, _bit);
-
-#define MCFG_TMSPROM_CTL4_BIT(_bit) \
-	tmsprom_device::set_ctl4_bit(*device, _bit);
-
-#define MCFG_TMSPROM_CTL8_BIT(_bit) \
-	tmsprom_device::set_ctl8_bit(*device, _bit);
-
-#define MCFG_TMSPROM_RESET_BIT(_bit) \
-	tmsprom_device::set_reset_bit(*device, _bit);
-
-#define MCFG_TMSPROM_STOP_BIT(_bit) \
-	tmsprom_device::set_stop_bit(*device, _bit);
-
-#define MCFG_TMSPROM_PDC_CB(_devcb) \
-	devcb = &tmsprom_device::set_pdc_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMSPROM_CTL_CB(_devcb) \
-	devcb = &tmsprom_device::set_ctl_callback(*device, DEVCB_##_devcb);
 
 #endif // MAME_SOUND_TMS5110_H

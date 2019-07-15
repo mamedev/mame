@@ -46,7 +46,7 @@ VIDEO_START_MEMBER(midyunit_state,common)
 	m_local_videoram = make_unique_clear<uint16_t[]>(0x80000/2);
 	m_pen_map = std::make_unique<pen_t[]>(65536);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), 0x2000 * 4);
+	m_nvram->set_base(m_cmos_ram.get(), 0x2000 * 4);
 
 	m_dma_timer = timer_alloc(TIMER_DMA);
 	m_autoerase_line_timer = timer_alloc(TIMER_AUTOERASE_LINE);
@@ -62,8 +62,8 @@ VIDEO_START_MEMBER(midyunit_state,common)
 
 	/* register for state saving */
 	save_item(NAME(m_autoerase_enable));
-	save_pointer(NAME(m_local_videoram.get()), 0x80000/2);
-	save_pointer(NAME(m_cmos_ram.get()), (0x2000 * 4)/2);
+	save_pointer(NAME(m_local_videoram), 0x80000/2);
+	save_pointer(NAME(m_cmos_ram), (0x2000 * 4)/2);
 	save_item(NAME(m_videobank_select));
 	save_item(NAME(m_dma_register));
 }

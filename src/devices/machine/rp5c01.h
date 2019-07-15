@@ -26,19 +26,6 @@
 #include "dirtc.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RP5C01_OUT_ALARM_CB(_devcb) \
-	devcb = &rp5c01_device::set_out_alarm_callback(*device, DEVCB_##_devcb);
-
-// include this macro if the chip is not battery backed
-#define MCFG_RP5C01_REMOVE_BATTERY() \
-	rp5c01_device::remove_battery(*device);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -53,8 +40,8 @@ public:
 	// construction/destruction
 	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_alarm_callback(device_t &device, Object &&cb) { return downcast<rp5c01_device &>(device).m_out_alarm_cb.set_callback(std::forward<Object>(cb)); }
-	static void remove_battery(device_t &device) { downcast<rp5c01_device &>(device).m_battery_backed = false; }
+	auto out_alarm_callback() { return m_out_alarm_cb.bind(); }
+	void remove_battery() { m_battery_backed = false; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

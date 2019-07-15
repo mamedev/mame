@@ -23,8 +23,7 @@
 #include "machine/ram.h"
 #include "machine/bankdev.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
-
+#include "screen.h"
 
 
 //**************************************************************************
@@ -36,7 +35,7 @@ INPUT_PORTS_EXTERN( coco_joystick );
 INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
 
-SLOT_INTERFACE_EXTERN( coco_cart );
+void coco_cart(device_slot_interface &device);
 
 // constants
 #define JOYSTICK_DELTA          10
@@ -119,7 +118,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus & "space"
-	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
+	DECLARE_READ8_MEMBER( floating_bus_r )   { return floating_bus_read(); }
 	uint8_t floating_space_read(offs_t offset);
 	void floating_space_write(offs_t offset, uint8_t data);
 
@@ -153,19 +152,17 @@ protected:
 	virtual void pia1_pb_changed(uint8_t data);
 
 	// accessors
-	cpu_device &maincpu() { return *m_maincpu; }
-	address_space &cpu_address_space() { return maincpu().space(); }
 	pia6821_device &pia_0() { return *m_pia_0; }
 	pia6821_device &pia_1() { return *m_pia_1; }
 	cococart_slot_device &cococart() { return *m_cococart; }
 	ram_device &ram() { return *m_ram; }
 
 	// miscellaneous
-	virtual void update_keyboard_input(uint8_t value, uint8_t z);
+	virtual void update_keyboard_input(uint8_t value);
 	virtual void cart_w(bool state);
-	virtual void update_cart_base(uint8_t *cart_base) = 0;
+	virtual void update_cart_base(uint8_t *cart_base) { };
 
-private:
+protected:
 	// timer constants
 	static const device_timer_id TIMER_HIRES_JOYSTICK_X = 0;
 	static const device_timer_id TIMER_HIRES_JOYSTICK_Y = 1;
@@ -238,7 +235,7 @@ private:
 	required_device<pia6821_device> m_pia_1;
 	required_device<dac_byte_interface> m_dac;
 	required_device<dac_1bit_device> m_sbs;
-	required_device<wave_device> m_wave;
+	optional_device<screen_device> m_screen;
 	required_device<cococart_slot_device> m_cococart;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;

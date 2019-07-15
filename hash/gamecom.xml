@@ -1,99 +1,128 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+List of games which were planned but never finished or released.
+
+- A Bug's Life
+- Castlevania: Symphony of the Night (71-742)
+- Command and Conquer: Red Alert
+- Deer Hunter
+- Giga Pets Deluxe (71-748)
+- Holyfield Champion Boxing (71-749)
+- Furbyland
+- Godzilla
+- The Legend of the Lost Creator (unknown "Wyvern" game)
+- Madden Football 99   (71-705)
+- Metal Gear Solid
+- Mutoids
+- Name That Tune (71-729)
+- NASCAR Racing
+- NBA Live 99 (71-741)
+- Shadow Madness
+- Small Soldiers (71-743)
+- Sonic 3D Blast
+- Turok: Dinosaur Hunter
+- WCW Whiplash
+- X-Files
+
+-->
+
 <softwarelist name="gamecom" description="Tiger Game.com cartridges">
 
-	<software name="batmanr" supported="no">
+	<software name="batmanr">
 		<description>Batman &amp; Robin</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-709"/>
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="batman &amp; robin (1997).bin" size="2097152" crc="b336e530" sha1="066d5cddce9729044ad598ad3cc3489a834f5197" offset="000000" />
+				<rom name="batman &amp; robin (1997).bin" size="2097152" crc="b336e530" sha1="066d5cddce9729044ad598ad3cc3489a834f5197"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="centiped" supported="no">
+	<software name="centiped">
 		<description>Centipede</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-755" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="centipede (1999)(hasbro - tiger electronics).bin" size="262144" crc="1a041ff0" sha1="b3d50e0cca6e2a539fba5883854aaf26424ab382" offset="000000" />
+				<rom name="centipede (1999)(hasbro - tiger electronics).bin" size="262144" crc="1a041ff0" sha1="b3d50e0cca6e2a539fba5883854aaf26424ab382"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dukenuke" supported="no">
+	<software name="dukenuke">
 		<description>Duke Nukem 3D</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-712" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="duke nukem 3d (1997).bin" size="2097152" crc="884568d1" sha1="9aaa1cf3b12f14201079dfbdd4c17fe868972de6" offset="000000" />
+				<rom name="duke nukem 3d (1997).bin" size="2097152" crc="884568d1" sha1="9aaa1cf3b12f14201079dfbdd4c17fe868972de6"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fightmix" supported="no">
+	<software name="fightmix">
 		<description>Fighters Megamix</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-739" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="fighters megamix (1998)(sega).bin" size="2097152" crc="061e943f" sha1="c165e5f4b61341ae0e8a4d141b28e18108942326" offset="000000" />
+				<rom name="fighters megamix (1998)(sega).bin" size="2097152" crc="061e943f" sha1="c165e5f4b61341ae0e8a4d141b28e18108942326"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="frogger" supported="no">
+	<software name="frogger">
 		<description>Frogger</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-756" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="frogger (1999)(hasbro - tiger electronics).bin" size="1048576" crc="10e4c5cd" sha1="8224d3e71a3da2f4029bee8b62b4a0c108c054e4" offset="000000" />
+				<rom name="frogger (1999)(hasbro - tiger electronics).bin" size="1048576" crc="10e4c5cd" sha1="8224d3e71a3da2f4029bee8b62b4a0c108c054e4"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="henry" supported="no">
+	<software name="henry">
 		<description>Henry - Match the Sounds Memory Game</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-728" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="henry (1997).bin" size="1048576" crc="75d3c8d8" sha1="b72a03af1dec0c621f9eda89ded3845724bb34ac" offset="000000" />
+				<rom name="henry (1997).bin" size="1048576" crc="75d3c8d8" sha1="b72a03af1dec0c621f9eda89ded3845724bb34ac"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="indy500" supported="no">
+	<software name="indy500">
 		<description>Indy 500</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-525" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="indy 500 (1997).bin" size="1048576" crc="845ed281" sha1="117bfa1c831fbcf4a1d507cb70b6e0636c29bbd3" offset="000000" />
+				<rom name="indy 500 (1997).bin" size="1048576" crc="845ed281" sha1="117bfa1c831fbcf4a1d507cb70b6e0636c29bbd3"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jeopardy" supported="no">
+	<software name="jeopardy">
 		<description>Jeopardy!</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-726" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="jeopardy! (1997).bin" size="1048576" crc="8c512912" sha1="c60ac5e59c3cc092506bc47adb60b40a9415bc97" offset="000000" />
+				<rom name="jeopardy! (1997).bin" size="1048576" crc="8c512912" sha1="c60ac5e59c3cc092506bc47adb60b40a9415bc97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,139 +134,139 @@
 		<info name="serial" value="71-735" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="lights out (1997).bin" size="32768" crc="496efa62" sha1="1d91b616caa2d35f53ec5680aada8f75e2f0ac43" offset="000000" />
+				<rom name="lights out (1997).bin" size="32768" crc="496efa62" sha1="1d91b616caa2d35f53ec5680aada8f75e2f0ac43"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="lostwrld" supported="no">
+	<software name="lostwrld">
 		<description>The Lost World - Jurassic Park</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-704" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="lost world, the - jurassic park (1997).bin" size="2097152" crc="b422c5f8" sha1="648badcac6c386d7ff40f917e34bd309e737c027" offset="000000" />
+				<rom name="lost world, the - jurassic park (1997).bin" size="2097152" crc="b422c5f8" sha1="648badcac6c386d7ff40f917e34bd309e737c027"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="monopoly" supported="no">
+	<software name="monopoly">
 		<description>Monopoly</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-752" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="monopoly (1999).bin" size="2097152" crc="d6a65a07" sha1="8057144f6995eafff6d893383114b48f4c77abc3" offset="000000" />
+				<rom name="monopoly (1999).bin" size="2097152" crc="d6a65a07" sha1="8057144f6995eafff6d893383114b48f4c77abc3"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mktrilgy" supported="no">
+	<software name="mktrilgy">
 		<description>Mortal Kombat Trilogy</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-711" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1835008">
-				<rom name="mortal kombat trilogy (1997)(midway).bin" size="1835008" crc="72893a77" sha1="d8a403a180f4a397098c8a598dd6cd5b45ef377a" offset="000000" />
+				<rom name="mortal kombat trilogy (1997)(midway).bin" size="1835008" crc="72893a77" sha1="d8a403a180f4a397098c8a598dd6cd5b45ef377a"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="quizwiz" supported="no">
+	<software name="quizwiz">
 		<description>Quiz Wiz - Cyber Trivia</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-524" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="quiz wiz - cyber trivia (1997).bin" size="1048576" crc="0e018f6a" sha1="c9c4435bdcea2b9ddaa2768f28f286abd382608d" offset="000000" />
+				<rom name="quiz wiz - cyber trivia (1997).bin" size="1048576" crc="0e018f6a" sha1="c9c4435bdcea2b9ddaa2768f28f286abd382608d"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="re2" supported="no">
+	<software name="re2">
 		<description>Resident Evil 2</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-745" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1835008">
-				<rom name="resident evil 2 (1998)(capcom).bin" size="1835008" crc="4f09457d" sha1="1d4d4ff13c8f7c228f30bddab174d4781b370ec9" offset="000000" />
+				<rom name="resident evil 2 (1998)(capcom).bin" size="1835008" crc="4f09457d" sha1="1d4d4ff13c8f7c228f30bddab174d4781b370ec9"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scrabble" supported="no">
+	<software name="scrabble">
 		<description>Scrabble</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-754" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="scrabble (1999)(hasbro - tiger electronics).bin" size="2097152" crc="4d4ad909" sha1="2735d59964fe7c1d43bd260df86b9dfbc1bfd736" offset="000000" />
+				<rom name="scrabble (1999)(hasbro - tiger electronics).bin" size="2097152" crc="4d4ad909" sha1="2735d59964fe7c1d43bd260df86b9dfbc1bfd736"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sonicjam" supported="no">
+	<software name="sonicjam">
 		<description>Sonic Jam</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-734" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="sonic jam (1998)(sega).bin" size="2097152" crc="8b4a63f9" sha1="393a98138c8825ed61990e1b15e1967f87068ac6" offset="000000" />
+				<rom name="sonic jam (1998)(sega).bin" size="2097152" crc="8b4a63f9" sha1="393a98138c8825ed61990e1b15e1967f87068ac6"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tcasino" supported="no">
+	<software name="tcasino">
 		<description>Tiger Casino</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-731" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1835008">
-				<rom name="tiger casino (1998).bin" size="1835008" crc="ba698142" sha1="32ce1be96f7f367b8a0adb8cc61a8cca7d6b79dd" offset="000000" />
+				<rom name="tiger casino (1998).bin" size="1835008" crc="ba698142" sha1="32ce1be96f7f367b8a0adb8cc61a8cca7d6b79dd"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wheelfor" supported="no">
+	<software name="wheelfor">
 		<description>Wheel of Fortune</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-523" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="wheel of fortune (1997).bin" size="524288" crc="048347a0" sha1="298c2b87754dd93481feea1d9e01585a1e269770" offset="000000" />
+				<rom name="wheel of fortune (1997).bin" size="524288" crc="048347a0" sha1="298c2b87754dd93481feea1d9e01585a1e269770"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wheelfo2" supported="no">
+	<software name="wheelfo2">
 		<description>Wheel of Fortune 2</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-527" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="wheel of fortune 2 (1998).bin" size="524288" crc="b91e2e32" sha1="30ddd349b8bdc21ef7ada4772ab1f3a9318ab0c8" offset="000000" />
+				<rom name="wheel of fortune 2 (1998).bin" size="524288" crc="b91e2e32" sha1="30ddd349b8bdc21ef7ada4772ab1f3a9318ab0c8"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="arcadecl" supported="no">
+	<software name="arcadecl">
 		<description>Williams Arcade Classics</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
 		<info name="serial" value="71-722" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="williams arcade classics (1997).bin" size="1048576" crc="f894065d" sha1="5e2164fa76546b2795af7b04a766e31784b82eca" offset="000000" />
+				<rom name="williams arcade classics (1997).bin" size="1048576" crc="f894065d" sha1="5e2164fa76546b2795af7b04a766e31784b82eca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +278,7 @@
 		<info name="serial" value="71-529" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="internet (1997)(tiger electronics).bin" size="262144" crc="7e721a84" sha1="4c6b5b91a70397cb5e1add4ab53afe3ec0fe2072" offset="000000" />
+				<rom name="internet (1997)(tiger electronics).bin" size="262144" crc="7e721a84" sha1="4c6b5b91a70397cb5e1add4ab53afe3ec0fe2072"/>
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +290,7 @@
 		<info name="serial" value="71-747" />
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="web link (1997)(tiger electronics).bin" size="262144" crc="4c13e65b" sha1="d4e08fc050c006ed6c1a177a1f4c41b4a68c26bb" offset="000000" />
+				<rom name="web link (1997)(tiger electronics).bin" size="262144" crc="4c13e65b" sha1="d4e08fc050c006ed6c1a177a1f4c41b4a68c26bb"/>
 			</dataarea>
 		</part>
 	</software>

@@ -102,22 +102,24 @@ const tiny_rom_entry *c64_multiscreen_cartridge_device::device_rom_region() cons
 }
 
 
-ADDRESS_MAP_START(c64_multiscreen_cartridge_device::multiscreen_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(MC6802P_TAG, 0)
-ADDRESS_MAP_END
+void c64_multiscreen_cartridge_device::multiscreen_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region(MC6802P_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_multiscreen_cartridge_device::device_add_mconfig)
-	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
+void c64_multiscreen_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	m6802_cpu_device &cpu(M6802(config, MC6802P_TAG, XTAL(4'000'000)));
+	cpu.set_addrmap(AS_PROGRAM, &c64_multiscreen_cartridge_device::multiscreen_mem);
 
-	MCFG_DEVICE_ADD(MC6821P_0_TAG, PIA6821, 0)
-	MCFG_DEVICE_ADD(MC6821P_1_TAG, PIA6821, 0)
-MACHINE_CONFIG_END
+	PIA6821(config, MC6821P_0_TAG, 0);
+	PIA6821(config, MC6821P_1_TAG, 0);
+}
 
 
 //**************************************************************************
@@ -160,7 +162,7 @@ void c64_multiscreen_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_multiscreen_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_multiscreen_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -197,7 +199,7 @@ uint8_t c64_multiscreen_cartridge_device::c64_cd_r(address_space &space, offs_t 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_multiscreen_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_multiscreen_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (offset >= 0x8000 && offset < 0xa000)
 	{

@@ -42,7 +42,7 @@ void ym2612_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void ym2612_device::timer_handler(int c,int count,int clock)
 {
-	if( count == 0 )
+	if( count == 0 || clock == 0 )
 	{   /* Reset FM Timer */
 		m_timer[c]->enable(false);
 	}
@@ -129,12 +129,12 @@ void ym2612_device::device_reset()
 }
 
 
-READ8_MEMBER( ym2612_device::read )
+u8 ym2612_device::read(offs_t offset)
 {
 	return ym2612_read(m_chip, offset & 3);
 }
 
-WRITE8_MEMBER( ym2612_device::write )
+void ym2612_device::write(offs_t offset, u8 data)
 {
 	ym2612_write(m_chip, offset & 3, data);
 }

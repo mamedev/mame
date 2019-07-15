@@ -38,30 +38,6 @@
 
 #pragma once
 
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MOS8722_Z80EN_CALLBACK(_write) \
-	devcb = &mos8722_device::set_z80en_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS8722_FSDIR_CALLBACK(_write) \
-	devcb = &mos8722_device::set_fsdir_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS8722_GAME_CALLBACK(_read) \
-	devcb = &mos8722_device::set_game_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_MOS8722_EXROM_CALLBACK(_read) \
-	devcb = &mos8722_device::set_exrom_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_MOS8722_SENSE40_CALLBACK(_read) \
-	devcb = &mos8722_device::set_sense40_rd_callback(*device, DEVCB_##_read);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -74,15 +50,14 @@ public:
 	// construction/destruction
 	mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_z80en_wr_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_write_z80en.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_fsdir_wr_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_write_fsdir.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_game_rd_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_read_game.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_exrom_rd_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_read_exrom.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sense40_rd_callback(device_t &device, Object &&cb) { return downcast<mos8722_device &>(device).m_read_sense40.set_callback(std::forward<Object>(cb)); }
-
+	auto z80en() { return m_write_z80en.bind(); }
+	auto fsdir() { return m_write_fsdir.bind(); }
+	auto game() { return m_read_game.bind(); }
+	auto exrom() { return m_read_exrom.bind(); }
+	auto sense40() { return m_read_sense40.bind(); }
 
 	uint8_t read(offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER( fsdir_r );
 

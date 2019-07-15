@@ -27,7 +27,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "bus/s100/s100.h"
+#include "seals8k.h"
 
 
 //**************************************************************************
@@ -51,8 +51,8 @@ protected:
 	virtual void device_start() override;
 
 	// S-100 memory access handlers
-	virtual u8 s100_smemr_r(address_space &space, offs_t offset) override;
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, u8 data) override;
+	virtual u8 s100_smemr_r(offs_t offset) override;
+	virtual void s100_mwrt_w(offs_t offset, u8 data) override;
 
 	// internal state
 	std::unique_ptr<u8[]> m_ram;
@@ -80,8 +80,10 @@ protected:
 	virtual void nvram_default() override;
 };
 
-DEFINE_DEVICE_TYPE(S100_8K_SC, s100_8k_sc_device, "s100_8k_sc", "Seals 8K SC Memory Board")
-DEFINE_DEVICE_TYPE(S100_8K_SC_BB, s100_8k_sc_bb_device, "s100_8k_sc_bb", "Seals 8K SC Memory Board with Battery Backup")
+DEFINE_DEVICE_TYPE_PRIVATE(S100_8K_SC, device_s100_card_interface, s100_8k_sc_device, "s100_8k_sc", "Seals 8K SC Memory Board")
+DEFINE_DEVICE_TYPE_PRIVATE(S100_8K_SC_BB, device_s100_card_interface, s100_8k_sc_bb_device, "s100_8k_sc_bb", "Seals 8K SC Memory Board with Battery Backup")
+template class device_finder<device_s100_card_interface, false>;
+template class device_finder<device_s100_card_interface, true>;
 
 
 //**************************************************************************
@@ -152,7 +154,7 @@ ioport_constructor s100_8k_sc_device::device_input_ports() const
 void s100_8k_sc_device::device_start()
 {
 	m_ram = make_unique_clear<u8[]>(0x2000);
-	save_pointer(NAME(m_ram.get()), 0x2000);
+	save_pointer(NAME(m_ram), 0x2000);
 }
 
 
@@ -201,12 +203,12 @@ bool s100_8k_sc_device::board_selected(offs_t offset) const
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-u8 s100_8k_sc_device::s100_smemr_r(address_space &space, offs_t offset)
+u8 s100_8k_sc_device::s100_smemr_r(offs_t offset)
 {
 	if (board_selected(offset))
 		return m_ram[offset & 0x1fff];
 	else
-		return 0;
+		return 0xff;
 }
 
 
@@ -214,7 +216,7 @@ u8 s100_8k_sc_device::s100_smemr_r(address_space &space, offs_t offset)
 //  s100_mwrt_w - memory write
 //-------------------------------------------------
 
-void s100_8k_sc_device::s100_mwrt_w(address_space &space, offs_t offset, u8 data)
+void s100_8k_sc_device::s100_mwrt_w(offs_t offset, u8 data)
 {
 	if (board_selected(offset))
 		m_ram[offset & 0x1fff] = data;

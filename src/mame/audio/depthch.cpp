@@ -83,11 +83,11 @@ WRITE8_MEMBER( vicdual_state::depthch_audio_w )
 }
 
 
-MACHINE_CONFIG_START(vicdual_state::depthch_audio)
-
+void vicdual_state::depthch_audio(machine_config &config)
+{
 	/* samples */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(depthch_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(depthch_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+}

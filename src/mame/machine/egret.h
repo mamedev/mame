@@ -17,35 +17,6 @@
 #define EGRET_341S0850  0x2200
 #define EGRET_344S0100  0x3300
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EGRET_ADD(_type) \
-	MCFG_DEVICE_ADD(EGRET_TAG, EGRET, 0) \
-	MCFG_EGRET_TYPE(_type)
-
-#define MCFG_EGRET_REPLACE(_type) \
-	MCFG_DEVICE_REPLACE(EGRET_TAG, EGRET, 0) \
-	MCFG_EGRET_TYPE(_type)
-
-#define MCFG_EGRET_TYPE(_type) \
-	egret_device::static_set_type(*device, _type);
-
-#define MCFG_EGRET_REMOVE() \
-	MCFG_DEVICE_REMOVE(EGRET_TAG)
-
-#define MCFG_EGRET_RESET_CALLBACK(_cb) \
-	devcb = &egret_device::set_reset_cb(*device, DEVCB_##_cb);
-
-#define MCFG_EGRET_LINECHANGE_CALLBACK(_cb) \
-	devcb = &egret_device::set_linechange_cb(*device, DEVCB_##_cb);
-
-#define MCFG_EGRET_VIA_CLOCK_CALLBACK(_cb) \
-	devcb = &egret_device::set_via_clock_cb(*device, DEVCB_##_cb);
-
-#define MCFG_EGRET_VIA_DATA_CALLBACK(_cb) \
-	devcb = &egret_device::set_via_data_cb(*device, DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -57,10 +28,16 @@ class egret_device :  public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
+	egret_device(const machine_config &mconfig, const char *tag, device_t *owner, int type)
+		: egret_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_type(type);
+	}
+
 	egret_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_type(device_t &device, int type);
+	void set_type(int type) { rom_offset = type; }
 
 	// device_config_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -94,10 +71,10 @@ public:
 
 	int rom_offset;
 
-	template<class _Object> static devcb_base &set_reset_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_reset.set_callback(wr); }
-	template<class _Object> static devcb_base &set_linechange_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_linechange.set_callback(wr); }
-	template<class _Object> static devcb_base &set_via_clock_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_via_clock.set_callback(wr); }
-	template<class _Object> static devcb_base &set_via_data_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_via_data.set_callback(wr); }
+	auto reset_callback() { return write_reset.bind(); }
+	auto linechange_callback() { return write_linechange.bind(); }
+	auto via_clock_callback() { return write_via_clock.bind(); }
+	auto via_data_callback() { return write_via_data.bind(); }
 
 	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
 

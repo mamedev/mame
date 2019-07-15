@@ -6,12 +6,6 @@
 
 #pragma once
 
-#define MCFG_APEXC_TAPE_READ_CB(_devcb) \
-	devcb = &apexc_cpu_device::set_tape_read_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_APEXC_TAPE_PUNCH_CB(_devcb) \
-	devcb = &apexc_cpu_device::set_tape_punch_cb(*device, DEVCB_##_devcb);
-
 enum
 {
 	APEXC_CR =1,    /* control register */
@@ -28,17 +22,9 @@ public:
 	// construction/destruction
 	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	template<class Object>
-	static devcb_base &set_tape_read_cb(device_t &device, Object &&object)
-	{
-		return downcast<apexc_cpu_device &>(device).m_tape_read_cb.set_callback(std::forward<Object>(object));
-	}
-	template<class Object>
-	static devcb_base &set_tape_punch_cb(device_t &device, Object &&object)
-	{
-		return downcast<apexc_cpu_device &>(device).m_tape_punch_cb.set_callback(std::forward<Object>(object));
-	}
+	// configuration
+	auto tape_read() { return m_tape_read_cb.bind(); }
+	auto tape_punch() { return m_tape_punch_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -58,7 +44,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	inline uint32_t apexc_readmem(uint32_t address) { return m_program->read_dword((address)<<2); }
 	inline void apexc_writemem(uint32_t address, uint32_t data) { m_program->write_dword((address)<<2, (data)); }

@@ -29,21 +29,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SAA5050_D_CALLBACK(_read) \
-	devcb = &saa5050_device::set_d_rd_callback(*device, DEVCB_##_read);
-
-
-#define MCFG_SAA5050_SCREEN_SIZE(_cols, _rows, _size) \
-	saa5050_device::static_set_screen_size(*device, _cols, _rows, _size);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -56,9 +41,9 @@ public:
 	// construction/destruction
 	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_screen_size(device_t &device, int cols, int rows, int size) { downcast<saa5050_device &>(device).m_cols = cols; downcast<saa5050_device &>(device).m_rows = rows; downcast<saa5050_device &>(device).m_size = size; }
+	void set_screen_size(int cols, int rows, int size) { m_cols = cols; m_rows = rows; m_size = size; }
 
-	template <class Object> static devcb_base &set_d_rd_callback(device_t &device, Object &&cb) { return downcast<saa5050_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
+	auto d_cb() { return m_read_d.bind(); }
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

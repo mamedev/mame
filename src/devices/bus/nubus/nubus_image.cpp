@@ -84,7 +84,7 @@ image_init_result nubus_image_device::messimg_disk_image_device::call_load()
 	m_size = (uint32_t)ftell();
 	if (m_size > (256*1024*1024))
 	{
-		printf("Mac image too large: must be 256MB or less!\n");
+		osd_printf_error("Mac image too large: must be 256MB or less!\n");
 		m_size = 0;
 		return image_init_result::FAIL;
 	}
@@ -130,9 +130,10 @@ DEFINE_DEVICE_TYPE(NUBUS_IMAGE, nubus_image_device, "nb_image", "NuBus Disk Imag
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_image_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(IMAGE_DISK0_TAG, MESSIMG_DISK, 0)
-MACHINE_CONFIG_END
+void nubus_image_device::device_add_mconfig(machine_config &config)
+{
+	MESSIMG_DISK(config, IMAGE_DISK0_TAG, 0);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -172,8 +173,6 @@ void nubus_image_device::device_start()
 	uint32_t slotspace;
 	uint32_t superslotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, IMAGE_ROM_REGION);
 
 	slotspace = get_slotspace();
@@ -181,13 +180,13 @@ void nubus_image_device::device_start()
 
 //  printf("[image %p] slotspace = %x, super = %x\n", this, slotspace, superslotspace);
 
-	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_image_device::image_r), this), write32_delegate(FUNC(nubus_image_device::image_w), this));
-	m_nubus->install_device(slotspace+4, slotspace+7, read32_delegate(FUNC(nubus_image_device::image_status_r), this), write32_delegate(FUNC(nubus_image_device::image_status_w), this));
-	m_nubus->install_device(slotspace+8, slotspace+11, read32_delegate(FUNC(nubus_image_device::file_cmd_r), this), write32_delegate(FUNC(nubus_image_device::file_cmd_w), this));
-	m_nubus->install_device(slotspace+12, slotspace+15, read32_delegate(FUNC(nubus_image_device::file_data_r), this), write32_delegate(FUNC(nubus_image_device::file_data_w), this));
-	m_nubus->install_device(slotspace+16, slotspace+19, read32_delegate(FUNC(nubus_image_device::file_len_r), this), write32_delegate(FUNC(nubus_image_device::file_len_w), this));
-	m_nubus->install_device(slotspace+20, slotspace+147, read32_delegate(FUNC(nubus_image_device::file_name_r), this), write32_delegate(FUNC(nubus_image_device::file_name_w), this));
-	m_nubus->install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32_delegate(FUNC(nubus_image_device::image_super_r), this), write32_delegate(FUNC(nubus_image_device::image_super_w), this));
+	nubus().install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_image_device::image_r), this), write32_delegate(FUNC(nubus_image_device::image_w), this));
+	nubus().install_device(slotspace+4, slotspace+7, read32_delegate(FUNC(nubus_image_device::image_status_r), this), write32_delegate(FUNC(nubus_image_device::image_status_w), this));
+	nubus().install_device(slotspace+8, slotspace+11, read32_delegate(FUNC(nubus_image_device::file_cmd_r), this), write32_delegate(FUNC(nubus_image_device::file_cmd_w), this));
+	nubus().install_device(slotspace+12, slotspace+15, read32_delegate(FUNC(nubus_image_device::file_data_r), this), write32_delegate(FUNC(nubus_image_device::file_data_w), this));
+	nubus().install_device(slotspace+16, slotspace+19, read32_delegate(FUNC(nubus_image_device::file_len_r), this), write32_delegate(FUNC(nubus_image_device::file_len_w), this));
+	nubus().install_device(slotspace+20, slotspace+147, read32_delegate(FUNC(nubus_image_device::file_name_r), this), write32_delegate(FUNC(nubus_image_device::file_name_w), this));
+	nubus().install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32_delegate(FUNC(nubus_image_device::image_super_r), this), write32_delegate(FUNC(nubus_image_device::image_super_w), this));
 
 	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
 
@@ -249,10 +248,6 @@ READ32_MEMBER( nubus_image_device::image_super_r )
 
 WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 {
-	const osd::directory::entry *dp;
-	char fullpath[1024];
-	uint64_t filesize;
-
 //  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.curcmd = data;
 	switch(data) {
@@ -271,7 +266,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		filectx.dirp = osd::directory::open((const char *)filectx.curdir);
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
-			dp = filectx.dirp->read();
+			osd::directory::entry const *const dp = filectx.dirp->read();
 			if(dp) {
 				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
 			} else {
@@ -283,20 +278,29 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		}
 		break;
 	case kFileCmdGetFile:
-		memset(fullpath, 0, sizeof(fullpath));
-		strcpy(fullpath, (const char *)filectx.curdir);
-		strcat(fullpath, "/");
-		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_file::open(std::string(fullpath), OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE) printf("Error opening %s\n", fullpath);
-		filectx.bytecount = 0;
+		{
+			std::string fullpath;
+			fullpath.reserve(1024);
+			fullpath.assign((const char *)filectx.curdir);
+			fullpath.append(PATH_SEPARATOR);
+			fullpath.append((const char*)filectx.filename);
+			if(osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
+				osd_printf_error("Error opening %s\n", fullpath.c_str());
+			filectx.bytecount = 0;
+		}
 		break;
 	case kFileCmdPutFile:
-		memset(fullpath, 0, sizeof(fullpath));
-		strcpy(fullpath, (const char *)filectx.curdir);
-		strcat(fullpath, "/");
-		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_file::open(std::string(fullpath), OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE) printf("Error opening %s\n", fullpath);
-		filectx.bytecount = 0;
+		{
+			std::string fullpath;
+			fullpath.reserve(1024);
+			fullpath.assign((const char *)filectx.curdir);
+			fullpath.append(PATH_SEPARATOR);
+			fullpath.append((const char*)filectx.filename);
+			uint64_t filesize; // unused, but it's an output from the open call
+			if(osd_file::open(fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE)
+				osd_printf_error("Error opening %s\n", fullpath.c_str());
+			filectx.bytecount = 0;
+		}
 		break;
 	}
 }

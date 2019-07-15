@@ -38,6 +38,8 @@ luafilesystem - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lzma - [The GNU Lesser General Public License](http://opensource.org/licenses/LGPL-2.1)
 
+minimp3 - [Creative Commons Zero v1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
+
 nanosvg - [zlib license](http://opensource.org/licenses/Zlib)
 
 portaudio - [The MIT License (MIT)](http://opensource.org/licenses/MIT) explanation at [their site](http://www.portaudio.com/license.html)
@@ -55,6 +57,8 @@ softfloat - [U.C. Berkeley open-source license](https://github.com/mamedev/mame/
 sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 sqlite3 - Public Domain
+
+tap-windows6 - [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)
 
 winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 

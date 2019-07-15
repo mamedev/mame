@@ -2,7 +2,7 @@
 // copyright-holders:James Wallace
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-// steppers.c steppermotor emulation                                     //
+// steppers.cpp steppermotor emulation                                   //
 //                                                                       //
 // Emulates : stepper motors driven with full step or half step          //
 //            also emulates the index optic                              //
@@ -17,7 +17,7 @@
 
 #pragma once
 
-#define NOT_A_REEL              0
+#define BASIC_STEPPER           0
 #define STARPOINT_48STEP_REEL   1           /* STARPOINT RMXXX reel unit */
 #define STARPOINT_144STEP_DICE  2           /* STARPOINT 1DCU DICE mechanism */
 #define STARPOINT_200STEP_REEL  3
@@ -33,117 +33,34 @@
 
 #define PROJECT_48STEP_REEL     10
 
-#define MCFG_STEPPER_ADD(_tag)\
-	MCFG_DEVICE_ADD(_tag, STEPPER, 0)
-
-#define MCFG_STEPPER_REEL_TYPE(_data) \
-	stepper_device::set_reel_type(*device, _data);
-
-/* total size of reel (in half steps) */
-#define MCFG_STEPPER_MAX_STEPS(_write) \
-	stepper_device::set_max_steps(*device, _write);
-
-/* start position of index (in half steps) */
-#define MCFG_STEPPER_START_INDEX(_write) \
-	stepper_device::set_start_index(*device, _write);
-
-/* end position of index (in half steps) */
-#define MCFG_STEPPER_END_INDEX(_write) \
-	stepper_device::set_end_index(*device, _write);
-
-/* end position of index (in half steps) */
-#define MCFG_STEPPER_INDEX_PATTERN(_write) \
-	stepper_device::set_index_pattern(*device, _write);
-
-/* Phase at 0, for opto linkage */
-#define MCFG_STEPPER_INIT_PHASE(_write) \
-	stepper_device::set_init_phase(*device, _write);
-
-#define MCFG_STARPOINT_48STEP_ADD(_tag)\
-	MCFG_STEPPER_ADD(_tag)\
-	MCFG_STEPPER_REEL_TYPE(STARPOINT_48STEP_REEL)\
-	MCFG_STEPPER_START_INDEX(1)\
-	MCFG_STEPPER_END_INDEX(3)\
-	MCFG_STEPPER_INDEX_PATTERN(0x09)\
-	MCFG_STEPPER_INIT_PHASE(4)
-
-#define MCFG_STARPOINT_RM20_48STEP_ADD(_tag)\
-	MCFG_DEVICE_ADD(_tag, STEPPER, 0)\
-	MCFG_STEPPER_REEL_TYPE(STARPOINT_48STEP_REEL)\
-	MCFG_STEPPER_START_INDEX(16)\
-	MCFG_STEPPER_END_INDEX(24)\
-	MCFG_STEPPER_INDEX_PATTERN(0x09)\
-	MCFG_STEPPER_INIT_PHASE(7)
-
-#define MCFG_STARPOINT_200STEP_ADD(_tag)\
-	MCFG_DEVICE_ADD(_tag, STEPPER, 0)\
-	MCFG_STEPPER_REEL_TYPE(STARPOINT_200STEP_REEL)\
-	MCFG_STEPPER_MAX_STEPS(200*2)\
-	MCFG_STEPPER_START_INDEX(12)\
-	MCFG_STEPPER_END_INDEX(24)\
-	MCFG_STEPPER_INDEX_PATTERN(0x09)\
-	MCFG_STEPPER_INIT_PHASE(7)
-
-//guess
-#define MCFG_ECOIN_200STEP_ADD(_tag)\
-	MCFG_DEVICE_ADD(_tag, STEPPER, 0)\
-	MCFG_STEPPER_REEL_TYPE(ECOIN_200STEP_REEL)\
-	MCFG_STEPPER_MAX_STEPS(200*2)\
-	MCFG_STEPPER_START_INDEX(12)\
-	MCFG_STEPPER_END_INDEX(24)\
-	MCFG_STEPPER_INDEX_PATTERN(0x09)\
-	MCFG_STEPPER_INIT_PHASE(7)
-
-#define MCFG_STEPPER_OPTIC_CALLBACK(_write) \
-	devcb = &stepper_device::set_optic_handler(*device, DEVCB_##_write);
-
-DECLARE_DEVICE_TYPE(STEPPER, stepper_device)
 
 class stepper_device : public device_t
 {
 public:
-	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <class Object> static devcb_base &set_optic_handler(device_t &device, Object &&cb) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(std::forward<Object>(cb)); }
-
-	static void set_reel_type(device_t &device, uint8_t type)
+	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t init_phase)
+		: stepper_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		downcast<stepper_device &>(device).m_type = type;
-		switch ( type )
-		{
-		default:
-		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
-		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
-		case MPU3_48STEP_REEL :
-		case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
-		case PROJECT_48STEP_REEL :
-			downcast<stepper_device &>(device).m_max_steps = (48*2);
-			break;
-		case GAMESMAN_100STEP_REEL :
-			downcast<stepper_device &>(device).m_max_steps = (100*2);
-			break;
-		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
-			//Dice reels are 48 step motors, but complete three full cycles between opto updates
-			downcast<stepper_device &>(device).m_max_steps = ((48*3)*2);
-			break;
-		case STARPOINT_200STEP_REEL :
-		case GAMESMAN_200STEP_REEL :
-		case ECOIN_200STEP_REEL :
-			downcast<stepper_device &>(device).m_max_steps = (200*2);
-			break;
-		}
+		set_init_phase(init_phase);
 	}
 
-	static void set_max_steps(device_t &device, int16_t steps) { downcast<stepper_device &>(device).m_max_steps = steps; }
-	static void set_start_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_start = index; }
-	static void set_end_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_end = index; }
-	static void set_index_pattern(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_patt = index; }
-	static void set_init_phase(device_t &device, uint8_t phase)
-	{
-		downcast<stepper_device &>(device).m_initphase = phase;
-		downcast<stepper_device &>(device).m_phase = phase;
-		downcast<stepper_device &>(device).m_old_phase = phase;
-	}
+	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto optic_handler() { return m_optic_cb.bind(); }
+
+	/* total size of reel (in half steps) */
+	void set_max_steps(int16_t steps) { m_max_steps = steps; }
+
+	/* start position of index (in half steps) */
+	void set_start_index(int16_t index) { m_index_start = index; }
+
+	/* end position of index (in half steps) */
+	void set_end_index(int16_t index) { m_index_end = index; }
+
+	/* end position of index (in half steps) */
+	void set_index_pattern(int16_t index) { m_index_patt = index; }
+
+	/* Phase at 0, for opto linkage */
+	void set_init_phase(uint8_t phase) { m_initphase = phase; m_phase = phase; m_old_phase = phase; }
 
 	/* update a motor */
 	int update(uint8_t pattern);
@@ -156,17 +73,17 @@ public:
 	int get_max()               { return m_max_steps; }
 
 protected:
+	stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
 	uint8_t m_pattern;      /* coil pattern */
 	uint8_t m_old_pattern;  /* old coil pattern */
 	uint8_t m_initphase;
 	uint8_t m_phase;        /* motor phase */
 	uint8_t m_old_phase;    /* old phase */
-	uint8_t m_type;         /* reel type */
 	int16_t m_step_pos;     /* step position 0 - max_steps */
 	int16_t m_max_steps;    /* maximum step position */
 	int32_t m_abs_step_pos; /* absolute step position */
@@ -176,7 +93,54 @@ private:
 	uint8_t m_optic;
 
 	void update_optic();
+	virtual void advance_phase();
 	devcb_write_line m_optic_cb;
 };
+
+class reel_device : public stepper_device
+{
+public:
+	reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t type, int16_t start_index, int16_t end_index
+		, int16_t index_pattern, uint8_t init_phase, int16_t max_steps = 48*2);
+
+	reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void advance_phase() override;
+
+	void set_reel_type(uint8_t type)
+	{
+		m_type = type;
+		switch ( type )
+		{
+		default:
+		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
+		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
+		case MPU3_48STEP_REEL :
+		case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
+		case PROJECT_48STEP_REEL :
+			m_max_steps = (48*2);
+			break;
+		case GAMESMAN_100STEP_REEL :
+			m_max_steps = (100*2);
+			break;
+		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
+			//Dice reels are 48 step motors, but complete three full cycles between opto updates
+			m_max_steps = ((48*3)*2);
+			break;
+		case STARPOINT_200STEP_REEL :
+		case GAMESMAN_200STEP_REEL :
+		case ECOIN_200STEP_REEL :
+			m_max_steps = (200*2);
+			break;
+		}
+	}
+
+	uint8_t m_type;         /* reel type */
+};
+
+DECLARE_DEVICE_TYPE(STEPPER, stepper_device)
+DECLARE_DEVICE_TYPE(REEL, reel_device)
 
 #endif // MAME_MACHINE_STEPPERS_H

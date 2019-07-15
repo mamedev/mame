@@ -14,8 +14,7 @@
 #include "emuopts.h"
 #include "hash.h"
 #include "drivenum.h"
-#define PUGIXML_HEADER_ONLY
-#include "pugixml/src/pugixml.hpp"
+#include <pugixml.hpp>
 
 /*-------------------------------------------------
     hashfile_lookup

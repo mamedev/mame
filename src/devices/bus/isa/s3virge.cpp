@@ -56,7 +56,7 @@ void s3virge_vga_device::device_start()
 	int x;
 	int i;
 	for (i = 0; i < 0x100; i++)
-		m_palette->set_pen_color(i, 0, 0, 0);
+		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;

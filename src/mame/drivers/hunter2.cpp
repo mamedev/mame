@@ -29,7 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/hd61830.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -50,6 +50,14 @@ public:
 		, m_bank3(*this, "bank3")
 	{ }
 
+	void hunter2(machine_config &config);
+
+	void init_hunter2();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(serial_dsr_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -62,21 +70,19 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(irqctrl_w);
 	DECLARE_WRITE8_MEMBER(memmap_w);
-	DECLARE_PALETTE_INIT(hunter2);
-	DECLARE_DRIVER_INIT(hunter2);
+	void hunter2_palette(palette_device &palette) const;
+
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 	DECLARE_WRITE_LINE_MEMBER(timer1_out);
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
-	void hunter2(machine_config &config);
 	void hunter2_banked_mem(address_map &map);
 	void hunter2_io(address_map &map);
 	void hunter2_mem(address_map &map);
-private:
+
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<rs232_port_device> m_rs232;
@@ -88,37 +94,40 @@ private:
 	required_device<address_map_bank_device> m_bank3;
 };
 
-ADDRESS_MAP_START(hunter2_state::hunter2_banked_mem)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("roms", 0x0000)
-	AM_RANGE(0x30000, 0x3ffff) AM_NOP
-	AM_RANGE(0x40000, 0xfffff) AM_RAM AM_REGION("rams", 0x0000)
-ADDRESS_MAP_END
+void hunter2_state::hunter2_banked_mem(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom().region("roms", 0x0000);
+	map(0x30000, 0x3ffff).noprw();
+	map(0x40000, 0xfffff).ram().region("rams", 0x0000);
+}
 
-ADDRESS_MAP_START(hunter2_state::hunter2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank3", address_map_bank_device, read8, write8)
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void hunter2_state::hunter2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rw(m_bank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).rw(m_bank2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0xbfff).rw(m_bank3, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(hunter2_state::hunter2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
-	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(display_ctrl_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(serial_tx_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(serial_dtr_w)
-	AM_RANGE(0x84, 0x84) AM_WRITE(serial_rts_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(speaker_w)
-	AM_RANGE(0xbb, 0xbb) AM_WRITE(irqctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(memmap_w)
-ADDRESS_MAP_END
+void hunter2_state::hunter2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x1f).rw("iotimer", FUNC(nsc810_device::read), FUNC(nsc810_device::write));
+	map(0x20, 0x20).w("lcdc", FUNC(hd61830_device::data_w));
+	map(0x21, 0x21).rw("lcdc", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
+	map(0x3e, 0x3e).r("lcdc", FUNC(hd61830_device::data_r));
+	map(0x40, 0x4f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
+	map(0x60, 0x60).w(FUNC(hunter2_state::display_ctrl_w));
+	map(0x80, 0x80).w(FUNC(hunter2_state::port80_w));
+	map(0x81, 0x81).w(FUNC(hunter2_state::serial_tx_w));
+	map(0x82, 0x82).w(FUNC(hunter2_state::serial_dtr_w));
+	map(0x84, 0x84).w(FUNC(hunter2_state::serial_rts_w));
+	map(0x86, 0x86).w(FUNC(hunter2_state::speaker_w));
+	map(0xbb, 0xbb).w(FUNC(hunter2_state::irqctrl_w));
+	map(0xe0, 0xe0).w(FUNC(hunter2_state::memmap_w));
+}
 
 
 /* Input ports */
@@ -329,14 +338,14 @@ void hunter2_state::machine_reset()
 }
 
 // it is presumed that writing to rom will go nowhere
-DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
+void hunter2_state::init_hunter2()
 {
 	uint8_t *ram = m_ram->base();
 
 	m_nvram->set_base(ram,m_ram->bytes());
 }
 
-PALETTE_INIT_MEMBER(hunter2_state, hunter2)
+void hunter2_state::hunter2_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -345,7 +354,7 @@ PALETTE_INIT_MEMBER(hunter2_state, hunter2)
 WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 {
 	if(state == ASSERT_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(hunter2_state::timer1_out)
@@ -369,70 +378,54 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(hunter2_state::hunter2)
+void hunter2_state::hunter2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
-	MCFG_CPU_IO_MAP(hunter2_io)
+	NSC800(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hunter2_state::hunter2_mem);
+	m_maincpu->set_addrmap(AS_IO, &hunter2_state::hunter2_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(240, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
+	screen.set_size(240, 128);
+	screen.set_visarea(0, 239, 0, 63);
+	screen.set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
-	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL(4'915'200)/2/2) // unknown clock
-	MCFG_VIDEO_SET_SCREEN("screen")
+	PALETTE(config, "palette", FUNC(hunter2_state::hunter2_palette), 2);
+	hd61830_device &hd61830(HD61830(config, "lcdc", XTAL(4'915'200)/2/2)); // unknown clock
+	hd61830.set_screen("screen");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
-	// this is all a guess
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	mm58274c_device &rtc(MM58274C(config, "rtc", 0));
+	// this is all guess
+	rtc.set_mode24(0); // 12 hour
+	rtc.set_day1(1);   // monday
 
-	MCFG_NSC810_ADD("iotimer",XTAL(4'000'000),XTAL(4'000'000))
-	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,keyboard_r))
-	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,serial_dsr_r))
-	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,keyboard_w))
-	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,serial_rx_r))
-	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
-	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
+	nsc810_device &iotimer(NSC810(config, "iotimer", 0, XTAL(4'000'000), XTAL(4'000'000)));
+	iotimer.portA_read_callback().set(FUNC(hunter2_state::keyboard_r));
+	iotimer.portB_read_callback().set(FUNC(hunter2_state::serial_dsr_r));
+	iotimer.portB_write_callback().set(FUNC(hunter2_state::keyboard_w));
+	iotimer.portC_read_callback().set(FUNC(hunter2_state::serial_rx_r));
+	iotimer.timer0_callback().set(FUNC(hunter2_state::timer0_out));
+	iotimer.timer1_callback().set(FUNC(hunter2_state::timer1_out));
 
-	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->cts_handler().set(FUNC(hunter2_state::cts_w));
+	m_rs232->rxd_handler().set(FUNC(hunter2_state::rxd_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-MACHINE_CONFIG_END
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank2").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank3").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank4").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+}
 
 /* ROM definition */
 ROM_START( hunter2 )
@@ -446,5 +439,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE           INIT      COMPANY   FULLNAME   FLAGS
-COMP( 1981, hunter2, 0,      0,       hunter2,   hunter2, hunter2_state,  hunter2,  "Husky", "Hunter 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
+COMP( 1981, hunter2, 0,      0,      hunter2, hunter2, hunter2_state, init_hunter2, "Husky", "Hunter 2", MACHINE_NOT_WORKING )

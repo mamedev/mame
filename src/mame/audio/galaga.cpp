@@ -127,7 +127,7 @@ static const discrete_mixer_desc bosco_final_mixer =
 	462000          /* gain */
 };
 
-DISCRETE_SOUND_START(bosco)
+DISCRETE_SOUND_START(bosco_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -307,7 +307,7 @@ static const discrete_mixer_desc galaga_final_mixer =
 	40800,          /* gain */
 };
 
-DISCRETE_SOUND_START(galaga)
+DISCRETE_SOUND_START(galaga_discrete)
 
 	/************************************************
 	 * Input register mapping

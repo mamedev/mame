@@ -6,19 +6,14 @@
 #pragma once
 
 
-#define MCFG_K054000_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K054000, 0)
-
 class k054000_device : public device_t
 {
 public:
 	k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k054000_device() {}
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( lsb_w );
-	DECLARE_READ16_MEMBER( lsb_r );
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 protected:
 	// device-level overrides

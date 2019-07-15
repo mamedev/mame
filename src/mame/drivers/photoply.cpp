@@ -7,6 +7,7 @@ Photo Play (c) 199? Funworld
 Preliminary driver by Angelo Salese
 
 TODO:
+- BIOS CMOS doesn't save at all (needed for setting up the Hard Disk);
 - DISK BOOT FAILURE after eeprom checking (many unknown IDE cs1 reads/writes);
 - partition boot sector is missing from the CHD dump, protection?
 - Detects CPU type as "-S 16 MHz"? Sometimes it detects it as 486SX, unknown repro (after fiddling with CMOS settings anyway)
@@ -40,12 +41,15 @@ public:
 	{
 	}
 
+	void photoply(machine_config &config);
+
+private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	required_region_ptr<uint8_t> m_main_bios;
 	required_region_ptr<uint8_t> m_video_bios;
 	required_region_ptr<uint8_t> m_ex_bios;
-	
+
 	uint8_t *m_shadow_ram;
 
 	DECLARE_READ8_MEMBER(bios_r);
@@ -53,23 +57,23 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	uint16_t m_pci_shadow_reg;
-	DECLARE_DRIVER_INIT(photoply);
-	void photoply(machine_config &config);
 
 	void photoply_io(address_map &map);
 	void photoply_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	uint32_t sis_pcm_r(int function, int reg, uint32_t mem_mask);
+	void sis_pcm_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 // regs 0x00-0x3f both devices below
 // regs 0x40-0x7f SiS85C496 PCI & CPU Memory Controller (PCM)
 // regs 0x80-0xff SiS85C497 AT Bus Controller & Megacell (ATM)
-static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
+uint32_t photoply_state::sis_pcm_r(int function, int reg, uint32_t mem_mask)
 {
 	uint32_t r = 0;
-	photoply_state *state = busdevice->machine().driver_data<photoply_state>();
 
 	//printf("PCM %02x %08x\n",reg,mem_mask);
 	if(reg == 0)
@@ -77,13 +81,13 @@ static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, i
 		// Device ID / Vendor ID
 		return 0x04961039;
 	}
-	
+
 	if(reg == 8)
 	{
 		// Device Class Code / Device Revision Identification
 		return 0x06000002;
 	}
-	
+
 	// Device Header Type
 	if(reg == 0xc)
 		return 0;
@@ -92,21 +96,19 @@ static uint32_t sis_pcm_r(device_t *busdevice, device_t *device, int function, i
 	{
 
 		if(ACCESSING_BITS_8_15) // reg 0x45
-			r |= (state->m_pci_shadow_reg & 0xff00);
+			r |= (m_pci_shadow_reg & 0xff00);
 		if(ACCESSING_BITS_0_7) // reg 0x44
-			r |= (state->m_pci_shadow_reg & 0x00ff);
+			r |= (m_pci_shadow_reg & 0x00ff);
 	}
 	return r;
 }
 
-static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
+void photoply_state::sis_pcm_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	photoply_state *state = busdevice->machine().driver_data<photoply_state>();
-
 	if(reg == 0x44)
 	{
 
-		/* 
+		/*
 		 * reg 0x45
 		 * shadow RAM control
 		 * xxxx ---- <reserved>
@@ -116,8 +118,8 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 * ---- ---x Shadow RAM Write Control (0=Enable)
 		 */
 		if(ACCESSING_BITS_8_15)
-			state->m_pci_shadow_reg = (data & 0xff00) | (state->m_pci_shadow_reg & 0x00ff);
-		
+			m_pci_shadow_reg = (data & 0xff00) | (m_pci_shadow_reg & 0x00ff);
+
 		/*
 		 * shadow RAM enable:
 		 * bit 7: 0xf8000-0xfffff shadow RAM enable
@@ -125,18 +127,18 @@ static void sis_pcm_w(device_t *busdevice, device_t *device, int function, int r
 		 * bit 0: 0xc0000-0xc7fff shadow RAM enable
 		 */
 		if(ACCESSING_BITS_0_7) // reg 0x44
-			state->m_pci_shadow_reg = (data & 0x00ff) | (state->m_pci_shadow_reg & 0xff00);
-			
-		//printf("%04x\n",state->m_pci_shadow_reg);
+			m_pci_shadow_reg = (data & 0x00ff) | (m_pci_shadow_reg & 0xff00);
+
+		//printf("%04x\n",m_pci_shadow_reg);
 	}
 }
 
 READ8_MEMBER(photoply_state::bios_r)
 {
 	uint8_t bit_mask = (offset & 0x38000) >> 15;
-	
+
 	if((m_pci_shadow_reg & 0x200) == 0x200)
-	{	
+	{
 		if(m_pci_shadow_reg & (1 << bit_mask))
 			return m_shadow_ram[offset];
 	}
@@ -168,7 +170,7 @@ READ8_MEMBER(photoply_state::bios_r)
 
 WRITE8_MEMBER(photoply_state::bios_w)
 {
-//	return m_bios[offset];
+//  return m_bios[offset];
 
 	if((m_pci_shadow_reg & 0x100) == 0)
 	{
@@ -190,37 +192,39 @@ WRITE8_MEMBER(photoply_state::eeprom_w)
 	// Bits 4-7 are set for some writes, but may do nothing?
 }
 
-ADDRESS_MAP_START(photoply_state::photoply_map)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, mem_r, mem_w, 0xffffffff)
-//	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-//	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
-	AM_RANGE(0x000c0000, 0x000fffff) AM_READWRITE8(bios_r,bios_w,0xffffffff)
-	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 64MB RAM, guess!
-	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void photoply_state::photoply_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5446_device::mem_r), FUNC(cirrus_gd5446_device::mem_w));
+//  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
+//  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
+	map(0x000c0000, 0x000fffff).rw(FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
+	map(0x00100000, 0x07ffffff).ram(); // 64MB RAM, guess!
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
+}
 
 
 
-ADDRESS_MAP_START(photoply_state::photoply_io)
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e8, 0x00eb) AM_NOP
+void photoply_state::photoply_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e8, 0x00eb).noprw();
 
-	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0200, 0x0203) AM_WRITE8(eeprom_w, 0x00ff0000)
-//	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
-	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
-//	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0202, 0x0202).w(FUNC(photoply_state::eeprom_w));
+//  AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+//  AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
+	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
 
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
-	
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 
-ADDRESS_MAP_END
+	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
@@ -229,8 +233,16 @@ static INPUT_PORTS_START( photoply )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
-	AT_KEYB_HELPER( 0x0004, "1",            KEYCODE_1           ) 
-	AT_KEYB_HELPER( 0x0008, "2",            KEYCODE_2           ) 
+	AT_KEYB_HELPER( 0x0004, "1",            KEYCODE_1           )
+	AT_KEYB_HELPER( 0x0008, "2",            KEYCODE_2           )
+	AT_KEYB_HELPER( 0x0010, "3",            KEYCODE_3           )
+	AT_KEYB_HELPER( 0x0020, "4",            KEYCODE_4           )
+	AT_KEYB_HELPER( 0x0040, "5",            KEYCODE_5           )
+	AT_KEYB_HELPER( 0x0080, "6",            KEYCODE_6           )
+	AT_KEYB_HELPER( 0x0100, "7",            KEYCODE_7           )
+	AT_KEYB_HELPER( 0x0200, "8",            KEYCODE_8           )
+	AT_KEYB_HELPER( 0x0400, "9",            KEYCODE_9           )
+	AT_KEYB_HELPER( 0x0800, "0",            KEYCODE_0           )
 
 	PORT_START("pc_keyboard_1")
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
@@ -283,42 +295,43 @@ static const gfx_layout CGA_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( photoply )
+static GFXDECODE_START( gfx_photoply )
 	GFXDECODE_ENTRY( "video_bios", 0x6000+0xa5*8+7, CGA_charlayout,              0, 256 )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 
-MACHINE_CONFIG_START(photoply_state::photoply)
+void photoply_state::photoply(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486DX4, 75000000) /* I486DX4, 75 or 100 Mhz */
-	MCFG_CPU_PROGRAM_MAP(photoply_map)
-	MCFG_CPU_IO_MAP(photoply_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	I486DX4(config, m_maincpu, 75000000); /* I486DX4, 75 or 100 Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &photoply_state::photoply_map);
+	m_maincpu->set_addrmap(AS_IO, &photoply_state::photoply_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", photoply )
+	GFXDECODE(config, "gfxdecode", "vga", gfx_photoply);
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(5, nullptr, sis_pcm_r, sis_pcm_w)
-	
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5446_device, screen_update)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (5, FUNC(photoply_state::sis_pcm_r), this);
+	pcibus.set_device_write(5, FUNC(photoply_state::sis_pcm_w), this);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5446_device::screen_update));
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
-	MCFG_EEPROM_ERASE_ALL_TIME(attotime::from_usec(10))
-MACHINE_CONFIG_END
+	CIRRUS_GD5446(config, "vga", 0).set_screen("screen");
+
+	EEPROM_93C46_16BIT(config, "eeprom")
+		.write_time(attotime::from_usec(1))
+		.erase_all_time(attotime::from_usec(10));
+}
 
 
 ROM_START(photoply)
@@ -327,9 +340,9 @@ ROM_START(photoply)
 
 	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) /* multifunction board with a ESS AudioDrive chip,  M27128A */
 	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
-//	ROM_RELOAD(                   0x004000, 0x4000 )
-//	ROM_RELOAD(                   0x008000, 0x4000 )
-//	ROM_RELOAD(                   0x00c000, 0x4000 )
+//  ROM_RELOAD(                   0x004000, 0x4000 )
+//  ROM_RELOAD(                   0x008000, 0x4000 )
+//  ROM_RELOAD(                   0x00c000, 0x4000 )
 
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
@@ -338,8 +351,25 @@ ROM_START(photoply)
 	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(photoply_state,photoply)
-{
-}
+// bios not provided, might be different
+ROM_START(photoply2k4)
+	ROM_REGION(0x20000, "bios", 0)  /* motherboard bios */
+	ROM_LOAD("award bootblock bios v1.0.bin", 0x000000, 0x20000, BAD_DUMP CRC(e96d1bbc) SHA1(64d0726c4e9ecee8fddf4cc39d92aecaa8184d5c) )
 
-GAME( 199?, photoply,  0,   photoply, photoply, photoply_state, photoply, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+	ROM_REGION(0x8000, "ex_bios", ROMREGION_ERASE00 ) /* multifunction board with a ESS AudioDrive chip,  M27128A */
+	ROM_LOAD("enhanced bios.bin", 0x000000, 0x4000, BAD_DUMP CRC(a216404e) SHA1(c9067cf87d5c8106de00866bb211eae3a6c02c65) )
+//  ROM_RELOAD(                   0x004000, 0x4000 )
+//  ROM_RELOAD(                   0x008000, 0x4000 )
+//  ROM_RELOAD(                   0x00c000, 0x4000 )
+
+	ROM_REGION(0x8000, "video_bios", 0 )
+	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) BAD_DUMP SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+//  CYLS:1023,HEADS:64,SECS:63,BPS:512.
+	DISK_IMAGE( "pp2004", 0, SHA1(a3f8861cf91cf7e7446ec931f812e774ada20802) )
+ROM_END
+
+
+GAME( 199?, photoply,     0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2000 (v2.01)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, photoply2k4,  0,  photoply, photoply, photoply_state, empty_init, ROT0, "Funworld", "Photo Play 2004", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_UNEMULATED_PROTECTION )

@@ -145,7 +145,7 @@ struct copy_info_t
 	copy_info_t           *next;
 };
 
-/* sdl_info is the information about SDL for the current screen */
+/* renderer_sdl2 is the information about SDL for the current screen */
 class renderer_sdl2 : public osd_renderer
 {
 public:

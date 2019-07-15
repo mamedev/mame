@@ -10,37 +10,35 @@
 
 #pragma once
 
-#define MCFG_S24TILE_DEVICE_ADD(_tag, tile_mask) \
-	MCFG_DEVICE_ADD(_tag, S24TILE, 0) \
-	segas24_tile_device::static_set_tile_mask(*device, tile_mask);
-
-#define MCFG_S24SPRITE_DEVICE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, S24SPRITE, 0)
-
-#define MCFG_S24MIXER_DEVICE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, S24MIXER, 0)
-
-
-#define MCFG_S24TILE_DEVICE_PALETTE(_palette_tag) \
-	MCFG_GFX_PALETTE(_palette_tag)
 
 class segas24_tile_device : public device_t, public device_gfx_interface
 {
 	friend class segas24_tile_config;
 
 public:
+	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint16_t _tile_mask)
+		: segas24_tile_device(mconfig, tag, owner, clock)
+	{
+		set_tile_mask(_tile_mask);
+	}
+
 	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_tile_mask(device_t &device, uint16_t tile_mask);
+	// configuration
+	void set_tile_mask(uint16_t _tile_mask) { tile_mask = _tile_mask; }
 
 	DECLARE_READ16_MEMBER(tile_r);
 	DECLARE_WRITE16_MEMBER(tile_w);
 	DECLARE_READ16_MEMBER(char_r);
 	DECLARE_WRITE16_MEMBER(char_w);
+	DECLARE_WRITE16_MEMBER(xhout_w);
+	DECLARE_WRITE16_MEMBER(xvout_w);
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
+
+	auto xhout_write_callback() { return m_xhout_write_cb.bind(); }
+	auto xvout_write_callback() { return m_xvout_write_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -71,6 +69,9 @@ private:
 
 	template<class _BitmapClass>
 	void draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
+
+	devcb_write16 m_xhout_write_cb;
+	devcb_write16 m_xvout_write_cb;
 };
 
 class segas24_sprite_device : public device_t

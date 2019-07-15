@@ -30,10 +30,11 @@ DEFINE_DEVICE_TYPE(C64_EASYFLASH, c64_easyflash_cartridge_device, "c64_easyflash
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_easyflash_cartridge_device::device_add_mconfig)
-	MCFG_AMD_29F040_ADD(AM29F040_0_TAG)
-	MCFG_AMD_29F040_ADD(AM29F040_1_TAG)
-MACHINE_CONFIG_END
+void c64_easyflash_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	AMD_29F040(config, AM29F040_0_TAG);
+	AMD_29F040(config, AM29F040_1_TAG);
+}
 
 
 //-------------------------------------------------
@@ -113,7 +114,7 @@ void c64_easyflash_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_easyflash_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -138,7 +139,7 @@ uint8_t c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t of
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_easyflash_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{

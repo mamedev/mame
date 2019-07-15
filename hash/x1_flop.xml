@@ -637,6 +637,19 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+	<software name="dkong3dg">
+		<description>Donkey Kong 3 - Dai Gyakushuu</description>
+		<year>1985</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="release" value="198506xx"/>
+		<info name="alt_title" value="ドンキーコング3 大逆襲"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "339648">
+				<rom name="donkey kong 3 dai gyakushuu.d88" size="339648" crc="2fd68d39" sha1="cfe4c16b972ec00fc8e2380d1219bdf5d75fa11f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dbuster">
 		<description>Dragon Buster</description>
 		<year>1987</year>

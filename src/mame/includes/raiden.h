@@ -5,16 +5,22 @@
     Seibu Raiden hardware
 
 *******************************************************************************/
+#ifndef MAME_INCLUDES_RAIDEN_H
+#define MAME_INCLUDES_RAIDEN_H
+
+#pragma once
 
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
-class raiden_state : public driver_device, protected seibu_sound_common
+class raiden_state : public driver_device, public seibu_sound_common
 {
 public:
-	raiden_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	raiden_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -27,6 +33,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -55,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(raidenb_control_w);
 	DECLARE_WRITE16_MEMBER(raidenb_layer_enable_w);
 	DECLARE_WRITE16_MEMBER(raidenb_layer_scroll_w);
-	DECLARE_DRIVER_INIT(raiden);
+	void init_raiden();
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -68,13 +75,14 @@ public:
 	uint32_t screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(raiden_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 	void common_decrypt();
 	void raidene(machine_config &config);
 	void raidenb(machine_config &config);
 	void raiden(machine_config &config);
+	void raidenkb(machine_config &config);
 	void raidenu(machine_config &config);
 	void main_map(address_map &map);
 	void raiden_sound_decrypted_opcodes_map(address_map &map);
@@ -85,3 +93,5 @@ public:
 	void sei80bu_encrypted_full_map(address_map &map);
 	void sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_RAIDEN_H

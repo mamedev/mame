@@ -13,8 +13,9 @@
 #include "sv602.h"
 #include "sv603.h"
 
-SLOT_INTERFACE_START( svi_expander_modules )
-	SLOT_INTERFACE("sv601", SV601)
-	SLOT_INTERFACE("sv602", SV602)
-	SLOT_INTERFACE("sv603", SV603)
-SLOT_INTERFACE_END
+void svi_expander_modules(device_slot_interface &device)
+{
+	device.option_add("sv601", SV601);
+	device.option_add("sv602", SV602);
+	device.option_add("sv603", SV603);
+}

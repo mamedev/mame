@@ -15,13 +15,6 @@ k053250_device::k053250_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void k053250_device::static_set_offsets(device_t &device, int offx, int offy)
-{
-	k053250_device &dev = downcast<k053250_device &>(device);
-	dev.m_offx = offx;
-	dev.m_offy = offy;
-}
-
 void k053250_device::unpack_nibbles()
 {
 	m_unpacked_rom.resize(m_rom.length()*2);

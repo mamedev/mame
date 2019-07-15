@@ -250,11 +250,12 @@ public:
 	void set_state_string(int index, const char *string);
 	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
 
+	// find the entry for a given index
+	const device_state_entry *state_find_entry(int index) const;
+
 	// deliberately ambiguous functions; if you have the state interface
-	// just use it or pc() and pcbase() directly
+	// just use it directly
 	device_state_interface &state() { return *this; }
-	offs_t safe_pc() { return pc(); }
-	offs_t safe_pcbase() { return pcbase(); }
 
 public: // protected eventually
 
@@ -295,9 +296,6 @@ protected:
 	// internal operation overrides
 	virtual void interface_post_start() override;
 
-	// find the entry for a given index
-	const device_state_entry *state_find_entry(int index) const;
-
 	// constants
 	static constexpr int FAST_STATE_MIN = -4;                           // range for fast state
 	static constexpr int FAST_STATE_MAX = 256;                          // lookups
@@ -310,33 +308,5 @@ protected:
 
 // iterator
 typedef device_interface_iterator<device_state_interface> state_interface_iterator;
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_t::safe_pc - return the current PC
-//  or 0 if no state object exists
-//-------------------------------------------------
-
-inline offs_t device_t::safe_pc() const
-{
-	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pc() : 0;
-}
-
-
-//-------------------------------------------------
-//  device_t::safe_pcbase - return the current PC
-//  base or 0 if no state object exists
-//-------------------------------------------------
-
-inline offs_t device_t::safe_pcbase() const
-{
-	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pcbase() : 0;
-}
-
 
 #endif  /* MAME_EMU_DISTATE_H */

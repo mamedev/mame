@@ -42,7 +42,6 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-
 //-------------------------------------------------
 //  rom_bank_updated - the rom bank has changed
 //-------------------------------------------------
@@ -50,17 +49,6 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 void c352_device::rom_bank_updated()
 {
 	m_stream->update();
-}
-
-//-------------------------------------------------
-//  static_set_dividder - configuration helper to
-//  set the divider setting
-//-------------------------------------------------
-
-void c352_device::static_set_divider(device_t &device, int setting)
-{
-	c352_device &c352 = downcast<c352_device &>(device);
-	c352.m_divider = setting;
 }
 
 void c352_device::fetch_sample(c352_voice_t* v)
@@ -74,18 +62,14 @@ void c352_device::fetch_sample(c352_voice_t* v)
 	}
 	else
 	{
-		int8_t s, s2;
+		int8_t s;
 
 		s = (int8_t)read_byte(v->pos);
 
-		v->sample = s<<8;
 		if(v->flags & C352_FLG_MULAW)
-		{
-			s2 = (s&0x7f)>>4;
-
-			v->sample = ((s2*s2)<<4) - (~(s2<<1)) * (s&0x0f);
-			v->sample = (s&0x80) ? (~v->sample)<<5 : v->sample<<5;
-		}
+			v->sample = m_mulawtab[s&0xff];
+		else
+			v->sample = s<<8;
 
 		uint16_t pos = v->pos&0xffff;
 
@@ -184,11 +168,11 @@ void c352_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 			// Left
 			out[0] += (((v->flags & C352_FLG_PHASEFL) ? -s : s) * v->curr_vol[0])>>8;
-			out[2] += (((v->flags & C352_FLG_PHASEFR) ? -s : s) * v->curr_vol[2])>>8;
+			out[2] += (((v->flags & C352_FLG_PHASERL) ? -s : s) * v->curr_vol[2])>>8;
 
 			// Right
-			out[1] += (((v->flags & C352_FLG_PHASERL) ? -s : s) * v->curr_vol[1])>>8;
-			out[3] += (((v->flags & C352_FLG_PHASERL) ? -s : s) * v->curr_vol[3])>>8;
+			out[1] += (((v->flags & C352_FLG_PHASEFR) ? -s : s) * v->curr_vol[1])>>8;
+			out[3] += (((v->flags & C352_FLG_PHASEFR) ? -s : s) * v->curr_vol[3])>>8;
 		}
 
 		*buffer_fl++ = (int16_t) (out[0]>>3);
@@ -255,7 +239,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((m_c352_v[i].flags & C352_FLG_KEYON))
+			if(m_c352_v[i].flags & C352_FLG_KEYON)
 			{
 				m_c352_v[i].pos = (m_c352_v[i].wave_bank<<16) | m_c352_v[i].wave_start;
 
@@ -269,7 +253,7 @@ void c352_device::write_reg16(unsigned long address, unsigned short val)
 				m_c352_v[i].curr_vol[0] = m_c352_v[i].curr_vol[1] = 0;
 				m_c352_v[i].curr_vol[2] = m_c352_v[i].curr_vol[3] = 0;
 			}
-			else if(m_c352_v[i].flags & C352_FLG_KEYOFF)
+			if(m_c352_v[i].flags & C352_FLG_KEYOFF)
 			{
 				m_c352_v[i].flags &= ~(C352_FLG_BUSY|C352_FLG_KEYOFF);
 				m_c352_v[i].counter = 0xffff;
@@ -294,6 +278,25 @@ void c352_device::device_start()
 	m_sample_rate_base = clock() / m_divider;
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 4, m_sample_rate_base);
+
+	// generate mulaw table (Output similar to namco's VC emulator)
+	int j = 0;
+	for(int i=0;i<128;i++)
+	{
+		m_mulawtab[i] = j<<5;
+		if(i < 16)
+			j += 1;
+		else if(i < 24)
+			j += 2;
+		else if(i < 48)
+			j += 4;
+		else if(i < 100)
+			j += 8;
+		else
+			j += 16;
+	}
+	for(int i=0;i<128;i++)
+		m_mulawtab[i+128] = (~m_mulawtab[i])&0xffe0;
 
 	// register save state info
 	for (i = 0; i < 32; i++)

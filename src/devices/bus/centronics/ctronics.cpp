@@ -82,6 +82,18 @@ void centronics_device::device_start()
 	m_select_in_handler(1);
 }
 
+void centronics_device::set_output_latch(output_latch_device &latch)
+{
+	latch.bit_handler<0>().set(*this, FUNC(centronics_device::write_data0));
+	latch.bit_handler<1>().set(*this, FUNC(centronics_device::write_data1));
+	latch.bit_handler<2>().set(*this, FUNC(centronics_device::write_data2));
+	latch.bit_handler<3>().set(*this, FUNC(centronics_device::write_data3));
+	latch.bit_handler<4>().set(*this, FUNC(centronics_device::write_data4));
+	latch.bit_handler<5>().set(*this, FUNC(centronics_device::write_data5));
+	latch.bit_handler<6>().set(*this, FUNC(centronics_device::write_data6));
+	latch.bit_handler<7>().set(*this, FUNC(centronics_device::write_data7));
+}
+
 WRITE_LINE_MEMBER( centronics_device::write_strobe ) { if (m_dev) m_dev->input_strobe(state); }
 WRITE_LINE_MEMBER( centronics_device::write_data0 ) { if (m_dev) m_dev->input_data0(state); }
 WRITE_LINE_MEMBER( centronics_device::write_data1 ) { if (m_dev) m_dev->input_data1(state); }
@@ -121,15 +133,18 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "nec_p72.h"
 #include "printer.h"
 #include "covox.h"
+#include "chessmec.h"
 
-SLOT_INTERFACE_START(centronics_devices)
-	SLOT_INTERFACE("pl80", COMX_PL80)
-	SLOT_INTERFACE("ex800", EPSON_EX800)
-	SLOT_INTERFACE("lx800", EPSON_LX800)
-	SLOT_INTERFACE("lx810l", EPSON_LX810L)
-	SLOT_INTERFACE("ap2000", EPSON_AP2000)
-	SLOT_INTERFACE("p72", NEC_P72)
-	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
-	SLOT_INTERFACE("covox", CENTRONICS_COVOX)
-	SLOT_INTERFACE("covox_stereo", CENTRONICS_COVOX_STEREO)
-SLOT_INTERFACE_END
+void centronics_devices(device_slot_interface &device)
+{
+	device.option_add("pl80", COMX_PL80);
+	device.option_add("ex800", EPSON_EX800);
+	device.option_add("lx800", EPSON_LX800);
+	device.option_add("lx810l", EPSON_LX810L);
+	device.option_add("ap2000", EPSON_AP2000);
+	device.option_add("p72", NEC_P72);
+	device.option_add("printer", CENTRONICS_PRINTER);
+	device.option_add("covox", CENTRONICS_COVOX);
+	device.option_add("covox_stereo", CENTRONICS_COVOX_STEREO);
+	device.option_add("chessmec", CENTRONICS_CHESSMEC);
+}

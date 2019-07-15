@@ -15,19 +15,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ATARI_MOTION_OBJECTS_ADD(_tag, _screen, _config) \
-	MCFG_DEVICE_ADD(_tag, ATARI_MOTION_OBJECTS, 0) \
-	MCFG_VIDEO_SET_SCREEN(_screen) \
-	atari_motion_objects_device::static_set_config(*device, _config);
-
-#define MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) \
-	atari_motion_objects_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -83,11 +70,19 @@ class atari_motion_objects_device : public sprite16_device_ind16,
 
 public:
 	// construction/destruction
+	template <typename T>
+	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag, const atari_motion_objects_config &config)
+		: atari_motion_objects_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+		set_config(config);
+	}
+
 	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_config(device_t &device, const atari_motion_objects_config &config);
+	// configuration
+	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_config(const atari_motion_objects_config &config) { static_cast<atari_motion_objects_config &>(*this) = config; }
 
 	// getters
 	int bank() const { return m_bank; }

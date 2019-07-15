@@ -33,33 +33,13 @@
 
 #pragma once
 
-
-#define MCFG_7400_Y1_CB(_devcb) \
-	devcb = &ttl7400_device::set_y1_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7400_Y2_CB(_devcb) \
-	devcb = &ttl7400_device::set_y2_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7400_Y3_CB(_devcb) \
-	devcb = &ttl7400_device::set_y3_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7400_Y4_CB(_devcb) \
-	devcb = &ttl7400_device::set_y4_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_7400_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL7400, 0)
-
 class ttl7400_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_y1_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y1_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y2_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y2_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y3_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y3_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y4_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y4_func.set_callback(std::forward<Object>(cb)); }
+	template <std::size_t Bit> auto y_cb() { return m_y_func[Bit].bind(); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( a1_w );
@@ -86,14 +66,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void init();
 	void update();
 
 	// callbacks
-	devcb_write_line m_y1_func;
-	devcb_write_line m_y2_func;
-	devcb_write_line m_y3_func;
-	devcb_write_line m_y4_func;
+	devcb_write_line m_y_func[4];
 
 	// inputs
 	uint8_t m_a;        // pins 1,4,9,12

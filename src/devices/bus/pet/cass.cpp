@@ -98,7 +98,8 @@ WRITE_LINE_MEMBER( pet_datassette_port_device::read_w ) { m_read_handler(state);
 //  SLOT_INTERFACE( cbm_datassette_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( cbm_datassette_devices )
-	SLOT_INTERFACE("c2n", C2N)
-	SLOT_INTERFACE("c1530", C1530)
-SLOT_INTERFACE_END
+void cbm_datassette_devices(device_slot_interface &device)
+{
+	device.option_add("c2n", C2N);
+	device.option_add("c1530", C1530);
+}

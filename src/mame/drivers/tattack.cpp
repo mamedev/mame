@@ -50,6 +50,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 #include "sound/samples.h"
 #include "speaker.h"
@@ -58,30 +59,35 @@
 class tattack_state : public driver_device
 {
 public:
-	tattack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tattack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_samples(*this,"samples")
-		{ }
+	{ }
 
+	void tattack(machine_config &config);
+
+	void init_tattack();
+
+protected:
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(paddle_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 	DECLARE_WRITE8_MEMBER(brick_dma_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_DRIVER_INIT(tattack);
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(tattack);
+	void tattack_palette(palette_device &palette) const;
 
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tattack(machine_config &config);
 	void tattack_map(address_map &map);
-protected:
-	virtual void video_start() override;
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -98,11 +104,11 @@ private:
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	static const uint8_t white_pen = 0xf;
-	static const uint8_t green_pen = 0x5;
-	static const uint8_t yellow_pen = 0x7;
-	static const uint8_t red_pen = 0x3;
-	static const int paddle_xpos = 38;
+	static constexpr uint8_t white_pen = 0xf;
+	static constexpr uint8_t green_pen = 0x5;
+	static constexpr uint8_t yellow_pen = 0x7;
+	static constexpr uint8_t red_pen = 0x3;
+	static constexpr int paddle_xpos = 38;
 };
 
 
@@ -112,15 +118,15 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	if((color&1 ) || (color>15) )
-		logerror("COLOR %i\n",color);
+	if((color & 1) || (color > 15))
+		logerror("COLOR %i\n", color);
 
-	color>>=1;
+	color >>= 1;
 
 	SET_TILE_INFO_MEMBER(0,
-		code,
-		color,
-		0);
+			code,
+			color,
+			0);
 }
 
 void tattack_state::draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -264,20 +270,21 @@ WRITE8_MEMBER(tattack_state::sound_w)
 	}
 }
 
-ADDRESS_MAP_START(tattack_state::tattack_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("AN_PADDLE") // $315, checks again with same memory, loops if different (?)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")       // dsw ? something else ?
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITE(sound_w) // sound
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(brick_dma_w) // bit 7 = strobe ($302)
-	AM_RANGE(0xc002, 0xc002) AM_WRITENOP // same as sound port, outputs?
-	AM_RANGE(0xc005, 0xc005) AM_WRITE(paddle_w)
-	AM_RANGE(0xc006, 0xc007) AM_WRITE(ball_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void tattack_state::tattack_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x4000).portr("AN_PADDLE"); // $315, checks again with same memory, loops if different (?)
+	map(0x5000, 0x53ff).ram().share("videoram");
+	map(0x6000, 0x6000).portr("DSW2");
+	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
+	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
+	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
+	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
+	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
+	map(0xc005, 0xc005).w(FUNC(tattack_state::paddle_w));
+	map(0xc006, 0xc007).w(FUNC(tattack_state::ball_w));
+	map(0xe000, 0xe3ff).ram().share("ram");
+}
 
 static INPUT_PORTS_START( tattack )
 	PORT_START("INPUTS")
@@ -366,26 +373,26 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( tattack )
+static GFXDECODE_START( gfx_tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(tattack_state, tattack)
+void tattack_state::tattack_palette(palette_device &palette) const
 {
-	int i,r,g,b;
-	for(i=0;i<8;i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if(i)
+		int r, g, b;
+		if (i)
 		{
-			r=(i&1)?0xff:0;
-			g=(i&2)?0xff:0;
-			b=(i&4)?0xff:0;
+			r = (i & 1) ? 0xff : 0;
+			g = (i & 2) ? 0xff : 0;
+			b = (i & 4) ? 0xff : 0;
 		}
 		else
-			r=g=b=128;
+			r = g = b = 128;
 
-		palette.set_pen_color(2*i,rgb_t(0x00,0x00,0xff));
-		palette.set_pen_color(2*i+1,rgb_t(r,g,b));
+		palette.set_pen_color(2 * i, rgb_t(0x00, 0x00, 0xff));
+		palette.set_pen_color(2 * i + 1, rgb_t(r, g, b));
 	}
 }
 
@@ -399,38 +406,37 @@ static const char *const tattack_sample_names[] =
 	nullptr
 };
 
-MACHINE_CONFIG_START(tattack_state::tattack)
-
+void tattack_state::tattack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(tattack_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000 / 2);   /* 4 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tattack_state::tattack_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tattack_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 256-32-1, 13, 256-11-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(24, 256-32-1, 13, 256-11-1);
+	screen.set_screen_update(FUNC(tattack_state::screen_update_tattack));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattack)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_tattack);
+	PALETTE(config, "palette", FUNC(tattack_state::tattack_palette), 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(tattack_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+	SPEAKER(config, "mono").front_center();
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(tattack_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
 
 	/* Discrete ???? */
-//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-//  MCFG_DISCRETE_INTF(tattack)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+//  DISCRETE(config, m_discrete);
+//  m_discrete->set_intf(tattack);
+//  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 
@@ -446,7 +452,7 @@ ROM_START( tattack )
 	ROM_LOAD( "rom.6c",     0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
 ROM_END
 
-DRIVER_INIT_MEMBER(tattack_state,tattack)
+void tattack_state::init_tattack()
 {
 //  uint8_t *rom = memregion("maincpu")->base();
 
@@ -483,5 +489,5 @@ DRIVER_INIT_MEMBER(tattack_state,tattack)
 
 }
 
-GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 // there is another undumped version with katakana Shonan logo and black background

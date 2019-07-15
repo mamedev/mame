@@ -117,7 +117,7 @@
             <bounds   left="0" right="800" top="550" bottom="600" />
         </bezel>
 -->
-		<screen index="0">
+		<screen tag="screen">
 			<bounds x="0" y="0" width="800" height="550" />
 		</screen>
 	</view>

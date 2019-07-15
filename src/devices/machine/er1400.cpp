@@ -16,6 +16,8 @@
     be left at logic zero when the device is in standby.
 
     Write and erase times are 10 ms (min), 15 ms (typical), 24 ms (max).
+    The data retention capability of the actual chip can be greatly
+    degraded by frequent reprogramming.
 
 ***************************************************************************/
 
@@ -40,6 +42,7 @@ DEFINE_DEVICE_TYPE(ER1400, er1400_device, "er1400", "ER1400 Serial EAROM (100x14
 er1400_device::er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ER1400, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, m_default_data(*this, DEVICE_SELF, 100)
 	, m_clock_input(0)
 	, m_code_input(0)
 	, m_data_input(0)
@@ -70,7 +73,9 @@ void er1400_device::device_start()
 	save_item(NAME(m_address_register));
 
 	m_data_array = std::make_unique<u16[]>(100);
-	save_pointer(m_data_array.get(), "m_data_array", 100);
+	save_pointer(NAME(m_data_array), 100);
+
+	m_data_propagation_timer = timer_alloc(PROPAGATION_TIMER);
 }
 
 
@@ -81,8 +86,16 @@ void er1400_device::device_start()
 
 void er1400_device::nvram_default()
 {
-	// all locations erased
-	std::fill(&m_data_array[0], &m_data_array[100], 0x3fff);
+	if (m_default_data.found())
+	{
+		// obtain default data from memory region
+		std::copy_n(&m_default_data[0], 100, &m_data_array[0]);
+	}
+	else
+	{
+		// all locations erased
+		std::fill_n(&m_data_array[0], 100, 0);
+	}
 }
 
 
@@ -93,7 +106,7 @@ void er1400_device::nvram_default()
 
 void er1400_device::nvram_read(emu_file &file)
 {
-	file.read(&m_data_array[0], 200);
+	file.read(&m_data_array[0], 100 * sizeof(m_data_array[0]));
 }
 
 
@@ -104,7 +117,23 @@ void er1400_device::nvram_read(emu_file &file)
 
 void er1400_device::nvram_write(emu_file &file)
 {
-	file.write(&m_data_array[0], 200);
+	file.write(&m_data_array[0], 100 * sizeof(m_data_array[0]));
+}
+
+
+//-------------------------------------------------
+//  address_binary_format - logging helper
+//-------------------------------------------------
+
+std::string er1400_device::address_binary_format() const
+{
+	std::ostringstream result;
+	for (int i = 19; i >= 10; i--)
+		result << (BIT(m_address_register, i) ? '1' : '0');
+	result << ':';
+	for (int i = 9; i >= 0; i--)
+		result << (BIT(m_address_register, i) ? '1' : '0');
+	return result.str();
 }
 
 
@@ -156,10 +185,11 @@ void er1400_device::write_data()
 				if (BIT(m_address_register, units))
 				{
 					offs_t offset = 10 * (tens - 10) + units;
-					if ((m_data_array[offset] & ~m_data_register) != 0)
+					if ((~m_data_array[offset] & m_data_register) != 0)
 					{
-						LOG("Writing data %04X at %d\n", m_data_register, offset);
-						m_data_array[offset] &= m_data_register;
+						LOG("Writing data at %d (%04X changed to %04X)\n", offset,
+							m_data_array[offset], m_data_array[offset] & m_data_register);
+						m_data_array[offset] |= m_data_register;
 					}
 					selected++;
 				}
@@ -189,10 +219,10 @@ void er1400_device::erase_data()
 				if (BIT(m_address_register, units))
 				{
 					offs_t offset = 10 * (tens - 10) + units;
-					if (m_data_array[offset] != 0x3fff)
+					if (m_data_array[offset] != 0)
 					{
 						LOG("Erasing data at %d\n", offset);
-						m_data_array[offset] = 0x3fff;
+						m_data_array[offset] = 0;
 					}
 					selected++;
 				}
@@ -211,7 +241,7 @@ void er1400_device::erase_data()
 
 WRITE_LINE_MEMBER(er1400_device::data_w)
 {
-	m_data_input = state;
+	m_data_input = bool(state);
 }
 
 
@@ -221,7 +251,12 @@ WRITE_LINE_MEMBER(er1400_device::data_w)
 
 WRITE_LINE_MEMBER(er1400_device::c1_w)
 {
-	m_code_input = (m_code_input & 3) | (state << 2);
+	if (bool(state) == BIT(m_code_input, 2))
+		return;
+
+	m_code_input = (m_code_input & 3) | (bool(state) << 2);
+	if (!m_data_propagation_timer->enabled())
+		m_data_propagation_timer->adjust(attotime::from_usec(20));
 }
 
 
@@ -231,7 +266,12 @@ WRITE_LINE_MEMBER(er1400_device::c1_w)
 
 WRITE_LINE_MEMBER(er1400_device::c2_w)
 {
-	m_code_input = (m_code_input & 5) | (state << 1);
+	if (bool(state) == BIT(m_code_input, 1))
+		return;
+
+	m_code_input = (m_code_input & 5) | (bool(state) << 1);
+	if (!m_data_propagation_timer->enabled())
+		m_data_propagation_timer->adjust(attotime::from_usec(20));
 }
 
 
@@ -241,7 +281,34 @@ WRITE_LINE_MEMBER(er1400_device::c2_w)
 
 WRITE_LINE_MEMBER(er1400_device::c3_w)
 {
-	m_code_input = (m_code_input & 6) | state;
+	if (bool(state) == BIT(m_code_input, 0))
+		return;
+
+	m_code_input = (m_code_input & 6) | bool(state);
+	if (!m_data_propagation_timer->enabled())
+		m_data_propagation_timer->adjust(attotime::from_usec(20));
+}
+
+
+//-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void er1400_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case PROPAGATION_TIMER:
+		if (m_code_input == 5)
+		{
+			m_data_output = BIT(m_data_register, 13);
+			LOG("Data output %d bit\n", m_data_output);
+		}
+		else
+			m_data_output = false;
+		break;
+	}
 }
 
 
@@ -258,17 +325,23 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 	// Commands are clocked by a logical 1 -> 0 transition (i.e. rising edge)
 	if (!state)
 	{
-		m_data_output = false;
-
 		if (machine().time() >= m_write_time)
 			write_data();
 		if (m_code_input != 6)
+		{
+			if (m_write_time != attotime::never && machine().time() < m_write_time)
+				logerror("Write not completed in time\n");
 			m_write_time = attotime::never;
+		}
 
 		if (machine().time() >= m_erase_time)
 			erase_data();
 		if (m_code_input != 2)
+		{
+			if (m_erase_time != attotime::never && machine().time() < m_erase_time)
+				logerror("Erase not completed in time\n");
 			m_erase_time = attotime::never;
+		}
 
 		switch (m_code_input)
 		{
@@ -281,12 +354,13 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 		case 2: // erase
 			if (m_erase_time == attotime::never)
 			{
-				LOG("Entering erase command\n");
+				LOG("Entering erase command (address = %s)\n", address_binary_format());
 				m_erase_time = machine().time() + attotime::from_msec(15);
 			}
 			break;
 
 		case 3: // accept address
+			LOG("Accepting address %d bit\n", m_data_input);
 			m_address_register = (m_address_register << 1) | m_data_input;
 			m_address_register &= 0xfffff;
 			break;
@@ -296,19 +370,20 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 			break;
 
 		case 5: // shift data out
-			m_data_output = BIT(m_data_register, 13);
 			m_data_register = (m_data_register & 0x1fff) << 1;
+			m_data_propagation_timer->adjust(attotime::from_usec(20));
 			break;
 
 		case 6: // write
 			if (m_write_time == attotime::never)
 			{
-				LOG("Entering write command\n");
+				LOG("Entering write command (address = %s, data = %04X)\n", address_binary_format(), m_data_register);
 				m_write_time = machine().time() + attotime::from_msec(15);
 			}
 			break;
 
 		case 7: // accept data
+			LOG("Accepting data %d bit\n", m_data_input);
 			m_data_register = (m_data_register & 0x1fff) << 1;
 			m_data_register |= m_data_input;
 			break;

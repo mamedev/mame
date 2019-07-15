@@ -46,7 +46,17 @@ class saturn_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
+		: saturn_control_port_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	saturn_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~saturn_control_port_device();
 
 	uint16_t read_direct();
@@ -61,22 +71,11 @@ protected:
 	device_saturn_control_port_interface *m_device;
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(SATURN_CONTROL_PORT, saturn_control_port_device)
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SATURN_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, SATURN_CONTROL_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-SLOT_INTERFACE_EXTERN( saturn_controls );
-SLOT_INTERFACE_EXTERN( saturn_joys );
+void saturn_controls(device_slot_interface &device);
+void saturn_joys(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SAT_CTRL_CTRL_H

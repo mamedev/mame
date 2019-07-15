@@ -26,9 +26,9 @@ ROM_START( cst_ql_disc_interface )
 	ROM_REGION( 0x2000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v116")
 	ROM_SYSTEM_BIOS( 0, "v113", "v1.13" )
-	ROMX_LOAD( "cst_qdisc_controller_v1.13_1984.rom", 0x0000, 0x2000, CRC(e08d9b5b) SHA1(ec981e60db0269412c518930ca6b5187b20a44f5), ROM_BIOS(1) )
+	ROMX_LOAD( "cst_qdisc_controller_v1.13_1984.rom", 0x0000, 0x2000, CRC(e08d9b5b) SHA1(ec981e60db0269412c518930ca6b5187b20a44f5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v116", "v1.16" )
-	ROMX_LOAD( "cst_qdisc_controller_v1.16_1984.rom", 0x0000, 0x2000, CRC(05a73b00) SHA1(de8c5a4257107a4a41bc94c532cbfb7c65bfb472), ROM_BIOS(2) )
+	ROMX_LOAD( "cst_qdisc_controller_v1.16_1984.rom", 0x0000, 0x2000, CRC(05a73b00) SHA1(de8c5a4257107a4a41bc94c532cbfb7c65bfb472), ROM_BIOS(1) )
 ROM_END
 
 
@@ -71,7 +71,7 @@ void cst_ql_disc_interface_device::device_start()
 //  read -
 //-------------------------------------------------
 
-uint8_t cst_ql_disc_interface_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t cst_ql_disc_interface_device::read(offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -81,6 +81,6 @@ uint8_t cst_ql_disc_interface_device::read(address_space &space, offs_t offset, 
 //  write -
 //-------------------------------------------------
 
-void cst_ql_disc_interface_device::write(address_space &space, offs_t offset, uint8_t data)
+void cst_ql_disc_interface_device::write(offs_t offset, uint8_t data)
 {
 }

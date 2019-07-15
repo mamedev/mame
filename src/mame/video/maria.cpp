@@ -61,14 +61,14 @@ DEFINE_DEVICE_TYPE(ATARI_MARIA, atari_maria_device, "atari_maria", "Atari MARIA"
 
 atari_maria_device::atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ATARI_MARIA, tag, owner, clock)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 {
 }
 
 
 void atari_maria_device::device_start()
 {
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	m_screen = machine().first_screen();
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_maria_palette));
@@ -392,7 +392,7 @@ void atari_maria_device::startdma(int lines)
 
 	if (m_nmi)
 	{
-		m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_nmi = 0;
 	}
 }

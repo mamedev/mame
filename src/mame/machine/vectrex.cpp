@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mathis Rosenhauer
 #include "emu.h"
+#include "includes/vectrex.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
-
-#include "includes/vectrex.h"
 
 
 #define VC_RED      rgb_t(0xff, 0x00, 0x00)
@@ -48,7 +48,7 @@ static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 
 
 
-void vectrex_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -74,7 +74,7 @@ void vectrex_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		update_signal(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in vectrex_state::device_timer");
+		fatalerror("Unknown id in vectrex_base_state::device_timer");
 	}
 }
 
@@ -86,7 +86,13 @@ void vectrex_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 *********************************************************************/
 
-void vectrex_state::vectrex_configuration()
+void vectrex_base_state::configure_imager(bool reset_refresh, const double *imager_angles)
+{
+	m_reset_refresh = reset_refresh;
+	m_imager_angles = imager_angles;
+}
+
+void vectrex_base_state::vectrex_configuration()
 {
 	unsigned char cport = m_io_3dconf->read();
 
@@ -98,7 +104,7 @@ void vectrex_state::vectrex_configuration()
 		if (m_imager_status == 0)
 			m_imager_status = cport & 0x01;
 
-		vector_add_point_function = cport & 0x02 ? &vectrex_state::vectrex_add_point_stereo: &vectrex_state::vectrex_add_point;
+		vector_add_point_function = cport & 0x02 ? &vectrex_base_state::vectrex_add_point_stereo: &vectrex_base_state::vectrex_add_point;
 
 		switch ((cport >> 2) & 0x07)
 		{
@@ -161,7 +167,7 @@ void vectrex_state::vectrex_configuration()
 	}
 	else
 	{
-		vector_add_point_function = &vectrex_state::vectrex_add_point;
+		vector_add_point_function = &vectrex_base_state::vectrex_add_point;
 		m_beam_color = rgb_t::white();
 		m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::white();
 	}
@@ -175,13 +181,13 @@ void vectrex_state::vectrex_configuration()
 
 *********************************************************************/
 
-WRITE_LINE_MEMBER(vectrex_state::vectrex_via_irq)
+WRITE_LINE_MEMBER(vectrex_base_state::vectrex_via_irq)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 
-READ8_MEMBER(vectrex_state::vectrex_via_pb_r)
+READ8_MEMBER(vectrex_base_state::vectrex_via_pb_r)
 {
 	int pot = m_io_contr[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
 
@@ -194,19 +200,19 @@ READ8_MEMBER(vectrex_state::vectrex_via_pb_r)
 }
 
 
-READ8_MEMBER(vectrex_state::vectrex_via_pa_r)
+READ8_MEMBER(vectrex_base_state::vectrex_via_pa_r)
 {
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		m_via_out[PORTA] = m_ay8912->data_r(space, 0)
+		m_via_out[PORTA] = m_ay8912->data_r()
 			& ~(m_imager_pinlevel & 0x80);
 	}
 	return m_via_out[PORTA];
 }
 
 
-READ8_MEMBER(vectrex_state::vectrex_s1_via_pb_r)
+READ8_MEMBER(raaspec_state::vectrex_s1_via_pb_r)
 {
 	return (m_via_out[PORTB] & ~0x40) | (m_io_coin->read() & 0x40);
 }
@@ -218,20 +224,20 @@ READ8_MEMBER(vectrex_state::vectrex_s1_via_pb_r)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_change_color)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_change_color)
 {
 	m_beam_color = param;
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::update_level)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::update_level)
 {
 	if (ptr)
 		* (uint8_t *) ptr = param;
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_eye)
 {
 	int coffset;
 	double rtime = (1.0 / m_imager_freq);
@@ -258,7 +264,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
 }
 
 
-WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
+WRITE8_MEMBER(vectrex_base_state::vectrex_psg_port_w)
 {
 	double wavel, ang_acc, tmp;
 	int mcontrol;
@@ -299,7 +305,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(vectrex_state,vectrex)
+void vectrex_base_state::driver_start()
 {
 	m_imager_angles = unknown_game_angles;
 	m_beam_color = rgb_t::white();
@@ -318,36 +324,32 @@ DRIVER_INIT_MEMBER(vectrex_state,vectrex)
 
 void vectrex_state::machine_start()
 {
-	if (m_cart && m_cart->exists())
+	if (m_cart->exists())
 	{
 		// install cart accesses
 		if (m_cart->get_type() == VECTREX_SRAM)
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),(vectrex_cart_slot_device*)m_cart), write8_delegate(FUNC(vectrex_cart_slot_device::write_ram),(vectrex_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),(vectrex_cart_slot_device*)m_cart), write8_delegate(FUNC(vectrex_cart_slot_device::write_ram),m_cart.target()));
 		else
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),(vectrex_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),m_cart.target()));
 
 		// setup 3d imager and refresh timer
-
-		// If VIA T2 starts, reset refresh timer. This is the best strategy for most games.
-		m_reset_refresh = 1;
-		m_imager_angles = narrow_escape_angles;
 
 		// let's do this 3D detection
 		switch (m_cart->get_vec3d())
 		{
-			case VEC3D_MINEST:
-				m_imager_angles = minestorm_3d_angles;
-				// Don't reset T2 each time it's written. This would cause jerking in mine3.
-				m_reset_refresh = 0;
-				break;
-			case VEC3D_CCOAST:
-				m_imager_angles = crazy_coaster_angles;
-				break;
-			case VEC3D_NARROW:
-				m_imager_angles = narrow_escape_angles;
-				break;
-			default:
-				break;
+		case VEC3D_MINEST:
+			// Don't reset T2 each time it's written. This would cause jerking in mine3.
+			configure_imager(false, minestorm_3d_angles);
+			break;
+		case VEC3D_CCOAST:
+			configure_imager(true, crazy_coaster_angles);
+			break;
+		case VEC3D_NARROW:
+			configure_imager(true, narrow_escape_angles);
+			break;
+		default:
+			// If VIA T2 starts, reset refresh timer. This is the best strategy for most games.
+			configure_imager(true, narrow_escape_angles);
 		}
 	}
 }

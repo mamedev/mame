@@ -17,7 +17,7 @@ public:
 	// construction/destruction
 	nes_sunsoft_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -35,7 +35,7 @@ public:
 	// construction/destruction
 	nes_sunsoft_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -53,7 +53,7 @@ public:
 	// construction/destruction
 	nes_sunsoft_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -78,10 +78,10 @@ public:
 	// construction/destruction
 	nes_sunsoft_4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(sun4_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { sun4_write(space, offset, data, mem_mask); }
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	void sun4_write(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override { sun4_write(offset, data); }
 
 	virtual void pcb_reset() override;
 
@@ -104,10 +104,10 @@ public:
 	// construction/destruction
 	nes_sunsoft_fme7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(fme7_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { fme7_write(space, offset, data, mem_mask); }
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	void fme7_write(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override { fme7_write(offset, data); }
 
 	virtual void pcb_reset() override;
 
@@ -138,7 +138,7 @@ public:
 	// construction/destruction
 	nes_sunsoft_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -153,6 +153,6 @@ DECLARE_DEVICE_TYPE(NES_SUNSOFT_2,    nes_sunsoft_2_device)
 DECLARE_DEVICE_TYPE(NES_SUNSOFT_3,    nes_sunsoft_3_device)
 DECLARE_DEVICE_TYPE(NES_SUNSOFT_4,    nes_sunsoft_4_device)
 DECLARE_DEVICE_TYPE(NES_SUNSOFT_FME7, nes_sunsoft_fme7_device)
-DECLARE_DEVICE_TYPE(NES_SUNSOFT_5,    nes_sunsoft_4_device)
+DECLARE_DEVICE_TYPE(NES_SUNSOFT_5,    nes_sunsoft_5_device)
 
 #endif // MAME_BUS_NES_SUNSOFT_H

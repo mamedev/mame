@@ -40,7 +40,14 @@ class sonydriv_floppy_image_device : public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
-	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const floppy_interface *config)
+		: sonydriv_floppy_image_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_floppy_config(config);
+	}
+	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	static void legacy_2_drives_add(machine_config &mconfig, const floppy_interface *config);
 
 	virtual void call_unload() override;
 
@@ -50,23 +57,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(FLOPPY_SONY, sonydriv_floppy_image_device)
-
-#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(_config)   \
-	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)       \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_DEVICE_ADD(FLOPPY_1, FLOPPY_SONY, 0)       \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config)
-
-#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(_config)    \
-	MCFG_DEVICE_ADD(FLOPPY_2, FLOPPY_SONY, 0)       \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_DEVICE_ADD(FLOPPY_3, FLOPPY_SONY, 0)       \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config)
-
-#define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(_config)    \
-	MCFG_DEVICE_MODIFY(FLOPPY_0)        \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	MCFG_DEVICE_MODIFY(FLOPPY_1)        \
-	MCFG_LEGACY_FLOPPY_CONFIG(_config)
 
 #endif // MAME_MACHINE_SONYDRIV_H

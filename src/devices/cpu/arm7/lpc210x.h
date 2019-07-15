@@ -23,9 +23,6 @@ class lpc210x_device : public arm7_cpu_device
 public:
 	lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	// static configuration helpers
-
-
 	DECLARE_READ32_MEMBER(arm_E01FC088_r);
 	DECLARE_READ32_MEMBER(flash_r);
 	DECLARE_WRITE32_MEMBER(flash_w);

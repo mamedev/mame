@@ -25,24 +25,6 @@
 
 #include "dirtc.h"
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RP5C15_OUT_ALARM_CB(_devcb) \
-	devcb = &rp5c15_device::set_out_alarm_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_RP5C15_OUT_CLKOUT_CB(_devcb) \
-	devcb = &rp5c15_device::set_out_clkout_callback(*device, DEVCB_##_devcb);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> rp5c15_device
-
 class rp5c15_device :   public device_t,
 						public device_rtc_interface
 {
@@ -50,8 +32,8 @@ public:
 	// construction/destruction
 	rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_alarm_callback(device_t &device, Object &&cb) { return downcast<rp5c15_device &>(device).m_out_alarm_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_clkout_callback(device_t &device, Object &&cb) { return downcast<rp5c15_device &>(device).m_out_clkout_cb.set_callback(std::forward<Object>(cb)); }
+	auto alarm() { return m_out_alarm_cb.bind(); }
+	auto clkout() { return m_out_clkout_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

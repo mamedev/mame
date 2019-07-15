@@ -65,7 +65,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(phi_int_w);
 
 	// Z80 IRQ
-	DECLARE_WRITE16_MEMBER(z80_m1_w);
+	DECLARE_WRITE8_MEMBER(z80_m1_w);
 
 	// Floppy interface
 	DECLARE_WRITE8_MEMBER(data_w);

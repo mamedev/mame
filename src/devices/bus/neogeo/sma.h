@@ -104,6 +104,17 @@ public:
 
 DECLARE_DEVICE_TYPE(NEOGEO_SMA_MSLUG3_CART, neogeo_sma_mslug3_cart_device)
 
+class neogeo_sma_mslug3a_cart_device : public neogeo_sma_cart_device
+{
+public:
+	neogeo_sma_mslug3a_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type() override { return 1; }
+	virtual uint32_t get_bank_base(uint16_t sel) override { return m_sma_prot->mslug3a_bank_base(sel); }
+};
+
+DECLARE_DEVICE_TYPE(NEOGEO_SMA_MSLUG3A_CART, neogeo_sma_mslug3a_cart_device)
+
 
 /*************************************************
  kof2000

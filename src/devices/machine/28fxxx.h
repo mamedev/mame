@@ -69,16 +69,23 @@ private:
 class intel_28f010_device : public base_28fxxx_device
 {
 public:
-	intel_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	intel_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class amd_28f010_device : public base_28fxxx_device
 {
 public:
-	amd_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	amd_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+class amd_28f020_device : public base_28fxxx_device
+{
+public:
+	amd_28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(INTEL_28F010, intel_28f010_device)
 DECLARE_DEVICE_TYPE(AMD_28F010, amd_28f010_device)
+DECLARE_DEVICE_TYPE(AMD_28F020, amd_28f020_device)
 
 #endif // MAME_MACHINE_28FXXX_H

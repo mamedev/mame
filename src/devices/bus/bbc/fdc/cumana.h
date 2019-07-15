@@ -12,6 +12,7 @@
 #pragma once
 
 #include "fdc.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"
 #include "formats/fsd_dsk.h"
@@ -23,7 +24,6 @@
 class bbc_cumanafdc_device :
 	public device_t,
 	public device_bbc_fdc_interface
-
 {
 public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -31,8 +31,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
 
 protected:
 	// construction/destruction
@@ -40,16 +38,17 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-	bool m_invert;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
-private:
-	required_memory_region m_dfs_rom;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
+	bool m_invert;
+
+private:
 	int m_drive_control;
 	int m_fdc_ie;
 };

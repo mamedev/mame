@@ -98,7 +98,7 @@ void bionicc_state::video_start()
 	m_bg_tilemap->set_transparent_pen(15);
 }
 
-PALETTE_DECODER_MEMBER( bionicc_state, RRRRGGGGBBBBIIII )
+rgb_t bionicc_state::RRRRGGGGBBBBIIII(uint32_t raw)
 {
 	uint8_t bright = (raw & 0x0f);
 
@@ -193,7 +193,7 @@ uint32_t bionicc_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 0 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), false);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

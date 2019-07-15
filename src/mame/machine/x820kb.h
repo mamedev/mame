@@ -14,16 +14,6 @@
 #include "cpu/mcs48/mcs48.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(_devcb) \
-	devcb = &xerox_820_keyboard_device::set_kbstb_wr_callback(*device, DEVCB_##_devcb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -36,7 +26,7 @@ public:
 	// construction/destruction
 	xerox_820_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_kbstb_wr_callback(device_t &device, Object &&cb) { return downcast<xerox_820_keyboard_device &>(device).m_kbstb_cb.set_callback(std::forward<Object>(cb)); }
+	auto kbstb_wr_callback() { return m_kbstb_cb.bind(); }
 
 	uint8_t read() { return m_bus; }
 
@@ -52,7 +42,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_ioport_array<16> m_y;
 
 	devcb_write_line   m_kbstb_cb;

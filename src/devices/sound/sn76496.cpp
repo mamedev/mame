@@ -46,10 +46,12 @@
   Noise is an XOR function, and audio output is negated before being output.
   All the Sega-made PSG chips act as if the frequency was set to 0 if 0 is written
   to the frequency register.
-  ** NCR7496 (as used on the Tandy 1000) is similar to the SN76489 but with a
-  different noise LFSR patttern: taps on bits A and E, output on E
+  ** NCR8496 (as used on the Tandy 1000TX) is similar to the SN76489 but with a
+  different noise LFSR pattern: taps on bits A and E, output on E, XNOR function
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
-  (all this chip's info needs to be verified)
+  Its output is inverted.
+  ** PSSJ-3 (as used on the later Tandy 1000 series computers) is the same as the
+  NCR8496 with the exception that its output is not inverted.
 
   28/03/2005 : Sebastien Chevalier
   Update th SN76496Write func, according to SN76489 doc found on SMSPower.
@@ -77,7 +79,7 @@
   16/11/2009 : Lord Nightmare
   Fix screeching in regulus: When summing together four equal channels, the
   size of the max amplitude per channel should be 1/4 of the max range, not
-  1/3. Added NCR7496.
+  1/3. Added NCR8496.
 
   18/11/2009 : Lord Nightmare
   Modify Init functions to support negating the audio output. The gamegear
@@ -115,12 +117,21 @@
   ValleyBell. Made Sega PSG chips start up with register 0x3 selected (volume
   for channel 2) based on hardware tests by Nemesis.
 
+  03/09/2018: Lord Nightmare, Qbix, ValleyBell, NewRisingSun
+  * renamed the NCR8496 to its correct name, based on chip pictures on VGMPF
+  * fixed NCR8496's noise LFSR behavior so it is only reset if the mode bit in
+  register 6 is changed.
+  * NCR8496's LFSR feedback function is an XNOR, which is now supported.
+  * add PSSJ-3 support for the later Tandy 1000 series computers.
+  * NCR8496's output is inverted, PSSJ-3's output is not.
+
   TODO: * Implement the TMS9919 - any difference to sn94624?
         * Implement the T6W28; has registers in a weird order, needs writes
           to be 'sanitized' first. Also is stereo, similar to game gear.
-        * Test the NCR7496; Smspower says the whitenoise taps are A and E,
-          but this needs verification on real hardware.
         * Factor out common code so that the SAA1099 can share some code.
+        * verify NCR8496/PSSJ-3 behavior on write to mirrored registers; unlike the
+          other variants, the NCR-derived variants are implied to ignore writes to
+          regs 1,3,5,6,7 if 0x80 is not set. This needs to be verified on real hardware.
 
 ***************************************************************************/
 
@@ -140,6 +151,7 @@ sn76496_base_device::sn76496_base_device(
 		bool negate,
 		bool stereo,
 		int clockdivider,
+		bool ncr,
 		bool sega,
 		device_t *owner,
 		uint32_t clock)
@@ -152,57 +164,63 @@ sn76496_base_device::sn76496_base_device(
 	, m_negate(negate)
 	, m_stereo(stereo)
 	, m_clock_divider(clockdivider)
+	, m_ncr_style_psg(ncr)
 	, m_sega_style_psg(sega)
 {
 }
 
 sn76496_device::sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76496, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
 }
 
 u8106_device::u8106_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, U8106, tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock)
+	: sn76496_base_device(mconfig, U8106, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
 {
 }
 
 y2404_device::y2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock)
+	: sn76496_base_device(mconfig, Y2404, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
 }
 
 sn76489_device::sn76489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76489, tag, 0x4000, 0x01, 0x02, true, false, 8, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76489, tag, 0x4000, 0x01, 0x02, true, false, 8, false, true, owner, clock)
 {
 }
 
 sn76489a_device::sn76489a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76489A, tag, 0x10000, 0x04, 0x08, false, false, 8, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76489A, tag, 0x10000, 0x04, 0x08, false, false, 8, false, true, owner, clock)
 {
 }
 
 sn76494_device::sn76494_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN76494, tag, 0x10000, 0x04, 0x08, false, false, 1, true, owner, clock)
+	: sn76496_base_device(mconfig, SN76494, tag, 0x10000, 0x04, 0x08, false, false, 1, false, true, owner, clock)
 {
 }
 
 sn94624_device::sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SN94624, tag, 0x4000, 0x01, 0x02, true, false, 1, true, owner, clock)
+	: sn76496_base_device(mconfig, SN94624, tag, 0x4000, 0x01, 0x02, true, false, 1, false, true, owner, clock)
 {
 }
 
-ncr7496_device::ncr7496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, NCR7496, tag, 0x8000, 0x02, 0x20, false, false, 8, true, owner, clock)
+ncr8496_device::ncr8496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sn76496_base_device(mconfig, NCR8496, tag, 0x8000, 0x02, 0x20, true, false, 8, true, true, owner, clock)
+{
+}
+
+pssj3_device::pssj3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sn76496_base_device(mconfig, PSSJ3, tag, 0x8000, 0x02, 0x20, false, false, 8, true, true, owner, clock)
 {
 }
 
 gamegear_device::gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, GAMEGEAR, tag, 0x8000, 0x01, 0x08, true, true, 8, false, owner, clock)
+	: sn76496_base_device(mconfig, GAMEGEAR, tag, 0x8000, 0x01, 0x08, true, true, 8, false, false, owner, clock)
 {
 }
 
 segapsg_device::segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sn76496_base_device(mconfig, SEGAPSG, tag, 0x8000, 0x01, 0x08, true, false, 8, false, owner, clock)
+	: sn76496_base_device(mconfig, SEGAPSG, tag, 0x8000, 0x01, 0x08, true, false, 8, false, false, owner, clock)
 {
 }
 
@@ -267,14 +285,19 @@ void sn76496_base_device::device_start()
 	register_for_save_states();
 }
 
-WRITE8_MEMBER( sn76496_base_device::stereo_w )
+void sn76496_base_device::device_clock_changed()
+{
+	m_sound->set_sample_rate(clock()/2);
+}
+
+void sn76496_base_device::stereo_w(u8 data)
 {
 	m_sound->update();
 	if (m_stereo) m_stereo_mask = data;
 	else fatalerror("sn76496_base_device: Call to stereo write with mono chip!\n");
 }
 
-void sn76496_base_device::write(uint8_t data)
+void sn76496_base_device::write(u8 data)
 {
 	int n, r, c;
 
@@ -289,11 +312,13 @@ void sn76496_base_device::write(uint8_t data)
 	{
 		r = (data & 0x70) >> 4;
 		m_last_register = r;
+		if (((m_ncr_style_psg) && (r == 6)) && ((data&0x04) != (m_register[6]&0x04))) m_RNG = m_feedback_mask; // NCR-style PSG resets the LFSR only on a mode write which actually changes the state of bit 2 of register 6
 		m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
 	}
 	else
 	{
 		r = m_last_register;
+		//if ((m_ncr_style_psg) && ((r & 1) || (r == 6))) return; // NCR-style PSG ignores writes to regs 1, 3, 5, 6 and 7 with bit 7 clear; this behavior is not verified on hardware yet, uncomment it once verified.
 	}
 
 	c = r >> 1;
@@ -326,15 +351,10 @@ void sn76496_base_device::write(uint8_t data)
 				n = m_register[6];
 				// N/512,N/1024,N/2048,Tone #3 output
 				m_period[3] = ((n&3) == 3)? (m_period[2]<<1) : (1 << (5+(n&3)));
-				m_RNG = m_feedback_mask;
+				if (!(m_ncr_style_psg)) m_RNG = m_feedback_mask;
 			}
 			break;
 	}
-}
-
-WRITE8_MEMBER( sn76496_base_device::write )
-{
-	write(data);
 }
 
 inline bool sn76496_base_device::in_noise_mode()
@@ -397,7 +417,7 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sampl
 				// if noisemode is 1, both taps are enabled
 				// if noisemode is 0, the lower tap, whitenoisetap2, is held at 0
 				// The != was a bit-XOR (^) before
-				if (((m_RNG & m_whitenoise_tap1)!=0) != (((m_RNG & m_whitenoise_tap2)!=0) && in_noise_mode()))
+				if (((m_RNG & m_whitenoise_tap1)!=0) != (((m_RNG & m_whitenoise_tap2)!=(m_ncr_style_psg?m_whitenoise_tap2:0)) && in_noise_mode()))
 				{
 					m_RNG >>= 1;
 					m_RNG |= m_feedback_mask;
@@ -469,6 +489,7 @@ DEFINE_DEVICE_TYPE(SN76489,  sn76489_device,   "sn76489",      "SN76489")
 DEFINE_DEVICE_TYPE(SN76489A, sn76489a_device,  "sn76489a",     "SN76489A")
 DEFINE_DEVICE_TYPE(SN76494,  sn76494_device,   "sn76494",      "SN76494")
 DEFINE_DEVICE_TYPE(SN94624,  sn94624_device,   "sn94624",      "SN94624")
-DEFINE_DEVICE_TYPE(NCR7496,  ncr7496_device,   "ncr7496",      "NCR7496")
+DEFINE_DEVICE_TYPE(NCR8496,  ncr8496_device,   "ncr8496",      "NCR8496")
+DEFINE_DEVICE_TYPE(PSSJ3,    pssj3_device,     "pssj3",        "PSSJ-3")
 DEFINE_DEVICE_TYPE(GAMEGEAR, gamegear_device,  "gamegear_psg", "Game Gear PSG")
 DEFINE_DEVICE_TYPE(SEGAPSG,  segapsg_device,   "segapsg",      "Sega VDP PSG")

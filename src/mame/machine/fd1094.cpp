@@ -655,7 +655,7 @@ void fd1094_device::device_start()
 	// register for the state changing callbacks we need in the m68000
 	set_cmpild_callback(write32_delegate(FUNC(fd1094_device::cmp_callback),this));
 	set_rte_callback(write_line_delegate(FUNC(fd1094_device::rte_callback),this));
-	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(fd1094_device::irq_callback), this));
+	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fd1094_device::irq_callback), this));
 
 	// save state
 	save_item(NAME(m_state));

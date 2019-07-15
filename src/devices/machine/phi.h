@@ -11,43 +11,6 @@
 #ifndef MAME_MACHINE_PHI_H
 #define MAME_MACHINE_PHI_H
 
-// Set read and write callbacks to access DIO bus on IEEE-488
-#define MCFG_PHI_DIO_READWRITE_CB(_read , _write)   \
-	phi_device::set_dio_read_cb(*device , DEVCB_##_read);               \
-	phi_device::set_dio_write_cb(*device , DEVCB_##_write);
-
-// Set write callbacks to access uniline signals on IEEE-488
-#define MCFG_PHI_EOI_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_EOI , DEVCB_##_write);
-
-#define MCFG_PHI_DAV_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_DAV , DEVCB_##_write);
-
-#define MCFG_PHI_NRFD_WRITE_CB(_write)  \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NRFD , DEVCB_##_write);
-
-#define MCFG_PHI_NDAC_WRITE_CB(_write)  \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NDAC , DEVCB_##_write);
-
-#define MCFG_PHI_IFC_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_IFC , DEVCB_##_write);
-
-#define MCFG_PHI_SRQ_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_SRQ , DEVCB_##_write);
-
-#define MCFG_PHI_ATN_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_ATN , DEVCB_##_write);
-
-#define MCFG_PHI_REN_WRITE_CB(_write)   \
-	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_REN , DEVCB_##_write);
-
-// Set write callback for INT signal
-#define MCFG_PHI_INT_WRITE_CB(_write)           \
-	phi_device::set_int_write_cb(*device , DEVCB_##_write);
-
-// Set write callback for DMARQ signal
-#define MCFG_PHI_DMARQ_WRITE_CB(_write)         \
-	phi_device::set_dmarq_write_cb(*device , DEVCB_##_write);
 
 class phi_device : public device_t
 {
@@ -68,20 +31,17 @@ public:
 		PHI_488_SIGNAL_COUNT
 	};
 
-	template<class _Object> static devcb_base& set_dio_read_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_dio_read_func.set_callback(object); }
-
-	template<class _Object> static devcb_base& set_dio_write_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_dio_write_func.set_callback(object); }
-
-	template<class _Object> static devcb_base& set_488_signal_write_cb(device_t &device , phi_488_signal_t signal , _Object object)
-	{ return downcast<phi_device&>(device).m_signal_wr_fns[ signal ].set_callback(object); }
-
-	template<class _Object> static devcb_base& set_int_write_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_int_write_func.set_callback(object); }
-
-	template<class _Object> static devcb_base& set_dmarq_write_cb(device_t &device , _Object object)
-	{ return downcast<phi_device&>(device).m_dmarq_write_func.set_callback(object); }
+	// Set read and write callbacks to access DIO bus on IEEE-488
+	auto dio_read_cb() { return m_dio_read_func.bind(); }
+	auto dio_write_cb() { return m_dio_write_func.bind(); }
+	// Set write callbacks to access uniline signals on IEEE-488
+	template <phi_488_signal_t Signal> auto signal_write_cb() { return m_signal_wr_fns[ Signal ].bind(); }
+	// Set write callback for INT signal
+	auto int_write_cb() { return m_int_write_func.bind(); }
+	// Set write callback for DMARQ signal
+	auto dmarq_write_cb() { return m_dmarq_write_func.bind(); }
+	// Set read callback for SYS_CNTRL signal
+	auto sys_cntrl_read_cb() { return m_sys_cntrl_read_func.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
@@ -91,6 +51,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(srq_w);
 	DECLARE_WRITE_LINE_MEMBER(atn_w);
 	DECLARE_WRITE_LINE_MEMBER(ren_w);
+
+	DECLARE_WRITE8_MEMBER(bus_dio_w);
 
 	void set_ext_signal(phi_488_signal_t signal , int state);
 
@@ -136,7 +98,7 @@ private:
 	devcb_write_line m_signal_wr_fns[ PHI_488_SIGNAL_COUNT ];
 	devcb_write_line m_int_write_func;
 	devcb_write_line m_dmarq_write_func;
-
+	devcb_read_line m_sys_cntrl_read_func;
 	bool m_int_line;
 	bool m_dmarq_line;
 
@@ -181,12 +143,11 @@ private:
 		PHI_T_SPAS,
 		PHI_T_TACS,
 		// The following are non-standard states for IDENTIFY sequencing
-		PHI_T_ID1,  // Untalked
-		PHI_T_ID2,  // Addressed by secondary address
-		PHI_T_ID3,  // Sending 1st byte
-		PHI_T_ID4,  // Waiting to send 2nd byte
-		PHI_T_ID5,  // Sending 2nd byte
-		PHI_T_ID6   // 2nd byte sent, end of sequence
+		PHI_T_ID1,  // Addressed by secondary address
+		PHI_T_ID2,  // Sending 1st byte
+		PHI_T_ID3,  // Waiting to send 2nd byte
+		PHI_T_ID4,  // Sending 2nd byte
+		PHI_T_ID5   // 2nd byte sent, end of sequence
 	};
 
 	int m_t_state;
@@ -210,6 +171,9 @@ private:
 
 	int m_sr_state;
 
+	// RL (Remote Local) states
+	bool m_rl_rems; // false: LOCS, true: REMS
+
 	// PP (Parallel poll) states
 	enum {
 		PHI_PP_PPIS,
@@ -218,7 +182,6 @@ private:
 	};
 
 	int m_pp_state;
-	bool m_pp_pacs;
 	uint8_t m_ppr_msg;
 	bool m_s_sense;
 
@@ -227,7 +190,6 @@ private:
 		PHI_C_CIDS,
 		PHI_C_CADS,
 		PHI_C_CACS,
-		PHI_C_CPWS,
 		PHI_C_CPPS,
 		PHI_C_CSBS,
 		PHI_C_CSHS,
@@ -237,6 +199,18 @@ private:
 	};
 
 	int m_c_state;
+
+	// Secondary address decoder states
+	enum {
+		PHI_SA_NONE,
+		PHI_SA_PACS,
+		PHI_SA_TPAS,
+		PHI_SA_LPAS,
+		PHI_SA_UNT
+	};
+
+	int m_sa_state;
+
 	uint8_t m_be_counter;
 	uint16_t m_reg_status;
 	uint16_t m_reg_int_cond;
@@ -253,8 +227,8 @@ private:
 		NBA_CMD_FROM_OFIFO,
 		NBA_BYTE_FROM_OFIFO,
 		NBA_FROM_SPAS,
-		NBA_FROM_ID3,
-		NBA_FROM_ID5
+		NBA_FROM_ID2,
+		NBA_FROM_ID4
 	} nba_origin_t;
 
 	int m_nba_origin;
@@ -284,7 +258,12 @@ private:
 	uint8_t my_address(void) const;
 	bool tcs_msg(void) const;
 	bool rpp_msg(void) const;
+	uint8_t get_pp_response();
 	bool controller_in_charge(void) const;
+	void configure_pp_response();
+	void update_pp();
+	void update_interrupt();
+	void update_dmarq();
 };
 
 // device type definition

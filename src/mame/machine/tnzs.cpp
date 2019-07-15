@@ -449,7 +449,7 @@ WRITE8_MEMBER(tnzs_mcu_state::bankswitch1_w)
 {
 	tnzs_base_state::bankswitch1_w(space, offset, data, mem_mask);
 	if ((data & 0x04) != 0 && m_mcu != nullptr)
-		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// written only at startup by plumppop?
 	if (m_upd4701.found())
@@ -485,8 +485,8 @@ WRITE8_MEMBER(jpopnics_state::subbankswitch_w)
 
 WRITE8_MEMBER(tnzsb_state::sound_command_w)
 {
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */

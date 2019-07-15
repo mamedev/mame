@@ -2,8 +2,8 @@
 // copyright-holders:Ryan Holtz
 #pragma once
 
-#ifndef __RENDER_BGFX__
-#define __RENDER_BGFX__
+#ifndef RENDER_BGFX
+#define RENDER_BGFX
 
 #include <bgfx/bgfx.h>
 
@@ -30,7 +30,7 @@ class bgfx_view;
 class osd_options;
 class avi_write;
 
-/* sdl_info is the information about SDL for the current screen */
+/* renderer_bgfx is the information about BGFX for the current screen */
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
@@ -75,12 +75,14 @@ public:
 		}
 
 		osd_dim wdim = win->get_size();
-		win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
+		if (wdim.width() > 0 && wdim.height() > 0)
+			win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
+
 		win->target()->set_transform_container(!chain_transform);
 		return &win->target()->get_primitives();
 	}
 
-	static const char* WINDOW_PREFIX;
+	static char const *const WINDOW_PREFIX;
 
 private:
 	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
@@ -162,4 +164,4 @@ private:
 	static uint32_t s_current_view;
 };
 
-#endif
+#endif // RENDER_BGFX

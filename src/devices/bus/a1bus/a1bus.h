@@ -13,54 +13,37 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_A1BUS_CPU(_cputag) \
-	a1bus_device::static_set_cputag(*device, _cputag);
-
-#define MCFG_A1BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &a1bus_device::set_out_irq_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_A1BUS_OUT_NMI_CB(_devcb) \
-	devcb = &a1bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_A1BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, A1BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	a1bus_slot_device::static_set_a1bus_slot(*device, _nbtag, _tag);
-#define MCFG_A1BUS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_A1BUS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_a1bus_card_interface::static_set_a1bus_tag(*device, _nbtag, _tag);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 class a1bus_device;
 
-class a1bus_slot_device : public device_t,
-							public device_slot_interface
+class a1bus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&a1bus_tag, U &&opts, const char *dflt)
+		: a1bus_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		m_a1bus.set_tag(std::forward<T>(a1bus_tag));
+	}
 	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// inline configuration
-	static void static_set_a1bus_slot(device_t &device, const char *tag, const char *slottag);
 
 protected:
 	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	// configuration
-	const char *m_a1bus_tag, *m_a1bus_slottag;
+	required_device<a1bus_device> m_a1bus;
 };
 
 // device type definition
@@ -76,9 +59,9 @@ public:
 	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<a1bus_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<a1bus_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+	auto out_irq_callback() { return m_out_irq_cb.bind(); }
+	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 
 	void add_a1bus_card(device_a1bus_card_interface *card);
 	device_a1bus_card_interface *get_a1bus_card();
@@ -96,17 +79,17 @@ protected:
 	a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
 
 	device_a1bus_card_interface *m_device;
-	const char *m_cputag;
 };
 
 
@@ -125,24 +108,28 @@ public:
 
 	device_a1bus_card_interface *next() const { return m_next; }
 
-	void set_a1bus_device();
+	// inline configuration
+	void set_a1bus(a1bus_device *a1bus, const char *slottag) { m_a1bus = a1bus; m_a1bus_slottag = slottag; }
+	template <typename T> void set_onboard(T &&a1bus) { m_a1bus_finder.set_tag(std::forward<T>(a1bus)); m_a1bus_slottag = device().tag(); }
 
+protected:
 	void raise_slot_irq() { m_a1bus->set_irq_line(ASSERT_LINE); }
 	void lower_slot_irq() { m_a1bus->set_irq_line(CLEAR_LINE); }
 	void raise_slot_nmi() { m_a1bus->set_nmi_line(ASSERT_LINE); }
 	void lower_slot_nmi() { m_a1bus->set_nmi_line(CLEAR_LINE); }
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	void install_bank(offs_t start, offs_t end, char *tag, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 
-	// inline configuration
-	static void static_set_a1bus_tag(device_t &device, const char *tag, const char *slottag);
-
-protected:
 	device_a1bus_card_interface(const machine_config &mconfig, device_t &device);
 
-	a1bus_device  *m_a1bus;
-	const char *m_a1bus_tag, *m_a1bus_slottag;
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+
+private:
+	optional_device<a1bus_device> m_a1bus_finder;
+	a1bus_device *m_a1bus;
+	const char *m_a1bus_slottag;
 	device_a1bus_card_interface *m_next;
 };
 

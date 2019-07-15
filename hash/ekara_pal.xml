@@ -1,0 +1,216 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_pal" description="Takara e-kara (UK/Europe, PAL) cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+
+	<!-- UK / Europe cartridges - these have 'UK' part codes, but multiple languages on the case suggesting they were used for the whole of Europe -->
+
+	<!-- e-kara UK / Europe Volume 1 (UK-E001)
+	1.  "Oops!...I Did It Again"       Britney Spears
+	2.  "Thank You"                    Dido
+	3.  "Bootylicious"                 Destiny's Child
+	4.  "I Need You"                   LeAnn Rimes
+	5.  "Love Don't Cost a Thing"      Jennifer Lopez
+	6.  "Don't Think I'm Not"          Kandi
+	7.  "Again"                        Janet Jackson
+	8.  "Hot Stuff"                    Donna Summer
+	9.  "Nobody Wants to be Lonely"    Ricky Martin & Christina Aguilera
+	10. "I Want It That Way"           Backstreet Boys
+	-->
+	<software name="uk_vol1">
+		<description>e-kara UK / Europe Volume 1 (UK-E001)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e001.u1" size="0x100000" crc="fc0ea770" sha1="47e2ef544cbb35431dd138b74d1f9b7290eba02d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 2 (UK-E002)
+	1.  "Independent Woman Part 1"             Destiny's Child
+	2.  "Lucky"                                Britney Spears
+	3.  "Back and Forth"                       Aaliyah
+	4.  "Thank You"                            Dido
+	5.  "Crush"                                Jennifer Paige
+	6.  "Stomp"                                Steps
+	7.  "All For You"                          Janet Jackson
+	8.  "Saving All My Love For You"           Whitney Houston
+	9.  "Take On Me"                           a1
+	10. "Show Me The Meaning of Being Lonely"  Backstreet Boys
+	-->
+	<software name="uk_vol2">
+		<description>e-kara UK / Europe Volume 2 (UK-E002)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e002.u1" size="0x100000" crc="ab011ea3" sha1="dd5c9cc330956861b0d172c5a07a72eb315009a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 3 (UK-E003)
+	1.  "Stronger"                   Britney Spears
+	2.  "I Turn To You"              Christina Aguilera
+	3.  "Survivor (Album Version)"   Destiny's Child
+	4.  "He Loves U Not"             Dream
+	5.  "5,6,7,8"                    Steps
+	6.  "Can't Fight The Moonlight"  LeAnn Rimes
+	7.  "Body II Body"               Samantha Mumba
+	8.  "Believe"                    Cher
+	9.  "Larger Than Life"           Backstreet Boys
+	10. "Bye Bye Bye"                *N Sync
+	-->
+	<software name="uk_vol3">
+		<description>e-kara UK / Europe Volume 3 (UK-E003)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e003.u1" size="0x100000" crc="ee16321c" sha1="cc6d22e164164dc678c75a65e13397fb29024b14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- e-kara UK / Europe Volume 4 (UK-E004) (not dumped) (this is the same tracklist as US-E004, but the code on the UK/EU one would be different as they use a different timing method)
+	1.  "Can't Buy Me Love"   The Beatles
+	2.  "A Hard Day's Night"  The Beatles
+	3.  "Ticket To Ride"      The Beatles
+	4.  "Yesterday"           The Beatles
+	5.  "Help"                The Beatles
+	6.  "Michelle"            The Beatles
+	7.  "Yellow Submarine"    The Beatles
+	8.  "All My Loving"       The Beatles
+	9.  "Drive My Car"        The Beatles
+	10. "We Can Work It Out"  The Beatles
+	-->
+
+	<!-- e-kara UK / Europe Volume 5 (UK-E005) (not dumped) (this is the same tracklist as US-E005, but the code on the UK/EU one would be different as they use a different timing method)
+	1.  "Lucy In the Sky With Diamonds"  The Beatles
+	2.  "All You Need Is Love"           The Beatles
+	3.  "Hello Goodbye"                  The Beatles
+	4.  "Hey Jude"                       The Beatles
+	5.  "Ob-La-Di, Ob-La-Da"             The Beatles
+	6.  "Get Back"                       The Beatles
+	7.  "Come Together"                  The Beatles
+	8.  "Oh! Darling"                    The Beatles
+	9.  "Let It Be"                      The Beatles
+	10. "The Long And Winding Road"      The Beatles
+	-->
+
+	<!-- e-kara UK / Europe Volume 6 (UK-E006)
+	1.  "Genie In A Bottle"             Christina Aguilera
+	2.  "Oops!... I Did it Again"       Britney Spears
+	3.  "Jumpin', Jumpin'"              Destiny's Child
+	4.  "Case Of The Ex"                Mya
+	5.  "The First Night"               Monica
+	6.  "Someone To Call My Lover"      Janet Jackson
+	7.  "American Pie (Album Version)"  Madonna
+	8.  "Lovin' You"                    Minnie Riperton
+	9.  "Let Me Let Go"                 Faith Hill
+	10. "Back To Your Heart"            Backstreet Boys
+	-->
+	<software name="uk_vol6">
+		<description>e-kara UK / Europe Volume 6 (UK-E006)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e006.u1" size="0x100000" crc="fad51dc4" sha1="522adfab98c2634bfaa9a01e3b7aebba2f867c1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	1.  "I'm A Slave 4 U"                    Britney Spears
+	2.  "It's Gonna Be Me"                   *N Sync
+	3.  "Doesn't Really Matter (radio edit)" Janet Jackson
+	4.  "Love Don't Cost a Thing"            Jennifer Lopez
+	5.  "I'll Be There For You"              Backstreet Boys
+	6.  "I Just Called To Say I Love You"    Stevie Wonder
+	7.  "Crazy For You"                      Madonna
+	8.  "True Colors"                        Cyndi Lauper
+	9.  "When It's Over"                     Sugar Ray
+	10. "Breathe"                            Faith Hill
+	-->
+	<software name="uk_vol7">
+		<description>e-kara UK / Europe Volume 7 (UK-E007)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e007.u1" size="0x100000" crc="753ce591" sha1="e12ac98470f1dbc470f2e3d957f1b72f0a90bee1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Note, same lineup as US Starter, but with 2002 copyright, different background picture on 'Stronger'
+	     this has a 'GER' code, which suggests there might be ones for other regions where the ROM will need checking
+	1. "Stronger"                  Britney Spears
+	2. "Bye Bye Bye"               *N Sync
+	3. "Independent Woman Part 1"  Destiny's Child
+	4. "I Want It That Way"        Backstreet Boys
+	5. "Yellow Submarine"          The Beatles
+	-->
+	<software name="ger_strt">
+		<description>e-kara Germany 5-Songs Starter (GER-M001)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="ger-m001.u1" size="0x080000" crc="ff2881f3" sha1="3470fc1ed81da5e2c929205fcd290da82d031c4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the Spanish carts do not have a part number on the cartridge, PCB or box -->
+
+	<!--
+	1.  "Cuéntame Al Oído"               La Oreja De Van Gogh
+	2.  "La Última Noche"                Luis Miguel
+	3.  "Corazón Latino"                 David Bisbal
+	4.  "Además De Ti"                   David Bustamante
+	5.  "Quiero"                         Raúl
+	6.  "No Rompas Mi Corazón"           Coyote Daxx
+	7.  "Atrévete"                       Chenoa
+	8.  "Europe's Living A Celebration"  Rosa
+	9.  "María"                          Ricky Martin
+	10. "Sin Miedo A Nada"               Alex Ubago
+	-->
+	<software name="spainvol1">
+		<description>e-kara Spain 10-Songs Volume 1</description>
+		<year>2002</year>
+		<publisher>Takara / newgent</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="spainvol1.bin" size="0x100000" crc="b90366cc" sha1="f6bab71fc8cb420728ffa721d7c12767719099e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	1.  "Héroe"               Enrique Iglesias
+	2.  "Vida"                Gisela
+	3.  "Suerte"              Shakira
+	4.  "Torero"              Chayanne
+	5.  "Dile Que La Quiero"  David Civera
+	6.  "Soledad"             La Oreja De Van Gogh
+	7.  "Aserejé"             Las Ketchup
+	8.  "Sueño Su Boca"       Raul
+	9.  "La Apuesta"          Rosa
+	10  "Ave María"           David Bisbal
+	-->
+	<software name="spainvol2">
+		<description>e-kara Spain 10-Songs Volume 2</description>
+		<year>2002</year>
+		<publisher>Takara / newgent</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

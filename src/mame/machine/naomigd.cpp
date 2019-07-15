@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "naomigd.h"
+#include "romload.h"
 #include "imagedev/chd_cd.h"
 
 /*
@@ -401,17 +402,10 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 }
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock)
+	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock),
+	picdata(*this, finder_base::DUMMY_TAG)
 {
 	image_tag = nullptr;
-	pic_tag = nullptr;
-}
-
-void naomi_gdrom_board::static_set_tags(device_t &device, const char *_image_tag, const char *_pic_tag)
-{
-	naomi_gdrom_board &dev = downcast<naomi_gdrom_board &>(device);
-	dev.image_tag = _image_tag;
-	dev.pic_tag = _pic_tag;
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -471,11 +465,9 @@ void naomi_gdrom_board::device_start()
 	uint64_t key;
 	uint8_t netpic = 0;
 
-	memory_region *mr = memregion(pic_tag);
-	const uint8_t *picdata = mr->base();
 
 	if(picdata) {
-		if(memregion(pic_tag)->bytes() >= 0x4000) {
+		if(picdata.length() >= 0x4000) {
 			printf("Real PIC binary found\n");
 			for(int i=0;i<7;i++)
 				name[i] = picdata[0x7c0+i*2];
@@ -637,12 +629,14 @@ ROM_START( dimm )
 	ROM_LOAD("315-6334.ic11", 0x000000, 0x01ff01, CRC(534c342d) SHA1(3e879f432c82305487922ab28c07107cf0f3c5cf) ) // Net-DIMM
 
 	// unused and/or unknown security PICs
-	// 253-5508-0352E 317-0352-EXP BFC.BIN unknown, presumable some mahjong game (MJ1 ?)
+	// 253-5508-0352E 317-0352-EXP BFC.BIN, probably Sega Yonin Uchi Mahjong MJ (Export)
 	ROM_LOAD("317-0352-exp.pic", 0x00, 0x4000, CRC(b216fbfc) SHA1(da2341003b35d1600d63fbe34d13ff3b42bdc939) )
 	// 253-5508-0422J 317-0422-JPN BHE.BIN Quest of D undumped version, high likely 2.0x "Gofu no Keisyousya"
 	ROM_LOAD("317-0422-jpn.pic", 0x00, 0x4000, CRC(54197fbf) SHA1(a18b5b7aec0498c7a62cacf9f2298ddefb7482c9) )
 	// 253-5508-0456J 317-0456-JPN BEG.BIN WCCF 2005-2006 undumped Japan version
 	ROM_LOAD("317-0456-jpn.pic", 0x00, 0x4000, CRC(cf3bd834) SHA1(6236cdb780260d34c02806478a39c9f3432a45e8) )
+	// Sangokushi Taisen 2 satellite firmware update (CDV-10023) key, .BIN file name is unknown/incorrect.
+	ROM_LOAD("317-unknown.pic",  0x00, 0x4000, CRC(7dc07733) SHA1(b223dc44718fa71e7b420c3b44ce4ab961445461) )
 
 	// main firmwares
 	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) )

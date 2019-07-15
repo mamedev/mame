@@ -25,7 +25,6 @@ TODO:
 #include "emu.h"
 #include "audio/galaxian.h"
 #include "includes/galaxian.h"
-#include "includes/galaxold.h"
 
 /*************************************
  *
@@ -244,7 +243,7 @@ static const discrete_op_amp_filt_info galaxian_bandpass_desc =
  *************************************/
 
 
-static DISCRETE_SOUND_START(galaxian)
+DISCRETE_SOUND_START(galaxian_discrete)
 
 	/************************************************/
 	/* Input register mapping for galaxian          */
@@ -376,8 +375,8 @@ static DISCRETE_SOUND_START(galaxian)
 DISCRETE_SOUND_END
 
 
-static DISCRETE_SOUND_START(mooncrst)
-	DISCRETE_IMPORT(galaxian)
+DISCRETE_SOUND_START(mooncrst_discrete)
+	DISCRETE_IMPORT(galaxian_discrete)
 
 	/************************************************/
 	/* Moon Cresta mixing stage                     */
@@ -393,6 +392,7 @@ galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, cons
 	: device_t(mconfig, GALAXIAN, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_lfo_val(0)
+	, m_discrete(*this, "^" GAL_AUDIO)
 {
 }
 
@@ -403,8 +403,6 @@ galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, cons
 void galaxian_sound_device::device_start()
 {
 	m_lfo_val = 0;
-
-	m_discrete = machine().device<discrete_device>(GAL_AUDIO);
 
 	save_item(NAME(m_lfo_val));
 }
@@ -418,7 +416,7 @@ void galaxian_sound_device::device_start()
 /* IC 9J */
 WRITE8_MEMBER( galaxian_sound_device::pitch_w )
 {
-	m_discrete->write(space, GAL_INP_PITCH, data );
+	m_discrete->write(GAL_INP_PITCH, data );
 }
 
 WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
@@ -428,28 +426,28 @@ WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
 	if (m_lfo_val != lfo_val_new)
 	{
 		m_lfo_val = lfo_val_new;
-		m_discrete->write(space, GAL_INP_BG_DAC, m_lfo_val);
+		m_discrete->write(GAL_INP_BG_DAC, m_lfo_val);
 	}
 }
 
 WRITE8_MEMBER( galaxian_sound_device::background_enable_w )
 {
-	m_discrete->write(space, NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
+	m_discrete->write(NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
 }
 
 WRITE8_MEMBER( galaxian_sound_device::noise_enable_w )
 {
-	m_discrete->write(space, GAL_INP_HIT, data & 0x01);
+	m_discrete->write(GAL_INP_HIT, data & 0x01);
 }
 
 WRITE8_MEMBER( galaxian_sound_device::vol_w )
 {
-	m_discrete->write(space, NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
+	m_discrete->write(NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
 }
 
 WRITE8_MEMBER( galaxian_sound_device::fire_enable_w )
 {
-	m_discrete->write(space, GAL_INP_FIRE, data & 0x01);
+	m_discrete->write(GAL_INP_FIRE, data & 0x01);
 }
 
 /* FIXME: May be replaced by one call! */
@@ -489,51 +487,3 @@ WRITE8_MEMBER( galaxian_sound_device::sound_w )
 void galaxian_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 }
-
-/*************************************
- *
- *  Driver definitions
- *
- *************************************/
-
-MACHINE_CONFIG_START(galaxold_state::galaxian_audio)
-
-	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
-
-	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(galaxian)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxold_state::mooncrst_audio)
-
-	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
-
-	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(mooncrst)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::galaxian_audio)
-
-	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
-
-	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(galaxian)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::mooncrst_audio)
-
-	MCFG_SOUND_ADD("cust", GALAXIAN, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
-
-	MCFG_SOUND_ADD(GAL_AUDIO, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(mooncrst)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END

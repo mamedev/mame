@@ -49,21 +49,6 @@
 #define VIDEOBRAIN_EXPANSION_SLOT_TAG       "exp"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, VIDEOBRAIN_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_VIDEOBRAIN_EXPANSION_SLOT_EXTRES_CALLBACK(_write) \
-	devcb = &videobrain_expansion_slot_device::set_extres_wr_callback(*device, DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -88,8 +73,8 @@ protected:
 	virtual uint8_t* videobrain_ram_pointer(running_machine &machine, size_t size);
 
 	// runtime
-	virtual uint8_t videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) { return 0; }
-	virtual void videobrain_bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2) { }
+	virtual uint8_t videobrain_bo_r(offs_t offset, int cs1, int cs2) { return 0; }
+	virtual void videobrain_bo_w(offs_t offset, uint8_t data, int cs1, int cs2) { }
 	virtual void videobrain_extres_w() { }
 
 	videobrain_expansion_slot_device *m_slot;
@@ -110,20 +95,29 @@ class videobrain_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
+		: videobrain_expansion_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> static devcb_base &set_extres_wr_callback(device_t &device, Object &&cb) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(std::forward<Object>(cb)); }
+	auto extres_wr_callback() { return m_write_extres.bind(); }
 
 	// computer interface
-	uint8_t bo_r(address_space &space, offs_t offset, int cs1, int cs2);
-	void bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2);
+	uint8_t bo_r(offs_t offset, int cs1, int cs2);
+	void bo_w(offs_t offset, uint8_t data, int cs1, int cs2);
 
-	DECLARE_READ8_MEMBER( cs1_r ) { return bo_r(space, offset + 0x1000, 0, 1); }
-	DECLARE_WRITE8_MEMBER( cs1_w ) { bo_w(space, offset + 0x1000, data, 0, 1); }
-	DECLARE_READ8_MEMBER( cs2_r ) { return bo_r(space, offset + 0x1800, 1, 0); }
-	DECLARE_WRITE8_MEMBER( cs2_w ) { bo_w(space, offset + 0x1800, data, 1, 0); }
-	DECLARE_READ8_MEMBER( unmap_r ) { return bo_r(space, offset + 0x3000, 1, 0); }
-	DECLARE_WRITE8_MEMBER( unmap_w ) { bo_w(space, offset + 0x3000, data, 1, 0); }
+	uint8_t cs1_r(offs_t offset) { return bo_r(offset + 0x1000, 0, 1); }
+	void cs1_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1000, data, 0, 1); }
+	uint8_t cs2_r(offs_t offset) { return bo_r(offset + 0x1800, 1, 0); }
+	void cs2_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1800, data, 1, 0); }
+	uint8_t unmap_r(offs_t offset) { return bo_r(offset + 0x3000, 1, 0); }
+	void unmap_w(offs_t offset, uint8_t data) { bo_w(offset + 0x3000, data, 1, 0); }
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }
@@ -159,6 +153,6 @@ protected:
 DECLARE_DEVICE_TYPE(VIDEOBRAIN_EXPANSION_SLOT, videobrain_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( vidbrain_expansion_cards );
+void vidbrain_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIDBRAIN_EXP_H

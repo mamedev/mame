@@ -7,10 +7,12 @@
 #include "includes/pc1403.h"
 #include "machine/ram.h"
 
+#define LOG_ASIC (1 << 0)
+
+#define VERBSOE  (0)
+#include "logmacro.h"
+
 /* C-CE while reset, program will not be destroyed! */
-
-
-
 
 /*
    port 2:
@@ -19,155 +21,84 @@
      bits 0..6 keyboard output select matrix line
 */
 
-WRITE8_MEMBER(pc1403_state::pc1403_asic_write)
+WRITE8_MEMBER(pc1403_state::asic_write)
 {
-	m_asic[offset>>9]=data;
-	switch( (offset>>9) ){
-		case 0/*0x3800*/:
-				// output
-				logerror ("asic write %.4x %.2x\n",offset, data);
-				break;
-		case 1/*0x3a00*/:
-				logerror ("asic write %.4x %.2x\n",offset, data);
-				break;
-		case 2/*0x3c00*/:
-				membank("bank1")->set_base(memregion("user1")->base()+((data&7)<<14));
-				logerror ("asic write %.4x %.2x\n",offset, data);
-				break;
-		case 3/*0x3e00*/: break;
+	m_asic[offset >> 9] = data;
+	switch (offset >> 9)
+	{
+	case 0: // 0x3800
+		// output
+		LOGMASKED(LOG_ASIC, "asic write %.4x %.2x\n", offset, data);
+		break;
+	case 1: // 0x3a00
+		LOGMASKED(LOG_ASIC, "asic write %.4x %.2x\n", offset, data);
+		break;
+	case 2: // 0x3c00
+		membank("bank1")->set_base(memregion("user1")->base() + ((data & 7) << 14));
+		LOGMASKED(LOG_ASIC, "asic write %.4x %.2x\n", offset, data);
+		break;
+	case 3: // 0x3e00
+		break;
 	}
 }
 
-READ8_MEMBER(pc1403_state::pc1403_asic_read)
+READ8_MEMBER(pc1403_state::asic_read)
 {
-	uint8_t data=m_asic[offset>>9];
-	switch( (offset>>9) ){
-		case 0: case 1: case 2:
-			logerror ("asic read %.4x %.2x\n",offset, data);
-			break;
+	uint8_t data = m_asic[offset >> 9];
+	switch (offset >> 9)
+	{
+	case 0:
+	case 1:
+	case 2:
+		LOGMASKED(LOG_ASIC, "asic read %.4x %.2x\n", offset, data);
+		break;
 	}
 	return data;
 }
 
-WRITE8_MEMBER(pc1403_state::pc1403_outa)
+READ8_MEMBER(pc1403_state::in_a_r)
 {
-	m_outa=data;
-}
+	uint8_t data = m_outa;
 
-READ8_MEMBER(pc1403_state::pc1403_ina)
-{
-	uint8_t data=m_outa;
+	for (int bit = 0; bit < 7; bit++)
+		if (BIT(m_asic[3], bit))
+			data |= m_keys[bit]->read();
 
-	if (m_asic[3] & 0x01)
-		data |= ioport("KEY0")->read();
-
-	if (m_asic[3] & 0x02)
-		data |= ioport("KEY1")->read();
-
-	if (m_asic[3] & 0x04)
-		data |= ioport("KEY2")->read();
-
-	if (m_asic[3] & 0x08)
-		data |= ioport("KEY3")->read();
-
-	if (m_asic[3] & 0x10)
-		data |= ioport("KEY4")->read();
-
-	if (m_asic[3] & 0x20)
-		data |= ioport("KEY5")->read();
-
-	if (m_asic[3] & 0x40)
-		data |= ioport("KEY6")->read();
-
-	if (m_outa & 0x01)
+	if (BIT(m_outa, 0))
 	{
-		data |= ioport("KEY7")->read();
+		data |= m_keys[7]->read();
 
 		/* At Power Up we fake a 'C-CE' pressure */
 		if (m_power)
 			data |= 0x02;
 	}
 
-	if (m_outa & 0x02)
-		data |= ioport("KEY8")->read();
-
-	if (m_outa & 0x04)
-		data |= ioport("KEY9")->read();
-
-	if (m_outa & 0x08)
-		data |= ioport("KEY10")->read();
-
-	if (m_outa & 0x10)
-		data |= ioport("KEY11")->read();
-
-	if (m_outa & 0x20)
-		data |= ioport("KEY12")->read();
-
-	if (m_outa & 0x40)
-		data |= ioport("KEY13")->read();
+	for (int bit = 1, key = 8; bit < 7; bit++, key++)
+		if (BIT(m_outa, bit))
+			data |= m_keys[key]->read();
 
 	return data;
 }
 
-#if 0
-READ8_MEMBER(pc1403_state::pc1403_inb)
-{
-	int data = m_outb;
-
-	if (ioport("KEY13")->read())
-		data |= 1;
-
-	return data;
-}
-#endif
-
-WRITE8_MEMBER(pc1403_state::pc1403_outc)
+WRITE8_MEMBER(pc1403_state::out_c_w)
 {
 	m_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->m_maincpu->safe_pc(), data);
 }
 
-
-READ_LINE_MEMBER(pc1403_state::pc1403_brk)
+READ_LINE_MEMBER(pc1403_state::reset_r)
 {
-	return (ioport("EXTRA")->read() & 0x01);
-}
-
-READ_LINE_MEMBER(pc1403_state::pc1403_reset)
-{
-	return (ioport("EXTRA")->read() & 0x02);
+	return BIT(m_extra->read(), 1);
 }
 
 void pc1403_state::machine_start()
 {
-	uint8_t *ram = memregion("maincpu")->base() + 0x8000;
-	uint8_t *cpu = m_maincpu->internal_ram();
-
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x8000);
-}
-
-void pc1403_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_POWER_UP:
-		m_power=0;
-		break;
-	default:
-		assert_always(false, "Unknown id in pc1403_state::device_timer");
-	}
-}
-
-DRIVER_INIT_MEMBER(pc1403_state,pc1403)
-{
-	int i;
-	uint8_t *gfx=memregion("gfx1")->base();
-
-	for (i=0; i<128; i++) gfx[i]=i;
-
-	m_power = 1;
-	timer_set(attotime::from_seconds(1), TIMER_POWER_UP);
+	pocketc_state::machine_start();
 
 	membank("bank1")->set_base(memregion("user1")->base());
+
+	m_ram_nvram->set_base(memregion("maincpu")->base() + 0x8000, 0x8000);
+
+	uint8_t *gfx = memregion("gfx1")->base();
+	for (int i = 0; i < 128; i++)
+		gfx[i] = i;
 }

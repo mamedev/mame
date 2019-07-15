@@ -43,6 +43,7 @@ E I1     Vectored interrupt error
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -51,6 +52,7 @@ E I1     Vectored interrupt error
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -61,8 +63,8 @@ E I1     Vectored interrupt error
 class m20_state : public driver_device
 {
 public:
-	m20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m20_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_kbdi8251(*this, "i8251_1"),
@@ -78,6 +80,9 @@ public:
 	{
 	}
 
+	void m20(machine_config &config);
+
+private:
 	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<i8251_device> m_kbdi8251;
@@ -105,23 +110,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	MC6845_UPDATE_ROW(update_row);
 
-	void m20(machine_config &config);
 	void m20_data_mem(address_map &map);
 	void m20_io(address_map &map);
 	void m20_program_mem(address_map &map);
-private:
+
 	offs_t m_memsize;
 	uint8_t m_port21;
 	void install_memory();
 
-public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
 
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */
-#define PIXEL_CLOCK XTAL(4'433'619)
+#define PIXEL_CLOCK 4.433619_MHz_XTAL
 
 
 MC6845_UPDATE_ROW( m20_state::update_row )
@@ -201,12 +204,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
-	return m_i8259->read(space, offset)<<1;
+	return m_i8259->read(offset)<<1;
 }
 
 WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
-	m_i8259->write(space, offset, (data>>1));
+	m_i8259->write(offset, (data>>1));
 }
 
 WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
@@ -233,7 +236,7 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 	 */
 	if(m_apb)
 		m_apb->nvi_w(state);
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
+	m_maincpu->set_input_line(z8001_device::NVI_LINE, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 
 
@@ -319,17 +322,19 @@ B/W, 128K cards, 3 cards => 512K of memory:
 */
 
 
-ADDRESS_MAP_START(m20_state::m20_program_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-ADDRESS_MAP_END
+void m20_state::m20_program_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x30000, 0x33fff).ram().share("videoram");
+	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+}
 
-ADDRESS_MAP_START(m20_state::m20_data_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-ADDRESS_MAP_END
+void m20_state::m20_data_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x30000, 0x33fff).ram().share("videoram");
+	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+}
 
 
 void m20_state::install_memory()
@@ -430,9 +435,9 @@ void m20_state::install_memory()
 			/* DRAM1, 32K */
 
 			/* prog
-			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			   map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			   map( 0x88000, 0x8bfff ).ram().share("dram1_4000");
+			   map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
 			*/
 			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
 			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram1_4000");
@@ -440,10 +445,10 @@ void m20_state::install_memory()
 
 			/*
 			  data
-			  AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
-			  AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
-			  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			  map( 0x04000, 0x07fff ).ram().share("dram1_4000");
+			  map( 0x1c000, 0x1ffff ).ram().share("dram1_0000");
+			  map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			  map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
 			*/
 			dspace.install_readwrite_bank(0x4000, 0x7fff, 0, "dram1_4000");
 			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0, "dram1_0000");
@@ -457,20 +462,20 @@ void m20_state::install_memory()
 				/* DRAM2, 32K */
 
 				/* prog
-				   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram2_0000")
-				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0x8c000, 0x8ffff ).ram().share("dram2_0000");
+				   map( 0x98000, 0x9bfff ).ram().share("dram2_4000");
+				   map( 0xac000, 0xaffff ).ram().share("dram2_0000");
 				*/
 				pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0, "dram2_0000");
 				pspace.install_readwrite_bank(0x98000, 0x9bfff, 0, "dram2_4000");
 				pspace.install_readwrite_bank(0xac000, 0xaffff, 0, "dram2_0000");
 
 				/* data
-				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
-				   AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0x08000, 0x0bfff ).ram().share("dram2_0000");
+				   map( 0x0c000, 0x0ffff ).ram().share("dram2_4000");
+				   map( 0x88000, 0x8bfff ).ram().share("dram2_4000");
+				   map( 0x98000, 0x9bfff ).ram().share("dram2_4000");
+				   map( 0xac000, 0xaffff ).ram().share("dram2_0000");
 				 */
 				dspace.install_readwrite_bank(0x8000, 0xbfff, 0, "dram2_0000");
 				dspace.install_readwrite_bank(0xc000, 0xffff, 0, "dram2_4000");
@@ -485,19 +490,19 @@ void m20_state::install_memory()
 				/* DRAM3, 32K */
 
 				/* prog
-				   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
+				   map( 0x9c000, 0x9ffff ).ram().share("dram3_0000");
+				   map( 0xb0000, 0xb3fff ).ram().share("dram3_4000");
 				*/
 				pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0, "dram3_0000");
 				pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0, "dram3_4000");
 
 				/* data
-				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram3_4000")
+				   map( 0x44000, 0x47fff ).ram().share("dram3_0000");
+				   map( 0x48000, 0x4bfff ).ram().share("dram3_4000");
+				   map( 0x8c000, 0x8ffff ).ram().share("dram3_0000");
+				   map( 0x9c000, 0x9ffff ).ram().share("dram3_0000");
+				   map( 0xb0000, 0xb3fff ).ram().share("dram3_4000");
+				   map( 0xc0000, 0xc3fff ).ram().share("dram3_4000");
 				 */
 				dspace.install_readwrite_bank(0x44000, 0x47fff, 0, "dram3_0000");
 				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0, "dram3_4000");
@@ -516,16 +521,16 @@ void m20_state::install_memory()
 			/* DRAM1, 128K */
 
 			/* prog
-			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram1_8000")
-			   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram1_c000")
-			   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram1_10000")
-			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram1_8000")
-			   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram1_14000")
-			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
-			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
+			   map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			   map( 0x88000, 0x8bfff ).ram().share("dram1_4000");
+			   map( 0x8c000, 0x8ffff ).ram().share("dram1_8000");
+			   map( 0x98000, 0x9bfff ).ram().share("dram1_c000");
+			   map( 0x9c000, 0x9ffff ).ram().share("dram1_10000");
+			   map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
+			   map( 0xac000, 0xaffff ).ram().share("dram1_8000");
+			   map( 0xb0000, 0xb3fff ).ram().share("dram1_14000");
+			   map( 0xb4000, 0xb7fff ).ram().share("dram1_18000");
+			   map( 0xb8000, 0xbbfff ).ram().share("dram1_1c000");
 			*/
 			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
 			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram1_4000");
@@ -539,18 +544,18 @@ void m20_state::install_memory()
 			pspace.install_readwrite_bank(0xb8000, 0xbbfff, 0, "dram1_1c000");
 
 			/* data
-			   AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_c000")
-			   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram1_10000")
-			   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram1_c000")
-			   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram1_10000")
-			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram1_8000")
-			   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram1_14000")
-			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
-			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
+			   map( 0x04000, 0x07fff ).ram().share("dram1_4000");
+			   map( 0x1c000, 0x1ffff ).ram().share("dram1_0000");
+			   map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			   map( 0x88000, 0x8bfff ).ram().share("dram1_c000");
+			   map( 0x8c000, 0x8ffff ).ram().share("dram1_10000");
+			   map( 0x98000, 0x9bfff ).ram().share("dram1_c000");
+			   map( 0x9c000, 0x9ffff ).ram().share("dram1_10000");
+			   map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
+			   map( 0xac000, 0xaffff ).ram().share("dram1_8000");
+			   map( 0xb0000, 0xb3fff ).ram().share("dram1_14000");
+			   map( 0xb4000, 0xb7fff ).ram().share("dram1_18000");
+			   map( 0xb8000, 0xbbfff ).ram().share("dram1_1c000");
 			 */
 			dspace.install_readwrite_bank(0x4000, 0x7fff, 0, "dram1_4000");
 			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0, "dram1_0000");
@@ -578,16 +583,16 @@ void m20_state::install_memory()
 				/* DRAM2, 128K */
 
 				/* prog
-				   AM_RANGE( 0xbc000, 0xbffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0xbc000, 0xbffff ).ram().share("dram2_0000");
 
-				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xc4000, 0xc7fff ) AM_RAM AM_SHARE("dram2_8000")
-				   AM_RANGE( 0xc8000, 0xcbfff ) AM_RAM AM_SHARE("dram2_c000")
-				   AM_RANGE( 0xcc000, 0xcffff ) AM_RAM AM_SHARE("dram2_10000")
+				   map( 0xc0000, 0xc3fff ).ram().share("dram2_4000");
+				   map( 0xc4000, 0xc7fff ).ram().share("dram2_8000");
+				   map( 0xc8000, 0xcbfff ).ram().share("dram2_c000");
+				   map( 0xcc000, 0xcffff ).ram().share("dram2_10000");
 
-				   AM_RANGE( 0xd0000, 0xd3fff ) AM_RAM AM_SHARE("dram2_14000")
-				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
-				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
+				   map( 0xd0000, 0xd3fff ).ram().share("dram2_14000");
+				   map( 0xd4000, 0xd7fff ).ram().share("dram2_18000");
+				   map( 0xd8000, 0xdbfff ).ram().share("dram2_1c000");
 				 */
 				pspace.install_readwrite_bank(0xbc000, 0xbffff, 0, "dram2_0000");
 				pspace.install_readwrite_bank(0xc0000, 0xc3fff, 0, "dram2_4000");
@@ -599,19 +604,19 @@ void m20_state::install_memory()
 				pspace.install_readwrite_bank(0xd8000, 0xdbfff, 0, "dram2_1c000");
 
 				/* data
-				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
-				   AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
+				   map( 0x08000, 0x0bfff ).ram().share("dram2_0000");
+				   map( 0x0c000, 0x0ffff ).ram().share("dram2_4000");
 
-				   AM_RANGE( 0xbc000, 0xbffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0xbc000, 0xbffff ).ram().share("dram2_0000");
 
-				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xc4000, 0xc7fff ) AM_RAM AM_SHARE("dram2_8000")
-				   AM_RANGE( 0xc8000, 0xcbfff ) AM_RAM AM_SHARE("dram2_c000")
-				   AM_RANGE( 0xcc000, 0xcffff ) AM_RAM AM_SHARE("dram2_10000")
+				   map( 0xc0000, 0xc3fff ).ram().share("dram2_4000");
+				   map( 0xc4000, 0xc7fff ).ram().share("dram2_8000");
+				   map( 0xc8000, 0xcbfff ).ram().share("dram2_c000");
+				   map( 0xcc000, 0xcffff ).ram().share("dram2_10000");
 
-				   AM_RANGE( 0xd0000, 0xd3fff ) AM_RAM AM_SHARE("dram2_14000")
-				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
-				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
+				   map( 0xd0000, 0xd3fff ).ram().share("dram2_14000");
+				   map( 0xd4000, 0xd7fff ).ram().share("dram2_18000");
+				   map( 0xd8000, 0xdbfff ).ram().share("dram2_1c000");
 				*/
 				dspace.install_readwrite_bank(0x8000, 0xbfff, 0, "dram2_0000");
 				dspace.install_readwrite_bank(0xc000, 0xffff, 0, "dram2_4000");
@@ -637,17 +642,17 @@ void m20_state::install_memory()
 				/* DRAM3, 128K */
 
 				/* prog
-				   AM_RANGE( 0xdc000, 0xdffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0xdc000, 0xdffff ).ram().share("dram3_0000");
 
-				   AM_RANGE( 0xe0000, 0xe3fff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xe4000, 0xe7fff ) AM_RAM AM_SHARE("dram3_8000")
-				   AM_RANGE( 0xe8000, 0xebfff ) AM_RAM AM_SHARE("dram3_c000")
-				   AM_RANGE( 0xec000, 0xeffff ) AM_RAM AM_SHARE("dram3_10000")
+				   map( 0xe0000, 0xe3fff ).ram().share("dram3_4000");
+				   map( 0xe4000, 0xe7fff ).ram().share("dram3_8000");
+				   map( 0xe8000, 0xebfff ).ram().share("dram3_c000");
+				   map( 0xec000, 0xeffff ).ram().share("dram3_10000");
 
-				   AM_RANGE( 0xf0000, 0xf3fff ) AM_RAM AM_SHARE("dram3_14000")
-				   AM_RANGE( 0xf4000, 0xf7fff ) AM_RAM AM_SHARE("dram3_18000")
-				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
-				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0xf0000, 0xf3fff ).ram().share("dram3_14000");
+				   map( 0xf4000, 0xf7fff ).ram().share("dram3_18000");
+				   map( 0xf8000, 0xfbfff ).ram().share("dram3_1c000");
+				   map( 0xfc000, 0xfffff ).ram().share("dram3_0000");
 				*/
 				pspace.install_readwrite_bank(0xdc000, 0xdffff, 0, "dram3_0000");
 				pspace.install_readwrite_bank(0xe0000, 0xe3fff, 0, "dram3_4000");
@@ -660,19 +665,19 @@ void m20_state::install_memory()
 				pspace.install_readwrite_bank(0xfc000, 0xfffff, 0, "dram3_0000");
 
 				/* data
-				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xdc000, 0xdffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0x44000, 0x47fff ).ram().share("dram3_0000");
+				   map( 0x48000, 0x4bfff ).ram().share("dram3_4000");
+				   map( 0xdc000, 0xdffff ).ram().share("dram3_0000");
 
-				   AM_RANGE( 0xe0000, 0xe3fff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xe4000, 0xe7fff ) AM_RAM AM_SHARE("dram3_8000")
-				   AM_RANGE( 0xe8000, 0xebfff ) AM_RAM AM_SHARE("dram3_c000")
-				   AM_RANGE( 0xec000, 0xeffff ) AM_RAM AM_SHARE("dram3_10000")
+				   map( 0xe0000, 0xe3fff ).ram().share("dram3_4000");
+				   map( 0xe4000, 0xe7fff ).ram().share("dram3_8000");
+				   map( 0xe8000, 0xebfff ).ram().share("dram3_c000");
+				   map( 0xec000, 0xeffff ).ram().share("dram3_10000");
 
-				   AM_RANGE( 0xf0000, 0xf3fff ) AM_RAM AM_SHARE("dram3_14000")
-				   AM_RANGE( 0xf4000, 0xf7fff ) AM_RAM AM_SHARE("dram3_18000")
-				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
-				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0xf0000, 0xf3fff ).ram().share("dram3_14000");
+				   map( 0xf4000, 0xf7fff ).ram().share("dram3_18000");
+				   map( 0xf8000, 0xfbfff ).ram().share("dram3_1c000");
+				   map( 0xfc000, 0xfffff ).ram().share("dram3_0000");
 				*/
 				dspace.install_readwrite_bank(0x44000, 0x47fff, 0, "dram3_0000");
 				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0, "dram3_4000");
@@ -699,32 +704,33 @@ void m20_state::install_memory()
 	}
 }
 
-ADDRESS_MAP_START(m20_state::m20_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void m20_state::m20_io(address_map &map)
+{
+	map.unmap_value_high();
 
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0x00ff)
+	map(0x00, 0x07).rw(m_fd1797, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
+	map(0x20, 0x21).rw(FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
 
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x62, 0x63) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00) // FIXME
-	AM_RANGE(0x62, 0x63) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
-	AM_RANGE(0x64, 0x65) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
+	map(0x61, 0x61).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x62, 0x62).w("crtc", FUNC(mc6845_device::address_w)); // FIXME
+	map(0x63, 0x63).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x64, 0x64).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
+	map(0x80, 0x87).rw(m_i8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa2, 0xa3) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
+	map(0xa1, 0xa1).rw(m_kbdi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xa3, 0xa3).rw(m_kbdi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0xc0, 0xc1) AM_DEVREADWRITE8("i8251_2", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xc2, 0xc3) AM_DEVREADWRITE8("i8251_2", i8251_device, status_r, control_w, 0x00ff)
+	map(0xc1, 0xc1).rw(m_ttyi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc3, 0xc3).rw(m_ttyi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0x120, 0x127) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
+	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
+	map(0x140, 0x143).rw(FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
 
-	AM_RANGE(0x3ffa, 0x3ffd) AM_DEVWRITE("apb", m20_8086_device, handshake_w)
-ADDRESS_MAP_END
+	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
+}
 
 IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 {
@@ -738,7 +744,7 @@ WRITE_LINE_MEMBER(m20_state::int_w)
 {
 	if(m_apb && !m_apb->halted())
 		m_apb->vi_w(state);
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void m20_state::machine_start()
@@ -762,116 +768,117 @@ void m20_state::machine_reset()
 	m_fd1797->reset();
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
-	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
+	m_maincpu->reset();   // FIXME: rewrite Z8000 core to not read the vector at this time
 	m_kbdi8251->write_cts(0);
 	if (m_apb)
 		m_apb->halt();
 }
 
 
-static SLOT_INTERFACE_START( m20_floppies )
-	SLOT_INTERFACE( "5dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void m20_floppies(device_slot_interface &device)
+{
+	device.option_add("5dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( m20_state::floppy_formats )
 	FLOPPY_M20_FORMAT,
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("m20", M20_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("m20", M20_KEYBOARD);
+}
 
-MACHINE_CONFIG_START(m20_state::m20)
+void m20_state::m20(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m20_program_mem)
-	MCFG_CPU_DATA_MAP(m20_data_mem)
-	MCFG_CPU_IO_MAP(m20_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(m20_state,m20_irq_callback)
+	Z8001(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m20_state::m20_program_mem);
+	m_maincpu->set_addrmap(AS_DATA, &m20_state::m20_data_mem);
+	m_maincpu->set_addrmap(AS_IO, &m20_state::m20_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(m20_state::m20_irq_callback));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("160K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_EXTRA_OPTIONS("128K,192K,224K,256K,384K,512K")
+	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_FD1797_ADD("fd1797", 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("i8259", pic8259_device, ir0_w))
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
+	FD1797(config, m_fd1797, 1000000);
+	m_fd1797->intrq_wr_callback().set(m_i8259, FUNC(pic8259_device::ir0_w));
+	FLOPPY_CONNECTOR(config, "fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8) /* hand tuned to get ~50 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_UPDATE_ROW_CB(m20_state, update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK/8)); /* hand tuned to get ~50 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(16);
+	crtc.set_update_row_callback(FUNC(m20_state::update_row), this);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	I8255A(config, m_i8255, 0);
 
-	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("kbd", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("i8259", pic8259_device, ir4_w))
+	I8251(config, m_kbdi8251, 0);
+	m_kbdi8251->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
+	m_kbdi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("i8251_2", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("i8259", pic8259_device, ir3_w))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("i8259", pic8259_device, ir5_w))
+	I8251(config, m_ttyi8251, 0);
+	m_ttyi8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_ttyi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir3_w));
+	m_ttyi8251->txrdy_handler().set(m_i8259, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1230782)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m20_state, tty_clock_tick_w))
-	MCFG_PIT8253_CLK1(1230782)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m20_state, kbd_clock_tick_w))
-	MCFG_PIT8253_CLK2(1230782)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m20_state, timer_tick_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(1230782);
+	pit8253.out_handler<0>().set(FUNC(m20_state::tty_clock_tick_w));
+	pit8253.set_clk<1>(1230782);
+	pit8253.out_handler<1>().set(FUNC(m20_state::kbd_clock_tick_w));
+	pit8253.set_clk<2>(1230782);
+	pit8253.out_handler<2>().set(FUNC(m20_state::timer_tick_w));
 
-	MCFG_DEVICE_ADD("i8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(m20_state, int_w))
+	PIC8259(config, m_i8259, 0);
+	m_i8259->out_int_callback().set(FUNC(m20_state::int_w));
 
-	MCFG_RS232_PORT_ADD("kbd", keyboard, "m20")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_1", i8251_device, write_rxd))
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard, "m20"));
+	kbd.rxd_handler().set(m_kbdi8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_2", i8251_device, write_rxd))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_ttyi8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("apb", M20_8086, 0)
+	M20_8086(config, m_apb, m_maincpu, m_i8259, RAM_TAG);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","m20")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("m20");
+}
 
 ROM_START(m20)
 	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "m20", "M20 1.0" )
-	ROMX_LOAD("m20.bin", 0x0000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(1))
+	ROMX_LOAD("m20.bin", 0x0000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "m20-20d", "M20 2.0d" )
-	ROMX_LOAD("m20-20d.bin", 0x0000, 0x2000, CRC(cbe265a6) SHA1(c7cb9d9900b7b5014fcf1ceb2e45a66a91c564d0), ROM_BIOS(2))
+	ROMX_LOAD("m20-20d.bin", 0x0000, 0x2000, CRC(cbe265a6) SHA1(c7cb9d9900b7b5014fcf1ceb2e45a66a91c564d0), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "m20-20f", "M20 2.0f" )
-	ROMX_LOAD("m20-20f.bin", 0x0000, 0x2000, CRC(db7198d8) SHA1(149d8513867081d31c73c2965dabb36d5f308041), ROM_BIOS(3))
+	ROMX_LOAD("m20-20f.bin", 0x0000, 0x2000, CRC(db7198d8) SHA1(149d8513867081d31c73c2965dabb36d5f308041), ROM_BIOS(2))
 ROM_END
 
 ROM_START(m40)
 	ROM_REGION(0x14000,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "m40-81", "M40 15.dec.81" )
-	ROMX_LOAD( "m40rom-15-dec-81", 0x0000, 0x2000, CRC(e8e7df84) SHA1(e86018043bf5a23ff63434f9beef7ce2972d8153), ROM_BIOS(1))
+	ROMX_LOAD( "m40rom-15-dec-81", 0x0000, 0x2000, CRC(e8e7df84) SHA1(e86018043bf5a23ff63434f9beef7ce2972d8153), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "m40-82", "M40 17.dec.82" )
-	ROMX_LOAD( "m40rom-17-dec-82", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(2))
+	ROMX_LOAD( "m40rom-17-dec-82", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "m40-41", "M40 4.1" )
-	ROMX_LOAD( "m40rom-4.1", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(3))
+	ROMX_LOAD( "m40rom-4.1", 0x0000, 0x2000, CRC(cf55681c) SHA1(fe4ae14a6751fef5d7bde49439286f1da3689437), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "m40-60", "M40 6.0" )
-	ROMX_LOAD( "m40rom-6.0", 0x0000, 0x4000, CRC(8114ebec) SHA1(4e2c65b95718c77a87dbee0288f323bd1c8837a3), ROM_BIOS(4))
+	ROMX_LOAD( "m40rom-6.0", 0x0000, 0x4000, CRC(8114ebec) SHA1(4e2c65b95718c77a87dbee0288f323bd1c8837a3), ROM_BIOS(3))
 
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT STATE      INIT COMPANY     FULLNAME           FLAGS
-COMP( 1981, m20,   0,      0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1981, m40,   m20,    0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
+COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

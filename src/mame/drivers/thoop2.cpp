@@ -75,12 +75,12 @@ Measurements from actual PCB:
 
 void thoop2_state::machine_start()
 {
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-WRITE8_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
+WRITE8_MEMBER(thoop2_state::oki_bankswitch_w)
 {
-	membank("okibank")->set_entry(data & 0x0f);
+	m_okibank->set_entry(data & 0x0f);
 }
 
 WRITE_LINE_MEMBER(thoop2_state::coin1_lockout_w)
@@ -116,35 +116,38 @@ READ8_MEMBER(thoop2_state::shareram_r)
 }
 
 
-ADDRESS_MAP_START(thoop2_state::mcu_hostmem_map)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(shareram_r, shareram_w) // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
-ADDRESS_MAP_END
+void thoop2_state::mcu_hostmem_map(address_map &map)
+{
+	map(0x8000, 0xffff).rw(FUNC(thoop2_state::shareram_r), FUNC(thoop2_state::shareram_w)); // confirmed that 0x8000 - 0xffff is a window into 68k shared RAM
+}
 
 
-ADDRESS_MAP_START(thoop2_state::thoop2_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                 /* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                 /* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)                           /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	;map(0x70000a, 0x70000b).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE8(OKIM6295_bankswitch_w, 0x00ff)               /* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)                  /* OKI6295 data register */
-	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                          /* Work RAM */
-	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                     /* Work RAM (shared with D5002FP) */
-ADDRESS_MAP_END
+void thoop2_state::thoop2_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                 /* ROM */
+	map(0x100000, 0x101fff).ram().w(FUNC(thoop2_state::vram_w)).share("videoram");   /* Video RAM */
+	map(0x108000, 0x108007).writeonly().share("vregs");                 /* Video Registers */
+	map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                           /* INT 6 ACK/Watchdog timer */
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* Palette */
+	map(0x440000, 0x440fff).ram().share("spriteram");                       /* Sprite RAM */
+	map(0x700000, 0x700001).portr("DSW2");
+	map(0x700002, 0x700003).portr("DSW1");
+	map(0x700004, 0x700005).portr("P1");
+	map(0x700006, 0x700007).portr("P2");
+	map(0x700008, 0x700009).portr("SYSTEM");
+	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
+	map(0x70000d, 0x70000d).w(FUNC(thoop2_state::oki_bankswitch_w));               /* OKI6295 bankswitch */
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                  /* OKI6295 data register */
+	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */
+	map(0xfe8000, 0xfeffff).ram().share("shareram");                     /* Work RAM (shared with D5002FP) */
+}
 
 
-ADDRESS_MAP_START(thoop2_state::oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void thoop2_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 
 static INPUT_PORTS_START( thoop2 )
@@ -231,74 +234,71 @@ INPUT_PORTS_END
 static const gfx_layout thoop2_tilelayout =
 {
 	8,8,                                    /* 8x8 tiles */
-	0x400000/16,                            /* number of tiles */
+	RGN_FRAC(1,2),                            /* number of tiles */
 	4,                                      /* 4 bpp */
-	{ 0*0x400000*8+8, 0*0x400000*8, 1*0x400000*8+8, 1*0x400000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
 static const gfx_layout thoop2_tilelayout_16 =
 {
 	16,16,                                  /* 16x16 tiles */
-	0x400000/64,                            /* number of tiles */
+	RGN_FRAC(1,2),                            /* number of tiles */
 	4,                                      /* 4 bpp */
-	{ 0*0x400000*8+8, 0*0x400000*8, 1*0x400000*8+8, 1*0x400000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+4, 16*16+5, 16*16+6, 16*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ 8, 0, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0 },
+	{ STEP8(0,1), STEP8(8*2*16,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
 
-static GFXDECODE_START( thoop2 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout, 0,        64 )
+static GFXDECODE_START( gfx_thoop2 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, thoop2_tilelayout_16, 0, 64 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(thoop2_state::thoop2)
-
+void thoop2_state::thoop2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000) / 2) // 12MHz verified
-	MCFG_CPU_PROGRAM_MAP(thoop2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thoop2_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2); // 12MHz verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &thoop2_state::thoop2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(thoop2_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) // 12MHz verified
-	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); // 12MHz verified
+	ds5002fp.set_addrmap(0, &thoop2_state::mcu_hostmem_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(thoop2_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(thoop2_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thoop2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(thoop2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // unknown. Sound related?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // unknown
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(thoop2_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(thoop2_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(thoop2_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(thoop2_state::coin2_counter_w));
+	m_outlatch->q_out_cb<4>().set_nop(); // unknown. Sound related?
+	m_outlatch->q_out_cb<5>().set_nop(); // unknown
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.24)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(thoop2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.24);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0, 320-1, 16, 256-1);
+	screen.set_screen_update(FUNC(thoop2_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thoop2)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thoop2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // 1MHz resonator - pin 7 not connected
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // 1MHz resonator - pin 7 not connected
+	oki.set_addrmap(0, &thoop2_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -348,5 +348,5 @@ ROM_START( thoop2a ) /* REF.940411 PCB */
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 
-GAME( 1994, thoop2,       0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020E0867)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, thoop2a, thoop2, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020EB356)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, thoop2,       0, thoop2, thoop2, thoop2_state, empty_init, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020E0867)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, thoop2a, thoop2, thoop2, thoop2, thoop2_state, empty_init, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020EB356)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

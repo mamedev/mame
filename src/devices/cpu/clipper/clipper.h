@@ -10,6 +10,9 @@
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 
+#include "cpu/clipper/common.h"
+#include "machine/cammu.h"
+
 // convenience macros for dealing with the psw and ssw
 #define PSW(mask) (m_psw & PSW_##mask)
 #define SSW(mask) (m_ssw & SSW_##mask)
@@ -17,21 +20,8 @@
 class clipper_device : public cpu_device
 {
 public:
-	DECLARE_READ32_MEMBER(get_ssw) const { return m_ssw; }
 	DECLARE_WRITE8_MEMBER(set_ivec) { m_ivec = data; }
 	DECLARE_WRITE16_MEMBER(set_exception);
-
-	enum addressing_modes : u8
-	{
-		ADDR_MODE_PC32  = 0x10, // pc relative with 32 bit displacement
-		ADDR_MODE_ABS32 = 0x30, // 32 bit absolute
-		ADDR_MODE_REL32 = 0x60, // relative with 32 bit displacement
-		ADDR_MODE_PC16  = 0x90, // pc relative with 16 bit displacement
-		ADDR_MODE_REL12 = 0xa0, // relative with 12 bit displacement
-		ADDR_MODE_ABS16 = 0xb0, // 16 bit absolute
-		ADDR_MODE_PCX   = 0xd0, // pc indexed
-		ADDR_MODE_RELX  = 0xe0  // relative indexed
-	};
 
 	// branch conditions (first description for comparison, second for move/logical)
 	enum branch_conditions : u8
@@ -94,73 +84,25 @@ public:
 		FR_3 = 0x00018000  // round toward zero
 	};
 
-	enum ssw : u32
+	enum psw_dsp : u32
 	{
-		SSW_IN  = 0x0000000f, // interrupt number (4 bits)
-		SSW_IL  = 0x000000f0, // interrupt level (4 bits)
-		SSW_EI  = 0x00000100, // enable interrupts
-		SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
-							  // unused (5 bits)
-		SSW_FRD = 0x00400000, // floating registers dirty
-		SSW_TP  = 0x00800000, // trace trap pending
-		SSW_ECM = 0x01000000, // enable corrected memory error
-		SSW_DF  = 0x02000000, // fpu disabled
-		SSW_M   = 0x04000000, // mapped mode
-		SSW_KU  = 0x08000000, // user protect key
-		SSW_UU  = 0x10000000, // user data mode
-		SSW_K   = 0x20000000, // protect key
-		SSW_U   = 0x40000000, // user mode
-		SSW_P   = 0x80000000  // previous mode
+		DSP_NONE  = 0x00000000, // no delayed branch active
+		DSP_S1    = 0x00100000, // delayed branch slot 1 active
+		DSP_SALL  = 0x00200000, // delayed branch slots 0 and 1 active
+		DSP_SETUP = 0x00300000  // delayed branch taken
 	};
 
 	enum ssw_id : u32
 	{
-		SSW_ID_C400R0 = 0x00000,
-		SSW_ID_C400R1 = 0x04000,
-		SSW_ID_C400R2 = 0x08000,
-		SSW_ID_C400R3 = 0x0c000,
-		SSW_ID_C400R4 = 0x10000
-	};
-
-	enum exception_vectors : u16
-	{
-		// data memory trap group
-		EXCEPTION_D_CORRECTED_MEMORY_ERROR     = 0x108,
-		EXCEPTION_D_UNCORRECTABLE_MEMORY_ERROR = 0x110,
-		EXCEPTION_D_ALIGNMENT_FAULT            = 0x120,
-		EXCEPTION_D_PAGE_FAULT                 = 0x128,
-		EXCEPTION_D_READ_PROTECT_FAULT         = 0x130,
-		EXCEPTION_D_WRITE_PROTECT_FAULT        = 0x138,
-
-		// floating-point arithmetic trap group
-		EXCEPTION_FLOATING_INEXACT             = 0x180,
-		EXCEPTION_FLOATING_UNDERFLOW           = 0x188,
-		EXCEPTION_FLOATING_DIVIDE_BY_ZERO      = 0x190,
-		EXCEPTION_FLOATING_OVERFLOW            = 0x1a0,
-		EXCEPTION_FLOATING_INVALID_OPERATION   = 0x1c0,
-
-		// integer arithmetic trap group
-		EXCEPTION_INTEGER_DIVIDE_BY_ZERO       = 0x208,
-
-		// instruction memory trap group
-		EXCEPTION_I_CORRECTED_MEMORY_ERROR     = 0x288,
-		EXCEPTION_I_UNCORRECTABLE_MEMORY_ERROR = 0x290,
-		EXCEPTION_I_ALIGNMENT_FAULT            = 0x2a0,
-		EXCEPTION_I_PAGE_FAULT                 = 0x2a8,
-		EXCEPTION_I_EXECUTE_PROTECT_FAULT      = 0x2b0,
-
-		// illegal operation trap group
-		EXCEPTION_ILLEGAL_OPERATION            = 0x300,
-		EXCEPTION_PRIVILEGED_INSTRUCTION       = 0x308,
-
-		// diagnostic trap group
-		EXCEPTION_TRACE                        = 0x380,
-
-		// supervisor calls (0x400-0x7f8)
-		EXCEPTION_SUPERVISOR_CALL_BASE         = 0x400,
-
-		// prioritized interrupts (0x800-0xff8)
-		EXCEPTION_INTERRUPT_BASE               = 0x800
+		SSW_ID_C1R1 = 0x00000,
+		SSW_ID_C2R1 = 0x00200,
+		SSW_ID_C3R1 = 0x00400,
+		SSW_ID_E1R1 = 0x00600,
+		SSW_ID_C4R0 = 0x00800,
+		SSW_ID_C4R1 = 0x04800,
+		SSW_ID_C4R2 = 0x08800,
+		SSW_ID_C4R3 = 0x0c800,
+		SSW_ID_C4R4 = 0x10800
 	};
 
 	// trap source values are shifted into the correct field in the psw
@@ -223,12 +165,17 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// mmu helpers
+	virtual cammu_device &get_icammu() const = 0;
+	virtual cammu_device &get_dcammu() const = 0;
 
 	// cpu execution logic
 	bool decode_instruction();
@@ -236,7 +183,7 @@ protected:
 	bool evaluate_branch() const;
 
 	// exception entry and return helpers
-	u32 intrap(const u16 vector, const u32 old_pc);
+	virtual u32 intrap(const u16 vector, const u32 old_pc);
 	u32 reti();
 
 	// cpu state helpers
@@ -248,10 +195,16 @@ protected:
 	virtual int get_ireg_count() const { return 16; }
 	virtual int get_freg_count() const { return 8; }
 
-	// exception vector and frame helpers
-	virtual int get_eframe_size() const { return 12; }
-	virtual int get_evpc_offset() const { return 0; }
-	virtual int get_evssw_offset() const { return 4; }
+	// register pair helpers
+	u64 get_64(const u8 reg) const
+	{
+		return u64(m_r[reg | 0x1]) << 32 | u64(m_r[reg & 0xe]);
+	}
+	void set_64(const u8 reg, const u64 data)
+	{
+		m_r[reg & 0xe] = u32(data & ~u32(0));
+		m_r[reg | 0x1] = u32(data >> 32);
+	}
 
 	// floating point helpers
 	float32 get_fp32(const u8 reg) const { return m_f[reg & 0xf]; }
@@ -316,20 +269,22 @@ protected:
 		m_ssw |= SSW_FRD;
 	};
 
-	// emulation state
-	address_space_config m_insn_config;
-	address_space_config m_data_config;
+	std::string debug_string(u32 pointer);
+	std::string debug_string_array(u32 array_pointer);
 
-	address_space *m_insn;
-	address_space *m_data;
+	// emulation state
+	address_space_config m_main_config;
+	address_space_config m_io_config;
+	address_space_config m_boot_config;
 
 	enum registers
 	{
-		CLIPPER_IREG = 0,
-		CLIPPER_FREG = 16,
-		CLIPPER_PSW  = 32,
-		CLIPPER_SSW  = 33,
-		CLIPPER_PC   = 34,
+		CLIPPER_UREG = 0,
+		CLIPPER_SREG = 16,
+		CLIPPER_FREG = 32,
+		CLIPPER_PSW  = 48,
+		CLIPPER_SSW  = 49,
+		CLIPPER_PC   = 50,
 	};
 
 	int m_icount;    // instruction cycle count
@@ -348,15 +303,16 @@ protected:
 	u64 m_fp_dst; // original value of destination register during fp exception
 
 	// non-visible cpu state
-	u32 m_ip;        // next instruction address
-	int m_irq;       // interrupt request state
+	bool m_wait;     // waiting for interrupt
 	int m_nmi;       // non-maskable interrupt state
+	int m_irq;       // interrupt request state
 	u8 m_ivec;       // interrupt vector
 	u16 m_exception; // pending exception
 
 	// decoded instruction information
 	struct decode
 	{
+		u32 pc;       // base address of instruction
 		u8 opcode;    // primary instruction opcode
 		u8 subopcode; // secondary instruction opcode
 		u8 r1;        // r1 instruction operand
@@ -372,12 +328,28 @@ class clipper_c100_device : public clipper_device
 {
 public:
 	clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual cammu_device &get_icammu() const override { return *m_icammu; }
+	virtual cammu_device &get_dcammu() const override { return *m_dcammu; }
+
+private:
+	required_device<cammu_device> m_icammu;
+	required_device<cammu_device> m_dcammu;
 };
 
 class clipper_c300_device : public clipper_device
 {
 public:
 	clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual cammu_device &get_icammu() const override { return *m_icammu; }
+	virtual cammu_device &get_dcammu() const override { return *m_dcammu; }
+
+private:
+	required_device<cammu_device> m_icammu;
+	required_device<cammu_device> m_dcammu;
 };
 
 class clipper_c400_device : public clipper_device
@@ -386,19 +358,23 @@ public:
 	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual u32 intrap(const u16 vector, const u32 old_pc) override;
+
 	// C400 has additional 8 floating point registers
 	virtual int get_freg_count() const override { return 16; }
 
-	// C400 creates a 24 byte exception frame (C100/C300 is 12 bytes), but the
-	// service routine must increment sp by 12 prior to executing reti
-	// exception frame size
-	virtual int get_eframe_size() const override { return 24; }
-
-	// C400 pc and ssw are reversed in exception vector compared to C100/C300
-	virtual int get_evpc_offset() const override { return 4; }
-	virtual int get_evssw_offset() const override { return 0; }
-
 	virtual void execute_instruction() override;
+
+	virtual cammu_device &get_icammu() const override { return *m_cammu; }
+	virtual cammu_device &get_dcammu() const override { return *m_cammu; }
+
+private:
+	u32 m_db_pc; // delayed branch pc
+
+	required_device<cammu_device> m_cammu;
 };
 
 DECLARE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device)

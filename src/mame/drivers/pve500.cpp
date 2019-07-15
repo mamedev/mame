@@ -48,6 +48,7 @@
 #include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "machine/clock.h"
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/mb8421.h"
@@ -69,13 +70,21 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
+		, m_cxdio(*this, "cxdio")
 		, m_eeprom(*this, "eeprom")
 		, m_buzzer(*this, "buzzer")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pve500(machine_config &config);
+
+	void init_pve500();
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
 	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
 	DECLARE_WRITE_LINE_MEMBER(GPI_w);
+	DECLARE_WRITE_LINE_MEMBER(cxdio_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
 
 	DECLARE_READ8_MEMBER(io_ky_r);
@@ -85,29 +94,36 @@ public:
 	DECLARE_WRITE8_MEMBER(io_sel_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_DRIVER_INIT(pve500);
-	void pve500(machine_config &config);
 	void maincpu_io(address_map &map);
 	void maincpu_prg(address_map &map);
 	void subcpu_io(address_map &map);
 	void subcpu_prg(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<tmpz84c015_device> m_maincpu;
 	required_device<tmpz84c015_device> m_subcpu;
+	required_device<cxd1095_device> m_cxdio;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<beep_device> m_buzzer;
+	output_finder<27> m_digits;
+
 	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
 	int LD_data[4];
 };
 
-WRITE_LINE_MEMBER( pve500_state::GPI_w )
+WRITE_LINE_MEMBER(pve500_state::GPI_w)
 {
 	/* TODO: Implement-me */
 }
 
-WRITE_LINE_MEMBER( pve500_state::external_monitor_w )
+WRITE_LINE_MEMBER(pve500_state::cxdio_reset_w)
+{
+	if (!state)
+		m_cxdio->reset();
+}
+
+WRITE_LINE_MEMBER(pve500_state::external_monitor_w)
 {
 	/* TODO: Implement-me */
 }
@@ -120,27 +136,31 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 };
 
 
-ADDRESS_MAP_START(pve500_state::maincpu_io)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0B) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void pve500_state::maincpu_io(address_map &map)
+{
+	map(0x00, 0x03).mirror(0xff00).rw("external_sio", FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0x08, 0x0B).mirror(0xff00).rw("external_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
-ADDRESS_MAP_START(pve500_state::maincpu_prg)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM // ICB7: 48kbytes EPROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // ICD6: 8kbytes of RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_DEVREADWRITE("mb8421", mb8421_device, left_r, left_w)
-ADDRESS_MAP_END
+void pve500_state::maincpu_prg(address_map &map)
+{
+	map(0x0000, 0xbfff).rom(); // ICB7: 48kbytes EPROM
+	map(0xc000, 0xdfff).ram(); // ICD6: 8kbytes of RAM
+	map(0xe000, 0xe7ff).mirror(0x1800).rw("mb8421", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+}
 
-ADDRESS_MAP_START(pve500_state::subcpu_io)
-ADDRESS_MAP_END
+void pve500_state::subcpu_io(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(pve500_state::subcpu_prg)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // ICG5: 32kbytes EPROM
-	AM_RANGE(0x8000, 0x8007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE("cxdio", cxd1095_device, read, write)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
-ADDRESS_MAP_END
+void pve500_state::subcpu_prg(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // ICG5: 32kbytes EPROM
+	map(0x8000, 0x8007).mirror(0x3ff8).rw(m_cxdio, FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0xc000, 0xc7ff).mirror(0x3800).rw("mb8421", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));
+}
 
-DRIVER_INIT_MEMBER( pve500_state, pve500 )
+void pve500_state::init_pve500()
 {
 }
 
@@ -240,6 +260,7 @@ void pve500_state::machine_start()
 	io_LE = 0;
 	io_SEL = 0;
 	io_KY = 0;
+	m_digits.resolve();
 }
 
 void pve500_state::machine_reset()
@@ -291,7 +312,7 @@ READ8_MEMBER(pve500_state::io_ky_r)
 
 WRITE8_MEMBER(pve500_state::io_sc_w)
 {
-	int swap[4] = {2,1,0,3};
+	const int swap[4] = {2,1,0,3};
 
 #if LOG_7SEG_DISPLAY_SIGNALS
 	printf("CXD1095 PORTA (io_SC=%02X)\n", data);
@@ -300,8 +321,12 @@ WRITE8_MEMBER(pve500_state::io_sc_w)
 
 	for (int j=0; j<8; j++){
 		if (!BIT(io_SC,j)){
-			for (int i=0; i<4; i++)
-				output().set_digit_value(8*swap[i] + j, LD_data[i]);
+			int digits = (j < 3) ? 4 : 3;
+			for (int i = 0; i < digits; i++)
+			{
+				assert(8*swap[i] + j < 27);
+				m_digits[8*swap[i] + j] = LD_data[i];
+			}
 		}
 	}
 }
@@ -335,86 +360,96 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 	}
 }
 
-MACHINE_CONFIG_START(pve500_state::pve500)
+void pve500_state::pve500(machine_config &config)
+{
 	/* Main CPU */
-	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
-	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
-	MCFG_CPU_IO_MAP(maincpu_io)
-	MCFG_Z80_DAISY_CHAIN(maincpu_daisy_chain)
-	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(pve500_state, GPI_w))
-	MCFG_TMPZ84C015_OUT_DTRB_CB(DEVWRITELINE("buzzer", beep_device, set_state))
-	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))
-	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("player1", rs232_port_device, write_txd))
+	TMPZ84C015(config, m_maincpu, 12_MHz_XTAL / 2); // TMPZ84C015BF-6
+	m_maincpu->set_addrmap(AS_PROGRAM, &pve500_state::maincpu_prg);
+	m_maincpu->set_addrmap(AS_IO, &pve500_state::maincpu_io);
+	m_maincpu->set_daisy_config(maincpu_daisy_chain);
+	m_maincpu->out_dtra_callback().set(FUNC(pve500_state::GPI_w));
+	m_maincpu->out_dtrb_callback().set(m_buzzer, FUNC(beep_device::set_state)).invert();
+	m_maincpu->out_txda_callback().set("recorder", FUNC(rs232_port_device::write_txd));
+	m_maincpu->out_txdb_callback().set("player1", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL(12'000'000) / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "external_ctc", 12_MHz_XTAL / 2));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("external_sio", Z80SIO0, XTAL(12'000'000) / 2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("player2", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("edl_inout", rs232_port_device, write_txd))
+	z80sio0_device& sio(Z80SIO0(config, "external_sio", 12_MHz_XTAL / 2));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set("player2", FUNC(rs232_port_device::write_txd));
+	sio.out_txdb_callback().set("edl_inout", FUNC(rs232_port_device::write_txd));
 
 	/* Secondary CPU */
-	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
-	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
-	MCFG_CPU_IO_MAP(subcpu_io)
-	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, external_monitor_w))
-	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("switcher", rs232_port_device, write_txd))
-	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("serial_mixer", rs232_port_device, write_txd))
+	TMPZ84C015(config, m_subcpu, 12_MHz_XTAL / 2); /* TMPZ84C015BF-6 */
+	m_subcpu->set_addrmap(AS_PROGRAM, &pve500_state::subcpu_prg);
+	m_subcpu->set_addrmap(AS_IO, &pve500_state::subcpu_io);
+	m_subcpu->out_dtra_callback().set(FUNC(pve500_state::cxdio_reset_w));
+	m_subcpu->out_dtrb_callback().set(FUNC(pve500_state::external_monitor_w));
+	m_subcpu->out_txda_callback().set("switcher", FUNC(rs232_port_device::write_txd));
+	m_subcpu->out_txdb_callback().set("serial_mixer", FUNC(rs232_port_device::write_txd));
 
 	// PIO callbacks
-	MCFG_TMPZ84C015_IN_PA_CB(READ8(pve500_state, eeprom_r))
-	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(pve500_state, eeprom_w))
+	m_subcpu->in_pa_callback().set(FUNC(pve500_state::eeprom_r));
+	m_subcpu->out_pa_callback().set(FUNC(pve500_state::eeprom_w));
 
 	// ICG3: I/O Expander
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(pve500_state, io_sc_w))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(pve500_state, io_le_w))
-	MCFG_CXD1095_IN_PORTC_CB(READ8(pve500_state, io_ky_r))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(pve500_state, io_ld_w))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(pve500_state, io_sel_w))
+	CXD1095(config, m_cxdio, 0);
+	m_cxdio->out_porta_cb().set(FUNC(pve500_state::io_sc_w));
+	m_cxdio->out_portb_cb().set(FUNC(pve500_state::io_le_w));
+	m_cxdio->in_portc_cb().set(FUNC(pve500_state::io_ky_r));
+	m_cxdio->out_portd_cb().set(FUNC(pve500_state::io_ld_w));
+	m_cxdio->out_porte_cb().set(FUNC(pve500_state::io_sel_w));
 
 	/* Search Dial MCUs */
-	MCFG_CPU_ADD("dial_mcu_left", MB88201, XTAL(4'000'000)) /* PLAYER DIAL MCU */
-	MCFG_CPU_ADD("dial_mcu_right", MB88201, XTAL(4'000'000)) /* RECORDER DIAL MCU */
+	MB88201(config, "dial_mcu_left", 4_MHz_XTAL).set_disable(); /* PLAYER DIAL MCU */
+	MB88201(config, "dial_mcu_right", 4_MHz_XTAL).set_disable(); /* RECORDER DIAL MCU */
 
 	/* Serial EEPROM (128 bytes, 8-bit data organization) */
 	/* The EEPROM stores the setup data */
-	MCFG_EEPROM_SERIAL_MSM16911_8BIT_ADD("eeprom")
+	EEPROM_MSM16911_8BIT(config, "eeprom");
 
 	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
-	MCFG_RS232_PORT_ADD("recorder", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, rxa_w))
+	rs232_port_device &recorder(RS232_PORT(config, "recorder", default_rs232_devices, nullptr));
+	recorder.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxa_w));
 
-	MCFG_RS232_PORT_ADD("player1", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, rxb_w))
+	rs232_port_device &player1(RS232_PORT(config, "player1", default_rs232_devices, nullptr));
+	player1.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxb_w));
 
-	MCFG_RS232_PORT_ADD("player2", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxa_w))
+	rs232_port_device &player2(RS232_PORT(config, "player2", default_rs232_devices, nullptr));
+	player2.rxd_handler().set("external_sio", FUNC(z80dart_device::rxa_w));
 
-	MCFG_RS232_PORT_ADD("edl_inout", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxb_w))
+	rs232_port_device &edl_inout(RS232_PORT(config, "edl_inout", default_rs232_devices, nullptr));
+	edl_inout.rxd_handler().set("external_sio", FUNC(z80dart_device::rxb_w));
 
-	MCFG_RS232_PORT_ADD("switcher", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu", tmpz84c015_device, rxa_w))
+	rs232_port_device &switcher(RS232_PORT(config, "switcher", default_rs232_devices, nullptr));
+	switcher.rxd_handler().set(m_subcpu, FUNC(tmpz84c015_device::rxa_w));
 
-	MCFG_RS232_PORT_ADD("serial_mixer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu", tmpz84c015_device, rxb_w))
+	rs232_port_device &serial_mixer(RS232_PORT(config, "serial_mixer", default_rs232_devices, nullptr));
+	serial_mixer.rxd_handler().set(m_subcpu, FUNC(tmpz84c015_device::rxb_w));
+
+	clock_device &clk1(CLOCK(config, "clk1", 12_MHz_XTAL / 20));
+	clk1.signal_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxca_w));
+	clk1.signal_handler().append(m_maincpu, FUNC(tmpz84c015_device::txca_w));
+	clk1.signal_handler().append(m_maincpu, FUNC(tmpz84c015_device::rxcb_w));
+	clk1.signal_handler().append(m_maincpu, FUNC(tmpz84c015_device::txcb_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::rxca_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::txca_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::rxcb_w));
+	clk1.signal_handler().append(m_subcpu, FUNC(tmpz84c015_device::txcb_w));
 
 	/* ICF5: 2kbytes of RAM shared between the two CPUs (dual-port RAM)*/
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(pve500_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(pve500_state, mb8421_intr))
+	mb8421_device &mb8421(MB8421(config, "mb8421"));
+	mb8421.intl_callback().set(FUNC(pve500_state::mb8421_intl));
+	mb8421.intr_callback().set(FUNC(pve500_state::mb8421_intr));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pve500)
+	config.set_default_layout(layout_pve500);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("buzzer", BEEP, 3750) // CLK2 coming out of IC D4 (frequency divider circuitry)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "buzzer", 12_MHz_XTAL / 3200).add_route(ALL_OUTPUTS, "mono", 0.05); // 3.75 kHz CLK2 coming out of IC D4 (frequency divider circuitry)
+}
 
 ROM_START( pve500 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -433,5 +468,5 @@ ROM_START( pve500 )
 	ROM_LOAD( "pve500.ice3", 0x0000, 0x080, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS         INIT    COMPANY  FULLNAME   FLAGS
-COMP( 1995, pve500, 0,      0,      pve500,     pve500, pve500_state, pve500, "SONY",  "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME   FLAGS
+COMP( 1995, pve500, 0,      0,      pve500,  pve500, pve500_state, init_pve500, "SONY",  "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

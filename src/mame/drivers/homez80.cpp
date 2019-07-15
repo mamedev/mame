@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -33,16 +34,19 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
+
+	void homez80(machine_config &config);
+
+private:
 
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void homez80(machine_config &config);
 	void homez80_io(address_map &map);
 	void homez80_mem(address_map &map);
-private:
+
 	bool m_irq;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -58,17 +62,19 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 	return ioport(kbdrow)->read();
 }
 
-ADDRESS_MAP_START(homez80_state::homez80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_SHARE("videoram") // Video RAM
-	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
-ADDRESS_MAP_END
+void homez80_state::homez80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();  // Monitor
+	map(0x2000, 0x23ff).ram().share("videoram"); // Video RAM
+	map(0x7020, 0x702f).r(FUNC(homez80_state::homez80_keyboard_r));
+	map(0x8000, 0xffff).ram();  // 32 K RAM
+}
 
-ADDRESS_MAP_START(homez80_state::homez80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void homez80_state::homez80_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 /* Input ports */
 INPUT_PORTS_START( homez80 )
@@ -270,7 +276,7 @@ const gfx_layout homez80_charlayout =
 	8*8                 /* size of one char */
 };
 
-static GFXDECODE_START( homez80 )
+static GFXDECODE_START( gfx_homez80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homez80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -281,25 +287,26 @@ INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
 	m_irq ^= 1;
 }
 
-MACHINE_CONFIG_START(homez80_state::homez80)
+void homez80_state::homez80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(homez80_mem)
-	MCFG_CPU_IO_MAP(homez80_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(homez80_state, homez80_interrupt,  50)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homez80_state::homez80_mem);
+	m_maincpu->set_addrmap(AS_IO, &homez80_state::homez80_io);
+	m_maincpu->set_periodic_int(FUNC(homez80_state::homez80_interrupt), attotime::from_hz(50));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(homez80_state, screen_update)
-	MCFG_SCREEN_SIZE(344, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(homez80_state::screen_update));
+	screen.set_size(344, 32*8);
+	screen.set_visarea(0, 344-1, 0, 32*8-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homez80 )
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_homez80);
+}
 
 /* ROM definition */
 ROM_START( homez80 )
@@ -312,5 +319,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY             FULLNAME                 FLAGS */
-COMP( 2008, homez80,  0,     0,      homez80,   homez80, homez80_state, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                 FLAGS */
+COMP( 2008, homez80, 0,      0,      homez80, homez80, homez80_state, empty_init, "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)

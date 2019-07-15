@@ -177,7 +177,11 @@ render_primitive_list *renderer_d3d9::get_primitives()
 	if (win == nullptr)
 		return nullptr;
 
-	GetClientRectExceptMenu(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client, win->fullscreen());
+	HWND hWnd = std::static_pointer_cast<win_window_info>(win)->platform_window();
+	if (IsIconic(hWnd))
+		return nullptr;
+
+	GetClientRectExceptMenu(hWnd, &client, win->fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
 		win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
@@ -453,7 +457,8 @@ void d3d_texture_manager::create_resources()
 		texture.height = m_default_bitmap.height();
 		texture.palette = nullptr;
 		texture.seqid = 0;
-		texture.osddata = 0;
+		texture.unique_id = ~0ULL;
+		texture.old_id = ~0ULL;
 
 		// now create it
 		auto tex = std::make_unique<texture_info>(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
@@ -484,10 +489,10 @@ texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, u
 	// find a match
 	for (auto it = m_texture_list.begin(); it != m_texture_list.end(); it++)
 	{
-		uint32_t test_screen = (uint32_t)(*it)->get_texinfo().osddata >> 1;
-		uint32_t test_page = (uint32_t)(*it)->get_texinfo().osddata & 1;
-		uint32_t prim_screen = (uint32_t)texinfo->osddata >> 1;
-		uint32_t prim_page = (uint32_t)texinfo->osddata & 1;
+		uint32_t test_screen = (uint32_t)((*it)->get_texinfo().unique_id >> 57);
+		uint32_t test_page = (uint32_t)((*it)->get_texinfo().unique_id >> 56) & 1;
+		uint32_t prim_screen = (uint32_t)(texinfo->unique_id >> 57);
+		uint32_t prim_page = (uint32_t)(texinfo->unique_id >> 56) & 1;
 		if (test_screen != prim_screen || test_page != prim_page)
 			continue;
 
@@ -1294,7 +1299,7 @@ void renderer_d3d9::pick_best_mode()
 	auto win = assert_window();
 
 	// determine the refresh rate of the primary screen
-	const screen_device *primary_screen = win->machine().config().first_screen();
+	const screen_device *primary_screen = screen_device_iterator(win->machine().root_device()).first();
 	if (primary_screen != nullptr)
 	{
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
@@ -2006,7 +2011,7 @@ texture_info::texture_info(d3d_texture_manager *manager, const render_texinfo* t
 		{
 			format = m_texture_manager->get_yuv_format();
 		}
-		else if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_PALETTEA16)
+		else if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_ARGB32)
 		{
 			format = D3DFMT_A8R8G8B8;
 		}
@@ -2213,7 +2218,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 //  copyline_palette16
 //============================================================
 
-static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
+inline void texture_info::copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*src];
@@ -2225,25 +2230,10 @@ static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int wi
 
 
 //============================================================
-//  copyline_palettea16
-//============================================================
-
-static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
-{
-	if (xborderpix)
-		*dst++ = palette[*src];
-	for (int x = 0; x < width; x++)
-		*dst++ = palette[*src++];
-	if (xborderpix)
-		*dst++ = palette[*--src];
-}
-
-
-//============================================================
 //  copyline_rgb32
 //============================================================
 
-static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
+inline void texture_info::copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (palette != nullptr)
 	{
@@ -2279,7 +2269,7 @@ static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width,
 //  copyline_argb32
 //============================================================
 
-static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
+inline void texture_info::copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (palette != nullptr)
 	{
@@ -2316,7 +2306,7 @@ static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width
 //  copyline_yuy16_to_yuy2
 //============================================================
 
-static inline void copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+inline void texture_info::copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 
@@ -2347,7 +2337,7 @@ static inline void copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, in
 //  copyline_yuy16_to_uyvy
 //============================================================
 
-static inline void copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+inline void texture_info::copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 
@@ -2374,7 +2364,7 @@ static inline void copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, in
 //  copyline_yuy16_to_argb
 //============================================================
 
-static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+inline void texture_info::copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 
@@ -2450,10 +2440,6 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 			{
 				case TEXFORMAT_PALETTE16:
 					copyline_palette16((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
-					break;
-
-				case TEXFORMAT_PALETTEA16:
-					copyline_palettea16((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 					break;
 
 				case TEXFORMAT_RGB32:
@@ -2708,7 +2694,7 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 
 	auto win = d3d->assert_window();
 
-	auto first_screen = win->machine().first_screen();
+	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
 	bool vector_screen =
 		first_screen != nullptr &&
 		first_screen->screen_type() == SCREEN_TYPE_VECTOR;

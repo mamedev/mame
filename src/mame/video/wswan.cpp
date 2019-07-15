@@ -22,6 +22,7 @@ DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai Wonde
 
 wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WSWAN_VIDEO, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 	, m_vdp_type(VDP_TYPE_WSWAN)
 {
 }
@@ -81,7 +82,7 @@ void wswan_video_device::common_save()
 
 void wswan_video_device::device_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	m_timer = timer_alloc(TIMER_SCANLINE);
 	m_timer->adjust(attotime::from_ticks(256, 3072000), 0, attotime::from_ticks(256, 3072000));
@@ -855,7 +856,7 @@ uint32_t wswan_video_device::screen_update(screen_device &screen, bitmap_ind16 &
 }
 
 
-READ8_MEMBER(wswan_video_device::reg_r)
+uint8_t wswan_video_device::reg_r(offs_t offset)
 {
 	uint8_t value = m_regs[offset];
 
@@ -891,7 +892,7 @@ READ8_MEMBER(wswan_video_device::reg_r)
 }
 
 
-WRITE8_MEMBER(wswan_video_device::reg_w)
+void wswan_video_device::reg_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x20 && offset < 0x40)
 	{
@@ -1205,12 +1206,12 @@ void wswan_video_device::scanline_interrupt()
 }
 
 
-READ8_MEMBER(wswan_video_device::vram_r)
+uint8_t wswan_video_device::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(wswan_video_device::vram_w)
+void wswan_video_device::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 }

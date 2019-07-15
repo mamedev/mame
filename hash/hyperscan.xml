@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+NOTE: This list is here only to document available dumps and it's not hoocked up with MAME yet.
+-->
+
+<softwarelist name="hyperscan" description="HyperScan CD-ROMs">
+
+	<software name="ben101">
+		<description>Ben 10 (USE1)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ben101" sha1="b9ca64097a69d40c10f4b6412396ec06fcf8179b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ben102">
+		<description>Ben 10 (USE2)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ben102" sha1="fa34cf65d91251cead457acbb1aa0cb51a26daff" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="iwluse1">
+		<description>IWL - Interstellar Wrestling League (USE1)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="iwluse1" sha1="ed2751a003d2b1f05153ede4557d6179b20c9444" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="iwluse2">
+		<description>IWL - Interstellar Wrestling League (USE2)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="iwluse2" sha1="eb61153a60c2df4f08496b072e0ef5df6b181aa6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="marvelh">
+		<description>Marvel Heroes (USE2)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="marvelh" sha1="df8094339255ca9c2e44004177fb8cc3737beb2e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="spidrman">
+		<description>Spider-Man (USE1)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="spidrman" sha1="41e9419601963883eb12e723e9f7184e983d09af" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xmen">
+		<description>X-Men (USE)</description>
+		<year>2006</year>
+		<publisher>Mattel</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="xmen" sha1="d2316c228c42474b429b8b8078f517022c850188" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

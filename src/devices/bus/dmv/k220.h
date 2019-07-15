@@ -44,10 +44,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_out1);
 	DECLARE_WRITE_LINE_MEMBER(write_out2);
 
+	required_device<dmvcart_slot_device> m_bus;
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_memory_region m_ram;
 	required_memory_region m_rom;
+
+	output_finder<2> m_digits;
 
 	uint8_t   m_portc;
 };

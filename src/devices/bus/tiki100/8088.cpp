@@ -49,27 +49,30 @@ const tiny_rom_entry *tiki100_8088_device::device_rom_region() const
 }
 
 
-ADDRESS_MAP_START(tiki100_8088_device::i8088_mem)
-	AM_RANGE(0x00000, 0xbffff) AM_RAM
-	AM_RANGE(0xc0000, 0xcffff) AM_DEVREADWRITE(":" TIKI100_BUS_TAG, tiki100_bus_device, exin_mrq_r, exin_mrq_w)
-	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
-ADDRESS_MAP_END
+void tiki100_8088_device::i8088_mem(address_map &map)
+{
+	map(0x00000, 0xbffff).ram();
+	map(0xc0000, 0xcffff).rw(":" TIKI100_BUS_TAG, FUNC(tiki100_bus_device::exin_mrq_r), FUNC(tiki100_bus_device::exin_mrq_w));
+	map(0xff000, 0xfffff).rom().region(I8088_TAG, 0);
+}
 
 
-ADDRESS_MAP_START(tiki100_8088_device::i8088_io)
-	AM_RANGE(0x7f, 0x7f) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void tiki100_8088_device::i8088_io(address_map &map)
+{
+	map(0x7f, 0x7f).rw(FUNC(tiki100_8088_device::read), FUNC(tiki100_8088_device::write));
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( tiki100_8088 )
+//  device_add_mconfig()
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tiki100_8088_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8088_TAG, I8088, 6000000)
-	MCFG_CPU_PROGRAM_MAP(i8088_mem)
-	MCFG_CPU_IO_MAP(i8088_io)
-MACHINE_CONFIG_END
+void tiki100_8088_device::device_add_mconfig(machine_config &config)
+{
+	I8088(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiki100_8088_device::i8088_mem);
+	m_maincpu->set_addrmap(AS_IO, &tiki100_8088_device::i8088_io);
+}
 
 
 
@@ -115,7 +118,7 @@ void tiki100_8088_device::device_reset()
 //  tiki100bus_iorq_r - I/O read
 //-------------------------------------------------
 
-uint8_t tiki100_8088_device::iorq_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t tiki100_8088_device::iorq_r(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x7f)
 	{
@@ -130,7 +133,7 @@ uint8_t tiki100_8088_device::iorq_r(address_space &space, offs_t offset, uint8_t
 //  tiki100bus_iorq_w - I/O write
 //-------------------------------------------------
 
-void tiki100_8088_device::iorq_w(address_space &space, offs_t offset, uint8_t data)
+void tiki100_8088_device::iorq_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x7f)
 	{

@@ -11,23 +11,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NAMCO_C148_ADD(_tag, _cputag, _cpumaster) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_C148, 0) \
-	namco_c148_device::configure_device(*device, _cputag, _cpumaster);
-
-#define MCFG_NAMCO_C148_EXT1_CB(_cb) \
-	devcb = &namco_c148_device::set_out_ext1_callback(*device, DEVCB_##_cb);
-
-#define MCFG_NAMCO_C148_EXT2_CB(_cb) \
-	devcb = &namco_c148_device::set_out_ext2_callback(*device, DEVCB_##_cb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -38,29 +21,26 @@ class namco_c148_device : public device_t
 {
 public:
 	// construction/destruction
+	template <typename T>
+	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&hostcpu, bool is_master)
+		: namco_c148_device(mconfig, tag, owner, clock)
+	{
+		set_hostcpu(std::forward<T>(hostcpu), is_master);
+	}
 	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void map(address_map &map);
 
-	static void configure_device(device_t &device, const char *tag, bool is_master)
+	template <typename T> void set_hostcpu(T &&tag, bool is_master)
 	{
-		namco_c148_device &dev = downcast<namco_c148_device &>(device);
-		dev.m_hostcpu_tag = tag;
-		dev.m_hostcpu_master = is_master;
+		m_hostcpu.set_tag(std::forward<T>(tag));
+		m_hostcpu_master = is_master;
 	}
 
-	static void link_c148_device(device_t &device, const char *tag)
-	{
-		namco_c148_device &dev = downcast<namco_c148_device &>(device);
+	template <typename T> void link_c148_device(T &&tag) { m_linked_c148.set_tag(std::forward<T>(tag)); }
 
-		dev.m_linked_c148_tag = tag;
-	}
-
-	template<class _Object> static devcb_base &set_out_ext1_callback(device_t &device, _Object object) { return downcast<namco_c148_device &>(device).m_out_ext1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ext2_callback(device_t &device, _Object object) { return downcast<namco_c148_device &>(device).m_out_ext2_cb.set_callback(object); }
-
-	devcb_write8 m_out_ext1_cb;
-	devcb_write8 m_out_ext2_cb;
+	auto out_ext1_callback() { return m_out_ext1_cb.bind(); }
+	auto out_ext2_callback() { return m_out_ext2_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( vblank_irq_level_r );
 	DECLARE_WRITE8_MEMBER( vblank_irq_level_w );
@@ -106,16 +86,18 @@ public:
 protected:
 	void cpu_irq_trigger();
 	// device-level overrides
-//  virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_validity_check(validity_checker &valid) const override;
+
 private:
-	cpu_device *m_hostcpu;              /**< reference to the host cpu */
-	namco_c148_device *m_linked_c148;   /**< reference to linked master/slave c148 */
-	const char *m_hostcpu_tag;      /**< host cpu tag name */
-	const char *m_linked_c148_tag;  /**< other c148 tag name */
-	bool        m_hostcpu_master;   /**< define if host cpu is master */
+	devcb_write8 m_out_ext1_cb;
+	devcb_write8 m_out_ext2_cb;
+
+	required_device<cpu_device> m_hostcpu;              // reference to the host cpu
+	optional_device<namco_c148_device> m_linked_c148;   // reference to linked master/slave c148
+	bool        m_hostcpu_master;                       // define if host cpu is master
+
 	struct{
 		uint8_t cpu;
 		uint8_t ex;
@@ -132,13 +114,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C148, namco_c148_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 
 
 #endif // MAME_MACHINE_NAMCO_C148_H

@@ -33,20 +33,11 @@
       1  | xxxxxxxx -------- | not used
 */
 
-TILE_GET_INFO_MEMBER(glass_state::get_tile_info_screen0)
+template<int Layer>
+TILE_GET_INFO_MEMBER(glass_state::get_tile_info)
 {
-	int data = m_videoram[tile_index << 1];
-	int data2 = m_videoram[(tile_index << 1) + 1];
-	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
-
-	SET_TILE_INFO_MEMBER(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
-}
-
-
-TILE_GET_INFO_MEMBER(glass_state::get_tile_info_screen1)
-{
-	int data = m_videoram[(0x1000 / 2) + (tile_index << 1)];
-	int data2 = m_videoram[(0x1000 / 2) + (tile_index << 1) + 1];
+	int data = m_videoram[(Layer * 0x1000 / 2) + (tile_index << 1)];
+	int data2 = m_videoram[(Layer * 0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
 
 	SET_TILE_INFO_MEMBER(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
@@ -69,26 +60,20 @@ TILE_GET_INFO_MEMBER(glass_state::get_tile_info_screen1)
 
 WRITE16_MEMBER(glass_state::blitter_w)
 {
-	m_blitter_serial_buffer[m_current_bit] = data & 0x01;
+	m_blitter_command = ((m_blitter_command << 1) | (data & 0x01)) & 0x1f;
 	m_current_bit++;
 
 	if (m_current_bit == 5)
 	{
-		m_current_command = (m_blitter_serial_buffer[0] << 4) |
-							(m_blitter_serial_buffer[1] << 3) |
-							(m_blitter_serial_buffer[2] << 2) |
-							(m_blitter_serial_buffer[3] << 1) |
-							(m_blitter_serial_buffer[4] << 0);
 		m_current_bit = 0;
 
 		/* fill the screen bitmap with the current picture */
 		{
 			int i, j;
-			uint8_t *gfx = (uint8_t *)memregion("gfx3")->base();
 
-			gfx = gfx + (m_current_command & 0x07) * 0x10000 + (m_current_command & 0x08) * 0x10000 + 0x140;
+			uint8_t *gfx = m_bmap + (m_blitter_command & 0x07) * 0x10000 + (m_blitter_command & 0x08) * 0x10000 + 0x140;
 
-			if ((m_current_command & 0x18) != 0)
+			if ((m_blitter_command & 0x18) != 0)
 			{
 				for (j = 0; j < 200; j++)
 				{
@@ -127,8 +112,8 @@ WRITE16_MEMBER(glass_state::vram_w)
 
 void glass_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_screen0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_screen1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_screen_bitmap = std::make_unique<bitmap_ind16>(320, 200);
 
 	save_item(NAME(*m_screen_bitmap));

@@ -13,12 +13,6 @@
 
 #pragma once
 
-// port setup
-#define MCFG_MN10200_READ_PORT_CB(X, _devcb) \
-	devcb = &mn10200_device::set_read_port##X##_callback(*device, DEVCB_##_devcb);
-#define MCFG_MN10200_WRITE_PORT_CB(X, _devcb) \
-	devcb = &mn10200_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
-
 enum
 {
 	MN10200_PORT0 = 0,
@@ -42,18 +36,9 @@ enum
 class mn10200_device : public cpu_device
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_port0_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port1_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port2_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port3_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_port4_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port4.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_write_port0_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port1_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port2_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port3_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_port4_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port4.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <std::size_t Port> auto read_port() { return m_read_port[Port].bind(); }
+	template <std::size_t Port> auto write_port() { return m_write_port[Port].bind(); }
 
 	DECLARE_READ8_MEMBER(io_control_r);
 	DECLARE_WRITE8_MEMBER(io_control_w);
@@ -88,15 +73,15 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
 	address_space *m_program;
 
 	// i/o handlers
-	devcb_read8 m_read_port0, m_read_port1, m_read_port2, m_read_port3, m_read_port4;
-	devcb_write8 m_write_port0, m_write_port1, m_write_port2, m_write_port3, m_write_port4;
+	devcb_read8 m_read_port[5];
+	devcb_write8 m_write_port[5];
 
 	int m_cycles;
 

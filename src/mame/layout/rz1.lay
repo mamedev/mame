@@ -1,0 +1,644 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+Casio RZ-1 layout
+-->
+
+<mamelayout version="2">
+
+	<element name="background">
+		<rect><color red="0.15" green="0.11" blue="0.11" /></rect>
+	</element>
+
+	<element name="teal">
+		<rect><color red="0.29" green="0.74" blue="0.68" /></rect>
+	</element>
+	<element name="darkgray">
+		<rect><color red="0.20" green="0.20" blue="0.20" /></rect>
+	</element>
+	<element name="black">
+		<rect><color red="0.00" green="0.00" blue="0.00" /></rect>
+	</element>
+
+	<element name="button_yellow">
+		<rect><color red="0.88" green="0.80" blue="0.00" /></rect>
+	</element>
+	<element name="button_blue">
+		<rect><color red="0.60" green="0.60" blue="0.74" /></rect>
+	</element>
+	<element name="button_darkblue">
+		<rect><color red="0.37" green="0.54" blue="0.87" /></rect>
+	</element>
+	<element name="button_gray">
+		<rect><color red="0.33" green="0.33" blue="0.33" /></rect>
+	</element>
+	<element name="button_white">
+		<rect><color red="0.83" green="0.81" blue="0.76" /></rect>
+	</element>
+
+	<element name="led" defstate="0">
+		<rect state="0">
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+		<rect state="1">
+			<color red="0.05" green="0.8" blue="0.05" />
+		</rect>
+		<rect state="2">
+			<color red="0.8" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+	<element name="text_0"><text string="0"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_1"><text string="1"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_9"><text string="9"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_10"><text string="10"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_casio"><text string="CASIO"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_desc"><text string="DIGITAL SAMPLING RHYTHM COMPOSER"><color red="0.29" green="0.74" blue="0.68" /></text></element>
+	<element name="text_rz1"><text string="RZ-1"><color red="0.29" green="0.74" blue="0.68" /></text></element>
+	<element name="text_song"><text string="SONG"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_pattern"><text string="PATTERN"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_edit"><text string="EDIT"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_record"><text string="RECORD"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_delete"><text string="DELETE"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_insert"><text string="INSERT"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_auto"><text string="AUTO"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_compensate"><text string="COMPENSATE"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_chain"><text string="CHAIN"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_beat"><text string="BEAT"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_reset"><text string="RESET"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_copy"><text string="/COPY"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_mt"><text string="MT"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_save"><text string="SAVE"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_load"><text string="LOAD"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_tempo"><text string="TEMPO"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_down"><text string="▼"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_up"><text string="▲"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_midi"><text string="MIDI"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_channel"><text string="CHANNEL"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_clock"><text string="CLOCK"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_sampling"><text string="SAMPLING"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_1_32"><text string="1/32"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_48"><text string="1/48"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_96"><text string="1/96"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_12"><text string="1/12"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_16"><text string="1/16"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_24"><text string="1/24"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_4"><text string="1/4"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_6"><text string="1/6"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_8"><text string="1/8"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_1_2"><text string="1/2"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_value"><text string="VALUE"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_no"><text string="NO"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_yes"><text string="YES"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_startstop"><text string="START/STOP"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_continue"><text string="CONTINUE"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_start"><text string="START"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_accent"><text string="ACCENT"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_mute"><text string="MUTE"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_tom1"><text string="TOM 1"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_tom2"><text string="TOM 2"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_tom3"><text string="TOM 3"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_bd"><text string="B D"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_rim"><text string="RIM"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_sd"><text string="S D"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_openhh"><text string="OPEN HH"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_closedhh"><text string="CLOSED HH"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_claps"><text string="CLAPS"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_ride"><text string="RIDE"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_cowbell"><text string="COWBELL"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_crash"><text string="CRASH"><color red="0.98" green="0.95" blue="0.89" /></text></element>
+	<element name="text_sample1"><text string="SAMPLE 1"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_sample2"><text string="SAMPLE 2"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_sample3"><text string="SAMPLE 3"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+	<element name="text_sample4"><text string="SAMPLE 4"><color red="0.15" green="0.11" blue="0.11" /></text></element>
+
+	<view name="Default">
+		<backdrop element="background">
+			<bounds x="0" y="0" width="800" height="535" />
+		</backdrop>
+
+		<backdrop element="button_white">
+			<bounds x="319" y="211" width="161" height="13" />
+		</backdrop>
+		<backdrop element="button_white">
+			<bounds x="319" y="211" width="23" height="47" />
+		</backdrop>
+		<backdrop element="button_white">
+			<bounds x="319" y="244" width="161" height="14" />
+		</backdrop>
+		<backdrop element="button_white">
+			<bounds x="457" y="211" width="23" height="47" />
+		</backdrop>
+
+		<screen index="0">
+			<bounds left="342" top="224" right="457" bottom="244" />
+		</screen>
+
+		<!-- top bar -->
+
+		<backdrop element="teal">
+			<bounds x="11" y="15" width="40" height="10" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="53" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_1">
+			<bounds x="69" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="91" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_2">
+			<bounds x="107" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="129" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_3">
+			<bounds x="143" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="167" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_4">
+			<bounds x="183" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="205" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_5">
+			<bounds x="221" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="243" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_6">
+			<bounds x="259" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="281" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_7">
+			<bounds x="296" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="319" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_8">
+			<bounds x="334" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="357" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_9">
+			<bounds x="373" y="16" width="3" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="395" y="15" width="36" height="10" />
+		</backdrop>
+		<backdrop element="text_10">
+			<bounds x="409" y="16" width="6" height="7" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="433" y="15" width="67" height="10" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="502" y="15" width="56" height="10" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="560" y="15" width="56" height="10" />
+		</backdrop>
+		<backdrop element="teal">
+			<bounds x="618" y="15" width="160" height="10" />
+		</backdrop>
+
+		<!-- logo and text top right -->
+
+		<cpanel element="text_casio">
+			<bounds x="623" y="46" width="141" height="31" />
+		</cpanel>
+		<cpanel element="text_desc">
+			<bounds x="607" y="123" width="184" height="9" />
+		</cpanel>
+		<cpanel element="text_rz1">
+			<bounds x="665" y="134" width="59" height="24" />
+		</cpanel>
+
+		<!-- separator -->
+
+		<cpanel name="sep1a" element="darkgray">
+			<bounds x="1" y="180" width="798" height="1" />
+		</cpanel>
+		<cpanel name="sep1b" element="black">
+			<bounds x="1" y="181" width="798" height="1" />
+		</cpanel>
+
+		<!-- leds -->
+
+		<cpanel name="led_song" element="led">
+			<bounds x="50" y="271" width="9" height="4" />
+		</cpanel>
+		<cpanel name="led_pattern" element="led">
+			<bounds x="50" y="301" width="9" height="4" />
+		</cpanel>
+		<cpanel name="led_startstop" element="led">
+			<bounds x="50" y="404" width="9" height="4" />
+		</cpanel>
+
+		<!-- controls top left -->
+
+		<cpanel element="text_song">
+			<bounds x="73" y="258" width="22" height="7" />
+		</cpanel>
+		<cpanel name="button_song" element="button_yellow" inputtag="kc4" inputmask="0x02">
+			<bounds x="71" y="267" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_pattern">
+			<bounds x="69" y="288" width="30" height="7" />
+		</cpanel>
+		<cpanel name="button_pattern" element="button_yellow" inputtag="kc4" inputmask="0x01">
+			<bounds x="71" y="298" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_edit">
+			<bounds x="115" y="270" width="14" height="7" />
+		</cpanel>
+		<cpanel element="text_record">
+			<bounds x="110" y="300" width="25" height="7" />
+		</cpanel>
+		<cpanel name="button_editrecord" element="button_gray" inputtag="kc4" inputmask="0x04">
+			<bounds x="109" y="328" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_delete">
+			<bounds x="148" y="270" width="24" height="7" />
+		</cpanel>
+		<cpanel element="text_delete">
+			<bounds x="148" y="300" width="24" height="7" />
+		</cpanel>
+		<cpanel name="button_delete" element="button_gray" inputtag="kc4" inputmask="0x08">
+			<bounds x="147" y="328" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_insert">
+			<bounds x="187" y="270" width="22" height="7" />
+		</cpanel>
+		<cpanel element="text_auto">
+			<bounds x="190" y="296" width="14" height="7" />
+		</cpanel>
+		<cpanel element="text_compensate">
+			<bounds x="184" y="303" width="30" height="7" />
+		</cpanel>
+		<cpanel name="button_insertautocomp" element="button_gray" inputtag="kc4" inputmask="0x10">
+			<bounds x="185" y="328" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_chain">
+			<bounds x="226" y="270" width="18" height="7" />
+		</cpanel>
+		<cpanel element="text_beat">
+			<bounds x="228" y="300" width="16" height="7" />
+		</cpanel>
+		<cpanel name="button_chainbeat" element="button_gray" inputtag="kc4" inputmask="0x20">
+			<bounds x="223" y="328" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_reset">
+			<bounds x="263" y="266" width="19" height="7" />
+		</cpanel>
+		<cpanel element="text_copy">
+			<bounds x="263" y="273" width="19" height="7" />
+		</cpanel>
+		<cpanel name="button_resetcopy" element="button_gray" inputtag="kc3" inputmask="0x20">
+			<bounds x="260" y="328" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_reset">
+			<bounds x="263" y="296" width="19" height="7" />
+		</cpanel>
+		<cpanel element="text_copy">
+			<bounds x="263" y="303" width="19" height="7" />
+		</cpanel>
+
+		<!-- controls top middle -->
+
+		<cpanel element="text_mt">
+			<bounds x="347" y="280" width="11" height="7" />
+		</cpanel>
+		<cpanel element="text_save">
+			<bounds x="326" y="289" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_save" element="button_gray" inputtag="kc5" inputmask="0x01">
+			<bounds x="321" y="298" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_load">
+			<bounds x="364" y="289" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_load" element="button_gray" inputtag="kc5" inputmask="0x02">
+			<bounds x="358" y="298" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_tempo">
+			<bounds x="340" y="315" width="23" height="7" />
+		</cpanel>
+		<cpanel name="button_tempodown" element="button_gray" inputtag="kc3" inputmask="0x10">
+			<bounds x="321" y="328" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_down">
+			<bounds x="327" y="329" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_tempoup" element="button_gray" inputtag="kc3" inputmask="0x08">
+			<bounds x="358" y="328" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_up">
+			<bounds x="364" y="329" width="14" height="7" />
+		</cpanel>
+		<cpanel element="text_midi">
+			<bounds x="438" y="280" width="16" height="7" />
+		</cpanel>
+		<cpanel element="text_channel">
+			<bounds x="415" y="289" width="24" height="7" />
+		</cpanel>
+		<cpanel name="button_channel" element="button_gray" inputtag="kc5" inputmask="0x04">
+			<bounds x="414" y="298" width="26" height="10" />
+		</cpanel>
+		<cpanel element="text_clock">
+			<bounds x="455" y="289" width="18" height="7" />
+		</cpanel>
+		<cpanel name="button_clock" element="button_gray" inputtag="kc5" inputmask="0x08">
+			<bounds x="452" y="298" width="26" height="10" />
+		</cpanel>
+		<cpanel name="bg_sampling" element="button_blue">
+			<bounds x="446" y="317" width="37" height="9" />
+		</cpanel>
+		<cpanel element="text_sampling">
+			<bounds x="450" y="318" width="32" height="7" />
+		</cpanel>
+		<cpanel name="button_sampling" element="button_darkblue" inputtag="kc3" inputmask="0x04">
+			<bounds x="452" y="328" width="26" height="10" />
+		</cpanel>
+
+		<!-- controls top right -->
+
+		<cpanel element="text_1_32">
+			<bounds x="518" y="226" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_7" element="button_white" inputtag="kc7" inputmask="0x02">
+			<bounds x="513" y="236" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_7">
+			<bounds x="524" y="237" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_48">
+			<bounds x="555" y="226" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_8" element="button_white" inputtag="kc7" inputmask="0x04">
+			<bounds x="551" y="236" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_8">
+			<bounds x="562" y="237" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_96">
+			<bounds x="592" y="226" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_9" element="button_white" inputtag="kc7" inputmask="0x08">
+			<bounds x="588" y="236" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_9">
+			<bounds x="599" y="237" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_12">
+			<bounds x="518" y="258" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_4" element="button_white" inputtag="kc6" inputmask="0x10">
+			<bounds x="513" y="268" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_4">
+			<bounds x="524" y="269" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_16">
+			<bounds x="555" y="258" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_5" element="button_white" inputtag="kc6" inputmask="0x20">
+			<bounds x="551" y="268" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_5">
+			<bounds x="562" y="269" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_24">
+			<bounds x="592" y="258" width="14" height="7" />
+		</cpanel>
+		<cpanel name="button_6" element="button_white" inputtag="kc7" inputmask="0x01">
+			<bounds x="588" y="268" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_6">
+			<bounds x="599" y="269" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_4">
+			<bounds x="520" y="288" width="11" height="7" />
+		</cpanel>
+		<cpanel name="button_1" element="button_white" inputtag="kc6" inputmask="0x02">
+			<bounds x="513" y="298" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_1">
+			<bounds x="524" y="299" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_6">
+			<bounds x="557" y="288" width="11" height="7" />
+		</cpanel>
+		<cpanel name="button_2" element="button_white" inputtag="kc6" inputmask="0x04">
+			<bounds x="551" y="298" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_2">
+			<bounds x="562" y="299" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_8">
+			<bounds x="594" y="288" width="11" height="7" />
+		</cpanel>
+		<cpanel name="button_3" element="button_white" inputtag="kc6" inputmask="0x08">
+			<bounds x="588" y="298" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_3">
+			<bounds x="599" y="299" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_1_2">
+			<bounds x="520" y="319" width="11" height="7" />
+		</cpanel>
+		<cpanel name="button_0" element="button_white" inputtag="kc6" inputmask="0x01">
+			<bounds x="513" y="328" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_0">
+			<bounds x="524" y="329" width="3" height="7" />
+		</cpanel>
+		<cpanel element="text_value">
+			<bounds x="572" y="319" width="18" height="7" />
+		</cpanel>
+		<cpanel element="text_no">
+			<bounds x="557" y="341" width="11" height="7" />
+		</cpanel>
+		<cpanel name="button_no" element="button_gray" inputtag="kc7" inputmask="0x20">
+			<bounds x="551" y="328" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_down">
+			<bounds x="556" y="329" width="14" height="7" />
+		</cpanel>
+		<cpanel element="text_yes">
+			<bounds x="594" y="341" width="11" height="7" />
+		</cpanel>
+		<cpanel name="button_yes" element="button_gray" inputtag="kc7" inputmask="0x10">
+			<bounds x="588" y="328" width="24" height="9" />
+		</cpanel>
+		<cpanel element="text_up">
+			<bounds x="593" y="329" width="14" height="7" />
+		</cpanel>
+
+		<!-- separator -->
+
+		<cpanel name="sep2a" element="darkgray">
+			<bounds x="1" y="360" width="798" height="1" />
+		</cpanel>
+		<cpanel name="sep2b" element="black">
+			<bounds x="1" y="361" width="798" height="1" />
+		</cpanel>
+
+		<!-- controls bottom -->
+
+		<cpanel element="text_startstop">
+			<bounds x="66" y="378" width="54" height="9" />
+		</cpanel>
+		<cpanel name="button_startstop" element="button_yellow" inputtag="kc3" inputmask="0x01">
+			<bounds x="71" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_continue">
+			<bounds x="71" y="428" width="46" height="9" />
+		</cpanel>
+		<cpanel element="text_start">
+			<bounds x="80" y="436" width="27" height="9" />
+		</cpanel>
+		<cpanel name="button_continue" element="button_yellow" inputtag="kc3" inputmask="0x02">
+			<bounds x="71" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_accent">
+			<bounds x="189" y="379" width="34" height="9" />
+		</cpanel>
+		<cpanel name="button_accent" element="button_blue" inputtag="kc2" inputmask="0x20">
+			<bounds x="184" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_mute">
+			<bounds x="194" y="436" width="25" height="9" />
+		</cpanel>
+		<cpanel name="button_mute" element="button_blue" inputtag="kc2" inputmask="0x10">
+			<bounds x="184" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_tom1">
+			<bounds x="279" y="379" width="25" height="9" />
+		</cpanel>
+		<cpanel name="button_tom1" element="button_gray" inputtag="kc0" inputmask="0x01">
+			<bounds x="269" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_tom2">
+			<bounds x="279" y="436" width="25" height="9" />
+		</cpanel>
+		<cpanel name="button_tom2" element="button_gray" inputtag="kc1" inputmask="0x01">
+			<bounds x="269" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_tom3">
+			<bounds x="335" y="379" width="25" height="9" />
+		</cpanel>
+		<cpanel name="button_tom3" element="button_gray" inputtag="kc0" inputmask="0x02">
+			<bounds x="326" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_bd">
+			<bounds x="340" y="436" width="14" height="9" />
+		</cpanel>
+		<cpanel name="button_bd" element="button_gray" inputtag="kc1" inputmask="0x02">
+			<bounds x="326" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_rim">
+			<bounds x="395" y="379" width="17" height="9" />
+		</cpanel>
+		<cpanel name="button_rim" element="button_gray" inputtag="kc0" inputmask="0x04">
+			<bounds x="382" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_sd">
+			<bounds x="397" y="436" width="13" height="9" />
+		</cpanel>
+		<cpanel name="button_sd" element="button_gray" inputtag="kc1" inputmask="0x04">
+			<bounds x="382" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_openhh">
+			<bounds x="439" y="379" width="39" height="9" />
+		</cpanel>
+		<cpanel name="button_openhh" element="button_gray" inputtag="kc0" inputmask="0x08">
+			<bounds x="437" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_closedhh">
+			<bounds x="434" y="436" width="48" height="9" />
+		</cpanel>
+		<cpanel name="button_closedhh" element="button_gray" inputtag="kc1" inputmask="0x08">
+			<bounds x="437" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_claps">
+			<bounds x="500" y="379" width="29" height="9" />
+		</cpanel>
+		<cpanel name="button_claps" element="button_gray" inputtag="kc0" inputmask="0x10">
+			<bounds x="493" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_ride">
+			<bounds x="504" y="436" width="21" height="9" />
+		</cpanel>
+		<cpanel name="button_ride" element="button_gray" inputtag="kc1" inputmask="0x10">
+			<bounds x="493" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_cowbell">
+			<bounds x="550" y="379" width="41" height="9" />
+		</cpanel>
+		<cpanel name="button_cowbell" element="button_gray" inputtag="kc0" inputmask="0x20">
+			<bounds x="550" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel element="text_crash">
+			<bounds x="555" y="436" width="30" height="9" />
+		</cpanel>
+		<cpanel name="button_crash" element="button_gray" inputtag="kc1" inputmask="0x20">
+			<bounds x="550" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel name="bg_sample1" element="button_blue">
+			<bounds x="605" y="379" width="46" height="9" />
+		</cpanel>
+		<cpanel element="text_sample1">
+			<bounds x="608" y="379" width="42" height="9" />
+		</cpanel>
+		<cpanel name="button_sample1" element="button_white" inputtag="kc2" inputmask="0x01">
+			<bounds x="607" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel name="bg_sample2" element="button_blue">
+			<bounds x="605" y="436" width="46" height="9" />
+		</cpanel>
+		<cpanel element="text_sample2">
+			<bounds x="608" y="436" width="42" height="9" />
+		</cpanel>
+		<cpanel name="button_sample2" element="button_white" inputtag="kc2" inputmask="0x02">
+			<bounds x="607" y="450" width="43" height="27" />
+		</cpanel>
+		<cpanel name="bg_sample3" element="button_blue">
+			<bounds x="662" y="379" width="46" height="9" />
+		</cpanel>
+		<cpanel element="text_sample3">
+			<bounds x="664" y="379" width="42" height="9" />
+		</cpanel>
+		<cpanel name="button_sample3" element="button_white" inputtag="kc2" inputmask="0x04">
+			<bounds x="664" y="393" width="43" height="27" />
+		</cpanel>
+		<cpanel name="bg_sample4" element="button_blue">
+			<bounds x="662" y="436" width="46" height="9" />
+		</cpanel>
+		<cpanel element="text_sample4">
+			<bounds x="664" y="436" width="42" height="9" />
+		</cpanel>
+		<cpanel name="button_sample4" element="button_white" inputtag="kc2" inputmask="0x08">
+			<bounds x="664" y="450" width="43" height="27" />
+		</cpanel>
+	</view>
+</mamelayout>

@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
-<!-- 2007-07-30: Initial version.  [Dirk Best] -->
-<!-- 2015-08-14: Eric Roberts version. [Best of the Best 2] -->
+	<!-- 2007-07-30: Initial version.  [Dirk Best] -->
+	<!-- 2015-08-14: Eric Roberts version. [Best of the Best 2] -->
 
 
-<!-- define elements -->
+	<!-- define elements -->
 
 	<element name="digit" defstate="0">
 		<led16seg>
@@ -18,118 +18,80 @@
 	<element name="static_white"><rect><color red="0.85" green="0.84" blue="0.84" /></rect></element>
 
 
-<!-- build screen -->
+	<!-- build screen -->
 
-	<view name="Internal Layout">
+	<group name="displays">
 		<bounds left="50" top="20" right="770" bottom="141" />
 		<bezel element="static_black">
 			<bounds left="50" top="20" right="770" bottom="141" />
 		</bezel>
 
-	<!-- bezel -->
+		<!-- bezel -->
 
 		<bezel element="static_white"><bounds left="50" top="20" right="770" bottom="141" /></bezel>
 		<bezel element="static_black"><bounds left="53" top="23" right="767" bottom="138" /></bezel>
 
-		<bezel element="static_white"><bounds x="63"  y="129" width="2" height="10" /></bezel>
-		<bezel element="static_white"><bounds x="97"  y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="131" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="165" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="202" y="135" width="2" height="4" /></bezel>
-
-		<bezel element="static_white"><bounds x="236" y="129" width="2" height="10" /></bezel>
-		<bezel element="static_white"><bounds x="270" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="304" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="341" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="375" y="135" width="2" height="4" /></bezel>
-
-		<bezel element="static_white"><bounds x="409" y="129" width="2" height="10" /></bezel>
-		<bezel element="static_white"><bounds x="443" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="480" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="514" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="548" y="135" width="2" height="4" /></bezel>
-
-		<bezel element="static_white"><bounds x="582" y="129" width="2" height="10" /></bezel>
-		<bezel element="static_white"><bounds x="619" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="653" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="687" y="135" width="2" height="4" /></bezel>
-		<bezel element="static_white"><bounds x="721" y="135" width="2" height="4" /></bezel>
+		<repeat count="4">
+			<param name="xl" start="63" increment="173" />
+			<param name="xsbase" start="97.6" increment="173" />
+			<bezel element="static_white"><bounds x="~xl~" y="129" width="2" height="10" /></bezel>
+			<repeat count="4">
+				<param name="xs" start="~xsbase~" increment="34.6" />
+				<bezel element="static_white"><bounds x="~xs~" y="135" width="2" height="4" /></bezel>
+			</repeat>
+		</repeat>
 
 		<bezel element="static_white"><bounds x="755" y="129" width="2" height="10" /></bezel>
 
 
-	<!-- digits -->
+		<!-- digits -->
 
-		<!-- DL1416A DS1 -->
-		<bezel name="digit0" element="digit">
-			<bounds left="65" top="80" right="90" bottom="120" />
-		</bezel>
-		<bezel name="digit1" element="digit">
-			<bounds left="99" top="80" right="124" bottom="120" />
-		</bezel>
-		<bezel name="digit2" element="digit">
-			<bounds left="133" top="80" right="158" bottom="120" />
-		</bezel>
-		<bezel name="digit3" element="digit">
-			<bounds left="167" top="80" right="192" bottom="120" />
-		</bezel>
+		<!-- DL1416A DS1/DS2/DS3/DS4/DS5 -->
+		<repeat count="5">
+			<param name="modulex" start="65" increment="139" />
+			<param name="moduleno" start="0" increment="4" />
+			<repeat count="4">
+				<param name="digitno" start="~moduleno~" increment="1" />
+				<param name="digitx" start="~modulex~" increment="34" />
+				<bezel name="digit~digitno~" element="digit"><bounds x="~digitx~" y="40" width="25" height="70" /></bezel>
+			</repeat>
+		</repeat>
+	</group>
 
-		<!-- DL1416A DS2 -->
-		<bezel name="digit4" element="digit">
-			<bounds left="204" top="80" right="229" bottom="120" />
-		</bezel>
-		<bezel name="digit5" element="digit">
-			<bounds left="238" top="80" right="263" bottom="120" />
-		</bezel>
-		<bezel name="digit6" element="digit">
-			<bounds left="272" top="80" right="297" bottom="120" />
-		</bezel>
-		<bezel name="digit7" element="digit">
-			<bounds left="306" top="80" right="331" bottom="120" />
-		</bezel>
+	<view name="Internal Layout">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="22" />
+		</group>
+	</view>
 
-		<!-- DL1416A DS3 -->
-		<bezel name="digit8" element="digit">
-			<bounds left="343" top="80" right="368" bottom="120" />
-		</bezel>
-		<bezel name="digit9" element="digit">
-			<bounds left="377" top="80" right="402" bottom="120" />
-		</bezel>
-		<bezel name="digit10" element="digit">
-			<bounds left="411" top="80" right="436" bottom="120" />
-		</bezel>
-		<bezel name="digit11" element="digit">
-			<bounds left="445" top="80" right="470" bottom="120" />
-		</bezel>
+	<view name="Printer Below">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="16" />
+		</group>
+		<screen index="0">
+			<bounds x="0" y="16" width="241" height="180.75" />
+		</screen>
+	</view>
 
-		<!-- DL1416A DS4 -->
-		<bezel name="digit12" element="digit">
-			<bounds left="482" top="80" right="507" bottom="120" />
-		</bezel>
-		<bezel name="digit13" element="digit">
-			<bounds left="516" top="80" right="541" bottom="120" />
-		</bezel>
-		<bezel name="digit14" element="digit">
-			<bounds left="550" top="80" right="575" bottom="120" />
-		</bezel>
-		<bezel name="digit15" element="digit">
-			<bounds left="584" top="80" right="609" bottom="120" />
-		</bezel>
+	<view name="Terminal Below">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="16" />
+		</group>
+		<screen index="1">
+			<bounds x="0" y="16" width="241" height="180.75" />
+		</screen>
+	</view>
 
-		<!-- DL1416A DS5 -->
-		<bezel name="digit16" element="digit">
-			<bounds left="621" top="80" right="646" bottom="120" />
-		</bezel>
-		<bezel name="digit17" element="digit">
-			<bounds left="655" top="80" right="680" bottom="120" />
-		</bezel>
-		<bezel name="digit18" element="digit">
-			<bounds left="689" top="80" right="714" bottom="120" />
-		</bezel>
-		<bezel name="digit19" element="digit">
-			<bounds left="723" top="80" right="748" bottom="120" />
-		</bezel>
-
+	<view name="Printer and Terminal">
+		<group ref="displays">
+			<bounds x="0" y="0" width="241" height="16" />
+		</group>
+		<screen index="0">
+			<bounds x="0" y="16" width="241" height="180.75" />
+		</screen>
+		<screen index="1">
+			<bounds x="250" y="0" width="241" height="196.75" />
+		</screen>
 	</view>
 
 </mamelayout>

@@ -33,8 +33,7 @@
 
 #include "emu.h"
 #include "a2scsi.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/devices.h"
 
 /***************************************************************************
     PARAMETERS
@@ -50,20 +49,6 @@ DEFINE_DEVICE_TYPE(A2BUS_SCSI, a2bus_scsi_device, "a2scsi", "Apple II SCSI Card"
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
-void a2bus_scsi_device::ncr5380(device_t *device)
-{
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_scsi_device, drq_w))
-}
-
-static SLOT_INTERFACE_START( scsi_devices )
-	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
-SLOT_INTERFACE_END
-
 ROM_START( scsi )
 	ROM_REGION(0x4000, SCSI_ROM_REGION, 0)  // this is the Rev. C ROM
 	ROM_LOAD( "341-0437-a.bin", 0x0000, 0x4000, CRC(5aff85d3) SHA1(451c85c46b92e6ad2ad930f055ccf0fe3049936d) )
@@ -77,18 +62,20 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_scsi_device::device_add_mconfig)
-	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
-MACHINE_CONFIG_END
+void a2bus_scsi_device::device_add_mconfig(machine_config &config)
+{
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, "cdrom", false);
+	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380N).machine_config([this](device_t *device) {
+		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
+	});
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -158,7 +145,7 @@ uint8_t a2bus_scsi_device::read_c0nx(uint8_t offset)
 		case 6:
 		case 7:
 //          logerror("Read 5380 @ %x\n", offset);
-			return m_ncr5380->read(machine().dummy_space(), offset);
+			return m_ncr5380->read(offset);
 
 		case 8:     // read and DACK
 			return m_ncr5380->dma_r();
@@ -198,7 +185,7 @@ void a2bus_scsi_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 6:
 		case 7:
 //          logerror("%02x to 5380 reg %x\n", data, offset);
-			m_ncr5380->write(machine().dummy_space(), offset, data);
+			m_ncr5380->write(offset, data);
 			break;
 
 		case 8: // write and DACK

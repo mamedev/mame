@@ -97,11 +97,6 @@
 
 // core artwork options
 #define OPTION_ARTWORK_CROP         "artwork_crop"
-#define OPTION_USE_BACKDROPS        "use_backdrops"
-#define OPTION_USE_OVERLAYS         "use_overlays"
-#define OPTION_USE_BEZELS           "use_bezels"
-#define OPTION_USE_CPANELS          "use_cpanels"
-#define OPTION_USE_MARQUEES         "use_marquees"
 #define OPTION_FALLBACK_ARTWORK     "fallback_artwork"
 #define OPTION_OVERRIDE_ARTWORK     "override_artwork"
 
@@ -177,6 +172,7 @@
 #define OPTION_COMM_LOCAL_PORT      "comm_localport"
 #define OPTION_COMM_REMOTE_HOST     "comm_remotehost"
 #define OPTION_COMM_REMOTE_PORT     "comm_remoteport"
+#define OPTION_COMM_FRAME_SYNC      "comm_framesync"
 
 #define OPTION_CONFIRM_QUIT         "confirm_quit"
 #define OPTION_UI_MOUSE             "ui_mouse"
@@ -378,11 +374,6 @@ public:
 
 	// core artwork options
 	bool artwork_crop() const { return bool_value(OPTION_ARTWORK_CROP); }
-	bool use_backdrops() const { return bool_value(OPTION_USE_BACKDROPS); }
-	bool use_overlays() const { return bool_value(OPTION_USE_OVERLAYS); }
-	bool use_bezels() const { return bool_value(OPTION_USE_BEZELS); }
-	bool use_cpanels() const { return bool_value(OPTION_USE_CPANELS); }
-	bool use_marquees() const { return bool_value(OPTION_USE_MARQUEES); }
 	const char *fallback_artwork() const { return value(OPTION_FALLBACK_ARTWORK); }
 	const char *override_artwork() const { return value(OPTION_OVERRIDE_ARTWORK); }
 
@@ -456,6 +447,7 @@ public:
 	const char *comm_localport() const { return value(OPTION_COMM_LOCAL_PORT); }
 	const char *comm_remotehost() const { return value(OPTION_COMM_REMOTE_HOST); }
 	const char *comm_remoteport() const { return value(OPTION_COMM_REMOTE_PORT); }
+	bool comm_framesync() const { return bool_value(OPTION_COMM_FRAME_SYNC); }
 
 
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }

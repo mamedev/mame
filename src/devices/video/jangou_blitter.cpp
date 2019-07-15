@@ -41,26 +41,28 @@ jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, cons
 }
 
 
-ADDRESS_MAP_START(jangou_blitter_device::blit_v1_regs)
-	AM_RANGE(0x00, 0x00) AM_WRITE(src_lo_address_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(src_md_address_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(x_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(y_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(width_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(height_and_trigger_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(src_hi_address_w)
-ADDRESS_MAP_END
+void jangou_blitter_device::blit_v1_regs(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(jangou_blitter_device::src_lo_address_w));
+	map(0x01, 0x01).w(FUNC(jangou_blitter_device::src_md_address_w));
+	map(0x02, 0x02).w(FUNC(jangou_blitter_device::x_w));
+	map(0x03, 0x03).w(FUNC(jangou_blitter_device::y_w));
+	map(0x04, 0x04).w(FUNC(jangou_blitter_device::width_w));
+	map(0x05, 0x05).w(FUNC(jangou_blitter_device::height_and_trigger_w));
+	map(0x06, 0x06).w(FUNC(jangou_blitter_device::src_hi_address_w));
+}
 
 // Sexy Gal and variants (v2) swaps around upper src address
-ADDRESS_MAP_START(jangou_blitter_device::blit_v2_regs)
-	AM_RANGE(0x00, 0x00) AM_WRITE(src_lo_address_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(src_md_address_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(src_hi_address_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(x_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(y_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(width_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(height_and_trigger_w)
-ADDRESS_MAP_END
+void jangou_blitter_device::blit_v2_regs(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(jangou_blitter_device::src_lo_address_w));
+	map(0x01, 0x01).w(FUNC(jangou_blitter_device::src_md_address_w));
+	map(0x02, 0x02).w(FUNC(jangou_blitter_device::src_hi_address_w));
+	map(0x03, 0x03).w(FUNC(jangou_blitter_device::x_w));
+	map(0x04, 0x04).w(FUNC(jangou_blitter_device::y_w));
+	map(0x05, 0x05).w(FUNC(jangou_blitter_device::width_w));
+	map(0x06, 0x06).w(FUNC(jangou_blitter_device::height_and_trigger_w));
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

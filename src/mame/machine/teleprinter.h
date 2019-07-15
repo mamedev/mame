@@ -14,9 +14,6 @@
 #define TELEPRINTER_TAG "teleprinter"
 #define TELEPRINTER_SCREEN_TAG "tty_screen"
 
-#define MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(cb) \
-		generic_terminal_device::set_keyboard_callback(*device, KEYBOARDCB_##cb);
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/

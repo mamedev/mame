@@ -11,60 +11,6 @@
 
 #pragma once
 
-
-// I/O ports setup
-#define MCFG_UCOM4_READ_A_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_read_a_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_READ_B_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_read_b_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_READ_C_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_read_c_callback(*device, DEVCB_##_devcb);
-#define MCFG_UCOM4_WRITE_C_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_write_c_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_READ_D_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
-#define MCFG_UCOM4_WRITE_D_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_E_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_write_e_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_F_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_G_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_H_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_write_h_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_UCOM4_WRITE_I_CB(_devcb) \
-	devcb = &ucom4_cpu_device::set_write_i_callback(*device, DEVCB_##_devcb);
-
-enum
-{
-	NEC_UCOM4_PORTA = 0,
-	NEC_UCOM4_PORTB,
-	NEC_UCOM4_PORTC,
-	NEC_UCOM4_PORTD,
-	NEC_UCOM4_PORTE,
-	NEC_UCOM4_PORTF,
-	NEC_UCOM4_PORTG,
-	NEC_UCOM4_PORTH,
-	NEC_UCOM4_PORTI
-};
-
-enum
-{
-	NEC_UCOM43 = 0,
-	NEC_UCOM44,
-	NEC_UCOM45
-};
-
-
 // pinout reference
 
 /*
@@ -99,21 +45,41 @@ enum
 class ucom4_cpu_device : public cpu_device
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_a_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_a.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_c_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_c.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto read_a() { return m_read_a.bind(); }
+	auto read_b() { return m_read_b.bind(); }
+	auto read_c() { return m_read_c.bind(); }
+	auto read_d() { return m_read_d.bind(); }
 
-	template <class Object> static devcb_base &set_write_c_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_c.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_e_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_e.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_g_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_g.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_h_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_h.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_i_callback(device_t &device, Object &&cb) { return downcast<ucom4_cpu_device &>(device).m_write_i.set_callback(std::forward<Object>(cb)); }
+	auto write_c() { return m_write_c.bind(); }
+	auto write_d() { return m_write_d.bind(); }
+	auto write_e() { return m_write_e.bind(); }
+	auto write_f() { return m_write_f.bind(); }
+	auto write_g() { return m_write_g.bind(); }
+	auto write_h() { return m_write_h.bind(); }
+	auto write_i() { return m_write_i.bind(); }
 
 protected:
+	enum
+	{
+		NEC_UCOM43 = 0,
+		NEC_UCOM44,
+		NEC_UCOM45
+	};
+
+	enum
+	{
+		PORTA = 0,
+		PORTB,
+		PORTC,
+		PORTD,
+		PORTE,
+		PORTF,
+		PORTG,
+		PORTH,
+		PORTI
+	};
+
 	// construction/destruction
 	ucom4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
@@ -134,7 +100,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;

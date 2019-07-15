@@ -31,32 +31,31 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(espial_state, espial)
+void espial_state::espial_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i + palette.entries()] >> 0) & 0x01;
-		bit2 = (color_prom[i + palette.entries()] >> 1) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i + palette.entries()], 0);
+		bit2 = BIT(color_prom[i + palette.entries()], 1);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i + palette.entries()] >> 2) & 0x01;
-		bit2 = (color_prom[i + palette.entries()] >> 3) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i + palette.entries()], 2);
+		bit2 = BIT(color_prom[i + palette.entries()], 3);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

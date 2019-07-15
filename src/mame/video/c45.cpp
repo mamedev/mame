@@ -65,26 +65,28 @@ GFXDECODE_MEMBER( namco_c45_road_device::gfxinfo )
 GFXDECODE_END
 
 
-ADDRESS_MAP_START(namco_c45_road_device::map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("tmapram")
-	AM_RANGE(0x10000, 0x1f9ff) AM_RAM_WRITE(tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x1fa00, 0x1ffff) AM_RAM AM_SHARE("lineram")
-ADDRESS_MAP_END
+void namco_c45_road_device::map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().w(FUNC(namco_c45_road_device::tilemap_w)).share("tmapram");
+	map(0x10000, 0x1f9ff).ram().w(FUNC(namco_c45_road_device::tileram_w)).share("tileram");
+	map(0x1fa00, 0x1ffff).ram().share("lineram");
+}
 
 
 //-------------------------------------------------
 //  namco_c45_road_device -- constructor
 //-------------------------------------------------
 
-namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C45_ROAD, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		device_memory_interface(mconfig, *this),
-		m_space_config("c45", ENDIANNESS_BIG, 16, 17, 0, address_map_constructor(FUNC(namco_c45_road_device::map), this)),
-		m_tmapram(*this, "tmapram"),
-		m_tileram(*this, "tileram"),
-		m_lineram(*this, "lineram"),
-		m_transparent_color(~0)
+namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_C45_ROAD, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
+	device_memory_interface(mconfig, *this),
+	m_space_config("c45", ENDIANNESS_BIG, 16, 17, 0, address_map_constructor(FUNC(namco_c45_road_device::map), this)),
+	m_tmapram(*this, "tmapram"),
+	m_tileram(*this, "tileram"),
+	m_lineram(*this, "lineram"),
+	m_clut(*this, "clut"),
+	m_transparent_color(~0)
 {
 }
 
@@ -231,9 +233,6 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void namco_c45_road_device::device_start()
 {
-	if (memregion("clut") != nullptr)
-		m_clut = memregion("clut")->base();
-
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
 		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);

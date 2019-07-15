@@ -26,7 +26,7 @@ struct kcc_header
 /* now type name that has appeared! */
 
 /* load snapshot */
-QUICKLOAD_LOAD_MEMBER( kc_state,kc)
+QUICKLOAD_LOAD_MEMBER(kc_state::quickload_cb)
 {
 	struct kcc_header *header;
 	uint16_t addr;
@@ -384,7 +384,7 @@ void kc_state::update_0x08000()
 		/* IRM enabled */
 		LOG(("IRM enabled\n"));
 
-		membank("bank3")->set_base(m_video_ram);
+		membank("bank3")->set_base(&m_video_ram[0]);
 		space.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 	}
 	else
@@ -485,12 +485,12 @@ void kc85_4_state::update_0x08000()
 		/* IRM enabled - has priority over RAM8 enabled */
 		LOG(("IRM enabled\n"));
 
-		uint8_t* ram_page = m_video_ram + ((BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14));
+		uint8_t* ram_page = &m_video_ram[(BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14)];
 
 		membank("bank3")->set_base(ram_page);
 		space.install_readwrite_bank(0x8000, 0xa7ff, "bank3");
 
-		membank("bank6")->set_base(m_video_ram + 0x2800);
+		membank("bank6")->set_base(&m_video_ram[0x2800]);
 		space.install_readwrite_bank(0xa800, 0xbfff, "bank6");
 	}
 	else if (m_pio_data[1] & (1<<5))
@@ -749,10 +749,6 @@ void kc_state::machine_start()
 	m_cassette_oneshot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kc_state::kc_cassette_oneshot_timer),this));
 
 	m_ram_base = m_ram->pointer();
-
-	m_expansions[0] = machine().device<kcexp_slot_device>("m8");
-	m_expansions[1] = machine().device<kcexp_slot_device>("mc");
-	m_expansions[2] = machine().device<kcexp_slot_device>("exp");
 }
 
 void kc_state::machine_reset()

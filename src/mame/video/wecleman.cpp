@@ -62,8 +62,7 @@
 void wecleman_state::get_sprite_info()
 {
 	const pen_t *base_pal = m_palette->pens();
-	uint8_t *base_gfx = memregion("gfx1")->base();
-	int gfx_max     = memregion("gfx1")->bytes();
+	int gfx_max     = m_sprite_region.length();
 
 	uint16_t *source = m_spriteram;
 
@@ -107,14 +106,14 @@ void wecleman_state::get_sprite_info()
 
 		if ((gfx + sprite->tile_width * sprite->tile_height - 1) >= gfx_max) continue;
 
-		sprite->pen_data = base_gfx + gfx;
+		sprite->pen_data = &m_sprite_region[gfx];
 		sprite->line_offset = sprite->tile_width;
 		sprite->total_width = sprite->tile_width - (sprite->tile_width * (zoom & 0xff)) / 0x80;
 		sprite->total_height += 1;
 		sprite->x += m_spr_offsx;
 		sprite->y += m_spr_offsy;
 
-		if (m_gameid == 0)
+		if (m_gameid == WECLEMAN_ID)
 		{
 			m_spr_idx_list[m_spr_count] = m_spr_count;
 			m_spr_pri_list[m_spr_count] = source[0x0e/2] >> 8;
@@ -319,7 +318,7 @@ void wecleman_state::sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect
 {
 	int i;
 
-	if (m_gameid == 0)   // Wec Le Mans
+	if (m_gameid == WECLEMAN_ID)   // Wec Le Mans
 	{
 		sortsprite(m_spr_idx_list, m_spr_pri_list, m_spr_count);
 
@@ -880,7 +879,7 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 	buffer = auto_alloc_array(machine(), uint8_t, 0x12c00);   // working buffer for sprite operations
 
-	m_gameid = 0;
+	m_gameid = WECLEMAN_ID;
 	m_gfx_bank = bank;
 	m_spr_offsx = -0xbc + BMP_PAD;
 	m_spr_offsy = 1 + BMP_PAD;
@@ -980,7 +979,7 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
 
 	buffer = auto_alloc_array(machine(), uint8_t, 0x400); // reserve 1k for sprite list
 
-	m_gameid = 1;
+	m_gameid = HOTCHASE_ID;
 	m_gfx_bank = bank;
 	m_spr_offsx = -0xc0;
 	m_spr_offsy = 0;
@@ -998,34 +997,28 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
 
 uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *mrct;
-	int video_on;
-	int fg_x, bg_x, fg_y, bg_y;
-	int cloud_sx, cloud_sy;
-	int i, j, k;
+	const pen_t *mrct = m_palette->pens();
 
-	mrct = m_palette->pens();
+	bool video_on = m_irqctrl & 0x40;
 
-	video_on = m_irqctrl & 0x40;
+	m_led[0] = (m_selected_ip & 0x04) ? 1 : 0;
 
-	output().set_led_value(0, m_selected_ip & 0x04); // Start lamp
+	int fg_y = (m_txtram[0x0f24 >> 1] & (TILEMAP_DIMY - 1));
+	int bg_y = (m_txtram[0x0f26 >> 1] & (TILEMAP_DIMY - 1));
 
-	fg_y = (m_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
-	bg_y = (m_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
-
-	cloud_sx = m_txtram[0xfee>>1] + 0xb0;
-	cloud_sy = bg_y;
+	int cloud_sx = m_txtram[0xfee >> 1] + 0xb0;
+	int cloud_sy = bg_y;
 
 	m_bg_tilemap->set_scrolly(0, bg_y -BMP_PAD);
 	m_fg_tilemap->set_scrolly(0, fg_y -BMP_PAD);
 
-	for (i=0; i<(28<<2); i+=4)
+	for (int i = 0; i < (28 << 2); i += 4)
 	{
-		fg_x = m_txtram[(i+0xf80)>>1] + (0xb0 -BMP_PAD);
-		bg_x = m_txtram[(i+0xf82)>>1] + (0xb0 -BMP_PAD);
+		int fg_x = m_txtram[(i + 0xf80) >> 1] + (0xb0 - BMP_PAD);
+		int bg_x = m_txtram[(i + 0xf82) >> 1] + (0xb0 - BMP_PAD);
 
-		k = i<<1;
-		for (j=0; j<8; j++)
+		int k = i << 1;
+		for (int j = 0; j < 8; j++)
 		{
 			m_fg_tilemap->set_scrollx((fg_y + k + j) & (TILEMAP_DIMY - 1), fg_x);
 			m_bg_tilemap->set_scrollx((bg_y + k + j) & (TILEMAP_DIMY - 1), bg_x);
@@ -1040,11 +1033,14 @@ uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rg
 
 	bitmap.fill(m_black_pen, cliprect);
 
-	/* Draw the road (lines which have priority 0x02) */
-	if (video_on) wecleman_draw_road(bitmap, cliprect, 0x02);
+	if (video_on)
+	{
+		/* Draw the road (lines which have priority 0x02) */
+		wecleman_draw_road(bitmap, cliprect, 0x02);
 
-	/* Draw the background */
-	if (video_on) m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		/* Draw the background */
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
 
 	// draws the cloud layer; needs work
 	if (m_cloud_visible)
@@ -1053,14 +1049,9 @@ uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rg
 		((pen_t *)mrct)[0] = ((pen_t *)mrct)[0x40] = ((pen_t *)mrct)[0x200] = ((pen_t *)mrct)[0x205];
 
 		if (video_on)
-			draw_cloud(bitmap,
-			m_gfxdecode->gfx(0),
-			m_pageram+0x1800,
-			BMP_PAD, BMP_PAD,
-			41, 20,
-			cloud_sx, cloud_sy,
-			6, 5,
-			m_cloud_blend/BLEND_STEPS, 0);
+		{
+			draw_cloud(bitmap, m_gfxdecode->gfx(0), m_pageram + 0x1800, BMP_PAD, BMP_PAD, 41, 20, cloud_sx, cloud_sy, 6, 5, m_cloud_blend/BLEND_STEPS, 0);
+		}
 
 		m_cloud_blend += m_cloud_ds;
 
@@ -1070,17 +1061,21 @@ uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rg
 			{ m_cloud_blend = BLEND_MAX; m_cloud_ds = 0; m_cloud_visible = 0; }
 	}
 
-	/* Draw the foreground */
-	if (video_on) m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (video_on)
+	{
+		/* Draw the foreground */
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	/* Draw the road (lines which have priority 0x04) */
-	if (video_on) wecleman_draw_road(bitmap,cliprect, 0x04);
+		/* Draw the road (lines which have priority 0x04) */
+		wecleman_draw_road(bitmap,cliprect, 0x04);
 
-	/* Draw the sprites */
-	if (video_on) sprite_draw(bitmap,cliprect);
+		/* Draw the sprites */
+		sprite_draw(bitmap,cliprect);
 
-	/* Draw the text layer */
-	if (video_on) m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		/* Draw the text layer */
+		m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
 	return 0;
 }
 
@@ -1090,30 +1085,27 @@ uint32_t wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rg
 
 uint32_t wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int video_on;
+	bool video_on = (m_irqctrl & 0x40) ? true : false;
 
-	video_on = m_irqctrl & 0x40;
-
-	output().set_led_value(0, m_selected_ip & 0x04); // Start lamp
+	m_led[0] = (m_selected_ip & 0x04) ? 1 : 0; // Start lamp
 
 	get_sprite_info();
 
 	bitmap.fill(m_black_pen, cliprect);
 
-	/* Draw the background */
 	if (video_on)
-		m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	{
+		/* Draw the background */
+		m_k051316[0]->zoom_draw(screen, bitmap, cliprect, 0, 0);
 
-	/* Draw the road */
-	if (video_on)
+		/* Draw the road */
 		hotchase_draw_road(bitmap, cliprect);
 
-	/* Draw the sprites */
-	if (video_on)
+		/* Draw the sprites */
 		sprite_draw(bitmap,cliprect);
 
-	/* Draw the foreground (text) */
-	if (video_on)
-		m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		/* Draw the foreground (text) */
+		m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	}
 	return 0;
 }

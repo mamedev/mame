@@ -48,19 +48,6 @@ ripple_counter_device::ripple_counter_device(const machine_config &mconfig, cons
 
 
 //-------------------------------------------------
-//  static_set_stages - configure the number of
-//  stages used to count
-//-------------------------------------------------
-
-void ripple_counter_device::static_set_stages(device_t &device, u8 stages)
-{
-	auto &dev = downcast<ripple_counter_device &>(device);
-	dev.m_count_mask = (1U << stages) - 1;
-	dev.set_rom_addr_width(stages);
-}
-
-
-//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------

@@ -76,11 +76,12 @@ void iq151_video32_device::device_start()
 
 void iq151_video32_device::device_reset()
 {
-	screen_device *screen = machine().first_screen();
-
 	// if required adjust screen size
-	if (screen->visible_area().max_x < 32*8 - 1)
-		screen->set_visible_area(0, 32*8-1, 0, 32*8-1);
+	if (m_screen != nullptr && m_screen->visible_area().max_x < 32*8 - 1)
+	{
+		printf("Setting visible area to 32\n");
+		m_screen->set_visible_area(0, 32*8-1, 0, 32*8-1);
+	}
 }
 
 //-------------------------------------------------

@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
+#ifndef MAME_INCLUDES_PC6001_H
+#define MAME_INCLUDES_PC6001_H
 
 #pragma once
 
-#ifndef MAME_INCLUDES_PC6001_H
-#define MAME_INCLUDES_PC6001_H
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -14,12 +14,12 @@
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
 //#include "sound/2203intf.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -28,8 +28,8 @@
 class pc6001_state : public driver_device
 {
 public:
-	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pc6001_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ppi(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
@@ -42,16 +42,17 @@ public:
 		m_io_mode4_dsw(*this, "MODE4_DSW"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
-		m_io_keys(*this, {"key1", "key2", "key3"}),
+		m_io_keys(*this, "key%u", 1U),
 		m_io_key_modifiers(*this, "key_modifiers"),
 		m_bank1(*this, "bank1"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(system_latch_w);
 	DECLARE_READ8_MEMBER(nec_ppi8255_r);
 	DECLARE_WRITE8_MEMBER(nec_ppi8255_w);
 
-	DECLARE_PALETTE_INIT(pc6001);
+	void pc6001_palette(palette_device &palette) const;
 
 	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -106,7 +107,7 @@ protected:
 	inline void set_timer_divider(uint8_t data);
 	inline void set_videoram_bank(uint32_t offs);
 	inline void set_maincpu_irq_line(uint8_t vector_num);
-	
+
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);
@@ -139,8 +140,8 @@ private:
 class pc6001mk2_state : public pc6001_state
 {
 public:
-	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc6001_state(mconfig, type, tag),
+	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc6001_state(mconfig, type, tag),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4"),
@@ -148,7 +149,7 @@ public:
 		m_bank6(*this, "bank6"),
 		m_bank7(*this, "bank7"),
 		m_bank8(*this, "bank8")
-	{}
+	{ }
 
 	DECLARE_READ8_MEMBER(mk2_bank_r0_r);
 	DECLARE_READ8_MEMBER(mk2_bank_r1_r);
@@ -173,7 +174,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mk2_timer_adj_w);
 	DECLARE_WRITE8_MEMBER(mk2_timer_irqv_w);
 
-	DECLARE_PALETTE_INIT(pc6001mk2);
+	void pc6001mk2_palette(palette_device &palette) const;
 	void pc6001mk2(machine_config &config);
 
 	uint32_t screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -191,10 +192,10 @@ protected:
 	required_memory_bank m_bank7;
 	required_memory_bank m_bank8;
 	inline void refresh_crtc_params();
-	
-	virtual void video_start() override; 
+
+	virtual void video_start() override;
 	virtual void machine_reset() override;
-	
+
 private:
 	uint8_t m_bank_r0;
 	uint8_t m_bank_r1;
@@ -211,9 +212,9 @@ private:
 class pc6601_state : public pc6001mk2_state
 {
 public:
-	pc6601_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc6001mk2_state(mconfig, type, tag)
-	{}
+	pc6601_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc6001mk2_state(mconfig, type, tag)
+	{ }
 
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
@@ -225,10 +226,10 @@ public:
 class pc6001sr_state : public pc6601_state
 {
 public:
-	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc6601_state(mconfig, type, tag),
+	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc6601_state(mconfig, type, tag),
 		m_sr_irq_vectors(*this, "irq_vectors")
-	{};
+	{ }
 
 	DECLARE_READ8_MEMBER(hw_rev_r);
 	DECLARE_READ8_MEMBER(sr_bank_rn_r);
@@ -249,7 +250,7 @@ public:
 	DECLARE_WRITE8_MEMBER(necsr_ppi8255_w);
 	DECLARE_WRITE8_MEMBER(sr_bitmap_yoffs_w);
 	DECLARE_WRITE8_MEMBER(sr_bitmap_xoffs_w);
-	
+
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
 
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -259,7 +260,7 @@ public:
 	void pc6001sr_io(address_map &map);
 	void pc6001sr_map(address_map &map);
 protected:
-	virtual void video_start() override; 
+	virtual void video_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -270,7 +271,7 @@ private:
 	uint8_t m_sr_text_rows;
 	uint8_t *m_gvram;
 	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
-	
+
 	enum{
 		SUB_CPU_IRQ = 0,
 		JOYSTICK_IRQ,
@@ -281,7 +282,7 @@ private:
 		PRINTER_IRQ,
 		EXT_IRQ
 	};
-	
+
 	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 };
 

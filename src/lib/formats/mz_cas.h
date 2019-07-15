@@ -7,12 +7,13 @@
     Format code for MZ700 cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_MZ_CAS_H
+#define MAME_FORMATS_MZ_CAS_H
 
-#ifndef MZ_CAS_H
-#define MZ_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(mz700_cassette_formats);
 
-#endif /* MZ_CAS_H */
+#endif // MAME_FORMATS_MZ_CAS_H

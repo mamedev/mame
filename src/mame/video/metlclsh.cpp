@@ -141,7 +141,7 @@ void metlclsh_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	save_pointer(NAME(m_otherram.get()), 0x800);
+	save_pointer(NAME(m_otherram), 0x800);
 }
 
 

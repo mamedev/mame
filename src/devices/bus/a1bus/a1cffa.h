@@ -21,8 +21,8 @@
 //**************************************************************************
 
 class a1bus_cffa_device:
-	public device_t,
-	public device_a1bus_card_interface
+		public device_t,
+		public device_a1bus_card_interface
 {
 public:
 	// construction/destruction
@@ -43,12 +43,12 @@ protected:
 	required_device<ata_interface_device> m_ata;
 
 private:
-	uint8_t *m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	uint16_t m_lastdata;
 	bool m_writeprotect;
 };
 
 // device type definition
-extern const device_type A1BUS_CFFA;
+DECLARE_DEVICE_TYPE(A1BUS_CFFA, a1bus_cffa_device)
 
 #endif  // MAME_BUS_A1BUS_A1CFFA_H

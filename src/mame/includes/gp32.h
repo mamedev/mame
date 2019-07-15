@@ -7,7 +7,8 @@
 #include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
-
+#include "emupal.h"
+#include "screen.h"
 
 #define INT_ADC       31
 #define INT_RTC       30
@@ -103,8 +104,12 @@ public:
 		m_nvram(*this, "nvram"),
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
+	void gp32(machine_config &config);
+
+private:
 	virtual void video_start() override;
 
 	required_shared_ptr<uint32_t> m_s3c240x_ram;
@@ -185,9 +190,8 @@ public:
 	TIMER_CALLBACK_MEMBER(s3c240x_dma_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iic_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iis_timer_exp);
-	void gp32(machine_config &config);
 	void gp32_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<smartmedia_image_device> m_smartmedia;
 	required_device<dac_word_interface> m_ldac;
@@ -195,6 +199,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	uint32_t s3c240x_get_fclk(int reg);

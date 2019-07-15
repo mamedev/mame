@@ -20,13 +20,12 @@
 class pc_keyboard_device : public device_t
 {
 public:
-	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(enable);
 
-	template <class Object> static devcb_base &static_set_keypress_callback(device_t &device, Object &&cb)
-	{ return downcast<pc_keyboard_device &>(device).m_out_keypress_func.set_callback(std::forward<Object>(cb)); }
+	auto keypress() { return m_out_keypress_func.bind(); }
 
 	enum class KEYBOARD_TYPE
 	{
@@ -77,12 +76,17 @@ private:
 class at_keyboard_device : public pc_keyboard_device
 {
 public:
-	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, KEYBOARD_TYPE type, int default_set)
+		: at_keyboard_device(mconfig, tag, owner, 0)
+	{
+		set_type(type, default_set);
+	}
+
+	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE8_MEMBER( write );
 
-	static void static_set_type(device_t &device, KEYBOARD_TYPE type, int default_set)
-	{ downcast<at_keyboard_device &>(device).m_scan_code_set = default_set; downcast<at_keyboard_device &>(device).m_type = type; }
+	void set_type(KEYBOARD_TYPE type, int default_set) { m_scan_code_set = default_set; m_type = type; }
 
 protected:
 	virtual void device_reset() override;
@@ -104,6 +108,7 @@ private:
 	static const int m_scancode_set_2_3[];
 	static const extended_keyboard_code m_mf2_code[0x10][2];
 
+	output_finder<3> m_leds;
 	int m_scan_code_set;
 	int m_input_state;
 };
@@ -113,19 +118,5 @@ INPUT_PORTS_EXTERN( at_keyboard );
 
 DECLARE_DEVICE_TYPE(PC_KEYB, pc_keyboard_device)
 DECLARE_DEVICE_TYPE(AT_KEYB, at_keyboard_device)
-
-#define MCFG_PC_KEYB_ADD(_tag, _cb) \
-	MCFG_DEVICE_ADD(_tag, PC_KEYB, 0) \
-	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB_##_cb);
-
-#define MCFG_AT_KEYB_ADD(_tag, _def_set, _cb) \
-	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
-	at_keyboard_device::static_set_type(*device, pc_keyboard_device::KEYBOARD_TYPE::AT, _def_set); \
-	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB_##_cb);
-
-#define MCFG_AT_MF2_KEYB_ADD(_tag, _def_set, _cb) \
-	MCFG_DEVICE_ADD(_tag, AT_KEYB, 0) \
-	at_keyboard_device::static_set_type(*device, pc_keyboard_device::KEYBOARD_TYPE_MF2, _def_set); \
-	devcb = &pc_keyboard_device::static_set_keypress_callback(*device, DEVCB_##_cb);
 
 #endif // MAME_MACHINE_PCKEYBRD_H

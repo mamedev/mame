@@ -39,26 +39,21 @@
  * processor, as each is shared.
  */
 
-#define MCFG_NES_APU_IRQ_HANDLER(_devcb) \
-	devcb = &nesapu_device::set_irq_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_NES_APU_MEM_READ_CALLBACK(_devcb) \
-	devcb = &nesapu_device::set_mem_read_callback(*device, DEVCB_##_devcb);
-
 class nesapu_device : public device_t,
 						public device_sound_interface
 {
 public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<nesapu_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_mem_read_callback(device_t &device, Object &&cb) { return downcast<nesapu_device &>(device).m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq() { return m_irq_handler.bind(); }
+	auto mem_read() { return m_mem_read_cb.bind(); }
 
+	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -74,10 +69,8 @@ private:
 
 	// internal state
 	apu_t   m_APU;                   /* Actual APUs */
-	float   m_apu_incsize;           /* Adjustment increment */
 	u32     m_samps_per_sync;        /* Number of samples per vsync */
 	u32     m_buffer_size;           /* Actual buffer size in bytes */
-	u32     m_real_rate;             /* Actual playback rate */
 	u8      m_noise_lut[apu_t::NOISE_LONG]; /* Noise sample lookup table */
 	u32     m_vbl_times[0x20];       /* VBL durations in samples */
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
@@ -93,8 +86,6 @@ private:
 	s8 apu_noise(apu_t::noise_t *chan);
 	s8 apu_dpcm(apu_t::dpcm_t *chan);
 	inline void apu_regwrite(int address, u8 value);
-	inline u8 apu_read(int address);
-	inline void apu_write(int address, u8 value);
 };
 
 DECLARE_DEVICE_TYPE(NES_APU, nesapu_device)

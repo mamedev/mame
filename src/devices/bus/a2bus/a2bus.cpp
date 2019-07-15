@@ -95,27 +95,33 @@ a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
-	, m_a2bus_tag(nullptr)
-	, m_a2bus_slottag(nullptr)
+	, m_a2bus(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void a2bus_slot_device::static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	a2bus_slot_device &a2bus_card = dynamic_cast<a2bus_slot_device &>(device);
-	a2bus_card.m_a2bus_tag = tag;
-	a2bus_card.m_a2bus_slottag = slottag;
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+void a2bus_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_a2bus_card_interface *>(card))
+		osd_printf_error("Card device %s (%s) does not implement device_a2bus_card_interface\n", card->tag(), card->name());
+}
+
+void a2bus_slot_device::device_resolve_objects()
+{
+	device_a2bus_card_interface *const a2bus_card(dynamic_cast<device_a2bus_card_interface *>(get_card_device()));
+	if (a2bus_card)
+		a2bus_card->set_a2bus(m_a2bus, tag());
+}
+
 void a2bus_slot_device::device_start()
 {
-	device_a2bus_card_interface *dev = dynamic_cast<device_a2bus_card_interface *>(get_card_device());
-
-	if (dev) device_a2bus_card_interface::static_set_a2bus_tag(*dev, m_a2bus_tag, m_a2bus_slottag);
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_a2bus_card_interface *>(card))
+		throw emu_fatalerror("a2bus_slot_device: card device %s (%s) does not implement device_a2bus_card_interface\n", card->tag(), card->name());
 }
 
 //**************************************************************************
@@ -123,12 +129,6 @@ void a2bus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS, a2bus_device, "a2bus", "Apple II Bus")
-
-void a2bus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	a2bus_device &a2bus = downcast<a2bus_device &>(device);
-	a2bus.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -145,31 +145,32 @@ a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, devic
 
 a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(nullptr) , m_maincpu_space(nullptr)
-	, m_out_irq_cb(*this) , m_out_nmi_cb(*this) , m_out_inh_cb(*this)
-	, m_cputag(nullptr)
+	, m_maincpu_space(*this, finder_base::DUMMY_TAG, -1)
+	, m_out_irq_cb(*this)
+	, m_out_nmi_cb(*this)
+	, m_out_inh_cb(*this)
+	, m_out_dma_cb(*this)
 	, m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void a2bus_device::device_start()
+void a2bus_device::device_resolve_objects()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	m_maincpu_space = &machine().device<cpu_device>(m_cputag)->space(AS_PROGRAM);
-
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
 	m_out_nmi_cb.resolve_safe();
 	m_out_inh_cb.resolve_safe();
+	m_out_dma_cb.resolve_safe();
+}
 
+void a2bus_device::device_start()
+{
 	// clear slots
-	for (auto & elem : m_device_list)
-	{
-		elem = nullptr;
-	}
+	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_slot_irq_mask = m_slot_nmi_mask = 0;
 }
@@ -240,27 +241,17 @@ void a2bus_device::set_nmi_line(int state, int slot)
 	}
 }
 
-void a2bus_device::set_maincpu_halt(int state)
+void a2bus_device::set_dma_line(int state)
 {
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_out_dma_cb(state);
 }
 
-uint8_t a2bus_device::dma_r(address_space &space, uint16_t offset)
-{
-	return m_maincpu_space->read_byte(offset);
-}
-
-void a2bus_device::dma_w(address_space &space, uint16_t offset, uint8_t data)
-{
-	m_maincpu_space->write_byte(offset, data);
-}
-
-uint8_t a2bus_device::dma_nospace_r(uint16_t offset)
+uint8_t a2bus_device::dma_r(uint16_t offset)
 {
 	return m_maincpu_space->read_byte(offset);
 }
 
-void a2bus_device::dma_nospace_w(uint16_t offset, uint8_t data)
+void a2bus_device::dma_w(uint16_t offset, uint8_t data)
 {
 	m_maincpu_space->write_byte(offset, data);
 }
@@ -289,9 +280,9 @@ WRITE_LINE_MEMBER( a2bus_device::nmi_w ) { m_out_nmi_cb(state); }
 //-------------------------------------------------
 
 device_a2bus_card_interface::device_a2bus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_a2bus(nullptr),
-		m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr), m_slot(0), m_next(nullptr)
+	: device_slot_card_interface(mconfig, device)
+	, m_a2bus_finder(device, finder_base::DUMMY_TAG), m_a2bus(nullptr)
+	, m_a2bus_slottag(nullptr), m_slot(-1), m_next(nullptr)
 {
 }
 
@@ -304,31 +295,34 @@ device_a2bus_card_interface::~device_a2bus_card_interface()
 {
 }
 
-void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag)
+void device_a2bus_card_interface::interface_validity_check(validity_checker &valid) const
 {
-	device_a2bus_card_interface &a2bus_card = dynamic_cast<device_a2bus_card_interface &>(device);
-	a2bus_card.m_a2bus_tag = tag;
-	a2bus_card.m_a2bus_slottag = slottag;
+	if (m_a2bus_finder && m_a2bus && (m_a2bus != m_a2bus_finder))
+		osd_printf_error("Contradictory buses configured (%s and %s)\n", m_a2bus_finder->tag(), m_a2bus->tag());
 }
 
 void device_a2bus_card_interface::interface_pre_start()
 {
+	device_slot_card_interface::interface_pre_start();
+
 	if (!m_a2bus)
 	{
+		m_a2bus = m_a2bus_finder;
+		if (!m_a2bus)
+			fatalerror("Can't find Apple II Bus device %s\n", m_a2bus_finder.finder_tag());
+	}
+
+	if (0 > m_slot)
+	{
+		if (!m_a2bus->started())
+			throw device_missing_dependencies();
+
 		// extract the slot number from the last digit of the slot tag
 		size_t const tlen = strlen(m_a2bus_slottag);
 
-		m_slot = (m_a2bus_slottag[tlen-1] - '0');
+		m_slot = (m_a2bus_slottag[tlen - 1] - '0');
 		if (m_slot < 0 || m_slot > 7)
 			fatalerror("Slot %x out of range for Apple II Bus\n", m_slot);
-
-		device_t *const bus = device().machine().device(m_a2bus_tag);
-		if (!bus)
-			fatalerror("Can't find Apple II Bus device %s\n", m_a2bus_tag);
-
-		m_a2bus = dynamic_cast<a2bus_device *>(bus);
-		if (!m_a2bus)
-			fatalerror("Device %s (%s) is not an instance of a2bus_device\n", bus->tag(), bus->name());
 
 		m_a2bus->add_a2bus_card(m_slot, this);
 	}

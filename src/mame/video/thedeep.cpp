@@ -84,12 +84,11 @@ WRITE8_MEMBER(thedeep_state::vram_1_w)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thedeep_state, thedeep)
+void thedeep_state::thedeep_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	for (i = 0;i < 512;i++)
-		palette.set_pen_color(i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 512; i++)
+		palette.set_pen_color(i, pal4bit(color_prom[0x400 + i] >> 0), pal4bit(color_prom[0x400 + i] >> 4), pal4bit(color_prom[0x200 + i] >> 0));
 }
 
 /***************************************************************************
@@ -132,7 +131,7 @@ uint32_t thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
-	m_spritegen->draw_sprites(bitmap, cliprect,  reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x00, 0x00, 0x0f);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(0), reinterpret_cast<uint16_t *>(m_spriteram.target()), 0x400/2);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

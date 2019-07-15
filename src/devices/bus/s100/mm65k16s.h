@@ -38,8 +38,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_s100_card_interface overrides
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) override;
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t s100_smemr_r(offs_t offset) override;
+	virtual void s100_mwrt_w(offs_t offset, uint8_t data) override;
 	virtual void s100_phantom_w(int state) override;
 
 private:

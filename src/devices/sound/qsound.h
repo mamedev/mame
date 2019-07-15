@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Paul Leaman, Miguel Angel Horna
+// copyright-holders:Vas Crabb
 /*********************************************************
 
-    Capcom Q-Sound system
+    Capcom System QSound™
 
 *********************************************************/
-
 #ifndef MAME_SOUND_QSOUND_H
 #define MAME_SOUND_QSOUND_H
 
@@ -13,72 +12,64 @@
 
 #include "cpu/dsp16/dsp16.h"
 
-#define QSOUND_CLOCK 4000000    /* default 4MHz clock (60MHz/15?) */
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_QSOUND_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, QSOUND, _clock)
-#define MCFG_QSOUND_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, QSOUND, _clock)
-
-
-// ======================> qsound_device
-
-class qsound_device : public device_t,
-						public device_sound_interface,
-						public device_rom_interface
+class qsound_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
-	qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
+	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
 
 	DECLARE_WRITE8_MEMBER(qsound_w);
 	DECLARE_READ8_MEMBER(qsound_r);
 
-	void dsp16_data_map(address_map &map);
-	void dsp16_program_map(address_map &map);
 protected:
-	// device-level overrides
-	const tiny_rom_entry *device_rom_region() const override;
+	// device_t implementation
+	tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
+	virtual void device_reset() override;
 
-	// sound stream update overrides
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	// device_rom_interface overrides
+	// device_rom_interface implementation
 	virtual void rom_bank_updated() override;
 
+	void dsp_io_map(address_map &map);
+
 private:
-	struct qsound_channel
-	{
-		uint32_t bank;        // bank
-		uint32_t address;     // start/cur address
-		uint16_t loop;        // loop address
-		uint16_t end;         // end address
-		uint32_t freq;        // frequency
-		uint16_t vol;         // master volume
+	// DSP ROM access
+	DECLARE_READ16_MEMBER(dsp_sample_r);
+	DECLARE_WRITE16_MEMBER(dsp_pio_w);
 
-		// work variables
-		bool enabled;       // key on / key off
-		int lvol;           // left volume
-		int rvol;           // right volume
-		uint32_t step_ptr;    // current offset counter
-	} m_channel[16];
+	// for synchronised DSP communication
+	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
+	DECLARE_READ16_MEMBER(dsp_pio_r);
+	void set_dsp_ready(void *ptr, s32 param);
+	void set_cmd(void *ptr, s32 param);
 
-	required_device<dsp16_device> m_cpu;
+	// MAME resources
+	required_device<dsp16_device_base> m_dsp;
+	sound_stream *m_stream;
 
-	int m_pan_table[33];    // pan volume table
-	uint16_t m_data;          // register latch data
-	sound_stream *m_stream; // audio stream
+	// DSP communication
+	u16 m_rom_bank, m_rom_offset;
+	u16 m_cmd_addr, m_cmd_data, m_new_data;
+	u8  m_cmd_pending, m_dsp_ready;
 
-	inline int8_t read_sample(uint32_t offset) { return (int8_t)read_byte(offset); }
-	void write_data(uint8_t address, uint16_t data);
+	// serial sample recovery
+	s16 m_samples[2];
+	u16 m_sr, m_fsr;
+	u8 m_ock, m_old, m_ready, m_channel;
 };
 
 DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
+
+#if !defined(QSOUND_LLE) // && 0
+#include "qsoundhle.h"
+#define qsound_device qsound_hle_device
+#define QSOUND QSOUND_HLE
+#endif // QSOUND_LLE
 
 #endif // MAME_SOUND_QSOUND_H

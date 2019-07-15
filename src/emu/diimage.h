@@ -94,28 +94,15 @@ private:
 enum class image_init_result { PASS, FAIL };
 enum class image_verify_result { PASS, FAIL };
 
-// device image interface function types
-typedef delegate<image_init_result (device_image_interface &)> device_image_load_delegate;
-typedef delegate<void (device_image_interface &)> device_image_func_delegate;
-
 //**************************************************************************
 //  MACROS
 //**************************************************************************
 
-#define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
-#define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        image_init_result DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         image_init_result DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_DELEGATE(_class,_name)       device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)				image_init_result _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)		DEVICE_IMAGE_LOAD_MEMBER(_name)
 
-#define DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)          device_image_unload_##_name
-#define DEVICE_IMAGE_UNLOAD_NAME(_class,_name)          _class::DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)       void DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_UNLOAD_MEMBER(_class,_name)        void DEVICE_IMAGE_UNLOAD_NAME(_class,_name)(device_image_interface &image)
-#define DEVICE_IMAGE_UNLOAD_DELEGATE(_class,_name)      device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
-
-#define MCFG_SET_IMAGE_LOADABLE(_usrload) \
-	device_image_interface::static_set_user_loadable(*device, _usrload);
+#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)        	void _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)	DEVICE_IMAGE_UNLOAD_MEMBER(_name)
 
 
 // ======================> device_image_interface
@@ -124,6 +111,9 @@ typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 class device_image_interface : public device_interface
 {
 public:
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<void (device_image_interface &)> unload_delegate;
+
 	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
 
 	// construction/destruction
@@ -198,7 +188,7 @@ public:
 
 	u8 *get_software_region(const char *tag);
 	u32 get_software_region_length(const char *tag);
-	const char *get_feature(const char *feature_name);
+	const char *get_feature(const char *feature_name) const;
 	bool load_software_region(const char *tag, optional_shared_ptr<u8> &ptr);
 
 	u32 crc();
@@ -230,13 +220,7 @@ public:
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const std::string &path);
 
-	static void static_set_user_loadable(device_t &device, bool user_loadable) {
-		device_image_interface *img;
-		if (!device.interface(img))
-			throw emu_fatalerror("MCFG_SET_IMAGE_LOADABLE called on device '%s' with no image interface\n", device.tag());
-
-		img->m_user_loadable = user_loadable;
-	}
+	void set_user_loadable(bool user_loadable) { m_user_loadable = user_loadable; }
 
 	bool user_loadable() const { return m_user_loadable; }
 	bool is_reset_and_loading() const { return m_is_reset_and_loading; }

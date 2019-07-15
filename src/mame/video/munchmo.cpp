@@ -4,29 +4,30 @@
 #include "includes/munchmo.h"
 
 
-PALETTE_INIT_MEMBER(munchmo_state, munchmo)
+void munchmo_state::munchmo_palette(palette_device &palette) const
 {
-	const u8 *color_prom = memregion("proms")->base();
-	int i;
+	u8 const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
+		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

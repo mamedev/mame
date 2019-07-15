@@ -6,7 +6,8 @@
  */
 
 #include "nld_am2847.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -19,6 +20,7 @@ namespace netlist
 		, m_IN(*this, "IN")
 		, m_buffer(*this, "m_buffer", 0)
 		, m_OUT(*this, "OUT")
+		, m_power_pins(*this, "VSS", "VDD")
 		{
 		}
 
@@ -30,9 +32,10 @@ namespace netlist
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_var<uint16_t[5]> m_buffer;
+		state_array<uint16_t, 5> m_buffer;
 
 		logic_output_t m_OUT;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT(AM2847)
@@ -44,6 +47,7 @@ namespace netlist
 		, m_D(*this, "D")
 		, m_CP(*this, "CP")
 		, m_last_CP(*this, "m_last_CP", 0)
+		// FIXME: needs family!
 		{
 			register_subalias("OUTA", m_A.m_OUT);
 			register_subalias("OUTB", m_B.m_OUT);
@@ -57,6 +61,16 @@ namespace netlist
 			register_subalias("RCB", m_B.m_RC);
 			register_subalias("RCC", m_C.m_RC);
 			register_subalias("RCD", m_D.m_RC);
+
+			connect("A.VSS", "B.VSS");
+			connect("A.VSS", "C.VSS");
+			connect("A.VSS", "D.VSS");
+			connect("A.VDD", "B.VDD");
+			connect("A.VDD", "C.VDD");
+			connect("A.VDD", "D.VDD");
+
+			register_subalias("VSS", "A.VSS");
+			register_subalias("VDD", "A.VDD");
 		}
 
 		NETLIB_RESETI();
@@ -83,6 +97,7 @@ namespace netlist
 			register_subalias("5", m_B.m_RC);
 			register_subalias("6", m_B.m_IN);
 			register_subalias("7", m_C.m_OUT);
+			register_subalias("8", "VDD");
 
 			register_subalias("9",  m_C.m_RC);
 			register_subalias("10", m_C.m_IN);
@@ -90,7 +105,7 @@ namespace netlist
 			register_subalias("13", m_D.m_OUT);
 			register_subalias("14", m_D.m_RC);
 			register_subalias("15", m_D.m_IN);
-
+			register_subalias("16", "VSS");
 		}
 	};
 
@@ -116,7 +131,7 @@ namespace netlist
 		/* do nothing */
 	}
 
-	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
+	NETLIB_FUNC_VOID(Am2847_shifter, shift, ())
 	{
 		uint32_t out = m_buffer[0] & 1;
 		uint32_t in = (m_RC() ? out : m_IN());
@@ -130,8 +145,8 @@ namespace netlist
 		m_OUT.push(out, NLTIME_FROM_NS(200));
 	}
 
-	NETLIB_DEVICE_IMPL(AM2847)
-	NETLIB_DEVICE_IMPL(AM2847_dip)
+	NETLIB_DEVICE_IMPL(AM2847,     "TTL_AM2847",     "+CP,+INA,+INB,+INC,+IND,+RCA,+RCB,+RCC,+RCD,@VSS,@VDD")
+	NETLIB_DEVICE_IMPL(AM2847_dip, "TTL_AM2847_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

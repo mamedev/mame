@@ -37,18 +37,19 @@ DEFINE_DEVICE_TYPE(C64_TURBO232, c64_turbo232_cartridge_device, "c64_turbo232", 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_turbo232_cartridge_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(3'686'400))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(c64_turbo232_cartridge_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+void c64_turbo232_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(3.6864_MHz_XTAL);
+	m_acia->irq_handler().set(FUNC(c64_turbo232_cartridge_device::acia_irq_w));
+	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+}
 
 
 //-------------------------------------------------
@@ -127,7 +128,7 @@ void c64_turbo232_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_turbo232_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_turbo232_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (((m_cs == DE00) && !io1) || ((m_cs == DF00) && !io2) ||
 		((m_cs == D700) && ((offset & 0xff00) == 0xd700)))
@@ -137,7 +138,7 @@ uint8_t c64_turbo232_cartridge_device::c64_cd_r(address_space &space, offs_t off
 			switch (offset & 0x07)
 			{
 			case 0: case 1: case 2: case 3:
-				data = m_acia->read(space, offset & 0x03);
+				data = m_acia->read(offset & 0x03);
 				break;
 
 			case 7:
@@ -154,7 +155,7 @@ uint8_t c64_turbo232_cartridge_device::c64_cd_r(address_space &space, offs_t off
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_turbo232_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (((m_cs == DE00) && !io1) || ((m_cs == DF00) && !io2) ||
 		((m_cs == D700) && ((offset & 0xff00) == 0xd700)))
@@ -164,11 +165,11 @@ void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 			switch (offset & 0x07)
 			{
 			case 0: case 1: case 2:
-				m_acia->write(space, offset & 0x03, data);
+				m_acia->write(offset & 0x03, data);
 				break;
 
 			case 3:
-				m_acia->write(space, offset & 0x03, data);
+				m_acia->write(offset & 0x03, data);
 
 				if (data & 0x0f)
 					m_es &= ~ES_M;

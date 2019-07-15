@@ -40,8 +40,8 @@
 uint16_t bbc_state::calculate_video_address(uint16_t ma, uint8_t ra)
 {
 	/* output from IC32 74LS259 bits 4 and 5 */
-	int c0 = m_b4_video0;
-	int c1 = m_b5_video1;
+	int c0 = m_latch->q4_r();
+	int c1 = m_latch->q5_r();
 
 	/* the 4 bit input port b on IC39 are produced by 4 NAND gates. These NAND gates take their inputs
 	   from c0 and c1 (from IC32) and ma12 (from the 6845) */
@@ -77,7 +77,7 @@ uint16_t bbc_state::calculate_video_address(uint16_t ma, uint8_t ra)
 	else
 		m = ((ma & 0xff)<<3) | (s<<11) | (ra & 0x7);
 
-	if (m_memorySize == 16) m &= 0x3fff;
+	if (m_ram->size() == 16 * 1024) m &= 0x3fff;
 
 	return m;
 }
@@ -117,9 +117,9 @@ inline rgb_t bbc_state::out_rgb(rgb_t entry)
 	}
 }
 
-PALETTE_INIT_MEMBER(bbc_state, bbc)
+void bbc_state::bbc_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
+	palette.set_pen_colors(0, bbc_palette);
 }
 
 /************************************************************************
@@ -141,16 +141,16 @@ void bbc_state::set_pixel_lookup()
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
+WRITE8_MEMBER(bbc_state::video_ula_w)
 {
 	// Make sure vpos is never <0
-	int vpos = machine().first_screen()->vpos();
+	int vpos = m_screen->vpos();
 	if (vpos == 0)
-		machine().first_screen()->update_partial(vpos);
+		m_screen->update_partial(vpos);
 	else
-		machine().first_screen()->update_partial(vpos - 1);
+		m_screen->update_partial(vpos - 1);
 
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,machine().first_screen()->vpos() );
+	logerror("setting videoULA %.4x to:%.4x   at :%d \n", data, offset, vpos);
 
 	switch (offset & 0x01)
 	{
@@ -175,13 +175,13 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 
 		m_hd6845->set_hpixels_per_column(m_pixels_per_byte);
 		if (m_video_ula.clock_rate_6845)
-			m_hd6845->set_clock(XTAL(16'000'000) / 8);
+			m_hd6845->set_unscaled_clock(16_MHz_XTAL / 8);
 		else
-			m_hd6845->set_clock(XTAL(16'000'000) / 16);
+			m_hd6845->set_unscaled_clock(16_MHz_XTAL / 16);
 
 		// FIXME: double clock for MODE7 until interlace is implemented
 		if (m_video_ula.teletext_normal_select)
-			m_hd6845->set_clock(XTAL(16'000'000) / 8);
+			m_hd6845->set_unscaled_clock(16_MHz_XTAL / 8);
 		break;
 	// Set a palette register in the Video ULA
 	case 1:
@@ -266,6 +266,7 @@ WRITE_LINE_MEMBER(bbc_state::bbc_hsync_changed)
 WRITE_LINE_MEMBER(bbc_state::bbc_vsync_changed)
 {
 	m_vsync = state;
+	m_via6522_0->write_ca1(state); // screen refresh interrupts
 	m_trom->dew_w(state);
 }
 
@@ -281,28 +282,26 @@ WRITE_LINE_MEMBER(bbc_state::bbc_de_changed)
 
 /**** BBC B+/Master Shadow Ram change ****/
 
-void bbc_state::bbc_setvideoshadow(int vdusel)
+void bbc_state::setvideoshadow(int vdusel)
 {
 	// LYNNE lives at 0xb000 in our map, but the offset we use here is 0x8000
 	// as the video circuitry will already be looking at 0x3000 or so above
 	// the offset.
 	if (vdusel)
-		m_video_ram = m_region_maincpu->base()+0x8000;
+		m_video_ram = m_ram->pointer() + 0x8000;
 	else
-		m_video_ram = m_region_maincpu->base();
+		m_video_ram = m_ram->pointer();
 }
 
 /************************************************************************
- * bbc_vh_start
  * Initialize the BBC video emulation
  ************************************************************************/
 
-VIDEO_START_MEMBER(bbc_state, bbc)
+void bbc_state::video_start()
 {
 	m_cursor_size = 1;
 
 	set_pixel_lookup();
 
-	m_video_ram = m_region_maincpu->base();
-	m_memorySize = m_ram->size() / 1024;
+	m_video_ram = m_ram->pointer();
 }

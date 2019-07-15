@@ -22,7 +22,7 @@ class h8s2600_device : public h8s2000_device {
 protected:
 	h8s2600_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;

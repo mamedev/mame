@@ -73,22 +73,6 @@
 
 #define X68K_EXP_SLOT_TAG       "x68kexp"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ2_CB(_devcb) \
-	devcb = &x68k_expansion_slot_device::set_out_irq2_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_IRQ4_CB(_devcb) \
-	devcb = &x68k_expansion_slot_device::set_out_irq4_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &x68k_expansion_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_X68K_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
-	devcb = &x68k_expansion_slot_device::set_out_reset_callback(*device, DEVCB_##_devcb);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -106,14 +90,11 @@ public:
 	// reset
 	virtual void x68k_reset_w() { }
 
-	void set_vector(uint8_t vector) { m_vector = vector; }
-	uint8_t vector() { return m_vector; }
+	virtual uint8_t iack2();
+	virtual uint8_t iack4();
 
 protected:
 	device_x68k_expansion_card_interface(const machine_config &mconfig, device_t &device);
-
-private:
-	uint8_t m_vector;
 };
 
 
@@ -123,26 +104,41 @@ class x68k_expansion_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	x68k_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: x68k_expansion_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~x68k_expansion_slot_device();
 
-	template <class Object> static devcb_base &set_out_irq2_callback(device_t &device, Object &&cb) { return downcast<x68k_expansion_slot_device &>(device).m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq4_callback(device_t &device, Object &&cb) { return downcast<x68k_expansion_slot_device &>(device).m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<x68k_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_reset_callback(device_t &device, Object &&cb) { return downcast<x68k_expansion_slot_device &>(device).m_out_reset_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 
+	auto out_irq2_callback() { return m_out_irq2_cb.bind(); }
+	auto out_irq4_callback() { return m_out_irq4_cb.bind(); }
+	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
+	auto out_reset_callback() { return m_out_reset_cb.bind(); }
+
+	address_space &space() { return *m_space; }
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
-	uint8_t vector() { return m_card->vector(); }
+	uint8_t iack2() { return (m_card != nullptr) ? m_card->iack2() : 0x18; }
+	uint8_t iack4() { return (m_card != nullptr) ? m_card->iack4() : 0x18; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq2_cb;
 	devcb_write_line    m_out_irq4_cb;

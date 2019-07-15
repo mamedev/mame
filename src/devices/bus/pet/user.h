@@ -27,69 +27,6 @@
 #pragma once
 
 
-
-#define MCFG_PET_USER_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PET_USER_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_PET_USER_PORT_2_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_2_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_3_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_3_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_4_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_4_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_5_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_5_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_6_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_6_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_7_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_7_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_8_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_8_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_9_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_9_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_10_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_10_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_B_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_b_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_C_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_c_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_D_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_d_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_E_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_e_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_F_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_f_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_H_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_h_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_J_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_j_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_K_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_k_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_L_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_l_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PET_USER_PORT_M_HANDLER(_devcb) \
-	devcb = &pet_user_port_device::set_m_handler(*device, DEVCB_##_devcb);
-
-
 DECLARE_DEVICE_TYPE(PET_USER_PORT, pet_user_port_device)
 
 class device_pet_user_port_interface;
@@ -100,27 +37,36 @@ class pet_user_port_device : public device_t,
 	friend class device_pet_user_port_interface;
 
 public:
+	template <typename T>
+	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: pet_user_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_2_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_3_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_3_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_4_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_4_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_5_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_5_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_6_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_6_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_7_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_7_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_8_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_8_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_9_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_9_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_10_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_10_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_b_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_b_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_c_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_c_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_d_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_d_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_e_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_e_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_f_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_f_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_h_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_h_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_j_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_j_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_k_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_k_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_l_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_l_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_m_handler(device_t &device, Object &&cb) { return downcast<pet_user_port_device &>(device).m_m_handler.set_callback(std::forward<Object>(cb)); }
+	auto p2_handler() { return m_2_handler.bind(); }
+	auto p3_handler() { return m_3_handler.bind(); }
+	auto p4_handler() { return m_4_handler.bind(); }
+	auto p5_handler() { return m_5_handler.bind(); }
+	auto p6_handler() { return m_6_handler.bind(); }
+	auto p7_handler() { return m_7_handler.bind(); }
+	auto p8_handler() { return m_8_handler.bind(); }
+	auto p9_handler() { return m_9_handler.bind(); }
+	auto p10_handler() { return m_10_handler.bind(); }
+	auto pb_handler() { return m_b_handler.bind(); }
+	auto pc_handler() { return m_c_handler.bind(); }
+	auto pd_handler() { return m_d_handler.bind(); }
+	auto pe_handler() { return m_e_handler.bind(); }
+	auto pf_handler() { return m_f_handler.bind(); }
+	auto ph_handler() { return m_h_handler.bind(); }
+	auto pj_handler() { return m_j_handler.bind(); }
+	auto pk_handler() { return m_k_handler.bind(); }
+	auto pl_handler() { return m_l_handler.bind(); }
+	auto pm_handler() { return m_m_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_2 );
 	DECLARE_WRITE_LINE_MEMBER( write_3 );
@@ -226,6 +172,6 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( pet_user_port_cards );
+void pet_user_port_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PET_USER_H

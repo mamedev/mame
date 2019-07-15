@@ -1,21 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet, R. Belmont
 /*
-    rtc65271.h: include file for rtc65271.c
+    rtc65271.h: include file for rtc65271.cpp
 */
 
 #ifndef MAME_MACHINE_RTC65271_H
 #define MAME_MACHINE_RTC65271_H
 
 #pragma once
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RTC65271_INTERRUPT_CB(cb) \
-		devcb = &rtc65271_device::set_interrupt_callback(*device, DEVCB_##cb);
 
 
 // ======================> rtc65271_device
@@ -27,12 +19,12 @@ public:
 	// construction/destruction
 	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_interrupt_callback(device_t &device, Object &&cb) { return downcast<rtc65271_device &>(device).m_interrupt_cb.set_callback(std::forward<Object>(cb)); }
+	auto interrupt_cb() { return m_interrupt_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_READ8_MEMBER( xram_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_WRITE8_MEMBER( xram_w );
+	uint8_t rtc_r(offs_t offset);
+	uint8_t xram_r(offs_t offset);
+	void rtc_w(offs_t offset, uint8_t data);
+	void xram_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

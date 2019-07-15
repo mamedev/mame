@@ -96,9 +96,10 @@ void portfolio_expansion_slot_device::device_reset()
 #include "hpc102.h"
 #include "hpc104.h"
 
-SLOT_INTERFACE_START( portfolio_expansion_cards )
-	SLOT_INTERFACE("lpt",  POFO_HPC101)
-	SLOT_INTERFACE("uart", POFO_HPC102)
-	SLOT_INTERFACE("ram",  POFO_HPC104)
-	SLOT_INTERFACE("ram2", POFO_HPC104_2)
-SLOT_INTERFACE_END
+void portfolio_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("lpt",  POFO_HPC101);
+	device.option_add("uart", POFO_HPC102);
+	device.option_add("ram",  POFO_HPC104);
+	device.option_add("ram2", POFO_HPC104_2);
+}

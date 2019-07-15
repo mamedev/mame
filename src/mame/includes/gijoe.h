@@ -5,6 +5,10 @@
     GI Joe
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GIJOE_H
+#define MAME_INCLUDES_GIJOE_H
+
+#pragma once
 
 #include "sound/k054539.h"
 #include "video/k053251.h"
@@ -12,12 +16,13 @@
 #include "video/k053246_k053247_k055673.h"
 #include "video/konami_helper.h"
 #include "machine/k054321.h"
+#include "emupal.h"
 
 class gijoe_state : public driver_device
 {
 public:
-	gijoe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gijoe_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
@@ -27,8 +32,12 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_palette(*this, "palette"),
-		m_k054321(*this, "k054321") { }
+		m_k054321(*this, "k054321")
+	{ }
 
+	void gijoe(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_workram;
@@ -67,7 +76,8 @@ public:
 	void gijoe_objdma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-	void gijoe(machine_config &config);
 	void gijoe_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GIJOE_H

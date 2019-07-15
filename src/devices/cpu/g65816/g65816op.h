@@ -59,6 +59,7 @@
 /* Effective-address based memory access macros */
 #define read_8_NORM(A)      g65816i_read_8_normal(A)
 #define read_8_IMM(A)       g65816i_read_8_immediate(A)
+#define read_8_OP(A)        g65816i_read_8_opcode(A)
 #define read_8_D(A)         g65816i_read_8_direct(A)
 #define read_8_A(A)         g65816i_read_8_normal(A)
 #define read_8_AL(A)        g65816i_read_8_normal(A)
@@ -1427,7 +1428,8 @@
 #undef OP_WDM
 #define OP_WDM()                                                            \
 			CLK(CLK_OP + CLK_IMPLIED);                                      \
-			REGISTER_PC++
+			SRC = OPER_8_IMM();                                             \
+			m_wdm_w(SRC);
 
 /* G65816  Exchange accum high and low bytes */
 #undef OP_XBA
@@ -1952,7 +1954,7 @@ TABLE_FUNCTION(int, execute, (int clocks))
 			G65816_CALL_DEBUGGER(REGISTER_PB | REGISTER_PC);
 
 			REGISTER_PC++;
-			REGISTER_IR = read_8_IMM(REGISTER_PB | REGISTER_PPC);
+			REGISTER_IR = read_8_OP(REGISTER_PB | REGISTER_PPC);
 			(this->*FTABLE_OPCODES[REGISTER_IR])();
 		} while((CLOCKS > 0) && g65816i_correct_mode());
 		return clocks - CLOCKS;

@@ -24,18 +24,6 @@ enum
 	PPS4_Ip
 };
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PPS4_DISCRETE_INPUT_A_CB(_devcb) \
-	devcb = &pps4_device::set_dia_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_PPS4_DISCRETE_INPUT_B_CB(_devcb) \
-	devcb = &pps4_device::set_dib_cb(*device, DEVCB_##_devcb);
-
-#define MCFG_PPS4_DISCRETE_OUTPUT_CB(_devcb) \
-	devcb = &pps4_device::set_do_cb(*device, DEVCB_##_devcb);
 
 //**************************************************************************
 //  DEVICE TYPE DEFINITIONS
@@ -54,10 +42,10 @@ public:
 	// construction/destruction
 	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_dia_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_dia_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dib_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_dib_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_do_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_do_cb.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto dia_cb() { return m_dia_cb.bind(); }
+	auto dib_cb() { return m_dib_cb.bind(); }
+	auto do_cb() { return m_do_cb.bind(); }
 
 	DECLARE_READ16_MEMBER(address_bus_r);
 
@@ -72,7 +60,6 @@ protected:
 	virtual u32 execute_min_cycles() const override { return 1; }
 	virtual u32 execute_max_cycles() const override { return 3; }
 	virtual u32 execute_input_lines() const override { return 0; }
-	virtual u32 execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -82,7 +69,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -93,7 +80,7 @@ protected:
 	devcb_write8 m_do_cb;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 	int     m_icount;

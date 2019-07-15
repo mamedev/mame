@@ -114,43 +114,6 @@ to implement the card in both systems.
 #pragma once
 
 
-#define MCFG_INTELLEC4_UNIV_SLOT_ADD(bus_tag, slot_tag, clock, slot_intf, def_slot) \
-		MCFG_DEVICE_ADD(slot_tag, INTELLEC4_UNIV_SLOT, clock) \
-		MCFG_DEVICE_SLOT_INTERFACE(slot_intf, def_slot, false) \
-		bus::intellec4::univ_slot_device::set_bus_tag(*device, "^" bus_tag);
-
-#define MCFG_INTELLEC4_UNIV_SLOT_REMOVE(slot_tag) \
-		MCFG_DEVICE_REMOVE(slot_tag)
-
-
-#define MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE(tag, space) \
-		bus::intellec4::univ_bus_device::set_rom_space(*device, "^" tag, space);
-
-#define MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE(tag, space) \
-		bus::intellec4::univ_bus_device::set_rom_ports_space(*device, "^" tag, space);
-
-#define MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE(tag, space) \
-		bus::intellec4::univ_bus_device::set_memory_space(*device, "^" tag, space);
-
-#define MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE(tag, space) \
-		bus::intellec4::univ_bus_device::set_status_space(*device, "^" tag, space);
-
-#define MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE(tag, space) \
-		bus::intellec4::univ_bus_device::set_ram_ports_space(*device, "^" tag, space);
-
-#define MCFG_INTELLEC4_UNIV_BUS_TEST_CB(obj) \
-		bus::intellec4::univ_bus_device::set_test_out_cb(*device, DEVCB_##obj);
-
-#define MCFG_INTELLEC4_UNIV_BUS_STOP_CB(obj) \
-		bus::intellec4::univ_bus_device::set_stop_out_cb(*device, DEVCB_##obj);
-
-#define MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(obj) \
-		bus::intellec4::univ_bus_device::set_reset_4002_out_cb(*device, DEVCB_##obj);
-
-#define MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(obj) \
-		bus::intellec4::univ_bus_device::set_user_reset_out_cb(*device, DEVCB_##obj);
-
-
 namespace bus { namespace intellec4 {
 
 class univ_slot_device;
@@ -161,14 +124,22 @@ class device_univ_card_interface;
 class univ_slot_device : public device_t, public device_slot_interface
 {
 public:
-	// configuration helpers
-	static void set_bus_tag(device_t &device, char const *bus_tag);
-
+	template <typename T, typename U>
+	univ_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&bus_tag, U &&opts, const char *dflt)
+		: univ_slot_device(mconfig, tag, owner, clock)
+	{
+		m_bus.set_tag(std::forward<T>(bus_tag));
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:
@@ -182,21 +153,17 @@ public:
 	friend class device_univ_card_interface;
 
 	// address space configuration
-	static void set_rom_space(device_t &device, char const *tag, int space);
-	static void set_rom_ports_space(device_t &device, char const *tag, int space);
-	static void set_memory_space(device_t &device, char const *tag, int space);
-	static void set_status_space(device_t &device, char const *tag, int space);
-	static void set_ram_ports_space(device_t &device, char const *tag, int space);
+	template <typename T> void set_rom_space(T &&tag, int space) { m_rom_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_rom_ports_space(T &&tag, int space) { m_rom_ports_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_memory_space(T &&tag, int space) { m_memory_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_status_space(T &&tag, int space) { m_status_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_ram_ports_space(T &&tag, int space) { m_ram_ports_space.set_tag(std::forward<T>(tag), space); }
 
 	// callback configuration
-	template <typename Obj> static devcb_base &set_stop_out_cb(device_t &device, Obj &&cb)
-	{ return downcast<univ_bus_device &>(device).m_stop_out_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> static devcb_base &set_test_out_cb(device_t &device, Obj &&cb)
-	{ return downcast<univ_bus_device &>(device).m_test_out_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> static devcb_base &set_reset_4002_out_cb(device_t &device, Obj &&cb)
-	{ return downcast<univ_bus_device &>(device).m_reset_4002_out_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> static devcb_base &set_user_reset_out_cb(device_t &device, Obj &&cb)
-	{ return downcast<univ_bus_device &>(device).m_user_reset_out_cb.set_callback(std::forward<Obj>(cb)); }
+	auto stop_out_cb() { return m_stop_out_cb.bind(); }
+	auto test_out_cb() { return m_test_out_cb.bind(); }
+	auto reset_4002_out_cb() { return m_reset_4002_out_cb.bind(); }
+	auto user_reset_out_cb() { return m_user_reset_out_cb.bind(); }
 
 	univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
@@ -216,7 +183,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_start() override;
 
 private:
@@ -228,10 +194,8 @@ private:
 	void set_user_reset(unsigned index, int state);
 
 	// finding address spaces
-	required_device<device_memory_interface>    m_rom_device, m_rom_ports_device;
-	required_device<device_memory_interface>    m_memory_device, m_status_device, m_ram_ports_device;
-	int                                         m_rom_space, m_rom_ports_space;
-	int                                         m_memory_space, m_status_space, m_ram_ports_space;
+	required_address_space                      m_rom_space, m_rom_ports_space;
+	required_address_space                      m_memory_space, m_status_space, m_ram_ports_space;
 
 	// output line callbacks
 	devcb_write_line    m_test_out_cb;
@@ -258,11 +222,11 @@ protected:
 	// device_interface implementation
 	void interface_pre_start() override;
 
-	address_space &rom_space()          { return m_bus->m_rom_device->space(m_bus->m_rom_space); }
-	address_space &rom_ports_space()    { return m_bus->m_rom_ports_device->space(m_bus->m_rom_ports_space); }
-	address_space &memory_space()       { return m_bus->m_memory_device->space(m_bus->m_memory_space); }
-	address_space &status_space()       { return m_bus->m_status_device->space(m_bus->m_status_space); }
-	address_space &ram_ports_space()    { return m_bus->m_ram_ports_device->space(m_bus->m_ram_ports_space); }
+	address_space &rom_space()          { return *m_bus->m_rom_space; }
+	address_space &rom_ports_space()    { return *m_bus->m_rom_ports_space; }
+	address_space &memory_space()       { return *m_bus->m_memory_space; }
+	address_space &status_space()       { return *m_bus->m_status_space; }
+	address_space &ram_ports_space()    { return *m_bus->m_ram_ports_space; }
 
 	DECLARE_WRITE_LINE_MEMBER(test_out)         { m_bus->set_test(m_index, state); }
 	DECLARE_WRITE_LINE_MEMBER(stop_out)         { m_bus->set_stop(m_index, state); }
@@ -290,6 +254,6 @@ private:
 DECLARE_DEVICE_TYPE_NS(INTELLEC4_UNIV_SLOT, bus::intellec4, univ_slot_device)
 DECLARE_DEVICE_TYPE_NS(INTELLEC4_UNIV_BUS,  bus::intellec4, univ_bus_device)
 
-SLOT_INTERFACE_EXTERN( intellec4_univ_cards );
+void intellec4_univ_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_INTELLEC4_INTELLEC4_H

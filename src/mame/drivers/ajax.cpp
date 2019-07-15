@@ -23,39 +23,42 @@
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(ajax_state::ajax_main_map)
-	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ls138_f10_r, ls138_f10_w)   /* bankswitch + sound command + FIRQ command */
-	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)                    /* sprite control registers */
-	AM_RANGE(0x0c00, 0x0fff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)                    /* sprite RAM 2128SL at J7 */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")/* palette */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                                  /* shared RAM with the 6809 */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM 6264L at K10 */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("mainbank")                             /* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_ROM         /* ROM N11 */
-ADDRESS_MAP_END
+void ajax_state::ajax_main_map(address_map &map)
+{
+	map(0x0000, 0x01c0).rw(FUNC(ajax_state::ls138_f10_r), FUNC(ajax_state::ls138_f10_w));   /* bankswitch + sound command + FIRQ command */
+	map(0x0800, 0x0807).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));                    /* sprite control registers */
+	map(0x0c00, 0x0fff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));                    /* sprite RAM 2128SL at J7 */
+	map(0x1000, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");/* palette */
+	map(0x2000, 0x3fff).ram().share("share1");                                  /* shared RAM with the 6809 */
+	map(0x4000, 0x5fff).ram();                                             /* RAM 6264L at K10 */
+	map(0x6000, 0x7fff).bankr("mainbank");                             /* banked ROM */
+	map(0x8000, 0xffff).rom();         /* ROM N11 */
+}
 
-ADDRESS_MAP_START(ajax_state::ajax_sub_map)
-	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("k051316", k051316_device, read, write)    /* 051316 zoom/rotation layer */
-	AM_RANGE(0x0800, 0x080f) AM_DEVWRITE("k051316", k051316_device, ctrl_w)              /* 051316 control registers */
-	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD("k051316", k051316_device, rom_r)                /* 051316 (ROM test) */
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(bankswitch_2_w)          /* bankswitch control */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                      /* shared RAM with the 052001 */
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)        /* video RAM + color RAM + video registers */
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")                            /* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION ("sub", 0x12000)     /* ROM I16 */
-ADDRESS_MAP_END
+void ajax_state::ajax_sub_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));    /* 051316 zoom/rotation layer */
+	map(0x0800, 0x080f).w(m_k051316, FUNC(k051316_device::ctrl_w));              /* 051316 control registers */
+	map(0x1000, 0x17ff).r(m_k051316, FUNC(k051316_device::rom_r));                /* 051316 (ROM test) */
+	map(0x1800, 0x1800).w(FUNC(ajax_state::bankswitch_2_w));          /* bankswitch control */
+	map(0x2000, 0x3fff).ram().share("share1");                      /* shared RAM with the 052001 */
+	map(0x4000, 0x7fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));        /* video RAM + color RAM + video registers */
+	map(0x8000, 0x9fff).bankr("subbank");                            /* banked ROM */
+	map(0xa000, 0xffff).rom().region("sub", 0x12000);     /* ROM I16 */
+}
 
-ADDRESS_MAP_START(ajax_state::ajax_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                             /* ROM F6 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                             /* RAM 2128SL at D16 */
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)             /* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)      /* 007232 registers (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)      /* 007232 registers (chip 2) */
-	AM_RANGE(0xb80c, 0xb80c) AM_WRITE(k007232_extvol_w)         /* extra volume, goes to the 007232 w/ A11 */
+void ajax_state::ajax_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                             /* ROM F6 */
+	map(0x8000, 0x87ff).ram();                             /* RAM 2128SL at D16 */
+	map(0x9000, 0x9000).w(FUNC(ajax_state::sound_bank_w));             /* 007232 bankswitch */
+	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));      /* 007232 registers (chip 1) */
+	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));      /* 007232 registers (chip 2) */
+	map(0xb80c, 0xb80c).w(FUNC(ajax_state::k007232_extvol_w));         /* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)       /* YM2151 */
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));       /* YM2151 */
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( ajax )
@@ -167,70 +170,68 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 }
 
 
-MACHINE_CONFIG_START(ajax_state::ajax)
-
+void ajax_state::ajax(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 12/4 MHz*/
-	MCFG_CPU_PROGRAM_MAP(ajax_main_map)
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4);    /* 052001 12/4 MHz*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_main_map);
 
-	MCFG_CPU_ADD("sub", HD6309E, 3000000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(ajax_sub_map)
+	HD6309E(config, m_subcpu, 3000000); /* ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_sub_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* 3.58 MHz */
-	MCFG_CPU_PROGRAM_MAP(ajax_sound_map)
+	Z80(config, m_audiocpu, 3579545);  /* 3.58 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 108, 412, 256, 16, 240)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000)/3, 528, 108, 412, 256, 16, 240);
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_screen_update(FUNC(ajax_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(ajax_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(ajax_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(ajax_state, sprite_callback)
-	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(ajax_state::sprite_callback), this);
+	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(7)
-	MCFG_K051316_CB(ajax_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_bpp(7);
+	m_k051316->set_zoom_callback(FUNC(ajax_state::zoom_callback), this);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(ajax_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	K007232(config, m_k007232_1, 3579545);
+	m_k007232_1->port_write().set(FUNC(ajax_state::volume_callback0));
+	m_k007232_1->add_route(0, "lspeaker", 0.20);
+	m_k007232_1->add_route(0, "rspeaker", 0.20);
+	m_k007232_1->add_route(1, "lspeaker", 0.20);
+	m_k007232_1->add_route(1, "rspeaker", 0.20);
 
-	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(ajax_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, 3579545);
+	m_k007232_2->port_write().set(FUNC(ajax_state::volume_callback1));
+	m_k007232_2->add_route(0, "lspeaker", 0.50);
+	m_k007232_2->add_route(1, "rspeaker", 0.50);
+}
 
 
 /*
@@ -377,6 +378,6 @@ ROM_START( ajaxj )
 ROM_END
 
 
-GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )

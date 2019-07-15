@@ -119,7 +119,7 @@ void gsword_state_base::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	}
 }
 
-uint32_t gsword_state_base::screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 gsword_state_base::screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -127,64 +127,32 @@ uint32_t gsword_state_base::screen_update_gsword(screen_device &screen, bitmap_i
 }
 
 
-PALETTE_INIT_MEMBER(gsword_state, gsword)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-
-	/* create a lookup table for the palette */
-	for (unsigned i = 0; i < 0x100; i++)
-	{
-		int bit0, bit1, bit2;
-		int r, g, b;
-
-		/* red component */
-		bit0 = BIT(color_prom[i + 0x100], 0);
-		bit1 = BIT(color_prom[i + 0x100], 1);
-		bit2 = BIT(color_prom[i + 0x100], 2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		/* green component */
-		bit0 = BIT(color_prom[i + 0x100], 3);
-		bit1 = BIT(color_prom[i + 0x000], 0);
-		bit2 = BIT(color_prom[i + 0x000], 1);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		/* blue component */
-		bit0 = 0;
-		bit1 = BIT(color_prom[i + 0x000], 2);
-		bit2 = BIT(color_prom[i + 0x000], 3);
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	/* color_prom now points to the beginning of the lookup table */
-	color_prom += 0x200;
-
-	/* characters */
-	for (unsigned i = 0; i < 0x100; i++)
-		palette.set_pen_indirect(i, i);
-
-	/* sprites */
-	for (unsigned i = 0x100; i < 0x200; i++)
-	{
-		uint8_t ctabentry = (bitswap<8>(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
-		palette.set_pen_indirect(i, ctabentry);
-	}
-}
-
-
-
-PALETTE_INIT_MEMBER(josvolly_state, josvolly)
+void gsword_state::gsword_palette(palette_device &palette) const
 {
 	u8 const *const color_prom = memregion("proms")->base();
 
 	// create a lookup table for the palette
 	for (unsigned i = 0; i < 0x100; i++)
 	{
-		u8 const r = pal4bit(color_prom[i + 0x000]);
-		u8 const g = pal4bit(color_prom[i + 0x100]);
-		u8 const b = pal4bit(color_prom[i + 0x200]);
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i | 0x100], 0);
+		bit1 = BIT(color_prom[i | 0x100], 1);
+		bit2 = BIT(color_prom[i | 0x100], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i | 0x100], 3);
+		bit1 = BIT(color_prom[i | 0x000], 0);
+		bit2 = BIT(color_prom[i | 0x000], 1);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i | 0x000], 2);
+		bit2 = BIT(color_prom[i | 0x000], 3);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 
@@ -192,7 +160,31 @@ PALETTE_INIT_MEMBER(josvolly_state, josvolly)
 		palette.set_pen_indirect(i, i);
 
 		// sprites
-		u8 const ctabentry = bitswap(color_prom[i + 0x300], 0, 1, 2, 3) | 0x80;
+		u8 const ctabentry = bitswap<4>(color_prom[i | 0x200], 0, 1, 2, 3) | 0x80;
+		palette.set_pen_indirect(i + 0x100, ctabentry);
+	}
+}
+
+
+
+void josvolly_state::josvolly_palette(palette_device &palette) const
+{
+	u8 const *const color_prom = memregion("proms")->base();
+
+	// create a lookup table for the palette
+	for (unsigned i = 0; i < 0x100; i++)
+	{
+		u8 const r = pal4bit(color_prom[i | 0x000]);
+		u8 const g = pal4bit(color_prom[i | 0x100]);
+		u8 const b = pal4bit(color_prom[i | 0x200]);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+
+		// characters
+		palette.set_pen_indirect(i, i);
+
+		// sprites
+		u8 const ctabentry = bitswap<4>(color_prom[i | 0x300], 0, 1, 2, 3) | 0x80;
 		palette.set_pen_indirect(i + 0x100, ctabentry);
 	}
 }

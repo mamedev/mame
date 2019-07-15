@@ -111,7 +111,7 @@
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )  \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Actually vblank, handled above */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* Actually vblank, handled above */
 
 /**************************** Coinage Dip Switches ****************************/
 

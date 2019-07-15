@@ -13,7 +13,7 @@
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "bus/scsi/scsihd.h"
 
 
@@ -44,7 +44,7 @@ protected:
 	virtual void abcbus_cs(uint8_t data) override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 
 	void abc_hdc_io(address_map &map);
 	void abc_hdc_mem(address_map &map);

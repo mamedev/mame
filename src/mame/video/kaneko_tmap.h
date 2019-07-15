@@ -5,87 +5,89 @@
 
 #pragma once
 
-
-
-class kaneko_view2_tilemap_device : public device_t
+class kaneko_view2_tilemap_device : public device_t, public device_gfx_interface
 {
 public:
-	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: kaneko_view2_tilemap_device(mconfig, tag, owner, (u32)0)
+	{
+	}
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_gfx_region(device_t &device, int region);
-	static void set_offset(device_t &device, int dx, int dy, int xdim, int ydim);
-	static void set_invert_flip(device_t &device, int invert_flip); // for fantasia (bootleg)
+	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	void kaneko16_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_);
+	// configuration
+	void set_colbase(u16 base) { m_colbase = base; }
+	void set_offset(int dx, int dy, int xdim, int ydim)
+	{
+		m_dx = dx;
+		m_dy = dy;
+		m_xdim = xdim;
+		m_ydim = ydim;
+	}
+	void set_invert_flip(int invert_flip) { m_invert_flip = invert_flip; } // for fantasia (bootleg)
+
+	typedef device_delegate<void (u8, u32*)> view2_cb_delegate;
+	void set_tile_callback(view2_cb_delegate cb) { m_view2_cb = cb; }
+
+	void vram_w(int _N_, offs_t offset, u16 data, u16 mem_mask = u16(~0));
 
 	// call to do the rendering etc.
 	template<class _BitmapClass>
-	void kaneko16_prepare_common(_BitmapClass &bitmap, const rectangle &cliprect);
+	void prepare_common(_BitmapClass &bitmap, const rectangle &cliprect);
 	template<class _BitmapClass>
-	void render_tilemap_chip_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri);
+	void render_tilemap_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri);
 	template<class _BitmapClass>
-	void render_tilemap_chip_alt_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri);
+	void render_tilemap_alt_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri, int v2pri);
 
-	void kaneko16_prepare(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void kaneko16_prepare(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void render_tilemap_chip(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	void render_tilemap_chip(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-	void render_tilemap_chip_alt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri);
-	void render_tilemap_chip_alt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri, int v2pri);
+	void prepare(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void prepare(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void render_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void render_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
+	void render_tilemap_alt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int v2pri);
+	void render_tilemap_alt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri, int v2pri);
 
 
 	// access
-	DECLARE_READ16_MEMBER( kaneko_tmap_vram_r );
-	DECLARE_WRITE16_MEMBER( kaneko_tmap_vram_w );
+	void vram_map(address_map &map);
 
-	DECLARE_READ16_MEMBER( kaneko_tmap_regs_r );
-	DECLARE_WRITE16_MEMBER( kaneko_tmap_regs_w );
+	u16 regs_r(offs_t offset);
+	void regs_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_0_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_1_w);
+	void vram_0_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
+	void vram_1_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 
-	DECLARE_READ16_MEMBER(kaneko16_vram_0_r);
-	DECLARE_READ16_MEMBER(kaneko16_vram_1_r);
+	u16 vram_0_r(offs_t offset);
+	u16 vram_1_r(offs_t offset);
 
-	DECLARE_READ16_MEMBER(kaneko16_scroll_0_r);
-	DECLARE_READ16_MEMBER(kaneko16_scroll_1_r);
+	void scroll_0_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
+	void scroll_1_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 
-	DECLARE_WRITE16_MEMBER( kaneko16_scroll_0_w );
-	DECLARE_WRITE16_MEMBER( kaneko16_scroll_1_w );
+	u16 scroll_0_r(offs_t offset);
+	u16 scroll_1_r(offs_t offset);
 
-	DECLARE_WRITE16_MEMBER(galsnew_vram_0_tilebank_w);
-	DECLARE_WRITE16_MEMBER(galsnew_vram_1_tilebank_w);
-
-
+	void mark_layer_dirty(u8 Layer);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	required_device<gfxdecode_device> m_gfxdecode;
+	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	required_shared_ptr_array<u16, 2> m_vram;
+	required_shared_ptr_array<u16, 2> m_vscroll;
 
 	// set when creating device
-	int m_tilebase;
+	required_memory_region m_gfxrom;
+	u16 m_colbase;
 	int m_dx, m_dy, m_xdim, m_ydim;
 	int m_invert_flip;
 
-	std::unique_ptr<uint16_t[]> m_vram[2];
-	std::unique_ptr<uint16_t[]> m_vscroll[2];
-	std::unique_ptr<uint16_t[]> m_regs;
+	view2_cb_delegate   m_view2_cb;
+	std::unique_ptr<u16[]> m_regs;
 	tilemap_t* m_tmap[2];
-	uint16_t m_vram_tile_addition[2]; // galsnew
 };
 
 
 DECLARE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device)
-
-#define MCFG_KANEKO_TMAP_GFXDECODE(_gfxtag) \
-	kaneko_view2_tilemap_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif // MAME_VIDEO_KANEKO_TMAP_H

@@ -161,7 +161,7 @@ READ8_MEMBER( towns_state::towns_gfx_r )
 	uint8_t ret = 0;
 
 	if(m_towns_mainmem_enable != 0)
-		return m_messram->pointer()[offset+0xc0000];
+		return m_ram->pointer()[offset+0xc0000];
 
 	offset = offset << 2;
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER( towns_state::towns_gfx_w )
 {
 	if(m_towns_mainmem_enable != 0)
 	{
-		m_messram->pointer()[offset+0xc0000] = data;
+		m_ram->pointer()[offset+0xc0000] = data;
 		return;
 	}
 	offset = offset << 2;
@@ -350,7 +350,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 READ8_MEMBER( towns_state::towns_video_cff80_mem_r )
 {
 	if(m_towns_mainmem_enable != 0)
-		return m_messram->pointer()[offset+0xcff80];
+		return m_ram->pointer()[offset+0xcff80];
 
 	return towns_video_cff80_r(space,offset);
 }
@@ -359,7 +359,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
 {
 	if(m_towns_mainmem_enable != 0)
 	{
-		m_messram->pointer()[offset+0xcff80] = data;
+		m_ram->pointer()[offset+0xcff80] = data;
 		return;
 	}
 	towns_video_cff80_w(space,offset,data);
@@ -511,12 +511,10 @@ READ8_MEMBER(towns_state::towns_video_5c8_r)
 
 WRITE8_MEMBER(towns_state::towns_video_5c8_w)
 {
-	pic8259_device* dev = m_pic_slave;
-
 	switch(offset)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
-			dev->ir3_w(0);
+			m_pic_slave->ir3_w(0);
 			if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 			//towns_vblank_flag = 0;
 			break;
@@ -533,10 +531,8 @@ void towns_state::towns_update_palette()
 	switch(m_video.towns_video_reg[1] & 0x30)  // Palette select
 	{
 		case 0x00:
-			m_palette16_0->set_pen_color(entry, r, g, b);
-			break;
 		case 0x20:
-			m_palette16_1->set_pen_color(entry, r, g, b);
+			m_palette16[(m_video.towns_video_reg[1] & 0x20) >> 5]->set_pen_color(entry, r, g, b);
 			break;
 		case 0x10:
 		case 0x30:
@@ -562,10 +558,8 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 
 	if(m_video.towns_video_reg[1] & 0x10)
 		pal = m_palette;
-	else if(m_video.towns_video_reg[1] & 0x20)
-		pal = m_palette16_1;
 	else
-		pal = m_palette16_0;
+		pal = m_palette16[(m_video.towns_video_reg[1] & 0x20) >> 5];
 //    if(LOG_VID) logerror("VID: read port %04x\n",offset+0xfd90);
 	switch(offset)
 	{
@@ -666,7 +660,7 @@ READ8_MEMBER(towns_state::towns_video_unknown_r)
  */
 READ8_MEMBER(towns_state::towns_spriteram_low_r)
 {
-	uint8_t* RAM = m_messram->pointer();
+	uint8_t* RAM = m_ram->pointer();
 	uint8_t* ROM = m_user->base();
 
 	if(offset < 0x1000)
@@ -704,7 +698,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 
 WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
 {
-	uint8_t* RAM = m_messram->pointer();
+	uint8_t* RAM = m_ram->pointer();
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
@@ -1199,7 +1193,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	uint32_t scroll;
 	int pixel;
 	int page = 0;
-	palette_device* pal = (layer == 0) ? m_palette16_0 : m_palette16_1;
+	palette_device* pal = m_palette16[layer];
 	bool sphscroll = !(m_video.towns_crtc_reg[28] & (layer ? 0x20 : 0x10));
 
 	if(m_video.towns_display_page_sel != 0)
@@ -1492,19 +1486,17 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_sprite_done)
 TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	device_t* dev = (device_t*)ptr;
-	downcast<pic8259_device *>(dev)->ir3_w(0);  // IRQ11 = VSync
+	m_pic_slave->ir3_w(0);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 	m_video.towns_vblank_flag = 0;
 }
 
 INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 {
-	pic8259_device* dev = m_pic_slave;
-	dev->ir3_w(1);  // IRQ11 = VSync
+	m_pic_slave->ir3_w(1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
-	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)dev);
+	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)m_pic_slave);
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
 	if(m_video.towns_sprite_reg[1] & 0x80)

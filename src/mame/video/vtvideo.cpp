@@ -78,6 +78,7 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 	, device_video_interface(mconfig, *this)
 	, m_read_ram(*this)
 	, m_write_vert_freq_intr(*this)
+	, m_write_lba3_lba4(*this)
 	, m_write_lba7(*this)
 	, m_char_rom(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
@@ -106,11 +107,15 @@ void vt100_video_device::device_start()
 	/* resolve callbacks */
 	m_read_ram.resolve_safe(0);
 	m_write_vert_freq_intr.resolve_safe();
+	m_write_lba3_lba4.resolve();
 	m_write_lba7.resolve_safe();
 
 	// LBA7 is scan line frequency update
 	m_lba7_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
 	m_lba7_change_timer->adjust(clocks_to_attotime(765), 0, clocks_to_attotime(765));
+
+	// LBA3 and LBA4 are first two stages of divide-by-17 counter
+	m_lba3_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba3_change), this));
 
 	screen().register_vblank_callback(vblank_state_delegate(&vt100_video_device::vblank_callback, this));
 
@@ -203,7 +208,7 @@ void vt100_video_device::recompute_parameters()
 
 	int vert_pix_visible = m_height * (m_linedoubler ? 20 : 10);
 	int vert_pix_total = m_is_50hz ? (m_interlaced ? 629 : 630/2) : (m_interlaced ? 525 : 524/2);
-	attoseconds_t frame_period = clocks_to_attotime(vert_pix_total * 1530).as_attoseconds();
+	attotime frame_period = clocks_to_attotime(vert_pix_total * 1530);
 
 	// display 1 less filler pixel in 132 char. mode
 	int horiz_pix_visible = m_columns * (m_columns == 132 ? 9 : 10);
@@ -212,10 +217,10 @@ void vt100_video_device::recompute_parameters()
 	// dot clock is divided by 1.5 in 80 column mode
 	screen().set_unscaled_clock(m_columns == 132 ? clock() : clock() * 2 / 3);
 	rectangle visarea(0, horiz_pix_visible - 1, 0, vert_pix_visible - 1);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period);
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period.as_attoseconds());
 
 	LOG("(RECOMPUTE) HPIX: %d (%d) - VPIX: %d (%d)\n", horiz_pix_visible, horiz_pix_total, vert_pix_visible, vert_pix_total);
-	LOG("(RECOMPUTE) FREQUENCY: %f\n", ATTOSECONDS_TO_HZ(frame_period));
+	LOG("(RECOMPUTE) FREQUENCY: %f\n", frame_period.as_hz());
 	if (m_interlaced)
 		LOG("(RECOMPUTE) * INTERLACED *\n");
 	if (m_linedoubler)
@@ -440,8 +445,8 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 	if (m_read_ram(0) != 0x7f)
 		return;
 
-	int vert_charlines_MAX = m_height;
 	int fill_lines = m_fill_lines;
+	int vert_charlines_MAX = m_height + fill_lines;
 	if (m_linedoubler)
 	{
 		vert_charlines_MAX *= 2;
@@ -489,7 +494,6 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			}
 		}
 	}
-
 }
 
 // ****** RAINBOW ******
@@ -892,6 +896,20 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 {
 	m_lba7 = (m_lba7) ? 0 : 1;
 	m_write_lba7(m_lba7);
+
+	if (!m_write_lba3_lba4.isnull())
+	{
+		// The first of every eight low periods of LBA 3 is twice as long
+		m_write_lba3_lba4(2);
+		m_lba3_change_timer->adjust(clocks_to_attotime(90), 3);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(vt100_video_device::lba3_change)
+{
+	m_write_lba3_lba4(param & 3);
+	if (param <= 16)
+		m_lba3_change_timer->adjust(clocks_to_attotime(45), param + 1);
 }
 
 
@@ -899,10 +917,12 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vt100_video_device::device_add_mconfig)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+void vt100_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+}
 
-MACHINE_CONFIG_START(rainbow_video_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 4)
-MACHINE_CONFIG_END
+void rainbow_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette).set_entries(4);
+}

@@ -1,12 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/***************************************************************************
+/*****************************************************************************************
 
-        PP-01 driver by Miodrag Milanovic
+PP-01 driver by Miodrag Milanovic
 
-        08/09/2008 Preliminary driver.
+2008-09-08 Preliminary driver.
 
-****************************************************************************/
+MONIT to enter the Monitor
+M - ?
+N - ?
+P - to return
+S - ?
+Z - ?
+
+ToDo:
+- Cassette (coded but unable to test as the i8251 device needs work to support syndet)
+- Interrupt controller
+
+*****************************************************************************************/
 
 #include "emu.h"
 #include "includes/pp01.h"
@@ -16,34 +27,35 @@
 
 
 /* Address maps */
-ADDRESS_MAP_START(pp01_state::pp01_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x5000, 0x5fff) AM_RAMBANK("bank6")
-	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank7")
-	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x8000, 0x8fff) AM_RAMBANK("bank9")
-	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa000, 0xafff) AM_RAMBANK("bank11")
-	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK("bank12")
-	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank13")
-	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank14")
-	AM_RANGE(0xe000, 0xefff) AM_RAMBANK("bank15")
-	AM_RANGE(0xf000, 0xffff) AM_RAMBANK("bank16")
-ADDRESS_MAP_END
+void pp01_state::pp01_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1");
+	map(0x1000, 0x1fff).bankrw("bank2");
+	map(0x2000, 0x2fff).bankrw("bank3");
+	map(0x3000, 0x3fff).bankrw("bank4");
+	map(0x4000, 0x4fff).bankrw("bank5");
+	map(0x5000, 0x5fff).bankrw("bank6");
+	map(0x6000, 0x6fff).bankrw("bank7");
+	map(0x7000, 0x7fff).bankrw("bank8");
+	map(0x8000, 0x8fff).bankrw("bank9");
+	map(0x9000, 0x9fff).bankrw("bank10");
+	map(0xa000, 0xafff).bankrw("bank11");
+	map(0xb000, 0xbfff).bankrw("bank12");
+	map(0xc000, 0xcfff).bankrw("bank13");
+	map(0xd000, 0xdfff).bankrw("bank14");
+	map(0xe000, 0xefff).bankrw("bank15");
+	map(0xf000, 0xffff).bankrw("bank16");
+}
 
-ADDRESS_MAP_START(pp01_state::pp01_io)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // system
-	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
-	AM_RANGE(0xc8, 0xc8) AM_MIRROR(2) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xc9, 0xc9) AM_MIRROR(2) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xcc, 0xcf) AM_WRITE(pp01_video_write_mode_w)
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0x10) AM_READWRITE(pp01_mem_block_r, pp01_mem_block_w)
-ADDRESS_MAP_END
+void pp01_state::pp01_io(address_map &map)
+{
+	map(0xc0, 0xc3).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
+	//map(0xc4, 0xc7).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // user
+	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xcc, 0xcf).w(FUNC(pp01_state::pp01_video_write_mode_w));
+	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pp01 )
@@ -198,56 +210,52 @@ static INPUT_PORTS_START( pp01 )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(pp01_state::pp01)
+void pp01_state::pp01(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(pp01_mem)
-	MCFG_CPU_IO_MAP(pp01_io)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pp01_state::pp01_mem);
+	m_maincpu->set_addrmap(AS_IO, &pp01_state::pp01_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pp01_state, screen_update_pp01)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(pp01_state::screen_update_pp01));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(pp01_state, pp01)
+	PALETTE(config, "palette", FUNC(pp01_state::pp01_palette), 8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, m_uart, 2000000);
+	m_uart->txd_handler().set([this] (bool state) { m_cass->output(state ? 1.0 : -1.0); });
 	// when rts and dtr are both high, the uart is being used for cassette operations
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(pp01_state,pp01_pit_out0))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pp01_state,pp01_pit_out1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk0))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(FUNC(pp01_state::z2_w));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pp01_state, pp01_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pp01_state, pp01_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pp01_state, pp01_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pp01_state, pp01_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pp01_state, pp01_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pp01_state, pp01_8255_portc_w))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_r));
+	ppi1.out_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_w));
+	ppi1.in_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_r));
+	ppi1.out_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_w));
+	ppi1.in_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_r));
+	ppi1.out_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+}
 
 /* ROM definition */
 
@@ -275,5 +283,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT  COMPANY  FULLNAME  FLAGS
-COMP( 198?, pp01,   0,      0,      pp01,       pp01,   pp01_state,  0,    "ZVT",   "PP-01",  MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, pp01, 0,      0,      pp01,    pp01,  pp01_state, empty_init, "ZVT",   "PP-01",  MACHINE_NOT_WORKING )

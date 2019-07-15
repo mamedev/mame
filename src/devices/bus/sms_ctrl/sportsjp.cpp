@@ -65,11 +65,11 @@ CUSTOM_INPUT_MEMBER( sms_sports_pad_jp_device::rldu_pins_r ) { return ~(m_rldu_p
 
 static INPUT_PORTS_START( sms_sports_pad_jp )
 	PORT_START("SPORTS_JP_IN")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_jp_device, rldu_pins_r, nullptr) // R,L,D,U
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sms_sports_pad_jp_device, rldu_pins_r, nullptr) // R,L,D,U
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // Vcc
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, sms_sports_pad_jp_device, tl_pin_r ) // TL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, sms_sports_pad_jp_device, tl_pin_r ) // TL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // TH
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, sms_sports_pad_jp_device, tr_pin_r ) // TR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, sms_sports_pad_jp_device, tr_pin_r ) // TR
 
 	PORT_START("SPORTS_JP_BT")    /* Sports Pad buttons nibble */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )

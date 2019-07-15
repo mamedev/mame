@@ -12,14 +12,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MB90082_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, MB90082, _freq)
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -39,15 +31,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	void mb90082_vram(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	enum
@@ -67,6 +58,8 @@ private:
 
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
+
+	void mb90082_vram(address_map &map);
 
 	const address_space_config      m_space_config;
 };

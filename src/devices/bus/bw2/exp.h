@@ -49,17 +49,6 @@
 #define BW2_EXPANSION_SLOT_TAG      "exp"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BW2_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BW2_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -73,18 +62,28 @@ class bw2_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	bw2_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+		: bw2_expansion_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	bw2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~bw2_expansion_slot_device();
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
+	uint8_t cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
+	void cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
 
-	DECLARE_READ8_MEMBER( slot_r );
-	DECLARE_WRITE8_MEMBER( slot_w );
+	uint8_t slot_r(offs_t offset);
+	void slot_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( modsel_r );
-	DECLARE_WRITE8_MEMBER( modsel_w );
+	uint8_t modsel_r(offs_t offset);
+	void modsel_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -104,14 +103,14 @@ public:
 	// construction/destruction
 	virtual ~device_bw2_expansion_slot_interface();
 
-	virtual uint8_t bw2_cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { return data; };
-	virtual void bw2_cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { };
+	virtual uint8_t bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { return data; }
+	virtual void bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { }
 
-	virtual uint8_t bw2_slot_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void bw2_slot_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t bw2_slot_r(offs_t offset) { return 0xff; }
+	virtual void bw2_slot_w(offs_t offset, uint8_t data) { }
 
-	virtual uint8_t bw2_modsel_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void bw2_modsel_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t bw2_modsel_r(offs_t offset) { return 0xff; }
+	virtual void bw2_modsel_w(offs_t offset, uint8_t data) { }
 
 protected:
 	device_bw2_expansion_slot_interface(const machine_config &mconfig, device_t &device);
@@ -124,7 +123,6 @@ protected:
 DECLARE_DEVICE_TYPE(BW2_EXPANSION_SLOT, bw2_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( bw2_expansion_cards );
-
+void bw2_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_BW2_EXP_H

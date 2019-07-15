@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -20,9 +22,9 @@ public:
 	// construction/destruction
 	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void set_cpu_tag(device_t &device, const char *tag) { downcast<mb_vcu_device &>(device).m_cpu.set_tag(tag); }
+	// configuration
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write_vregs );
@@ -35,14 +37,10 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( vbank_w );
 	DECLARE_WRITE8_MEMBER( vbank_clear_w );
-	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
-	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(void);
 
-	void mb_vcu_pal_ram(address_map &map);
-	void mb_vcu_vram(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -55,6 +53,12 @@ private:
 	inline void write_byte(offs_t address, uint8_t data);
 	inline uint8_t read_io(offs_t address);
 	inline void write_io(offs_t address, uint8_t data);
+
+	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
+	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
+
+	void mb_vcu_pal_ram(address_map &map);
+	void mb_vcu_vram(address_map &map);
 
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_paletteram_space_config;
@@ -81,16 +85,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(MB_VCU, mb_vcu_device)
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MB_VCU_CPU(_tag) \
-	mb_vcu_device::set_cpu_tag(*device, "^" _tag);
-
-#define MCFG_MB_VCU_PALETTE(_palette_tag) \
-	mb_vcu_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif // MAME_VIDEO_MB_VCU_H

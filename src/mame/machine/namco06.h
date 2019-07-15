@@ -6,74 +6,19 @@
 #pragma once
 
 
-struct namco_06xx_config
-{
-	const char *nmicpu;
-	const char *chip0;
-	const char *chip1;
-	const char *chip2;
-	const char *chip3;
-};
-
-
-#define MCFG_NAMCO_06XX_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_06XX, _clock)
-
-#define MCFG_NAMCO_06XX_MAINCPU(_tag) \
-	namco_06xx_device::set_maincpu(*device, "^" _tag);
-
-#define MCFG_NAMCO_06XX_READ_0_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<0>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_READ_1_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<1>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_READ_2_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<2>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_READ_3_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_callback<3>(*device, DEVCB_##_devcb);
-
-
-#define MCFG_NAMCO_06XX_READ_REQUEST_0_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<0>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_READ_REQUEST_1_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<1>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_READ_REQUEST_2_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<2>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_READ_REQUEST_3_CB(_devcb) \
-	devcb = &namco_06xx_device::set_read_request_callback<3>(*device, DEVCB_##_devcb);
-
-
-#define MCFG_NAMCO_06XX_WRITE_0_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<0>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_WRITE_1_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<1>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_WRITE_2_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<2>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_06XX_WRITE_3_CB(_devcb) \
-	devcb = &namco_06xx_device::set_write_callback<3>(*device, DEVCB_##_devcb);
-
-
 /* device get info callback */
 class namco_06xx_device : public device_t
 {
 public:
 	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_maincpu(device_t &device, const char *tag) { downcast<namco_06xx_device &>(device).m_nmicpu.set_tag(tag); }
+	template <typename T> void set_maincpu(T &&tag) { m_nmicpu.set_tag(std::forward<T>(tag)); }
 
-	template <unsigned N, class Object> static devcb_base &set_read_callback(device_t &device, Object &&cb) { return downcast<namco_06xx_device &>(device).m_read[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto read_callback() { return m_read[N].bind(); }
 
-	template <unsigned N, class Object> static devcb_base &set_read_request_callback(device_t &device, Object &&cb) { return downcast<namco_06xx_device &>(device).m_readreq[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto read_request_callback() { return m_readreq[N].bind(); }
 
-	template <unsigned N, class Object> static devcb_base &set_write_callback(device_t &device, Object &&cb) { return downcast<namco_06xx_device &>(device).m_write[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto write_callback() { return m_write[N].bind(); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );

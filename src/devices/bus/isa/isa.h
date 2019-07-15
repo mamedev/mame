@@ -67,87 +67,7 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ISA8_CPU(_cputag) \
-	isa8_device::static_set_cputag(*device, _cputag);
-// include this in a driver to have ISA allocate it's own address spaces (e.g. non-x86)
-#define MCFG_ISA8_BUS_CUSTOM_SPACES() \
-	isa8_device::static_set_custom_spaces(*device);
-#define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	isa8_slot_device::static_set_isa8_slot(*device, this, _isatag);
-#define MCFG_ISA16_CPU(_cputag) \
-	isa8_device::static_set_cputag(*device, _cputag);
-#define MCFG_ISA16_BUS_CUSTOM_SPACES() \
-	isa8_device::static_set_custom_spaces(*device);
-#define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	isa16_slot_device::static_set_isa16_slot(*device, this, _isatag);
-
-#define MCFG_ISA_BUS_IOCHCK(_iochck) \
-	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
-
-#define MCFG_ISA_OUT_IRQ2_CB(_devcb) \
-	devcb = &isa8_device::set_out_irq2_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
-	devcb = &isa8_device::set_out_irq3_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ4_CB(_devcb) \
-	devcb = &isa8_device::set_out_irq4_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ5_CB(_devcb) \
-	devcb = &isa8_device::set_out_irq5_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ6_CB(_devcb) \
-	devcb = &isa8_device::set_out_irq6_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ7_CB(_devcb) \
-	devcb = &isa8_device::set_out_irq7_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ1_CB(_devcb) \
-	devcb = &isa8_device::set_out_drq1_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ2_CB(_devcb) \
-	devcb = &isa8_device::set_out_drq2_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ3_CB(_devcb) \
-	devcb = &isa8_device::set_out_drq3_callback(*device, DEVCB_##_devcb);
-
-
-#define MCFG_ISA_OUT_IRQ10_CB(_devcb) \
-	devcb = &isa16_device::set_out_irq10_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ11_CB(_devcb) \
-	devcb = &isa16_device::set_out_irq11_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ12_CB(_devcb) \
-	devcb = &isa16_device::set_out_irq12_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ14_CB(_devcb) \
-	devcb = &isa16_device::set_out_irq14_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ15_CB(_devcb) \
-	devcb = &isa16_device::set_out_irq15_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ0_CB(_devcb) \
-	devcb = &isa16_device::set_out_drq0_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ5_CB(_devcb) \
-	devcb = &isa16_device::set_out_drq5_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ6_CB(_devcb) \
-	devcb = &isa16_device::set_out_drq6_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ7_CB(_devcb) \
-	devcb = &isa16_device::set_out_drq7_callback(*device, DEVCB_##_devcb);
+#include <forward_list>
 
 
 //**************************************************************************
@@ -156,25 +76,30 @@
 
 class isa8_device;
 
-class isa8_slot_device : public device_t,
-							public device_slot_interface
+class isa8_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
+		: isa8_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+		m_isa_bus.set_tag(std::forward<T>(isa_tag));
+	}
 	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
-
-	// inline configuration
-	static void static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag);
 
 protected:
 	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// device-level overrides
+	virtual void device_start() override;
+
 	// configuration
-	device_t *m_owner;
-	const char *m_isa_tag;
+	required_device<device_t> m_isa_bus;
 };
 
 // device type definition
@@ -196,31 +121,35 @@ public:
 
 	// construction/destruction
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_set_custom_spaces(device_t &device);
-	template <class Object> devcb_base &set_iochck_callback(Object &&cb) { return m_write_iochck.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq2_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq3_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_irq3_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq4_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq5_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_irq5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq6_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_irq6_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq7_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_irq7_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq1_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_drq1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq2_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_drq2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq3_callback(device_t &device, Object &&cb) { return downcast<isa8_device &>(device).m_out_drq3_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
+	auto iochck_callback() { return m_write_iochck.bind(); }
+	auto irq2_callback() { return m_out_irq2_cb.bind(); }
+	auto irq3_callback() { return m_out_irq3_cb.bind(); }
+	auto irq4_callback() { return m_out_irq4_cb.bind(); }
+	auto irq5_callback() { return m_out_irq5_cb.bind(); }
+	auto irq6_callback() { return m_out_irq6_cb.bind(); }
+	auto irq7_callback() { return m_out_irq7_cb.bind(); }
+	auto drq1_callback() { return m_out_drq1_cb.bind(); }
+	auto drq2_callback() { return m_out_drq2_cb.bind(); }
+	auto drq3_callback() { return m_out_drq3_cb.bind(); }
+
+	// include this in a driver to have ISA allocate its own address spaces (e.g. non-x86)
+	void set_custom_spaces() { m_allocspaces = true; }
 
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
 	virtual space_config_vector memory_space_config() const override;
 
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler);
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
-	void install_memory(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler);
 
 	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);
@@ -228,7 +157,7 @@ public:
 	bool is_option_rom_space_available(offs_t start, int size);
 
 	// FIXME: shouldn't need to expose this
-	address_space &memspace() const { return m_maincpu->space(AS_PROGRAM); }
+	address_space &memspace() const { return *m_memspace; }
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq3_w );
@@ -248,31 +177,34 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 
 	uint8_t dack_r(int line);
-	void dack_w(int line,uint8_t data);
+	void dack_w(int line, uint8_t data);
+	void dack_line_w(int line, int state);
 	void eop_w(int channels, int state);
 
 	void nmi();
-	void set_nmi_state(bool enabled) { m_nmi_enabled = enabled; }
 
 	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
+
+	void add_slot(const char *tag);
+	void add_slot(device_slot_interface *slot);
+	virtual void remap(int space_id, offs_t start, offs_t end);
 
 	const address_space_config m_mem_config, m_io_config, m_mem16_config, m_io16_config;
 
 protected:
 	isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void install_space(int spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	template<typename R, typename W> void install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// internal state
-	required_device<cpu_device> m_maincpu;
-
 	// address spaces
-	address_space *m_iospace, *m_memspace;
-	int m_iowidth, m_memwidth;
+	required_address_space m_memspace, m_iospace;
+	int m_memwidth, m_iowidth;
 	bool m_allocspaces;
 
 	devcb_write_line    m_out_irq2_cb;
@@ -287,7 +219,7 @@ protected:
 
 	device_isa8_card_interface *m_dma_device[8];
 	bool                        m_dma_eop[8];
-	bool                        m_nmi_enabled;
+	std::forward_list<device_slot_interface *> m_slot_list;
 
 private:
 	devcb_write_line m_write_iochck;
@@ -313,11 +245,14 @@ public:
 	void set_isa_device();
 	// configuration access
 	virtual uint8_t dack_r(int line);
-	virtual void dack_w(int line,uint8_t data);
+	virtual void dack_w(int line, uint8_t data);
+	virtual void dack_line_w(int line, int state);
 	virtual void eop_w(int state);
 
+	virtual void remap(int space_id, offs_t start, offs_t end) {}
+
 	// inline configuration
-	static void static_set_isabus(device_t &device, device_t *isa_device);
+	void set_isabus(device_t *isa_device) { m_isa_dev = isa_device; }
 
 public:
 	device_isa8_card_interface(const machine_config &mconfig, device_t &device);
@@ -335,12 +270,21 @@ class isa16_slot_device : public isa8_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
+		: isa16_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+		m_isa_bus.set_tag(std::forward<T>(isa_tag));
+	}
 	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-		// device-level overrides
-	virtual void device_start() override;
 
-	// inline configuration
-	static void static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag);
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -354,15 +298,15 @@ public:
 	// construction/destruction
 	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_irq10_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_irq10_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq11_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_irq11_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq12_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_irq12_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq14_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_irq14_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq15_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_irq15_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq0_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_drq0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq5_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_drq5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq6_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_drq6_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_drq7_callback(device_t &device, Object &&cb) { return downcast<isa16_device &>(device).m_out_drq7_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq10_callback() { return m_out_irq10_cb.bind(); }
+	auto irq11_callback() { return m_out_irq11_cb.bind(); }
+	auto irq12_callback() { return m_out_irq12_cb.bind(); }
+	auto irq14_callback() { return m_out_irq14_cb.bind(); }
+	auto irq15_callback() { return m_out_irq15_cb.bind(); }
+	auto drq0_callback() { return m_out_drq0_cb.bind(); }
+	auto drq5_callback() { return m_out_drq5_cb.bind(); }
+	auto drq6_callback() { return m_out_drq6_cb.bind(); }
+	auto drq7_callback() { return m_out_drq7_cb.bind(); }
 
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
@@ -381,7 +325,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq7_w );
 
 	uint16_t dack16_r(int line);
-	void dack16_w(int line,uint16_t data);
+	void dack16_w(int line, uint16_t data);
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	// 16 bit accessors for ISA-defined address spaces
 	DECLARE_READ16_MEMBER(mem16_r);
@@ -425,7 +370,7 @@ public:
 	// construction/destruction
 	virtual ~device_isa16_card_interface();
 	virtual uint16_t dack16_r(int line);
-	virtual void dack16_w(int line,uint16_t data);
+	virtual void dack16_w(int line, uint16_t data);
 
 	void set_isa_device();
 

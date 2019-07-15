@@ -40,14 +40,14 @@ TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 K051316_CB_MEMBER(divebomb_state::zoom_callback_1)
 {
 	*code |= (*color & 0x03) << 8;
-	*color = 0 + ((roz_pal >> 4) & 3);
+	*color = 0 + ((m_roz_pal >> 4) & 3);
 }
 
 
 K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
 {
 	*code |= (*color & 0x03) << 8;
-	*color = 4 + (roz_pal & 3);
+	*color = 4 + (m_roz_pal & 3);
 }
 
 
@@ -65,39 +65,19 @@ WRITE8_MEMBER(divebomb_state::fgram_w)
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap1_enable_w)
-{
-	roz1_wrap = !(data & 1);
-}
-
-
-WRITE8_MEMBER(divebomb_state::rozcpu_enable1_w)
-{
-	roz1_enable = !(data & 1);
-}
-
-
-WRITE8_MEMBER(divebomb_state::rozcpu_enable2_w)
-{
-	roz2_enable = !(data & 1);
-}
-
-
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap2_enable_w)
-{
-	roz2_wrap = !(data & 1);
-}
-
-
 WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
 {
 	//.... ..xx  K051316 1 palette select
 	//..xx ....  K051316 2 palette select
 
-	roz_pal = data;
+	uint8_t old_pal = m_roz_pal;
+	m_roz_pal = data;
 
-	m_k051316_2->mark_tmap_dirty();
-	m_k051316_1->mark_tmap_dirty();
+	if ((old_pal & 0x03) != (data & 0x03))
+		m_k051316[1]->mark_tmap_dirty();
+
+	if ((old_pal & 0x30) != (data & 0x30))
+		m_k051316[0]->mark_tmap_dirty();
 
 	if (data & 0xcc)
 		logerror("rozcpu_port50_w %02x\n", data);
@@ -111,44 +91,43 @@ WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
  *
  *************************************/
 
-void divebomb_state::decode_proms(const uint8_t * rgn, int size, int index, bool inv)
+void divebomb_state::decode_proms(palette_device &palette, const uint8_t * rgn, int size, int index, bool inv)
 {
-	static const int resistances[4] = { 2000, 1000, 470, 220 };
+	static constexpr int resistances[4] = { 2000, 1000, 470, 220 };
 
+	// compute the color output resistor weights
 	double rweights[4], gweights[4], bweights[4];
-
-	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
-								4, resistances, rweights, 0, 0,
-								4, resistances, gweights, 0, 0,
-								4, resistances, bweights, 0, 0);
+			4, resistances, rweights, 0, 0,
+			4, resistances, gweights, 0, 0,
+			4, resistances, bweights, 0, 0);
 
-	/* create a lookup table for the palette */
+	// create a lookup table for the palette
 	for (uint32_t i = 0; i < size; ++i)
 	{
-		uint32_t rdata = rgn[i + size*2] & 0x0f;
-		uint32_t r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
+		uint32_t const rdata = rgn[i + size*2] & 0x0f;
+		uint32_t const r = combine_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
 
-		uint32_t gdata = rgn[i + size] & 0x0f;
-		uint32_t g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
+		uint32_t const gdata = rgn[i + size] & 0x0f;
+		uint32_t const g = combine_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
 
-		uint32_t bdata = rgn[i] & 0x0f;
-		uint32_t b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
+		uint32_t const bdata = rgn[i] & 0x0f;
+		uint32_t const b = combine_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
 
 		if (!inv)
-			m_palette->set_pen_color(index + i, rgb_t(r, g, b));
+			palette.set_pen_color(index + i, rgb_t(r, g, b));
 		else
-			m_palette->set_pen_color(index + (i ^ 0xff), rgb_t(r, g, b));
+			palette.set_pen_color(index + (i ^ 0xff), rgb_t(r, g, b));
 	}
 }
 
 
-PALETTE_INIT_MEMBER(divebomb_state, divebomb)
+void divebomb_state::divebomb_palette(palette_device &palette) const
 {
-	decode_proms(memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
-	decode_proms(memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);
-	decode_proms(memregion("k051316_1_pr")->base(), 0x400, 0, true);
-	decode_proms(memregion("k051316_2_pr")->base(), 0x400, 0x400, true);
+	decode_proms(palette, memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
+	decode_proms(palette, memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);
+	decode_proms(palette, memregion("k051316_1_pr")->base(), 0x400, 0, true);
+	decode_proms(palette, memregion("k051316_2_pr")->base(), 0x400, 0x400, true);
 }
 
 
@@ -190,16 +169,15 @@ void divebomb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t divebomb_state::screen_update_divebomb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k051316_1->wraparound_enable(roz1_wrap);
-	m_k051316_2->wraparound_enable(roz2_wrap);
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	if (roz2_enable)
-		m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
-
-	if (roz1_enable)
-		m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	for (int chip = 1; chip >= 0; chip--)
+	{
+		if (m_roz_enable[chip])
+		{
+			m_k051316[chip]->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		}
+	}
 
 	draw_sprites(bitmap, cliprect);
 

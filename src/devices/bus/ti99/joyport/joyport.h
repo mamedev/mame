@@ -24,6 +24,13 @@
 
 namespace bus { namespace ti99 { namespace joyport {
 
+enum
+{
+	PLAIN=0,
+	MOUSE,
+	HANDSET
+};
+
 class joyport_device;
 
 /********************************************************************
@@ -49,13 +56,22 @@ protected:
 class joyport_device : public device_t, public device_slot_interface
 {
 public:
+	template <typename U>
+	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: joyport_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	uint8_t   read_port();
 	void    write_port(int data);
 	void    set_interrupt(int state);
 	void    pulse_clock();
-
-	template <class Object> static devcb_base &static_set_int_callback(device_t &device, Object &&cb) { return downcast<joyport_device &>(device).m_interrupt.set_callback(std::forward<Object>(cb)); }
+	auto    int_cb() { return m_interrupt.bind(); }
 
 protected:
 	void device_start() override;
@@ -68,26 +84,10 @@ private:
 
 } } } // end namespace bus::ti99::joyport
 
-SLOT_INTERFACE_EXTERN(ti99_joystick_port);
-SLOT_INTERFACE_EXTERN(ti99_joystick_port_994);
-SLOT_INTERFACE_EXTERN(ti99_joystick_port_gen);
-
 DECLARE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device)
 
-#define MCFG_JOYPORT_INT_HANDLER( _intcallb ) \
-	devcb = &bus::ti99::joyport::joyport_device::static_set_int_callback( *device, DEVCB_##_intcallb );
-
-#define MCFG_GENEVE_JOYPORT_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_joystick_port_gen, "twinjoy", false)
-
-#define MCFG_TI_JOYPORT4A_ADD( _tag )    \
-	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_joystick_port, "twinjoy", false)
-
-#define MCFG_TI_JOYPORT4_ADD( _tag ) \
-	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_joystick_port_994, "twinjoy", false)
-
+void ti99_joyport_options_plain(device_slot_interface &device);
+void ti99_joyport_options_mouse(device_slot_interface &device);
+void ti99_joyport_options_994(device_slot_interface &device);
 
 #endif // MAME_BUS_TI99_JOYPORT_JOYPORT_H

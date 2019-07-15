@@ -25,8 +25,8 @@ public:
 
 	virtual bool read(offs_t offset, uint8_t &data) { return false; }
 	virtual bool write(offs_t offset, uint8_t data) { return false; }
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) { }
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) { }
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) { }
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) { }
 
 	// slot 1
 	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data) { }
@@ -59,14 +59,25 @@ class dmvcart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	dmvcart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: dmvcart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~dmvcart_slot_device();
 
-	template <class Object> static devcb_base &set_prog_read_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_prog_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_prog_write_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_prog_write_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_thold_callback(device_t &device, Object &&cb) { return downcast<dmvcart_slot_device &>(device).m_out_thold_cb.set_callback(std::forward<Object>(cb)); }
+	auto prog_read() { return m_prog_read_cb.bind(); }
+	auto prog_write() { return m_prog_write_cb.bind(); }
+	auto out_int() { return m_out_int_cb.bind(); }
+	auto out_irq() { return m_out_irq_cb.bind(); }
+	auto out_thold() { return m_out_thold_cb.bind(); }
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -76,8 +87,8 @@ public:
 	virtual bool write(offs_t offset, uint8_t data);
 	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data);
 	virtual void ram_write(uint8_t cas, offs_t offset, uint8_t data);
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data);
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data);
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data);
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data);
 	virtual void hold_w(int state);
 	virtual void switch16_w(int state);
 	virtual void timint_w(int state);
@@ -98,29 +109,15 @@ public:
 	devcb_write_line                m_out_int_cb;
 	devcb_write_line                m_out_irq_cb;
 	devcb_write_line                m_out_thold_cb;
+
+	required_address_space          m_memspace;
+	required_address_space          m_iospace;
+
 	device_dmvslot_interface*       m_cart;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(DMVCART_SLOT, dmvcart_slot_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(_read_devcb, _write_devcb) \
-	devcb = &dmvcart_slot_device::set_prog_read_callback(*device, DEVCB_##_read_devcb); \
-	devcb = &dmvcart_slot_device::set_prog_write_callback(*device, DEVCB_##_write_devcb);
-
-#define MCFG_DMVCART_SLOT_OUT_INT_CB(_devcb) \
-	devcb = &dmvcart_slot_device::set_out_int_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_DMVCART_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &dmvcart_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_DMVCART_SLOT_OUT_THOLD_CB(_devcb) \
-	devcb = &dmvcart_slot_device::set_out_thold_callback(*device, DEVCB_##_devcb);
 
 #endif // MAME_BUS_DMV_DMVBUS_H

@@ -6,7 +6,7 @@
  */
 
 #include "nlid_system.h"
-#include "../analog/nlid_twoterm.h"
+#include "netlist/analog/nlid_twoterm.h"
 
 #include <cmath>
 
@@ -83,101 +83,101 @@ namespace netlist
 	NETLIB_OBJECT(74123_dip)
 	{
 		NETLIB_CONSTRUCTOR(74123_dip)
-		, m_1(*this, "1", 74123)
-		, m_2(*this, "2", 74123)
+		, m_A(*this, "A", 74123)
+		, m_B(*this, "B", 74123)
 		{
-			register_subalias("1", m_1.m_A);
-			register_subalias("2", m_1.m_B);
-			register_subalias("3", m_1.m_CLRQ);
-			register_subalias("4", m_1.m_QQ);
-			register_subalias("5", m_2.m_Q);
-			register_subalias("6", m_2.m_RN.m_R.m_N);
-			register_subalias("7", m_2.m_RN.m_R.m_P);
-			register_subalias("8", m_1.m_RN.m_R.m_N);
-			connect(m_1.m_RN.m_R.m_N, m_2.m_RN.m_R.m_N);
+			register_subalias("1", m_A.m_A);
+			register_subalias("2", m_A.m_B);
+			register_subalias("3", m_A.m_CLRQ);
+			register_subalias("4", m_A.m_QQ);
+			register_subalias("5", m_B.m_Q);
+			register_subalias("6", m_B.m_RN.m_R.m_N);
+			register_subalias("7", m_B.m_RN.m_R.m_P);
+			register_subalias("8", m_A.m_RN.m_R.m_N);
+			connect(m_A.m_RN.m_R.m_N, m_B.m_RN.m_R.m_N);
 
-			register_subalias("9", m_2.m_A);
-			register_subalias("10", m_2.m_B);
-			register_subalias("11", m_2.m_CLRQ);
-			register_subalias("12", m_2.m_QQ);
-			register_subalias("13", m_1.m_Q);
-			register_subalias("14", m_1.m_RN.m_R.m_N);
-			register_subalias("15", m_1.m_RN.m_R.m_P);
-			register_subalias("16", m_1.m_RP.m_R.m_P);
-			connect(m_1.m_RP.m_R.m_P, m_2.m_RP.m_R.m_P);
+			register_subalias("9", m_B.m_A);
+			register_subalias("10", m_B.m_B);
+			register_subalias("11", m_B.m_CLRQ);
+			register_subalias("12", m_B.m_QQ);
+			register_subalias("13", m_A.m_Q);
+			register_subalias("14", m_A.m_RN.m_R.m_N);
+			register_subalias("15", m_A.m_RN.m_R.m_P);
+			register_subalias("16", m_A.m_RP.m_R.m_P);
+			connect(m_A.m_RP.m_R.m_P, m_B.m_RP.m_R.m_P);
 		}
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 	private:
-		NETLIB_SUB(74123) m_1;
-		NETLIB_SUB(74123) m_2;
+		NETLIB_SUB(74123) m_A;
+		NETLIB_SUB(74123) m_B;
 	};
 
 	NETLIB_OBJECT(9602_dip)
 	{
 		NETLIB_CONSTRUCTOR(9602_dip)
-		, m_1(*this, "1", 9602)
-		, m_2(*this, "2", 9602)
+		, m_A(*this, "A", 9602)
+		, m_B(*this, "B", 9602)
 		{
-			register_subalias("1", m_1.m_RN.m_R.m_N); // C1
-			register_subalias("2", m_1.m_RN.m_R.m_P); // RC1
-			register_subalias("3", m_1.m_CLRQ);
-			register_subalias("4", m_1.m_B);
-			register_subalias("5", m_1.m_A);
-			register_subalias("6", m_1.m_Q);
-			register_subalias("7", m_1.m_QQ);
-			register_subalias("8", m_1.m_RN.m_R.m_N);
-			connect(m_1.m_RN.m_R.m_N, m_2.m_RN.m_R.m_N);
+			register_subalias("1", m_A.m_RN.m_R.m_N); // C1
+			register_subalias("2", m_A.m_RN.m_R.m_P); // RC1
+			register_subalias("3", m_A.m_CLRQ);
+			register_subalias("4", m_A.m_B);
+			register_subalias("5", m_A.m_A);
+			register_subalias("6", m_A.m_Q);
+			register_subalias("7", m_A.m_QQ);
+			register_subalias("8", m_A.m_RN.m_R.m_N);
+			connect(m_A.m_RN.m_R.m_N, m_B.m_RN.m_R.m_N);
 
-			register_subalias("9", m_2.m_QQ);
-			register_subalias("10", m_2.m_Q);
-			register_subalias("11", m_2.m_A);
-			register_subalias("12", m_2.m_B);
-			register_subalias("13", m_2.m_CLRQ);
-			register_subalias("14", m_2.m_RN.m_R.m_P); // RC2
-			register_subalias("15", m_2.m_RN.m_R.m_N); // C2
-			register_subalias("16", m_1.m_RP.m_R.m_P);
-			connect(m_1.m_RP.m_R.m_P, m_2.m_RP.m_R.m_P);
+			register_subalias("9", m_B.m_QQ);
+			register_subalias("10", m_B.m_Q);
+			register_subalias("11", m_B.m_A);
+			register_subalias("12", m_B.m_B);
+			register_subalias("13", m_B.m_CLRQ);
+			register_subalias("14", m_B.m_RN.m_R.m_P); // RC2
+			register_subalias("15", m_B.m_RN.m_R.m_N); // C2
+			register_subalias("16", m_A.m_RP.m_R.m_P);
+			connect(m_A.m_RP.m_R.m_P, m_B.m_RP.m_R.m_P);
 		}
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 	private:
-		NETLIB_SUB(74123) m_1;
-		NETLIB_SUB(74123) m_2;
+		NETLIB_SUB(74123) m_A;
+		NETLIB_SUB(74123) m_B;
 	};
 
 	NETLIB_OBJECT(4538_dip)
 	{
 		NETLIB_CONSTRUCTOR(4538_dip)
 		NETLIB_FAMILY("CD4XXX")
-		, m_1(*this, "1", 4538)
-		, m_2(*this, "2", 4538)
+		, m_A(*this, "A", 4538)
+		, m_B(*this, "B", 4538)
 		{
-			register_subalias("1", m_1.m_RN.m_R.m_N); // C1
-			register_subalias("2", m_1.m_RN.m_R.m_P); // RC1
-			register_subalias("3", m_1.m_CLRQ);
-			register_subalias("4", m_1.m_A);
-			register_subalias("5", m_1.m_B);
-			register_subalias("6", m_1.m_Q);
-			register_subalias("7", m_1.m_QQ);
-			register_subalias("8", m_1.m_RN.m_R.m_N);
-			connect(m_1.m_RN.m_R.m_N, m_2.m_RN.m_R.m_N);
+			register_subalias("1", m_A.m_RN.m_R.m_N); // C1
+			register_subalias("2", m_A.m_RN.m_R.m_P); // RC1
+			register_subalias("3", m_A.m_CLRQ);
+			register_subalias("4", m_A.m_A);
+			register_subalias("5", m_A.m_B);
+			register_subalias("6", m_A.m_Q);
+			register_subalias("7", m_A.m_QQ);
+			register_subalias("8", m_A.m_RN.m_R.m_N);
+			connect(m_A.m_RN.m_R.m_N, m_B.m_RN.m_R.m_N);
 
-			register_subalias("9", m_2.m_QQ);
-			register_subalias("10", m_2.m_Q);
-			register_subalias("11", m_2.m_B);
-			register_subalias("12", m_2.m_A);
-			register_subalias("13", m_2.m_CLRQ);
-			register_subalias("14", m_2.m_RN.m_R.m_P); // RC2
-			register_subalias("15", m_2.m_RN.m_R.m_N); // C2
-			register_subalias("16", m_1.m_RP.m_R.m_P);
-			connect(m_1.m_RP.m_R.m_P, m_2.m_RP.m_R.m_P);
+			register_subalias("9", m_B.m_QQ);
+			register_subalias("10", m_B.m_Q);
+			register_subalias("11", m_B.m_B);
+			register_subalias("12", m_B.m_A);
+			register_subalias("13", m_B.m_CLRQ);
+			register_subalias("14", m_B.m_RN.m_R.m_P); // RC2
+			register_subalias("15", m_B.m_RN.m_R.m_N); // C2
+			register_subalias("16", m_A.m_RP.m_R.m_P);
+			connect(m_A.m_RP.m_R.m_P, m_B.m_RP.m_R.m_P);
 		}
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 	private:
-		NETLIB_SUB(74123) m_1;
-		NETLIB_SUB(74123) m_2;
+		NETLIB_SUB(74123) m_A;
+		NETLIB_SUB(74123) m_B;
 	};
 
 	NETLIB_UPDATE(74123)
@@ -257,8 +257,8 @@ namespace netlist
 	{
 		m_KP = 1.0 / (1.0 + exp(m_K()));
 
-		m_RP.do_reset();
-		m_RN.do_reset();
+		m_RP.reset();
+		m_RN.reset();
 
 		//m_RP.set_R(R_OFF);
 		//m_RN.set_R(R_OFF);
@@ -276,8 +276,8 @@ namespace netlist
 
 	NETLIB_RESET(74123_dip)
 	{
-		//m_1.do_reset();
-		//m_2.do_reset();
+		//m_1.reset();
+		//m_2.reset();
 	}
 
 	NETLIB_UPDATE(9602_dip)
@@ -289,8 +289,8 @@ namespace netlist
 
 	NETLIB_RESET(9602_dip)
 	{
-		//m_1.do_reset();
-		//m_2.do_reset();
+		//m_1.reset();
+		//m_2.reset();
 	}
 
 	NETLIB_UPDATE(4538_dip)
@@ -302,14 +302,14 @@ namespace netlist
 
 	NETLIB_RESET(4538_dip)
 	{
-		m_1.do_reset();
-		m_2.do_reset();
+		m_A.reset();
+		m_B.reset();
 	}
 
-	NETLIB_DEVICE_IMPL(74123)
-	NETLIB_DEVICE_IMPL(74123_dip)
-	NETLIB_DEVICE_IMPL(4538_dip)
-	NETLIB_DEVICE_IMPL(9602_dip)
+	NETLIB_DEVICE_IMPL(74123, "TTL_74123", "")
+	NETLIB_DEVICE_IMPL(74123_dip, "TTL_74123_DIP", "")
+	NETLIB_DEVICE_IMPL(4538_dip, "CD4538_DIP", "")
+	NETLIB_DEVICE_IMPL(9602_dip, "TTL_9602_DIP",           "")
 
 	} //namespace devices
 } // namespace netlist

@@ -13,9 +13,8 @@
 
 #pragma once
 
+#include "emupal.h"
 
-#define MCFG_EF9345_PALETTE(_palette_tag) \
-	ef9345_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -31,16 +30,15 @@ public:
 	// construction/destruction
 	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	// configuration
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	// device interface
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(offs_t offset);
+	void data_w(offs_t offset, uint8_t data);
 	void update_scanline(uint16_t scanline);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ef9345(address_map &map);
 protected:
 
 	enum class EF9345_MODE {
@@ -87,6 +85,8 @@ private:
 	void makechar_24x40(uint16_t x, uint16_t y);
 	void makechar_12x80(uint16_t x, uint16_t y);
 	void ef9345_exec(uint8_t cmd);
+
+	void ef9345(address_map &map);
 
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;

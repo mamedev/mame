@@ -40,14 +40,13 @@ WRITE8_MEMBER(runaway_state::runaway_video_ram_w)
 
 
 
-WRITE8_MEMBER(runaway_state::runaway_tile_bank_w)
+WRITE_LINE_MEMBER(runaway_state::tile_bank_w)
 {
-	if ((data & 1) != m_tile_bank)
+	if (state != m_tile_bank)
 	{
+		m_tile_bank = state;
 		m_bg_tilemap->mark_all_dirty();
 	}
-
-	m_tile_bank = data & 1;
 }
 
 

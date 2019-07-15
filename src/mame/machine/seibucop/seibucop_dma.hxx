@@ -22,7 +22,8 @@ void raiden2cop_device::dma_palette_buffer()
 	{
 		uint16_t palval = m_host_space->read_word(src);
 		src += 2;
-		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
+		m_paletteramout_cb(i, palval);
+		//m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
 	}
 }
 
@@ -81,12 +82,12 @@ void raiden2cop_device::dma_palette_brightness()
 				pal_val |= ((r + rt) & 0x1f);
 			}
 		}
-		else if (pal_brightness_mode == 4) //Denjin Makai
+		else if (pal_brightness_mode == 4) //Denjin Makai & Godzilla
 		{
-			// mode 4 swaps endianness between two words, likely that DMA works in dword steps and bit 0.
-			// TODO: check on V30 flavour
-			uint16_t targetpaldata = m_host_space->read_word((src + (cop_dma_adr_rel * 0x400)) ^ 2);
-			uint16_t paldata = m_host_space->read_word(src ^ 2);
+			// In mode 4 Denjin Makai seems to swaps endianness between two words, likely that DMA works in dword steps and bit 0.
+			// Godzilla contradicts with this tho, so maybe it's just an address swap for the palette range ...
+			uint16_t targetpaldata = m_host_space->read_word((src + (cop_dma_adr_rel * 0x400)));
+			uint16_t paldata = m_host_space->read_word(src);
 
 			bt = (targetpaldata & 0x7c00) >> 10;
 			b = (paldata & 0x7c00) >> 10;
@@ -173,10 +174,10 @@ void raiden2cop_device::dma_zsorting(uint16_t data)
 	}
 	switch(cop_sort_param) {
 	case 2:
-		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key > b.sorting_key; });
+		std::stable_sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key > b.sorting_key; });
 		break;
 	case 1:
-		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key < b.sorting_key; });
+		std::stable_sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key < b.sorting_key; });
 		break;
 	}
 

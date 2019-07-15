@@ -82,7 +82,7 @@ READ8Z_MEMBER(ti_32k_expcard_device::readz)
 	}
 }
 
-WRITE8_MEMBER(ti_32k_expcard_device::write)
+void ti_32k_expcard_device::write(offs_t offset, uint8_t data)
 {
 	bool select = ((offset & 0xfc000)==0x7c000) | ((offset & 0xf6000)==0x72000); // PAL output pin 14 [1]
 
@@ -100,10 +100,11 @@ void ti_32k_expcard_device::device_start()
 {
 }
 
-MACHINE_CONFIG_START(ti_32k_expcard_device::device_add_mconfig)
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("32k")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+void ti_32k_expcard_device::device_add_mconfig(machine_config &config)
+{
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("32k");
+	m_ram->set_default_value(0);
+}
 
 } } } // end namespace bus::ti99::peb

@@ -28,35 +28,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MOS6529_P0_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p0_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6529_P1_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p1_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6529_P2_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p2_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6529_P3_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p3_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6529_P4_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p4_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6529_P5_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p5_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6529_P6_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p6_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6529_P7_HANDLER(_devcb) \
-	devcb = &mos6529_device::set_p7_handler(*device, DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -68,14 +39,7 @@ public:
 	// construction/destruction
 	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_p0_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p0_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p1_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p2_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p3_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p3_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p4_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p4_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p5_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p5_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p6_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p6_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_p7_handler(device_t &device, Object &&cb) { return downcast<mos6529_device &>(device).m_p7_handler.set_callback(std::forward<Object>(cb)); }
+	template <std::size_t Bit> auto p_handler() { return m_p_handler[Bit].bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -95,14 +59,7 @@ protected:
 
 	uint8_t m_input;
 
-	devcb_write_line m_p0_handler;
-	devcb_write_line m_p1_handler;
-	devcb_write_line m_p2_handler;
-	devcb_write_line m_p3_handler;
-	devcb_write_line m_p4_handler;
-	devcb_write_line m_p5_handler;
-	devcb_write_line m_p6_handler;
-	devcb_write_line m_p7_handler;
+	devcb_write_line m_p_handler[8];
 };
 
 

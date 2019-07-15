@@ -16,6 +16,22 @@
 
 #include "debugger.h"
 
+void abstract_ata_interface_device::set_default_ata_devices(const char* _master, const char* _slave)
+{
+	for (size_t slot_index = 0; slot_index < SLOT_COUNT; slot_index++)
+	{
+		slot(slot_index).option_add("hdd", IDE_HARDDISK);
+		slot(slot_index).option_add("cdrom", ATAPI_CDROM);
+	}
+	slot(SLOT_MASTER).set_default_option(_master);
+	slot(SLOT_SLAVE).set_default_option(_slave);
+}
+
+ata_slot_device &abstract_ata_interface_device::slot(int index)
+{
+	assert(index < 2);
+	return *subdevice<ata_slot_device>(m_slot[index].finder_tag());
+}
 
 void abstract_ata_interface_device::set_irq(int state)
 {
@@ -204,16 +220,19 @@ WRITE_LINE_MEMBER( abstract_ata_interface_device::write_dmack )
 			elem->dev()->write_dmack(state);
 }
 
-SLOT_INTERFACE_START(ata_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
-SLOT_INTERFACE_END
+void ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
 
 abstract_ata_interface_device::abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_slot(*this, "%u", 0U),
 	m_irq_handler(*this),
 	m_dmarq_handler(*this),
-	m_dasp_handler(*this){
+	m_dasp_handler(*this)
+{
 }
 
 
@@ -223,6 +242,7 @@ ata_interface_device::ata_interface_device(const machine_config &mconfig, const 
 	abstract_ata_interface_device(mconfig, ATA_INTERFACE, tag, owner, clock)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -234,10 +254,6 @@ void abstract_ata_interface_device::device_start()
 	m_dmarq_handler.resolve_safe();
 	m_dasp_handler.resolve_safe();
 
-	/* set MAME harddisk handle */
-	m_slot[0] = subdevice<ata_slot_device>("0");
-	m_slot[1] = subdevice<ata_slot_device>("1");
-
 	for (int i = 0; i < 2; i++)
 	{
 		m_irq[i] = 0;
@@ -246,21 +262,21 @@ void abstract_ata_interface_device::device_start()
 		m_pdiag[i] = 0;
 
 		device_ata_interface *dev = m_slot[i]->dev();
-		if (dev != nullptr)
+		if (dev)
 		{
 			if (i == 0)
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq0_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq0_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp0_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag0_write_line));
+				dev->m_irq_handler.bind().set(*this, FUNC(abstract_ata_interface_device::irq0_write_line));
+				dev->m_dmarq_handler.bind().set(*this, FUNC(abstract_ata_interface_device::dmarq0_write_line));
+				dev->m_dasp_handler.bind().set(*this, FUNC(abstract_ata_interface_device::dasp0_write_line));
+				dev->m_pdiag_handler.bind().set(*this, FUNC(abstract_ata_interface_device::pdiag0_write_line));
 			}
 			else
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq1_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq1_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp1_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag1_write_line));
+				dev->m_irq_handler.bind().set(*this, FUNC(abstract_ata_interface_device::irq1_write_line));
+				dev->m_dmarq_handler.bind().set(*this, FUNC(abstract_ata_interface_device::dmarq1_write_line));
+				dev->m_dasp_handler.bind().set(*this, FUNC(abstract_ata_interface_device::dasp1_write_line));
+				dev->m_pdiag_handler.bind().set(*this, FUNC(abstract_ata_interface_device::pdiag1_write_line));
 			}
 
 			dev->write_csel(i);
@@ -273,10 +289,11 @@ void abstract_ata_interface_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abstract_ata_interface_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "0", ATA_SLOT, 0 )
-	MCFG_DEVICE_ADD( "1", ATA_SLOT, 0 )
-MACHINE_CONFIG_END
+void abstract_ata_interface_device::device_add_mconfig(machine_config &config)
+{
+	for (size_t slot = 0; slot < SLOT_COUNT; slot++)
+		ATA_SLOT(config, m_slot[slot]);
+}
 
 
 //**************************************************************************

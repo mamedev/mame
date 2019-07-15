@@ -13,26 +13,6 @@
 
 
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RIOT6532_IN_PA_CB(_devcb) \
-	devcb = &riot6532_device::set_in_pa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_RIOT6532_OUT_PA_CB(_devcb) \
-	devcb = &riot6532_device::set_out_pa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_RIOT6532_IN_PB_CB(_devcb) \
-	devcb = &riot6532_device::set_in_pb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_RIOT6532_OUT_PB_CB(_devcb) \
-	devcb = &riot6532_device::set_out_pb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_RIOT6532_IRQ_CB(_devcb) \
-	devcb = &riot6532_device::set_irq_callback(*device, DEVCB_##_devcb);
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -46,11 +26,11 @@ public:
 	// construction/destruction
 	riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_out_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<riot6532_device &>(device).m_irq_cb.set_callback(object); }
+	auto in_pa_callback() { return m_in_pa_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto irq_callback() { return m_irq_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

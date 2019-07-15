@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker
 /***************************************************************************
 
-  timex.c
+  timex.cpp
 
   Functions to emulate the video hardware of the Timex ZX Spectrum clones.
 
@@ -20,19 +20,32 @@
 #include "includes/timex.h"
 #include "machine/ram.h"
 
-inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
+inline void timex_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
 	bitmap.pix16(y, x) = (uint16_t)color;
 }
 
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
-VIDEO_START_MEMBER(spectrum_state,ts2068)
+VIDEO_START_MEMBER(timex_state,ts2068)
 {
-	VIDEO_START_CALL_MEMBER( spectrum );
 	m_frame_invert_count = 30;
+
+	m_frame_number = 0;
+	m_flash_invert = 0;
+
+	m_previous_border_x = 0;
+	m_previous_border_y = 0;
+	m_screen->register_screen_bitmap(m_border_bitmap);
+	m_previous_screen_x = 0;
+	m_previous_screen_y = 0;
+	m_screen->register_screen_bitmap(m_screen_bitmap);
+
+	m_screen_location = m_video_ram;
+
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 }
 
-WRITE_LINE_MEMBER(spectrum_state::screen_vblank_timex)
+WRITE_LINE_MEMBER(timex_state::screen_vblank_timex)
 {
 	// rising edge
 	if (state)
@@ -73,7 +86,7 @@ WRITE_LINE_MEMBER(spectrum_state::screen_vblank_timex)
  *******************************************************************/
 
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
-void spectrum_state::ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines)
+void timex_state::ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines)
 {
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
@@ -118,7 +131,7 @@ void spectrum_state::ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int bord
 }
 
 /* Draw a scanline in TS2068/TC2048 64-column mode */
-void spectrum_state::ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor)
+void timex_state::ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor)
 {
 	int x,b,scrx,scry;
 	unsigned char *scr1, *scr2;
@@ -152,7 +165,7 @@ void spectrum_state::ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int bord
 }
 
 /* Draw a scanline in TS2068/TC2048 lores (normal Spectrum) mode */
-void spectrum_state::ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen)
+void timex_state::ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen)
 {
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
@@ -196,7 +209,7 @@ void spectrum_state::ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int bord
 	}
 }
 
-uint32_t spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t timex_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now TS2068 will do a full-refresh */
 	int count;
@@ -233,7 +246,7 @@ uint32_t spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-uint32_t spectrum_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t timex_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for now TS2068 will do a full-refresh */
 	int count;

@@ -26,6 +26,8 @@
   * Jack Potten's Poker (set 8, Australian),          198?, Bootleg.
   * Jack Potten's Poker (set 9, 'just 4 fun'),        198?, Bootleg.
   * Jack Potten's Poker (set 10, ICP-1 PCB),          198?, Bootleg.
+  * Jack Potten's Poker (set 11, German, W.W.),       198?, Bootleg.
+  * Jack Potten's Poker (set 12, no Double-Up),       198?, Bootleg.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
@@ -112,6 +114,8 @@
   * Witch Jack (Export, 6T/12T ver 0.87-89),          1992-1996, Video Klein.
   * Witch Jackpot (Export, 6T/12T ver 0.25),          1992-1996, Video Klein.
   * PlayMan Poker (German),                           1981, PM / Beck Elektronik.
+  * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
+  * Casino Poker (Ver PM86-35-1, German),             1986, PM / Beck Elektronik.
   * Royale (set 1),                                   198?, Unknown.
   * Royale (set 2),                                   198?, Unknown.
   * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
@@ -126,7 +130,6 @@
   * Genie (ICP-1, set 1),                             198?, Video Fun Games Ltd.
   * Genie (ICP-1, set 2),                             198?, Unknown.
   * Silver Game,                                      1983, Unknown.
-  * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
   * Super Double (French),                            198?, Karateco.
   * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
@@ -514,15 +517,14 @@
 
   - CPU:            1x M6502.
   - Video:          1x MC6845.
-  - RAM:            4x uPD2114LC
+  - RAM:            2x SCM21C14E, 4x uPD2114LC
   - I/O             2x 6821 PIAs.
   - prg ROMs:       3x 2732 (32Kb) or similar.
   - gfx ROMs:       4x 2716 (16Kb) or similar.
   - sound:          (discrete).
-  - battery backup: 2x S8423
 
 
-  PCB Layout (pmpoker): (XX) = unreadable.
+  PCB Layout (pmpoker):
    _______________________________________________________________________________
   |   _________                                                                   |
   |  |         |               -- DIP SW x8 --                                    |
@@ -530,10 +532,10 @@
   |  |   055   |  | 74LS32  | |1|2|3|4|5|6|7|8| | HCF4011 || HCF4096 | | LM339N | |
   |  |_________|  |_________| |_|_|_|_|_|_|_|_| |_________||_________| |________| |
   |       _________     _________   _________   _________                         |
-  |      | 74LS138 |   | S-8423  | | 74LS08N | | 74LS(XX)|                        |
+  |      | 74LS138 |   | 21C14E  | | 74LS08N | | 74LS42  |                        |
   |      |_________|   |_________| |_________| |_________|                        |
   |  _______________    _________   ____________________                      ____|
-  | |               |  | S-8423  | |                    |                    |
+  | |               |  | 21C14E  | |                    |                    |
   | |     2732      |  |_________| |       6502P        |                    |
   | |_______________|   _________  |____________________|                    |
   |  _______________   |  7432   |  ____________________                     |____
@@ -557,7 +559,7 @@
   |      | 74LS245 |   | 2114-LC |             | 74LS174 |                    ____|
   |      |_________|   |_________|             |_________|                    ____|
   |  ________________   _________   _________   _________                     ____|
-  | |                | | 2114-LC | | 74LS08H | | TI (XX) | <-- socketed.      ____|
+  | |                | | 2114-LC | | 74LS08H | |TBP24SA10| <-- socketed.      ____|
   | |      2716      | |_________| |_________| |_________|       PROM         ____|
   | |________________|              _________   _________                     ____|
   |  ________________              | 74LS04P | | 74LS174 |                    ____|
@@ -1281,6 +1283,7 @@
 #include "sound/discrete.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1296,64 +1299,19 @@
 class goldnpkr_state : public driver_device
 {
 public:
-	goldnpkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	goldnpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pia(*this, "pia%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_discrete(*this, "discrete"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_ay8910(*this, "ay8910"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
-	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
-	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
-	DECLARE_WRITE8_MEMBER(wcfalcon_snd_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pia0_a_w);
-	DECLARE_WRITE8_MEMBER(pia0_b_w);
-	DECLARE_WRITE8_MEMBER(pia1_a_w);
-	DECLARE_WRITE8_MEMBER(pia1_b_w);
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_a_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_DRIVER_INIT(vkdlswwh);
-	DECLARE_DRIVER_INIT(icp1db);
-	DECLARE_DRIVER_INIT(flcnw);
-	DECLARE_DRIVER_INIT(vkdlswwp);
-	DECLARE_DRIVER_INIT(vkdlsww);
-	DECLARE_DRIVER_INIT(vkdlsb);
-	DECLARE_DRIVER_INIT(vkdlsc);
-	DECLARE_DRIVER_INIT(vkdlswwl);
-	DECLARE_DRIVER_INIT(vkdlswwu);
-	DECLARE_DRIVER_INIT(vkdlswwo);
-	DECLARE_DRIVER_INIT(vkdlswwa);
-	DECLARE_DRIVER_INIT(vkdlsa);
-	DECLARE_DRIVER_INIT(vkdlswwt);
-	DECLARE_DRIVER_INIT(vkdlswwd);
-	DECLARE_DRIVER_INIT(wstrike);
-	DECLARE_DRIVER_INIT(vkdlswws);
-	DECLARE_DRIVER_INIT(vkdlswwc);
-	DECLARE_DRIVER_INIT(vkdlswwr);
-	DECLARE_DRIVER_INIT(vkdlswwv);
-	DECLARE_DRIVER_INIT(bchancep);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldnpkr);
-	DECLARE_PALETTE_INIT(witchcrd);
-	DECLARE_VIDEO_START(wcrdxtnd);
-	DECLARE_PALETTE_INIT(wcrdxtnd);
-	DECLARE_MACHINE_START(mondial);
-	DECLARE_MACHINE_RESET(mondial);
-	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void goldnpkr_base(machine_config &config);
 	void wildcard(machine_config &config);
 	void wildcrdb(machine_config &config);
 	void witchcrd(machine_config &config);
@@ -1365,6 +1323,77 @@ public:
 	void pottnpkr(machine_config &config);
 	void goldnpkr(machine_config &config);
 	void wcrdxtnd(machine_config &config);
+
+	void init_vkdlswwh();
+	void init_icp1db();
+	void init_flcnw();
+	void init_vkdlswwp();
+	void init_vkdlsww();
+	void init_vkdlsb();
+	void init_vkdlsc();
+	void init_vkdlswwl();
+	void init_vkdlswwu();
+	void init_vkdlswwo();
+	void init_vkdlswwa();
+	void init_vkdlsa();
+	void init_vkdlswwt();
+	void init_vkdlswwd();
+	void init_wstrike();
+	void init_vkdlswws();
+	void init_vkdlswwc();
+	void init_vkdlswwr();
+	void init_vkdlswwv();
+	void init_bchancep();
+	void init_bonuspkr();
+
+	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+
+	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	virtual void video_start() override;
+
+	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
+	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
+
+	void witchcrd_palette(palette_device &palette) const;
+
+	void goldnpkr_base(machine_config &config);
+
+	required_device<cpu_device> m_maincpu;
+	required_device_array<pia6821_device, 2> m_pia;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<discrete_device> m_discrete;
+
+private:
+	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
+	DECLARE_WRITE8_MEMBER(mux_port_w);
+	uint8_t ay8910_data_r();
+	void ay8910_data_w(uint8_t data);
+	void ay8910_control_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER(pia0_a_w);
+	DECLARE_WRITE8_MEMBER(pia0_b_w);
+	DECLARE_WRITE8_MEMBER(pia1_a_w);
+	DECLARE_WRITE8_MEMBER(pia1_b_w);
+	DECLARE_READ8_MEMBER(pia0_a_r);
+	DECLARE_READ8_MEMBER(pia0_b_r);
+	DECLARE_READ8_MEMBER(pia1_a_r);
+	DECLARE_READ8_MEMBER(pia1_b_r);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
+	void goldnpkr_palette(palette_device &palette) const;
+	DECLARE_VIDEO_START(wcrdxtnd);
+	void wcrdxtnd_palette(palette_device &palette) const;
+	DECLARE_MACHINE_START(mondial);
+	DECLARE_MACHINE_RESET(mondial);
+
 	void bchancep_map(address_map &map);
 	void genie_map(address_map &map);
 	void goldnpkr_map(address_map &map);
@@ -1377,31 +1406,40 @@ public:
 	void wildcrdb_mcu_map(address_map &map);
 	void witchcrd_falcon_map(address_map &map);
 	void witchcrd_map(address_map &map);
-protected:
+
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<discrete_device> m_discrete;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	optional_device<ay8910_device> m_ay8910;
+	output_finder<5> m_lamps;
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_mux_data;
 	uint8_t m_pia0_PA_data;
+	uint8_t m_ay8910_data;
+	uint8_t m_ay8910_control;
 };
 
 class blitz_state : public goldnpkr_state
 {
 public:
-	blitz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: goldnpkr_state(mconfig, type, tag),
+	blitz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		goldnpkr_state(mconfig, type, tag),
 		m_cpubank(*this, "cpubank"),
 		m_mcu(*this, "mcu"),
 		m_bankdev(*this, "bankdev"),
 		m_cpubank_xor(0),
 		m_portc_data(0x0f)
 	{ }
+
+	void megadpkr(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
+	DECLARE_WRITE8_MEMBER(mcu_command_w);
+	DECLARE_WRITE8_MEMBER(mcu_portb_w);
+	DECLARE_WRITE8_MEMBER(mcu_portc_w);
+	void megadpkr_banked_map(address_map &map);
+	void megadpkr_map(address_map &map);
 
 	required_region_ptr<uint8_t> m_cpubank;
 
@@ -1410,14 +1448,6 @@ public:
 
 	uint8_t m_cpubank_xor;
 	uint8_t m_portc_data;
-
-	DECLARE_READ8_MEMBER(cpubank_decrypt_r);
-	DECLARE_WRITE8_MEMBER(mcu_command_w);
-	DECLARE_WRITE8_MEMBER(mcu_portb_w);
-	DECLARE_WRITE8_MEMBER(mcu_portc_w);
-	void megadpkr(machine_config &config);
-	void megadpkr_banked_map(address_map &map);
-	void megadpkr_map(address_map &map);
 };
 
 
@@ -1484,15 +1514,14 @@ VIDEO_START_MEMBER(goldnpkr_state,wcrdxtnd)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
+void goldnpkr_state::goldnpkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1501,42 +1530,36 @@ PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
     ---- x---   intensity.
     xxxx ----   unused.
 */
-	int i;
 
-	/* 0000IBGR */
-	if (color_prom == nullptr) return;
+	// 0000IBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
+		constexpr int intenmin = 0xe0;
+//      constexpr int intenmin = 0xc2;    // 2.5 Volts (75.757575% of the whole range)
+		constexpr int intenmax = 0xff;    // 3.3 Volts (the whole range)
 
-		intenmin = 0xe0;
-//      intenmin = 0xc2;    /* 2.5 Volts (75.757575% of the whole range) */
-		intenmax = 0xff;    /* 3.3 Volts (the whole range) */
+		// intensity component
+		int const inten = BIT(color_prom[i], 3);
 
-		/* intensity component */
-		inten = (color_prom[i] >> 3) & 0x01;
+		// red component
+		int const r = BIT(color_prom[i], 0) * (inten ? intenmax : intenmin);
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * intenmin) + (inten * (bit0 * (intenmax - intenmin)));
+		// green component
+		int const g = BIT(color_prom[i], 1) * (inten ? intenmax : intenmin);
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
-
+		// blue component
+		int const b = BIT(color_prom[i], 2) * (inten ? intenmax : intenmin);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
+void goldnpkr_state::witchcrd_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1552,39 +1575,32 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
     ---- x---   blue killer.
     xxxx ----   unused.
 */
-	int i;
 
-	/* 0000KBGR */
+	// 0000KBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	if (color_prom == nullptr) return;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// blue killer (from schematics)
+		int const bk = BIT(color_prom[i], 3);
 
-		/* blue killer (from schematics) */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
+		// blue component
+		int const b = bk * BIT(color_prom[i], 2) * 0xff;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::wcrdxtnd_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.
@@ -1596,32 +1612,25 @@ PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
     ---- x---   intensity / blue killer.
     xxxx ----   unused.
 */
-	int i;
+	// 0000KBGR
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	/* 0000KBGR */
-
-	if (color_prom == nullptr) return;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// blue killer (from schematics)
+		int const bk = BIT(color_prom[i], 3);
 
-		/* blue killer (from schematics) */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
-		//if ((b == 0) & (bk = 1))   --> needs better implementation
+		// blue component
+		int b = bk * BIT(color_prom[i], 2) * 0xff;
+		//if (!b & bk)   --> needs better implementation
 		//  b = 0x3f;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
@@ -1676,7 +1685,7 @@ READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
 
 WRITE8_MEMBER(goldnpkr_state::mux_w)
 {
-	logerror("mux_w: %2x\n",data);
+	//logerror("mux_w: %2x\n",data);
 	m_mux_data = data ^ 0xff;   /* inverted */
 }
 
@@ -1688,20 +1697,28 @@ WRITE8_MEMBER(goldnpkr_state::mux_port_w)
 
 /* Demuxing ay8910 data/address from Falcon board, PIA portA out */
 
-uint8_t wcfalcon_flag = 0;
-
-WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
+uint8_t goldnpkr_state::ay8910_data_r()
 {
-	if (wcfalcon_flag == 0)
-	{
-		machine().device<ay8910_device>("ay8910")->data_address_w(space, 0, data);
-	}
-	else
-	{
-		machine().device<ay8910_device>("ay8910")->data_address_w(space, 1, data);
-	}
+	return (m_ay8910_control & 0xc0) == 0x40 ? m_ay8910->data_r() : 0xff;
+}
 
-	wcfalcon_flag = wcfalcon_flag ^ 1;
+void goldnpkr_state::ay8910_data_w(uint8_t data)
+{
+	m_ay8910_data = data;
+}
+
+void goldnpkr_state::ay8910_control_w(uint8_t data)
+{
+	if (BIT(data, 7))
+		m_ay8910->data_address_w(BIT(data, 6), m_ay8910_data);
+
+	m_ay8910_control = data;
+
+	m_lamps[0] = !BIT(data, 0);
+	m_lamps[1] = !BIT(data, 1);
+	m_lamps[2] = !BIT(data, 2);
+	m_lamps[3] = !BIT(data, 3);
+	m_lamps[4] = !BIT(data, 4);
 }
 
 
@@ -1765,11 +1782,11 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 */
 	data = data ^ 0xff;
 
-	output().set_lamp_value(0, (data) & 1);         /* Lamp 0 */
-	output().set_lamp_value(1, (data >> 1) & 1);    /* Lamp 1 */
-	output().set_lamp_value(2, (data >> 2) & 1);    /* Lamp 2 */
-	output().set_lamp_value(3, (data >> 3) & 1);    /* Lamp 3 */
-	output().set_lamp_value(4, (data >> 4) & 1);    /* Lamp 4 */
+	m_lamps[0] = BIT(data, 0);    /* Lamp 0 */
+	m_lamps[1] = BIT(data, 1);    /* Lamp 1 */
+	m_lamps[2] = BIT(data, 2);    /* Lamp 2 */
+	m_lamps[3] = BIT(data, 3);    /* Lamp 3 */
+	m_lamps[4] = BIT(data, 4);    /* Lamp 4 */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* counter1 */
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);  /* counter2 */
@@ -1782,8 +1799,8 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	m_discrete->write(space, NODE_01, data >> 3 & 0x01);
-	m_discrete->write(space, NODE_10, data & 0x07);
+	m_discrete->write(NODE_01, data >> 3 & 0x01);
+	m_discrete->write(NODE_10, data & 0x07);
 }
 
 WRITE8_MEMBER(goldnpkr_state::pia0_a_w)
@@ -1832,44 +1849,47 @@ READ8_MEMBER(goldnpkr_state::pia1_b_r)
 *           Memory Map Information           *
 *********************************************/
 
-ADDRESS_MAP_START(goldnpkr_state::goldnpkr_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x7fff) AM_ROM /* superdbl uses 0x2000..0x3fff address space */
-ADDRESS_MAP_END
+void goldnpkr_state::goldnpkr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x7fff).rom(); /* superdbl uses 0x2000..0x3fff address space */
+}
 
-ADDRESS_MAP_START(goldnpkr_state::pottnpkr_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void goldnpkr_state::pottnpkr_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x3fff).rom();
+}
 
-ADDRESS_MAP_START(goldnpkr_state::witchcrd_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
-//  AM_RANGE(0x2108, 0x210b) AM_NOP /* unknown 40-pin device */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void goldnpkr_state::witchcrd_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW2");
+//  map(0x2108, 0x210b).noprw(); /* unknown 40-pin device */
+	map(0x2800, 0x2fff).ram();
+	map(0x4000, 0x7fff).rom();
+}
 
 /*
    Witch Card (Video klein)
@@ -1883,33 +1903,35 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(goldnpkr_state::witchcrd_falcon_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
-	AM_RANGE(0x2100, 0x2100) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2101, 0x2101) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void goldnpkr_state::witchcrd_falcon_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW2");
+	map(0x2100, 0x2100).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2101, 0x2101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(goldnpkr_state::wildcard_map)
+void goldnpkr_state::wildcard_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
-	AM_RANGE(0x2200, 0x27ff) AM_ROM /* for VK set */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM /* for VK set */
-	AM_RANGE(0x3000, 0xffff) AM_ROM /* for VK set. bootleg starts from 4000 */
-ADDRESS_MAP_END
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW2");
+	map(0x2200, 0x27ff).rom(); /* for VK set */
+	map(0x2800, 0x2fff).ram(); /* for VK set */
+	map(0x3000, 0xffff).rom(); /* for VK set. bootleg starts from 4000 */
+}
 
 /*
   Video Klein extended hardware
@@ -1918,19 +1940,20 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(goldnpkr_state::wcrdxtnd_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram") /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
-	AM_RANGE(0x2200, 0x27ff) AM_ROM /* for VK hardware */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")   /* Dallas ds1210 + battery backed RAM */
-	AM_RANGE(0x3000, 0xffff) AM_ROM /* for VK hardware. bootleg starts from 4000 */
-ADDRESS_MAP_END
+void goldnpkr_state::wcrdxtnd_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); //AM_SHARE("nvram") /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW2");
+	map(0x2200, 0x27ff).rom(); /* for VK hardware */
+	map(0x2800, 0x2fff).ram().share("nvram");   /* Dallas ds1210 + battery backed RAM */
+	map(0x3000, 0xffff).rom(); /* for VK hardware. bootleg starts from 4000 */
+}
 
 /*
 
@@ -1938,29 +1961,32 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(goldnpkr_state::wildcrdb_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
-	AM_RANGE(0x2100, 0x2100) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2101, 0x2101) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void goldnpkr_state::wildcrdb_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x2000).portr("SW2");
+	map(0x2100, 0x2100).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2101, 0x2101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2800, 0x2fff).ram();
+	map(0x3000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(goldnpkr_state::wildcrdb_mcu_map)
+void goldnpkr_state::wildcrdb_mcu_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x2fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x2fff).ram();
+}
 
-ADDRESS_MAP_START(goldnpkr_state::wildcrdb_mcu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void goldnpkr_state::wildcrdb_mcu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 /*
   wildcrdb:
@@ -1971,42 +1997,45 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(goldnpkr_state::genie_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void goldnpkr_state::genie_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x17ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x3fff).rom();
+}
 
 
-ADDRESS_MAP_START(goldnpkr_state::mondial_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void goldnpkr_state::mondial_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x4000, 0x7fff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(goldnpkr_state::bchancep_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void goldnpkr_state::bchancep_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0x7fff).rom();
+}
 
 
 /*********************************************
@@ -4077,6 +4106,69 @@ static INPUT_PORTS_START( bsuertev )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( bonuspkr )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Off (Payout)") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("IN0-3 02")   PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, "Pair of Aces" )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 
 /*********************************************
 *              Graphics Layouts              *
@@ -4098,12 +4190,12 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( goldnpkr )
+static GFXDECODE_START( gfx_goldnpkr )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wcrdxtnd )
+static GFXDECODE_START( gfx_wcrdxtnd )
 	GFXDECODE_ENTRY( "gfx0", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
@@ -4175,7 +4267,7 @@ static const discrete_dac_r1_ladder dac_goldnpkr_ladder =
 //  0,                                  /* resistor tied to ground */
 };
 
-static DISCRETE_SOUND_START( goldnpkr )
+static DISCRETE_SOUND_START( goldnpkr_discrete )
 /*
     - bits -
     76543210
@@ -4238,7 +4330,7 @@ static const discrete_dac_r1_ladder dac_pottnpkr_ladder =
 	0                                   /* no filtering cap tied to ground */
 };
 
-static DISCRETE_SOUND_START( pottnpkr )
+static DISCRETE_SOUND_START( pottnpkr_discrete )
 /*
     - bits -
     76543210
@@ -4264,6 +4356,8 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(goldnpkr_state, mondial)
 {
+	m_lamps.resolve();
+
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
@@ -4280,288 +4374,241 @@ MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
 *              Machine Drivers               *
 *********************************************/
 
-MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
-
+void goldnpkr_state::goldnpkr_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goldnpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldnpkr_state, nmi_line_pulse)
+	M6502(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::goldnpkr_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, goldnpkr_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, lamps_a_w))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::goldnpkr_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lamps_a_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, mux_w))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::sound_w));
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((39+1)*8, (31+1)*8);          /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 29*8-1); /* From MC6845 init, registers 01 & 06. */
+	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 68B45 or 6845s @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 68B45 or 6845s @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, goldnpkr)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldnpkr);
+	PALETTE(config, m_palette, FUNC(goldnpkr_state::goldnpkr_palette), 256);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::goldnpkr)
+void goldnpkr_state::goldnpkr(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::pottnpkr)
+void goldnpkr_state::pottnpkr(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pottnpkr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::pottnpkr_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(pottnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::witchcrd)
+void goldnpkr_state::witchcrd(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(witchcrd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::witchcrd_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, "discrete", goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wcfalcon)
+void goldnpkr_state::wcfalcon(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(witchcrd_falcon_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::witchcrd_falcon_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
-
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w)) /* port A out, custom handler due to address + data are muxed */
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::ay8910_control_w));
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::ay8910_data_w));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);    /* guess, seems ok */
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wildcard)
+void goldnpkr_state::wildcard(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wildcard_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcard_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+//  m_gfxdecode->set_info(gfx_wildcard);
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
+void goldnpkr_state::wcrdxtnd(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wcrdxtnd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wcrdxtnd_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wcrdxtnd)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, wcrdxtnd)
+	m_gfxdecode->set_info(gfx_wcrdxtnd);
+	m_palette->set_init(FUNC(goldnpkr_state::wcrdxtnd_palette));
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
+void goldnpkr_state::wildcrdb(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wildcrdb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_map);
 
-	MCFG_CPU_ADD("mcu", Z80, MASTER_CLOCK/4)    /* guess */
-	MCFG_CPU_PROGRAM_MAP(wildcrdb_mcu_map)
-	MCFG_CPU_IO_MAP(wildcrdb_mcu_io_map)
+	z80_device &mcu(Z80(config, "mcu", MASTER_CLOCK/4));    /* guess */
+	mcu.set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_mcu_map);
+	mcu.set_addrmap(AS_IO, &goldnpkr_state::wildcrdb_mcu_io_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
-
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w))
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::ay8910_control_w));
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::ay8910_data_w));
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+//  m_gfxdecode->set_info(gfx_wildcard);
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);    /* guess, seems ok */
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::genie)
+void goldnpkr_state::genie(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(genie_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::genie_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::geniea)
+void goldnpkr_state::geniea(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(goldnpkr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::goldnpkr_map);
 
-//  MCFG_DEVICE_MODIFY("pia0")
-//  MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-//  MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+//  m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+//  m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(goldnpkr_state::mondial)
+void goldnpkr_state::mondial(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mondial_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::mondial_map);
 
 	MCFG_MACHINE_START_OVERRIDE(goldnpkr_state, mondial)
 	MCFG_MACHINE_RESET_OVERRIDE(goldnpkr_state, mondial)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(goldnpkr_state::bchancep)
+void goldnpkr_state::bchancep(machine_config &config)
+{
 	goldnpkr_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bchancep_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::bchancep_map);
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pia0_a_r))
-	MCFG_PIA_READPB_HANDLER(READ8(goldnpkr_state, pia0_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia0_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia0_b_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pia0_a_r));
+	m_pia[0]->readpb_handler().set(FUNC(goldnpkr_state::pia0_b_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::pia0_a_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::pia0_b_w));
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pia1_a_r))
-	MCFG_PIA_READPB_HANDLER(READ8(goldnpkr_state, pia1_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia1_b_w))
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::pia1_a_r));
+	m_pia[1]->readpb_handler().set(FUNC(goldnpkr_state::pia1_b_r));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::pia1_a_w));
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::pia1_b_w));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(pottnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -4603,31 +4650,33 @@ WRITE8_MEMBER(blitz_state::mcu_portc_w)
 }
 
 
-ADDRESS_MAP_START(blitz_state::megadpkr_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+void blitz_state::megadpkr_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); //AM_SHARE("nvram")   /* battery backed RAM */
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
 /*  There is another set of PIAs controlled by the code.
     Maybe they are just mirrors...
 
-    AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-    AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+    map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+    map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
+	map(0x1000, 0x13ff).ram().w(FUNC(blitz_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(blitz_state::goldnpkr_colorram_w)).share("colorram");
 
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bankdev", address_map_bank_device, read8, write8)
-	AM_RANGE(0x8000, 0xbfff) AM_READNOP AM_WRITE(mcu_command_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x4000, 0x7fff).rw(m_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0xbfff).nopr().w(FUNC(blitz_state::mcu_command_w));
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(blitz_state::megadpkr_banked_map)
-	AM_RANGE(0x00000, 0x07fff) AM_READ(cpubank_decrypt_r)
-	AM_RANGE(0x08000, 0x087ff) AM_DEVREADWRITE("timekpr", m48t02_device, read, write)
-ADDRESS_MAP_END
+void blitz_state::megadpkr_banked_map(address_map &map)
+{
+	map(0x00000, 0x07fff).r(FUNC(blitz_state::cpubank_decrypt_r));
+	map(0x08000, 0x087ff).rw("timekpr", FUNC(m48t02_device::read), FUNC(m48t02_device::write));
+}
 
 
 static INPUT_PORTS_START( megadpkr )
@@ -4685,57 +4734,50 @@ static INPUT_PORTS_START( megadpkr )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(blitz_state::megadpkr)
-
+void blitz_state::megadpkr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(megadpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_hold)
+	M6502(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blitz_state::megadpkr_map);
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(megadpkr_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&blitz_state::megadpkr_banked_map).set_data_width(8).set_addr_width(16).set_stride(0x4000);
 
-	MCFG_CPU_ADD("mcu", M68705P5, CPU_CLOCK) /* unknown */
-	MCFG_M68705_PORTB_W_CB(WRITE8(blitz_state, mcu_portb_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(blitz_state, mcu_portc_w))
+	M68705P5(config, m_mcu, CPU_CLOCK); /* unknown */
+	m_mcu->portb_w().set(FUNC(blitz_state::mcu_portb_w));
+	m_mcu->portc_w().set(FUNC(blitz_state::mcu_portc_w));
 
-	MCFG_M48T02_ADD("timekpr")
+	M48T02(config, "timekpr", 0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, lamps_a_w))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lamps_a_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, mux_w))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::sound_w));
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((32)*8, (32)*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldnpkr);
+	PALETTE(config, m_palette, FUNC(blitz_state::witchcrd_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(goldnpkr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*********************************************
@@ -5124,6 +5166,65 @@ ROM_START( potnpkri )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "prom.9c",    0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump OK */
 ROM_END
+
+/*
+  Unknown Potten's Poker.
+  German bootleg (W.W.).
+  Set 11.
+
+  Need to BET in each hand.
+*/
+ROM_START( potnpkrj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pok5.a11",  0x5000, 0x1000, CRC(60140393) SHA1(f24a4435fe44d14053e28c7cb144ae00f66d74cb) )
+	ROM_LOAD( "pok6.a13",  0x6000, 0x1000, CRC(58161c72) SHA1(c5607a843ca1b4bde9999f265acae835ab9832fc) )
+	ROM_LOAD( "pok7.a14",  0x7000, 0x1000, CRC(38d92f95) SHA1(9523ef5fae57ad7cdd3fe52667a9670fdca8aa75) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "pok4_ww.a7",  0x1000, 0x0800, CRC(5cafb3a9) SHA1(efec24d4dd1f83f40a1b7ec66bc6bf36c4b1e541) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "7.a2",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "8.a4",  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "9.a5",  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+	ROM_LOAD( "potnpkrj_nvram.bin", 0x0000, 0x0800, CRC(7c5206ce) SHA1(fc6e9b8d21184b8220b8835696d7eb2d071f5475) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10.d7",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
+ROM_END
+
+/*
+  Unknown Potten's Poker.
+  English bootleg with Bonanza's graphics.
+  Set 12.
+
+  No Double-Up.
+  Need to BET in each hand.
+*/
+ROM_START( potnpkrk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "07.a13",   0x6000, 0x1000, CRC(cdb86a7d) SHA1(d1c20aa6484bbaa794bfba993f21ae0bc199db7a) )
+	ROM_LOAD( "08.a15",   0x7000, 0x1000, CRC(cb4502f4) SHA1(abe0916f01a1b3742e99e0da5f1b5c6a0e7e7dbd) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "8.a7",   0x1000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "4.a2",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "6.a4",   0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "7.a5",   0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+	ROM_LOAD( "potnpkrk_nvram.bin", 0x0000, 0x0800, CRC(87970f3f) SHA1(3130594c83407e13f2b08027188b333f29dce568) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129n.d7",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
+ROM_END
+
 
 ROM_START( goodluck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5884,13 +5985,13 @@ ROM_END
 */
 ROM_START( witchcdf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "$25.bin",    0x5000, 0x1000, CRC(afd6cb4a) SHA1(4c769e1c724bada5875e028781086c32967953a1) )
-	ROM_LOAD( "$26.bin",    0x6000, 0x1000, CRC(ad11960c) SHA1(2b562cfe9401e21c9dcd90307165e2c2d1acfc5b) )
-	ROM_LOAD( "$27.bin",    0x7000, 0x1000, CRC(e6f9c973) SHA1(f209d13d1565160bc2c05c6c4fce73d14a9a56ab) )
+	ROM_LOAD( "@25.bin",    0x5000, 0x1000, CRC(afd6cb4a) SHA1(4c769e1c724bada5875e028781086c32967953a1) )
+	ROM_LOAD( "@26.bin",    0x6000, 0x1000, CRC(ad11960c) SHA1(2b562cfe9401e21c9dcd90307165e2c2d1acfc5b) )
+	ROM_LOAD( "@27.bin",    0x7000, 0x1000, CRC(e6f9c973) SHA1(f209d13d1565160bc2c05c6c4fce73d14a9a56ab) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x2000, 0x0000 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "$14.bin",    0x2000, 0x1000, CRC(19b68bec) SHA1(b8ef17ba5545e2f104cd2783e5f1c97c400fcbbc) )    /* text layer */
+	ROM_LOAD( "@14.bin",    0x2000, 0x1000, CRC(19b68bec) SHA1(b8ef17ba5545e2f104cd2783e5f1c97c400fcbbc) )    /* text layer */
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "11.bin", 0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
@@ -10237,8 +10338,147 @@ ROM_START( pmpoker )
 	ROM_LOAD( "1-3.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24sa10n.7d",      0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_LOAD( "tbp24sa10.bin",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump confirmed OK */
 ROM_END
+
+/***************************************************************
+
+  Casino Poker
+  1987, PM / Beck Elektronik
+
+  1x Xtal 10.000 MHz.
+  1x UM6502A
+  2x UM6521A
+  1x UM6845
+
+  GFX ROMS 051, 052, 053 and 054 have duplicated halves.
+
+  Bipolar PROM was faulty, but a clone appeared with the
+  same GFX set, so assume the BP is the same.
+
+  Discrete sound circuitry was traced, being identical to the Golden Poker one.
+  Only difference is the PC617 replaced by one PC817.
+
+  The sound is ugly and seems that was programmed that way.
+
+***************************************************************/
+ROM_START( caspoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "234.bin",    0x4000, 0x1000, CRC(174bc526) SHA1(faef01484f0e0ea769d7bd2c5ad03369a6fdf037) )
+	ROM_LOAD( "235.bin",    0x5000, 0x1000, CRC(2e43552f) SHA1(5fbe0e62dec960850ef5f937254858fcd4da9e64) )
+	ROM_LOAD( "236.bin",    0x6000, 0x1000, CRC(3f4cfa39) SHA1(e2750a9c5d12c668e599181ee3972c5d78bd0006) )
+	ROM_LOAD( "237.bin",    0x7000, 0x1000, CRC(b411d0c4) SHA1(0617cd312026da78a171fc23f4788393d70371cf) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "054.bin",    0x1000, 0x0800, CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )    /* text chars */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "051.bin",    0x0000, 0x0800, CRC(82d823e5) SHA1(75bdf427a6204ef87444be0d8b06a07c5a2fc38f) )    /* cards deck gfx, bitplane1 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+	ROM_LOAD( "052.bin",    0x0800, 0x0800, CRC(eda12738) SHA1(ec7806c2bf1a238f489459c3c3653f43febaa464) )    /* cards deck gfx, bitplane2 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+	ROM_LOAD( "053.bin",    0x1000, 0x0800, CRC(d147ae0a) SHA1(dfdf0a42eb0a6f2afc9f301b0cf01411085247bd) )    /* cards deck gfx, bitplane3 */
+	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise settings parameters are incorrect */
+	ROM_LOAD( "caspoker_nvram.bin", 0x0000, 0x0800, CRC(be6e2671) SHA1(aef1b09d09e07eb39480a7901ed8535f74e461fa) )
+
+	ROM_REGION( 0x0100, "proms", 0 )    /* from other games */
+	ROM_LOAD( "24sa10.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Casino Poker.
+  Ver. PM86-35-1.
+  COPYRIGHT PM 1985,1986
+
+  COPYRIGHT 1985,1986 BECK COMPUTER,
+  D-6330 WETZLAR / *DG* / PM86-35-1 / 08.12.86
+*/
+ROM_START( caspokera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "215b_neu.bin",    0x5000, 0x1000, CRC(54b789e3) SHA1(96f1fa8ee3cdde338f5748bfe39b8d8fd6bafd0a) )
+	ROM_LOAD( "216b_neu.bin",    0x6000, 0x1000, CRC(be7793f2) SHA1(e29dd20591d39f404e5a3bec44701aab71102846) )
+	ROM_LOAD( "217b_neu.bin",    0x7000, 0x1000, CRC(9344ac66) SHA1(8735e18652e36a5fb534ebf259a195bc2b58fdf4) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // borrowed from parent set.
+	ROM_FILL(               0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "054.bin",    0x1000, 0x0800, BAD_DUMP CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )  // text chars
+	ROM_IGNORE(                     0x0800)  // identical halves, discarding the 2nd half
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "b.poker_051_16.bin",  0x0000, 0x0800, CRC(598c9a21) SHA1(901c15529e0a72f750a0e64e220d27be45a2a628) )  // cards deck gfx, bitplane 1
+	ROM_CONTINUE(                    0x0000, 0x0800)  // Discarding 1nd half (empty)
+	ROM_LOAD( "b.poker_052_16.bin",  0x0800, 0x0800, CRC(42aa83fe) SHA1(e7d87a37993774ac1bee824ba4750b92d637ec85) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "b.poker_053_16.bin",  0x1000, 0x0800, CRC(b8765304) SHA1(afdab2de3b3140e90241f3adf4069ccce95a54fd) )  // cards deck gfx, bitplane 3
+	ROM_CONTINUE(                    0x1000, 0x0800)  // Discarding 1nd half (empty)
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+	ROM_LOAD( "caspokera_nvram.bin", 0x0000, 0x0800, CRC(b0c63467) SHA1(0a031686821ce7da43816076ea498389310b98c6) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // PROM dump confirmed OK
+ROM_END
+
+ROM_START( caspokerb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "514.bin",    0x4000, 0x1000, CRC(4fadd660) SHA1(a06ef3e89ae09536a2f159c16726091a42430140) )
+	ROM_LOAD( "515.bin",    0x5000, 0x1000, CRC(07d8b4e0) SHA1(105a1595a1a4e2d8c976ffc852636938acdd5922) )
+	ROM_LOAD( "516.bin",    0x6000, 0x1000, CRC(da067462) SHA1(308368057c3126d053c89c36701be446001d34cf) )
+	ROM_LOAD( "517.bin",    0x7000, 0x1000, CRC(df4c2976) SHA1(425e9f05df2e7c30422d1828c3c6471635249c7a) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "433.bin",    0x1000, 0x0800, CRC(434a7cbb) SHA1(447bf44e04d023aab8a58c3973f83a12af5b1b2b) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "430.bin",  0x0000, 0x0800, CRC(46927b19) SHA1(d24c8f81bc1d34d52c759268b582a61f1455299b) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "431.bin",  0x0800, 0x0800, CRC(082a5585) SHA1(580ee2a824bed4b483d88dc99793c3a06dad12e0) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "432.bin",  0x1000, 0x0800, CRC(04adfcb8) SHA1(3aabbd997dec65cb5e4f044f16c742902a775e98) )  // cards deck gfx, bitplane 3
+
+	// TODO, once the game boots
+	//ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise settings parameters are incorrect
+	//ROM_LOAD( "caspokerb_nvram.bin", 0x0000, 0x0800, CRC() SHA1() )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10.bin",  0x0000, 0x0100, CRC(079d26c4) SHA1(b8adf9bdc36107f3e4f6f41f2337a8b67b70e0da) )
+ROM_END
+
+/*
+  Bonus Poker.
+  Copyright 1984 Galanthis Inc.
+  For amusement only.
+
+  From inside another rom:
+  Copyright (C) 1983
+  Zenitone Limited.
+  Malcom Mailer.
+  S/N 24165483.
+*/
+ROM_START( bonuspkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5000_bonus_12000.bin",  0x5000, 0x1000, CRC(eb93b60b) SHA1(6d6dcc0899caf1cb2179264c311bb41050834aa4) )
+	ROM_LOAD( "5_6000.bin",            0x6000, 0x1000, CRC(9f444112) SHA1(cae3a092898b4cc12a4f3eac955d8c8590a7b1fd) )
+	ROM_LOAD( "hn462732g.bin",         0x7000, 0x1000, CRC(6fd3bf27) SHA1(8f9a53cd20dd6198dd0ed329ac0b9b3d9a62a323) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                    0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "poke_5.4_x.bin",  0x1000, 0x0800, CRC(ca9182b1) SHA1(4c440eb53a46c4f751cf8807cbe3187ad9dbc214) )  // text chars
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "bp_c1.bin",  0x0000, 0x0800, CRC(89a8c5f9) SHA1(e3aab20b2a962778a221ab96c691c37fad5b6877) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "bp_c2.bin",  0x0800, 0x0800, CRC(b59a8a11) SHA1(d378ac2615ec9990903d1ad9c63f785cb65f41ab) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "bp_c3.bin",  0x1000, 0x0800, CRC(cb4e8cb9) SHA1(c99f685f2f2ef4d360b48449e9520b40df58b3ae) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "74s387.b",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // color PROM
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "74s387.a",  0x0000, 0x0100, CRC(6cc491b9) SHA1(0a97518d11bfc9eb2b8a70ed6c75882209e1abd7) )  // decode?
+ROM_END
+
 
 ROM_START( royale )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10273,6 +10513,7 @@ ROM_START( royalea )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
+
 
 ROM_START( sloco93 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10438,6 +10679,7 @@ ROM_START( poker91 )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
+
 /****************************************************
 
   Genie (Video Fun Games Ltd.)
@@ -10545,54 +10787,6 @@ ROM_START( silverga )
 	ROM_LOAD( "s287",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-/***************************************************************
-
-  Casino Poker
-  1987, PM / Beck Elektronik
-
-  1x Xtal 10.000 MHz.
-  1x UM6502A
-  2x UM6521A
-  1x UM6845
-
-  GFX ROMS 051, 052, 053 and 054 have duplicated halves.
-
-  Bipolar PROM 24sa10 is filled with 0x09, so has at least
-  fixed bits 0 and 3 along the whole data. Needs a redump
-  using a supported EEPROM programmer.
-
-  Discrete sound circuitry was traced, being identical to the Golden Poker one.
-  Only difference is the PC617 replaced by one PC817.
-
-  The sound is ugly and seems that was programmed that way.
-
-***************************************************************/
-ROM_START( caspoker )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "234.bin",    0x4000, 0x1000, CRC(174bc526) SHA1(faef01484f0e0ea769d7bd2c5ad03369a6fdf037) )
-	ROM_LOAD( "235.bin",    0x5000, 0x1000, CRC(2e43552f) SHA1(5fbe0e62dec960850ef5f937254858fcd4da9e64) )
-	ROM_LOAD( "236.bin",    0x6000, 0x1000, CRC(3f4cfa39) SHA1(e2750a9c5d12c668e599181ee3972c5d78bd0006) )
-	ROM_LOAD( "237.bin",    0x7000, 0x1000, CRC(b411d0c4) SHA1(0617cd312026da78a171fc23f4788393d70371cf) )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "054.bin",    0x1000, 0x0800, CRC(7b401a09) SHA1(affb90a52761c36be7c67f7606f3f982f6dc724e) )    /* text chars */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-
-	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_LOAD( "051.bin",    0x0000, 0x0800, CRC(82d823e5) SHA1(75bdf427a6204ef87444be0d8b06a07c5a2fc38f) )    /* cards deck gfx, bitplane1 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-	ROM_LOAD( "052.bin",    0x0800, 0x0800, CRC(eda12738) SHA1(ec7806c2bf1a238f489459c3c3653f43febaa464) )    /* cards deck gfx, bitplane2 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-	ROM_LOAD( "053.bin",    0x1000, 0x0800, CRC(d147ae0a) SHA1(dfdf0a42eb0a6f2afc9f301b0cf01411085247bd) )    /* cards deck gfx, bitplane3 */
-	ROM_IGNORE(                     0x0800) /* identical halves, discarding the 2nd half */
-
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM, otherwise settings parameters are incorrect */
-	ROM_LOAD( "caspoker_nvram.bin", 0x0000, 0x0800, CRC(be6e2671) SHA1(aef1b09d09e07eb39480a7901ed8535f74e461fa) )
-
-	ROM_REGION( 0x0100, "proms", 0 )    /* from other games */
-	ROM_LOAD( "24sa10.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
 
 /****************************************************
 
@@ -11068,16 +11262,15 @@ ROM_END
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
+void goldnpkr_state::init_flcnw()
 {
 	/* Attempt to decrypt the MCU program (we're sooo close!) */
 
 	uint8_t *ROM = memregion("mcu")->base();
 	int size = memregion("mcu")->bytes();
 	int start = 0x0000;
-	int i;
 
-	for (i = start; i < size; i++)
+	for (int i = start; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0xa0;
 		ROM[i] = bitswap<8>(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
@@ -11085,7 +11278,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
+void goldnpkr_state::init_vkdlsa()
 {
 	/* $e097-e098, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11097,7 +11290,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
 	ROM[0xe098] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
+void goldnpkr_state::init_vkdlsb()
 {
 	/* $e87b-e87c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11109,7 +11302,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
 	ROM[0xe87c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
+void goldnpkr_state::init_vkdlsc()
 {
 	/* $453a-453b, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11121,7 +11314,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
 	ROM[0x453b] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
+void goldnpkr_state::init_vkdlsww()
 {
 	/* $f2c9-f2ca, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11133,7 +11326,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
 	ROM[0xf2ca] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
+void goldnpkr_state::init_vkdlswwa()
 {
 	/* $df80-df81, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11145,7 +11338,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
 	ROM[0xdf81] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
+void goldnpkr_state::init_vkdlswwc()
 {
 	/* $e42f-e430, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11157,7 +11350,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
 	ROM[0xe430] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
+void goldnpkr_state::init_vkdlswwd()
 {
 	/* $e442-e443, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11169,7 +11362,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
 	ROM[0xe443] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
+void goldnpkr_state::init_vkdlswwh()
 {
 	/* $e4d5-e4d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11181,7 +11374,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
 	ROM[0xe4d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
+void goldnpkr_state::init_vkdlswwl()
 {
 	/* $e87c-e87d, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11193,7 +11386,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
 	ROM[0xe87d] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
+void goldnpkr_state::init_vkdlswwo()
 {
 	/* $e7d5-e7d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11205,7 +11398,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
 	ROM[0xe7d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
+void goldnpkr_state::init_vkdlswwp()
 {
 	/* $e7d9-e7da, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11217,7 +11410,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
 	ROM[0xe7da] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
+void goldnpkr_state::init_vkdlswwr()
 {
 	/* $e7f7-e7f8, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11229,7 +11422,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
 	ROM[0xe7f8] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
+void goldnpkr_state::init_vkdlswws()
 {
 	/* $e8a5-e8a6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11241,7 +11434,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
 	ROM[0xe8a6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
+void goldnpkr_state::init_vkdlswwt()
 {
 	/* $e955-e956, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11253,7 +11446,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
 	ROM[0xe956] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
+void goldnpkr_state::init_vkdlswwu()
 {
 	/* $ee6b-ee6c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11265,7 +11458,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
 	ROM[0xee6c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
+void goldnpkr_state::init_vkdlswwv()
 {
 	/* $f052-f053, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11315,10 +11508,9 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
+void goldnpkr_state::init_icp1db()
 {
 /*
-    int i;
     uint8_t *ROM = memregion("maincpu")->base();
 
     unsigned char rawData[256] = {
@@ -11340,7 +11532,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
         0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8,
     };
 
-    for (i = 0; i < 0x10000; i++)
+    for (int i = 0; i < 0x10000; i++)
     {
         ROM[i] = ROM[i] ^ rawData[i & 0xff];
     }
@@ -11386,7 +11578,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
+void goldnpkr_state::init_wstrike()
 {
 	/* NOPing the BNE --> $F2EA (KILL)
 	   after compare with a string inside the Dallas TK RAM
@@ -11399,20 +11591,56 @@ DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
+void goldnpkr_state::init_bchancep()
 {
 	/* Attempt to invert the color data from the bipolar PROM */
 
 	uint8_t *ROM = memregion("proms")->base();
 	int size = memregion("proms")->bytes();
 	int start = 0x0000;
-	int i;
 
-	for (i = start; i < size; i++)
+	for (int i = start; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0x0f;
 	}
 	m_palette->update();
+}
+
+
+/*
+  Bonus Poker protection.
+
+  Code checks for a ROM offset value (at $FFC8) and XOR it with the next value.
+  if the result is 0, the code continues. If not 0, just jump to a previous
+  subroutine, getting an infinite loop...
+
+  7B7A: A9 FF    lda #$ff         ; Set the offset pointer to $30/$31...
+  7B7C: 85 31    sta $31
+  7B7E: A9 19    lda #$19
+  7B80: 0A       asl a
+  7B81: 0A       asl a
+  7B82: 0A       asl a
+  7B83: 85 30    sta $30
+  7B85: A0 01    ldy #$01         ; load Y with 1.
+  7B87: B1 30    lda ($30), y     ; load A with the content of $FFC8,y (0xAA).
+  7B89: 88       dey              ; decrement Y...
+  7B8A: 51 30    eor ($30), y     ; XOR against the content of $FFC8,y (now 0x55).
+  7B8C: F0 03    beq $7b91        ; if 0, jumps to $7B91 (where the game execution continues).
+
+  7B8E: 4C 4C E0 jmp $e04c        ; jumps to an infinite loop.
+
+  7B91: A2 1D    ldx #$1d         ; the game continue executing...
+
+*/
+
+void goldnpkr_state::init_bonuspkr()
+{
+//  NOPing the DEY, so the XOR is against the same value
+//  instead of the next offset one.
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0x7b89] = 0xea;
 }
 
 
@@ -11421,152 +11649,157 @@ DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
 *********************************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT     COMPANY                     FULLNAME                                      FLAGS             LAYOUT
-GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",           0,                layout_goldnpkr )
-GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",          0,                layout_goldnpkr )
-GAMEL( 198?, goldnpkc,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg)",           0,                layout_goldnpkr )
+GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",           0,                layout_goldnpkr )
+GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",          0,                layout_goldnpkr )
+GAMEL( 198?, goldnpkc,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg)",           0,                layout_goldnpkr )
 
-GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
-GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )
-GAMEL( 198?, videtrna,  videtron, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Videotron Poker (normal controls)",          0,                layout_goldnpkr )
+GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
+GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )
+GAMEL( 198?, videtrna,  videtron, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (normal controls)",          0,                layout_goldnpkr )
 
-GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",                0,                layout_goldnpkr )
-GAMEL( 198?, potnpkra,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 2)",                0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrb,  pottnpkr, pottnpkr, pottnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 3)",                0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrc,  pottnpkr, pottnpkr, potnpkrc, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",                0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",                0,                layout_goldnpkr )
-GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",                0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrf,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 7, Royale GFX)",    0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrg,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 8, Australian)",    0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrh,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 9, 'just 4 fun')",  0,                layout_goldnpkr )
-GAMEL( 198?, potnpkri,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 10, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
-GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, 0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
-GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, 0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
-GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, 0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
+GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",                0,                layout_goldnpkr )
+GAMEL( 198?, potnpkra,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 2)",                0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrb,  pottnpkr, pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 3)",                0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrc,  pottnpkr, pottnpkr, potnpkrc, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",                0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",                0,                layout_goldnpkr )
+GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",                0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrf,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 7, Royale GFX)",    0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrg,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 8, Australian)",    0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrh,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 9, 'just 4 fun')",  0,                layout_goldnpkr )
+GAMEL( 198?, potnpkri,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 10, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
+GAMEL( 198?, potnpkrj,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 11, German, W.W.)", 0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrk,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 12, no Double-Up)", 0,                layout_goldnpkr )
+GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
+GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
+GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
 
-GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",              0,                layout_goldnpkr )
-GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",              0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteb,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",              0,                layout_goldnpkr )
-GAMEL( 1991, bsuertec,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",              0,                layout_goldnpkr )
-GAMEL( 1991, bsuerted,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",              0,                layout_goldnpkr )
-GAMEL( 1991, bsuertee,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",              0,                layout_goldnpkr )
-GAMEL( 1991, bsuertef,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",              0,                layout_goldnpkr )
-GAME(  1991, bsuerteg,  bsuerte,  witchcrd, bsuertew, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",              0 )
-GAME(  1991, bsuerteh,  bsuerte,  witchcrd, bsuertew, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",              0 )
-GAMEL( 1991, bsuertei,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15, Prodel PCB)", 0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",             0,                layout_goldnpkr )
-GAMEL( 1991, bsuertev,  bsuerte,  witchcrd, bsuertev, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish/Portuguese, set 23)",  0,                layout_goldnpkr )
-GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Good Luck",                                  0,                layout_goldnpkr )
+GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",              0,                layout_goldnpkr )
+GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",              0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteb,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",              0,                layout_goldnpkr )
+GAMEL( 1991, bsuertec,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",              0,                layout_goldnpkr )
+GAMEL( 1991, bsuerted,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",              0,                layout_goldnpkr )
+GAMEL( 1991, bsuertee,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",              0,                layout_goldnpkr )
+GAMEL( 1991, bsuertef,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",              0,                layout_goldnpkr )
+GAME(  1991, bsuerteg,  bsuerte,  witchcrd, bsuertew, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",              0 )
+GAME(  1991, bsuerteh,  bsuerte,  witchcrd, bsuertew, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",              0 )
+GAMEL( 1991, bsuertei,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15, Prodel PCB)", 0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",             0,                layout_goldnpkr )
+GAMEL( 1991, bsuertev,  bsuerte,  witchcrd, bsuertev, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish/Portuguese, set 23)",  0,                layout_goldnpkr )
+GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Good Luck",                                  0,                layout_goldnpkr )
 
-GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, 0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
-GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
-GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
-GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING )
+GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
+GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
+GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
+GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, init_flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING )
 
-GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
-GAME(  1991, witchcda,  witchcrd, witchcrd, witchcda, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
-GAME(  1991, witchcdb,  witchcrd, witchcrd, witchcda, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)",    0 )
-GAME(  1991, witchcdc,  witchcrd, witchcrd, witchcdc, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",        0 )
-GAMEL( 1994, witchcdd,  witchcrd, witchcrd, witchcdd, goldnpkr_state, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",        0,                   layout_goldnpkr )
-GAMEL( 1991, witchcde,  witchcrd, witchcrd, witchcrd, goldnpkr_state, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)",    0,                   layout_goldnpkr )
-GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, goldnpkr_state, 0,        ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)",    0,                   layout_goldnpkr )
-GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, goldnpkr_state, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
-GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, goldnpkr_state, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
-GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
+GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
+GAME(  1991, witchcda,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
+GAME(  1991, witchcdb,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)",    0 )
+GAME(  1991, witchcdc,  witchcrd, witchcrd, witchcdc, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (English, no witch game)",        0 )
+GAMEL( 1994, witchcdd,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",        0,                   layout_goldnpkr )
+GAMEL( 1991, witchcde,  witchcrd, witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)",    0,                   layout_goldnpkr )
+GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)",    0,                   layout_goldnpkr )
+GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
+GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
+GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
 
-GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
-GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
+GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
 
-GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
+GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
 
-GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                   layout_goldnpkr )  /* Ver 184A, 2001-09-12 */
-GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                   layout_goldnpkr )  /* Ver 157-SP, 1992-12-25 */
-GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     MACHINE_NOT_WORKING, layout_goldnpkr )  /* Ver 157-TE, 1992-12-25 */
-GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                   layout_goldnpkr )  /* Ver 162A, 1994-04-26 */
-GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                   layout_goldnpkr )  /* Ver 162B, 1994-04-26 */
-GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     MACHINE_NOT_WORKING, layout_goldnpkr )  /* Ver 162A-F, 1994-04-26 */
-GAMEL( 1994, wldwitchf, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A alt)",   0,                   layout_goldnpkr )  /* Ver 162A alt, 1994-11-03 */
-GAMEL( 1994, wldwitchg, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B alt)",   0,                   layout_goldnpkr )  /* Ver 162B alt, 1994-11-03 */
-GAMEL( 1995, wldwitchh, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A)",       0,                   layout_goldnpkr )  /* Ver 165A, 1995-11-16 */
-GAMEL( 1996, wldwitchi, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S)",     0,                   layout_goldnpkr )  /* Ver 165A-S (Fast Deal), 1996-03-26 */
-GAMEL( 1996, wldwitchj, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S alt)", 0,                   layout_goldnpkr )  /* Ver 165A-S alt (Fast Deal), 1996-05-26 */
-GAMEL( 1996, wldwitchk, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-N)",     0,                   layout_goldnpkr )  /* Ver 165A-N, 1996-05-29 */
-GAMEL( 1996, wldwitchl, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A beta)",  0,                   layout_goldnpkr )  /* Ver 170A-beta, 1996-06-25 */
-GAMEL( 1996, wldwitchm, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A)",       0,                   layout_goldnpkr )  /* Ver 170A, 1996-09-30 */
-GAMEL( 1997, wldwitchn, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A alt)",   0,                   layout_goldnpkr )  /* Ver 170A alt, 1997-06-11 */
-GAMEL( 1998, wldwitcho, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwo, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG)", 0,                 layout_goldnpkr )  /* Ver 174A-SP-BELG (no D-UP, no payout), 1998-05-11 */
-GAMEL( 1998, wldwitchp, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwp, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",       0,                   layout_goldnpkr )  /* Ver 174A (no D-UP, no payout), 1998-09-20 */
-GAMEL( 1998, wldwitchq, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A alt)",   0,                   layout_goldnpkr )  /* Ver 174A alt, box, 1998-09-25 */
-GAMEL( 1999, wldwitchr, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwr, ROT0,   "Video Klein",              "Wild Witch (Export, 6B/12B ver 1.75A-E English)", 0,               layout_goldnpkr )  /* Ver 175A-E (English), 1999-01-11 */
-GAMEL( 1999, wldwitchs, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswws, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.76A)",       0,                   layout_goldnpkr )  /* Ver 176A, 1999-??-?? */
-GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwt, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.77A)",       0,                   layout_goldnpkr )  /* Ver 177A, 1999-??-?? */
-GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                   layout_goldnpkr )  /* Ver 179A, 2000-05-10 */
-GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                   layout_goldnpkr )  /* Ver 183A, 2001-06-13 */
+GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                   layout_goldnpkr )  /* Ver 184A, 2001-09-12 */
+GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                   layout_goldnpkr )  /* Ver 157-SP, 1992-12-25 */
+GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     MACHINE_NOT_WORKING, layout_goldnpkr )  /* Ver 157-TE, 1992-12-25 */
+GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                   layout_goldnpkr )  /* Ver 162A, 1994-04-26 */
+GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                   layout_goldnpkr )  /* Ver 162B, 1994-04-26 */
+GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     MACHINE_NOT_WORKING, layout_goldnpkr )  /* Ver 162A-F, 1994-04-26 */
+GAMEL( 1994, wldwitchf, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A alt)",   0,                   layout_goldnpkr )  /* Ver 162A alt, 1994-11-03 */
+GAMEL( 1994, wldwitchg, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B alt)",   0,                   layout_goldnpkr )  /* Ver 162B alt, 1994-11-03 */
+GAMEL( 1995, wldwitchh, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A)",       0,                   layout_goldnpkr )  /* Ver 165A, 1995-11-16 */
+GAMEL( 1996, wldwitchi, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S)",     0,                   layout_goldnpkr )  /* Ver 165A-S (Fast Deal), 1996-03-26 */
+GAMEL( 1996, wldwitchj, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S alt)", 0,                   layout_goldnpkr )  /* Ver 165A-S alt (Fast Deal), 1996-05-26 */
+GAMEL( 1996, wldwitchk, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-N)",     0,                   layout_goldnpkr )  /* Ver 165A-N, 1996-05-29 */
+GAMEL( 1996, wldwitchl, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A beta)",  0,                   layout_goldnpkr )  /* Ver 170A-beta, 1996-06-25 */
+GAMEL( 1996, wldwitchm, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A)",       0,                   layout_goldnpkr )  /* Ver 170A, 1996-09-30 */
+GAMEL( 1997, wldwitchn, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A alt)",   0,                   layout_goldnpkr )  /* Ver 170A alt, 1997-06-11 */
+GAMEL( 1998, wldwitcho, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwo, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG)", 0,                 layout_goldnpkr )  /* Ver 174A-SP-BELG (no D-UP, no payout), 1998-05-11 */
+GAMEL( 1998, wldwitchp, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwp, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",       0,                   layout_goldnpkr )  /* Ver 174A (no D-UP, no payout), 1998-09-20 */
+GAMEL( 1998, wldwitchq, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A alt)",   0,                   layout_goldnpkr )  /* Ver 174A alt, box, 1998-09-25 */
+GAMEL( 1999, wldwitchr, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwr, ROT0,   "Video Klein",              "Wild Witch (Export, 6B/12B ver 1.75A-E English)", 0,               layout_goldnpkr )  /* Ver 175A-E (English), 1999-01-11 */
+GAMEL( 1999, wldwitchs, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswws, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.76A)",       0,                   layout_goldnpkr )  /* Ver 176A, 1999-??-?? */
+GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwt, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.77A)",       0,                   layout_goldnpkr )  /* Ver 177A, 1999-??-?? */
+GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                   layout_goldnpkr )  /* Ver 179A, 2000-05-10 */
+GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                   layout_goldnpkr )  /* Ver 183A, 2001-06-13 */
 
-GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )    /* Ver 1.02, 1998-10-26 */
-GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )    /* Ver 0.99, 1998-04-09 */
-GAMEL( 1998, wupndownb, wupndown, wcrdxtnd, wupndown, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 2)", 0,           layout_upndown )    /* Ver 0.99, 1998-03-23 */
-GAMEL( 1998, wupndownc, wupndown, wcrdxtnd, wupndown, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 3)", 0,           layout_upndown )    /* Ver 0.99 alt, 1998-05-11 */
-GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99T)",       0,           layout_upndown )    /* Ver 0.99T, 1998-03-23 */
+GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )    /* Ver 1.02, 1998-10-26 */
+GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )    /* Ver 0.99, 1998-04-09 */
+GAMEL( 1998, wupndownb, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 2)", 0,           layout_upndown )    /* Ver 0.99, 1998-03-23 */
+GAMEL( 1998, wupndownc, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 3)", 0,           layout_upndown )    /* Ver 0.99 alt, 1998-05-11 */
+GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99T)",       0,           layout_upndown )    /* Ver 0.99T, 1998-03-23 */
 
-GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  goldnpkr_state, wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
-GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  goldnpkr_state, wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
+GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  goldnpkr_state, init_wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
+GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  goldnpkr_state, init_wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
 
-GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                          layout_goldnpkr )    /* Ver 0.87-89 / 1996-10-08 GFX OK */
-GAMEL( 1996, wtchjacka, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                          layout_goldnpkr )    /* Ver 0.87-88 / 1996-10-02, GFX OK */
-GAMEL( 1996, wtchjackb, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                          layout_goldnpkr )    /* Ver 0.87 / 1996-07-16, GFX OK */
-GAMEL( 1996, wtchjackc, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70S / 1996-03-26 */
-GAMEL( 1996, wtchjackd, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70P / 1996-03-26 */
-GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.65 / 1995-10-19 */
-GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.64 / 1995-09-13 */
-GAMEL( 1995, wtchjackg, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.62 / 1995-08-02 */
-GAMEL( 1995, wtchjackh, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   MACHINE_NOT_WORKING,        layout_goldnpkr )    /* Ver 0.40T / 1995-02-27 */
-GAMEL( 1995, wtchjacki, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.40 / 1995-02-27 */
-GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, 0,        ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.25 / 1994-11-24 */
+GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                          layout_goldnpkr )    /* Ver 0.87-89 / 1996-10-08 GFX OK */
+GAMEL( 1996, wtchjacka, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                          layout_goldnpkr )    /* Ver 0.87-88 / 1996-10-02, GFX OK */
+GAMEL( 1996, wtchjackb, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                          layout_goldnpkr )    /* Ver 0.87 / 1996-07-16, GFX OK */
+GAMEL( 1996, wtchjackc, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70S / 1996-03-26 */
+GAMEL( 1996, wtchjackd, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70P / 1996-03-26 */
+GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.65 / 1995-10-19 */
+GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.64 / 1995-09-13 */
+GAMEL( 1995, wtchjackg, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.62 / 1995-08-02 */
+GAMEL( 1995, wtchjackh, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   MACHINE_NOT_WORKING,        layout_goldnpkr )    /* Ver 0.40T / 1995-02-27 */
+GAMEL( 1995, wtchjacki, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.40 / 1995-02-27 */
+GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.25 / 1994-11-24 */
 
 /*************************************** OTHER SETS ***************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
-GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  goldnpkr_state, 0,        ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
-GAMEL( 198?, royale,    0,        goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Royale (set 1)",                          0,                layout_goldnpkr )
-GAMEL( 198?, royalea,   royale,   goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Royale (set 2)",                          0,                layout_goldnpkr )
-GAME(  1993, sloco93,   0,        witchcrd, sloco93,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
-GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
-GAME(  198?, maverik,   0,        witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Maverik",                                 0 )
-GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
-GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
-GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
-GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
-GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )              // no lamps
-GAME(  1991, poker91,   0,        witchcrd, poker91,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
-GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, 0,        ROT0,   "Video Fun Games Ltd.",     "Genie (ICP-1, set 1)",                    0 )
-GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, 0,        ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
-GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
-GAME(  1987, caspoker,  0,        goldnpkr, caspoker, goldnpkr_state, 0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  MACHINE_IMPERFECT_COLORS )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                  FLAGS                LAYOUT  */
+GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                   layout_pmpoker  )
+GAMEL( 1987, caspoker,  0,        goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  0,                   layout_pmpoker  )
+GAMEL( 1986, caspokera, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86-35-1, German)",    0,                   layout_pmpoker  )
+GAMEL( 1988, caspokerb, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM88-01-21, German)",   MACHINE_NOT_WORKING, layout_pmpoker  ) // flashes ROM FEHLER (ROM error) on start up
+GAMEL( 198?, royale,    0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 1)",                          0,                   layout_goldnpkr )
+GAMEL( 198?, royalea,   royale,   goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 2)",                          0,                   layout_goldnpkr )
+GAME(  1993, sloco93,   0,        witchcrd, sloco93,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
+GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
+GAME(  198?, maverik,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Maverik",                                 0 )
+GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
+GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
+GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
+GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
+GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 93",                               0 )              // no lamps
+GAME(  1991, poker91,   0,        witchcrd, poker91,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Poker 91",                                0 )
+GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init,    ROT0,   "Video Fun Games Ltd.",     "Genie (ICP-1, set 1)",                    0 )
+GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
+GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
 
-GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
-GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
-GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            MACHINE_NOT_WORKING )   // encrypted.
-GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, 0,        ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            MACHINE_NOT_WORKING )   // fix banking (4 prgs?)...
+GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
+GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
+GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            MACHINE_NOT_WORKING )   // encrypted.
+GAME(  198?, pokersis,  0,        bchancep, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            MACHINE_NOT_WORKING )   // fix banking (4 prgs?)...
 
-GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 1)", MACHINE_NOT_WORKING, layout_goldnpkr )
-GAMEL( 198?, bchanceq,  0,        goldnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 2)", MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 1)", MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 198?, bchanceq,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW, set 2)", MACHINE_NOT_WORKING, layout_goldnpkr )
 
-GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                  // banked selectable program
-GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, 0,        ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               MACHINE_NOT_WORKING )  // program checks zeropage registers for changes...
+GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                  // banked selectable program
+GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               MACHINE_NOT_WORKING )  // program checks zeropage registers for changes...
 
-GAME(  198?, animpkr,   0,        pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "unknown animal-themed game (bottom)",     MACHINE_NOT_WORKING )  // banked selectable program (bottom).
-GAME(  198?, animpkra,  animpkr,  pottnpkr, goldnpkr, goldnpkr_state, 0,        ROT0,   "<unknown>",                "unknown animal-themed game (top)",        MACHINE_NOT_WORKING )  // banked selectable program (top).
+GAME(  198?, animpkr,   0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown animal-themed game (bottom)",     MACHINE_NOT_WORKING )  // banked selectable program (bottom).
+GAME(  198?, animpkra,  animpkr,  pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown animal-themed game (top)",        MACHINE_NOT_WORKING )  // banked selectable program (top).
 
-GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    0,        ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
-GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    0,        ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time
+GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
+GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",             "Mega Double Poker (conversion kit, version 2.1 MD)", 0 ) // may need an extra reset to work the first time

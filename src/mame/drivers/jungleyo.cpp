@@ -9,7 +9,7 @@ QTY     Type    clock   position    function
 1x  u6295       u98     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
 1x  HA17358         u101    Dual Operational Amplifier - sound
 1x  TDA2003         u104    Audio Amplifier - sound
-1x  oscillator  12.000MHz   osc1
+1x  oscillator  24.000MHz   osc1
 ROMs
 QTY     Type    position    status
 2x  M27C1001    2,3     dumped
@@ -40,6 +40,7 @@ PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,19 +49,24 @@ class jungleyo_state : public driver_device
 {
 public:
 	jungleyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+	{ }
 
-	/* memory pointers */
+	void jungleyo(machine_config &config);
 
-	/* video-related */
+protected:
 	virtual void video_start() override;
+
+private:
+	/* video-related */
 	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void jungleyo_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void jungleyo(machine_config &config);
-	void jungleyo_map(address_map &map);
 };
 
 void jungleyo_state::video_start()
@@ -73,9 +79,10 @@ uint32_t jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_in
 }
 
 
-ADDRESS_MAP_START(jungleyo_state::jungleyo_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-ADDRESS_MAP_END
+void jungleyo_state::jungleyo_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+}
 
 static INPUT_PORTS_START( jungleyo )
 INPUT_PORTS_END
@@ -106,44 +113,44 @@ static const gfx_layout jungleyo16_layout =
 };
 
 
-static GFXDECODE_START( jungleyo )
+static GFXDECODE_START( gfx_jungleyo )
 	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x0, 2  )
 	GFXDECODE_ENTRY( "gfx2", 0, jungleyo_layout,   0x0, 2  )
 	GFXDECODE_ENTRY( "gfx3", 0, jungleyo_layout,   0x0, 2  )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(jungleyo_state::jungleyo)
+void jungleyo_state::jungleyo(machine_config &config)
+{
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jungleyo_state::jungleyo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jungleyo_state::irq1_line_hold));
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(jungleyo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jungleyo_state,  irq1_line_hold)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_jungleyo);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jungleyo)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(jungleyo_state::screen_update_jungleyo));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jungleyo_state, screen_update_jungleyo)
-	MCFG_SCREEN_PALETTE("palette")
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 24_MHz_XTAL / 20, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+}
 
 
 ROM_START( jungleyo )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */ // encrypted?
-	ROM_LOAD16_BYTE( "jungle_(record)_rom3_vi3.02.u15", 0x00001, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
-	ROM_LOAD16_BYTE( "jungle_(record)_rom2_vi3.02.u14", 0x00000, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
+	ROM_LOAD16_BYTE( "jungle_=record=_rom3_vi3.02.u15", 0x00001, 0x20000, CRC(7c9f431e) SHA1(fb3f90c4fe59c938f36b30c5fa3af227031e7d7a) )
+	ROM_LOAD16_BYTE( "jungle_=record=_rom2_vi3.02.u14", 0x00000, 0x20000, CRC(f6a71260) SHA1(8e48cbb9d701ad968540244396820359afe97c28) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "jungle_rom1.u99", 0x00000, 0x40000, CRC(05ef5b85) SHA1(ca7584646271c6adc7880eca5cf43a412340c522) )
@@ -159,4 +166,4 @@ ROM_START( jungleyo )
 ROM_END
 
 
-GAME( 1999, jungleyo,    0,        jungleyo,    jungleyo, jungleyo_state,    0, ROT0,  "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )
+GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, empty_init, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )

@@ -244,10 +244,11 @@ WRITE8_MEMBER(o2_cart_slot_device::io_write)
 #include "bus/odyssey2/chess.h"
 #include "bus/odyssey2/voice.h"
 
-SLOT_INTERFACE_START(o2_cart)
-	SLOT_INTERFACE_INTERNAL("o2_rom",    O2_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("o2_rom12",  O2_ROM_12K)
-	SLOT_INTERFACE_INTERNAL("o2_rom16",  O2_ROM_16K)
-	SLOT_INTERFACE_INTERNAL("o2_chess",  O2_ROM_CHESS)
-	SLOT_INTERFACE_INTERNAL("o2_voice",  O2_ROM_VOICE)
-SLOT_INTERFACE_END
+void o2_cart(device_slot_interface &device)
+{
+	device.option_add_internal("o2_rom",    O2_ROM_STD);
+	device.option_add_internal("o2_rom12",  O2_ROM_12K);
+	device.option_add_internal("o2_rom16",  O2_ROM_16K);
+	device.option_add_internal("o2_chess",  O2_ROM_CHESS);
+	device.option_add_internal("o2_voice",  O2_ROM_VOICE);
+}

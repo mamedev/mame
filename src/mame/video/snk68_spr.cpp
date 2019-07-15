@@ -12,7 +12,7 @@ snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *ta
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, "^spriteram")
 	, m_screen(*this, "^screen")
-	, m_flipscreen(0)
+	, m_flipscreen(false)
 	, m_partialupdates(1)
 {
 	m_newtilecb =  snk68_tile_indirection_delegate(FUNC(snk68_spr_device::tile_callback_noindirect), this);
@@ -20,30 +20,6 @@ snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *ta
 
 void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int& region)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void snk68_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<snk68_spr_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-// static
-void snk68_spr_device::set_tile_indirect_cb(device_t &device,snk68_tile_indirection_delegate newtilecb)
-{
-	snk68_spr_device &dev = downcast<snk68_spr_device &>(device);
-	dev.m_newtilecb = newtilecb;
-}
-
-void snk68_spr_device::static_set_no_partial(device_t &device)
-{
-	snk68_spr_device &dev = downcast<snk68_spr_device &>(device);
-	dev.m_partialupdates = 0;
 }
 
 void snk68_spr_device::device_start()
@@ -161,8 +137,7 @@ void snk68_spr_device::draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &c
 	draw_sprites(bitmap, cliprect, 1);
 }
 
-void snk68_spr_device::set_flip(int flip)
+void snk68_spr_device::set_flip(bool flip)
 {
-	if (flip) m_flipscreen = 1;
-	else m_flipscreen = 0;
+	m_flipscreen = flip;
 }

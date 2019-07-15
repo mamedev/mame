@@ -56,25 +56,6 @@ static constexpr int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199
 static int diff_lookup[16];
 
 
-uint8_t ymz280b_device::ymz280b_read_memory(uint32_t offset)
-{
-	if (m_ext_read_handler.isnull())
-	{
-		if (offset < m_mem_size)
-			return m_mem_base[offset];
-
-		/* 16MB chip limit (shouldn't happen) */
-		else if (offset > 0xffffff)
-			return m_mem_base[offset & 0xffffff];
-
-		else
-			return 0;
-	}
-	else
-		return m_ext_read_handler(offset);
-}
-
-
 void ymz280b_device::update_irq_state()
 {
 	int irq_bits = m_status_register & m_irq_mask;
@@ -198,7 +179,7 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, int16_t *buffer, 
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			val = ymz280b_read_memory(position / 2) >> ((~position & 1) << 2);
+			val = read_byte(position / 2) >> ((~position & 1) << 2);
 			signal += (step * diff_lookup[val & 15]) / 8;
 
 			/* clamp to the maximum */
@@ -235,7 +216,7 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, int16_t *buffer, 
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			val = ymz280b_read_memory(position / 2) >> ((~position & 1) << 2);
+			val = read_byte(position / 2) >> ((~position & 1) << 2);
 			signal += (step * diff_lookup[val & 15]) / 8;
 
 			/* clamp to the maximum */
@@ -308,7 +289,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, int16_t *buffer, i
 		while (samples)
 		{
 			/* fetch the current value */
-			val = ymz280b_read_memory(position / 2);
+			val = read_byte(position / 2);
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = (int8_t)val * 256;
@@ -331,7 +312,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, int16_t *buffer, i
 		while (samples)
 		{
 			/* fetch the current value */
-			val = ymz280b_read_memory(position / 2);
+			val = read_byte(position / 2);
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = (int8_t)val * 256;
@@ -378,7 +359,7 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, int16_t *buffer, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (int16_t)((ymz280b_read_memory(position / 2 + 1) << 8) + ymz280b_read_memory(position / 2 + 0));
+			val = (int16_t)((read_byte(position / 2 + 1) << 8) + read_byte(position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -401,7 +382,7 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, int16_t *buffer, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (int16_t)((ymz280b_read_memory(position / 2 + 1) << 8) + ymz280b_read_memory(position / 2 + 0));
+			val = (int16_t)((read_byte(position / 2 + 1) << 8) + read_byte(position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -573,23 +554,12 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 void ymz280b_device::device_start()
 {
-	m_ext_read_handler.resolve();
-	m_ext_write_handler.resolve();
-
 	/* compute ADPCM tables */
 	compute_tables();
 
 	/* initialize the rest of the structure */
 	m_master_clock = (double)clock() / 384.0;
 	m_irq_handler.resolve();
-
-	memory_region *region = memregion(DEVICE_SELF);
-	if (region != nullptr)
-	{
-		/* Some systems (e.g. Konami Firebeat) have a YMZ280B on-board that isn't hooked up to ROM, so be safe. */
-		m_mem_base = region->base();
-		m_mem_size = region->bytes();
-	}
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -691,6 +661,12 @@ void ymz280b_device::device_clock_changed()
 {
 	m_master_clock = (double)clock() / 384.0;
 	m_stream->set_sample_rate(INTERNAL_SAMPLE_RATE);
+}
+
+
+void ymz280b_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 
@@ -803,7 +779,8 @@ void ymz280b_device::write_to_register(int data)
 				break;
 
 			default:
-				logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
+				if (data != 0)
+					logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
 				break;
 		}
 	}
@@ -831,16 +808,13 @@ void ymz280b_device::write_to_register(int data)
 			case 0x86:      /* ROM readback / RAM write (low) -> update latch */
 				m_ext_mem_address = m_ext_mem_address_hi | m_ext_mem_address_mid | data;
 				if (m_ext_mem_enable)
-					m_ext_readlatch = ymz280b_read_memory(m_ext_mem_address);
+					m_ext_readlatch = read_byte(m_ext_mem_address);
 				break;
 
 			case 0x87:      /* RAM write */
 				if (m_ext_mem_enable)
 				{
-					if (!m_ext_write_handler.isnull())
-						m_ext_write_handler(m_ext_mem_address, data);
-					else
-						logerror("YMZ280B attempted RAM write to %X\n", m_ext_mem_address);
+					space(0).write_byte(m_ext_mem_address, data);
 					m_ext_mem_address = (m_ext_mem_address + 1) & 0xffffff;
 				}
 				break;
@@ -877,7 +851,8 @@ void ymz280b_device::write_to_register(int data)
 				break;
 
 			default:
-				logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
+				if (data != 0)
+					logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
 				break;
 		}
 	}
@@ -911,11 +886,11 @@ int ymz280b_device::compute_status()
 
 /**********************************************************************************************
 
-     ymz280b_r/ymz280b_w -- handle external accesses
+     read/write -- handle external accesses
 
 ***********************************************************************************************/
 
-READ8_MEMBER( ymz280b_device::read )
+u8 ymz280b_device::read(offs_t offset)
 {
 	if ((offset & 1) == 0)
 	{
@@ -924,7 +899,7 @@ READ8_MEMBER( ymz280b_device::read )
 
 		/* read from external memory */
 		uint8_t ret = m_ext_readlatch;
-		m_ext_readlatch = ymz280b_read_memory(m_ext_mem_address);
+		m_ext_readlatch = read_byte(m_ext_mem_address);
 		m_ext_mem_address = (m_ext_mem_address + 1) & 0xffffff;
 		return ret;
 	}
@@ -933,7 +908,7 @@ READ8_MEMBER( ymz280b_device::read )
 }
 
 
-WRITE8_MEMBER( ymz280b_device::write )
+void ymz280b_device::write(offs_t offset, u8 data)
 {
 	if ((offset & 1) == 0)
 		m_current_register = data;
@@ -952,6 +927,7 @@ DEFINE_DEVICE_TYPE(YMZ280B, ymz280b_device, "ymz280b", "Yamaha YMZ280B PCMD8")
 ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMZ280B, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 24)
 	, m_current_register(0)
 	, m_status_register(0)
 	, m_irq_state(0)
@@ -964,8 +940,6 @@ ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, d
 	, m_ext_mem_address_mid(0)
 	, m_ext_mem_address(0)
 	, m_irq_handler(*this)
-	, m_ext_read_handler(*this)
-	, m_ext_write_handler(*this)
 {
 	memset(m_voice, 0, sizeof(m_voice));
 }

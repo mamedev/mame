@@ -11,8 +11,8 @@
 #ifndef NLID_PROXY_H_
 #define NLID_PROXY_H_
 
-#include "../nl_setup.h"
-#include "../analog/nlid_twoterm.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/nl_setup.h"
 
 namespace netlist
 {
@@ -26,10 +26,8 @@ namespace netlist
 	NETLIB_OBJECT(base_proxy)
 	{
 	public:
-		nld_base_proxy(netlist_t &anetlist, const pstring &name,
+		nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout);
-
-		virtual ~nld_base_proxy();
 
 		logic_t &term_proxied() const { return *m_term_proxied; }
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
@@ -49,13 +47,11 @@ namespace netlist
 	{
 	public:
 
-		virtual ~nld_base_a_to_d_proxy();
-
 		virtual logic_output_t &out() { return m_Q; }
 
 	protected:
 
-		nld_base_a_to_d_proxy(netlist_t &anetlist, const pstring &name,
+		nld_base_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *in_proxied, detail::core_terminal_t *in_proxy);
 
 	private:
@@ -67,9 +63,7 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_a_to_d_proxy)
 	{
 	public:
-		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied);
-
-		virtual ~nld_a_to_d_proxy() override;
+		nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *in_proxied);
 
 		analog_input_t m_I;
 
@@ -88,24 +82,20 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
 	{
 	public:
-		virtual ~nld_base_d_to_a_proxy();
 
 		virtual logic_input_t &in() { return m_I; }
 
 	protected:
-		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
+		nld_base_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out);
 
 		logic_input_t m_I;
-
-	private:
 	};
 
 	NETLIB_OBJECT_DERIVED(d_to_a_proxy, base_d_to_a_proxy)
 	{
 	public:
-		nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied);
-		virtual ~nld_d_to_a_proxy() override {}
+		nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *out_proxied);
 
 	protected:
 
@@ -113,8 +103,13 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
-		analog::NETLIB_SUB(twoterm) m_RV;
+
+		static constexpr const nl_double G_OFF = 1e-9;
+
+		plib::unique_ptr<analog_output_t> m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
+		plib::unique_ptr<analog_output_t> m_VCCHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
+		analog::NETLIB_NAME(twoterm) m_RP;
+		analog::NETLIB_NAME(twoterm) m_RN;
 		state_var<int> m_last_state;
 		bool m_is_timestep;
 };

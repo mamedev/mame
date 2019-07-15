@@ -61,8 +61,8 @@ void quizdna_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0 );
 
-	save_pointer(NAME(m_bg_ram.get()), 0x2000);
-	save_pointer(NAME(m_fg_ram.get()), 0x1000);
+	save_pointer(NAME(m_bg_ram), 0x2000);
+	save_pointer(NAME(m_fg_ram), 0x1000);
 	save_item(NAME(m_bg_xscroll));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_video_enable));

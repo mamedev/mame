@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_web" description="Takara e-kara (Japan) Web cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+
+	<!-- Japanese e-kara web cartridges
+	     this was meant to be used with an e-kara web unit, USB cable and PC software, presumably to transfer songs offered on some online service
+	     e-karaweb.com no longer resolves to anything, these cartridges seem to be blank / unused so have no songs in them -->
+	<software name="ekaraweb28">
+		<description>e-kara Web cartridge 28M (blank) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="web.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ekaraweb12">
+		<description>e-kara Web cartridge 12M (blank) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb2.bin" size="0x100000" crc="9149a3a8" sha1="01277650706c1b168c5125b0ddcceacbd207be25"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it (TODO, list them here for reference) -->
+
+	<software name="ekaraweb12a">
+		<description>e-kara Web cartridge 12M (used, with 7 Songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb3.bin" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

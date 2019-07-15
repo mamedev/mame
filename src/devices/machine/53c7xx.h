@@ -16,25 +16,16 @@
 #include "machine/nscsi_bus.h"
 
 
-#define MCFG_NCR53C7XX_IRQ_HANDLER(_devcb) \
-	devcb = &ncr53c7xx_device::set_irq_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_NCR53C7XX_HOST_WRITE(_devcb) \
-	devcb = &ncr53c7xx_device::set_host_write(*device, DEVCB_##_devcb);
-
-#define MCFG_NCR53C7XX_HOST_READ(_devcb) \
-	devcb = &ncr53c7xx_device::set_host_read(*device, DEVCB_##_devcb);
-
-class ncr53c7xx_device : public nscsi_device, public device_execute_interface
+class ncr53c7xx_device : public nscsi_device, public nscsi_slot_card_interface, public device_execute_interface
 {
 public:
 	// construction/destruction
 	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr53c7xx_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_host_write(device_t &device, Object &&cb) { return downcast<ncr53c7xx_device &>(device).m_host_write.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_host_read(device_t &device, Object &&cb) { return downcast<ncr53c7xx_device &>(device).m_host_read.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto host_write() { return m_host_write.bind(); }
+	auto host_read() { return m_host_read.bind(); }
 
 	// our API
 	DECLARE_READ32_MEMBER(read);

@@ -8,8 +8,6 @@
 
     The TLCS-870/C appears to have a completely different encoding.
 
-    loosely baesd on the tlcs90 core by Luca Elia
-
 *************************************************************************************************************/
 
 
@@ -19,102 +17,51 @@
 #include "tlcs870d.h"
 #include "debugger.h"
 
-#define IS16BIT 0x80
-#define BITPOS 0x40
-#define BITPOS_INDIRECT 0x20
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define ABSOLUTE_VAL_8 0x01
-#define REG_8BIT 0x02
+DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "Toshiba TMP87PH40AN")
 
-// special
-#define CONDITIONAL 0x03
-#define STACKPOINTER (0x04 | IS16BIT) // this is a 16-bit reg
-#define CARRYFLAG (0x5 | BITPOS) // also flag as BITPOS since it's a bit operation?
-#define MEMVECTOR_16BIT 0x6
-#define REGISTERBANK 0x7
-#define PROGRAMSTATUSWORD 0x8
-
-#define ABSOLUTE_VAL_16 (ABSOLUTE_VAL_8|IS16BIT)
-#define REG_16BIT (REG_8BIT|IS16BIT)
-
-#define ADDR_IN_BASE 0x10
-#define ADDR_IN_IMM_X (ADDR_IN_BASE+0x0)
-#define ADDR_IN_PC_PLUS_REG_A (ADDR_IN_BASE+0x1)
-#define ADDR_IN_DE (ADDR_IN_BASE+0x2)
-#define ADDR_IN_HL (ADDR_IN_BASE+0x3)
-#define ADDR_IN_HL_PLUS_IMM_D (ADDR_IN_BASE+0x4)
-#define ADDR_IN_HL_PLUS_REG_C (ADDR_IN_BASE+0x5)
-#define ADDR_IN_HLINC (ADDR_IN_BASE+0x6)
-#define ADDR_IN_DECHL (ADDR_IN_BASE+0x7)
-
-#define MODE_MASK 0x1f
-
-
-#define FLAG_J (0x80)
-#define FLAG_Z (0x40)
-#define FLAG_C (0x20)
-#define FLAG_H (0x10)
-
-
-#define IS_JF ((m_F & FLAG_J) ? 1 : 0)
-#define IS_ZF ((m_F & FLAG_Z) ? 1 : 0)
-#define IS_CF ((m_F & FLAG_C) ? 1 : 0)
-#define IS_HF ((m_F & FLAG_H) ? 1 : 0)
-
-#define SET_JF (m_F |= FLAG_J)
-#define SET_ZF (m_F |= FLAG_Z)
-#define SET_CF (m_F |= FLAG_C)
-#define SET_HF (m_F |= FLAG_H)
-
-#define CLEAR_JF (m_F &= ~FLAG_J)
-#define CLEAR_ZF (m_F &= ~FLAG_Z)
-#define CLEAR_CF (m_F &= ~FLAG_C)
-#define CLEAR_HF (m_F &= ~FLAG_H)
-
-
-
-DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "TMP87PH40AN")
-
-ADDRESS_MAP_START(tlcs870_device::tmp87ph40an_mem)
-#if 0
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port0_r,port0_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port1_r,port1_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port2_r,port2_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port3_r,port3_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r,port4_w)
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(port5_r,port5_w)
-	AM_RANGE(0x0006, 0x0006) AM_READWRITE(port6_r,port6_w)
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(port7_r,port7_w)
+void tlcs870_device::tmp87ph40an_mem(address_map &map)
+{
+	map(0x0000, 0x0000).rw(FUNC(tlcs870_device::port0_r), FUNC(tlcs870_device::port0_w));
+	map(0x0001, 0x0001).rw(FUNC(tlcs870_device::port1_r), FUNC(tlcs870_device::port1_w));
+	map(0x0002, 0x0002).rw(FUNC(tlcs870_device::port2_r), FUNC(tlcs870_device::port2_w));
+	map(0x0003, 0x0003).rw(FUNC(tlcs870_device::port3_r), FUNC(tlcs870_device::port3_w));
+	map(0x0004, 0x0004).rw(FUNC(tlcs870_device::port4_r), FUNC(tlcs870_device::port4_w));
+	map(0x0005, 0x0005).rw(FUNC(tlcs870_device::port5_r), FUNC(tlcs870_device::port5_w));
+	map(0x0006, 0x0006).rw(FUNC(tlcs870_device::port6_r), FUNC(tlcs870_device::port6_w));
+	map(0x0007, 0x0007).rw(FUNC(tlcs870_device::port7_r), FUNC(tlcs870_device::port7_w));
 	// 0x8 reserved
 	// 0x9 reserved
-	AM_RANGE(0x000a, 0x000a) AM_WRITE(p0cr_w) // Port 0 I/O control
-	AM_RANGE(0x000b, 0x000b) AM_WRITE(p1cr_w) // Port 1 I/O control
-	AM_RANGE(0x000c, 0x000c) AM_WRITE(p6cr_w) // Port 6 I/O control
-	AM_RANGE(0x000d, 0x000d) AM_WRITE(p7cr_w) // Port 7 I/O control
-	AM_RANGE(0x000e, 0x000e) AM_READWRITE(adccr_r,adccr_w) // A/D converter control
-	AM_RANGE(0x000f, 0x000f) AM_READ(adcdr_r) // A/D converter result
+	map(0x000a, 0x000a).w(FUNC(tlcs870_device::p0cr_w)); // Port 0 I/O control
+	map(0x000b, 0x000b).w(FUNC(tlcs870_device::p1cr_w)); // Port 1 I/O control
+	map(0x000c, 0x000c).w(FUNC(tlcs870_device::p6cr_w)); // Port 6 I/O control
+	map(0x000d, 0x000d).w(FUNC(tlcs870_device::p7cr_w)); // Port 7 I/O control
 
-	AM_RANGE(0x0010, 0x0010) AM_WRITE(treg1a_l_w) // Timer register 1A
-	AM_RANGE(0x0011, 0x0011) AM_WRITE(treg1a_h_w) //
-	AM_RANGE(0x0012, 0x0012) AM_READWRITE(treg1b_l_r, treg1b_l_w) // Timer register 1B
-	AM_RANGE(0x0013, 0x0013) AM_READWRITE(treg1b_h_r, treg1b_h_w) //
-	AM_RANGE(0x0014, 0x0014) AM_WRITE(tc1cr_w) // TC1 control
-	AM_RANGE(0x0015, 0x0015) AM_WRITE(tc2cr_w) // TC2 control
-	AM_RANGE(0x0016, 0x0016) AM_WRITE(treg2_l_w) // Timer register 2
-	AM_RANGE(0x0017, 0x0017) AM_WRITE(treg2_h_w) //
-	AM_RANGE(0x0018, 0x0018) AM_READWRITE(treg3a_r, treg3a_w) // Timer register 3A
-	AM_RANGE(0x0019, 0x0019) AM_READ(treg3b_r) // Timer register 3B
-	AM_RANGE(0x001a, 0x001a) AM_WRITE(tc3cr_w) // TC3 control
-	AM_RANGE(0x001b, 0x001b) AM_READ(treg4_r) // Timer register 4
-	AM_RANGE(0x001c, 0x001c) AM_WRITE(tc4cr_w) // TC4 control
+	map(0x000e, 0x000e).rw(FUNC(tlcs870_device::adccr_r), FUNC(tlcs870_device::adccr_w)); // A/D converter control
+	map(0x000f, 0x000f).r(FUNC(tlcs870_device::adcdr_r)); // A/D converter result
+
+	map(0x0010, 0x0010).w(FUNC(tlcs870_device::treg1a_l_w)); // Timer register 1A
+	map(0x0011, 0x0011).w(FUNC(tlcs870_device::treg1a_h_w)); //
+	map(0x0012, 0x0012).rw(FUNC(tlcs870_device::treg1b_l_r), FUNC(tlcs870_device::treg1b_l_w)); // Timer register 1B
+	map(0x0013, 0x0013).rw(FUNC(tlcs870_device::treg1b_h_r), FUNC(tlcs870_device::treg1b_h_w)); //
+	map(0x0014, 0x0014).w(FUNC(tlcs870_device::tc1cr_w)); // TC1 control
+	map(0x0015, 0x0015).w(FUNC(tlcs870_device::tc2cr_w)); // TC2 control
+	map(0x0016, 0x0016).w(FUNC(tlcs870_device::treg2_l_w)); // Timer register 2
+	map(0x0017, 0x0017).w(FUNC(tlcs870_device::treg2_h_w)); //
+	map(0x0018, 0x0018).rw(FUNC(tlcs870_device::treg3a_r), FUNC(tlcs870_device::treg3a_w)); // Timer register 3A
+	map(0x0019, 0x0019).r(FUNC(tlcs870_device::treg3b_r)); // Timer register 3B
+	map(0x001a, 0x001a).w(FUNC(tlcs870_device::tc3cr_w)); // TC3 control
+	map(0x001b, 0x001b).w(FUNC(tlcs870_device::treg4_w)); // Timer register 4
+	map(0x001c, 0x001c).w(FUNC(tlcs870_device::tc4cr_w)); // TC4 control
 	// 0x1d reserved
 	// 0x1e reserved
 	// 0x1f reserved
-
-	AM_RANGE(0x0020, 0x0020) AM_READWRITE(sio1sr_r, sio1cr1_w) // SIO1 status / SIO1 control
-	AM_RANGE(0x0021, 0x0021) AM_WRITE(sio1cr2_w) // SIO1 control
-	AM_RANGE(0x0022, 0x0022) AM_READWRITE(sio2sr_r, sio2cr1_w) // SIO2 status / SIO2 control
-	AM_RANGE(0x0023, 0x0023) AM_WRITE(sio2cr2_w) // SIO2 control
+	map(0x0020, 0x0020).rw(FUNC(tlcs870_device::sio1sr_r), FUNC(tlcs870_device::sio1cr1_w)); // SIO1 status / SIO1 control
+	map(0x0021, 0x0021).w(FUNC(tlcs870_device::sio1cr2_w)); // SIO1 control
+	map(0x0022, 0x0022).rw(FUNC(tlcs870_device::sio2sr_r), FUNC(tlcs870_device::sio2cr1_w)); // SIO2 status / SIO2 control
+	map(0x0023, 0x0023).w(FUNC(tlcs870_device::sio2cr2_w)); // SIO2 control
 	// 0x24 reserved
 	// 0x25 reserved
 	// 0x26 reserved
@@ -132,35 +79,42 @@ ADDRESS_MAP_START(tlcs870_device::tmp87ph40an_mem)
 	// 0x31 reserved
 	// 0x32 reserved
 	// 0x33 reserved
-	AM_RANGE(0x0034, 0x0034) AM_WRITE(wdtcr1_w) // WDT control
-	AM_RANGE(0x0035, 0x0035) AM_WRITE(wdtcr2_w) //
+	map(0x0034, 0x0034).w(FUNC(tlcs870_device::wdtcr1_w)); // WDT control
+	map(0x0035, 0x0035).w(FUNC(tlcs870_device::wdtcr2_w)); //
 
-	AM_RANGE(0x0036, 0x0036) AM_READWRITE(tbtcr_r, tbtcr_w) // TBT / TG / DVO control
-	AM_RANGE(0x0037, 0x0037) AM_READWRITE(eintcr_r, eintcr_w) // External interrupt control
+	map(0x0036, 0x0036).rw(FUNC(tlcs870_device::tbtcr_r), FUNC(tlcs870_device::tbtcr_w)); // TBT / TG / DVO control
 
-	AM_RANGE(0x0038, 0x0038) AM_READWRITE(syscr1_r, syscr1_w) // System Control
-	AM_RANGE(0x0039, 0x0039) AM_READWRITE(syscr2_r, syscr2_w) //
+	map(0x0037, 0x0037).rw(FUNC(tlcs870_device::eintcr_r), FUNC(tlcs870_device::eintcr_w)); // External interrupt control
 
-	AM_RANGE(0x003a, 0x003a) AM_READWRITE(eir_l_r, eir_l_w) // Interrupt enable register
-	AM_RANGE(0x003b, 0x003b) AM_READWRITE(eir_h_r, eir_h_w) //
+	map(0x0038, 0x0038).rw(FUNC(tlcs870_device::syscr1_r), FUNC(tlcs870_device::syscr1_w)); // System Control
+	map(0x0039, 0x0039).rw(FUNC(tlcs870_device::syscr2_r), FUNC(tlcs870_device::syscr2_w)); //
 
-	AM_RANGE(0x003c, 0x003c) AM_READWRITE(il_l_r, il_l_w) // Interrupt latch
-	AM_RANGE(0x003d, 0x003d) AM_READWRITE(il_h_r, il_h_w) //
+	map(0x003a, 0x003a).rw(FUNC(tlcs870_device::eir_l_r), FUNC(tlcs870_device::eir_l_w)); // Interrupt enable register
+	map(0x003b, 0x003b).rw(FUNC(tlcs870_device::eir_h_r), FUNC(tlcs870_device::eir_h_w)); //
+
+	map(0x003c, 0x003c).rw(FUNC(tlcs870_device::il_l_r), FUNC(tlcs870_device::il_l_w)); // Interrupt latch
+	map(0x003d, 0x003d).rw(FUNC(tlcs870_device::il_h_r), FUNC(tlcs870_device::il_h_w)); //
+
 	// 0x3e reserved
-	AM_RANGE(0x003f, 0x003f) AM_READWRITE(psw_r, rbs_w) // Program status word / Register bank selector
-#endif
+	map(0x003f, 0x003f).rw(FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
 
-	AM_RANGE(0x0040, 0x023f) AM_RAM AM_SHARE("intram") // register banks + internal RAM, not, code execution NOT allowed here
-	AM_RANGE(0x0f80, 0x0fff) AM_RAM // DBR
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0040, 0x023f).ram().share("intram"); // register banks + internal RAM, not, code execution NOT allowed here (fetches FF and causes SWI)
+	map(0x0f80, 0x0fef).ram();              // DBR (0f80 - 0fef = reserved)
+	map(0x0ff0, 0x0fff).ram().share("dbr"); // DBR 0ff0-0ff7 = SIO1 buffer, 0ff8 - 0fff = SIO2 buffer)
+	map(0xc000, 0xffff).rom();
+}
 
 
-tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
-	: cpu_device(mconfig, type, tag, owner, clock)
+tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type optype, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+	: cpu_device(mconfig, optype, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
+	, m_dbr(*this, "dbr")
+	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_analog_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_serial_out_cb{{*this}, {*this}}
 {
 }
 
@@ -172,2086 +126,10 @@ tmp87ph40an_device::tmp87ph40an_device(const machine_config &mconfig, const char
 
 device_memory_interface::space_config_vector tlcs870_device::memory_space_config() const
 {
-	return space_config_vector {
+	return space_config_vector{
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_IO,      &m_io_config)
 	};
-}
-
-uint8_t  tlcs870_device::RM8 (uint32_t a)    { return m_program->read_byte( a ); }
-uint16_t tlcs870_device::RM16(uint32_t a)    { return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
-
-void tlcs870_device::WM8 (uint32_t a, uint8_t  v)    { m_program->write_byte( a, v ); }
-void tlcs870_device::WM16(uint32_t a, uint16_t v)    { WM8(a,v);    WM8( (a+1) & 0xffff, v >> 8); }
-
-uint8_t  tlcs870_device::RX8 (uint32_t a, uint32_t base)   { return m_program->read_byte( base | a ); }
-uint16_t tlcs870_device::RX16(uint32_t a, uint32_t base)   { return RX8(a,base) | (RX8( (a+1) & 0xffff, base ) << 8); }
-
-void tlcs870_device::WX8 (uint32_t a, uint8_t  v, uint32_t base)   { m_program->write_byte( base | a, v ); }
-void tlcs870_device::WX16(uint32_t a, uint16_t v, uint32_t base)   { WX8(a,v,base);   WX8( (a+1) & 0xffff, v >> 8, base); }
-
-uint8_t  tlcs870_device::READ8() { uint8_t b0 = RM8( m_addr++ ); m_addr &= 0xffff; return b0; }
-uint16_t tlcs870_device::READ16()    { uint8_t b0 = READ8(); return b0 | (READ8() << 8); }
-
-void tlcs870_device::decode()
-{
-	m_op = 0;
-	m_param1_type = 0;
-	m_param1 = 0;
-	m_param2_type = 0;
-	m_param2 = 0;
-	m_bitpos = 0;
-	m_cycles = 1;
-	m_flagsaffected = 0; // needed to signal which flags to change and which to leave alone in some cases (LD operations at least)
-
-	uint8_t b0;
-	uint8_t b1;
-
-	int tmppc = m_addr;
-
-	b0 = READ8();
-
-
-	switch (b0)
-	{
-	case 0x00:
-		m_op = NOP;
-		// NOP;
-		break;
-
-	case 0x01:
-		// SWAP A
-		m_op = SWAP;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x02:
-		// MUL W,A
-		m_op = MUL;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 1; // W
-
-		m_param2_type = REG_8BIT;
-		m_param2 = 0; // A
-		break;
-
-	case 0x03:
-		// DIV WA,C
-		m_op = DIV;
-
-		m_param1_type = REG_16BIT;
-		m_param1 = 0; // WA
-
-		m_param2_type = REG_8BIT;
-		m_param2 = 2; // C
-		break;
-
-	case 0x04:
-		// RETI
-		m_op = RETI;
-		break;
-
-	case 0x05:
-		// RET
-		m_op = RET;
-		break;
-
-	case 0x06:
-		// POP PSW
-		m_op = POP;
-		m_param1_type = PROGRAMSTATUSWORD;
-		break;
-
-	case 0x07:
-		// PUSH PSW:
-		m_op = PUSH;
-		m_param1_type = PROGRAMSTATUSWORD;
-		break;
-
-	case 0x08:
-	case 0x09:
-		// unused?
-		break;
-
-	case 0x0a:
-		// DAA A
-		m_op = DAA;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x0b:
-		// DAS A
-		m_op = DAS;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x0c:
-		// CLR CF
-		m_op = CLR;
-
-		m_param1_type = CARRYFLAG; // 16-bit register
-		//m_param1 = 0;
-		break;
-
-	case 0x0d:
-		// SET CF
-		m_op = SET;
-
-		m_param1_type = CARRYFLAG; // 16-bit register
-		//m_param1 = 0;
-		break;
-
-	case 0x0e:
-		// CPL CF
-		m_op = CPL;
-
-		m_param1_type = CARRYFLAG; // 16-bit register
-		//m_param1 = 0;
-		break;
-
-	case 0x0f:
-		// LD RBS,n
-		m_op = LD;      // Flags / Cycles  1--- / 2
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = REGISTERBANK; // 4-bit register
-		//m_param1 = 0;
-
-		m_param2_type = ABSOLUTE_VAL_8;
-		m_param2 = READ8();
-
-		break;
-
-	case 0x10:
-	case 0x11:
-	case 0x12:
-	case 0x13:
-		// INC rr
-		m_op = INC;
-
-		m_param1_type = REG_16BIT; // 16-bit register
-		m_param1 = b0&3;
-
-		break;
-
-	case 0x14:
-	case 0x15:
-	case 0x16:
-	case 0x17:
-		// LD rr,mn
-		m_op = LD;   // Flags / Cycles  1--- / 3
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = REG_16BIT; // 16-bit register
-		m_param1 = b0&3;
-
-		m_param2_type = ABSOLUTE_VAL_16; // absolute value
-		m_param2 = READ16(); // 16-bit
-
-		break;
-
-	case 0x18:
-	case 0x19:
-	case 0x1a:
-	case 0x1b:
-		// DEC rr
-		m_op = DEC;
-
-		m_param1_type = REG_16BIT; // 16-bit register
-		m_param1 = b0&3;
-
-		break;
-
-	case 0x1c:
-		// SHLC A
-		m_op = SHLC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x1d:
-		// SHRC A
-		m_op = SHRC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x1e:
-		// ROLC A
-		m_op = ROLC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x1f:
-		// RORC A
-		m_op = RORC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x20:
-		// INC (x)
-		m_op = INC;
-		m_param1_type = ADDR_IN_IMM_X;
-		m_param1 = READ8();
-		break;
-
-	case 0x21:
-		// INC (HL)
-		m_op = INC;
-		m_param1_type = ADDR_IN_HL;
-		//m_param1 = 0;
-		break;
-
-	case 0x22:
-		// LD A,(x)
-		m_op = LD;   // Flags / Cycles  1Z-- / 3
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-
-		m_param2_type = ADDR_IN_IMM_X;
-		m_param2 = READ8();
-		break;
-
-	case 0x23:
-		// LD A,(HL)
-		m_op = LD;  // Flags / Cycles  1Z-- / 2
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-
-		m_param2_type = ADDR_IN_HL;
-		//m_param2 = 0;
-		break;
-
-	case 0x24:
-		// LDW (x),mn
-		m_op = LDW;
-		m_param1_type = ADDR_IN_IMM_X; // 8-bit memory address
-		m_param1 = READ8();
-
-		m_param2_type = ABSOLUTE_VAL_16; // absolute value
-		m_param2 = READ16();
-		break;
-
-	case 0x25:
-		// LDW (HL),mn
-		m_op = LDW;
-		m_param1_type = ADDR_IN_HL;
-		//m_param1 = 0;
-
-		m_param2_type = ABSOLUTE_VAL_16;
-		m_param2 = READ16();
-		break;
-
-
-	case 0x26:
-		// LD (x),(y)  // Flags / Cycles  1Z-- / 5
-		m_op = LD;
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param2_type = ADDR_IN_IMM_X;
-		m_param2 = READ8();
-
-		m_param1_type = ADDR_IN_IMM_X;
-		m_param1 = READ8();
-		break;
-
-	case 0x27:
-		// unused
-		break;
-
-	case 0x28:
-		// DEC (x)
-		m_op = DEC;
-		m_param1_type = ADDR_IN_IMM_X;
-		m_param1 = READ8();
-		break;
-
-	case 0x29:
-		// DEC (HL)
-		m_op = DEC;
-		m_param1_type = ADDR_IN_HL;
-		//m_param1 = 0;
-		break;
-
-	case 0x2a:
-		// LD (x),A  // Flags / Cycles  1Z-- / 3
-		m_op = LD;
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param1_type = ADDR_IN_IMM_X;
-		m_param1 = READ8();
-
-		m_param2_type = REG_8BIT;
-		m_param2 = 0; // A
-
-		break;
-
-	case 0x2b:
-		// LD (HL),A  // Flags / Cycles  1--- / 2
-		m_op = LD;
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = ADDR_IN_HL;
-		//m_param1 = 0;
-
-		m_param2_type = REG_8BIT;
-		m_param2 = 0; // A
-		break;
-
-	case 0x2c:
-		// LD (x),n
-		m_op = LD;   // Flags / Cycles  1--- / 4
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = ADDR_IN_IMM_X; // 8-bit memory address
-		m_param1 = READ8();
-
-		m_param2_type = ABSOLUTE_VAL_8; // absolute value
-		m_param2 = READ8();
-
-		break;
-
-	case 0x2d:
-		// LD (HL),n
-		m_op = LD;  // Flags / Cycles  1--- / 3
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = ADDR_IN_HL; // memory address in 16-bit register
-		//m_param1 = 3; // (HL)
-
-		m_param2_type = ABSOLUTE_VAL_8; // absolute value
-		m_param2 = READ8();
-
-		break;
-
-	case 0x2e:
-		// CLR (x)
-		m_op = CLR;
-		m_param1_type = ADDR_IN_IMM_X; // 8-bit memory address
-		m_param1 = READ8();
-
-		break;
-
-	case 0x2f:
-		// CLR (HL)
-		m_op = CLR;
-		m_param1_type = ADDR_IN_HL; // memory address in 16-bit register
-		//m_param1 = 3; // (HL)
-
-		break;
-
-	case 0x30:
-	case 0x31:
-	case 0x32:
-	case 0x33:
-	case 0x34:
-	case 0x35:
-	case 0x36:
-	case 0x37:
-		// LD r,n
-
-		m_op = LD;  // Flags / Cycles  1--- / 2
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = REG_8BIT; // 8-bit register register
-		m_param1 = b0&7;
-
-		m_param2_type = ABSOLUTE_VAL_8; // absolute value
-		m_param2 = READ8();
-
-
-		break;
-
-	case 0x38:
-	case 0x39:
-	case 0x3a:
-	case 0x3b:
-	case 0x3c:
-	case 0x3d:
-	case 0x3e:
-	case 0x3f:
-		break;
-
-	case 0x40:
-	case 0x41:
-	case 0x42:
-	case 0x43:
-	case 0x44:
-	case 0x45:
-	case 0x46:
-	case 0x47:
-		// SET (x).b
-		b1 = READ8();
-#if 0
-		// this is just an alias
-		if ((b0 == 0x40) && (b1 == 0x3a))
-		{
-			// EI 'Assembler expansion machine instruction'
-			break;
-		}
-#endif
-		m_op = SET;
-
-		m_param1_type = ADDR_IN_IMM_X | BITPOS;
-		m_param1 = b1;
-		m_bitpos = b0 & 7;
-
-		break;
-
-	case 0x48:
-	case 0x49:
-	case 0x4a:
-	case 0x4b:
-	case 0x4c:
-	case 0x4d:
-	case 0x4e:
-	case 0x4f:
-		// CLR (x).b
-		b1 = READ8();
-#if 0
-		// this is just an alias
-		if ((b0 == 0x48) && (b1 == 0x3a))
-		{
-			// DI 'Assembler expansion machine instruction'
-			break;
-		}
-#endif
-		m_op = CLR;
-
-		m_param1_type = ADDR_IN_IMM_X | BITPOS;
-		m_param1 = b1;
-		m_bitpos = b0 & 7;
-
-		break;
-
-	case 0x50:
-	case 0x51:
-	case 0x52:
-	case 0x53:
-	case 0x54:
-	case 0x55:
-	case 0x56:
-	case 0x57:
-		// LD A,r  0101 0rrr
-		m_op = LD;   // Flags / Cycles  1Z-- / 1
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-
-		m_param2_type = REG_8BIT;
-		m_param2 = b0 & 0x7;
-
-		break;
-
-	case 0x58:
-	case 0x59:
-	case 0x5a:
-	case 0x5b:
-	case 0x5c:
-	case 0x5d:
-	case 0x5e:
-	case 0x5f:
-		// LD r,A  0101 1rrr
-		m_op = LD;  // Flags / Cycles  1Z-- / 1
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param2_type = REG_8BIT;
-		m_param2 = 0; // A
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-		break;
-
-	case 0x60:
-	case 0x61:
-	case 0x62:
-	case 0x63:
-	case 0x64:
-	case 0x65:
-	case 0x66:
-	case 0x67:
-		// INC r
-		m_op = INC;
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-		break;
-
-	case 0x68:
-	case 0x69:
-	case 0x6a:
-	case 0x6b:
-	case 0x6c:
-	case 0x6d:
-	case 0x6e:
-	case 0x6f:
-		// DEC r
-		m_op = DEC;
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-		break;
-
-	case 0x70:
-	case 0x71:
-	case 0x72:
-	case 0x73:
-	case 0x74:
-	case 0x75:
-	case 0x76:
-	case 0x77:
-		// (ALU OP) A,n
-		m_op = (b0 & 0x7)+ALU_ADDC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-
-		m_param2_type = ABSOLUTE_VAL_8;
-		m_param2 = READ8();
-
-		break;
-
-	case 0x78:
-	case 0x79:
-	case 0x7a:
-	case 0x7b:
-	case 0x7c:
-	case 0x7d:
-	case 0x7e:
-	case 0x7f:
-		// (ALU OP) A,(x)
-		m_op = (b0 & 0x7)+ALU_ADDC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-
-		m_param2_type = ADDR_IN_IMM_X;
-		m_param2 = READ8();
-
-		break;
-
-	case 0x80:
-	case 0x81:
-	case 0x82:
-	case 0x83:
-	case 0x84:
-	case 0x85:
-	case 0x86:
-	case 0x87:
-	case 0x88:
-	case 0x89:
-	case 0x8a:
-	case 0x8b:
-	case 0x8c:
-	case 0x8d:
-	case 0x8e:
-	case 0x8f:
-	case 0x90:
-	case 0x91:
-	case 0x92:
-	case 0x93:
-	case 0x94:
-	case 0x95:
-	case 0x96:
-	case 0x97:
-	case 0x98:
-	case 0x99:
-	case 0x9a:
-	case 0x9b:
-	case 0x9c:
-	case 0x9d:
-	case 0x9e:
-	case 0x9f:
-	{
-		// JRS T,a
-		m_op = JRS;
-
-		m_param1_type = CONDITIONAL;
-		m_param1 = 6;
-
-		m_param2_type = ABSOLUTE_VAL_16;
-
-		int val = b0 & 0x1f;
-		if (val & 0x10) val -= 0x20;
-
-		m_param2 = tmppc + 2 + val;
-
-		break;
-	}
-	case 0xa0:
-	case 0xa1:
-	case 0xa2:
-	case 0xa3:
-	case 0xa4:
-	case 0xa5:
-	case 0xa6:
-	case 0xa7:
-	case 0xa8:
-	case 0xa9:
-	case 0xaa:
-	case 0xab:
-	case 0xac:
-	case 0xad:
-	case 0xae:
-	case 0xaf:
-	case 0xb0:
-	case 0xb1:
-	case 0xb2:
-	case 0xb3:
-	case 0xb4:
-	case 0xb5:
-	case 0xb6:
-	case 0xb7:
-	case 0xb8:
-	case 0xb9:
-	case 0xba:
-	case 0xbb:
-	case 0xbc:
-	case 0xbd:
-	case 0xbe:
-	case 0xbf:
-	{
-		// JRS F,a
-		m_op = JRS;
-
-		m_param1_type = CONDITIONAL;
-		m_param1 = 7;
-
-		m_param2_type = ABSOLUTE_VAL_16;
-
-		int val = b0 & 0x1f;
-		if (val & 0x10) val -= 0x20;
-
-		m_param2 = tmppc + 2 + val;
-
-		break;
-	}
-
-	case 0xc0:
-	case 0xc1:
-	case 0xc2:
-	case 0xc3:
-	case 0xc4:
-	case 0xc5:
-	case 0xc6:
-	case 0xc7:
-	case 0xc8:
-	case 0xc9:
-	case 0xca:
-	case 0xcb:
-	case 0xcc:
-	case 0xcd:
-	case 0xce:
-	case 0xcf:
-		// CALLV n
-		m_op = CALLV;
-
-		m_param1_type = MEMVECTOR_16BIT;
-
-		m_param1 = 0xffc0 + ((b0 & 0xf) * 2);
-
-		break;
-
-	case 0xd0:
-	case 0xd1:
-	case 0xd2:
-	case 0xd3:
-	case 0xd4:
-	case 0xd5:
-	case 0xd6:
-	case 0xd7:
-	{
-		// JR cc,a
-
-		m_op = JR;
-
-		m_param1_type = CONDITIONAL;
-		m_param1 = b0 & 0x7;
-
-		m_param2_type = ABSOLUTE_VAL_16;
-
-		int val = READ8();
-		if (val & 0x80) val -= 0x100;
-
-		m_param2 = tmppc+ 2 + val;
-
-		break;
-	}
-	case 0xd8:
-	case 0xd9:
-	case 0xda:
-	case 0xdb:
-	case 0xdc:
-	case 0xdd:
-	case 0xde:
-	case 0xdf:
-		// LD CF, (x).b  aka TEST (x).b
-		m_op = LD;  // Flags / Cycles  %-*- / 4
-		m_flagsaffected |= FLAG_J | FLAG_C;
-
-		m_param1_type = CARRYFLAG;
-		//m_param1 = 0;
-
-		m_param2_type = ADDR_IN_IMM_X | BITPOS;
-		m_param2 = READ8();
-		m_bitpos = b0 & 0x7;
-		break;
-
-	case 0xe0:
-		// src prefix
-		decode_source(ADDR_IN_BASE+(b0&0x7), READ8());
-		break;
-
-	case 0xe1:
-	case 0xe2:
-	case 0xe3:
-		decode_source(ADDR_IN_BASE+(b0&0x7), 0);
-		break;
-
-	case 0xe4:
-		decode_source(ADDR_IN_BASE+(b0&0x7), READ8());
-		break;
-
-	case 0xe5:
-	case 0xe6:
-	case 0xe7:
-		decode_source(ADDR_IN_BASE+(b0&0x7), 0);
-		break;
-
-	case 0xe8:
-	case 0xe9:
-	case 0xea:
-	case 0xeb:
-	case 0xec:
-	case 0xed:
-	case 0xee:
-	case 0xef:
-		// register prefix: g/gg
-		decode_register_prefix(b0);
-		break;
-
-	case 0xf0: // 1111 0000 xxxx xxxx 0101 0rrr
-		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7);
-		m_param1 = READ8();
-		decode_dest(b0);
-		break;
-
-	case 0xf2: // 1111 001p 0101 0rrr
-	case 0xf3: // 1111 001p 0101 0rrr
-		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7);
-		decode_dest(b0);
-		break;
-
-
-	case 0xf4: // 1111 0100 dddd dddd 0101 0rrr
-		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7);
-		m_param1 = READ8();
-		decode_dest(b0);
-		break;
-
-	case 0xf6: // 1110 0110 0101 0rrr
-	case 0xf7: // 1111 0111 0101 0rrr
-		// destination memory prefix (dst)
-		m_param1_type = ADDR_IN_BASE+(b0&0x7);
-		decode_dest(b0);
-		break;
-
-	case 0xf1:
-	case 0xf5:
-		// invalid dst memory prefix
-		break;
-
-
-	case 0xf8:
-	case 0xf9:
-		// unused
-		break;
-
-	case 0xfa:
-		// LD SP,mn
-		m_op = LD;  // Flags / Cycles  1--- / 3
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = STACKPOINTER;
-		//m_param1 = 0;
-
-		m_param2_type = ABSOLUTE_VAL_16;
-		m_param2 = READ16();
-
-		break;
-
-	case 0xfb:
-	{
-		// JR a
-		m_op = JR;
-
-		m_param2_type = ABSOLUTE_VAL_16;
-
-		int val = READ8();
-		if (val & 0x80) val -= 0x100;
-
-		m_param2 = tmppc + 2 + val;
-
-		break;
-	}
-
-	break;
-
-	case 0xfc:
-		// CALL mn
-		m_op = CALL;
-
-		m_param1_type = ABSOLUTE_VAL_16;
-		m_param1 = READ16();
-		break;
-
-	case 0xfd:
-		// CALLP n
-		m_op = CALLP;
-
-		m_param1_type = ABSOLUTE_VAL_16;
-		m_param1 = READ8()+0xff00;
-
-		break;
-
-	case 0xfe:
-		// JP mn
-		m_op = JP;
-
-		m_param2_type = ABSOLUTE_VAL_16;
-		m_param2 = READ16();
-
-		break;
-
-	case 0xff:
-		// SWI
-		m_op = SWI;
-
-		break;
-	}
-}
-
-// e8 - ef use this table
-void tlcs870_device::decode_register_prefix(uint8_t b0)
-{
-	uint8_t bx;
-
-	bx = READ8();
-
-	switch (bx)
-	{
-	case 0x00:
-		// nothing
-		break;
-
-	case 0x01:
-		// SWAP g
-		m_op = SWAP;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-		break;
-
-	case 0x02:
-		// MUL ggG, ggL
-		m_op = MUL;
-
-		m_param1_type = REG_16BIT; // odd syntax
-		m_param1 = b0 & 0x3;
-		break;
-
-	case 0x03:
-		// DIV gg,C
-		m_op = DIV;
-		m_param1_type = REG_16BIT;
-		m_param1 = b0 & 3;
-
-		m_param2_type = REG_8BIT;
-		m_param2 = 2; // C
-
-		break;
-
-	case 0x04:
-		// with E8 only
-		// RETN
-		if (b0 == 0xe8)
-		{
-			m_op = RETN;
-		}
-
-		break;
-
-	case 0x05:
-		break;
-
-	case 0x06:
-		// POP gg
-		m_op = POP;
-		m_param1_type = REG_16BIT;
-		m_param1 = b0 & 3;
-		// b0 & 4 = invalid?
-
-		break;
-
-	case 0x07:
-		// PUSH gg
-		m_op = PUSH;
-		m_param1_type = REG_16BIT;
-		m_param1 = b0 & 3;
-		// b0 & 4 = invalid?
-
-		break;
-
-	case 0x08:
-	case 0x09:
-		break;
-
-	case 0x0a:
-		// DAA g
-		m_op = DAA;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		break;
-
-	case 0x0b:
-		// DAS g
-		m_op = DAS;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		break;
-
-	case 0x0c:
-	case 0x0d:
-	case 0x0e:
-	case 0x0f:
-		break;
-
-	case 0x10:
-	case 0x11:
-	case 0x12:
-	case 0x13:
-		// XCH rr,gg
-		m_op = XCH;
-
-		m_param1_type = REG_16BIT;
-		m_param1 = bx & 0x3;
-
-		m_param2_type = REG_16BIT;
-		m_param2 = b0 & 0x3;
-		break;
-
-	case 0x14:
-	case 0x15:
-	case 0x16:
-	case 0x17:
-		// LD rr,gg
-		m_op = LD;  // Flags / Cycles  1--- / 2
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = REG_16BIT;
-		m_param1 = bx & 0x3;
-
-		m_param2_type = REG_16BIT;
-		m_param2 = b0 & 0x3;
-
-		break;
-
-	case 0x18:
-	case 0x19:
-	case 0x1a:
-	case 0x1b:
-		break;
-
-	case 0x1c:
-		// SHLC g
-		m_op = SHLC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		break;
-
-	case 0x1d:
-		// SHRC g
-		m_op = SHRC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		break;
-
-	case 0x1e:
-		// ROLC g
-		m_op = ROLC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		break;
-
-	case 0x1f:
-		// RORC g
-		m_op = RORC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		break;
-
-	case 0x20:
-	case 0x21:
-	case 0x22:
-	case 0x23:
-	case 0x24:
-	case 0x25:
-	case 0x26:
-	case 0x27:
-	case 0x28:
-	case 0x29:
-	case 0x2a:
-	case 0x2b:
-	case 0x2c:
-	case 0x2d:
-	case 0x2e:
-	case 0x2f:
-		break;
-
-	case 0x30:
-	case 0x31:
-	case 0x32:
-	case 0x33:
-	case 0x34:
-	case 0x35:
-	case 0x36:
-	case 0x37:
-		// (ALU OP) WA,gg
-		m_op = (bx & 0x7)+ALU_ADDC;
-
-		m_param1_type = REG_16BIT;
-		m_param1 = 0;
-
-		m_param2_type = REG_16BIT;
-		m_param2 = b0 & 3;
-		// b0 & 4 would be invalid?
-
-
-		break;
-
-	case 0x38:
-	case 0x39:
-	case 0x3a:
-	case 0x3b:
-	case 0x3c:
-	case 0x3d:
-	case 0x3e:
-	case 0x3f:
-		// (ALU OP) gg,mn
-		m_op = (bx & 0x7)+ALU_ADDC;
-
-		m_param1_type = REG_16BIT;
-		m_param1 = b0 & 0x3;
-
-		m_param2_type = ABSOLUTE_VAL_16; // absolute value
-		m_param2 = READ16(); // 16-bit
-
-		break;
-
-	case 0x40:
-	case 0x41:
-	case 0x42:
-	case 0x43:
-	case 0x44:
-	case 0x45:
-	case 0x46:
-	case 0x47:
-		// SET g.b
-		m_op = SET;
-
-		m_param1_type = REG_8BIT | BITPOS;
-		m_param1 = b0 & 0x7;
-		m_bitpos = bx & 0x7;
-
-
-		break;
-
-	case 0x48:
-	case 0x49:
-	case 0x4a:
-	case 0x4b:
-	case 0x4c:
-	case 0x4d:
-	case 0x4e:
-	case 0x4f:
-		// CLR g.b
-		m_op = CLR;
-
-		m_param1_type = REG_8BIT | BITPOS;
-		m_param1 = b0 & 0x7;
-		m_bitpos = bx & 0x7;
-
-		break;
-
-	case 0x50:
-	case 0x51:
-	case 0x52:
-	case 0x53:
-	case 0x54:
-	case 0x55:
-	case 0x56:
-	case 0x57:
-		break;
-
-	case 0x58:
-	case 0x59:
-	case 0x5a:
-	case 0x5b:
-	case 0x5c:
-	case 0x5d:
-	case 0x5e:
-	case 0x5f:
-		// LD r,g
-		m_op = LD;   // Flags / Cycles  1Z-- / 2
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = bx & 0x7;
-
-		m_param2_type = REG_8BIT;
-		m_param2 = b0 & 0x7;
-		break;
-
-	case 0x60:
-	case 0x61:
-	case 0x62:
-	case 0x63:
-	case 0x64:
-	case 0x65:
-	case 0x66:
-	case 0x67:
-		// (ALU OP) A,g
-		m_op = (bx & 0x7)+ALU_ADDC;
-
-		m_param2_type = REG_8BIT;
-		m_param2 = b0 & 0x7;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x68:
-	case 0x69:
-	case 0x6a:
-	case 0x6b:
-	case 0x6c:
-	case 0x6d:
-	case 0x6e:
-	case 0x6f:
-		// (ALU OP) g,A
-		m_op = (bx & 0x7)+ALU_ADDC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		m_param2_type = REG_8BIT;
-		m_param2 = 0; // A
-		break;
-
-	case 0x70:
-	case 0x71:
-	case 0x72:
-	case 0x73:
-	case 0x74:
-	case 0x75:
-	case 0x76:
-	case 0x77:
-		// (ALU OP) g,n
-		m_op = (bx & 0x7)+ALU_ADDC;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = b0 & 0x7;
-
-		m_param2_type = ABSOLUTE_VAL_8;
-		m_param2 = READ8();
-
-
-		break;
-
-	case 0x78:
-	case 0x79:
-	case 0x7a:
-	case 0x7b:
-	case 0x7c:
-	case 0x7d:
-	case 0x7e:
-	case 0x7f:
-		break;
-
-
-	case 0x80:
-	case 0x81:
-		break;
-
-	case 0x82:
-	case 0x83:
-		// SET (pp).g
-		m_op = SET;
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
-		//m_param1 = 0;
-		m_bitpos = b0 & 7;
-		break;
-
-	case 0x84:
-	case 0x85:
-	case 0x86:
-	case 0x87:
-		break;
-
-	case 0x88:
-	case 0x89:
-		break;
-
-	case 0x8a:
-	case 0x8b:
-		// CLR (pp).g
-		m_op = CLR;
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
-		//m_param1 = 0;
-		m_bitpos = b0 & 7;
-		break;
-
-	case 0x8c:
-	case 0x8d:
-	case 0x8e:
-	case 0x8f:
-		break;
-
-
-	case 0x90:
-	case 0x91:
-		break;
-
-	case 0x92:
-	case 0x93:
-		// CPL (pp).g
-		m_op = CPL;
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
-		//m_param1 = 0;
-		m_bitpos = b0 & 7;
-		break;
-
-	case 0x94:
-	case 0x95:
-	case 0x96:
-	case 0x97:
-		break;
-
-	case 0x9a:
-	case 0x9b:
-		// LD (pp).g,CF
-		m_op = LD;  // Flags / Cycles  1--- / 5
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
-		//m_para1 = 0;
-		m_bitpos = b0 & 7;
-
-		m_param2_type = CARRYFLAG;
-		//m_param2 = 0;
-		break;
-
-	case 0x9c:
-	case 0x9d:
-		break;
-
-	case 0x9e:
-	case 0x9f:
-		// LD CF,(pp).g   aka TEST (pp).g
-		m_op = LD;   // Flags / Cycles  %-*- / 4
-		m_flagsaffected |= FLAG_J | FLAG_C;
-
-		m_param1_type = CARRYFLAG;
-		//m_param1 = 0;
-
-		m_param2_type = (ADDR_IN_DE+(bx&1)) | BITPOS | BITPOS_INDIRECT;
-		//m_param2 = 0;
-		m_bitpos = b0 & 7;
-		break;
-
-	case 0xa0:
-	case 0xa1:
-	case 0xa2:
-	case 0xa3:
-	case 0xa4:
-	case 0xa5:
-	case 0xa6:
-	case 0xa7:
-		break;
-
-	case 0xb0:
-	case 0xb1:
-	case 0xb2:
-	case 0xb3:
-	case 0xb4:
-	case 0xb5:
-	case 0xb6:
-	case 0xb7:
-	case 0xb8:
-	case 0xb9:
-	case 0xba:
-	case 0xbb:
-	case 0xbc:
-	case 0xbd:
-	case 0xbe:
-	case 0xbf:
-		break;
-
-	case 0xc0:
-	case 0xc1:
-	case 0xc2:
-	case 0xc3:
-	case 0xc4:
-	case 0xc5:
-	case 0xc6:
-	case 0xc7:
-		// CPL g.b
-		m_op = CPL;
-
-		m_param1_type = REG_8BIT | BITPOS;
-		m_param1 = b0 & 0x7;
-		m_bitpos = bx & 0x7;
-		break;
-
-	case 0xc8:
-	case 0xc9:
-	case 0xca:
-	case 0xcb:
-	case 0xcc:
-	case 0xcd:
-	case 0xce:
-	case 0xcf:
-		// LD g.b,CF
-		m_op = LD;    // Flags / Cycles  1--- / 2
-		m_flagsaffected |= FLAG_J;
-
-		m_param2_type = CARRYFLAG;
-		//m_param2 = 0;
-
-		m_param1_type = REG_8BIT | BITPOS;
-		m_param1 = b0 & 0x7;
-		m_bitpos = bx & 0x7;
-
-		break;
-
-	case 0xd0:
-	case 0xd1:
-	case 0xd2:
-	case 0xd3:
-	case 0xd4:
-	case 0xd5:
-	case 0xd6:
-	case 0xd7:
-		// XOR CF,g.b
-		m_op = ALU_XOR;
-
-		m_param1_type = CARRYFLAG;
-		//m_param1 = 0;
-
-		m_param2_type = REG_8BIT | BITPOS;
-		m_param2 = b0 & 0x7;
-		m_bitpos = bx & 0x7;
-
-		break;
-
-	case 0xd8:
-	case 0xd9:
-	case 0xda:
-	case 0xdb:
-	case 0xdc:
-	case 0xdd:
-	case 0xde:
-	case 0xdf:
-		// LD CF,g.b   aka TEST g.b
-		m_op = LD;  // Flags / Cycles  %-*- / 2
-		m_flagsaffected |= FLAG_J | FLAG_C;
-
-		m_param1_type = CARRYFLAG;
-		//m_param1 = 0;
-
-		m_param2_type = REG_8BIT | BITPOS;
-		m_param2 = b0 & 0x7;
-		m_bitpos = bx & 0x7;
-
-		break;
-
-	case 0xe0:
-	case 0xe1:
-	case 0xe2:
-	case 0xe3:
-	case 0xe4:
-	case 0xe5:
-	case 0xe6:
-	case 0xe7:
-	case 0xe8:
-	case 0xe9:
-	case 0xea:
-	case 0xeb:
-	case 0xec:
-	case 0xed:
-	case 0xee:
-	case 0xef:
-		break;
-
-	case 0xf0:
-	case 0xf1:
-	case 0xf2:
-	case 0xf3:
-	case 0xf4:
-	case 0xf5:
-	case 0xf6:
-	case 0xf7:
-		break;
-
-	case 0xf8:
-	case 0xf9:
-		break;
-
-	case 0xfa:
-		// LD SP,gg
-		m_op = LD;  // Flags / Cycles  1--- / 3
-		m_flagsaffected |= FLAG_J;
-
-		m_param2_type = REG_16BIT;
-		m_param2 = b0 & 3;
-		// b0 & 4 would be invalid?
-
-		m_param1_type = STACKPOINTER;
-	//  m_param1 = 0;
-
-		break;
-
-	case 0xfb:
-		// LD gg,SP
-		m_op = LD;  // Flags / Cycles  1--- / 3
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = REG_16BIT;
-		m_param1 = b0 & 3;
-		// b0 & 4 would be invalid?
-
-		m_param2_type = STACKPOINTER;
-	//  m_param2 = 0;
-		break;
-
-	case 0xfc:
-		// CALL gg
-		m_op = CALL;
-
-		m_param2_type = REG_16BIT;
-		m_param2 = b0 & 3;
-		// b0 & 4 would be invalid?
-
-		break;
-
-	case 0xfd:
-		break;
-
-	case 0xfe:
-		// JP gg
-		m_op = JP;
-
-		m_param2_type = REG_16BIT;
-		m_param2 = b0 & 3;
-		// b0 & 4 would be invalid?
-
-		break;
-
-	case 0xff:
-		break;
-
-	}
-
-}
-
-
-
-// e0 - e7 use this table
-void tlcs870_device::decode_source(int type, uint16_t val)
-{
-	uint8_t bx;
-
-	bx = READ8();
-
-	switch (bx)
-	{
-	case 0x00:
-	case 0x01:
-	case 0x02:
-	case 0x03:
-	case 0x04:
-	case 0x05:
-	case 0x06:
-	case 0x07:
-		break;
-
-	case 0x08:
-		// ROLD A,(src)
-		m_op = ROLD;
-		m_param2_type = type;
-		m_param2 = val;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x09:
-		// RORD A,(src)
-		m_op = RORD;
-		m_param2_type = type;
-		m_param2 = val;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x0a:
-	case 0x0b:
-	case 0x0c:
-	case 0x0d:
-	case 0x0e:
-	case 0x0f:
-
-	case 0x10:
-	case 0x11:
-	case 0x12:
-	case 0x13:
-		// see dst
-		break;
-
-	case 0x14:
-	case 0x15:
-	case 0x16:
-	case 0x17:
-		// LD rr, (src)
-		m_op = LD;  // Flags / Cycles  1--- / x
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = REG_16BIT;
-		m_param1 = bx & 0x3;
-
-		m_param2_type = type | IS16BIT;
-		m_param2 = val;
-		break;
-
-	case 0x18:
-	case 0x19:
-	case 0x1a:
-	case 0x1b:
-	case 0x1c:
-	case 0x1d:
-	case 0x1e:
-	case 0x1f:
-		break;
-
-	case 0x20:
-		// INC (src)
-		m_op = INC;
-		m_param1_type = type;
-		m_param1 = val;
-
-		break;
-
-	case 0x21:
-	case 0x22:
-	case 0x23:
-	case 0x24:
-	case 0x25:
-		break;
-
-	case 0x26:  // invalid if (src) is also (x) ? (not specified)
-		// LD (x),(src)
-		m_op = LD;  // Flags / Cycles  1U-- / x
-		m_flagsaffected |= FLAG_J /*| FLAG_Z*/; // Z is undefined!
-
-		m_param1_type = ADDR_IN_IMM_X;
-		m_param1 = READ8();
-
-		m_param2_type = type;
-		m_param2 = val;
-		break;
-
-	case 0x27:
-		// LD (HL),(src)
-		m_op = LD;   // Flags / Cycles  1Z-- / x
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param1_type = ADDR_IN_HL;
-		//m_param1 = 0;
-
-		m_param2_type = type;
-		m_param2 = val;
-		break;
-
-
-	case 0x28:
-		// DEC (src)
-		m_op = DEC;
-		m_param1_type = type;
-		m_param1 = val;
-
-		break;
-
-	case 0x29:
-	case 0x2a:
-	case 0x2b:
-	case 0x2c:
-	case 0x2d:
-	case 0x2e:
-		break;
-
-	case 0x2f:
-		// MCMP (src), n
-		m_op = MCMP;
-		m_param1_type = type;
-		m_param1 = val;
-
-		m_param2_type = ABSOLUTE_VAL_8;
-		m_param2 = READ8();
-		break;
-
-	case 0x30:
-	case 0x31:
-	case 0x32:
-	case 0x33:
-	case 0x34:
-	case 0x35:
-	case 0x36:
-	case 0x37:
-	case 0x38:
-	case 0x39:
-	case 0x3a:
-	case 0x3b:
-	case 0x3c:
-	case 0x3d:
-	case 0x3e:
-	case 0x3f:
-		break;
-
-	case 0x40:
-	case 0x41:
-	case 0x42:
-	case 0x43:
-	case 0x44:
-	case 0x45:
-	case 0x46:
-	case 0x47:
-		// SET (src).b
-		m_op = SET;
-
-		m_param1_type = type | BITPOS;
-		m_param1 = val;
-		m_bitpos = bx & 0x7;
-		break;
-
-	case 0x48:
-	case 0x49:
-	case 0x4a:
-	case 0x4b:
-	case 0x4c:
-	case 0x4d:
-	case 0x4e:
-	case 0x4f:
-		// CLR (src).b
-		m_op = CLR;
-
-		m_param1_type = type | BITPOS;
-		m_param1 = val;
-		m_bitpos = bx & 0x7;
-		break;
-
-	case 0x50:
-	case 0x51:
-	case 0x52:
-	case 0x53:
-	case 0x54:
-	case 0x55:
-	case 0x56:
-	case 0x57:
-		// see dst
-		break;
-
-	case 0x58:
-	case 0x59:
-	case 0x5a:
-	case 0x5b:
-	case 0x5c:
-	case 0x5d:
-	case 0x5e:
-	case 0x5f:
-		// LD r, (src)
-		m_op = LD;  // Flags / Cycles  1Z-- / x
-		m_flagsaffected |= FLAG_J | FLAG_Z;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = bx & 0x7;
-
-		m_param2_type = type;
-		m_param2 = val;
-		break;
-
-	case 0x60:
-	case 0x61:
-	case 0x62:
-	case 0x63:
-	case 0x64:
-	case 0x65:
-	case 0x66:
-	case 0x67:
-		// (ALU OP) (src), (HL)
-		m_op = (bx & 0x7)+ALU_ADDC;
-		m_param1_type = type;
-		m_param1 = val;
-
-		m_param2_type = ADDR_IN_HL;
-		//m_param2 = 0;
-		break;
-
-	case 0x68:
-	case 0x69:
-	case 0x6a:
-	case 0x6b:
-	case 0x6c:
-	case 0x6d:
-	case 0x6e:
-	case 0x6f:
-		break;
-
-	case 0x70:
-	case 0x71:
-	case 0x72:
-	case 0x73:
-	case 0x74:
-	case 0x75:
-	case 0x76:
-	case 0x77:
-		// (ALU OP) (src), n
-		m_op = (bx & 0x7)+ALU_ADDC;
-		m_param1_type = type;
-		m_param1 = val;
-
-		m_param2_type = ABSOLUTE_VAL_8;
-		m_param2 = READ8();
-		break;
-
-	case 0x78:
-	case 0x79:
-	case 0x7a:
-	case 0x7b:
-	case 0x7c:
-	case 0x7d:
-	case 0x7e:
-	case 0x7f:
-		// (ALU OP) A, (src)
-
-		m_op = (bx & 0x7)+ALU_ADDC;
-		m_param2_type = type;
-		m_param2 = val;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = 0; // A
-		break;
-
-	case 0x80:
-	case 0x81:
-	case 0x82:
-	case 0x83:
-	case 0x84:
-	case 0x85:
-	case 0x86:
-	case 0x87:
-	case 0x88:
-	case 0x89:
-	case 0x8a:
-	case 0x8b:
-	case 0x8c:
-	case 0x8d:
-	case 0x8e:
-	case 0x8f:
-		break;
-
-	case 0x90:
-	case 0x91:
-	case 0x92:
-	case 0x93:
-	case 0x94:
-	case 0x95:
-	case 0x96:
-	case 0x97:
-	case 0x98:
-	case 0x99:
-	case 0x9a:
-	case 0x9b:
-	case 0x9c:
-	case 0x9d:
-	case 0x9e:
-	case 0x9f:
-		break;
-
-	case 0xa0:
-	case 0xa1:
-	case 0xa2:
-	case 0xa3:
-	case 0xa4:
-	case 0xa5:
-	case 0xa6:
-	case 0xa7:
-		break;
-
-	case 0xa8:
-	case 0xa9:
-	case 0xaa:
-	case 0xab:
-	case 0xac:
-	case 0xad:
-	case 0xae:
-	case 0xaf:
-		// XCH r,(src)
-		m_op = XCH;
-
-		m_param1_type = REG_8BIT;
-		m_param1 = bx & 0x7;
-
-		m_param2_type = type;
-		m_param2 = val;
-		break;
-
-
-	case 0xb0:
-	case 0xb1:
-	case 0xb2:
-	case 0xb3:
-	case 0xb4:
-	case 0xb5:
-	case 0xb6:
-	case 0xb7:
-	case 0xb8:
-	case 0xb9:
-	case 0xba:
-	case 0xbb:
-	case 0xbc:
-	case 0xbd:
-	case 0xbe:
-	case 0xbf:
-		break;
-
-	case 0xc0:
-	case 0xc1:
-	case 0xc2:
-	case 0xc3:
-	case 0xc4:
-	case 0xc5:
-	case 0xc6:
-	case 0xc7:
-		// CPL (src).b
-		m_op = CPL;
-
-		m_param1_type = type | BITPOS;
-		m_param1 = val;
-		m_bitpos = bx & 0x7;
-		break;
-
-	case 0xc8:
-	case 0xc9:
-	case 0xca:
-	case 0xcb:
-	case 0xcc:
-	case 0xcd:
-	case 0xce:
-	case 0xcf:
-		// LD (src).b,CF
-		m_op = LD;  // Flags / Cycles  1--- / x
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type = type | BITPOS;
-		m_param1 = val;
-		m_bitpos = bx & 0x7;
-
-		m_param2_type = CARRYFLAG;
-		//m_param2 = 0;
-		break;
-
-
-	case 0xd0:
-	case 0xd1:
-	case 0xd2:
-	case 0xd3:
-	case 0xd4:
-	case 0xd5:
-	case 0xd6:
-	case 0xd7:
-		// XOR CF,(src).b
-		m_op = ALU_XOR;
-		m_param1_type = CARRYFLAG;
-		//m_param1 = 0;
-
-		m_param2_type = type | BITPOS;
-		m_param2 = val;
-		m_bitpos = bx & 0x7;
-		break;
-
-	case 0xd8:
-	case 0xd9:
-	case 0xda:
-	case 0xdb:
-	case 0xdc:
-	case 0xdd:
-	case 0xde:
-	case 0xdf:
-		// LD CF,(src).b  aka  TEST (src).b
-		m_op = LD;   // Flags / Cycles  %-*- / x
-		m_flagsaffected |= FLAG_J | FLAG_C;
-
-		m_param2_type = type | BITPOS;
-		m_param2 = val;
-		m_bitpos = bx & 0x7;
-
-		m_param1_type = CARRYFLAG;
-		//m_param1 = 0;
-		break;
-
-
-	case 0xe0:
-	case 0xe1:
-	case 0xe2:
-	case 0xe3:
-	case 0xe4:
-	case 0xe5:
-	case 0xe6:
-	case 0xe7:
-	case 0xe8:
-	case 0xe9:
-	case 0xea:
-	case 0xeb:
-	case 0xec:
-	case 0xed:
-	case 0xee:
-	case 0xef:
-		break;
-
-	case 0xf0:
-	case 0xf1:
-	case 0xf2:
-	case 0xf3:
-	case 0xf4:
-	case 0xf5:
-	case 0xf6:
-	case 0xf7:
-		break;
-
-	case 0xf8:
-	case 0xf9:
-	case 0xfa:
-	case 0xfb:
-	case 0xfc:
-		// CALL (src)
-		m_op = CALL;
-		m_param1_type = type;
-		m_param1 = val;
-		break;
-
-	case 0xfd:
-		break;
-
-	case 0xfe:
-		// JP (src)
-		m_op = JP;
-		m_param2_type = type | IS16BIT;
-		m_param2 = val;
-		break;
-
-	case 0xff:
-		break;
-
-
-	}
-
-}
-
-// f0 - f7 use this table
-// note, same table is shown as above in manual, there's no overlap between src/dest, but they're not compatible
-void tlcs870_device::decode_dest(uint8_t b0)
-{
-	uint8_t bx;
-
-	bx = READ8();
-
-	switch (bx)
-	{
-	case 0x10:
-	case 0x11:
-	case 0x12:
-	case 0x13:
-		// LD (dst),rr    // (dst) can only be  (x) (pp) or (HL+d) ?  not (HL+) or (-HL) ?
-		m_op = LD;  // Flags / Cycles  1--- / x
-		m_flagsaffected |= FLAG_J;
-
-		m_param1_type |= IS16BIT;
-
-
-		m_param2_type = REG_16BIT;
-		m_param2 = bx&0x3;
-		break;
-
-	case 0x2c:
-		// LD (dst),n   // (dst) can only be (DE), (HL+), (-HL), or (HL+d)  because (x) and (HL) are redundant encodings?
-		m_op = LD;  // Flags / Cycles  1--- / x
-		m_flagsaffected |= FLAG_J;
-
-		m_param2_type = ABSOLUTE_VAL_8;
-		m_param2 = READ8();
-		break;
-
-	case 0x50:
-	case 0x51:
-	case 0x52:
-	case 0x53:
-	case 0x54:
-	case 0x55:
-	case 0x56:
-	case 0x57:
-		// LD (dst),r
-		m_op = LD;   // Flags / Cycles  1--- / x
-		m_flagsaffected |= FLAG_J;
-
-		m_param2_type = REG_8BIT;
-		m_param2 = bx&0x7;
-		break;
-
-	default:
-		break;
-	}
 }
 
 bool tlcs870_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const uint16_t mode, const uint16_t r, const uint16_t rb)
@@ -2259,799 +137,1013 @@ bool tlcs870_device::stream_arg(std::ostream &stream, uint32_t pc, const char *p
 	return false;
 }
 
+// NOT using templates here because there are subtle differences in the port behavior (the ports are multi-purpose) that still need implementing
+READ8_MEMBER(tlcs870_device::port0_r)
+{
+	// need to use P0CR (0x000a) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[0]();
+	else
+		return m_port_out_latch[0];
+}
+
+READ8_MEMBER(tlcs870_device::port1_r)
+{
+	// need to use P1CR (0x000b) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[1]();
+	else
+		return m_port_out_latch[1];
+}
+
+READ8_MEMBER(tlcs870_device::port2_r) // 3-bit port
+{
+	if (m_read_input_port)
+		return m_port_in_cb[2]() | 0xf8;
+	else
+		return m_port_out_latch[2];
+}
+
+READ8_MEMBER(tlcs870_device::port3_r)
+{
+	if (m_read_input_port)
+		return m_port_in_cb[3]();
+	else
+		return m_port_out_latch[3];
+}
+
+READ8_MEMBER(tlcs870_device::port4_r)
+{
+	if (m_read_input_port)
+		return m_port_in_cb[4]();
+	else
+		return m_port_out_latch[4];
+}
+
+READ8_MEMBER(tlcs870_device::port5_r) // 5-bit port
+{
+	if (m_read_input_port)
+		return m_port_in_cb[5]() | 0xe0;
+	else
+		return m_port_out_latch[5];
+}
+
+READ8_MEMBER(tlcs870_device::port6_r) // doubles up as analog?
+{
+	// need to use P6CR (0x000c) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[6]();
+	else
+		return m_port_out_latch[6];
+}
+
+READ8_MEMBER(tlcs870_device::port7_r)
+{
+	// need to use P7CR (0x000d) to control direction
+
+	if (m_read_input_port)
+		return m_port_in_cb[7]();
+	else
+		return m_port_out_latch[7];
+}
+
+WRITE8_MEMBER(tlcs870_device::port0_w)
+{
+	m_port_out_latch[0] = data;
+	m_port_out_cb[0](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port1_w)
+{
+	m_port_out_latch[1] = data;
+	m_port_out_cb[1](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port2_w)
+{
+	m_port_out_latch[2] = data;
+	m_port_out_cb[2](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port3_w)
+{
+	m_port_out_latch[3] = data;
+	m_port_out_cb[3](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port4_w)
+{
+	m_port_out_latch[4] = data;
+	m_port_out_cb[4](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port5_w)
+{
+	m_port_out_latch[5] = data;
+	m_port_out_cb[5](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port6_w)
+{
+	m_port_out_latch[6] = data;
+	m_port_out_cb[6](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::port7_w)
+{
+	m_port_out_latch[7] = data;
+	m_port_out_cb[7](data);
+}
+
+WRITE8_MEMBER(tlcs870_device::p0cr_w)
+{
+	m_port0_cr = data;
+}
+
+WRITE8_MEMBER(tlcs870_device::p1cr_w)
+{
+	m_port1_cr = data;
+}
+
+WRITE8_MEMBER(tlcs870_device::p6cr_w)
+{
+	m_port6_cr = data;
+}
+
+WRITE8_MEMBER(tlcs870_device::p7cr_w)
+{
+	m_port7_cr = data;
+}
+
+// Timer emulation
+
+// 16-Bit Timer / Counter 2 (TC1)
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc1_cb)
+{
+
+}
+
+WRITE8_MEMBER(tlcs870_device::tc1cr_w)
+{
+	m_TC1CR = data;
+
+	LOG("%s m_TC1CR (16-bit TC1 Timer Control Register) bits set to\n", machine().describe_context());
+	LOG("%d: TFF1 (Timer F/F1 control for PPG mode)\n",   (m_TC1CR & 0x80) ? 1 : 0);
+	LOG("%d: SCAP1/MCAP1/METT1/MPPG1\n",                  (m_TC1CR & 0x40) ? 1 : 0);
+	LOG("%d: TC1S-1 (TC1 Start Control)\n",               (m_TC1CR & 0x20) ? 1 : 0);
+	LOG("%d: TC1S-0 (TC1 Start Control)\n",               (m_TC1CR & 0x10) ? 1 : 0);
+	LOG("%d: TC1CK-1 (TC1 Source Clock select)\n",        (m_TC1CR & 0x08) ? 1 : 0);
+	LOG("%d: TC1CK-0 (TC1 Source Clock select)\n",        (m_TC1CR & 0x04) ? 1 : 0);
+	LOG("%d: TC1M-1 (TC1 Mode Select)\n",                 (m_TC1CR & 0x02) ? 1 : 0);
+	LOG("%d: TC1M-0 (TC1 Mode Select)\n",                 (m_TC1CR & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg1a_l_w)
+{
+	m_TREG1A = (m_TREG1A & 0xff00) | data;
+}
+
+WRITE8_MEMBER(tlcs870_device::treg1a_h_w)
+{
+	m_TREG1A = (m_TREG1A & 0x00ff) | (data << 8);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg1b_l_w)
+{
+	m_TREG1B = (m_TREG1B & 0xff00) | data;
+}
+
+WRITE8_MEMBER(tlcs870_device::treg1b_h_w)
+{
+	m_TREG1B = (m_TREG1B & 0x00ff) | (data << 8);
+}
+
+READ8_MEMBER(tlcs870_device::treg1b_l_r)
+{
+	return m_TREG1B & 0xff;
+}
+
+READ8_MEMBER(tlcs870_device::treg1b_h_r)
+{
+	return (m_TREG1B >>8) & 0xff;
+}
+
+// 16-Bit Timer / Counter 2 (TC2)
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc2_cb)
+{
+	m_IL |= 1 << (15-TLCS870_IRQ_INTTC2);
+	tc2_reload();
+}
+
+void tlcs870_device::tc2_reload()
+{
+	m_tcx_timer[1]->adjust(cycles_to_attotime(1500)); // TODO: use real value
+}
+
+void tlcs870_device::tc2_cancel()
+{
+	m_tcx_timer[1]->adjust(attotime::never);
+}
+
+WRITE8_MEMBER(tlcs870_device::tc2cr_w)
+{
+	if (data & 0x20)
+	{
+		if (!(m_TC2CR & 0x20))
+		{
+			tc2_reload();
+		}
+	}
+	else
+	{
+		tc2_cancel();
+	}
+
+	m_TC2CR = data;
+
+	LOG("%s m_TC2CR (16-bit TC2 Timer Control Register) bits set to\n", machine().describe_context());
+	LOG("%d: (invalid)\n",                         (m_TC2CR & 0x80) ? 1 : 0);
+	LOG("%d: (invalid)\n",                         (m_TC2CR & 0x40) ? 1 : 0);
+	LOG("%d: TC2S (TC2 Start Control)\n",          (m_TC2CR & 0x20) ? 1 : 0);
+	LOG("%d: TC2CK-2 (TC2 Source Clock select)\n", (m_TC2CR & 0x10) ? 1 : 0);
+	LOG("%d: TC2CK-1 (TC2 Source Clock select)\n", (m_TC2CR & 0x08) ? 1 : 0);
+	LOG("%d: TC2CK-0 (TC2 Source Clock select)\n", (m_TC2CR & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                         (m_TC2CR & 0x02) ? 1 : 0);
+	LOG("%d: TC2M (TC2 Mode Select)\n",            (m_TC2CR & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg2_l_w)
+{
+	m_TREG2 = (m_TREG2 & 0xff00) | data;
+}
+
+WRITE8_MEMBER(tlcs870_device::treg2_h_w)
+{
+	m_TREG2 = (m_TREG2 & 0x00ff) | (data << 8);
+}
+
+// 8-Bit Timer / Counter 3 (TC3)
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc3_cb)
+{
+
+}
+
+WRITE8_MEMBER(tlcs870_device::tc3cr_w)
+{
+	m_TC3CR = data;
+
+	LOG("%s m_TC3CR (8-bit TC3 Timer Control Register) bits set to\n", machine().describe_context());
+	LOG("%d: (invalid)\n",                         (m_TC3CR & 0x80) ? 1 : 0);
+	LOG("%d: SCAP (Software Capture Control)\n",   (m_TC3CR & 0x40) ? 1 : 0);
+	LOG("%d: (invalid)\n",                         (m_TC3CR & 0x20) ? 1 : 0);
+	LOG("%d: TC3S (TC3 Start Control)\n",          (m_TC3CR & 0x10) ? 1 : 0);
+	LOG("%d: TC3CK-1 (TC3 Source Clock select)\n", (m_TC3CR & 0x08) ? 1 : 0);
+	LOG("%d: TC3CK-0 (TC3 Source Clock select)\n", (m_TC3CR & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                         (m_TC3CR & 0x02) ? 1 : 0);
+	LOG("%d: TC3M (TC3 Mode Select)\n",            (m_TC3CR & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg3a_w)
+{
+	m_TREG3A = data;
+}
+
+READ8_MEMBER(tlcs870_device::treg3a_r)
+{
+	return m_TREG3A;
+}
+
+READ8_MEMBER(tlcs870_device::treg3b_r)
+{
+	return m_TREG3B;
+}
+
+// 8-Bit Timer / Counter 3 (TC4)
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::tc4_cb)
+{
+
+}
+
+WRITE8_MEMBER(tlcs870_device::tc4cr_w)
+{
+	m_TC4CR = data;
+
+	LOG("%s m_TC4CR (8-bit TC4 Timer Control Register) bits set to\n", machine().describe_context());
+	LOG("%d: TFF4-1 (Timer F/F 4 Control)\n",      (m_TC4CR & 0x80) ? 1 : 0);
+	LOG("%d: TFF4-0 (Timer F/F 4 Control)\n",      (m_TC4CR & 0x40) ? 1 : 0);
+	LOG("%d: (invalid)\n",                         (m_TC4CR & 0x20) ? 1 : 0);
+	LOG("%d: TC4S (TC4 Start Control)\n",          (m_TC4CR & 0x10) ? 1 : 0);
+	LOG("%d: TC4CK-1 (TC4 Source Clock select)\n", (m_TC4CR & 0x08) ? 1 : 0);
+	LOG("%d: TC4CK-0 (TC4 Source Clock select)\n", (m_TC4CR & 0x04) ? 1 : 0);
+	LOG("%d: TC4M-1 (TC4 Mode Select)\n",          (m_TC4CR & 0x02) ? 1 : 0);
+	LOG("%d: TC4M-0 (TC4 Mode Select)\n",          (m_TC4CR & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::treg4_w)
+{
+	m_TREG4 = data;
+}
+
+// Time Base Timer
+
+// this is used with TLCS870_IRQ_INTTBT (FFF2 INTTBT) (not used by hng64)
+// the divider output makes use of PORT1 bit 3, which must be properly configured
+WRITE8_MEMBER(tlcs870_device::tbtcr_w)
+{
+	m_TBTCR = data;
+
+	LOG("%s m_TBTCR (Time Base Timer) bits set to\n", machine().describe_context());
+	LOG("%d: DV0EN (Divider Output Enable)\n",                  (m_TBTCR & 0x80) ? 1 : 0);
+	LOG("%d: DVOCK-1 (Divide Output Frequency Selection)n",     (m_TBTCR & 0x40) ? 1 : 0);
+	LOG("%d: DVOCK-0 (Divide Output Frequency Selection)\n",    (m_TBTCR & 0x20) ? 1 : 0);
+	LOG("%d: DV7CK (?)\n",                                      (m_TBTCR & 0x10) ? 1 : 0);
+	LOG("%d: TBTEN (Time Base Timer Enable)\n",                 (m_TBTCR & 0x08) ? 1 : 0);
+	LOG("%d: TBTCK-2 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x04) ? 1 : 0);
+	LOG("%d: TBTCK-1 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x02) ? 1 : 0);
+	LOG("%d: TBTCK-0 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x01) ? 1 : 0);
+}
+
+READ8_MEMBER(tlcs870_device::tbtcr_r)
+{
+	return m_TBTCR;
+}
+
+/* SIO emulation */
+
+// TODO: use templates for SIO1/2 ports, as they're the same except for the DBR region they use?
+
+// Serial Port 1
+WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
+{
+	m_SIOCR1[0] = data;
+
+	LOG("%s m_SIOCR1[0] (Serial IO Port 1 Control Register 1) bits set to\n", machine().describe_context());
+	LOG("%d: SIOS1 (Start/Stop transfer)\n",       (m_SIOCR1[0] & 0x80) ? 1 : 0);
+	LOG("%d: SIOINH1 (Abort/Continue transfer)\n", (m_SIOCR1[0] & 0x40) ? 1 : 0);
+	LOG("%d: SIOM1-2 (Serial Mode)\n",             (m_SIOCR1[0] & 0x20) ? 1 : 0);
+	LOG("%d: SIOM1-1 (Serial Mode)\n",             (m_SIOCR1[0] & 0x10) ? 1 : 0);
+	LOG("%d: SIOM1-0 (Serial Mode)\n",             (m_SIOCR1[0] & 0x08) ? 1 : 0);
+	LOG("%d: SCK1-2 (Serial Clock)\n",             (m_SIOCR1[0] & 0x04) ? 1 : 0);
+	LOG("%d: SCK1-1 (Serial Clock)\n",             (m_SIOCR1[0] & 0x02) ? 1 : 0);
+	LOG("%d: SCK1-0 (Serial Clock)\n",             (m_SIOCR1[0] & 0x01) ? 1 : 0);
+
+	m_transfer_mode[0] = (m_SIOCR1[0] & 0x38) >> 3;
+	switch (m_transfer_mode[0])
+	{
+	case 0x0:
+		LOG("(Serial set to 8-bit transmit mode)\n");
+		m_transmit_bits[0] = 8;
+		m_receive_bits[0] = 0;
+		break;
+
+	case 0x2:
+		LOG("(Serial set to 4-bit transmit mode)\n");
+		m_transmit_bits[0] = 4;
+		m_receive_bits[0] = 0;
+		break;
+
+	case 0x4:
+		LOG("(Serial set to 8-bit transmit/receive mode)\n");
+		m_transmit_bits[0] = 8;
+		m_receive_bits[0] = 8;
+		break;
+
+	case 0x5: LOG("(Serial set to 8-bit receive mode)\n");
+		m_transmit_bits[0] = 0;
+		m_receive_bits[0] = 8;
+		break;
+
+	case 0x6:
+		LOG("(Serial set to 4-bit receive mode)\n");
+		m_transmit_bits[0] = 0;
+		m_receive_bits[0] = 4;
+		break;
+
+	default:
+		LOG("(Serial set to invalid mode)\n");
+		m_transmit_bits[0] = 0;
+		m_receive_bits[0] = 0;
+		break;
+	}
+
+	if ((m_SIOCR1[0] & 0xc0) == 0x80)
+	{
+		// start transfer
+		m_transfer_shiftpos[0] = 0;
+		m_transfer_shiftreg[0] = 0;
+		m_transfer_pos[0] = 0;
+
+		m_serial_transmit_timer[0]->adjust(attotime::zero);
+	}
+}
+
+
+WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
+{
+	m_SIOCR2[0] = data;
+
+	LOG("%s m_SIOCR2[0] (Serial IO Port 1 Control Register 2) bits set to\n", machine().describe_context());
+	LOG("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x80) ? 1 : 0);
+	LOG("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x40) ? 1 : 0);
+	LOG("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x20) ? 1 : 0);
+	LOG("%d: WAIT1-1 (Wait Control\n",              (m_SIOCR2[0] & 0x10) ? 1 : 0);
+	LOG("%d: WAIT1-0 (Wait Control)\n",             (m_SIOCR2[0] & 0x08) ? 1 : 0);
+	LOG("%d: BUF1-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x04) ? 1 : 0);
+	LOG("%d: BUF1-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x02) ? 1 : 0);
+	LOG("%d: BUF1-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x01) ? 1 : 0);
+
+	m_transfer_numbytes[0] = (m_SIOCR2[0] & 0x7);
+	LOG("(serial set to transfer %01x bytes)\n", m_transfer_numbytes[0]+1);
+
+}
+
+READ8_MEMBER(tlcs870_device::sio1sr_r)
+{
+	/* TS-- ----
+
+	   T = Transfer in Progress
+	   S = Shift in Progress
+
+	*/
+	return 0x00;
+}
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::sio0_transmit_cb)
+{
+	if (m_transmit_bits[0]) // TODO: handle receive cases
+	{
+		int finish = 0;
+		if (m_transfer_shiftpos[0] == 0)
+		{
+			m_transfer_shiftreg[0] = m_dbr[m_transfer_pos[0]];
+			LOG("transmitting byte %02x\n", m_transfer_shiftreg[0]);
+		}
+
+		int dataout = m_transfer_shiftreg[0] & 0x01;
+
+		m_serial_out_cb[0](dataout);
+
+		m_transfer_shiftreg[0] >>= 1;
+		m_transfer_shiftpos[0]++;
+
+		if (m_transfer_shiftpos[0] == 8)
+		{
+			LOG("transmitted\n");
+
+			m_transfer_shiftpos[0] = 0;
+			m_transfer_pos[0]++;
+
+			if (m_transfer_pos[0] > m_transfer_numbytes[0])
+			{
+				LOG("end of transmission\n");
+				m_SIOCR1[0] &= ~0x80;
+				// set interrupt latch
+				m_IL |= 1 << (15 - TLCS870_IRQ_INTSIO1);
+				finish = 1;
+			}
+		}
+
+		if (!finish)
+			m_serial_transmit_timer[0]->adjust(cycles_to_attotime(1000)); // TODO: use real speed
+	}
+}
+
+// Serial Port 2
+WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
+{
+	m_SIOCR1[1] = data;
+
+	LOG("%s m_SIOCR1[1] (Serial IO Port 2 Control Register 1) bits set to\n", machine().describe_context());
+	LOG("%d: SIOS2 (Start/Stop transfer)\n",       (m_SIOCR1[1] & 0x80) ? 1 : 0);
+	LOG("%d: SIOINH2 (Abort/Continue transfer)\n", (m_SIOCR1[1] & 0x40) ? 1 : 0);
+	LOG("%d: SIOM2-2 (Serial Mode)\n",             (m_SIOCR1[1] & 0x20) ? 1 : 0);
+	LOG("%d: SIOM2-1 (Serial Mode)\n",             (m_SIOCR1[1] & 0x10) ? 1 : 0);
+	LOG("%d: SIOM2-0 (Serial Mode)\n",             (m_SIOCR1[1] & 0x08) ? 1 : 0);
+	LOG("%d: SCK2-2 (Serial Clock)\n",             (m_SIOCR1[1] & 0x04) ? 1 : 0);
+	LOG("%d: SCK2-1 (Serial Clock)\n",             (m_SIOCR1[1] & 0x02) ? 1 : 0);
+	LOG("%d: SCK2-0 (Serial Clock)\n",             (m_SIOCR1[1] & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::sio2cr2_w)
+{
+	m_SIOCR2[1] = data;
+
+	LOG("%s m_SIOCR2[1] (Serial IO Port 2 Control Register 2) bits set to\n", machine().describe_context());
+	LOG("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x80) ? 1 : 0);
+	LOG("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x40) ? 1 : 0);
+	LOG("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x20) ? 1 : 0);
+	LOG("%d: WAIT2-1 (Wait Control\n",              (m_SIOCR2[1] & 0x10) ? 1 : 0);
+	LOG("%d: WAIT2-0 (Wait Control)\n",             (m_SIOCR2[1] & 0x08) ? 1 : 0);
+	LOG("%d: BUF2-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x04) ? 1 : 0);
+	LOG("%d: BUF2-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x02) ? 1 : 0);
+	LOG("%d: BUF2-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x01) ? 1 : 0);
+}
+
+TIMER_CALLBACK_MEMBER(tlcs870_device::sio1_transmit_cb)
+{
+}
+
+READ8_MEMBER(tlcs870_device::sio2sr_r)
+{
+	/* TS-- ----
+
+	   T = Transfer in Progress
+	   S = Shift in Progress
+
+	*/
+	return 0x00;
+}
+
+// WDT emulation (Watchdog Timer)
+
+WRITE8_MEMBER(tlcs870_device::wdtcr1_w)
+{
+	m_WDTCR1 = data;
+
+	LOG("%s m_WDTCR1 (Watchdog Timer Control 1) bits set to\n", machine().describe_context());
+	LOG("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x80) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x40) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x20) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x10) ? 1 : 0);
+	LOG("%d: WDTEN (Watchdog Timer Enable, also req disable code to WDTCR2)\n",     (m_WDTCR1 & 0x08) ? 1 : 0);
+	LOG("%d: WDTT-1 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x04) ? 1 : 0);
+	LOG("%d: WDTT-0 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x02) ? 1 : 0);
+	LOG("%d: WDTOUT (Watchdog Timer Output select, 0 = interrupt, 1 = reset out)\n",(m_WDTCR1 & 0x01) ? 1 : 0);
+
+	// WDTOUT cannot be set to 1 by software
+}
+
+WRITE8_MEMBER(tlcs870_device::wdtcr2_w)
+{
+	if (data == 0x4e)
+	{
+		// clear watchdog counter
+	}
+	else if (data == 0xb1)
+	{
+		// disable code
+		if (!(m_WDTCR1 & 0x08))
+		{
+			LOG("%s wdtcr2_w - Watchdog disabled\n", machine().describe_context());
+		}
+	}
+}
+
+// Misc
+
+// not used by hng64
+WRITE8_MEMBER(tlcs870_device::syscr1_w)
+{
+	m_SYSCR1 = data;
+
+	LOG("%s m_SYSCR1 (System Control Register 1) bits set to\n", machine().describe_context());
+	LOG("%d: STOP (STOP mode start)\n",                          (m_SYSCR1 & 0x80) ? 1 : 0);
+	LOG("%d: RELM (release method for STOP, 0 edge, 1 level)\n", (m_SYSCR1 & 0x40) ? 1 : 0);
+	LOG("%d: RETM (return mode after STOP, 0 normal, 1 slow)\n", (m_SYSCR1 & 0x20) ? 1 : 0);
+	LOG("%d: OUTEN (port output control during STOP)\n",         (m_SYSCR1 & 0x10) ? 1 : 0);
+	LOG("%d: WUT-1 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x08) ? 1 : 0);
+	LOG("%d: WUT-0 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR1 & 0x02) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR1 & 0x01) ? 1 : 0);
+}
+
+WRITE8_MEMBER(tlcs870_device::syscr2_w)
+{
+	m_SYSCR2 = data;
+
+	LOG("%s m_SYSCR2 (System Control Register 2) bits set to\n", machine().describe_context());
+	LOG("%d: XEN (High Frequency Oscillator control)\n",         (m_SYSCR2 & 0x80) ? 1 : 0);
+	LOG("%d: XTEN (Low Frequency Oscillator control)\n",         (m_SYSCR2 & 0x40) ? 1 : 0);
+	LOG("%d: SYSCK (system clock select 0 high, 1 low)\n",       (m_SYSCR2 & 0x20) ? 1 : 0);
+	LOG("%d: IDLE (IDLE mode start)\n",                          (m_SYSCR2 & 0x10) ? 1 : 0); // hng64 sets this in case of ram test failures
+	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x08) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x02) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x01) ? 1 : 0);
+}
+
+READ8_MEMBER(tlcs870_device::syscr1_r)
+{
+	return m_SYSCR1; // low 2 bits are 'undefined'
+}
+
+READ8_MEMBER(tlcs870_device::syscr2_r)
+{
+	return m_SYSCR2 | 0x0f; // low bits always read as 1
+}
+
+// RBS / PSW direct access
+
+WRITE8_MEMBER(tlcs870_device::rbs_w)
+{
+	// upper bits of PSW (status flags) cannot be written, only the register bank
+	m_RBS = data & 0x0f;
+}
+
+READ8_MEMBER(tlcs870_device::psw_r)
+{
+	// outside of checking the results of opcodes that  use it directly (DAA / DAS) this is the only way to read / check the 'half' flag
+	return get_PSW();
+}
+
+// ADC emulation
+
+READ8_MEMBER(tlcs870_device::adcdr_r)
+{
+	return m_ADCDR;
+}
+
+/*
+
+ ADCCR register bits
+
+ es-apppp
+
+ e = end flag (1 = done, data available in ADCDR, 0 = not requested / not finished) (r/o)
+ s = start flag (1 = request data be processed and put in ADCDR)
+
+ a = analog input enable (won't function at all with this disabled?)
+
+ p = analog port to use (upper bit is 'reserved', so 8 ports)
+
+ current emulation assumes this is instant
+
+ bits in P6CR (0x0c) should also be set to '1' to enable analog input on the port as the
+ same pins are otherwise used as a normal input port, not this multiplexed ADC
+
+ */
+
+READ8_MEMBER(tlcs870_device::adccr_r)
+{
+	return m_ADCCR | 0x80; // return with 'finished' bit set
+}
+
+WRITE8_MEMBER(tlcs870_device::adccr_w)
+{
+	m_ADCCR = data;
+
+	if (data & 0x40)
+	{
+		m_ADCDR = m_port_analog_in_cb[data&0x07]();
+	}
+}
+
+
+READ8_MEMBER(tlcs870_device::eintcr_r)
+{
+	return 0x00;
+}
+
+WRITE8_MEMBER(tlcs870_device::eintcr_w)
+{
+	m_EINTCR = data;
+
+	LOG("%s m_EINTCR (External Interrupt Control) bits set to\n", machine().describe_context());
+	LOG("%d: INT1NC (Interrupt noise reject)\n", (m_EINTCR & 0x80) ? 1 : 0);
+	LOG("%d: INT0EN (Interrupt 0 enable)\n",     (m_EINTCR & 0x40) ? 1 : 0);
+	LOG("%d: (invalid)\n",                       (m_EINTCR & 0x20) ? 1 : 0);
+	LOG("%d: INT4ES (edge select)\n",            (m_EINTCR & 0x10) ? 1 : 0);
+	LOG("%d: INT3ES (edge select)\n",            (m_EINTCR & 0x08) ? 1 : 0);
+	LOG("%d: INT2ES (edge select)\n",            (m_EINTCR & 0x04) ? 1 : 0);
+	LOG("%d: INT1ES (edge select)\n",            (m_EINTCR & 0x02) ? 1 : 0);
+	LOG("%d: (invalid)\n",                       (m_EINTCR & 0x01) ? 1 : 0);
+
+	/* For edge select register 0 = rising edge, 1 = falling edge
+
+	   For INT0EN if 1 then Port 1 bit 0 is used for IRQ0, otherwise it is used for a port bit
+	   if it is used as an IRQ pin then it should also be configured as an input in P1CR
+	*/
+}
+
+READ8_MEMBER(tlcs870_device::eir_l_r)
+{
+	return m_EIR & 0xff;
+}
+
+READ8_MEMBER(tlcs870_device::eir_h_r)
+{
+	return (m_EIR >> 8) & 0xff;
+}
+
+WRITE8_MEMBER(tlcs870_device::eir_l_w)
+{
+	m_EIR = (m_EIR & 0xff00) | data;
+
+	LOG("%s m_EIR(LSB) (Interrupt Enable) bits set to\n", machine().describe_context());
+	LOG("%d: EF7 (External Interrupt 2)\n",      (m_EIR & 0x0080) ? 1 : 0);
+	LOG("%d: EF6 (Time Base Timer Interrupt)\n", (m_EIR & 0x0040) ? 1 : 0);
+	LOG("%d: EF5 (External Interrupt 1)\n",      (m_EIR & 0x0020) ? 1 : 0);
+	LOG("%d: EF4 (16-bit TC1 Interrupt)\n",      (m_EIR & 0x0010) ? 1 : 0);
+	LOG("%d: (invalid)\n",                       (m_EIR & 0x0008) ? 1 : 0); // can't be External Int 0 (bit in different register is used)
+	LOG("%d: (invalid)\n",                       (m_EIR & 0x0004) ? 1 : 0); // can't be Watchdog interrupt (non-maskable)
+	LOG("%d: (invalid)\n",                       (m_EIR & 0x0002) ? 1 : 0); // can't be Software interrupt (non-maskable)
+	LOG("%d: IMF\n",                             (m_EIR & 0x0001) ? 1 : 0); // can't be Reset interrupt (non-maskable)
+}
+
+WRITE8_MEMBER(tlcs870_device::eir_h_w)
+{
+	m_EIR = (m_EIR & 0x00ff) | (data << 8);
+
+	LOG("%s m_EIR(MSB) (Interrupt Enable) bits set to\n", machine().describe_context());
+	LOG("%d: EF15 (External Interrupt 5)\n",          (m_EIR & 0x8000) ? 1 : 0);
+	LOG("%d: EF14 (16-bit TC2 Interrupt)\n",          (m_EIR & 0x4000) ? 1 : 0);
+	LOG("%d: EF13 (Serial Interface 2 Interrupt)\n",  (m_EIR & 0x2000) ? 1 : 0);
+	LOG("%d: EF12 (External Interrupt 4)\n",          (m_EIR & 0x1000) ? 1 : 0);
+	LOG("%d: EF11 (External Interrupt 3)\n",          (m_EIR & 0x0800) ? 1 : 0);
+	LOG("%d: EF10 (8-bit TC4 Interrupt)\n",           (m_EIR & 0x0400) ? 1 : 0);
+	LOG("%d: EF9  (Serial Interface 1 Interrupt)\n",  (m_EIR & 0x0200) ? 1 : 0);
+	LOG("%d: EF8  (8-bit TC3 Interrupt)\n",           (m_EIR & 0x0100) ? 1 : 0);
+}
+
+/*
+    the READ/WRITE/MODIFY operations cannot be used to clear interrupt latches
+
+    also you can't set a latch by writing '1' to it, only clear a latch
+    by writing 0 to it
+
+*/
+READ8_MEMBER(tlcs870_device::il_l_r)
+{
+	return m_IL & 0xff;
+}
+
+READ8_MEMBER(tlcs870_device::il_h_r)
+{
+	return (m_IL >> 8) & 0xff;
+}
+
+WRITE8_MEMBER(tlcs870_device::il_l_w)
+{
+	// probably not this logic
+	m_IL = (m_IL & 0xff00) | data;
+}
+
+WRITE8_MEMBER(tlcs870_device::il_h_w)
+{
+	// probably not this logic
+	m_IL = (m_EIR & 0x00ff) | (data << 8);
+}
+
 void tlcs870_device::execute_set_input(int inputnum, int state)
 {
-#if 0
-	switch(inputnum) {
-		case INPUT_LINE_NMI:
-			set_irq_line(INTNMI, state);
-			break;
-		case INPUT_LINE_IRQ0:
-			set_irq_line(INT0, state);
-			break;
-		case INPUT_LINE_IRQ1:
-			set_irq_line(INT1, state);
-			break;
-		case INPUT_LINE_IRQ2:
-			set_irq_line(INT2, state);
-			break;
+	int32_t irqline = -1;
+
+	switch (inputnum)
+	{
+	case INPUT_LINE_IRQ5:
+		irqline = 15;
+		break;
+
+	case INPUT_LINE_IRQ4:
+		irqline = 12;
+		break;
+
+	case INPUT_LINE_IRQ3:
+		irqline = 11;
+		break;
+
+	case INPUT_LINE_IRQ2:
+		irqline = 7;
+		break;
+
+	case INPUT_LINE_IRQ1:
+		irqline = 5;
+		break;
+
+	case INPUT_LINE_IRQ0:
+		irqline = 3;
+		break;
 	}
-#endif
+
+	if (irqline != -1)
+	{
+		set_irq_line(irqline, state);
+	}
 }
 
-uint16_t tlcs870_device::get_addr(uint16_t param_type, uint16_t param_val)
+void tlcs870_device::set_irq_line(int irqline, int state)
 {
-	uint16_t addr = 0x0000;
+	//LOG("set_irq_line %d %d\n", irqline, state);
 
-	switch (param_type&MODE_MASK)
+	if (!(m_irqstate & (1 << irqline)))
 	{
-	case ADDR_IN_IMM_X:
-		addr = param_val;
-		break;
-	case ADDR_IN_PC_PLUS_REG_A:
-		addr = m_temppc + 2 + get_reg8(REG_A);
-		break;
-	case ADDR_IN_DE:
-		addr = get_reg16(REG_DE);
-		break;
-	case ADDR_IN_HL:
-		addr = get_reg16(REG_HL);
-		break;
-	case ADDR_IN_HL_PLUS_IMM_D:
-		addr = get_reg16(REG_HL) + param_val;
-		break;
-	case ADDR_IN_HL_PLUS_REG_C:
-		addr = get_reg16(REG_HL) + get_reg16(REG_C);
-		break;
-	case ADDR_IN_HLINC:
-	{
-		uint16_t tmpHL = get_reg16(REG_HL);
-		addr = tmpHL;
-		tmpHL++;
-		set_reg16(REG_HL, tmpHL);
-		break;
-	}
-	case ADDR_IN_DECHL:
-	{
-		uint16_t tmpHL = get_reg16(REG_HL);
-		tmpHL--;
-		set_reg16(REG_HL, tmpHL);
-		addr = tmpHL;
-		break;
-	}
-	}
-
-	return addr;
-}
-
-void tlcs870_device::set_dest_val(uint16_t param_type, uint16_t param_val, uint16_t dest_val)
-{
-	if (param_type & IS16BIT)
-	{
-		switch (param_type)
+		// rising edge
+		if (state)
 		{
-		case ABSOLUTE_VAL_16:
-			logerror("illegal dest ABSOLUTE_VAL_16\n");
-			break;
+			m_irqstate |= 1<<irqline;
 
-		case REG_16BIT:
-			set_reg16(param_val, dest_val);
-			break;
-
-		case (STACKPOINTER):
-			m_sp.d = dest_val;
-			break;
+			// TODO: add checks to see if interrupt pin(s) are configured, and if they're in rising edge mode
+			m_IL |= 1<<irqline;
 		}
 	}
 	else
 	{
-		switch (param_type & MODE_MASK)
+		if (!state)
 		{
-		case ABSOLUTE_VAL_8:
-			logerror("illegal dest ABSOLUTE_VAL_8\n");
-			break;
-		case REG_8BIT:
-			set_reg8(param_val, dest_val);
-			break;
+			m_irqstate &= ~(1<<irqline);
 		}
 	}
 }
 
-uint16_t tlcs870_device::get_source_val(uint16_t param_type, uint16_t param_val)
+void tlcs870_device::check_interrupts()
 {
-	uint16_t ret_val = 0x0000;
-
-	if (param_type & IS16BIT)
+	// priority 0-2 are non-maskable, and should have already been processed before we get here
+	for (int priority = 0; priority <= 15; priority++)
 	{
-		switch (param_type)
+		if (priority >= 3) // only priorities 0,1,2 are non-maskable
 		{
-		case ABSOLUTE_VAL_16:
-			ret_val = param_val;
-			break;
-
-		case REG_16BIT:
-			ret_val = get_reg16(param_val);
-			break;
-
-		case (STACKPOINTER):
-			ret_val = m_sp.d;
-			break;
-		}
-	}
-	else
-	{
-		switch (param_type & MODE_MASK)
-		{
-		case ABSOLUTE_VAL_8:
-			ret_val = param_val;
-			break;
-		case REG_8BIT:
-			ret_val = get_reg8(param_val);
-			break;
-		}
-	}
-	return ret_val;
-}
-
-void tlcs870_device::setbit_param(uint16_t param_type, uint16_t param, uint8_t bit, bool do_flag)
-{
-	if (param_type & BITPOS)
-	{
-		uint8_t bitpos = 0;
-
-		// need to read param 1
-		uint16_t addr = 0x0000;
-		uint16_t val = 0;
-
-		// READ
-		if (param_type & ADDR_IN_BASE)
-		{
-			addr = get_addr(param_type, param); // any pre/post HL address adjustments happen here
-			if (param_type & IS16BIT)
-				val = RM16(addr);
-			else
-				val = RM8(addr);
-		}
-		else
-		{
-			val = get_source_val(param_type, param);
-		}
-
-		if (param_type & BITPOS_INDIRECT)
-		{
-			bitpos = get_reg8(m_bitpos & 7) & 0x7;
-		}
-		else
-		{
-			bitpos = m_bitpos;
-		}
-
-		// MODIFY
-		int bitused = (1 << bitpos);
-
-		// this is the flag behavior for the set/clr bit opcodes
-		if (do_flag)
-		{
-			int existingbit = (val & bitused);
-			if (existingbit)
+			if (!(m_EIR & 1))
 			{
-				CLEAR_ZF;
-				CLEAR_JF; // 'Z' (so copy Z flag?)
+				// maskable interrupts are disabled, bail
+				continue;
 			}
-			else
+
+			int is_latched = m_IL & (1<<priority);
+
+			if (is_latched)
 			{
-				SET_ZF;
-				SET_JF;  // 'Z'
+				take_interrupt(priority);
+				return;
 			}
 		}
-
-
-		bit ? (val |= bitused) : (val &= ~bitused);
-
-		//printf("bit to set is %d, value is %02x", bitused, val);
-
-		// WRITE
-		if (param_type & ADDR_IN_BASE)
-		{
-			//addr = get_addr(param_type,param); // already have addr, don't want to cause any further HL decrements/increments.
-			if (param_type & IS16BIT)
-				WM16(addr, val);
-			else
-				WM8(addr, val);
-		}
 		else
 		{
-			set_dest_val(param_type, param, val);
+			// TODO: handle non-maskable here
 		}
-	}
-	else
-	{
-		fatalerror("not a bit op? 0\n");
 	}
 }
 
-uint8_t tlcs870_device::getbit_param(uint16_t param_type, uint16_t param)
+void tlcs870_device::take_interrupt(int priority)
 {
-	uint8_t bit = 0;
+	m_IL &= ~(1<<priority);
+	m_EIR &= ~1;
+	LOG("taken interrupt %d\n", priority);
 
-	if (param_type & BITPOS)
-	{
-		uint8_t bitpos;
+	uint16_t vector = RM16(0xffe0 + ((15-priority)*2));
 
-		// need to read param 2
-		uint16_t addr = 0x0000;
-		uint16_t val = 0;
-		if (param_type & ADDR_IN_BASE)
-		{
-			addr = get_addr(param_type, param);
-			if (param_type & IS16BIT)
-				val = RM16(addr);
-			else
-				val = RM8(addr);
-		}
-		else
-		{
-			val = get_source_val(param_type, param);
-		}
+	WM8(m_sp.d, get_PSW());
+	WM16(m_sp.d - 2, m_addr);
+	m_sp.d -= 3;
 
-		if (param_type & BITPOS_INDIRECT)
-		{
-			bitpos = get_reg8(m_bitpos & 7) & 0x7;
-		}
-		else
-		{
-			bitpos = m_bitpos;
-		}
+	m_pc.d = vector;
+	LOG("setting PC to %04x\n", m_pc.d);
 
-		bit = (val >> bitpos) & 1;
-	}
-	else
-	{
-		fatalerror("not a bit op? 0\n");
-	}
-
-	return bit;
 }
 
 void tlcs870_device::execute_run()
 {
-	do
+	while (m_icount > 0)
 	{
-		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(this, m_pc.d);
+		check_interrupts();
 
-		//check_interrupts();
-		m_temppc = m_pc.d;
+		m_prvpc.d = m_pc.d;
+		debugger_instruction_hook(m_pc.d);
 
 		m_addr = m_pc.d;
+		m_tmppc = m_addr; // used for jumps etc.
+		m_cycles = 0;
+		m_read_input_port = 1; // some operations force the output latches to read from the memory mapped ports, not input ports
 		decode();
 		m_pc.d = m_addr;
 
-		switch (m_op)
+		if (m_cycles)
 		{
-		case UNKNOWN:
-			// invalid instruction
-			break;
-
-		case CALL:
-			break;
-		case CALLP:
-			break;
-		case CALLV:
-			break;
-
-		case CLR:
-			if ((m_param1_type & BITPOS))
-			{
-				//printf("clr on bit\n");
-
-				if (m_param1_type == CARRYFLAG)
-				{
-					CLEAR_CF;
-					SET_JF;
-				}
-				else
-				{
-					setbit_param(m_param1_type, m_param1, 0, true);
-				}
-			}
-			else
-			{
-				// grouped with the LD operations in the manual but with CLR name, so probably internally just calling LD with 0 value
-
-				uint16_t addr = 0x0000;
-				uint16_t val = 0;
-
-				if (m_param1_type & ADDR_IN_BASE)
-				{
-					addr = get_addr(m_param1_type,m_param1);
-					if (m_param1_type & IS16BIT)
-						WM16(addr, val);
-					else
-						WM8(addr, val);
-				}
-				else
-				{
-					set_dest_val(m_param1_type,m_param1, val);
-				}
-				SET_JF;
-			}
-			break;
-
-
-		case CPL:
-			break;
-		case DAA:
-			break;
-		case DAS:
-			break;
-		case DEC:
-			break;
-		/*
-		case DI:
-		    break;
-		*/
-		case DIV:
-			break;
-		/*
-		case EI:
-		    break;
-		*/
-		case INC:
+			//m_icount -= m_cycles * 4; // 1 machine cycle = 4 clock cycles? (unclear, execution seems far too slow even for the ram test this way)
+			m_icount -= m_cycles;
+		}
+		else
 		{
-			// READ
-			uint16_t addr = 0x0000;
-			uint16_t val = 0;
-			if (m_param1_type & ADDR_IN_BASE)
-			{
-				addr = get_addr(m_param1_type, m_param1);
-				if (m_param1_type & IS16BIT)
-					val = RM16(addr);
-				else
-					val = RM8(addr);
-			}
-			else
-			{
-				val = get_source_val(m_param1_type, m_param1);
-			}
-
-			// MODIFY
-			val++;
-
-			if (!(m_param1_type & IS16BIT))
-				val &= 0xff;
-
-			if (val == 0)
-			{
-				SET_ZF;
-				SET_JF;
-			}
-			else
-			{
-				CLEAR_ZF;
-				CLEAR_JF;
-			}
-
-			// WRITE
-			if (m_param1_type & ADDR_IN_BASE)
-			{
-				//addr = get_addr(m_param1_type,m_param1); // already have
-				if (m_param1_type & IS16BIT)
-					WM16(addr, val);
-				else
-					WM8(addr, val);
-			}
-			else
-			{
-				set_dest_val(m_param1_type,m_param1, val);
-			}
-
-			break;
+			fatalerror("m_cycles == 0 after PC %04x\n", m_tmppc);
 		}
-		/*
-		case J:
-		    break;
-		*/
-		case JP:
-		case JR:
-		case JRS:
-		{
-			bool takejump = true;
-
-			if (m_param1_type == CONDITIONAL)
-			{
-				switch (m_param1)
-				{
-				case COND_EQ_Z:
-					if (IS_ZF == 1) takejump = true;
-					else takejump = false;
-					break;
-
-				case COND_NE_NZ:
-					if (IS_ZF == 0) takejump = true;
-					else takejump = false;
-					break;
-
-				case COND_LT_CS:
-					if (IS_CF == 1) takejump = true;
-					else takejump = false;
-					break;
-
-				case COND_GE_CC:
-					if (IS_CF == 0) takejump = true;
-					else takejump = false;
-					break;
-
-				case COND_LE:
-					if ((IS_CF || IS_ZF) == 1) takejump = true;
-					else takejump = false;
-					break;
-
-				case COND_GT:
-					if ((IS_CF || IS_ZF) == 0) takejump = true;
-					else takejump = false;
-					break;
-
-				case COND_T:
-					if (IS_JF == 1) takejump = true;
-					else takejump = false;
-					break;
-
-				case COND_F:
-					if (IS_JF == 0) takejump = true;
-					else takejump = false;
-					break;
-
-				}
-			}
-
-			if (takejump)
-			{
-				// would the address / register be read even if the jump isn't going to be taken?
-				uint16_t addr = 0x0000;
-				uint16_t val = 0;
-				if (m_param2_type & ADDR_IN_BASE)
-				{
-					addr = get_addr(m_param2_type,m_param2);
-					if (m_param2_type & IS16BIT)
-						val = RM16(addr);
-					else
-					{
-						fatalerror("8-bit jump destination?");
-						//  val = RM8(addr);
-					}
-				}
-				else
-				{
-					val = get_source_val(m_param2_type,m_param2);
-				}
-
-				m_pc.d = val;
-			}
-
-			SET_JF;
-
-			break;
-		}
-		case LD:
-		{
-			if ((m_param1_type & BITPOS) || (m_param2_type & BITPOS))
-			{
-				// bit operations, including the 'TEST' style bit instruction
-				uint8_t bit = 0;
-
-				if (m_param2_type == CARRYFLAG)
-				{
-					bit = IS_CF;
-
-					setbit_param(m_param1_type,m_param1,bit, false);
-
-					// for this type of operation ( LD *.b, CF ) the Jump Flag always ends up being 1
-					SET_JF;
-
-				}
-				else if (m_param1_type == CARRYFLAG)
-				{
-					getbit_param(m_param2_type,m_param2);
-
-					bit ? SET_CF : CLEAR_CF;
-					// for this type of operation ( LD CF, *.b ) the Jump Flag always ends up the inverse of the Carry Flag
-					bit ? CLEAR_JF : SET_JF;
-				}
-				else
-				{
-					fatalerror("not a bit op?! 2");
-				}
-			}
-			else
-			{
-				uint16_t addr = 0x0000;
-				uint16_t val = 0;
-				if (m_param2_type & ADDR_IN_BASE)
-				{
-					addr = get_addr(m_param2_type,m_param2);
-					if (m_param2_type & IS16BIT)
-						val = RM16(addr);
-					else
-						val = RM8(addr);
-				}
-				else
-				{
-					val = get_source_val(m_param2_type,m_param2);
-				}
-
-				SET_JF; // Jump Flag always gets set
-
-				// some (but not all) LD operations change the Zero Flag, some leave it undefined (for those we don't change it)
-				if (m_flagsaffected & FLAG_Z)
-				{
-					if (val == 0x00) SET_ZF;
-					else CLEAR_ZF;
-				}
-
-				if (m_param1_type & ADDR_IN_BASE)
-				{
-					addr = get_addr(m_param1_type,m_param1);
-					if (m_param1_type & IS16BIT)
-						WM16(addr, val);
-					else
-						WM8(addr, val);
-				}
-				else
-				{
-					set_dest_val(m_param1_type,m_param1, val);
-				}
-			}
-			break;
-		}
-		case LDW:
-			break;
-		case MCMP:
-			break;
-		case MUL:
-			break;
-		case NOP:
-			break;
-		case POP:
-			break;
-		case PUSH:
-			break;
-		case RET:
-			break;
-		case RETI:
-			break;
-		case RETN:
-			break;
-		case ROLC:
-			break;
-		case ROLD:
-			break;
-		case RORC:
-			break;
-		case RORD:
-			break;
-
-
-		case SET:
-			if ((m_param1_type & BITPOS))
-			{
-				//printf("set on bit\n");
-
-				if (m_param1_type == CARRYFLAG)
-				{
-					SET_CF;
-					CLEAR_JF;
-				}
-				else
-				{
-					//printf("set with setbit_param\n");
-
-					setbit_param(m_param1_type, m_param1, 1, true);
-				}
-			}
-			else
-			{
-				fatalerror("all SET opcode should be bit operations\n");
-				/*
-				uint16_t addr = 0x0000;
-				uint16_t val = 1;
-
-				if (m_param1_type & ADDR_IN_BASE)
-				{
-				    addr = get_addr(m_param1_type,m_param1);
-				    if (m_param1_type & IS16BIT)
-				        WM16(addr, val);
-				    else
-				        WM8(addr, val);
-				}
-				else
-				{
-				    set_dest_val(m_param1_type,m_param1, val);
-				}
-				*/
-
-			}
-			break;
-
-
-		case SHLC:
-			break;
-		case SHRC:
-			break;
-		case SWAP:
-			break;
-		case SWI:
-			break;
-		/*
-		case TEST:
-		    break;
-		*/
-		case XCH:
-			break;
-		case ALU_ADDC:
-			break;
-		case ALU_ADD:
-			break;
-		case ALU_SUBB:
-			break;
-		case ALU_SUB:
-			break;
-		case ALU_AND:
-			break;
-		case ALU_XOR:
-			break;
-		case ALU_OR:
-			break;
-		case ALU_CMP:
-
-				uint16_t addr = 0x0000;
-				uint16_t val = 0;
-				if (m_param2_type & ADDR_IN_BASE)
-				{
-					addr = get_addr(m_param2_type,m_param2);
-					if (m_param2_type & IS16BIT)
-						val = RM16(addr);
-					else
-						val = RM8(addr);
-				}
-				else
-				{
-					val = get_source_val(m_param2_type,m_param2);
-				}
-
-				uint16_t val2 = val;
-
-				if (m_param1_type & ADDR_IN_BASE)
-				{
-					addr = get_addr(m_param1_type,m_param1);
-					if (m_param1_type & IS16BIT)
-						val = RM16(addr);
-					else
-						val = RM8(addr);
-				}
-				else
-				{
-					val = get_source_val(m_param1_type,m_param1);
-				}
-
-				if (val < val2)
-				{
-					SET_CF;
-				}
-				else
-				{
-					CLEAR_CF;
-				}
-
-				if (val == val2)
-				{
-					SET_ZF;
-					SET_JF;
-				}
-				else
-				{
-					CLEAR_ZF;
-					CLEAR_JF;
-				}
-
-				// TODO: HF (how to calculate it?)
-
-
-			break;
-		}
-
-		m_icount-=m_cycles*4; // 1 machine cycle = 4 clock cycles?
-
-
-	} while( m_icount > 0 );
+	};
 }
 
 void tlcs870_device::device_reset()
 {
-	// todo, read from top address
-	m_pc.d = 0xc030;
+	m_pc.d = RM16(0xfffe);
 
-	m_RBS = 0;
+	m_RBS = 0x00;
+	m_EIR = 0x0000;
+	m_IL = 0x0000;
+	m_EINTCR = 0x00;
+	m_ADCCR = 0x00;
+	m_ADCDR = 0x00;
+	m_SYSCR1 = 0x00;
+	m_SYSCR2 = 0x80; // | 0x40, can order parts with low frequency oscillator enabled by default too (although default state is always to use high one?)
+	m_TBTCR = 0x00;
 
+	m_TREG1A = 0x1234; // not initialized?
+	m_TREG1B = 0x4321; // not initialized?
+	m_TC1CR = 0x00;
+
+	m_TREG2 = 0x2301; // not initialized?
+	m_TC2CR = 0x00;
+
+	m_TREG3A = 0x10; // not initialized?
+	m_TREG3B = 0x32; // not initialized?
+	m_TC3CR = 0x00;
+
+	m_TREG4 = 0x30; // not initialized?
+	m_TC3CR = 0x00;
+
+	m_SIOCR1[0] = 0x00;
+	m_SIOCR1[1] = 0x00;
+
+	m_SIOCR2[0] = 0x00;
+	m_SIOCR2[1] = 0x00;
+
+	m_WDTCR1 = 0x09;
+
+	m_irqstate = 0;
+	m_transfer_numbytes[0] = 0;
+	m_transfer_numbytes[1] = 0;
+	m_transfer_mode[0] = 0;
+	m_transfer_mode[1] = 0;
+	m_transfer_pos[0] = 0;
+	m_transfer_pos[1] = 0;
+	m_transfer_shiftreg[0] = 0;
+	m_transfer_shiftreg[1] = 0;
+	m_transfer_shiftpos[0] = 0;
+	m_transfer_shiftpos[1] = 0;
+
+
+	m_port_out_latch[0] = 0x00;
+	m_port_out_latch[1] = 0x00;
+	m_port_out_latch[2] = 0xff;
+	m_port_out_latch[3] = 0xff;
+	m_port_out_latch[4] = 0xff;
+	m_port_out_latch[5] = 0xff;
+	m_port_out_latch[6] = 0x00;
+	m_port_out_latch[7] = 0x00;
+
+	m_port0_cr = 0xff;
+	m_port1_cr = 0xff;
+	m_port6_cr = 0xff;
+	m_port7_cr = 0xff;
 }
-
-uint8_t tlcs870_device::get_reg8(int reg)
-{
-	return m_intram[((m_RBS & 0xf) * 8) + (reg & 0x7)];
-}
-
-void tlcs870_device::set_reg8(int reg, uint8_t val)
-{
-	m_intram[((m_RBS & 0xf) * 8) + (reg & 0x7)] = val;
-}
-
-uint16_t tlcs870_device::get_reg16(int reg)
-{
-	uint16_t res = 0;
-	res |= get_reg8(((reg & 0x3) * 2) + 1) << 8;
-	res |= get_reg8(((reg & 0x3) * 2) + 0) << 0;
-	return res;
-}
-
-void tlcs870_device::set_reg16(int reg, uint16_t val)
-{
-	set_reg8(((reg & 0x3) * 2) + 1, (val & 0xff00) >> 8);
-	set_reg8(((reg & 0x3) * 2) + 0, (val & 0x00ff) >> 0);
-}
-
-
 
 void tlcs870_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case DEBUGGER_REG_A:
-			set_reg8(REG_A, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_A:
+		set_reg8(REG_A, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_W:
-			set_reg8(REG_W, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_W:
+		set_reg8(REG_W, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_C:
-			set_reg8(REG_C, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_C:
+		set_reg8(REG_C, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_B:
-			set_reg8(REG_B, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_B:
+		set_reg8(REG_B, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_E:
-			set_reg8(REG_E, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_E:
+		set_reg8(REG_E, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_D:
-			set_reg8(REG_D, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_D:
+		set_reg8(REG_D, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_L:
-			set_reg8(REG_L, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_L:
+		set_reg8(REG_L, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_H:
-			set_reg8(REG_H, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_H:
+		set_reg8(REG_H, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_WA:
-			set_reg16(REG_WA, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_WA:
+		set_reg16(REG_WA, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_BC:
-			set_reg16(REG_BC, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_BC:
+		set_reg16(REG_BC, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_DE:
-			set_reg16(REG_DE, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_DE:
+		set_reg16(REG_DE, m_debugger_temp);
+		break;
 
-		case DEBUGGER_REG_HL:
-			set_reg16(REG_HL, m_debugger_temp);
-			break;
+	case DEBUGGER_REG_HL:
+		set_reg16(REG_HL, m_debugger_temp);
+		break;
+
+	case DEBUGGER_REG_RB:
+		m_RBS = m_debugger_temp;
+		break;
 	}
 }
 
@@ -3060,53 +1152,57 @@ void tlcs870_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case DEBUGGER_REG_A:
-			m_debugger_temp = get_reg8(REG_A);
-			break;
+	case DEBUGGER_REG_A:
+		m_debugger_temp = get_reg8(REG_A);
+		break;
 
-		case DEBUGGER_REG_W:
-			m_debugger_temp = get_reg8(REG_W);
-			break;
+	case DEBUGGER_REG_W:
+		m_debugger_temp = get_reg8(REG_W);
+		break;
 
-		case DEBUGGER_REG_C:
-			m_debugger_temp = get_reg8(REG_C);
-			break;
+	case DEBUGGER_REG_C:
+		m_debugger_temp = get_reg8(REG_C);
+		break;
 
-		case DEBUGGER_REG_B:
-			m_debugger_temp = get_reg8(REG_B);
-			break;
+	case DEBUGGER_REG_B:
+		m_debugger_temp = get_reg8(REG_B);
+		break;
 
-		case DEBUGGER_REG_E:
-			m_debugger_temp = get_reg8(REG_E);
-			break;
+	case DEBUGGER_REG_E:
+		m_debugger_temp = get_reg8(REG_E);
+		break;
 
-		case DEBUGGER_REG_D:
-			m_debugger_temp = get_reg8(REG_D);
-			break;
+	case DEBUGGER_REG_D:
+		m_debugger_temp = get_reg8(REG_D);
+		break;
 
-		case DEBUGGER_REG_L:
-			m_debugger_temp = get_reg8(REG_L);
-			break;
+	case DEBUGGER_REG_L:
+		m_debugger_temp = get_reg8(REG_L);
+		break;
 
-		case DEBUGGER_REG_H:
-			m_debugger_temp = get_reg8(REG_H);
-			break;
+	case DEBUGGER_REG_H:
+		m_debugger_temp = get_reg8(REG_H);
+		break;
 
-		case DEBUGGER_REG_WA:
-			m_debugger_temp = get_reg16(REG_WA);
-			break;
+	case DEBUGGER_REG_WA:
+		m_debugger_temp = get_reg16(REG_WA);
+		break;
 
-		case DEBUGGER_REG_BC:
-			m_debugger_temp = get_reg16(REG_BC);
-			break;
+	case DEBUGGER_REG_BC:
+		m_debugger_temp = get_reg16(REG_BC);
+		break;
 
-		case DEBUGGER_REG_DE:
-			m_debugger_temp = get_reg16(REG_DE);
-			break;
+	case DEBUGGER_REG_DE:
+		m_debugger_temp = get_reg16(REG_DE);
+		break;
 
-		case DEBUGGER_REG_HL:
-			m_debugger_temp = get_reg16(REG_HL);
-			break;
+	case DEBUGGER_REG_HL:
+		m_debugger_temp = get_reg16(REG_HL);
+		break;
+
+	case DEBUGGER_REG_RB:
+		m_debugger_temp = m_RBS;
+		break;
 
 	}
 }
@@ -3114,7 +1210,7 @@ void tlcs870_device::state_export(const device_state_entry &entry)
 
 void tlcs870_device::device_start()
 {
-//  int i, p;
+	//  int i, p;
 	m_sp.d = 0x0000;
 	m_F = 0;
 
@@ -3135,14 +1231,33 @@ void tlcs870_device::device_start()
 	state_add(DEBUGGER_REG_DE, "DE", m_debugger_temp).callimport().callexport().formatstr("%04X");
 	state_add(DEBUGGER_REG_HL, "HL", m_debugger_temp).callimport().callexport().formatstr("%04X");
 
+	state_add(DEBUGGER_REG_RB, "RB", m_debugger_temp).callimport().callexport().formatstr("%01X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc.w.l).formatstr("%04X");
 	state_add(STATE_GENPCBASE, "CURPC", m_prvpc.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X");
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_F ).formatstr("%8s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_F).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
+
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
+	for (auto &cb : m_port_analog_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_serial_out_cb)
+		cb.resolve_safe();
+
+	m_serial_transmit_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio0_transmit_cb), this));
+	m_serial_transmit_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::sio1_transmit_cb), this));
+
+	m_tcx_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc1_cb), this));
+	m_tcx_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc2_cb), this));
+	m_tcx_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc3_cb), this));
+	m_tcx_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs870_device::tc4_cb), this));
 }
+
 
 
 void tlcs870_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -3152,19 +1267,19 @@ void tlcs870_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 
-		case STATE_GENFLAGS:
-			str = string_format("%c%c%c%c",
-				F & 0x80 ? 'J':'.',
-				F & 0x40 ? 'Z':'.',
-				F & 0x20 ? 'C':'.',
-				F & 0x10 ? 'H':'.'
-			);
-			break;
+	case STATE_GENFLAGS:
+		str = string_format("%c%c%c%c",
+			F & 0x80 ? 'J' : '.',
+			F & 0x40 ? 'Z' : '.',
+			F & 0x20 ? 'C' : '.',
+			F & 0x10 ? 'H' : '.'
+		);
+		break;
 	}
 
 }
 
-util::disasm_interface *tlcs870_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs870_device::create_disassembler()
 {
-	return new tlcs870_disassembler;
+	return std::make_unique<tlcs870_disassembler>();
 }

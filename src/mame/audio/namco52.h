@@ -6,35 +6,16 @@
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
 
-#define MCFG_NAMCO_52XX_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_52XX, _clock)
-
-#define MCFG_NAMCO_52XX_DISCRETE(_tag) \
-	namco_52xx_device::set_discrete(*device, "^" _tag);
-
-#define MCFG_NAMCO_52XX_BASENODE(_node) \
-	namco_52xx_device::set_basenote(*device, _node);
-
-#define MCFG_NAMCO_52XX_EXT_CLOCK(_clock) \
-	namco_52xx_device::set_extclock(*device, _clock);
-
-#define MCFG_NAMCO_52XX_ROMREAD_CB(_devcb) \
-	devcb = &namco_52xx_device::set_romread_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_52XX_SI_CB(_devcb) \
-	devcb = &namco_52xx_device::set_si_callback(*device, DEVCB_##_devcb);
-
-
 class namco_52xx_device : public device_t
 {
 public:
 	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_discrete(device_t &device, const char *tag) { downcast<namco_52xx_device &>(device).m_discrete.set_tag(tag); }
-	static void set_basenote(device_t &device, int node) { downcast<namco_52xx_device &>(device).m_basenode = node; }
-	static void set_extclock(device_t &device, attoseconds_t clk) { downcast<namco_52xx_device &>(device).m_extclock = clk; }
-	template <class Object> static devcb_base &set_romread_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_si_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_si.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_discrete(T &&tag) { m_discrete.set_tag(std::forward<T>(tag)); }
+	void set_basenote(int node) { m_basenode = node; }
+	void set_extclock(attoseconds_t clk) { m_extclock = clk; }
+	auto romread_callback() { return m_romread.bind(); }
+	auto si_callback() { return m_si.bind(); }
 
 	DECLARE_WRITE8_MEMBER(write);
 

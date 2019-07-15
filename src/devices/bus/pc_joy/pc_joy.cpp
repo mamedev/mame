@@ -19,6 +19,10 @@ pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, dev
 	device_slot_interface(mconfig, *this),
 	m_dev(nullptr)
 {
+	option_reset();
+	pc_joysticks(*this);
+	set_default_option("basic_joy");
+	set_fixed(false);
 }
 
 READ8_MEMBER ( pc_joy_device::joy_port_r )
@@ -91,7 +95,8 @@ pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const ch
 {
 }
 
-SLOT_INTERFACE_START(pc_joysticks)
-	SLOT_INTERFACE("basic_joy", PC_BASIC_JOY)
-	SLOT_INTERFACE("mssw_pad", PC_MSSW_PAD)
-SLOT_INTERFACE_END
+void pc_joysticks(device_slot_interface &device)
+{
+	device.option_add("basic_joy", PC_BASIC_JOY);
+	device.option_add("mssw_pad", PC_MSSW_PAD);
+}

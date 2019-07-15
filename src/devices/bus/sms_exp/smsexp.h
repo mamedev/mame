@@ -15,18 +15,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SMS_EXPANSION_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, SMS_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -61,7 +49,16 @@ class sms_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	sms_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: sms_expansion_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	sms_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sms_expansion_slot_device();
 
 	// reading and writing
@@ -87,7 +84,7 @@ protected:
 DECLARE_DEVICE_TYPE(SMS_EXPANSION_SLOT, sms_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( sms_expansion_devices );
+void sms_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SMS_EXP_SMSEXP_H

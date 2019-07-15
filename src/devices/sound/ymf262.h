@@ -24,6 +24,7 @@ typedef void (*OPL3_UPDATEHANDLER)(device_t *device,int min_interval_us);
 
 
 void *ymf262_init(device_t *device, int clock, int rate);
+void ymf262_clock_changed(void *chip, int clock, int rate);
 void ymf262_post_load(void *chip);
 void ymf262_shutdown(void *chip);
 void ymf262_reset_chip(void *chip);

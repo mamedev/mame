@@ -1,15 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
+#include "emupal.h"
 #include "screen.h"
 
 class nbmj8900_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER
-	};
+
 
 	nbmj8900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
@@ -17,6 +15,18 @@ public:
 		m_nb1413m3(*this, "nb1413m3"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")   { }
+
+	void ohpaipee(machine_config &config);
+	void togenkyo(machine_config &config);
+
+	void init_togenkyo();
+	void init_ohpaipee();
+
+private:
+	enum
+	{
+		TIMER_BLITTER
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
@@ -59,8 +69,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vramsel_w);
 	DECLARE_WRITE8_MEMBER(romsel_w);
 
-	DECLARE_DRIVER_INIT(togenkyo);
-	DECLARE_DRIVER_INIT(ohpaipee);
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -70,11 +78,9 @@ public:
 	void gfxdraw();
 	void postload();
 
-	void ohpaipee(machine_config &config);
-	void togenkyo(machine_config &config);
 	void ohpaipee_io_map(address_map &map);
 	void ohpaipee_map(address_map &map);
 	void togenkyo_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

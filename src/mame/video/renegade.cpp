@@ -13,15 +13,13 @@
 WRITE8_MEMBER(renegade_state::bg_videoram_w)
 {
 	m_bg_videoram[offset] = data;
-	offset = offset % (64 * 16);
-	m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(renegade_state::fg_videoram_w)
 {
 	m_fg_videoram[offset] = data;
-	offset = offset % (32 * 32);
-	m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(renegade_state::flipscreen_w)
@@ -54,7 +52,7 @@ TILE_GET_INFO_MEMBER(renegade_state::get_fg_tilemap_info)
 	const uint8_t *source = &m_fg_videoram[tile_index];
 	uint8_t attributes = source[0x400];
 	SET_TILE_INFO_MEMBER(0,
-		(attributes & 3) * 256 + source[0],
+		((attributes & 3) << 8) | source[0],
 		attributes >> 6,
 		0);
 }
@@ -100,9 +98,8 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (attributes & 0x80) /* big sprite */
 			{
-				sprite_number &= ~1;
 				m_gfxdecode->gfx(sprite_bank)->transpen(bitmap,cliprect,
-					sprite_number + 1,
+					sprite_number | 1,
 					color,
 					xflip, flip_screen(),
 					sx, sy + (flip_screen() ? -16 : 16), 0);

@@ -32,7 +32,7 @@ enum {
 };
 
 
-DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "i860XR")
+DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "Intel i860XR")
 
 
 i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -138,7 +138,7 @@ void i860_cpu_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -232,9 +232,9 @@ void i860_cpu_device::device_reset()
 	reset_i860();
 }
 
-util::disasm_interface *i860_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i860_cpu_device::create_disassembler()
 {
-	return new i860_disassembler;
+	return std::make_unique<i860_disassembler>();
 }
 
 

@@ -221,6 +221,22 @@ class MachineHandler(QueryPageHandler):
         if haveoptions:
             yield '</select>\n<script>set_default_system_bios();</script>\n'.encode('utf-8')
 
+        # allow RAM size selection
+        first = True
+        for name, size, isdef in self.dbcurs.get_ram_options(id):
+            if first:
+                if not haveoptions:
+                    haveoptions = True;
+                    yield htmltmpl.MACHINE_OPTIONS_HEADING.substitute().encode('utf-8')
+                yield htmltmpl.MACHINE_RAM_PROLOGUE.substitute().encode('utf-8')
+                first = False
+            yield htmltmpl.MACHINE_RAM_OPTION.substitute(
+                    name=cgi.escape(name, True),
+                    size=cgi.escape('{:,}'.format(size)),
+                    isdefault=('yes' if isdef else 'no')).encode('utf-8')
+        if not first:
+            yield '</select>\n<script>set_default_ram_option();</script>\n'.encode('utf-8')
+
         # placeholder for machine slots - populated by client-side JavaScript
         if self.dbcurs.count_slots(id):
             if not haveoptions:

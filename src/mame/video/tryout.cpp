@@ -11,31 +11,31 @@
 #include "includes/tryout.h"
 
 
-PALETTE_INIT_MEMBER(tryout_state, tryout)
+void tryout_state::tryout_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (int i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int attr = m_videoram[tile_index + 0x400];
 	code |= ((attr & 0x03) << 8);
-	int color = ((attr & 0x4)>>2)+6;
+	int color = ((attr & 0x4) >> 2) + 6;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -173,8 +173,8 @@ void tryout_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_vram_bank));
-	save_pointer(NAME(m_vram.get()), 8 * 0x800);
-	save_pointer(NAME(m_vram_gfx.get()), 0x6000);
+	save_pointer(NAME(m_vram), 8 * 0x800);
+	save_pointer(NAME(m_vram_gfx), 0x6000);
 }
 
 void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)

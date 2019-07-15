@@ -18,25 +18,6 @@
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-#define MCFG_MICROPOLIS_DRIVE_TAGS(_tag1, _tag2, _tag3, _tag4) \
-	micropolis_device::set_drive_tags(*device, _tag1, _tag2, _tag3, _tag4);
-
-#define MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS \
-	MCFG_MICROPOLIS_DRIVE_TAGS(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3)
-
-#define MCFG_MICROPOLIS_DDEN_CALLBACK(_read) \
-	devcb = &micropolis_device::set_dden_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_MICROPOLIS_INTRQ_CALLBACK(_write) \
-	devcb = &micropolis_device::set_intrq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MICROPOLIS_DRQ_CALLBACK(_write) \
-	devcb = &micropolis_device::set_drq_wr_callback(*device, DEVCB_##_write);
-
-/***************************************************************************
     MACROS
 ***************************************************************************/
 
@@ -45,18 +26,19 @@ class micropolis_device : public device_t
 public:
 	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_dden_rd_callback(device_t &device, Object &&cb) { return downcast<micropolis_device &>(device).m_read_dden.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<micropolis_device &>(device).m_write_intrq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<micropolis_device &>(device).m_write_drq.set_callback(std::forward<Object>(cb)); }
+	auto dden_rd_callback() { return m_read_dden.bind(); }
+	auto intrq_wr_callback() { return m_write_intrq.bind(); }
+	auto drq_wr_callback() { return m_write_drq.bind(); }
 
-	static void set_drive_tags(device_t &device, const char *tag1, const char *tag2, const char *tag3, const char *tag4)
+	void set_drive_tags(const char *tag1, const char *tag2, const char *tag3, const char *tag4)
 	{
-		micropolis_device &dev = downcast<micropolis_device &>(device);
-		dev.m_floppy_drive_tags[0] = tag1;
-		dev.m_floppy_drive_tags[1] = tag2;
-		dev.m_floppy_drive_tags[2] = tag3;
-		dev.m_floppy_drive_tags[3] = tag4;
+		m_floppy_drive_tags[0] = tag1;
+		m_floppy_drive_tags[1] = tag2;
+		m_floppy_drive_tags[2] = tag3;
+		m_floppy_drive_tags[3] = tag4;
 	}
+
+	void set_default_drive_tags() { set_drive_tags(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3); }
 
 	void set_drive(uint8_t drive); // set current drive (0-3)
 

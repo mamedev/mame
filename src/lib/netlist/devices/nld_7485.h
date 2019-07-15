@@ -23,20 +23,22 @@
 #ifndef NLD_7485_H_
 #define NLD_7485_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define TTL_7485(name, cA0, cA1, cA2, cA3, cB0, cB1, cB2, cB3, cLTIN, cEQIN, cGTIN)    \
-		NET_REGISTER_DEV(TTL_7485, name)    \
-		NET_CONNECT(name, A0,   cA0)    \
-		NET_CONNECT(name, A1,   cA1)    \
-		NET_CONNECT(name, A2,   cA2)    \
-		NET_CONNECT(name, A3,   cA3)    \
-		NET_CONNECT(name, B0,   cB0)    \
-		NET_CONNECT(name, B1,   cB1)    \
-		NET_CONNECT(name, B2,   cB2)    \
-		NET_CONNECT(name, B3,   cB3)    \
-		NET_CONNECT(name, LTIN, cLTIN)  \
-		NET_CONNECT(name, EQIN, cEQIN)  \
+		NET_REGISTER_DEV(TTL_7485, name)                                       \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, A0,   cA0)                                           \
+		NET_CONNECT(name, A1,   cA1)                                           \
+		NET_CONNECT(name, A2,   cA2)                                           \
+		NET_CONNECT(name, A3,   cA3)                                           \
+		NET_CONNECT(name, B0,   cB0)                                           \
+		NET_CONNECT(name, B1,   cB1)                                           \
+		NET_CONNECT(name, B2,   cB2)                                           \
+		NET_CONNECT(name, B3,   cB3)                                           \
+		NET_CONNECT(name, LTIN, cLTIN)                                         \
+		NET_CONNECT(name, EQIN, cEQIN)                                         \
 		NET_CONNECT(name, GTIN, cGTIN)
 
 #define TTL_7485_DIP(name)                                                     \

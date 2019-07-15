@@ -34,10 +34,6 @@
 
 #pragma once
 
-
-#define MCFG_KR2376_STROBE_CALLBACK(_write) \
-	devcb = &kr2376_device::set_strobe_wr_callback(*device, DEVCB_##_write);
-
 class kr2376_device : public device_t
 {
 public:
@@ -53,12 +49,15 @@ public:
 	enum output_pin_t
 	{
 		KR2376_SO=16,           /* SO    - Pin 16 - Strobe Output */
-		KR2376_PO=7         /* PO    - Pin  7 - Parity Output */
+		KR2376_PO=7             /* PO    - Pin  7 - Parity Output */
 	};
 
-	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kr2376_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_strobe_wr_callback(device_t &device, Object &&cb) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto x() { return m_read_x[N].bind(); }
+	auto shift() { return m_read_shift.bind(); }
+	auto control() { return m_read_control.bind(); }
+	auto strobe() { return m_write_strobe.bind(); }
 
 	/* keyboard data */
 	DECLARE_READ8_MEMBER( data_r );
@@ -73,7 +72,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual uint8_t key_codes(int mode, int x, int y) { return 0x00; }
 
 private:
 	// internal state
@@ -81,7 +80,6 @@ private:
 
 	int m_ring11;                     /* sense input scan counter */
 	int m_ring8;                      /* drive output scan counter */
-	int m_modifiers;                  /* modifier inputs */
 
 	int m_strobe;                     /* strobe output */
 	int m_strobe_old;
@@ -90,6 +88,8 @@ private:
 
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
+	devcb_read16 m_read_x[8];
+	devcb_read_line m_read_shift, m_read_control;
 	devcb_write_line m_write_strobe;
 
 	enum
@@ -102,6 +102,24 @@ private:
 	void detect_keypress();
 };
 
-DECLARE_DEVICE_TYPE(KR2376, kr2376_device)
+class kr2376_st_device : public kr2376_device
+{
+public:
+	kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	virtual uint8_t key_codes(int mode, int x, int y) override;
+};
+
+//class kr2376_12_device : public kr2376_device
+//{
+//public:
+//  // construction/destruction
+//  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+//protected:
+//  virtual uint8_t key_codes(int mode, int x, int y) override;
+//};
+
+DECLARE_DEVICE_TYPE(KR2376_ST, kr2376_st_device)
+//DECLARE_DEVICE_TYPE(KR2376_12, kr2376_12_device)
 
 #endif // MAME_MACHINE_KR2376_H

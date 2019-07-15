@@ -413,44 +413,47 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank04_write)
 
 /**********************************************************************************/
 
-ADDRESS_MAP_START(polygonet_state::main_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16("k053936", k053936_device, ctrl_r, ctrl_w, 0xffffffff)
-	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
-	AM_RANGE(0x480000, 0x480003) AM_READ8(polygonet_inputs_r, 0xffffffff)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE8(polygonet_sys_w, 0xffffffff)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_SHARE("shared_ram")
-	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
-	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
-	AM_RANGE(0x540000, 0x540fff) AM_READWRITE(polygonet_ttl_ram_r, polygonet_ttl_ram_w)
-	AM_RANGE(0x541000, 0x54101f) AM_RAM
-	AM_RANGE(0x580000, 0x5807ff) AM_RAM
-	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP /* network RAM | registers? */
-	AM_RANGE(0x600000, 0x60000f) AM_DEVICE8("k054321", k054321_device, main_map, 0xffffffff)
-	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x680000, 0x680003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
-	AM_RANGE(0x700000, 0x73ffff) AM_ROM AM_REGION("gfx2", 0)
-	AM_RANGE(0x780000, 0x79ffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xff8000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void polygonet_state::main_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x21ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x400000, 0x40001f).rw(m_k053936, FUNC(k053936_device::ctrl_r), FUNC(k053936_device::ctrl_w));
+	map(0x440000, 0x440fff).rw(FUNC(polygonet_state::polygonet_roz_ram_r), FUNC(polygonet_state::polygonet_roz_ram_w));
+	map(0x480000, 0x480003).r(FUNC(polygonet_state::polygonet_inputs_r));
+	map(0x4c0000, 0x4c0003).w(FUNC(polygonet_state::polygonet_sys_w));
+	map(0x500000, 0x503fff).ram().w(FUNC(polygonet_state::shared_ram_write)).share("shared_ram");
+	map(0x504000, 0x504003).w(FUNC(polygonet_state::dsp_w_lines));
+	map(0x506000, 0x50600f).rw(FUNC(polygonet_state::dsp_host_interface_r), FUNC(polygonet_state::dsp_host_interface_w));
+	map(0x540000, 0x540fff).rw(FUNC(polygonet_state::polygonet_ttl_ram_r), FUNC(polygonet_state::polygonet_ttl_ram_w));
+	map(0x541000, 0x54101f).ram();
+	map(0x580000, 0x5807ff).ram();
+	map(0x580800, 0x580803).r(FUNC(polygonet_state::network_r)).nopw(); /* network RAM | registers? */
+	map(0x600000, 0x60000f).m(m_k054321, FUNC(k054321_device::main_map));
+	map(0x640000, 0x640003).w(FUNC(polygonet_state::sound_irq_w));
+	map(0x680000, 0x680003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
+	map(0x700000, 0x73ffff).rom().region("gfx2", 0);
+	map(0x780000, 0x79ffff).rom().region("gfx1", 0);
+	map(0xff8000, 0xffffff).ram();
+}
 
 /**********************************************************************************/
 
-ADDRESS_MAP_START(polygonet_state::dsp_program_map)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("dsp56k_p_mirror") /* Unsure of size, but 0x1000 matches bank01 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("dsp56k_p_8000")
-	AM_RANGE(0xc000, 0xc000) AM_READ(dsp56k_bootload_r)
-ADDRESS_MAP_END
+void polygonet_state::dsp_program_map(address_map &map)
+{
+	map(0x7000, 0x7fff).ram().share("dsp56k_p_mirror"); /* Unsure of size, but 0x1000 matches bank01 */
+	map(0x8000, 0x87ff).ram().share("dsp56k_p_8000");
+	map(0xc000, 0xc000).r(FUNC(polygonet_state::dsp56k_bootload_r));
+}
 
-ADDRESS_MAP_START(polygonet_state::dsp_data_map)
-	AM_RANGE(0x0800, 0x5fff) AM_RAM      /* Appears to not be affected by banking? */
-	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)  /* Mirrored in program space @ 0x7000 */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(dsp56k_shared_ram_read, dsp56k_shared_ram_write)
-	AM_RANGE(0xe000, 0xffbf) AM_READWRITE(dsp56k_ram_bank04_read, dsp56k_ram_bank04_write)
-ADDRESS_MAP_END
+void polygonet_state::dsp_data_map(address_map &map)
+{
+	map(0x0800, 0x5fff).ram();      /* Appears to not be affected by banking? */
+	map(0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp56k_ram_bank00_read), FUNC(polygonet_state::dsp56k_ram_bank00_write));
+	map(0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp56k_ram_bank01_read), FUNC(polygonet_state::dsp56k_ram_bank01_write));  /* Mirrored in program space @ 0x7000 */
+	map(0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp56k_ram_bank02_read), FUNC(polygonet_state::dsp56k_ram_bank02_write));
+	map(0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp56k_shared_ram_read), FUNC(polygonet_state::dsp56k_shared_ram_write));
+	map(0xe000, 0xffbf).rw(FUNC(polygonet_state::dsp56k_ram_bank04_read), FUNC(polygonet_state::dsp56k_ram_bank04_write));
+}
 
 /**********************************************************************************/
 
@@ -472,17 +475,18 @@ WRITE8_MEMBER(polygonet_state::sound_ctrl_w)
 
 
 
-ADDRESS_MAP_START(polygonet_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_READNOP AM_WRITENOP // Second 054539 (not present)
-	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
-ADDRESS_MAP_END
+void polygonet_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe22f).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe230, 0xe3ff).ram();
+	map(0xe400, 0xe62f).nopr().nopw(); // Second 054539 (not present)
+	map(0xe630, 0xe7ff).ram();
+	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
+	map(0xf800, 0xf800).w(FUNC(polygonet_state::sound_ctrl_w));
+}
 
 
 /**********************************************************************************/
@@ -500,7 +504,7 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static GFXDECODE_START( plygonet )
+static GFXDECODE_START( gfx_plygonet )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
@@ -548,51 +552,51 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 	m_sound_intck = state;
 }
 
-MACHINE_CONFIG_START(polygonet_state::plygonet)
+void polygonet_state::plygonet(machine_config &config)
+{
+	M68EC020(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &polygonet_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(polygonet_state::polygonet_interrupt));
 
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state, polygonet_interrupt)
+	DSP56156(config, m_dsp, XTAL(40'000'000));
+	m_dsp->set_addrmap(AS_PROGRAM, &polygonet_state::dsp_program_map);
+	m_dsp->set_addrmap(AS_DATA, &polygonet_state::dsp_data_map);
 
-	MCFG_CPU_ADD("dsp", DSP56156, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	Z80(config, m_audiocpu, 8000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	config.m_perfect_cpu_quantum = subtag("maincpu"); /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
+	EEPROM_ER5911_8BIT(config, m_eeprom);
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plygonet)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_plygonet);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(polygonet_state, screen_update_polygonet)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(64, 64+368-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(polygonet_state::screen_update_polygonet));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	K053936(config, m_k053936, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(polygonet_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set(FUNC(polygonet_state::k054539_nmi_gen));
+	k054539.add_route(0, "lspeaker", 0.75);
+	k054539.add_route(1, "rspeaker", 0.75);
+}
 
 
 /**********************************************************************************/
@@ -621,8 +625,8 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 2, unused
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -659,7 +663,7 @@ INPUT_PORTS_END
 
 
 /**********************************************************************************/
-DRIVER_INIT_MEMBER(polygonet_state,polygonet)
+void polygonet_state::init_polygonet()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
@@ -721,5 +725,5 @@ ROM_START( polynetw )
 ROM_END
 
 //    YEAR  NAME      PARENT   MACHINE   INPUT      STATE            INIT
-GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, init_polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, init_polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )

@@ -45,7 +45,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 
 READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff );
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff ); // Z80
 	return 0x00;
 }
 
@@ -74,7 +74,7 @@ void simpsons_state::machine_start()
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
-	save_pointer(NAME(m_spriteram.get()), 0x1000 / 2);
+	save_pointer(NAME(m_spriteram), 0x1000 / 2);
 }
 
 void simpsons_state::machine_reset()

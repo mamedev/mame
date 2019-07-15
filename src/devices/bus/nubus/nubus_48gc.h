@@ -46,7 +46,6 @@ private:
 	uint32_t m_registers[0x100];
 	int m_xres, m_yres;
 	const bool m_is824;
-	const std::string m_assembled_tag;
 };
 
 class nubus_48gc_device : public jmfb_device

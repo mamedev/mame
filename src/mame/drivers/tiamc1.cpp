@@ -151,48 +151,52 @@ WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
 }
 
 
-ADDRESS_MAP_START(tiamc1_state::tiamc1_map)
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(tiamc1_videoram_w)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tiamc1_state::tiamc1_map(address_map &map)
+{
+	map(0xb000, 0xb7ff).w(FUNC(tiamc1_state::tiamc1_videoram_w));
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(tiamc1_state::kotrybolov_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(kot_videoram_w)
-ADDRESS_MAP_END
+void tiamc1_state::kotrybolov_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xf000, 0xf3ff).w(FUNC(tiamc1_state::kot_videoram_w));
+}
 
-ADDRESS_MAP_START(tiamc1_state::tiamc1_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
-	AM_RANGE(0x50, 0x5f) AM_WRITE(tiamc1_sprite_x_w) /* sprites X */
-	AM_RANGE(0x60, 0x6f) AM_WRITE(tiamc1_sprite_n_w) /* sprites # */
-	AM_RANGE(0x70, 0x7f) AM_WRITE(tiamc1_sprite_a_w) /* sprites attributes */
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(tiamc1_palette_w)  /* color ram */
-	AM_RANGE(0xbc, 0xbc) AM_WRITE(tiamc1_bg_vshift_w)/* background V scroll */
-	AM_RANGE(0xbd, 0xbd) AM_WRITE(tiamc1_bg_hshift_w)/* background H scroll */
-	AM_RANGE(0xbe, 0xbe) AM_WRITE(tiamc1_bankswitch_w) /* VRAM selector */
-	AM_RANGE(0xbf, 0xbf) AM_WRITE(tiamc1_bg_bplctrl_w) /* charset control */
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer0_w)   /* timer 0 */
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("kr580vv55a", i8255_device, read, write)    /* input ports + coin counters & lockout */
-	AM_RANGE(0xd4, 0xd7) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer1_w)   /* timer 1 */
-	AM_RANGE(0xda, 0xda) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer1_gate_w) /* timer 1 gate control */
-ADDRESS_MAP_END
+void tiamc1_state::tiamc1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x4f).w(FUNC(tiamc1_state::tiamc1_sprite_y_w)); /* sprites Y */
+	map(0x50, 0x5f).w(FUNC(tiamc1_state::tiamc1_sprite_x_w)); /* sprites X */
+	map(0x60, 0x6f).w(FUNC(tiamc1_state::tiamc1_sprite_n_w)); /* sprites # */
+	map(0x70, 0x7f).w(FUNC(tiamc1_state::tiamc1_sprite_a_w)); /* sprites attributes */
+	map(0xa0, 0xaf).w(FUNC(tiamc1_state::tiamc1_palette_w));  /* color ram */
+	map(0xbc, 0xbc).w(FUNC(tiamc1_state::tiamc1_bg_vshift_w));/* background V scroll */
+	map(0xbd, 0xbd).w(FUNC(tiamc1_state::tiamc1_bg_hshift_w));/* background H scroll */
+	map(0xbe, 0xbe).w(FUNC(tiamc1_state::tiamc1_bankswitch_w)); /* VRAM selector */
+	map(0xbf, 0xbf).w(FUNC(tiamc1_state::tiamc1_bg_bplctrl_w)); /* charset control */
+	map(0xc0, 0xc3).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer0_w));   /* timer 0 */
+	map(0xd0, 0xd3).rw("kr580vv55a", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* input ports + coin counters & lockout */
+	map(0xd4, 0xd7).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer1_w));   /* timer 1 */
+	map(0xda, 0xda).w("2x8253", FUNC(tiamc1_sound_device::tiamc1_timer1_gate_w)); /* timer 1 gate control */
+}
 
-ADDRESS_MAP_START(tiamc1_state::kotrybolov_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)    // sprites Y
-	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)    // sprites X
-	AM_RANGE(0x20, 0x2f) AM_WRITE(tiamc1_sprite_n_w)    // sprites #
-	AM_RANGE(0x30, 0x3f) AM_WRITE(tiamc1_sprite_a_w)    // sprites attributes
-	AM_RANGE(0xe0, 0xef) AM_WRITE(tiamc1_palette_w)     // color ram
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(tiamc1_bg_vshift_w)   // background V scroll
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(tiamc1_bg_hshift_w)   // background H scroll
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(kot_bankswitch_w)     // character rom offset
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("kr580vv55a", i8255_device, read, write)    /* input ports + coin counters & lockout */
-ADDRESS_MAP_END
+void tiamc1_state::kotrybolov_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w(FUNC(tiamc1_state::tiamc1_sprite_y_w));    // sprites Y
+	map(0x10, 0x1f).w(FUNC(tiamc1_state::tiamc1_sprite_x_w));    // sprites X
+	map(0x20, 0x2f).w(FUNC(tiamc1_state::tiamc1_sprite_n_w));    // sprites #
+	map(0x30, 0x3f).w(FUNC(tiamc1_state::tiamc1_sprite_a_w));    // sprites attributes
+	map(0xe0, 0xef).w(FUNC(tiamc1_state::tiamc1_palette_w));     // color ram
+	map(0xf0, 0xf0).w(FUNC(tiamc1_state::tiamc1_bg_vshift_w));   // background V scroll
+	map(0xf4, 0xf4).w(FUNC(tiamc1_state::tiamc1_bg_hshift_w));   // background H scroll
+	map(0xf8, 0xf8).w(FUNC(tiamc1_state::kot_bankswitch_w));     // character rom offset
+	map(0xc0, 0xc3).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xd0, 0xd3).rw("kr580vv55a", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* input ports + coin counters & lockout */
+}
 
 
 static INPUT_PORTS_START( tiamc1 )
@@ -218,8 +222,8 @@ static INPUT_PORTS_START( tiamc1 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:game counter */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* OUT:game counter */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick
@@ -237,8 +241,8 @@ static INPUT_PORTS_START( gorodki )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:game counter */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* OUT:game counter */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // right button
@@ -269,8 +273,8 @@ static INPUT_PORTS_START( kot )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:game counter */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* OUT:game counter */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* RAZR ??? */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Punch / Right
@@ -312,67 +316,65 @@ static const gfx_layout char_rom_layout =
 	8*8
 };
 
-static GFXDECODE_START( tiamc1 )
+static GFXDECODE_START( gfx_tiamc1 )
 	GFXDECODE_ENTRY( nullptr, 0x0000, char_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( kot )
+static GFXDECODE_START( gfx_kot )
 	GFXDECODE_ENTRY( nullptr, 0x0000, char_rom_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tiamc1_state::tiamc1)
+void tiamc1_state::tiamc1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(tiamc1_map)
-	MCFG_CPU_IO_MAP(tiamc1_io_map)
+	I8080(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiamc1_state::tiamc1_map);
+	m_maincpu->set_addrmap(AS_IO, &tiamc1_state::tiamc1_io_map);
 
-	MCFG_DEVICE_ADD("kr580vv55a", I8255A, 0)  /* soviet clone of i8255 */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tiamc1_state, tiamc1_control_w))
+	i8255_device &ppi(I8255A(config, "kr580vv55a"));  /* soviet clone of i8255 */
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
+	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256)       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
-	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256);       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
+	screen.set_screen_update(FUNC(tiamc1_state::screen_update_tiamc1));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tiamc1)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(tiamc1_state, tiamc1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tiamc1);
+	PALETTE(config, m_palette, FUNC(tiamc1_state::tiamc1_palette), 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("2x8253", TIAMC1, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	TIAMC1(config, "2x8253", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(tiamc1_state::kot)
+void tiamc1_state::kot(machine_config &config)
+{
 	tiamc1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
-	MCFG_CPU_IO_MAP(kotrybolov_io_map)
 
-	MCFG_SCREEN_MODIFY("screen")
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiamc1_state::kotrybolov_map);
+	m_maincpu->set_addrmap(AS_IO, &tiamc1_state::kotrybolov_io_map);
+
 	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
-	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(tiamc1_state::screen_update_kot));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", kot)
+	m_gfxdecode->set_info(gfx_kot);
 
-	MCFG_DEVICE_REMOVE("2x8253")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	config.device_remove("2x8253");
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
-	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tiamc1_state, pit8253_2_w))
-MACHINE_CONFIG_END
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(PIXEL_CLOCK / 4);
+	pit8253.set_clk<2>(SND_CLOCK);                // guess
+	pit8253.out_handler<2>().set(FUNC(tiamc1_state::pit8253_2_w));
+}
 
 
 ROM_START( konek )
@@ -545,9 +547,9 @@ ROM_START( kot )
 ROM_END
 
 
-GAME( 1988, konek,    0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gorodki,  0, tiamc1, gorodki, tiamc1_state, 0, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kot,      0, kot,    kot,     tiamc1_state, 0, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1988, konek,    0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
+GAME( 1988, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gorodki,  0, tiamc1, gorodki, tiamc1_state, empty_init, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kot,      0, kot,    kot,     tiamc1_state, empty_init, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

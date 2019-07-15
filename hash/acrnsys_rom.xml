@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Acorn System - ROM images -->
+
+<softwarelist name="acrnsys_rom" description="Acorn System ROM images">
+
+	<software name="ade">
+		<description>ADE</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="GO C000" />
+		<part name="rom1" interface="acrnsys_rom">
+			<dataarea name="rom" size="4096">
+				<rom name="ade.rom" size="4096" crc="14c21b46" sha1="6745f62ee27611222ba96b9115666b1f4c49ae67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="econ148" supported="no">
+		<description>System/3 Econet 1.48</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="GO A000" />
+		<part name="rom1" interface="acrnsys_rom">
+			<dataarea name="rom" size="4096">
+				<rom name="sys3-econet-1.48.rom" size="4096" crc="5aed8523" sha1="6cb71bf25cf936a04a8e5ac58e08293f2081fae5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="econ240">
+		<description>Econet 2.40</description>
+		<year>1981</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="GO E000" />
+		<part name="rom1" interface="acrnsys_rom">
+			<dataarea name="rom" size="4096">
+				<rom name="eco240s.rom" size="4096" crc="cab18b7d" sha1="173ef3525300b11596399358973d7573a3be71e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="econ340">
+		<description>Econet 3.40</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="GO E000" />
+		<part name="rom1" interface="acrnsys_rom">
+			<dataarea name="rom" size="4096">
+				<rom name="sys3-econet-3.40.rom" size="4096" crc="e38eade1" sha1="ba11b8d3e112d622b4e9db598360c6be8bfe66cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="econ350">
+		<description>Econet 3.50</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="GO E000" />
+		<part name="rom1" interface="acrnsys_rom">
+			<dataarea name="rom" size="4096">
+				<rom name="sys3-econet-3.50.rom" size="4096" crc="b109d797" sha1="5975a85d4e4ff2350c04012e8f4629520ec38ace"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

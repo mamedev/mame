@@ -44,6 +44,7 @@ Z nothing
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -54,51 +55,31 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_rom(*this, "rom")
-		, m_uart1(*this, "uart1")
-		, m_uart2(*this, "uart2")
-		, m_uart3(*this, "uart3")
+		, m_uart(*this, "uart%u", 1)
 	{ }
 
+	void hpz80unk(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port02_r);
 	DECLARE_READ8_MEMBER(port03_r);
-	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_READ8_MEMBER(port0d_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_WRITE8_MEMBER(port0e_w);
 	DECLARE_READ8_MEMBER(portfc_r);
 
-	void hpz80unk(machine_config &config);
 	void hpz80unk_io(address_map &map);
 	void hpz80unk_mem(address_map &map);
-private:
+
 	uint8_t m_port02_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_rom;
-	required_device<ay31015_device> m_uart1;
-	required_device<ay31015_device> m_uart2;
-	required_device<ay31015_device> m_uart3;
+	required_device_array<ay51013_device, 3> m_uart;
 };
 
 READ8_MEMBER( hpz80unk_state::port00_r )
 {
-	return (m_uart1->get_output_pin(AY31015_DAV) << 1) | (m_uart1->get_output_pin(AY31015_TBMT)) | 0xfc;
-}
-
-READ8_MEMBER( hpz80unk_state::port01_r )
-{
-	m_uart1->set_input_pin(AY31015_RDAV, 0);
-	uint8_t result = m_uart1->get_received_data();
-	m_uart1->set_input_pin(AY31015_RDAV, 1);
-	return result;
-}
-
-WRITE8_MEMBER( hpz80unk_state::port01_w )
-{
-	m_uart1->set_transmit_data(data);
+	return (m_uart[0]->dav_r() << 1) | (m_uart[0]->tbmt_r()) | 0xfc;
 }
 
 READ8_MEMBER( hpz80unk_state::port02_r )
@@ -109,30 +90,12 @@ READ8_MEMBER( hpz80unk_state::port02_r )
 
 READ8_MEMBER( hpz80unk_state::port03_r )
 {
-	return (m_uart2->get_output_pin(AY31015_DAV) << 1) | (m_uart2->get_output_pin(AY31015_TBMT)) | 0xfc;
-}
-
-READ8_MEMBER( hpz80unk_state::port04_r )
-{
-	m_uart2->set_input_pin(AY31015_RDAV, 0);
-	uint8_t result = m_uart2->get_received_data();
-	m_uart2->set_input_pin(AY31015_RDAV, 1);
-	return result;
-}
-
-WRITE8_MEMBER( hpz80unk_state::port04_w )
-{
-	m_uart2->set_transmit_data(data);
+	return (m_uart[1]->dav_r() << 1) | (m_uart[1]->tbmt_r()) | 0xfc;
 }
 
 READ8_MEMBER( hpz80unk_state::port0d_r )
 {
-	return (m_uart3->get_output_pin(AY31015_DAV) << 1) | (m_uart3->get_output_pin(AY31015_TBMT)) | 0xfc;
-}
-
-WRITE8_MEMBER( hpz80unk_state::port0e_w )
-{
-	m_uart3->set_transmit_data(data);
+	return (m_uart[2]->dav_r() << 1) | (m_uart[2]->tbmt_r()) | 0xfc;
 }
 
 READ8_MEMBER( hpz80unk_state::portfc_r )
@@ -140,26 +103,28 @@ READ8_MEMBER( hpz80unk_state::portfc_r )
 	return 0xfe; // or it halts
 }
 
-ADDRESS_MAP_START(hpz80unk_state::hpz80unk_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_SHARE("rom")
-ADDRESS_MAP_END
+void hpz80unk_state::hpz80unk_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).ram();
+	map(0xc000, 0xffff).rom().share("rom");
+}
 
-ADDRESS_MAP_START(hpz80unk_state::hpz80unk_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r) // uart1 status
-	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w) // uart1 data
-	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-	AM_RANGE(0x03, 0x03) AM_READ(port03_r) // uart2 status
-	AM_RANGE(0x04, 0x04) AM_READWRITE(port04_r,port04_w) // uart2 data
-	AM_RANGE(0x0d, 0x0d) AM_READ(port0d_r) // uart3 status
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(port0e_w) // uart3 data
-	AM_RANGE(0x1d, 0x1e) // top of memory is written here, big-endian
-	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("DSW") // select which uarts to use
-	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
-ADDRESS_MAP_END
+void hpz80unk_state::hpz80unk_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(hpz80unk_state::port00_r)); // uart1 status
+	map(0x01, 0x01).rw("uart1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit)); // uart1 data
+	map(0x02, 0x02).r(FUNC(hpz80unk_state::port02_r));
+	map(0x03, 0x03).r(FUNC(hpz80unk_state::port03_r)); // uart2 status
+	map(0x04, 0x04).rw("uart2", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit)); // uart2 data
+	map(0x0d, 0x0d).r(FUNC(hpz80unk_state::port0d_r)); // uart3 status
+	map(0x0e, 0x0e).w("uart3", FUNC(ay31015_device::transmit)); // uart3 data
+	map(0x1d, 0x1e); // top of memory is written here, big-endian
+	map(0x1f, 0x1f).portr("DSW"); // select which uarts to use
+	map(0xfc, 0xfc).r(FUNC(hpz80unk_state::portfc_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hpz80unk )
@@ -180,70 +145,57 @@ void hpz80unk_state::machine_reset()
 	m_maincpu->set_pc(0xc000);
 
 	// no idea if these are hard-coded, or programmable
-	m_uart1->set_input_pin(AY31015_XR, 0);
-	m_uart1->set_input_pin(AY31015_XR, 1);
-	m_uart1->set_input_pin(AY31015_SWE, 0);
-	m_uart1->set_input_pin(AY31015_NP, 1);
-	m_uart1->set_input_pin(AY31015_TSB, 0);
-	m_uart1->set_input_pin(AY31015_NB1, 1);
-	m_uart1->set_input_pin(AY31015_NB2, 1);
-	m_uart1->set_input_pin(AY31015_EPS, 1);
-	m_uart1->set_input_pin(AY31015_CS, 1);
-	m_uart1->set_input_pin(AY31015_CS, 0);
+	for (auto &uart : m_uart)
+	{
+		uart->write_xr(0);
+		uart->write_xr(1);
+		uart->write_swe(0);
+		uart->write_np(1);
+		uart->write_tsb(0);
+		uart->write_nb1(1);
+		uart->write_nb2(1);
+		uart->write_eps(1);
+		uart->write_cs(1);
+		uart->write_cs(0);
+	}
 
-	m_uart2->set_input_pin(AY31015_XR, 0);
-	m_uart2->set_input_pin(AY31015_XR, 1);
-	m_uart2->set_input_pin(AY31015_SWE, 0);
-	m_uart2->set_input_pin(AY31015_NP, 1);
-	m_uart2->set_input_pin(AY31015_TSB, 0);
-	m_uart2->set_input_pin(AY31015_NB1, 1);
-	m_uart2->set_input_pin(AY31015_NB2, 1);
-	m_uart2->set_input_pin(AY31015_EPS, 1);
-	m_uart2->set_input_pin(AY31015_CS, 1);
-	m_uart2->set_input_pin(AY31015_CS, 0);
-
-	m_uart3->set_input_pin(AY31015_XR, 0);
-	m_uart3->set_input_pin(AY31015_XR, 1);
-	m_uart3->set_input_pin(AY31015_SWE, 0);
-	m_uart3->set_input_pin(AY31015_NP, 1);
-	m_uart3->set_input_pin(AY31015_TSB, 0);
-	m_uart3->set_input_pin(AY31015_NB1, 1);
-	m_uart3->set_input_pin(AY31015_NB2, 1);
-	m_uart3->set_input_pin(AY31015_EPS, 1);
-	m_uart3->set_input_pin(AY31015_CS, 1);
-	m_uart3->set_input_pin(AY31015_CS, 0);
 	// this should be rom/ram banking
 }
 
 
-MACHINE_CONFIG_START(hpz80unk_state::hpz80unk)
+void hpz80unk_state::hpz80unk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hpz80unk_mem)
-	MCFG_CPU_IO_MAP(hpz80unk_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hpz80unk_state::hpz80unk_mem);
+	m_maincpu->set_addrmap(AS_IO, &hpz80unk_state::hpz80unk_io);
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("uart1", AY51013, 0) // COM2502
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232a", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+	AY51013(config, m_uart[0]); // COM2502
+	m_uart[0]->read_si_callback().set("rs232a", FUNC(rs232_port_device::rxd_r));
+	m_uart[0]->write_so_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_uart[0]->set_auto_rdav(true);
+	RS232_PORT(config, "rs232a", default_rs232_devices, "terminal");
 
-	MCFG_DEVICE_ADD("uart2", AY51013, 0) // COM2502
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232b", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+	AY51013(config, m_uart[1]); // COM2502
+	m_uart[1]->read_si_callback().set("rs232b", FUNC(rs232_port_device::rxd_r));
+	m_uart[1]->write_so_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_uart[1]->set_auto_rdav(true);
+	RS232_PORT(config, "rs232b", default_rs232_devices, nullptr);
 
-	MCFG_DEVICE_ADD("uart3", AY51013, 0) // COM2502
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232c", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232c", rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD("rs232c", default_rs232_devices, nullptr)
-MACHINE_CONFIG_END
+	AY51013(config, m_uart[2]); // COM2502
+	m_uart[2]->read_si_callback().set("rs232c", FUNC(rs232_port_device::rxd_r));
+	m_uart[2]->write_so_callback().set("rs232c", FUNC(rs232_port_device::write_txd));
+	m_uart[2]->set_auto_rdav(true);
+	RS232_PORT(config, "rs232c", default_rs232_devices, nullptr);
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set(m_uart[0], FUNC(ay51013_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart[0], FUNC(ay51013_device::write_rcp));
+	uart_clock.signal_handler().append(m_uart[1], FUNC(ay51013_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart[1], FUNC(ay51013_device::write_rcp));
+	uart_clock.signal_handler().append(m_uart[2], FUNC(ay51013_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart[2], FUNC(ay51013_device::write_rcp));
+}
 
 /* ROM definition */
 ROM_START( hpz80unk )
@@ -270,5 +222,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY            FULLNAME                       FLAGS
-COMP( 1977, hpz80unk, 0,      0,       hpz80unk,  hpz80unk, hpz80unk_state, 0,    "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME                       FLAGS
+COMP( 1977, hpz80unk, 0,      0,      hpz80unk, hpz80unk, hpz80unk_state, empty_init, "Hewlett-Packard", "unknown Z80-based mainframe", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -9,7 +9,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
 #include "machine/timer.h"
@@ -37,7 +36,6 @@ public:
 		m_sprites(*this, "sprites"),
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
-		m_soundlatch(*this, "soundlatch"),
 		m_bankmotor_timer(*this, "bankmotor"),
 		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
 		m_adc_ports(*this, "ADC.%u", 0),
@@ -52,6 +50,23 @@ public:
 		m_bankmotor_delta(0)
 	{ }
 
+	void shangon_fd1089b(machine_config &config);
+	void outrun_fd1094(machine_config &config);
+	void outrundx(machine_config &config);
+	void shangon(machine_config &config);
+	void outrun_fd1089a(machine_config &config);
+	void outrun(machine_config &config);
+	void outrun_base(machine_config &config);
+
+	// game-specific driver init
+	void init_generic();
+	void init_outrun();
+	void init_outrunb();
+	void init_shangon();
+
+	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
+
+protected:
 	// PPI read/write handlers
 	DECLARE_READ8_MEMBER( unknown_porta_r );
 	DECLARE_READ8_MEMBER( unknown_portb_r );
@@ -64,22 +79,11 @@ public:
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-	uint8_t mapper_sound_r();
-	void mapper_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 	DECLARE_WRITE16_MEMBER( nop_w );
-
-	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
-
-	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(outrun);
-	DECLARE_DRIVER_INIT(outrunb);
-	DECLARE_DRIVER_INIT(shangon);
 
 	// video updates
 	uint32_t screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -87,25 +91,17 @@ public:
 
 	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
 	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
-	DECLARE_READ16_MEMBER( sega_road_control_0_r ) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
-	DECLARE_WRITE16_MEMBER( sega_road_control_0_w ) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
+	DECLARE_READ16_MEMBER( sega_road_control_0_r ) { return m_segaic16road->segaic16_road_control_0_r(); };
+	DECLARE_WRITE16_MEMBER( sega_road_control_0_w ) { m_segaic16road->segaic16_road_control_0_w(offset,data,mem_mask); };
 
-	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
-	void shangon_fd1089b(machine_config &config);
-	void outrun_fd1094(machine_config &config);
-	void outrundx(machine_config &config);
-	void shangon(machine_config &config);
-	void outrun_fd1089a(machine_config &config);
-	void outrun(machine_config &config);
-	void outrun_base(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void outrun_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 	void sub_map(address_map &map);
-protected:
+
 	// timer IDs
 	enum
 	{
@@ -140,7 +136,6 @@ protected:
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
-	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<timer_device> m_bankmotor_timer;
 
 	// input ports

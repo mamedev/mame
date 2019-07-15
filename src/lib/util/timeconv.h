@@ -18,6 +18,7 @@
 
 #include <chrono>
 #include <algorithm>
+#include <stdexcept>
 
 
 namespace util {
@@ -240,7 +241,7 @@ private:
 		duration -= century_count * century;
 		const int four_years_count = std::min(int(duration / four_years), 25);
 		duration -= four_years_count * four_years;
-		const int year_count = int(duration / year);
+		const int year_count = std::min(int(duration / year), 3);
 		duration -= year_count * year;
 		const int actual_year = tm_conversion_clock::base_year + four_centuries_count * 400 + century_count * 100 + four_years_count * 4 + year_count;
 

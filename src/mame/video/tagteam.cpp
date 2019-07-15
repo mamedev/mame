@@ -34,11 +34,11 @@ static const res_net_decode_info tagteam_decode_info =
 	{  0x07, 0x07, 0x03 }  /* masks */
 };
 
-PALETTE_INIT_MEMBER(tagteam_state, tagteam)
+void tagteam_state::tagteam_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	std::vector<rgb_t> rgb;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
+	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
 	palette.set_pen_colors(0x00, rgb);
 }

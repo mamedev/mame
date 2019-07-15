@@ -414,8 +414,11 @@ static cassette_image::error lookup_sample(cassette_image *cassette, int channel
     waveform accesses
 *********************************************************************/
 
+// Note: In normal use, the sample_spacing is the same as the sample size (in bytes)
+//       But it can be larger to help do an interleaved write to samples
+//       (see cassette_write_samples)
 cassette_image::error cassette_get_samples(cassette_image *cassette, int channel,
-	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
+	double time_index, double sample_period, size_t sample_count, size_t sample_spacing,
 	void *samples, int waveform_flags)
 {
 	cassette_image::error err;
@@ -456,7 +459,7 @@ cassette_image::error cassette_get_samples(cassette_image *cassette, int channel
 
 		/* and write out the result */
 		dest_ptr = (uint8_t*)samples;
-		dest_ptr += waveform_bytes_per_sample(waveform_flags) * sample_index * cassette->channels;
+		dest_ptr += sample_index * sample_spacing;
 		switch(waveform_bytes_per_sample(waveform_flags))
 		{
 			case 1:
@@ -465,13 +468,13 @@ cassette_image::error cassette_get_samples(cassette_image *cassette, int channel
 			case 2:
 				word = interpolate16(sum);
 				if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-					word = flipendian_int16(word);
+					word = swapendian_int16(word);
 				*((int16_t *) dest_ptr) = word;
 				break;
 			case 4:
 				dword = sum;
 				if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-					dword = flipendian_int32(dword);
+					dword = swapendian_int32(dword);
 				*((int32_t *) dest_ptr) = dword;
 				break;
 		}
@@ -480,9 +483,11 @@ cassette_image::error cassette_get_samples(cassette_image *cassette, int channel
 }
 
 
-
+// Note: In normal use, the sample_spacing is the same as the sample size (in bytes)
+//       But it can be larger to help do an interleaved read from samples
+//       (see cassette_read_samples)
 cassette_image::error cassette_put_samples(cassette_image *cassette, int channel,
-	double time_index, double sample_period, size_t sample_count, size_t sample_bytes,
+	double time_index, double sample_period, size_t sample_count, size_t sample_spacing,
 	const void *samples, int waveform_flags)
 {
 	cassette_image::error err;
@@ -521,7 +526,7 @@ cassette_image::error cassette_put_samples(cassette_image *cassette, int channel
 		/* figure out the source pointer */
 		d = map_double(sample_count, ranges.sample_first, ranges.sample_last + 1, sample_index);
 		source_ptr = (const uint8_t*)samples;
-		source_ptr += ((size_t) d) * sample_bytes;
+		source_ptr += ((size_t) d) * sample_spacing;
 
 		/* compute the value that we are writing */
 		switch(waveform_bytes_per_sample(waveform_flags)) {
@@ -534,13 +539,13 @@ cassette_image::error cassette_put_samples(cassette_image *cassette, int channel
 		case 2:
 			word = *((int16_t *) source_ptr);
 			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-				word = flipendian_int16(word);
+				word = swapendian_int16(word);
 			dest_value = extrapolate16(word);
 			break;
 		case 4:
 			dword = *((int32_t *) source_ptr);
 			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-				dword = flipendian_int32(dword);
+				dword = swapendian_int32(dword);
 			dest_value = dword;
 			break;
 		default:
@@ -589,7 +594,7 @@ cassette_image::error cassette_read_samples(cassette_image *cassette, int channe
 	cassette_image::error err;
 	size_t chunk_sample_count;
 	size_t bytes_per_sample;
-	size_t sample_bytes;
+	size_t sample_spacing;
 	size_t samples_loaded = 0;
 	double chunk_time_index;
 	double chunk_sample_period;
@@ -597,25 +602,25 @@ cassette_image::error cassette_read_samples(cassette_image *cassette, int channe
 	uint8_t buffer[8192];
 
 	bytes_per_sample = waveform_bytes_per_sample(waveform_flags);
-	sample_bytes = bytes_per_sample * channels;
+	sample_spacing = bytes_per_sample * channels;
 
 	while(samples_loaded < sample_count)
 	{
-		chunk_sample_count = std::min(sizeof(buffer) / sample_bytes, (sample_count - samples_loaded));
+		chunk_sample_count = std::min(sizeof(buffer) / sample_spacing, (sample_count - samples_loaded));
 		chunk_sample_period = map_double(sample_period, 0, sample_count, chunk_sample_count);
 		chunk_time_index = time_index + map_double(sample_period, 0, sample_count, samples_loaded);
 
-		cassette_image_read(cassette, buffer, offset, chunk_sample_count * sample_bytes);
+		cassette_image_read(cassette, buffer, offset, chunk_sample_count * sample_spacing);
 
 		for (channel = 0; channel < channels; channel++)
 		{
 			err = cassette_put_samples(cassette, channel, chunk_time_index, chunk_sample_period,
-				chunk_sample_count, sample_bytes, &buffer[channel * bytes_per_sample], waveform_flags);
+				chunk_sample_count, sample_spacing, &buffer[channel * bytes_per_sample], waveform_flags);
 			if (err != cassette_image::error::SUCCESS)
 				return err;
 		}
 
-		offset += chunk_sample_count * sample_bytes;
+		offset += chunk_sample_count * sample_spacing;
 		samples_loaded += chunk_sample_count;
 	}
 	return cassette_image::error::SUCCESS;
@@ -629,7 +634,7 @@ cassette_image::error cassette_write_samples(cassette_image *cassette, int chann
 	cassette_image::error err;
 	size_t chunk_sample_count;
 	size_t bytes_per_sample;
-	size_t sample_bytes;
+	size_t sample_spacing;
 	size_t samples_saved = 0;
 	double chunk_time_index;
 	double chunk_sample_period;
@@ -637,25 +642,25 @@ cassette_image::error cassette_write_samples(cassette_image *cassette, int chann
 	uint8_t buffer[8192];
 
 	bytes_per_sample = waveform_bytes_per_sample(waveform_flags);
-	sample_bytes = bytes_per_sample * channels;
+	sample_spacing = bytes_per_sample * channels;
 
 	while(samples_saved < sample_count)
 	{
-		chunk_sample_count = std::min(sizeof(buffer) / sample_bytes, (sample_count - samples_saved));
+		chunk_sample_count = std::min(sizeof(buffer) / sample_spacing, (sample_count - samples_saved));
 		chunk_sample_period = map_double(sample_period, 0, sample_count, chunk_sample_count);
 		chunk_time_index = time_index + map_double(sample_period, 0, sample_count, samples_saved);
 
 		for (channel = 0; channel < channels; channel++)
 		{
 			err = cassette_get_samples(cassette, channel, chunk_time_index, chunk_sample_period,
-				chunk_sample_count, sample_bytes, &buffer[channel * bytes_per_sample], waveform_flags);
+				chunk_sample_count, sample_spacing, &buffer[channel * bytes_per_sample], waveform_flags);
 			if (err != cassette_image::error::SUCCESS)
 				return err;
 		}
 
-		cassette_image_write(cassette, buffer, offset, chunk_sample_count * sample_bytes);
+		cassette_image_write(cassette, buffer, offset, chunk_sample_count * sample_spacing);
 
-		offset += chunk_sample_count * sample_bytes;
+		offset += chunk_sample_count * sample_spacing;
 		samples_saved += chunk_sample_count;
 	}
 	return cassette_image::error::SUCCESS;

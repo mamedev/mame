@@ -21,20 +21,6 @@
 #define ADAMNET_TAG     "adamnet"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ADAMNET_BUS_ADD() \
-	MCFG_DEVICE_ADD(ADAMNET_TAG, ADAMNET, 0)
-
-#define MCFG_ADAMNET_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, ADAMNET_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -92,6 +78,15 @@ class adamnet_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	adamnet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: adamnet_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -127,8 +122,6 @@ DECLARE_DEVICE_TYPE(ADAMNET,      adamnet_device)
 DECLARE_DEVICE_TYPE(ADAMNET_SLOT, adamnet_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( adamnet_devices );
-
-
+void adamnet_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ADAMNET_ADAMNET_H

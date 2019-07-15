@@ -13,36 +13,6 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EEPROM_SIZE(_cells, _cellbits) \
-	eeprom_base_device::static_set_size(*device, _cells, _cellbits);
-#define MCFG_EEPROM_DATA(_data, _size) \
-	eeprom_base_device::static_set_default_data(*device, _data, _size);
-#define MCFG_EEPROM_DEFAULT_VALUE(_value) \
-	eeprom_base_device::static_set_default_value(*device, _value);
-
-#define MCFG_EEPROM_WRITE_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::WRITE_TIME, _value);
-#define MCFG_EEPROM_WRITE_ALL_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::WRITE_ALL_TIME, _value);
-#define MCFG_EEPROM_ERASE_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::ERASE_TIME, _value);
-#define MCFG_EEPROM_ERASE_ALL_TIME(_value) \
-	eeprom_base_device::static_set_timing(*device, eeprom_base_device::ERASE_ALL_TIME, _value);
-
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> eeprom_base_device
-
 class eeprom_base_device :  public device_t,
 							public device_nvram_interface
 {
@@ -58,11 +28,15 @@ public:
 	};
 
 	// inline configuration helpers
-	static void static_set_size(device_t &device, int cells, int cellbits);
-	static void static_set_default_data(device_t &device, const uint8_t *data, uint32_t size);
-	static void static_set_default_data(device_t &device, const uint16_t *data, uint32_t size);
-	static void static_set_default_value(device_t &device, uint32_t value);
-	static void static_set_timing(device_t &device, timing_type type, const attotime &duration);
+	eeprom_base_device& size(int cells, int cellbits);
+	eeprom_base_device& default_data(const uint8_t *data, uint32_t size);
+	eeprom_base_device& default_data(const uint16_t *data, uint32_t size);
+	eeprom_base_device& default_value(uint32_t value) { m_default_value = value; m_default_value_set = true; return *this; }
+	eeprom_base_device& timing(timing_type type, const attotime &duration) { m_operation_time[type] = duration; return *this; }
+	eeprom_base_device& write_time(const attotime &duration) { m_operation_time[eeprom_base_device::WRITE_TIME] = duration; return *this; }
+	eeprom_base_device& write_all_time(const attotime &duration) { m_operation_time[eeprom_base_device::WRITE_ALL_TIME] = duration; return *this; }
+	eeprom_base_device& erase_time(const attotime &duration) { m_operation_time[eeprom_base_device::ERASE_TIME] = duration; return *this; }
+	eeprom_base_device& erase_all_time(const attotime &duration) { m_operation_time[eeprom_base_device::ERASE_ALL_TIME] = duration; return *this; }
 
 	// read/write/erase data
 	uint32_t read(offs_t address);

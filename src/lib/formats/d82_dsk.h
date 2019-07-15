@@ -7,13 +7,15 @@
     Commodore 8250/SFD-1001 sector disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_D82_DSK_H
+#define MAME_FORMATS_D82_DSK_H
 
-#ifndef D82_DSK_H_
-#define D82_DSK_H_
+#pragma once
 
 #include "d80_dsk.h"
 
-class d82_format : public d80_format {
+class d82_format : public d80_format
+{
 public:
 	d82_format();
 
@@ -27,6 +29,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_D82_FORMAT;
 
-
-
-#endif
+#endif // MAME_FORMATS_D82_DSK_H

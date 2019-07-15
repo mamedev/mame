@@ -7,6 +7,9 @@
 
 #include "sound/beep.h"
 
+#include "diserial.h"
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -30,12 +33,6 @@
 // TSR - Timer Status Register
 #define TSR_OCFL 0x40 // TSR (68HC05 output compare flag)
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LK201_TX_HANDLER(_cb) \
-	devcb = &lk201_device::set_tx_handler(*device, DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -60,7 +57,7 @@ public:
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_WRITE8_MEMBER(timer_w);
 
-	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
+	auto tx_handler() { return m_tx_handler.bind(); }
 
 	void lk201_map(address_map &map);
 protected:

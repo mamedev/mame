@@ -20,6 +20,7 @@
 #include "video/pc090oj.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
+#include "machine/timer.h"
 
 
 class asuka_state : public driver_device
@@ -31,38 +32,47 @@ public:
 	};
 
 	asuka_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cadash_shared_ram(*this, "sharedram"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_cchip(*this, "cchip"),
-		m_msm(*this, "msm"),
-		m_adpcm_select(*this, "adpcm_select"),
-		m_sound_data(*this, "ymsnd"),
-		m_pc090oj(*this, "pc090oj"),
-		m_tc0100scn(*this, "tc0100scn"),
-		m_tc0110pcr(*this, "tc0110pcr"),
-		m_tc0220ioc(*this, "tc0220ioc") { }
+		: driver_device(mconfig, type, tag)
+		, m_cadash_shared_ram(*this, "sharedram")
+		, m_audiobank(*this, "audiobank")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_cchip(*this, "cchip")
+		, m_msm(*this, "msm")
+		, m_adpcm_select(*this, "adpcm_select")
+		, m_sound_data(*this, "msm")
+		, m_pc090oj(*this, "pc090oj")
+		, m_tc0100scn(*this, "tc0100scn")
+		, m_tc0110pcr(*this, "tc0110pcr")
+		, m_tc0220ioc(*this, "tc0220ioc")
+		, m_cchip_irq_clear(*this, "cchip_irq_clear")
+	{ }
 
-	/* video-related */
-	u16         m_video_ctrl;
-	u16         m_video_mask;
+	void init_cadash();
+	void init_earthjkr();
 
-	/* c-chip */
-	int         m_current_round;
-	int         m_current_bank;
+	void mofflott(machine_config &config);
+	void asuka(machine_config &config);
+	void cadash(machine_config &config);
+	void eto(machine_config &config);
+	void bonzeadv(machine_config &config);
 
-	u8          m_cval[26];
-	u8          m_cc_port;
-	u8          m_restart_status;
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// memory pointers
+	optional_shared_ptr<u8> m_cadash_shared_ram;
+
+	required_memory_bank m_audiobank;
 
 	/* misc */
 	u16         m_adpcm_pos;
 	bool        m_adpcm_ff;
 
 	emu_timer *m_cadash_int5_timer;
-
-	optional_shared_ptr<uint8_t> m_cadash_shared_ram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -75,40 +85,27 @@ public:
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
-	DECLARE_WRITE8_MEMBER(coin_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
-	DECLARE_READ16_MEMBER(cadash_share_r);
-	DECLARE_WRITE16_MEMBER(cadash_share_w);
-	DECLARE_WRITE16_MEMBER(asuka_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_2151_w);
-	DECLARE_WRITE8_MEMBER(asuka_msm5205_start_w);
-	DECLARE_WRITE8_MEMBER(asuka_msm5205_stop_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_asuka);
+
+	optional_device<timer_device> m_cchip_irq_clear;
+
+	void coin_control_w(u8 data);
+	void sound_bankswitch_w(u8 data);
+	void msm5205_address_w(u8 data);
+	u16 cadash_share_r(offs_t offset);
+	void cadash_share_w(offs_t offset, u16 data);
+	void msm5205_start_w(u8 data);
+	void msm5205_stop_w(u8 data);
+	void counters_w(u8 data);
+	void asuka_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
+	void bonzeadv_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
-	DECLARE_DRIVER_INIT(cadash);
+	INTERRUPT_GEN_MEMBER(bonze_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	/*----------- defined in machine/bonzeadv.c -----------*/
-	void WriteLevelData();
-	void WriteRestartPos(int level );
-
-	DECLARE_READ16_MEMBER( bonzeadv_cchip_ctrl_r );
-	DECLARE_READ16_MEMBER( bonzeadv_cchip_ram_r );
-	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ctrl_w );
-	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_bank_w );
-	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ram_w );
 	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
 
-	void mofflott(machine_config &config);
-	void asuka(machine_config &config);
-	void cadash(machine_config &config);
-	void eto(machine_config &config);
-	void galmedes(machine_config &config);
-	void bonzeadv(machine_config &config);
 	void asuka_map(address_map &map);
 	void bonzeadv_map(address_map &map);
 	void bonzeadv_z80_map(address_map &map);
@@ -118,8 +115,6 @@ public:
 	void cadash_z80_map(address_map &map);
 	void eto_map(address_map &map);
 	void z80_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_ASUKA_H

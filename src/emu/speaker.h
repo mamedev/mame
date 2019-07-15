@@ -6,7 +6,20 @@
 
     Speaker output sound device.
 
+    Speakers have (x, y, z) coordinates in 3D space:
+    * Observer is at position (0, 0, 0)
+    * Positive x is to the right of the observer
+    * Negative x is to the left of the observer
+    * Positive y is above the observer
+    * Negative y is below the observer
+    * Positive z is in front of the observer
+    * Negative z is behind the observer
+
+    Currently, MAME only considers the sign of the x coordinate (not its
+    magnitude), and completely ignores the y and z coordinates.
+
 ***************************************************************************/
+
 #ifndef MAME_EMU_SPEAKER_H
 #define MAME_EMU_SPEAKER_H
 
@@ -23,23 +36,6 @@ DECLARE_DEVICE_TYPE(SPEAKER, speaker_device)
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// add/remove speakers
-#define MCFG_SPEAKER_ADD(_tag, _x, _y, _z) \
-	MCFG_DEVICE_ADD(_tag, SPEAKER, 0) \
-	speaker_device::static_set_position(*device, _x, _y, _z);
-#define MCFG_SPEAKER_STANDARD_MONO(_tag) \
-	MCFG_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
-
-#define MCFG_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
-	MCFG_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
-	MCFG_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -49,11 +45,23 @@ class speaker_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, double x, double y, double z)
+		: speaker_device(mconfig, tag, owner, 0)
+	{
+		set_position(x, y, z);
+	}
+	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~speaker_device();
 
 	// inline configuration helpers
-	static void static_set_position(device_t &device, double x, double y, double z);
+	speaker_device &set_position(double x, double y, double z) { m_x = x; m_y = y; m_z = z; return *this; }
+	speaker_device &front_center() { set_position(0.0, 0.0, 1.0); return *this; }
+	speaker_device &front_left() { set_position(-0.2, 0.0, 1.0); return *this; }
+	speaker_device &front_right() { set_position(0.2, 0.0, 1.0); return *this; }
+	speaker_device &rear_center() { set_position(0.0, 0.0, -0.5); return *this; }
+	speaker_device &rear_left() { set_position(-0.2, 0.0, -0.5); return *this; }
+	speaker_device &rear_right() { set_position(0.2, 0.0, -0.5); return *this; }
+	speaker_device &subwoofer() { set_position(0.0, 0.0, 0.0); return *this; }
 
 	// internally for use by the sound system
 	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);
@@ -80,4 +88,4 @@ protected:
 typedef device_type_iterator<speaker_device> speaker_device_iterator;
 
 
-#endif  /* MAME_EMU_SPEAKER_H */
+#endif // MAME_EMU_SPEAKER_H

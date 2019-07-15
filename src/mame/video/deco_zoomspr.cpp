@@ -21,17 +21,6 @@ deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const ch
 {
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void deco_zoomspr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<deco_zoomspr_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
 void deco_zoomspr_device::device_start()
 {
 }
@@ -104,27 +93,27 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 					y_index = 0;
 				}
 
-				if( sx < clip.min_x)
+				if( sx < clip.left())
 				{ /* clip left */
-					int pixels = clip.min_x-sx;
+					int pixels = clip.left()-sx;
 					sx += pixels;
 					x_index_base += pixels*dx;
 				}
-				if( sy < clip.min_y )
+				if( sy < clip.top() )
 				{ /* clip top */
-					int pixels = clip.min_y-sy;
+					int pixels = clip.top()-sy;
 					sy += pixels;
 					y_index += pixels*dy;
 				}
 				/* NS 980211 - fixed incorrect clipping */
-				if( ex > clip.max_x+1 )
+				if( ex > clip.right()+1 )
 				{ /* clip right */
-					int pixels = ex-clip.max_x-1;
+					int pixels = ex-clip.right()-1;
 					ex -= pixels;
 				}
-				if( ey > clip.max_y+1 )
+				if( ey > clip.bottom()+1 )
 				{ /* clip bottom */
-					int pixels = ey-clip.max_y-1;
+					int pixels = ey-clip.bottom()-1;
 					ey -= pixels;
 				}
 
@@ -247,10 +236,11 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	        0x8000: Y flip
 	        0x03ff: Y size of block in pixels (for scaling)
 	    Word 6 :
-	        0x1f - colour.
-	        0x20 - ?  Used for background at 'frog' boss and title screen dragon.
-	        0x40 - ?  priority?
-	        0x80 - Alpha blending enable
+	        0x0000001f - colour.
+	        0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
+	        0x00000040 - ?  priority?
+	        0x00000080 - Alpha blending enable
+	        0x40000000 - Additive/Subtractable blend? (dragngun)
 	    Word 7 :
 
 
@@ -407,12 +397,12 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 		}
 	}
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t *src = &temp_bitmap.pix32(y);
 		uint32_t *dst = &bitmap.pix32(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint32_t srcpix = src[x];
 

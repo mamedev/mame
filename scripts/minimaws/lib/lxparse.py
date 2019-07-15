@@ -151,6 +151,23 @@ class SlotHandler(ElementHandler):
         self.setChildHandler(name, attrs, self.IGNORE)
 
 
+class RamOptionHandler(TextAccumulator):
+    def __init__(self, parent, **kwargs):
+        super(RamOptionHandler, self).__init__(parent=parent, **kwargs)
+        self.dbcurs = parent.dbcurs
+        self.machine = parent.id
+
+    def startMainElement(self, name, attrs):
+        self.name = attrs['name']
+        self.default = attrs.get('default', 'no') == 'yes';
+
+    def endMainElement(self, name):
+        self.size = int(self.text)
+        self.dbcurs.add_ramoption(self.machine, self.name, self.size)
+        if self.default:
+            self.dbcurs.add_ramdefault(self.machine, self.size)
+
+
 class MachineHandler(ElementHandler):
     CHILD_HANDLERS = {
             'description':      TextAccumulator,
@@ -158,7 +175,8 @@ class MachineHandler(ElementHandler):
             'manufacturer':     TextAccumulator,
             'dipswitch':        DipSwitchHandler,
             'configuration':    DipSwitchHandler,
-            'slot':             SlotHandler }
+            'slot':             SlotHandler,
+            'ramoption':        RamOptionHandler }
 
     def __init__(self, parent, **kwargs):
         super(MachineHandler, self).__init__(parent=parent, **kwargs)

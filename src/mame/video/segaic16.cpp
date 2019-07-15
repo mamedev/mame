@@ -389,24 +389,6 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	m_pagelatch_cb =  segaic16_video_pagelatch_delegate(FUNC(segaic16_video_device::tilemap_16b_fill_latch), this);
 }
 
-void segaic16_video_device::set_pagelatch_cb(device_t &device,segaic16_video_pagelatch_delegate newtilecb)
-{
-	segaic16_video_device &dev = downcast<segaic16_video_device &>(device);
-	dev.m_pagelatch_cb = newtilecb;
-}
-
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void segaic16_video_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<segaic16_video_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
 void segaic16_video_device::device_start()
 {
 	if(!m_gfxdecode->started())
@@ -1382,7 +1364,7 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 	info->buffer = std::make_unique<uint16_t[]>(info->ramsize/2);
 
 	save_item(NAME(info->colorbase), which);
-	save_pointer(NAME((uint8_t *) info->buffer.get()), info->ramsize, which);
+	save_pointer(NAME(info->buffer), info->ramsize/2, which);
 }
 
 

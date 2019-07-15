@@ -6,8 +6,8 @@
 #define DP8390_BYTE_ORDER(w) ((m_regs.dcr & 3) == 3 ? ((data << 8) | (data >> 8)) : data)
 #define LOOPBACK (!(m_regs.dcr & 8) && (m_regs.tcr & 6))
 
-DEFINE_DEVICE_TYPE(DP8390D,  dp8390d_device,  "dp8390d",  "DP8390D")
-DEFINE_DEVICE_TYPE(RTL8019A, rtl8019a_device, "rtl8019a", "RTL8019A")
+DEFINE_DEVICE_TYPE(DP8390D,  dp8390d_device,  "dp8390d",  "DP8390D NIC")
+DEFINE_DEVICE_TYPE(RTL8019A, rtl8019a_device, "rtl8019a", "RTL8019A Ethernet Controller")
 
 dp8390d_device::dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: dp8390_device(mconfig, DP8390D, tag, owner, clock, TYPE::DP8390D, 10.0f)
@@ -132,7 +132,9 @@ void dp8390_device::recv(uint8_t *buf, int len) {
 	if(buf[0] & 1) {
 		if(!memcmp((const char *)buf, "\xff\xff\xff\xff\xff\xff", 6)) {
 			if(!(m_regs.rcr & 4)) return;
-		} else return; // multicast
+		} else if (memcmp((const char *)buf, "\x09\x00\x07\xff\xff\xff", 6) != 0) { // not AppleTalk broadcast
+			return; // multicast
+		}
 		m_regs.rsr = 0x20;
 	} else m_regs.rsr = 0;
 	len &= 0xffff;

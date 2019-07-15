@@ -86,6 +86,8 @@
 #include "hashfile.h"
 #include "nes_slot.h"
 
+#include "cpu/m6502/m6502.h"
+
 #define NES_BATTERY_SIZE 0x2000
 
 
@@ -111,7 +113,9 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	, m_ciram(nullptr)
 	, m_prg_size(0)
 	, m_vrom_size(0)
-	, m_maincpu(nullptr)
+	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
+	// main NES CPU here, even if it does not belong to this device.
+	, m_maincpu(*this, ":maincpu")
 	, m_mapper_sram(nullptr)
 	, m_mapper_sram_size(0)
 	, m_ce_mask(0)
@@ -565,6 +569,36 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 }
 
 //-------------------------------------------------
+//  Interrupt helpers
+//-------------------------------------------------
+
+DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
+{
+	// use hold_irq_line for HOLD_LINE semantics (not recommended)
+	assert(state == ASSERT_LINE || state == CLEAR_LINE);
+
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
+}
+
+void device_nes_cart_interface::hold_irq_line()
+{
+	// hack which requires the CPU object
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
+}
+
+void device_nes_cart_interface::reset_cpu()
+{
+	// another hack
+	m_maincpu->set_pc(0xfffc);
+}
+
+void device_nes_cart_interface::poke(offs_t offset, uint8_t data)
+{
+	// even worse hack
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
+}
+
+//-------------------------------------------------
 //  Other helpers
 //-------------------------------------------------
 
@@ -596,7 +630,7 @@ uint8_t device_nes_cart_interface::account_bus_conflict(uint32_t offset, uint8_t
 //  PPU accessors
 //-------------------------------------------------
 
-WRITE8_MEMBER(device_nes_cart_interface::chr_w)
+void device_nes_cart_interface::chr_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 10;
 
@@ -604,14 +638,14 @@ WRITE8_MEMBER(device_nes_cart_interface::chr_w)
 		m_chr_access[bank][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(device_nes_cart_interface::chr_r)
+uint8_t device_nes_cart_interface::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 	return m_chr_access[bank][offset & 0x3ff];
 }
 
 
-WRITE8_MEMBER(device_nes_cart_interface::nt_w)
+void device_nes_cart_interface::nt_w(offs_t offset, uint8_t data)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -621,7 +655,7 @@ WRITE8_MEMBER(device_nes_cart_interface::nt_w)
 	m_nt_access[page][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(device_nes_cart_interface::nt_r)
+uint8_t device_nes_cart_interface::nt_r(offs_t offset)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nt_access[page][offset & 0x3ff];
@@ -637,26 +671,26 @@ READ8_MEMBER(device_nes_cart_interface::nt_r)
 //  source)
 //-------------------------------------------------
 
-READ8_MEMBER(device_nes_cart_interface::read_l)
+uint8_t device_nes_cart_interface::read_l(offs_t offset)
 {
-	return m_open_bus;
+	return get_open_bus();
 }
 
-READ8_MEMBER(device_nes_cart_interface::read_m)
+uint8_t device_nes_cart_interface::read_m(offs_t offset)
 {
 	if (!m_battery.empty())
 		return m_battery[offset & (m_battery.size() - 1)];
 	if (!m_prgram.empty())
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return m_open_bus;
+	return get_open_bus();
 }
 
-WRITE8_MEMBER(device_nes_cart_interface::write_l)
+void device_nes_cart_interface::write_l(offs_t offset, uint8_t data)
 {
 }
 
-WRITE8_MEMBER(device_nes_cart_interface::write_m)
+void device_nes_cart_interface::write_m(offs_t offset, uint8_t data)
 {
 	if (!m_battery.empty())
 		m_battery[offset & (m_battery.size() - 1)] = data;
@@ -664,17 +698,13 @@ WRITE8_MEMBER(device_nes_cart_interface::write_m)
 		m_prgram[offset & (m_prgram.size() - 1)] = data;
 }
 
-WRITE8_MEMBER(device_nes_cart_interface::write_h)
+void device_nes_cart_interface::write_h(offs_t offset, uint8_t data)
 {
 }
 
 
 void device_nes_cart_interface::pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted)
 {
-	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
-	// main NES CPU here, even if it does not belong to this device.
-	m_maincpu = machine.device<cpu_device>("maincpu");
-
 	if (cart_mounted)       // disksys expansion can arrive here without the memory banks!
 	{
 		// Setup PRG
@@ -716,6 +746,9 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, uint8_t *cir
 		device().save_item(NAME(m_vram));
 	if (!m_battery.empty())
 		device().save_item(NAME(m_battery));
+
+	// open bus
+	device().save_item(NAME(m_open_bus));
 }
 
 void device_nes_cart_interface::pcb_reg_postload(running_machine &machine)
@@ -919,11 +952,11 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_cart_slot_device::read_l)
+uint8_t nes_cart_slot_device::read_l(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_l(space, offset);
+		uint8_t val = m_cart->read_l(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4100) & 0xff00) >> 8);
 		return val;
@@ -932,11 +965,11 @@ READ8_MEMBER(nes_cart_slot_device::read_l)
 		return 0xff;
 }
 
-READ8_MEMBER(nes_cart_slot_device::read_m)
+uint8_t nes_cart_slot_device::read_m(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_m(space, offset);
+		uint8_t val = m_cart->read_m(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x6000) & 0xff00) >> 8);
 		return val;
@@ -945,11 +978,11 @@ READ8_MEMBER(nes_cart_slot_device::read_m)
 		return 0xff;
 }
 
-READ8_MEMBER(nes_cart_slot_device::read_h)
+uint8_t nes_cart_slot_device::read_h(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_h(space, offset);
+		uint8_t val = m_cart->read_h(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x8000) & 0xff00) >> 8);
 		return val;
@@ -958,11 +991,11 @@ READ8_MEMBER(nes_cart_slot_device::read_h)
 		return 0xff;
 }
 
-READ8_MEMBER(nes_cart_slot_device::read_ex)
+uint8_t nes_cart_slot_device::read_ex(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_ex(space, offset);
+		uint8_t val = m_cart->read_ex(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
 		return val;
@@ -976,41 +1009,41 @@ READ8_MEMBER(nes_cart_slot_device::read_ex)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_cart_slot_device::write_l)
+void nes_cart_slot_device::write_l(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_l(space, offset, data);
+		m_cart->write_l(offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4100) & 0xff00) >> 8);
 	}
 }
 
-WRITE8_MEMBER(nes_cart_slot_device::write_m)
+void nes_cart_slot_device::write_m(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_m(space, offset, data);
+		m_cart->write_m(offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x6000) & 0xff00) >> 8);
 	}
 }
 
-WRITE8_MEMBER(nes_cart_slot_device::write_h)
+void nes_cart_slot_device::write_h(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_h(space, offset, data);
+		m_cart->write_h(offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x8000) & 0xff00) >> 8);
 	}
 }
 
-WRITE8_MEMBER(nes_cart_slot_device::write_ex)
+void nes_cart_slot_device::write_ex(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_ex(space, offset, data);
+		m_cart->write_ex(offset, data);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
 	}

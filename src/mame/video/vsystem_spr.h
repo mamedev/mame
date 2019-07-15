@@ -9,38 +9,28 @@
 
 typedef device_delegate<uint32_t (uint32_t)> vsystem_tile_indirection_delegate;
 
-#define MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( _class, _method) \
-	vsystem_spr_device::set_tile_indirect_cb(*device, vsystem_tile_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-#define MCFG_VSYSTEM_SPR_SET_GFXREGION( _rgn ) \
-	vsystem_spr_device::set_gfx_region(*device, _rgn);
-#define MCFG_VSYSTEM_SPR_SET_PALBASE( _palbase ) \
-	vsystem_spr_device::CG10103_set_pal_base(*device, _palbase);
-#define MCFG_VSYSTEM_SPR_SET_PALMASK( _palmask ) \
-	vsystem_spr_device::set_pal_mask(*device, _palmask);
-#define MCFG_VSYSTEM_SPR_SET_TRANSPEN( _transpen ) \
-	vsystem_spr_device::CG10103_set_transpen(*device, _transpen);
-#define MCFG_VSYSTEM_SPR_GFXDECODE(_gfxtag) \
-	vsystem_spr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
 /*** CG10103 **********************************************/
 
 class vsystem_spr_device : public device_t
 {
 public:
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_offsets(device_t &device, int xoffs, int yoffs);
-	static void set_pdraw(device_t &device, bool pdraw);
-	static void set_tile_indirect_cb(device_t &device, vsystem_tile_indirection_delegate newtilecb);
-	static void set_gfx_region(device_t &device, int gfx_region);
-	static void CG10103_set_pal_base(device_t &device, int pal_base);
-	static void set_pal_mask(device_t &device, int pal_mask);
-	static void CG10103_set_transpen(device_t &device, int transpen);
+	// configuration
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_offsets(int xoffs, int yoffs)
+	{
+		m_xoffs = xoffs;
+		m_yoffs = yoffs;
+	}
+	void set_pdraw(bool pdraw) { m_pdraw = pdraw; }
+	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb = vsystem_tile_indirection_delegate(std::forward<T>(args)...); }
+	void set_gfx_region(int gfx_region) { m_gfx_region = gfx_region; }
+	void set_pal_base(int pal_base) { m_pal_base = pal_base; }
+	void set_pal_mask(int pal_mask) { m_pal_mask = pal_mask; }
+	void set_transpen(int transpen) { m_transpen = transpen; }
 
 	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void draw_sprites(uint16_t const *spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask = -1, int prihack_val = -1 );
-	void set_pal_base(int pal_base) { m_pal_base = pal_base; }
 
 protected:
 	virtual void device_start() override;

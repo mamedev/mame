@@ -260,6 +260,64 @@ inline float recip_approx(float value)
 #endif
 
 
+/*-------------------------------------------------
+    mul_64x64 - perform a signed 64 bit x 64 bit
+    multiply and return the full 128 bit result
+-------------------------------------------------*/
+
+#ifndef mul_64x64
+inline int64_t mul_64x64(int64_t a, int64_t b, int64_t *hi)
+{
+	uint64_t const a_hi = uint64_t(a) >> 32;
+	uint64_t const b_hi = uint64_t(b) >> 32;
+	uint64_t const a_lo = uint32_t(uint64_t(a));
+	uint64_t const b_lo = uint32_t(uint64_t(b));
+
+	uint64_t const ab_lo = a_lo * b_lo;
+	uint64_t const ab_m1 = a_hi * b_lo;
+	uint64_t const ab_m2 = a_lo * b_hi;
+	uint64_t const ab_hi = a_hi * b_hi;
+	uint64_t const carry = ((ab_lo >> 32) + uint32_t(ab_m1) + uint32_t(ab_m2)) >> 32;
+
+	*hi = ab_hi + (ab_m1 >> 32) + (ab_m2 >> 32) + carry;
+
+	// adjust for sign
+	if (a < 0)
+		*hi -= b;
+	if (b < 0)
+		*hi -= a;
+
+	return ab_lo + (ab_m1 << 32) + (ab_m2 << 32);
+}
+#endif
+
+
+/*-------------------------------------------------
+    mulu_64x64 - perform an unsigned 64 bit x 64
+    bit multiply and return the full 128 bit result
+-------------------------------------------------*/
+
+#ifndef mulu_64x64
+inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t *hi)
+{
+	uint64_t const a_hi = uint32_t(a >> 32);
+	uint64_t const b_hi = uint32_t(b >> 32);
+	uint64_t const a_lo = uint32_t(a);
+	uint64_t const b_lo = uint32_t(b);
+
+	uint64_t const ab_lo = a_lo * b_lo;
+	uint64_t const ab_m1 = a_hi * b_lo;
+	uint64_t const ab_m2 = a_lo * b_hi;
+	uint64_t const ab_hi = a_hi * b_hi;
+	uint64_t const carry = ((ab_lo >> 32) + uint32_t(ab_m1) + uint32_t(ab_m2)) >> 32;
+
+	*hi = ab_hi + (ab_m1 >> 32) + (ab_m2 >> 32) + carry;
+
+	return ab_lo + (ab_m1 << 32) + (ab_m2 << 32);
+}
+#endif
+
+
 
 /***************************************************************************
     INLINE BIT MANIPULATION FUNCTIONS
@@ -273,6 +331,7 @@ inline float recip_approx(float value)
 #ifndef count_leading_zeros
 inline uint8_t count_leading_zeros(uint32_t val)
 {
+	if (!val) return 32U;
 	uint8_t count;
 	for (count = 0; int32_t(val) >= 0; count++) val <<= 1;
 	return count;
@@ -289,7 +348,7 @@ inline uint8_t count_leading_zeros(uint32_t val)
 inline uint8_t count_leading_ones(uint32_t val)
 {
 	uint8_t count;
-	for (count = 0; (int32_t)val < 0; count++) val <<= 1;
+	for (count = 0; int32_t(val) < 0; count++) val <<= 1;
 	return count;
 }
 #endif

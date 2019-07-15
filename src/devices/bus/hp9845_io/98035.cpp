@@ -154,7 +154,7 @@ hp98035_io_card_device::~hp98035_io_card_device()
 }
 
 static INPUT_PORTS_START(hp98035_port)
-	MCFG_HP9845_IO_SC(9)
+	PORT_HP9845_IO_SC(9)
 INPUT_PORTS_END
 
 ioport_constructor hp98035_io_card_device::device_input_ports() const
@@ -727,39 +727,42 @@ ROM_START(hp98035)
 	ROM_LOAD("1818-0469.bin" , 0 , 0x800 , CRC(e16ab3bc) SHA1(34e89a37a2822f27af21969941201317dbff615b))
 ROM_END
 
-ADDRESS_MAP_START(hp98035_io_card_device::np_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000 , 0x7ff) AM_ROM AM_REGION("np" , 0)
-ADDRESS_MAP_END
+void hp98035_io_card_device::np_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x7ff).rom().region("np", 0);
+}
 
-ADDRESS_MAP_START(hp98035_io_card_device::np_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0 , 0x0) AM_WRITE(ram_addr_w)
-	AM_RANGE(0x1 , 0x1) AM_READ(ram_data_r)
-	AM_RANGE(0x2 , 0x2) AM_WRITE(ram_addr_data_w)
-	AM_RANGE(0x3 , 0x3) AM_WRITE(ram_data_w)
-	AM_RANGE(0x5 , 0x5) AM_WRITE(clock_key_w)
-	AM_RANGE(0x7 , 0x7) AM_READ(clock_digit_r)
-	AM_RANGE(0x8 , 0x8) AM_WRITE(odr_w)
-	AM_RANGE(0x9 , 0x9) AM_READ(idr_r)
-	AM_RANGE(0xa , 0xa) AM_READ(np_status_r)
-	AM_RANGE(0xb , 0xb) AM_WRITE(clear_np_irq_w)
-	AM_RANGE(0xc , 0xc) AM_READ(clock_mux_r)
-	AM_RANGE(0xd , 0xd) AM_WRITE(set_irq_w)
-	AM_RANGE(0xe , 0xe) AM_READWRITE(clr_inten_r , clr_inten_w)
-ADDRESS_MAP_END
+void hp98035_io_card_device::np_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0, 0x0).w(FUNC(hp98035_io_card_device::ram_addr_w));
+	map(0x1, 0x1).r(FUNC(hp98035_io_card_device::ram_data_r));
+	map(0x2, 0x2).w(FUNC(hp98035_io_card_device::ram_addr_data_w));
+	map(0x3, 0x3).w(FUNC(hp98035_io_card_device::ram_data_w));
+	map(0x5, 0x5).w(FUNC(hp98035_io_card_device::clock_key_w));
+	map(0x7, 0x7).r(FUNC(hp98035_io_card_device::clock_digit_r));
+	map(0x8, 0x8).w(FUNC(hp98035_io_card_device::odr_w));
+	map(0x9, 0x9).r(FUNC(hp98035_io_card_device::idr_r));
+	map(0xa, 0xa).r(FUNC(hp98035_io_card_device::np_status_r));
+	map(0xb, 0xb).w(FUNC(hp98035_io_card_device::clear_np_irq_w));
+	map(0xc, 0xc).r(FUNC(hp98035_io_card_device::clock_mux_r));
+	map(0xd, 0xd).w(FUNC(hp98035_io_card_device::set_irq_w));
+	map(0xe, 0xe).rw(FUNC(hp98035_io_card_device::clr_inten_r), FUNC(hp98035_io_card_device::clr_inten_w));
+}
 
 const tiny_rom_entry *hp98035_io_card_device::device_rom_region() const
 {
 	return ROM_NAME(hp98035);
 }
 
-MACHINE_CONFIG_START(hp98035_io_card_device::device_add_mconfig)
-	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(np_program_map)
-	MCFG_CPU_IO_MAP(np_io_map)
-	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98035_io_card_device , dc_w))
-MACHINE_CONFIG_END
+void hp98035_io_card_device::device_add_mconfig(machine_config &config)
+{
+	HP_NANOPROCESSOR(config, m_cpu, XTAL(1'000'000));
+	m_cpu->set_addrmap(AS_PROGRAM, &hp98035_io_card_device::np_program_map);
+	m_cpu->set_addrmap(AS_IO, &hp98035_io_card_device::np_io_map);
+	m_cpu->dc_changed().set(FUNC(hp98035_io_card_device::dc_w));
+}
 
 // device type definition
 DEFINE_DEVICE_TYPE(HP98035_IO_CARD, hp98035_io_card_device, "hp98035", "HP98035 card")

@@ -94,7 +94,7 @@ void spectrum_state::update_paging()
 			m_port_1ffd_data = 0x04;
 		else
 			m_port_1ffd_data = 0x00;
-		spectrum_plus3_update_memory();
+		plus3_update_memory();
 	}
 }
 
@@ -108,7 +108,7 @@ void spectrum_state::page_basicrom()
 }
 
 
-SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
+SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot_data(snapshot_size);
 
@@ -2323,10 +2323,10 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 			// Only set up sound registers for 128K machine or TS2068!
 			for (i = 0; i < 16; i++)
 			{
-				ay8912->address_w(generic_space(), 0, i);
-				ay8912->data_w(generic_space(), 0, snapdata[39 + i]);
+				ay8912->address_w(i);
+				ay8912->data_w(snapdata[39 + i]);
 			}
-			ay8912->address_w(generic_space(), 0, snapdata[38]);
+			ay8912->address_w(snapdata[38]);
 		}
 
 		pSource = snapdata + header_size;
@@ -2415,7 +2415,7 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
+QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 {
 	std::vector<uint8_t> quickload_data(quickload_size);
 

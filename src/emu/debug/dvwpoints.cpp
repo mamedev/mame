@@ -11,102 +11,87 @@
 #include "emu.h"
 #include "dvwpoints.h"
 
+#include <algorithm>
 #include <iomanip>
 
 
 
-static int cIndexAscending(const void* a, const void* b)
+static bool cIndexAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->index() - right->index();
+	return a->index() < b->index();
 }
 
-static int cIndexDescending(const void* a, const void* b)
+static bool cIndexDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cIndexAscending(b, a);
 }
 
-static int cEnabledAscending(const void* a, const void* b)
+static bool cEnabledAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return (left->enabled() ? 1 : 0) - (right->enabled() ? 1 : 0);
+	return !a->enabled() && b->enabled();
 }
 
-static int cEnabledDescending(const void* a, const void* b)
+static bool cEnabledDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cEnabledAscending(b, a);
 }
 
-static int cCpuAscending(const void* a, const void* b)
+static bool cCpuAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return strcmp(left->debugInterface()->device().tag(), right->debugInterface()->device().tag());
+	return strcmp(a->debugInterface()->device().tag(), b->debugInterface()->device().tag()) < 0;
 }
 
-static int cCpuDescending(const void* a, const void* b)
+static bool cCpuDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cCpuAscending(b, a);
 }
 
-static int cSpaceAscending(const void* a, const void* b)
+static bool cSpaceAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return strcmp(left->space().name(), right->space().name());
+	return strcmp(a->space().name(), b->space().name()) < 0;
 }
 
-static int cSpaceDescending(const void* a, const void* b)
+static bool cSpaceDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cSpaceAscending(b, a);
 }
 
-static int cAddressAscending(const void* a, const void* b)
+static bool cAddressAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return (left->address() > right->address()) ? 1 : (left->address() < right->address()) ? -1 : 0;
+	return a->address() < b->address();
 }
 
-static int cAddressDescending(const void* a, const void* b)
+static bool cAddressDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cAddressAscending(b, a);
 }
 
-static int cTypeAscending(const void* a, const void* b)
+static bool cTypeAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->type() - right->type();
+	return int(a->type()) < int(b->type());
 }
 
-static int cTypeDescending(const void* a, const void* b)
+static bool cTypeDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cTypeAscending(b, a);
 }
 
-static int cConditionAscending(const void* a, const void* b)
+static bool cConditionAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return strcmp(left->condition(), right->condition());
+	return strcmp(a->condition(), b->condition()) < 0;
 }
 
-static int cConditionDescending(const void* a, const void* b)
+static bool cConditionDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cConditionAscending(b, a);
 }
 
-static int cActionAscending(const void* a, const void* b)
+static bool cActionAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
-	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
-	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return left->action().compare(right->action());
+	return a->action() < b->action();
 }
 
-static int cActionDescending(const void* a, const void* b)
+static bool cActionDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
 {
 	return cActionAscending(b, a);
 }
@@ -229,14 +214,14 @@ void debug_view_watchpoints::gather_watchpoints()
 		device_debug &debugInterface = *source.device()->debug();
 		for (int spacenum = 0; spacenum < debugInterface.watchpoint_space_count(); ++spacenum)
 		{
-			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
-				m_buffer.push_back(wp);
+			for (const auto &wp : debugInterface.watchpoint_vector(spacenum))
+				m_buffer.push_back(wp.get());
 		}
 	}
 
 	// And now for the sort
 	if (!m_buffer.empty())
-		qsort(&m_buffer[0], m_buffer.size(), sizeof(device_debug::watchpoint *), m_sortType);
+		std::stable_sort(m_buffer.begin(), m_buffer.end(), m_sortType);
 }
 
 
@@ -326,11 +311,11 @@ void debug_view_watchpoints::view_update()
 			pad_ostream_to_length(linebuf, tableBreaks[2]);
 			linebuf << wp->space().name();
 			pad_ostream_to_length(linebuf, tableBreaks[3]);
-			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->space().byte_to_address(wp->address()));
+			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->address());
 			linebuf.put('-');
-			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->space().byte_to_address_end(wp->address() + wp->length()) - 1);
+			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->address() + wp->length() - 1);
 			pad_ostream_to_length(linebuf, tableBreaks[4]);
-			linebuf << types[wp->type() & 3];
+			linebuf << types[int(wp->type())];
 			pad_ostream_to_length(linebuf, tableBreaks[5]);
 			if (strcmp(wp->condition(), "1"))
 				linebuf << wp->condition();

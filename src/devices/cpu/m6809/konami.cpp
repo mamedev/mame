@@ -110,9 +110,9 @@ void konami_cpu_device::device_start()
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *konami_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> konami_cpu_device::create_disassembler()
 {
-	return new konami_disassembler;
+	return std::make_unique<konami_disassembler>();
 }
 
 

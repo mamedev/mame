@@ -6,16 +6,13 @@
 
     Code for emulating the CoCo Direct Connect Modem PAK
 
-    This is just a "skeleton device"; the UART is emulated but pretty much
-    nothing else
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "coco_dcmodem.h"
 
-#include "cococart.h"
 #include "machine/mos6551.h"
+#include "bus/rs232/rs232.h"
 
 
 /***************************************************************************
@@ -23,6 +20,7 @@
 ***************************************************************************/
 
 #define UART_TAG        "uart"
+#define PORT_TAG        "port"
 
 
 //**************************************************************************
@@ -43,6 +41,7 @@ namespace
 			: device_t(mconfig, COCO_DCMODEM, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_uart(*this, UART_TAG)
+			, m_eprom(*this, "eprom")
 		{
 		}
 
@@ -60,8 +59,8 @@ namespace
 		virtual void device_start() override
 		{
 			install_readwrite_handler(0xFF6C, 0xFF6F,
-				read8_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
-				write8_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
+				read8sm_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
+				write8sm_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
 		}
 
 		virtual const tiny_rom_entry *device_rom_region() const override;
@@ -69,12 +68,20 @@ namespace
 		// CoCo cartridge level overrides
 		virtual uint8_t *get_cart_base() override
 		{
-			return memregion("eprom")->base();
+			return m_eprom->base();
 		}
+
+		virtual memory_region* get_cart_memregion() override
+		{
+			return m_eprom;
+		}
+
+		virtual DECLARE_READ8_MEMBER(cts_read) override;
 
 	private:
 		// internal state
 		required_device<mos6551_device> m_uart;
+		required_memory_region m_eprom;
 	};
 };
 
@@ -83,19 +90,27 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-MACHINE_CONFIG_START(coco_dc_modem_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(coco_dc_modem_device, uart_irq_w))
-MACHINE_CONFIG_END
+void coco_dc_modem_device::device_add_mconfig(machine_config &config)
+{
+	MOS6551(config, m_uart, 0);
+	m_uart->set_xtal(1.8432_MHz_XTAL);
+	m_uart->irq_handler().set(FUNC(coco_dc_modem_device::uart_irq_w));
+	m_uart->txd_handler().set(PORT_TAG, FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, PORT_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_uart, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_uart, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_uart, FUNC(mos6551_device::write_cts));
+}
 
 
 ROM_START(coco_dcmodem)
 	ROM_REGION(0x2000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("Direct Connect Modem Pak (1985) (26-2228) (Tandy).rom", 0x0000, 0x2000, CRC(667bc55d) SHA1(703fe0aba4a603591078cb675ffd26a67c02df88))
+	ROM_LOAD("direct connect modem pak,1985,26-2228,tandy.rom", 0x0000, 0x2000, CRC(667bc55d) SHA1(703fe0aba4a603591078cb675ffd26a67c02df88))
 ROM_END
 
-DEFINE_DEVICE_TYPE(COCO_DCMODEM, coco_dc_modem_device, "coco_dcmodem", "CoCo Direct Connect Modem PAK")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_DCMODEM, device_cococart_interface, coco_dc_modem_device, "coco_dcmodem", "CoCo Direct Connect Modem PAK")
 
 
 //-------------------------------------------------
@@ -107,4 +122,12 @@ const tiny_rom_entry *coco_dc_modem_device::device_rom_region() const
 	return ROM_NAME(coco_dcmodem);
 }
 
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_dc_modem_device::cts_read)
+{
+	return m_eprom->base()[offset & 0x1fff];
+}
 

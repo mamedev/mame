@@ -62,12 +62,14 @@ const tiny_rom_entry *powermate_ide_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(powermate_ide_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+void powermate_ide_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	centronics_device &centronics(CENTRONICS(config, CENTRONICS_TAG, centronics_devices, "printer"));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
-MACHINE_CONFIG_END
+	OUTPUT_LATCH(config, m_cent_data_out);
+	centronics.set_output_latch(*m_cent_data_out);
+}
 
 
 
@@ -101,7 +103,7 @@ void powermate_ide_device::device_start()
 //  adam_bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+uint8_t powermate_ide_device::adam_bd_r(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!biorq)
 	{
@@ -162,7 +164,7 @@ uint8_t powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, uin
 //  adam_bd_w - buffered data write
 //-------------------------------------------------
 
-void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+void powermate_ide_device::adam_bd_w(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!biorq)
 	{
@@ -178,7 +180,7 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, uint8_
 			break;
 
 		case 0x40:
-			m_cent_data_out->write(space, 0, data);
+			m_cent_data_out->write(data);
 			break;
 
 		case 0x42: // Bank Number

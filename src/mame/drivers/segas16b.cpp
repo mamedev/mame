@@ -881,7 +881,7 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 //  CONSTANTS
 //**************************************************************************
 
-#define MASTER_CLOCK_10MHz              XTAL(10'000'000)
+#define MASTER_CLOCK_10MHz              XTAL(20'000'000) / 2
 #define MASTER_CLOCK_8MHz               XTAL(8'000'000)
 #define MASTER_CLOCK_25MHz              XTAL(25'174'800)
 
@@ -895,10 +895,6 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 //  memory_mapper - callback to handle mapping
 //  requests
 //-------------------------------------------------
-
-
-
-
 
 void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
@@ -967,33 +963,12 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 }
 
 
-//-------------------------------------------------
-//  mapper_sound_r - sound port read from the
-//  memory mapper chip
-//-------------------------------------------------
-
-uint8_t segas16b_state::mapper_sound_r()
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  mapper_sound_w - sound port write from the
-//  memory mapper chip
-//-------------------------------------------------
-
-void segas16b_state::mapper_sound_w(uint8_t data)
-{
-	if (m_soundlatch != nullptr)
-		m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
-	if (m_soundcpu != nullptr)
-		m_soundcpu->set_input_line(0, HOLD_LINE);
-}
-
 WRITE16_MEMBER( segas16b_state::sound_w16 )
 {
-	mapper_sound_w(data);
+	if (m_soundlatch != nullptr)
+		m_soundlatch->write(data & 0xff);
+	if (m_soundcpu != nullptr)
+		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 //**************************************************************************
@@ -1024,13 +999,13 @@ READ16_MEMBER( segas16b_state::rom_5797_bank_math_r )
 	{
 		case 0x0000/2:
 			// multiply registers
-			return m_multiplier->read(space, offset, mem_mask);
+			return m_multiplier->read(offset);
 
 		case 0x1000/2:
 			// compare registers
-			return m_cmptimer_1->read(space, offset, mem_mask);
+			return m_cmptimer_1->read(offset);
 	}
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -1046,12 +1021,12 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 	{
 		case 0x0000/2:
 			// multiply registers
-			m_multiplier->write(space, offset, data, mem_mask);
+			m_multiplier->write(offset, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			// compare registers
-			m_cmptimer_1->write(space, offset, data, mem_mask);
+			m_cmptimer_1->write(offset, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1070,7 +1045,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 {
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return m_cmptimer_2->read(space, offset, mem_mask);
+	return m_cmptimer_2->read(offset);
 }
 
 
@@ -1082,7 +1057,7 @@ READ16_MEMBER( segas16b_state::unknown_rgn2_r )
 WRITE16_MEMBER( segas16b_state::unknown_rgn2_w )
 {
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
-	m_cmptimer_2->write(space, offset, data, mem_mask);
+	m_cmptimer_2->write(offset, data, mem_mask);
 }
 
 
@@ -1105,7 +1080,7 @@ READ16_MEMBER( segas16b_state::standard_io_r )
 			return ioport((offset & 1) ? "DSW1" : "DSW2")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return open_bus_r(space);
 }
 
 
@@ -1134,8 +1109,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 				m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
-			output().set_led_value(1, data & 0x08);
-			output().set_led_value(0, data & 0x04);
+			m_lamps[1] = BIT(data, 3);
+			m_lamps[0] = BIT(data, 2);
 			machine().bookkeeping().coin_counter_w(1, data & 0x02);
 			machine().bookkeeping().coin_counter_w(0, data & 0x01);
 			return;
@@ -1151,7 +1126,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 
 WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 {
-	m_ym2413->write(space, offset, data >> 8);
+	m_ym2413->write(offset, data >> 8);
 }
 
 
@@ -1172,8 +1147,8 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 	{
 		// it is important to write in this order: if the /START line goes low
 		// at the same time /RESET goes low, no sample should be started
-		m_upd7759->start_w(data & 0x80);
-		m_upd7759->reset_w(data & 0x40);
+		m_upd7759->start_w(BIT(data, 7));
+		m_upd7759->reset_w(BIT(data, 6));
 
 		// banking depends on the ROM board
 		int bankoffs = 0;
@@ -1258,7 +1233,7 @@ READ8_MEMBER( segas16b_state::upd7759_status_r )
 WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
 {
 	if (state)
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -1354,8 +1329,8 @@ void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoff
 	// set tile banks
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int bank = m_workram[0x3094 / 2] & 0x00ff;
-	// alt_bank is used for the alt rom loading (where there are space between the ROMs)
-	// alternatively the rom loading could be changed, but the loading is correct for the non-mcu .b14/.a14 type
+	// alt_bank is used for the alt ROM loading (where there are space between the ROMs)
+	// alternatively the ROM loading could be changed, but the loading is correct for the non-mcu .b14/.a14 type
 	// board so presumably our MCU simulation should act accordingly.
 	if (alt_bank) bank = (bank & 0x1) | ((bank & 0xfe) << 1);
 
@@ -1707,130 +1682,141 @@ WRITE16_MEMBER( segas16b_state::sjryuko_custom_io_w )
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16b_state::system16b_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
+void segas16b_state::system16b_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0xffffff).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write)).umask16(0x00ff);
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0x100000, 0x1007ff).ram().share("sprites");
+	map(0x200000, 0x200fff).ram().share("paletteram");
+	map(0x300000, 0x30ffff).ram().share("tileram");
+	map(0x400000, 0x400fff).ram().share("textram");
+	map(0x500000, 0x503fff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16b_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16b_state::system16c_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
+void segas16b_state::system16c_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0xffffff).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write)).umask16(0x00ff);
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("workram") // only change from system16b_map
-ADDRESS_MAP_END
+	map(0x100000, 0x1007ff).ram().share("sprites");
+	map(0x200000, 0x200fff).ram().share("paletteram");
+	map(0x300000, 0x30ffff).ram().share("tileram");
+	map(0x400000, 0x400fff).ram().share("textram");
+	map(0x500000, 0x53ffff).ram().share("workram"); // only change from system16b_map
+}
 
-ADDRESS_MAP_START(segas16b_state::system16b_bootleg_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc43fff) AM_READWRITE(bootleg_custom_io_r, bootleg_custom_io_w)
-	AM_RANGE(0x123406, 0x123407) AM_WRITE(sound_w16)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+void segas16b_state::system16b_bootleg_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x23ffff).ram(); // used during startup for decompression
+	map(0x3f0000, 0x3fffff).w(FUNC(segas16b_state::rom_5704_bank_w));
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).rw(FUNC(segas16b_state::bootleg_custom_io_r), FUNC(segas16b_state::bootleg_custom_io_w));
+	map(0x123406, 0x123407).w(FUNC(segas16b_state::sound_w16));
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas16b_state::map_fpointbla)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x02000e, 0x02000f) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0000, 0x0a001f) AM_RAM AM_SHARE("bootleg_scroll")
-	AM_RANGE(0x0a0020, 0x0a0027) AM_RAM AM_SHARE("bootleg_page")
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x443002, 0x443003) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x843018, 0x843019) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfe000c, 0xfe000d) AM_READ_PORT("P1")
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+void segas16b_state::map_fpointbla(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x02000e, 0x02000f).portr("P2");
+	map(0x0a0000, 0x0a001f).ram().share("bootleg_scroll");
+	map(0x0a0020, 0x0a0027).ram().share("bootleg_page");
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x443002, 0x443003).portr("SERVICE");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0x843018, 0x843019).portr("DSW1");
+	map(0xfe0005, 0xfe0005).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfe000c, 0xfe000d).portr("P1");
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map_x)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16b_state::decrypted_opcodes_map_x(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map_fpointbla)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16b_state::decrypted_opcodes_map_fpointbla(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x01ffff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16b_state::lockonph_map)
+void segas16b_state::lockonph_map(address_map &map)
+{
 	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x841fff) AM_RAM_WRITE(philko_paletteram_w) AM_SHARE("paletteram")
+	map(0x000000, 0x0bffff).rom();
+	map(0x3f0000, 0x3fffff).w(FUNC(segas16b_state::rom_5704_bank_w));
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x840000, 0x841fff).ram().w(FUNC(segas16b_state::philko_paletteram_w)).share("paletteram");
 
-	AM_RANGE(0xC40000, 0xC40001) AM_WRITENOP // coin counters etc.?
+	map(0xC40000, 0xC40001).nopw(); // coin counters etc.?
 
-	AM_RANGE(0xC41000, 0xC41001) AM_READ_PORT("P1")
-	AM_RANGE(0xC41002, 0xC41003) AM_READ_PORT("P2")
-	AM_RANGE(0xC41004, 0xC41005) AM_READ_PORT("SERVICE")
+	map(0xC41000, 0xC41001).portr("P1");
+	map(0xC41002, 0xC41003).portr("P2");
+	map(0xC41004, 0xC41005).portr("SERVICE");
 
-	AM_RANGE(0xC42000, 0xC42001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xC42002, 0xC42003) AM_READ_PORT("DSW2")
+	map(0xC42000, 0xC42001).portr("DSW1");
+	map(0xC42002, 0xC42003).portr("DSW2");
 
-	AM_RANGE(0x777706, 0x777707) AM_WRITE(sound_w16) // AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	map(0x777707, 0x777707).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("workram");
+}
 
 
 
-ADDRESS_MAP_START(segas16b_state::fpointbl_map)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+void segas16b_state::fpointbl_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
 
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x440fff).ram().share("sprites");
 
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_w16)
-	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
-	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
+	map(0x600007, 0x600007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x601000, 0x601001).portr("SERVICE");
+	map(0x601002, 0x601003).portr("P1");
+	map(0x601004, 0x601005).portr("P2");
+	map(0x600000, 0x600001).portr("DSW2");
+	map(0x600002, 0x600003).portr("DSW1");
 
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x843000, 0x843001) AM_WRITENOP
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0x843000, 0x843001).nopw();
 
-	AM_RANGE(0xC46000, 0xC4601f) AM_RAM AM_SHARE("bootleg_scroll")
-	AM_RANGE(0xC46020, 0xC46027) AM_RAM AM_SHARE("bootleg_page")
+	map(0xC46000, 0xC4601f).ram().share("bootleg_scroll");
+	map(0xC46020, 0xC46027).ram().share("bootleg_page");
 
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 /*
     Flash Point (Datsu bootlegs = fpointbl, fpointbj)
     Has sound latch at $E000 instead of I/O ports $C0-FF
 */
-ADDRESS_MAP_START(segas16b_state::fpointbl_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16b_state::fpointbl_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf800, 0xffff).ram();
+}
 
 
 READ16_MEMBER(segas16b_state::bootleg_custom_io_r)
@@ -1848,43 +1834,67 @@ WRITE16_MEMBER(segas16b_state::bootleg_custom_io_w)
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16b_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16b_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xdfff).bankr("soundbank");
+	map(0xe800, 0xe800).r(m_mapper, FUNC(sega_315_5195_mapper_device::pread));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas16b_state::sound_decrypted_opcodes_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
+void segas16b_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom().share("sound_decrypted_opcodes");
+	map(0x8000, 0xdfff).bankr("soundbank");
+}
 
-ADDRESS_MAP_START(segas16b_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_WRITE(upd7759_control_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READ(upd7759_status_r) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void segas16b_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).w(FUNC(segas16b_state::upd7759_control_w));
+	map(0x80, 0x80).mirror(0x3f).r(FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_mapper, FUNC(sega_315_5195_mapper_device::pread));
+}
+
+void segas16b_state::bootleg_sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xdfff).bankr("soundbank");
+	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf800, 0xffff).ram();
+}
+
+void segas16b_state::bootleg_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).w(FUNC(segas16b_state::upd7759_control_w));
+	map(0x80, 0x80).mirror(0x3f).r(FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 // similar to whizz / other philko games in sidearms.cpp, but with the m6295
-ADDRESS_MAP_START(segas16b_state::lockonph_sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16b_state::lockonph_sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas16b_state::lockonph_sound_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITENOP // ??
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void segas16b_state::lockonph_sound_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).nopw(); // ??
+	map(0x80, 0x80).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 //**************************************************************************
@@ -1899,11 +1909,12 @@ WRITE8_MEMBER(segas16b_state::spin_68k_w)
 	m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(20000));
 }
 
-ADDRESS_MAP_START(segas16b_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SERVICE") AM_WRITE(spin_68k_w)
-ADDRESS_MAP_END
+void segas16b_state::mcu_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write));
+}
 
 
 
@@ -2189,7 +2200,7 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_INCLUDE( afighter )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_accel_r, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_accel_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // SHOT
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // WEAPON1
@@ -2197,10 +2208,10 @@ static INPUT_PORTS_START( afighter_analog )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) // WEAPON3
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_handl_left_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_handl_left_r, nullptr)
 
 	PORT_MODIFY("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_handl_right_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, afighter_16b_analog_state, afighter_handl_right_r, nullptr)
 
 	PORT_START("STEER")  // steering
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
@@ -2423,7 +2434,9 @@ static INPUT_PORTS_START( dunkshot )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW2")
-	//"SW2:1" unused
+	PORT_DIPNAME( 0x01, 0x00, "Winner Advances" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2440,7 +2453,9 @@ static INPUT_PORTS_START( dunkshot )
 	PORT_DIPNAME( 0x40, 0x40, "CPU Starts With +6 Pts." ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	//"SW2:8" unused
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("ANALOGX1")              // fake analog X
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_REVERSE
@@ -2465,6 +2480,15 @@ static INPUT_PORTS_START( dunkshot )
 
 	PORT_START("ANALOGY4")              // fake analog Y
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(4) PORT_REVERSE
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dunkshoto )
+	PORT_INCLUDE( dunkshot )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 
@@ -3459,6 +3483,64 @@ static INPUT_PORTS_START( fantzoneta )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ultracin )
+//  it uses two wheels (see https://youtu.be/Je7Bm9YgiPg?t=33), which seem to rely on bits 0x08, 0x40 and 0x80 of P1 and P2.
+//  for now it's roughly useable by keeping the direction pressed and then pressing the fake button 2. TODO: emulate wheels
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Advertise Sound Interval" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "No Interval" )
+	PORT_DIPSETTING(    0x02, "4 Cycle" )
+	PORT_DIPSETTING(    0x03, "2 Cycle" )
+	PORT_DIPNAME( 0x04, 0x04, "Advertise Coin Indication" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "Coin" )
+	PORT_DIPSETTING(    0x04, "100 - 400 Yen" )
+	PORT_DIPNAME( 0x08, 0x08, "Game Time" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, "Short" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+INPUT_PORTS_END
+
 // we use common sys16b tags to simplify port reads
 static INPUT_PORTS_START( atomicp )
 	PORT_START("SERVICE")   // P1
@@ -3688,11 +3770,11 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segas16b )
+static GFXDECODE_START( gfx_segas16b )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 1024 )
 GFXDECODE_END
 
-static GFXDECODE_START( lockonph )
+static GFXDECODE_START( gfx_lockonph )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   0, 1024 )
 GFXDECODE_END
 
@@ -3700,131 +3782,147 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segas16b_state::system16b)
-
+void segas16b_state::system16b(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	M68000(config, m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, MASTER_CLOCK_10MHz/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::sound_portmap);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK_10MHz, m_maincpu);
+	m_mapper->set_mapper(FUNC(segas16b_state::memory_mapper), this);
+	m_mapper->pbf().set_inputline(m_soundcpu, 0);
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16b)
-	MCFG_PALETTE_ADD("palette", 2048*3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
+	PALETTE(config, m_palette).set_entries(2048*2);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2).add_route(ALL_OUTPUTS, "mono", 0.43);
 
-	MCFG_YM2151_ADD("ym2151", MASTER_CLOCK_8MHz/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
+	UPD7759(config, m_upd7759);
+	m_upd7759->md_w(0);
+	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.48);
+}
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas16b_state,upd7759_generate_nmi))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(segas16b_state::system16b_mc8123)
+void segas16b_state::system16b_mc8123(machine_config &config)
+{
 	system16b(config);
-	MCFG_CPU_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_soundcpu, MASTER_CLOCK_10MHz/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::sound_portmap);
+	m_soundcpu->set_addrmap(AS_OPCODES, &segas16b_state::sound_decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1089a)
+void segas16b_state::system16b_fd1089a(machine_config &config)
+{
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1089b)
+void segas16b_state::system16b_fd1089b(machine_config &config)
+{
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1094)
+void segas16b_state::system16b_fd1094(machine_config &config)
+{
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas16b_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+}
 
-MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
+void segas16b_state::aceattacb_fd1094(machine_config &config)
+{
 	system16b_fd1094(config);
 	// 834-6602 I/O board
-	MCFG_DEVICE_ADD("upd4701a1", UPD4701A, 0)
-	MCFG_DEVICE_ADD("upd4701a2", UPD4701A, 0)
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("HANDX1"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("HANDX2"))
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701a[0]);
+	UPD4701A(config, m_upd4701a[1]);
 
+	CXD1095(config, m_cxdio, 0);
+	m_cxdio->in_porta_cb().set_ioport("HANDX1");
+	m_cxdio->in_portb_cb().set_ioport("HANDX2");
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
+void segas16b_state::system16b_i8751(machine_config &config)
+{
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, i8751_main_cpu_vblank)
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::i8751_main_cpu_vblank));
 
-	MCFG_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	I8751(config, m_mcu, MASTER_CLOCK_8MHz);
+	m_mcu->set_addrmap(AS_IO, &segas16b_state::mcu_io_map);
+	m_mcu->port_in_cb<1>().set_ioport("SERVICE");
+	m_mcu->port_out_cb<1>().set(FUNC(segas16b_state::spin_68k_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(6000);
+
+	m_screen->screen_vblank().set_inputline(m_mcu, INPUT_LINE_IRQ0);
+}
 
 // same as the above, but with custom Sega ICs
 
-MACHINE_CONFIG_START(segas16b_state::rom_5797_fragment)
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier")
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_1")
-	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_2")
-MACHINE_CONFIG_END
+void segas16b_state::rom_5797_fragment(machine_config &config)
+{
+	SEGA_315_5248_MULTIPLIER(config, m_multiplier, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_5797)
+void segas16b_state::system16b_5797(machine_config &config)
+{
 	system16b(config);
 	rom_5797_fragment(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_i8751_5797)
+void segas16b_state::system16b_i8751_5797(machine_config &config)
+{
 	system16b_i8751(config);
 	rom_5797_fragment(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_fd1094_5797)
+void segas16b_state::system16b_fd1094_5797(machine_config &config)
+{
 	system16b_fd1094(config);
 	rom_5797_fragment(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas16b_state::system16b_split)
+void segas16b_state::system16b_split(machine_config &config)
+{
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(system16b_bootleg_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_x)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16b_bootleg_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas16b_state::decrypted_opcodes_map_x);
 
-	MCFG_DEVICE_REMOVE("mapper")
-MACHINE_CONFIG_END
+	config.device_remove("mapper");
+
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::bootleg_sound_portmap);
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+}
 
 void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
 {
@@ -3852,114 +3950,111 @@ void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pa
 //  printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
 }
 
-MACHINE_CONFIG_START(segas16b_state::fpointbl)
+void segas16b_state::fpointbl(machine_config &config)
+{
 	system16b(config);
 
-	MCFG_DEVICE_REMOVE("mapper")
-	MCFG_DEVICE_REMOVE("sprites")
+	config.device_remove("mapper");
+	config.device_remove("sprites");
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::fpointbl_map);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::fpointbl_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::bootleg_sound_portmap);
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
-	MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(-2) // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_DEVICE_MODIFY("segaic16vid")
-	MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB(segas16b_state, tilemap_16b_fpointbl_fill_latch)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(75); // these align the pieces with the playfield
+	m_sprites->set_local_originy(-2); // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
-MACHINE_CONFIG_END
+	m_segaic16vid->set_pagelatch_cb(FUNC(segas16b_state::tilemap_16b_fpointbl_fill_latch), this);
+}
 
-MACHINE_CONFIG_START(segas16b_state::fpointbla)
+void segas16b_state::fpointbla(machine_config &config)
+{
 	fpointbl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::map_fpointbla);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas16b_state::decrypted_opcodes_map_fpointbla);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
 
-	MCFG_DEVICE_MODIFY("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
-	MACHINE_CONFIG_END
+	m_sprites->set_local_originx(60); // these align the pieces with the playfield
+}
 
-MACHINE_CONFIG_START(segas16b_state::lockonph)
-
+void segas16b_state::lockonph(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
-	MCFG_CPU_PROGRAM_MAP(lockonph_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::lockonph_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
-	MCFG_CPU_PROGRAM_MAP(lockonph_sound_map)
-	MCFG_CPU_IO_MAP(lockonph_sound_iomap)
+	Z80(config, m_soundcpu, XTAL(16'000'000)/4); // ?
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::lockonph_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::lockonph_sound_iomap);
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-//  MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockonph)
-	MCFG_PALETTE_ADD("palette", 0x2000*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockonph);
+	PALETTE(config, m_palette).set_entries(4096*2);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224) // wrong, other XTAL seems to be 17Mhz?
-	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?
+	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) // ??
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
-	MCFG_SOUND_ROUTE(0, "mono", 0.5)
-	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	YM2151(config, m_ym2151, XTAL(16'000'000)/4); // ??
+//  m_ym2151->irq_handler().set_inputline(m_soundcpu", 0); // does set up the timer, but end up with no sound?
+	m_ym2151->add_route(0, "mono", 0.5);
+	m_ym2151->add_route(1, "mono", 0.5);
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // clock / pin not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
-
-
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000)/16, okim6295_device::PIN7_LOW)); // clock / pin not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.2);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.2);
+}
 
 
 //**************************************************************************
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segas16b_state::atomicp) // 10MHz CPU Clock verified
+void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
+{
 	system16b(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REMOVE("soundcpu")
-	MCFG_DEVICE_REMOVE("sprites")
+	config.device_remove("soundcpu");
+	config.device_remove("sprites");
+
+	m_mapper->pbf().set_nop();
 
 	// sound hardware
-	MCFG_DEVICE_REMOVE("soundlatch")
-	MCFG_DEVICE_REMOVE("ym2151")
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	config.device_remove("ym2151");
+	YM2413(config, m_ym2413, XTAL(20'000'000)/4); // 20MHz OSC divided by 4 (verified)
+	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REMOVE("upd")
-MACHINE_CONFIG_END
+	config.device_remove("upd");
+}
 
 
-MACHINE_CONFIG_START(segas16b_state::system16c)
+void segas16b_state::system16c(machine_config &config)
+{
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(system16c_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::system16c_map);
+}
 
 
 
@@ -4048,14 +4143,13 @@ ROM_START( aliensyn )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 ROM_END
 
-
 //*************************************************************************************************************************
 //  Alien Syndrome, Sega System 16B
 //  CPU: FD1089A (317-0033)
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6308-03
 //    Main board: 837-6312
-//     Rom board: 834-6311-03
+//     ROM board: 834-6311-03
 //
 ROM_START( aliensyn3 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -4088,9 +4182,8 @@ ROM_START( aliensyn3 )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
-
 
 //*************************************************************************************************************************
 //  Alien Syndrome, Sega System 16B
@@ -4098,7 +4191,7 @@ ROM_END
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6308-05
 //    Main board: 837-6312-02
-//     Rom board: 834-6311-04
+//     ROM board: 834-6311-04
 //
 ROM_START( aliensyn7 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -4134,14 +4227,13 @@ ROM_START( aliensyn7 )
 	ROM_LOAD( "317-00xx.key",  0x0000, 0x2000, CRC(76b370cd) SHA1(996a4a24dec085caf93cbe614d3b0888379c91dd) )
 ROM_END
 
-
 //*************************************************************************************************************************
 //  Alien Syndrome, Sega System 16B
 //  CPU: FD1089A (317-0033)
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6308
 //    Main board: 837-6312
-//     Rom board: 834-6311
+//     ROM board: 834-6311
 //
 ROM_START( aliensynj )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -4174,7 +4266,7 @@ ROM_START( aliensynj )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 
@@ -4182,8 +4274,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Action Fighter, Sega System 16B
-
-
+//
 ROM_START( afightere )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr10269.bin", 0x00001, 0x08000, CRC(688b4ff7) SHA1(8972b75b6fa72513a6ebb3a5ed5988a43f1b6266) )
@@ -4240,9 +4331,8 @@ ROM_START( afighterf )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
-
 
 ROM_START( afighterg )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -4272,9 +4362,8 @@ ROM_START( afighterg )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
-
 
 ROM_START( afighterh )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -4304,7 +4393,7 @@ ROM_START( afighterh )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4752,6 +4841,7 @@ ROM_START( snapper )
 	ROM_LOAD( "snap5.r05",  0x10000, 0x8000, CRC(378e08eb) SHA1(f2c10bd9e885c185ac2d0d51d907ceca1f21dd7a) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -4761,31 +4851,30 @@ ROM_END
 //
 ROM_START( lockonph )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "B2", 0x000001, 0x40000, CRC(fc1c9f81) SHA1(09c51fbf4cc440ad3166407d1b96b4a4dcc9e412) )
-	ROM_LOAD16_BYTE( "B4", 0x000000, 0x40000, CRC(fbb896f4) SHA1(36fe1199d27c6b106164ed359ddd735a75bcb85b) )
-	ROM_LOAD16_BYTE( "B1", 0x080001, 0x20000, CRC(f11a72ac) SHA1(e3010114abc79e4787f9e68fac40fdc231a22a5f) )
-	ROM_LOAD16_BYTE( "B3", 0x080000, 0x20000, CRC(3f8c0215) SHA1(3d8081c2e2a8dea398b390d5bcde5b1684c136ad) )
+	ROM_LOAD16_BYTE( "b2", 0x000001, 0x40000, CRC(fc1c9f81) SHA1(09c51fbf4cc440ad3166407d1b96b4a4dcc9e412) )
+	ROM_LOAD16_BYTE( "b4", 0x000000, 0x40000, CRC(fbb896f4) SHA1(36fe1199d27c6b106164ed359ddd735a75bcb85b) )
+	ROM_LOAD16_BYTE( "b1", 0x080001, 0x20000, CRC(f11a72ac) SHA1(e3010114abc79e4787f9e68fac40fdc231a22a5f) )
+	ROM_LOAD16_BYTE( "b3", 0x080000, 0x20000, CRC(3f8c0215) SHA1(3d8081c2e2a8dea398b390d5bcde5b1684c136ad) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // z80
-	ROM_LOAD( "B6",  0x00000, 0x10000, CRC(aa7b1880) SHA1(866c057e076178da2395ce0351f7060cccd7bd81) )
+	ROM_LOAD( "b6",  0x00000, 0x10000, CRC(aa7b1880) SHA1(866c057e076178da2395ce0351f7060cccd7bd81) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // m6295
-	ROM_LOAD( "B5",  0x00000, 0x20000, CRC(d6369a39) SHA1(354075ec6eb7861567917f61d2dda23652dbec60) )
+	ROM_LOAD( "b5",  0x00000, 0x20000, CRC(d6369a39) SHA1(354075ec6eb7861567917f61d2dda23652dbec60) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "B10", 0x00000, 0x20000, CRC(d3a8bd15) SHA1(06fc030d4325aaf181578ae8b7da671190ca9548) )
-	ROM_LOAD( "B7",  0x20000, 0x20000, CRC(787c382e) SHA1(4e1912c891d69a9fbeecfa16ff0fc1377ae5ad8e) )
-	ROM_LOAD( "B9",  0x40000, 0x20000, CRC(aae2cef1) SHA1(3f83cf8b605822561bd0f745f7568cae86d3a3b8) )
-	ROM_LOAD( "B8",  0x60000, 0x20000, CRC(cd30abe0) SHA1(9fb19b9d2bee033fc81a47fb00ab4a59ea77ecb1) )
+	ROM_LOAD( "b10", 0x00000, 0x20000, CRC(d3a8bd15) SHA1(06fc030d4325aaf181578ae8b7da671190ca9548) )
+	ROM_LOAD( "b7",  0x20000, 0x20000, CRC(787c382e) SHA1(4e1912c891d69a9fbeecfa16ff0fc1377ae5ad8e) )
+	ROM_LOAD( "b9",  0x40000, 0x20000, CRC(aae2cef1) SHA1(3f83cf8b605822561bd0f745f7568cae86d3a3b8) )
+	ROM_LOAD( "b8",  0x60000, 0x20000, CRC(cd30abe0) SHA1(9fb19b9d2bee033fc81a47fb00ab4a59ea77ecb1) )
 
 
 	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) // sprites
-	ROM_LOAD16_BYTE( "B12", 0x000000, 0x40000, CRC(9088d980) SHA1(bc6c24d4b56472a4bd2f2b0999b850fc99b6c556) )
-	ROM_LOAD16_BYTE( "B14", 0x000001, 0x40000, CRC(af943525) SHA1(fe1accca30602c8b5db799c7cb038230b0113810) )
-	ROM_LOAD16_BYTE( "B11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
-	ROM_LOAD16_BYTE( "B13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
+	ROM_LOAD16_BYTE( "b12", 0x000000, 0x40000, CRC(9088d980) SHA1(bc6c24d4b56472a4bd2f2b0999b850fc99b6c556) )
+	ROM_LOAD16_BYTE( "b14", 0x000001, 0x40000, CRC(af943525) SHA1(fe1accca30602c8b5db799c7cb038230b0113810) )
+	ROM_LOAD16_BYTE( "b11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
+	ROM_LOAD16_BYTE( "b13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
 ROM_END
-
 
 
 //*************************************************************************************************************************
@@ -4878,7 +4967,7 @@ ROM_START( aurail1 )
 	ROM_RELOAD(                0x30000, 0x20000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0168.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
+	ROM_LOAD( "317-0168.key", 0x0000, 0x2000, CRC(fed38390) SHA1(b5f458bc70c069542be16d476645c153ed1d1b45) )
 ROM_END
 
 ROM_START( aurail1d )
@@ -4984,14 +5073,13 @@ ROM_START( aurailj )
 	ROM_RELOAD(                0x30000, 0x20000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
+	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(fed38390) SHA1(b5f458bc70c069542be16d476645c153ed1d1b45) )
 ROM_END
-
 
 ROM_START( aurailjd )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-13446.a7", 0x000000, 0x20000, CRC(25221510) SHA1(8c461db9438bc785c5f81e3cb3bcea9adbd2be9c) )
-	ROM_LOAD16_BYTE( "bootleg_epr-13444.a5", 0x000001, 0x20000, CRC(56ba5356) SHA1(a8cf41f415776328b645a23f13999ff356284772))
+	ROM_LOAD16_BYTE( "bootleg_epr-13444.a5", 0x000001, 0x20000, CRC(56ba5356) SHA1(a8cf41f415776328b645a23f13999ff356284772) )
 	ROM_LOAD16_BYTE( "epr-13447.a8", 0x040000, 0x20000, CRC(70a52167) SHA1(51512d4ee1e63902375b197cf04170744b099d88) )
 	ROM_LOAD16_BYTE( "epr-13445.a6", 0x040001, 0x20000, CRC(28dfc3dd) SHA1(b1d6d3e31a48062a91cc9b7b6ff68bfde0a3ea1c) )
 
@@ -5026,6 +5114,7 @@ ROM_START( aurailjd )
 	ROM_LOAD( "mpr-13449.a11", 0x10000, 0x20000, CRC(d3d9aaf9) SHA1(0fb3a8cb11033accceb3a43a691fb424cf8b9619) )
 	ROM_RELOAD(                0x30000, 0x20000 )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -5084,7 +5173,6 @@ ROM_START( bayrouted )
 	ROM_LOAD( "mpr-12460.a11", 0x10000, 0x20000, CRC(0bae570d) SHA1(05fa4a3405666342ab66e696a7344cca97569f19) )
 	ROM_LOAD( "mpr-12461.a12", 0x30000, 0x20000, CRC(b03b8b46) SHA1(b0283ac377d464f3d9374a992192ec6c515a3c2f) )
 ROM_END
-
 
 //*************************************************************************************************************************
 //  Bay Route, Sega System 16B
@@ -5187,7 +5275,7 @@ ROM_END
 //  (c)1987 Sega
 //  System 16B
 //  CPU Custom No. 317-0041
-//  Rom Board No. 171-5358
+//  ROM Board No. 171-5358
 //
 //  J1 - -
 //  J2 ---
@@ -5228,11 +5316,10 @@ ROM_START( bullet )
 	ROM_LOAD( "epr-10998.a8", 0x10000, 0x8000, CRC(f971a817) SHA1(502c95638e4fd5f87e5fc837cb44b39a5d62f4e4) )
 ROM_END
 
-
 ROM_START( bulletd )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-11010.a4",  0x000000, 0x08000, CRC(c4b7cb63) SHA1(c35fceab2a03f23d9690432a582064d12de950f6) )
-	ROM_LOAD16_BYTE( "bootleg_epr-11007.a1",  0x000001, 0x08000, CRC(2afa84c5) SHA1(97f74ba4b9f83314c9e1f61afe7db3d7fa7a9935))
+	ROM_LOAD16_BYTE( "bootleg_epr-11007.a1",  0x000001, 0x08000, CRC(2afa84c5) SHA1(97f74ba4b9f83314c9e1f61afe7db3d7fa7a9935) )
 	ROM_LOAD16_BYTE( "epr-11011.a5",  0x010000, 0x08000, CRC(7f446b9f) SHA1(0b92ab100c13bdcdd0f770da5da5e19cb79afde1) )
 	ROM_LOAD16_BYTE( "epr-11008.a2",  0x010001, 0x08000, CRC(34824d3b) SHA1(7a3134a71ad176b8a08a919c0acb75ae1e05743b) )
 	ROM_LOAD16_BYTE( "epr-11012.a6",  0x020000, 0x08000, CRC(3992f159) SHA1(50686b394693ab01cbd159ae661f326c8eee50b8) )
@@ -5258,12 +5345,16 @@ ROM_START( bulletd )
 	ROM_LOAD( "epr-10998.a8", 0x10000, 0x8000, CRC(f971a817) SHA1(502c95638e4fd5f87e5fc837cb44b39a5d62f4e4) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Cotton, Sega System 16B
 //  CPU: FD1094 (317-0181A)
 //  ROM Board type: 171-5704
+//  Sega game ID: 833-8021-02 COTTON
+//    Main board: 837-8023-02
+//     ROM board: 834-8022-02
 //
 ROM_START( cotton )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5308,7 +5399,7 @@ ROM_END
 
 ROM_START( cottond )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "bootleg_epr-13921a.a7", 0x000000, 0x20000, CRC(92947867) SHA1(6d5f1be45690bacac7093b442ed99c4de56d73a4))
+	ROM_LOAD16_BYTE( "bootleg_epr-13921a.a7", 0x000000, 0x20000, CRC(92947867) SHA1(6d5f1be45690bacac7093b442ed99c4de56d73a4) )
 	ROM_LOAD16_BYTE( "bootleg_epr-13919a.a5", 0x000001, 0x20000, CRC(30f131fb) SHA1(5b35b4691d2436e82be3079634d8f7f259e46450) )
 	ROM_LOAD16_BYTE( "bootleg_epr-13922a.a8", 0x040000, 0x20000, CRC(f0f75329) SHA1(e223b3b6e15ead11f93e353ddce5227f8b362d2e) )
 	ROM_LOAD16_BYTE( "bootleg_epr-13920a.a6", 0x040001, 0x20000, CRC(a3721aab) SHA1(bfcd8e564f06520e51c61418246ef06e4a0036d7) )
@@ -5599,6 +5690,7 @@ ROM_START( cottonjad )
 	ROM_LOAD( "opr-13061.a11", 0x10000, 0x20000, CRC(4d21153f) SHA1(173ddd9633f255c39ca508c37d0562e374704e7b) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -5645,10 +5737,10 @@ ROM_START( dunkshot )
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
-ROM_START( dunkshota ) // several roms had replacement? (different style to others) labels with 'T' markings, content identical.
+ROM_START( dunkshota ) // several ROMs had replacement? (different style to others) labels with 'T' markings, content identical.
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10520a.a1", 0x000001, 0x8000, CRC(16e213ba) SHA1(efddff17d1802ccbea9eac69cedef62fa6b9a640) )
 	ROM_LOAD16_BYTE( "epr-10523a.a4", 0x000000, 0x8000, CRC(22e3f074) SHA1(acdb6952308957244355bedb9cc627314a0139ef) )
@@ -5687,9 +5779,8 @@ ROM_START( dunkshota ) // several roms had replacement? (different style to othe
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
-
 
 ROM_START( dunkshoto )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -5730,7 +5821,7 @@ ROM_START( dunkshoto )
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
 
@@ -5812,7 +5903,7 @@ ROM_END
 //  ROM Board type: 171-5521
 //
 //   Game Number 837-6768-01
-//   Rom Number  834-6767-01
+//   ROM Number  834-6767-01
 //
 ROM_START( dduxj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5865,9 +5956,9 @@ ROM_END
 // Dynamite Dux (8751 version), Sega System 16B
 //
 //   Game Number 837-6768-09
-//   Rom Number  834-6767-09
+//   ROM Number  834-6767-09
 //
-//   Rom Board Type 171-5704
+//   ROM Board Type 171-5704
 //
 ROM_START( ddux1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5901,6 +5992,9 @@ ROM_END
 //  E-Swat (World), Sega System 16B
 //  CPU: FD1094 (317-0130)
 //  ROM Board type: 171-5797
+//  Sega game ID: 833-7164-02 ESWAT
+//    Main board: 837-7166-02
+//     ROM board: 834-7165-02
 //
 ROM_START( eswat )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5967,7 +6061,9 @@ ROM_END
 //  E-Swat (US), Sega System 16B
 //  CPU: FD1094 (317-0129)
 //  ROM Board type: 171-5797
-//  Sega ID# for ROM board: 834-7165-01
+//  Sega game ID: 833-7164-01 ESWAT
+//    Main board: 837-7166-01
+//     ROM board: 834-7165-01
 //
 ROM_START( eswatu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -6034,7 +6130,7 @@ ROM_END
 //  E-Swat (Japan), Sega System 16B
 //  CPU: FD1094 (317-0128)
 //  ROM Board type: 171-5797
-//  Sega game ID: 833-7164
+//  Sega game ID: 833-7164 ESWAT
 //    Main board: 837-7166
 //     ROM board: 834-7165
 //
@@ -6212,17 +6308,16 @@ ROM_START( exctleag )
 	ROM_LOAD16_BYTE( "epr-11957.b8", 0x60000, 0x10000, CRC(218f835b) SHA1(bfef3ec45665a5921c095da34701528d4d4e0e3a) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-11945.a7", 0x00000, 0x8000, CRC(c2a83012) SHA1(b3de8af803497438aa3e110a9c608ac290f7d1e8) )
-	ROM_LOAD( "epr-11140.a8", 0x10000, 0x8000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
-	ROM_LOAD( "epr-11141.a9", 0x20000, 0x8000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
+	ROM_LOAD( "epr-11945.a7",  0x00000, 0x8000, CRC(c2a83012) SHA1(b3de8af803497438aa3e110a9c608ac290f7d1e8) )
+	ROM_LOAD( "epr-11140.a8",  0x10000, 0x8000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
+	ROM_LOAD( "epr-11141.a9",  0x20000, 0x8000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
 	ROM_LOAD( "epr-11142.a10", 0x30000, 0x8000, CRC(25d26c66) SHA1(2485afb859f84a9cc90b2091e9ae4eef263f42b3) )
 	ROM_LOAD( "epr-11143.a11", 0x40000, 0x8000, CRC(848b7b77) SHA1(8903a39f8f0ffb4ce32117d33282876196516c30) )
 ROM_END
 
-
 ROM_START( exctleagd )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "bootleg_epr-11939.a4", 0x00000, 0x10000, CRC(42db9082) SHA1(3ac03ad9dc9b5554b0e4ded4520f957e7dc4bf6e))
+	ROM_LOAD16_BYTE( "bootleg_epr-11939.a4", 0x00000, 0x10000, CRC(42db9082) SHA1(3ac03ad9dc9b5554b0e4ded4520f957e7dc4bf6e) )
 	ROM_LOAD16_BYTE( "bootleg_epr-11936.a1", 0x00001, 0x10000, CRC(8a0c126c) SHA1(8770ab22b06829ad3441c54cdc3211991fe6299b) )
 	ROM_LOAD16_BYTE( "bootleg_epr-11940.a5", 0x20000, 0x10000, CRC(e490bb47) SHA1(cc6c05b86149f2fa180c67d351df06571b48f3c8) )
 	ROM_LOAD16_BYTE( "bootleg_epr-11937.a2", 0x20001, 0x10000, CRC(f1c07e10) SHA1(844da4f2cf5b084e833a834dd70e584d69f15d33) )
@@ -6245,12 +6340,13 @@ ROM_START( exctleagd )
 	ROM_LOAD16_BYTE( "epr-11957.b8", 0x60000, 0x10000, CRC(218f835b) SHA1(bfef3ec45665a5921c095da34701528d4d4e0e3a) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-11945.a7", 0x00000, 0x8000, CRC(c2a83012) SHA1(b3de8af803497438aa3e110a9c608ac290f7d1e8) )
-	ROM_LOAD( "epr-11140.a8", 0x10000, 0x8000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
-	ROM_LOAD( "epr-11141.a9", 0x20000, 0x8000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
+	ROM_LOAD( "epr-11945.a7",  0x00000, 0x8000, CRC(c2a83012) SHA1(b3de8af803497438aa3e110a9c608ac290f7d1e8) )
+	ROM_LOAD( "epr-11140.a8",  0x10000, 0x8000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
+	ROM_LOAD( "epr-11141.a9",  0x20000, 0x8000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
 	ROM_LOAD( "epr-11142.a10", 0x30000, 0x8000, CRC(25d26c66) SHA1(2485afb859f84a9cc90b2091e9ae4eef263f42b3) )
 	ROM_LOAD( "epr-11143.a11", 0x40000, 0x8000, CRC(848b7b77) SHA1(8903a39f8f0ffb4ce32117d33282876196516c30) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -6309,7 +6405,7 @@ ROM_END
 ROM_START( fpointd )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-12599b.a4", 0x000000, 0x10000, CRC(f5102d28) SHA1(5353e66a3c510ea394025162abe9a04c6122b19b) )
-	ROM_LOAD16_BYTE( "bootleg_epr-12598b.a1", 0x000001, 0x10000, CRC(5335558c) SHA1(508cd878cb9653c0169532002b5e4ee0a7de98b9))
+	ROM_LOAD16_BYTE( "bootleg_epr-12598b.a1", 0x000001, 0x10000, CRC(5335558c) SHA1(508cd878cb9653c0169532002b5e4ee0a7de98b9) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "opr-12593.a14", 0x00000, 0x10000, CRC(cc0582d8) SHA1(92c7d125a6dcb9c5e6e7bd92a5bf3008385ed487) )
@@ -6373,22 +6469,21 @@ ROM_END
 
 ROM_START( fpointbla )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "B3-ic59.bin", 0x000000, 0x10000, CRC(3b7d3b3a) SHA1(6c440f7706d392336a1e9165ac125b45695b9e0c) )
-	ROM_LOAD16_BYTE( "B2-ic55.bin", 0x000001, 0x10000, CRC(4b7e2a54) SHA1(598d16be99491fe13485ec2b546444d92dad49c7) )
+	ROM_LOAD16_BYTE( "b3-ic59.bin", 0x000000, 0x10000, CRC(3b7d3b3a) SHA1(6c440f7706d392336a1e9165ac125b45695b9e0c) )
+	ROM_LOAD16_BYTE( "b2-ic55.bin", 0x000001, 0x10000, CRC(4b7e2a54) SHA1(598d16be99491fe13485ec2b546444d92dad49c7) )
 
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) // tiles
-	ROM_LOAD( "B8-9.bin", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
-	ROM_LOAD( "B7-8.bin", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
-	ROM_LOAD( "B6-7.bin", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
+	ROM_LOAD( "b8-9.bin", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
+	ROM_LOAD( "b7-8.bin", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
+	ROM_LOAD( "b6-7.bin", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
 
 	ROM_REGION16_BE( 0x10000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "B5-5.bin", 0x00001, 0x08000, CRC(93181d2e) SHA1(1d25bfea889012a9616ed03791f830f2a8139367) )
-	ROM_LOAD16_BYTE( "B4-3.bin", 0x00000, 0x08000, CRC(ae466f37) SHA1(5fb423695a1d862f628ad2ea7651831ef48f6f0b) )
+	ROM_LOAD16_BYTE( "b5-5.bin", 0x00001, 0x08000, CRC(93181d2e) SHA1(1d25bfea889012a9616ed03791f830f2a8139367) )
+	ROM_LOAD16_BYTE( "b4-3.bin", 0x00000, 0x08000, CRC(ae466f37) SHA1(5fb423695a1d862f628ad2ea7651831ef48f6f0b) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "B1-ic19.bin", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
+	ROM_LOAD( "b1-ic19.bin", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
 ROM_END
-
 
 //*************************************************************************************************************************
 //  Flash Point, Sega System 16B
@@ -6452,6 +6547,7 @@ ROM_START( fpoint1d )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12592.a10", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -6567,9 +6663,11 @@ ROM_END
 //  ROM Board type: 171-5704
 //  Sega ID# for ROM board: 834-7002-04
 //
+// NOTE: ROM board 834-7002-04EP has EPROMs for EPR-12383, EPR-12378, EPR-12379 & EPR-12384 instead of MPR mask ROMs
+//
 ROM_START( goldnaxej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	// fails rom test on 8 & 6 ?! roms verfied from two separate sources
+	// fails ROM test on 8 & 6 ?! ROMs verfied from two separate sources
 	ROM_LOAD16_BYTE( "epr-12540.a7", 0x00000, 0x20000, CRC(0c7ccc6d) SHA1(25bc29eee731befc665472c2c1998cac8447cc21) )
 	ROM_LOAD16_BYTE( "epr-12539.a5", 0x00001, 0x20000, CRC(1f24f7d0) SHA1(a09cdf394c03069707f7ed400b8fbdc13674fa74) )
 	ROM_LOAD16_BYTE( "epr-12521.a8", 0x40000, 0x20000, CRC(5001d713) SHA1(68cf3f48d6e440e5b800503a211adda02107d956) )
@@ -6598,7 +6696,7 @@ ROM_START( goldnaxej )
 	ROM_CONTINUE(                    0x180000, 0x20000 )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-12390.a10",     0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
+	ROM_LOAD( "epr-12390.a10", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 ROM_END
 
@@ -6629,7 +6727,7 @@ ROM_START( goldnaxejd )
 	ROM_CONTINUE(                    0x180000, 0x20000 )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-12390.a10",     0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
+	ROM_LOAD( "epr-12390.a10", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 ROM_END
 
@@ -6637,11 +6735,12 @@ ROM_END
 //  Golden Axe (World), Sega System 16B
 //  CPU: FD1094 (317-0120)
 //  ROM Board type: 171-5704
-//  Sega ID# for ROM board: 834-7002-11
+//  Sega game ID: 833-7001-03 GOLDEN AXE
+//     ROM board: 834-7002-03
 //
 ROM_START( goldnaxe3 )
 	ROM_REGION( 0x80000, "maincpu", 0) // 68000 code
-	// fails rom test on 8 & 6 ?! roms verfied from two separate sources
+	// fails ROM test on 8 & 6 ?! ROMs verfied from two separate sources
 	ROM_LOAD16_BYTE( "epr-12525.a7", 0x00000, 0x20000, CRC(48332c76) SHA1(4cdf7dc2f504a030ae63b4854bb76a3f2cc1d96b) )
 	ROM_LOAD16_BYTE( "epr-12524.a5", 0x00001, 0x20000, CRC(8e58f342) SHA1(a972b05f7d5d7228067f97724191fce1aeb0371d) )
 	ROM_LOAD16_BYTE( "epr-12521.a8", 0x40000, 0x20000, CRC(5001d713) SHA1(68cf3f48d6e440e5b800503a211adda02107d956) )
@@ -6812,6 +6911,7 @@ ROM_START( goldnaxe1d )
 	ROM_LOAD( "mpr-12384.ic6", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -6827,7 +6927,7 @@ ROM_START( hwchamp )
 	ROM_LOAD16_BYTE( "epr-11238.a5", 0x000001, 0x20000, CRC(25180124) SHA1(77b414f8cd88270713c57bddadec5d8dca490e86) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "mpr-11241.a14", 0x00000, 0x20000, CRC(fc586a86) SHA1(2c26ef3ab94089940add3be9952804a6e62f5113) ) // all MPR-11xxx here are 28 pin Fujitsu MB831000 MASK roms
+	ROM_LOAD( "mpr-11241.a14", 0x00000, 0x20000, CRC(fc586a86) SHA1(2c26ef3ab94089940add3be9952804a6e62f5113) ) // all MPR-11xxx here are 28 pin Fujitsu MB831000 mask ROMs
 	ROM_LOAD( "mpr-11166.b14", 0x20000, 0x20000, CRC(aeaaa9d8) SHA1(6b7e5320f515c1c35445d3320b3edaef911191e1) )
 	ROM_LOAD( "mpr-11242.a15", 0x40000, 0x20000, CRC(7715a742) SHA1(e6040ff0e9c68f3f502e5f6d7e7ca04b14059752) )
 	ROM_LOAD( "mpr-11167.b15", 0x60000, 0x20000, CRC(63a82afa) SHA1(a02bbb6dd84cdf7cdab8e738c6927f5b1e3fcad5) )
@@ -6835,7 +6935,7 @@ ROM_START( hwchamp )
 	ROM_LOAD( "mpr-11168.b16", 0xA0000, 0x20000, CRC(5b8494a8) SHA1(9e3f09f4037a007b6a188dd81ec8f9c635e87650) )
 
 	ROM_REGION16_BE( 0x200000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "mpr-11158.b1", 0x000001, 0x010000, CRC(fc098a13) SHA1(b4a6e00d4765265bad170dabf0b2a4a58e063b16) ) // all MPR-111xx here are 28 pin Fujitsu MB831000 MASK roms
+	ROM_LOAD16_BYTE( "mpr-11158.b1", 0x000001, 0x010000, CRC(fc098a13) SHA1(b4a6e00d4765265bad170dabf0b2a4a58e063b16) ) // all MPR-111xx here are 28 pin Fujitsu MB831000 mask ROMs
 	ROM_CONTINUE(                    0x020001, 0x010000 )
 	ROM_LOAD16_BYTE( "mpr-11162.b5", 0x000000, 0x010000, CRC(5db934a8) SHA1(ba7cc93025af71ad2674b1376b61afbb7ae910ff) )
 	ROM_CONTINUE(                    0x020000, 0x010000 )
@@ -6854,8 +6954,8 @@ ROM_START( hwchamp )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11240.a10", 0x00000, 0x08000, CRC(96a12d9d) SHA1(f4ba70c3b5d80a1b6a187c940b922d5182d5ab12) )
-	ROM_LOAD( "mpr-11244.a11", 0x10000, 0x20000, CRC(4191c03d) SHA1(40809fb80527980015d3b5c4ca7cf159bc09cf5a) ) // 28 pin Fujitsu MB831000 MASK rom
-	ROM_LOAD( "mpr-11245.a12", 0x30000, 0x20000, CRC(a4d53f7b) SHA1(71123a8ecfa093897c6f2bb7312e6c755be14521) ) // 28 pin Fujitsu MB831000 MASK rom
+	ROM_LOAD( "mpr-11244.a11", 0x10000, 0x20000, CRC(4191c03d) SHA1(40809fb80527980015d3b5c4ca7cf159bc09cf5a) ) // 28 pin Fujitsu MB831000 mask ROM
+	ROM_LOAD( "mpr-11245.a12", 0x30000, 0x20000, CRC(a4d53f7b) SHA1(71123a8ecfa093897c6f2bb7312e6c755be14521) ) // 28 pin Fujitsu MB831000 mask ROM
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pls153.bin",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) )
@@ -6949,6 +7049,7 @@ ROM_START( hwchampjd )
 	ROM_LOAD( "pls153.bin",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -7031,6 +7132,8 @@ ROM_END
 //  MVP (Japan), Sega System 16B
 //  CPU: FD1094 (317-0142)
 //  ROM Board type: 171-5704
+//  Sega game ID: 833-7364
+//     ROM board: 834-7365
 //
 ROM_START( mvpj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -7307,7 +7410,7 @@ ROM_END
 //  Center Court (World, 4 Players - Prototype / Location Test), Sega System 16B
 //  CPU: 68000 + MC8123 (handwritten label "CENTER COURT 7/13 - '88")
 //  ROM Board No. 171-5358 (with a Sega ID sticker 834-6618-01, conversion or actual Sega ID# ???)
-//  Note: prototype; checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations instead of numbers
+//  Note: prototype; checksums handwritten on prg ROMs, EPR stickers present on other ROMs, but handwritten locations instead of numbers
 //        The PCB was found in a 4 player cocktail cabinet with full Center Court artwork & instruction cards - Likely a location test unit.
 //
 //  The following bugs are confirmed to happen on real hardware (due to game being a prototype)
@@ -7320,7 +7423,7 @@ ROM_START( cencourt )
 	ROM_LOAD16_BYTE( "a1_478b.a1", 0x000001, 0x10000, CRC(37beb770) SHA1(694a7f7977226997e06a198b311b355505e45b0b) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-b-9.b9",  0x00000, 0x10000, CRC(9a55cd88) SHA1(4a6cf4aa5dde8d50148381aee8c141c98bb86fe8) )
+	ROM_LOAD( "epr-b-9.b9",   0x00000, 0x10000, CRC(9a55cd88) SHA1(4a6cf4aa5dde8d50148381aee8c141c98bb86fe8) )
 	ROM_LOAD( "epr-b-10.b10", 0x10000, 0x10000, CRC(fc13ca35) SHA1(3dc9d7c7f28d5605c6ce93243c79f63839aec8f4) )
 	ROM_LOAD( "epr-b-11.b11", 0x20000, 0x10000, CRC(1503c203) SHA1(95e9634bdcfd8027c1b0a47fa87736180ec39b08) )
 
@@ -7344,7 +7447,6 @@ ROM_START( cencourt )
 	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "mc-8123b_center_court.key",  0x0000, 0x2000, CRC(2be5c90b) SHA1(e98d989237f2b001950b876efdb21c1507162830) ) // No official 317-xxxx number
 ROM_END
-
 
 
 //*************************************************************************************************************************
@@ -7393,10 +7495,41 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Ryukyu, Sega System 16B
+//  CPU: FD1094 8M2 (317-5023A)
+//  ROM Board type: 171-5704
+//  Sega game ID: 836-7666 RYUKYU
+//     ROM board: 836-7667
+//
+ROM_START( ryukyu )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-13348a.a7", 0x00000, 0x10000, CRC(64f6ada9) SHA1(31e2adc8697c21ca4aa2d9357f7303644168d0a2) )
+	ROM_LOAD16_BYTE( "epr-13347a.a5", 0x00001, 0x10000, CRC(fade1f50) SHA1(46e6224060d526aa362df1a1026ba445832ad7f3) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-5023a.key", 0x0000, 0x2000, CRC(5e372b89) SHA1(885e56e5a54ed46a230396654696e2fd5f31a382) )
+
+	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-13351.a14", 0x00000, 0x20000, CRC(a68a4e6d) SHA1(ee3e317c7184b41af5dd383d41f7be3eebff0d04) )
+	ROM_LOAD( "opr-13352.a15", 0x20000, 0x20000, CRC(5e5531e4) SHA1(e8e16b35f7985e6cdd77353ca5235db518914744) )
+	ROM_LOAD( "opr-13353.a16", 0x40000, 0x20000, CRC(6d23dfd8) SHA1(21266340290b9854cee0b62fc107cc2981519a80) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "opr-13354.b1", 0x00001, 0x20000, CRC(f07aad99) SHA1(71759525a5b7fe76d112cec93984f0f89cadbc00) )
+	ROM_LOAD16_BYTE( "opr-13356.b5", 0x00000, 0x20000, CRC(5498290b) SHA1(b3115b636d8cb6ecac22d5264b7961e3b807cf04) )
+	ROM_LOAD16_BYTE( "opr-13355.b2", 0x40001, 0x20000, CRC(67890019) SHA1(165c6a32f305273396ec0e9499e00329caadc484) )
+	ROM_LOAD16_BYTE( "opr-13357.b6", 0x40000, 0x20000, CRC(f9e7cf03) SHA1(2258111499c79443faf84fb0495007016282bb3c) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-13349.a10", 0x00000, 0x08000, CRC(b83183f8) SHA1(9d6127f51c04a16bb2637dc9992b843b94613c2b) )
+	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
+ROM_END
+
+//*************************************************************************************************************************
+//  Ryukyu, Sega System 16B
 //  CPU: FD1094 8J2 (317-5023)
 //  ROM Board type: 171-5521
 //
-ROM_START( ryukyu )
+ROM_START( ryukyua )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-13348.a7", 0x00000, 0x10000, CRC(5f0e0c86) SHA1(f8f5912a190d0755cc5158e2e43cceb825f95b4f) )
 	ROM_LOAD16_BYTE( "epr-13347.a5", 0x00001, 0x10000, CRC(398031fa) SHA1(5c118c85b7af1a83726b95bbeb85cb5020254f57) )
@@ -7420,7 +7553,6 @@ ROM_START( ryukyu )
 	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
 ROM_END
 
-
 ROM_START( ryukyud )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-13348.a7", 0x00000, 0x10000, CRC(3a96bdcd) SHA1(5097a5d022eb046826c9e06f61db2c482306abeb) )
@@ -7441,6 +7573,7 @@ ROM_START( ryukyud )
 	ROM_LOAD( "epr-13349.a10", 0x00000, 0x08000, CRC(b83183f8) SHA1(9d6127f51c04a16bb2637dc9992b843b94613c2b) )
 	ROM_LOAD( "opr-13350.a11", 0x10000, 0x20000, CRC(3c59a658) SHA1(2cef13ee9e666bb850fe6c6e6954d7b75df665a9) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -7475,7 +7608,7 @@ ROM_START( defense )
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(1514662f) SHA1(d6241cb2a70c5b0442ecc2f8a10307608e5a0870) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -7510,7 +7643,7 @@ ROM_START( sdib )
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(1514662f) SHA1(d6241cb2a70c5b0442ecc2f8a10307608e5a0870) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -7544,8 +7677,6 @@ ROM_START( sdibl )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "a7.rom", 0x0000, 0x8000, CRC(793f9f7f) SHA1(9e4fde376db9e99a83eb2fc734c6721c122ba9af) )
 ROM_END
-
-
 
 ROM_START(sdibl2)
 	ROM_REGION16_BE(0x40000, "maincpu", 0) // 68000 data
@@ -7721,37 +7852,83 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Shinobi, Sega System 16B
-//  CPU: 68000
-//  ROM Board type: 171-5521
+//   Shinobi, Sega System 16B
+//   CPU: 68000
+//   ROM Board type: 171-5521
+//  Main board: 837-6500-01
+// Game Number: 833-6496-01 SHINOBI ??
+//   ROM board: 834-6499-01 ??
 //
-ROM_START( shinobi5 )
+// Game Number and ROM board NOT verified
+//
+//  Same version as shinobi4 below except with a standard Z80 sound CPU and sound program ROM
+//
+ROM_START( shinobi6 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-11360.a7", 0x00000, 0x20000, CRC(b1f67ab9) SHA1(83eddd1ef3fbe58f1f8e8d57229fabf1907fc371) )
 	ROM_LOAD16_BYTE( "epr-11359.a5", 0x00001, 0x20000, CRC(0f0306e1) SHA1(eebe7c88e5f665d1d0920fb9b545e20b05be9b52) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-11363.a14", 0x00000, 0x20000, CRC(40914168) SHA1(cf0508e8c852c24ec3d2fc4a4013aec631d2271f) )
-	ROM_LOAD( "epr-11364.a15", 0x20000, 0x20000, CRC(e63649a4) SHA1(042dded1ff964889571f63d2642b2b21b75f9763) )
-	ROM_LOAD( "epr-11365.a16", 0x40000, 0x20000, CRC(1ef55d20) SHA1(314590881a2f18339b7b9c16010e408aa0164e04) )
+	ROM_LOAD( "mpr-11363.a14", 0x00000, 0x20000, CRC(40914168) SHA1(cf0508e8c852c24ec3d2fc4a4013aec631d2271f) ) // 28 pin Fujitsu MB831000 mask ROMs
+	ROM_LOAD( "mpr-11364.a15", 0x20000, 0x20000, CRC(e63649a4) SHA1(042dded1ff964889571f63d2642b2b21b75f9763) )
+	ROM_LOAD( "mpr-11365.a16", 0x40000, 0x20000, CRC(1ef55d20) SHA1(314590881a2f18339b7b9c16010e408aa0164e04) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-11366.b1", 0x00001, 0x20000, CRC(319ede73) SHA1(c48ba4694ff677f30cc1ced3a3ad11c0feb1122d) )
-	ROM_LOAD16_BYTE( "epr-11368.b5", 0x00000, 0x20000, CRC(0377d7ce) SHA1(14f9674c142b78bf8b458beccfef93cc3e722c03) )
-	ROM_LOAD16_BYTE( "epr-11367.b2", 0x40001, 0x20000, CRC(1d06c5c7) SHA1(3a44f5a2058b96f212930c2e838eda1ce1036818) )
-	ROM_LOAD16_BYTE( "epr-11369.b6", 0x40000, 0x20000, CRC(d751d2a2) SHA1(3659948beacfc8dde5c50775859aa3fed537f768) )
+	ROM_LOAD16_BYTE( "mpr-11366.b1", 0x00001, 0x20000, CRC(319ede73) SHA1(c48ba4694ff677f30cc1ced3a3ad11c0feb1122d) ) // 28 pin Fujitsu MB831000 mask ROMs
+	ROM_LOAD16_BYTE( "mpr-11368.b5", 0x00000, 0x20000, CRC(0377d7ce) SHA1(14f9674c142b78bf8b458beccfef93cc3e722c03) )
+	ROM_LOAD16_BYTE( "mpr-11367.b2", 0x40001, 0x20000, CRC(1d06c5c7) SHA1(3a44f5a2058b96f212930c2e838eda1ce1036818) )
+	ROM_LOAD16_BYTE( "mpr-11369.b6", 0x40000, 0x20000, CRC(d751d2a2) SHA1(3659948beacfc8dde5c50775859aa3fed537f768) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11361.a10", 0x00000, 0x08000, CRC(1f47ebcb) SHA1(32837f3f1dd5ff309d1d955c1a738c444b248d3d) )
-	ROM_LOAD( "epr-11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) )
+	ROM_LOAD( "mpr-11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) ) // 28 pin Fujitsu MB831000 mask ROM
+ROM_END
+
+//*************************************************************************************************************************
+//    Shinobi, Sega System 16B
+//    CPU: 68000
+//    ROM Board type: 171-5358
+//  Main board: 837-6500-01
+// Game Number: 833-6496-02 SHINOBI
+//   ROM board: 834-6499-02
+//
+//  Same version as shinobi3 below except with a standard Z80 sound CPU and sound program ROM
+//
+ROM_START( shinobi5 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-11299.a4", 0x00000, 0x10000, CRC(b930399d) SHA1(955ff2948e1990463631b0bc5c7f5275384236cc) )
+	ROM_LOAD16_BYTE( "epr-11298.a1", 0x00001, 0x10000, CRC(343f4c46) SHA1(2cf5d00462ad85ae9a2e16d59171c8ab85e10f49) )
+	ROM_LOAD16_BYTE( "epr-11283.a5", 0x20000, 0x10000, CRC(9d46e707) SHA1(37ab25b3b37365c9f45837bfb6ec80652691dd4c) )
+	ROM_LOAD16_BYTE( "epr-11281.a2", 0x20001, 0x10000, CRC(7961d07e) SHA1(38cbdab35f901532c0ad99ad0083513abd2ff182) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-11284.b9",  0x00000, 0x10000, CRC(5f62e163) SHA1(03f008745a1af84142ada647acf3601049f43ad5) )
+	ROM_LOAD( "opr-11285.b10", 0x10000, 0x10000, CRC(75f8fbc9) SHA1(29072edcd583af60ec66b4c8bb82b179a3751edf) )
+	ROM_LOAD( "opr-11286.b11", 0x20000, 0x10000, CRC(06508bb9) SHA1(57c9036123ec8e35d0275ab6eaff25a16aa203d4) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "opr-11290.b1", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
+	ROM_LOAD16_BYTE( "opr-11294.b5", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
+	ROM_LOAD16_BYTE( "opr-11291.b2", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
+	ROM_LOAD16_BYTE( "opr-11295.b6", 0x20000, 0x10000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
+	ROM_LOAD16_BYTE( "opr-11292.b3", 0x40001, 0x10000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
+	ROM_LOAD16_BYTE( "opr-11296.b7", 0x40000, 0x10000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
+	ROM_LOAD16_BYTE( "opr-11293.b4", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
+	ROM_LOAD16_BYTE( "opr-11297.b8", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11287.a7", 0x00000, 0x8000, CRC(e8cccd42) SHA1(39cbf9298540b9d5a26f47fcf6c9b89b6cead6c9) )
+	ROM_LOAD( "epr-11288.a8", 0x10000, 0x8000, CRC(c8df8460) SHA1(0aeb41a493df155edb5f600f53ec43b798927dff) )
+	ROM_LOAD( "epr-11289.a9", 0x20000, 0x8000, CRC(e5a4cf30) SHA1(d1982da7a550c11ab2253f5d64ac6ab847da0a04) )
 ROM_END
 
 //*************************************************************************************************************************
 //    Shinobi, Sega System 16B
 //    CPU: 68000 + MC8123B (317-0054)
 //    ROM Board type: 171-5521
-// Game Nunmber: 834-6496-04
-//    ROM board: 834-6499-03
+//  Main board: 837-6500-02
+// Game Number: 833-6496-03 SHINOBI
+//   ROM board: 834-6499-03
 //
 ROM_START( shinobi4 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -7759,19 +7936,19 @@ ROM_START( shinobi4 )
 	ROM_LOAD16_BYTE( "epr-11359.a5", 0x00001, 0x20000, CRC(0f0306e1) SHA1(eebe7c88e5f665d1d0920fb9b545e20b05be9b52) )
 
 	ROM_REGION( 0x60000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-11363.a14", 0x00000, 0x20000, CRC(40914168) SHA1(cf0508e8c852c24ec3d2fc4a4013aec631d2271f) )
-	ROM_LOAD( "epr-11364.a15", 0x20000, 0x20000, CRC(e63649a4) SHA1(042dded1ff964889571f63d2642b2b21b75f9763) )
-	ROM_LOAD( "epr-11365.a16", 0x40000, 0x20000, CRC(1ef55d20) SHA1(314590881a2f18339b7b9c16010e408aa0164e04) )
+	ROM_LOAD( "mpr-11363.a14", 0x00000, 0x20000, CRC(40914168) SHA1(cf0508e8c852c24ec3d2fc4a4013aec631d2271f) ) // 28 pin Fujitsu MB831000 mask ROMs
+	ROM_LOAD( "mpr-11364.a15", 0x20000, 0x20000, CRC(e63649a4) SHA1(042dded1ff964889571f63d2642b2b21b75f9763) )
+	ROM_LOAD( "mpr-11365.a16", 0x40000, 0x20000, CRC(1ef55d20) SHA1(314590881a2f18339b7b9c16010e408aa0164e04) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-11366.b1", 0x00001, 0x20000, CRC(319ede73) SHA1(c48ba4694ff677f30cc1ced3a3ad11c0feb1122d) )
-	ROM_LOAD16_BYTE( "epr-11368.b5", 0x00000, 0x20000, CRC(0377d7ce) SHA1(14f9674c142b78bf8b458beccfef93cc3e722c03) )
-	ROM_LOAD16_BYTE( "epr-11367.b2", 0x40001, 0x20000, CRC(1d06c5c7) SHA1(3a44f5a2058b96f212930c2e838eda1ce1036818) )
-	ROM_LOAD16_BYTE( "epr-11369.b6", 0x40000, 0x20000, CRC(d751d2a2) SHA1(3659948beacfc8dde5c50775859aa3fed537f768) )
+	ROM_LOAD16_BYTE( "mpr-11366.b1", 0x00001, 0x20000, CRC(319ede73) SHA1(c48ba4694ff677f30cc1ced3a3ad11c0feb1122d) ) // 28 pin Fujitsu MB831000 mask ROMs
+	ROM_LOAD16_BYTE( "mpr-11368.b5", 0x00000, 0x20000, CRC(0377d7ce) SHA1(14f9674c142b78bf8b458beccfef93cc3e722c03) )
+	ROM_LOAD16_BYTE( "mpr-11367.b2", 0x40001, 0x20000, CRC(1d06c5c7) SHA1(3a44f5a2058b96f212930c2e838eda1ce1036818) )
+	ROM_LOAD16_BYTE( "mpr-11369.b6", 0x40000, 0x20000, CRC(d751d2a2) SHA1(3659948beacfc8dde5c50775859aa3fed537f768) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11377.a10", 0x00000, 0x08000, CRC(0fb6af34) SHA1(ae9da18bd2db317ed96c5f642f90cc1eba60ba99) ) // MC8123B (317-0054) encrypted version of epr-11361.a10 above
-	ROM_LOAD( "epr-11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) )
+	ROM_LOAD( "mpr-11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) ) // 28 pin Fujitsu MB831000 mask ROM
 
 	ROM_REGION( 0x2000, "soundcpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-0054.key",  0x0000, 0x2000, CRC(39fd4535) SHA1(93bbb139d2d5acc6a1e338d92077e79a5e880b2e) )
@@ -7781,8 +7958,9 @@ ROM_END
 //    Shinobi, Sega System 16B
 //    CPU: 68000 + MC8123B (317-0054)
 //    ROM Board type: 171-5358
-// Game Nunmber: 834-6496-04
-//  ROM board: 834-6499-02
+//  Main board: 837-6500-02
+// Game Number: 833-6496-04 SHINOBI
+//   ROM board: 834-6499-04
 //
 ROM_START( shinobi3 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -7792,19 +7970,19 @@ ROM_START( shinobi3 )
 	ROM_LOAD16_BYTE( "epr-11281.a2", 0x20001, 0x10000, CRC(7961d07e) SHA1(38cbdab35f901532c0ad99ad0083513abd2ff182) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-11284.b9",  0x00000, 0x10000, CRC(5f62e163) SHA1(03f008745a1af84142ada647acf3601049f43ad5) )
-	ROM_LOAD( "epr-11285.b10", 0x10000, 0x10000, CRC(75f8fbc9) SHA1(29072edcd583af60ec66b4c8bb82b179a3751edf) )
-	ROM_LOAD( "epr-11286.b11", 0x20000, 0x10000, CRC(06508bb9) SHA1(57c9036123ec8e35d0275ab6eaff25a16aa203d4) )
+	ROM_LOAD( "opr-11284.b9",  0x00000, 0x10000, CRC(5f62e163) SHA1(03f008745a1af84142ada647acf3601049f43ad5) )
+	ROM_LOAD( "opr-11285.b10", 0x10000, 0x10000, CRC(75f8fbc9) SHA1(29072edcd583af60ec66b4c8bb82b179a3751edf) )
+	ROM_LOAD( "opr-11286.b11", 0x20000, 0x10000, CRC(06508bb9) SHA1(57c9036123ec8e35d0275ab6eaff25a16aa203d4) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-11290.b1", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
-	ROM_LOAD16_BYTE( "epr-11294.b5", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
-	ROM_LOAD16_BYTE( "epr-11291.b2", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
-	ROM_LOAD16_BYTE( "epr-11295.b6", 0x20000, 0x10000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
-	ROM_LOAD16_BYTE( "epr-11292.b3", 0x40001, 0x10000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
-	ROM_LOAD16_BYTE( "epr-11296.b7", 0x40000, 0x10000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
-	ROM_LOAD16_BYTE( "epr-11293.b4", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
-	ROM_LOAD16_BYTE( "epr-11297.b8", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
+	ROM_LOAD16_BYTE( "opr-11290.b1", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
+	ROM_LOAD16_BYTE( "opr-11294.b5", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
+	ROM_LOAD16_BYTE( "opr-11291.b2", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
+	ROM_LOAD16_BYTE( "opr-11295.b6", 0x20000, 0x10000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
+	ROM_LOAD16_BYTE( "opr-11292.b3", 0x40001, 0x10000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
+	ROM_LOAD16_BYTE( "opr-11296.b7", 0x40000, 0x10000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
+	ROM_LOAD16_BYTE( "opr-11293.b4", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
+	ROM_LOAD16_BYTE( "opr-11297.b8", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11372.a7", 0x00000, 0x8000, CRC(0824269a) SHA1(501ab1b80c6e8a4b0ccda148c13fa96c71c7300d) )   // MC8123B (317-0054) encrypted version of epr-11287.a7
@@ -7819,7 +7997,9 @@ ROM_END
 //  Shinobi, Sega System 16B
 //  CPU: FD1094 (317-0049)
 //  ROM Board type: 171-5358
-//  ROM board: 834-6499
+//  Main board: 837-6500
+// Game Number: 833-6496 SHINOBI
+//   ROM board: 834-6499
 //
 ROM_START( shinobi2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -7889,7 +8069,7 @@ ROM_END
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6531-01 SONIC BOOM
 //    Main board: 837-6533
-//     Rom board: 834-6532-01
+//     ROM board: 834-6532-01
 //
 //  Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
 //
@@ -7964,6 +8144,7 @@ ROM_START( sonicbomd )
 	ROM_LOAD( "epr-11349.a9", 0x20000, 0x8000, CRC(8e4b6204) SHA1(ec0a2812b4726b5ff236f2fbb63fd2dd13cf4935) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -8010,7 +8191,7 @@ ROM_START( sjryuko )
 	ROM_LOAD( "epr-12248.a11",0x40000, 0x8000, CRC(d1eabdab) SHA1(f255a66e082353768e8d2bb574e883a4a45f7670) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(c3e32937) SHA1(22bccea1c3d97adca3dce2fa418f7e7b058c0837) )
+	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(8e40b2ab) SHA1(f3e2d70a17ac5270bec586cc67b2b8ba14bf53cf) )
 ROM_END
 
 
@@ -8034,7 +8215,7 @@ ROM_START( suprleag )
 	ROM_LOAD( "317-0045.key", 0x0000, 0x2000, CRC(0594cc2e) SHA1(8aec3fffd00cbfd50d7cfb92e4748e2653fbb504) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-11136.b9", 0x00000, 0x10000, CRC(c3860ce4) SHA1(af7618f3b5a0e8d6374877c7815ba69fff218a45) )
+	ROM_LOAD( "epr-11136.b9",  0x00000, 0x10000, CRC(c3860ce4) SHA1(af7618f3b5a0e8d6374877c7815ba69fff218a45) )
 	ROM_LOAD( "epr-11137.b10", 0x10000, 0x10000, CRC(92d96187) SHA1(45138795992b9842d5b0c86a96b300445bf12060) )
 	ROM_LOAD( "epr-11138.b11", 0x20000, 0x10000, CRC(c01dc773) SHA1(b27da906186e1272cdd6f8d5e5a979f6623255ac) )
 
@@ -8049,9 +8230,9 @@ ROM_START( suprleag )
 	ROM_LOAD16_BYTE( "epr-11151.b8", 0x60000, 0x10000, CRC(9de95169) SHA1(1a2801ecd9dece3dae7ceab3b793d5005caa4614) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-11139.a7", 0x00000, 0x08000, CRC(9cbd99da) SHA1(55960b68b23a4f89ec810e1d31f22ba60cda0cfe) )
-	ROM_LOAD( "epr-11140.a8", 0x10000, 0x08000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
-	ROM_LOAD( "epr-11141.a9", 0x20000, 0x08000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
+	ROM_LOAD( "epr-11139.a7",  0x00000, 0x08000, CRC(9cbd99da) SHA1(55960b68b23a4f89ec810e1d31f22ba60cda0cfe) )
+	ROM_LOAD( "epr-11140.a8",  0x10000, 0x08000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
+	ROM_LOAD( "epr-11141.a9",  0x20000, 0x08000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
 	ROM_LOAD( "epr-11142.a10", 0x30000, 0x08000, CRC(25d26c66) SHA1(2485afb859f84a9cc90b2091e9ae4eef263f42b3) )
 	ROM_LOAD( "epr-11143.a11", 0x40000, 0x08000, CRC(848b7b77) SHA1(8903a39f8f0ffb4ce32117d33282876196516c30) )
 ROM_END
@@ -8063,7 +8244,7 @@ ROM_END
 //  Tetris, Sega System 16B
 //  CPU: FD1094 (317-0092)
 //  ROM Board type: 171-5704
-//       Rom board: 834-6891-02
+//       ROM board: 834-6891-02
 //
 ROM_START( tetris2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -8079,8 +8260,8 @@ ROM_START( tetris2 )
 	ROM_LOAD( "epr-12167.b11", 0x20000, 0x10000, CRC(2495fd4e) SHA1(2db94ead9223a67238a97e724668076fc43e5534) )
 
 	ROM_REGION16_BE( 0x020000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-12194.b1", 0x00001, 0x10000, CRC(2fb38880) SHA1(0e1b601bbda78d1887951c1f7e752531c281bc83) ) // 28 pin Fujitsu MB831000 MASK rom
-	ROM_LOAD16_BYTE( "epr-12195.b5", 0x00000, 0x10000, CRC(d6a02cba) SHA1(d80000f92e754e89c6ca7b7273feab448fc9a061) ) // 28 pin Fujitsu MB831000 MASK rom
+	ROM_LOAD16_BYTE( "mpr-12194.b1", 0x00001, 0x10000, CRC(2fb38880) SHA1(0e1b601bbda78d1887951c1f7e752531c281bc83) ) // 28 pin Fujitsu MB831000 mask ROM
+	ROM_LOAD16_BYTE( "mpr-12195.b5", 0x00000, 0x10000, CRC(d6a02cba) SHA1(d80000f92e754e89c6ca7b7273feab448fc9a061) ) // 28 pin Fujitsu MB831000 mask ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12168.a7", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
@@ -8097,8 +8278,8 @@ ROM_START( tetris2d )
 	ROM_LOAD( "epr-12167.b11", 0x20000, 0x10000, CRC(2495fd4e) SHA1(2db94ead9223a67238a97e724668076fc43e5534) )
 
 	ROM_REGION16_BE( 0x020000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-12194.b1", 0x00001, 0x10000, CRC(2fb38880) SHA1(0e1b601bbda78d1887951c1f7e752531c281bc83) ) // 28 pin Fujitsu MB831000 MASK rom
-	ROM_LOAD16_BYTE( "epr-12195.b5", 0x00000, 0x10000, CRC(d6a02cba) SHA1(d80000f92e754e89c6ca7b7273feab448fc9a061) ) // 28 pin Fujitsu MB831000 MASK rom
+	ROM_LOAD16_BYTE( "mpr-12194.b1", 0x00001, 0x10000, CRC(2fb38880) SHA1(0e1b601bbda78d1887951c1f7e752531c281bc83) ) // 28 pin Fujitsu MB831000 mask ROM
+	ROM_LOAD16_BYTE( "mpr-12195.b5", 0x00000, 0x10000, CRC(d6a02cba) SHA1(d80000f92e754e89c6ca7b7273feab448fc9a061) ) // 28 pin Fujitsu MB831000 mask ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12168.a7", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
@@ -8161,12 +8342,16 @@ ROM_START( tetris1d )
 	ROM_LOAD( "epr-12168.a7", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Time Scanner, Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5358
+//  Sega game ID: 833-6207-01 TIME SCANNER
+//    Main board: 837-6224-01
+//     ROM board: 834-6223-01
 //
 ROM_START( timescan )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -8283,12 +8468,12 @@ ROM_START( tturf )
 	ROM_LOAD16_BYTE( "epr-12326.a5",  0x00001, 0x20000, CRC(f998862b) SHA1(69902ab0162eb42e1d6a9792651a5d41cb77477d) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "opr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) ) // ROMS are Toshiba TMM24512AF one time programmable roms
+	ROM_LOAD( "opr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) ) // ROMS are Toshiba TMM24512AF one time programmable ROMs
 	ROM_LOAD( "opr-12269.a15", 0x10000, 0x10000, CRC(457a8790) SHA1(b701e1a1745cefb31083c8a3daa3b23181f89576) ) // Some ROM boards might have standard EPR numbers with
 	ROM_LOAD( "opr-12270.a16", 0x20000, 0x10000, CRC(69fc025b) SHA1(20be1242de27f1b997d43890051cc5d5ac8a127a) ) //  standard EPROM chips instead
 
 	ROM_REGION16_BE( 0x100000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "opr-12279.b1", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )   // ROMS are Toshiba TMM24512AF one time programmable roms
+	ROM_LOAD16_BYTE( "opr-12279.b1", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )   // ROMS are Toshiba TMM24512AF one time programmable ROMs
 	ROM_LOAD16_BYTE( "opr-12283.b5", 0x00000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )   // Some ROM boards might have standard EPR numbers with
 	ROM_LOAD16_BYTE( "opr-12278.b2", 0x40001, 0x10000, CRC(961d06b7) SHA1(b1a9dea63785bfa2c0e7b931387b91dfcd27d79b) )   //  standard EPROM chips instead
 	ROM_LOAD16_BYTE( "opr-12282.b6", 0x40000, 0x10000, CRC(e8671ee1) SHA1(a3732938c370f1936d867aae9c3d1e9bbfb57ede) )
@@ -8310,7 +8495,9 @@ ROM_END
 //  Tough Turf, Sega System 16B
 //  CPU: 68000 + i8751 (317-0099)
 //  ROM Board type: 171-5358
-//  Sega ID# for ROM board: 834-6949
+//  Sega game ID: 833-6948 TOUGH TURF
+//    Main board: 837-6950
+//     ROM board: 834-6949
 //
 ROM_START( tturfu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -8380,12 +8567,11 @@ ROM_START( wb3 )
 	ROM_LOAD( "317-0098.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
-
 //*************************************************************************************************************************
 //  Wonder Boy III, Sega System 16B
 //  CPU: FD1094 (317-0087)
 //  ROM Board type: 171-5704
-// Sega ID# for Game Nunmber: 833-6851-01  MONSTER LAIR
+// Sega ID# for Game Number: 833-6851-01  MONSTER LAIR
 // Sega ID# for ROM board: 834-6854-01
 //
 ROM_START( wb34 )
@@ -8443,6 +8629,9 @@ ROM_END
 //  Wonder Boy III, Sega System 16B
 //  CPU: FD1094 (317-0089)
 //  ROM Board type: 171-5704
+//  Sega game ID: 833-6851-03 MONSTER LAIR
+//    Main board: 837-6855-03
+//     ROM board: 834-6854-03
 //
 ROM_START( wb33 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -8474,7 +8663,7 @@ ROM_END
 ROM_START( wb33d )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-12137.a7", 0x000000, 0x20000, CRC(18a898af) SHA1(4614fab9f27bdfefc0c402edbac454c517b78c2f) )
-	ROM_LOAD16_BYTE( "bootleg_epr-12136.a5", 0x000001, 0x20000, CRC(e3d21248) SHA1(6d146a0c9a5b1f8cb0d2770b2c272fafe58360c0))
+	ROM_LOAD16_BYTE( "bootleg_epr-12136.a5", 0x000001, 0x20000, CRC(e3d21248) SHA1(6d146a0c9a5b1f8cb0d2770b2c272fafe58360c0) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "epr-12124.a14", 0x00000, 0x10000, CRC(dacefb6f) SHA1(789a5a99ad9419aee9da5397bcea34452ea8b4b3) )
@@ -8570,13 +8759,16 @@ ROM_START( wb32d )
 	ROM_LOAD( "epr-12127.a7", 0x0000, 0x8000, CRC(0bb901bb) SHA1(c81b198df8e3b0ec568032c76addf0d1a1711194) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //  Wrestle War, Sega System 16B
 //  CPU: 68000 + i8751 (317-0103)
 //  ROM Board type: 171-5704
-//  GAME NUMBER: 837-6889-02 (MB:833-6887-07, ROM:834-6888-07)
+//  Sega game ID: 833-6887-07
+//    Main board: 837-6889-02
+//     ROM board: 834-6888-07
 //
 //  LOC   NAME         LOC   NAME
 //  A1    OPR-12141    B1    MPR-12153
@@ -8744,7 +8936,6 @@ ROM_START( wrestwar1 )
 	ROM_LOAD( "mpr-12149.a12", 0x30000, 0x20000, CRC(d6617b19) SHA1(aa36d257eaa52c8c871a39aaa2f29c203525dbaf) )
 ROM_END
 
-
 ROM_START( wrestwar1d )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "bootleg_epr-12145.a7", 0x00000, 0x20000, CRC(6a50d373) SHA1(bc4ff28f02a326ca535251cc59399149e625b266) )
@@ -8776,6 +8967,7 @@ ROM_START( wrestwar1d )
 	ROM_LOAD( "mpr-12148.a11", 0x10000, 0x20000, CRC(fb9a7f29) SHA1(7ba79c18ab4e586be2deccd78e4479d55eb75a7e) )
 	ROM_LOAD( "mpr-12149.a12", 0x30000, 0x20000, CRC(d6617b19) SHA1(aa36d257eaa52c8c871a39aaa2f29c203525dbaf) )
 ROM_END
+
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -8908,12 +9100,12 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 //  initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16b_state,generic_5358_small) { init_generic(ROM_BOARD_171_5358_SMALL); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5358) { init_generic(ROM_BOARD_171_5358); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5521) { init_generic(ROM_BOARD_171_5521); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5704) { init_generic(ROM_BOARD_171_5704); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5797) { init_generic(ROM_BOARD_171_5797); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
+void segas16b_state::init_generic_5358_small() { init_generic(ROM_BOARD_171_5358_SMALL); }
+void segas16b_state::init_generic_5358() { init_generic(ROM_BOARD_171_5358); }
+void segas16b_state::init_generic_5521() { init_generic(ROM_BOARD_171_5521); }
+void segas16b_state::init_generic_5704() { init_generic(ROM_BOARD_171_5704); }
+void segas16b_state::init_generic_5797() { init_generic(ROM_BOARD_171_5797); }
+void segas16b_state::init_generic_korean()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
@@ -8926,7 +9118,7 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
-DRIVER_INIT_MEMBER(segas16b_state, lockonph)
+void segas16b_state::init_lockonph()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
@@ -8937,7 +9129,7 @@ DRIVER_INIT_MEMBER(segas16b_state, lockonph)
 
 	m_spritepalbase = 0x800; // tiles are 4bpp so sprite base is 0x800 instead of 0x400
 }
-DRIVER_INIT_MEMBER(segas16b_state, generic_bootleg)
+void segas16b_state::init_generic_bootleg()
 {
 	init_generic(ROM_BOARD_KOREAN);
 	m_disable_screen_blanking = true;
@@ -8949,78 +9141,78 @@ DRIVER_INIT_MEMBER(segas16b_state, generic_bootleg)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16b_state,aceattac_5358)
+void segas16b_state::init_aceattac_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::aceattac_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::aceattac_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
+void segas16b_state::init_aliensyn7_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeasj_5521)
+void segas16b_state::init_altbeasj_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeasj_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeas5_5521)
+void segas16b_state::init_altbeas5_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeas5_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeas4_5521)
+void segas16b_state::init_altbeas4_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,ddux_5704)
+void segas16b_state::init_ddux_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::ddux_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,dunkshot_5358_small)
+void segas16b_state::init_dunkshot_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::dunkshot_custom_io_r), this);
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,exctleag_5358)
+void segas16b_state::init_exctleag_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,hwchamp_5521)
+void segas16b_state::init_hwchamp_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::hwchamp_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::hwchamp_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,passshtj_5358)
+void segas16b_state::init_passshtj_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::passshtj_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,cencourt_5358)
+void segas16b_state::init_cencourt_5358()
 {
-	DRIVER_INIT_CALL(passshtj_5358);
+	init_passshtj_5358();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
+void segas16b_state::init_sdi_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 
 	if (memregion("maincpux") != nullptr)
@@ -9030,9 +9222,9 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	}
 }
 
-DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
+void segas16b_state::init_fpointbla()
 {
-	DRIVER_INIT_CALL(generic_bootleg);
+	init_generic_bootleg();
 
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -9042,53 +9234,53 @@ DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
 	}
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,defense_5358_small)
+void segas16b_state::init_defense_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,shinobi4_5521)
+void segas16b_state::init_shinobi4_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,shinobi3_5358)
+void segas16b_state::init_shinobi3_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,sjryuko_5358_small)
+void segas16b_state::init_sjryuko_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sjryuko_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::sjryuko_custom_io_w), this);
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,timescan_5358_small)
+void segas16b_state::init_timescan_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,tturf_5704)
+void segas16b_state::init_tturf_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::tturf_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,wb3_5704)
+void segas16b_state::init_wb3_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::wb3_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,snapper)
+void segas16b_state::init_snapper()
 {
-	DRIVER_INIT_CALL(generic_korean);
+	init_generic_korean();
 	m_atomicp_sound_divisor = 4;
 }
 
@@ -9099,208 +9291,210 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 //**************************************************************************
 
 //    YEAR, NAME,       PARENT,   MACHINE,             INPUT,    INIT,               MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, aceattac,   0,        aceattacb_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
+GAME( 1988, aceattac,   0,        aceattacb_fd1094,      aceattac, segas16b_state, init_aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
 
-GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
-GAME( 1987, aliensyn7,  aliensyn, system16b_mc8123,    aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
-GAME( 1987, aliensyn3,  aliensyn, system16b_fd1089a,   aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
-GAME( 1987, aliensynj,  aliensyn, system16b_fd1089a,   aliensynj,segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
+GAME( 1987, aliensyn,   0,        system16b,             aliensyn, segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
+GAME( 1987, aliensyn7,  aliensyn, system16b_mc8123,      aliensyn, segas16b_state, init_aliensyn7_5358_small, ROT0, "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
+GAME( 1987, aliensyn3,  aliensyn, system16b_fd1089a,     aliensyn, segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
+GAME( 1987, aliensynj,  aliensyn, system16b_fd1089a,     aliensynj,segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
 
-GAME( 1986, afightere,  afighter, system16b,           afighter_analog,afighter_16b_analog_state,generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, unprotected, analog controls)", 0 )
-GAME( 1986, afighterf,  afighter, system16b_fd1089b,   afighter_analog,afighter_16b_analog_state,generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown, analog controls)", 0 ) // encrypted version of afightere
-GAME( 1986, afighterg,  afighter, system16b_fd1089b,   afighter,       segas16b_state,           generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown)", 0 ) // same encryption as afighterf
-GAME( 1986, afighterh,  afighter, system16b_fd1089a,   afighter,       segas16b_state,           generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089A 317-0018)", 0 ) // same rev as afighterg
+GAME( 1986, afightere,  afighter, system16b,             afighter_analog, afighter_16b_analog_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, unprotected, analog controls)", 0 )
+GAME( 1986, afighterf,  afighter, system16b_fd1089b,     afighter_analog, afighter_16b_analog_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown, analog controls)", 0 ) // encrypted version of afightere
+GAME( 1986, afighterg,  afighter, system16b_fd1089b,     afighter, segas16b_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089B 317-unknown)", 0 ) // same encryption as afighterf
+GAME( 1986, afighterh,  afighter, system16b_fd1089a,     afighter, segas16b_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089A 317-0018)", 0 ) // same rev as afighterg
 
-GAME( 1988, altbeast,   0,        system16b_i8751,     altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Altered Beast (set 8) (8751 317-0078)", 0 )
-GAME( 1988, altbeastj,  altbeast, system16b_i8751,     altbeast, segas16b_state,altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
-GAME( 1988, altbeast6,  altbeast, system16b_i8751,     altbeast, segas16b_state,altbeas5_5521,      ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
-GAME( 1988, altbeast5,  altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Altered Beast (set 5) (FD1094 317-0069)", 0 )
-GAME( 1988, altbeast4,  altbeast, system16b_mc8123,    altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4) (MC-8123B 317-0066)", 0 )
-GAME( 1988, altbeastj3, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan) (FD1094 317-0068)", 0 )
-GAME( 1988, altbeast2,  altbeast, system16b_mc8123,    altbeast, segas16b_state,altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2) (MC-8123B 317-0066)", 0 )
-GAME( 1988, altbeastj1, altbeast, system16b_fd1094,    altbeast, segas16b_state,generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan) (FD1094 317-0065)", 0 )
+GAME( 1988, altbeast,   0,        system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 8) (8751 317-0078)", 0 )
+GAME( 1988, altbeastj,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
+GAME( 1988, altbeast6,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeas5_5521,      ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
+GAME( 1988, altbeast5,  altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 5) (FD1094 317-0069)", 0 )
+GAME( 1988, altbeast4,  altbeast, system16b_mc8123,      altbeast, segas16b_state, init_altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4) (MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeastj3, altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Juuouki (set 3, Japan) (FD1094 317-0068)", 0 )
+GAME( 1988, altbeast2,  altbeast, system16b_mc8123,      altbeast, segas16b_state, init_altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 2) (MC-8123B 317-0066)", 0 )
+GAME( 1988, altbeastj1, altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Juuouki (set 1, Japan) (FD1094 317-0065)", 0 )
 
-GAME( 1990, aurail,     0,        system16b,           aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 3, US) (unprotected)", 0 )
-GAME( 1990, aurail1,    aurail,   system16b_fd1089b,   aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 2, World) (FD1089B 317-0168)", 0 )
-GAME( 1990, aurailj,    aurail,   system16b_fd1089a,   aurail,   segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 1, Japan) (FD1089A 317-0167)", 0 )
+GAME( 1990, aurail,     0,        system16b,             aurail,   segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 3, US) (unprotected)", 0 )
+GAME( 1990, aurail1,    aurail,   system16b_fd1089b,     aurail,   segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 2, World) (FD1089B 317-0168)", 0 )
+GAME( 1990, aurailj,    aurail,   system16b_fd1089a,     aurail,   segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Aurail (set 1, Japan) (FD1089A 317-0167)", 0 )
 
-GAME( 1989, bayroute,   0,        system16b_fd1094,    bayroute, segas16b_state,generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World) (FD1094 317-0116)", 0 )
-GAME( 1989, bayroutej,  bayroute, system16b_fd1094,    bayroute, segas16b_state,generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan) (FD1094 317-0115)", 0 )
-GAME( 1989, bayroute1,  bayroute, system16b,           bayroute, segas16b_state,generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", 0 )
+GAME( 1989, bayroute,   0,        system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World) (FD1094 317-0116)", 0 )
+GAME( 1989, bayroutej,  bayroute, system16b_fd1094,      bayroute, segas16b_state, init_generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan) (FD1094 317-0115)", 0 )
+GAME( 1989, bayroute1,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US) (unprotected)", 0 )
 
-GAME( 1987, bullet,     0,        system16b_fd1094,    bullet,   segas16b_state,generic_5358_small, ROT0,   "Sega", "Bullet (FD1094 317-0041)", 0 )
+GAME( 1987, bullet,     0,        system16b_fd1094,      bullet,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Bullet (FD1094 317-0041)", 0 )
 
 // Charon
 
-GAME( 1991, cotton,     0,        system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 4, World) (FD1094 317-0181a)", 0 )
-GAME( 1991, cottonu,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 3, US) (FD1094 317-0180)", 0 )
-GAME( 1991, cottonj,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 2, Japan, Rev B) (FD1094 317-0179b)", 0 )
-GAME( 1991, cottonja,   cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 1, Japan, Rev A) (FD1094 317-0179a)", 0 )
+GAME( 1991, cotton,     0,        system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 4, World) (FD1094 317-0181a)", 0 )
+GAME( 1991, cottonu,    cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 3, US) (FD1094 317-0180)", 0 )
+GAME( 1991, cottonj,    cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 2, Japan, Rev B) (FD1094 317-0179b)", 0 )
+GAME( 1991, cottonja,   cotton,   system16b_fd1094,      cotton,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "Cotton (set 1, Japan, Rev A) (FD1094 317-0179a)", 0 )
 
-GAME( 1988, ddux,       0,        system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 3, World) (FD1094 317-0096)", 0 )
-GAME( 1988, dduxj,      ddux,     system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan) (FD1094 317-0094)", 0 )
-GAME( 1988, ddux1,      ddux,     system16b_i8751,     ddux,     segas16b_state,ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1) (8751 317-0095)", 0 )
+GAME( 1988, ddux,       0,        system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 3, World) (FD1094 317-0096)", 0 )
+GAME( 1988, dduxj,      ddux,     system16b_fd1094,      ddux,     segas16b_state, init_generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, Japan) (FD1094 317-0094)", 0 )
+GAME( 1988, ddux1,      ddux,     system16b_i8751,       ddux,     segas16b_state, init_ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1) (8751 317-0095)", 0 )
 
-GAME( 1987, dunkshot,   0,        system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
-GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
-GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,   dunkshot, segas16b_state,dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
+GAME( 1987, dunkshot,   0,        system16b_fd1089a,     dunkshot,  segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev C, FD1089A 317-0022)", 0 )
+GAME( 1987, dunkshota,  dunkshot, system16b_fd1089a,     dunkshot,  segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (Rev A, FD1089A 317-0022)", 0 )
+GAME( 1986, dunkshoto,  dunkshot, system16b_fd1089a,     dunkshoto, segas16b_state, init_dunkshot_5358_small,ROT0,   "Sega", "Dunk Shot (FD1089A 317-0022)", 0 )
 
-GAME( 1989, eswat,      0,        system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World) (FD1094 317-0130)", 0 )
-GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US) (FD1094 317-0129)", 0 )
-GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, Japan) (FD1094 317-0128)", 0 )
-GAME( 1989, eswatj1,    eswat,    system16b_fd1094,     eswat,   segas16b_state,generic_5704,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan) (FD1094 317-0131)", 0 )
+GAME( 1989, eswat,      0,        system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 4, World) (FD1094 317-0130)", 0 )
+GAME( 1989, eswatu,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 3, US) (FD1094 317-0129)", 0 )
+GAME( 1989, eswatj,     eswat,    system16b_fd1094_5797, eswat,    segas16b_state, init_generic_5797,       ROT0,   "Sega", "E-Swat - Cyber Police (set 2, Japan) (FD1094 317-0128)", 0 )
+GAME( 1989, eswatj1,    eswat,    system16b_fd1094,      eswat,    segas16b_state, init_generic_5704,       ROT0,   "Sega", "E-Swat - Cyber Police (set 1, Japan) (FD1094 317-0131)", 0 )
 
-GAME( 1988, exctleag,   0,        system16b_fd1094,    exctleag, segas16b_state,exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
+GAME( 1988, exctleag,   0,        system16b_fd1094,      exctleag, segas16b_state, init_exctleag_5358,      ROT0,   "Sega", "Excite League (FD1094 317-0079)", 0 )
 
-GAME( 1989, fpoint,     0,        system16b_fd1094,    fpoint,   segas16b_state,generic_5358,       ROT0,   "Sega", "Flash Point (set 2, Japan) (FD1094 317-0127A)", 0 )
-GAME( 1989, fpoint1,    fpoint,   system16b_fd1094,    fpoint,   segas16b_state,generic_5704,       ROT0,   "Sega", "Flash Point (set 1, Japan) (FD1094 317-0127A)", 0 )
+GAME( 1989, fpoint,     0,        system16b_fd1094,      fpoint,   segas16b_state, init_generic_5358,       ROT0,   "Sega", "Flash Point (set 2, Japan) (FD1094 317-0127A)", 0 )
+GAME( 1989, fpoint1,    fpoint,   system16b_fd1094,      fpoint,   segas16b_state, init_generic_5704,       ROT0,   "Sega", "Flash Point (set 1, Japan) (FD1094 317-0127A)", 0 )
 
-GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,goldnaxe, segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 6, US) (8751 317-123A)", 0 )
-GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US) (FD1094 317-0122)", 0 )
-GAME( 1989, goldnaxej,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 4, Japan) (FD1094 317-0121)", 0 )
-GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 3, World) (FD1094 317-0120)", 0)
-GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,     goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
-GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
+GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,  goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 6, US) (8751 317-123A)", 0 )
+GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5797, goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US) (FD1094 317-0122)", 0 )
+GAME( 1989, goldnaxej,  goldnaxe, system16b_fd1094,      goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 4, Japan) (FD1094 317-0121)", 0 )
+GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,      goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 3, World) (FD1094 317-0120)", 0)
+GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,       goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
+GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797, goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
 
-GAME( 1987, hwchamp,    0,        system16b,           hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )
-GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,    hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
+GAME( 1987, hwchamp,    0,        system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )
+GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,      hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
 
-GAME( 1989, mvp,        0,        system16b_fd1094_5797,mvp,     segas16b_state,generic_5797,       ROT0,   "Sega", "MVP (set 2, US) (FD1094 317-0143)", 0 )
-GAME( 1989, mvpj,       mvp,      system16b_fd1094,     mvp,     segas16b_state,generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan) (FD1094 317-0142)", 0 )
+GAME( 1989, mvp,        0,        system16b_fd1094_5797, mvp,      segas16b_state, init_generic_5797,       ROT0,   "Sega", "MVP (set 2, US) (FD1094 317-0143)", 0 )
+GAME( 1989, mvpj,       mvp,      system16b_fd1094,      mvp,      segas16b_state, init_generic_5704,       ROT0,   "Sega", "MVP (set 1, Japan) (FD1094 317-0142)", 0 )
 
-GAME( 1988, passsht,    0,        system16b_fd1094,    passsht,  segas16b_state,generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players) (FD1094 317-0080)", 0 )
-GAME( 1988, passshta,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players) (FD1094 317-0074)", 0 )
-GAME( 1988, passshtj,   passsht,  system16b_fd1094,    passshtj, segas16b_state,passshtj_5358,      ROT270, "Sega", "Passing Shot (Japan, 4 Players) (FD1094 317-0070)", 0 )
-GAME( 1988, cencourt,   passsht,  system16b_mc8123,    cencourt, segas16b_state,cencourt_5358,      ROT270, "Sega", "Center Court (World, 4 Players, prototype) (MC-8123B)", 0 )
+GAME( 1988, passsht,    0,        system16b_fd1094,      passsht,  segas16b_state, init_generic_5358,       ROT270, "Sega", "Passing Shot (World, 2 Players) (FD1094 317-0080)", 0 )
+GAME( 1988, passshta,   passsht,  system16b_fd1094,      passshtj, segas16b_state, init_passshtj_5358,      ROT270, "Sega", "Passing Shot (World, 4 Players) (FD1094 317-0074)", 0 )
+GAME( 1988, passshtj,   passsht,  system16b_fd1094,      passshtj, segas16b_state, init_passshtj_5358,      ROT270, "Sega", "Passing Shot (Japan, 4 Players) (FD1094 317-0070)", 0 )
+GAME( 1988, cencourt,   passsht,  system16b_mc8123,      cencourt, segas16b_state, init_cencourt_5358,      ROT270, "Sega", "Center Court (World, 4 Players, prototype) (MC-8123B)", 0 )
 
-GAME( 1991, riotcity,   0,        system16b,           riotcity, segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
+GAME( 1991, riotcity,   0,        system16b,             riotcity, segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Riot City (Japan)", 0 )
 
-GAME( 1990, ryukyu,     0,        system16b_fd1094,    ryukyu,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
+GAME( 1990, ryukyu,     0,        system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Rev A, Japan) (FD1094 317-5023A)", 0 )
+GAME( 1990, ryukyua,    ryukyu,   system16b_fd1094,      ryukyu,   segas16b_state, init_generic_5704,       ROT0,   "Success / Sega", "RyuKyu (Japan) (FD1094 317-5023)", 0 )
 
-GAME( 1987, defense,    sdi,      system16b_fd1089a,   sdi,      segas16b_state,defense_5358_small, ROT0,   "Sega", "Defense (System 16B, FD1089A 317-0028)", 0 )
-GAME( 1987, sdib,       sdi,      system16b_fd1089a,   sdi,      segas16b_state,defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
-GAME( 1987, sdibl,      sdi,      system16b,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, original hardware)", 0 ) // seems to be a bootleg of an older version of the game than any supported original sets
+GAME( 1987, defense,    sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "Defense (System 16B, FD1089A 317-0028)", 0 )
+GAME( 1987, sdib,       sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
+GAME( 1987, sdibl,      sdi,      system16b,             sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, original hardware)", 0 ) // seems to be a bootleg of an older version of the game than any supported original sets
 
-GAME( 1987, shinobi5,   shinobi,  system16b,           shinobi,  segas16b_state,generic_5521,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
-GAME( 1987, shinobi4,   shinobi,  system16b_mc8123,    shinobi,  segas16b_state,shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B) (MC-8123B 317-0054)", 0 )
-GAME( 1987, shinobi3,   shinobi,  system16b_mc8123,    shinobi,  segas16b_state,shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B) (MC-8123B 317-0054)", 0 )
-GAME( 1987, shinobi2,   shinobi,  system16b_fd1094,    shinobi,  segas16b_state,generic_5358,       ROT0,   "Sega", "Shinobi (set 2, System 16B) (FD1094 317-0049)", 0 )
+GAME( 1987, shinobi6,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5521,       ROT0,   "Sega", "Shinobi (set 6, System 16B) (unprotected)", 0 )
+GAME( 1987, shinobi5,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5358,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
+GAME( 1987, shinobi4,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B) (MC-8123B 317-0054)", 0 )
+GAME( 1987, shinobi3,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B) (MC-8123B 317-0054)", 0 )
+GAME( 1987, shinobi2,   shinobi,  system16b_fd1094,      shinobi,  segas16b_state, init_generic_5358,       ROT0,   "Sega", "Shinobi (set 2, System 16B) (FD1094 317-0049)", 0 )
 
-GAME( 1987, sonicbom,   0,        system16b_fd1094,    sonicbom, segas16b_state,generic_5358,       ROT270, "Sega", "Sonic Boom (FD1094 317-0053)", 0 )
+GAME( 1987, sonicbom,   0,        system16b_fd1094,      sonicbom, segas16b_state, init_generic_5358,       ROT270, "Sega", "Sonic Boom (FD1094 317-0053)", 0 )
 
-GAME( 1988, sjryuko,    0,        system16b_fd1089b,   sjryuko,  segas16b_state,sjryuko_5358_small, ROT0,   "White Board", "Sukeban Jansi Ryuko (set 2, System 16B, FD1089B 317-5021)", 0 )
+GAME( 1988, sjryuko,    0,        system16b_fd1089b,     sjryuko,  segas16b_state, init_sjryuko_5358_small, ROT0,   "White Board", "Sukeban Jansi Ryuko (set 2, System 16B, FD1089B 317-5021)", 0 )
 
-GAME( 1987, suprleag,   0,        system16b_fd1094,    exctleag, segas16b_state,exctleag_5358,      ROT0,   "Sega", "Super League (FD1094 317-0045)", 0 )
+GAME( 1987, suprleag,   0,        system16b_fd1094,      exctleag, segas16b_state, init_exctleag_5358,      ROT0,   "Sega", "Super League (FD1094 317-0045)", 0 )
 
-GAME( 1988, tetris2,    tetris,   system16b_fd1094,    tetris,   segas16b_state,generic_5704,       ROT0,   "Sega", "Tetris (set 2, Japan, System 16B) (FD1094 317-0092)", 0 )
-GAME( 1988, tetris1,    tetris,   system16b_fd1094,    tetris,   segas16b_state,generic_5358_small, ROT0,   "Sega", "Tetris (set 1, Japan, System 16B) (FD1094 317-0091)", 0 )
+GAME( 1988, tetris2,    tetris,   system16b_fd1094,      tetris,   segas16b_state, init_generic_5704,       ROT0,   "Sega", "Tetris (set 2, Japan, System 16B) (FD1094 317-0092)", 0 )
+GAME( 1988, tetris1,    tetris,   system16b_fd1094,      tetris,   segas16b_state, init_generic_5358_small, ROT0,   "Sega", "Tetris (set 1, Japan, System 16B) (FD1094 317-0091)", 0 )
 
-GAME( 1987, timescan,   0,        system16b,           timescan, segas16b_state,timescan_5358_small, ROT270, "Sega", "Time Scanner (set 2, System 16B)", 0 )
+GAME( 1987, timescan,   0,        system16b,             timescan, segas16b_state, init_timescan_5358_small, ROT270, "Sega", "Time Scanner (set 2, System 16B)", 0 )
 
-GAME( 1994, toryumon,   0,        system16b_5797,      toryumon, segas16b_state,generic_5797,       ROT0,   "Sega", "Toryumon", 0 )
+GAME( 1994, toryumon,   0,        system16b_5797,        toryumon, segas16b_state, init_generic_5797,        ROT0,   "Sega", "Toryumon", 0 )
 
-GAME( 1989, tturf,      0,        system16b_i8751,     tturf,    segas16b_state,tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan) (8751 317-0104)", 0 )
-GAME( 1989, tturfu,     tturf,    system16b_i8751,     tturf,    segas16b_state,generic_5358,       ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US) (8751 317-0099)", 0)
+GAME( 1989, tturf,      0,        system16b_i8751,       tturf,    segas16b_state, init_tturf_5704,          ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan) (8751 317-0104)", 0 )
+GAME( 1989, tturfu,     tturf,    system16b_i8751,       tturf,    segas16b_state, init_generic_5358,        ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US) (8751 317-0099)", 0)
 
-GAME( 1996, ultracin,   0,        system16b_5797, system16b_generic, segas16b_state, generic_5797,  ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
+GAME( 1996, ultracin,   0,        system16b_5797,        ultracin, segas16b_state, init_generic_5797, ROT0,   "Sega", "Waku Waku Ultraman Racing", 0 )
 
-GAME( 1988, wb3,        0,        system16b_i8751,     wb3,      segas16b_state,wb3_5704,           ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B) (8751 317-0098)", 0 )
-GAME( 1988, wb34,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (FD1094 317-0087)", 0 )
-GAME( 1988, wb33,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (FD1094 317-0089)", 0 )
-GAME( 1988, wb32,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5358,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (FD1094 317-0085)", 0 )
+GAME( 1988, wb3,        0,        system16b_i8751,       wb3,      segas16b_state, init_wb3_5704,            ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B) (8751 317-0098)", 0 )
+GAME( 1988, wb34,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (FD1094 317-0087)", 0 )
+GAME( 1988, wb33,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (FD1094 317-0089)", 0 )
+GAME( 1988, wb32,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5358,        ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (FD1094 317-0085)", 0 )
 
-GAME( 1989, wrestwar,   0,        system16b_i8751,     wrestwar, segas16b_state,generic_5704,       ROT270, "Sega", "Wrestle War (set 3, World) (8751 317-0103)", 0 )
-GAME( 1989, wrestwar2,  wrestwar, system16b_fd1094,    wrestwar, segas16b_state,generic_5704,       ROT270, "Sega", "Wrestle War (set 2, World) (FD1094 317-0102)", 0 )
-GAME( 1989, wrestwar1,  wrestwar, system16b_fd1094,    wrestwar, segas16b_state,generic_5704,       ROT270, "Sega", "Wrestle War (set 1, Japan) (FD1094 317-0090)", 0 )
+GAME( 1989, wrestwar,   0,        system16b_i8751,       wrestwar, segas16b_state, init_generic_5704,        ROT270, "Sega", "Wrestle War (set 3, World) (8751 317-0103)", 0 )
+GAME( 1989, wrestwar2,  wrestwar, system16b_fd1094,      wrestwar, segas16b_state, init_generic_5704,        ROT270, "Sega", "Wrestle War (set 2, World) (FD1094 317-0102)", 0 )
+GAME( 1989, wrestwar1,  wrestwar, system16b_fd1094,      wrestwar, segas16b_state, init_generic_5704,        ROT270, "Sega", "Wrestle War (set 1, Japan) (FD1094 317-0090)", 0 )
 
 // Extra RAM, dubbed by M2 as 'System 16C'
-GAME( 2008, fantzn2x,   0,        system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
-GAME( 2008, fantzn2xp,  fantzn2x, system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version, prototype)", 0 ) // "
+GAME( 2008, fantzn2x,   0,        system16c,             fz2,      segas16b_state, init_generic_5704,        ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
+GAME( 2008, fantzn2xp,  fantzn2x, system16c,             fz2,      segas16b_state, init_generic_5704,        ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version, prototype)", 0 ) // "
 
-GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state,generic_5704,       ROT0,  "bootleg", "Fantasy Zone (Time Attack, bootleg)", 0 ) // based on the PS2 version, unlicensed PCB conversion
+GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta, segas16b_state, init_generic_5704,        ROT0,  "bootleg", "Fantasy Zone (Time Attack, bootleg)", 0 ) // based on the PS2 version, unlicensed PCB conversion
 
 
 // Custom Korean Board - these probably belong with the bootlegs...
-GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
-GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
+GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_state, init_generic_korean,      ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
+GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,             ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
-GAME( 1991, lockonph,   0,        lockonph,            lockonph, segas16b_state,lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
+GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,            ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
 
 // decrypted bootleg / 'suicide repair' sets
 
-GAME( 1987, shinobi2d,  shinobi,  system16b,    shinobi,  segas16b_state,generic_5358,       ROT0,   "bootleg", "Shinobi (set 2, System 16B) (bootleg of FD1094 317-0049 set)", 0 )
+GAME( 1987, shinobi2d,  shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5358,        ROT0,   "bootleg", "Shinobi (set 2, System 16B) (bootleg of FD1094 317-0049 set)", 0 )
 
-GAME( 1989, fpointd,    fpoint,   system16b,    fpoint,   segas16b_state,generic_5358,       ROT0,   "bootleg", "Flash Point (set 2, Japan) (bootleg of FD1094 317-0127A set)", 0 )
-GAME( 1989, fpoint1d,   fpoint,   system16b,    fpoint,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Flash Point (set 1, Japan) (bootleg of FD1094 317-0127A set)", 0 )
+GAME( 1989, fpointd,    fpoint,   system16b,             fpoint,   segas16b_state, init_generic_5358,        ROT0,   "bootleg", "Flash Point (set 2, Japan) (bootleg of FD1094 317-0127A set)", 0 )
+GAME( 1989, fpoint1d,   fpoint,   system16b,             fpoint,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Flash Point (set 1, Japan) (bootleg of FD1094 317-0127A set)", 0 )
 
-GAME( 1988, tetris2d,   tetris,   system16b,    tetris,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Tetris (set 2, Japan, System 16B) (bootleg of FD1094 317-0092 set)", 0 )
-GAME( 1988, tetris1d,   tetris,   system16b,    tetris,   segas16b_state,generic_5358_small, ROT0,   "bootleg", "Tetris (set 1, Japan, System 16B) (bootleg of FD1094 317-0091 set)", 0 )
+GAME( 1988, tetris2d,   tetris,   system16b,             tetris,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Tetris (set 2, Japan, System 16B) (bootleg of FD1094 317-0092 set)", 0 )
+GAME( 1988, tetris1d,   tetris,   system16b,             tetris,   segas16b_state, init_generic_5358_small,  ROT0,   "bootleg", "Tetris (set 1, Japan, System 16B) (bootleg of FD1094 317-0091 set)", 0 )
 
-GAME( 1988, dduxd,      ddux,     system16b,    ddux,     segas16b_state,generic_5521,       ROT0,   "bootleg", "Dynamite Dux (set 3, World) (bootleg of FD1094 317-0096 set)", 0 )
-GAME( 1988, dduxjd,     ddux,     system16b,    ddux,     segas16b_state,generic_5521,       ROT0,   "bootleg", "Dynamite Dux (set 2, Japan) (bootleg of FD1094 317-0094 set)", 0 )
+GAME( 1988, dduxd,      ddux,     system16b,             ddux,     segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Dynamite Dux (set 3, World) (bootleg of FD1094 317-0096 set)", 0 )
+GAME( 1988, dduxjd,     ddux,     system16b,             ddux,     segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Dynamite Dux (set 2, Japan) (bootleg of FD1094 317-0094 set)", 0 )
 
-GAME( 1988, altbeast5d, altbeast, system16b,    altbeast, segas16b_state,generic_5521,       ROT0,   "bootleg", "Altered Beast (set 5) (bootleg of FD1094 317-0069 set)", 0 )
-GAME( 1988, altbeastj3d,altbeast, system16b,    altbeast, segas16b_state,generic_5521,       ROT0,   "bootleg", "Juuouki (set 3, Japan) (bootleg of FD1094 317-0068 set)", 0 )
+GAME( 1988, altbeast5d, altbeast, system16b,             altbeast, segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Altered Beast (set 5) (bootleg of FD1094 317-0069 set)", 0 )
+GAME( 1988, altbeastj3d,altbeast, system16b,             altbeast, segas16b_state, init_generic_5521,        ROT0,   "bootleg", "Juuouki (set 3, Japan) (bootleg of FD1094 317-0068 set)", 0 )
 
-GAME( 1990, aurail1d,   aurail,   system16b,    aurail,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Aurail (set 2, World) (bootleg of FD1089B 317-0168 set)", 0 )
-GAME( 1990, aurailjd,   aurail,   system16b,    aurail,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Aurail (set 1, Japan) (bootleg of FD1089A 317-0167 set)", 0 )
+GAME( 1990, aurail1d,   aurail,   system16b,             aurail,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Aurail (set 2, World) (bootleg of FD1089B 317-0168 set)", 0 )
+GAME( 1990, aurailjd,   aurail,   system16b,             aurail,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Aurail (set 1, Japan) (bootleg of FD1089A 317-0167 set)", 0 )
 
-GAME( 1989, mvpd,       mvp,      system16b_5797,mvp,     segas16b_state,generic_5797,       ROT0,   "bootleg", "MVP (set 2, US) (bootleg of FD1094 317-0143 set)", 0 )
-GAME( 1989, mvpjd,      mvp,      system16b,    mvp,      segas16b_state,generic_5704,       ROT0,   "bootleg", "MVP (set 1, Japan) (bootleg of FD1094 317-0142 set)", 0 )
+GAME( 1989, mvpd,       mvp,      system16b_5797,        mvp,      segas16b_state, init_generic_5797,        ROT0,   "bootleg", "MVP (set 2, US) (bootleg of FD1094 317-0143 set)", 0 )
+GAME( 1989, mvpjd,      mvp,      system16b,             mvp,      segas16b_state, init_generic_5704,        ROT0,   "bootleg", "MVP (set 1, Japan) (bootleg of FD1094 317-0142 set)", 0 )
 
-GAME( 1991, cottond,    cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 4, World) (bootleg of FD1094 317-0181a set)", 0 )
-GAME( 1991, cottonud,   cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 3, US) (bootleg of FD1094 317-0180 set)", 0 )
-GAME( 1991, cottonjad,  cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 1, Japan, Rev A) (bootleg of FD1094 317-0179a set)", 0 )
-GAME( 1991, cottonjd,   cotton,   system16b,    cotton,   segas16b_state,generic_5704,       ROT0,   "bootleg", "Cotton (set 2, Japan, Rev B) (bootleg of FD1094 317-0179b set)", 0 )
-
-
-GAME( 1989, bayrouted,  bayroute, system16b,    bayroute, segas16b_state,generic_5704,       ROT0,   "bootleg", "Bay Route (set 3, World) (bootleg of FD1094 317-0116 set)", 0 )
-GAME( 1989, bayroutejd, bayroute, system16b,    bayroute, segas16b_state,generic_5704,       ROT0,   "bootleg", "Bay Route (set 2, Japan) (bootleg of FD1094 317-0115 set)", 0 )
-
-GAME( 1988, exctleagd,  exctleag, system16b,    exctleag, segas16b_state,exctleag_5358,      ROT0,   "bootleg", "Excite League (bootleg of FD1094 317-0079 set)", 0 )
-
-GAME( 1987, sonicbomd,  sonicbom, system16b,    sonicbom, segas16b_state,generic_5358,       ROT270, "bootleg", "Sonic Boom (bootleg of FD1094 317-0053 set)", 0 )
-
-GAME( 1990, ryukyud,    ryukyu,   system16b,    ryukyu,   segas16b_state,generic_5704,       ROT0,   "bootleg", "RyuKyu (Japan) (bootleg of FD1094 317-5023 set)", 0 )
-
-GAME( 1987, hwchampjd,  hwchamp,  system16b,    hwchamp,  segas16b_state,hwchamp_5521,       ROT0,   "bootleg", "Heavyweight Champ (Japan) (bootleg of FD1094 317-0046 set)", 0 )
-
-GAME( 1987, bulletd,    bullet,   system16b,    bullet,   segas16b_state,generic_5358_small, ROT0,   "bootleg", "Bullet (bootleg of FD1094 317-0041 set)", 0 )
-
-GAME( 1989, eswatd,     eswat,    system16b_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
-GAME( 1989, eswatud,    eswat,    system16b_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
-GAME( 1989, eswatjd,    eswat,    system16b_5797,eswat,   segas16b_state,generic_5797,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
-GAME( 1989, eswatj1d,   eswat,    system16b,    eswat,    segas16b_state,generic_5704,       ROT0,   "bootleg", "E-Swat - Cyber Police (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
+GAME( 1991, cottond,    cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 4, World) (bootleg of FD1094 317-0181a set)", 0 )
+GAME( 1991, cottonud,   cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 3, US) (bootleg of FD1094 317-0180 set)", 0 )
+GAME( 1991, cottonjad,  cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 1, Japan, Rev A) (bootleg of FD1094 317-0179a set)", 0 )
+GAME( 1991, cottonjd,   cotton,   system16b,             cotton,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Cotton (set 2, Japan, Rev B) (bootleg of FD1094 317-0179b set)", 0 )
 
 
-GAME( 1989, goldnaxeud, goldnaxe, system16b_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "bootleg", "Golden Axe (set 5, US) (bootleg of FD1094 317-0122 set)", 0 )
-GAME( 1989, goldnaxe3d, goldnaxe, system16b,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "bootleg", "Golden Axe (set 3, World) (bootleg of FD1094 317-0120 set)", 0)
-GAME( 1989, goldnaxe1d, goldnaxe, system16b_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "bootleg", "Golden Axe (set 1, World) (bootleg of FD1094 317-0110 set)", 0 )
-GAME( 1989, goldnaxejd, goldnaxe, system16b,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "bootleg", "Golden Axe (set 4, Japan) (bootleg of FD1094 317-0121 set)", 0 )
+GAME( 1989, bayrouted,  bayroute, system16b,             bayroute, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Bay Route (set 3, World) (bootleg of FD1094 317-0116 set)", 0 )
+GAME( 1989, bayroutejd, bayroute, system16b,             bayroute, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Bay Route (set 2, Japan) (bootleg of FD1094 317-0115 set)", 0 )
+
+GAME( 1988, exctleagd,  exctleag, system16b,             exctleag, segas16b_state, init_exctleag_5358,       ROT0,   "bootleg", "Excite League (bootleg of FD1094 317-0079 set)", 0 )
+
+GAME( 1987, sonicbomd,  sonicbom, system16b,             sonicbom, segas16b_state, init_generic_5358,        ROT270, "bootleg", "Sonic Boom (bootleg of FD1094 317-0053 set)", 0 )
+
+GAME( 1990, ryukyud,    ryukyu,   system16b,             ryukyu,   segas16b_state, init_generic_5704,        ROT0,   "bootleg", "RyuKyu (Japan) (bootleg of FD1094 317-5023 set)", 0 )
+
+GAME( 1987, hwchampjd,  hwchamp,  system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,        ROT0,   "bootleg", "Heavyweight Champ (Japan) (bootleg of FD1094 317-0046 set)", 0 )
+
+GAME( 1987, bulletd,    bullet,   system16b,             bullet,   segas16b_state, init_generic_5358_small,  ROT0,   "bootleg", "Bullet (bootleg of FD1094 317-0041 set)", 0 )
+
+GAME( 1989, eswatd,     eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 4, World) (bootleg of FD1094 317-0130 set)", 0 )
+GAME( 1989, eswatud,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 3, US) (bootleg of FD1094 317-0129 set)", 0 )
+GAME( 1989, eswatjd,    eswat,    system16b_5797,        eswat,    segas16b_state, init_generic_5797,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 2, Japan) (bootleg of FD1094 317-0128 set)", 0 )
+GAME( 1989, eswatj1d,   eswat,    system16b,             eswat,    segas16b_state, init_generic_5704,        ROT0,   "bootleg", "E-Swat - Cyber Police (set 1, Japan) (bootleg of FD1094 317-0131 set)", 0 )
 
 
-GAME( 1988, passshtd,   passsht,  system16b,    passsht,  segas16b_state,generic_5358,       ROT270, "bootleg", "Passing Shot (World, 2 Players) (bootleg of FD1094 317-0080 set)", 0 )
-GAME( 1988, passshtad,  passsht,  system16b,    passshtj, segas16b_state,passshtj_5358,      ROT270, "bootleg", "Passing Shot (World, 4 Players) (bootleg of FD1094 317-0074 set)", 0 )
-GAME( 1988, passshtjd,  passsht,  system16b,    passshtj, segas16b_state,passshtj_5358,      ROT270, "bootleg", "Passing Shot (Japan, 4 Players) (bootleg of FD1094 317-0070 set)", 0 )
+GAME( 1989, goldnaxeud, goldnaxe, system16b_5797,        goldnaxe, segas16b_state, init_generic_5797,        ROT0,   "bootleg", "Golden Axe (set 5, US) (bootleg of FD1094 317-0122 set)", 0 )
+GAME( 1989, goldnaxe3d, goldnaxe, system16b,             goldnaxe, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Golden Axe (set 3, World) (bootleg of FD1094 317-0120 set)", 0)
+GAME( 1989, goldnaxe1d, goldnaxe, system16b_5797,        goldnaxe, segas16b_state, init_generic_5797,        ROT0,   "bootleg", "Golden Axe (set 1, World) (bootleg of FD1094 317-0110 set)", 0 )
+GAME( 1989, goldnaxejd, goldnaxe, system16b,             goldnaxe, segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Golden Axe (set 4, Japan) (bootleg of FD1094 317-0121 set)", 0 )
 
-GAME( 1988, wb34d,      wb3,      system16b,    wb3,      segas16b_state,generic_5704,       ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (bootleg of FD1094 317-0087 set)", 0 )
-GAME( 1988, wb33d,      wb3,      system16b,    wb3,      segas16b_state,generic_5704,       ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (bootleg of FD1094 317-0089 set)", 0 )
-GAME( 1988, wb32d,      wb3,      system16b,    wb3,      segas16b_state,generic_5358,       ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (bootleg of FD1094 317-0085 set)", 0 )
 
-GAME( 1989, wrestwar2d, wrestwar, system16b,    wrestwar, segas16b_state,generic_5704,       ROT270, "bootleg", "Wrestle War (set 2, World) (bootleg of FD1094 317-0102 set)", 0 )
-GAME( 1989, wrestwar1d, wrestwar, system16b,    wrestwar, segas16b_state,generic_5704,       ROT270, "bootleg", "Wrestle War (set 1, Japan) (bootleg of FD1094 317-0090 set)", 0 )
+GAME( 1988, passshtd,   passsht,  system16b,             passsht,  segas16b_state, init_generic_5358,        ROT270, "bootleg", "Passing Shot (World, 2 Players) (bootleg of FD1094 317-0080 set)", 0 )
+GAME( 1988, passshtad,  passsht,  system16b,             passshtj, segas16b_state, init_passshtj_5358,       ROT270, "bootleg", "Passing Shot (World, 4 Players) (bootleg of FD1094 317-0074 set)", 0 )
+GAME( 1988, passshtjd,  passsht,  system16b,             passshtj, segas16b_state, init_passshtj_5358,       ROT270, "bootleg", "Passing Shot (Japan, 4 Players) (bootleg of FD1094 317-0070 set)", 0 )
+
+GAME( 1988, wb34d,      wb3,      system16b,             wb3,      segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B) (bootleg of FD1094 317-0087 set)", 0 )
+GAME( 1988, wb33d,      wb3,      system16b,             wb3,      segas16b_state, init_generic_5704,        ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (bootleg of FD1094 317-0089 set)", 0 )
+GAME( 1988, wb32d,      wb3,      system16b,             wb3,      segas16b_state, init_generic_5358,        ROT0,   "bootleg", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (bootleg of FD1094 317-0085 set)", 0 )
+
+GAME( 1989, wrestwar2d, wrestwar, system16b,             wrestwar, segas16b_state, init_generic_5704,        ROT270, "bootleg", "Wrestle War (set 2, World) (bootleg of FD1094 317-0102 set)", 0 )
+GAME( 1989, wrestwar1d, wrestwar, system16b,             wrestwar, segas16b_state, init_generic_5704,        ROT270, "bootleg", "Wrestle War (set 1, Japan) (bootleg of FD1094 317-0090 set)", 0 )
 
 // bootlegs with split code/data, no memory mapper
-GAME( 1987, sdibl2,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
-GAME( 1987, sdibl3,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
-GAME( 1987, sdibl4,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
-GAME( 1987, sdibl5,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
-GAME( 1987, sdibl6,      sdi,      system16b_split,           sdi,      segas16b_state,sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
+GAME( 1987, sdibl2,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
+GAME( 1987, sdibl3,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
+GAME( 1987, sdibl4,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
+GAME( 1987, sdibl5,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
+GAME( 1987, sdibl6,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,      ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
 
 // bootlegs with modified hardware
-GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
-GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas16b_state,  generic_bootleg,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
-GAME( 1989, fpointbla,   fpoint,    fpointbla,   fpointbl, segas16b_state,  fpointbla,         ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1989, fpointbl,    fpoint,    fpointbl,            fpointbl, segas16b_state, init_generic_bootleg,     ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
+GAME( 1989, fpointbj,    fpoint,    fpointbl,            fpointbl, segas16b_state, init_generic_bootleg,     ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
+GAME( 1989, fpointbla,   fpoint,    fpointbla,           fpointbl, segas16b_state, init_fpointbla,           ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
 
 
 
@@ -9314,7 +9508,7 @@ and the external casing of the unit is near identical)  The system does NOT howe
 fit, and the hardware is basically a bootleg of Sega System 16 instead of PGM!  So far only one cartridge has been seen.
 
 There are various levels of 'protection' on the system
- - Address XOR + 16-bit bitswap on the BIOS rom and Cartridge ROMs
+ - Address XOR + 16-bit bitswap on the BIOS ROM and Cartridge ROMs
  - A device which performs a 32-bit bitswap, used to produce decryption keys for the data compressed on the cartridges
  - An alternate way of reading the cartridge data through a port, which causes an additional 8-bit data xor to be applied
  - A simple hardware RLE decompression device used to decrypt data for the BIOS (the games use a stronger software
@@ -9577,36 +9771,37 @@ WRITE16_MEMBER( isgsm_state::main_bank_change_w )
 		membank(ISGSM_MAIN_BANK)->set_base(memregion("maincpu")->base());
 }
 
-ADDRESS_MAP_START(isgsm_state::isgsm_map)
+void isgsm_state::isgsm_map(address_map &map)
+{
 
-	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) AM_REGION("bios", 0) // this area is ALWAYS read-only, even when the game is banked in
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc43fff) AM_READWRITE(standard_io_r, standard_io_w)
+	map(0x000000, 0x0fffff).bankr(ISGSM_MAIN_BANK).region("bios", 0); // this area is ALWAYS read-only, even when the game is banked in
+	map(0x200000, 0x23ffff).ram(); // used during startup for decompression
+	map(0x3f0000, 0x3fffff).w(FUNC(isgsm_state::rom_5704_bank_w));
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x840000, 0x840fff).ram().w(FUNC(isgsm_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).rw(FUNC(isgsm_state::standard_io_r), FUNC(isgsm_state::standard_io_w));
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(data_w) // writes decompressed data here (copied from RAM..)
-	AM_RANGE(0xe00002, 0xe00003) AM_WRITE(datatype_w) // selects which 'type' of data we're writing
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(addr_high_w) // high address, and some mode bits
-	AM_RANGE(0xe00006, 0xe00007) AM_WRITE(addr_low_w)  // low address
+	map(0xe00000, 0xe00001).w(FUNC(isgsm_state::data_w)); // writes decompressed data here (copied from RAM..)
+	map(0xe00002, 0xe00003).w(FUNC(isgsm_state::datatype_w)); // selects which 'type' of data we're writing
+	map(0xe00004, 0xe00005).w(FUNC(isgsm_state::addr_high_w)); // high address, and some mode bits
+	map(0xe00006, 0xe00007).w(FUNC(isgsm_state::addr_low_w));  // low address
 
-	AM_RANGE(0xe80000, 0xe80001) AM_READ(cart_data_r) // 8-bit port that the entire cart can be read from
-	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("CARDDSW")
-	AM_RANGE(0xe80004, 0xe80005) AM_WRITE(cart_addr_high_w)
-	AM_RANGE(0xe80006, 0xe80007) AM_WRITE(cart_addr_low_w)
-	AM_RANGE(0xe80008, 0xe80009) AM_READWRITE(cart_security_high_r, cart_security_high_w) // 32-bit bitswap device..
-	AM_RANGE(0xe8000a, 0xe8000b) AM_READWRITE(cart_security_low_r,  cart_security_low_w)
+	map(0xe80000, 0xe80001).r(FUNC(isgsm_state::cart_data_r)); // 8-bit port that the entire cart can be read from
+	map(0xe80002, 0xe80003).portr("CARDDSW");
+	map(0xe80004, 0xe80005).w(FUNC(isgsm_state::cart_addr_high_w));
+	map(0xe80006, 0xe80007).w(FUNC(isgsm_state::cart_addr_low_w));
+	map(0xe80008, 0xe80009).rw(FUNC(isgsm_state::cart_security_high_r), FUNC(isgsm_state::cart_security_high_w)); // 32-bit bitswap device..
+	map(0xe8000a, 0xe8000b).rw(FUNC(isgsm_state::cart_security_low_r), FUNC(isgsm_state::cart_security_low_w));
 
-	AM_RANGE(0xee0000, 0xefffff) AM_ROM AM_REGION("gamecart_rgn", 0) // only the first 0x20000 bytes of the cart are visible here..
+	map(0xee0000, 0xefffff).rom().region("gamecart_rgn", 0); // only the first 0x20000 bytes of the cart are visible here..
 
-	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE(sound_w16)
-	AM_RANGE(0xfe0008, 0xfe0009) AM_WRITE(sound_reset_w)
-	AM_RANGE(0xfe000a, 0xfe000b) AM_WRITE(main_bank_change_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0xfe0006, 0xfe0007).w(FUNC(isgsm_state::sound_w16));
+	map(0xfe0008, 0xfe0009).w(FUNC(isgsm_state::sound_reset_w));
+	map(0xfe000a, 0xfe000b).w(FUNC(isgsm_state::main_bank_change_w));
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 
 
 
@@ -9727,26 +9922,30 @@ void isgsm_state::machine_reset()
 			m_sprites->set_bank(i, i);
 
 	membank(ISGSM_MAIN_BANK)->set_base(memregion("bios")->base());
-	m_maincpu->reset();
 }
 
 
-MACHINE_CONFIG_START(isgsm_state::isgsm)
+void isgsm_state::isgsm(machine_config &config)
+{
 	system16b(config);
 	// basic machine hardware
 
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_REMOVE("mapper")
+	config.device_remove("maincpu");
+	config.device_remove("mapper");
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
-	MCFG_CPU_PROGRAM_MAP(isgsm_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
+	M68000(config, m_maincpu, 16000000); // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	m_maincpu->set_addrmap(AS_PROGRAM, &isgsm_state::isgsm_map);
+	m_maincpu->set_vblank_int("screen", FUNC(isgsm_state::irq4_line_hold));
 
-MACHINE_CONFIG_END
+	m_soundcpu->set_addrmap(AS_PROGRAM, &isgsm_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &isgsm_state::bootleg_sound_portmap);
 
-DRIVER_INIT_MEMBER(isgsm_state,isgsm)
+	GENERIC_LATCH_8(config, m_soundlatch);
+}
+
+void isgsm_state::init_isgsm()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 
 	// decrypt the bios...
 	std::vector<uint16_t> temp(0x20000/2);
@@ -9756,7 +9955,7 @@ DRIVER_INIT_MEMBER(isgsm_state,isgsm)
 	memcpy(rom, &temp[0], 0x20000);
 }
 
-DRIVER_INIT_MEMBER(isgsm_state,shinfz)
+void isgsm_state::init_shinfz()
 {
 	init_isgsm();
 
@@ -9770,7 +9969,7 @@ DRIVER_INIT_MEMBER(isgsm_state,shinfz)
 	m_security_callback = security_callback_delegate(&isgsm_state::shinfz_security, this);
 }
 
-DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
+void isgsm_state::init_tetrbx()
 {
 	init_isgsm();
 
@@ -9815,9 +10014,9 @@ ROM_END
 
 
 
-//             YEAR, NAME,   PARENT, MACHINE,INPUT,  INIT,                       MONITOR, COMPANY,         FULLNAME, FLAGS
-GAME(          2006, isgsm,  0,      isgsm,  isgsm,  isgsm_state,isgsm,  ROT0,   "bootleg (ISG)", "ISG Selection Master Type 2006 BIOS", MACHINE_IS_BIOS_ROOT )
+//             YEAR, NAME,   PARENT  MACHINE  INPUT   CLASS        INIT         MONITOR  COMPANY          FULLNAME, FLAGS
+GAME(          2006, isgsm,  0,      isgsm,   isgsm,  isgsm_state, init_isgsm,  ROT0,    "bootleg (ISG)", "ISG Selection Master Type 2006 BIOS", MACHINE_IS_BIOS_ROOT )
 
 /* 01 */ // ?? unknown
-/* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm,  tetrbx, isgsm_state,tetrbx, ROT0,   "bootleg (ISG)", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
-/* 03 */ GAME( 2008, shinfz, isgsm,  isgsm,  shinfz, isgsm_state,shinfz, ROT0,   "bootleg (ISG)", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 ) // claims it's released in 2006, but set includes the PS2/S16 remake of Fantasy Zone II which is clearly from 2008
+/* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm,   tetrbx, isgsm_state, init_tetrbx, ROT0,    "bootleg (ISG)", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
+/* 03 */ GAME( 2008, shinfz, isgsm,  isgsm,   shinfz, isgsm_state, init_shinfz, ROT0,    "bootleg (ISG)", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 ) // claims it's released in 2006, but set includes the PS2/S16 remake of Fantasy Zone II which is clearly from 2008

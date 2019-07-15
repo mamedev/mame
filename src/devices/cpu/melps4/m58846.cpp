@@ -10,18 +10,20 @@
 #include "m58846.h"
 
 
-DEFINE_DEVICE_TYPE(M58846, m58846_device, "m58846", "M58846")
+DEFINE_DEVICE_TYPE(M58846, m58846_device, "m58846", "Mitsubishi M58846")
 
 
 // internal memory maps
-ADDRESS_MAP_START(m58846_device::program_2kx9)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void m58846_device::program_2kx9(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
-ADDRESS_MAP_START(m58846_device::data_128x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void m58846_device::data_128x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
 
 // device definitions

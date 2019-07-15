@@ -63,6 +63,10 @@
 //      LPARAM = ID you wish to know about
 #define OM_MAME_GET_ID_STRING       TEXT("MAMEOutputGetIDString")
 
+// IM_MAME_MESSAGE: send message to MAME
+//      WPARAM = ID of the message
+//      LPARAM = value
+#define IM_MAME_MESSAGE             TEXT("MAMEInputMessage")
 
 //
 // These constants are used to identify WM_COPYDATA messages

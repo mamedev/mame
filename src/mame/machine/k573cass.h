@@ -16,9 +16,6 @@
 #include "machine/x76f100.h"
 #include "machine/zs01.h"
 
-#define MCFG_KONAMI573_CASSETTE_DSR_HANDLER(_devcb) \
-	devcb = &konami573_cassette_slot_device::set_dsr_handler(*device, DEVCB_##_devcb);
-
 
 DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_SLOT, konami573_cassette_slot_device)
 
@@ -32,7 +29,7 @@ class konami573_cassette_slot_device : public device_t,
 public:
 	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_dsr_handler(device_t &device, Object &&cb) { return downcast<konami573_cassette_slot_device &>(device).m_dsr_handler.set_callback(std::forward<Object>(cb)); }
+	auto dsr_handler() { return m_dsr_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_line_d0);
 	DECLARE_WRITE_LINE_MEMBER(write_line_d1);
@@ -107,7 +104,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	required_device<x76f041_device> m_x76f041;
 };
 
@@ -128,7 +124,7 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5) override;
 
-	ADC083X_INPUT_CB(punchmania_inputs_callback);
+	double punchmania_inputs_callback(uint8_t input);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -141,46 +137,21 @@ private:
 
 DECLARE_DEVICE_TYPE(KONAMI573_CASSETTE_Y, konami573_cassette_y_device)
 
-
-#define MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d0_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d1_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_KONAMI573_CASSETTE_Y_D2_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d2_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d3_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d4_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d5_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d6_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER(_devcb) \
-	devcb = &konami573_cassette_y_device::set_d7_handler(*device, DEVCB_##_devcb);
-
 class konami573_cassette_y_device: public device_t,
 	public konami573_cassette_interface
 {
 public:
 	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_d0_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d0_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d1_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d2_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d2_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d3_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d3_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d4_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d4_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d5_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d5_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d6_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d6_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_d7_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d7_handler.set_callback(object); }
+	// configuration helpers
+	auto d0_handler() { return m_d0_handler.bind(); }
+	auto d1_handler() { return m_d1_handler.bind(); }
+	auto d2_handler() { return m_d2_handler.bind(); }
+	auto d3_handler() { return m_d3_handler.bind(); }
+	auto d4_handler() { return m_d4_handler.bind(); }
+	auto d5_handler() { return m_d5_handler.bind(); }
+	auto d6_handler() { return m_d6_handler.bind(); }
+	auto d7_handler() { return m_d7_handler.bind(); }
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;
@@ -198,8 +169,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	required_device<x76f100_device> m_x76f100;
+
+private:
 	devcb_write_line m_d0_handler;
 	devcb_write_line m_d1_handler;
 	devcb_write_line m_d2_handler;

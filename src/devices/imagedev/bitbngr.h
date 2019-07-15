@@ -13,8 +13,8 @@ class bitbanger_device : public device_t,
 	public device_image_interface
 {
 public:
-	static void static_set_interface(device_t &device, const char *_interface) { downcast<bitbanger_device &>(device).m_interface = _interface; }
-	static void static_set_readonly(device_t &device, bool is_readonly) { downcast<bitbanger_device &>(device).m_is_readonly = is_readonly; }
+	void set_interface(const char *interface) { m_interface = interface; }
+	void set_readonly(bool is_readonly) { m_is_readonly = is_readonly; }
 
 	// construction/destruction
 	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -48,10 +48,6 @@ private:
 	bool m_is_readonly;
 };
 
-#define MCFG_BITBANGER_INTERFACE(_interface) \
-	bitbanger_device::static_set_interface(*device, _interface);
-#define MCFG_BITBANGER_READONLY(_readonly) \
-	bitbanger_device::static_set_readonly(*device, _readonly);
 
 // device type definition
 DECLARE_DEVICE_TYPE(BITBANGER, bitbanger_device)

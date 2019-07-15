@@ -355,7 +355,7 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, 
 
 ***********************************************************************************************/
 
-void okim6376_device::postload()
+void okim6376_device::device_post_load()
 {
 	notify_clock_changed();
 }
@@ -378,21 +378,21 @@ void okim6376_device::okim6376_state_save_register()
 	{
 		adpcm_state_save_register(&m_voice[j], j);
 	}
-		machine().save().register_postload(save_prepost_delegate(FUNC(okim6376_device::postload), this));
-		save_item(NAME(m_command[0]));
-		save_item(NAME(m_command[1]));
-		save_item(NAME(m_stage[0]));
-		save_item(NAME(m_stage[1]));
-		save_item(NAME(m_latch));
-		save_item(NAME(m_divisor));
-		save_item(NAME(m_nar));
-		save_item(NAME(m_nartimer));
-		save_item(NAME(m_busy));
-		save_item(NAME(m_st));
-		save_item(NAME(m_st_pulses));
-		save_item(NAME(m_st_update));
-		save_item(NAME(m_ch2));
-		save_item(NAME(m_ch2_update));
+
+	save_item(NAME(m_command[0]));
+	save_item(NAME(m_command[1]));
+	save_item(NAME(m_stage[0]));
+	save_item(NAME(m_stage[1]));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_divisor));
+	save_item(NAME(m_nar));
+	save_item(NAME(m_nartimer));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_st));
+	save_item(NAME(m_st_pulses));
+	save_item(NAME(m_st_update));
+	save_item(NAME(m_ch2));
+	save_item(NAME(m_ch2_update));
 }
 
 void okim6376_device::device_clock_changed()
@@ -513,7 +513,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 
 ***********************************************************************************************/
 
-WRITE8_MEMBER( okim6376_device::write )
+void okim6376_device::write(uint8_t data)
 {
 	// The data port is purely used to set the latch, everything else is started by an ST pulse
 

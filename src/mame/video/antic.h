@@ -50,7 +50,7 @@ public:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	static void set_gtia_tag(device_t &device, const char *tag) { downcast<antic_device &>(device).m_gtia_tag = tag; }
+	template <typename T> void set_gtia_tag(T &&tag) { m_gtia.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -113,8 +113,7 @@ private:
 	};
 
 
-	const char *m_gtia_tag;
-	gtia_device  *m_gtia;
+	required_device<gtia_device> m_gtia;
 	required_device<cpu_device> m_maincpu;
 	optional_ioport m_djoy_b;
 	optional_ioport m_artifacts;
@@ -208,26 +207,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_ANTIC, antic_device)
-
-
-
-#define MCFG_ANTIC_GTIA(_tag) \
-		antic_device::set_gtia_tag(*device, _tag);
-
-#define MCFG_SCREEN_VISIBLE_AREA_ANTIC() \
-		MCFG_SCREEN_VISIBLE_AREA(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y)
-
-#define MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ() \
-		MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_50HZ)
-
-#define MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ() \
-		MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
-
-#define MCFG_SCREEN_SIZE_ANTIC_50HZ() \
-		MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ)
-
-#define MCFG_SCREEN_SIZE_ANTIC_60HZ() \
-		MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
-
 
 #endif // MAME_VIDEO_ANTIC_H

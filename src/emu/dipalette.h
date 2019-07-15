@@ -42,9 +42,6 @@ class device_palette_interface : public device_interface
 	static constexpr int MAX_SHADOW_PRESETS = 4;
 
 public:
-	// construction/destruction
-	device_palette_interface(const machine_config &mconfig, device_t &device);
-
 	// getters
 	u32 entries() const { return palette_entries(); }
 	u32 indirect_entries() const { return palette_indirect_entries(); }
@@ -66,6 +63,7 @@ public:
 	void set_pen_blue_level(pen_t pen, u8 level) { m_palette->entry_set_blue_level(pen, level); }
 	void set_pen_color(pen_t pen, u8 r, u8 g, u8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
 	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
+	template <size_t N> void set_pen_colors(pen_t color_base, const rgb_t (&colors)[N]) { set_pen_colors(color_base, colors, N); }
 	void set_pen_colors(pen_t color_base, const std::vector<rgb_t> &colors) { for (unsigned int i=0; i != colors.size(); i++) set_pen_color(color_base+i, colors[i]); }
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
 
@@ -82,6 +80,9 @@ public:
 	void set_shadow_mode(int mode) { assert(mode >= 0 && mode < MAX_SHADOW_PRESETS); m_shadow_table = m_shadow_tables[mode].base; }
 
 protected:
+	// construction/destruction
+	device_palette_interface(const machine_config &mconfig, device_t &device);
+
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;

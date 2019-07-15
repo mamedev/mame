@@ -9,13 +9,6 @@
 
 typedef device_delegate<void (int&, int&, int&, int&)> snk68_tile_indirection_delegate;
 
-#define MCFG_SNK68_SPR_GFXDECODE(_gfxtag) \
-	snk68_spr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-#define MCFG_SNK68_SPR_SET_TILE_INDIRECT( _class, _method) \
-	snk68_spr_device::set_tile_indirect_cb(*device, snk68_tile_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-#define MCFG_SNK68_SPR_NO_PARTIAL \
-	snk68_spr_device::static_set_no_partial(*device);
-
 
 class snk68_spr_device : public device_t
 {
@@ -23,9 +16,9 @@ public:
 	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_tile_indirect_cb(device_t &device,snk68_tile_indirection_delegate newtilecb);
-	static void static_set_no_partial(device_t &device);
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb = snk68_tile_indirection_delegate(std::forward<T>(args)...); }
+	void set_no_partial() { m_partialupdates = 0; }
 
 	DECLARE_READ16_MEMBER(spriteram_r);
 	DECLARE_WRITE16_MEMBER(spriteram_w);
@@ -35,7 +28,7 @@ public:
 	snk68_tile_indirection_delegate m_newtilecb;
 
 	void tile_callback_noindirect(int& tile, int& fx, int& fy, int& region);
-	void set_flip(int flip);
+	void set_flip(bool flip);
 
 protected:
 	virtual void device_start() override;
@@ -45,7 +38,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<screen_device> m_screen;
-	int m_flipscreen;
+	bool m_flipscreen;
 	int m_partialupdates; // the original hardware needs this, the cloned hardware does not.
 };
 

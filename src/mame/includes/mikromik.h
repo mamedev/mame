@@ -1,14 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_MIKROMIK_H
+#define MAME_INCLUDES_MIKROMIK_H
 
-#ifndef MAME_INCLUDES_MIKROMIKKO_H
-#define MAME_INCLUDES_MIKROMIKKO_H
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "formats/mm_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
+#include "machine/bankdev.h"
 #include "machine/i8212.h"
 #include "machine/mm1kb.h"
 #include "machine/pit8253.h"
@@ -17,6 +19,7 @@
 #include "machine/upd765.h"
 #include "video/i8275.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define I8085A_TAG      "ic40"
@@ -38,6 +41,7 @@ public:
 	mm1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8085A_TAG),
+		m_io(*this, "io"),
 		m_iop(*this, I8212_TAG),
 		m_dmac(*this, I8237_TAG),
 		m_pit(*this, I8253_TAG),
@@ -63,7 +67,18 @@ public:
 		m_fdc_tc(0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void mm1(machine_config &config);
+	void mm1m6(machine_config &config);
+	void mm1m6_video(machine_config &config);
+	void mm1m7(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<i8085a_cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_io;
 	required_device<i8212_device> m_iop;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
@@ -83,28 +98,6 @@ public:
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint16_t> m_video_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( ls259_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
-	DECLARE_READ8_MEMBER( mpsc_dack_r );
-	DECLARE_WRITE8_MEMBER( mpsc_dack_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_WRITE_LINE_MEMBER( itxc_w );
-	DECLARE_WRITE_LINE_MEMBER( irxc_w );
-	DECLARE_WRITE_LINE_MEMBER( auxc_w );
-	DECLARE_WRITE_LINE_MEMBER( drq2_w );
-	DECLARE_WRITE_LINE_MEMBER( drq1_w );
-	DECLARE_READ_LINE_MEMBER( dsra_r );
-
-	void update_tc();
-
 	int m_a8;
 
 	// video state
@@ -122,16 +115,39 @@ public:
 	int m_tc;
 	int m_fdc_tc;
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( a8_w );
+	DECLARE_WRITE_LINE_MEMBER( recall_w );
+	DECLARE_WRITE_LINE_MEMBER( rx21_w );
+	DECLARE_WRITE_LINE_MEMBER( tx21_w );
+	DECLARE_WRITE_LINE_MEMBER( rcl_w );
+	DECLARE_WRITE_LINE_MEMBER( intc_w );
+	DECLARE_WRITE_LINE_MEMBER( llen_w );
+	DECLARE_WRITE_LINE_MEMBER( motor_on_w );
+	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
+	DECLARE_READ8_MEMBER( mpsc_dack_r );
+	DECLARE_WRITE8_MEMBER( mpsc_dack_w );
+	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
+	DECLARE_WRITE_LINE_MEMBER( dack3_w );
+	DECLARE_WRITE_LINE_MEMBER( itxc_w );
+	DECLARE_WRITE_LINE_MEMBER( irxc_w );
+	DECLARE_WRITE_LINE_MEMBER( auxc_w );
+	DECLARE_WRITE_LINE_MEMBER( drq2_w );
+	DECLARE_WRITE_LINE_MEMBER( drq1_w );
+	DECLARE_READ_LINE_MEMBER( dsra_r );
+
+	void update_tc();
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	DECLARE_PALETTE_INIT( mm1 );
-	void mm1(machine_config &config);
-	void mm1m6(machine_config &config);
-	void mm1m6_video(machine_config &config);
-	void mm1m7(machine_config &config);
+	void mm1_palette(palette_device &palette) const;
 	void mm1_map(address_map &map);
+	void mmu_io_map(address_map &map);
 	void mm1_upd7220_map(address_map &map);
 };
 
-#endif
+#endif // MAME_INCLUDES_MIKROMIK_H

@@ -36,32 +36,6 @@
 
 #pragma once
 
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ISBX_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, ISBX_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_ISBX_SLOT_MINTR0_CALLBACK(_mintr0) \
-	downcast<isbx_slot_device *>(device)->set_mintr0_callback(DEVCB_##_mintr0);
-
-#define MCFG_ISBX_SLOT_MINTR1_CALLBACK(_mintr1) \
-	downcast<isbx_slot_device *>(device)->set_mintr1_callback(DEVCB_##_mintr1);
-
-#define MCFG_ISBX_SLOT_MDRQT_CALLBACK(_mdrqt) \
-	downcast<isbx_slot_device *>(device)->set_mdrqt_callback(DEVCB_##_mdrqt);
-
-#define MCFG_ISBX_SLOT_MWAIT_CALLBACK(_mwait) \
-	downcast<isbx_slot_device *>(device)->set_mwait_callback(DEVCB_##_mwait);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -73,12 +47,12 @@ class isbx_slot_device;
 class device_isbx_card_interface : public device_slot_card_interface
 {
 public:
-	virtual uint8_t mcs0_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) { }
-	virtual uint8_t mcs1_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mcs1_w(address_space &space, offs_t offset, uint8_t data) { }
-	virtual uint8_t mdack_r(address_space &space, offs_t offset) { return 0xff; }
-	virtual void mdack_w(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t mcs0_r(offs_t offset) { return 0xff; }
+	virtual void mcs0_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t mcs1_r(offs_t offset) { return 0xff; }
+	virtual void mcs1_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t mdack_r(offs_t offset) { return 0xff; }
+	virtual void mdack_w(offs_t offset, uint8_t data) { }
 	virtual int opt0_r() { return 1; }
 	virtual void opt0_w(int state) { }
 	virtual int opt1_r() { return 1; }
@@ -101,20 +75,29 @@ class isbx_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	isbx_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+		: isbx_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	isbx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> void set_mintr0_callback(Object &&cb) { m_write_mintr0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_mintr1_callback(Object &&cb) { m_write_mintr1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_mdrqt_callback(Object &&cb) { m_write_mdrqt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_mwait_callback(Object &&cb) { m_write_mwait.set_callback(std::forward<Object>(cb)); }
+	auto mintr0() { return m_write_mintr0.bind(); }
+	auto mintr1() { return m_write_mintr1.bind(); }
+	auto mdrqt() { return m_write_mdrqt.bind(); }
+	auto mwait() { return m_write_mwait.bind(); }
 
 	// computer interface
-	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs0_w ) { if (m_card) m_card->mcs0_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mcs1_r ) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs1_w ) { if (m_card) m_card->mcs1_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mdack_r ) { return m_card ? m_card->mdack_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mdack_w ) { if (m_card) m_card->mdack_w(space, offset, data); }
+	uint8_t mcs0_r(offs_t offset) { return m_card ? m_card->mcs0_r(offset) : 0xff; }
+	void mcs0_w(offs_t offset, uint8_t data) { if (m_card) m_card->mcs0_w(offset, data); }
+	uint8_t mcs1_r(offs_t offset) { return m_card ? m_card->mcs1_r(offset) : 0xff; }
+	void mcs1_w(offs_t offset, uint8_t data) { if (m_card) m_card->mcs1_w(offset, data); }
+	uint8_t mdack_r(offs_t offset) { return m_card ? m_card->mdack_r(offset) : 0xff; }
+	void mdack_w(offs_t offset, uint8_t data) { if (m_card) m_card->mdack_w(offset, data); }
 	DECLARE_READ_LINE_MEMBER( mpst_r ) { return m_card == nullptr; }
 	DECLARE_READ_LINE_MEMBER( opt0_r ) { return m_card ? m_card->opt0_r() : 1; }
 	DECLARE_WRITE_LINE_MEMBER( opt0_w ) { if (m_card) m_card->opt0_w(state); }
@@ -147,7 +130,7 @@ protected:
 DECLARE_DEVICE_TYPE(ISBX_SLOT, isbx_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( isbx_cards );
+void isbx_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ISBX_ISBX_SLOT_H

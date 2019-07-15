@@ -30,8 +30,8 @@ protected:
 
 private:
 	void el2_3c503_irq_w(int state);
-	DECLARE_READ8_MEMBER(el2_3c503_mem_read);
-	DECLARE_WRITE8_MEMBER(el2_3c503_mem_write);
+	DECLARE_READ8_MEMBER(el2_3c503_mem_r) { return el2_3c503_mem_read(offset); }
+	DECLARE_WRITE8_MEMBER(el2_3c503_mem_w) { el2_3c503_mem_write(offset, data); }
 
 	required_device<dp8390d_device> m_dp8390;
 	uint8_t m_board_ram[8*1024];

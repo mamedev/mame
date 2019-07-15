@@ -153,13 +153,13 @@ std::string videobrain_expansion_slot_device::get_default_card_software(get_defa
 //  bo_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset, int cs1, int cs2)
+uint8_t videobrain_expansion_slot_device::bo_r(offs_t offset, int cs1, int cs2)
 {
 	uint8_t data = 0;
 
 	if (m_cart != nullptr)
 	{
-		data = m_cart->videobrain_bo_r(space, offset, cs1, cs2);
+		data = m_cart->videobrain_bo_r(offset, cs1, cs2);
 	}
 
 	return data;
@@ -170,11 +170,11 @@ uint8_t videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offs
 //  bo_w - cartridge data write
 //-------------------------------------------------
 
-void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2)
+void videobrain_expansion_slot_device::bo_w(offs_t offset, uint8_t data, int cs1, int cs2)
 {
 	if (m_cart != nullptr)
 	{
-		m_cart->videobrain_bo_w(space, offset, data, cs1, cs2);
+		m_cart->videobrain_bo_w(offset, data, cs1, cs2);
 	}
 }
 
@@ -188,8 +188,9 @@ void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset,
 #include "money_minder.h"
 #include "timeshare.h"
 
-SLOT_INTERFACE_START( vidbrain_expansion_cards )
-	SLOT_INTERFACE_INTERNAL("standard", VB_STD)
-	SLOT_INTERFACE_INTERNAL("moneyminder", VB_MONEY_MINDER)
-	SLOT_INTERFACE_INTERNAL("timeshare", VB_TIMESHARE)
-SLOT_INTERFACE_END
+void vidbrain_expansion_cards(device_slot_interface &device)
+{
+	device.option_add_internal("standard", VB_STD);
+	device.option_add_internal("moneyminder", VB_MONEY_MINDER);
+	device.option_add_internal("timeshare", VB_TIMESHARE);
+}

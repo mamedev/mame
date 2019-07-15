@@ -5,25 +5,10 @@
 
 #pragma once
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SPU_IRQ_HANDLER(_devcb) \
-	devcb = &spu_device::set_irq_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SPU_ADD(_tag, _clock) \
-	MCFG_DEVICE_MODIFY( "maincpu" ) \
-	MCFG_PSX_SPU_READ_HANDLER(DEVREAD16(_tag, spu_device, read)) \
-	MCFG_PSX_SPU_WRITE_HANDLER(DEVWRITE16(_tag, spu_device, write)) \
-	MCFG_DEVICE_ADD(_tag, SPU, _clock) \
-	MCFG_SPU_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin9)) \
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psxdma_device::read_delegate(&spu_device::dma_read, (spu_device *) device ) ) \
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 4, psxdma_device::write_delegate(&spu_device::dma_write, (spu_device *) device ) )
-
 // ======================> spu_device
 
 class stream_buffer;
+class psxcpu_device;
 
 class spu_device : public device_t, public device_sound_interface
 {
@@ -66,38 +51,39 @@ protected:
 
 	unsigned char *spu_ram;
 	reverb *rev;
-	unsigned int taddr, sample_t;
+	unsigned int taddr;
+	unsigned int sample_t;
 
-	stream_buffer *xa_buffer, *cdda_buffer;
-	unsigned int xa_cnt,cdda_cnt,
-					xa_freq,cdda_freq,
-					xa_channels,
-					xa_spf,
-					xa_out_ptr,
-					cur_frame_sample,
-					cur_generate_sample,
-					dirty_flags;
+	stream_buffer *xa_buffer;
+	stream_buffer *cdda_buffer;
+	unsigned int xa_cnt;
+	unsigned int cdda_cnt;
+	unsigned int xa_freq;
+	unsigned int cdda_freq;
+	unsigned int xa_channels;
+	unsigned int xa_spf;
+	unsigned int xa_out_ptr;
+	unsigned int cur_frame_sample;
+	unsigned int cur_generate_sample;
+	unsigned int dirty_flags;
 
 	uint16_t m_cd_out_ptr;
 
 	signed short xa_last[4];
-	bool status_enabled,
-				xa_playing,
-				cdda_playing;
-	int xa_voll,xa_volr,
-			changed_xa_vol;
+	bool status_enabled, xa_playing, cdda_playing;
+	int xa_voll, xa_volr, changed_xa_vol;
 	voiceinfo *voice;
 	sample_cache **cache;
-	float samples_per_frame,
-				samples_per_cycle;
+	float samples_per_frame;
+	float samples_per_cycle;
 
 	static float freq_multiplier;
 
 	unsigned char *output_buf[4];
-	unsigned int output_head,
-								output_tail,
-								output_size,
-								cur_qsz;
+	unsigned int output_head;
+	unsigned int output_tail;
+	unsigned int output_size;
+	unsigned int cur_qsz;
 
 	unsigned int noise_t;
 	signed short noise_cur;
@@ -107,14 +93,14 @@ protected:
 
 	struct voicereg
 	{
-		unsigned short vol_l,   // 0
-										vol_r, // 2
-										pitch, // 4
-										addr,  // 6
-										adsl,  // 8
-										srrr,  // a
-										curvol, // c
-										repaddr; // e
+		unsigned short vol_l;   // 0
+		unsigned short vol_r;   // 2
+		unsigned short pitch;   // 4
+		unsigned short addr;    // 6
+		unsigned short adsl;    // 8
+		unsigned short srrr;    // a
+		unsigned short curvol;  // c
+		unsigned short repaddr; // e
 	};
 
 	union
@@ -123,23 +109,27 @@ protected:
 		struct
 		{
 			voicereg voice[24];
-			unsigned short mvol_l,mvol_r,
-											rvol_l,rvol_r;
-			unsigned int keyon,
-										keyoff,
-										fm,
-										noise,
-										reverb,
-										chon;
-			unsigned short _unknown,
-											reverb_addr,
-											irq_addr,
-											trans_addr,
-											data,
-											ctrl;
+			unsigned short mvol_l;
+			unsigned short mvol_r;
+			unsigned short rvol_l;
+			unsigned short rvol_r;
+			unsigned int keyon;
+			unsigned int keyoff;
+			unsigned int fm;
+			unsigned int noise;
+			unsigned int reverb;
+			unsigned int chon;
+			unsigned short _unknown;
+			unsigned short reverb_addr;
+			unsigned short irq_addr;
+			unsigned short trans_addr;
+			unsigned short data;
+			unsigned short ctrl;
 			unsigned int status;
-			signed short cdvol_l,cdvol_r,
-										exvol_l,exvol_r;
+			signed short cdvol_l;
+			signed short cdvol_r;
+			signed short exvol_l;
+			signed short exvol_r;
 		} spureg;
 	};
 
@@ -160,18 +150,9 @@ protected:
 	bool update_envelope(const int v);
 	void write_data(const unsigned short data);
 	void generate(void *ptr, const unsigned int sz);
-	void generate_voice(const unsigned int v,
-											void *ptr,
-											void *noiseptr,
-											void *outxptr,
-											const unsigned int sz);
+	void generate_voice(const unsigned int v, void *ptr, void *noiseptr, void *outxptr, const unsigned int sz);
 	void generate_noise(void *ptr, const unsigned int num);
-	bool process_voice(const unsigned int v,
-											const unsigned int sz,
-											void *ptr,
-											void *fmnoise_ptr,
-											void *outxptr,
-											unsigned int *tleft);
+	bool process_voice(const unsigned int v, const unsigned int sz, void *ptr, void *fmnoise_ptr, void *outxptr, unsigned int *tleft);
 	void process_until(const unsigned int tsample);
 	void update_voice_loop(const unsigned int v);
 	bool update_voice_state(const unsigned int v);
@@ -189,9 +170,7 @@ protected:
 
 	bool translate_sample_addr(const unsigned int addr, cache_pointer *cp);
 	sample_cache *get_sample_cache(const unsigned int addr);
-	void flush_cache(sample_cache *sc,
-										const unsigned int istart,
-										const unsigned int iend);
+	void flush_cache(sample_cache *sc, const unsigned int istart, const unsigned int iend);
 	void invalidate_cache(const unsigned int st, const unsigned int en);
 
 	void set_xa_format(const float freq, const int channels);
@@ -203,17 +182,10 @@ protected:
 
 	void flush_output_buffer();
 
-	sample_loop_cache *get_loop_cache(sample_cache *cache,
-																		const unsigned int lpen,
-																		sample_cache *lpcache,
-																		const unsigned int lpst);
+	sample_loop_cache *get_loop_cache(sample_cache *cache, const unsigned int lpen, sample_cache *lpcache, const unsigned int lpst);
 #if 0
-	void write_cache_pointer(outfile *fout,
-														cache_pointer *cp,
-														sample_loop_cache *lc=nullptr);
-	void read_cache_pointer(infile *fin,
-													cache_pointer *cp,
-													sample_loop_cache **lc=nullptr);
+	void write_cache_pointer(outfile *fout, cache_pointer *cp, sample_loop_cache *lc=nullptr);
+	void read_cache_pointer(infile *fin, cache_pointer *cp, sample_loop_cache **lc=nullptr);
 #endif
 	static float get_linear_rate(const int n);
 	static float get_linear_rate_neg_phase(const int n);
@@ -228,10 +200,11 @@ protected:
 	static reverb_preset *find_reverb_preset(const unsigned short *param);
 
 public:
+	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<spu_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );

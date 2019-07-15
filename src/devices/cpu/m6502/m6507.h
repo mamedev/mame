@@ -4,7 +4,7 @@
 
     m6507.h
 
-    Mostek 6502, NMOS variant with reduced address bus
+    MOS Technology 6502, NMOS variant with reduced address bus
 
 ***************************************************************************/
 

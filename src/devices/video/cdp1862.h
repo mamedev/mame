@@ -30,35 +30,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define CPD1862_CLOCK   XTAL(7'159'090)
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDP1861_RD_CALLBACK(_read) \
-	devcb = &cdp1862_device::set_rd_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_CDP1861_BD_CALLBACK(_read) \
-	devcb = &cdp1862_device::set_bd_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_CDP1861_GD_CALLBACK(_read) \
-	devcb = &cdp1862_device::set_gd_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_CDP1862_LUMINANCE(_r, _b, _g, _bkg) \
-	cdp1862_device::static_set_luminance(*device, _r, _b, _g, _bkg);
-
-#define MCFG_CDP1862_CHROMINANCE(_r, _b, _g, _bkg) \
-	cdp1862_device::static_set_chrominance(*device, _r, _b, _g, _bkg);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -71,14 +42,14 @@ public:
 	// construction/destruction
 	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_rd_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1862_device &>(device).m_read_rd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_bd_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1862_device &>(device).m_read_bd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_gd_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1862_device &>(device).m_read_gd.set_callback(std::forward<Object>(cb)); }
+	auto rdata_cb() { return m_read_rd.bind(); }
+	auto bdata_cb() { return m_read_bd.bind(); }
+	auto gdata_cb() { return m_read_gd.bind(); }
 
-	static void static_set_luminance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_lum_r = r; downcast<cdp1862_device &>(device).m_lum_b = b; downcast<cdp1862_device &>(device).m_lum_g = g; downcast<cdp1862_device &>(device).m_lum_bkg = bkg; }
-	static void static_set_chrominance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_chr_r = r; downcast<cdp1862_device &>(device).m_chr_b = b; downcast<cdp1862_device &>(device).m_chr_g = g; downcast<cdp1862_device &>(device).m_chr_bkg = bkg; }
+	void set_luminance(double r, double b, double g, double bkg) { m_lum_r = r; m_lum_b = b; m_lum_g = g; m_lum_bkg = bkg; }
+	void set_chrominance(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( bkg_w );
 	DECLARE_WRITE_LINE_MEMBER( con_w );
 

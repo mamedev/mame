@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
 /*
- * video/konamigx.c - Konami GX video hardware (here there be dragons, and achocode)
+ * video/konamigx.cpp - Konami GX video hardware (here there be dragons, and achocode)
  *
  */
 
@@ -735,7 +735,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 		}
 		else
 		{
-			machine().device<k053250_device>("k053250_1")->draw(bitmap, cliprect, m_vcblk[4]<<l, 0, screen.priority(), 0);
+			m_k053250_1->draw(bitmap, cliprect, m_vcblk[4]<<l, 0, screen.priority(), 0);
 		}
 	}
 }
@@ -804,7 +804,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 			}
 		}
 		else
-			machine().device<k053250_device>("k053250_2")->draw(bitmap, cliprect, m_vcblk[5]<<l, 0, screen.priority(), 0);
+			m_k053250_2->draw(bitmap, cliprect, m_vcblk[5]<<l, 0, screen.priority(), 0);
 	}
 }
 

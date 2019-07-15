@@ -6,7 +6,7 @@
   video hardware emulation
 
  -- this seems to be the same as the tumblepop bootleg based hardware
-    in tumbleb.c
+    in tumbleb.cpp
 
 
 */
@@ -15,10 +15,19 @@
 #include "includes/crospang.h"
 
 
-WRITE16_MEMBER(crospang_state::bestri_tilebank_w)
+void crospang_state::tilebank_select_w(u16 data)
 {
-	m_bestri_tilebank = (data>>10) & 0xf;
-	//printf("bestri %04x\n", data);
+	logerror("tilebank_select_w %04x\n", data);
+
+	m_tilebankselect = (data >> 8) & 3;
+}
+
+
+void crospang_state::tilebank_data_w(u16 data)
+{
+	logerror("tilebank_data_w %04x\n", data);
+
+	m_tilebank[m_tilebankselect] = data >> 8;
 
 	m_fg_layer->mark_all_dirty();
 	m_bg_layer->mark_all_dirty();
@@ -26,7 +35,7 @@ WRITE16_MEMBER(crospang_state::bestri_tilebank_w)
 
 
 // Bestri performs some unusual operations on the scroll values before writing them
-WRITE16_MEMBER(crospang_state::bestri_bg_scrolly_w)
+void crospang_state::bestri_bg_scrolly_w(u16 data)
 {
 	// addi.w #$1f8, D0
 	// eori.w #$154, D0
@@ -34,7 +43,7 @@ WRITE16_MEMBER(crospang_state::bestri_bg_scrolly_w)
 	m_bg_layer->set_scrolly(0, -scroll + 7);
 }
 
-WRITE16_MEMBER(crospang_state::bestri_fg_scrolly_w)
+void crospang_state::bestri_fg_scrolly_w(u16 data)
 {
 	// addi.w #$1f8, D0
 	// eori.w #$aa, D0
@@ -42,7 +51,7 @@ WRITE16_MEMBER(crospang_state::bestri_fg_scrolly_w)
 	m_fg_layer->set_scrolly(0, -scroll + 7);
 }
 
-WRITE16_MEMBER(crospang_state::bestri_fg_scrollx_w)
+void crospang_state::bestri_fg_scrollx_w(u16 data)
 {
 	// addi.w #$400, D1
 	// eori.w #$1e0, D1
@@ -50,7 +59,7 @@ WRITE16_MEMBER(crospang_state::bestri_fg_scrollx_w)
 	m_fg_layer->set_scrollx(0, scroll - 1);
 }
 
-WRITE16_MEMBER(crospang_state::bestri_bg_scrollx_w)
+void crospang_state::bestri_bg_scrollx_w(u16 data)
 {
 	// addi.w #$3fc, D1
 	// eori.w #$3c0, D1
@@ -59,34 +68,34 @@ WRITE16_MEMBER(crospang_state::bestri_bg_scrollx_w)
 }
 
 
-WRITE16_MEMBER(crospang_state::crospang_fg_scrolly_w)
+void crospang_state::fg_scrolly_w(u16 data)
 {
 	m_fg_layer->set_scrolly(0, data + 8);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_bg_scrolly_w)
+void crospang_state::bg_scrolly_w(u16 data)
 {
 	m_bg_layer->set_scrolly(0, data + 8);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_fg_scrollx_w)
+void crospang_state::fg_scrollx_w(u16 data)
 {
 	m_fg_layer->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_bg_scrollx_w)
+void crospang_state::bg_scrollx_w(u16 data)
 {
 	m_bg_layer->set_scrollx(0, data + 4);
 }
 
 
-WRITE16_MEMBER(crospang_state::crospang_fg_videoram_w)
+void crospang_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_bg_videoram_w)
+void crospang_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_layer->mark_tile_dirty(offset);
@@ -95,19 +104,23 @@ WRITE16_MEMBER(crospang_state::crospang_bg_videoram_w)
 TILE_GET_INFO_MEMBER(crospang_state::get_bg_tile_info)
 {
 	int data  = m_bg_videoram[tile_index];
-	int tile  = data & 0xfff;
+	int tile  = data & 0x03ff;
+	int tilebank = (data & 0x0c00) >> 10;
+	tile = tile + (m_tilebank[tilebank] << 10);
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile + m_bestri_tilebank * 0x1000, color + 0x20, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
 {
 	int data  = m_fg_videoram[tile_index];
-	int tile  = data & 0xfff;
+	int tile  = data & 0x03ff;
+	int tilebank = (data & 0x0c00) >> 10;
+	tile = tile + (m_tilebank[tilebank] << 10);
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile + m_bestri_tilebank * 0x1000, color + 0x10, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 0x10, 0);
 }
 
 
@@ -119,7 +132,7 @@ void crospang_state::video_start()
 	m_fg_layer->set_transparent_pen(0);
 }
 
-uint32_t crospang_state::screen_update_crospang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 crospang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(screen, bitmap, cliprect, 0, 0);

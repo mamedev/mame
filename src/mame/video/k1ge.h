@@ -11,23 +11,18 @@
 
 #pragma once
 
-
-#define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
-	MCFG_DEVICE_ADD( _tag, K1GE, _clock ) \
-	MCFG_VIDEO_SET_SCREEN( _screen ) \
-	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB_##_vblank ); \
-	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB_##_hblank );
-
-#define MCFG_K2GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
-	MCFG_DEVICE_ADD( _tag, K2GE, _clock ) \
-	MCFG_VIDEO_SET_SCREEN( _screen ) \
-	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB_##_vblank ); \
-	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB_##_hblank );
-
+#include "emupal.h"
 
 class k1ge_device : public device_t, public device_video_interface
 {
 public:
+	template <typename T>
+	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: k1ge_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+
 	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( read );
@@ -36,8 +31,8 @@ public:
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	// Static methods
-	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_hblank_callback(device_t &device, Object &&cb) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(std::forward<Object>(cb)); }
+	auto vblank_callback() { return m_vblank_pin_w.bind(); }
+	auto hblank_callback() { return m_hblank_pin_w.bind(); }
 
 	static const int K1GE_SCREEN_HEIGHT = 199;
 
@@ -66,13 +61,20 @@ protected:
 	TIMER_CALLBACK_MEMBER( timer_callback );
 
 private:
-	DECLARE_PALETTE_INIT(k1ge);
+	void k1ge_palette(palette_device &palette) const;
 };
 
 
 class k2ge_device : public k1ge_device
 {
 public:
+	template <typename T>
+	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: k2ge_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+
 	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -86,7 +88,7 @@ protected:
 	void k1ge_draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y );
 
 private:
-	DECLARE_PALETTE_INIT(k2ge);
+	void k2ge_palette(palette_device &palette) const;
 };
 
 DECLARE_DEVICE_TYPE(K1GE, k1ge_device)

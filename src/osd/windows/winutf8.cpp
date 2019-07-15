@@ -2,18 +2,18 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  winutf8.c - Win32 OSD core utility functions
+//  winutf8.cpp - Win32 OSD core utility functions
 //
 //============================================================
-
-// standard windows headers
-#include <windows.h>
-#include <shellapi.h>
-#include <stdlib.h>
 
 // MAMEOS headers
 #include "winutf8.h"
 #include "strconv.h"
+
+#include <stdlib.h>
+
+// standard windows headers
+#include <shellapi.h>
 
 
 //============================================================

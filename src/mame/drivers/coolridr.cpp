@@ -286,7 +286,9 @@ to the same bank as defined through A20.
 #include "cpu/sh/sh2.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "machine/315_5649.h"
 #include "sound/scsp.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -303,8 +305,8 @@ to the same bank as defined through A20.
 class coolridr_state : public driver_device
 {
 public:
-	coolridr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	coolridr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_textBytesToWrite(0x00),
 		m_blitterSerialCount(0x00),
 		m_blitterMode(0x00),
@@ -315,20 +317,12 @@ public:
 		//m_dmac(*this, "i8237"),
 		m_framebuffer_vram(*this, "fb_vram"),
 		m_txt_vram(*this, "txt_vram"),
-		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
-		m_sysh1_workram_h(*this, "sysh1_workrah"),
+		m_txt_blit(*this, "txt_blit"),
+		m_workram_h(*this, "workrah"),
 		m_sound_dma(*this, "sound_dma"),
-		m_soundram(*this, "soundram"),
-		m_soundram2(*this, "soundram2"),
+		m_soundram(*this, "soundram%u", 1U),
 		m_rom(*this, "share1"),
-		m_io_an0(*this, "AN0"),
-		m_io_an1(*this, "AN1"),
-		m_io_an2(*this, "AN2"),
-		m_io_an3(*this, "AN3"),
-		m_io_an4(*this, "AN4"),
-		m_io_an5(*this, "AN5"),
-		m_io_an6(*this, "AN6"),
-		m_io_an7(*this, "AN7"),
+		m_compressedgfx(*this, "compressedgfx"),
 		m_io_config(*this, "CONFIG"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -344,9 +338,8 @@ public:
 	uint16_t m_blitterAddr;
 	uint16_t m_textOffset;
 	uint32_t m_blitterClearMode;
-	int16_t m_blitterClearCount;
-	pen_t m_tilepals[0x10000];
-	pen_t m_fadedpals[0x8000];
+	int16_t  m_blitterClearCount;
+	std::unique_ptr<pen_t[]> m_fadedpals;
 
 	// store the blit params here
 	uint32_t m_spriteblit[12];
@@ -362,69 +355,50 @@ public:
 
 	required_shared_ptr<uint32_t> m_framebuffer_vram;
 	required_shared_ptr<uint32_t> m_txt_vram;
-	required_shared_ptr<uint32_t> m_sysh1_txt_blit;
-	required_shared_ptr<uint32_t> m_sysh1_workram_h;
+	required_shared_ptr<uint32_t> m_txt_blit;
+	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint32_t> m_sound_dma;
-	required_shared_ptr<uint16_t> m_soundram;
-	required_shared_ptr<uint16_t> m_soundram2;
+	required_shared_ptr_array<uint16_t, 2> m_soundram;
 	required_shared_ptr<uint32_t> m_rom;
-	required_ioport m_io_an0;
-	required_ioport m_io_an1;
-	required_ioport m_io_an2;
-	required_ioport m_io_an3;
-	required_ioport m_io_an4;
-	required_ioport m_io_an5;
-	required_ioport m_io_an6;
-	required_ioport m_io_an7;
+	required_region_ptr<uint8_t> m_compressedgfx;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	bitmap_ind16 m_temp_bitmap_sprites;
-	bitmap_ind16 m_temp_bitmap_sprites2;
-	//bitmap_ind16 m_zbuffer_bitmap;
-	//bitmap_ind16 m_zbuffer_bitmap2;
+	bitmap_ind16 m_temp_bitmap_sprites[2];
+	//bitmap_ind16 m_zbuffer_bitmap[2];
 
-	bitmap_ind16 m_bg_bitmap;
-	bitmap_ind16 m_bg_bitmap2;
+	bitmap_ind16 m_screen_bitmap[2];
+	uint8_t m_an_mux_data;
+	uint8_t m_sound_data, m_sound_fifo;
 
-	bitmap_ind16 m_screen1_bitmap;
-	bitmap_ind16 m_screen2_bitmap;
-	uint8_t an_mux_data;
-	uint8_t sound_data, sound_fifo;
-
-	uint8_t* m_compressedgfx;
 	std::unique_ptr<uint16_t[]> m_expanded_10bit_gfx;
 	std::unique_ptr<uint16_t[]> m_rearranged_16bit_gfx;
 
 	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
 	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
-	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
-	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
-	DECLARE_READ32_MEMBER(sysh1_unk_blit_r);
-	DECLARE_WRITE32_MEMBER(sysh1_unk_blit_w);
-	DECLARE_WRITE32_MEMBER(sysh1_blit_mode_w);
-	DECLARE_WRITE32_MEMBER(sysh1_blit_data_w);
-	DECLARE_WRITE32_MEMBER(sysh1_fb_mode_w);
-	DECLARE_WRITE32_MEMBER(sysh1_fb_data_w);
+	DECLARE_READ32_MEMBER(sound_dma_r);
+	DECLARE_WRITE32_MEMBER(sound_dma_w);
+	DECLARE_READ32_MEMBER(unk_blit_r);
+	DECLARE_WRITE32_MEMBER(unk_blit_w);
+	DECLARE_WRITE32_MEMBER(blit_mode_w);
+	DECLARE_WRITE32_MEMBER(blit_data_w);
+	DECLARE_WRITE32_MEMBER(fb_mode_w);
+	DECLARE_WRITE32_MEMBER(fb_data_w);
 
-	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
+	DECLARE_WRITE32_MEMBER(dma_w);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 	DECLARE_READ32_MEMBER(aquastge_hack_r);
-	DECLARE_READ16_MEMBER(h1_soundram_r);
-	DECLARE_READ16_MEMBER(h1_soundram2_r);
-	DECLARE_WRITE16_MEMBER(h1_soundram_w);
-	DECLARE_WRITE16_MEMBER(h1_soundram2_w);
-	DECLARE_READ8_MEMBER(analog_mux_r);
-	DECLARE_WRITE8_MEMBER(analog_mux_w);
+	template<int Chip> DECLARE_READ16_MEMBER(soundram_r);
+	template<int Chip> DECLARE_WRITE16_MEMBER(soundram_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
-	DECLARE_DRIVER_INIT(coolridr);
-	DECLARE_DRIVER_INIT(aquastge);
+	void init_coolridr();
+	void init_aquastge();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -439,21 +413,19 @@ public:
 		uint32_t transpen);
 
 	void draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
-	uint32_t screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
-	uint32_t screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template<int Screen> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_current_sprite(address_space &space);
-	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
-	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_main);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_sub);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
 
-	void sysh1_dma_transfer( address_space &space, uint16_t dma_index );
+	void dma_transfer( address_space &space, uint16_t dma_index );
 
-	int debug_randompal;
+	int m_debug_randompal;
 
-	std::unique_ptr<uint16_t[]> m_h1_vram;
-	std::unique_ptr<uint8_t[]> m_h1_pcg;
-	std::unique_ptr<uint16_t[]> m_h1_pal;
+	std::unique_ptr<uint16_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_pcgram;
+	std::unique_ptr<uint16_t[]> m_palram;
 	int m_gfx_index;
 	int m_color_bank;
 	struct {
@@ -486,11 +458,9 @@ public:
 		int colbase;
 	};
 
-	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list1;
-	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list2;
+	std::unique_ptr<std::unique_ptr<cool_render_object> []> m_cool_render_object_list[2];
 
-	int m_listcount1;
-	int m_listcount2;
+	int m_listcount[2];
 
 	// the decode cache mechansim is an optimization
 	// we know all gfx are in ROM, and that calling the RLE decompression every time they're used is slow, so we cache the decoded tiles
@@ -536,14 +506,17 @@ public:
 		uint16_t tempshape[16*16];
 	};
 
-	objcachemanager decode[2];
+	objcachemanager m_decode[2];
 	void aquastge(machine_config &config);
 	void coolridr(machine_config &config);
+	void coolridr_h1_map(address_map &map);
 	void aquastge_h1_map(address_map &map);
 	void aquastge_submap(address_map &map);
 	void coolridr_submap(address_map &map);
 	void system_h1_map(address_map &map);
+	void system_h1_submap(address_map &map);
 	void system_h1_sound_map(address_map &map);
+	template<int Chip> void scsp_map(address_map &map);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -559,9 +532,9 @@ static const gfx_layout h1_tile_layout =
 	16,16,
 	0x1000,
 	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,8*16) },
 	16*128
 };
 
@@ -573,17 +546,33 @@ void coolridr_state::video_start()
 		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
-	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
-	m_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
-	//m_screen->register_screen_bitmap(m_zbuffer_bitmap);
-	//m_screen->register_screen_bitmap(m_zbuffer_bitmap2);
-	m_screen->register_screen_bitmap(m_bg_bitmap);
-	m_screen->register_screen_bitmap(m_bg_bitmap2);
+	m_fadedpals = make_unique_clear<pen_t[]>(0x8000);
+	m_vram = make_unique_clear<uint16_t[]>(VRAM_SIZE);
+	m_pcgram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
+	m_palram = make_unique_clear<uint16_t[]>(VRAM_SIZE);
 
-	m_screen->register_screen_bitmap(m_screen1_bitmap);
-	m_screen->register_screen_bitmap(m_screen2_bitmap);
+	m_cool_render_object_list[0] = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
+	m_listcount[0] = 0;
 
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, h1_tile_layout, m_h1_pcg.get(), 0, 8, 0));
+	m_cool_render_object_list[1] = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
+	m_listcount[1] = 0;
+
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites[0]);
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites[1]);
+	//m_screen->register_screen_bitmap(m_zbuffer_bitmap[0]);
+	//m_screen->register_screen_bitmap(m_zbuffer_bitmap[1]);
+
+	m_screen->register_screen_bitmap(m_screen_bitmap[0]);
+	m_screen->register_screen_bitmap(m_screen_bitmap[1]);
+
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, h1_tile_layout, m_pcgram.get(), 0, 8, 0));
+
+	m_debug_randompal = 9;
+
+	save_pointer(NAME(m_fadedpals), 0x8000);
+	save_pointer(NAME(m_vram), VRAM_SIZE);
+	save_pointer(NAME(m_pcgram), VRAM_SIZE);
+	save_pointer(NAME(m_palram), VRAM_SIZE);
 }
 
 /*
@@ -759,7 +748,7 @@ while (0)
 void coolridr_state::coolriders_drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
 		uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty)
 {
-	const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	const uint16_t *paldata = &m_palram[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	code %= gfx->elements();
 	COOLRIDERS_DRAWGFX_CORE(uint16_t, COOLRIDERS_PIXEL_OP_REMAP_OPAQUE);
 }
@@ -787,7 +776,7 @@ void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const recta
 	}
 
 	// render
-		const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())] ;
+	const uint16_t *paldata = &m_palram[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())] ;
 	COOLRIDERS_DRAWGFX_CORE(uint16_t, COOLRIDERS_PIXEL_OP_REMAP_TRANSPEN);
 }
 
@@ -813,19 +802,15 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 	}
 	else
 	{
-		uint32_t base_offset;
-		int tile,vram_data,color;
-		int scrollx;
-		int scrolly;
 		uint8_t transpen_setting;
 		gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 		#define VREG(_offs) \
 			space.read_dword(m_vregs_address+_offs+which*0x40)
 
-		scrollx = (VREG(0x2c) >> 16) & 0x7ff;
-		scrolly = VREG(0x2c) & 0x3ff;
+		uint16_t const scrollx = (VREG(0x2c) >> 16) & 0x7ff;
+		uint16_t const scrolly = VREG(0x2c) & 0x3ff;
 
-		base_offset = (VREG(0x1c) * 0x8000)/2;
+		uint32_t const base_offset = (VREG(0x1c) * 0x8000)/2;
 		m_color_bank = which * 2;
 		/* TODO: the whole transpen logic might be incorrect */
 		transpen_setting = (VREG(0x3c) & 0x80000000) >> 31;
@@ -836,16 +821,16 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		bitmap.fill(VREG(0x3c),cliprect);
 
 
-		uint16_t basey = scrolly>>4;
-		for (int y=0;y<25;y++)
+		uint16_t basey = ((scrolly + cliprect.top()) & 0x3ff) >> 4;
+		for (int y = cliprect.top() >> 4; y <= (cliprect.bottom() + 15) >> 4; y++)
 		{
-			uint16_t basex = scrollx>>4;
-			for (int x=0;x<32;x++)
+			uint16_t basex = ((scrollx + cliprect.left()) & 0x7ff) >> 4;
+			for (int x = cliprect.left() >> 4; x <= (cliprect.right() + 15) >> 4; x++)
 			{
-				vram_data = (m_h1_vram[((basex&0x7f)+((basey&0x3f)*0x80)+base_offset)&0x07ffff] & 0xffff);
-				color = m_color_bank + ((vram_data & 0x800) >> 11) * 4;
+				uint16_t const vram_data = (m_vram[((basex&0x7f)+((basey&0x3f)*0x80)+base_offset)&0x07ffff] & 0xffff);
+				uint16_t const color = m_color_bank + ((vram_data & 0x800) >> 11) * 4;
 				/* bike select enables bits 15-12, pretty sure one of these is tile bank (because there's a solid pen on 0x3ff / 0x7ff). */
-				tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
+				uint16_t const tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
 
 				coolriders_drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,(x*16)-(scrollx&0xf),(y*16)-(scrolly&0xf),transpen_setting ? -1 : 0);
 
@@ -858,18 +843,32 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 
 }
 
-uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+template<int Screen>
+uint32_t coolridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if(m_rgb_ctrl[which].gradient)
+	if(m_rgb_ctrl[Screen].gradient)
 	{
-		if( (m_rgb_ctrl[which].setting == 0x1240) || (m_rgb_ctrl[which].setting == 0x920) || (m_rgb_ctrl[which].setting == 0x800) )
+		if( (m_rgb_ctrl[Screen].setting == 0x1240) || (m_rgb_ctrl[Screen].setting == 0x920) || (m_rgb_ctrl[Screen].setting == 0x800) )
 		{
 		}
 		else
 		{
-			popmessage("%08x %08x",m_rgb_ctrl[which].setting,m_rgb_ctrl[which].gradient);
+			popmessage("%08x %08x",m_rgb_ctrl[Screen].setting,m_rgb_ctrl[Screen].gradient);
 		}
 	}
+
+#if 0
+	if (machine().input().code_pressed_once(KEYCODE_W))
+	{
+		m_debug_randompal++;
+		popmessage("%02x",m_debug_randompal);
+	}
+	if (machine().input().code_pressed_once(KEYCODE_Q))
+	{
+		m_debug_randompal--;
+		popmessage("%02x",m_debug_randompal);
+	}
+#endif
 
 	// there are probably better ways to do this
 	for (int i = 0; i < 0x8000; i++)
@@ -878,32 +877,32 @@ uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_in
 		int g = (i >> 5)&0x1f;
 		int b = (i >> 0)&0x1f;
 
-		if(m_rgb_ctrl[which].gradient)
+		if(m_rgb_ctrl[Screen].gradient)
 		{
 			/* fade-in / outs */
-			if(m_rgb_ctrl[which].setting == 0x1240)
+			if(m_rgb_ctrl[Screen].setting == 0x1240)
 			{
-				r -= m_rgb_ctrl[which].gradient;
-				g -= m_rgb_ctrl[which].gradient;
-				b -= m_rgb_ctrl[which].gradient;
+				r -= m_rgb_ctrl[Screen].gradient;
+				g -= m_rgb_ctrl[Screen].gradient;
+				b -= m_rgb_ctrl[Screen].gradient;
 				if(r < 0) { r = 0; }
 				if(g < 0) { g = 0; }
 				if(b < 0) { b = 0; }
 			}
-			else if(m_rgb_ctrl[which].setting == 0x920) /* at bike select / outside tunnels, addition */
+			else if(m_rgb_ctrl[Screen].setting == 0x920) /* at bike select / outside tunnels, addition */
 			{
-				r += m_rgb_ctrl[which].gradient;
-				g += m_rgb_ctrl[which].gradient;
-				b += m_rgb_ctrl[which].gradient;
+				r += m_rgb_ctrl[Screen].gradient;
+				g += m_rgb_ctrl[Screen].gradient;
+				b += m_rgb_ctrl[Screen].gradient;
 				if(r > 0x1f) { r = 0x1f; }
 				if(g > 0x1f) { g = 0x1f; }
 				if(b > 0x1f) { b = 0x1f; }
 			}
-			else if(m_rgb_ctrl[which].setting == 0x800) /* when you get hit TODO: algo might be different. */
+			else if(m_rgb_ctrl[Screen].setting == 0x800) /* when you get hit TODO: algo might be different. */
 			{
-				r += m_rgb_ctrl[which].gradient;
-				g -= m_rgb_ctrl[which].gradient;
-				b -= m_rgb_ctrl[which].gradient;
+				r += m_rgb_ctrl[Screen].gradient;
+				g -= m_rgb_ctrl[Screen].gradient;
+				b -= m_rgb_ctrl[Screen].gradient;
 				if(r > 0x1f) { r = 0x1f; }
 				if(g < 0) { g = 0; }
 				if(b < 0) { b = 0; }
@@ -912,57 +911,18 @@ uint32_t coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_in
 		m_fadedpals[i] = (r<<10|g<<5|b);
 	}
 
-	if (which==0)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int y=0;y<384;y++)
-		{
-			uint16_t* linesrc = &m_screen1_bitmap.pix16(y);
-			uint16_t* linedest = &bitmap.pix16(y);
+		uint16_t* linesrc = &m_screen_bitmap[Screen].pix16(y);
+		uint16_t* linedest = &bitmap.pix16(y);
 
-			for (int x=0;x<496;x++)
-			{
-				linedest[x] = m_fadedpals[linesrc[x]];
-			}
-		}
-	}
-	else
-	{
-		for (int y=0;y<384;y++)
+		for (int x = cliprect.left(); x<= cliprect.right(); x++)
 		{
-			uint16_t* linesrc = &m_screen2_bitmap.pix16(y);
-			uint16_t* linedest = &bitmap.pix16(y);
-
-			for (int x=0;x<496;x++)
-			{
-				linedest[x] = m_fadedpals[linesrc[x]];
-			}
+			linedest[x] = m_fadedpals[linesrc[x]];
 		}
 	}
 
 	return 0;
-}
-
-uint32_t coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-#if 0
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		debug_randompal++;
-		popmessage("%02x",debug_randompal);
-	}
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		debug_randompal--;
-		popmessage("%02x",debug_randompal);
-	}
-#endif
-
-	return screen_update_coolridr(screen,bitmap,cliprect,0);
-}
-
-uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return screen_update_coolridr(screen,bitmap,cliprect,1);
 }
 
 /* end video */
@@ -1032,11 +992,11 @@ uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_i
 			} \
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
 			{ \
-				object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded = true; \
+				object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded = true; \
 				if (blankcount==0) \
-					object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
+					object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
 				else \
-					object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
+					object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
 				/* if (object->screen==0) printf("marking offset %04x as decoded (sprite number %08x ptr %08x)\n", v*used_hCellCount + h, spriteNumber, ((uint64_t)(void*)tempshape)&0xffffffff);*/ \
 			} \
 		} \
@@ -1067,7 +1027,7 @@ uint32_t coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_i
 	} \
 	if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
 	{ \
-		if (object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank == true) \
+		if (object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank == true) \
 				continue; \
 	} \
 	else \
@@ -1422,7 +1382,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// note the road always has 0x8000 bit set in the palette.  I *think* this is because they do a gradual blend of some kind between the road types
 	//  see the number of transitional road bits which have various values above set
 
-	if (blit4blendlevel==object->state.debug_randompal)
+	if (blit4blendlevel==object->state.m_debug_randompal)
 	{
 		b1colorNumber = object->state.machine().rand()&0xfff;
 	}
@@ -1821,16 +1781,16 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		for (int k=0;k<DECODECACHE_NUMOBJECTCACHES;k++)
 		{
-			if(((object->state.decode[screen].objcache[k].lastromoffset == b3romoffset)) &&
-				((object->state.decode[screen].objcache[k].lastused_flipx == used_flipx)) &&
-				((object->state.decode[screen].objcache[k].lastused_flipy == used_flipy)) &&
-				((object->state.decode[screen].objcache[k].lastblit_rotate == blit_rotate)) &&
-				((object->state.decode[screen].objcache[k].lastb1mode == b1mode)) &&
-				((object->state.decode[screen].objcache[k].lastb1colorNumber == b1colorNumber)) &&
-				((object->state.decode[screen].objcache[k].lastb2colorNumber == b2colorNumber)) &&
-				((object->state.decode[screen].objcache[k].lastused_hCellCount == used_hCellCount)) &&
-				((object->state.decode[screen].objcache[k].lastused_vCellCount == used_vCellCount)) &&
-				((object->state.decode[screen].objcache[k].lastb2altpenmask == b2altpenmask)))
+			if(((object->state.m_decode[screen].objcache[k].lastromoffset == b3romoffset)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_flipx == used_flipx)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_flipy == used_flipy)) &&
+				((object->state.m_decode[screen].objcache[k].lastblit_rotate == blit_rotate)) &&
+				((object->state.m_decode[screen].objcache[k].lastb1mode == b1mode)) &&
+				((object->state.m_decode[screen].objcache[k].lastb1colorNumber == b1colorNumber)) &&
+				((object->state.m_decode[screen].objcache[k].lastb2colorNumber == b2colorNumber)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_hCellCount == used_hCellCount)) &&
+				((object->state.m_decode[screen].objcache[k].lastused_vCellCount == used_vCellCount)) &&
+				((object->state.m_decode[screen].objcache[k].lastb2altpenmask == b2altpenmask)))
 			{
 				found = k;
 				break;
@@ -1839,32 +1799,32 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		if (found != -1)
 		{
-			object->state.decode[screen].objcache[found].repeatcount++;
+			object->state.m_decode[screen].objcache[found].repeatcount++;
 			use_object = found;
 		}
 		else
 		{
-			use_object = object->state.decode[screen].current_object;
+			use_object = object->state.m_decode[screen].current_object;
 
 			// dirty the cache
 			for (int i=0;i<DECODECACHE_NUMSPRITETILES;i++)
-				object->state.decode[screen].objcache[use_object].tiles[i].tempshape_multi_decoded = false;
+				object->state.m_decode[screen].objcache[use_object].tiles[i].tempshape_multi_decoded = false;
 
-			object->state.decode[screen].objcache[use_object].lastromoffset = b3romoffset;
-			object->state.decode[screen].objcache[use_object].lastused_flipx = used_flipx;
-			object->state.decode[screen].objcache[use_object].lastused_flipy = used_flipy;
-			object->state.decode[screen].objcache[use_object].lastblit_rotate = blit_rotate;
-			object->state.decode[screen].objcache[use_object].lastb1mode = b1mode;
-			object->state.decode[screen].objcache[use_object].lastb1colorNumber = b1colorNumber;
-			object->state.decode[screen].objcache[use_object].lastb2colorNumber = b2colorNumber;
-			object->state.decode[screen].objcache[use_object].lastused_hCellCount = used_hCellCount;
-			object->state.decode[screen].objcache[use_object].lastused_vCellCount = used_vCellCount;
-			object->state.decode[screen].objcache[use_object].lastb2altpenmask = b2altpenmask;
-			object->state.decode[screen].objcache[use_object].repeatcount = 0;
+			object->state.m_decode[screen].objcache[use_object].lastromoffset = b3romoffset;
+			object->state.m_decode[screen].objcache[use_object].lastused_flipx = used_flipx;
+			object->state.m_decode[screen].objcache[use_object].lastused_flipy = used_flipy;
+			object->state.m_decode[screen].objcache[use_object].lastblit_rotate = blit_rotate;
+			object->state.m_decode[screen].objcache[use_object].lastb1mode = b1mode;
+			object->state.m_decode[screen].objcache[use_object].lastb1colorNumber = b1colorNumber;
+			object->state.m_decode[screen].objcache[use_object].lastb2colorNumber = b2colorNumber;
+			object->state.m_decode[screen].objcache[use_object].lastused_hCellCount = used_hCellCount;
+			object->state.m_decode[screen].objcache[use_object].lastused_vCellCount = used_vCellCount;
+			object->state.m_decode[screen].objcache[use_object].lastb2altpenmask = b2altpenmask;
+			object->state.m_decode[screen].objcache[use_object].repeatcount = 0;
 
-			object->state.decode[screen].current_object++;
-			if (object->state.decode[screen].current_object >= DECODECACHE_NUMOBJECTCACHES)
-				object->state.decode[screen].current_object = 0;
+			object->state.m_decode[screen].current_object++;
+			if (object->state.m_decode[screen].current_object >= DECODECACHE_NUMOBJECTCACHES)
+				object->state.m_decode[screen].current_object = 0;
 		}
 	}
 
@@ -1958,8 +1918,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES)
 			{
-				tempshape = object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
-				current_decoded = object->state.decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded;
+				tempshape = object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
+				current_decoded = object->state.m_decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded;
 				/*
 				if (object->screen==0)
 				{
@@ -1971,7 +1931,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			else
 			{
 				//if (object->screen==0) printf("using base tempshape\n");
-				tempshape = object->state.decode[screen].tempshape;
+				tempshape = object->state.m_decode[screen].tempshape;
 			}
 
 
@@ -2279,8 +2239,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// which queue, which bitmap
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
-		testobject->drawbitmap = &m_temp_bitmap_sprites;
-		/* testobject->zbitmap = &m_zbuffer_bitmap; */
+		testobject->drawbitmap = &m_temp_bitmap_sprites[0];
+		/* testobject->zbitmap = &m_zbuffer_bitmap[0]; */
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[0][0];
 		testobject->clipvals[1] = m_clipvals[0][1];
@@ -2292,8 +2252,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	}
 	else // 0x90, 0xa0, 0xaf, 0xb0, 0xc0
 	{
-		testobject->drawbitmap = &m_temp_bitmap_sprites2;
-		/* testobject->zbitmap = &m_zbuffer_bitmap2; */
+		testobject->drawbitmap = &m_temp_bitmap_sprites[1];
+		/* testobject->zbitmap = &m_zbuffer_bitmap[1]; */
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[1][0];
 		testobject->clipvals[1] = m_clipvals[1][1];
@@ -2317,33 +2277,33 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
-		if (m_listcount1<1000000)
+		if (m_listcount[0]<1000000)
 		{
-			m_cool_render_object_list1[m_listcount1] =  std::move(testobject);
-			m_listcount1++;
+			m_cool_render_object_list[0][m_listcount[0]] =  std::move(testobject);
+			m_listcount[0]++;
 		}
 		else
 		{
-			popmessage("m_listcount1 overflow!\n");
+			popmessage("m_listcount[0] overflow!\n");
 		}
 	}
 	else
 	{
-		if (m_listcount2<1000000)
+		if (m_listcount[1]<1000000)
 		{
-			m_cool_render_object_list2[m_listcount2] =  std::move(testobject);
-			m_listcount2++;
+			m_cool_render_object_list[1][m_listcount[1]] =  std::move(testobject);
+			m_listcount[1]++;
 		}
 		else
 		{
-			popmessage("m_listcount2 overflow!\n");
+			popmessage("m_listcount[1] overflow!\n");
 		}
 	}
 #endif
 }
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
+WRITE32_MEMBER(coolridr_state::blit_mode_w)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
@@ -2429,7 +2389,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
+WRITE32_MEMBER(coolridr_state::blit_data_w)
 {
 	if (m_blitterMode == 0xf4)
 	{
@@ -2492,7 +2452,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
+WRITE32_MEMBER(coolridr_state::fb_mode_w)
 {
 	/*
 	This does the fb display/clear phases of blitter data processed in the previous frame.
@@ -2524,7 +2484,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
 
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
+WRITE32_MEMBER(coolridr_state::fb_data_w)
 {
 	if(m_blitterClearCount == 0)
 	{
@@ -2539,7 +2499,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 	else if(m_blitterClearCount == 2)
 	{
 		/*
-		if(data != 0x000701f7 && m_sysh1_txt_blit[offset] != 0x020703f7)
+		if(data != 0x000701f7 && m_txt_blit[offset] != 0x020703f7)
 		    printf("Blitter Clear Count == 2 used with param %08x\n",data);
 		*/
 	}
@@ -2557,16 +2517,16 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
 
 				// copy our old buffer to the actual screen
-				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
+				copybitmap(m_screen_bitmap[0], m_temp_bitmap_sprites[0], 0, 0, 0, 0, visarea);
 
 
 
 
-				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
+				//m_temp_bitmap_sprites[1].fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
-				draw_bg_coolridr(m_temp_bitmap_sprites, visarea, 0);
+				draw_bg_coolridr(m_temp_bitmap_sprites[0], visarea, 0);
 				// wipe the z-buffer ready for the sprites
-				/* m_zbuffer_bitmap.fill(0xffff, visarea); */
+				/* m_zbuffer_bitmap[0].fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[0][0] = 0;
 				m_clipvals[0][1] = 0;
@@ -2574,28 +2534,28 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipblitterMode[0] = 0xff;
 
 				/* bubble sort, might be something better to use instead */
-				for (int pass = 0 ; pass < (m_listcount1 - 1); pass++)
+				for (int pass = 0 ; pass < (m_listcount[0] - 1); pass++)
 				{
-					for (int elem2 = 0 ; elem2 < m_listcount1 - pass - 1; elem2++)
+					for (int elem2 = 0 ; elem2 < m_listcount[0] - pass - 1; elem2++)
 					{
-						if (m_cool_render_object_list1[elem2]->zpri > m_cool_render_object_list1[elem2+1]->zpri)
-							std::swap(m_cool_render_object_list1[elem2], m_cool_render_object_list1[elem2+1]);
+						if (m_cool_render_object_list[0][elem2]->zpri > m_cool_render_object_list[0][elem2+1]->zpri)
+							std::swap(m_cool_render_object_list[0][elem2], m_cool_render_object_list[0][elem2+1]);
 					}
 				}
 
-				for (int i=m_listcount1-1;i>=0;i--)
+				for (int i=m_listcount[0]-1;i>=0;i--)
 				{
 					if (m_usethreads)
 					{
-						osd_work_item_queue(m_work_queue[0], draw_object_threaded, m_cool_render_object_list1[i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
+						osd_work_item_queue(m_work_queue[0], draw_object_threaded, m_cool_render_object_list[0][i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
 					}
 					else
 					{
-						draw_object_threaded((void*)m_cool_render_object_list1[i].release(), 0);
+						draw_object_threaded((void*)m_cool_render_object_list[0][i].release(), 0);
 					}
 				}
 
-				m_listcount1 = 0;
+				m_listcount[0] = 0;
 
 
 			}
@@ -2605,16 +2565,16 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
 
 				// copy our old buffer to the actual screen
-				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
+				copybitmap(m_screen_bitmap[1], m_temp_bitmap_sprites[1], 0, 0, 0, 0, visarea);
 
 
 
 
-				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
+				//m_temp_bitmap_sprites[1].fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
-				draw_bg_coolridr(m_temp_bitmap_sprites2, visarea, 1);
+				draw_bg_coolridr(m_temp_bitmap_sprites[1], visarea, 1);
 				// wipe the z-buffer ready for the sprites
-				/* m_zbuffer_bitmap2.fill(0xffff, visarea); */
+				/* m_zbuffer_bitmap[1].fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[1][0] = 0;
 				m_clipvals[1][1] = 0;
@@ -2622,28 +2582,28 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipblitterMode[1] = 0xff;
 
 				/* bubble sort, might be something better to use instead */
-				for (int pass = 0 ; pass < (m_listcount2 - 1); pass++)
+				for (int pass = 0 ; pass < (m_listcount[1] - 1); pass++)
 				{
-					for (int elem2 = 0 ; elem2 < m_listcount2 - pass - 1; elem2++)
+					for (int elem2 = 0 ; elem2 < m_listcount[1] - pass - 1; elem2++)
 					{
-						if (m_cool_render_object_list2[elem2]->zpri > m_cool_render_object_list2[elem2+1]->zpri)
-							std::swap(m_cool_render_object_list2[elem2], m_cool_render_object_list2[elem2+1]);
+						if (m_cool_render_object_list[1][elem2]->zpri > m_cool_render_object_list[1][elem2+1]->zpri)
+							std::swap(m_cool_render_object_list[1][elem2], m_cool_render_object_list[1][elem2+1]);
 					}
 				}
 
-				for (int i=m_listcount2-1;i>=0;i--)
+				for (int i=m_listcount[1]-1;i>=0;i--)
 				{
 					if (m_usethreads)
 					{
-						osd_work_item_queue(m_work_queue[1], draw_object_threaded, m_cool_render_object_list2[i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
+						osd_work_item_queue(m_work_queue[1], draw_object_threaded, m_cool_render_object_list[1][i].release(), WORK_ITEM_FLAG_AUTO_RELEASE);
 					}
 					else
 					{
-						draw_object_threaded((void*)m_cool_render_object_list2[i].release(), 0);
+						draw_object_threaded((void*)m_cool_render_object_list[1][i].release(), 0);
 					}
 				}
 
-				m_listcount2 = 0;
+				m_listcount[1] = 0;
 
 			}
 
@@ -2652,23 +2612,23 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 	}
 	else
 	{
-		printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_sysh1_txt_blit[offset]);
+		printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_txt_blit[offset]);
 	}
 
 	m_blitterClearCount++;
 }
 
-READ32_MEMBER(coolridr_state::sysh1_unk_blit_r)
+READ32_MEMBER(coolridr_state::unk_blit_r)
 {
 //  if(offset == 0x0c/4) // TODO
 
-	return m_sysh1_txt_blit[offset];
+	return m_txt_blit[offset];
 }
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
+WRITE32_MEMBER(coolridr_state::unk_blit_w)
 {
-	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
+	COMBINE_DATA(&m_txt_blit[offset]);
 
 	switch(offset)
 	{
@@ -2700,7 +2660,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 
 
 
-void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_index )
+void coolridr_state::dma_transfer( address_space &space, uint16_t dma_index )
 {
 	uint32_t src = 0,dst = 0,size = 0;
 	uint8_t end_dma_mark;
@@ -2730,7 +2690,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 
 				for(int i=0;i<size;i+=2)
 				{
-					m_h1_vram[dst] = space.read_word(src);
+					m_vram[dst] = space.read_word(src);
 					dst++;
 					src+=2;
 				}
@@ -2748,7 +2708,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 
 				for(int i=0;i<size;i++)
 				{
-					m_h1_pcg[dst] = space.read_byte(src);
+					m_pcgram[dst] = space.read_byte(src);
 					m_gfxdecode->gfx(m_gfx_index)->mark_dirty(dst/256);
 					dst++;
 					src++;
@@ -2769,8 +2729,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 
 				for(int i=0;i<size;i+=2)
 				{
-					m_h1_pal[dst] = space.read_word(src);
-					m_tilepals[dst&0xffff] = m_h1_pal[dst];
+					m_palram[dst] = space.read_word(src);
 					dst++;
 					src+=2;
 				}
@@ -2811,7 +2770,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 	}while(!end_dma_mark );
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
+WRITE32_MEMBER(coolridr_state::dma_w)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
@@ -2819,82 +2778,58 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 	{
 		/* enable */
 		if((m_framebuffer_vram[offset] & 0xff000000) == 0x0f000000)
-			sysh1_dma_transfer(space, m_framebuffer_vram[offset] & 0xffff);
+			dma_transfer(space, m_framebuffer_vram[offset] & 0xffff);
 	}
 }
 
 
-ADDRESS_MAP_START(coolridr_state::system_h1_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
-	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
-
-	AM_RANGE(0x03c00000, 0x03c1ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
-
-	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"
-	AM_RANGE(0x04000000, 0x0400000f) AM_READWRITE(sysh1_unk_blit_r,sysh1_unk_blit_w) AM_SHARE("sysh1_txt_blit")
-	AM_RANGE(0x04000010, 0x04000013) AM_WRITE(sysh1_blit_mode_w)
-	AM_RANGE(0x04000014, 0x04000017) AM_WRITE(sysh1_blit_data_w)
-	AM_RANGE(0x04000018, 0x0400001b) AM_WRITE(sysh1_fb_mode_w)
-	AM_RANGE(0x0400001c, 0x0400001f) AM_WRITE(sysh1_fb_data_w)
-
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("sysh1_workrah")
-	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
-
-	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(coolridr_state::aquastge_h1_map)
-	AM_IMPORT_FROM(system_h1_map)
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
-	AM_RANGE(0x03f50000, 0x03f5ffff) AM_RAM // video registers
-	AM_RANGE(0x03e10000, 0x03e1ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM  /*Communication area RAM*/
-ADDRESS_MAP_END
-
-READ16_MEMBER( coolridr_state::h1_soundram_r)
+void coolridr_state::system_h1_map(address_map &map)
 {
-	return m_soundram[offset];
+	map(0x00000000, 0x001fffff).rom().share("share1").nopw();
+	map(0x01000000, 0x01ffffff).rom().region("gfx_data", 0x0000000);
+
+	map(0x03f40000, 0x03f4ffff).ram().share("txt_vram");//text tilemap + "lineram"
+	map(0x04000000, 0x0400000f).rw(FUNC(coolridr_state::unk_blit_r), FUNC(coolridr_state::unk_blit_w)).share("txt_blit");
+	map(0x04000010, 0x04000013).w(FUNC(coolridr_state::blit_mode_w));
+	map(0x04000014, 0x04000017).w(FUNC(coolridr_state::blit_data_w));
+	map(0x04000018, 0x0400001b).w(FUNC(coolridr_state::fb_mode_w));
+	map(0x0400001c, 0x0400001f).w(FUNC(coolridr_state::fb_data_w));
+
+	map(0x06000000, 0x060fffff).ram().share("workrah");
+	map(0x20000000, 0x201fffff).rom().share("share1");
+
+	map(0x60000000, 0x600003ff).nopw();
 }
 
-READ16_MEMBER( coolridr_state::h1_soundram2_r)
+void coolridr_state::coolridr_h1_map(address_map &map)
 {
-	return m_soundram2[offset];
+	system_h1_map(map);
+	map(0x03c00000, 0x03c1ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
+
+	map(0x03f00000, 0x03f0ffff).ram().share("share3"); /*Communication area RAM*/
 }
 
-WRITE16_MEMBER( coolridr_state::h1_soundram_w)
+void coolridr_state::aquastge_h1_map(address_map &map)
 {
-	COMBINE_DATA(&m_soundram[offset]);
+	system_h1_map(map);
+	map(0x03c00000, 0x03c0ffff).mirror(0x00200000).ram().w(FUNC(coolridr_state::dma_w)).share("fb_vram"); /* mostly mapped at 0x03e00000 */
+	map(0x03f50000, 0x03f5ffff).ram(); // video registers
+	map(0x03e10000, 0x03e1ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x03f00000, 0x03f0ffff).ram();  /*Communication area RAM*/
 }
 
-WRITE16_MEMBER( coolridr_state::h1_soundram2_w)
+template<int Chip>
+READ16_MEMBER( coolridr_state::soundram_r)
 {
-	COMBINE_DATA(&m_soundram2[offset]);
+	return m_soundram[Chip][offset];
 }
 
-READ8_MEMBER( coolridr_state::analog_mux_r )
+template<int Chip>
+WRITE16_MEMBER( coolridr_state::soundram_w)
 {
-	uint8_t adc_data = 0;
-	switch(an_mux_data)
-	{
-		case 0x0: adc_data = m_io_an0->read(); break;
-		case 0x1: adc_data = m_io_an1->read(); break;
-		case 0x2: adc_data = m_io_an2->read(); break;
-		case 0x3: adc_data = m_io_an3->read(); break;
-		case 0x4: adc_data = m_io_an4->read(); break;
-		case 0x5: adc_data = m_io_an5->read(); break;
-		case 0x6: adc_data = m_io_an6->read(); break;
-		case 0x7: adc_data = m_io_an7->read(); break;
-	}
-	an_mux_data++;
-	an_mux_data &= 0x7;
-	return adc_data;
+	COMBINE_DATA(&m_soundram[Chip][offset]);
 }
 
-WRITE8_MEMBER( coolridr_state::analog_mux_w )
-{
-	an_mux_data = data;
-}
 
 WRITE8_MEMBER( coolridr_state::lamps_w )
 {
@@ -2910,17 +2845,17 @@ WRITE8_MEMBER( coolridr_state::lamps_w )
 }
 
 
-READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
+READ32_MEMBER(coolridr_state::sound_dma_r)
 {
 	if(offset == 8)
 	{
-		//popmessage("%02x",sound_data);
+		//popmessage("%02x",m_sound_data);
 		/*
 		Checked in irq routine
 		--x- ---- second SCSP
 		---x ---- first SCSP
 		*/
-		return sound_data;
+		return m_sound_data;
 	}
 
 	if(offset == 2 || offset == 6) // DMA status
@@ -2931,7 +2866,7 @@ READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
 	return m_sound_dma[offset];
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
+WRITE32_MEMBER(coolridr_state::sound_dma_w)
 {
 	address_space &main_space = m_maincpu->space(AS_PROGRAM);
 	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
@@ -2953,7 +2888,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 			uint32_t dst = m_sound_dma[1];
 			uint32_t size = (m_sound_dma[2]>>16)*0x40;
 
-			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
+			//printf("%08x %08x %08x %02x\n",src,dst,size,m_sound_fifo);
 
 			for(int i = 0;i < size; i+=2)
 			{
@@ -2972,7 +2907,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 			uint32_t dst = m_sound_dma[5];
 			uint32_t size = (m_sound_dma[6]>>16)*0x40;
 
-			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
+			//printf("%08x %08x %08x %02x\n",src,dst,size,m_sound_fifo);
 
 			for(int i = 0;i < size; i+=2)
 			{
@@ -2988,535 +2923,151 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 
 
 
-ADDRESS_MAP_START(coolridr_state::coolridr_submap)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM // note: SH7032 only supports 64KB
+void coolridr_state::system_h1_submap(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom(); // note: SH7032 only supports 64KB
 
-	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
+	map(0x01000000, 0x0100ffff).ram(); //communication RAM
 
-	AM_RANGE(0x03000000, 0x0307ffff) AM_READWRITE16(h1_soundram_r, h1_soundram_w,0xffffffff) //AM_SHARE("soundram")
-	AM_RANGE(0x03100000, 0x03100fff) AM_DEVREADWRITE16("scsp1", scsp_device, read, write, 0xffffffff)
-	AM_RANGE(0x03200000, 0x0327ffff) AM_READWRITE16(h1_soundram2_r, h1_soundram2_w,0xffffffff) //AM_SHARE("soundram2")
-	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16("scsp2", scsp_device, read, write, 0xffffffff)
+	map(0x03000000, 0x0307ffff).rw(FUNC(coolridr_state::soundram_r<0>), FUNC(coolridr_state::soundram_w<0>)); //.share("soundram1");
+	map(0x03100000, 0x03100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x03200000, 0x0327ffff).rw(FUNC(coolridr_state::soundram_r<1>), FUNC(coolridr_state::soundram_w<1>)); //.share("soundram2");
+	map(0x03300000, 0x03300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
 
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_sound_dma_r,sysh1_sound_dma_w) AM_SHARE("sound_dma")
-//  AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* unknown */
+	map(0x04000000, 0x0400003f).rw(FUNC(coolridr_state::sound_dma_r), FUNC(coolridr_state::sound_dma_w)).share("sound_dma");
+//  map(0x04200000, 0x0420003f).ram(); /* unknown */
 
-	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
-	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
-	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-//  AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
-	AM_RANGE(0x06000000, 0x060001ff) AM_RAM AM_SHARE("nvram") // backup RAM
-	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITE8(lamps_w,0x000000ff)
-	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
-	AM_RANGE(0x06100008, 0x0610000b) AM_READ_PORT("IN5")
-	AM_RANGE(0x0610000c, 0x0610000f) AM_READ_PORT("IN6")
-	AM_RANGE(0x06100010, 0x06100013) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x06100014, 0x06100017) AM_READ_PORT("IN3")
-	AM_RANGE(0x0610001c, 0x0610001f) AM_READWRITE8(analog_mux_r,analog_mux_w,0x000000ff) //AM_WRITENOP
-	AM_RANGE(0x06200000, 0x06200fff) AM_RAM //network related?
-	AM_RANGE(0x07ffe000, 0x07ffffff) AM_RAM // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
-ADDRESS_MAP_END
+	map(0x05000000, 0x05000fff).ram();
+//  map(0x05fffe00, 0x05ffffff).rw(FUNC(coolridr_state::sh7032_r), FUNC(coolridr_state::sh7032_w)); // SH-7032H internal i/o
+	map(0x06000000, 0x060001ff).ram().share("nvram"); // backup RAM
+	map(0x06100000, 0x0610001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
+	map(0x06200000, 0x06200fff).ram(); //network related?
+	map(0x07ffe000, 0x07ffffff).ram(); // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
+}
 
-ADDRESS_MAP_START(coolridr_state::aquastge_submap)
-	AM_IMPORT_FROM(coolridr_submap)
-	AM_RANGE(0x05200000, 0x0537ffff) AM_RAM
-	AM_RANGE(0x05210000, 0x0521ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x06000200, 0x06000207) AM_WRITENOP // program bug?
-	AM_RANGE(0x06100018, 0x0610001b) AM_READ_PORT("IN7")
-ADDRESS_MAP_END
+void coolridr_state::coolridr_submap(address_map &map)
+{
+	system_h1_submap(map);
+	map(0x05200000, 0x052001ff).ram();
+	map(0x05300000, 0x0530ffff).ram().share("share3"); /*Communication area RAM*/
+}
+
+void coolridr_state::aquastge_submap(address_map &map)
+{
+	system_h1_submap(map);
+	map(0x05200000, 0x0520ffff).ram();
+	map(0x05210000, 0x0521ffff).ram().share("share3"); /*Communication area RAM*/
+	map(0x05220000, 0x0537ffff).ram();
+	map(0x06000200, 0x06000207).nopw(); // program bug?
+}
 
 /* TODO: what is this for, volume mixing? MIDI? */
 WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 {
-	sound_fifo = data;
+	m_sound_fifo = data;
 }
 
-ADDRESS_MAP_START(coolridr_state::system_h1_sound_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
-	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_device, read, write)
-	AM_RANGE(0x800000, 0x80ffff) AM_MIRROR(0x200000) AM_RAM
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(sound_to_sh1_w,0x00ff)
-ADDRESS_MAP_END
+void coolridr_state::system_h1_sound_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share("soundram1");
+	map(0x100000, 0x100fff).rw("scsp1", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x200000, 0x27ffff).ram().share("soundram2");
+	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x800000, 0x80ffff).mirror(0x200000).ram();
+	map(0x900001, 0x900001).w(FUNC(coolridr_state::sound_to_sh1_w));
+}
+
+template<int Chip>
+void coolridr_state::scsp_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().share(m_soundram[Chip]);
+}
 
 
-
-
-
-static GFXDECODE_START( coolridr )
+static GFXDECODE_START( gfx_coolridr )
 //  GFXDECODE_ENTRY( nullptr, 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-#define DUMMY_INPUT_PORT(_x_) \
-	PORT_START(_x_) \
-	PORT_DIPNAME( 0x00000001, 0x00000001, _x_ ) \
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00010000, 0x00010000, _x_ ) \
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) ) \
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) ) \
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-static INPUT_PORTS_START( aquastge )
-	DUMMY_INPUT_PORT("IN0")
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN1" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin")
-	PORT_SERVICE_NO_TOGGLE( 0x00040000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	DUMMY_INPUT_PORT("IN2")
-
-	DUMMY_INPUT_PORT("IN3")
-
-	DUMMY_INPUT_PORT("IN5")
-
-	DUMMY_INPUT_PORT("IN6")
-
-	DUMMY_INPUT_PORT("IN7")
-
-	PORT_START("AN0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN6")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN7")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-
-	// driver debug
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x01, "Use Threading Code" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( coolridr )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN0-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN0-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_NAME("P1 Coin")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_NAME("P2 Coin")
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("P1 Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )   PORT_NAME("P2 Start")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x00000003, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Music <<") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Music >>") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Up")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Down")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin")
-	PORT_SERVICE_NO_TOGGLE( 0x00040000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("P1")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Music <<") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Music >>") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Down")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN2-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN2-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN3-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN3-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN4-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN4-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN5-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x00030000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Music <<") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Music >>") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Up")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Down")
-	PORT_BIT( 0x00c00000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN6")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "IN6-0" )
-	PORT_DIPSETTING(    0x00000001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000010, 0x00000010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000020, 0x00000020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000040, 0x00000040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00010000, 0x00010000, "IN6-1" )
-	PORT_DIPSETTING(    0x00010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0xff00ff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("P2")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Music <<") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Music >>") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Shift Down")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Handle Bar")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Handle Bar")
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("P1 Throttle")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Throttle")   PORT_REVERSE
 
 	PORT_START("AN2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("P1 Brake")
-
-	PORT_START("AN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("P1 Brake")      PORT_REVERSE
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Handle Bar")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Handle Bar")
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_REVERSE PORT_NAME("P2 Throttle")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Throttle")   PORT_REVERSE
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_REVERSE PORT_NAME("P2 Brake")
-
-	PORT_START("AN7")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(2) PORT_NAME("P2 Brake")      PORT_REVERSE
 
 	// driver debug
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x01, 0x01, "Use Threading Code" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( aquastge )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_NAME("P1 Coin")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_NAME("P2 Coin")
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Switch")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("P1 Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )   PORT_NAME("P2 Start")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Switch")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )   PORT_PLAYER(1)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// driver debug
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Use Threading Code" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 // IRQs 4 & 6 are valid on SH-2
-TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
+TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::interrupt_main)
 {
 	int scanline = param;
 
@@ -3527,7 +3078,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
+TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::interrupt_sub)
 {
 	int scanline = param;
 
@@ -3591,8 +3142,7 @@ uint16_t coolridr_state::get_10bit_data(uint32_t romoffset, int _10bitwordnum)
 
 void coolridr_state::machine_start()
 {
-	m_compressedgfx = memregion( "compressedgfx" )->base();
-	size_t  size    = memregion( "compressedgfx" )->bytes();
+	size_t  size    = m_compressedgfx.length();
 
 	// we're expanding 10bit packed data to 16bits(10 used)
 	m_expanded_10bit_gfx = std::make_unique<uint16_t[]>(((size/10)*16)/2);
@@ -3606,7 +3156,7 @@ void coolridr_state::machine_start()
 	// be referenced this way?!
 	m_rearranged_16bit_gfx = std::make_unique<uint16_t[]>(size/2);
 
-	uint16_t* compressed = (uint16_t*)memregion( "compressedgfx" )->base();
+	uint16_t* compressed = (uint16_t*)&m_compressedgfx[0];
 	int count = 0;
 	for (int i=0;i<size/2/10;i++)
 	{
@@ -3641,25 +3191,13 @@ void coolridr_state::machine_start()
 		}
 	}
 
-	m_h1_vram = make_unique_clear<uint16_t[]>(VRAM_SIZE);
-	m_h1_pcg = make_unique_clear<uint8_t[]>(VRAM_SIZE);
-	m_h1_pal = make_unique_clear<uint16_t[]>(VRAM_SIZE);
-
-	m_cool_render_object_list1 = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
-	m_listcount1 = 0;
-
-	m_cool_render_object_list2 = std::make_unique<std::unique_ptr<cool_render_object> []>(1000000);
-	m_listcount2 = 0;
-
 	m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 	m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
-	decode[0].current_object = 0;
-	decode[1].current_object = 0;
-	debug_randompal = 9;
+	m_decode[0].current_object = 0;
+	m_decode[1].current_object = 0;
 
-	save_pointer(NAME(m_h1_vram.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pcg.get()), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pal.get()), VRAM_SIZE);
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_sound_fifo));
 }
 
 void coolridr_state::machine_reset()
@@ -3678,77 +3216,97 @@ WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
-		sound_data |= 0x10;
+		m_sound_data |= 0x10;
 	else
-		sound_data &= ~0x10;
+		m_sound_data &= ~0x10;
 }
 
 WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
-		sound_data |= 0x20;
+		m_sound_data |= 0x20;
 	else
-		sound_data &= ~0x20;
+		m_sound_data &= ~0x20;
 }
 
 #define MAIN_CLOCK XTAL(28'636'363)
 
-MACHINE_CONFIG_START(coolridr_state::coolridr)
-	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
-	MCFG_CPU_PROGRAM_MAP(system_h1_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
+void coolridr_state::coolridr(machine_config &config)
+{
+	SH2(config, m_maincpu, MAIN_CLOCK);  // 28 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
-	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
-	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)
+	M68000(config, m_soundcpu, 22579000/2); // 22.579 MHz XTAL / 2 = 11.2895 MHz
+	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	MCFG_CPU_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
-	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "screen", 0, 1)
+	SH1(config, m_subcpu, 16000000);  // SH7032 HD6417032F20!! 16 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
+	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coolridr)
+	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
+	io.out_pb_callback().set(FUNC(coolridr_state::lamps_w));
+	io.in_pc_callback().set_ioport("IN0");
+	io.in_pd_callback().set_ioport("P1");
+	io.in_pe_callback().set_ioport("P2");
+	io.an_port_callback<0>().set_ioport("AN0");
+	io.an_port_callback<1>().set_ioport("AN1");
+	io.an_port_callback<2>().set_ioport("AN2");
+	io.an_port_callback<4>().set_ioport("AN4");
+	io.an_port_callback<5>().set_ioport("AN5");
+	io.an_port_callback<6>().set_ioport("AN6");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 512);
+	m_screen->set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
+	m_screen->set_screen_update(FUNC(coolridr_state::screen_update<0>));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(640, 512);
+	screen2.set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
+	screen2.set_screen_update(FUNC(coolridr_state::screen_update<1>));
+	screen2.set_palette(m_palette);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(coolridr_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp1_to_sh1_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp2_to_sh1_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-MACHINE_CONFIG_START(coolridr_state::aquastge)
+	scsp_device &scsp1(SCSP(config, "scsp1", 22579000)); // 22.579 MHz XTAL
+	scsp1.set_addrmap(0, &coolridr_state::scsp_map<0>);
+	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
+	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
+	scsp1.add_route(0, "lspeaker", 1.0);
+	scsp1.add_route(1, "rspeaker", 1.0);
+
+	scsp_device &scsp2(SCSP(config, "scsp2", 22579000)); // 22.579 MHz XTAL
+	scsp2.set_addrmap(0, &coolridr_state::scsp_map<1>);
+	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
+	scsp2.add_route(0, "lspeaker", 1.0);
+	scsp2.add_route(1, "rspeaker", 1.0);
+}
+
+void coolridr_state::aquastge(machine_config &config)
+{
 	coolridr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aquastge_h1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::aquastge_h1_map);
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(aquastge_submap)
-MACHINE_CONFIG_END
+	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::aquastge_submap);
+
+	sega_315_5649_device &io(SEGA_315_5649(config.replace(), "io", 0));
+	io.in_pc_callback().set_ioport("IN0");
+	io.in_pd_callback().set_ioport("IN1");
+}
 
 ROM_START( coolridr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */
@@ -3768,8 +3326,6 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00002, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
 	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00000, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
 
-	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
 
@@ -3785,12 +3341,6 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-17646.ic7", 0x2000000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
-
-	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
-
-	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
 ROM_END
 
 /*
@@ -3812,8 +3362,6 @@ ROM_START( aquastge )
 	ROM_LOAD32_WORD_SWAP( "mpr-18284.ic18", 0x0c00000, 0x0200000, CRC(5fdf3c1f) SHA1(9976fe4afc3234eecbaf47a2e0f951b6fe1cb5f5) )
 	ROM_RELOAD(0x0000000, 0x0200000)
 
-	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "epr-18278.ic12", 0x000000, 0x020000,  CRC(e601132a) SHA1(bed103ef2e0dfa8bb485d93d661142b82c23088b) )
 
@@ -3829,12 +3377,6 @@ ROM_START( aquastge )
 	ROM_LOAD16_WORD_SWAP( "mpr-18292.ic8", 0x1c00000, 0x0200000, CRC(59a713f9) SHA1(388b833fa6fb930f26c80674606505ec80668a16) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-18291.ic7", 0x2000000, 0x0200000, CRC(b6c167bd) SHA1(4990bae50e8804b2e1048aa5c64b086e8427073f) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-18290.ic6", 0x2400000, 0x0200000, CRC(11f7adb0) SHA1(a72f9892f93506456edc7ffc66224446a58ca38b) ) // 0049
-
-	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
-
-	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0x00 )
 ROM_END
 
 
@@ -3873,7 +3415,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 	if(pc == 0x06002cbc || pc == 0x06002d44)
 		return 0;
 
-	return m_sysh1_workram_h[0xd8894/4];
+	return m_workram_h[0xd8894/4];
 }
 
 
@@ -3888,11 +3430,11 @@ READ32_MEMBER(coolridr_state::aquastge_hack_r)
 //      printf("pc %08x\n", pc);
 	}
 
-	return m_sysh1_workram_h[0xc3fd8/4];
+	return m_workram_h[0xc3fd8/4];
 }
 
 
-DRIVER_INIT_MEMBER(coolridr_state,coolridr)
+void coolridr_state::init_coolridr()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 
@@ -3902,18 +3444,15 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	m_colbase = 0x7b20;
 
 	// work around the hack when mapping the workram directly
-	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_sysh1_workram_h[0]);
-	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_sysh1_workram_h[0xd9000/4]);
+	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060d7fff, 0, &m_workram_h[0]);
+	m_maincpu->sh2drc_add_fastram(0x060d9000, 0x060fffff, 0, &m_workram_h[0xd9000/4]);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, 1, &m_rom[0]);
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }
 
-DRIVER_INIT_MEMBER(coolridr_state, aquastge)
+void coolridr_state::init_aquastge()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
-
-
-
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -3921,5 +3460,5 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 	m_colbase = 0;
 }
 
-GAME ( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
-GAMEL( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)
+GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

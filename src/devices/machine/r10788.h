@@ -19,15 +19,6 @@
 
 #include "device.h"
 
-/*************************************
- *
- *  Device configuration macros
- *
- *************************************/
-
-/* Set the writer used to update a display digit */
-#define MCFG_R10788_UPDATE(devcb) \
-		r10788_device::set_update(*device, DEVCB_##devcb);
 
 class r10788_device : public device_t
 {
@@ -48,7 +39,7 @@ public:
 	DECLARE_READ8_MEMBER ( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
-	template <class Object> static devcb_base &set_update(device_t &device, Object &&cb) { return downcast<r10788_device &>(device).m_display.set_callback(std::forward<Object>(cb)); }
+	auto update_cb() { return m_display.bind(); } /* Set the writer used to update a display digit */
 
 protected:
 	// device-level overrides

@@ -176,6 +176,14 @@ osd_file::error posix_open_socket(std::string const &path, std::uint32_t openfla
 		return errno_to_file_error(err);
 	}
 
+	if (::setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>(&flag), sizeof(flag)) < 0)
+	{
+		int const err = errno;
+		::close(sock);
+		return errno_to_file_error(err);
+	}
+
+
 	// listening socket support
 	if (openflags & OPEN_FLAG_CREATE)
 	{

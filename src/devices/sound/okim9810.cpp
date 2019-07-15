@@ -6,6 +6,11 @@
 
     OKI MSM9810 ADPCM(2) sound chip.
 
+    TODO:
+        Serial input/output are not verified
+        8-bit Non-linear PCM Algorithm aren't implemented
+        DADR Command is correct?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -41,25 +46,25 @@ const uint8_t okim9810_device::okim_voice::s_volume_table[16] =
 	0x04,   // -30.0 dB
 };
 
-// sampling frequency lookup table.
-const uint32_t okim9810_device::s_sampling_freq_table[16] =
+// sampling frequency divider lookup table.
+const uint32_t okim9810_device::s_sampling_freq_div_table[16] =
 {
-	4000,
-	8000,
-	16000,
-	32000,
-	0,
-	6400,
-	12800,
-	25600,
-	0,
-	5300,
-	10600,
-	21200,
-	0,
-	0,
-	0,
-	0
+	1024, // 4.0KHz
+	512,  // 8.0KHz
+	256,  // 16.0KHz
+	128,  // 32.0KHz
+	1,
+	640,  // 6.4KHz
+	320,  // 12.8KHz
+	160,  // 25.6KHz
+	1,
+	768,  // 5.3KHz
+	384,  // 10.6KHz
+	192,  // 21.3KHz
+	1,
+	1,
+	1,
+	1
 };
 
 
@@ -80,7 +85,19 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 		m_TMP_register(0x00),
 		m_global_volume(0x00),
 		m_filter_type(SECONDARY_FILTER),
-		m_output_level(OUTPUT_TO_DIRECT_DAC)
+		m_output_level(OUTPUT_TO_DIRECT_DAC),
+		m_dadr(0),
+		m_dadr_start_offset(0),
+		m_dadr_end_offset(0),
+		m_dadr_flags(0),
+		m_serial(0),
+		m_serial_read_latch(0),
+		m_serial_write_latch(0),
+		m_serial_bits(0),
+		m_ud(0),
+		m_si(0),
+		m_sd(0),
+		m_cmd(0)
 {
 }
 
@@ -92,7 +109,6 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 void okim9810_device::device_start()
 {
 	// create the stream
-	//int divisor = m_pin7 ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 
 	// save state stuff
@@ -100,6 +116,20 @@ void okim9810_device::device_start()
 	save_item(NAME(m_global_volume));
 	save_item(NAME(m_filter_type));
 	save_item(NAME(m_output_level));
+
+	save_item(NAME(m_dadr));
+	save_item(NAME(m_dadr_start_offset));
+	save_item(NAME(m_dadr_end_offset));
+	save_item(NAME(m_dadr_flags));
+
+	save_item(NAME(m_serial));
+	save_item(NAME(m_serial_read_latch));
+	save_item(NAME(m_serial_write_latch));
+	save_item(NAME(m_serial_bits));
+	save_item(NAME(m_ud));
+	save_item(NAME(m_si));
+	save_item(NAME(m_sd));
+	save_item(NAME(m_cmd));
 
 	for  (int i = 0; i < OKIM9810_VOICES; i++)
 	{
@@ -137,6 +167,8 @@ void okim9810_device::device_reset()
 	m_stream->update();
 	for (auto & elem : m_voice)
 		elem.m_playing = false;
+
+	m_serial_bits = 0;
 }
 
 
@@ -146,6 +178,7 @@ void okim9810_device::device_reset()
 
 void okim9810_device::device_post_load()
 {
+	device_clock_changed();
 }
 
 
@@ -156,6 +189,7 @@ void okim9810_device::device_post_load()
 
 void okim9810_device::device_clock_changed()
 {
+	m_stream->set_sample_rate(clock());
 }
 
 
@@ -183,7 +217,7 @@ void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
-		elem.generate_audio(*this, outputs, samples, m_global_volume, clock(), m_filter_type);
+		elem.generate_audio(*this, outputs, samples, m_global_volume, m_filter_type);
 }
 
 
@@ -210,6 +244,7 @@ uint8_t okim9810_device::read_status()
 
 READ8_MEMBER( okim9810_device::read )
 {
+	assert(!m_serial);
 	return read_status();
 }
 
@@ -338,12 +373,12 @@ void okim9810_device::write_command(uint8_t data)
 			m_voice[channel].m_endFlags = endFlags;
 			m_voice[channel].m_count = (endAddr-startAddr) + 1;     // Is there yet another extra byte at the end?
 
-			m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4;
-			m_voice[channel].m_samplingFreq = s_sampling_freq_table[startFlags & 0x0f];
+			m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
+			m_voice[channel].m_samplingFreq = startFlags & 0x0f;
 			if (m_voice[channel].m_playbackAlgo == ADPCM_PLAYBACK ||
 				m_voice[channel].m_playbackAlgo == ADPCM2_PLAYBACK)
 				m_voice[channel].m_count *= 2;
-			else
+			else if (m_voice[channel].m_playbackAlgo == NONLINEAR8_PLAYBACK)
 				osd_printf_warning("MSM9810: UNIMPLEMENTED PLAYBACK METHOD %d\n", m_voice[channel].m_playbackAlgo);
 
 			osd_printf_debug("FADR  channel %d phrase offset %02x => ", channel, m_TMP_register);
@@ -353,8 +388,33 @@ void okim9810_device::write_command(uint8_t data)
 
 		case 0x06:  // DADR (direct address playback)
 		{
-			osd_printf_warning("DADR  channel %d complex data %02x\n", channel, m_TMP_register);
-			osd_printf_warning("MSM9810: UNIMPLEMENTED COMMAND!\n");
+			if ((channel & 4) == 0) // DADR is available only channel 1~4
+			{
+				offs_t startAddr = m_dadr_start_offset;
+				offs_t endAddr = m_dadr_end_offset;
+				uint8_t startFlags = m_dadr_flags;
+
+				m_voice[channel].m_sample = 0;
+				m_voice[channel].m_interpSampleNum = 0;
+				m_voice[channel].m_startFlags = startFlags;
+				m_voice[channel].m_base_offset = startAddr;
+				m_voice[channel].m_endFlags = 0;
+				m_voice[channel].m_count = (endAddr-startAddr) + 1;     // Is there yet another extra byte at the end?
+
+				m_voice[channel].m_playbackAlgo = (startFlags & 0x0c) >> 2;
+				m_voice[channel].m_samplingFreq = (startFlags & 0xf0) >> 4;
+				if (m_voice[channel].m_playbackAlgo == ADPCM_PLAYBACK ||
+					m_voice[channel].m_playbackAlgo == ADPCM2_PLAYBACK)
+					m_voice[channel].m_count *= 2;
+				else if (m_voice[channel].m_playbackAlgo == NONLINEAR8_PLAYBACK)
+					osd_printf_warning("MSM9810: UNIMPLEMENTED PLAYBACK METHOD %d\n", m_voice[channel].m_playbackAlgo);
+
+				osd_printf_debug("startFlags(%02x) startAddr(%06x) endAddr(%06x) bytes(%d)\n", startFlags, startAddr, endAddr, endAddr-startAddr);
+			}
+			else
+			{
+				osd_printf_warning("MSM9810: UNKNOWN COMMAND!\n");
+			}
 			break;
 		}
 		case 0x07:  // CVOL (channel volume)
@@ -381,10 +441,12 @@ void okim9810_device::write_command(uint8_t data)
 			break;
 		}
 	}
+	m_dadr = 0;
 }
 
 WRITE8_MEMBER( okim9810_device::write )
 {
+	assert(!m_serial);
 	write_command(data);
 }
 
@@ -397,13 +459,121 @@ WRITE8_MEMBER( okim9810_device::write )
 void okim9810_device::write_tmp_register(uint8_t data)
 {
 	m_TMP_register = data;
+
+	if (m_dadr < 7)
+	{
+		switch (m_dadr)
+		{
+			case 0:
+				m_dadr_start_offset = (m_TMP_register << 16);
+				break;
+			case 1:
+				m_dadr_start_offset |= (m_TMP_register << 8);
+				break;
+			case 2:
+				m_dadr_start_offset |= (m_TMP_register << 0);
+				break;
+			case 3:
+				m_dadr_end_offset = (m_TMP_register << 16);
+				break;
+			case 4:
+				m_dadr_end_offset |= (m_TMP_register << 8);
+				break;
+			case 5:
+				m_dadr_end_offset |= (m_TMP_register << 0);
+				break;
+			case 6:
+				m_dadr_flags = m_TMP_register;
+				break;
+			default:
+				break;
+		}
+		osd_printf_debug("DADR direct offset %02x = %02x => ", m_dadr, m_TMP_register);
+		m_dadr++;
+	}
 }
 
-WRITE8_MEMBER( okim9810_device::write_tmp_register )
+WRITE8_MEMBER( okim9810_device::tmp_register_w )
 {
+	assert(!m_serial);
 	write_tmp_register(data);
 }
 
+
+//-----------------------------------------------------------
+//  Serial interface, NOT verified
+//-----------------------------------------------------------
+
+WRITE_LINE_MEMBER( okim9810_device::serial_w )
+{
+	m_serial = state;
+}
+
+WRITE_LINE_MEMBER( okim9810_device::si_w )
+{
+	if (m_si != state)
+	{
+		m_si = state;
+		if (m_si)
+		{
+			m_serial_write_latch = (m_serial_write_latch << 1) | (m_sd);
+			m_serial_bits++;
+			if (m_serial_bits >= 8)
+			{
+				if (m_cmd == 0)
+				{
+					write_command(m_serial_write_latch);
+				}
+				else
+				{
+					write_tmp_register(m_serial_write_latch);
+				}
+				m_serial_bits = 0;
+			}
+		}
+	}
+}
+
+WRITE_LINE_MEMBER( okim9810_device::sd_w )
+{
+	m_sd = state;
+}
+
+WRITE_LINE_MEMBER( okim9810_device::ud_w )
+{
+	m_ud = state;
+}
+
+WRITE_LINE_MEMBER( okim9810_device::cmd_w )
+{
+	m_cmd = state;
+}
+
+READ_LINE_MEMBER( okim9810_device::so_r )
+{
+	m_serial_read_latch = (m_serial_read_latch & ~(1<<m_serial_bits)) | (read_status() & (1<<m_serial_bits));
+	return (read_status() >> (7-m_serial_bits)) & 1;
+}
+
+READ_LINE_MEMBER( okim9810_device::sr0_r )
+{
+	return (m_serial_read_latch >> ((m_ud) ? 4 : 0)) & 1;
+}
+
+READ_LINE_MEMBER( okim9810_device::sr1_r )
+{
+	return (m_serial_read_latch >> ((m_ud) ? 5 : 1)) & 1;
+}
+
+READ_LINE_MEMBER( okim9810_device::sr2_r )
+{
+	return (m_serial_read_latch >> ((m_ud) ? 6 : 2)) & 1;
+}
+
+READ_LINE_MEMBER( okim9810_device::sr3_r )
+{
+	return (m_serial_read_latch >> ((m_ud) ? 7 : 3)) & 1;
+}
 
 //**************************************************************************
 //  OKIM VOICE
@@ -420,7 +590,7 @@ okim9810_device::okim_voice::okim_voice()
 		m_endFlags(0),
 		m_base_offset(0),
 		m_count(0),
-		m_samplingFreq(s_sampling_freq_table[2]),
+		m_samplingFreq(2),
 		m_playing(false),
 		m_sample(0),
 		m_channel_volume(0x00),
@@ -441,7 +611,6 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 													stream_sample_t **buffers,
 													int samples,
 													const uint8_t global_volume,
-													const uint32_t clock,
 													const uint8_t filter_type)
 {
 	// skip if not active
@@ -457,7 +626,9 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 	uint8_t volume_scale_right = volume_scale(global_volume, m_channel_volume, m_pan_volume_right);
 
 	// total samples per byte
-	uint32_t totalInterpSamples = clock / m_samplingFreq;
+	uint32_t totalInterpSamples = s_sampling_freq_div_table[m_samplingFreq];
+	if (totalInterpSamples == 1)
+		return;
 
 	// loop while we still have samples to generate
 	while (samples-- != 0)
@@ -465,23 +636,45 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		// If interpSampleNum == 0, we are at the beginning of a new interp chunk, gather data
 		if (m_interpSampleNum == 0)
 		{
-			// If m_sample == 0, we have begun to play a new voice.  Get both the first nibble & the second.
-			if (m_sample == 0)
+			if (m_playbackAlgo & EIGHTBIT_PLAYBACK) // 8-bit case
 			{
-				// fetch the first sample nibble
-				int nibble0 = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
+				// If m_sample == 0, we have begun to play a new voice.  Get both the first byte & the second.
+				if (m_sample == 0)
+				{
+					// fetch the first sample byte
+					switch (m_playbackAlgo)
+					{
+						case STRAIGHT8_PLAYBACK:
+						{
+							m_startSample = ((int8_t)rom.read_byte(m_base_offset + m_sample)) << 4; // shift to 12bit
+							break;
+						}
+						case NONLINEAR8_PLAYBACK: // TODO : Algorithm Unimplemented
+						{
+							m_startSample = ((int8_t)rom.read_byte(m_base_offset + m_sample)) << 4; // shift to 12bit
+							break;
+						}
+						default:
+							break;
+					}
+				}
+				else
+				{
+					// Otherwise just move the second byte back to the first spot.
+					m_startSample = m_endSample;
+				}
+
+				// And fetch the second sample byte
 				switch (m_playbackAlgo)
 				{
-					case ADPCM_PLAYBACK:
+					case STRAIGHT8_PLAYBACK:
 					{
-						m_adpcm.reset();
-						m_startSample = (int32_t)m_adpcm.clock(nibble0);
+						m_endSample = ((int8_t)rom.read_byte(m_base_offset + m_sample + 1)) << 4; // shift to 12bit
 						break;
 					}
-					case ADPCM2_PLAYBACK:
+					case NONLINEAR8_PLAYBACK: // TODO : Algorithm Unimplemented
 					{
-						m_adpcm2.reset();
-						m_startSample = (int32_t)m_adpcm2.clock(nibble0);
+						m_endSample = ((int8_t)rom.read_byte(m_base_offset + m_sample + 1)) << 4; // shift to 12bit
 						break;
 					}
 					default:
@@ -490,26 +683,52 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 			}
 			else
 			{
-				// Otherwise just move the second nibble back to the first spot.
-				m_startSample = m_endSample;
-			}
+				// If m_sample == 0, we have begun to play a new voice.  Get both the first nibble & the second.
+				if (m_sample == 0)
+				{
+					// fetch the first sample nibble
+					int nibble0 = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
+					switch (m_playbackAlgo)
+					{
+						case ADPCM_PLAYBACK:
+						{
+							m_adpcm.reset();
+							m_startSample = (int32_t)m_adpcm.clock(nibble0);
+							break;
+						}
+						case ADPCM2_PLAYBACK:
+						{
+							m_adpcm2.reset();
+							m_startSample = (int32_t)m_adpcm2.clock(nibble0);
+							break;
+						}
+						default:
+							break;
+					}
+				}
+				else
+				{
+					// Otherwise just move the second nibble back to the first spot.
+					m_startSample = m_endSample;
+				}
 
-			// And fetch the second sample nibble
-			int nibble1 = rom.read_byte(m_base_offset + (m_sample+1) / 2) >> ((((m_sample+1) & 1) << 2) ^ 4);
-			switch (m_playbackAlgo)
-			{
-				case ADPCM_PLAYBACK:
+				// And fetch the second sample nibble
+				int nibble1 = rom.read_byte(m_base_offset + (m_sample+1) / 2) >> ((((m_sample+1) & 1) << 2) ^ 4);
+				switch (m_playbackAlgo)
 				{
-					m_endSample = (int32_t)m_adpcm.clock(nibble1);
-					break;
+					case ADPCM_PLAYBACK:
+					{
+						m_endSample = (int32_t)m_adpcm.clock(nibble1);
+						break;
+					}
+					case ADPCM2_PLAYBACK:
+					{
+						m_endSample = (int32_t)m_adpcm2.clock(nibble1);
+						break;
+					}
+					default:
+						break;
 				}
-				case ADPCM2_PLAYBACK:
-				{
-					m_endSample = (int32_t)m_adpcm2.clock(nibble1);
-					break;
-				}
-				default:
-					break;
 			}
 		}
 

@@ -6,46 +6,51 @@
 #pragma once
 
 
-#define MCFG_ADDRESS_MAP_BANK_ENDIANNESS(_endianness) \
-	address_map_bank_device::set_endianness(*device, _endianness);
-
-#define MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(_data_width) \
-	address_map_bank_device::set_data_width(*device, _data_width);
-
-#define MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(_addr_width) \
-	address_map_bank_device::set_addr_width(*device, _addr_width);
-
-#define MCFG_ADDRESS_MAP_BANK_STRIDE(_stride) \
-	address_map_bank_device::set_stride(*device, _stride);
-
 class address_map_bank_device :
 	public device_t,
 	public device_memory_interface
 {
 public:
 	// construction/destruction
-	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	// static configuration helpers
-	static void set_endianness(device_t &device, endianness_t endianness) { downcast<address_map_bank_device &>(device).m_endianness = endianness; }
-	static void set_data_width(device_t &device, uint8_t data_width) { downcast<address_map_bank_device &>(device).m_data_width = data_width; }
-	static void set_addr_width(device_t &device, uint8_t addr_width) { downcast<address_map_bank_device &>(device).m_addr_width = addr_width; }
-	static void set_stride(device_t &device, uint32_t stride) { downcast<address_map_bank_device &>(device).m_stride = stride; }
+	// configuration helpers
+	template <typename... T> address_map_bank_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+	address_map_bank_device& set_endianness(endianness_t endianness) { m_endianness = endianness; return *this; }
+	address_map_bank_device& set_data_width(u8 data_width) { m_data_width = data_width; return *this; }
+	address_map_bank_device& set_addr_width(u8 addr_width) { m_addr_width = addr_width; return *this; }
+	address_map_bank_device& set_stride(u32 stride) { m_stride = stride; return *this; }
+	address_map_bank_device& set_shift(u32 shift) { m_shift = shift; return *this; }
+	address_map_bank_device& set_options(endianness_t endianness, u8 data_width, u8 addr_width, u32 stride = 1)
+	{
+		set_endianness(endianness);
+		set_data_width(data_width);
+		set_addr_width(addr_width);
+		set_stride(stride);
+		return *this;
+	}
+
+	template <typename... T> address_map_bank_device& map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
+	address_map_bank_device& endianness(endianness_t endianness) { m_endianness = endianness; return *this; }
+	address_map_bank_device& data_width(u8 data_width) { m_data_width = data_width; return *this; }
+	address_map_bank_device& addr_width(u8 addr_width) { m_addr_width = addr_width; return *this; }
+	address_map_bank_device& stride(u32 stride) { m_stride = stride; return *this; }
+	address_map_bank_device& shift(u32 shift) { m_shift = shift; return *this; }
 
 	void amap8(address_map &map);
 	void amap16(address_map &map);
 	void amap32(address_map &map);
 	void amap64(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(write8);
-	DECLARE_WRITE16_MEMBER(write16);
-	DECLARE_WRITE32_MEMBER(write32);
-	DECLARE_WRITE64_MEMBER(write64);
+	void write8(offs_t offset, u8 data);
+	void write16(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	void write32(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
+	void write64(offs_t offset, u64 data, u64 mem_mask = ~u64(0));
 
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_READ16_MEMBER(read16);
-	DECLARE_READ32_MEMBER(read32);
-	DECLARE_READ64_MEMBER(read64);
+	u8 read8(offs_t offset);
+	u16 read16(offs_t offset, u16 mem_mask = 0xffff);
+	u32 read32(offs_t offset, u32 mem_mask = 0xffffffff);
+	u64 read64(offs_t offset, u64 mem_mask = ~u64(0));
 
 	void set_bank(offs_t offset);
 
@@ -59,12 +64,13 @@ protected:
 private:
 	// internal state
 	endianness_t m_endianness;
-	uint8_t m_data_width;
-	uint8_t m_addr_width;
-	uint32_t m_stride;
+	u8 m_data_width;
+	u8 m_addr_width;
+	u32 m_stride;
 	address_space_config m_program_config;
 	address_space *m_program;
 	offs_t m_offset;
+	int m_shift;
 };
 
 

@@ -183,53 +183,53 @@ static const char *const turbo_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(turbo_state::turbo_samples)
-
+void turbo_state::turbo_samples(machine_config &config)
+{
 	/* this is the cockpit speaker configuration */
-	MCFG_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)     /* front */
-	MCFG_SPEAKER_ADD("bspeaker",  0.0, 0.0, -0.5)   /* back */
-	MCFG_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)    /* left */
-	MCFG_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)     /* right */
+	SPEAKER(config, "fspeaker", 0.0, 0.0, 1.0);     // front
+	SPEAKER(config, "bspeaker",  0.0, 0.0, -0.5);   // back
+	SPEAKER(config, "lspeaker", -0.2, 0.0, 1.0);    // left
+	SPEAKER(config, "rspeaker", 0.2, 0.0, 1.0);     // right
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(10)
-	MCFG_SAMPLES_NAMES(turbo_sample_names)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(10);
+	m_samples->set_samples_names(turbo_sample_names);
 
 	/* channel 0 = CRASH.S -> CRASH.S/SM */
-	MCFG_SOUND_ROUTE(0, "fspeaker", 0.25)
+	m_samples->add_route(0, "fspeaker", 0.25);
 
 	/* channel 1 = TRIG1-4 -> ALARM.M/F/R/L */
-	MCFG_SOUND_ROUTE(1, "fspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.25)
+	m_samples->add_route(1, "fspeaker", 0.25);
+	m_samples->add_route(1, "rspeaker", 0.25);
+	m_samples->add_route(1, "lspeaker",  0.25);
 
 	/* channel 2 = SLIP/SPIN -> SKID.F/R/L/M */
-	MCFG_SOUND_ROUTE(2, "fspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.25)
+	m_samples->add_route(2, "fspeaker", 0.25);
+	m_samples->add_route(2, "rspeaker", 0.25);
+	m_samples->add_route(2, "lspeaker",  0.25);
 
 	/* channel 3 = CRASH.L -> CRASH.L/LM */
-	MCFG_SOUND_ROUTE(3, "bspeaker",  0.25)
+	m_samples->add_route(3, "bspeaker",  0.25);
 
 	/* channel 4 = AMBU -> AMBULANCE/AMBULANCE.M */
-	MCFG_SOUND_ROUTE(4, "fspeaker", 0.25)
+	m_samples->add_route(4, "fspeaker", 0.25);
 
 	/* channel 5 = ACCEL+BSEL -> MYCAR.F/W/M + MYCAR0.F/M + MYCAR1.F/M */
-	MCFG_SOUND_ROUTE(5, "fspeaker", 0.25)
-	MCFG_SOUND_ROUTE(5, "bspeaker",  0.25)
+	m_samples->add_route(5, "fspeaker", 0.25);
+	m_samples->add_route(5, "bspeaker",  0.25);
 
 	/* channel 6 = OSEL -> OCAR.F/FM */
-	MCFG_SOUND_ROUTE(6, "fspeaker", 0.25)
+	m_samples->add_route(6, "fspeaker", 0.25);
 
 	/* channel 7 = OSEL -> OCAR.L/LM */
-	MCFG_SOUND_ROUTE(7, "lspeaker",  0.25)
+	m_samples->add_route(7, "lspeaker",  0.25);
 
 	/* channel 8 = OSEL -> OCAR.R/RM */
-	MCFG_SOUND_ROUTE(8, "rspeaker", 0.25)
+	m_samples->add_route(8, "rspeaker", 0.25);
 
 	/* channel 9 = OSEL -> OCAR.W/WM */
-	MCFG_SOUND_ROUTE(9, "bspeaker",  0.25)
-MACHINE_CONFIG_END
+	m_samples->add_route(9, "bspeaker",  0.25);
+}
 
 /*
     Cockpit: CN2 1+2 -> FRONT
@@ -429,45 +429,47 @@ static const char *const subroc3d_sample_names[] =
 	nullptr
 };
 
-MACHINE_CONFIG_START(turbo_state::subroc3d_samples)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+void turbo_state::subroc3d_samples(machine_config &config)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(12)
-	MCFG_SAMPLES_NAMES(subroc3d_sample_names)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(12);
+	m_samples->set_samples_names(subroc3d_sample_names);
 
 	/* MISSILE in channels 0 and 1 */
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
+	m_samples->add_route(0, "lspeaker", 0.25);
+	m_samples->add_route(1, "rspeaker", 0.25);
 
 	/* TORPEDO in channels 2 and 3 */
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.25)
+	m_samples->add_route(2, "lspeaker", 0.25);
+	m_samples->add_route(3, "rspeaker", 0.25);
 
 	/* FIGHTER in channels 4 and 5 */
-	MCFG_SOUND_ROUTE(4, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(5, "rspeaker", 0.25)
+	m_samples->add_route(4, "lspeaker", 0.25);
+	m_samples->add_route(5, "rspeaker", 0.25);
 
 	/* HIT in channels 6 and 7 */
-	MCFG_SOUND_ROUTE(6, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(7, "rspeaker", 0.25)
+	m_samples->add_route(6, "lspeaker", 0.25);
+	m_samples->add_route(7, "rspeaker", 0.25);
 
 	/* FIRE sound in channel 8 */
-	MCFG_SOUND_ROUTE(8, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(8, "rspeaker", 0.25)
+	m_samples->add_route(8, "lspeaker", 0.25);
+	m_samples->add_route(8, "rspeaker", 0.25);
 
 	/* SHIP EXP sound in channel 9 */
-	MCFG_SOUND_ROUTE(9, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(9, "rspeaker", 0.25)
+	m_samples->add_route(9, "lspeaker", 0.25);
+	m_samples->add_route(9, "rspeaker", 0.25);
 
 	/* ALARM TRIG sound in channel 10 */
-	MCFG_SOUND_ROUTE(10, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(10, "rspeaker", 0.25)
+	m_samples->add_route(10, "lspeaker", 0.25);
+	m_samples->add_route(10, "rspeaker", 0.25);
 
 	/* PROLOGUE sound in channel 11 */
-	MCFG_SOUND_ROUTE(11, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(11, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	m_samples->add_route(11, "lspeaker", 0.25);
+	m_samples->add_route(11, "rspeaker", 0.25);
+}
 
 
 
@@ -574,13 +576,14 @@ static const char *const buckrog_sample_names[]=
 };
 
 
-MACHINE_CONFIG_START(turbo_state::buckrog_samples)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(buckrog_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+void turbo_state::buckrog_samples(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(buckrog_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -616,7 +619,7 @@ static const discrete_555_desc turbo_alarm_555 =
 	DEFAULT_555_VALUES,
 };
 
-DISCRETE_SOUND_START(turbo)
+DISCRETE_SOUND_START(turbo_discrete)
 	/************************************************/
 	/* Input register mapping for turbo             */
 	/************************************************/

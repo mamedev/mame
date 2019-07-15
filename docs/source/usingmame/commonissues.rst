@@ -24,7 +24,7 @@ Common Issues and Questions (FAQ)
 18. :ref:`Ultracade`
 19. :ref:`Blackscreen-DirectX`
 20. :ref:`ControllerIssues`
-
+21. :ref:`ExternalOPL`
 
 
 .. _rapid-coins:
@@ -39,12 +39,14 @@ In either case, the game would display an error for the operator to look into th
 
 .. _broken-package:
 
-Why is my non-official MAME package (e.g. EmuCR build) broken?
---------------------------------------------------------------
+Why is my non-official MAME package (e.g. EmuCR build) broken? Why is my official update broken?
+------------------------------------------------------------------------------------------------
 
 In many cases, updates to various subsystems such as HLSL, BGFX, or Lua plugins come as updates to the external shader files as well as to the core MAME code. Unfortunately, builds that come from third parties may come as just a main MAME executable or with outdated external files, which can break the coupling between these external files and MAME core code. Despite repeated attempts at contacting some of these third parties to warn them, they persist in distributing broken MAME updates.
 
 As we have no control over how third parties distribute these, all we really can do is disclaim the use of sites like EmuCR and say that we cannot provide support for packages we didn't build. Compile your own MAME or use one of the official packages provided by us.
+
+You may also run into this problem if you have not replaced the contents of the HLSL and BGFX folders with the latest files when updating your MAME install with a new official build.
 
 
 .. _faster-if-X:
@@ -233,3 +235,11 @@ By default, MAME on Microsoft Windows tries to do raw reads of the joystick(s), 
 One thing you can try is setting the keyboardprovider, mouseprovider, or joystickprovider setting (depending on which kind of device your input device acts as) from rawinput to one of the other options such as dinput or win32. See :ref:`osd-commandline-options` for details on supported providers.
 
 
+.. _ExternalOPL:
+
+What happened to the MAME support for external OPL2-carrying soundcards?
+------------------------------------------------------------------------
+
+MAME added support in version 0.23 for the use of a soundcard's onboard OPL2 (Yamaha YM3812 chip) instead of emulating the OPL2. This feature was never supported on the official Windows version of MAME and was dropped entirely as of MAME 0.60, because the OPL2 emulation in MAME had become advanced enough to be a better solution in almost all cases as of that time; now it's superior to using a sound card's YM3812 in all cases, especially as modern cards lack a YM3812.
+
+Unofficial builds of MAME may have supported it for varying amounts of time as well.

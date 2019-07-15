@@ -12,7 +12,6 @@ TODO:
 
 #include "emu.h"
 #include "msnat.h"
-#include "cpu/mcs51/mcs51.h"
 
 
 /***************************************************************************
@@ -196,18 +195,6 @@ INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device, "kb_ms_natural", "Microsoft Natural Keyboard")
 
-/*****************************************************************************
-    ADDRESS MAPS
-*****************************************************************************/
-
-ADDRESS_MAP_START(pc_kbd_microsoft_natural_device::microsoft_natural_io)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(p0_read, p0_write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_write)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(p2_write)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_read, p3_write)
-ADDRESS_MAP_END
-
-
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
@@ -257,10 +244,16 @@ void pc_kbd_microsoft_natural_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc_kbd_microsoft_natural_device::device_add_mconfig)
-	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL(6'000'000))
-	MCFG_CPU_IO_MAP(microsoft_natural_io)
-MACHINE_CONFIG_END
+void pc_kbd_microsoft_natural_device::device_add_mconfig(machine_config &config)
+{
+	I8051(config, m_cpu, XTAL(6'000'000));
+	m_cpu->port_in_cb<0>().set(FUNC(pc_kbd_microsoft_natural_device::p0_read));
+	m_cpu->port_out_cb<0>().set(FUNC(pc_kbd_microsoft_natural_device::p0_write));
+	m_cpu->port_out_cb<1>().set(FUNC(pc_kbd_microsoft_natural_device::p1_write));
+	m_cpu->port_out_cb<2>().set(FUNC(pc_kbd_microsoft_natural_device::p2_write));
+	m_cpu->port_in_cb<3>().set(FUNC(pc_kbd_microsoft_natural_device::p3_read));
+	m_cpu->port_out_cb<3>().set(FUNC(pc_kbd_microsoft_natural_device::p3_write));
+}
 
 
 ioport_constructor pc_kbd_microsoft_natural_device::device_input_ports() const

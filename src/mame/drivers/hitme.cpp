@@ -21,6 +21,7 @@
 
 #include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "barricad.lh"
@@ -194,15 +195,15 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	m_timeout_time = machine().time() + duration;
 
-	m_discrete->write(space, HITME_DOWNCOUNT_VAL, data);
-	m_discrete->write(space, HITME_OUT0, 1);
+	m_discrete->write(HITME_DOWNCOUNT_VAL, data);
+	m_discrete->write(HITME_OUT0, 1);
 }
 
 
 WRITE8_MEMBER(hitme_state::output_port_1_w)
 {
-	m_discrete->write(space, HITME_ENABLE_VAL, data);
-	m_discrete->write(space, HITME_OUT1, 1);
+	m_discrete->write(HITME_ENABLE_VAL, data);
+	m_discrete->write(HITME_OUT1, 1);
 }
 
 
@@ -220,32 +221,34 @@ WRITE8_MEMBER(hitme_state::output_port_1_w)
     upper 8 bits.
 */
 
-ADDRESS_MAP_START(hitme_state::hitme_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x09ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
-	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)
-	AM_RANGE(0x1600, 0x16ff) AM_READ(hitme_port_2_r)
-	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
-	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
-	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(output_port_0_w)
-	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(output_port_1_w)
-ADDRESS_MAP_END
+void hitme_state::hitme_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x09ff).rom();
+	map(0x0c00, 0x0eff).ram().w(FUNC(hitme_state::hitme_vidram_w)).share("videoram");
+	map(0x1000, 0x10ff).mirror(0x300).ram();
+	map(0x1400, 0x14ff).r(FUNC(hitme_state::hitme_port_0_r));
+	map(0x1500, 0x15ff).r(FUNC(hitme_state::hitme_port_1_r));
+	map(0x1600, 0x16ff).r(FUNC(hitme_state::hitme_port_2_r));
+	map(0x1700, 0x17ff).r(FUNC(hitme_state::hitme_port_3_r));
+	map(0x1800, 0x18ff).portr("IN4");
+	map(0x1900, 0x19ff).portr("IN5");
+	map(0x1d00, 0x1dff).w(FUNC(hitme_state::output_port_0_w));
+	map(0x1e00, 0x1fff).w(FUNC(hitme_state::output_port_1_w));
+}
 
 
-ADDRESS_MAP_START(hitme_state::hitme_portmap)
-	AM_RANGE(0x14, 0x14) AM_READ(hitme_port_0_r)
-	AM_RANGE(0x15, 0x15) AM_READ(hitme_port_1_r)
-	AM_RANGE(0x16, 0x16) AM_READ(hitme_port_2_r)
-	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
-	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
-	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d, 0x1d) AM_WRITE(output_port_0_w)
-	AM_RANGE(0x1e, 0x1f) AM_WRITE(output_port_1_w)
-ADDRESS_MAP_END
+void hitme_state::hitme_portmap(address_map &map)
+{
+	map(0x14, 0x14).r(FUNC(hitme_state::hitme_port_0_r));
+	map(0x15, 0x15).r(FUNC(hitme_state::hitme_port_1_r));
+	map(0x16, 0x16).r(FUNC(hitme_state::hitme_port_2_r));
+	map(0x17, 0x17).r(FUNC(hitme_state::hitme_port_3_r));
+	map(0x18, 0x18).portr("IN4");
+	map(0x19, 0x19).portr("IN5");
+	map(0x1d, 0x1d).w(FUNC(hitme_state::output_port_0_w));
+	map(0x1e, 0x1f).w(FUNC(hitme_state::output_port_1_w));
+}
 
 
 
@@ -272,7 +275,7 @@ static const gfx_layout hitme_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( hitme )
+static GFXDECODE_START( gfx_hitme )
 	GFXDECODE_ENTRY( "gfx1", 0, hitme_charlayout, 0, 2  )
 GFXDECODE_END
 
@@ -288,7 +291,7 @@ static const gfx_layout barricad_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( barricad )
+static GFXDECODE_START( gfx_barricad )
 	GFXDECODE_ENTRY( "gfx1", 0, barricad_charlayout,   0, 1  )
 GFXDECODE_END
 
@@ -311,33 +314,30 @@ void hitme_state::machine_reset()
 	m_timeout_time = attotime::zero;
 }
 
-MACHINE_CONFIG_START(hitme_state::hitme)
-
+void hitme_state::hitme(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(hitme_map)
-	MCFG_CPU_IO_MAP(hitme_portmap)
+	I8080(config, m_maincpu, MASTER_CLOCK/16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hitme_state::hitme_map);
+	m_maincpu->set_addrmap(AS_IO, &hitme_state::hitme_portmap);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 19*10)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 19*10);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 19*10-1);
+	m_screen->set_screen_update(FUNC(hitme_state::screen_update_hitme));
+	m_screen->set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitme)
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_hitme);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(hitme)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, hitme_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -348,19 +348,19 @@ MACHINE_CONFIG_END
     Barricade or is the resolution set by a dip switch?
 */
 
-MACHINE_CONFIG_START(hitme_state::barricad)
+void hitme_state::barricad(machine_config &config)
+{
 	hitme(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(32*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
+	m_screen->set_size(32*8, 24*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
+	m_screen->set_screen_update(FUNC(hitme_state::screen_update_barricad));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", barricad)
+	m_gfxdecode->set_info(gfx_barricad);
 
 	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
-MACHINE_CONFIG_END
+}
 
 
 
@@ -374,12 +374,12 @@ static INPUT_PORTS_START( hitme )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                 /* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* P1 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* P1 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* P1 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -389,19 +389,19 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* P2 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* P2 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* P2 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x00, "Extra Hand On Natural" )         /* Aux 1 dipswitch */
 	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR ( On )  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) /* P3 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) /* P3 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) /* P3 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Time out counter (TOC1) */
@@ -411,7 +411,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) /* P4 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) /* P4 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) /* P4 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN4")
 	PORT_DIPNAME( 0x07, 0x07, "Number of Chips" )
@@ -450,12 +450,12 @@ static INPUT_PORTS_START( super21 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Always high */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) /* P4 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) /* P4 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) /* P4 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -465,17 +465,17 @@ static INPUT_PORTS_START( super21 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) /* P3 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) /* P3 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) /* P3 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Aux 1 dipswitch? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* P2 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* P2 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* P2 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Time out counter (TOC1) */
@@ -485,7 +485,7 @@ static INPUT_PORTS_START( super21 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* P1 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* P1 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* P1 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN4")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -506,12 +506,12 @@ static INPUT_PORTS_START( barricad )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                         /* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                         /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -521,17 +521,17 @@ static INPUT_PORTS_START( barricad )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(3)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                        /* ??? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                         /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(4)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(4)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                        /* Time out counter (TOC1) */
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( barricad )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	/* On the flyer it says that barricade has both user adjustable points per
 	    game, and speed. From experimenting it looks like points per game is the
@@ -691,9 +691,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
-GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
-GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, 0, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
-GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
-GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
+GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
+GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, empty_init, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
+GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )

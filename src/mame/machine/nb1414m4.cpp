@@ -27,7 +27,7 @@ Notes:
 ********************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/nb1414m4.h"
+#include "machine/nb1414m4.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(NB1414M4, nb1414m4_device, "nb1414m4", "NB1414M4 Mahjong Custom")
@@ -319,7 +319,7 @@ void nb1414m4_device::exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, u
 		case 0x8000: break; //Ninja Emaki, attract mode
 		case 0xff00: break; //Ninja Emaki POST, presumably invalid
 		default:
-			popmessage("NB 1414M4 executes %04x command, contact MAMEdev\n",mcu_cmd);
+			popmessage("NB 1414M4 executes %04x command, contact MAMEdev",mcu_cmd);
 			break;
 	}
 

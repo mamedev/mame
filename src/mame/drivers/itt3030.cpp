@@ -192,11 +192,13 @@ Beeper Circuit, all ICs shown:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"          //Display hardware
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "formats/itt3030_dsk.h"
@@ -214,6 +216,7 @@ public:
 	itt3030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_kbdmcu(*this, "kbdmcu")
 		, m_ram(*this, "mainram")
 		, m_crtc(*this, "crt5027")
@@ -227,10 +230,16 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void itt3030(machine_config &config);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
 	DECLARE_WRITE8_MEMBER( beep_w );
@@ -248,20 +257,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
-	DECLARE_PALETTE_INIT(itt3030);
+	void itt3030_palette(palette_device &palette) const;
 
-	void itt3030(machine_config &config);
 	void itt3030_io(address_map &map);
 	void itt3030_map(address_map &map);
 	void lower48_map(address_map &map);
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<i8741_device> m_kbdmcu;
+	required_device<screen_device> m_screen;
+	required_device<i8741a_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
 	required_device<address_map_bank_device> m_48kbank;
@@ -274,7 +279,6 @@ protected:
 	// shared pointers
 	required_shared_ptr<uint8_t> m_vram;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -290,27 +294,30 @@ private:
 // The upper 16K is always the top 16K of the first bank, F5 can set this to 32K
 // Port F6 bits 7-5 select banks 0-7, bit 4 enables bank 8
 
-ADDRESS_MAP_START(itt3030_state::itt3030_map)
-	AM_RANGE(0x0000, 0xbfff) AM_DEVICE("lowerbank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void itt3030_state::itt3030_map(address_map &map)
+{
+	map(0x0000, 0xbfff).m(m_48kbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(itt3030_state::lower48_map)
-	AM_RANGE(0x60000, 0x607ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
-	AM_RANGE(0x60800, 0x60fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x61000, 0x610ff) AM_RAM AM_MIRROR(0x100)  // only 256 bytes, but ROM also clears 11xx?
-	AM_RANGE(0x63000, 0x63fff) AM_RAM AM_SHARE("vram")
-ADDRESS_MAP_END
+void itt3030_state::lower48_map(address_map &map)
+{
+	map(0x60000, 0x607ff).rom().region("maincpu", 0);   // begin "page 8"
+	map(0x60800, 0x60fff).rom().region("maincpu", 0);
+	map(0x61000, 0x610ff).ram().mirror(0x100);  // only 256 bytes, but ROM also clears 11xx?
+	map(0x63000, 0x63fff).ram().share("vram");
+}
 
-ADDRESS_MAP_START(itt3030_state::itt3030_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("kbdmcu", i8741_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
-	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
-ADDRESS_MAP_END
+void itt3030_state::itt3030_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x20, 0x2f).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write));
+	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
+	map(0x32, 0x32).w(FUNC(itt3030_state::beep_w));
+	map(0x35, 0x35).r(FUNC(itt3030_state::vsync_r));
+	map(0x50, 0x53).rw(FUNC(itt3030_state::fdc_r), FUNC(itt3030_state::fdc_w));
+	map(0x54, 0x54).rw(FUNC(itt3030_state::fdc_stat_r), FUNC(itt3030_state::fdc_cmd_w));
+	map(0xf6, 0xf6).w(FUNC(itt3030_state::bank_w));
+}
 
 
 //**************************************************************************
@@ -463,12 +470,12 @@ READ8_MEMBER(itt3030_state::vsync_r)
 {
 	uint8_t ret = 0;
 
-	if (machine().first_screen()->vblank())
+	if (m_screen->vblank())
 	{
 		ret |= 0xc0;    // set both bits 6 and 7 if vblank
 	}
 
-	if (machine().first_screen()->hblank())
+	if (m_screen->hblank())
 	{
 		ret |= 0x80;    // set only bit 7 if hblank
 	}
@@ -520,12 +527,12 @@ static const gfx_layout charlayout =
 	8*16                    /* size of one char */
 };
 
-static GFXDECODE_START( itt3030 )
+static GFXDECODE_START( gfx_itt3030 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(itt3030_state, itt3030)
+void itt3030_state::itt3030_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(215, 229, 82));
@@ -592,12 +599,12 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 /* As far as we can tell, the mess of ttl de-inverts the bus */
 READ8_MEMBER(itt3030_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(itt3030_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 /*
@@ -656,10 +663,11 @@ FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
 FLOPPY_FORMATS_END
 
 
-static SLOT_INTERFACE_START( itt3030_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void itt3030_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 
@@ -687,66 +695,57 @@ void itt3030_state::machine_reset()
 	m_curfloppy = nullptr;
 }
 
-MACHINE_CONFIG_START(itt3030_state::itt3030)
-
+void itt3030_state::itt3030(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(itt3030_map)
-	MCFG_CPU_IO_MAP(itt3030_io)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itt3030_state::itt3030_map);
+	m_maincpu->set_addrmap(AS_IO, &itt3030_state::itt3030_io);
 
 	// Schematics + i8278 datasheet says:
 	// Port 1 goes to the keyboard matrix.
 	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 	// T0 is the key matrix return
 	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-	MCFG_CPU_ADD("kbdmcu", I8741, XTAL(6'000'000))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(itt3030_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(itt3030_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(itt3030_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(itt3030_state, kbd_port2_w))
+	I8741A(config, m_kbdmcu, 6_MHz_XTAL);
+	m_kbdmcu->t0_in_cb().set(FUNC(itt3030_state::kbd_matrix_r));
+	m_kbdmcu->p1_out_cb().set(FUNC(itt3030_state::kbd_matrix_w));
+	m_kbdmcu->p2_in_cb().set(FUNC(itt3030_state::kbd_port2_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(itt3030_state::kbd_port2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
-	MCFG_SCREEN_UPDATE_DRIVER(itt3030_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	m_screen->set_screen_update(FUNC(itt3030_state::screen_update));
+	m_screen->set_size(80*8, 24*12);
+	m_screen->set_visarea(0, 80*8-1, 0, 24*12-1);
+	m_screen->set_palette(m_palette);
 
 	/* devices */
-	MCFG_DEVICE_ADD("lowerbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lower48_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0xc000)
+	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
 
-	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL(6'000'000))
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5027(config, m_crtc, 6_MHz_XTAL / 8).set_char_width(8);
 
-	MCFG_FD1791_ADD("fdc", XTAL(20'000'000) / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(itt3030_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(itt3030_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(itt3030_state, fdchld_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
+	FD1791(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(itt3030_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(itt3030_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(itt3030_state::fdchld_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_itt3030);
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)
+	PALETTE(config, m_palette, FUNC(itt3030_state::itt3030_palette), 3);
 
 	/* internal ram */
-	MCFG_RAM_ADD("mainram")
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, "mainram").set_default_size("256K");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 //**************************************************************************
@@ -766,4 +765,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  itt3030_state, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, itt3030, 0, 0, itt3030, itt3030, itt3030_state, empty_init, "ITT RFA", "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -20,21 +20,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MM5837_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MM5837, 0)
-
-#define MCFG_MM5837_VDD(_voltage) \
-	mm5837_device::set_vdd_voltage(*device, _voltage);
-
-#define MCFG_MM5837_OUTPUT_CB(_devcb) \
-	devcb = &mm5837_device::set_output_callback(*device, DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,12 +28,11 @@ class mm5837_device : public device_t
 {
 public:
 	// construction/destruction
-	mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	static void set_vdd_voltage(device_t &device, int voltage) { downcast<mm5837_device &>(device).m_vdd = voltage; }
-	template <class Object> static devcb_base &set_output_callback(device_t &device, Object &&cb)
-	{ return downcast<mm5837_device &>(device).m_output_cb.set_callback(std::forward<Object>(cb)); }
+	void set_vdd_voltage(int voltage) { m_vdd = voltage; }
+	auto output_callback() { return m_output_cb.bind(); }
 
 protected:
 	// device-level overrides

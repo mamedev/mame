@@ -51,7 +51,17 @@ class gamate_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	gamate_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	gamate_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: gamate_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	gamate_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~gamate_cart_slot_device();
 
 	// image-level overrides
@@ -95,10 +105,6 @@ DECLARE_DEVICE_TYPE(GAMATE_CART_SLOT, gamate_cart_slot_device)
 
 #define GAMATESLOT_ROM_REGION_TAG ":cart:rom"
 
-#define MCFG_GAMATE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, GAMATE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-SLOT_INTERFACE_EXTERN( gamate_cart );
+void gamate_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_GAMATE_SLOT_H

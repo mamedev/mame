@@ -57,7 +57,7 @@ READ8_MEMBER( decocass_state::decocass_sound_command_main_r)
 WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 {
 	LOG(2,("CPU %s sound command -> $%02x\n", m_maincpu->tag(), data));
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	m_sound_ack &= ~0x40;
@@ -66,7 +66,7 @@ WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 
 READ8_MEMBER(decocass_state::decocass_sound_data_r)
 {
-	uint8_t data = m_soundlatch2->read(space, 0);
+	uint8_t data = m_soundlatch2->read();
 	LOG(2,("CPU %s sound data    <- $%02x\n", m_maincpu->tag(), data));
 	return data;
 }
@@ -81,13 +81,13 @@ READ8_MEMBER(decocass_state::decocass_sound_ack_r)
 WRITE8_MEMBER(decocass_state::decocass_sound_data_w)
 {
 	LOG(2,("CPU %s sound data    -> $%02x\n", m_audiocpu->tag(), data));
-	m_soundlatch2->write(space, 0, data);
+	m_soundlatch2->write(data);
 	m_sound_ack |= 0x40;
 }
 
 READ8_MEMBER(decocass_state::decocass_sound_command_r)
 {
-	uint8_t data = m_soundlatch->read(space, 0);
+	uint8_t data = m_soundlatch->read();
 	LOG(4,("CPU %s sound command <- $%02x\n", m_audiocpu->tag(), data));
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	m_sound_ack &= ~0x80;
@@ -1037,7 +1037,7 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			if (m_widel_latch && !machine().side_effect_disabled())
+			if (m_widel_latch && !machine().side_effects_disabled())
 				m_widel_ctrs = (m_widel_ctrs + 0x100) & 0xfffff;
 			data = m_mcu->upi41_master_r(space,1);
 			LOG(4,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x <- 8041 STATUS\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data));
@@ -1057,7 +1057,7 @@ READ8_MEMBER(decocass_widel_state::decocass_widel_r)
 			data = prom[m_widel_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_widel_r(%02x): $%02x '%c' <- PROM[%04x]\n", machine().time().as_string(6), m_maincpu->pcbase(), offset, data, (data >= 32) ? data : '.', m_widel_ctrs));
 
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				m_widel_ctrs = (m_widel_ctrs + 1) & 0xfffff;
 		}
 		else

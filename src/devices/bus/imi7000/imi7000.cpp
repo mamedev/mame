@@ -98,6 +98,7 @@ void imi7000_bus_device::device_start()
 
 #include "imi5000h.h"
 
-SLOT_INTERFACE_START( imi7000_devices )
-	SLOT_INTERFACE("imi5000h", IMI5000H)
-SLOT_INTERFACE_END
+void imi7000_devices(device_slot_interface &device)
+{
+	device.option_add("imi5000h", IMI5000H);
+}

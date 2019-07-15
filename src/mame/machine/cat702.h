@@ -10,16 +10,13 @@
 
 DECLARE_DEVICE_TYPE(CAT702, cat702_device)
 
-#define MCFG_CAT702_DATAOUT_HANDLER(_devcb) \
-	devcb = &cat702_device::set_dataout_handler(*device, DEVCB_##_devcb);
-
 class cat702_device : public device_t
 {
 public:
 	cat702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_dataout_handler(device_t &device, Object &&cb) { return downcast<cat702_device &>(device).m_dataout_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto dataout_handler() { return m_dataout_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_select);
 	DECLARE_WRITE_LINE_MEMBER(write_datain);

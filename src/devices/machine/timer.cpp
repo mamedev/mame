@@ -53,97 +53,6 @@ timer_device::timer_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
-//  static_configure_generic - configuration
-//  helper to set up a generic timer
-//-------------------------------------------------
-
-void timer_device::static_configure_generic(device_t &device, expired_delegate callback)
-{
-	timer_device &timer = downcast<timer_device &>(device);
-	timer.m_type = TIMER_TYPE_GENERIC;
-	timer.m_callback = callback;
-}
-
-
-//-------------------------------------------------
-//  static_configure_periodic - configuration
-//  helper to set up a periodic timer
-//-------------------------------------------------
-
-void timer_device::static_configure_periodic(device_t &device, expired_delegate callback, const attotime &period)
-{
-	timer_device &timer = downcast<timer_device &>(device);
-	timer.m_type = TIMER_TYPE_PERIODIC;
-	timer.m_callback = callback;
-	timer.m_period = period;
-}
-
-
-//-------------------------------------------------
-//  static_configure_scanline - configuration
-//  helper to set up a scanline timer
-//-------------------------------------------------
-
-void timer_device::static_configure_scanline(device_t &device, expired_delegate callback, const char *screen, int first_vpos, int increment)
-{
-	timer_device &timer = downcast<timer_device &>(device);
-	timer.m_type = TIMER_TYPE_SCANLINE;
-	timer.m_callback = callback;
-	timer.m_screen_tag = screen;
-	timer.m_first_vpos = first_vpos;
-	timer.m_increment = increment;
-}
-
-
-//-------------------------------------------------
-//  static_set_callback - configuration helper
-//  to set the callback
-//-------------------------------------------------
-
-void timer_device::static_set_callback(device_t &device, expired_delegate callback)
-{
-	timer_device &timer = downcast<timer_device &>(device);
-	timer.m_callback = callback;
-}
-
-
-//-------------------------------------------------
-//  static_set_start_delay - configuration helper
-//  to set the starting delay
-//-------------------------------------------------
-
-void timer_device::static_set_start_delay(device_t &device, const attotime &delay)
-{
-	timer_device &timer = downcast<timer_device &>(device);
-	timer.m_start_delay = delay;
-}
-
-
-//-------------------------------------------------
-//  static_set_param - configuration helper to set
-//  the integer parameter
-//-------------------------------------------------
-
-void timer_device::static_set_param(device_t &device, int param)
-{
-	timer_device &timer = downcast<timer_device &>(device);
-	timer.m_param = param;
-}
-
-
-//-------------------------------------------------
-//  static_set_ptr - configuration helper to set
-//  the pointer parameter
-//-------------------------------------------------
-
-void timer_device::static_set_ptr(device_t &device, void *ptr)
-{
-	timer_device &timer = downcast<timer_device &>(device);
-	timer.m_ptr = ptr;
-}
-
-
-//-------------------------------------------------
 //  device_validity_check - validate the device
 //  configuration
 //-------------------------------------------------
@@ -172,6 +81,10 @@ void timer_device::device_validity_check(validity_checker &valid) const
 				osd_printf_warning("Scanline timer specified parameters for a periodic timer\n");
 			if (m_param != 0)
 				osd_printf_warning("Scanline timer specified parameter which is ignored\n");
+			if (m_screen_tag == nullptr)
+				osd_printf_error("Scanline timer has no screen specified\n");
+			else if (dynamic_cast<screen_device *>(siblingdevice(m_screen_tag)) == nullptr)
+				osd_printf_error("Scanline timer specifies nonexistent screen %s\n", m_screen_tag);
 //          if (m_first_vpos < 0)
 //              osd_printf_error("Scanline timer specified invalid initial position\n");
 //          if (m_increment < 0)
@@ -194,7 +107,7 @@ void timer_device::device_start()
 {
 	// fetch the screen
 	if (m_screen_tag != nullptr)
-		m_screen = machine().device<screen_device>(m_screen_tag);
+		m_screen = siblingdevice<screen_device>(m_screen_tag);
 
 	// allocate the timer
 	m_timer = timer_alloc();
@@ -262,8 +175,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				(m_callback)(*this, m_ptr, param);
 			break;
 
-
-		// scanline timers have to do some additiona bookkeeping
+		// scanline timers have to do some additional bookkeeping
 		case TIMER_TYPE_SCANLINE:
 		{
 			// by default, we fire at the first position

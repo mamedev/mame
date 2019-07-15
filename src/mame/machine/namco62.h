@@ -5,36 +5,14 @@
 
 #include "cpu/mb88xx/mb88xx.h"
 
-#define MCFG_NAMCO_62XX_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_62XX, _clock)
-
-#define MCFG_NAMCO_62XX_INPUT_0_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<0>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_62XX_INPUT_1_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<1>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_62XX_INPUT_2_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<2>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_62XX_INPUT_3_CB(_devcb) \
-	devcb = &namco_62xx_device::set_input_callback<3>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_62XX_OUTPUT_0_CB(_devcb) \
-	devcb = &namco_62xx_device::set_output_callback<0>(*device, DEVCB_##_devcb);
-
-#define MCFG_NAMCO_62XX_OUTPUT_1_CB(_devcb) \
-	devcb = &namco_62xx_device::set_output_callback<1>(*device, DEVCB_##_devcb);
-
-
 class namco_62xx_device : public device_t
 {
 public:
 	namco_62xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <unsigned N, class Object> static devcb_base &set_input_callback(device_t &device, Object &&cb) { return downcast<namco_62xx_device &>(device).m_in[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto input_callback() { return m_in[N].bind(); }
 
-	template <unsigned N, class Object> static devcb_base &set_output_callback(device_t &device, Object &&cb) { return downcast<namco_62xx_device &>(device).m_out[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto output_callback() { return m_out[N].bind(); }
 
 protected:
 	// device-level overrides

@@ -18,6 +18,7 @@
 
 #include "emuopts.h"
 #include "harddisk.h"
+#include "romload.h"
 
 
 OPTION_GUIDE_START(hd_option_guide)
@@ -28,7 +29,7 @@ OPTION_GUIDE_START(hd_option_guide)
 	OPTION_INT('K', "hunksize",         "Hunk Bytes")
 OPTION_GUIDE_END
 
-static const char *hd_option_spec =
+static char const *const hd_option_spec =
 	"C1-[512]-1024;H1/2/[4]/8;S1-[16]-64;L128/256/[512]/1024;K512/1024/2048/[4096]";
 
 
@@ -52,8 +53,8 @@ harddisk_image_device::harddisk_image_device(const machine_config &mconfig, devi
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),
-		m_device_image_load(device_image_load_delegate()),
-		m_device_image_unload(device_image_func_delegate()),
+		m_device_image_load(load_delegate()),
+		m_device_image_unload(unload_delegate()),
 		m_interface(nullptr)
 {
 }

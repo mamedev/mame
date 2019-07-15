@@ -3,8 +3,8 @@
 
 <mamelayout version="2">
 
-	<element name="led">
-		<disk>
+	<element name="led" defstate="0">
+		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>

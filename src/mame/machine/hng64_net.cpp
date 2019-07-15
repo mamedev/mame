@@ -106,14 +106,16 @@ WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
 	}
 }
 
-ADDRESS_MAP_START(hng64_state::hng_comm_map)
-	AM_RANGE(0x0000,0xffff) AM_READWRITE(hng64_comm_space_r, hng64_comm_space_w )
-ADDRESS_MAP_END
+void hng64_state::hng_comm_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(hng64_state::hng64_comm_space_r), FUNC(hng64_state::hng64_comm_space_w));
+}
 
-ADDRESS_MAP_START(hng64_state::hng_comm_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void hng64_state::hng_comm_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 	/* Reserved for the KL5C80 internal hardware */
-	AM_RANGE(0x00, 0x07) AM_READWRITE(hng64_comm_mmu_r,hng64_comm_mmu_w )
+	map(0x00, 0x07).rw(FUNC(hng64_state::hng64_comm_mmu_r), FUNC(hng64_state::hng64_comm_mmu_w));
 //  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */
 //  AM_RANGE(0x20,0x25) AM_READWRITE        /* Timer/Counter B */           /* hng64 writes here */
 //  AM_RANGE(0x27,0x27) AM_NOP              /* Reserved */
@@ -126,22 +128,23 @@ ADDRESS_MAP_START(hng64_state::hng_comm_io_map)
 //  AM_RANGE(0x3c,0x3f) AM_NOP              /* Reserved */
 
 	/* General IO */
-	AM_RANGE(0x50,0x57) AM_READWRITE(hng64_com_share_r, hng64_com_share_w)
+	map(0x50, 0x57).rw(FUNC(hng64_state::hng64_com_share_r), FUNC(hng64_state::hng64_com_share_w));
 //  AM_RANGE(0x72,0x72) AM_WRITE            /* dunno yet */
-ADDRESS_MAP_END
+}
 
 
 void hng64_state::reset_net()
 {
-//  m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  m_comm->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // reset the CPU and let 'er rip
 //  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	m_mmub[0] = 0;
 	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
-MACHINE_CONFIG_START(hng64_state::hng64_network)
-	MCFG_CPU_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
-	MCFG_CPU_PROGRAM_MAP(hng_comm_map)
-	MCFG_CPU_IO_MAP(hng_comm_io_map)
-MACHINE_CONFIG_END
+void hng64_state::hng64_network(machine_config &config)
+{
+	KL5C80A12(config, m_comm, HNG64_MASTER_CLOCK / 4);        /* KL5C80A12CFP - binary compatible with Z80. */
+	m_comm->set_addrmap(AS_PROGRAM, &hng64_state::hng_comm_map);
+	m_comm->set_addrmap(AS_IO, &hng64_state::hng_comm_io_map);
+}

@@ -15,8 +15,7 @@ const ssg_callbacks ym2203_device::psgintf =
 /* IRQ Handler */
 void ym2203_device::irq_handler(int irq)
 {
-	if (!m_irq_handler.isnull())
-		m_irq_handler(irq);
+	m_timer[2]->adjust(attotime::zero, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -24,19 +23,24 @@ void ym2203_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch(id)
 	{
-	case 0:
+	case TIMER_A:
 		ym2203_timer_over(m_chip,0);
 		break;
 
-	case 1:
+	case TIMER_B:
 		ym2203_timer_over(m_chip,1);
+		break;
+
+	case TIMER_IRQ_SYNC:
+		if (!m_irq_handler.isnull())
+			m_irq_handler(param);
 		break;
 	}
 }
 
 void ym2203_device::timer_handler(int c, int count, int clock)
 {
-	if( count == 0 )
+	if( count == 0 || clock == 0)
 	{   /* Reset FM Timer */
 		m_timer[c]->enable(false);
 	}
@@ -77,8 +81,9 @@ void ym2203_device::device_start()
 	m_irq_handler.resolve();
 
 	/* Timer Handler set */
-	m_timer[0] = timer_alloc(0);
-	m_timer[1] = timer_alloc(1);
+	m_timer[0] = timer_alloc(TIMER_A);
+	m_timer[1] = timer_alloc(TIMER_B);
+	m_timer[2] = timer_alloc(TIMER_IRQ_SYNC);
 
 	/* stream system initialize */
 	calculate_rates();
@@ -125,34 +130,34 @@ void ym2203_device::device_reset()
 }
 
 
-READ8_MEMBER( ym2203_device::read )
+u8 ym2203_device::read(offs_t offset)
 {
 	return ym2203_read(m_chip, offset & 1);
 }
 
-WRITE8_MEMBER( ym2203_device::write )
+void ym2203_device::write(offs_t offset, u8 data)
 {
 	ym2203_write(m_chip, offset & 1, data);
 }
 
-READ8_MEMBER( ym2203_device::status_port_r )
+u8 ym2203_device::status_port_r()
 {
-	return read(space, 0);
+	return read(0);
 }
 
-READ8_MEMBER( ym2203_device::read_port_r )
+u8 ym2203_device::read_port_r()
 {
-	return read(space, 1);
+	return read(1);
 }
 
-WRITE8_MEMBER( ym2203_device::control_port_w )
+void ym2203_device::control_port_w(u8 data)
 {
-	write(space, 0, data);
+	write(0, data);
 }
 
-WRITE8_MEMBER( ym2203_device::write_port_w )
+void ym2203_device::write_port_w(u8 data)
 {
-	write(space, 1, data);
+	write(1, data);
 }
 
 DEFINE_DEVICE_TYPE(YM2203, ym2203_device, "ym2203", "YM2203 OPN")

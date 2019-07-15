@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
 #include "includes/relief.h"
 
 
@@ -79,7 +78,7 @@ const atari_motion_objects_config relief_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(relief_state,relief)
+void relief_state::video_start()
 {
 	/* MOs are 5bpp but with a 4-bit color granularity */
 	m_gfxdecode->gfx(1)->set_granularity(16);
@@ -107,12 +106,12 @@ uint32_t relief_state::screen_update_relief(screen_device &screen, bitmap_ind16 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
 			uint8_t *pri = &priority_bitmap.pix8(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
 					/* verified from the GALs on the real PCB; equations follow

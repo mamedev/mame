@@ -7,11 +7,12 @@
     Disk image formats
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_AFS_DSK_H
+#define MAME_FORMATS_AFS_DSK_H
 
 #pragma once
 
-#ifndef __AFS_DSK_H__
-#define __AFS_DSK_H__
+#pragma once
 
 #include "wd177x_dsk.h"
 
@@ -34,4 +35,4 @@ private:
 
 extern const floppy_format_type FLOPPY_AFS_FORMAT;
 
-#endif // __AFS_DSK_H__
+#endif // MAME_FORMATS_AFS_DSK_H

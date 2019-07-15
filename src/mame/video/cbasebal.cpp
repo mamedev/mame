@@ -46,8 +46,8 @@ void cbasebal_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(3);
 
-	save_pointer(NAME(m_textram.get()), 0x1000);
-	save_pointer(NAME(m_scrollram.get()), 0x1000);
+	save_pointer(NAME(m_textram), 0x1000);
+	save_pointer(NAME(m_scrollram), 0x1000);
 }
 
 

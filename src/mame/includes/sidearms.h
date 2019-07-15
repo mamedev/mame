@@ -1,12 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Curt Coder
+#ifndef MAME_INCLUDES_SIDEARMS_H
+#define MAME_INCLUDES_SIDEARMS_H
+
+#pragma once
+
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class sidearms_state : public driver_device
 {
 public:
-	sidearms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sidearms_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -20,6 +26,16 @@ public:
 	{
 	}
 
+	void sidearms(machine_config &config);
+	void turtship(machine_config &config);
+	void whizz(machine_config &config);
+
+	void init_dyger();
+	void init_sidearms();
+	void init_whizz();
+	void init_turtship();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -62,10 +78,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
 
-	DECLARE_DRIVER_INIT(dyger);
-	DECLARE_DRIVER_INIT(sidearms);
-	DECLARE_DRIVER_INIT(whizz);
-	DECLARE_DRIVER_INIT(turtship);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -78,9 +90,7 @@ public:
 	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset );
 	void draw_starfield( bitmap_ind16 &bitmap );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sidearms(machine_config &config);
-	void turtship(machine_config &config);
-	void whizz(machine_config &config);
+
 	void sidearms_map(address_map &map);
 	void sidearms_sound_map(address_map &map);
 	void turtship_map(address_map &map);
@@ -88,3 +98,5 @@ public:
 	void whizz_map(address_map &map);
 	void whizz_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SIDEARMS_H

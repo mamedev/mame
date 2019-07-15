@@ -59,19 +59,21 @@ const tiny_rom_entry *serial_box_device::device_rom_region() const
 //  ADDRESS_MAP( serial_box_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(serial_box_device::serial_box_mem)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-ADDRESS_MAP_END
+void serial_box_device::serial_box_mem(address_map &map)
+{
+	map(0xf000, 0xffff).rom().region(M6502_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(serial_box_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6502_TAG, M65C02, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(serial_box_mem)
-MACHINE_CONFIG_END
+void serial_box_device::device_add_mconfig(machine_config &config)
+{
+	M65C02(config, m_maincpu, XTAL(4'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &serial_box_device::serial_box_mem);
+}
 
 
 

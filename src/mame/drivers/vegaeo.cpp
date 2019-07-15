@@ -27,36 +27,36 @@ class vegaeo_state : public eolith_state
 {
 public:
 	vegaeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state(mconfig, type, tag),
-		m_soundlatch(*this, "soundlatch") { }
+		: eolith_state(mconfig, type, tag)
+		, m_soundlatch(*this, "soundlatch")
+		, m_system_io(*this, "SYSTEM")
+	{
+	}
 
+	void vega(machine_config &config);
+
+	void init_vegaeo();
+
+private:
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_ioport m_system_io;
 
-	std::unique_ptr<uint32_t[]> m_vega_vram;
-	uint8_t m_vega_vbuffer;
+	std::unique_ptr<uint8_t[]> m_vram;
+	int m_vbuffer;
 
-	DECLARE_WRITE32_MEMBER(vega_vram_w);
-	DECLARE_READ32_MEMBER(vega_vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vega_misc_w);
 	DECLARE_READ32_MEMBER(vegaeo_custom_read);
-	DECLARE_WRITE32_MEMBER(soundlatch_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	DECLARE_DRIVER_INIT(vegaeo);
 	DECLARE_VIDEO_START(vega);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vega(machine_config &config);
 	void vega_map(address_map &map);
 };
-
-READ8_MEMBER( vegaeo_state::qs1000_p1_r )
-{
-	return m_soundlatch->read(space, 0);
-}
 
 WRITE8_MEMBER( vegaeo_state::qs1000_p1_w )
 {
@@ -75,80 +75,50 @@ WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		m_qs1000->set_irq(CLEAR_LINE);
+		m_soundlatch->acknowledge_w();
 }
 
-WRITE32_MEMBER(vegaeo_state::vega_vram_w)
+WRITE8_MEMBER(vegaeo_state::vram_w)
 {
-	switch(mem_mask)
-	{
-		case 0xffffffff:
-			vega_vram_w(space,offset,data,0xff000000);
-			vega_vram_w(space,offset,data,0x00ff0000);
-			vega_vram_w(space,offset,data,0x0000ff00);
-			vega_vram_w(space,offset,data,0x000000ff);
-			return;
-
-		case 0xffff0000:
-			vega_vram_w(space,offset,data,0xff000000);
-			vega_vram_w(space,offset,data,0x00ff0000);
-			return;
-
-		case 0x0000ffff:
-			vega_vram_w(space,offset,data,0x0000ff00);
-			vega_vram_w(space,offset,data,0x000000ff);
-			return;
-
-		default:
-			// don't write transparent pen
-			if((data & mem_mask) == mem_mask)
-				return;
-	}
-
-	COMBINE_DATA(&m_vega_vram[offset + m_vega_vbuffer * (0x14000/4)]);
+	// don't write transparent pen
+	if (data != 0xff)
+		COMBINE_DATA(&m_vram[offset + m_vbuffer * 0x14000]);
 }
 
-READ32_MEMBER(vegaeo_state::vega_vram_r)
+READ8_MEMBER(vegaeo_state::vram_r)
 {
-	return m_vega_vram[offset + (0x14000/4) * m_vega_vbuffer];
+	return m_vram[offset + 0x14000 * m_vbuffer];
 }
 
 WRITE32_MEMBER(vegaeo_state::vega_misc_w)
 {
 	// other bits ???
 
-	m_vega_vbuffer = data & 1;
+	m_vbuffer = data & 1;
 }
 
 
 READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 {
 	speedup_read();
-	return ioport("SYSTEM")->read();
+	return m_system_io->read();
 }
 
-WRITE32_MEMBER(vegaeo_state::soundlatch_w)
+
+void vegaeo_state::vega_map(address_map &map)
 {
-	m_soundlatch->write(space, 0, data);
-	m_qs1000->set_irq(ASSERT_LINE);
-
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	map(0x00000000, 0x001fffff).ram();
+	map(0x80000000, 0x80013fff).rw(FUNC(vegaeo_state::vram_r), FUNC(vegaeo_state::vram_w));
+	map(0xfc000000, 0xfc0000ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x000000ff);
+	map(0xfc200000, 0xfc2003ff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
+	map(0xfc400000, 0xfc40005b).nopw(); // crt registers ?
+	map(0xfc600000, 0xfc600003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0xfca00000, 0xfca00003).w(FUNC(vegaeo_state::vega_misc_w));
+	map(0xfcc00000, 0xfcc00003).r(FUNC(vegaeo_state::vegaeo_custom_read));
+	map(0xfce00000, 0xfce00003).portr("P1_P2");
+	map(0xfd000000, 0xfeffffff).rom().region("maindata", 0);
+	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
 }
-
-
-ADDRESS_MAP_START(vegaeo_state::vega_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
-	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x000000ff)
-	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
-	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
-	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)
-	AM_RANGE(0xfcc00000, 0xfcc00003) AM_READ(vegaeo_custom_read)
-	AM_RANGE(0xfce00000, 0xfce00003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( crazywar )
 	PORT_START("SYSTEM")
@@ -158,7 +128,7 @@ static INPUT_PORTS_START( crazywar )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegaeo_state, eolith_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vegaeo_state, eolith_speedup_getvblank, nullptr)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -185,76 +155,62 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER(vegaeo_state,vega)
 {
-	m_vega_vram = std::make_unique<uint32_t[]>(0x14000*2/4);
-	save_pointer(NAME(m_vega_vram.get()), 0x14000*2/4);
-	save_item(NAME(m_vega_vbuffer));
+	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
+	save_pointer(NAME(m_vram), 0x14000*2);
+	save_item(NAME(m_vbuffer));
 }
 
 uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-	int color;
-
-	count = 0;
-	for (y=0;y < 240;y++)
+	for (int y = 0; y < 240; y++)
 	{
-		for (x=0;x < 320/4;x++)
+		for (int x = 0; x < 320; x++)
 		{
-			color = m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff;
-			bitmap.pix16(y, x*4 + 3) = color;
-
-			color = (m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff00) >> 8;
-			bitmap.pix16(y, x*4 + 2) = color;
-
-			color = (m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff0000) >> 16;
-			bitmap.pix16(y, x*4 + 1) = color;
-
-			color = (m_vega_vram[count + (0x14000/4) * (m_vega_vbuffer ^ 1)] & 0xff000000) >> 24;
-			bitmap.pix16(y, x*4 + 0) = color;
-
-			count++;
+			bitmap.pix16(y, x) = m_vram[0x14000 * (m_vbuffer ^ 1) + (y * 320) + x] & 0xff;
 		}
 	}
 	return 0;
 }
 
+void vegaeo_state::vega(machine_config &config)
+{
+	GMS30C2132(config, m_maincpu, XTAL(55'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vegaeo_state::vega_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(vegaeo_state::eolith_speedup), "screen", 0, 1);
 
-MACHINE_CONFIG_START(vegaeo_state::vega)
-	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL(55'000'000))
-	MCFG_CPU_PROGRAM_MAP(vega_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)
-
-	MCFG_AT28C16_ADD("at28c16", nullptr)
+	AT28C16(config, "at28c16", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(vegaeo_state, screen_update_vega)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 262);
+	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_screen_update(FUNC(vegaeo_state::screen_update_vega));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
+	m_palette->set_membits(16);
 
 	MCFG_VIDEO_START_OVERRIDE(vegaeo_state,vega)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
-	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(vegaeo_state, qs1000_p1_r))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(vegaeo_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(vegaeo_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(vegaeo_state, qs1000_p3_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	QS1000(config, m_qs1000, XTAL(24'000'000));
+	m_qs1000->set_external_rom(true);
+	m_qs1000->p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_qs1000->p1_out().set(FUNC(vegaeo_state::qs1000_p1_w));
+	m_qs1000->p2_out().set(FUNC(vegaeo_state::qs1000_p2_w));
+	m_qs1000->p3_out().set(FUNC(vegaeo_state::qs1000_p3_w));
+	m_qs1000->add_route(0, "lspeaker", 1.0);
+	m_qs1000->add_route(1, "rspeaker", 1.0);
+}
 
 /*
 Crazy Wars
@@ -306,7 +262,7 @@ ROM_START( crazywar )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u7",         0x00000, 0x80000, CRC(697c2505) SHA1(c787007f05d2ddf1706e15e9d9ef9b2479708f12) )
 
-	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_REGION32_BE( 0x2000000, "maindata", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
 	ROM_LOAD32_WORD_SWAP( "00", 0x0000000, 0x200000, CRC(fbb917ae) SHA1(1fd975cda06b3cb748503b7c8009e6184b46af3f) )
 	ROM_LOAD32_WORD_SWAP( "01", 0x0000002, 0x200000, CRC(59308556) SHA1(bc8c28531fca009be5b7b3b1a4a9b3ebcc9d3c3a) )
 	ROM_LOAD32_WORD_SWAP( "02", 0x0400000, 0x200000, CRC(34813167) SHA1(d04c71164b36af78425dcd637e60aee45c39a1ba) )
@@ -332,13 +288,13 @@ ROM_START( crazywar )
 	ROM_LOAD( "qs1001a.u86",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
+void vegaeo_state::init_vegaeo()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	init_speedup();
 }
 
-GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, init_vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_SUPPORTS_SAVE )

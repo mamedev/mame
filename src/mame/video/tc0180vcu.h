@@ -5,39 +5,52 @@
 
 #pragma once
 
-class tc0180vcu_device : public device_t
+class tc0180vcu_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
 	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_bg_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_bg_color_base = color; }
-	static void set_fg_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_fg_color_base = color; }
-	static void set_tx_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_tx_color_base = color; }
+	// configuration
+	void set_fb_colorbase(int color) { m_fb_color_base = color * 16; }
+	void set_bg_colorbase(int color) { m_bg_color_base = color; }
+	void set_fg_colorbase(int color) { m_fg_color_base = color; }
+	void set_tx_colorbase(int color) { m_tx_color_base = color; }
+	auto inth_callback() { return m_inth_callback.bind(); }
+	auto intl_callback() { return m_intl_callback.bind(); }
 
-	DECLARE_READ8_MEMBER( get_fb_page );
-	DECLARE_WRITE8_MEMBER( set_fb_page );
-	DECLARE_READ8_MEMBER( get_videoctrl );
-	DECLARE_READ16_MEMBER( ctrl_r );
+	uint8_t get_videoctrl() { return m_video_control; }
 	DECLARE_WRITE16_MEMBER( ctrl_w );
-	DECLARE_READ16_MEMBER( scroll_r );
-	DECLARE_WRITE16_MEMBER( scroll_w );
-	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
+	DECLARE_READ16_MEMBER( framebuffer_word_r );
+	DECLARE_WRITE16_MEMBER( framebuffer_word_w );
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 
+	void tc0180vcu_memrw(address_map &map);
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	// internal state
-	uint16_t         m_ctrl[0x10];
+	enum {
+		TIMER_INTL
+	};
 
-	std::unique_ptr<uint16_t[]>       m_ram;
-	std::unique_ptr<uint16_t[]>       m_scrollram;
+	void vblank_callback(screen_device &screen, bool state);
+	void vblank_update();
+
+	// internal state
+
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_scrollram;
+	required_shared_ptr<uint16_t> m_ctrl;
+	/* framebuffer is a raw bitmap, remapped as a last step */
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 
 	tilemap_t      *m_tilemap[3];
 
@@ -45,11 +58,17 @@ private:
 	uint8_t          m_framebuffer_page;
 	uint8_t          m_video_control;
 
+	int            m_fb_color_base;
 	int            m_bg_color_base;
 	int            m_fg_color_base;
 	int            m_tx_color_base;
 
-	required_device<gfxdecode_device> m_gfxdecode;
+	static const gfx_layout charlayout, tilelayout;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
+	devcb_write_line m_inth_callback;
+	devcb_write_line m_intl_callback;
+	emu_timer *m_intl_timer;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -59,17 +78,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)
-
-#define MCFG_TC0180VCU_BG_COLORBASE(_color) \
-	tc0180vcu_device::set_bg_colorbase(*device, _color);
-
-#define MCFG_TC0180VCU_FG_COLORBASE(_color) \
-	tc0180vcu_device::set_fg_colorbase(*device, _color);
-
-#define MCFG_TC0180VCU_TX_COLORBASE(_color) \
-	tc0180vcu_device::set_tx_colorbase(*device, _color);
-
-#define MCFG_TC0180VCU_GFXDECODE(_gfxtag) \
-	tc0180vcu_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif // MAME_VIDEO_TC0180VCU_H

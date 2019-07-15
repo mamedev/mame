@@ -38,8 +38,10 @@
 
 ****************************************************************************/
 
-#ifndef __OPRESOLV_H__
-#define __OPRESOLV_H__
+#ifndef MAME_UTIL_OPRESOLV_H
+#define MAME_UTIL_OPRESOLV_H
+
+#pragma once
 
 #include <stdlib.h>
 #include <vector>
@@ -271,4 +273,4 @@ private:
 
 } // namespace util
 
-#endif /* __OPRESOLV_H__ */
+#endif // MAME_UTIL_OPRESOLV_H

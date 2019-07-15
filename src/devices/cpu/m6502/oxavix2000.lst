@@ -1,0 +1,490 @@
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
+# xavix2000 opcodes (Super XaviX)
+
+phy_imp
+	read_pc_noinc();
+	write_stack(SP, Y);
+	dec_SP();
+	prefetch();
+
+phx_imp
+	read_pc_noinc();
+	write_stack(SP, X);
+	dec_SP();
+	prefetch();
+
+plx_imp
+	read_pc_noinc();
+	read_stack(SP);
+	inc_SP();
+	X = read_stack(SP);
+	set_nz(X);
+	prefetch();
+
+ply_imp
+	read_pc_noinc();
+	read_stack(SP);
+	inc_SP();
+	Y = read_stack(SP);
+	set_nz(Y);
+	prefetch();
+
+clr_acc
+	read_pc_noinc();
+	A = 0;
+	set_nz(A);
+	prefetch();
+
+dec_acc
+	read_pc_noinc();
+	A--;
+	set_nz(A);
+	prefetch();
+
+not_acc
+	read_pc_noinc();
+	A = A ^ 0xff;
+	set_nz(A);
+	prefetch();
+
+inc_acc
+	read_pc_noinc();
+	A++;
+	set_nz(A);
+	prefetch();
+
+neg_acc
+	read_pc_noinc();
+	A = (0x00 - A) & 0xff;
+	set_nz(A);
+	prefetch();
+
+oraj_imp
+	read_pc_noinc();
+	A |= m_j;
+	set_nz(A);
+	prefetch();
+
+orak_imp
+	read_pc_noinc();
+	A |= m_k;
+	set_nz(A);
+	prefetch();
+
+oral_imp
+	read_pc_noinc();
+	A |= m_l;
+	set_nz(A);
+	prefetch();
+
+oram_imp
+	read_pc_noinc();
+	A |= m_m;
+	set_nz(A);
+	prefetch();
+
+andj_imp
+	read_pc_noinc();
+	A &= m_j;
+	set_nz(A);
+	prefetch();
+
+andk_imp
+	read_pc_noinc();
+	A &= m_k;
+	set_nz(A);
+	prefetch();
+
+andl_imp
+	read_pc_noinc();
+	A &= m_l;
+	set_nz(A);
+	prefetch();
+
+andm_imp
+	read_pc_noinc();
+	A &= m_m;
+	set_nz(A);
+	prefetch();
+
+eorj_imp
+	read_pc_noinc();
+	A ^= m_j;
+	set_nz(A);
+	prefetch();
+
+eork_imp
+	read_pc_noinc();
+	A ^= m_k;
+	set_nz(A);
+	prefetch();
+
+eorl_imp
+	read_pc_noinc();
+	A ^= m_l;
+	set_nz(A);
+	prefetch();
+
+eorm_imp
+	read_pc_noinc();
+	A ^= m_m;
+	set_nz(A);
+	prefetch();
+
+adcj_imp
+	read_pc_noinc();
+	do_adc(m_j);
+	prefetch();
+
+adck_imp
+	read_pc_noinc();
+	do_adc(m_k);
+	prefetch();
+
+adcl_imp
+	read_pc_noinc();
+	do_adc(m_l);
+	prefetch();
+
+adcm_imp
+	read_pc_noinc();
+	do_adc(m_m);
+	prefetch();
+
+staj_imp
+	read_pc_noinc();
+	m_j = A;
+	prefetch();
+
+stak_imp
+	read_pc_noinc();
+	m_k = A;
+	prefetch();
+
+stal_imp
+	read_pc_noinc();
+	m_l = A;
+	prefetch();
+
+stam_imp
+	read_pc_noinc();
+	m_m = A;
+	prefetch();
+
+ldaj_imp
+	read_pc_noinc();
+	A = m_j;
+	set_nz(A);
+	prefetch();
+
+ldak_imp
+	read_pc_noinc();
+	A = m_k;
+	set_nz(A);
+	prefetch();
+
+ldal_imp
+	read_pc_noinc();
+	A = m_l;
+	set_nz(A);
+	prefetch();
+
+ldam_imp
+	read_pc_noinc();
+	A = m_m;
+	set_nz(A);
+	prefetch();
+
+cmpj_imp
+	read_pc_noinc();
+	do_cmp(A, m_j);
+	prefetch();
+
+cmpk_imp
+	read_pc_noinc();
+	do_cmp(A, m_k);
+	prefetch();
+
+cmpl_imp
+	read_pc_noinc();
+	do_cmp(A, m_l);
+	prefetch();
+
+cmpm_imp
+	read_pc_noinc();
+	do_cmp(A, m_m);
+	prefetch();
+
+sbcj_imp
+	read_pc_noinc();
+	do_sbc(m_j);
+	prefetch();
+
+sbck_imp
+	read_pc_noinc();
+	do_sbc(m_k);
+	prefetch();
+
+sbcl_imp
+	read_pc_noinc();
+	do_sbc(m_l);
+	prefetch();
+
+sbcm_imp
+	read_pc_noinc();
+	do_sbc(m_m);
+	prefetch();
+
+spa0_imp
+	read_pc_noinc();
+	m_pa = (m_pa & 0xffff00) | A;
+	prefetch();
+
+lpa0_imp
+	read_pc_noinc();
+	A = (m_pa & 0x0000ff) >> 0;
+	set_nz(A);
+	prefetch();
+
+spa1_imp
+	read_pc_noinc();
+	m_pa = (m_pa & 0xff00ff) | (A << 8);
+	prefetch();
+
+lpa1_imp
+	read_pc_noinc();
+	A = (m_pa & 0x00ff00) >> 8;
+	set_nz(A);
+	prefetch();
+
+spa2_imp
+	read_pc_noinc();
+	m_pa = (m_pa & 0x00ffff) | (A << 16);
+	prefetch();
+
+lpa2_imp
+	read_pc_noinc();
+	A = (m_pa & 0xff0000) >> 16;
+	set_nz(A);
+	prefetch();
+
+spb0_imp
+	read_pc_noinc();
+	m_pb = (m_pb & 0xffff00) | A;
+	prefetch();
+
+lpb0_imp
+	read_pc_noinc();
+	A = (m_pb & 0x0000ff) >> 0;
+	set_nz(A);
+	prefetch();
+
+spb1_imp
+	read_pc_noinc();
+	m_pb = (m_pb & 0xff00ff) | (A << 8);
+	prefetch();
+
+lpb1_imp
+	read_pc_noinc();
+	A = (m_pb & 0x00ff00) >> 8;
+	set_nz(A);
+	prefetch();
+
+spb2_imp
+	read_pc_noinc();
+	m_pb = (m_pb & 0x00ffff) | (A << 16);
+	prefetch();
+
+lpb2_imp
+	read_pc_noinc();
+	A = (m_pb & 0xff0000) >> 16;
+	set_nz(A);
+	prefetch();
+
+incpa_imp
+	read_pc_noinc();
+	m_pa = (m_pa & ~0xff) | ((m_pa+1) & 0xff);
+	set_nz(m_pa&0xff); // startup code seems to require flag to set if low byte is 0x00?
+	prefetch();
+
+incpb_imp
+	read_pc_noinc();
+	m_pb = (m_pb & ~0xff) | ((m_pb+1) & 0xff);
+	set_nz(m_pb&0xff); // startup code seems to require flag to set if low byte is 0x00?
+	prefetch();
+
+decpa_imp
+	read_pc_noinc();
+	m_pa = (m_pa & ~0xff) | ((m_pa-1) & 0xff);
+	set_nz(m_pa&0xff); // startup code seems to require flag to set if low byte is 0x00?
+	prefetch();
+
+decpb_imp
+	read_pc_noinc();
+	m_pb = (m_pb & ~0xff) | ((m_pb-1) & 0xff);
+	set_nz(m_pb&0xff); // startup code seems to require flag to set if low byte is 0x00?
+	prefetch();
+
+orapa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorpa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcpa_imp
+	do_adc(read_full_data(m_pa));
+	prefetch();
+
+stapa_imp
+	write_full_data(m_pa, A);
+	prefetch();
+
+ldapa_imp
+	A = read_full_data(m_pa);
+	set_nz(A);
+	prefetch();
+
+cmppa_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcpa_imp
+	do_sbc(read_full_data(m_pa));
+	prefetch();
+
+orapb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+andpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+eorpb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+adcpb_imp
+	do_adc(read_full_data(m_pb));
+	prefetch();
+
+stapb_imp
+	write_full_data(m_pb, A);
+	prefetch();
+
+ldapb_imp
+	A = read_full_data(m_pb);
+	set_nz(A);
+	prefetch();
+
+cmppb_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sbcpb_imp
+	do_sbc(read_full_data(m_pb));
+	prefetch();
+
+stx_aby
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	write(TMP+Y, X);
+	prefetch();
+
+sty_abx
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	write(TMP+X, Y);
+	prefetch();
+
+stz_xav_zpg
+	TMP = read_pc();
+	write_zeropage(TMP, 0x00);
+	prefetch();
+
+stz_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	write(TMP, 0x00);
+	prefetch();
+
+bit_xav_zpx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+bit_abx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+bit_imm
+	TMP = read_pc();
+	if(A & TMP)
+		P &= ~F_Z;
+	else
+		P |= F_Z;
+	prefetch();
+
+asr_xav_zpg
+	TMP = read_pc(); // TODO: verify this, should it write back or set A?
+	TMP = read_zeropage(TMP);
+	do_asr(TMP);
+	prefetch();
+
+asr_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	write(TMP, TMP2);
+	TMP2 = do_asr(TMP2); // used by xavbox, see 14e8
+	write(TMP, TMP2);
+	prefetch();
+
+asr_xav_zpx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+asr_acc
+	A = do_asr(A);
+	prefetch();
+
+asr_abx
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+cmc_imp
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	read_pc_noinc();
+	prefetch();
+
+sev_imp
+	read_pc_noinc();
+	P |= F_V;
+	prefetch();
+
+jmpf_ind
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	PC = read(TMP);
+	PC = set_h(PC, read(set_l(TMP, TMP+1)));
+	TMP2 = read(TMP+2);
+	set_codebank(TMP2);
+	prefetch();

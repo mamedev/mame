@@ -9,37 +9,39 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
-#include "machine/timer.h"
+#include "cpu/sm510/sm510.h"
 #include "sound/spkrdev.h"
 
 
 class hh_sm510_state : public driver_device
 {
 public:
-	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_inp_lines(0),
 		m_inp_fixed(-1),
 		m_display_wait(33)
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<8> m_inp_matrix; // max 8
-	output_finder<16, 16, 4> m_out_x;
+	required_device<sm510_base_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<8+1> m_inputs; // max 8
+	output_finder<16, 16, 4> m_out_x;
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed inputs mask
 	int m_inp_lines;                // number of input mux columns
 	int m_inp_fixed;                // input column fixed to GND/Vdd (-1 means none)
+	u8 m_speaker_data;              // speaker output data(if more than 1 bit)
 	u8 m_s;                         // MCU S output pins
 	u8 m_r;                         // MCU R output pins
 
+	void inp_fixed_last() { m_inp_fixed = -2; } // last input line to GND
 	u8 read_inputs(int columns, int fixed = -1);
 
 	virtual void update_k_line();
@@ -52,6 +54,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
+	virtual DECLARE_WRITE8_MEMBER(piezo2bit_r1_w);
+	virtual DECLARE_WRITE8_MEMBER(piezo2bit_input_w);
 
 	// display common
 	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 33ms)
@@ -62,7 +66,8 @@ public:
 	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	void set_display_size(u8 x, u8 y, u8 z);
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	TIMER_CALLBACK_MEMBER(display_decay_tick);
+	emu_timer *m_display_decay_timer;
 
 protected:
 	virtual void machine_start() override;

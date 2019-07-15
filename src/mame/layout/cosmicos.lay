@@ -126,7 +126,7 @@
 	</bezel>
 
 	<!-- cassette led -->
-	<bezel name="led12" element="red_led">
+	<bezel name="led13" element="red_led">
 		<bounds x="144" y="0" width="5" height="5" />
 	</bezel>
 	</view>

@@ -12,14 +12,14 @@ Atari Sprint 4 video emulation
 #include "screen.h"
 
 
-PALETTE_INIT_MEMBER(sprint4_state, sprint4)
+void sprint4_state::sprint4_palette(palette_device &palette) const
 {
-	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); /* black  */
-	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); /* peach  */
-	palette.set_indirect_color(2, rgb_t(0xf0, 0x00, 0xf0)); /* violet */
-	palette.set_indirect_color(3, rgb_t(0x00, 0xf0, 0x0f)); /* green  */
-	palette.set_indirect_color(4, rgb_t(0x30, 0x4f, 0xff)); /* blue   */
-	palette.set_indirect_color(5, rgb_t(0xff, 0xff, 0xff)); /* white  */
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); // peach
+	palette.set_indirect_color(2, rgb_t(0xf0, 0x00, 0xf0)); // violet
+	palette.set_indirect_color(3, rgb_t(0x00, 0xf0, 0x0f)); // green
+	palette.set_indirect_color(4, rgb_t(0x30, 0x4f, 0xff)); // blue
+	palette.set_indirect_color(5, rgb_t(0xff, 0xff, 0xff)); // white
 
 	palette.set_pen_indirect(0, 0);
 	palette.set_pen_indirect(2, 0);
@@ -90,19 +90,17 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 
 		for (int i = 0; i < 4; i++)
 		{
-			rectangle rect;
-
 			int bank = 0;
 
 			uint8_t horz = m_videoram[0x390 + 2 * i + 0];
 			uint8_t vert = m_videoram[0x398 + 2 * i + 0];
 			uint8_t code = m_videoram[0x398 + 2 * i + 1];
 
-			rect.min_x = horz - 15;
-			rect.min_y = vert - 15;
-			rect.max_x = horz - 15 + m_gfxdecode->gfx(1)->width() - 1;
-			rect.max_y = vert - 15 + m_gfxdecode->gfx(1)->height() - 1;
-
+			rectangle rect(
+					horz - 15,
+					horz - 15 + m_gfxdecode->gfx(1)->width() - 1,
+					vert - 15,
+					vert - 15 + m_gfxdecode->gfx(1)->height() - 1);
 			rect &= m_screen->visible_area();
 
 			m_playfield->draw(*m_screen, m_helper, rect, 0, 0);
@@ -117,19 +115,18 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 				horz - 15,
 				vert - 15, 1);
 
-			for (int y = rect.min_y; y <= rect.max_y; y++)
-				for (int x = rect.min_x; x <= rect.max_x; x++)
+			for (int y = rect.top(); y <= rect.bottom(); y++)
+				for (int x = rect.left(); x <= rect.right(); x++)
 					if (m_palette->pen_indirect(m_helper.pix16(y, x)) != 0)
 						m_collision[i] = 1;
 		}
 
 		/* update sound status */
 
-		address_space &space = machine().dummy_space();
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_1, m_videoram[0x391] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_2, m_videoram[0x393] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_3, m_videoram[0x395] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_4, m_videoram[0x397] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_1, m_videoram[0x391] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_2, m_videoram[0x393] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_3, m_videoram[0x395] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_4, m_videoram[0x397] & 15);
 	}
 }
 

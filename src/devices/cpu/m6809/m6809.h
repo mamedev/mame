@@ -35,7 +35,7 @@ protected:
 	class memory_interface {
 	public:
 		address_space *m_program, *m_sprogram;
-		direct_read_data<0> *m_direct, *m_sdirect;
+		memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_scache;
 
 		virtual ~memory_interface() {}
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -65,6 +65,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
 
@@ -72,7 +73,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -304,19 +305,14 @@ public:
 
 // ======================> mc6809e_device
 
-// MC6809E has LIC line to indicate opcode/data fetch
-#define MCFG_MC6809E_LIC_CB(_devcb) \
-	devcb = &mc6809e_device::set_lic_cb(*device, DEVCB_##_devcb);
-
-
 class mc6809e_device : public m6809_base_device
 {
 public:
 	// construction/destruction
 	mc6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_lic_cb(device_t &device, _Object object) { return downcast<mc6809e_device &>(device).m_lic_func.set_callback(object); }
+	// MC6809E has LIC line to indicate opcode/data fetch
+	auto lic() { return m_lic_func.bind(); }
 };
 
 // ======================> m6809_device (LEGACY)

@@ -32,30 +32,34 @@ ROM_START( dmv_k235 )
 	ROM_LOAD( "dmv_int_8088_pic_33473.bin", 0x0000, 0x1000, CRC(104195dc) SHA1(08d48ca3b84ab26c1a764792e04ec4def7dad2ad))
 ROM_END
 
-ADDRESS_MAP_START(dmv_k230_device::k230_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x7ffff ) AM_READWRITE(program_r, program_w)
-	AM_RANGE( 0x80000, 0xfffff ) AM_READ(rom_r)
-ADDRESS_MAP_END
+void dmv_k230_device::k230_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x7ffff).rw(FUNC(dmv_k230_device::program_r), FUNC(dmv_k230_device::program_w));
+	map(0x80000, 0xfffff).r(FUNC(dmv_k230_device::rom_r));
+}
 
-ADDRESS_MAP_START(dmv_k230_device::k230_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void dmv_k230_device::k230_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
+}
 
-ADDRESS_MAP_START(dmv_k230_device::k234_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x7ffff ) AM_READWRITE(program_r, program_w)
-	AM_RANGE( 0xfff00, 0xfffff ) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void dmv_k234_device::k234_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x7ffff).rw(FUNC(dmv_k234_device::program_r), FUNC(dmv_k234_device::program_w));
+	map(0xfff00, 0xfffff).rw(FUNC(dmv_k234_device::io_r), FUNC(dmv_k234_device::io_w));
+}
 
-ADDRESS_MAP_START(dmv_k230_device::k235_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
-	AM_RANGE( 0x90, 0x91 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-ADDRESS_MAP_END
+void dmv_k235_device::k235_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(dmv_k235_device::io_r), FUNC(dmv_k235_device::io_w));
+	map(0x90, 0x91).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+}
 
 static INPUT_PORTS_START( dmv_k235 )
 	PORT_START("DSW")
@@ -94,7 +98,10 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_dmvslot_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
-	, m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
+	, m_rom(*this, "rom")
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_switch16(0)
+	, m_hold(0)
 {
 }
 
@@ -132,14 +139,12 @@ dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k230_device::device_start()
 {
-	m_bus = static_cast<dmvcart_slot_device*>(owner());
-	m_io = &machine().device<cpu_device>("maincpu")->space(AS_IO);
 }
 
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
-	m_io->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
+	m_bus->m_iospace->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
 }
 
 //-------------------------------------------------
@@ -162,26 +167,29 @@ void dmv_k234_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dmv_k230_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k230_io)
-MACHINE_CONFIG_END
+void dmv_k230_device::device_add_mconfig(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(15'000'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmv_k230_device::k230_mem);
+	m_maincpu->set_addrmap(AS_IO, &dmv_k230_device::k230_io);
+}
 
-MACHINE_CONFIG_START(dmv_k234_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", M68008, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(k234_mem)
-MACHINE_CONFIG_END
+void dmv_k234_device::device_add_mconfig(machine_config &config)
+{
+	M68008(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmv_k234_device::k234_mem);
+}
 
-MACHINE_CONFIG_START(dmv_k235_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", V20, XTAL(15'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k235_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+void dmv_k235_device::device_add_mconfig(machine_config &config)
+{
+	V20(config, m_maincpu, XTAL(15'000'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dmv_k235_device::k230_mem);
+	m_maincpu->set_addrmap(AS_IO, &dmv_k235_device::k235_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-MACHINE_CONFIG_END
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
+}
 
 //-------------------------------------------------
 //  device_rom_region
@@ -240,12 +248,12 @@ READ8_MEMBER(dmv_k230_device::rom_r)
 
 READ8_MEMBER( dmv_k230_device::io_r )
 {
-	return m_io->read_byte(offset);
+	return m_bus->m_iospace->read_byte(offset);
 }
 
 WRITE8_MEMBER( dmv_k230_device::io_w )
 {
-	m_io->write_byte(offset, data);
+	m_bus->m_iospace->write_byte(offset, data);
 }
 
 READ8_MEMBER( dmv_k230_device::program_r )

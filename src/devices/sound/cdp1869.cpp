@@ -64,28 +64,33 @@ constexpr XTAL cdp1869_device::CPU_CLK_PAL;
 DEFINE_DEVICE_TYPE(CDP1869, cdp1869_device, "cdp1869", "RCA CDP1869 VIS")
 
 // I/O map
-ADDRESS_MAP_START(cdp1869_device::io_map)
-	AM_RANGE(0x03, 0x03) AM_WRITE(out3_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(out4_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(out5_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(out6_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(out7_w)
-ADDRESS_MAP_END
+void cdp1869_device::io_map(address_map &map)
+{
+	map(0x03, 0x03).w(FUNC(cdp1869_device::out3_w));
+	map(0x04, 0x04).w(FUNC(cdp1869_device::out4_w));
+	map(0x05, 0x05).w(FUNC(cdp1869_device::out5_w));
+	map(0x06, 0x06).w(FUNC(cdp1869_device::out6_w));
+	map(0x07, 0x07).w(FUNC(cdp1869_device::out7_w));
+}
 
 // character RAM map
-ADDRESS_MAP_START(cdp1869_device::char_map)
-	AM_RANGE(0x000, 0x3ff) AM_READWRITE(char_ram_r, char_ram_w)
-ADDRESS_MAP_END
+void cdp1869_device::char_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw(FUNC(cdp1869_device::char_ram_r), FUNC(cdp1869_device::char_ram_w));
+}
 
 // page RAM map
-ADDRESS_MAP_START(cdp1869_device::page_map)
-	AM_RANGE(0x000, 0x7ff) AM_READWRITE(page_ram_r, page_ram_w)
-ADDRESS_MAP_END
+void cdp1869_device::page_map(address_map &map)
+{
+	map(0x000, 0x7ff).rw(FUNC(cdp1869_device::page_ram_r), FUNC(cdp1869_device::page_ram_w));
+}
 
 // default address map
-ADDRESS_MAP_START(cdp1869_device::cdp1869)
-	AM_RANGE(0x000, 0x7ff) AM_RAM
-ADDRESS_MAP_END
+void cdp1869_device::cdp1869(address_map &map)
+{
+	if (!has_configured_map(0))
+		map(0x000, 0x7ff).ram();
+}
 
 
 
@@ -224,7 +229,7 @@ inline void cdp1869_device::update_prd_changed_timer()
 
 inline rgb_t cdp1869_device::get_rgb(int i, int c, int l)
 {
-	int luma = 0, r, g, b;
+	int luma = 0;
 
 	luma += (l & 4) ? CDP1869_WEIGHT_RED : 0;
 	luma += (l & 1) ? CDP1869_WEIGHT_GREEN : 0;
@@ -232,9 +237,9 @@ inline rgb_t cdp1869_device::get_rgb(int i, int c, int l)
 
 	luma = (luma * 0xff) / 100;
 
-	r = (c & 4) ? luma : 0;
-	g = (c & 1) ? luma : 0;
-	b = (c & 2) ? luma : 0;
+	int const r = (c & 4) ? luma : 0;
+	int const g = (c & 1) ? luma : 0;
+	int const b = (c & 2) ? luma : 0;
 
 	return rgb_t(r, g, b);
 }
@@ -355,7 +360,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	m_color_clock(0),
 	m_stream(nullptr),
 	m_palette(*this, "palette"),
-	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, address_map_constructor(), address_map_constructor(FUNC(cdp1869_device::cdp1869), this))
+	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, address_map_constructor(FUNC(cdp1869_device::cdp1869), this))
 {
 }
 
@@ -364,10 +369,10 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cdp1869_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 8+64)
-	MCFG_PALETTE_INIT_OWNER(cdp1869_device, cdp1869)
-MACHINE_CONFIG_END
+void cdp1869_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette, FUNC(cdp1869_device::cdp1869_palette), 8 + 64);
+}
 
 
 //-------------------------------------------------
@@ -477,15 +482,13 @@ device_memory_interface::space_config_vector cdp1869_device::memory_space_config
 //  initialize_palette - initialize palette
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER(cdp1869_device, cdp1869)
+void cdp1869_device::cdp1869_palette(palette_device &palette) const
 {
-	// color-on-color display (CFC=0)
 	int i;
 
+	// color-on-color display (CFC=0)
 	for (i = 0; i < 8; i++)
-	{
 		palette.set_pen_color(i, get_rgb(i, i, 15));
-	}
 
 	// tone-on-tone display (CFC=1)
 	for (int c = 0; c < 8; c++)
@@ -574,7 +577,7 @@ void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 
 	data <<= 2;
 
-	for (i = 0; i < CHAR_WIDTH; i++)
+	for (i = 0; i < CH_WIDTH; i++)
 	{
 		if (data & 0x80)
 		{
@@ -968,7 +971,7 @@ uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	if (!m_dispoff)
 	{
-		int width = CHAR_WIDTH;
+		int width = CH_WIDTH;
 		int height = get_lines();
 
 		if (!m_freshorz)

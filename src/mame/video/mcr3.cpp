@@ -66,18 +66,16 @@ TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
+void mcr3_state::spyhunt_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
-	{
-		palette.set_pen_color(i,rgb_t::black());
-	}
+		palette.set_pen_color(i, rgb_t::black());
 
-	/* alpha colors are hard-coded */
-	palette.set_pen_color(4*16+0,rgb_t(0x00,0x00,0x00));
-	palette.set_pen_color(4*16+1,rgb_t(0x00,0xff,0x00));
-	palette.set_pen_color(4*16+2,rgb_t(0x00,0x00,0xff));
-	palette.set_pen_color(4*16+3,rgb_t(0xff,0xff,0xff));
+	// alpha colors are hard-coded
+	palette.set_pen_color(4 * 16 + 0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(4 * 16 + 1, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(4 * 16 + 2, rgb_t(0x00, 0x00, 0xff));
+	palette.set_pen_color(4 * 16 + 3, rgb_t(0xff, 0xff, 0xff));
 }
 
 

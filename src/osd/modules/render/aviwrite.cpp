@@ -56,10 +56,11 @@ void avi_write::begin_avi_recording(const char *name)
 	m_frame = 0;
 	m_next_frame_time = m_machine.time();
 
+	const screen_device *primary_screen = screen_device_iterator(m_machine.root_device()).first();
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * ((m_machine.first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(m_machine.first_screen()->frame_period().m_attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+	info.video_timescale = 1000 * (primary_screen ? ATTOSECONDS_TO_HZ(primary_screen->frame_period().m_attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = m_width;

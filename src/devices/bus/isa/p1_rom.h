@@ -35,7 +35,7 @@ protected:
 
 
 // device type definition
-extern const device_type P1_ROM;
+DECLARE_DEVICE_TYPE(P1_ROM, p1_rom_device)
 
 
 #endif // MAME_BUS_ISA_P1_ROM_H

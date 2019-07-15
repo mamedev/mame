@@ -25,18 +25,21 @@ public:
 		m_ie15(*this, "ie15")
 	{ }
 
-	required_device<ie15_device> m_ie15;
 	void ie15(machine_config &config);
+
+private:
+	required_device<ie15_device> m_ie15;
 };
 
 
-MACHINE_CONFIG_START(ie15_state::ie15)
-	MCFG_DEVICE_ADD("ie15", IE15, 0)
-MACHINE_CONFIG_END
+void ie15_state::ie15(machine_config &config)
+{
+	IE15(config, m_ie15, 0);
+}
 
 
 ROM_START(ie15)
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE           INIT   COMPANY     FULLNAME       FLAGS
-COMP( 1980, ie15,     0,      0,       ie15,      0,       ie15_state,     0,     "USSR",     "15IE-00-013", 0)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1980, ie15, 0,      0,      ie15,    0,     ie15_state, empty_init, "USSR",  "15IE-00-013", 0)

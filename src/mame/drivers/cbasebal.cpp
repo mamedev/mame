@@ -71,7 +71,7 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 		break;
 	case 1:
 		if (offset < 0x800)
-			m_palette->write8(space, offset, data);
+			m_palette->write8(offset, data);
 		break;
 	default:
 		cbasebal_scrollram_w(space, offset, data);
@@ -94,35 +94,38 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cbasebal_state::cbasebal_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("palette")  /* palette + vram + scrollram */
-	AM_RANGE(0xe000, 0xfdff) AM_RAM     /* work RAM */
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void cbasebal_state::cbasebal_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).rw(FUNC(cbasebal_state::bankedram_r), FUNC(cbasebal_state::bankedram_w)).share("palette");  /* palette + vram + scrollram */
+	map(0xe000, 0xfdff).ram();     /* work RAM */
+	map(0xfe00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(cbasebal_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void cbasebal_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+}
 
-ADDRESS_MAP_START(cbasebal_state::cbasebal_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cbasebal_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE_PORT("IO_01")
-	AM_RANGE(0x02, 0x02) AM_WRITE_PORT("IO_02")
-	AM_RANGE(0x03, 0x03) AM_WRITE_PORT("IO_03")
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x08, 0x09) AM_WRITE(cbasebal_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(cbasebal_scrolly_w)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("P1")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("P2")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x13, 0x13) AM_WRITE(cbasebal_gfxctrl_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(cbasebal_coinctrl_w)
-ADDRESS_MAP_END
+void cbasebal_state::cbasebal_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(cbasebal_state::cbasebal_bankswitch_w));
+	map(0x01, 0x01).portw("IO_01");
+	map(0x02, 0x02).portw("IO_02");
+	map(0x03, 0x03).portw("IO_03");
+	map(0x05, 0x05).w("oki", FUNC(okim6295_device::write));
+	map(0x06, 0x07).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x08, 0x09).w(FUNC(cbasebal_state::cbasebal_scrollx_w));
+	map(0x0a, 0x0b).w(FUNC(cbasebal_state::cbasebal_scrolly_w));
+	map(0x10, 0x10).portr("P1");
+	map(0x11, 0x11).portr("P2");
+	map(0x12, 0x12).portr("SYSTEM");
+	map(0x13, 0x13).w(FUNC(cbasebal_state::cbasebal_gfxctrl_w));
+	map(0x14, 0x14).w(FUNC(cbasebal_state::cbasebal_coinctrl_w));
+}
 
 
 /*************************************
@@ -160,7 +163,7 @@ static INPUT_PORTS_START( cbasebal )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")       /* ? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "IO_01" )
 	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -217,7 +220,7 @@ static const gfx_layout cbasebal_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( cbasebal )
+static GFXDECODE_START( gfx_cbasebal )
 	GFXDECODE_ENTRY( "gfx1", 0, cbasebal_textlayout,   256,  8 ) /* colors 256- 287 */
 	GFXDECODE_ENTRY( "gfx2", 0, cbasebal_tilelayout,   768, 16 ) /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx3", 0, cbasebal_spritelayout, 512,  8 ) /* colors 512- 639 */
@@ -258,41 +261,38 @@ void cbasebal_state::machine_reset()
 	m_scroll_y[1] = 0;
 }
 
-MACHINE_CONFIG_START(cbasebal_state::cbasebal)
-
+void cbasebal_state::cbasebal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
-	MCFG_CPU_PROGRAM_MAP(cbasebal_map)
-	MCFG_CPU_IO_MAP(cbasebal_portmap)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
+	Z80(config, m_maincpu, 6000000);   /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cbasebal_state::cbasebal_map);
+	m_maincpu->set_addrmap(AS_IO, &cbasebal_state::cbasebal_portmap);
+	m_maincpu->set_addrmap(AS_OPCODES, &cbasebal_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cbasebal_state::irq0_line_hold));   /* ??? */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
+	screen.set_screen_update(FUNC(cbasebal_state::screen_update_cbasebal));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbasebal)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cbasebal);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -336,7 +336,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
+void cbasebal_state::init_cbasebal()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -354,4 +354,4 @@ DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
  *
  *************************************/
 
-GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, init_cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )

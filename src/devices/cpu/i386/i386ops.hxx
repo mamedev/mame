@@ -697,6 +697,8 @@ void i386_device::i386_mov_cr_r32()        // Opcode 0x0f 22
 		case 0:
 			data &= 0xfffeffff; // wp not supported on 386
 			CYCLES(CYCLES_MOV_REG_CR0);
+			if (PROTECTED_MODE != BIT(data, 0))
+				debugger_privilege_hook();
 			break;
 		case 2: CYCLES(CYCLES_MOV_REG_CR2); break;
 		case 3:
@@ -718,19 +720,27 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 	uint8_t modrm = FETCH();
 	uint8_t dr = (modrm >> 3) & 0x7;
 
-	m_dr[dr] = LOAD_RM32(modrm);
+	uint32_t rm32 = LOAD_RM32(modrm);
 	switch(dr)
 	{
 		case 0:
 		case 1:
 		case 2:
 		case 3:
+		{
+			m_dr[dr] = rm32;
+			dri_changed();
 			CYCLES(CYCLES_MOV_DR0_3_REG);
 			break;
-		case 6:
+		}
+		case 6: CYCLES(CYCLES_MOV_DR6_7_REG); m_dr[dr] = LOAD_RM32(modrm); break;
 		case 7:
+		{
+			dr7_changed(m_dr[7], rm32);
 			CYCLES(CYCLES_MOV_DR6_7_REG);
+			m_dr[dr] = rm32;
 			break;
+		}
 		default:
 			logerror("i386: mov_dr_r32 DR%d!\n", dr);
 			return;
@@ -2508,6 +2518,7 @@ void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286),
 	if(PROTECTED_MODE && (m_CPL != 0))
 		FAULT(FAULT_GP,0)
 	uint32_t ea = i386_translate(ES, REG32(EDI), 0);
+	uint32_t old_dr7 = m_dr[7];
 	m_cr[0] = READ32(ea) & 0xfffeffff; // wp not supported on 386
 	set_flags(READ32(ea + 0x04));
 	m_eip = READ32(ea + 0x08);
@@ -2564,6 +2575,8 @@ void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286),
 		m_sreg[i].valid = (m_sreg[i].flags & 0x80) ? true : false;
 		m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
 	}
+	
+	dr7_changed(old_dr7, m_dr[7]);
 	CHANGE_PC(m_eip);
 }
 

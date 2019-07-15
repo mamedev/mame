@@ -9,9 +9,6 @@
 // used to connect the 022
 typedef device_delegate<void (void)> igs025_execute_external;
 
-#define MCFG_IGS025_SET_EXTERNAL_EXECUTE( _class, _method) \
-	igs025_device::set_external_cb(*device, igs025_execute_external(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-
 class igs025_device : public device_t
 {
 public:
@@ -23,9 +20,7 @@ public:
 	uint32_t m_kb_game_id;
 	uint32_t m_kb_region;
 
-
-	igs025_execute_external m_execute_external;
-	static void set_external_cb(device_t &device,igs025_execute_external newcb);
+	template <typename... T> void set_external_cb(T &&... args) { m_execute_external = igs025_execute_external(std::forward<T>(args)...); }
 
 	DECLARE_WRITE16_MEMBER( olds_w );
 	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
@@ -36,6 +31,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	igs025_execute_external m_execute_external;
 
 	uint16_t        m_kb_prot_hold;
 	uint16_t        m_kb_prot_hilo;

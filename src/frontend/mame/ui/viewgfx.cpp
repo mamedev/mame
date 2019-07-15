@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "emupal.h"
 #include "ui/ui.h"
 #include "uiinput.h"
 #include "render.h"
@@ -424,7 +425,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 				util::stream_format(title_buf, " = %X", paldev->read_entry(index));
 
 			rgb_t col = state.palette.which ? palette->indirect_color(index) : raw_color[index];
-			util::stream_format(title_buf, " (R:%X G:%X B:%X)", col.r(), col.g(), col.b());
+			util::stream_format(title_buf, " (A:%X R:%X G:%X B:%X)", col.a(), col.r(), col.g(), col.b());
 		}
 	}
 
@@ -436,7 +437,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	// go ahead and draw the outer box now
-	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
 	x0 = 0.5f - 0.5f * titlewidth;
@@ -730,7 +731,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	// go ahead and draw the outer box now
-	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
 	x0 = 0.5f - 0.5f * titlewidth;
@@ -1139,7 +1140,7 @@ static void tilemap_handler(mame_ui_manager &mui, render_container &container, u
 	}
 
 	// go ahead and draw the outer box now
-	mui.draw_outlined_box(container, boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	mui.draw_outlined_box(container, boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
 	x0 = 0.5f - 0.5f * titlewidth;
@@ -1320,7 +1321,11 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 	{
 		state.bitmap->fill(0);
 		tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
-		tilemap->draw_debug(*machine.first_screen(), *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs, state.tilemap.flags);
+		screen_device *first_screen = screen_device_iterator(machine.root_device()).first();
+		if (first_screen)
+		{
+			tilemap->draw_debug(*first_screen, *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs, state.tilemap.flags);
+		}
 
 		// reset the texture to force an update
 		state.texture->set_bitmap(*state.bitmap, state.bitmap->cliprect(), TEXFORMAT_RGB32);

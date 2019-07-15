@@ -6,7 +6,8 @@
  */
 
 #include "nld_74165.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -24,6 +25,7 @@ namespace netlist
 		, m_QHQ(*this, "QHQ")
 		, m_shifter(*this, "m_shifter", 0)
 		, m_last_CLK(*this, "m_last_CLK", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -41,6 +43,7 @@ namespace netlist
 
 		state_var<unsigned> m_shifter;
 		state_var<unsigned> m_last_CLK;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(74165_dip, 74165)
@@ -54,6 +57,7 @@ namespace netlist
 			register_subalias("5", m_DATA[6]);
 			register_subalias("6", m_DATA[7]);
 			register_subalias("7", m_QHQ);
+			register_subalias("8", "GND");
 
 			register_subalias("9",  m_QH);
 			register_subalias("10", m_SER);
@@ -62,7 +66,7 @@ namespace netlist
 			register_subalias("13", m_DATA[2]);
 			register_subalias("14", m_DATA[3]);
 			register_subalias("15", m_CLKINH);
-
+			register_subalias("16", "VCC");
 		}
 	};
 
@@ -86,6 +90,7 @@ namespace netlist
 		}
 		else if (!m_CLK() || m_CLKINH())
 		{
+			// FIXME: qh is overwritten below?
 			qh = old_qh;
 		}
 		else if (!m_last_CLK)
@@ -101,8 +106,8 @@ namespace netlist
 		m_QH.push(qh, NLTIME_FROM_NS(20)); // FIXME: Timing
 	}
 
-	NETLIB_DEVICE_IMPL(74165)
-	NETLIB_DEVICE_IMPL(74165_dip)
+	NETLIB_DEVICE_IMPL(74165, "TTL_74165", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74165_dip, "TTL_74165_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -15,27 +15,16 @@
 
 #define YMZ280B_MAKE_WAVS 0
 
-#define MCFG_YMZ280B_IRQ_HANDLER(_devcb) \
-	devcb = &ymz280b_device::set_irq_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_YMZ280B_EXT_READ_HANDLER(_devcb) \
-	devcb = &ymz280b_device::set_ext_read_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_YMZ280B_EXT_WRITE_HANDLER(_devcb) \
-	devcb = &ymz280b_device::set_ext_write_handler(*device, DEVCB_##_devcb);
-
-class ymz280b_device : public device_t, public device_sound_interface
+class ymz280b_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
 	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ymz280b_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ext_read_handler(device_t &device, Object &&cb) { return downcast<ymz280b_device &>(device).m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ext_write_handler(device_t &device, Object &&cb) { return downcast<ymz280b_device &>(device).m_ext_write_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -47,6 +36,9 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
 
 private:
 	/* struct describing a single playing ADPCM voice */
@@ -86,7 +78,6 @@ private:
 		emu_timer *timer;
 	};
 
-	uint8_t ymz280b_read_memory(uint32_t offset);
 	void update_irq_state();
 	void update_step(struct YMZ280BVoice *voice);
 	void update_volumes(struct YMZ280BVoice *voice);
@@ -112,12 +103,8 @@ private:
 	uint32_t m_ext_mem_address;         /* where the CPU can read the ROM */
 
 	devcb_write_line m_irq_handler;  /* IRQ callback */
-	devcb_read8 m_ext_read_handler;  /* external RAM read handler */
-	devcb_write8 m_ext_write_handler;/* external RAM write handler */
 
 	double m_master_clock;            /* master clock frequency */
-	uint8_t *m_mem_base;                /* pointer to the base of external memory */
-	uint32_t m_mem_size;
 	sound_stream *m_stream;           /* which stream are we using */
 	std::unique_ptr<int16_t[]> m_scratch;
 #if YMZ280B_MAKE_WAVS

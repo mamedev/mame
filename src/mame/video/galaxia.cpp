@@ -19,10 +19,10 @@
 // Colors are 3bpp, but how they are generated is a mystery
 // there's no color prom on the pcb, nor palette ram
 
-PALETTE_INIT_MEMBER(galaxia_state,galaxia)
+void galaxia_state::galaxia_palette(palette_device &palette) const
 {
 	// estimated with video/photo references
-	const int lut_clr[0x18] = {
+	constexpr int lut_clr[0x18] = {
 		// background
 		0, 1, 4, 5,
 		0, 3, 6, 2,
@@ -41,10 +41,10 @@ PALETTE_INIT_MEMBER(galaxia_state,galaxia)
 	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
-PALETTE_INIT_MEMBER(galaxia_state,astrowar)
+void galaxia_state::astrowar_palette(palette_device &palette) const
 {
 	// no reference material available(?), except for Data East astrof
-	const int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
+	constexpr int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -112,17 +112,17 @@ uint32_t galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind1
 {
 	int x, y;
 
-	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
-	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
-	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636[2]->update(cliprect);
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			bool bullet = m_bullet_ram[y] && x == (m_bullet_ram[y] ^ 0xff);
 			bool background = (bitmap.pix16(y, x) & 3) != 0;
@@ -178,14 +178,14 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 	// astrowar has only one S2636
 	int x, y;
 
-	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		// draw bullets (guesswork)
 		if (m_bullet_ram[y])
@@ -201,14 +201,14 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 			if (pos) bitmap.pix16(y, pos-1) = BULLET_PEN;
 		}
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// NOTE: similar to zac2650.c, the sprite chip runs at a different frequency than the background generator
 			// the exact timing ratio is unknown, so we'll have to do with guesswork
 			float s_ratio = 256.0f / 196.0f;
 
 			float sx = x * s_ratio;
-			if ((int)(sx + 0.5f) > cliprect.max_x)
+			if (int(sx + 0.5f) > cliprect.right())
 				break;
 
 			// copy the S2636 bitmap into the main bitmap and check collision
@@ -217,11 +217,11 @@ uint32_t galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. background collision detection
-				if ((m_temp_bitmap.pix16(y, (int)(sx)) | m_temp_bitmap.pix16(y, (int)(sx + 0.5f))) & 1)
+				if ((m_temp_bitmap.pix16(y, int(sx)) | m_temp_bitmap.pix16(y, int(sx + 0.5f))) & 1)
 					m_collision_register |= 0x01;
 
-				bitmap.pix16(y, (int)(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
-				bitmap.pix16(y, (int)(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix16(y, int(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix16(y, int(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
 			}
 		}
 	}

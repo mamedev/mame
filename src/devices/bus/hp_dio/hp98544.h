@@ -7,27 +7,31 @@
 #pragma once
 
 #include "hp_dio.h"
-
+#include "video/topcat.h"
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> dio16_98544_device
 
+namespace bus {
+	namespace hp_dio {
+
 class dio16_98544_device :
-		public device_t,
-		public device_dio16_card_interface
+	public device_t,
+	public device_dio16_card_interface,
+	public device_memory_interface
 {
 public:
 	// construction/destruction
 	dio16_98544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(rom_r);
 	DECLARE_WRITE16_MEMBER(rom_w);
 
-protected:
+	required_device<topcat_device> m_topcat;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+ protected:
 	dio16_98544_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -37,16 +41,27 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
+	virtual space_config_vector memory_space_config() const override;
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	std::vector<uint16_t> m_vram;
-	uint32_t m_palette[2];
-	uint8_t *m_rom;
+	WRITE_LINE_MEMBER(vblank_w);
+	WRITE_LINE_MEMBER(int_w);
+
+	static constexpr int m_v_pix = 768;
+	static constexpr int m_h_pix = 1024;
+
+	const address_space_config m_space_config;
+	void map(address_map &map);
+	required_region_ptr<uint8_t> m_rom;
+	required_shared_ptr<uint8_t> m_vram;
+
+	uint8_t m_intreg;
 };
 
+} // namespace bus::hp_dio
+} // namespace bus
+
 // device type definition
-DECLARE_DEVICE_TYPE(HPDIO_98544, dio16_98544_device)
+DECLARE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device)
 
 #endif // MAME_BUS_HPDIO_98544_H

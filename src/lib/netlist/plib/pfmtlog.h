@@ -9,6 +9,7 @@
 
 #include "pstring.h"
 #include "ptypes.h"
+#include "putil.h"
 
 #include <limits>
 
@@ -16,8 +17,8 @@ namespace plib {
 
 P_ENUM(plog_level,
 	DEBUG,
-	INFO,
 	VERBOSE,
+	INFO,
 	WARNING,
 	ERROR,
 	FATAL)
@@ -34,7 +35,6 @@ struct ptype_traits_base
 template <>
 struct ptype_traits_base<bool>
 {
-	static unsigned int cast(bool &x) { return static_cast<unsigned int>(x); }
 	static unsigned int cast(const bool &x) { return static_cast<unsigned int>(x); }
 	static const bool is_signed = std::numeric_limits<bool>::is_signed;
 	static const char *size_spec() { return ""; }
@@ -136,11 +136,17 @@ struct ptype_traits<double> : ptype_traits_base<double>
 	static char32_t fmt_spec() { return 'f'; }
 };
 
-
 template<>
 struct ptype_traits<char *> : ptype_traits_base<char *>
 {
 	static const char *cast(const char *x) { return x; }
+	static char32_t fmt_spec() { return 's'; }
+};
+
+template<>
+struct ptype_traits<std::string> : ptype_traits_base<char *>
+{
+	static const char *cast(const std::string &x) { return x.c_str(); }
 	static char32_t fmt_spec() { return 's'; }
 };
 
@@ -151,44 +157,63 @@ public:
 	: m_str(fmt), m_arg(0)
 	{
 	}
+	COPYASSIGNMOVE(pfmt, default)
 
-	pfmt(const pfmt &rhs) : m_str(rhs.m_str), m_arg(rhs.m_arg) { }
-
-	~pfmt()
-	{
-	}
+	~pfmt() noexcept = default;
 
 	operator pstring() const { return m_str; }
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	pfmt &          e(const double &x) {return format_element("", 'e', x);  }
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	pfmt &          g(const double &x) {return format_element("", 'g', x);  }
 
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	pfmt &          e(const float &x) {return format_element("", 'e', static_cast<double>(x));  }
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	pfmt &          g(const float &x) {return format_element("", 'g', static_cast<double>(x));  }
 
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	pfmt &operator ()(const void *x) {return format_element("", 'p', x);  }
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	pfmt &operator ()(const pstring &x) {return format_element("", 's', x.c_str() );  }
 
 	template<typename T>
 	pfmt &operator ()(const T &x)
 	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		return format_element(ptype_traits<T>::size_spec(), ptype_traits<T>::fmt_spec(), ptype_traits<T>::cast(x));
 	}
 
 	template<typename T>
 	pfmt &operator ()(const T *x)
 	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		return format_element(ptype_traits<T *>::size_spec(), ptype_traits<T *>::fmt_spec(), ptype_traits<T *>::cast(x));
+	}
+
+	pfmt &operator ()()
+	{
+		return *this;
+	}
+
+
+	template<typename X, typename Y, typename... Args>
+	pfmt &operator()(X&& x, Y && y, Args&&... args)
+	{
+		return ((*this)(std::forward<X>(x)))(std::forward<Y>(y), std::forward<Args>(args)...);
 	}
 
 	template<typename T>
 	pfmt &x(const T &x)
 	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		return format_element(ptype_traits<T>::size_spec(), 'x', x);
 	}
 
 	template<typename T>
 	pfmt &o(const T &x)
 	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		return format_element(ptype_traits<T>::size_spec(), 'o', x);
 	}
 
@@ -203,10 +228,12 @@ private:
 };
 
 template <class T, bool build_enabled = true>
-class pfmt_writer_t : plib::nocopyassignmove
+class pfmt_writer_t
 {
 public:
 	explicit pfmt_writer_t() : m_enabled(true)  { }
+
+	COPYASSIGNMOVE(pfmt_writer_t, delete)
 
 	/* runtime enable */
 	template<bool enabled, typename... Args>
@@ -237,7 +264,7 @@ public:
 	bool is_enabled() const { return m_enabled; }
 
 protected:
-	~pfmt_writer_t() { }
+	~pfmt_writer_t() noexcept = default;
 
 private:
 	pfmt &xlog(pfmt &fmt) const { return fmt; }
@@ -258,7 +285,10 @@ class plog_channel : public pfmt_writer_t<plog_channel<T, L, build_enabled>, bui
 	friend class pfmt_writer_t<plog_channel<T, L, build_enabled>, build_enabled>;
 public:
 	explicit plog_channel(T &b) : pfmt_writer_t<plog_channel, build_enabled>(), m_base(b) { }
-	~plog_channel() { }
+
+	COPYASSIGNMOVE(plog_channel, delete)
+
+	~plog_channel() noexcept = default;
 
 protected:
 	void vdowrite(const pstring &ls) const
@@ -283,7 +313,9 @@ public:
 		error(proxy),
 		fatal(proxy)
 	{}
-	virtual ~plog_base() {}
+
+	COPYASSIGNMOVE(plog_base, default)
+	virtual ~plog_base() noexcept = default;
 
 	plog_channel<T, plog_level::DEBUG, debug_enabled> debug;
 	plog_channel<T, plog_level::INFO> info;
@@ -293,7 +325,7 @@ public:
 	plog_channel<T, plog_level::FATAL> fatal;
 };
 
-}
+} // namespace plib
 
 template<typename T>
 plib::pfmt& operator<<(plib::pfmt &p, T&& val) { return p(std::forward<T>(val)); }

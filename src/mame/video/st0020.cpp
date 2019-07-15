@@ -29,23 +29,12 @@ DEFINE_DEVICE_TYPE(ST0020_SPRITES, st0020_device, "st0020", "Seta ST0020 Sprites
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ST0020_SPRITES, tag, owner, clock),
-	device_gfx_interface(mconfig, *this)
+	device_gfx_interface(mconfig, *this),
+	m_rom_ptr(*this, DEVICE_SELF)
 {
 	m_is_st0032 = 0;
 	m_is_jclub2 = 0;
 }
-
-
-void st0020_device::static_set_is_st0032(device_t &device, int is_st0032)
-{
-	downcast<st0020_device &>(device).m_is_st0032 = is_st0032;
-}
-
-void st0020_device::static_set_is_jclub2(device_t &device, int is_jclub2)
-{
-	downcast<st0020_device &>(device).m_is_jclub2 = is_jclub2;
-}
-
 
 void st0020_device::device_reset()
 {
@@ -56,11 +45,6 @@ void st0020_device::device_start()
 {
 	if (!palette().device().started())
 		throw device_missing_dependencies();
-
-	// ROM region
-	memory_region *rgn = memregion(tag());
-	m_rom_ptr  = rgn ? rgn->base()  : nullptr;
-	m_rom_size = rgn ? rgn->bytes() : 0;
 
 	// Allocate RAM
 	m_gfxram    =   make_unique_clear<uint16_t[]>(4 * 0x100000/2);
@@ -83,10 +67,14 @@ void st0020_device::device_start()
 	gfx(0)->set_granularity(granularity); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
 	// Tilemaps
-	m_tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_0), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
-	m_tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_1), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
-	m_tmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_2), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
-	m_tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info_3), this), TILEMAP_SCAN_ROWS,16,8, 0x40,0x40*2);
+	m_tmap[0] = &machine().tilemap().create(
+				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<0>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+	m_tmap[1] = &machine().tilemap().create(
+				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<1>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+	m_tmap[2] = &machine().tilemap().create(
+				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<2>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
+	m_tmap[3] = &machine().tilemap().create(
+				*this, tilemap_get_info_delegate(FUNC(st0020_device::get_tile_info<3>), this), tilemap_mapper_delegate(FUNC(st0020_device::scan_16x16),this),16,8, 0x40,0x40*2);
 	for (int i = 0; i < 4; ++i)
 	{
 		m_tmap[i]->set_transparent_pen(0);
@@ -94,9 +82,9 @@ void st0020_device::device_start()
 	}
 
 	// Save state
-	save_pointer(NAME(m_gfxram.get()),      4 * 0x100000/2);
-	save_pointer(NAME(m_spriteram.get()),   0x80000/2);
-	save_pointer(NAME(m_regs.get()),        0x100/2);
+	save_pointer(NAME(m_gfxram),      4 * 0x100000/2);
+	save_pointer(NAME(m_spriteram),   0x80000/2);
+	save_pointer(NAME(m_regs),        0x100/2);
 	save_item(NAME(m_gfxram_bank));
 }
 
@@ -171,23 +159,23 @@ int st0020_device::tmap_is_enabled(int i)
 
 ***************************************************************************/
 
-inline void st0020_device::get_tile_info_i(int i, tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
+template<int Layer>
+TILE_GET_INFO_MEMBER(st0020_device::get_tile_info)
 {
-	int offset = tmap_offset(i) + ((tile_index % 0x40) + (tile_index / 0x80) * 0x40) * 2;
-	uint16_t tile   =   m_spriteram[offset + 0] + ((tile_index / 0x40) & 1);
+	int offset = tmap_offset(Layer) + (tile_index & ~1);
+	uint16_t tile   =   m_spriteram[offset + 0] + (tile_index & 1);
 	uint16_t color  =   m_spriteram[offset + 1];
 
 	if (m_is_st0032)    color = (color & 0x1ff) * ((color & 0x200) ? 4 : 16);
-	else                color = color * ((m_regs[i * 4 + 3] & 0x0100) ? 2 : 8);
+	else                color = color * ((m_regs[Layer * 4 + 3] & 0x0100) ? 2 : 8);
 
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_0)    { get_tile_info_i(0, tilemap, tileinfo, tile_index); }
-TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_1)    { get_tile_info_i(1, tilemap, tileinfo, tile_index); }
-TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_2)    { get_tile_info_i(2, tilemap, tileinfo, tile_index); }
-TILE_GET_INFO_MEMBER(st0020_device::get_tile_info_3)    { get_tile_info_i(3, tilemap, tileinfo, tile_index); }
-
+TILEMAP_MAPPER_MEMBER(st0020_device::scan_16x16)
+{
+	return (row & 1) | ((col & 0x3f) << 1) | ((row & ~1) << 6);
+}
 
 // Sprite RAM
 READ16_MEMBER(st0020_device::sprram_r)
@@ -204,10 +192,9 @@ WRITE16_MEMBER(st0020_device::sprram_w)
 		int tmap_offs = tmap_offset(i);
 		if ((offset >= tmap_offs) && (offset < tmap_offs + 0x4000/2))
 		{
-			int tile_index = (offset - tmap_offs) / 2;
-			tile_index = (tile_index % 0x40) + ((tile_index / 0x40) * 0x80);
+			int tile_index = (offset - tmap_offs) & ~1;
 			m_tmap[i]->mark_tile_dirty(tile_index);
-			m_tmap[i]->mark_tile_dirty(tile_index + 0x40);
+			m_tmap[i]->mark_tile_dirty(tile_index + 1);
 			// the same offset can be used by multiple tilemaps, so do not break the loop here
 		}
 	}
@@ -220,7 +207,7 @@ WRITE16_MEMBER(st0020_device::do_blit_w)
 	uint32_t dst  =   (m_regs[0xc4/2] + (m_regs[0xc6/2] << 16)) << 4;
 	uint32_t len  =   (m_regs[0xc8/2]) << 4;
 
-	if ( m_rom_ptr && (src+len <= m_rom_size) && (dst+len <= 4 * 0x100000) )
+	if ( m_rom_ptr && (src+len <= m_rom_ptr.bytes()) && (dst+len <= 4 * 0x100000) )
 	{
 		memcpy( &m_gfxram[dst/2], &m_rom_ptr[src], len );
 

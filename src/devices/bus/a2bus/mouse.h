@@ -22,8 +22,8 @@
 //**************************************************************************
 
 class a2bus_mouse_device:
-	public device_t,
-	public device_a2bus_card_interface
+		public device_t,
+		public device_a2bus_card_interface
 {
 public:
 	// construction/destruction
@@ -71,6 +71,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_MOUSE;
+DECLARE_DEVICE_TYPE(A2BUS_MOUSE, a2bus_mouse_device)
 
 #endif // MAME_DEVICES_A2BUS_MOUSE_H

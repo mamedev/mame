@@ -11,11 +11,6 @@
 
 #pragma once
 
-
-#define MCFG_HD44352_ON_CB(_devcb) \
-	devcb = &hd44352_device::set_on_callback(*device, DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -28,7 +23,7 @@ public:
 	// construction/destruction
 	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_on_callback(device_t &device, Object &&cb) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(std::forward<Object>(cb)); }
+	auto on_cb() { return m_on_cb.bind(); }
 
 	// device interface
 	uint8_t data_read();

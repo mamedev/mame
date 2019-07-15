@@ -245,7 +245,7 @@ void mb86901_device::execute_div(uint32_t op)
 	{
 		uint32_t result = 0;
 		bool temp_v = false;
-		int64_t temp_64bit;
+		int64_t temp_64bit = 0;
 		if (UDIV || UDIVCC)
 		{
 			temp_64bit = int64_t(uint64_t((uint64_t(Y) << 32) | uint64_t(RS1REG)) / operand2);

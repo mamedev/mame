@@ -10,16 +10,6 @@
 
 DECLARE_DEVICE_TYPE(TAITO_SJ_SECURITY_MCU, taito_sj_security_mcu_device)
 
-#define MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(mode) \
-		taito_sj_security_mcu_device::set_int_mode(*device, taito_sj_security_mcu_device::int_mode::mode);
-#define MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(cb) \
-		devcb = &taito_sj_security_mcu_device::set_68read_cb(*device, DEVCB_##cb);
-#define MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(cb) \
-		devcb = &taito_sj_security_mcu_device::set_68write_cb(*device, DEVCB_##cb);
-#define MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(cb) \
-		devcb = &taito_sj_security_mcu_device::set_68intrq_cb(*device, DEVCB_##cb);
-#define MCFG_TAITO_SJ_SECURITY_MCU_BUSRQ_CB(cb) \
-		devcb = &taito_sj_security_mcu_device::set_busrq_cb(*device, DEVCB_##cb);
 
 class taito_sj_security_mcu_device : public device_t
 {
@@ -31,16 +21,11 @@ public:
 		WRITE
 	};
 
-	static void set_int_mode(device_t &device, int_mode mode)
-	{ downcast<taito_sj_security_mcu_device &>(device).m_int_mode = mode; }
-	template <typename Obj> static devcb_base &set_68read_cb(device_t &device, Obj &&cb)
-	{ return downcast<taito_sj_security_mcu_device &>(device).m_68read_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> static devcb_base &set_68write_cb(device_t &device, Obj &&cb)
-	{ return downcast<taito_sj_security_mcu_device &>(device).m_68write_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> static devcb_base &set_68intrq_cb(device_t &device, Obj &&cb)
-	{ return downcast<taito_sj_security_mcu_device &>(device).m_68intrq_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> static devcb_base &set_busrq_cb(device_t &device, Obj &&cb)
-	{ return downcast<taito_sj_security_mcu_device &>(device).m_busrq_cb.set_callback(std::forward<Obj>(cb)); }
+	void set_int_mode(int_mode mode) { m_int_mode = mode; }
+	auto m68read_cb() { return m_68read_cb.bind(); }
+	auto m68write_cb() { return m_68write_cb.bind(); }
+	auto m68intrq_cb() { return m_68intrq_cb.bind(); }
+	auto busrq_cb() { return m_busrq_cb.bind(); }
 
 	taito_sj_security_mcu_device(
 			machine_config const &mconfig,

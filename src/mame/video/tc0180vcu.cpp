@@ -1,40 +1,87 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 /* Taito TC0180VCU */
+// Sprite/Framebuffer emulation by Jarek Burczynski (from taito_b.cpp)
 
 #include "emu.h"
 #include "tc0180vcu.h"
+#include "screen.h"
 
-#define TC0180VCU_RAM_SIZE          0x10000
-#define TC0180VCU_SCROLLRAM_SIZE    0x0800
+//#define TC0180VCU_RAM_SIZE          0x10000
+//#define TC0180VCU_SCROLLRAM_SIZE    0x0800
 
+const gfx_layout tc0180vcu_device::charlayout =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	4,
+	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
+	16*8
+};
+
+const gfx_layout tc0180vcu_device::tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
+	{ STEP8(0,1), STEP8(8*8*2,1) },
+	{ STEP8(0,8*2), STEP8(8*8*2*2,8*2) },
+	64*8
+};
+
+GFXDECODE_MEMBER( tc0180vcu_device::gfxinfo )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, charlayout,  0, 256 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, tilelayout,  0, 256 )
+GFXDECODE_END
+
+void tc0180vcu_device::tc0180vcu_memrw(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().w(FUNC(tc0180vcu_device::word_w)).share("vram");
+	map(0x10000, 0x1197f).ram().share("spriteram");
+	map(0x11980, 0x137ff).ram();
+	map(0x13800, 0x13fff).ram().share("scrollram");
+	map(0x18000, 0x1801f).ram().w(FUNC(tc0180vcu_device::ctrl_w)).share("ctrl");
+	map(0x40000, 0x7ffff).rw(FUNC(tc0180vcu_device::framebuffer_word_r), FUNC(tc0180vcu_device::framebuffer_word_w));
+}
 
 DEFINE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device, "tc0180vcu", "Taito TC0180VCU")
 
-tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0180VCU, tag, owner, clock),
-	m_ram(nullptr),
-	//m_scrollram(nullptr),
+tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TC0180VCU, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
+	device_video_interface(mconfig, *this),
+	m_spriteram(*this, "spriteram"),
+	m_vram(*this, "vram"),
+	m_scrollram(*this, "scrollram"),
+	m_ctrl(*this, "ctrl"),
 	//m_bg_rambank(0),
 	//m_fg_rambank(0),
 	//m_tx_rambank(0),
 	m_framebuffer_page(0),
 	m_video_control(0),
+	m_fb_color_base(0),
 	m_bg_color_base(0),
 	m_fg_color_base(0),
 	m_tx_color_base(0),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	m_inth_callback(*this),
+	m_intl_callback(*this),
+	m_intl_timer(nullptr)
 {
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void tc0180vcu_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+void tc0180vcu_device::device_resolve_objects()
 {
-	downcast<tc0180vcu_device &>(device).m_gfxdecode.set_tag(tag);
+	m_inth_callback.resolve_safe();
+	m_intl_callback.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -43,21 +90,18 @@ void tc0180vcu_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 
 void tc0180vcu_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_ram = make_unique_clear<uint16_t[]>(TC0180VCU_RAM_SIZE / 2);
-	m_scrollram = make_unique_clear<uint16_t[]>(TC0180VCU_SCROLLRAM_SIZE / 2);
+	m_framebuffer[0] = std::make_unique<bitmap_ind16>(512, 256);
+	m_framebuffer[1] = std::make_unique<bitmap_ind16>(512, 256);
 
-	save_pointer(NAME(m_ram.get()), TC0180VCU_RAM_SIZE / 2);
-	save_pointer(NAME(m_scrollram.get()), TC0180VCU_SCROLLRAM_SIZE / 2);
+	screen().register_vblank_callback(vblank_state_delegate(&tc0180vcu_device::vblank_callback, this));
+	m_intl_timer = timer_alloc(TIMER_INTL);
 
 	save_item(NAME(m_bg_rambank));
 	save_item(NAME(m_fg_rambank));
@@ -66,7 +110,9 @@ void tc0180vcu_device::device_start()
 	save_item(NAME(m_framebuffer_page));
 
 	save_item(NAME(m_video_control));
-	save_item(NAME(m_ctrl));
+
+	save_item(NAME(*m_framebuffer[0]));
+	save_item(NAME(*m_framebuffer[1]));
 }
 
 //-------------------------------------------------
@@ -88,6 +134,47 @@ void tc0180vcu_device::device_reset()
 
 	m_framebuffer_page = 0;
 	m_video_control = 0;
+}
+
+//-------------------------------------------------
+//  vblank_callback - generate blanking-related
+//  interrupts
+//-------------------------------------------------
+
+void tc0180vcu_device::vblank_callback(screen_device &screen, bool state)
+{
+	// TODO: Measure the actual duty cycle of the INTH/"INT5" (pin 67)
+	// and INTL/"INT4" (pin 66) interrupt outputs (both of which are externally
+	// encoded and acknowledged through a PAL and additional flip-flops).
+	// Is their timing programmable at all? Most registers are accounted for...
+
+	// TODO: Verify that INTH indeed fires before INTL, and not vice versa.
+
+	if (state)
+	{
+		vblank_update();
+
+		m_inth_callback(ASSERT_LINE);
+		m_intl_timer->adjust(screen.time_until_pos(screen.vpos() + 8));
+	}
+	else
+		m_intl_callback(CLEAR_LINE);
+}
+
+//-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void tc0180vcu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INTL:
+		m_inth_callback(CLEAR_LINE);
+		m_intl_callback(ASSERT_LINE);
+		break;
+	}
 }
 
 
@@ -138,21 +225,6 @@ void tc0180vcu_device::device_reset()
 *
 */
 
-READ8_MEMBER( tc0180vcu_device::get_fb_page )
-{
-	return m_framebuffer_page;
-}
-
-WRITE8_MEMBER( tc0180vcu_device::set_fb_page )
-{
-	m_framebuffer_page = data;
-}
-
-READ8_MEMBER( tc0180vcu_device::get_videoctrl )
-{
-	return m_video_control;
-}
-
 void tc0180vcu_device::video_control( uint8_t data )
 {
 #if 0
@@ -163,14 +235,9 @@ void tc0180vcu_device::video_control( uint8_t data )
 	m_video_control = data;
 
 	if (m_video_control & 0x80)
-		m_framebuffer_page = (~m_video_control & 0x40) >> 6;
+		m_framebuffer_page = BIT(~m_video_control, 6);
 
 	machine().tilemap().set_flip_all((m_video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
-}
-
-READ16_MEMBER( tc0180vcu_device::ctrl_r )
-{
-	return m_ctrl[offset];
 }
 
 WRITE16_MEMBER( tc0180vcu_device::ctrl_w )
@@ -179,7 +246,7 @@ WRITE16_MEMBER( tc0180vcu_device::ctrl_w )
 
 	COMBINE_DATA (&m_ctrl[offset]);
 
-	if (oldword != m_ctrl[offset])
+	if (oldword ^ m_ctrl[offset])
 	{
 		if (ACCESSING_BITS_8_15)
 		{
@@ -213,10 +280,29 @@ WRITE16_MEMBER( tc0180vcu_device::ctrl_w )
 	}
 }
 
+READ16_MEMBER(tc0180vcu_device::framebuffer_word_r)
+{
+	int sy = offset >> 8;
+	int sx = 2 * (offset & 0xff);
+
+	return (m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
+}
+
+WRITE16_MEMBER(tc0180vcu_device::framebuffer_word_w)
+{
+	int sy = offset >> 8;
+	int sx = 2 * (offset & 0xff);
+
+	if (ACCESSING_BITS_8_15)
+		m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) = data >> 8;
+	if (ACCESSING_BITS_0_7)
+		m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1) = data & 0xff;
+}
+
 TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 {
-	int tile  = m_ram[tile_index + m_bg_rambank[0]];
-	int color = m_ram[tile_index + m_bg_rambank[1]];
+	int tile  = m_vram[tile_index + m_bg_rambank[0]];
+	int color = m_vram[tile_index + m_bg_rambank[1]];
 
 	SET_TILE_INFO_MEMBER(1, tile,
 		m_bg_color_base + (color & 0x3f),
@@ -225,8 +311,8 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 {
-	int tile  = m_ram[tile_index + m_fg_rambank[0]];
-	int color = m_ram[tile_index + m_fg_rambank[1]];
+	int tile  = m_vram[tile_index + m_fg_rambank[0]];
+	int color = m_vram[tile_index + m_fg_rambank[1]];
 
 	SET_TILE_INFO_MEMBER(1, tile,
 		m_fg_color_base + (color & 0x3f),
@@ -235,7 +321,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 {
-	int tile = m_ram[tile_index + m_tx_rambank];
+	int tile = m_vram[tile_index + m_tx_rambank];
 
 	SET_TILE_INFO_MEMBER(0,
 		(tile & 0x07ff) | ((m_ctrl[4 + ((tile & 0x800) >> 11)]>>8) << 11),
@@ -243,24 +329,9 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 		0);
 }
 
-READ16_MEMBER( tc0180vcu_device::scroll_r )
-{
-	return m_scrollram[offset];
-}
-
-WRITE16_MEMBER( tc0180vcu_device::scroll_w )
-{
-	COMBINE_DATA(&m_scrollram[offset]);
-}
-
-READ16_MEMBER( tc0180vcu_device::word_r )
-{
-	return m_ram[offset];
-}
-
 WRITE16_MEMBER( tc0180vcu_device::word_w )
 {
-	COMBINE_DATA(&m_ram[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 
 	if ((offset & 0x7000) == m_fg_rambank[0] || (offset & 0x7000) == m_fg_rambank[1])
 		m_tilemap[1]->mark_tile_dirty(offset & 0x0fff);
@@ -318,4 +389,244 @@ void tc0180vcu_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap
 			}
 		}
 	}
+}
+
+void tc0180vcu_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+/*  Sprite format: (16 bytes per sprite)
+  offs:             bits:
+  0000: 0xxxxxxxxxxxxxxx: tile code - 0x0000 to 0x7fff in qzshowby
+  0002: 0000000000xxxxxx: color (0x00 - 0x3f)
+        x000000000000000: flipy
+        0x00000000000000: flipx
+        00????????000000: unused ?
+  0004: xxxxxx0000000000: doesn't matter - some games (eg nastar) fill this with sign bit, some (eg ashura) do not
+        000000xxxxxxxxxx: x-coordinate 10 bits signed (all zero for sprites forming up a big sprite, except for the first one)
+  0006: xxxxxx0000000000: doesn't matter - same as x
+        000000xxxxxxxxxx: y-coordinate 10 bits signed (same as x)
+  0008: xxxxxxxx00000000: sprite x-zoom level
+        00000000xxxxxxxx: sprite y-zoom level
+      0x00 - non scaled = 100%
+      0x80 - scaled to 50%
+      0xc0 - scaled to 25%
+      0xe0 - scaled to 12.5%
+      0xff - scaled to zero pixels size (off)
+      Sprite zoom is used in Ashura Blaster just in the beginning
+      where you can see a big choplifter and a japanese title.
+      This japanese title is a scaled sprite.
+      It is used in Crime City also at the end of the third level (in the garage)
+      where there are four columns on the sides of the screen
+      Heaviest usage is in Rambo 3 - almost every sprite in game is scaled
+  000a: xxxxxxxx00000000: x-sprites number (big sprite) decremented by one
+        00000000xxxxxxxx: y-sprites number (big sprite) decremented by one
+  000c - 000f: unused
+*/
+
+	int x, y, xlatch = 0, ylatch = 0, x_no = 0, y_no = 0, x_num = 0, y_num = 0, big_sprite = 0;
+	int offs, code, color, flipx, flipy;
+	uint32_t data, zoomx, zoomy, zx, zy, zoomxlatch = 0, zoomylatch = 0;
+
+	for (offs = (0x1980 - 16) / 2; offs >=0; offs -= 8)
+	{
+		code = m_spriteram[offs];
+
+		color = m_spriteram[offs + 1];
+		flipx = color & 0x4000;
+		flipy = color & 0x8000;
+#if 0
+		/*check the unknown bits*/
+		if (color & 0x3fc0)
+		{
+			logerror("sprite color (taitob)=%4x ofs=%4x\n", color, offs);
+			color = machine().rand() & 0x3f;
+		}
+#endif
+		color = (color & 0x3f) * 16;
+
+		x = m_spriteram[offs + 2] & 0x3ff;
+		y = m_spriteram[offs + 3] & 0x3ff;
+		if (x >= 0x200)  x -= 0x400;
+		if (y >= 0x200)  y -= 0x400;
+
+		data = m_spriteram[offs + 5];
+		if (data)
+		{
+			if (!big_sprite)
+			{
+				x_num = (data >> 8) & 0xff;
+				y_num = (data >> 0) & 0xff;
+				x_no  = 0;
+				y_no  = 0;
+				xlatch = x;
+				ylatch = y;
+				data = m_spriteram[offs + 4];
+				zoomxlatch = (data >> 8) & 0xff;
+				zoomylatch = (data >> 0) & 0xff;
+				big_sprite = 1;
+			}
+		}
+
+		data = m_spriteram[offs + 4];
+		zoomx = (data >> 8) & 0xff;
+		zoomy = (data >> 0) & 0xff;
+		zx = (0x100 - zoomx) / 16;
+		zy = (0x100 - zoomy) / 16;
+
+		if (big_sprite)
+		{
+			zoomx = zoomxlatch;
+			zoomy = zoomylatch;
+
+			/* Note: like taito_f2.cpp, this zoom implementation is wrong,
+			chopped up into 16x16 sections instead of one sprite. This
+			is especially visible in rambo3. */
+
+			x = xlatch + (x_no * (0xff - zoomx) + 15) / 16;
+			y = ylatch + (y_no * (0xff - zoomy) + 15) / 16;
+			zx = xlatch + ((x_no + 1) * (0xff - zoomx) + 15) / 16 - x;
+			zy = ylatch + ((y_no + 1) * (0xff - zoomy) + 15) / 16 - y;
+			y_no++;
+
+			if (y_no > y_num)
+			{
+				y_no = 0;
+				x_no++;
+
+				if (x_no > x_num)
+					big_sprite = 0;
+			}
+		}
+
+		if ( zoomx || zoomy )
+		{
+			gfx(1)->zoom_transpen_raw(bitmap,cliprect,
+				code,
+				color,
+				flipx,flipy,
+				x,y,
+				(zx << 16) / 16,(zy << 16) / 16,0);
+		}
+		else
+		{
+			gfx(1)->transpen_raw(bitmap,cliprect,
+				code,
+				color,
+				flipx,flipy,
+				x,y,
+				0);
+		}
+	}
+}
+
+void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+{
+	rectangle myclip = cliprect;
+	int x, y;
+
+g_profiler.start(PROFILER_USER1);
+
+	priority <<= 4;
+
+	if (m_video_control & 0x08)
+	{
+		if (priority)
+		{
+			g_profiler.stop();
+			return;
+		}
+
+		if (m_video_control & 0x10)   /*flip screen*/
+		{
+			/*popmessage("1. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
+			for (y = myclip.min_y; y <= myclip.max_y; y++)
+			{
+				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst;
+
+				dst = &bitmap.pix16(bitmap.height()-1-y, myclip.max_x);
+
+				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				{
+					uint16_t c = *src++;
+
+					if (c != 0)
+						*dst = m_fb_color_base + c;
+
+					dst--;
+				}
+			}
+		}
+		else
+		{
+			for (y = myclip.min_y; y <= myclip.max_y; y++)
+			{
+				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix16(y, myclip.min_x);
+
+				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				{
+					uint16_t c = *src++;
+
+					if (c != 0)
+						*dst = m_fb_color_base + c;
+
+					dst++;
+				}
+			}
+		}
+	}
+	else
+	{
+		if (m_video_control & 0x10)   /*flip screen*/
+		{
+			/*popmessage("3. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
+			for (y = myclip.min_y ;y <= myclip.max_y; y++)
+			{
+				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst;
+
+				dst = &bitmap.pix16(bitmap.height()-1-y, myclip.max_x);
+
+				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				{
+					uint16_t c = *src++;
+
+					if (c != 0 && (c & 0x10) == priority)
+						*dst = m_fb_color_base + c;
+
+					dst--;
+				}
+			}
+		}
+		else
+		{
+			for (y = myclip.min_y; y <= myclip.max_y; y++)
+			{
+				uint16_t *src = &m_framebuffer[m_framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix16(y, myclip.min_x);
+
+				for (x = myclip.min_x; x <= myclip.max_x; x++)
+				{
+					uint16_t c = *src++;
+
+					if (c != 0 && (c & 0x10) == priority)
+						*dst = m_fb_color_base + c;
+
+					dst++;
+				}
+			}
+		}
+	}
+g_profiler.stop();
+}
+
+void tc0180vcu_device::vblank_update()
+{
+	if (~m_video_control & 0x01)
+		m_framebuffer[m_framebuffer_page]->fill(0, screen().visible_area());
+
+	if (~m_video_control & 0x80)
+		m_framebuffer_page ^= 1;
+
+	draw_sprites(*m_framebuffer[m_framebuffer_page], screen().visible_area());
 }

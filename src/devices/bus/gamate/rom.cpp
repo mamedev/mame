@@ -168,17 +168,19 @@ WRITE8_MEMBER(gamate_rom_4in1_device::write_rom)
 	}
 }
 
-MACHINE_CONFIG_START(gamate_rom_plain_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("protection", GAMATE_PROT, 0)
-MACHINE_CONFIG_END
+void gamate_rom_plain_device::device_add_mconfig(machine_config &config)
+{
+	GAMATE_PROT(config, m_protection, 0);
+}
 
 
 /*-------------------------------------------------
  slot interface
  -------------------------------------------------*/
 
-SLOT_INTERFACE_START(gamate_cart)
-	SLOT_INTERFACE_INTERNAL("plain",       GAMATE_ROM_PLAIN)
-	SLOT_INTERFACE_INTERNAL("banked",      GAMATE_ROM_BANKED)
-	SLOT_INTERFACE_INTERNAL("4in1",        GAMATE_ROM_4IN1)
-SLOT_INTERFACE_END
+void gamate_cart(device_slot_interface &device)
+{
+	device.option_add_internal("plain",       GAMATE_ROM_PLAIN);
+	device.option_add_internal("banked",      GAMATE_ROM_BANKED);
+	device.option_add_internal("4in1",        GAMATE_ROM_4IN1);
+}

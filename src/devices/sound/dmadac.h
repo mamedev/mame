@@ -16,7 +16,7 @@
 class dmadac_sound_device : public device_t, public device_sound_interface
 {
 public:
-	dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void flush();
 	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int16_t *data);

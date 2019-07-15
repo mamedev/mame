@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -27,12 +27,12 @@ namespace bx
 			int32_t result = _fn(&data[ii*_stride], _pivot);
 			if (0 > result)
 			{
-				xchg(&data[ll*_stride], &data[ii*_stride], _stride);
+				swap(&data[ll*_stride], &data[ii*_stride], _stride);
 				++ll;
 			}
 			else if (0 == result)
 			{
-				xchg(&data[gg*_stride], &data[ii*_stride], _stride);
+				swap(&data[gg*_stride], &data[ii*_stride], _stride);
 				++gg;
 				++ii;
 			}

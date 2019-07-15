@@ -7,7 +7,7 @@
 #pragma once
 
 #include "machine/buffer.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 
 #define SCSI_PORT_DEVICE1 "1"
 #define SCSI_PORT_DEVICE2 "2"
@@ -17,77 +17,6 @@
 #define SCSI_PORT_DEVICE6 "6"
 #define SCSI_PORT_DEVICE7 "7"
 
-#define MCFG_SCSI_BSY_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_bsy_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_SEL_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_sel_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_CD_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_cd_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_IO_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_io_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_MSG_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_msg_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_REQ_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_req_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_ACK_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_ack_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_ATN_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_atn_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_RST_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_rst_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA0_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data0_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA1_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data1_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA2_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data2_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA3_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data3_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA4_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data4_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA5_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data5_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA6_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data6_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_DATA7_HANDLER(_devcb) \
-	devcb = &scsi_port_device::set_data7_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_SCSI_OUTPUT_LATCH_ADD(_tag, scsi_port_tag) \
-	MCFG_DEVICE_ADD(_tag, OUTPUT_LATCH, 0) \
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data0)) \
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data1)) \
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data2)) \
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data3)) \
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data4)) \
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data5)) \
-	MCFG_OUTPUT_LATCH_BIT6_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data6)) \
-	MCFG_OUTPUT_LATCH_BIT7_HANDLER(DEVWRITELINE(scsi_port_tag, scsi_port_device, write_data7))
-
-#define MCFG_SCSI_DATA_INPUT_BUFFER(_tag) \
-	MCFG_SCSI_DATA0_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit0)) \
-	MCFG_SCSI_DATA1_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit1)) \
-	MCFG_SCSI_DATA2_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit2)) \
-	MCFG_SCSI_DATA3_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit3)) \
-	MCFG_SCSI_DATA4_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit4)) \
-	MCFG_SCSI_DATA5_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit5)) \
-	MCFG_SCSI_DATA6_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit6)) \
-	MCFG_SCSI_DATA7_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit7))
 
 class scsi_port_slot_device;
 class scsi_port_interface;
@@ -98,25 +27,40 @@ class scsi_port_device : public device_t
 
 public:
 	// construction/destruction
-	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scsi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> static devcb_base &set_bsy_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_bsy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sel_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_sel_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cd_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_cd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_io_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_io_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_msg_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_msg_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_req_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_req_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ack_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_ack_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_atn_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_atn_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rst_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_rst_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data0_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data0_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data1_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data2_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data3_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data3_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data4_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data4_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data5_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data5_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data6_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data6_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_data7_handler(device_t &device, Object &&cb) { return downcast<scsi_port_device &>(device).m_data7_handler.set_callback(std::forward<Object>(cb)); }
+	auto bsy_handler() { return m_bsy_handler.bind(); }
+	auto sel_handler() { return m_sel_handler.bind(); }
+	auto cd_handler() { return m_cd_handler.bind(); }
+	auto io_handler() { return m_io_handler.bind(); }
+	auto msg_handler() { return m_msg_handler.bind(); }
+	auto req_handler() { return m_req_handler.bind(); }
+	auto ack_handler() { return m_ack_handler.bind(); }
+	auto atn_handler() { return m_atn_handler.bind(); }
+	auto rst_handler() { return m_rst_handler.bind(); }
+	auto data0_handler() { return m_data0_handler.bind(); }
+	auto data1_handler() { return m_data1_handler.bind(); }
+	auto data2_handler() { return m_data2_handler.bind(); }
+	auto data3_handler() { return m_data3_handler.bind(); }
+	auto data4_handler() { return m_data4_handler.bind(); }
+	auto data5_handler() { return m_data5_handler.bind(); }
+	auto data6_handler() { return m_data6_handler.bind(); }
+	auto data7_handler() { return m_data7_handler.bind(); }
+
+	template <typename T>
+	void set_data_input_buffer(T &&tag)
+	{
+		data0_handler().set(tag, FUNC(input_buffer_device::write_bit0));
+		data1_handler().set(tag, FUNC(input_buffer_device::write_bit1));
+		data2_handler().set(tag, FUNC(input_buffer_device::write_bit2));
+		data3_handler().set(tag, FUNC(input_buffer_device::write_bit3));
+		data4_handler().set(tag, FUNC(input_buffer_device::write_bit4));
+		data5_handler().set(tag, FUNC(input_buffer_device::write_bit5));
+		data6_handler().set(tag, FUNC(input_buffer_device::write_bit6));
+		data7_handler().set(tag, FUNC(input_buffer_device::write_bit7));
+	}
+
+	void set_output_latch(output_latch_device &latch);
 
 	DECLARE_WRITE_LINE_MEMBER( write_bsy );
 	DECLARE_WRITE_LINE_MEMBER( write_sel );
@@ -135,6 +79,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_data5 );
 	DECLARE_WRITE_LINE_MEMBER( write_data6 );
 	DECLARE_WRITE_LINE_MEMBER( write_data7 );
+
+	scsi_port_slot_device &slot(int index);
+	void set_slot_device(int index, const char *option, const device_type &type, const input_device_default *id);
 
 protected:
 	// device-level overrides
@@ -178,7 +125,7 @@ private:
 	devcb_write_line m_data6_handler;
 	devcb_write_line m_data7_handler;
 
-	scsi_port_slot_device *m_slot[7];
+	optional_device_array<scsi_port_slot_device, 7> m_slot;
 	int m_device_count;
 
 	int m_bsy_in;
@@ -217,7 +164,7 @@ private:
 	int m_data7_out;
 };
 
-extern const device_type SCSI_PORT;
+DECLARE_DEVICE_TYPE(SCSI_PORT, scsi_port_device)
 
 class scsi_port_interface;
 
@@ -228,7 +175,7 @@ class scsi_port_slot_device : public device_t,
 	friend class scsi_port_interface;
 
 public:
-	scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scsi_port_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	scsi_port_interface *dev() { return m_dev; }
 	scsi_port_device *port() { return m_port; }

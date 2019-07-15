@@ -6,13 +6,16 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "bus/centronics/ctronics.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
+#include "screen.h"
 
 class kaypro_state : public driver_device
 {
@@ -25,6 +28,7 @@ public:
 	kaypro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
 		, m_pio_g(*this, "z80pio_g")
@@ -56,13 +60,13 @@ public:
 	DECLARE_MACHINE_START(kayproii);
 	DECLARE_MACHINE_RESET(kaypro);
 	DECLARE_VIDEO_START(kaypro);
-	DECLARE_PALETTE_INIT(kaypro);
-	DECLARE_DRIVER_INIT(kaypro);
+	void kaypro_palette(palette_device &palette) const;
+	void init_kaypro();
 	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	MC6845_UPDATE_ROW(kaypro484_update_row);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void omni2(machine_config &config);
 	void kayproiv(machine_config &config);
@@ -75,6 +79,10 @@ public:
 	void kaypro_map(address_map &map);
 	void kayproii_io(address_map &map);
 private:
+	void mc6845_cursor_configure();
+	void mc6845_screen_configure();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	uint8_t m_mc6845_cursor[16];
 	uint8_t m_mc6845_reg[32];
 	uint8_t m_mc6845_ind;
@@ -86,11 +94,10 @@ private:
 	uint8_t m_system_port;
 	uint16_t m_mc6845_video_address;
 	floppy_image_device *m_floppy;
-	void mc6845_cursor_configure();
-	void mc6845_screen_configure();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;

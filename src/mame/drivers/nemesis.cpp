@@ -20,13 +20,16 @@
     Hyper Crash (Version C) GX790
     Kitten Kaboodle         GX712
     Nyan Nyan Panic (Japan) GX712
-
+    Bubble System
 
 driver by Bryan McPhail
 
 TODO:
 - hcrash: coin insertion isn't always recognized.
 - hcrash: Konami GT-type inputs doesn't work properly.
+- gradiusb: requires ~16 seconds to resume after each death, way too much?
+- gradiusb: missing gfxs on title screen logo;
+- gradiusb: still needs proper MCU emulation;
 
 modified by Hau
 03/27/2009
@@ -35,6 +38,8 @@ modified by Hau
 modified by hap
 06/09/2012
  Special thx 2 Neusneus, Audrey Tautou, my water bottle, chair, sleepiness
+
+Bubble System added 2019 ArcadeHacker/Bryan McPhail
 
 Notes:
 - blkpnthr:
@@ -66,16 +71,22 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "konamigt.lh"
 
 
-INTERRUPT_GEN_MEMBER(nemesis_state::nemesis_interrupt)
+WRITE_LINE_MEMBER(nemesis_state::nemesis_vblank_irq)
 {
-	if (m_irq_on)
-		device.execute().set_input_line(1, HOLD_LINE);
+	if (state && m_irq_on)
+		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(nemesis_state::blkpnthr_interrupt)
+WRITE_LINE_MEMBER(nemesis_state::blkpnthr_vblank_irq)
 {
-	if (m_irq_on)
-		device.execute().set_input_line(2, HOLD_LINE);
+	if (state && m_irq_on)
+		m_maincpu->set_input_line(2, HOLD_LINE);
+}
+
+WRITE_LINE_MEMBER(nemesis_state::bubsys_vblank_irq)
+{
+	if (state && m_irq_on)
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
@@ -137,9 +148,55 @@ WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
 WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
 {
 	if (state)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
+WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
+{
+	if (state) // On Bubble System this goes to an LS02 NOR before the Z80, so there may be a disable somewhere
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
+{
+	COMBINE_DATA(&m_bubsys_control_ram[offset]);
+	//logerror("bubsys_mcu_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+
+	if (offset==1)
+	{
+		// NOP?
+		if (m_bubsys_control_ram[1]==0)
+		{
+		}
+		// Read
+		else if (m_bubsys_control_ram[1]==1)
+		{
+			// The MCU copies the requested page of bubble memory to 0xf00 of shared RAM
+			int page = m_bubsys_control_ram[0] & 0x7ff;
+			//int unknownBit = m_bubsys_control_ram[0] & 0x800;
+
+			logerror("\tCopy page %02x to shared ram\n", page);
+
+			const uint8_t *src = memregion("bubblememory")->base();
+			memcpy(m_bubsys_shared_ram + 0xf00/2, src + page * 0x90, 0x80);
+
+			// The last 2 bytes of the block are loaded into the control register
+			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
+
+			m_maincpu->set_input_line(5, HOLD_LINE);
+		}
+		// Write?
+		else if (m_bubsys_control_ram[1]==2)
+		{
+			logerror("Request to write to bubble memory?  %04x\n", m_bubsys_control_ram[0]);
+		}
+	}
+	else
+	{
+		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here
+	}
+}
 
 READ16_MEMBER(nemesis_state::gx400_sharedram_word_r)
 {
@@ -251,271 +308,323 @@ WRITE8_MEMBER(nemesis_state::city_sound_bank_w)
 }
 
 
-ADDRESS_MAP_START(nemesis_state::nemesis_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x050000, 0x051fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
-	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
-	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
-	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
-	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05c800, 0x05c801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
-	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
-	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05cc06, 0x05cc07) AM_READ_PORT("TEST")
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
-ADDRESS_MAP_END
+void nemesis_state::nemesis_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x056000, 0x056fff).ram().share("spriteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x05c400, 0x05c401).portr("DSW0");
+	map(0x05c402, 0x05c403).portr("DSW1");
+	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x05cc00, 0x05cc01).portr("IN0");
+	map(0x05cc02, 0x05cc03).portr("IN1");
+	map(0x05cc04, 0x05cc05).portr("IN2");
+	map(0x05cc06, 0x05cc07).portr("TEST");
+	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x060000, 0x067fff).ram();         /* WORK RAM */
+}
 
-ADDRESS_MAP_START(nemesis_state::gx400_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
-	AM_RANGE(0x010000, 0x01ffff) AM_RAM
-	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
-	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x050000, 0x051fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
-	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
-	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
-	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x057000, 0x057fff) AM_RAM             /* needed for twinbee */
-	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
-	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
-	AM_RANGE(0x05c800, 0x05c801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
-	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
-	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM         /* WORK RAM */
-	AM_RANGE(0x080000, 0x0bffff) AM_ROM
-ADDRESS_MAP_END
+void nemesis_state::gx400_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();     /* ROM BIOS */
+	map(0x010000, 0x01ffff).ram();
+	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
+	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x056000, 0x056fff).ram().share("spriteram");
+	map(0x057000, 0x057fff).ram();             /* needed for twinbee */
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x05c402, 0x05c403).portr("DSW0");
+	map(0x05c404, 0x05c405).portr("DSW1");
+	map(0x05c406, 0x05c407).portr("TEST");
+	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x05cc00, 0x05cc01).portr("IN0");
+	map(0x05cc02, 0x05cc03).portr("IN1");
+	map(0x05cc04, 0x05cc05).portr("IN2");
+	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x060000, 0x07ffff).ram();         /* WORK RAM */
+	map(0x080000, 0x0bffff).rom();
+}
 
-ADDRESS_MAP_START(nemesis_state::konamigt_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x050000, 0x051fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
-	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
-	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
-	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
-	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05c800, 0x05c801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
-	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
-	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05cc06, 0x05cc07) AM_READ_PORT("TEST")
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
-	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
-ADDRESS_MAP_END
+void nemesis_state::bubsys_map(address_map &map)
+{
+	map(0x000000, 0x000fff).ram().share("bubsys_shared"); /* Shared with MCU */
+	map(0x010000, 0x01ffff).ram(); /* PROGRAM RAM */
+	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
+	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x040000, 0x040007).ram().w(FUNC(nemesis_state::bubsys_mcu_w)).share("bubsys_control"); // Shared with MCU
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x056000, 0x056fff).ram().share("spriteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x05c402, 0x05c403).portr("DSW0");
+	map(0x05c404, 0x05c405).portr("DSW1");
+	map(0x05c406, 0x05c407).portr("TEST");
+	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x05cc00, 0x05cc01).portr("IN0");
+	map(0x05cc02, 0x05cc03).portr("IN1");
+	map(0x05cc04, 0x05cc05).portr("IN2");
+	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x070000, 0x073fff).ram();  /* WORK RAM */
+	map(0x078000, 0x07ffff).rom();  /* Empty diagnostic ROM slot */
+}
 
-ADDRESS_MAP_START(nemesis_state::rf2_gx400_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
-	AM_RANGE(0x010000, 0x01ffff) AM_RAM
-	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
-	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x050000, 0x051fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x050400, 0x0507ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x050f00, 0x050f7f) AM_SHARE("yscroll2")
-	AM_RANGE(0x050f80, 0x050fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
-	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
-	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
-	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
-	AM_RANGE(0x05c800, 0x05c801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
-	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
-	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("outlatch", ls259_device, write_d0, 0xff00)
-	AM_RANGE(0x05e000, 0x05e00f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
-	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
-	AM_RANGE(0x080000, 0x0bffff) AM_ROM
-ADDRESS_MAP_END
+void nemesis_state::konamigt_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x04ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x056000, 0x056fff).ram().share("spriteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x05c400, 0x05c401).portr("DSW0");
+	map(0x05c402, 0x05c403).portr("DSW1");
+	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x05cc00, 0x05cc01).portr("IN0");
+	map(0x05cc02, 0x05cc03).portr("IN1");
+	map(0x05cc04, 0x05cc05).portr("IN2");
+	map(0x05cc06, 0x05cc07).portr("TEST");
+	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x060000, 0x067fff).ram();         /* WORK RAM */
+	map(0x070000, 0x070001).r(FUNC(nemesis_state::konamigt_input_word_r));
+}
+
+void nemesis_state::rf2_gx400_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();     /* ROM BIOS */
+	map(0x010000, 0x01ffff).ram();
+	map(0x020000, 0x027fff).rw(FUNC(nemesis_state::gx400_sharedram_word_r), FUNC(nemesis_state::gx400_sharedram_word_w));
+	map(0x030000, 0x03ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x050000, 0x0503ff).ram().share("xscroll1");
+	map(0x050400, 0x0507ff).ram().share("xscroll2");
+	map(0x050800, 0x050eff).ram();
+	map(0x050f00, 0x050f7f).ram().share("yscroll2");
+	map(0x050f80, 0x050fff).ram().share("yscroll1");
+	map(0x051000, 0x051fff).ram();
+	map(0x052000, 0x052fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x053000, 0x053fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x054000, 0x054fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x055000, 0x055fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x056000, 0x056fff).ram().share("spriteram");
+	map(0x05a000, 0x05afff).ram().w(FUNC(nemesis_state::nemesis_palette_word_w)).share("paletteram");
+	map(0x05c001, 0x05c001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x05c402, 0x05c403).portr("DSW0");
+	map(0x05c404, 0x05c405).portr("DSW1");
+	map(0x05c406, 0x05c407).portr("TEST");
+	map(0x05c800, 0x05c801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x05cc00, 0x05cc01).portr("IN0");
+	map(0x05cc02, 0x05cc03).portr("IN1");
+	map(0x05cc04, 0x05cc05).portr("IN2");
+	map(0x05e000, 0x05e00f).w("outlatch", FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0x05e000, 0x05e00f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x060000, 0x067fff).ram();         /* WORK RAM */
+	map(0x070000, 0x070001).r(FUNC(nemesis_state::konamigt_input_word_r));
+	map(0x080000, 0x0bffff).rom();
+}
 
 
-ADDRESS_MAP_START(nemesis_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("k005289", k005289_device, ld1_w)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("k005289", k005289_device, ld2_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("k005289", k005289_device, tg1_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("k005289", k005289_device, tg2_w)
-	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xe007, 0xe007) AM_SELECT(0x1ff8) AM_WRITE(nemesis_filter_w)
-	AM_RANGE(0xe086, 0xe086) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0xe205, 0xe205) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE("ay2", ay8910_device, data_w)
-ADDRESS_MAP_END
+void nemesis_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0xa000, 0xafff).w(m_k005289, FUNC(k005289_device::ld1_w));
+	map(0xc000, 0xcfff).w(m_k005289, FUNC(k005289_device::ld2_w));
+	map(0xe001, 0xe001).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe003, 0xe003).w(m_k005289, FUNC(k005289_device::tg1_w));
+	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
+	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
+	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
+	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xe405, 0xe405).w("ay2", FUNC(ay8910_device::data_w));
+}
 
-ADDRESS_MAP_START(nemesis_state::gx400_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("gx400_shared")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("voiceram")
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("k005289", k005289_device, ld1_w)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("k005289", k005289_device, ld2_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("k005289", k005289_device, tg1_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("k005289", k005289_device, tg2_w)
-	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xe007, 0xe007) AM_SELECT(0x1ff8) AM_WRITE(nemesis_filter_w)
-	AM_RANGE(0xe030, 0xe030) AM_WRITE(gx400_speech_start_w)
-	AM_RANGE(0xe086, 0xe086) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0xe205, 0xe205) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE("ay2", ay8910_device, data_w)
-ADDRESS_MAP_END
+void nemesis_state::gx400_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x7fff).ram().share("gx400_shared");
+	map(0x8000, 0x87ff).ram().share("voiceram");
+	map(0xa000, 0xafff).w(m_k005289, FUNC(k005289_device::ld1_w));
+	map(0xc000, 0xcfff).w(m_k005289, FUNC(k005289_device::ld2_w));
+	map(0xe000, 0xe000).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0xe001, 0xe001).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe003, 0xe003).w(m_k005289, FUNC(k005289_device::tg1_w));
+	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
+	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
+	map(0xe030, 0xe030).w(FUNC(nemesis_state::gx400_speech_start_w));
+	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
+	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xe405, 0xe405).w("ay2", FUNC(ay8910_device::data_w));
+}
 
 // gx400 voice data is not in a ROM but in sound RAM at $8000
-ADDRESS_MAP_START(nemesis_state::gx400_vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x000, 0x7ff) AM_RAM AM_SHARE("voiceram")
-ADDRESS_MAP_END
+void nemesis_state::gx400_vlm_map(address_map &map)
+{
+	map.global_mask(0x7ff);
+	map(0x000, 0x7ff).ram().share("voiceram");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(nemesis_state::salamand_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x090000, 0x091fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c0004, 0x0c0005) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
-	AM_RANGE(0x0c2002, 0x0c2003) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2004, 0x0c2005) AM_READ_PORT("IN2")
-	AM_RANGE(0x0c2006, 0x0c2007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")       /* VRAM */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x120000, 0x12ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
-	AM_RANGE(0x190000, 0x191fff) AM_RAM
-	AM_RANGE(0x190000, 0x1903ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x190400, 0x1907ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x190f00, 0x190f7f) AM_SHARE("yscroll1")
-	AM_RANGE(0x190f80, 0x190fff) AM_SHARE("yscroll2")
-ADDRESS_MAP_END
+void nemesis_state::salamand_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x087fff).ram();
+	map(0x090000, 0x091fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x0a0000, 0x0a0001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0c0002, 0x0c0003).portr("DSW0");
+	map(0x0c0004, 0x0c0005).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x0c2000, 0x0c2001).portr("IN0");    /* Coins, start buttons, test mode */
+	map(0x0c2002, 0x0c2003).portr("IN1");
+	map(0x0c2004, 0x0c2005).portr("IN2");
+	map(0x0c2006, 0x0c2007).portr("DSW1");
+	map(0x100000, 0x100fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");       /* VRAM */
+	map(0x101000, 0x101fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
+	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x180000, 0x180fff).ram().share("spriteram");       /* more sprite ram ??? */
+	map(0x190000, 0x1903ff).ram().share("xscroll2");
+	map(0x190400, 0x1907ff).ram().share("xscroll1");
+	map(0x190800, 0x190eff).ram();
+	map(0x190f00, 0x190f7f).ram().share("yscroll1");
+	map(0x190f80, 0x190fff).ram().share("yscroll2");
+	map(0x191000, 0x191fff).ram();
+}
 
-ADDRESS_MAP_START(nemesis_state::blkpnthr_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x081fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x090000, 0x097fff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c0004, 0x0c0005) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
-	AM_RANGE(0x0c2002, 0x0c2003) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2004, 0x0c2005) AM_READ_PORT("IN2")
-	AM_RANGE(0x0c2006, 0x0c2007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1") AM_MIRROR(0x4000) /* VRAM */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2") AM_MIRROR(0x4000)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
-	AM_RANGE(0x120000, 0x12ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x180000, 0x181fff) AM_RAM
-	AM_RANGE(0x180000, 0x1803ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x180400, 0x1807ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x180f00, 0x180f7f) AM_SHARE("yscroll2")
-	AM_RANGE(0x180f80, 0x180fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x190000, 0x190fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
-ADDRESS_MAP_END
+void nemesis_state::blkpnthr_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x081fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x090000, 0x097fff).ram();
+	map(0x0a0000, 0x0a0001).ram().w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0c0002, 0x0c0003).portr("DSW0");
+	map(0x0c0004, 0x0c0005).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x0c2000, 0x0c2001).portr("IN0");    /* Coins, start buttons, test mode */
+	map(0x0c2002, 0x0c2003).portr("IN1");
+	map(0x0c2004, 0x0c2005).portr("IN2");
+	map(0x0c2006, 0x0c2007).portr("DSW1");
+	map(0x100000, 0x100fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1").mirror(0x4000); /* VRAM */
+	map(0x101000, 0x101fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2").mirror(0x4000);
+	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
+	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x180000, 0x1803ff).ram().share("xscroll1");
+	map(0x180400, 0x1807ff).ram().share("xscroll2");
+	map(0x180800, 0x180eff).ram();
+	map(0x180f00, 0x180f7f).ram().share("yscroll2");
+	map(0x180f80, 0x180fff).ram().share("yscroll1");
+	map(0x181000, 0x181fff).ram();
+	map(0x190000, 0x190fff).ram().share("spriteram");       /* more sprite ram ??? */
+}
 
-ADDRESS_MAP_START(nemesis_state::citybomb_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0e0000, 0x0e1fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0f0002, 0x0f0003) AM_READ_PORT("IN2")
-	AM_RANGE(0x0f0004, 0x0f0005) AM_READ_PORT("IN1")
-	AM_RANGE(0x0f0006, 0x0f0007) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
-	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0f0010, 0x0f0011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0f0018, 0x0f0019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x0f0020, 0x0f0021) AM_READ(selected_ip_word_r) AM_WRITENOP    /* WEC Le Mans 24 control? */
-	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x100000, 0x1bffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x210000, 0x210fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
-	AM_RANGE(0x211000, 0x211fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
-	AM_RANGE(0x212000, 0x212fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x213000, 0x213fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x300000, 0x301fff) AM_RAM
-	AM_RANGE(0x300000, 0x3003ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x300400, 0x3007ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x300f00, 0x300f7f) AM_SHARE("yscroll2")
-	AM_RANGE(0x300f80, 0x300fff) AM_SHARE("yscroll1")
-	AM_RANGE(0x310000, 0x310fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
-ADDRESS_MAP_END
+void nemesis_state::citybomb_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x080000, 0x087fff).ram();
+	map(0x0e0000, 0x0e1fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x0f0000, 0x0f0001).portr("DSW1");
+	map(0x0f0002, 0x0f0003).portr("IN2");
+	map(0x0f0004, 0x0f0005).portr("IN1");
+	map(0x0f0006, 0x0f0007).portr("IN0");    /* Coins, start buttons, test mode */
+	map(0x0f0008, 0x0f0009).portr("DSW0");
+	map(0x0f0011, 0x0f0011).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0f0018, 0x0f0019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x0f0020, 0x0f0021).r(FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control? */
+	map(0x0f8000, 0x0f8001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x100000, 0x1bffff).rom();
+	map(0x200000, 0x20ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x210000, 0x210fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x211000, 0x211fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x212000, 0x212fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x213000, 0x213fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x300000, 0x3003ff).ram().share("xscroll1");
+	map(0x300400, 0x3007ff).ram().share("xscroll2");
+	map(0x300800, 0x300eff).ram();
+	map(0x300f00, 0x300f7f).ram().share("yscroll2");
+	map(0x300f80, 0x300fff).ram().share("yscroll1");
+	map(0x301000, 0x301fff).ram();
+	map(0x310000, 0x310fff).ram().share("spriteram");       /* more sprite ram ??? */
+}
 
-ADDRESS_MAP_START(nemesis_state::nyanpani_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x047fff) AM_RAM
-	AM_RANGE(0x060000, 0x061fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("IN2")
-	AM_RANGE(0x070004, 0x070005) AM_READ_PORT("IN1")
-	AM_RANGE(0x070006, 0x070007) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
-	AM_RANGE(0x070008, 0x070009) AM_READ_PORT("DSW0")
-	AM_RANGE(0x070010, 0x070011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x070018, 0x070019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* probably */
-	AM_RANGE(0x078000, 0x078001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x100000, 0x13ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
-	AM_RANGE(0x201000, 0x201fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x203000, 0x203fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
-	AM_RANGE(0x310000, 0x311fff) AM_RAM
-	AM_RANGE(0x310000, 0x3103ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x310400, 0x3107ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x310f00, 0x310f7f) AM_SHARE("yscroll2")
-	AM_RANGE(0x310f80, 0x310fff) AM_SHARE("yscroll1")
-ADDRESS_MAP_END
+void nemesis_state::nyanpani_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x047fff).ram();
+	map(0x060000, 0x061fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x070000, 0x070001).portr("DSW1");
+	map(0x070002, 0x070003).portr("IN2");
+	map(0x070004, 0x070005).portr("IN1");
+	map(0x070006, 0x070007).portr("IN0");    /* Coins, start buttons, test mode */
+	map(0x070008, 0x070009).portr("DSW0");
+	map(0x070011, 0x070011).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x070018, 0x070019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
+	map(0x078000, 0x078001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x100000, 0x13ffff).rom();
+	map(0x200000, 0x200fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");       /* VRAM */
+	map(0x201000, 0x201fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");
+	map(0x202000, 0x202fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x203000, 0x203fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x210000, 0x21ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x300000, 0x300fff).ram().share("spriteram");       /* more sprite ram ??? */
+	map(0x310000, 0x3103ff).ram().share("xscroll1");
+	map(0x310400, 0x3107ff).ram().share("xscroll2");
+	map(0x310800, 0x310eff).ram();
+	map(0x310f00, 0x310f7f).ram().share("yscroll2");
+	map(0x310f80, 0x310fff).ram().share("yscroll1");
+	map(0x311000, 0x311fff).ram();
+}
 
 READ8_MEMBER(nemesis_state::wd_r)
 {
@@ -523,75 +632,77 @@ READ8_MEMBER(nemesis_state::wd_r)
 	return m_frame_counter;
 }
 
-ADDRESS_MAP_START(nemesis_state::sal_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(salamand_speech_start_w)
-ADDRESS_MAP_END
+void nemesis_state::sal_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xd000, 0xd000).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
+	map(0xf000, 0xf000).w(FUNC(nemesis_state::salamand_speech_start_w));
+}
 
-ADDRESS_MAP_START(nemesis_state::salamand_vlm_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void nemesis_state::salamand_vlm_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom();
+}
 
-ADDRESS_MAP_START(nemesis_state::blkpnthr_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
-ADDRESS_MAP_END
+void nemesis_state::blkpnthr_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe000, 0xe000).r(FUNC(nemesis_state::wd_r)); /* watchdog?? */
+}
 
-ADDRESS_MAP_START(nemesis_state::city_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(city_sound_bank_w) /* 7232 bankswitch */
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void nemesis_state::city_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
+	map(0xc000, 0xc000).w(FUNC(nemesis_state::city_sound_bank_w)); /* 7232 bankswitch */
+	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(nemesis_state::hcrash_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x05ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x090000, 0x091fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("TEST")
-	AM_RANGE(0x0c0008, 0x0c0009) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* watchdog probably */
-	AM_RANGE(0x0c000a, 0x0c000b) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c2000, 0x0c2001) AM_READ(konamigt_input_word_r) /* Konami GT control */
-	AM_RANGE(0x0c2800, 0x0c280f) AM_DEVWRITE8("intlatch", ls259_device, write_d0, 0x00ff) // ???
-	AM_RANGE(0x0c4000, 0x0c4001) AM_READ_PORT("IN1") AM_WRITE(selected_ip_word_w)
-	AM_RANGE(0x0c4002, 0x0c4003) AM_READ(selected_ip_word_r) AM_WRITENOP    /* WEC Le Mans 24 control. latches the value read previously */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")       /* VRAM */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
-	AM_RANGE(0x120000, 0x12ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
-	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x190000, 0x191fff) AM_RAM
-	AM_RANGE(0x190000, 0x1903ff) AM_SHARE("xscroll2")
-	AM_RANGE(0x190400, 0x1907ff) AM_SHARE("xscroll1")
-	AM_RANGE(0x190f00, 0x190f7f) AM_SHARE("yscroll1")
-	AM_RANGE(0x190f80, 0x190fff) AM_SHARE("yscroll2")
-ADDRESS_MAP_END
+void nemesis_state::hcrash_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x05ffff).rom();
+	map(0x080000, 0x083fff).ram();
+	map(0x090000, 0x091fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
+	map(0x0a0000, 0x0a0001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x0c0002, 0x0c0003).portr("DSW0");
+	map(0x0c0004, 0x0c0005).portr("DSW1");
+	map(0x0c0006, 0x0c0007).portr("TEST");
+	map(0x0c0008, 0x0c0009).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* watchdog probably */
+	map(0x0c000a, 0x0c000b).portr("IN0");
+	map(0x0c2000, 0x0c2001).r(FUNC(nemesis_state::konamigt_input_word_r)); /* Konami GT control */
+	map(0x0c2800, 0x0c280f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); // ???
+	map(0x0c4000, 0x0c4001).portr("IN1").w(FUNC(nemesis_state::selected_ip_word_w));
+	map(0x0c4002, 0x0c4003).r(FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control. latches the value read previously */
+	map(0x100000, 0x100fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");       /* VRAM */
+	map(0x101000, 0x101fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
+	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
+	map(0x103000, 0x103fff).ram().w(FUNC(nemesis_state::nemesis_colorram1_word_w)).share("colorram1");
+	map(0x120000, 0x12ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
+	map(0x180000, 0x180fff).ram().share("spriteram");
+	map(0x190000, 0x1903ff).ram().share("xscroll2");
+	map(0x190400, 0x1907ff).ram().share("xscroll1");
+	map(0x190800, 0x190eff).ram();
+	map(0x190f00, 0x190f7f).ram().share("yscroll1");
+	map(0x190f80, 0x190fff).ram().share("yscroll2");
+	map(0x191000, 0x191fff).ram();
+}
 
 /******************************************************************************/
 
@@ -1244,7 +1355,7 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)        // only in WEC Le Mans 24 cabinets
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02) // player 2?
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   // must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -1300,6 +1411,75 @@ static INPUT_PORTS_START( hcrash )
 
 	PORT_START("WHEEL")     /* Steering Wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bubsys )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)    // power-up
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)    // shoot
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)    // missile
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW0")
+	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), DEF_STR( None ), SW1)
+	/* "None" = coin slot B disabled */
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "50k and every 100k" )
+	PORT_DIPSETTING(    0x10, "30k" )
+	PORT_DIPSETTING(    0x08, "50k" )
+	PORT_DIPSETTING(    0x00, "100k" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("TEST")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -1398,7 +1578,7 @@ static const gfx_layout spritelayout6464 =
 	spritelayout6464_yoffset
 };
 
-static GFXDECODE_START( nemesis )
+static GFXDECODE_START( gfx_nemesis )
 	GFXDECODE_RAM( "charram", 0x0, charlayout,   0, 0x80 )
 	GFXDECODE_RAM( "charram", 0x0, spritelayout, 0, 0x80 )
 	GFXDECODE_RAM( "charram", 0x0, spritelayout3216, 0, 0x80 )
@@ -1428,7 +1608,6 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_gx400_irq1_cnt));
 	save_item(NAME(m_selected_ip));
-
 	save_item(NAME(m_tilemap_flip));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_irq_port_last));
@@ -1446,536 +1625,524 @@ void nemesis_state::machine_reset()
 	m_irq_port_last = 0;
 }
 
-MACHINE_CONFIG_START(nemesis_state::nemesis)
-
+void nemesis_state::nemesis(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-//          14318180/2, /* From schematics, should be accurate */
-	MCFG_CPU_PROGRAM_MAP(nemesis_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+//  14318180/2, /* From schematics, should be accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::nemesis_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map) /* fixed */
+	Z80(config, m_audiocpu, 14318180/4); /* From schematics, should be accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map); /* fixed */
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 13J
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // 13J
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
+	outlatch.q_out_cb<0>().append(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0) // 11K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch")); // 11K
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog", 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* ??? */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264));      /* ??? */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter4", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::gx400)
-
+void nemesis_state::gx400(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
-	MCFG_CPU_PROGRAM_MAP(gx400_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
+	Z80(config, m_audiocpu, 14318180/4);        /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter4", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::konamigt)
-
+void nemesis_state::konamigt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_CPU_PROGRAM_MAP(konamigt_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, konamigt_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::konamigt_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::konamigt_interrupt), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 14318180/4);        /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin1_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter4", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
-
+void nemesis_state::rf2_gx400(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
-	MCFG_CPU_PROGRAM_MAP(rf2_gx400_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::rf2_gx400_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
+	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));;
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter4", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::salamand)
-
+void nemesis_state::salamand(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)       /* 9.216MHz */
-	MCFG_CPU_PROGRAM_MAP(salamand_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::salamand_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)         /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(sal_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((264-256)*125/2))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((264-256)*125/2));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.50)
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::salamand_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 2.50);
+	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 2.50);
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.08)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.08)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.08)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.08)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.08);
+	m_k007232->add_route(0, "rspeaker", 0.08);
+	m_k007232->add_route(1, "lspeaker", 0.08);
+	m_k007232->add_route(1, "rspeaker", 0.08);
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2) // reversed according to MT #4565
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.2)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "rspeaker", 1.2); // reversed according to MT #4565
+	ymsnd.add_route(1, "lspeaker", 1.2);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::blkpnthr)
-
+void nemesis_state::blkpnthr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_CPU_PROGRAM_MAP(blkpnthr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  blkpnthr_interrupt)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::blkpnthr_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(blkpnthr_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::blkpnthr_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::blkpnthr_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.10);
+	m_k007232->add_route(0, "rspeaker", 0.10);
+	m_k007232->add_route(1, "lspeaker", 0.10);
+	m_k007232->add_route(1, "rspeaker", 0.10);
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::citybomb)
-
+void nemesis_state::citybomb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_CPU_PROGRAM_MAP(citybomb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::citybomb_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(city_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::city_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.30);
+	m_k007232->add_route(0, "rspeaker", 0.30);
+	m_k007232->add_route(1, "lspeaker", 0.30);
+	m_k007232->add_route(1, "rspeaker", 0.30);
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-//  MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
+//  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
+	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_K051649_ADD("k051649", 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.38)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.38)
-MACHINE_CONFIG_END
+	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
+	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
+	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::nyanpani)
-
+void nemesis_state::nyanpani(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
-	MCFG_CPU_PROGRAM_MAP(nyanpani_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nemesis_interrupt)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::nyanpani_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(city_sound_map)
+	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::city_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.30);
+	m_k007232->add_route(0, "rspeaker", 0.30);
+	m_k007232->add_route(1, "lspeaker", 0.30);
+	m_k007232->add_route(1, "rspeaker", 0.30);
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-//  MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym3812_device &ym3812(YM3812(config, "ymsnd", 3579545));
+//  ym3812.irq_handler().set_inputline("audiocpu", 0); ... Interrupts _are_ generated, I wonder where they go
+	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_K051649_ADD("k051649", 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.38)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.38)
-MACHINE_CONFIG_END
+	k051649_device &k051649(K051649(config, "k051649", 3579545/2));
+	k051649.add_route(ALL_OUTPUTS, "lspeaker", 0.38);
+	k051649.add_route(ALL_OUTPUTS, "rspeaker", 0.38);
+}
 
-
-MACHINE_CONFIG_START(nemesis_state::hcrash)
-
+void nemesis_state::hcrash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/3)         /* 6.144MHz */
-	MCFG_CPU_PROGRAM_MAP(hcrash_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, konamigt_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 18432000/3); /* 6.144MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::hcrash_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::konamigt_interrupt), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)       /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(sal_sound_map)
+	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w)) // or at 0x0c2804 ?
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set_nop(); // ?
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq2_enable_w)); // or at 0x0c2804 ?
+	intlatch.q_out_cb<2>().set_nop(); // ?
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	m_palette->set_membits(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, salamand_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::salamand_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.10);
+	m_k007232->add_route(0, "rspeaker", 0.10);
+	m_k007232->add_route(1, "lspeaker", 0.10);
+	m_k007232->add_route(1, "rspeaker", 0.10);
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
+}
 
 /***************************************************************************
 
@@ -2390,24 +2557,24 @@ ROM_END
 
 
 
-GAME( 1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state,  0,    ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state,  0,    ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, konamigt,  0,         konamigt,   konamigt, nemesis_state,  0,    ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME( 1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state,  0,    ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, twinbee,   0,         gx400,      twinbee,  nemesis_state,  0,    ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state,  0,    ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gwarrior,  0,         gx400,      gwarrior, nemesis_state,  0,    ROT0,   "Konami", "Galactic Warriors",              MACHINE_SUPPORTS_SAVE )
-GAME( 1986, salamand,  0,         salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Salamander (version D)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, salamandj, salamand,  salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Salamander (version J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lifefrce,  salamand,  salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Lifeforce (US)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, lifefrcej, salamand,  salamand,   lifefrcj, nemesis_state,  0,    ROT0,   "Konami", "Lifeforce (Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkpnthr,  0,         blkpnthr,   blkpnthr, nemesis_state,  0,    ROT0,   "Konami", "Black Panther",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, citybomb,  0,         citybomb,   citybomb, nemesis_state,  0,    ROT270, "Konami", "City Bomber (World)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, citybombj, citybomb,  citybomb,   citybomb, nemesis_state,  0,    ROT270, "Konami", "City Bomber (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hcrash,    0,         hcrash,     hcrash,   nemesis_state,  0,    ROT0,   "Konami", "Hyper Crash (version D)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hcrashc,   hcrash,    hcrash,     hcrash,   nemesis_state,  0,    ROT0,   "Konami", "Hyper Crash (version C)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kittenk,   0,         nyanpani,   nyanpani, nemesis_state,  0,    ROT0,   "Konami", "Kitten Kaboodle",                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nyanpani,  kittenk,   nyanpani,   nyanpani, nemesis_state,  0,    ROT0,   "Konami", "Nyan Nyan Panic (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, konamigt,  0,         konamigt,   konamigt, nemesis_state, empty_init, ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAME(  1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state, empty_init, ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
+GAME(  1985, twinbee,   0,         gx400,      twinbee,  nemesis_state, empty_init, ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state, empty_init, ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gwarrior,  0,         gx400,      gwarrior, nemesis_state, empty_init, ROT0,   "Konami", "Galactic Warriors",              MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamand,  0,         salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version D)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamandj, salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version J)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1986, lifefrce,  salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (US)",                 MACHINE_SUPPORTS_SAVE )
+GAME(  1987, lifefrcej, salamand,  salamand,   lifefrcj, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME(  1987, blkpnthr,  0,         blkpnthr,   blkpnthr, nemesis_state, empty_init, ROT0,   "Konami", "Black Panther",                  MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybomb,  0,         citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (World)",            MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybombj, citybomb,  citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrash,    0,         hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version D)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrashc,   hcrash,    hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version C)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1988, kittenk,   0,         nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Kitten Kaboodle",                MACHINE_SUPPORTS_SAVE )
+GAME(  1988, nyanpani,  kittenk,   nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Nyan Nyan Panic (Japan)",        MACHINE_SUPPORTS_SAVE )
 
 /*
 
@@ -2431,18 +2598,6 @@ a black background and numbers that count down from 99 to 0, and below that text
 'PRESENTED BY KONAMI". A tune also plays while the numbers count down.
 When the counter reaches 0 the game boots.
 
-I suspect that the 'GETTING READY' stuff is actually warming up the bubble memory
-(which operates at 30-40 degrees C) and the 'WARMING UP NOW' part is actually copying
-data from the bubble memory to the 2x 6264 SRAMs on the small plug-in PCB or some other
-on-board RAM then the game runs entirely from RAM thereafter. This is assuming the
-bubble memory is not fast enough to be directly accessed in real time.
-This is speculation at this early stage.... it's entirely possible that the game does
-run from the bubble memory.
-
-Only two games were released on the 'Bubble Memory' version of the
-GX400 hardware ....
-1985/02 TwinBee
-1985/05 Gradius (Japan release) / Nemesis (International release)
 
 The harness pinout matches Scramble with 3 additional wires....
 -12V = A15 (pin 15 solder side)
@@ -2676,86 +2831,87 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 
 */
 
-MACHINE_CONFIG_START(nemesis_state::bubsys)
-
+void nemesis_state::bubsys(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
-	MCFG_CPU_PROGRAM_MAP(gx400_map)
-	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nemesis_state, gx400_interrupt, "screen", 0, 1)
-	MCFG_DEVICE_DISABLE()
+	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::bubsys_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state, nmi_line_pulse)    /* interrupts are triggered by the main CPU */
+	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, sound_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(nemesis_state, irq4_enable_w)) // ??
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(nemesis_state::coin1_lockout_w));
+	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
+	outlatch.q_out_cb<4>().set(FUNC(nemesis_state::sound_nmi_w));
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
 
-	MCFG_DEVICE_ADD("intlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(nemesis_state, irq2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(nemesis_state, irq1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(nemesis_state, gfx_flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(nemesis_state, gfx_flipy_w))
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(nemesis_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(nemesis_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(nemesis_state::gfx_flipy_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))      /* 60.606060 Hz */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nemesis_state, nemesis_portA_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(nemesis_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("k005289", k005289_device, k005289_control_B_w))
-	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
-	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
-	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::k005289_control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter4", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	FILTER_RC(config, m_filter1);
+	m_filter1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2);
+	m_filter2->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3);
+	m_filter3->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter4);
+	m_filter4->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	K005289(config, m_k005289, 3579545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(0, gx400_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	VLM5030(config, m_vlm, 3579545);
+	m_vlm->set_addrmap(0, &nemesis_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
 
 
 ROM_START( bubsys )
-	ROM_REGION( 0x140000, "maincpu", ROMREGION_ERASE00 )
-	// no dump, MCU provides code there
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) // Fujitsu MCU, unknown type
+	ROM_REGION( 0x49000, "bubblememory", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
@@ -2764,10 +2920,51 @@ ROM_START( bubsys )
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
 	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
-
-	ROM_REGION( 0x4000, "sram", 0 ) // raw RAM dumps, just for emulation aid, to be removed ...
-	ROM_LOAD( "sram1.ic1", 0x0000, 0x2000, CRC(45fc9453) SHA1(eeb4ff2c2c9d3b6ea9d0f0e8fd4873f2cce2cff9) )
-	ROM_LOAD( "sram2.ic3", 0x2000, 0x2000, CRC(dda768be) SHA1(e98bae3ccf63eb67193346e9c40257a3ddb88e59) )
 ROM_END
 
-GAME( 1985, bubsys,   0,         bubsys,    nemesis, nemesis_state,   0,    ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+ROM_START( gradiusb )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
+
+	ROM_REGION( 0x48360, "bubblememory", 0 )
+	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
+	ROM_LOAD16_WORD_SWAP( "gradius.bin", 0x000, 0x48360, CRC(f83b9607) SHA1(53493c2d5b0e66dd6b75865abf0982ee50c01a6f) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
+	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_LOAD( "400b03.8g",   0x00000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
+
+	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
+	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+ROM_END
+
+void nemesis_state::bubsys_init()
+{
+	/*
+	    The MCU is the master of the system and controls the /RESET and /HALT lines of the 68000.
+	    At boot the MCU halts the 68000 and copies the 68000 boot program to shared RAM which
+	    takes 30.65 milliseconds then the 68000 starts execution.
+
+	    As the MCU is not dumped we effectively start the simulation at the point the 68000
+	    is released, and manually copy the boot program to 68000 address space.
+	*/
+
+	const uint8_t *src = memregion("maincpu")->base();
+	memcpy(m_bubsys_shared_ram, src, 0x1e0);
+
+	/*
+	    The MCU sets this flag once the boot program is copied.  The 68000 will reset
+	    if the value is not correct.
+	*/
+	m_bubsys_control_ram[3]=0x240;
+}
+
+GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
+// Bubble System Twinbee
+// Bubble System RF2
+// Bubble System Galactic Warriors
+// Bubble System Attack Rush

@@ -16,13 +16,14 @@
 #include "wordpro.h"
 
 
-SLOT_INTERFACE_START( vtech_memexp_carts )
-	SLOT_INTERFACE("floppy",       VTECH_FLOPPY_CONTROLLER)
-	SLOT_INTERFACE("laser110_16k", VTECH_LASER110_16K)
-	SLOT_INTERFACE("laser210_16k", VTECH_LASER210_16K)
-	SLOT_INTERFACE("laser310_16k", VTECH_LASER310_16K)
-	SLOT_INTERFACE("laser_64k",    VTECH_LASER_64K)
-	SLOT_INTERFACE("rs232",        VTECH_RS232_INTERFACE)
-	SLOT_INTERFACE("rtty",         VTECH_RTTY_INTERFACE)
-	SLOT_INTERFACE("wordpro",      VTECH_WORDPRO)
-SLOT_INTERFACE_END
+void vtech_memexp_carts(device_slot_interface &device)
+{
+	device.option_add("floppy",       VTECH_FLOPPY_CONTROLLER);
+	device.option_add("laser110_16k", VTECH_LASER110_16K);
+	device.option_add("laser210_16k", VTECH_LASER210_16K);
+	device.option_add("laser310_16k", VTECH_LASER310_16K);
+	device.option_add("laser_64k",    VTECH_LASER_64K);
+	device.option_add("rs232",        VTECH_RS232_INTERFACE);
+	device.option_add("rtty",         VTECH_RTTY_INTERFACE);
+	device.option_add("wordpro",      VTECH_WORDPRO);
+}

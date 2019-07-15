@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -23,30 +23,34 @@ public:
 	{ }
 
 	void haze(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
-	required_device<cpu_device> m_maincpu;
+
+	required_device<z80_device> m_maincpu;
 };
 
 
 
-ADDRESS_MAP_START(haze_state::mem_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x9000, 0x9fff) AM_RAM
-ADDRESS_MAP_END
+void haze_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x9000, 0x9fff).ram();
+}
 
-ADDRESS_MAP_START(haze_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write) // irq 17E0 => 0183(ch3)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt) // 91 irq 17F8 => 0A5E
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("pio2", z80pio_device, read_alt, write_alt) // not programmed to interrupt
-	AM_RANGE(0xb0, 0xb3) AM_DEVREADWRITE("pio3", z80pio_device, read_alt, write_alt) // not programmed to interrupt
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("pio4", z80pio_device, read_alt, write_alt) // not programmed to interrupt
-	AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write) // irq 17E8 => 023D(ch0),0366(ch1),02BB(ch2),0378(ch3)
-	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("ctc3", z80ctc_device, read, write) // irq 17F0 => 030E(ch0),038A(ch1)
-ADDRESS_MAP_END
+void haze_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // irq 17E0 => 0183(ch3)
+	map(0x90, 0x93).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // 91 irq 17F8 => 0A5E
+	map(0xa0, 0xa3).rw("pio2", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // not programmed to interrupt
+	map(0xb0, 0xb3).rw("pio3", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // not programmed to interrupt
+	map(0xc0, 0xc3).rw("pio4", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)); // not programmed to interrupt
+	map(0xc4, 0xc7).rw("ctc2", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // irq 17E8 => 023D(ch0),0366(ch1),02BB(ch2),0378(ch3)
+	map(0xc8, 0xcb).rw("ctc3", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // irq 17F0 => 030E(ch0),038A(ch1)
+}
 
 
 static INPUT_PORTS_START( haze )
@@ -68,41 +72,42 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 // All frequencies are guesswork, in an effort to get something to happen
-MACHINE_CONFIG_START(haze_state::haze)
+void haze_state::haze(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,2000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 2000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &haze_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &haze_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 1'000'000)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg2))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc2", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc3", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc3", z80ctc_device, trg1))
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1'000'000));
+	ctc_clock.signal_handler().set("ctc1", FUNC(z80ctc_device::trg3));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg1));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg2));
+	ctc_clock.signal_handler().append("ctc2", FUNC(z80ctc_device::trg3));
+	ctc_clock.signal_handler().append("ctc3", FUNC(z80ctc_device::trg0));
+	ctc_clock.signal_handler().append("ctc3", FUNC(z80ctc_device::trg1));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, 1'000'000 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc1(Z80CTC(config, "ctc1", 1'000'000));
+	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, 1'000'000 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc2(Z80CTC(config, "ctc2", 1'000'000));
+	ctc2.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc3", Z80CTC, 1'000'000 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc3(Z80CTC(config, "ctc3", 1'000'000));
+	ctc3.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, 1'000'000 )
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("TEST"))
+	z80pio_device& pio1(Z80PIO(config, "pio1", 1'000'000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.in_pa_callback().set_ioport("TEST");
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, 1'000'000 )
+	Z80PIO(config, "pio2", 1'000'000);
 
-	MCFG_DEVICE_ADD("pio3", Z80PIO, 1'000'000 )
+	Z80PIO(config, "pio3", 1'000'000);
 
-	MCFG_DEVICE_ADD("pio4", Z80PIO, 1'000'000 )
-MACHINE_CONFIG_END
+	Z80PIO(config, "pio4", 1'000'000);
+}
 
 ROM_START( hg_frd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -112,4 +117,4 @@ ROM_START( hg_frd )
 ROM_END
 
 
-GAME( 198?,  hg_frd,  0,  haze,  haze, haze_state,  0,  ROT0,  "Hazel Grove",    "Fruit Deuce (Hazel Grove)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?, hg_frd, 0, haze, haze, haze_state, empty_init, ROT0, "Hazel Grove", "Fruit Deuce (Hazel Grove)", MACHINE_IS_SKELETON_MECHANICAL)

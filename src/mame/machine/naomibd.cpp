@@ -50,7 +50,7 @@
     * bit 29 (mode bit 1)
     "M2" type carts: DMA_OFFSET - no effect, ROM_OFFSET - ROM size/mapping select, 0 - 4MB ROM-mode, 1 - 8MB ROM mode. for both PIO and DMA
     "M1" type carts: DMA_OFFSET 0 = enable decryptyon/decompression during DMA transfer, ROM_OFFSET - ROM size/mapping select similar to M2 cart type
-    "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
+    "M4" type carts: no effect, ROM_OFFSET bit 29 when read return 1 if security PIC present, used by BIOS to determine this cart is encrypted and require bit 30 set when read ROM header
 
     * bit 28 (mode bit 0)
     "M2" type carts: ROM_OFFSET - master/slave ROM board select
@@ -60,31 +60,25 @@
     Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
 */
 
-ADDRESS_MAP_START(naomi_board::submap)
-	AM_RANGE(0x00, 0xff) AM_READ(default_r)
+void naomi_board::submap(address_map &map)
+{
+	map(0x00, 0xff).r(FUNC(naomi_board::default_r));
 
-	AM_RANGE(0x00, 0x01) AM_WRITE(rom_offseth_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rom_offsetl_w)
-	AM_RANGE(0x04, 0x05) AM_READWRITE(rom_data_r, rom_data_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(dma_offseth_w)
-	AM_RANGE(0x08, 0x09) AM_WRITE(dma_offsetl_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(dma_count_w)
-	AM_RANGE(0x3c, 0x3d) AM_WRITE(boardid_w)
-	AM_RANGE(0x3e, 0x3f) AM_READ(boardid_r)
-ADDRESS_MAP_END
+	map(0x00, 0x01).w(FUNC(naomi_board::rom_offseth_w));
+	map(0x02, 0x03).w(FUNC(naomi_board::rom_offsetl_w));
+	map(0x04, 0x05).rw(FUNC(naomi_board::rom_data_r), FUNC(naomi_board::rom_data_w));
+	map(0x06, 0x07).w(FUNC(naomi_board::dma_offseth_w));
+	map(0x08, 0x09).w(FUNC(naomi_board::dma_offsetl_w));
+	map(0x0a, 0x0b).w(FUNC(naomi_board::dma_count_w));
+	map(0x3c, 0x3d).w(FUNC(naomi_board::boardid_w));
+	map(0x3e, 0x3f).r(FUNC(naomi_board::boardid_r));
+}
 
 naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_g1_device(mconfig, type, tag, owner, clock)
+	: naomi_g1_device(mconfig, type, tag, owner, clock),
+	eeprom(*this, finder_base::DUMMY_TAG)
 {
-	eeprom_tag = nullptr;
 }
-
-void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag)
-{
-	naomi_board &dev = downcast<naomi_board &>(device);
-	dev.eeprom_tag = _eeprom_tag;
-}
-
 
 void naomi_board::device_start()
 {
@@ -96,11 +90,6 @@ void naomi_board::device_start()
 	save_item(NAME(dma_cur_offset));
 	save_item(NAME(pio_ready));
 	save_item(NAME(dma_ready));
-
-	if (eeprom_tag != nullptr)
-		eeprom = owner()->subdevice<x76f100_device>(eeprom_tag);
-	else
-		eeprom = nullptr;
 }
 
 void naomi_board::device_reset()

@@ -47,7 +47,7 @@ const char *const robotbwl_sample_names[] =
 /* Nodes - Sounds */
 #define CIRCUS_MUSIC_SND    NODE_10
 
-DISCRETE_SOUND_START(circus)
+DISCRETE_SOUND_START(circus_discrete)
 	/************************************************/
 	/* Input register mapping for circus            */
 	/************************************************/
@@ -94,7 +94,7 @@ static const discrete_555_desc crash_beeper_555a =
 #define CRASH_MUSIC_SND     NODE_20
 #define CRASH_BEEPER_SND    NODE_21
 
-DISCRETE_SOUND_START(crash)
+DISCRETE_SOUND_START(crash_discrete)
 	/************************************************/
 	/* Input register mapping for crash             */
 	/************************************************/
@@ -129,7 +129,7 @@ DISCRETE_SOUND_END
 /* Nodes - Sounds */
 #define ROBOTBWL_MUSIC_SND      NODE_10
 
-DISCRETE_SOUND_START(robotbwl)
+DISCRETE_SOUND_START(robotbwl_discrete)
 	/************************************************/
 	/* Input register mapping for robotbwl          */
 	/************************************************/
@@ -162,11 +162,11 @@ WRITE8_MEMBER(circus_state::circus_clown_z_w)
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					m_discrete->write(space, CIRCUS_MUSIC_BIT, 0);
+					m_discrete->write(CIRCUS_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					m_discrete->write(space, CIRCUS_MUSIC_BIT, 1);
+					m_discrete->write(CIRCUS_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Circus = Pop; Rip Cord = Splash */
@@ -195,7 +195,7 @@ WRITE8_MEMBER(circus_state::circus_clown_z_w)
 			break;
 
 		case 2: /* robotbwl */
-			m_discrete->write(space, ROBOTBWL_MUSIC_BIT, data & 0x08);   /* Footsteps */
+			m_discrete->write(ROBOTBWL_MUSIC_BIT, data & 0x08);   /* Footsteps */
 
 			if (data & 0x40)    /* Hit */
 				m_samples->start(0, 0);
@@ -220,11 +220,11 @@ WRITE8_MEMBER(circus_state::circus_clown_z_w)
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					m_discrete->write(space, CRASH_MUSIC_BIT, 0);
+					m_discrete->write(CRASH_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					m_discrete->write(space, CRASH_MUSIC_BIT, 1);
+					m_discrete->write(CRASH_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Crash */
@@ -232,14 +232,14 @@ WRITE8_MEMBER(circus_state::circus_clown_z_w)
 					break;
 
 				case 3 : /* Normal Video and Beep */
-					m_discrete->write(space, CRASH_BEEPER_EN, 0);
+					m_discrete->write(CRASH_BEEPER_EN, 0);
 					break;
 
 				case 4 : /* Skid */
 					break;
 
 				case 5 : /* Invert Video and Beep */
-					m_discrete->write(space, CRASH_BEEPER_EN, 0);
+					m_discrete->write(CRASH_BEEPER_EN, 0);
 					break;
 
 				case 6 : /* Hi Motor */

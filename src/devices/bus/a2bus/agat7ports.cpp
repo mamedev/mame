@@ -14,6 +14,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "agat7ports.h"
 
 //#define VERBOSE 1
@@ -50,18 +51,20 @@ INPUT_PORTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_agat7_ports_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("d9", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(a2bus_agat7_ports_device, write_portb))
-	MCFG_I8255_IN_PORTC_CB(READ8(a2bus_agat7_ports_device, read_portc))
+void a2bus_agat7_ports_device::device_add_mconfig(machine_config &config)
+{
+	I8255(config, m_d9);
+	m_d9->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_d9->out_pb_callback().set(FUNC(a2bus_agat7_ports_device::write_portb));
+	m_d9->in_pc_callback().set(FUNC(a2bus_agat7_ports_device::read_portc));
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(a2bus_agat7_ports_device, write_centronics_busy))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(a2bus_agat7_ports_device::write_centronics_busy));
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_DEVICE_ADD("d10", I8251, 0)
-MACHINE_CONFIG_END
+	I8251(config, m_d10, 0);
+}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -80,6 +83,7 @@ ioport_constructor a2bus_agat7_ports_device::device_input_ports() const
 a2bus_agat7_ports_device::a2bus_agat7_ports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
+	, m_printer_cfg(*this, "PRINTER_CFG")
 	, m_d9(*this, "d9")
 	, m_d10(*this, "d10")
 	, m_centronics(*this, "centronics")
@@ -116,18 +120,11 @@ uint8_t a2bus_agat7_ports_device::read_c0nx(uint8_t offset)
 	switch (offset & 8)
 	{
 	case 0:
-		data = m_d9->read(machine().dummy_space(), offset & 3);
+		data = m_d9->read(offset & 3);
 		break;
 
 	case 8:
-		if (offset & 1)
-		{
-			data = m_d10->status_r(machine().dummy_space(), 0);
-		}
-		else
-		{
-			data = m_d10->data_r(machine().dummy_space(), 0);
-		}
+		data = m_d10->read(offset & 1);
 		break;
 	}
 
@@ -144,29 +141,22 @@ void a2bus_agat7_ports_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset & 8)
 	{
 	case 0:
-		m_d9->write(machine().dummy_space(), offset & 3, data);
+		m_d9->write(offset & 3, data);
 		break;
 
 	case 8:
-		if (offset & 1)
-		{
-			m_d10->control_w(machine().dummy_space(), 0, data);
-		}
-		else
-		{
-			m_d10->data_w(machine().dummy_space(), 0, data);
-		}
+		m_d10->write(offset & 1, data);
 		break;
 	}
 }
 
 /*
- * 0	ODD
- * 1	EVEN
- * 4	INIT
- * 5	STROBE
- * 6	/INIT
- * 7	/STROBE
+ * 0    ODD
+ * 1    EVEN
+ * 4    INIT
+ * 5    STROBE
+ * 6    /INIT
+ * 7    /STROBE
  */
 WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
 {
@@ -175,17 +165,17 @@ WRITE8_MEMBER(a2bus_agat7_ports_device::write_portb)
 }
 
 /*
- * 1	dip CNTRLESC (0: CPA-80, FX-85, Gemini.  1: D100)
- * 2	dip ALF0
- * 3	dip A/BR (0: level, BUSY/READY.  1: edge, ACK)
- * 4	dip INVD (1: data are sent inverted)
- * 5	dip ALF1 (00: KOI-8, 01: GOST, 10: CPA-80, 11: FX-85)
- * 6	dip ABRLEV (0: BUSY, /ACK.  1: READY, ACK)
- * 7	ready signal from device
+ * 1    dip CNTRLESC (0: CPA-80, FX-85, Gemini.  1: D100)
+ * 2    dip ALF0
+ * 3    dip A/BR (0: level, BUSY/READY.  1: edge, ACK)
+ * 4    dip INVD (1: data are sent inverted)
+ * 5    dip ALF1 (00: KOI-8, 01: GOST, 10: CPA-80, 11: FX-85)
+ * 6    dip ABRLEV (0: BUSY, /ACK.  1: READY, ACK)
+ * 7    ready signal from device
  */
 READ8_MEMBER(a2bus_agat7_ports_device::read_portc)
 {
-	return (m_centronics_busy << 7) | ioport("PRINTER_CFG")->read();
+	return (m_centronics_busy << 7) | m_printer_cfg->read();
 }
 
 WRITE_LINE_MEMBER(a2bus_agat7_ports_device::write_centronics_busy)

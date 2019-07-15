@@ -10,19 +10,17 @@ DEFINE_DEVICE_TYPE(RF5C296, rf5c296_device, "rf5c296", "RF5C296 PC Card controll
 rf5c296_device::rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RF5C296, tag, owner, clock)
 	, m_rf5c296_reg(0)
-	, m_pccard(nullptr)
-	, m_pccard_name(nullptr)
+	, m_pccard(*this, finder_base::DUMMY_TAG)
 {
 }
 
 void rf5c296_device::device_start()
 {
-	m_pccard = machine().device<pccard_slot_device>(m_pccard_name);
 }
 
 void rf5c296_device::reg_w(ATTR_UNUSED uint8_t reg, uint8_t data)
 {
-	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, machine().describe_context());
+	//  fprintf(stderr, "%s rf5c296_reg_w %02x, %02x\n", machine().describe_context().c_str(), reg, data);
 	switch (reg)
 	{
 		// Interrupt and General Control Register
@@ -41,7 +39,7 @@ void rf5c296_device::reg_w(ATTR_UNUSED uint8_t reg, uint8_t data)
 
 uint8_t rf5c296_device::reg_r(ATTR_UNUSED uint8_t reg)
 {
-	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, machine().describe_context());
+	//  fprintf(stderr, "%s rf5c296_reg_r %02x\n", machine().describe_context().c_str(), reg);
 	return 0x00;
 }
 

@@ -8,16 +8,17 @@
     and HP 85 systems.
 
 *********************************************************************/
-
-#ifndef _HTI_TAPE_H_
-#define _HTI_TAPE_H_
+#ifndef MAME_FORMATS_HTI_TAPE_H
+#define MAME_FORMATS_HTI_TAPE_H
 
 #pragma once
 
-#include <map>
 #include "ioprocs.h"
 
-class hti_format_t {
+#include <map>
+
+class hti_format_t
+{
 public:
 	hti_format_t();
 
@@ -32,6 +33,12 @@ public:
 
 	// Tape length: 140 ft of usable tape + 72" of punched tape at either end
 	static constexpr tape_pos_t TAPE_LENGTH = (140 * 12 + 72 * 2) * ONE_INCH_POS;
+
+	// Length of 0 bits at slow tape speed: 1/(35200 Hz)
+	static constexpr tape_pos_t ZERO_BIT_LEN = 619;
+
+	// Length of 1 bits at slow tape speed: 1.75 times ZERO_BIT_LEN
+	static constexpr tape_pos_t ONE_BIT_LEN = 1083;
 
 	// Words stored on tape
 	typedef uint16_t tape_word_t;
@@ -67,17 +74,19 @@ public:
 	// Return position of next data word in a given direction
 	bool next_data(unsigned track_no , tape_pos_t pos , bool forward , bool inclusive , track_iterator_t& it);
 
-	typedef enum {
+	enum adv_res_t
+	{
 		ADV_NO_MORE_DATA,
 		ADV_CONT_DATA,
 		ADV_DISCONT_DATA
-	} adv_res_t;
+	};
 
 	// Advance an iterator to next word of data
 	adv_res_t adv_it(unsigned track_no , bool forward , track_iterator_t& it);
 
 	// Scan for beginning of next gap in a given direction
 	bool next_gap(unsigned track_no , tape_pos_t& pos , bool forward , tape_pos_t min_gap);
+
 private:
 	// Content of tape tracks
 	tape_track_t m_tracks[ 2 ];
@@ -90,4 +99,4 @@ private:
 	static void ensure_a_lt_b(tape_pos_t& a , tape_pos_t& b);
 };
 
-#endif /* _HTI_TAPE_H_ */
+#endif // MAME_FORMATS_HTI_TAPE_H

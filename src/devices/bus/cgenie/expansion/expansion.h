@@ -39,24 +39,8 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CG_EXP_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CG_EXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(cg_exp_slot_carts, nullptr, false)
-
-#define MCFG_CG_EXP_SLOT_INT_HANDLER(_devcb) \
-	devcb = &cg_exp_slot_device::set_int_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_CG_EXP_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &cg_exp_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_CG_EXP_SLOT_RESET_HANDLER(_devcb) \
-	devcb = &cg_exp_slot_device::set_reset_handler(*device, DEVCB_##_devcb);
+// include here so drivers don't need to
+#include "carts.h"
 
 
 //**************************************************************************
@@ -69,29 +53,32 @@ class cg_exp_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	cg_exp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
+		: cg_exp_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		cg_exp_slot_carts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
 	cg_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cg_exp_slot_device();
 
-	void set_program_space(address_space *program);
-	void set_io_space(address_space *io);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callbacks
-	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
-	{ return downcast<cg_exp_slot_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<cg_exp_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb)
-	{ return downcast<cg_exp_slot_device &>(device).m_reset_handler.set_callback(std::forward<Object>(cb)); }
+	auto int_handler() { return m_int_handler.bind(); }
+	auto nmi_handler() { return m_nmi_handler.bind(); }
+	auto reset_handler() { return m_reset_handler.bind(); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_reset_handler(state); }
 
-	address_space *m_program;
-	address_space *m_io;
+	required_address_space m_program;
+	required_address_space m_io;
 
 protected:
 	// device-level overrides
@@ -120,9 +107,6 @@ protected:
 };
 
 // device type definition
-extern const device_type CG_EXP_SLOT;
-
-// include here so drivers don't need to
-#include "carts.h"
+DECLARE_DEVICE_TYPE(CG_EXP_SLOT, cg_exp_slot_device)
 
 #endif // MAME_BUS_CGENIE_EXPANSION_EXPANSION_H

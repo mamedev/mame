@@ -15,15 +15,6 @@
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-#define ADC083X_INPUT_CB(name)  double name(uint8_t input)
-
-#define MCFG_ADC083X_INPUT_CB(_class, _method) \
-	adc083x_device::set_input_callback(*device, adc083x_device::input_delegate(&_class::_method, #_class "::" #_method, this));
-
-/***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
@@ -48,8 +39,16 @@ class adc083x_device : public device_t
 public:
 	typedef device_delegate<double (uint8_t input)> input_delegate;
 
-	// static configuration helpers
-	static void set_input_callback(device_t &device, input_delegate &&cb) { downcast<adc083x_device &>(device).m_input_callback = std::move(cb); }
+	// configuration helpers
+	void set_input_callback(input_delegate callback) { m_input_callback = callback; }
+	template <class FunctionClass> void set_input_callback(const char *devname, double (FunctionClass::*callback)(uint8_t), const char *name)
+	{
+		set_input_callback(input_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_input_callback(double (FunctionClass::*callback)(uint8_t), const char *name)
+	{
+		set_input_callback(input_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	DECLARE_WRITE_LINE_MEMBER( cs_write );
 	DECLARE_WRITE_LINE_MEMBER( clk_write );
@@ -93,28 +92,28 @@ private:
 class adc0831_device : public adc083x_device
 {
 public:
-	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
 class adc0832_device : public adc083x_device
 {
 public:
-	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
 class adc0834_device : public adc083x_device
 {
 public:
-	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
 class adc0838_device : public adc083x_device
 {
 public:
-	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 

@@ -72,9 +72,9 @@ WRITE8_MEMBER(tunhunt_state::control_w)
 	*/
 
 	m_control = data;
-	machine().bookkeeping().coin_counter_w(0,data&0x01 );
-	machine().bookkeeping().coin_counter_w(1,data&0x02 );
-	output().set_led_value(0, data&0x40 ); /* start */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	m_led = BIT(data , 6); /* start */
 }
 
 
@@ -129,26 +129,27 @@ READ8_MEMBER(tunhunt_state::dsw2_4r)
  *
  *************************************/
 
-ADDRESS_MAP_START(tunhunt_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("workram") /* Work RAM */
-	AM_RANGE(0x1080, 0x10ff) AM_WRITEONLY
-	AM_RANGE(0x1200, 0x12ff) AM_WRITEONLY
-	AM_RANGE(0x1400, 0x14ff) AM_WRITEONLY
-	AM_RANGE(0x1600, 0x160f) AM_WRITEONLY AM_SHARE("paletteram")    /* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
-	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY   /* SHEL0H */
-	AM_RANGE(0x1a00, 0x1a00) AM_WRITEONLY   /* SHEL1H */
-	AM_RANGE(0x1c00, 0x1c00) AM_WRITEONLY   /* MOBJV */
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(videoram_w) AM_SHARE("videoram")  /* ALPHA */
-	AM_RANGE(0x2000, 0x2000) AM_WRITENOP    /* watchdog */
-	AM_RANGE(0x2000, 0x2007) AM_READ(button_r)
-	AM_RANGE(0x2400, 0x2400) AM_WRITENOP    /* INT ACK */
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(control_w)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x5000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void tunhunt_state::main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x03ff).ram().share("workram"); /* Work RAM */
+	map(0x1080, 0x10ff).writeonly();
+	map(0x1200, 0x12ff).writeonly();
+	map(0x1400, 0x14ff).writeonly();
+	map(0x1600, 0x160f).writeonly().share("paletteram");    /* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
+	map(0x1800, 0x1800).writeonly();   /* SHEL0H */
+	map(0x1a00, 0x1a00).writeonly();   /* SHEL1H */
+	map(0x1c00, 0x1c00).writeonly();   /* MOBJV */
+	map(0x1e00, 0x1eff).w(FUNC(tunhunt_state::videoram_w)).share("videoram");  /* ALPHA */
+	map(0x2000, 0x2000).nopw();    /* watchdog */
+	map(0x2000, 0x2007).r(FUNC(tunhunt_state::button_r));
+	map(0x2400, 0x2400).nopw();    /* INT ACK */
+	map(0x2800, 0x2800).w(FUNC(tunhunt_state::control_w));
+	map(0x2c00, 0x2fff).writeonly().share("spriteram");
+	map(0x3000, 0x300f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x4000, 0x400f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x5000, 0x7fff).rom();
+}
 
 
 /*************************************
@@ -255,7 +256,7 @@ static const gfx_layout obj_layout =
 };
 
 
-static GFXDECODE_START( tunhunt )
+static GFXDECODE_START( gfx_tunhunt )
 	GFXDECODE_ENTRY( "gfx1", 0x000, alpha_layout, 0x10, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x200, obj_layout,   0x18, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x000, obj_layout,   0x18, 1 ) /* second bank, or second bitplane? */
@@ -268,46 +269,44 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tunhunt_state::tunhunt)
-
+void tunhunt_state::tunhunt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000)/6)        /* ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
+	M6502(config, m_maincpu, 12.096_MHz_XTAL/6); /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tunhunt_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(tunhunt_state::irq0_line_hold), attotime::from_hz(4*60));  /* 48V, 112V, 176V, 240V */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256-16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(256, 256-16);
+	m_screen->set_visarea(0, 255, 0, 255-16);
+	m_screen->set_screen_update(FUNC(tunhunt_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tunhunt)
-	MCFG_PALETTE_ADD("palette", 0x1a)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(tunhunt_state, tunhunt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tunhunt);
+	PALETTE(config, m_palette, FUNC(tunhunt_state::tunhunt_palette), 0x1a, 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(12'096'000)/10)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
-	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", 12.096_MHz_XTAL/10));
+	pokey1.allpot_r().set_ioport("DSW");
+	pokey1.set_output_rc(RES_K(1), CAP_U(0.047), 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(12'096'000)/10)
-	MCFG_POKEY_POT0_R_CB(IOPORT("IN1"))
-	MCFG_POKEY_POT1_R_CB(IOPORT("IN2"))
-	MCFG_POKEY_POT2_R_CB(READ8(tunhunt_state, dsw2_0r))
-	MCFG_POKEY_POT3_R_CB(READ8(tunhunt_state, dsw2_1r))
-	MCFG_POKEY_POT4_R_CB(READ8(tunhunt_state, dsw2_2r))
-	MCFG_POKEY_POT5_R_CB(READ8(tunhunt_state, dsw2_3r))
-	MCFG_POKEY_POT6_R_CB(READ8(tunhunt_state, dsw2_4r))
-	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", 12.096_MHz_XTAL/10));
+	pokey2.pot_r<0>().set_ioport("IN1");
+	pokey2.pot_r<1>().set_ioport("IN2");
+	pokey2.pot_r<2>().set(FUNC(tunhunt_state::dsw2_0r));
+	pokey2.pot_r<3>().set(FUNC(tunhunt_state::dsw2_1r));
+	pokey2.pot_r<4>().set(FUNC(tunhunt_state::dsw2_2r));
+	pokey2.pot_r<5>().set(FUNC(tunhunt_state::dsw2_3r));
+	pokey2.pot_r<6>().set(FUNC(tunhunt_state::dsw2_4r));
+	pokey2.set_output_rc(RES_K(1), CAP_U(0.047), 5.0);
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -394,5 +393,5 @@ ROM_END
  *************************************/
 
 /*         rom       parent   machine    inp      state          init */
-GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
-GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, tunhunt_state, empty_init, ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, tunhunt_state, empty_init, ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )

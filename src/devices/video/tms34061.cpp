@@ -32,7 +32,7 @@
 
 DEFINE_DEVICE_TYPE(TMS34061, tms34061_device, "tms34061", "TI TMS34061 VSC")
 
-tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TMS34061, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_rowshift(0),
@@ -64,10 +64,10 @@ void tms34061_device::device_start()
 	m_vrammask = m_vramsize - 1;
 
 	/* allocate memory for VRAM */
-	m_vram = auto_alloc_array_clear(machine(), uint8_t, m_vramsize + 256 * 2);
+	m_vram = auto_alloc_array_clear(machine(), u8, m_vramsize + 256 * 2);
 
 	/* allocate memory for latch RAM */
-	m_latchram = auto_alloc_array_clear(machine(), uint8_t, m_vramsize + 256 * 2);
+	m_latchram = auto_alloc_array_clear(machine(), u8, m_vramsize + 256 * 2);
 
 	/* add some buffer space for VRAM and latch RAM */
 	m_vram += 256;
@@ -171,7 +171,7 @@ TIMER_CALLBACK_MEMBER( tms34061_device::interrupt )
  *
  *************************************/
 
-void tms34061_device::register_w(address_space &space, offs_t offset, uint8_t data)
+void tms34061_device::register_w(offs_t offset, u8 data)
 {
 	int scanline;
 	int regnum = offset >> 2;
@@ -242,10 +242,10 @@ void tms34061_device::register_w(address_space &space, offs_t offset, uint8_t da
  *
  *************************************/
 
-uint8_t tms34061_device::register_r(address_space &space, offs_t offset)
+u8 tms34061_device::register_r(offs_t offset)
 {
 	int regnum = offset >> 2;
-	uint16_t result;
+	u16 result;
 
 	/* extract the correct portion of the register */
 	if (regnum < ARRAY_LENGTH(m_regs))
@@ -364,7 +364,7 @@ void tms34061_device::adjust_xyaddress(int offset)
 }
 
 
-void tms34061_device::xypixel_w(address_space &space, int offset, uint8_t data)
+void tms34061_device::xypixel_w(int offset, u8 data)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = m_regs[TMS34061_XYADDRESS];
@@ -384,7 +384,7 @@ void tms34061_device::xypixel_w(address_space &space, int offset, uint8_t data)
 }
 
 
-uint8_t tms34061_device::xypixel_r(address_space &space, int offset)
+u8 tms34061_device::xypixel_r(int offset)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = m_regs[TMS34061_XYADDRESS];
@@ -409,7 +409,7 @@ uint8_t tms34061_device::xypixel_r(address_space &space, int offset)
  *
  *************************************/
 
-void tms34061_device::write(address_space &space, int col, int row, int func, uint8_t data)
+void tms34061_device::write(int col, int row, int func, u8 data)
 {
 	offs_t offs;
 
@@ -419,12 +419,12 @@ void tms34061_device::write(address_space &space, int col, int row, int func, ui
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			register_w(space, col, data);
+			register_w(col, data);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			xypixel_w(space, col, data);
+			xypixel_w(col, data);
 			break;
 
 		/* function 3 maps to direct access */
@@ -471,7 +471,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, ui
 }
 
 
-uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
+u8 tms34061_device::read(int col, int row, int func)
 {
 	int result = 0;
 	offs_t offs;
@@ -482,12 +482,12 @@ uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			result = register_r(space, col);
+			result = register_r(col);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			result = xypixel_r(space, col);
+			result = xypixel_r(col);
 			break;
 
 		/* function 3 maps to direct access */
@@ -535,13 +535,13 @@ uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
  *
  *************************************/
 
-READ8_MEMBER( tms34061_device::latch_r )
+u8 tms34061_device::latch_r()
 {
 	return m_latchdata;
 }
 
 
-WRITE8_MEMBER( tms34061_device::latch_w )
+void tms34061_device::latch_w(u8 data)
 {
 	LOG("tms34061_latch = %02X\n", data);
 	m_latchdata = data;

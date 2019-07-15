@@ -14,26 +14,10 @@
 #include "tms0980.h"
 
 
-// TMS0270 was designed to interface with TMS5100, set it up at driver level
-#define MCFG_TMS0270_READ_CTL_CB(_devcb) \
-	devcb = &tms0270_cpu_device::set_read_ctl_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS0270_WRITE_CTL_CB(_devcb) \
-	devcb = &tms0270_cpu_device::set_write_ctl_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_TMS0270_WRITE_PDC_CB(_devcb) \
-	devcb = &tms0270_cpu_device::set_write_pdc_callback(*device, DEVCB_##_devcb);
-
-
 class tms0270_cpu_device : public tms0980_cpu_device
 {
 public:
 	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	// static configuration helpers
-	template <class Object> static devcb_base &set_read_ctl_callback(device_t &device, Object &&cb) { return downcast<tms0270_cpu_device &>(device).m_read_ctl.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_ctl_callback(device_t &device, Object &&cb) { return downcast<tms0270_cpu_device &>(device).m_write_ctl.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_write_pdc_callback(device_t &device, Object &&cb) { return downcast<tms0270_cpu_device &>(device).m_write_pdc.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// overrides
@@ -61,10 +45,6 @@ private:
 	u8   m_o_latch_low;
 	u8   m_o_latch;
 	u8   m_o_latch_prev;
-
-	devcb_read8 m_read_ctl;
-	devcb_write8 m_write_ctl;
-	devcb_write_line m_write_pdc;
 };
 
 

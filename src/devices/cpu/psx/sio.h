@@ -16,21 +16,6 @@
 DECLARE_DEVICE_TYPE(PSX_SIO0, psxsio0_device)
 DECLARE_DEVICE_TYPE(PSX_SIO1, psxsio1_device)
 
-#define MCFG_PSX_SIO_IRQ_HANDLER(_devcb) \
-	devcb = &psxsio_device::set_irq_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PSX_SIO_SCK_HANDLER(_devcb) \
-	devcb = &psxsio_device::set_sck_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PSX_SIO_TXD_HANDLER(_devcb) \
-	devcb = &psxsio_device::set_txd_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PSX_SIO_DTR_HANDLER(_devcb) \
-	devcb = &psxsio_device::set_dtr_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_PSX_SIO_RTS_HANDLER(_devcb) \
-	devcb = &psxsio_device::set_rts_handler(*device, DEVCB_##_devcb);
-
 #define SIO_BUF_SIZE ( 8 )
 
 #define SIO_STATUS_TX_RDY ( 1 << 0 )
@@ -51,12 +36,12 @@ DECLARE_DEVICE_TYPE(PSX_SIO1, psxsio1_device)
 class psxsio_device : public device_t
 {
 public:
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sck_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_sck_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dtr_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_dtr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<psxsio_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto sck_handler() { return m_sck_handler.bind(); }
+	auto txd_handler() { return m_txd_handler.bind(); }
+	auto dtr_handler() { return m_dtr_handler.bind(); }
+	auto rts_handler() { return m_rts_handler.bind(); }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );

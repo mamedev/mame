@@ -51,35 +51,6 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 #include "emu.h"
 #include "includes/cischeat.h"
 
-#ifdef MAME_DEBUG
-#define SHOW_READ_ERROR(_format_,_offset_)\
-{\
-	popmessage(_format_,_offset_);\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_);\
-}
-#define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
-{\
-	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_,_data_); \
-}
-
-#else
-
-#define SHOW_READ_ERROR(_format_,_offset_)\
-{\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_);\
-}
-#define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
-{\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_,_data_); \
-}
-
-#endif
-
 
 #define cischeat_tmap_DRAW(_n_) \
 	if ( (m_tmap[_n_]).found() && (active_layers1 & (1 << _n_) ) ) \
@@ -119,7 +90,25 @@ void cischeat_state::video_start()
 	m_io_value = 0;
 }
 
+void wildplt_state::video_start()
+{
+	cischeat_state::video_start();
+	m_buffer_spriteram = &m_ram[0x8000/2];
+	m_spriteram = auto_alloc_array(machine(),uint16_t, 0x1000/2);
+}
 
+WRITE16_MEMBER(wildplt_state::sprite_dma_w)
+{
+	// bit 13: 0 -> 1 transition triggers a sprite DMA
+	if(data & 0x2000 && (m_sprite_dma_reg & 0x2000) == 0)
+	{
+		for(int i=0;i<0x1000/2;i++)
+			m_spriteram[i] = m_buffer_spriteram[i];
+	}
+
+	// other bits unknown
+	COMBINE_DATA(&m_sprite_dma_reg);
+}
 
 /***************************************************************************
 
@@ -161,8 +150,8 @@ WRITE16_MEMBER(cischeat_state::leds_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		output().set_led_value(0, data & 0x10);   // start button
-		output().set_led_value(1, data & 0x20);   // ?
+		m_leds[0] = BIT(data, 4);   // start button
+		m_leds[1] = BIT(data, 5);   // ?
 	}
 }
 
@@ -177,7 +166,7 @@ WRITE16_MEMBER(cischeat_state::motor_out_w)
 {
 	// motor (seat?)
 	if (ACCESSING_BITS_0_7)
-		output().set_led_value(2, (data & 0xff) != m_motor_value ? 1 : 0);
+		m_leds[2] = (data & 0xff) != m_motor_value ? 1 : 0;
 	m_motor_value = data & 0xff;
 }
 
@@ -209,7 +198,7 @@ WRITE16_MEMBER(cischeat_state::bigrun_comms_w)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
+// TODO: fake port, never written to my knowledge!
 WRITE16_MEMBER(cischeat_state::active_layers_w)
 {
 	COMBINE_DATA(&m_active_layers);
@@ -235,7 +224,7 @@ READ16_MEMBER(cischeat_state::cischeat_ip_select_r)
 WRITE16_MEMBER(cischeat_state::cischeat_soundlatch_w)
 {
 	/* Sound CPU: reads latch during int 4, and stores command */
-	m_soundlatch->write(space, 0, data, mem_mask);
+	m_soundlatch->write(data);
 	m_soundcpu->set_input_line(4, HOLD_LINE);
 }
 
@@ -278,10 +267,10 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_motor_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		output().set_led_value(0, data & 0x04);   // start button
-		output().set_led_value(1, data & 0x20);   // ?
+		m_leds[0] = BIT(data, 2);   // start button
+		m_leds[1] = BIT(data, 5);   // ?
 		// wheel | seat motor
-		output().set_led_value(2, ((data >> 3) | (data >> 4)) & 1 );
+		m_leds[2] = BIT(data, 3) | BIT(data, 4);
 	}
 }
 
@@ -593,8 +582,15 @@ void cischeat_state::cischeat_draw_sprites(bitmap_ind16 &bitmap , const rectangl
 
 		sx      =   source[ 3 ];
 		sy      =   source[ 4 ];
-		sx      =   (sx & 0x1ff) - (sx & 0x200);
-		sy      =   (sy & 0x1ff) - (sy & 0x200);
+		// TODO: was & 0x1ff with 0x200 as sprite wrap sign, looks incorrect with Grand Prix Star
+		//       during big car on side view in attract mode (a tyre gets stuck on the right of the screen)
+		//       this arrangement works with both games (otherwise Part 2 gets misaligned bleachers sprites)
+		sx      =   (sx & 0x7ff);
+		sy      =   (sy & 0x7ff);
+		if(sx & 0x400)
+			sx -= 0x800;
+		if(sy & 0x400)
+			sy -= 0x800;
 
 		/* use fixed point values (16.16), for accuracy */
 		sx <<= 16;
@@ -869,41 +865,29 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 uint32_t cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	int active_layers1, flag;
 
-#ifdef MAME_DEBUG
-	/* FAKE Videoreg */
-	active_layers1 = m_active_layers;
-	if (active_layers1 == 0)   active_layers1 = 0x3f;
-#else
-	active_layers1 = 0x3f;
-#endif
-
-#ifdef MAME_DEBUG
-	CISCHEAT_LAYERSCTRL
-#endif
-
-	bitmap.fill(0, cliprect);
+	bitmap.fill(0x1000, cliprect);
 
 	for (i = 7; i >= 4; i--)
-	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,false);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+	{
+		/* bitmap, cliprect, road, min_priority, max_priority, transparency */
+		cischeat_draw_road(bitmap,cliprect,0,i,i,(i != 7));
+		cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+		bigrun_draw_sprites(bitmap,cliprect,i+1,i);
 	}
 
-	flag = 0;
-	cischeat_tmap_DRAW(0)
-	cischeat_tmap_DRAW(1)
+	m_tmap[0]->draw(screen, bitmap, cliprect, 0, 0 );
+	m_tmap[1]->draw(screen, bitmap, cliprect, 0, 0 );
 
 	for (i = 3; i >= 0; i--)
-	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,true);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+	{
+		/* bitmap, cliprect, road, min_priority, max_priority, transparency */
+		cischeat_draw_road(bitmap,cliprect,0,i,i,true);
+		cischeat_draw_road(bitmap,cliprect,1,i,i,true);
+		bigrun_draw_sprites(bitmap,cliprect,i+1,i);
 	}
 
-	if (active_layers1 & 0x08) bigrun_draw_sprites(bitmap,cliprect,15,0);
-
-	cischeat_tmap_DRAW(2)
+	m_tmap[2]->draw(screen, bitmap, cliprect, 0, 0 );
 
 	return 0;
 }
@@ -982,7 +966,7 @@ uint32_t cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_in
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
 	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
-	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,6,7,true);
+	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,6,7,false);
 	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,6,7,true);
 
 	flag = 0;

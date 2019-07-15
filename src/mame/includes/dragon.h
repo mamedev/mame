@@ -8,16 +8,17 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_INCLUDES_DRAGON_H
 #define MAME_INCLUDES_DRAGON_H
+
+#pragma once
 
 
 #include "includes/coco12.h"
 #include "imagedev/printer.h"
 #include "machine/mos6551.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -65,6 +66,8 @@ public:
 
 	void tanodr64(machine_config &config);
 	void dragon64(machine_config &config);
+	void tanodr64h(machine_config &config);
+	void dragon64h(machine_config &config);
 protected:
 	virtual DECLARE_READ8_MEMBER( ff00_read ) override;
 	virtual DECLARE_WRITE8_MEMBER( ff00_write ) override;
@@ -119,7 +122,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_plus_ram;
 	optional_shared_ptr<uint8_t> m_video_ram;

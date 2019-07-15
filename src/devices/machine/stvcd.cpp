@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, R. Belmont
 /***************************************************************************
 
-  machine/stvcd.c - Sega Saturn and ST-V CD-ROM handling
+  machine/stvcd.cpp - Sega Saturn and ST-V CD-ROM handling
 
   Another tilt at the windmill in 2011 by R. Belmont.
 
@@ -70,6 +70,7 @@ DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE"
 
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this, 2)
 	, m_cdrom_image(*this, "cdrom")
 	, m_sector_timer(*this, "sector_timer")
 	, m_sh1_timer(*this, "sh1_cmd")
@@ -77,18 +78,17 @@ stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-MACHINE_CONFIG_START(stvcd_device::device_add_mconfig)
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("sat_cdrom")
+void stvcd_device::device_add_mconfig(machine_config &config)
+{
+	CDROM(config, "cdrom").set_interface("sat_cdrom");
 
-	MCFG_TIMER_DRIVER_ADD("sector_timer", stvcd_device, stv_sector_cb)
-	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stvcd_device, stv_sh1_sim)
+	TIMER(config, m_sector_timer).configure_generic(FUNC(stvcd_device::stv_sector_cb));
+	TIMER(config, m_sh1_timer).configure_generic(FUNC(stvcd_device::stv_sh1_sim));
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-	// FIXME: these outputs should not be hardcoded
-	MCFG_SOUND_ROUTE(0, ":lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
-MACHINE_CONFIG_END
+	CDDA(config, m_cdda);
+	m_cdda->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_cdda->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+}
 
 void stvcd_device::device_start()
 {
@@ -1412,6 +1412,13 @@ void stvcd_device::cd_exec_command()
 			status_type = 0;
 			break;
 
+		// Get MPEG Card Boot ROM
+		// TODO: incomplete, needs to actually retrieve from MPEG ROM, just silence popmessage for now.
+		case 0xe2:
+			cr_standard_return(cd_stat);
+			hirqreg |= (CMOK|MPED);
+			break;
+
 		// following are MPEG commands, enough to get Sport Fishing to do something
 		// MPEG Get Status
 		case 0x90:
@@ -1443,6 +1450,7 @@ void stvcd_device::cd_exec_command()
 			cr3 = 0;
 			cr4 = 0;
 			break;
+
 
 		default:
 			LOG("Unknown command %04x\n", cr1>>8);

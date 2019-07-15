@@ -14,44 +14,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NUBUS_CPU(_cputag) \
-	nubus_device::static_set_cputag(*device, _cputag);
-
-#define MCFG_NUBUS_OUT_IRQ9_CB(_devcb) \
-	devcb = &nubus_device::set_out_irq9_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQA_CB(_devcb) \
-	devcb = &nubus_device::set_out_irqa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQB_CB(_devcb) \
-	devcb = &nubus_device::set_out_irqb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQC_CB(_devcb) \
-	devcb = &nubus_device::set_out_irqc_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQD_CB(_devcb) \
-	devcb = &nubus_device::set_out_irqd_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_NUBUS_OUT_IRQE_CB(_devcb) \
-	devcb = &nubus_device::set_out_irqe_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	nubus_slot_device::static_set_nubus_slot(*device, _nbtag, _tag);
-#define MCFG_NUBUS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_NUBUS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	device_nubus_card_interface::static_set_nubus_tag(*device, _nbtag, _tag);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -62,10 +24,20 @@ class nubus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
+		: nubus_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_nubus_slot(nbtag, tag);
+	}
+
 	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void static_set_nubus_slot(device_t &device, const char *tag, const char *slottag);
+	void set_nubus_slot(const char *tag, const char *slottag) { m_nubus_tag = tag; m_nubus_slottag = slottag; }
 protected:
 	nubus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -90,13 +62,13 @@ public:
 	~nubus_device() { m_device_list.detach_all(); }
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	template <class Object> static devcb_base &set_out_irq9_callback(device_t &device, Object &&cb) { return downcast<nubus_device &>(device).m_out_irq9_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irqa_callback(device_t &device, Object &&cb) { return downcast<nubus_device &>(device).m_out_irqa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irqb_callback(device_t &device, Object &&cb) { return downcast<nubus_device &>(device).m_out_irqb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irqc_callback(device_t &device, Object &&cb) { return downcast<nubus_device &>(device).m_out_irqc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irqd_callback(device_t &device, Object &&cb) { return downcast<nubus_device &>(device).m_out_irqd_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irqe_callback(device_t &device, Object &&cb) { return downcast<nubus_device &>(device).m_out_irqe_cb.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+	auto out_irq9_callback() { return m_out_irq9_cb.bind(); }
+	auto out_irqa_callback() { return m_out_irqa_cb.bind(); }
+	auto out_irqb_callback() { return m_out_irqb_cb.bind(); }
+	auto out_irqc_callback() { return m_out_irqc_cb.bind(); }
+	auto out_irqd_callback() { return m_out_irqd_cb.bind(); }
+	auto out_irqe_callback() { return m_out_irqe_cb.bind(); }
 
 	void add_nubus_card(device_nubus_card_interface *card);
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask=0xffffffff);
@@ -118,11 +90,11 @@ protected:
 	nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_address_space m_space;
 
 	devcb_write_line    m_out_irq9_cb;
 	devcb_write_line    m_out_irqa_cb;
@@ -132,7 +104,6 @@ protected:
 	devcb_write_line    m_out_irqe_cb;
 
 	simple_list<device_nubus_card_interface> m_device_list;
-	const char *m_cputag;
 };
 
 
@@ -161,21 +132,24 @@ public:
 	uint32_t get_slotspace() { return 0xf0000000 | (m_slot<<24); }
 	uint32_t get_super_slotspace() { return m_slot<<28; }
 
-	void raise_slot_irq() { m_nubus->set_irq_line(m_slot, ASSERT_LINE); }
-	void lower_slot_irq() { m_nubus->set_irq_line(m_slot, CLEAR_LINE); }
+	void raise_slot_irq() { nubus().set_irq_line(m_slot, ASSERT_LINE); }
+	void lower_slot_irq() { nubus().set_irq_line(m_slot, CLEAR_LINE); }
 
 	// inline configuration
-	static void static_set_nubus_tag(device_t &device, const char *tag, const char *slottag);
+	void set_nubus_tag(const char *tag, const char *slottag) { m_nubus_tag = tag; m_nubus_slottag = slottag; }
 
 protected:
 	device_nubus_card_interface(const machine_config &mconfig, device_t &device);
+	virtual void interface_pre_start() override;
 
+	int slotno() const { assert(m_nubus); return m_slot; }
+	nubus_device &nubus() { assert(m_nubus); return *m_nubus; }
+
+private:
 	nubus_device  *m_nubus;
 	const char *m_nubus_tag, *m_nubus_slottag;
 	int m_slot;
 	std::vector<uint8_t> m_declaration_rom;
-
-private:
 	device_nubus_card_interface *m_next;
 };
 

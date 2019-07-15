@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="rled" defstate="0">
+		<rect state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="yled" defstate="0">
+		<rect state="1">
+			<color red="0.75" green="0.75" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.20" green="0.20" blue="0.0" />
+		</rect>
+	</element>
+	<element name="gled" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</rect>
+	</element>
+	<element name="DRIVE0">
+		<text string="A">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="DRIVE1">
+		<text string="B">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="61" y="0" width="751" height="480" />
+		</screen>
+		<bezel name="red_led" element="rled">
+			<bounds x="15" y="3" width="10" height="10" />
+		</bezel>
+		<bezel name="yellow_led" element="yled">
+			<bounds x="15" y="18" width="10" height="10" />
+		</bezel>
+		<bezel name="green_led" element="gled">
+			<bounds x="15" y="33" width="10" height="10" />
+		</bezel>
+		<bezel name="label0" element="DRIVE0">
+			<bounds x="0" y="60" width="15" height="16" />
+		</bezel>
+		<bezel name="drive0_led" element="gled">
+			<bounds x="15" y="63" width="10" height="10" />
+		</bezel>
+		<bezel name="label1" element="DRIVE1">
+			<bounds x="0" y="74" width="15" height="16" />
+		</bezel>
+		<bezel name="drive1_led" element="gled">
+			<bounds x="15" y="79" width="10" height="10" />
+		</bezel>
+	</view>
+</mamelayout>

@@ -114,22 +114,24 @@ WRITE8_MEMBER( abc_fd2_device::status_w )
 //  ADDRESS_MAP( abc_fd2_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc_fd2_device::abc_fd2_mem)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM
-ADDRESS_MAP_END
+void abc_fd2_device::abc_fd2_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).rom().region(Z80_TAG, 0);
+	map(0x0800, 0x0bff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc_fd2_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc_fd2_device::abc_fd2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x73)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(FD1771_TAG, fd1771_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(status_w)
-ADDRESS_MAP_END
+void abc_fd2_device::abc_fd2_io(address_map &map)
+{
+	map.global_mask(0x73);
+	map(0x30, 0x33).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x50, 0x53).rw(FD1771_TAG, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0x60, 0x60).w(FUNC(abc_fd2_device::status_w));
+}
 
 
 //-------------------------------------------------
@@ -221,9 +223,10 @@ static const z80_daisy_config daisy_chain[] =
 //  SLOT_INTERFACE( abc_fd2_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( abc_fd2_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
-SLOT_INTERFACE_END
+static void abc_fd2_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+}
 
 FLOPPY_FORMATS_MEMBER( abc_fd2_device::floppy_formats )
 	FLOPPY_ABC_FD2_FORMAT
@@ -234,27 +237,28 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc_fd2_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(abc_fd2_mem)
-	MCFG_CPU_IO_MAP(abc_fd2_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void abc_fd2_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc_fd2_device::abc_fd2_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc_fd2_device::abc_fd2_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(4'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(abc_fd2_device, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(abc_fd2_device, pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(abc_fd2_device, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc_fd2_device, pio_pb_w))
+	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(abc_fd2_device::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(abc_fd2_device::pio_pa_w));
+	m_pio->in_pb_callback().set(FUNC(abc_fd2_device::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(abc_fd2_device::pio_pb_w));
 
-	MCFG_FD1771_ADD(FD1771_TAG, XTAL(4'000'000)/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb7_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb5_w))
-	MCFG_WD_FDC_HLD_CALLBACK(DEVWRITELINE(Z80PIO_TAG, z80pio_device, pb6_w))
+	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pb7_w));
+	m_fdc->drq_wr_callback().set(m_pio, FUNC(z80pio_device::pb5_w));
+	m_fdc->hld_wr_callback().set(m_pio, FUNC(z80pio_device::pb6_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats);
+}
 
 
 //**************************************************************************

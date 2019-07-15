@@ -36,41 +36,39 @@
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(cclimber_state,cclimber)
+void cclimber_state::cclimber_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_rg[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0;i < palette.entries(); i++)
+	for (int i = 0;i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(weights_rg, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(weights_rg, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -113,67 +111,64 @@ PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(cclimber_state,swimmer)
+void cclimber_state::swimmer_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
-		r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		// red component
+		bit0 = BIT(color_prom[i + 0x000], 0);
+		bit1 = BIT(color_prom[i + 0x000], 1);
+		bit2 = BIT(color_prom[i + 0x000], 2);
+		int const r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[i + 0x000] >> 3) & 0x01;
-		bit1 = (color_prom[i + 0x100] >> 0) & 0x01;
-		bit2 = (color_prom[i + 0x100] >> 1) & 0x01;
-		g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i + 0x000], 3);
+		bit1 = BIT(color_prom[i + 0x100], 0);
+		bit2 = BIT(color_prom[i + 0x100], 1);
+		int const g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i + 0x100] >> 2) & 0x01;
-		bit2 = (color_prom[i + 0x100] >> 3) & 0x01;
-		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		bit1 = BIT(color_prom[i + 0x100], 2);
+		bit2 = BIT(color_prom[i + 0x100], 3);
+		int const b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	color_prom += 0x200;
 
-	/* big sprite */
-	for (i = 0; i < 0x20; i++)
+	// big sprite
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 		palette.set_pen_color(i + 0x100, rgb_t(r, g, b));
 	}
 
-	/* side panel backgrond pen */
+	// side panel backgrond pen
 #if 0
 	// values calculated from the resistors don't seem to match the real board
 	palette.set_pen_color(SWIMMER_SIDE_BG_PEN, rgb_t(0x24, 0x5d, 0x4e));
@@ -182,101 +177,96 @@ PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 }
 
 
-PALETTE_INIT_MEMBER(cclimber_state,yamato)
+void cclimber_state::yamato_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* chars - 12 bits RGB */
-	for (i = 0; i < 0x40; i++)
+	// chars - 12 bits RGB
+	for (int i = 0; i < 0x40; i++)
 	{
 		int bit0, bit1, bit2, bit3;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i + 0x00] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x00] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x00] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x00] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// red component
+		bit0 = BIT(color_prom[i + 0x00], 0);
+		bit1 = BIT(color_prom[i + 0x00], 1);
+		bit2 = BIT(color_prom[i + 0x00], 2);
+		bit3 = BIT(color_prom[i + 0x00], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* green component */
-		bit0 = (color_prom[i + 0x00] >> 4) & 0x01;
-		bit1 = (color_prom[i + 0x00] >> 5) & 0x01;
-		bit2 = (color_prom[i + 0x00] >> 6) & 0x01;
-		bit3 = (color_prom[i + 0x00] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// green component
+		bit0 = BIT(color_prom[i + 0x00], 4);
+		bit1 = BIT(color_prom[i + 0x00], 5);
+		bit2 = BIT(color_prom[i + 0x00], 6);
+		bit3 = BIT(color_prom[i + 0x00], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* blue component */
-		bit0 = (color_prom[i + 0x40] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x40] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x40] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x40] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
+		bit0 = BIT(color_prom[i + 0x40], 0);
+		bit1 = BIT(color_prom[i + 0x40], 1);
+		bit2 = BIT(color_prom[i + 0x40], 2);
+		bit3 = BIT(color_prom[i + 0x40], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-	/* big sprite - 8 bits RGB */
-	for (i = 0; i < 0x20; i++)
+	// big sprite - 8 bits RGB
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i + 0x80] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x80] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x80] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(color_prom[i + 0x80], 0);
+		bit1 = BIT(color_prom[i + 0x80], 1);
+		bit2 = BIT(color_prom[i + 0x80], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[i + 0x80] >> 3) & 0x01;
-		bit1 = (color_prom[i + 0x80] >> 4) & 0x01;
-		bit2 = (color_prom[i + 0x80] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i + 0x80], 3);
+		bit1 = BIT(color_prom[i + 0x80], 4);
+		bit2 = BIT(color_prom[i + 0x80], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i + 0x80] >> 6) & 0x01;
-		bit2 = (color_prom[i + 0x80] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i + 0x80], 6);
+		bit2 = BIT(color_prom[i + 0x80], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i + 0x40, rgb_t(r, g, b));
 	}
 
-	/* fake colors for bg gradient */
-	for (i = 0; i < 0x100; i++)
+	// fake colors for bg gradient
+	for (int i = 0; i < 0x100; i++)
 		palette.set_pen_color(YAMATO_SKY_PEN_BASE + i, rgb_t(0, 0, i));
 }
 
 
-PALETTE_INIT_MEMBER(cclimber_state,toprollr)
+void cclimber_state::toprollr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0xa0; i++)
+	for (int i = 0; i < 0xa0; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

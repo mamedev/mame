@@ -109,13 +109,24 @@ void ymf262_device::device_reset()
 	ymf262_reset_chip(m_chip);
 }
 
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
 
-READ8_MEMBER( ymf262_device::read )
+void ymf262_device::device_clock_changed()
+{
+	int rate = clock()/288;
+	ymf262_clock_changed(m_chip,clock(),rate);
+	m_stream->set_sample_rate(rate);
+}
+
+u8 ymf262_device::read(offs_t offset)
 {
 	return ymf262_read(m_chip, offset & 3);
 }
 
-WRITE8_MEMBER( ymf262_device::write )
+void ymf262_device::write(offs_t offset, u8 data)
 {
 	ymf262_write(m_chip, offset & 3, data);
 }

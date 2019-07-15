@@ -5,11 +5,9 @@
 
 #pragma once
 
-#define MCFG_KONPPC_CGBOARD_NUMBER(_num) \
-	konppc_device::static_set_num_boards(*device, _num);
-
-#define MCFG_KONPPC_CGBOARD_TYPE(_cgtype) \
-	konppc_device::static_set_cbboard_type(*device, konppc_device::CGBOARD_TYPE_##_cgtype);
+#include "cpu/sharc/sharc.h"
+#include "machine/k033906.h"
+#include "video/voodoo.h"
 
 class konppc_device :  public device_t
 {
@@ -25,8 +23,8 @@ public:
 	// construction/destruction
 	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_num_boards(device_t &device, int num) { downcast<konppc_device &>(device).num_cgboards = num; }
-	static void static_set_cbboard_type(device_t &device, int cgtype) { downcast<konppc_device &>(device).cgboard_type = cgtype; }
+	void set_num_boards(int num) { num_cgboards = num; }
+	void set_cbboard_type(int cgtype) { cgboard_type = cgtype; }
 
 	void set_cgboard_id(int board_id);
 	int get_cgboard_id(void);
@@ -71,6 +69,11 @@ protected:
 	uint32_t nwk_fifo_r(address_space &space, int board);
 	void nwk_fifo_w(int board, uint32_t data);
 private:
+	// device finders
+	optional_device_array<adsp21062_device, 2> m_dsp;
+	optional_device_array<k033906_device, 2> m_k033906;
+	optional_device_array<voodoo_device, 2> m_voodoo;
+
 	// internal state
 	uint32_t dsp_comm_ppc[MAX_CG_BOARDS][2];
 	uint32_t dsp_comm_sharc[MAX_CG_BOARDS][2];

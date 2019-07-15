@@ -48,10 +48,10 @@ class mos6530_device : public device_t
 public:
 	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_pa_callback() { return m_in_pa_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -107,18 +107,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MOS6530, mos6530_device)
-
-
-#define MCFG_MOS6530_IN_PA_CB(_devcb) \
-	devcb = &mos6530_device::set_in_pa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6530_OUT_PA_CB(_devcb) \
-	devcb = &mos6530_device::set_out_pa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6530_IN_PB_CB(_devcb) \
-	devcb = &mos6530_device::set_in_pb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_MOS6530_OUT_PB_CB(_devcb) \
-	devcb = &mos6530_device::set_out_pb_callback(*device, DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_MOS6530_H

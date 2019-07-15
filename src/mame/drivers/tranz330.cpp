@@ -23,6 +23,7 @@
 #include "emu.h"
 #include "includes/tranz330.h"
 
+#include "machine/input_merger.h"
 #include "speaker.h"
 
 #include "tranz330.lh"
@@ -139,48 +140,52 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 
 // * - check clocks
 // ? - check purported RS232 hookup, inconsistent information found at the relevant webpage vs. user-submitted errata
-MACHINE_CONFIG_START(tranz330_state::tranz330)
-	MCFG_CPU_ADD(CPU_TAG, Z80, XTAL(7'159'090)/2) //*
-	MCFG_CPU_PROGRAM_MAP(tranz330_mem)
-	MCFG_CPU_IO_MAP(tranz330_io)
-	MCFG_Z80_DAISY_CHAIN(tranz330_daisy_chain)
+void tranz330_state::tranz330(machine_config &config)
+{
+	Z80(config, m_cpu, XTAL(7'159'090)/2); //*
+	m_cpu->set_addrmap(AS_PROGRAM, &tranz330_state::tranz330_mem);
+	m_cpu->set_addrmap(AS_IO, &tranz330_state::tranz330_io);
+	m_cpu->set_daisy_config(tranz330_daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(7'159'090)/4) // ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tranz330_state, clock_w))
+	CLOCK(config, "ctc_clock", XTAL(7'159'090)/4) // ?
+			.signal_handler().set(FUNC(tranz330_state::clock_w));
 
-	MCFG_DEVICE_ADD(RTC_TAG, MSM6242, XTAL(32'768))
+	MSM6242(config, RTC_TAG, XTAL(32'768));
 
-	MCFG_DEVICE_ADD(PIO_TAG, Z80PIO, XTAL(7'159'090)/2) //*
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0)) //*
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(tranz330_state, pio_a_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8(tranz330_state, card_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(tranz330_state, pio_b_r))
+	INPUT_MERGER_ANY_HIGH(config, "irq")
+			.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(DART_TAG, Z80DART, XTAL(7'159'090)/2) //*
-	MCFG_Z80DART_OUT_SYNCB_CB(WRITELINE(tranz330_state, syncb_w))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd)) //?
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr)) //?
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts)) //?
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio, XTAL(7'159'090)/2); //*
+	m_pio->out_int_callback().set("irq", FUNC(input_merger_device::in_w<0>)); //*
+	m_pio->out_pa_callback().set(FUNC(tranz330_state::pio_a_w));
+	m_pio->in_pa_callback().set(FUNC(tranz330_state::card_r));
+	m_pio->in_pb_callback().set(FUNC(tranz330_state::pio_b_r));
 
-	MCFG_DEVICE_ADD(CTC_TAG, Z80CTC, XTAL(7'159'090)/2) //*
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(tranz330_state, sound_w))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_dart, XTAL(7'159'090)/2); //*
+	m_dart->out_syncb_callback().set(FUNC(tranz330_state::syncb_w));
+	m_dart->out_txdb_callback().set(m_rs232, FUNC(rs232_port_device::write_txd)); //?
+	m_dart->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr)); //?
+	m_dart->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts)); //?
+	m_dart->out_int_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(DART_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(DART_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(DART_TAG, z80dart_device, ctsb_w))
+	Z80CTC(config, m_ctc, XTAL(7'159'090)/2); //*
+	m_ctc->zc_callback<2>().set(FUNC(tranz330_state::sound_w));
+	m_ctc->intr_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	m_rs232->dcd_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
+	m_rs232->cts_handler().set(m_dart, FUNC(z80dart_device::ctsb_w));
 
 	// video
-	MCFG_MIC10937_ADD(VFD_TAG, 0)
-	MCFG_DEFAULT_LAYOUT( layout_tranz330 )
+	MIC10937(config, VFD_TAG).set_port_value(0);
+	config.set_default_layout(layout_tranz330);
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker", 0)
+			.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 ROM_START( tranz330 )
@@ -189,5 +194,5 @@ ROM_START( tranz330 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT   COMPANY      FULLNAME        FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state,  0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME        FLAGS
+COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state, empty_init, "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )

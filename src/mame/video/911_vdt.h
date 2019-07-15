@@ -6,6 +6,8 @@
 #pragma once
 
 #include "sound/beep.h"
+#include "emupal.h"
+#include "screen.h"
 
 #define vdt911_chr_region ":gfx1"
 
@@ -48,15 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
-	template <class Object> static devcb_base &static_set_keyint_callback(device_t &device, Object &&cb)
-	{
-		return downcast<vdt911_device &>(device).m_keyint_line.set_callback(std::forward<Object>(cb));
-	}
-
-	template <class Object> static devcb_base &static_set_lineint_callback(device_t &device, Object &&cb)
-	{
-		return downcast<vdt911_device &>(device).m_lineint_line.set_callback(std::forward<Object>(cb));
-	}
+	auto keyint_cb() { return m_keyint_line.bind(); }
+	auto lineint_cb() { return m_lineint_line.bind(); }
 
 protected:
 	// device-level overrides
@@ -69,10 +64,9 @@ protected:
 
 private:
 	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
-	int get_refresh_rate();
 	void check_keyboard();
 
-	DECLARE_PALETTE_INIT(vdt911);
+	void vdt911_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -106,17 +100,14 @@ private:
 	int m_last_modifier_state;
 	char m_foreign_mode;
 
-	required_device<beep_device>        m_beeper;
+	required_device<beep_device> m_beeper;
+	required_device<screen_device> m_screen;
+	required_ioport_array<6> m_keys;
+
 	devcb_write_line                   m_keyint_line;
 	devcb_write_line                   m_lineint_line;
 };
 
 DECLARE_DEVICE_TYPE(VDT911, vdt911_device)
-
-#define MCFG_VDT911_KEYINT_HANDLER( _intcallb ) \
-	devcb = &vdt911_device::static_set_keyint_callback( *device, DEVCB_##_intcallb );
-
-#define MCFG_VDT911_LINEINT_HANDLER( _intcallb ) \
-	devcb = &vdt911_device::static_set_lineint_callback( *device, DEVCB_##_intcallb );
 
 #endif // MAME_VIDEO_911_VDT_H

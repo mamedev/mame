@@ -35,31 +35,31 @@ ROM_START( gfxultrp )
 	ROM_DEFAULT_BIOS("isa")
 
 	ROM_SYSTEM_BIOS( 0, "isa", "ISA BIOS 112-18900-100" )
-	ROMX_LOAD("gfxultrapro.bin", 0x00000, 0x8000, CRC(4e5effd7) SHA1(84ad3abf7653e4734bf39f5d5c8b88e74527e8ce), ROM_BIOS(1) )
+	ROMX_LOAD("gfxultrapro.bin", 0x00000, 0x8000, CRC(4e5effd7) SHA1(84ad3abf7653e4734bf39f5d5c8b88e74527e8ce), ROM_BIOS(0) )
 
 	// We can separate out this BIOS once a proper VLB bus emulation is available
 	ROM_SYSTEM_BIOS( 1, "vlb", "VLB BIOS 113-19500-100" )
-	ROMX_LOAD("gfxultrapro_vlb.bin", 0x00000, 0x8000, CRC(5018f71e) SHA1(61321dfecf1bcdd8043836fabbe41786dbf3001b), ROM_BIOS(2) )
+	ROMX_LOAD("gfxultrapro_vlb.bin", 0x00000, 0x8000, CRC(5018f71e) SHA1(61321dfecf1bcdd8043836fabbe41786dbf3001b), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( mach64 )
 	ROM_REGION(0x8000,"mach64", 0)
 
 	ROM_SYSTEM_BIOS( 0, "isa", "ISA BIOS 112-28122-101" )
-	ROMX_LOAD("mach64.bin", 0x00000, 0x8000, CRC(1300aa8f) SHA1(dfc7f817900f125b89b0bda16fcb205f066a47fc), ROM_BIOS(1) )
+	ROMX_LOAD("mach64.bin", 0x00000, 0x8000, CRC(1300aa8f) SHA1(dfc7f817900f125b89b0bda16fcb205f066a47fc), ROM_BIOS(0) )
 
 	// We can separate out these BIOSes once a proper PCI and VLB bus emulation is available
 	ROM_SYSTEM_BIOS( 1, "vlb_d", "VLB DRAM BIOS 113-27803-102" )
-	ROMX_LOAD("mach64_vlb_dram.bin", 0x00000, 0x8000, CRC(f2a24699) SHA1(580401a8bdfc379180a8d7d77305fc529b2a8374), ROM_BIOS(2) )
+	ROMX_LOAD("mach64_vlb_dram.bin", 0x00000, 0x8000, CRC(f2a24699) SHA1(580401a8bdfc379180a8d7d77305fc529b2a8374), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 2, "gfxultrapt_vlb", "ATi Graphics Pro Turbo VLB VRAM BIOS 113-26900-103" )
-	ROMX_LOAD("mach64_vlb_vram.bin", 0x00000, 0x8000, CRC(47779d8f) SHA1(87b01b7a16d9c79dfc6c5aa8a39455c725d2e455), ROM_BIOS(3) )
+	ROMX_LOAD("mach64_vlb_vram.bin", 0x00000, 0x8000, CRC(47779d8f) SHA1(87b01b7a16d9c79dfc6c5aa8a39455c725d2e455), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS( 3, "pci", "PCI BIOS 113-25420-100" )
-	ROMX_LOAD("pci_mach64__113-25420-100-1995.27c256.u1.bin", 0x00000, 0x8000, CRC(762596e8) SHA1(9544b073ac182ec2990e18f54afbb96d52db744a), ROM_BIOS(4) )
+	ROMX_LOAD("pci_mach64__113-25420-100-1995.27c256.u1.bin", 0x00000, 0x8000, CRC(762596e8) SHA1(9544b073ac182ec2990e18f54afbb96d52db744a), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 4, "pci_v1", "PCI mach64 V1 BIOS 113-34404-104" )
-	ROMX_LOAD("pci_mach64_v1_113-34404-104_1996.bin", 0x00000, 0x8000, CRC(c6a39c3f) SHA1(0f4cf9221179c675dafafde638bc00244b6feb63), ROM_BIOS(5) )
+	ROMX_LOAD("pci_mach64_v1_113-34404-104_1996.bin", 0x00000, 0x8000, CRC(c6a39c3f) SHA1(0f4cf9221179c675dafafde638bc00244b6feb63), ROM_BIOS(4) )
 	ROM_IGNORE(0x8000)
 
 ROM_END
@@ -76,35 +76,33 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_MACH64,      isa16_vga_mach64_device,      "mach64
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa16_vga_gfxultra_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", ati_vga_device, screen_update)
+void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(ati_vga_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ATI_VGA(config, "vga", 0).set_screen("screen");
+}
 
-	MCFG_DEVICE_ADD("vga", ATI_VGA, 0)
-MACHINE_CONFIG_END
+void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(mach32_device::screen_update));
 
-MACHINE_CONFIG_START(isa16_vga_gfxultrapro_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", mach32_device, screen_update)
+	ATIMACH32(config, "vga", 0).set_screen("screen");
+}
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(mach64_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", ATIMACH32, 0)
-MACHINE_CONFIG_END
+	ATIMACH64(config, "vga", 0).set_screen("screen");
+}
 
-MACHINE_CONFIG_START(isa16_vga_mach64_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", mach64_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-
-	MCFG_DEVICE_ADD("vga", ATIMACH64, 0)
-MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

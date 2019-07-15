@@ -1,5 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_DOGFGT_H
+#define MAME_INCLUDES_DOGFGT_H
+
+#pragma once
+
+#include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define PIXMAP_COLOR_BASE  (16 + 32)
@@ -9,8 +16,8 @@
 class dogfgt_state : public driver_device
 {
 public:
-	dogfgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dogfgt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_sharedram(*this, "sharedram"),
@@ -18,12 +25,30 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_ay(*this, "ay%u", 0U)
+	{ }
 
+	void dogfgt(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_sharedram;
+
+	/* devices */
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device_array<ay8910_device, 2> m_ay;
 
 	/* video-related */
 	bitmap_ind16 m_pixbitmap;
@@ -39,33 +64,26 @@ public:
 	int       m_soundlatch;
 	int       m_last_snd_ctrl;
 
-	/* devices */
-	required_device<cpu_device> m_subcpu;
-	DECLARE_READ8_MEMBER(sharedram_r);
-	DECLARE_WRITE8_MEMBER(sharedram_w);
 	DECLARE_WRITE8_MEMBER(subirqtrigger_w);
 	DECLARE_WRITE8_MEMBER(sub_irqack_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_soundcontrol_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_plane_select_w);
-	DECLARE_READ8_MEMBER(dogfgt_bitmapram_r);
+	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	DECLARE_WRITE8_MEMBER(soundcontrol_w);
+	DECLARE_WRITE8_MEMBER(plane_select_w);
+	DECLARE_READ8_MEMBER(bitmapram_r);
 	DECLARE_WRITE8_MEMBER(internal_bitmapram_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_bitmapram_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_scroll_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_1800_w);
+	DECLARE_WRITE8_MEMBER(bitmapram_w);
+	DECLARE_WRITE8_MEMBER(bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(scroll_w);
+	DECLARE_WRITE8_MEMBER(_1800_w);
+
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dogfgt);
-	uint32_t screen_update_dogfgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	void dogfgt(machine_config &config);
+	void dogfgt_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DOGFGT_H

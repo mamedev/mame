@@ -49,17 +49,16 @@
 #include "softlist.h"
 
 
-#define VERBOSE_DBG 1       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class tosh1000_state : public driver_device
@@ -72,8 +71,12 @@ public:
 		, m_bram(*this, "bram")
 		{ }
 
+	void tosh1000(machine_config &config);
+
+	void init_tosh1000();
+
+private:
 	DECLARE_MACHINE_RESET(tosh1000);
-	DECLARE_DRIVER_INIT(tosh1000);
 
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
 	DECLARE_READ8_MEMBER(romdos_bank_r);
@@ -82,16 +85,14 @@ public:
 	DECLARE_READ8_MEMBER(bram_r);
 
 	static void cfg_fdc_35(device_t *device);
-	void tosh1000(machine_config &config);
 	void tosh1000_io(address_map &map);
 	void tosh1000_map(address_map &map);
 	void tosh1000_romdos(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<tosh1000_bram_device> m_bram;
 
-private:
 	enum {
 		IDLE, READ_DATA, WRITE_DATA
 	};
@@ -102,7 +103,7 @@ private:
 };
 
 
-DRIVER_INIT_MEMBER(tosh1000_state, tosh1000)
+void tosh1000_state::init_tosh1000()
 {
 }
 
@@ -117,7 +118,7 @@ MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
 
 WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 {
-	DBG_LOG(2,"ROM-DOS", ("<- %02x (%s, accessing bank %d)\n", data, BIT(data, 7)?"enable":"disable", data&7));
+	LOGDBG("ROM-DOS <- %02x (%s, accessing bank %d)\n", data, BIT(data, 7)?"enable":"disable", data&7);
 
 	if (BIT(data, 7))
 	{
@@ -131,14 +132,14 @@ WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 
 WRITE8_MEMBER(tosh1000_state::bram_w)
 {
-	DBG_LOG(2, "BRAM", ("%02x <- %02x\n", 0xc0 + offset, data));
+	LOGDBG("BRAM %02x <- %02x\n", 0xc0 + offset, data);
 
 	switch (offset)
 	{
 	case 1:
 		if (m_bram_latch)
 		{
-			DBG_LOG(1, "Backup RAM", ("%02x <- %02x\n", m_bram_offset % 160, data));
+			LOG("Backup RAM %02x <- %02x\n", m_bram_offset % 160, data);
 			m_bram->write(m_bram_offset % 160, data);
 			m_bram_offset++;
 		}
@@ -186,7 +187,7 @@ READ8_MEMBER(tosh1000_state::bram_r)
 		if (m_bram_state == READ_DATA)
 		{
 			data = m_bram->read(m_bram_offset % 160);
-			DBG_LOG(1, "BRAM", ("@ %02x == %02x\n", m_bram_offset % 160, data));
+			LOG("BRAM @ %02x == %02x\n", m_bram_offset % 160, data);
 			m_bram_offset++;
 		}
 		break;
@@ -210,91 +211,89 @@ READ8_MEMBER(tosh1000_state::bram_r)
 		break;
 	}
 
-	DBG_LOG(2, "BRAM", ("%02x == %02x\n", 0xc0 + offset, data));
+	LOGDBG("BRAM %02x == %02x\n", 0xc0 + offset, data);
 
 	return data;
 }
 
 
-ADDRESS_MAP_START(tosh1000_state::tosh1000_romdos)
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("romdos", 0)
-	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("romdos", 0x10000)
-	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("romdos", 0x20000)
-	AM_RANGE(0x30000, 0x3ffff) AM_ROM AM_REGION("romdos", 0x30000)
-	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("romdos", 0x40000)
-	AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("romdos", 0x50000)
-	AM_RANGE(0x60000, 0x6ffff) AM_ROM AM_REGION("romdos", 0x60000)
-	AM_RANGE(0x70000, 0x7ffff) AM_ROM AM_REGION("romdos", 0x70000)
-ADDRESS_MAP_END
+void tosh1000_state::tosh1000_romdos(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("romdos", 0);
+	map(0x10000, 0x1ffff).rom().region("romdos", 0x10000);
+	map(0x20000, 0x2ffff).rom().region("romdos", 0x20000);
+	map(0x30000, 0x3ffff).rom().region("romdos", 0x30000);
+	map(0x40000, 0x4ffff).rom().region("romdos", 0x40000);
+	map(0x50000, 0x5ffff).rom().region("romdos", 0x50000);
+	map(0x60000, 0x6ffff).rom().region("romdos", 0x60000);
+	map(0x70000, 0x7ffff).rom().region("romdos", 0x70000);
+}
 
-ADDRESS_MAP_START(tosh1000_state::tosh1000_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xa0000, 0xaffff) AM_DEVREADWRITE("bankdev", address_map_bank_device, read8, write8)
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void tosh1000_state::tosh1000_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xa0000, 0xaffff).rw(m_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(tosh1000_state::tosh1000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-	AM_RANGE(0x00c0, 0x00c3) AM_READWRITE(bram_r, bram_w)
-	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)    // ROM-DOS page select [p. B-15]
-	AM_RANGE(0x02c0, 0x02df) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
-ADDRESS_MAP_END
+void tosh1000_state::tosh1000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x00c0, 0x00c3).rw(FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
+	map(0x00c8, 0x00c8).w(FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
+	map(0x02c0, 0x02df).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
+}
 
 
 void tosh1000_state::cfg_fdc_35(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-MACHINE_CONFIG_START(tosh1000_state::tosh1000)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(tosh1000_map)
-	MCFG_CPU_IO_MAP(tosh1000_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void tosh1000_state::tosh1000(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tosh1000_state::tosh1000_map);
+	m_maincpu->set_addrmap(AS_IO, &tosh1000_state::tosh1000_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(tosh1000_romdos)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&tosh1000_state::tosh1000_romdos).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
 
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
+	TC8521(config, "rtc", XTAL(32'768));
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_35)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_fdc_35);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
-//  MCFG_SOFTWARE_LIST_ADD("flop_list","tosh1000")
+//  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
 	// uses a 80C50 instead of 8042 for KBDC
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 
-	MCFG_TOSH1000_BRAM_ADD("bram")
-MACHINE_CONFIG_END
+	TOSH1000_BRAM(config, m_bram, 0);
+}
 
 
 ROM_START( tosh1000 )
 	ROM_REGION16_LE(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v410", "V4.10")
-	ROMX_LOAD( "026F.27C256.IC25.bin", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(1))
+	ROMX_LOAD( "026f.27c256.ic25", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(0))
 
 	ROM_REGION16_LE(0x80000, "romdos", 0)
-	ROM_LOAD("tc534000p__B004.dos.ic26", 0x0000, 0x80000, CRC(716027f6) SHA1(563e3a7e1961d4cda216169bd1ecc66925a101aa))
+	ROM_LOAD("tc534000p__b004.dos.ic26", 0x0000, 0x80000, CRC(716027f6) SHA1(563e3a7e1961d4cda216169bd1ecc66925a101aa))
 
 	/* XXX IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000, "gfx1", 0)
@@ -302,5 +301,5 @@ ROM_START( tosh1000 )
 ROM_END
 
 
-//     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT     STATE             INIT        COMPANY     FULLNAME         FLAGS
-COMP ( 1987,    tosh1000,   ibm5150,    0,      tosh1000,   0,        tosh1000_state,   tosh1000,   "Toshiba",  "Toshiba T1000", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY    FULLNAME         FLAGS
+COMP( 1987, tosh1000, ibm5150, 0,      tosh1000, 0,     tosh1000_state, init_tosh1000, "Toshiba", "Toshiba T1000", MACHINE_IS_SKELETON )

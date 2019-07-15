@@ -57,7 +57,7 @@ mos8726_device::mos8726_device(const machine_config &mconfig, const char *tag, d
 void mos8726_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// save state
 	save_item(NAME(m_bs));
@@ -90,7 +90,7 @@ void mos8726_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos8726_device::read )
+uint8_t mos8726_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -102,7 +102,7 @@ READ8_MEMBER( mos8726_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos8726_device::write )
+void mos8726_device::write(offs_t offset, uint8_t data)
 {
 }
 

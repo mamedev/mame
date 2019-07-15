@@ -32,6 +32,14 @@
 #include <utility>
 #include <vector>
 
+// Generate a N-bit mask at compile time.  N better be constant.
+// Works even for signed types
+
+template<typename T> constexpr T make_bitmask(unsigned int N)
+{
+	return T((N < (8 * sizeof(T)) ? (std::make_unsigned_t<T>(1) << N) : std::make_unsigned_t<T>(0)) - 1);
+}
+
 
 // ======================> simple_list
 
@@ -877,6 +885,17 @@ public:
 	bool full() const { return !m_empty && (m_head == m_tail); }
 	bool empty() const { return m_empty; }
 
+	// number of currently enqueued elements
+	std::size_t queue_length() const
+	{
+		if (m_empty)
+			return 0;
+
+		auto const distance = std::distance(m_head, m_tail);
+
+		return (distance > 0) ? distance : (N + distance);
+	}
+
 	void enqueue(T const &v)
 	{
 		if (WriteWrap || m_empty || (m_head != m_tail))
@@ -936,6 +955,71 @@ private:
 	typename fifo::iterator m_head, m_tail;
 	bool                    m_empty;
 };
+
+
+template <typename E>
+using enable_enum_t = typename std::enable_if_t<std::is_enum<E>::value, typename std::underlying_type_t<E> >;
+
+// template function which takes a strongly typed enumerator and returns its value as a compile-time constant
+template <typename E>
+constexpr enable_enum_t<E> underlying_value(E e) noexcept
+{
+	return static_cast<typename std::underlying_type_t<E> >(e);
+}
+
+// template function which takes an integral value and returns its representation as enumerator (even strongly typed)
+template <typename E , typename T>
+constexpr typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T>::value, E> enum_value(T value) noexcept
+{
+	return static_cast<E>(value);
+}
+
+
+// useful functions to deal with bit shuffling
+template <typename T, typename U> constexpr T BIT(T x, U n) noexcept { return (x >> n) & T(1); }
+
+template <typename T, typename U> constexpr T bitswap(T val, U b) noexcept { return BIT(val, b) << 0U; }
+
+template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c) noexcept
+{
+	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
+}
+
+// explicit version that checks number of bit position arguments
+template <unsigned B, typename T, typename... U> T bitswap(T val, U... b) noexcept
+{
+	static_assert(sizeof...(b) == B, "wrong number of bits");
+	static_assert((sizeof(std::remove_reference_t<T>) * 8) >= B, "return type too small for result");
+	return bitswap(val, b...);
+}
+
+
+// constexpr absolute value of an integer
+template <typename T>
+constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v) noexcept
+{
+	return (v < T(0)) ? -v : v;
+}
+
+
+// returns greatest common divisor of a and b using the Euclidean algorithm
+template <typename M, typename N>
+constexpr std::common_type_t<M, N> euclid_gcd(M a, N b)
+{
+	return b ? euclid_gcd(b, a % b) : a;
+}
+
+// reduce a fraction
+template <typename M, typename N>
+inline void reduce_fraction(M &num, N &den)
+{
+	auto const div(euclid_gcd(num, den));
+	if (div)
+	{
+		num /= div;
+		den /= div;
+	}
+}
 
 }; // namespace util
 

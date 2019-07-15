@@ -23,6 +23,8 @@ cpu/alph8201/ will be removed when the alpha 8304 has been dumped.
 #include "8201dasm.h"
 
 #include <ctype.h>
+#include <stdexcept>
+
 
 #define FMT(a,b) a, b
 #define PTRS_PER_FORMAT 2
@@ -299,16 +301,16 @@ alpha8201_disassembler::alpha8201_disassembler()
 					pmask |= 1<<bit;
 					pdown  = bit;
 				case 'x':
-					bit --;
+					bit--;
 					break;
 				case '_':
 					continue;
 				default:
-					fatalerror("Invalid instruction encoding '%s %s'\n", Formats[i*2],Formats[i*2+1]);
+					throw std::logic_error(util::string_format("Invalid instruction encoding '%s %s'\n", Formats[i*2],Formats[i*2+1]));
 			}
 		}
-		if (bit != -1 ) {
-			fatalerror("not enough bits in encoding '%s %s' %d\n", Formats[i*2],Formats[i*2+1],bit);
+		if (bit != -1) {
+			throw std::logic_error(util::string_format("not enough bits in encoding '%s %s' %d\n", Formats[i*2],Formats[i*2+1],bit));
 		}
 
 		Op[i].mask  = mask;

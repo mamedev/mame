@@ -17,9 +17,6 @@
 #include "2610intf.h"
 #include "fm.h"
 
-char const *const ym2610_device::YM2610_TAG = "ymsnd";
-char const *const ym2610_device::YM2610_DELTAT_TAG = "ymsnd.deltat";
-
 const ssg_callbacks ym2610_device::psgintf =
 {
 	&ym2610_device::psg_set_clock,
@@ -51,7 +48,7 @@ void ym2610_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void ym2610_device::timer_handler(int c,int count,int clock)
 {
-	if( count == 0 )
+	if( count == 0 || clock == 0 )
 	{   /* Reset FM Timer */
 		m_timer[c]->enable(false);
 	}
@@ -107,25 +104,32 @@ void ym2610_device::device_start()
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(&ym2610_device::stream_generate,this));
 
-	/* setup adpcm buffers */
-	void *pcmbufa = m_region->base();
-	int pcmsizea = m_region->bytes();
-
-	std::string name = tag() + std::string(".deltat");
-	memory_region *deltat_region = machine().root_device().memregion(name.c_str());
-	void *pcmbufb = pcmbufa;
-	int pcmsizeb = pcmsizea;
-	if (deltat_region != nullptr && deltat_region->base() != nullptr && deltat_region->bytes() != 0)
+	if (!has_configured_map(0) && !has_configured_map(1))
 	{
-		pcmbufb = deltat_region->base();
-		pcmsizeb = deltat_region->bytes();
+		if (m_adpcm_a_region)
+			space(0).install_rom(0, m_adpcm_a_region->bytes() - 1, m_adpcm_a_region->base());
+
+		if (m_adpcm_b_region)
+			space(1).install_rom(0, m_adpcm_b_region->bytes() - 1, m_adpcm_b_region->base());
+		else if (m_adpcm_a_region)
+			space(1).install_rom(0, m_adpcm_a_region->bytes() - 1, m_adpcm_a_region->base());
 	}
 
 	/**** initialize YM2610 ****/
-	m_chip = ym2610_init(this,clock(),rate,
-					pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
-					&ym2610_device::static_timer_handler,&ym2610_device::static_irq_handler,&psgintf);
+	m_chip = ym2610_init(this, clock(), rate,
+		&ym2610_device::static_adpcm_a_read_byte, &ym2610_device::static_adpcm_b_read_byte,
+		&ym2610_device::static_timer_handler, &ym2610_device::static_irq_handler, &psgintf);
 	assert_always(m_chip != nullptr, "Error creating YM2610 chip");
+}
+
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void ym2610_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 72);
+	ym2610_clock_changed(m_chip, clock(), clock() / 72);
 }
 
 //-------------------------------------------------
@@ -146,13 +150,26 @@ void ym2610_device::device_reset()
 	ym2610_reset_chip(m_chip);
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
 
-READ8_MEMBER( ym2610_device::read )
+device_memory_interface::space_config_vector ym2610_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_adpcm_a_config),
+		std::make_pair(1, &m_adpcm_b_config)
+	};
+}
+
+
+u8 ym2610_device::read(offs_t offset)
 {
 	return ym2610_read(m_chip, offset & 3);
 }
 
-WRITE8_MEMBER( ym2610_device::write )
+void ym2610_device::write(offs_t offset, u8 data)
 {
 	ym2610_write(m_chip, offset & 3, data);
 }
@@ -167,10 +184,15 @@ ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, dev
 
 ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, type, tag, owner, clock, PSG_TYPE_YM, 1, 0)
+	, device_memory_interface(mconfig, *this)
+	, m_adpcm_a_config("adpcm-a", ENDIANNESS_LITTLE, 8, 24, 0)
+	, m_adpcm_b_config("adpcm-b", ENDIANNESS_LITTLE, 8, 24, 0)
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
 	, m_irq_handler(*this)
-	, m_region(*this, DEVICE_SELF)
+	, m_adpcm_b_region_name("^" + std::string(basetag()) + ".deltat")
+	, m_adpcm_a_region(*this, DEVICE_SELF)
+	, m_adpcm_b_region(*this, m_adpcm_b_region_name.c_str())
 {
 }
 

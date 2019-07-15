@@ -61,41 +61,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MOS6526_TOD(_clock) \
-	mos6526_device::static_set_tod_clock(*device, _clock);
-
-#define MCFG_MOS6526_IRQ_CALLBACK(_write) \
-	devcb = &mos6526_device::set_irq_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS6526_CNT_CALLBACK(_write) \
-	devcb = &mos6526_device::set_cnt_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS6526_SP_CALLBACK(_write) \
-	devcb = &mos6526_device::set_sp_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS6526_PA_INPUT_CALLBACK(_read) \
-	devcb = &mos6526_device::set_pa_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_MOS6526_PA_OUTPUT_CALLBACK(_write) \
-	devcb = &mos6526_device::set_pa_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS6526_PB_INPUT_CALLBACK(_read) \
-	devcb = &mos6526_device::set_pb_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_MOS6526_PB_OUTPUT_CALLBACK(_write) \
-	devcb = &mos6526_device::set_pb_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MOS6526_PC_CALLBACK(_write) \
-	devcb = &mos6526_device::set_pc_wr_callback(*device, DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -109,24 +74,22 @@ public:
 	// construction/destruction
 	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_tod_clock(device_t &device, int clock) { downcast<mos6526_device &>(device).m_tod_clock = clock; }
+	void set_tod_clock(int clock) { m_tod_clock = clock; }
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cnt_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_cnt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_sp_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_sp.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pa_rd_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_read_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pa_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_rd_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_read_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pc_wr_callback(device_t &device, Object &&cb) { return downcast<mos6526_device &>(device).m_write_pc.set_callback(std::forward<Object>(cb)); }
+	auto irq_wr_callback() { return m_write_irq.bind(); }
+	auto cnt_wr_callback() { return m_write_cnt.bind(); }
+	auto sp_wr_callback() { return m_write_sp.bind(); }
+	auto pa_rd_callback() { return m_read_pa.bind(); }
+	auto pa_wr_callback() { return m_write_pa.bind(); }
+	auto pb_rd_callback() { return m_read_pb.bind(); }
+	auto pb_wr_callback() { return m_write_pb.bind(); }
+	auto pc_wr_callback() { return m_write_pc.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t pa_r() { return m_pa; }
-	DECLARE_READ8_MEMBER( pa_r ) { return pa_r(); }
 	uint8_t pb_r() { return m_pb; }
-	DECLARE_READ8_MEMBER( pb_r ) { return pb_r(); }
 
 	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
@@ -265,8 +228,8 @@ class mos8520_device : public mos6526_device
 public:
 	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	virtual inline void clock_tod() override;
@@ -280,8 +243,8 @@ class mos5710_device : public mos6526_device
 public:
 	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	//DECLARE_READ8_MEMBER( read );
-	//DECLARE_WRITE8_MEMBER( write );
+	//uint8_t read(offs_t offset);
+	//void write(offs_t offset, uint8_t data);
 };
 
 

@@ -13,7 +13,7 @@ class okim6376_device : public device_t,
 public:
 	okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( st_w );
 	DECLARE_WRITE_LINE_MEMBER( ch2_w );
@@ -26,6 +26,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual void device_post_load() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -70,7 +71,6 @@ private:
 
 	void oki_process(int channel, int command);
 	void generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, int samples,int channel);
-	void postload();
 	void okim6376_state_save_register();
 	void adpcm_state_save_register(struct ADPCMVoice *voice, int index);
 };

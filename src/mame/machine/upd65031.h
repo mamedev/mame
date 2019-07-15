@@ -12,30 +12,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_UPD65031_KB_CALLBACK(_read) \
-	devcb = &upd65031_device::set_kb_rd_callback(*device, DEVCB_##_read);
-
-#define MCFG_UPD65031_INT_CALLBACK(_write) \
-	devcb = &upd65031_device::set_int_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_UPD65031_NMI_CALLBACK(_write) \
-	devcb = &upd65031_device::set_nmi_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_UPD65031_SPKR_CALLBACK(_write) \
-	devcb = &upd65031_device::set_spkr_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_UPD65031_SCR_UPDATE_CB(_class, _method) \
-	upd65031_device::set_screen_update_callback(*device, upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_UPD65031_MEM_UPDATE_CB(_class, _method) \
-	upd65031_device::set_memory_update_callback(*device, upd65031_memory_update_delegate(&_class::_method, #_class "::" #_method, this));
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -55,13 +31,13 @@ public:
 	// construction/destruction
 	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_kb_rd_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_read_kb.set_callback(object); }
-	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_int.set_callback(object); }
-	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_nmi.set_callback(object); }
-	template<class _Object> static devcb_base &set_spkr_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_spkr.set_callback(object); }
+	auto kb_rd_callback() { return m_read_kb.bind(); }
+	auto int_wr_callback() { return m_write_int.bind(); }
+	auto nmi_wr_callback() { return m_write_nmi.bind(); }
+	auto spkr_wr_callback() { return m_write_spkr.bind(); }
 
-	static void set_screen_update_callback(device_t &device, upd65031_screen_update_delegate callback) { downcast<upd65031_device &>(device).m_screen_update_cb = callback; }
-	static void set_memory_update_callback(device_t &device, upd65031_memory_update_delegate callback) { downcast<upd65031_device &>(device).m_out_mem_cb = callback; }
+	template <typename... T> void set_screen_update_callback(T &&... args) { m_screen_update_cb = upd65031_screen_update_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_memory_update_callback(T &&... args) { m_out_mem_cb = upd65031_memory_update_delegate(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

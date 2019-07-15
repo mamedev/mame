@@ -58,9 +58,9 @@
     P30 and P40
     ===========
     Those were P3 and P4's with an additional 8088 card, a 128K RAM card (some with an extra 32K graphics extension) to support MS-DOS.
-	
-	
-	comments, testing, modification: rfka01, helwie44
+
+
+    comments, testing, modification: rfka01, helwie44
 
 ***************************************************************************/
 
@@ -68,12 +68,15 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "video/tms9927.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "debugger.h"
@@ -100,6 +103,14 @@ public:
 		m_gfx(*this, "gfx"),
 		m_ram(*this, "ram")
 	{ }
+	void alphatp1(machine_config &config);
+	void alphatp2(machine_config &config);
+	void alphatp2u(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -119,26 +130,18 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 
-	void alphatp1(machine_config &config);
-	void alphatp2(machine_config &config);
-	void alphatp2u(machine_config &config);
-
 	void alphatp2_io(address_map &map);
 	void alphatp2_map(address_map &map);
 	void alphatp2_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<address_map_bank_device> m_bankdev;
-	required_device<i8041_device> m_kbdmcu;
+	required_device<i8041a_device> m_kbdmcu;
 	required_device<crt5027_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_vram;
@@ -164,12 +167,22 @@ public:
 		m_floppy(*this, "fdc:%u", 0),
 		m_i8088(*this, "i8088"),
 		m_beep(*this, "beeper"),
+		m_pic(*this, "pic8259"),
 		m_keycols(*this, "COL.%u", 0),
+		m_scncfg(*this, "SCREEN"),
 		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_vram(*this, "vram"),
 		m_gfx(*this, "gfx"),
 		m_ram(*this, "ram")
 	{ }
+
+	void alphatp3(machine_config &config);
+	void alphatp30(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -189,66 +202,81 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(start88_r);
+	DECLARE_READ8_MEMBER(comm85_r);
+	DECLARE_WRITE8_MEMBER(comm85_w);
+	DECLARE_READ8_MEMBER(comm88_r);
+	DECLARE_WRITE8_MEMBER(comm88_w);
+	DECLARE_READ8_MEMBER(gfxext_r);
+	DECLARE_WRITE8_MEMBER(gfxext_w);
+	DECLARE_WRITE8_MEMBER(gfxext1_w);
+	DECLARE_WRITE8_MEMBER(gfxext2_w);
+	DECLARE_WRITE8_MEMBER(gfxext3_w);
 
-	void alphatp3(machine_config &config);
-	void alphatp30(machine_config &config);
+	u8* vramext_addr_xlate(offs_t offset);
 
 	void alphatp30_8088_io(address_map &map);
 	void alphatp30_8088_map(address_map &map);
 	void alphatp3_io(address_map &map);
 	void alphatp3_map(address_map &map);
 	void alphatp3_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<address_map_bank_device> m_bankdev;
-	required_device<i8041_device> m_kbdmcu;
+	required_device<i8041a_device> m_kbdmcu;
 	required_device<crt5037_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	optional_device<cpu_device> m_i8088;
 	required_device<beep_device> m_beep;
+	optional_device<pic8259_device> m_pic;
 	required_ioport_array<16> m_keycols;
+	required_ioport m_scncfg;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_gfx;
 	required_shared_ptr<u8> m_ram;
 	floppy_image_device *m_curfloppy;
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
+	u8 m_85_data, m_88_data;
+	bool m_88_da, m_85_da, m_88_started;
+	u8 m_gfxext1, m_gfxext2, m_vramlatch;
+	u16 m_gfxext3;
+	u8 m_vramext[371*80];
+	u8 m_vramchr[256*12];  // these are one 32K ram region but with complex mapping
 };
 
 //**************************************************************************
 //  ADDRESS MAPS - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-ADDRESS_MAP_START(alphatp_12_state::alphatp2_mem)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void alphatp_12_state::alphatp2_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(alphatp_12_state::alphatp2_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
-	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
-	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
-	AM_RANGE(0x03000, 0x03bff) AM_WRITEONLY AM_SHARE("vram") // test  2017 hw, MOS directly writes to display RAM
-	AM_RANGE(0x03FF0, 0x03fff) AM_DEVWRITE("crtc", crt5027_device, write) //test hw, mem-mapped registers, cursor position can be determined through this range
+void alphatp_12_state::alphatp2_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).bankrw("ram_0000");
+	map(0x00000, 0x017ff).rom().region("boot", 0);  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
+	map(0x01800, 0x01c00).ram(); // boot rom variables
+	map(0x03000, 0x03bff).writeonly().share("vram"); // test  2017 hw, MOS directly writes to display RAM
+	map(0x03FF0, 0x03fff).w(m_crtc, FUNC(crt5027_device::write)); //test hw, mem-mapped registers, cursor position can be determined through this range
 
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+	map(0x10000, 0x1ffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(alphatp_12_state::alphatp2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("kbdmcu", i8041_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(beep_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
-	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
-ADDRESS_MAP_END
+void alphatp_12_state::alphatp2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
+	map(0x12, 0x12).w(FUNC(alphatp_12_state::beep_w));
+	map(0x50, 0x53).rw(FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
+	map(0x54, 0x54).rw(FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
+	map(0x78, 0x78).w(FUNC(alphatp_12_state::bank_w));
+}
 
 
 WRITE8_MEMBER(alphatp_12_state::bank_w)
@@ -261,51 +289,175 @@ WRITE8_MEMBER(alphatp_12_state::bank_w)
 //  ADDRESS MAPS - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp3_mem)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void alphatp_34_state::alphatp3_mem(address_map &map)
+{
+	map(0x0000, 0xffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp3_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
-	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
-	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
-	AM_RANGE(0x03000, 0x03bff) AM_WRITEONLY AM_SHARE("vram") // test  2017 hw, MOS directly writes to display RAM
-	AM_RANGE(0x03FF0, 0x03fff) AM_DEVWRITE("crtc", crt5037_device, write) //test hw, mem-mapped registers, cursor position can be determined through this range
+void alphatp_34_state::alphatp3_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).bankrw("ram_0000");
+	map(0x00000, 0x017ff).rom().region("boot", 0);  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
+	map(0x01800, 0x01c00).ram(); // boot rom variables
+	map(0x03000, 0x03bff).writeonly().share("vram"); // test  2017 hw, MOS directly writes to display RAM
+	map(0x03FF0, 0x03fff).w(m_crtc, FUNC(crt5037_device::write)); //test hw, mem-mapped registers, cursor position can be determined through this range
 
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+	map(0x10000, 0x1ffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp3_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("kbdmcu", i8041_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(beep_w)
-	AM_RANGE(0x40, 0x40) AM_READ(start88_r)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
-	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
-ADDRESS_MAP_END
+void alphatp_34_state::alphatp3_io(address_map &map)
+{
+	map.unmap_value_high();
+	//AM_RANGE(0x00, 0x00) AM_READ // unknown
+	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
+	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
+	map(0x40, 0x41).r(FUNC(alphatp_34_state::start88_r));
+	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
+	map(0x50, 0x53).rw(FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
+	map(0x54, 0x54).rw(FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
+	map(0x78, 0x78).w(FUNC(alphatp_34_state::bank_w));
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("16bit", 0)
-ADDRESS_MAP_END
+void alphatp_34_state::alphatp30_8088_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram();
+	map(0xe0000, 0xeffff).rw(FUNC(alphatp_34_state::gfxext_r), FUNC(alphatp_34_state::gfxext_w));
+	map(0xfe000, 0xfffff).rom().region("16bit", 0);
+}
 
-ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
-	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-ADDRESS_MAP_END
+void alphatp_34_state::alphatp30_8088_io(address_map &map)
+{
+	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
+	map(0xf800, 0xf800).w(FUNC(alphatp_34_state::gfxext1_w));
+	map(0xf900, 0xf900).w(FUNC(alphatp_34_state::gfxext2_w));
+	map(0xfa00, 0xfa01).w(FUNC(alphatp_34_state::gfxext3_w));
+	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
+	map(0xffe0, 0xffe1).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xffe4, 0xffe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xffe9, 0xffea).rw(FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
+}
 
 READ8_MEMBER(alphatp_34_state::start88_r)
 {
-	if(m_i8088)
-		m_i8088->resume(SUSPEND_REASON_DISABLE);
+	if(!offset)
+	{
+		if(m_i8088 && !m_88_started)
+		{
+			m_i8088->resume(SUSPEND_REASON_DISABLE);
+			m_88_started = true;
+		}
+		m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
+	}
+	else
+		m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 	return 0;
 }
 
 WRITE8_MEMBER(alphatp_34_state::bank_w)
 {
 	m_bankdev->set_bank(BIT(data, 6));
+}
+
+READ8_MEMBER(alphatp_34_state::comm88_r)
+{
+	if(!offset)
+		return (m_85_da ? 0 : 1) | (m_88_da ? 0 : 0x80);
+	if(m_i8088)
+		m_i8088->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
+	m_85_da = false;
+	return m_85_data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::comm88_w)
+{
+	m_88_data = data;
+	if(m_pic)
+		m_pic->ir2_w(ASSERT_LINE);
+	m_88_da = true;
+}
+
+READ8_MEMBER(alphatp_34_state::comm85_r)
+{
+	if(!offset)
+		return m_88_da ? 0 : 1;
+	m_pic->ir2_w(CLEAR_LINE);
+	m_88_da = false;
+	return m_88_data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::comm85_w)
+{
+	m_85_data = data;
+	m_85_da = true;
+	m_i8088->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext1_w)
+{
+	m_gfxext1 = data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext2_w)
+{
+	m_gfxext2 = data;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext3_w)
+{
+	u16 mask = 0xff << (offset ? 0 : 8);
+	m_gfxext3 = (m_gfxext3 & mask) | (data << (offset * 8));
+}
+
+u8* alphatp_34_state::vramext_addr_xlate(offs_t offset)
+{
+	offset = offset >> 3;
+	int bank = offset >> 7;
+	int offs = offset & 0x7f;
+	if(offs < 80)
+		return &m_vramext[(((((m_gfxext2 & 0xf8) << 2) + bank) * 80) + offs) % (371*80)];
+	else
+		return &m_vramchr[(((((m_gfxext2 & 0x8) << 2) ^ bank) * 48) + (offs - 80)) % (256*12)];
+}
+
+READ8_MEMBER(alphatp_34_state::gfxext_r)
+{
+	switch(m_gfxext1)
+	{
+		case 0x33:
+			m_vramlatch = *vramext_addr_xlate(offset);
+			return 0;
+	}
+	logerror("gfxext read offset %x %x\n", offset, m_gfxext1);
+	return 0;
+}
+
+WRITE8_MEMBER(alphatp_34_state::gfxext_w)
+{
+	switch(m_gfxext1)
+	{
+		case 5:
+		{
+			if(m_gfxext3 == 0xe0f)
+				data = ~data;
+			u8 mask = 1 << (offset & 7);
+			u8 *addr = vramext_addr_xlate(offset);
+			*addr &= ~mask;
+			*addr |= data & mask;
+			break;
+		}
+		case 6:
+			*vramext_addr_xlate(offset) ^= 1 << (offset & 7);
+			break;
+		case 0x33:
+			*vramext_addr_xlate(offset) = m_vramlatch;
+			break;
+		default:
+			logerror("gfxext write offset %x %x %x\n", offset, data, m_gfxext1);
+	}
+	if((offset & 0x3ff) > 0x280)
+		m_gfxdecode->gfx(1)->mark_dirty(((uintptr_t)vramext_addr_xlate(offset) - (uintptr_t)m_vramchr) / 12);
 }
 
 //**************************************************************************
@@ -352,8 +504,9 @@ READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
 
 WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
 {
-	if ((data & 0x80) && (!m_kbdclk))
+	if (data & 0x80)
 	{
+		data--; // FIXME: the p30 kbc program doesn't clock the keyboard but gets the wrong value from t0
 		const ioport_value tmp_read = m_keycols[(data >> 3) & 0xf]->read() & (1 << (data & 0x7));
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
@@ -498,7 +651,7 @@ PORT_START("COL.10")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')							// TAB key
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')                         // TAB key
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER")       PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
@@ -672,7 +825,7 @@ PORT_START("COL.10")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')							// TAB key
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')                         // TAB key
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER")       PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
@@ -710,6 +863,12 @@ PORT_START("COL.15")
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_F1)       PORT_CHAR(UCHAR_MAMEKEY(F1))    // 7Dh -> 85H func. F1 ok
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SM")          PORT_CODE(KEYCODE_NUMLOCK)  PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))// SM (typewriter) mode key */
+
+PORT_START("SCREEN")
+	PORT_CONFNAME(0x01, 0x00, "Screen")
+	PORT_CONFSETTING(0x00, "Main")
+	PORT_CONFSETTING(0x01, "Extension")
+
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -725,6 +884,17 @@ static const gfx_layout charlayout =
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
 	8*16
+};
+
+static const gfx_layout extcharlayout =
+{
+	8, 12,
+	256,
+	1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	8*12
 };
 
 //**************************************************************************
@@ -744,7 +914,7 @@ uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		{
 			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, vramy * 12);
+			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
@@ -769,7 +939,7 @@ uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 //  VIDEO - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-static GFXDECODE_START( alphatp3 )
+static GFXDECODE_START( gfx_alphatp3 )
 	GFXDECODE_ENTRY("gfx", 0, charlayout, 0, 1)
 GFXDECODE_END
 
@@ -779,6 +949,7 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	int start = m_crtc->upscroll_offset();
 	rectangle cursor;
 	m_crtc->cursor_bounds(cursor);
+	bool scrext = m_scncfg->read() ? true : false;
 	for (int y = 0; y < 24; y++)
 	{
 		int vramy = (start + y) % 24;
@@ -789,9 +960,20 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
-				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
-				if (cursoren)
-					data ^= 0xff;
+				u8 data = 0;
+				if(scrext)
+				{
+					offs_t offset = (((vramy * 12) + line) * 80) + x;
+					if(offset < (371 * 80))
+						data = m_vramext[offset];
+					code = 0;
+				}
+				else
+				{
+					data = m_gfx[((code & 0x7f) * 16) + line];
+					if (cursoren)
+						data ^= 0xff;
+				}
 				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 2) = pen[BIT(data, 2) ^ BIT(code, 7)];
@@ -866,12 +1048,12 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_12_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_12_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 
@@ -879,7 +1061,7 @@ WRITE8_MEMBER(alphatp_12_state::fdc_cmd_w)
 {
 	floppy_image_device *floppy = nullptr;
 
-	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
+	//logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
 
 	// select drive
 	if (!(data & 0x80))
@@ -945,12 +1127,12 @@ READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_34_state::fdc_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_34_state::fdc_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 
@@ -958,7 +1140,7 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 {
 	floppy_image_device *floppy = nullptr;
 
-	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
+	//logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
 
 	// select drive
 	if (!(data & 0x80))
@@ -987,17 +1169,20 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 //  FLOPPY - Drive definitions
 //**************************************************************************
 
-static SLOT_INTERFACE_START( alphatp2_floppies ) // two BASF 2471 drives
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
-SLOT_INTERFACE_END
+static void alphatp2_floppies(device_slot_interface &device) // two BASF 2471 drives
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
-static SLOT_INTERFACE_START( alphatp2su_floppies )
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void alphatp2su_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START( alphatp3_floppies ) // P3:  two BASF 6106 drives
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)       // P30: two Shugart SA465-3AA drives
-SLOT_INTERFACE_END
+static void alphatp3_floppies(device_slot_interface &device) // P3:  two BASF 6106 drives
+{
+	device.option_add("525qd", FLOPPY_525_QD);       // P30: two Shugart SA465-3AA drives
+}
 
 //**************************************************************************
 //  MACHINE - Alphatronic P1, P2, P2S, P2U and Hell 2069
@@ -1019,64 +1204,60 @@ void alphatp_12_state::machine_reset()
 	m_curfloppy = nullptr;
 }
 
-MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(alphatp2_mem)
-	MCFG_CPU_IO_MAP(alphatp2_io)
+void alphatp_12_state::alphatp2(machine_config &config)
+{
+	i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &alphatp_12_state::alphatp2_mem);
+	maincpu.set_addrmap(AS_IO, &alphatp_12_state::alphatp2_io);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_CPU_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(alphatp_12_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alphatp_12_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(alphatp_12_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alphatp_12_state, kbd_port2_w))
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
+	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
+	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_12_state::kbd_matrix_w));
+	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_12_state::kbd_port2_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(alphatp_12_state::kbd_port2_w));
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(alphatp2_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_12_state::alphatp2_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'854'400), 824, 0, 640, 312, 0, 288)
-	MCFG_SCREEN_UPDATE_DRIVER(alphatp_12_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
+	screen.set_screen_update(FUNC(alphatp_12_state::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("crtc", CRT5027, XTAL(12'854'400))
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_HSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
-	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5027(config, m_crtc, 12.8544_MHz_XTAL / 8);
+	m_crtc->set_char_width(8);
+	m_crtc->hsyn_callback().set_inputline("maincpu", I8085_RST55_LINE);
+	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->set_screen("screen");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_alphatp3);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 1060 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 1060).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	// XTAL(4'915'200) serial clock
+	I8251(config, "uart", 0);
+	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(alphatp_12_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(alphatp_12_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(alphatp_12_state, fdchld_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatp_12_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(alphatp_12_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(alphatp_12_state::fdchld_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+}
 
-MACHINE_CONFIG_START(alphatp_12_state::alphatp2u)
+void alphatp_12_state::alphatp2u(machine_config &config)
+{
 	alphatp2(config);
-	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_DEVICE_REMOVE("fdc:1")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	config.device_remove("fdc:0");
+	config.device_remove("fdc:1");
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatp2su_floppies, "525dd", floppy_image_device::default_floppy_formats);
+}
 
 
 //**************************************************************************
@@ -1087,9 +1268,11 @@ void alphatp_34_state::machine_start()
 {
 	// setup banking
 	membank("ram_0000")->set_base(m_ram.target());
-
+	save_item(NAME(m_vramext));
 
 	m_kbdclk = 0;   // must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
+	if(m_i8088)
+		m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, extcharlayout, &m_vramchr[0], 0, 1, 0));
 }
 
 void alphatp_34_state::machine_reset()
@@ -1097,70 +1280,72 @@ void alphatp_34_state::machine_reset()
 	m_kbdread = 1;
 	m_kbdclk = 1;   m_fdc_irq = m_fdc_drq = m_fdc_hld = 0;
 	m_curfloppy = nullptr;
+	m_88_da = m_85_da = m_88_started = false;
 }
-MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(alphatp3_mem)
-	MCFG_CPU_IO_MAP(alphatp3_io)
+void alphatp_34_state::alphatp3(machine_config &config)
+{
+	i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp3_mem);
+	maincpu.set_addrmap(AS_IO, &alphatp_34_state::alphatp3_io);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_CPU_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(alphatp_34_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alphatp_34_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(alphatp_34_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alphatp_34_state, kbd_port2_w))
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
+	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
+	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));
+	m_kbdmcu->p2_out_cb().set(FUNC(alphatp_34_state::kbd_port2_w));
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(alphatp3_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_34_state::alphatp3_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'854'400), 824, 0, 640, 312, 0, 288)
-	MCFG_SCREEN_UPDATE_DRIVER(alphatp_34_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_raw(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288);
+	screen.set_screen_update(FUNC(alphatp_34_state::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, XTAL(12'854'400))
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5037(config, m_crtc, 12.8544_MHz_XTAL / 8);
+	m_crtc->set_char_width(8);
+	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->set_screen("screen");
 
-	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
-	MCFG_VIDEO_SET_SCREEN("screen")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_alphatp3);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 1060 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 1060).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	// XTAL(4'915'200) serial clock
+	I8251(config, "uart", 0);
+	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(alphatp_34_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(alphatp_34_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(alphatp_34_state, fdchld_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatp_34_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(alphatp_34_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(alphatp_34_state::fdchld_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats);
+}
 
-MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
+void alphatp_34_state::alphatp30(machine_config &config)
+{
 	alphatp3(config);
-	MCFG_CPU_ADD("i8088", I8088, 6000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(alphatp30_8088_map)
-	MCFG_CPU_IO_MAP(alphatp30_8088_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-	MCFG_DEVICE_DISABLE()
+	I8088(config, m_i8088, 6000000); // unknown clock
+	m_i8088->set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp30_8088_map);
+	m_i8088->set_addrmap(AS_IO, &alphatp_34_state::alphatp30_8088_io);
+	m_i8088->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_i8088->set_disable();
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
-	MCFG_PIC8259_IN_SP_CB(GND)
-MACHINE_CONFIG_END
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_i8088, 0);
+	m_pic->in_sp_callback().set_constant(0);
+
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(100000);  // 15Mhz osc with unknown divisor
+	pit.set_clk<1>(100000);
+	pit.set_clk<2>(100000);
+	pit.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -1187,26 +1372,26 @@ ROM_START( alphatp2 ) // P2 ROM space 0x1800
 	ROM_SYSTEM_BIOS(1, "caap04-06", "caap04-06")
 	ROM_SYSTEM_BIOS(2, "p2_es", "p2_es")
 
-	ROMX_LOAD("caap_96_00_5a.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(1) ) // earlier P2, three 16K RAM boards
-	ROMX_LOAD("caap_05_02_12.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(1) )
-	ROMX_LOAD("caap_94_01_50.bin", 0x1000, 0x0800, CRC(fda8d4a4) SHA1(fa91e6e8504e7f84cf69d86f72826ad5405fd82d), ROM_BIOS(1) )
+	ROMX_LOAD("caap_96_00_5a.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(0) ) // earlier P2, three 16K RAM boards
+	ROMX_LOAD("caap_05_02_12.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(0) )
+	ROMX_LOAD("caap_94_01_50.bin", 0x1000, 0x0800, CRC(fda8d4a4) SHA1(fa91e6e8504e7f84cf69d86f72826ad5405fd82d), ROM_BIOS(0) )
 
-	ROMX_LOAD("caap_06_00_17.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(2) ) // later P2, one 48K RAM board
-	ROMX_LOAD("caap_05_01_12.bin", 0x0800, 0x0800, CRC(98c5ec7a) SHA1(b170e9a73b0b64d4111fa1170af6e333793da479), ROM_BIOS(2) )
-	ROMX_LOAD("caap_04_01_03.bin", 0x1000, 0x0800, CRC(f304c3aa) SHA1(92213e77e4e6de12a4eaee25a9c1ec0ab54e93d4), ROM_BIOS(2) )
+	ROMX_LOAD("caap_06_00_17.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(1) ) // later P2, one 48K RAM board
+	ROMX_LOAD("caap_05_01_12.bin", 0x0800, 0x0800, CRC(98c5ec7a) SHA1(b170e9a73b0b64d4111fa1170af6e333793da479), ROM_BIOS(1) )
+	ROMX_LOAD("caap_04_01_03.bin", 0x1000, 0x0800, CRC(f304c3aa) SHA1(92213e77e4e6de12a4eaee25a9c1ec0ab54e93d4), ROM_BIOS(1) )
 
-	ROMX_LOAD("caap_p2_es_1.bin", 0x0000, 0x0800, CRC(91b58eb3) SHA1(a4467cf9a14366198ee5f676b9471734e820522d), ROM_BIOS(3) )   // P2 Spain
-	ROMX_LOAD("caap_p2_es_2.bin", 0x0800, 0x0800, CRC(f4dfac82) SHA1(266d1fdaef875515d9c68ae3e67ec88831bb55cb), ROM_BIOS(3) )
-	ROMX_LOAD("caap_p2_es_3.bin", 0x1000, 0x0800, CRC(6f6918ba) SHA1(8dc9f5e337df8abf42e5b55f5f1a1a9d61c42d78), ROM_BIOS(3) )
+	ROMX_LOAD("caap_p2_es_1.bin", 0x0000, 0x0800, CRC(91b58eb3) SHA1(a4467cf9a14366198ee5f676b9471734e820522d), ROM_BIOS(2) )   // P2 Spain
+	ROMX_LOAD("caap_p2_es_2.bin", 0x0800, 0x0800, CRC(f4dfac82) SHA1(266d1fdaef875515d9c68ae3e67ec88831bb55cb), ROM_BIOS(2) )
+	ROMX_LOAD("caap_p2_es_3.bin", 0x1000, 0x0800, CRC(6f6918ba) SHA1(8dc9f5e337df8abf42e5b55f5f1a1a9d61c42d78), ROM_BIOS(2) )
 
 	ROM_REGION(0x400, "kbdmcu", 0)                                                                                          // same across all dumped P2 and P3 machines so far
 	ROM_LOAD("p2_keyboard_ip8041a_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51))   // needs to be checked with P2 sks and Spain
 
 	ROM_REGION(0x800, "gfx", 0)
-	ROMX_LOAD("cajp_97_00_5a.bin", 0x000, 0x800, CRC(aa5eab85) SHA1(2718924f5520e7e9aad635786847e78e3096b285), ROM_BIOS(1)) // came with caap94-96
-	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(2)) // came with caap04-06
-	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(3)) // sks KISS chargen not dumped yet
-	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(4)) // spanish P2 chargen not dumped yet
+	ROMX_LOAD("cajp_97_00_5a.bin", 0x000, 0x800, CRC(aa5eab85) SHA1(2718924f5520e7e9aad635786847e78e3096b285), ROM_BIOS(0)) // came with caap94-96
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(1)) // came with caap04-06
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(2)) // sks KISS chargen not dumped yet
+	// FIXME: no BIOS option for selecting this ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(3)) // spanish P2 chargen not dumped yet
 ROM_END
 
 // Alphatronic P2U
@@ -1235,14 +1420,14 @@ ROM_START( alphatp3 )
 	ROM_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51) )
 
 	ROM_REGION(0x800, "gfx", 0)
-	ROMX_LOAD("cajp08_00_15.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(1) )
-	ROMX_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8), ROM_BIOS(2) )
+	ROMX_LOAD("cajp08_00_15.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(0) )
+	ROMX_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8), ROM_BIOS(1) )
 ROM_END
 
 // Alphatronic P30
 ROM_START( alphatp30 ) // P30 add-on card with 8088 needs to be emulated to boot DOS
 	ROM_REGION(0x1800, "boot", 0)
-	ROM_LOAD("hasl17.07.84.bin", 0x0000, 0x1000, CRC(6A91701B) SHA1(8A4F925D0FABAB37852A54D04E06DEB2AEAA349C))  // ...wait for INT6.5 or INT5.5 with RIM to write char in hsync or hsync GAP-time !!
+	ROM_LOAD("hasl17.07.84.bin", 0x0000, 0x1000, CRC(6a91701b) SHA1(8a4f925d0fabab37852a54d04e06deb2aeaa349c))  // ...wait for INT6.5 or INT5.5 with RIM to write char in hsync or hsync GAP-time !!
 
 	ROM_REGION(0x400, "kbdmcu", 0)
 	ROM_LOAD("caju_01_01_01.bin",  0x000, 0x400, CRC(e9b4359f) SHA1(835f4a580b4c108ef2f239039b765324adc7f078))
@@ -1259,9 +1444,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT       CLASS           INIT  COMPANY          FULLNAME  FLAGS
-COMP( 198?, alphatp1,  alphatp2, 0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, alphatp2,  0,        0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp2u, alphatp2, 0,     alphatp2u,alphatp3, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
-COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp30, alphatp3, 0,     alphatp30, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT        COMPANY          FULLNAME           FLAGS
+COMP( 198?, alphatp1,  alphatp2, 0,       alphatp2,  alphatp2, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, alphatp2,  0,        0,       alphatp2,  alphatp2, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P2",  MACHINE_NOT_WORKING )
+COMP( 198?, alphatp2u, alphatp2, 0,       alphatp2u, alphatp3, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
+COMP( 1982, alphatp3,  0,        0,       alphatp3,  alphatp3, alphatp_34_state, empty_init, "Triumph-Adler", "alphatronic P3",  MACHINE_NOT_WORKING )
+COMP( 198?, alphatp30, alphatp3, 0,       alphatp30, alphatp3, alphatp_34_state, empty_init, "Triumph-Adler", "alphatronic P30", MACHINE_NOT_WORKING )

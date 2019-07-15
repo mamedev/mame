@@ -1,10 +1,19 @@
 // license:BSD-3-Clause
-// copyright-holders:Acho A. Tang,R. Belmont
+// copyright-holders:Acho A. Tang,R. Belmont, Valley Bell
 /*********************************************************
 
 Irem GA20 PCM Sound Chip
+80 pin QFP, label NANAO GA20 (Nanao Corporation was Irem's parent company)
 
-It's not currently known whether this chip is stereo.
+TODO:
+- It's not currently known whether this chip is stereo.
+- Is sample position base(regs 0,1) used while sample is playing, or
+  latched at key on? We've always emulated it the latter way.
+  gunforc2 seems to be the only game updating the address regs sometimes
+  while a sample is playing, but it doesn't seem intentional.
+- What is the 2nd sample address for? Is it end(cut-off) address, or
+  loop start address? Every game writes a value that's past sample end.
+- All games write either 0 or 2 to reg #6, do other bits have any function?
 
 
 Revisions:
@@ -26,12 +35,15 @@ Revisions:
 02-03-2007 R. Belmont
 - Cleaned up faux x86 assembly.
 
+09-25-2018 Valley Bell & co
+- rewrote channel update to make data 0 act as sample terminator
+
 *********************************************************/
 
 #include "emu.h"
 #include "iremga20.h"
 
-#define MAX_VOL 256
+#include <algorithm>
 
 
 // device type definition
@@ -46,11 +58,11 @@ DEFINE_DEVICE_TYPE(IREMGA20, iremga20_device, "iremga20", "Irem GA20")
 //  iremga20_device - constructor
 //-------------------------------------------------
 
-iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IREMGA20, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_rom(*this, DEVICE_SELF),
-		m_stream(nullptr)
+iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, IREMGA20, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_rom_interface(mconfig, *this, 20),
+	m_stream(nullptr)
 {
 }
 
@@ -61,27 +73,16 @@ iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag,
 
 void iremga20_device::device_start()
 {
-	int i;
-
-	iremga20_reset();
-
-	for ( i = 0; i < 0x40; i++ )
-		m_regs[i] = 0;
-
 	m_stream = stream_alloc(0, 2, clock()/4);
 
 	save_item(NAME(m_regs));
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		save_item(NAME(m_channel[i].rate), i);
-		save_item(NAME(m_channel[i].size), i);
-		save_item(NAME(m_channel[i].start), i);
 		save_item(NAME(m_channel[i].pos), i);
-		save_item(NAME(m_channel[i].frac), i);
+		save_item(NAME(m_channel[i].counter), i);
 		save_item(NAME(m_channel[i].end), i);
 		save_item(NAME(m_channel[i].volume), i);
-		save_item(NAME(m_channel[i].pan), i);
-		save_item(NAME(m_channel[i].effect), i);
 		save_item(NAME(m_channel[i].play), i);
 	}
 }
@@ -93,9 +94,36 @@ void iremga20_device::device_start()
 
 void iremga20_device::device_reset()
 {
-	iremga20_reset();
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	for (int i = 0; i < 4; i++)
+	{
+		m_channel[i].rate = 0;
+		m_channel[i].pos = 0;
+		m_channel[i].counter = 0;
+		m_channel[i].end = 0;
+		m_channel[i].volume = 0;
+		m_channel[i].play = 0;
+	}
 }
 
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void iremga20_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock()/4);
+}
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void iremga20_device::rom_bank_updated()
+{
+	m_stream->update();
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -103,161 +131,101 @@ void iremga20_device::device_reset()
 
 void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	uint32_t rate[4], pos[4], frac[4], end[4], vol[4], play[4];
-	uint8_t *pSamples;
 	stream_sample_t *outL, *outR;
-	int i, sampleout;
 
-	/* precache some values */
-	for (i=0; i < 4; i++)
-	{
-		rate[i] = m_channel[i].rate;
-		pos[i] = m_channel[i].pos;
-		frac[i] = m_channel[i].frac;
-		end[i] = m_channel[i].end - 0x20;
-		vol[i] = m_channel[i].volume;
-		play[i] = m_channel[i].play;
-	}
-
-	i = samples;
-	pSamples = &m_rom[0];
 	outL = outputs[0];
 	outR = outputs[1];
 
-	for (i = 0; i < samples; i++)
+	for (int i = 0; i < samples; i++)
 	{
-		sampleout = 0;
+		stream_sample_t sampleout = 0;
 
-		// update the 4 channels inline
-		if (play[0])
+		for (auto &ch : m_channel)
 		{
-			sampleout += (pSamples[pos[0]] - 0x80) * vol[0];
-			frac[0] += rate[0];
-			pos[0] += frac[0] >> 24;
-			frac[0] &= 0xffffff;
-			play[0] = (pos[0] < end[0]);
-		}
-		if (play[1])
-		{
-			sampleout += (pSamples[pos[1]] - 0x80) * vol[1];
-			frac[1] += rate[1];
-			pos[1] += frac[1] >> 24;
-			frac[1] &= 0xffffff;
-			play[1] = (pos[1] < end[1]);
-		}
-		if (play[2])
-		{
-			sampleout += (pSamples[pos[2]] - 0x80) * vol[2];
-			frac[2] += rate[2];
-			pos[2] += frac[2] >> 24;
-			frac[2] &= 0xffffff;
-			play[2] = (pos[2] < end[2]);
-		}
-		if (play[3])
-		{
-			sampleout += (pSamples[pos[3]] - 0x80) * vol[3];
-			frac[3] += rate[3];
-			pos[3] += frac[3] >> 24;
-			frac[3] &= 0xffffff;
-			play[3] = (pos[3] < end[3]);
+			if (ch.play)
+			{
+				int sample = read_byte(ch.pos);
+				if (sample == 0x00) // check for sample end marker
+					ch.play = 0;
+				else
+				{
+					sampleout += (sample - 0x80) * (int32_t)ch.volume;
+					ch.counter--;
+					if (ch.counter <= ch.rate)
+					{
+						ch.pos++;
+						ch.counter = 0x100;
+					}
+				}
+			}
 		}
 
 		sampleout >>= 2;
 		outL[i] = sampleout;
 		outR[i] = sampleout;
 	}
-
-	/* update the regs now */
-	for (i=0; i < 4; i++)
-	{
-		m_channel[i].pos = pos[i];
-		m_channel[i].frac = frac[i];
-		m_channel[i].play = play[i];
-	}
 }
 
 WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 {
-	int channel;
-
-	//logerror("GA20:  Offset %02x, data %04x\n",offset,data);
-
 	m_stream->update();
 
-	channel = offset >> 3;
-
+	offset &= 0x1f;
 	m_regs[offset] = data;
+	int ch = offset >> 3;
+
+	// channel regs:
+	// 0,1: start address
+	// 2,3: end? address
+	// 4: rate
+	// 5: volume
+	// 6: control
+	// 7: voice status (read-only)
 
 	switch (offset & 0x7)
 	{
-		case 0: /* start address low */
-			m_channel[channel].start = ((m_channel[channel].start)&0xff000) | (data<<4);
-			break;
-
-		case 1: /* start address high */
-			m_channel[channel].start = ((m_channel[channel].start)&0x00ff0) | (data<<12);
-			break;
-
-		case 2: /* end address low */
-			m_channel[channel].end = ((m_channel[channel].end)&0xff000) | (data<<4);
-			break;
-
-		case 3: /* end address high */
-			m_channel[channel].end = ((m_channel[channel].end)&0x00ff0) | (data<<12);
-			break;
-
 		case 4:
-			m_channel[channel].rate = 0x1000000 / (256 - data);
+			m_channel[ch].rate = data;
 			break;
 
-		case 5: //AT: gain control
-			m_channel[channel].volume = (data * MAX_VOL) / (data + 10);
+		case 5:
+			m_channel[ch].volume = (data * 256) / (data + 10);
 			break;
 
-		case 6: //AT: this is always written 2(enabling both channels?)
-			m_channel[channel].play = data;
-			m_channel[channel].pos = m_channel[channel].start;
-			m_channel[channel].frac = 0;
+		case 6:
+			// d1: key on/off
+			if (data & 2)
+			{
+				m_channel[ch].play = 1;
+				m_channel[ch].pos = (m_regs[ch << 3 | 0] | m_regs[ch << 3 | 1] << 8) << 4;
+				m_channel[ch].end = (m_regs[ch << 3 | 2] | m_regs[ch << 3 | 3] << 8) << 4;
+				m_channel[ch].counter = 0x100;
+			}
+			else
+				m_channel[ch].play = 0;
+
+			// other: unknown/unused
+			// possibilities are: loop flag, left/right speaker(stereo)
 			break;
 	}
 }
 
 READ8_MEMBER( iremga20_device::irem_ga20_r )
 {
-	int channel;
-
 	m_stream->update();
 
-	channel = offset >> 3;
+	offset &= 0x1f;
+	int ch = offset >> 3;
 
 	switch (offset & 0x7)
 	{
-		case 7: // voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
-			return m_channel[channel].play ? 1 : 0;
+		case 7: // voice status. bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
+			return m_channel[ch].play;
 
 		default:
-			logerror("GA20: read unk. register %d, channel %d\n", offset & 0xf, channel);
+			logerror("GA20: read unk. register %d, channel %d\n", offset & 0x7, ch);
 			break;
 	}
 
 	return 0;
-}
-
-
-void iremga20_device::iremga20_reset()
-{
-	int i;
-
-	for( i = 0; i < 4; i++ ) {
-	m_channel[i].rate = 0;
-	m_channel[i].size = 0;
-	m_channel[i].start = 0;
-	m_channel[i].pos = 0;
-	m_channel[i].frac = 0;
-	m_channel[i].end = 0;
-	m_channel[i].volume = 0;
-	m_channel[i].pan = 0;
-	m_channel[i].effect = 0;
-	m_channel[i].play = 0;
-	}
 }

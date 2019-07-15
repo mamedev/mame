@@ -5,9 +5,10 @@
 //  osdsync.h - Core synchronization functions
 //
 //============================================================
+#ifndef MAME_OSD_OSDSYNC_H
+#define MAME_OSD_OSDSYNC_H
 
-#ifndef __OSDSYNC__
-#define __OSDSYNC__
+#pragma once
 
 // C++ headers
 #include <mutex>
@@ -163,4 +164,4 @@ private:
 
 };
 
-#endif  /* __OSDSYNC__ */
+#endif // MAME_OSD_OSDSYNC_H

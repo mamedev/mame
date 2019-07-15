@@ -23,14 +23,15 @@
 // - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
 //   plus separate lines for custom opcode handling like TMS0270, used for SETR and RSTR
 // - 24-term output PLA above LCD RAM
-DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP, ..
+DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "Texas Instruments TP0320") // 28-pin SDIP, ..
 
 
 // internal memory maps
-ADDRESS_MAP_START(tp0320_cpu_device::data_192x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0xbf) AM_RAM AM_MIRROR(0x40) // DAM
-ADDRESS_MAP_END
+void tp0320_cpu_device::data_192x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0xbf).ram().mirror(0x40); // DAM
+}
 
 
 // device definitions
@@ -41,20 +42,18 @@ tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *
 
 
 // machine configs
-MACHINE_CONFIG_START(tp0320_cpu_device::device_add_mconfig)
-
+void tp0320_cpu_device::device_add_mconfig(machine_config &config)
+{
 	// main opcodes PLA(partial), microinstructions PLA
-	MCFG_PLA_ADD("ipla", 9, 6, 8)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-	MCFG_PLA_ADD("mpla", 6, 22, 64)
-	MCFG_PLA_FILEFORMAT(BERKELEY)
-MACHINE_CONFIG_END
+	PLA(config, "ipla", 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+}
 
 
 // disasm
-util::disasm_interface *tp0320_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tp0320_cpu_device::create_disassembler()
 {
-	return new tp0320_disassembler;
+	return std::make_unique<tp0320_disassembler>();
 }
 
 

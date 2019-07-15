@@ -235,7 +235,8 @@ READ8_MEMBER( namco_51xx_device::read )
 
 					if (m_mode == 1)
 					{
-						int on = (machine().first_screen()->frame_number() & 0x10) >> 4;
+						// HACK: Just a way of deriving the lamp blink rate. Unclear if this is verified on actual hardware.
+						int on = (m_screen->frame_number() & 0x10) >> 4;
 
 						if (m_credits >= 2)
 							WRITE_PORT(0,0x0c | 3*on);    // lamps
@@ -329,15 +330,16 @@ ROM_END
 DEFINE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device, "namco51", "Namco 51xx")
 
 namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_51XX, tag, owner, clock),
-	m_cpu(*this, "mcu"),
-	m_in{ { *this }, { *this }, { *this }, { *this } },
-	m_out{ { *this }, { *this } },
-	m_lastcoins(0),
-	m_lastbuttons(0),
-	m_mode(0),
-	m_coincred_mode(0),
-	m_remap_joy(0)
+	: device_t(mconfig, NAMCO_51XX, tag, owner, clock)
+	, m_cpu(*this, "mcu")
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_in{ { *this }, { *this }, { *this }, { *this } }
+	, m_out{ { *this }, { *this } }
+	, m_lastcoins(0)
+	, m_lastbuttons(0)
+	, m_mode(0)
+	, m_coincred_mode(0)
+	, m_remap_joy(0)
 {
 }
 
@@ -388,14 +390,15 @@ void namco_51xx_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(namco_51xx_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-//  MCFG_MB88XX_READ_K_CB(READ8(namco_51xx_device, namco_51xx_K_r))
-//  MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_51xx_device, namco_51xx_O_w))
-//  MCFG_MB88XX_READ_R0_CB(READ8(namco_51xx_device, namco_51xx_R0_r))
-//  MCFG_MB88XX_READ_R2_CB(READ8(namco_51xx_device, namco_51xx_R2_r))
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
+void namco_51xx_device::device_add_mconfig(machine_config &config)
+{
+	MB8843(config, m_cpu, DERIVED_CLOCK(1,1));     /* parent clock, internally divided by 6 */
+//  m_cpu->read_k().set(FUNC(namco_51xx_device::namco_51xx_K_r));
+//  m_cpu->write_o().set(FUNC(namco_51xx_device::namco_51xx_O_w));
+//  m_cpu->read_r<0>().set(FUNC(namco_51xx_device::namco_51xx_R0_r));
+//  m_cpu->read_r<2>().set(FUNC(namco_51xx_device::namco_51xx_R2_r));
+	m_cpu->set_disable();
+}
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

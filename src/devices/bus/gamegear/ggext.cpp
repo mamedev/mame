@@ -8,6 +8,7 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "ggext.h"
 // slot devices
 #include "smsctrladp.h"
@@ -58,9 +59,9 @@ device_gg_ext_port_interface::~device_gg_ext_port_interface()
 gg_ext_port_device::gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GG_EXT_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
+	m_screen(*this, finder_base::DUMMY_TAG),
 	m_device(nullptr),
-	m_th_pin_handler(*this),
-	m_pixel_handler(*this)
+	m_th_pin_handler(*this)
 {
 }
 
@@ -83,7 +84,6 @@ void gg_ext_port_device::device_start()
 	m_device = dynamic_cast<device_gg_ext_port_interface *>(get_card_device());
 
 	m_th_pin_handler.resolve_safe();
-	m_pixel_handler.resolve_safe(0);
 }
 
 
@@ -107,16 +107,12 @@ void gg_ext_port_device::th_pin_w(int state)
 	m_th_pin_handler(state);
 }
 
-uint32_t gg_ext_port_device::pixel_r()
-{
-	return m_pixel_handler();
-}
-
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( gg_ext_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( gg_ext_port_devices )
-	SLOT_INTERFACE("smsctrladp", SMS_CTRL_ADAPTOR)
-SLOT_INTERFACE_END
+void gg_ext_port_devices(device_slot_interface &device)
+{
+	device.option_add("smsctrladp", SMS_CTRL_ADAPTOR);
+}

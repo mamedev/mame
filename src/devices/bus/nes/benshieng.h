@@ -16,7 +16,7 @@ public:
 	// construction/destruction
 	nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -33,6 +33,6 @@ private:
 
 
 // device type definition
-extern const device_type NES_BENSHIENG;
+DECLARE_DEVICE_TYPE(NES_BENSHIENG, nes_benshieng_device)
 
 #endif // MAME_BUS_NES_BENSHIENG_H

@@ -8,23 +8,22 @@
 #include "imagedev/chd_cd.h"
 #include "sound/spu.h"
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PSXCD_ADD(_tag, _devname) \
-	MCFG_DEVICE_ADD(_tag, PSXCD, 0)
-
-#define MCFG_PSXCD_IRQ_HANDLER(_devcb) \
-	devcb = &psxcd_device::set_irq_handler(*device, DEVCB_##_devcb);
 
 class psxcd_device : public cdrom_image_device
 {
 public:
+	template <typename T, typename U>
+	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&spu_tag)
+		: psxcd_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+		m_spu.set_tag(std::forward<U>(spu_tag));
+	}
+
 	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
@@ -151,10 +150,9 @@ private:
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
 
-
 	devcb_write_line m_irq_handler;
-	cpu_device *m_maincpu;
-	spu_device *m_spu;
+	required_device<cpu_device> m_maincpu;
+	required_device<spu_device> m_spu;
 };
 
 // device type definition

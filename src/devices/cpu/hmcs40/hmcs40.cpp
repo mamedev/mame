@@ -23,60 +23,64 @@
 // MCU types
 
 // HMCS42/C/CL
-//DEFINE_DEVICE_TYPE(HD38702, hd38702_device, "hd38702", "HD38702") // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
-//DEFINE_DEVICE_TYPE(HD44700, hd44700_device, "hd44700", "HD44700") // CMOS version
-//DEFINE_DEVICE_TYPE(HD44708, hd44708_device, "hd44708", "HD44708") // CMOS version, low-power
+//DEFINE_DEVICE_TYPE(HD38702, hd38702_device, "hd38702", "Hitachi HD38702") // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
+//DEFINE_DEVICE_TYPE(HD44700, hd44700_device, "hd44700", "Hitachi HD44700") // CMOS version
+//DEFINE_DEVICE_TYPE(HD44708, hd44708_device, "hd44708", "Hitachi HD44708") // CMOS version, low-power
 
 // HMCS43/C/CL
-DEFINE_DEVICE_TYPE(HD38750, hd38750_device, "hd38750", "HD38750") // PMOS, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
-DEFINE_DEVICE_TYPE(HD38755, hd38755_device, "hd38755", "HD38755") // ceramic filter oscillator type
-DEFINE_DEVICE_TYPE(HD44750, hd44750_device, "hd44750", "HD44750") // CMOS version
-DEFINE_DEVICE_TYPE(HD44758, hd44758_device, "hd44758", "HD44758") // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD38750, hd38750_device, "hd38750", "Hitachi HD38750") // PMOS, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
+DEFINE_DEVICE_TYPE(HD38755, hd38755_device, "hd38755", "Hitachi HD38755") // ceramic filter oscillator type
+DEFINE_DEVICE_TYPE(HD44750, hd44750_device, "hd44750", "Hitachi HD44750") // CMOS version
+DEFINE_DEVICE_TYPE(HD44758, hd44758_device, "hd44758", "Hitachi HD44758") // CMOS version, low-power
 
 // HMCS44A/C/CL
-DEFINE_DEVICE_TYPE(HD38800, hd38800_device, "hd38800", "HD38800") // PMOS, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
-DEFINE_DEVICE_TYPE(HD38805, hd38805_device, "hd38805", "HD38805") // ceramic filter oscillator type
-DEFINE_DEVICE_TYPE(HD44801, hd44801_device, "hd44801", "HD44801") // CMOS version
-DEFINE_DEVICE_TYPE(HD44808, hd44808_device, "hd44808", "HD44808") // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD38800, hd38800_device, "hd38800", "Hitachi HD38800") // PMOS, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD38805, hd38805_device, "hd38805", "Hitachi HD38805") // ceramic filter oscillator type
+DEFINE_DEVICE_TYPE(HD44801, hd44801_device, "hd44801", "Hitachi HD44801") // CMOS version
+DEFINE_DEVICE_TYPE(HD44808, hd44808_device, "hd44808", "Hitachi HD44808") // CMOS version, low-power
 
 // HMCS45A/C/CL
-DEFINE_DEVICE_TYPE(HD38820, hd38820_device, "hd38820", "HD38820") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
-DEFINE_DEVICE_TYPE(HD38825, hd38825_device, "hd38825", "HD38825") // ceramic filter oscillator type
-DEFINE_DEVICE_TYPE(HD44820, hd44820_device, "hd44820", "HD44820") // CMOS version
-DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "HD44828") // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD38820, hd38820_device, "hd38820", "Hitachi HD38820") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD38825, hd38825_device, "hd38825", "Hitachi HD38825") // ceramic filter oscillator type
+DEFINE_DEVICE_TYPE(HD44820, hd44820_device, "hd44820", "Hitachi HD44820") // CMOS version
+DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "Hitachi HD44828") // CMOS version, low-power
 
 // HMCS46C/CL (no PMOS version exists)
-//DEFINE_DEVICE_TYPE(HD44840, hd44840_device, "hd44840", "HD44840") // CMOS, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM
-//DEFINE_DEVICE_TYPE(HD44848, hd44848_device, "hd44848", "HD44848") // CMOS, low-power
+//DEFINE_DEVICE_TYPE(HD44840, hd44840_device, "hd44840", "Hitachi HD44840") // CMOS, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM
+//DEFINE_DEVICE_TYPE(HD44848, hd44848_device, "hd44848", "Hitachi HD44848") // CMOS, low-power
 
 // HMCS47A/C/CL
-//DEFINE_DEVICE_TYPE(HD38870, hd38870_device, "hd38870", "HD38870") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
-//DEFINE_DEVICE_TYPE(HD44860, hd44860_device, "hd44860", "HD44860") // CMOS version
-//DEFINE_DEVICE_TYPE(HD44868, hd44868_device, "hd44868", "HD44868") // CMOS version, low-power
+//DEFINE_DEVICE_TYPE(HD38870, hd38870_device, "hd38870", "Hitachi HD38870") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
+//DEFINE_DEVICE_TYPE(HD44860, hd44860_device, "hd44860", "Hitachi HD44860") // CMOS version
+//DEFINE_DEVICE_TYPE(HD44868, hd44868_device, "hd44868", "Hitachi HD44868") // CMOS version, low-power
 
 
 // internal memory maps
-ADDRESS_MAP_START(hmcs40_cpu_device::program_1k)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0780, 0x07bf) AM_ROM // patterns on page 30
-ADDRESS_MAP_END
+void hmcs40_cpu_device::program_1k(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+	map(0x0780, 0x07bf).rom(); // patterns on page 30
+}
 
-ADDRESS_MAP_START(hmcs40_cpu_device::program_2k)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0f40, 0x0fbf) AM_ROM // patterns on page 61,62
-ADDRESS_MAP_END
+void hmcs40_cpu_device::program_2k(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0f40, 0x0fbf).rom(); // patterns on page 61,62
+}
 
 
-ADDRESS_MAP_START(hmcs40_cpu_device::data_80x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x40, 0x4f) AM_RAM AM_MIRROR(0x30)
-ADDRESS_MAP_END
+void hmcs40_cpu_device::data_80x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x40, 0x4f).ram().mirror(0x30);
+}
 
-ADDRESS_MAP_START(hmcs40_cpu_device::data_160x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x30)
-	AM_RANGE(0xc0, 0xcf) AM_RAM AM_MIRROR(0x30)
-ADDRESS_MAP_END
+void hmcs40_cpu_device::data_160x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0x8f).ram().mirror(0x30);
+	map(0xc0, 0xcf).ram().mirror(0x30);
+}
 
 
 // device definitions
@@ -90,8 +94,8 @@ hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type 
 	, m_family(family)
 	, m_polarity(polarity)
 	, m_stack_levels(stack_levels)
-	, m_read_r0(*this), m_read_r1(*this), m_read_r2(*this), m_read_r3(*this), m_read_r4(*this), m_read_r5(*this), m_read_r6(*this), m_read_r7(*this)
-	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this), m_write_r5(*this), m_write_r6(*this), m_write_r7(*this)
+	, m_read_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_read_d(*this)
 	, m_write_d(*this)
 {
@@ -174,9 +178,9 @@ void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-util::disasm_interface *hmcs40_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hmcs40_cpu_device::create_disassembler()
 {
-	return new hmcs40_disassembler;
+	return std::make_unique<hmcs40_disassembler>();
 }
 
 
@@ -202,23 +206,11 @@ void hmcs40_cpu_device::device_start()
 	reset_prescaler();
 
 	// resolve callbacks
-	m_read_r0.resolve_safe(m_polarity & 0xf);
-	m_read_r1.resolve_safe(m_polarity & 0xf);
-	m_read_r2.resolve_safe(m_polarity & 0xf);
-	m_read_r3.resolve_safe(m_polarity & 0xf);
-	m_read_r4.resolve_safe(m_polarity & 0xf);
-	m_read_r5.resolve_safe(m_polarity & 0xf);
-	m_read_r6.resolve_safe(m_polarity & 0xf);
-	m_read_r7.resolve_safe(m_polarity & 0xf);
-
-	m_write_r0.resolve_safe();
-	m_write_r1.resolve_safe();
-	m_write_r2.resolve_safe();
-	m_write_r3.resolve_safe();
-	m_write_r4.resolve_safe();
-	m_write_r5.resolve_safe();
-	m_write_r6.resolve_safe();
-	m_write_r7.resolve_safe();
+	for (int i = 0; i < 8; i++)
+	{
+		m_read_r[i].resolve_safe(m_polarity & 0xf);
+		m_write_r[i].resolve_safe();
+	}
 
 	m_read_d.resolve_safe(m_polarity);
 	m_write_d.resolve_safe();
@@ -295,7 +287,7 @@ void hmcs40_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -333,19 +325,7 @@ void hmcs40_cpu_device::device_reset()
 u8 hmcs40_cpu_device::read_r(int index)
 {
 	index &= 7;
-	u8 inp = 0;
-
-	switch (index)
-	{
-		case 0: inp = m_read_r0(index, 0xff); break;
-		case 1: inp = m_read_r1(index, 0xff); break;
-		case 2: inp = m_read_r2(index, 0xff); break;
-		case 3: inp = m_read_r3(index, 0xff); break;
-		case 4: inp = m_read_r4(index, 0xff); break;
-		case 5: inp = m_read_r5(index, 0xff); break;
-		case 6: inp = m_read_r6(index, 0xff); break;
-		case 7: inp = m_read_r7(index, 0xff); break;
-	}
+	u8 inp = m_read_r[index](index, 0xff);
 
 	if (m_polarity)
 		return (inp & m_r[index]) & 0xf;
@@ -358,18 +338,7 @@ void hmcs40_cpu_device::write_r(int index, u8 data)
 	index &= 7;
 	data &= 0xf;
 	m_r[index] = data;
-
-	switch (index)
-	{
-		case 0: m_write_r0(index, data, 0xff); break;
-		case 1: m_write_r1(index, data, 0xff); break;
-		case 2: m_write_r2(index, data, 0xff); break;
-		case 3: m_write_r3(index, data, 0xff); break;
-		case 4: m_write_r4(index, data, 0xff); break;
-		case 5: m_write_r5(index, data, 0xff); break;
-		case 6: m_write_r6(index, data, 0xff); break;
-		case 7: m_write_r7(index, data, 0xff); break;
-	}
+	m_write_r[index](index, data, 0xff);
 }
 
 int hmcs40_cpu_device::read_d(int index)
@@ -497,6 +466,7 @@ void hmcs40_cpu_device::do_interrupt()
 		m_irt = 0;
 
 	standard_irq_callback(line);
+	m_prev_pc = m_pc;
 }
 
 void hmcs40_cpu_device::execute_set_input(int line, int state)
@@ -617,7 +587,7 @@ void hmcs40_cpu_device::execute_run()
 		}
 
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_icount--;
 		m_op = m_program->read_word(m_pc) & 0x3ff;
 		m_i = bitswap<8>(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR)

@@ -5,11 +5,13 @@
 
 #include "pci.h"
 
-#define MCFG_SMBUS_ADD(_tag, _main_id, _revision, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, SMBUS, _main_id, _revision, 0x0c0500, _subdevice_id)
-
 class smbus_device : public pci_device {
 public:
+	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
+		: smbus_device(mconfig, tag, owner, clock)
+	{
+		set_ids(main_id, revision, 0x0c0500, subdevice_id);
+	}
 	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

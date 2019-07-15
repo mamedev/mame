@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_en" description="Takara e-kara (Japan) EN-xx series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+	<!--
+	Japanese cart listing (by EN code)  * = dumped
+	 * = dumped
+
+	These don't seem to have a secondary numbering scheme (eg ENxxxx-xxx)
+
+	(check what units these are for)
+
+	 EN-1  (unknown)
+	 EN-2  (unknown)
+	*EN-3  (unknown)
+
+	(more? what's the EN highest number?)
+
+	-->
+
+	<software name="en3">
+		<description>EN-3 (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="en-3.u1" size="0x100000" crc="e3686ff4" sha1="e7e9a53a778739c406b2b226300d2f525cd9676b"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

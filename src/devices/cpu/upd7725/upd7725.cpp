@@ -22,8 +22,8 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "uPD7725")
-DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "uPD96050")
+DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "NEC uPD7725")
+DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "NEC uPD96050")
 
 necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits)
 	: cpu_device(mconfig, type, tag, owner, clock),
@@ -33,7 +33,7 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 		m_irq_firing(0),
 		m_program(nullptr),
 		m_data(nullptr),
-		m_direct(nullptr),
+		m_cache(nullptr),
 		m_in_int_cb(*this),
 		//m_in_si_cb(*this),
 		//m_in_sck_cb(*this),
@@ -68,7 +68,7 @@ void necdsp_device::device_start()
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_direct = m_program->direct<-2>();
+	m_cache = m_program->cache<2, -2, ENDIANNESS_BIG>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
@@ -150,7 +150,7 @@ void necdsp_device::device_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_irq_firing));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	for (auto & elem : dataRAM)
 	{
@@ -321,9 +321,9 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *necdsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> necdsp_device::create_disassembler()
 {
-	return new necdsp_disassembler;
+	return std::make_unique<necdsp_disassembler>();
 }
 
 void necdsp_device::execute_run()
@@ -335,12 +335,12 @@ void necdsp_device::execute_run()
 		// call debugger hook if necessary
 		if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 		{
-			debugger_instruction_hook(this, regs.pc);
+			debugger_instruction_hook(regs.pc);
 		}
 
 		if (m_irq_firing == 0) // normal opcode
 		{
-			opcode = m_direct->read_dword(regs.pc) >> 8;
+			opcode = m_cache->read_dword(regs.pc) >> 8;
 			regs.pc++;
 		}
 		else if (m_irq_firing == 1) // if we're in an interrupt cycle, execute a op 'nop' first...

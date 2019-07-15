@@ -35,12 +35,6 @@
 
 #pragma once
 
-#define MCFG_SP0256_DATA_REQUEST_CB(_devcb) \
-	devcb = &sp0256_device::set_data_request_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_SP0256_STANDBY_CB(_devcb) \
-	devcb = &sp0256_device::set_standby_callback(*device, DEVCB_##_devcb);
-
 
 class sp0256_device : public device_t,
 						public device_sound_interface
@@ -48,14 +42,14 @@ class sp0256_device : public device_t,
 public:
 	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_data_request_callback(device_t &device, Object &&cb) { return downcast<sp0256_device &>(device).m_drq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_standby_callback(device_t &device, Object &&cb) { return downcast<sp0256_device &>(device).m_sby_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_request_callback() { return m_drq_cb.bind(); }
+	auto standby_callback() { return m_sby_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(ald_w);
+	void ald_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(lrq_r);
 	DECLARE_READ_LINE_MEMBER(sby_r);
-	DECLARE_READ16_MEMBER(spb640_r);
-	DECLARE_WRITE16_MEMBER(spb640_w);
+	uint16_t spb640_r(offs_t offset);
+	void spb640_w(offs_t offset, uint16_t data);
 
 	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
 	void set_clock(int clock);

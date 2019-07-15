@@ -111,6 +111,7 @@ std::string hp80_optrom_slot_device::get_default_card_software(get_default_card_
 	return software_get_default_slot("rom");
 }
 
-SLOT_INTERFACE_START(hp80_optrom_slot_device)
-	SLOT_INTERFACE_INTERNAL("rom", HP80_OPTROM_CART)
-SLOT_INTERFACE_END
+void hp80_optrom_slot_devices(device_slot_interface &device)
+{
+	device.option_add_internal("rom", HP80_OPTROM_CART);
+}

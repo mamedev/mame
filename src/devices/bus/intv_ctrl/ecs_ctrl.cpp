@@ -118,11 +118,12 @@ void intvecs_control_port_device::write_portA(uint8_t data)
 //  SLOT_INTERFACE( intvecs_control_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( intvecs_control_port_devices )
-	SLOT_INTERFACE("ctrls", ECS_CTRLS)
-	SLOT_INTERFACE("keybd", ECS_KEYBD)
-	SLOT_INTERFACE("synth", ECS_SYNTH)
-SLOT_INTERFACE_END
+void intvecs_control_port_devices(device_slot_interface &device)
+{
+	device.option_add("ctrls", ECS_CTRLS);
+	device.option_add("keybd", ECS_KEYBD);
+	device.option_add("synth", ECS_SYNTH);
+}
 
 
 
@@ -139,14 +140,16 @@ SLOT_INTERFACE_END
 
 DEFINE_DEVICE_TYPE(ECS_CTRLS, intvecs_ctrls_device, "intvecs_ctrls", "Mattel Intellivision ECS Hand Controller x2 (HACK)")
 
-static SLOT_INTERFACE_START( intvecs_controller )
-	SLOT_INTERFACE("handctrl", INTV_HANDCTRL)
-SLOT_INTERFACE_END
+static void intvecs_controller(device_slot_interface &device)
+{
+	device.option_add("handctrl", INTV_HANDCTRL);
+}
 
-MACHINE_CONFIG_START(intvecs_ctrls_device::device_add_mconfig)
-	MCFG_INTV_CONTROL_PORT_ADD("port1", intvecs_controller, "handctrl")
-	MCFG_INTV_CONTROL_PORT_ADD("port2", intvecs_controller, "handctrl")
-MACHINE_CONFIG_END
+void intvecs_ctrls_device::device_add_mconfig(machine_config &config)
+{
+	INTV_CONTROL_PORT(config, m_hand1, intvecs_controller, "handctrl");
+	INTV_CONTROL_PORT(config, m_hand2, intvecs_controller, "handctrl");
+}
 
 
 intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

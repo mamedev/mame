@@ -1032,7 +1032,7 @@ READ8_MEMBER( z8536_device::read )
 			data = read_register(m_pointer);
 
 			// return to state 0 after read
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				m_state0 = true;
 
 			break;

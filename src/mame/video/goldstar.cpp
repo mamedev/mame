@@ -153,9 +153,9 @@ WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
 
 
 
-uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -198,9 +198,9 @@ uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_in
 }
 
 
-uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -295,9 +295,9 @@ WRITE8_MEMBER(cmaster_state::background_col_w)
 }
 
 
-uint32_t cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -376,9 +376,9 @@ VIDEO_START_MEMBER(wingco_state, magical)
 }
 
 
-uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -414,9 +414,9 @@ uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -466,9 +466,9 @@ uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_ind16
 }
 
 
-uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;
@@ -483,9 +483,9 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_ind16 
 		}
 
 		// are these hardcoded, or registers?
-		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+		//const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
 		const rectangle visible2(0*8, (14+48)*8-1, 14*8, (36+7)*8-1);  // seems to be the one used...
-		const rectangle visible3(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
+		//const rectangle visible3(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
 
 //      m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
 		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
@@ -616,9 +616,9 @@ VIDEO_START_MEMBER(sanghopm_state, sangho)
 }
 
 
-uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	m_bg_tilemap->set_scrolly(0, -16);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -724,9 +724,9 @@ VIDEO_START_MEMBER(unkch_state, unkch)
 	m_cm_enable_reg = 0x0b;
 }
 
-uint32_t unkch_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unkch_state::screen_update_unkch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!(m_cm_enable_reg & 0x01))
 		return 0;

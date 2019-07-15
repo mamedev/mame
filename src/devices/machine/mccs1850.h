@@ -25,22 +25,6 @@
 #include "dirtc.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MCCS1850_INT_CALLBACK(_write) \
-	devcb = &mccs1850_device::set_int_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MCCS1850_PSE_CALLBACK(_write) \
-	devcb = &mccs1850_device::set_pse_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_MCCS1850_NUC_CALLBACK(_write) \
-	devcb = &mccs1850_device::set_nuc_wr_callback(*device, DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -55,9 +39,9 @@ public:
 	// construction/destruction
 	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pse_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nuc_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(std::forward<Object>(cb)); }
+	auto int_wr_callback() { return int_cb.bind(); }
+	auto pse_wr_callback() { return pse_cb.bind(); }
+	auto nuc_wr_callback() { return nuc_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sck_w );

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:James Wallace
 /***************************************************************************
 
     Sony LDP-1450 laserdisc emulation.
@@ -13,13 +13,6 @@
 
 #include "laserdsc.h"
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LASERDISC_LDP1450_ADD(_tag, clock) \
-	MCFG_DEVICE_ADD(_tag, SONY_LDP1450, clock)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

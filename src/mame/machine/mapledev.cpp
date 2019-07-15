@@ -2,26 +2,16 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "mapledev.h"
-#include "maple-dc.h"
-
-void maple_device::static_set_host(device_t &device, const char *_host_tag, int _host_port)
-{
-	maple_device &dev = downcast<maple_device &>(device);
-	dev.host_tag = _host_tag;
-	dev.host_port = _host_port;
-}
-
 
 maple_device::maple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : device_t(mconfig, type, tag, owner, clock)
+, host(*this, finder_base::DUMMY_TAG)
 {
-	host_tag = nullptr;
 	host_port = 0;
 }
 
 
 void maple_device::device_start()
 {
-	host = machine().device<maple_dc_device>(host_tag);
 	host->register_port(host_port, this);
 
 	timer = timer_alloc(TIMER_ID);

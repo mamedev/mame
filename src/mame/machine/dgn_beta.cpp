@@ -67,7 +67,7 @@
 #include "includes/dgn_beta.h"
 #include "includes/coco.h"
 #include "machine/mos6551.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "debugger.h"
 #include "debug/debugcon.h"
@@ -149,7 +149,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 	int                 MapPage;
 	char                page_num[10];
 
-	LOG_BANK_UPDATE(("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,space_0.device().safe_pc()));
+	LOG_BANK_UPDATE(("\n\n%s Updating banks %d to %d\n", machine().describe_context(), first, last));
 	for(Page=first;Page<=last;Page++)
 	{
 		sprintf(page_num,"bank%d",Page+1);
@@ -438,7 +438,8 @@ int dgn_beta_state::GetKeyRow(dgn_beta_state *state, int RowNo)
 */
 READ8_MEMBER(dgn_beta_state::d_pia0_pa_r)
 {
-	return 0;
+	// The hardware has pullup resistors on port A.
+	return 0xff;
 }
 
 WRITE8_MEMBER(dgn_beta_state::d_pia0_pa_w)
@@ -558,7 +559,8 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_b)
 
 READ8_MEMBER(dgn_beta_state::d_pia1_pa_r)
 {
-	return 0;
+	// The hardware has pullup resistors on port A.
+	return 0xff;
 }
 
 WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
@@ -657,7 +659,8 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_b)
 */
 READ8_MEMBER(dgn_beta_state::d_pia2_pa_r)
 {
-	return 0;
+	// The hardware has pullup resistors on port A.
+	return 0xff;
 }
 
 WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
@@ -811,13 +814,13 @@ WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_drq_w )
 
 READ8_MEMBER( dgn_beta_state::dgnbeta_wd2797_r )
 {
-	return m_fdc->read(space, offset & 0x03);
+	return m_fdc->read(offset & 0x03);
 }
 
 WRITE8_MEMBER( dgn_beta_state::dgnbeta_wd2797_w )
 {
 	m_wd2797_written = 1;
-	m_fdc->write(space, offset & 0x03, data);
+	m_fdc->write(offset & 0x03, data);
 }
 
 /* Scan physical keyboard into Keyboard array */
@@ -901,11 +904,6 @@ void dgn_beta_state::machine_reset()
 	m_EnableMapRegs = 0;
 	memset(m_PageRegs, 0, sizeof(m_PageRegs));    /* Reset page registers to 0 */
 	SetDefaultTask();
-
-	/* Set pullups on all PIA port A, to match what hardware does */
-	m_pia_0->set_port_a_z_mask(0xFF);
-	m_pia_1->set_port_a_z_mask(0xFF);
-	m_pia_2->set_port_a_z_mask(0xFF);
 
 	m_d_pia1_pa_last = 0x00;
 	m_d_pia1_pb_last = 0x00;

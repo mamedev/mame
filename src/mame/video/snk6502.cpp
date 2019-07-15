@@ -25,50 +25,43 @@
   Zarzon has a different PROM layout from the others.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(snk6502_state,snk6502)
+void snk6502_state::snk6502_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
 
-		/* green component */
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		/* blue component */
-
+		// blue component
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
 
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		m_palette_val[i] = rgb_t(r, g, b);
-
-		color_prom++;
 	}
 
-	m_backcolor = 0;    /* background color can be changed by the game */
+	m_backcolor = 0;    // background color can be changed by the game
 
-	for (i = 0; i < TOTAL_COLORS(0); i++)
+	for (int i = 0; i < TOTAL_COLORS(0); i++)
 		palette.set_pen_color(COLOR(0, i), m_palette_val[i]);
 
-	for (i = 0; i < TOTAL_COLORS(1); i++)
+	for (int i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
 			palette.set_pen_color(COLOR(1, i), m_palette_val[4 * m_backcolor + 0x20]);
@@ -137,9 +130,9 @@ WRITE8_MEMBER(snk6502_state::flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::fantasy_flipscreen_w)
+WRITE8_MEMBER(fantasy_state::fantasy_flipscreen_w)
 {
-	m_sound->fantasy_sound_w(space, offset | 0x03, data, mem_mask);
+	m_sound->sound_w(space, offset | 0x03, data, mem_mask);
 	flipscreen_w(space, offset, data, mem_mask);
 }
 
@@ -195,7 +188,7 @@ VIDEO_START_MEMBER(snk6502_state,pballoon)
 }
 
 
-uint32_t snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snk6502_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -204,50 +197,43 @@ uint32_t snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Satan of Saturn */
 
-PALETTE_INIT_MEMBER(snk6502_state,satansat)
+void snk6502_state::satansat_palette(palette_device &palette)
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
 
-		/* green component */
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		/* blue component */
-
+		// blue component
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
 
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		m_palette_val[i] = rgb_t(r, g, b);
-
-		color_prom++;
 	}
 
-	m_backcolor = 0;    /* background color can be changed by the game */
+	m_backcolor = 0;    // background color can be changed by the game
 
-	for (i = 0; i < TOTAL_COLORS(0); i++)
+	for (int i = 0; i < TOTAL_COLORS(0); i++)
 		palette.set_pen_color(COLOR(0, i), m_palette_val[4 * (i % 4) + (i / 4)]);
 
-	for (i = 0; i < TOTAL_COLORS(1); i++)
+	for (int i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
 			palette.set_pen_color(COLOR(1, i), m_palette_val[m_backcolor + 0x10]);

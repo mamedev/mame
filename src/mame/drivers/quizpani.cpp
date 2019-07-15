@@ -52,30 +52,32 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(quizpani_state::quizpani_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITENOP /* screen flipping? */
-	AM_RANGE(0x100016, 0x100017) AM_WRITENOP /* IRQ enable? */
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(tilesbank_w)
-	AM_RANGE(0x104000, 0x104001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
-	AM_RANGE(0x108000, 0x1083ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
-	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_SHARE("scrollreg")
-	AM_RANGE(0x10c008, 0x10c403) AM_WRITENOP
-	AM_RANGE(0x110000, 0x113fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x11c000, 0x11ffff) AM_RAM_WRITE(txt_videoram_w) AM_SHARE("txt_videoram")
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM
-	AM_RANGE(0x200000, 0x33ffff) AM_ROM
-ADDRESS_MAP_END
+void quizpani_state::quizpani_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x100001).portr("SYSTEM");
+	map(0x100002, 0x100003).portr("P1_P2");
+	map(0x100008, 0x100009).portr("DSW1");
+	map(0x10000a, 0x10000b).portr("DSW2");
+	map(0x100014, 0x100015).nopw(); /* screen flipping? */
+	map(0x100016, 0x100017).nopw(); /* IRQ enable? */
+	map(0x100018, 0x100019).w(FUNC(quizpani_state::tilesbank_w));
+	map(0x104001, 0x104001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x104020, 0x104027).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
+	map(0x108000, 0x1083ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x108400, 0x1085ff).nopw();
+	map(0x10c000, 0x10c007).ram().share("scrollreg");
+	map(0x10c008, 0x10c403).nopw();
+	map(0x110000, 0x113fff).ram().w(FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
+	map(0x11c000, 0x11ffff).ram().w(FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
+	map(0x180000, 0x18ffff).ram();
+	map(0x200000, 0x33ffff).rom();
+}
 
 
 /* verified from M68000 code */
@@ -187,39 +189,37 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( quizpani )
+static GFXDECODE_START( gfx_quizpani )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0x100, 16 ) /* Background */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x000, 16 ) /* Text */
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(quizpani_state::quizpani)
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(quizpani_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
+void quizpani_state::quizpani(machine_config &config)
+{
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &quizpani_state::quizpani_map);
+	m_maincpu->set_vblank_int("screen", FUNC(quizpani_state::irq4_line_hold));
+	m_maincpu->set_periodic_int(FUNC(quizpani_state::irq1_line_hold), attotime::from_hz(164)); // music tempo
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpani)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_quizpani);
+	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quizpani_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(quizpani_state::screen_update));
+	screen.set_palette("palette");
 
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	OKIM6295(config, "oki", 16000000/4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_OKIM6295_ADD("oki", 16000000/4, PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki")
-MACHINE_CONFIG_END
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki");
+}
 
 ROM_START( quizpani )
 	ROM_REGION( 0x340000, "maincpu", 0 ) /* 68000 Code */
@@ -248,4 +248,4 @@ ROM_START( quizpani )
 	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) /* unknown */
 ROM_END
 
-GAME( 1993, quizpani, 0, quizpani, quizpani, quizpani_state, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, quizpani, 0, quizpani, quizpani, quizpani_state, empty_init, ROT0, "NMK", "Quiz Panicuru Fantasy", MACHINE_SUPPORTS_SAVE )

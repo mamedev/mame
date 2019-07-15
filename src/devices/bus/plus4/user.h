@@ -28,6 +28,6 @@
 
 #include "bus/vic20/user.h"
 
-SLOT_INTERFACE_EXTERN( plus4_user_port_cards );
+void plus4_user_port_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PLUS4_USER_H

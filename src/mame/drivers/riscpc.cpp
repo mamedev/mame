@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -29,10 +30,20 @@ public:
 	riscpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
+	void rpc700(machine_config &config);
+	void rpc600(machine_config &config);
+	void sarpc(machine_config &config);
+	void sarpc_j233(machine_config &config);
+	void a7000(machine_config &config);
+	void a7000p(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	DECLARE_READ32_MEMBER(a7000_iomd_r);
 	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
@@ -67,12 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
-	void rpc700(machine_config &config);
-	void rpc600(machine_config &config);
-	void sarpc(machine_config &config);
-	void sarpc_j233(machine_config &config);
-	void a7000(machine_config &config);
-	void a7000p(machine_config &config);
+
 	void a7000_mem(address_map &map);
 };
 
@@ -186,16 +192,17 @@ void riscpc_state::vidc20_dynamic_screen_change()
 		{
 			/* finally ready to change the resolution */
 			int hblank_period,vblank_period;
-			rectangle visarea = machine().first_screen()->visible_area();
+			rectangle visarea = m_screen->visible_area();
 			hblank_period = (m_vidc20_horz_reg[HCR] & 0x3ffc);
 			vblank_period = (m_vidc20_vert_reg[VCR] & 0x3fff);
 			/* note that we use the border registers as the visible area */
-			visarea.min_x = (m_vidc20_horz_reg[HBSR] & 0x3ffe);
-			visarea.max_x = (m_vidc20_horz_reg[HBER] & 0x3ffe)-1;
-			visarea.min_y = (m_vidc20_vert_reg[VBSR] & 0x1fff);
-			visarea.max_y = (m_vidc20_vert_reg[VBER] & 0x1fff)-1;
+			visarea.set(
+					(m_vidc20_horz_reg[HBSR] & 0x3ffe),
+					(m_vidc20_horz_reg[HBER] & 0x3ffe) - 1,
+					(m_vidc20_vert_reg[VBSR] & 0x1fff),
+					(m_vidc20_vert_reg[VBER] & 0x1fff) - 1);
 
-			machine().first_screen()->configure(hblank_period, vblank_period, visarea, machine().first_screen()->frame_period().attoseconds() );
+			m_screen->configure(hblank_period, vblank_period, visarea, m_screen->frame_period().attoseconds() );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
 						(m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]),(m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]),
 						(m_vidc20_horz_reg[HBER]-m_vidc20_horz_reg[HBSR]),(m_vidc20_vert_reg[VBER]-m_vidc20_vert_reg[VBSR]),
@@ -266,7 +273,7 @@ WRITE32_MEMBER( riscpc_state::a7000_vidc20_w )
 			if(vert_reg == 4)
 			{
 				if(m_vidc20_vert_reg[VDER] != 0)
-					m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
+					m_flyback_timer->adjust(m_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
 				else
 					m_flyback_timer->adjust(attotime::never);
 			}
@@ -617,7 +624,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 
-	m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
+	m_flyback_timer->adjust(m_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
 }
 
 void riscpc_state::viddma_transfer_start()
@@ -652,7 +659,7 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 			uint8_t flyback;
 			int vert_pos;
 
-			vert_pos = machine().first_screen()->vpos();
+			vert_pos = m_screen->vpos();
 			flyback = (vert_pos <= m_vidc20_vert_reg[VDSR] || vert_pos >= m_vidc20_vert_reg[VDER]) ? 0x80 : 0x00;
 
 			return m_IOMD_IO_ctrl | 0x34 | flyback;
@@ -758,8 +765,9 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 	}
 }
 
-ADDRESS_MAP_START(riscpc_state::a7000_mem)
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0)
+void riscpc_state::a7000_mem(address_map &map)
+{
+	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
 //  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
 //  I/O 03000000 - 033fffff
@@ -768,16 +776,16 @@ ADDRESS_MAP_START(riscpc_state::a7000_mem)
 //  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
-	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(a7000_iomd_r,a7000_iomd_w) //IOMD Registers //mirrored at 0x03000000-0x1ff?
+	map(0x03200000, 0x032001ff).rw(FUNC(riscpc_state::a7000_iomd_r), FUNC(riscpc_state::a7000_iomd_w)); //IOMD Registers //mirrored at 0x03000000-0x1ff?
 //  AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
 
-	AM_RANGE(0x03400000, 0x037fffff) AM_WRITE(a7000_vidc20_w)
+	map(0x03400000, 0x037fffff).w(FUNC(riscpc_state::a7000_vidc20_w));
 //  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
-	AM_RANGE(0x10000000, 0x13ffffff) AM_RAM //SIMM 0 bank 0
-	AM_RANGE(0x14000000, 0x17ffffff) AM_RAM //SIMM 0 bank 1
+	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
+	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
 //  AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
 //  AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
-ADDRESS_MAP_END
+}
 
 
 /* Input ports */
@@ -806,93 +814,98 @@ void riscpc_state::machine_reset()
 	m_flyback_timer->adjust( attotime::never);
 }
 
-MACHINE_CONFIG_START(riscpc_state::rpc600)
+void riscpc_state::rpc600(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(30'000'000) ) // ARM610
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 60_MHz_XTAL/2); // ARM610
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::rpc700)
+void riscpc_state::rpc700(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(40'000'000) ) // ARM710
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 80_MHz_XTAL/2); // ARM710
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::a7000)
+void riscpc_state::a7000(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, XTAL(32'000'000) ) // ARM7500
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, XTAL(32'000'000)); // ARM7500
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::a7000p)
+void riscpc_state::a7000p(machine_config &config)
+{
 	a7000(config);
-	MCFG_CPU_MODIFY("maincpu") // ARM7500FE
-	MCFG_CPU_CLOCK(XTAL(48'000'000))
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(XTAL(48'000'000)); // ARM7500FE
+}
 
-MACHINE_CONFIG_START(riscpc_state::sarpc)
+void riscpc_state::sarpc(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 202000000); // StrongARM
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
-MACHINE_CONFIG_START(riscpc_state::sarpc_j233)
+void riscpc_state::sarpc_j233(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
-	MCFG_CPU_PROGRAM_MAP(a7000_mem)
+	ARM7(config, m_maincpu, 233000000); // StrongARM
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1900, 1080) //max available size
-	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
-	MCFG_SCREEN_UPDATE_DRIVER(riscpc_state, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
 ROM_START(rpc600)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.50
 	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
-	ROMX_LOAD( "0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(1))
-	ROMX_LOAD( "0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(1))
+	ROMX_LOAD("0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(0))
+	ROMX_LOAD("0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -900,8 +913,8 @@ ROM_START(rpc700)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
-	ROMX_LOAD( "1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -909,8 +922,8 @@ ROM_START(a7000)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
-	ROMX_LOAD( "1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -918,16 +931,16 @@ ROM_START(a7000p)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.71
 	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
-	ROMX_LOAD( "1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	// Version 4.02
 	ROM_SYSTEM_BIOS( 1, "402", "RiscOS 4.02" )
-	ROMX_LOAD( "riscos402_1.bin", 0x000000, 0x200000, CRC(4c32f7e2) SHA1(d290e29a4de7be9eb36cbafbb2dc99b1c4ce7f72), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
-	ROMX_LOAD( "riscos402_2.bin", 0x000002, 0x200000, CRC(7292b790) SHA1(67f999c1ccf5419e0a142b7e07f809e13dfed425), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("riscos402_1.bin", 0x000000, 0x200000, CRC(4c32f7e2) SHA1(d290e29a4de7be9eb36cbafbb2dc99b1c4ce7f72), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("riscos402_2.bin", 0x000002, 0x200000, CRC(7292b790) SHA1(67f999c1ccf5419e0a142b7e07f809e13dfed425), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
 	// Version 4.39
 	ROM_SYSTEM_BIOS( 2, "439", "RiscOS 4.39" )
-	ROMX_LOAD( "riscos439_1.bin", 0x000000, 0x200000, CRC(dab94cb8) SHA1(a81fb7f1a8117f85e82764675445092d769aa9af), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
-	ROMX_LOAD( "riscos439_2.bin", 0x000002, 0x200000, CRC(22e6a5d4) SHA1(b73b73c87824045130840a19ce16fa12e388c039), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("riscos439_1.bin", 0x000000, 0x200000, CRC(dab94cb8) SHA1(a81fb7f1a8117f85e82764675445092d769aa9af), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("riscos439_2.bin", 0x000002, 0x200000, CRC(22e6a5d4) SHA1(b73b73c87824045130840a19ce16fa12e388c039), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -935,8 +948,8 @@ ROM_START(sarpc)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.70
 	ROM_SYSTEM_BIOS( 0, "370", "RiscOS 3.70" )
-	ROMX_LOAD( "1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -944,8 +957,8 @@ ROM_START(sarpc_j233)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.71
 	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
-	ROMX_LOAD( "1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -955,10 +968,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE         INIT  COMPANY   FULLNAME                  FLAGS */
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, 0,    "Acorn",  "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, 0,    "Acorn",  "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  CLASS         INIT        COMPANY  FULLNAME                  FLAGS */
+COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

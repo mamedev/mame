@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_MAYGAY1B_H
+#define MAME_INCLUDES_MAYGAY1B_H
 
+#pragma once
 
 
 #define VERBOSE 0
@@ -30,8 +33,8 @@
 class maygay1b_state : public driver_device
 {
 public:
-	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_vfd(*this, "vfd"),
@@ -44,16 +47,24 @@ public:
 		m_sw2_port(*this, "SW2"),
 		m_kbd_ports(*this, { "SW1", "SW2", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", }),
 		m_bank1(*this, "bank1"),
-		m_reel0(*this, "reel0"),
-		m_reel1(*this, "reel1"),
-		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3"),
-		m_reel4(*this, "reel4"),
-		m_reel5(*this, "reel5"),
+		m_reels(*this, "reel%u", 0U),
 		m_meters(*this, "meters"),
-		m_oki_region(*this, "msm6376")
-	{}
+		m_oki_region(*this, "msm6376"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_triacs(*this, "triac%u", 0U)
+	{
+	}
 
+	void maygay_m1_no_oki(machine_config &config);
+	void maygay_m1(machine_config &config);
+	void maygay_m1_nec(machine_config &config);
+	void maygay_m1_empire(machine_config &config);
+
+	void init_m1();
+	void init_m1common();
+	void init_m1nec();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i80c51_device> m_mcu;
 	optional_device<s16lf01_device> m_vfd;
@@ -66,14 +77,11 @@ public:
 	required_ioport m_sw2_port;
 	required_ioport_array<8> m_kbd_ports;
 	required_memory_bank m_bank1;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
-	required_device<stepper_device> m_reel4;
-	required_device<stepper_device> m_reel5;
-	required_device<meters_device> m_meters;
+	required_device_array<stepper_device, 6> m_reels;
+	optional_device<meters_device> m_meters;
 	optional_region_ptr<uint8_t> m_oki_region;
+	output_finder<256> m_lamps;
+	output_finder<8> m_triacs;
 
 	uint8_t m_lamppos;
 	int m_lamp_strobe;
@@ -90,12 +98,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
 	uint8_t m_Lamps[256];
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(scanlines_2_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
@@ -140,18 +143,12 @@ public:
 
 	uint8_t m_main_to_mcu;
 
-	DECLARE_DRIVER_INIT(m1);
-	DECLARE_DRIVER_INIT(m1common);
-	DECLARE_DRIVER_INIT(m1nec);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
-	void maygay_m1_no_oki(machine_config &config);
-	void maygay_m1(machine_config &config);
-	void maygay_m1_nec(machine_config &config);
-	void maygay_m1_empire(machine_config &config);
 	void m1_memmap(address_map &map);
 	void m1_nec_memmap(address_map &map);
-	void maygay_mcu_io(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MAYGAY1B_H

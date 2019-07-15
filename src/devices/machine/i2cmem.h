@@ -23,61 +23,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, I2CMEM, 0 )
-
-#define MCFG_I2CMEM_ADDRESS( address ) \
-	i2cmem_device::set_address(*device, address);
-#define MCFG_I2CMEM_PAGE_SIZE( page_size ) \
-	i2cmem_device::set_page_size(*device, page_size);
-#define MCFG_I2CMEM_DATA_SIZE(data_size) \
-	i2cmem_device::set_data_size(*device, data_size);
-#define MCFG_I2CMEM_E0(e0) \
-	i2cmem_device::set_e0(*device, e0);
-#define MCFG_I2CMEM_E1(e1) \
-	i2cmem_device::set_e1(*device, e1);
-#define MCFG_I2CMEM_E2(e2) \
-	i2cmem_device::set_e2(*device, e2);
-#define MCFG_I2CMEM_WC(wc) \
-	i2cmem_device::set_wc(*device, wc);
-
-#define MCFG_X2404P_ADD( _tag ) \
-	MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_I2CMEM_PAGE_SIZE(8) \
-	MCFG_I2CMEM_DATA_SIZE(0x200)
-
-#define MCFG_24C01_ADD( _tag ) \
-	MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_I2CMEM_PAGE_SIZE(4) \
-	MCFG_I2CMEM_DATA_SIZE(0x80)
-
-#define MCFG_24C02_ADD( _tag ) \
-	MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_I2CMEM_PAGE_SIZE(4) \
-	MCFG_I2CMEM_DATA_SIZE(0x100)
-
-#define MCFG_24C08_ADD( _tag ) \
-	MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_I2CMEM_DATA_SIZE(0x400)
-
-#define MCFG_24C16_ADD( _tag ) \
-	MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_I2CMEM_PAGE_SIZE(8) \
-	MCFG_I2CMEM_DATA_SIZE(0x800)
-
-#define MCFG_24C16A_ADD( _tag ) \
-	MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_I2CMEM_DATA_SIZE(0x800)
-
-#define MCFG_24C64_ADD( _tag ) \
-	MCFG_I2CMEM_ADD( _tag ) \
-	MCFG_I2CMEM_PAGE_SIZE(8) \
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -89,15 +34,15 @@ class i2cmem_device :
 {
 public:
 	// construction/destruction
-	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
+	i2cmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	static void set_address(device_t &device, int address) { downcast<i2cmem_device &>(device).m_slave_address = address; }
-	static void set_page_size(device_t &device, int page_size) { downcast<i2cmem_device &>(device).m_page_size = page_size; }
-	static void set_data_size(device_t &device, int data_size) { downcast<i2cmem_device &>(device).m_data_size = data_size; }
-	static void set_e0(device_t &device, int e0) { downcast<i2cmem_device &>(device).m_e0 = e0; }
-	static void set_e1(device_t &device, int e1) { downcast<i2cmem_device &>(device).m_e1 = e1; }
-	static void set_e2(device_t &device, int e2) { downcast<i2cmem_device &>(device).m_e2 = e2; }
-	static void set_wc(device_t &device, int wc) { downcast<i2cmem_device &>(device).m_wc = wc; }
+	i2cmem_device & set_address(int address) { m_slave_address = address; return *this; }
+	i2cmem_device & set_page_size(int page_size) { m_page_size = page_size; return *this; }
+	i2cmem_device & set_data_size(int data_size) { m_data_size = data_size; return *this; }
+	i2cmem_device & set_e0(int e0) { m_e0 = e0; return *this; }
+	i2cmem_device & set_e1(int e1) { m_e1 = e1; return *this; }
+	i2cmem_device & set_e2(int e2) { m_e2 = e2; return *this; }
+	i2cmem_device & set_wc(int wc) { m_wc = wc; return *this; }
 
 	// I/O operations
 	DECLARE_WRITE_LINE_MEMBER( write_e0 );
@@ -109,6 +54,9 @@ public:
 	DECLARE_READ_LINE_MEMBER( read_sda );
 
 protected:
+	// construction/destruction
+	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int page_size, int data_size);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -144,10 +92,33 @@ protected:
 	int m_byteaddr;
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
+	int m_page_written_size;
+	bool m_in_write;
 };
 
+#define DECLARE_I2C_DEVICE(name) \
+	class i2c_##name##_device : public i2cmem_device \
+	{ \
+	public: \
+		i2c_##name##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0); \
+	};
+
+DECLARE_I2C_DEVICE(x2404p)
+DECLARE_I2C_DEVICE(24c01)
+DECLARE_I2C_DEVICE(24c02)
+DECLARE_I2C_DEVICE(24c08)
+DECLARE_I2C_DEVICE(24c16);
+DECLARE_I2C_DEVICE(24c16a);
+DECLARE_I2C_DEVICE(24c64);
 
 // device type definition
-DECLARE_DEVICE_TYPE(I2CMEM, i2cmem_device)
+DECLARE_DEVICE_TYPE(I2CMEM,     i2cmem_device)
+DECLARE_DEVICE_TYPE(I2C_X2404P, i2c_x2404p_device)
+DECLARE_DEVICE_TYPE(I2C_24C01,  i2c_24c01_device)
+DECLARE_DEVICE_TYPE(I2C_24C02,  i2c_24c02_device)
+DECLARE_DEVICE_TYPE(I2C_24C08,  i2c_24c08_device)
+DECLARE_DEVICE_TYPE(I2C_24C16,  i2c_24c16_device)
+DECLARE_DEVICE_TYPE(I2C_24C16A, i2c_24c16a_device)
+DECLARE_DEVICE_TYPE(I2C_24C64,  i2c_24c64_device)
 
 #endif // MAME_MACHINE_I2CMEM_H

@@ -27,6 +27,8 @@ ToDo:
 
 Unable to proceed due to no info available (& in English).
 
+ZPS stands for "Základní Počítačová Sestava" (basic computer system).
+
 ****************************************************************************/
 
 
@@ -35,16 +37,18 @@ Unable to proceed due to no info available (& in English).
 //#include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sapi1_state : public driver_device
 {
 public:
-	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sapi1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_bank1(*this, "bank1"),
 		m_line0(*this, "LINE0"),
@@ -54,11 +58,23 @@ public:
 		m_line4(*this, "LINE4"),
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
 		m_v24(*this, "v24"),
 		m_palette(*this, "palette")
 	{
 	}
 
+	void sapi3(machine_config &config);
+	void sapi1(machine_config &config);
+	void sapi2(machine_config &config);
+	void sapi3a(machine_config &config);
+	void sapi3b(machine_config &config);
+
+	void init_sapizps3();
+	void init_sapizps3a();
+	void init_sapizps3b();
+
+private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
 	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
@@ -73,22 +89,13 @@ public:
 	DECLARE_WRITE8_MEMBER(modem_control_w);
 	DECLARE_READ8_MEMBER(uart_ready_r);
 	DECLARE_WRITE8_MEMBER(uart_mode_w);
-	DECLARE_READ8_MEMBER(uart_data_r);
-	DECLARE_WRITE8_MEMBER(uart_data_w);
 	DECLARE_WRITE8_MEMBER(uart_reset_w);
-	DECLARE_DRIVER_INIT(sapizps3);
-	DECLARE_DRIVER_INIT(sapizps3a);
-	DECLARE_DRIVER_INIT(sapizps3b);
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sapi3(machine_config &config);
-	void sapi1(machine_config &config);
-	void sapi2(machine_config &config);
-	void sapi3a(machine_config &config);
-	void sapi3b(machine_config &config);
+
 	void sapi1_mem(address_map &map);
 	void sapi2_mem(address_map &map);
 	void sapi3_io(address_map &map);
@@ -97,7 +104,7 @@ public:
 	void sapi3a_mem(address_map &map);
 	void sapi3b_io(address_map &map);
 	void sapi3b_mem(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	uint8_t m_keyboard_mask;
 	uint8_t m_refresh_counter;
@@ -110,8 +117,9 @@ private:
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
 	optional_device<ay31015_device> m_uart;
+	optional_device<clock_device> m_uart_clock;
 	optional_device<rs232_port_device> m_v24;
-public:
+
 	optional_device<palette_device> m_palette;
 };
 
@@ -191,80 +199,88 @@ static const uint8_t MHB2501[] = {
 
 
 /* Address maps */
-ADDRESS_MAP_START(sapi1_state::sapi1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x27ff) AM_READWRITE(sapi1_keyboard_r, sapi1_keyboard_w) // PORT 0 - keyboard
+void sapi1_state::sapi1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x1fff).rom(); // Extension ROM
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0x27ff).rw(FUNC(sapi1_state::sapi1_keyboard_r), FUNC(sapi1_state::sapi1_keyboard_w)); // PORT 0 - keyboard
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("videoram") // AND-1 (video RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
-ADDRESS_MAP_END
+	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
+	map(0x4000, 0x7fff).ram(); // REM-1
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x27ff) AM_READ(sapi2_keyboard_status_r)
-	AM_RANGE(0x2800, 0x28ff) AM_READ(sapi2_keyboard_data_r)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("videoram") // AND-1 (video RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
-ADDRESS_MAP_END
+void sapi1_state::sapi2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x1fff).rom(); // Extension ROM
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0x27ff).r(FUNC(sapi1_state::sapi2_keyboard_status_r));
+	map(0x2800, 0x28ff).r(FUNC(sapi1_state::sapi2_keyboard_data_r));
+	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
+	map(0x4000, 0x7fff).ram(); // REM-1
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0x0800, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void sapi1_state::sapi3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().bankrw("bank1");
+	map(0x0800, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3a_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0x0800, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfdff) AM_ROM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sapi1_state::sapi3a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().bankrw("bank1");
+	map(0x0800, 0xf7ff).ram();
+	map(0xf800, 0xfdff).rom();
+	map(0xfe00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3b_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0x0800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xb800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sapi1_state::sapi3b_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().bankrw("bank1");
+	map(0x0800, 0xafff).ram();
+	map(0xb000, 0xb7ff).ram().share("videoram");
+	map(0xb800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
-ADDRESS_MAP_END
+void sapi1_state::sapi3_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3a_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(uart_status_r, modem_control_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(uart_ready_r, uart_mode_w)
-	AM_RANGE(0x12, 0x12) AM_READWRITE(uart_data_r, uart_data_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(uart_reset_w)
-	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
-ADDRESS_MAP_END
+void sapi1_state::sapi3a_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x10, 0x10).rw(FUNC(sapi1_state::uart_status_r), FUNC(sapi1_state::modem_control_w));
+	map(0x11, 0x11).rw(FUNC(sapi1_state::uart_ready_r), FUNC(sapi1_state::uart_mode_w));
+	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0x13, 0x13).w(FUNC(sapi1_state::uart_reset_w));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3b_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(sapi3_0c_r)
-	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+void sapi1_state::sapi3b_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(sapi1_state::sapi3_00_w));
+	map(0x0c, 0x0c).r(FUNC(sapi1_state::sapi3_0c_r));
+	map(0x25, 0x25).rw(FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0xe0, 0xe0).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xe1, 0xe1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sapi1 )
@@ -503,10 +519,10 @@ void sapi1_state::kbd_put(u8 data)
 READ8_MEMBER(sapi1_state::uart_status_r)
 {
 	uint8_t result = 0;
-	result |= m_uart->get_output_pin(AY31015_TBMT) || m_uart->get_output_pin(AY31015_DAV);
-	result |= m_uart->get_output_pin(AY31015_OR) << 1;
-	result |= m_uart->get_output_pin(AY31015_FE) << 2;
-	result |= m_uart->get_output_pin(AY31015_PE) << 3;
+	result |= m_uart->tbmt_r() || m_uart->dav_r();
+	result |= m_uart->or_r() << 1;
+	result |= m_uart->fe_r() << 2;
+	result |= m_uart->pe_r() << 3;
 	// RD4 = RI (= SI)
 	result |= m_v24->dcd_r() << 5;
 	result |= m_v24->dsr_r() << 6;
@@ -528,37 +544,25 @@ WRITE8_MEMBER(sapi1_state::modem_control_w)
 
 READ8_MEMBER(sapi1_state::uart_ready_r)
 {
-	return (m_uart->get_output_pin(AY31015_DAV) << 7) | (m_uart->get_output_pin(AY31015_TBMT) << 6) | 0x3f;
+	return (m_uart->dav_r() << 7) | (m_uart->tbmt_r() << 6) | 0x3f;
 }
 
 WRITE8_MEMBER(sapi1_state::uart_mode_w)
 {
-	m_uart->set_input_pin(AY31015_NP, BIT(data, 0));
-	m_uart->set_input_pin(AY31015_TSB, BIT(data, 1));
-	m_uart->set_input_pin(AY31015_NB1, BIT(data, 3));
-	m_uart->set_input_pin(AY31015_NB2, BIT(data, 2));
-	m_uart->set_input_pin(AY31015_EPS, BIT(data, 4));
-	m_uart->set_input_pin(AY31015_CS, 1);
-	m_uart->set_input_pin(AY31015_CS, 0);
-}
-
-READ8_MEMBER(sapi1_state::uart_data_r)
-{
-	m_uart->set_input_pin(AY31015_RDAV, 0);
-	uint8_t result = m_uart->get_received_data();
-	m_uart->set_input_pin(AY31015_RDAV, 1);
-	return result;
-}
-
-WRITE8_MEMBER(sapi1_state::uart_data_w)
-{
-	m_uart->set_transmit_data(data);
+	m_uart->write_np(BIT(data, 0));
+	m_uart->write_tsb(BIT(data, 1));
+	m_uart->write_nb1(BIT(data, 3));
+	m_uart->write_nb2(BIT(data, 2));
+	m_uart->write_eps(BIT(data, 4));
+	m_uart->write_cs(1);
+	m_uart->write_cs(0);
 }
 
 WRITE8_MEMBER(sapi1_state::uart_reset_w)
 {
-	m_uart->set_input_pin(AY31015_XR, 0);
-	m_uart->set_input_pin(AY31015_XR, 1);
+	// really pulsed by K155AG3 (=74123N): R29=22k, C16=220 (output combined with master reset)
+	m_uart->write_xr(0);
+	m_uart->write_xr(1);
 }
 
 /**************************************
@@ -601,20 +605,20 @@ MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
 	m_bank1->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::init_sapizps3()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
+void sapi1_state::init_sapizps3a()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
-	m_uart->set_input_pin(AY31015_SWE, 0);
+	m_uart->write_swe(0);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
+void sapi1_state::init_sapizps3b()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -622,66 +626,68 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 
 
 /* Machine driver */
-MACHINE_CONFIG_START(sapi1_state::sapi1)
+void sapi1_state::sapi1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
-	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
+	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi1_mem);
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(40*6, 24*9)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(40*6, 24*9);
+	screen.set_visarea(0, 40*6-1, 0, 24*9-1);
+	screen.set_screen_update(FUNC(sapi1_state::screen_update_sapi1));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K");
+}
 
-MACHINE_CONFIG_START(sapi1_state::sapi2)
+void sapi1_state::sapi2(machine_config &config)
+{
 	sapi1(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi2_mem);
 
-MACHINE_CONFIG_START(sapi1_state::sapi3)
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(sapi1_state::kbd_put));
+}
+
+void sapi1_state::sapi3(machine_config &config)
+{
 	sapi2(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
-	MCFG_CPU_IO_MAP(sapi3_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3_io);
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(40*6, 20*9)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 20*9-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi3)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sapi1_state::sapi3b)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(40*6, 20*9);
+	screen.set_visarea(0, 40*6-1, 0, 20*9-1);
+	screen.set_screen_update(FUNC(sapi1_state::screen_update_sapi3));
+}
+
+void sapi1_state::sapi3b(machine_config &config)
+{
 	sapi3(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sapi3b_mem)
-	MCFG_CPU_IO_MAP(sapi3b_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3b_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3b_io);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // guess
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
-	MCFG_MC6845_UPDATE_ROW_CB(sapi1_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(6);
+	crtc.set_update_row_callback(FUNC(sapi1_state::crtc_update_row), this);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_NO_PALETTE
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	subdevice<screen_device>("screen")->set_palette(finder_base::DUMMY_TAG);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
@@ -692,29 +698,29 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(sapi1_state::sapi3a)
+void sapi1_state::sapi3a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
-	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)
-	MCFG_CPU_IO_MAP(sapi3a_io)
+	I8080A(config, m_maincpu, 18_MHz_XTAL / 9); // Tesla MHB8080A + MHB8224 + MHB8228
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapi1_state::sapi3a_mem);
+	m_maincpu->set_addrmap(AS_IO, &sapi1_state::sapi3a_io);
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // Tesla MHB1012
-	MCFG_AY51013_TX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
-	MCFG_AY51013_RX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("v24", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("v24", rs232_port_device, write_txd))
+	AY51013(config, m_uart); // Tesla MHB1012
+	m_uart->read_si_callback().set(m_v24, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(m_v24, FUNC(rs232_port_device::write_txd));
+	m_uart->set_auto_rdav(true); // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
 
-	MCFG_RS232_PORT_ADD("v24", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	CLOCK(config, m_uart_clock, 12.288_MHz_XTAL / 80); // TODO: divider selectable by jumpers
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_tcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_rcp));
+
+	RS232_PORT(config, m_v24, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
-
-
+	RAM(config, RAM_TAG).set_default_size("64K");
+}
 
 
 /**************************************
@@ -726,55 +732,56 @@ MACHINE_CONFIG_END
 ROM_START( sapi1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "mb1", "MB1" )
-	ROMX_LOAD( "sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(1))
+	ROMX_LOAD("sapi1.rom", 0x0000, 0x1000, CRC(c6e85b01) SHA1(2a26668249c6161aef7215a1e2b92bfdf6fe3671), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "mb2", "MB2 (ANK-1)" )
-	ROMX_LOAD( "mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(2))
+	ROMX_LOAD("mb2_4.bin", 0x0000, 0x1000, CRC(a040b3e0) SHA1(586990a07a96323741679a11ff54ad0023da87bc), ROM_BIOS(1))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "sapi1.chr",  0x0000, 0x1000, CRC(9edafa2c) SHA1(a903db0e8923cca91646274d010dc19b6b377e3e) )
+	ROM_LOAD("sapi1.chr",  0x0000, 0x1000, CRC(9edafa2c) SHA1(a903db0e8923cca91646274d010dc19b6b377e3e))
 ROM_END
 
 ROM_START( sapizps2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v4", "MIKOS 4" )
-	ROMX_LOAD( "36.bin", 0x0000, 0x0800, CRC(a27f340a) SHA1(d07d208fcbe428897336c17197d3e8fb52181f38), ROM_BIOS(1))
-	ROMX_LOAD( "37.bin", 0x0800, 0x0800, CRC(30daa708) SHA1(66e990c40788ee25cf6cabd4842a78daf4fcdddd), ROM_BIOS(1))
+	ROMX_LOAD("36.bin", 0x0000, 0x0800, CRC(a27f340a) SHA1(d07d208fcbe428897336c17197d3e8fb52181f38), ROM_BIOS(0))
+	ROMX_LOAD("37.bin", 0x0800, 0x0800, CRC(30daa708) SHA1(66e990c40788ee25cf6cabd4842a78daf4fcdddd), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v5", "MIKOS 5" )
-	ROMX_LOAD( "mikos5_1.bin", 0x0000, 0x0800, CRC(c2a83ca3) SHA1(a3678253d7690c89945e791ea0f8e15b081c9126), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_2.bin", 0x0800, 0x0800, CRC(c4458a04) SHA1(0cc909323f0e6507d95e57ea39e1deb8bd57bf89), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_3.bin", 0x1000, 0x0800, CRC(efb499f3) SHA1(78f0ca3ff10d7af4ae94ab820723296beb035f8f), ROM_BIOS(2))
-	ROMX_LOAD( "mikos5_4.bin", 0x1800, 0x0800, CRC(4d90e9be) SHA1(8ec554198697550a49432e8210d43700ef1d6a32), ROM_BIOS(2))
+	ROMX_LOAD("mikos5_1.bin", 0x0000, 0x0800, CRC(c2a83ca3) SHA1(a3678253d7690c89945e791ea0f8e15b081c9126), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_2.bin", 0x0800, 0x0800, CRC(c4458a04) SHA1(0cc909323f0e6507d95e57ea39e1deb8bd57bf89), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_3.bin", 0x1000, 0x0800, CRC(efb499f3) SHA1(78f0ca3ff10d7af4ae94ab820723296beb035f8f), ROM_BIOS(1))
+	ROMX_LOAD("mikos5_4.bin", 0x1800, 0x0800, CRC(4d90e9be) SHA1(8ec554198697550a49432e8210d43700ef1d6a32), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "mb3", "MB3 (Consul)" )
-	ROMX_LOAD( "mb3_1.bin", 0x0000, 0x1000, CRC(be895f88) SHA1(7fc2a92f41d978a9f0ccd0e235ea3c6146adfb6f), ROM_BIOS(3))
+	ROMX_LOAD("mb3_1.bin", 0x0000, 0x1000, CRC(be895f88) SHA1(7fc2a92f41d978a9f0ccd0e235ea3c6146adfb6f), ROM_BIOS(2))
 ROM_END
 
 ROM_START( sapizps3 )
 	ROM_REGION( 0x10800, "maincpu", 0 )
 	// These 2 bioses use videoram at F800
 	ROM_SYSTEM_BIOS( 0, "per", "Perina" )
-	ROMX_LOAD( "perina_1988.bin",0x10000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(1))
+	ROMX_LOAD("perina_1988.bin",0x10000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "1zmod", "JPR-1Zmod" )
-	ROMX_LOAD( "jpr1zmod.bin",   0x10000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(2))
+	ROMX_LOAD("jpr1zmod.bin",   0x10000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(1))
 ROM_END
 
 ROM_START( sapizps3a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// This bios uses a terminal
-	ROM_LOAD( "jpr1a.bin",      0xf800, 0x0800, CRC(3ed89786) SHA1(dcc8657b4884bfe58d114c539b733b73d038ee30))
+	ROM_LOAD("jpr1a.bin",      0xf800, 0x0800, CRC(3ed89786) SHA1(dcc8657b4884bfe58d114c539b733b73d038ee30))
 ROM_END
 
 ROM_START( sapizps3b )
 	ROM_REGION( 0x10800, "maincpu", 0 )
-	// This bios uses a 6845
-	ROM_LOAD( "pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
+	// This BIOS uses a 6845
+	ROM_LOAD("pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
 ROM_END
 
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  CLASS        INIT       COMPANY  FULLNAME                   FLAGS
-COMP( 1985, sapi1,     0,       0,      sapi1,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps2,  sapi1,   0,      sapi2,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3,  sapi1,   0,      sapi3,      sapi1, sapi1_state, sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3a, sapi1,   0,      sapi3a,     sapi1, sapi1_state, sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3b, sapi1,   0,      sapi3b,     sapi1, sapi1_state, sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT            COMPANY  FULLNAME                   FLAGS
+COMP( 1985, sapi1,     0,      0,      sapi1,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi1_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi1_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi1_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+
