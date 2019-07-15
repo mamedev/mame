@@ -30,6 +30,8 @@ protected:
 	required_device<floppy_connector> m_fdco[2];
 	required_shared_ptr<u16> m_vram;
 	required_ioport_array<11> m_kbd_row;
+	required_ioport_array<2> m_mouse_axis;
+	required_ioport m_mouse_btn, m_joystick;
 	output_finder<2> m_floppy_leds;
 	output_finder<> m_red_led;
 	output_finder<> m_yellow_led;
@@ -42,6 +44,7 @@ protected:
 	bool m_genlock[16];
 	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr, m_fdc_dma_count;
 	u8 m_kbd_p1, m_kbd_p2, m_borderidx;
+	u8 m_mouse_last_read[2], m_mouse_counter[2];
 	bool m_fdc_intext, m_fdc_int, m_fdc_drq, m_trap_int, m_trap_drq;
 
 	u16 m_trap_data[8];
@@ -128,6 +131,9 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 	m_fdco{{*this, "fdc:0"}, {*this, "fdc:1"}},
 	m_vram(*this, "vram"),
 	m_kbd_row(*this, "K%02u", 0U),
+	m_mouse_axis(*this, "MOUSEAXIS%u", 0U),
+	m_mouse_btn(*this, "MOUSEBTN"),
+	m_joystick(*this, "JOYSTICK"),
 	m_floppy_leds(*this, "drive%u_led", 0U),
 	m_red_led(*this, "red_led"),
 	m_yellow_led(*this, "yellow_led"),
@@ -174,6 +180,8 @@ void mindset_state::machine_start()
 	save_item(NAME(m_kbd_p1));
 	save_item(NAME(m_kbd_p2));
 	save_item(NAME(m_borderidx));
+	save_item(NAME(m_mouse_last_read));
+	save_item(NAME(m_mouse_counter));
 }
 
 void mindset_state::machine_reset()
@@ -185,6 +193,8 @@ void mindset_state::machine_reset()
 	memset(m_genlock, 0, sizeof(m_genlock));
 	m_dispctrl = m_screenpos = m_intpos = m_intaddr = m_fdc_dma_count = 0;
 	m_kbd_p1 = m_kbd_p2 = m_borderidx = 0;
+	memset(m_mouse_last_read, 0, sizeof(m_mouse_last_read));
+	memset(m_mouse_counter, 0, sizeof(m_mouse_counter));
 }
 
 int mindset_state::sys_t0_r()
@@ -266,40 +276,28 @@ u16 mindset_state::keyscan()
 	for(unsigned int i=0; i<11; i++)
 		if(!(src & (1 << i)))
 			res &= m_kbd_row[i]->read();
-	if(!(src & 0x2000)) {
-		switch((src >> 1) & 3) {
-		case 0:
-			res &= 0xc0;
-			break;
-		case 1:
-			res &= 0xc0;
-			break;
-		case 2:
-			res &= 0xc0;
-			break;
-		case 3:
-			res &= 0xc0;
-			break;
-		}
-	}
+
 	if(!(src & 0x8000)) {
-		switch((src >> 1) & 3) {
-		case 0:
-			res &= 0xc0;
-			break;
-		case 1:
-			res &= 0xc0;
-			break;
-		case 2:
-			res &= 0xc0;
-			break;
-		case 3:
-			res &= 0xc0;
-			break;
+		int axis = (src >> 12) & 1;
+		u8 aval = m_mouse_axis[axis]->read();
+		m_mouse_counter[axis] += aval - m_mouse_last_read[axis];
+		m_mouse_last_read[axis] = aval;
+
+		u8 nib;
+		if((src >> 11) & 1) {
+			nib = m_mouse_counter[axis] & 0xf;
+			m_mouse_counter[axis] &= 0xf0;
+		} else {
+			nib = m_mouse_counter[axis] >> 4;
+			m_mouse_counter[axis] &= 0x0f;
 		}
+
+		res &= m_mouse_btn->read() & (nib | 0x1f0);
 	}
 
-	//	logerror("scan src=%04x %04x %d%d/%d(%03x)\n", src, 0xffff ^ src, (src >> 15) & 1, (src >> 13) & 1, (src >> 11) & 3, m_kbdcpu->pc());
+	if(!(src & 0x2000))
+		res &= m_joystick->read();
+
 	return res;
 }
 
@@ -1127,6 +1125,26 @@ static INPUT_PORTS_START(mindset)
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("MOUSEAXIS1")
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+
+	PORT_START("MOUSEAXIS0")
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+
+	PORT_START("MOUSEBTN")
+	PORT_BIT(0x1cf, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+
+	PORT_START("JOYSTICK")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x1c0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 ROM_START(mindset)
