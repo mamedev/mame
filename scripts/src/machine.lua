@@ -4082,3 +4082,15 @@ if (MACHINES["EDLC"]~=null) then
 		MAME_DIR .. "src/devices/machine/edlc.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/wtl3132.h,MACHINES["WTL3132"] = true
+---------------------------------------------------
+
+if (MACHINES["WTL3132"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/wtl3132.cpp",
+		MAME_DIR .. "src/devices/machine/wtl3132.h",
+	}
+end
