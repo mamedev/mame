@@ -11,11 +11,11 @@ This entire hardware series is generally called 'GX400'
     RF2                     (Game 561) PWB(B) 352473
     Nemesis (Hacked?)       (Game 456) GX400 PWB(B) 201000A
     Nemesis (World?)        (Game 456) GX400 PWB(B) 201000A
+    Salamander (Version D)  (Game 587) GX400 PWB(B) 201012A
+    Salamander (Version J)  (Game 587) GX400 PWB(B) 201012A
+    Lifeforce (US)          (Game 587) GX400 PWB(B) 201012A
+    Lifeforce (Japan)       (Game 587) GX400 PWB(B) 201012A
 TODO: find pcb pics for below
-    Salamander (Version D)  (Game 587)
-    Salamander (Version J)  (Game 587)
-    Lifeforce (US)          (Game 587)
-    Lifeforce (Japan)       (Game 587)
     Black Panther           (Game 604)
     City Bomber (World)     (Game 787)
     City Bomber (Japan)     (Game 787)
@@ -61,7 +61,7 @@ Boards, from earliest to latest:
     Has 2 Interrupts: ODD/EVEN frame, VBLANK, through a priority encoder
     Sound CPU clocked at 1.789772MHz
     Has a spot on the PCB for a VLM5030 and ROM(RAM?) but unpopulated and not shown on schematics
-* Unknown board - The 'Salamander board' (FROM SCHEMATICS)
+* GX400 PWB(B) 201012A - The 'Salamander board' (FROM SCHEMATICS)
     We have schematics for this PCB
     Uses fixed roms at 0x00000-0x7ffff
     Has 2 Interrupts: ODD/EVEN frame, VBLANK, and does away with the priority encoder in favor of implementing
@@ -2407,7 +2407,7 @@ ROM_START( lifefrcej )
 	ROM_LOAD(      "587-n09.11j",  0x00000, 0x08000, CRC(e8496150) SHA1(c7d40b6dc56849dfd8d080f1aaebad36c88d93df) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
-	ROM_LOAD(      "587-k08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
+	ROM_LOAD(      "587-n08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) BAD_DUMP ) // TODO: verify if contents are different from K08
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
 	ROM_LOAD(      "587-c01.10a", 0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
