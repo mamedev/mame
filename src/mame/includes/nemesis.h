@@ -96,6 +96,7 @@ private:
 	uint16_t    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
 	int       m_gx400_irq1_cnt;
 	uint8_t     m_frame_counter;
+	uint16_t    m_scanline_counter;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -150,6 +151,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(bubsys_vblank_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void create_palette_lookups();
