@@ -20,6 +20,7 @@
 #include "formats/sdf_dsk.h"
 #include "imagedev/floppy.h"
 
+#include "bus/coco/dragon_amtor.h"
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"
 #include "bus/coco/dragon_sprites.h"
@@ -176,6 +177,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("pak", COCO_PAK);
+	device.option_add_internal("amtor", DRAGON_AMTOR);
 }
 
 FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )

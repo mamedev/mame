@@ -25,6 +25,19 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
+	<software name="amtor" supported="no">
+		<description>AMTOR/AX25</description>
+		<year>1990</year>
+		<publisher>Grosvenor Software</publisher>
+		<info name="usage" value="EXEC 49152" />
+		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="amtor" />
+			<dataarea name="rom" size="32768">
+				<rom name="ax25-amtor (1990) (grosvenor).rom" size="32768" crc="81ba0d4a" sha1="6ad86b5faa5ba07ad42256e96f1c798cd3f0ea5e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="doodlbug">
 		<description>Doodle Bug</description>
 		<year>1982</year>
