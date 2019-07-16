@@ -21336,13 +21336,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="Word Attack 061285 (4am crack) side A.dsk" size="143360" crc="c869e411" sha1="fb17b52b049f6184ce2a7c4c8f75d735a6979b9d" />
+				<rom name="word attack 061285 (4am crack) side a.dsk" size="143360" crc="c869e411" sha1="fb17b52b049f6184ce2a7c4c8f75d735a6979b9d" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
-				<rom name="Word Attack 061285 (4am crack) side B.dsk" size="143360" crc="6d13680b" sha1="4915c3042288456ca271a2a0a6b27361a8ee58d5" />
+				<rom name="word attack 061285 (4am crack) side b.dsk" size="143360" crc="6d13680b" sha1="4915c3042288456ca271a2a0a6b27361a8ee58d5" />
 			</dataarea>
 		</part>
 	</software>
@@ -21353,12 +21353,718 @@
 		<publisher>Phoenix Software</publisher>
 		<info name="release" value="2019-05-05"/>
 		<!-- No compatibility data known at this time. -->
-		<!-- This version is dated 25-MAY-83 according to comments within the program
-		itself. -->
+		<!-- This version is dated 25-MAY-83 according to comments within the
+		program itself. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="Zoom Grafix 25-MAY-83 (4am crack).dsk" size="143360" crc="6692bf9f" sha1="043a588c7fb800b6e913da008ed0327db0046d04" />
+				<rom name="zoom grafix 25-may-83 (4am crack).dsk" size="143360" crc="6692bf9f" sha1="043a588c7fb800b6e913da008ed0327db0046d04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afunlrn">
+		<description>Alphabet Fun: Learning The Alphabet (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2019-03-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alphabet fun - learning the alphabet (4am crack).dsk" size="143360" crc="e7e4eb65" sha1="7cb18cd049ce1a6a2eaa05a9fc646de8a2241f0b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apoaresp">
+		<description>A Puff of Air: The Respiratory System (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Marshware</publisher>
+		<info name="release" value="2019-03-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="a puff of air (4am crack).dsk" size="143360" crc="8aa66382" sha1="4fe290084395bc61b58bc4fd61f5e83815a451b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="weekchng">
+		<description>A Week That Changed The World (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="release" value="2019-02-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="a week that changed the world (4am crack) side a.dsk" size="143360" crc="d4ed4dfa" sha1="6e434634f0f8911af19edb00e0bb9bca01b3cde7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="a week that changed the world (4am crack) side b.dsk" size="143360" crc="5de32c03" sha1="9da24d2da6528248f40ffb7e625e6495f0b862e7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batsblfr">
+		<description>Bats in the Belfry (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2019-02-11"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bats in the belfry (4am crack).dsk" size="143360" crc="6109dac9" sha1="d19344e23610bf6b448fbbc4098a9dbd450ba713" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzbghrvy">
+		<description>Buzz Bang Harvey (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Queue</publisher>
+		<info name="release" value="2019-03-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="buzz bang harvey (4am crack).dsk" size="143360" crc="f5e8445f" sha1="caa19292c9b09a76b2e9b9ec5393098639c526b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dietanly">
+		<description>Diet Analysis Program (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Tess Enterprises</publisher>
+		<info name="release" value="2019-04-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diet analysis program (4am and san inc crack) disk 1 - program.dsk" size="143360" crc="aac4a47a" sha1="3e46a9ee787096c0986970a4e7ad576a7afcb1f2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Composition"/>
+			<dataarea name="flop" size="143360">
+				<rom name="diet analysis program (4am and san inc crack) disk 2 - composition.dsk" size="143360" crc="c4fa5b9a" sha1="4bf8bc68d66a9ae2b9dd6e3f9848791666bcad27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forbcstl">
+		<description>Forbidden Castle (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-02-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="forbidden castle (4am crack).dsk" size="143360" crc="b1a98dfe" sha1="d7ca81084186c907df1f128bfa91e17287b3d949" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fore">
+		<description>Fore (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2019-02-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fore (4am crack).dsk" size="143360" crc="f56a69c1" sha1="0aaa1df40e4afab6ef5e51ed8a3e867ef0caab48" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractv31">
+		<description>Fractions (Version 3.1 / 25-NOV-83) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Edu-Ware Services</publisher>
+		<info name="release" value="2019-04-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions v3.1 (4am crack).dsk" size="143360" crc="dab099ff" sha1="e4c0dcd81d93ebc4fe3906a53261bd91ecbe4881" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtcel2">
+		<description>Good Thinking - Cause and Effect Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! cause and effect level two (4am crack).dsk" size="143360" crc="65e41cfc" sha1="dc53ff28e0dcdcfc5d0e44ccc922dd49b643a66d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtdl1">
+		<description>Good Thinking - Details Level One (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! details level one (4am crack).dsk" size="143360" crc="b14fa5d9" sha1="b224195b188dbff6aa377a3a81fe3f47ddffb740" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtdl2">
+		<description>Good Thinking - Details Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! details level two (4am crack).dsk" size="143360" crc="83bdefa5" sha1="ae30b39c407557186fde3e27cab4d087b7a83f52" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="gtdcl2">
+		<description>Good Thinking - Drawing Conclusions Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! drawing conclusions level two (4am crack).dsk" size="143360" crc="31194564" sha1="b9abab309834d1f902c49723767302d21b34004f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtfaol2">
+		<description>Good Thinking - Fact and Opinion Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! fact and opinion level two (4am crack).dsk" size="143360" crc="58bba79f" sha1="68e5df6cb7ef32a137ea52364d5618c73bbbe538" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtmil2">
+		<description>Good Thinking - Main Idea Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! main idea level two (4am crack).dsk" size="143360" crc="816c199f" sha1="3bcea5b02a2817820f7afad8e23d086cb5173264" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtpol1">
+		<description>Good Thinking - Predicting Outcomes Level One (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! predicting outcomes level one (4am crack).dsk" size="143360" crc="7e9e6f5a" sha1="870a372c555c12d4eac06a50221404e29ac69b9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtsel2">
+		<description>Good Thinking - Sequencing Events Level Two (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hoffman Educational Systems</publisher>
+		<info name="release" value="2019-04-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="good thinking! sequencing events level two (4am crack).dsk" size="143360" crc="8cc6ba5b" sha1="bcce9148832200dfb205879b25cc0fb867a6c9f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="latintut">
+		<description>Latin Tutor (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2019-04-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="latin tutor (4am crack).dsk" size="143360" crc="cf994fb0" sha1="5f74319920788c3a8a2ae3d364881f7115b579e0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llacomp">
+		<description>Let's Learn About Computers (cleanly cracked)</description>
+		<year>1994</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2019-03-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="let's learn about computers (4am crack).dsk" size="143360" crc="8fe40923" sha1="46fb987a4e42d28f37c2906d0222de588fe21119" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madrat">
+		<description>Mad Rat (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2019-02-10"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mad rat (4am crack).dsk" size="143360" crc="68acb4d5" sha1="15de375139c30bdd74701a55761e431a822ffe2d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mastrsat">
+		<description>Mastering the SAT (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-02-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape)(4am crack) disk 1.dsk" size="143360" crc="dee018ff" sha1="f7d057a08eed2935bf1ed6725163eabb9a8a1523" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape)(4am crack) disk 2.dsk" size="143360" crc="9503e6dc" sha1="82482daa7c6a2cda3dc5f58cd4bc4cd0abf246af" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape)(4am crack) disk 3.dsk" size="143360" crc="8c2ef736" sha1="67412d36f0397cd3e4db9ab7c456be562d0b3409" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastering the sat (mindscape)(4am crack) disk 4.dsk" size="143360" crc="f294f336" sha1="fa27bb62a31f6198201bb8505ea488d9c91d6bb1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millrel2">
+		<description>Millionaire Release 2 (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Designware</publisher>
+		<info name="release" value="2019-02-09"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="millionaire release 2 (4am crack) side a.dsk" size="143360" crc="50eee2af" sha1="58125ec55efbd8b7f41208364f96be7776abe38a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="millionaire release 2 (4am crack) side b.dsk" size="143360" crc="df69dcb4" sha1="454b1720cd9bd5a9ec8730149268d1d565617583" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mirv">
+		<description>MIRV (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Level-10</publisher>
+		<info name="release" value="2019-02-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mirv (4am crack).dsk" size="143360" crc="07268c70" sha1="5dcc9da377d8f5e6faae6179e0268f9834e99429" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moseslhp">
+		<description>Moses Leads His People (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="release" value="2019-02-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="moses leads his people (4am crack) side a.dsk" size="143360" crc="41a67e27" sha1="e8209f454c1be968d55f597425dbb3bdc1d460b7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="moses leads his people (4am crack) side b.dsk" size="143360" crc="360080a2" sha1="f657b886134ace87161399f228e82bd4b348da39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patrnmkr">
+		<description>PatternMaker (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="release" value="2019-04-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patternmaker (4am crack).dsk" size="143360" crc="5bfa941d" sha1="63a4d1e2d67eac8390628613e3d777cf87a4a40a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paulmsj">
+		<description>Paul's Missionary Journeys (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="release" value="2019-02-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="paul's missionary journeys (4am crack) side a.dsk" size="143360" crc="752993ed" sha1="14ddbe52b978cd5d6a2e855ce38ce3093aa32b25" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="paul's missionary journeys (4am crack) side b.dsk" size="143360" crc="41c4584a" sha1="148d0ec4865cabc3cfa70b83658b2ded699b030c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="photar">
+		<description>Photar (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Softape</publisher>
+		<info name="release" value="2019-02-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="photar (4am crack).dsk" size="143360" crc="15907427" sha1="4e9c34c1b30314d40532e29bc900939b603e042c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quadrils">
+		<description>Quadrilaterals (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Reader's Digest Services</publisher>
+		<info name="release" value="2019-03-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="quadrilaterals (4am crack).dsk" size="143360" crc="c31ac20f" sha1="18ab23f756920727f473e8c5147a11117db4d682" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robtdawn">
+		<description>Robots of Dawn (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2019-04-11"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="robots of dawn (4am crack).dsk" size="143360" crc="228f7f5f" sha1="3e008a1cff3a5f644ec3b74ea219e00932feb892" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmplstkn">
+		<description>Rumpelstiltskin (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2019-03-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rumpelstiltskin (4am crack).dsk" size="143360" crc="a8a38ab7" sha1="2a7f24d937761715ce9c517632b6c6c35141cc94" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shiela">
+		<description>Sheila (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>H.A.L. Labs</publisher>
+		<info name="release" value="2019-02-09"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sheila (4am crack).dsk" size="143360" crc="e6e3f85e" sha1="c3c2dc08e5fd14efdfbdffdb91549bb44ef4db1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoopywr">
+		<description>Snoopy Writer (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Random House Software</publisher>
+		<info name="release" value="2019-03-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="snoopy writer (4am crack) side a - program disk.dsk" size="143360" crc="a4e44671" sha1="d9ada88430fdbc2e35577b7228f86062f525d93b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Story disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="snoopy writer (4am crack) side b - story disk.dsk" size="143360" crc="12e683fb" sha1="b24934195db06389feb2ed65125e3f3708c5181c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sorcsiva">
+		<description>Sorcerer of Siva (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2019-02-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sorcerer of siva (4am crack).dsk" size="143360" crc="1deb1c25" sha1="11e323ade8316655b4e0712a7081af88ead3c219" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprsd10">
+		<description>Super Sunday (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="release" value="2019-04-08"/>
+		<!-- The lack of a visible version number on the title screen suggests that
+		this is version 1.0. (Later releases have a visible version number.) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="super sunday 1.0 (4am crack).dsk" size="143360" crc="77c726d0" sha1="17383c119ac5e7f6484b94f66e59c10d551e9a93" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprtxm2">
+		<description>Super Taxman II (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>H.A.L. Labs</publisher>
+		<info name="release" value="2019-02-09"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="super taxman ii (4am crack).dsk" size="143360" crc="1e7f2eeb" sha1="bb518b5828e4bb6ed9d275ed67fed413db952bcf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavfrei">
+		<description>The Caverns of Freitag (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-02-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the caverns of freitag (4am crack).dsk" size="143360" crc="898b44a1" sha1="9e8679cc669d3dd372d8f8eae90dae69256f811f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mostania">
+		<description>The Chalice of Mostania (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Coastal Software</publisher>
+		<info name="release" value="2019-02-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the chalice of mostania (4am crack) side 1.dsk" size="143360" crc="29e569b5" sha1="d0a0ee777485dcada587e7424dbc5caf0d36c8cb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the chalice of mostania (4am crack) side 2.dsk" size="143360" crc="7a0bef41" sha1="74c05026a4fd34224deef3a20ca8da4b542a3aff" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the chalice of mostania (4am crack) side 3.dsk" size="143360" crc="ea37f8b5" sha1="b4c4e5126ea2f74572c9e5eaab239c7f19a8cf93" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the chalice of mostania (4am crack) side 4.dsk" size="143360" crc="0ac4272e" sha1="1078c13348e7d8c772b1ac545d3ef1d0431dabd7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digexcr">
+		<description>The Digestive and Excretory Systems (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2019-03-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the digestive and excretory systems (4am crack).dsk" size="143360" crc="af1103fe" sha1="3f6c3451291a2178619352d4f6603b6e4d09ce8f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dispdinr">
+		<description>The Disappearing Dinner: The Digestive System (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Marshware</publisher>
+		<info name="release" value="2019-03-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the disappearing dinner (4am crack).dsk" size="143360" crc="d442a9fb" sha1="cd821669bbb9cf9bc82f2a35e6644d1c65f48818" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="titanemp">
+		<description>Titan Empire (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-02-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="titan empire (4am crack).dsk" size="143360" crc="fa3b494b" sha1="eef8ad27b69beb3403b5e41d4fe056721ff2cdc7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomsawyr">
+		<description>Troll Reading Games: The Adventures of Tom Sawyer (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2019-03-26"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="troll reading games - the adventures of tom sawyer (4am crack).dsk" size="143360" crc="9cd36012" sha1="f6a67b18f28597de4d0c64e7e9d562041e25d6a6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsushima">
+		<description>Tsushima (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="release" value="2019-02-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tsushima (4am crack).dsk" size="143360" crc="5e7e047a" sha1="715f36b6850e718110f8b74e8af7b791264c5325" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrldwar3">
+		<description>World War III (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Crystalware</publisher>
+		<info name="release" value="2019-02-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="world war iii (4am crack).dsk" size="143360" crc="c10acf2d" sha1="7bff2f75a2784a1ad1bd70b13ec5aa2999226b86" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zgfx0182">
+		<description>Zoom Grafix (Version 26-JAN-82) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2019-04-08"/>
+		<!-- This version is dated 26-JAN-82 according to comments within the
+		program itself. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoom grafix 26-jan-82 (4am crack).dsk" size="143360" crc="789d302a" sha1="c3c457bc13a2eb4061b9843c54adbc6a3e50644f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zgfx0482">
+		<description>Zoom Grafix (Version 29-APR-82) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Phoenix Software</publisher>
+		<info name="release" value="2019-04-08"/>
+		<!-- This version is dated 29-APR-82 according to comments within the
+		program itself. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoom grafix 29-apr-82 (4am crack).dsk" size="143360" crc="dc92bdae" sha1="8cfa992832dcb9abe5b44ce4e2e51bb5bc4491d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork3r10">
+		<description>Zork III (Release 10 / 820818) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-01-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zork iii r10 (4am crack).dsk" size="143360" crc="e858bd5b" sha1="77351325b9896e57f488d1584e3b511129c5b4dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork75o">
+		<description>Zork I (Release 75 / 830929 / earlier interpreter) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-04-10"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- This is release 75 / 830929.
+		Compared to other releases with the same number, this has identical game
+		data but comes bundled with an earlier interpreter that only supports
+		40-column uppercase text. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zork i r75 (earlier interpreter) (4am crack).dsk" size="143360" crc="697d378a" sha1="4a90ad23f7fe38fea8912c2efa40aeb511dd9289" />
 			</dataarea>
 		</part>
 	</software>
