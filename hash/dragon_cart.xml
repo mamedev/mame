@@ -272,7 +272,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
-	<software name="prestel">
+	<software name="prestela">
 		<description>Prestel for Dragon Alpha</description>
 		<year>198?</year>
 		<publisher>Dragon Data</publisher>
@@ -317,7 +317,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>FarmFax</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="cash planner.1" size="8192" crc="29309592" sha1="8b230ef1a234e9c24d6a322366a84270259cf244"/>
+				<rom name="cash planner.1" size="8192" crc="29309592" sha1="8b230ef1a234e9c24d6a322366a84270259cf244" offset="0x0000" />
 				<rom name="cash planner.2" size="8192" crc="d41465b3" sha1="bc368a31d8e30c56749c783b181f83b70fd50fad" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -329,7 +329,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>FarmFax</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="dairy prediction.1" size="8192" crc="bb3d1a7e" sha1="d79850fabda1fae61bd4ade5af6f4b545e4f96ed"/>
+				<rom name="dairy prediction.1" size="8192" crc="bb3d1a7e" sha1="d79850fabda1fae61bd4ade5af6f4b545e4f96ed" offset="0x0000" />
 				<rom name="dairy prediction.2" size="8192" crc="7858d11c" sha1="e13384ab1bb6f47deb5def36e488873720cce059" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -341,7 +341,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>FarmFax</publisher>
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="rotation formulation dairy.1" size="8192" crc="fd0dda29" sha1="c2f67e2cb89cf7d7dd4a7346e0e19c54f7f5e7d4"/>
+				<rom name="rotation formulation dairy.1" size="8192" crc="fd0dda29" sha1="c2f67e2cb89cf7d7dd4a7346e0e19c54f7f5e7d4" offset="0x0000" />
 				<rom name="rotation formulation dairy.2" size="8192" crc="d0de8e62" sha1="2adf61728c272c09277637ee28c2b7b586d3c01f" offset="0x2000" />
 			</dataarea>
 		</part>
@@ -373,12 +373,25 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 
 	<software name="sprdose6">
 		<description>SuperDOS E6</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>PNP</publisher>
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="dragon_fdc" />
 			<dataarea name="rom" size="8192">
 				<rom name="superdos e6 (198x)(pnp).rom" size="8192" crc="8c1d6c45" sha1="ef157016386ed463374de6bac84d1f8ce654ed80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="testcond">
+		<description>Test De Conducción</description>
+		<year>1982</year>
+		<publisher>Belrampa Servicios, SA</publisher>
+		<info name="usage" value="Disable Cart Auto-Start, EXEC 49152" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="test de conduccion 1 (1982)(belrampa servicios, sa)[!].rom" size="8192" crc="65d3153d" sha1="c44277f3d7ec615947465d20674b0771bdd44867" offset="0x0000" />
+				<rom name="test de conduccion 2 (1982)(belrampa servicios, sa)[!].rom" size="8192" crc="477921ca" sha1="a3d23148842fd7eb3b4f04d63a701a88573cbfb5" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -399,7 +412,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 
 	<software name="epromprg" supported="no">
 		<description>EPROM Programmer</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Dragon data</publisher>
 		<part name="cart" interface="coco_cart">
 			<!-- <feature name="slot" value="epromprg" /> -->
@@ -411,7 +424,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 
 	<software name="soaktest" supported="no">
 		<description>Dragon 32 Soak Test</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>&lt;unknown;&gt;</publisher>
 		<part name="cart" interface="coco_cart">
 			<!-- <feature name="slot" value="soaktest" /> -->

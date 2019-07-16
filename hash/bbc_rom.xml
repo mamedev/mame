@@ -7942,6 +7942,17 @@
 		</part>
 	</software>
 
+	<software name="uniterm">
+		<description>Uniterm</description>
+		<year>1983</year>
+		<publisher>Wolfson Microelectronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Uniterm-2.2C.rom" size="8192" crc="8018c650" sha1="d343a1b38374b48231fc34639baa6c2bd769b0a1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="upgrade12" cloneof="upgrade">
 		<description>Upgrade 2.2C</description>
 		<year>1984</year>
@@ -8124,6 +8135,17 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="VASM-2.0E.rom" size="8192" crc="543f8b95" sha1="f033a05839251955d1ce21f436861c3d42eff984"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vax">
+		<description>Vax</description>
+		<year>1985</year>
+		<publisher>Liverpool University</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Vax.rom" size="16384" crc="238919c3" sha1="1895399d776f76d027652550a81df3e026ce6b5b"/>
 			</dataarea>
 		</part>
 	</software>
