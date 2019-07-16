@@ -41,12 +41,9 @@
         Status:
         - DG640 is completely emulated, even though BINBUG doesn't use most
           of its features.
-        - BINBUG works except that the cassette interface isn't the same as
-          real hardware. But you can save, and load it back.
 
         ToDo:
         - Need dumps of 4.4 and 5.2.
-        - Fix cassette
 
 ****************************************************************************/
 
@@ -119,6 +116,9 @@ WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
 
 WRITE_LINE_MEMBER( binbug_state::kansas_w )
 {
+	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_RECORD)
+		return;
+
 	u8 twobit = m_cass_data[3] & 15;
 
 	if (state)
@@ -145,6 +145,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( binbug_state::kansas_r )
 		m_cassinbit = 1;
 	}
 
+	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
+		return;
+
 	/* cassette - turn 1200/2400Hz to a bit */
 	uint8_t cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
 
@@ -165,7 +168,6 @@ READ_LINE_MEMBER( binbug_state::binbug_serial_r )
 
 WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 {
-	m_cassinbit = 1;
 	m_cassoutbit = state;
 }
 
@@ -470,8 +472,6 @@ ToDo:
 - dips
 - leds
 - need schematic to find out what else is missing
-- cassette
-- ctc / clock
 
 */
 
