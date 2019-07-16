@@ -464,9 +464,9 @@ std::string wtl3132_device::disassemble(u64 const code)
 
 	switch (OPF(code, IOCT))
 	{
-	case 1: return util::string_format("%-32s ; floadrc %4s", alu, reg(OPF(code, DADD))); break;
-	case 2: return util::string_format("%-32s ; fstore  %4s", alu, reg(OPF(code, DADD))); break;
-	case 3: return util::string_format("%-32s ; fload   %4s", alu, reg(OPF(code, DADD))); break;
+	case 1: return util::string_format("%-38s ; floadrc %4s", alu, reg(OPF(code, DADD))); break;
+	case 2: return util::string_format("%-38s ; fstore  %4s", alu, reg(OPF(code, DADD))); break;
+	case 3: return util::string_format("%-38s ; fload   %4s", alu, reg(OPF(code, DADD))); break;
 	default:
 		return alu;
 	}
