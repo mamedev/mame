@@ -11,10 +11,10 @@ This entire hardware series is generally called 'GX400'
     RF2                     (Game 561) PWB(B) 352473
     Nemesis (Hacked?)       (Game 456) GX400 PWB(B) 201000A
     Nemesis (World?)        (Game 456) GX400 PWB(B) 201000A
-    Salamander (Version D)  (Game 587) GX400 PWB(B) 201012A
-    Salamander (Version J)  (Game 587) GX400 PWB(B) 201012A
-    Lifeforce (US)          (Game 587) GX400 PWB(B) 201012A
-    Lifeforce (Japan)       (Game 587) GX400 PWB(B) 201012A
+    Salamander (Version D)  (Game 587) PWB(B) 201012A GX587
+    Salamander (Version J)  (Game 587) PWB(B) 201012A GX587
+    Lifeforce (US)          (Game 587) PWB(B) 201012A GX587
+    Lifeforce (Japan)       (Game 587) PWB(B) 201012A GX587
 TODO: find pcb pics for below
     Black Panther           (Game 604)
     City Bomber (World)     (Game 787)
@@ -61,7 +61,7 @@ Boards, from earliest to latest:
     Has 2 Interrupts: ODD/EVEN frame, VBLANK, through a priority encoder
     Sound CPU clocked at 1.789772MHz
     Has a spot on the PCB for a VLM5030 and ROM(RAM?) but unpopulated and not shown on schematics
-* GX400 PWB(B) 201012A - The 'Salamander board' (FROM SCHEMATICS)
+* PWB(B) 201012A GX587 - The 'Salamander board' (FROM SCHEMATICS)
     We have schematics for this PCB
     Uses fixed roms at 0x00000-0x7ffff
     Has 2 Interrupts: ODD/EVEN frame, VBLANK, and does away with the priority encoder in favor of implementing
