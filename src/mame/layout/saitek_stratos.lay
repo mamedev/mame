@@ -300,8 +300,6 @@
 	<view name="Internal Layout">
 		<bounds left="-5" right="110" top="5" bottom="95" />
 
-		<screen tag="screen"><bounds x="0" y="0" width="10" height="10" /></screen>
-
 		<element ref="ledo"><bounds x="8" y="14" width="1" height="2" /></element>
 		<element ref="ledo"><bounds x="8" y="24" width="1" height="2" /></element>
 		<element ref="ledo"><bounds x="8" y="34" width="1" height="2" /></element>
@@ -311,22 +309,22 @@
 		<element ref="ledo"><bounds x="8" y="74" width="1" height="2" /></element>
 		<element ref="ledo"><bounds x="8" y="84" width="1" height="2" /></element>
 
-		<element ref="ledr" name="0.7" blend="add"><bounds x="8" y="14" width="1" height="2" /></element>
-		<element ref="ledr" name="0.6" blend="add"><bounds x="8" y="24" width="1" height="2" /></element>
-		<element ref="ledr" name="0.5" blend="add"><bounds x="8" y="34" width="1" height="2" /></element>
-		<element ref="ledr" name="0.4" blend="add"><bounds x="8" y="44" width="1" height="2" /></element>
-		<element ref="ledr" name="0.3" blend="add"><bounds x="8" y="54" width="1" height="2" /></element>
-		<element ref="ledr" name="0.2" blend="add"><bounds x="8" y="64" width="1" height="2" /></element>
-		<element ref="ledr" name="0.1" blend="add"><bounds x="8" y="74" width="1" height="2" /></element>
-		<element ref="ledr" name="0.0" blend="add"><bounds x="8" y="84" width="1" height="2" /></element>
-		<element ref="ledg" name="1.7" blend="add"><bounds x="8" y="14" width="1" height="2" /></element>
-		<element ref="ledg" name="1.6" blend="add"><bounds x="8" y="24" width="1" height="2" /></element>
-		<element ref="ledg" name="1.5" blend="add"><bounds x="8" y="34" width="1" height="2" /></element>
-		<element ref="ledg" name="1.4" blend="add"><bounds x="8" y="44" width="1" height="2" /></element>
-		<element ref="ledg" name="1.3" blend="add"><bounds x="8" y="54" width="1" height="2" /></element>
-		<element ref="ledg" name="1.2" blend="add"><bounds x="8" y="64" width="1" height="2" /></element>
-		<element ref="ledg" name="1.1" blend="add"><bounds x="8" y="74" width="1" height="2" /></element>
-		<element ref="ledg" name="1.0" blend="add"><bounds x="8" y="84" width="1" height="2" /></element>
+		<element ref="ledr" name="2.7" blend="add"><bounds x="8" y="14" width="1" height="2" /></element>
+		<element ref="ledr" name="2.6" blend="add"><bounds x="8" y="24" width="1" height="2" /></element>
+		<element ref="ledr" name="2.5" blend="add"><bounds x="8" y="34" width="1" height="2" /></element>
+		<element ref="ledr" name="2.4" blend="add"><bounds x="8" y="44" width="1" height="2" /></element>
+		<element ref="ledr" name="2.3" blend="add"><bounds x="8" y="54" width="1" height="2" /></element>
+		<element ref="ledr" name="2.2" blend="add"><bounds x="8" y="64" width="1" height="2" /></element>
+		<element ref="ledr" name="2.1" blend="add"><bounds x="8" y="74" width="1" height="2" /></element>
+		<element ref="ledr" name="2.0" blend="add"><bounds x="8" y="84" width="1" height="2" /></element>
+		<element ref="ledg" name="3.7" blend="add"><bounds x="8" y="14" width="1" height="2" /></element>
+		<element ref="ledg" name="3.6" blend="add"><bounds x="8" y="24" width="1" height="2" /></element>
+		<element ref="ledg" name="3.5" blend="add"><bounds x="8" y="34" width="1" height="2" /></element>
+		<element ref="ledg" name="3.4" blend="add"><bounds x="8" y="44" width="1" height="2" /></element>
+		<element ref="ledg" name="3.3" blend="add"><bounds x="8" y="54" width="1" height="2" /></element>
+		<element ref="ledg" name="3.2" blend="add"><bounds x="8" y="64" width="1" height="2" /></element>
+		<element ref="ledg" name="3.1" blend="add"><bounds x="8" y="74" width="1" height="2" /></element>
+		<element ref="ledg" name="3.0" blend="add"><bounds x="8" y="84" width="1" height="2" /></element>
 
 		<element ref="ledo"><bounds x="14" y="91" width="2" height="1" /></element>
 		<element ref="ledo"><bounds x="24" y="91" width="2" height="1" /></element>
@@ -337,22 +335,22 @@
 		<element ref="ledo"><bounds x="74" y="91" width="2" height="1" /></element>
 		<element ref="ledo"><bounds x="84" y="91" width="2" height="1" /></element>
 
-		<element ref="ledr" name="2.0" blend="add"><bounds x="14" y="91" width="2" height="1" /></element>
-		<element ref="ledr" name="2.1" blend="add"><bounds x="24" y="91" width="2" height="1" /></element>
-		<element ref="ledr" name="2.2" blend="add"><bounds x="34" y="91" width="2" height="1" /></element>
-		<element ref="ledr" name="2.3" blend="add"><bounds x="44" y="91" width="2" height="1" /></element>
-		<element ref="ledr" name="2.4" blend="add"><bounds x="54" y="91" width="2" height="1" /></element>
-		<element ref="ledr" name="2.5" blend="add"><bounds x="64" y="91" width="2" height="1" /></element>
-		<element ref="ledr" name="2.6" blend="add"><bounds x="74" y="91" width="2" height="1" /></element>
-		<element ref="ledr" name="2.7" blend="add"><bounds x="84" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.0" blend="add"><bounds x="14" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.1" blend="add"><bounds x="24" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.2" blend="add"><bounds x="34" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.3" blend="add"><bounds x="44" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.4" blend="add"><bounds x="54" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.5" blend="add"><bounds x="64" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.6" blend="add"><bounds x="74" y="91" width="2" height="1" /></element>
-		<element ref="ledg" name="3.7" blend="add"><bounds x="84" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.0" blend="add"><bounds x="14" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.1" blend="add"><bounds x="24" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.2" blend="add"><bounds x="34" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.3" blend="add"><bounds x="44" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.4" blend="add"><bounds x="54" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.5" blend="add"><bounds x="64" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.6" blend="add"><bounds x="74" y="91" width="2" height="1" /></element>
+		<element ref="ledr" name="4.7" blend="add"><bounds x="84" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.0" blend="add"><bounds x="14" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.1" blend="add"><bounds x="24" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.2" blend="add"><bounds x="34" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.3" blend="add"><bounds x="44" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.4" blend="add"><bounds x="54" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.5" blend="add"><bounds x="64" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.6" blend="add"><bounds x="74" y="91" width="2" height="1" /></element>
+		<element ref="ledg" name="5.7" blend="add"><bounds x="84" y="91" width="2" height="1" /></element>
 
 		<element ref="ledo"><bounds x="94" y="10" width="2" height="1" /></element>
 		<element ref="ledo"><bounds x="94" y="15" width="2" height="1" /></element>
@@ -366,27 +364,27 @@
 		<element ref="ledo"><bounds x="94" y="55" width="2" height="1" /></element>
 		<element ref="ledo"><bounds x="94" y="60" width="2" height="1" /></element>
 
-		<element ref="ledg" name="5.7" blend="add"><bounds x="94" y="10" width="2" height="1" /></element>
-		<element ref="ledg" name="5.6" blend="add"><bounds x="94" y="15" width="2" height="1" /></element>
-		<element ref="ledg" name="5.5" blend="add"><bounds x="94" y="20" width="2" height="1" /></element>
-		<element ref="ledg" name="5.4" blend="add"><bounds x="94" y="25" width="2" height="1" /></element>
-		<element ref="ledg" name="5.3" blend="add"><bounds x="94" y="30" width="2" height="1" /></element>
-		<element ref="ledg" name="5.2" blend="add"><bounds x="94" y="35" width="2" height="1" /></element>
+		<element ref="ledg" name="1.7" blend="add"><bounds x="94" y="10" width="2" height="1" /></element>
+		<element ref="ledg" name="1.6" blend="add"><bounds x="94" y="15" width="2" height="1" /></element>
+		<element ref="ledg" name="1.5" blend="add"><bounds x="94" y="20" width="2" height="1" /></element>
+		<element ref="ledg" name="1.4" blend="add"><bounds x="94" y="25" width="2" height="1" /></element>
+		<element ref="ledg" name="1.3" blend="add"><bounds x="94" y="30" width="2" height="1" /></element>
+		<element ref="ledg" name="1.2" blend="add"><bounds x="94" y="35" width="2" height="1" /></element>
 
-		<element ref="ledr" name="4.7" blend="add"><bounds x="94" y="10" width="2" height="1" /></element>
-		<element ref="ledr" name="4.6" blend="add"><bounds x="94" y="15" width="2" height="1" /></element>
-		<element ref="ledr" name="4.5" blend="add"><bounds x="94" y="20" width="2" height="1" /></element>
-		<element ref="ledr" name="4.4" blend="add"><bounds x="94" y="25" width="2" height="1" /></element>
-		<element ref="ledr" name="4.3" blend="add"><bounds x="94" y="30" width="2" height="1" /></element>
-		<element ref="ledr" name="4.2" blend="add"><bounds x="94" y="35" width="2" height="1" /></element>
+		<element ref="ledr" name="0.7" blend="add"><bounds x="94" y="10" width="2" height="1" /></element>
+		<element ref="ledr" name="0.6" blend="add"><bounds x="94" y="15" width="2" height="1" /></element>
+		<element ref="ledr" name="0.5" blend="add"><bounds x="94" y="20" width="2" height="1" /></element>
+		<element ref="ledr" name="0.4" blend="add"><bounds x="94" y="25" width="2" height="1" /></element>
+		<element ref="ledr" name="0.3" blend="add"><bounds x="94" y="30" width="2" height="1" /></element>
+		<element ref="ledr" name="0.2" blend="add"><bounds x="94" y="35" width="2" height="1" /></element>
 
-		<element ref="ledr" name="4.1" blend="add"><bounds x="94" y="40" width="2" height="1" /></element>
-		<element ref="ledr" name="5.1" blend="add"><bounds x="94" y="45" width="2" height="1" /></element>
-		<element ref="ledr" name="4.0" blend="add"><bounds x="94" y="50" width="2" height="1" /></element>
-		<element ref="ledr" name="5.0" blend="add"><bounds x="94" y="55" width="2" height="1" /></element>
+		<element ref="ledr" name="0.1" blend="add"><bounds x="94" y="40" width="2" height="1" /></element>
+		<element ref="ledr" name="1.1" blend="add"><bounds x="94" y="45" width="2" height="1" /></element>
+		<element ref="ledr" name="0.0" blend="add"><bounds x="94" y="50" width="2" height="1" /></element>
+		<element ref="ledr" name="1.0" blend="add"><bounds x="94" y="55" width="2" height="1" /></element>
 
-		<element ref="ledg" name="5.8" blend="add"><bounds x="94" y="60" width="2" height="1" /></element>
-		<element ref="ledr" name="4.8" blend="add"><bounds x="94" y="60" width="2" height="1" /></element>
+		<element ref="ledg" name="1.8" blend="add"><bounds x="94" y="60" width="2" height="1" /></element>
+		<element ref="ledr" name="0.8" blend="add"><bounds x="94" y="60" width="2" height="1" /></element>
 
 		<group ref="sb_board"><bounds x="10" y="10" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-4" y="10" width="10" height="80" /></group>
