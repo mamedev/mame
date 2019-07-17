@@ -69,10 +69,10 @@
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-class ip6_state : public driver_device
+class pi4d2x_state : public driver_device
 {
 public:
-	ip6_state(machine_config const &mconfig, device_type type, char const *tag)
+	pi4d2x_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "maincpu")
 		, m_ram(*this, "ram")
@@ -87,7 +87,9 @@ public:
 	{
 	}
 
-	void configure(machine_config &config);
+	void pi4d20(machine_config &config);
+	void pi4d25(machine_config &config);
+
 	void initialize();
 
 private:
@@ -111,6 +113,7 @@ private:
 	};
 	output_finder<4> m_leds;
 
+	void common(machine_config &config);
 	void map(address_map &map);
 
 	template <unsigned N> void lio_interrupt(int state) { lio_interrupt(N, state); }
@@ -180,7 +183,7 @@ private:
 	std::unique_ptr<u16 []> m_dma_map;
 };
 
-void ip6_state::map(address_map &map)
+void pi4d2x_state::map(address_map &map)
 {
 	//map(0x10000000, 0x1bffffff); // vme a32 modifier 0x09 non-privileged
 	//map(0x1c000000, 0x1cffffff); // vme a24 modifier 0x3d privileged
@@ -191,7 +194,7 @@ void ip6_state::map(address_map &map)
 	//map(0x1df00000, 0x1df00003).umask32(0x0000ff00); // VME_IACK: vme interrupt acknowledge
 
 	map(0x1f800000, 0x1f800003).lw8("mem_cfg", [this](u8 data) { m_mem_cfg = data; }).umask32(0xff000000);
-	map(0x1f800000, 0x1f800003).r(FUNC(ip6_state::ctl_sid_r)).umask32(0x00ff0000);
+	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::ctl_sid_r)).umask32(0x00ff0000);
 
 	map(0x1f840000, 0x1f840003).lrw8("vme_isr", [this]() { return m_vme_isr; }, [this](u8 data) { m_vme_isr = data; }).umask32(0x000000ff);
 	map(0x1f840008, 0x1f84000b).lrw8("vme_imr", [this]() { return m_vme_imr; }, [this](u8 data) { m_vme_imr = data; }).umask32(0x000000ff);
@@ -310,7 +313,7 @@ void ip6_state::map(address_map &map)
 
 	map(0x1fbc0000, 0x1fbc007f).rw(m_rtc, FUNC(dp8573_device::read), FUNC(dp8573_device::write)).umask32(0xff000000);
 
-	map(0x1fc00000, 0x1fc3ffff).rom().region("prom", 0);
+	map(0x1fc00000, 0x1fc3ffff).rom().region("boot", 0);
 }
 
 static void scsi_devices(device_slot_interface &device)
@@ -323,12 +326,26 @@ static void scsi_devices(device_slot_interface &device)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
-void ip6_state::configure(machine_config &config)
+void pi4d2x_state::pi4d20(machine_config &config)
 {
 	R2000A(config, m_cpu, 25_MHz_XTAL / 2, 16384, 8192);
-	m_cpu->set_endianness(ENDIANNESS_BIG);
-	m_cpu->set_addrmap(AS_PROGRAM, &ip6_state::map);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
+
+	common(config);
+}
+
+void pi4d2x_state::pi4d25(machine_config &config)
+{
+	R3000(config, m_cpu, 20_MHz_XTAL, 32768, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010);
+
+	common(config);
+}
+
+void pi4d2x_state::common(machine_config &config)
+{
+	m_cpu->set_endianness(ENDIANNESS_BIG);
+	m_cpu->set_addrmap(AS_PROGRAM, &pi4d2x_state::map);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	// 16 SIMM slots with 1, 2 or 4MB SIMMs installed in sets of 4
@@ -355,8 +372,8 @@ void ip6_state::configure(machine_config &config)
 			wd33c93_device &wd33c93(downcast<wd33c93_device &>(*device));
 
 			wd33c93.set_clock(10000000);
-			wd33c93.irq_cb().set(*this, FUNC(ip6_state::lio_interrupt<LIO_SCSI>)).invert();
-			wd33c93.drq_cb().set(*this, FUNC(ip6_state::scsi_drq));
+			wd33c93.irq_cb().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_SCSI>)).invert();
+			wd33c93.drq_cb().set(*this, FUNC(pi4d2x_state::scsi_drq));
 		});
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
@@ -367,7 +384,7 @@ void ip6_state::configure(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
 
 	AM7990(config, m_enet);
-	m_enet->intr_out().set(FUNC(ip6_state::lio_interrupt<LIO_ENET>));
+	m_enet->intr_out().set(FUNC(pi4d2x_state::lio_interrupt<LIO_ENET>));
 	m_enet->dma_in().set(
 		[this](offs_t offset)
 		{
@@ -396,7 +413,7 @@ void ip6_state::configure(machine_config &config)
 		"mouse"));
 
 	// duart 0 outputs
-	m_duart[0]->irq_cb().set(FUNC(ip6_state::lio_interrupt<LIO_D0>)).invert();
+	m_duart[0]->irq_cb().set(FUNC(pi4d2x_state::lio_interrupt<LIO_D0>)).invert();
 	m_duart[0]->a_tx_cb().set(keyboard_port, FUNC(sgi_keyboard_port_device::write_txd));
 	m_duart[0]->b_tx_cb().set(mouse_port, FUNC(rs232_port_device::write_txd));
 
@@ -410,7 +427,7 @@ void ip6_state::configure(machine_config &config)
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 
 	// duart 1 outputs
-	m_duart[1]->irq_cb().set(FUNC(ip6_state::lio_interrupt<LIO_D1>)).invert();
+	m_duart[1]->irq_cb().set(FUNC(pi4d2x_state::lio_interrupt<LIO_D1>)).invert();
 	m_duart[1]->a_tx_cb().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_duart[1]->b_tx_cb().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_duart[1]->outport_cb().set(
@@ -434,7 +451,7 @@ void ip6_state::configure(machine_config &config)
 	m_serial[1]->dcd_handler().set(m_duart[1], FUNC(scn2681_device::ip2_w));
 }
 
-void ip6_state::initialize()
+void pi4d2x_state::initialize()
 {
 	// map the configured ram
 	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
@@ -452,7 +469,7 @@ void ip6_state::initialize()
 	m_leds.resolve();
 }
 
-void ip6_state::lio_interrupt(unsigned number, int state)
+void pi4d2x_state::lio_interrupt(unsigned number, int state)
 {
 	u16 const mask = 1 << number;
 
@@ -471,7 +488,7 @@ void ip6_state::lio_interrupt(unsigned number, int state)
 	}
 }
 
-void ip6_state::scsi_drq(int state)
+void pi4d2x_state::scsi_drq(int state)
 {
 	if (state)
 	{
@@ -488,7 +505,7 @@ void ip6_state::scsi_drq(int state)
 	}
 }
 
-u8 ip6_state::ctl_sid_r()
+u8 pi4d2x_state::ctl_sid_r()
 {
 	u8 data = m_ctl_sid;
 
@@ -501,11 +518,31 @@ u8 ip6_state::ctl_sid_r()
 	return data;
 }
 
-// FIXME: boot prom is in fact four 27C512 eproms
 ROM_START(4d20)
-	ROM_REGION32_BE(0x40000, "prom", 0)
-	ROM_LOAD("4d202031.bin", 0x000000, 0x040000, CRC(065a290a) SHA1(6f5738e79643f94901e6efe3612468d14177f65b))
+	ROM_REGION32_BE(0x40000, "boot", 0)
+	ROM_SYSTEM_BIOS(0, "3.1c", "Version 4D1-3.1 Rev C, Tue Jan 10 15:11:42 PST 1989 SGI")
+	ROMX_LOAD("070_8000_005_boot_0.h1c5", 0x000000, 0x010000, CRC(c7a182de) SHA1(56038f54b5a3254960ad7c8232f1a7cf058b9ead), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_005_boot_1.h1d2", 0x000001, 0x010000, CRC(4b1395f5) SHA1(926f3172b79ebaf7040ff04b0cfdc3d48d03293c), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_005_boot_2.h1d9", 0x000002, 0x010000, CRC(e0a55120) SHA1(0b675489ea94bf85a5a0e5f0ebf0c0b7ff5fc389), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_005_boot_3.h1e6", 0x000003, 0x010000, CRC(11536526) SHA1(5149f453347ae566e9fee4447615dff88c7f6a37), ROM_BIOS(0) | ROM_SKIP(3))
+
+	// this firmware has been found in both 4D/20 and 4D/25 hardware
+	ROM_SYSTEM_BIOS(1, "3.2e", "Version 3.2 Rev E, Fri Jul 14 14:37:38 PDT 1989 SGI")
+	ROMX_LOAD("070_8000_007_boot_0.h1c5", 0x000000, 0x010000, CRC(e448b865) SHA1(f0276b76360ea0b3250dbdaa7a1e57ea8f6144d6), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_1.h1d2", 0x000001, 0x010000, CRC(59fda717) SHA1(ef3ccb1f8a815e7b13c79deeea0d73006deed09f), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_2.h1d9", 0x000002, 0x010000, CRC(569146ad) SHA1(5442a13ed93afdaa55c1951b97e335cf60dde834), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_3.h1e6", 0x000003, 0x010000, CRC(682977c3) SHA1(d9bcf7cdc5caef4221929fe26eccf34253fa7f29), ROM_BIOS(1) | ROM_SKIP(3))
 ROM_END
 
-//   YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT  CLASS      INIT        COMPANY                 FULLNAME  FLAGS
-COMP(1988, 4d20, 0,      0,      configure, 0,     ip6_state, initialize, "Silicon Graphics Inc", "4D/20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+ROM_START(4d25)
+	ROM_REGION32_BE(0x40000, "boot", 0)
+	ROM_SYSTEM_BIOS(0, "3.2e", "Version 3.2 Rev E, Fri Jul 14 14:37:38 PDT 1989 SGI")
+	ROMX_LOAD("070_8000_007_boot_0.h1c5", 0x000000, 0x010000, CRC(e448b865) SHA1(f0276b76360ea0b3250dbdaa7a1e57ea8f6144d6), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_1.h1d2", 0x000001, 0x010000, CRC(59fda717) SHA1(ef3ccb1f8a815e7b13c79deeea0d73006deed09f), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_2.h1d9", 0x000002, 0x010000, CRC(569146ad) SHA1(5442a13ed93afdaa55c1951b97e335cf60dde834), ROM_BIOS(0) | ROM_SKIP(3))
+	ROMX_LOAD("070_8000_007_boot_3.h1e6", 0x000003, 0x010000, CRC(682977c3) SHA1(d9bcf7cdc5caef4221929fe26eccf34253fa7f29), ROM_BIOS(0) | ROM_SKIP(3))
+ROM_END
+
+//   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                 FULLNAME                FLAGS
+COMP(1988, 4d20, 0,      0,      pi4d20,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal Iris 4D/20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1989, 4d25, 0,      0,      pi4d25,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal Iris 4D/25",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
