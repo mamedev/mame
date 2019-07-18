@@ -458,7 +458,7 @@ void tec1_state::tecjmon(machine_config &config)
 
 	/* Devices */
 	CASSETTE(config, m_cass);
-	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 }
 
 
