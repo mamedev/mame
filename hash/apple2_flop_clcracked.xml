@@ -1169,7 +1169,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="binomial multiplication (4am crack) (2).dsk" size="143360" crc="362c9ff4" sha1="566aa3c2a2f25dfbaef9df91e0ac4b339e916a41" />
+				<rom name="binomial multiplication (4am crack).dsk" size="143360" crc="362c9ff4" sha1="566aa3c2a2f25dfbaef9df91e0ac4b339e916a41" />
 			</dataarea>
 		</part>
 	</software>
@@ -1564,11 +1564,12 @@
 	</software>
 
 	<software name="compread">
-		<description>Compu-Read 3.4 (cleanly cracked)</description>
+		<description>Compu-Read (Version 3.4) (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware Services Inc.</publisher>
 		<info name="release" value="2014-09-22"/>
 		<!-- No compatibility data known at this time. -->
+		<!-- The on-disk main menu says "Ver. 3.4  25 Jan 82" -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -2764,7 +2765,7 @@
 	<software name="housefir">
 		<description>House-A-Fire! (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>Decision Development Co</publisher>
+		<publisher>Decision Development</publisher>
 		<info name="release" value="2014-09-23"/>
 		<!-- No compatibility data known at this time. -->
 
@@ -2969,7 +2970,7 @@
 	</software>
 
 	<software name="kmwldhis">
-		<description>Knowledge Master World History 1 (cleanly cracked)</description>
+		<description>Knowledge Master: World History 1 (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Academic Hallmarks</publisher>
 		<info name="release" value="2014-10-28"/>
@@ -22442,7 +22443,7 @@
 	<software name="sciv3mtr">
 		<description>Science Volume 3: Matter, Liquid, and Solid (cleanly cracked)</description>
 		<year>1986</year>
-		<publisher>The Ellen Nelson Learning Library</publisher>
+		<publisher>Decision Development</publisher>
 		<info name="release" value="2014-08-20"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -22883,6 +22884,184 @@
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="riddle magic (4am crack) side b.dsk" size="143360" crc="291eabb6" sha1="b6a7707818472e96b3ab5885a0ec8272009aa11e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellit">
+		<description>Spell It! (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2014-09-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell it (4am crack) side a.dsk" size="143360" crc="5e1e1c9a" sha1="331a8613e1bb815d28b6f83f312f35726c7c0b8d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="spell it (4am crack) side b.dsk" size="143360" crc="580a3e09" sha1="4d8ade83dd07e03cb0158e95109072b1a367d06e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tangrams">
+		<description>Tangrams Puzzler (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing</publisher>
+		<info name="release" value="2014-09-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tangrams puzzler (4am crack).dsk" size="143360" crc="1e6b80a7" sha1="39c3d1cf3013c610aed92a128eeaee1016fe62bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svmath20">
+		<description>Survival Math (Version 2.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2014-09-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="survival math (4am crack).dsk" size="143360" crc="0965ef15" sha1="e66d1ab9f5b0f244f5cbdb0f0d03c3c850e29aff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordattk">
+		<description>Word Attack (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2014-09-19"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="word attack (4am crack) side a.dsk" size="143360" crc="b5509fb9" sha1="7f88f3a3c3bee8a7d95b7c3f57e9566d1332ab28" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="word attack (4am crack) side b.dsk" size="143360" crc="eedddf91" sha1="e5061feeae091b99b4941872cdb650d204071f0b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rfmlv2">
+		<description>Reading for Meaning: Level 2 (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2014-10-28"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading for meaning 2 (4am crack) side a.dsk" size="143360" crc="b6bef60c" sha1="c78a2bb6b51e63de2d44abddf2d6651c79f3dd95" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading for meaning 2 (4am crack) side b.dsk" size="143360" crc="c3b1e08f" sha1="bed7ba6d2876ee1869e9b546138bb19ff91141ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sspsai">
+		<description>Safari Search: Problem Solving and Inference (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2014-11-11"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="safari search (4am crack).dsk" size="143360" crc="aeab8d5e" sha1="f317cee59c075c623a584025a82a119bfda9ca23" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttpresid">
+		<description>The Time Tunnel: The Presidents (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2014-11-14"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the time tunnel - the presidents (4am crack).dsk" size="143360" crc="385a870e" sha1="e24d9d79f7049f2465bdf3e955895a0a2b662476" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twztusa">
+		<description>Travels with Za-Zoom: The United States (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2014-11-14"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="travels with za-zoom - the united states (4am crack).dsk" size="143360" crc="b4ab7528" sha1="486fbd46b0290bf5e4a1d5cec62f67c05b323221" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twztwrld">
+		<description>Travels with Za-Zoom: The World (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2014-11-14"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="travels with za-zoom - the world (4am crack).dsk" size="143360" crc="99196e5a" sha1="399fca093f2b85a20ad2b344ba2b29671c717e92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatfr">
+		<description>Word Attack Plus! French (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2014-11-18"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="word attack plus french (4am crack) side a.dsk" size="143360" crc="531a35d0" sha1="1904b000c03c24d25071bd79f90b59ea82625947" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="word attack plus french (4am crack) side b.dsk" size="143360" crc="3269f352" sha1="d158aebe2d266dff4417a8b285746b9503e759a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdatgr">
+		<description>Word Attack German / Wortgefecht (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Gessler Educational Software</publisher>
+		<info name="release" value="2014-11-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="word attack german (4am crack) disk 1.dsk" size="143360" crc="87d844a3" sha1="9e465f4a629fb32c8c6942f88c1930f60c150ae3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="word attack german (4am crack) disk 2.dsk" size="143360" crc="66f32eb6" sha1="55abe5420f21f3e525e51c669661ed416af35c21" />
 			</dataarea>
 		</part>
 	</software>
