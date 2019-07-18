@@ -65,7 +65,7 @@
 		<description>2006 FIFA World Cup - Germany 2006 (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-B6WE-USA, AGB-B6WP-EUR"/>
+		<info name="serial" value="AGB-B6WE-USA, AGB-B6WP-EUR (EAX03304957C)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -744,6 +744,22 @@
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-bhqp-0.u1" size="4194304" crc="83bc2d2c" sha1="ab2c6faef04ba4d69eae936e0dbaa9e776d12edf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agecart">
+		<description>Aging Cartridge (World, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="エージングカートリッジ"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="2097152">
+				<rom name="agb-tchk-1.u1" size="2097152" crc="bbb6a960" sha1="c67e0a5e26ea5eba2bc11c99d003027a96e44060"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1665,11 +1681,14 @@
 		<description>Avatar - The Legend of Aang (Euro)</description>
 		<year>2006</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BQZP"/>
+		<info name="serial" value="AGB-BQZP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="avatar - the legend of aang (europe) (en,fr,de,nl).bin" size="8388608" crc="52fe8a62" sha1="4a62dfaaa562b23d4f851d3bb483d0fbf67894af"/>
+				<rom name="agb-bqzp-0.u1" size="8388608" crc="52fe8a62" sha1="4a62dfaaa562b23d4f851d3bb483d0fbf67894af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1734,11 +1753,14 @@
 		<description>Babar to the Rescue (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
-		<info name="serial" value="AGB-BBVP"/>
+		<info name="serial" value="AGB-BBVP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="babar to the rescue (europe) (en,fr,de,da).bin" size="4194304" crc="ab7d6c17" sha1="06d6265df757731b5ad59b8e6e5b9701e703e54b"/>
+				<rom name="agb-bbvp-0.u1" size="4194304" crc="ab7d6c17" sha1="06d6265df757731b5ad59b8e6e5b9701e703e54b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2284,10 +2306,12 @@
 		<description>Barbie in the 12 Dancing Princesses (Euro)</description>
 		<year>2006</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BB3P"/>
+		<info name="serial" value="AGB-BB3P-EUR (75313.133.5E)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="barbie in the 12 dancing princesses (europe) (en,fr,de,es,it).bin" size="4194304" crc="7ca7aa12" sha1="3feb77f60ad71d4dbb83c7ea0712759e50ccc088"/>
+				<rom name="agb-bb3p-0.u1" size="4194304" crc="7ca7aa12" sha1="3feb77f60ad71d4dbb83c7ea0712759e50ccc088"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2775,6 +2799,22 @@
 	</software>
 
 	<software name="bibitina">
+		<description>Bibi und Tina - Ferien auf dem Martinshof (Ger, Rev. 1)</description>
+		<year>2006</year>
+		<publisher>Kiddinx</publisher>
+		<info name="serial" value="AGB-BUXD-NOE (Art.-Nr.: 32252)"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-buxd-1.u1" size="16777216" crc="fd8c06ee" sha1="29b46f4728d55db0e0d4092a9bf85f143adc7e22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bibitina1" cloneof="bibitina">
 		<description>Bibi und Tina - Ferien auf dem Martinshof (Ger)</description>
 		<year>2006</year>
 		<publisher>Kiddinx</publisher>
@@ -3158,6 +3198,30 @@
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="blender bros. (usa).bin" size="8388608" crc="9a91d7f1" sha1="485b1698b4005bc15a83982b85bac68bbbae40ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Released by the developer as a digital download on the web. -->
+	<software name="bluangel1" cloneof="bluangel">
+		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 1)</description>
+		<year>200x</year>
+		<publisher>VetaSoft</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8140988">
+				<rom name="blue angelo proto 1.bin" size="8140988" crc="0cec865b" sha1="d57b1f717ee65a8e45cf5c2a38a9fc542a1d1d20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Released by the developer as a digital download on the web. -->
+	<software name="bluangel">
+		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 2)</description>
+		<year>200x</year>
+		<publisher>VetaSoft</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="19468416">
+				<rom name="blue angelo proto 2.bin" size="19468416" crc="f1b924dc" sha1="b238acd325d8a53ead8e72a95c29922e31d0012e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7765,6 +7829,22 @@
 		</part>
 	</software>
 
+	<software name="dogz2u1" cloneof="dogz2">
+		<description>Dogz 2 (USA, Rev. 1)</description>
+		<year>2007</year>
+		<publisher>Ubisoft</publisher>
+		<info name="serial" value="AGB-BIME-USA (143222-CART)"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-bime-1.u1" size="16777216" crc="0e2aca9e" sha1="bd12aaadfac73e7fde336c8b25ece78447cc1d87"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dogz2u" cloneof="dogz2">
 		<description>Dogz 2 (USA)</description>
 		<year>2007</year>
@@ -9431,7 +9511,7 @@
 		<description>Eragon (Euro)</description>
 		<year>2006</year>
 		<publisher>Vivendi Universal</publisher>
-		<info name="serial" value="AGB-BENP-EUR"/>
+		<info name="serial" value="AGB-BENP-EUR (S0030185)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -9666,6 +9746,27 @@
 	</software>
 
 	<software name="exmonply">
+		<description>EX Monopoly (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="AGB-AMOJ-JPN"/>
+		<info name="release" value="20010713"/>
+		<info name="alt_title" value="EXモノポリー"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081ED70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-amoj-1.u1" size="4194304" crc="d45abf21" sha1="29e1e9037ada40d6a81360794c9aff13ffaa7135"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exmonply1" cloneof="exmonply">
 		<description>EX Monopoly (Jpn)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
@@ -9767,7 +9868,7 @@
 	</software>
 
 	<software name="eyeshiel">
-		<description>Eyeshield 21 Devilbats Devildays (Jpn)</description>
+		<description>Eyeshield 21 - Devilbats Devildays (Jpn)</description>
 		<year>2006</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-BE4J-JPN"/>
@@ -10742,6 +10843,29 @@
 		</part>
 	</software>
 
+	<software name="farbe" supported="no">
+		<description>Farbe (Ger)</description>
+		<year>200x</year>
+		<publisher>Nintendo?</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-F01-01" />
+			<feature name="u1" value="U1 [AGB-MBA1]" />
+			<feature name="u2" value="U2 [LH28F320BJE-PTTL90]" />
+			<feature name="u3" value="U3 [LH28F320BJE-PTTL90]" />
+			<feature name="u4" value="U4 [empty]" />
+			<feature name="u5" value="U5 [empty]" />
+			<feature name="u6" value="U6 [empty]" />
+			<feature name="u7" value="U7 [empty]" />
+			<feature name="u8" value="U8 [empty]" />
+			<feature name="u9" value="U9 [empty]" />
+			<feature name="s1" value="S1 [dipswitch]" /> <!-- -.-. -->
+			<dataarea name="rom" size="8388608">
+				<rom name="u2" size="4194304" crc="3dfe6d2b" sha1="d33323f86d16135a3cc8f956fa4e71f2c2dfced4"/>
+				<rom name="u3" size="4194304" crc="7d5b6975" sha1="d92e064abb09a1a5a5f9f9ac6b165c82844668c8" offset="0x400000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fearfact">
 		<description>Fear Factor Unleashed (USA)</description>
 		<year>2004</year>
@@ -10791,8 +10915,8 @@
 		<description>FIFA 07 (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="alt_title" value="Fifa 07 Soccer (USA Box)" />
-		<info name="serial" value="AGB-B7FE-USA, AGB-B7FP-EUR"/>
+		<info name="alt_title" value="FIFA 07 Soccer (USA Box)" />
+		<info name="serial" value="AGB-B7FE-USA, AGB-B7FP-EUR (EAX03305406C)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -11233,9 +11357,12 @@
 		<description>Findet Nemo (Ger)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-AZID-NOE"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-30" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="8388608">
-				<rom name="findet nemo (germany).bin" size="8388608" crc="6b6b0908" sha1="5c5ee51c4bc8196bea226b3bf4750c8de1ee7f38"/>
+				<rom name="agb-azid-0.u1" size="8388608" crc="6b6b0908" sha1="5c5ee51c4bc8196bea226b3bf4750c8de1ee7f38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12569,13 +12696,16 @@
 
 	<software name="v_sharkt" supported="no">
 		<description>Game Boy Advance Video - Shark Tale (USA, Rev. 6)</description>
-		<year>2004?</year>
+		<year>2005</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-MSAE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E31-02" />
+			<feature name="u1" value="U1 Controller IC [Matrix Memory 11246-01-99]" />
+			<feature name="u2" value="U2 3D Memory" />
 			<feature name="slot" value="gba_3dmatrix" />
 			<dataarea name="rom" size="67108864">
-				<rom name="sharkstale-msae.bin" size="67108864" crc="d2cf417a" sha1="9bc5b60793b8a6de3b80eb2c213cd125e1fa468e"/>
+				<rom name="agb-msae-6.u2" size="67108864" crc="d2cf417a" sha1="9bc5b60793b8a6de3b80eb2c213cd125e1fa468e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12594,6 +12724,22 @@
 	</software>
 
 	<software name="v_shrek" supported="no">
+		<description>Game Boy Advance Video - Shrek (USA, Rev. 6)</description>
+		<year>2005</year>
+		<publisher>Majesco</publisher>
+		<info name="serial" value="AGB-MSKE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E31-02" />
+			<feature name="u1" value="U1 Controller IC [Matrix Memory 11246-01-99]" />
+			<feature name="u2" value="U2 3D Memory" />
+			<feature name="slot" value="gba_3dmatrix" />
+			<dataarea name="rom" size="67108864">
+				<rom name="agb-mske-6.u2" size="67108864" crc="4010e9fa" sha1="95d612057682b7b886441d387b167ba2493e49ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="v_shrek1" cloneof="v_shrek" supported="no">
 		<description>Game Boy Advance Video - Shrek (USA)</description>
 		<year>2004?</year>
 		<publisher>Nintendo</publisher>
@@ -12607,6 +12753,22 @@
 	</software>
 
 	<software name="v_shrek2" supported="no">
+		<description>Game Boy Advance Video - Shrek 2 (USA, Rev. 6)</description>
+		<year>2005</year>
+		<publisher>Majesco</publisher>
+		<info name="serial" value="AGB-M2SE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E31-02" />
+			<feature name="u1" value="U1 Controller IC [Matrix Memory 11246-01-99]" />
+			<feature name="u2" value="U2 3D Memory" />
+			<feature name="slot" value="gba_3dmatrix" />
+			<dataarea name="rom" size="67108864">
+				<rom name="agb-m2se-6.u2" size="67108864" crc="925b6c02" sha1="3bcb4acc5da539bc1b91c9537bf7ffa081ded1d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="v_shrek2a" cloneof="v_shrek2" supported="no">
 		<description>Game Boy Advance Video - Shrek 2 (USA)</description>
 		<year>2004?</year>
 		<publisher>Nintendo</publisher>
@@ -12620,14 +12782,17 @@
 	</software>
 
 	<software name="v_2shrst" supported="no">
-		<description>Game Boy Advance Video - Shrek + Shark Tale (USA)</description>
-		<year>2004?</year>
-		<publisher>Nintendo</publisher>
+		<description>Game Boy Advance Video - Shrek + Shark Tale (USA, Rev. 5)</description>
+		<year>2005</year>
+		<publisher>Majesco</publisher>
 		<info name="serial" value="AGB-MSTE-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E31-02" />
+			<feature name="u1" value="U1 Controller IC [Matrix Memory 11246-01-99]" />
+			<feature name="u2" value="U2 3D Memory" />
 			<feature name="slot" value="gba_3dmatrix" />
 			<dataarea name="rom" size="67108864">
-				<rom name="shrekshark21-mste.bin" size="67108864" crc="aadb3e3d" sha1="f23390b7a62c605fbce6730addc29d381488e076"/>
+				<rom name="agb-mste-5.u2" size="67108864" crc="aadb3e3d" sha1="f23390b7a62c605fbce6730addc29d381488e076"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12783,9 +12948,12 @@
 		<description>Game Boy Advance Video - Yu-Gi-Oh! - Yugi vs. Joey (Fra)</description>
 		<year>2004?</year>
 		<publisher>Majesco</publisher>
+		<info name="serial" value="AGB-MYGF-FRA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="33554432">
-				<rom name="game boy advance video - yu-gi-oh! - yugi vs. joey (france).bin" size="33554432" crc="c9b6ccf1" sha1="8fb43e5018cf2d4b1a2aa2d1693862ce248ab6b0"/>
+				<rom name="agb-mygf-0.u1" size="33554432" crc="c9b6ccf1" sha1="8fb43e5018cf2d4b1a2aa2d1693862ce248ab6b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12854,7 +13022,7 @@
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="16777216">
 			<!-- 2nd half (8MB) filled with 0xff, verified on the real cart -->
-				<rom name="agb-bgop-2.u1" size="16777216" crc="f7cd830c" sha1="c3ab25e65f59c5d80d45b605a2c55ba666362be5"/>
+				<rom name="agb-bgop-2.u1" size="16777216" crc="0c3aa538" sha1="3e38901cecad2c8ae3e5d91375af6fa5d7734c19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14322,6 +14490,20 @@
 		</part>
 	</software>
 
+	<software name="hardpoolf" cloneof="hardpool">
+		<description>Hardcore Pool (Fra)</description>
+		<year>2004</year>
+		<publisher>Neko Entertainment</publisher>
+		<info name="serial" value="AGB-BHOF-FRA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-bhof-0.u1" size="4194304" crc="44779175" sha1="bfb0a17c4463d73e597640ab88299adc5f26a270"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="harlemgt">
 		<description>Harlem Globetrotters - World Tour (Euro)</description>
 		<year>2006</year>
@@ -15407,6 +15589,27 @@
 	</software>
 
 	<software name="hxhmintd">
+		<description>Hunter X Hunter - Minna Tomodachi Daisakusen!! (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="AGB-A8NJ-JPN (RK319-J1)"/>
+		<info name="release" value="20030424"/>
+		<info name="alt_title" value="ハンター×ハンター みんな友だち大作戦!!"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-a8nj-1.u1" size="16777216" crc="86c21aeb" sha1="5a327073c67ee6a29bdd595f0c4031f055804e32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hxhmintd1" cloneof="hxhmintd">
 		<description>Hunter X Hunter - Minna Tomodachi Daisakusen!! (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -15491,11 +15694,11 @@
 		<description>Ice Age 2 - The Meltdown (Euro)</description>
 		<year>2006</year>
 		<publisher>Sierra Entertainment</publisher>
-		<info name="serial" value="AGB-BIAP-EUR"/>
+		<info name="serial" value="AGB-BIAP-EUR (S1003516)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" />
+			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" /> <!-- Also with [9853] -->
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
 				<rom name="agb-biap-0.u1" size="16777216" crc="58043308" sha1="0b1384988df2a16f0e33c25bc0eccece021e23b1"/>
@@ -15507,7 +15710,7 @@
 		<description>Ice Age 2 - The Meltdown (USA)</description>
 		<year>2006</year>
 		<publisher>Sierra Entertainment</publisher>
-		<info name="serial" value="AGB-BIAE-USA"/>
+		<info name="serial" value="AGB-BIAE-USA (7244580)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -15907,6 +16110,27 @@
 	</software>
 
 	<software name="jleagpck">
+		<description>J.League Pocket (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="AGB-AJPJ-JPN (RK240-J1)"/>
+		<info name="release" value="20010321"/>
+		<info name="alt_title" value="Jリーグポケット"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-ajpj-1.u1" size="8388608" crc="0524e9ef" sha1="64c6b3f0113d91daf41e63b2755d26b9ed0cea3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jleagpck1" cloneof="jleagpck">
 		<description>J.League Pocket (Jpn)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -17137,7 +17361,7 @@
 	</software>
 
 	<software name="kingkong">
-		<description>King Kong - The Official Game of the Movie (Euro)</description>
+		<description>King Kong - The Official Game of the Movie (Euro, English / French / German / Spanish / Italian / Dutch)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
 		<info name="serial" value="AGB-BKQP-EUR"/>
@@ -17145,6 +17369,22 @@
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="king kong - the official game of the movie (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="37387b19" sha1="c71426b1fa93206199ca4a3f4a1324186dd275ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingkong1" cloneof="kingkong">
+		<description>King Kong - The Official Game of the Movie (Euro, English / Swedish / Norwegian / Danish / Finnish)</description>
+		<year>2005</year>
+		<publisher>Ubisoft</publisher>
+		<info name="serial" value="AGB-BKQX-SCN"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-bkqx-0.u1" size="8388608" crc="37387b19" sha1="c71426b1fa93206199ca4a3f4a1324186dd275ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17761,10 +18001,12 @@
 		<description>Kong - King of Atlantis (Euro)</description>
 		<year>2005</year>
 		<publisher>Majesco</publisher>
-		<info name="serial" value="AGB-BK7P"/>
+		<info name="serial" value="AGB-BK7P-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="kong - king of atlantis (europe).bin" size="4194304" crc="9c12cd31" sha1="f235de9845182b1c28b98fe716f3332481fb1975"/>
+				<rom name="agb-bk7p-0.u1" size="4194304" crc="9c12cd31" sha1="f235de9845182b1c28b98fe716f3332481fb1975"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18314,7 +18556,7 @@
 		<description>The Legend of Spyro - A New Beginning (Euro)</description>
 		<year>2006</year>
 		<publisher>Sierra Entertainment</publisher>
-		<info name="serial" value="AGB-B3YP-EUR"/>
+		<info name="serial" value="AGB-B3YP-EUR (S1004226)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -18807,7 +19049,7 @@
 	<software name="lilostch">
 		<description>Disney's Lilo &amp; Stitch (Euro, Rev. 1)</description>
 		<year>2002</year>
-		<publisher>Ubi Soft</publisher>
+		<publisher>Buena Vista Games</publisher>
 		<info name="serial" value="AGB-ALTP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
@@ -19082,12 +19324,15 @@
 		<description>Looney Tunes Double Pack (Euro)</description>
 		<year>2005</year>
 		<publisher>Majesco</publisher>
-		<info name="alt_title" value="Looney Tunes Double Pack: Dizzy Driving + ACME Antics" />
-		<info name="serial" value="AGB-BLNP"/>
+		<info name="alt_title" value="Looney Tunes Double Pack: Dizzy Driving &amp; ACME Antics (Box)" />
+		<info name="serial" value="AGB-BLNP-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="looney tunes double pack (europe).bin" size="8388608" crc="dca23b31" sha1="2e8a157daa0b0031f629940846412b9f8197f8a1"/>
+				<rom name="agb-blnp-0.u1" size="8388608" crc="dca23b31" sha1="2e8a157daa0b0031f629940846412b9f8197f8a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19163,6 +19408,22 @@
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-alop-0.u1" size="8388608" crc="2380b93a" sha1="f330de5440f561e9fb0f808876261ee124230f9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotrfelru1" cloneof="lotrfelr">
+		<description>The Lord of the Rings - The Fellowship of the Ring (USA, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Black Label Games</publisher>
+		<info name="serial" value="AGB-ALOE-USA (S7149410)"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-aloe-1.u1" size="8388608" crc="5a2b01f1" sha1="c2b709a07e8bdbab265500ea4ae740c123bf944b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19346,8 +19607,10 @@
 		<publisher>DSI Games</publisher>
 		<info name="serial" value="AGB-BEME-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="4194304">
-				<rom name="m&amp;m's - break 'em (usa) (rev 1).bin" size="4194304" crc="a4ea65c0" sha1="5dc56db613a0a27b7724cbe8889fd2ba3a0993d9"/>
+				<rom name="agb-beme-1.u1" size="4194304" crc="a4ea65c0" sha1="5dc56db613a0a27b7724cbe8889fd2ba3a0993d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19448,11 +19711,14 @@
 		<description>Madagascar - Operation Penguin (Euro)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BM7P-EUR"/>
+		<info name="serial" value="AGB-BM7P-EUR, AGB-BM7P-UKV (81205.133.UK)"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="madagascar - operation penguin (europe).bin" size="8388608" crc="15bb7278" sha1="f33187bbc0187dd3bdbaaec6f88380bf2f107ab2"/>
+				<rom name="agb-bm7p-0.u1" size="8388608" crc="15bb7278" sha1="f33187bbc0187dd3bdbaaec6f88380bf2f107ab2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20302,7 +20568,7 @@
 		<description>Mario Tennis - Power Tour (USA, Aus)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-BTME-USA"/>
+		<info name="serial" value="AGB-BTME-USA, AGB-BTMU-AUS"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="16777216">
@@ -20371,7 +20637,7 @@
 		<description>Marvel - Ultimate Alliance (Euro)</description>
 		<year>2006</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-B4MP-EUR"/>
+		<info name="serial" value="AGB-B4MP-EUR (81477.133.EU)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -20475,6 +20741,24 @@
 	</software>
 
 	<software name="mataloki">
+		<description>Matantei Loki Ragnarok - Gensou no Labyrinth (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>J-Wing</publisher>
+		<info name="serial" value="AGB-BMRJ-JPN"/>
+		<info name="release" value="20031016"/>
+		<info name="alt_title" value="魔探偵ロキラグナロク 〜幻想のラビリンス〜"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-bmrj-1.u1" size="8388608" crc="d647ab18" sha1="3489569fa8a3c6a750c5cb0048915da78c5f40ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mataloki1" cloneof="mataloki">
 		<description>Matantei Loki Ragnarok - Gensou no Labyrinth (Jpn)</description>
 		<year>2003</year>
 		<publisher>J-Wing</publisher>
@@ -20942,11 +21226,14 @@
 		<description>Disney's Meet the Robinsons (Euro)</description>
 		<year>2007</year>
 		<publisher>Disney</publisher>
-		<info name="serial" value="AGB-BRHP"/>
+		<info name="serial" value="AGB-BRHP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="meet the robinsons (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="df3e58d3" sha1="1b5376d0c0b64973d74434a3a7388eeba3005aab"/>
+				<rom name="agb-brhp-0.u1" size="8388608" crc="df3e58d3" sha1="1b5376d0c0b64973d74434a3a7388eeba3005aab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23784,7 +24071,7 @@
 		<description>Need for Speed Carbon - Own the City (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-BN7E-USA, AGB-BN7P-EUR"/>
+		<info name="serial" value="AGB-BN7E-USA, AGB-BN7P-EUR (EAX03305407C)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -24083,7 +24370,8 @@
 		<description>Noddy - A Day in Toyland (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
-		<info name="serial" value="AGB-BNKP-EUR"/>
+		<info name="serial" value="AGB-BNKP-EUR, AGB-BNKP-EUU, AGB-BNKP-FRA"/>
+		<info name="alt_title" value="Oui-Oui: Une journée au Pays des Jouets (Fra Box)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -24575,7 +24863,7 @@
 		<description>Over the Hedge (Euro)</description>
 		<year>2006</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BH5P-UKV"/>
+		<info name="serial" value="AGB-BH5P-UKV (81457.133.UK)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -24664,7 +24952,7 @@
 		<description>Over the Hedge - Hammy Goes Nuts! (Euro)</description>
 		<year>2006</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BH7P-EUR"/>
+		<info name="serial" value="AGB-BH7P-EUR (81641.133.EU)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -24689,6 +24977,7 @@
 		</part>
 	</software>
 
+	<!-- Released by the developer as a digital download on the web. -->
 	<software name="overstrm">
 		<description>Overstorm (Euro, Prototype Demo)</description>
 		<year>2003</year>
@@ -24875,6 +25164,22 @@
 		</part>
 	</software>
 
+	<software name="pawclwpv">
+		<description>Paws &amp; Claws - Pet Vet (USA)</description>
+		<year>2006?</year>
+		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BQVE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-bqve-0.u1" size="8388608" crc="efee1ddf" sha1="c121eea8f816c4f8cbab32058d6b9bac57f0d7e3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="payback">
 		<description>Payback (Euro)</description>
 		<year>2004</year>
@@ -24920,7 +25225,7 @@
 		<description>Disney's Peter Pan - Return to Neverland (Euro, Rev. 1)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-APPP"/>
+		<info name="serial" value="AGB-APPP-EUR-2"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E01-41" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -24938,6 +25243,20 @@
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="peter pan - return to neverland (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="be7d574c" sha1="ccf431f78f749360dc385271a806f2cf1141cea8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petpanrnu1" cloneof="petpanrn">
+		<description>Disney's Peter Pan - Return to Neverland (USA, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Disney Interactive</publisher>
+		<info name="serial" value="AGB-APPE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-30" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-appe-1.u1" size="8388608" crc="431dfea8" sha1="daf2ea149bdd74e15a66710d29646f2142777102"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25664,6 +25983,24 @@
 	</software>
 
 	<software name="pokelfgrj" cloneof="pokelfgr">
+		<description>Pocket Monsters - Leaf Green (Jpn, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-BPGJ-JPN"/>
+		<info name="release" value="20040129"/>
+		<info name="alt_title" value="ポケットモンスター リーフグリーン"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E02-30" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 512K/1M FLASH [MX29L010TC-15A1]" />
+			<feature name="slot" value="gba_flash_1m" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-bpgj-1.u1" size="16777216" crc="8da4601a" sha1="de9d5a844f9bfb63a4448cccd4a2d186ecf455c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokelfgrj1" cloneof="pokelfgr">
 		<description>Pocket Monsters - Leaf Green (Jpn)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -26389,7 +26726,7 @@
 		<description>Pokémon Mystery Dungeon - Red Rescue Team (USA, Aus)</description>
 		<year>2006</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-B24E-USA"/>
+		<info name="serial" value="AGB-B24E-USA, AGB-B24U-AUS"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_flash_1m" />
 			<dataarea name="rom" size="33554432">
@@ -26702,6 +27039,27 @@
 	</software>
 
 	<software name="powrpkp5">
+		<description>Power Pro Kun Pocket 5 (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="AGB-A5PJ-JPN-1 (RK321-J1·)"/>
+		<info name="release" value="20030123"/>
+		<info name="alt_title" value="パワプロクンポケット5"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-20" />
+			<feature name="u1" value="U1 GPIO MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-a5pj-1.u1" size="8388608" crc="b2d8732d" sha1="29101619ef0ede2fe0174ba2ab6bd2427c1fe0a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrpkp5a" cloneof="powrpkp5">
 		<description>Power Pro Kun Pocket 5 (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -27032,6 +27390,22 @@
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="agb-bpyp-0.u1" size="8388608" crc="f0f16b7e" sha1="bf6a2b3bdb1fa3c010046306ecf4b2b5e67cceae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersiau1" cloneof="ppersia">
+		<description>Prince of Persia - The Sands of Time (USA, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Ubisoft</publisher>
+		<info name="serial" value="AGB-BPYE-USA-1 (141594-CART)"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-bpye-1.u1" size="8388608" crc="5adf72e6" sha1="3f379cd2e598ca69ba68649c81cf425ed284ae27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27382,6 +27756,20 @@
 		</part>
 	</software>
 
+	<software name="racingfvf" cloneof="racingfv">
+		<description>Racing Fever (Fra)</description>
+		<year>2005</year>
+		<publisher>Neko Entertainment</publisher>
+		<info name="serial" value="AGB-BRWF-FRA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-brwf-0.u1" size="4194304" crc="4f61dedb" sha1="67eb3051c7527692cfd7515ea367796fab3a1362"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="racingga">
 		<description>Racing Gears Advance (Euro)</description>
 		<year>2004</year>
@@ -27550,7 +27938,7 @@
 		<description>Rayman - Raving Rabbids (Euro)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
-		<info name="serial" value="AGB-BQ3P"/>
+		<info name="serial" value="AGB-BQ3P-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -27949,6 +28337,25 @@
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
 				<rom name="riviera - the promised land (usa).bin" size="33554432" crc="4fb6958d" sha1="30ee6610aaa77bce2ffd8911058078147d61b925"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rivieraj1" cloneof="riviera">
+		<description>Riviera - Yakusoku no Chi Riviera (Jpn, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>Sting</publisher>
+		<info name="serial" value="AGB-BREJ-JPN"/>
+		<info name="release" value="20041125"/>
+		<info name="alt_title" value="Riviera 〜約束の地リヴィエラ〜"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-01" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
+			<feature name="u3" value="U3 [empty]" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-brej-1.u1" size="16777216" crc="146097f2" sha1="7a053463964af2fe03faaa541b35a5f15e5e7bd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30294,6 +30701,22 @@
 	</software>
 
 	<software name="shreksks" supported="partial">
+		<description>Shrek - Swamp Kart Speedway (USA, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>TDK Mediactive</publisher>
+		<info name="serial" value="AGB-AS4E-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-as4e-1.u1" size="8388608" crc="41f55560" sha1="86e88efe3e8c8d7341a990b1da40ea6c7e66d9a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shreksks1" cloneof="shreksks" supported="partial">
 		<description>Shrek - Swamp Kart Speedway (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>TDK Mediactive</publisher>
@@ -30484,7 +30907,7 @@
 		<description>Sim City 2000 (Euro, Rev. 1)</description>
 		<year>2003</year>
 		<publisher>Zoo Digital Publishing</publisher>
-		<info name="serial" value="AGB-A5CP"/>
+		<info name="serial" value="AGB-A5CP-EUR"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-20" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -30492,6 +30915,22 @@
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-a5cp-1.u1" size="4194304" crc="95c79648" sha1="c5eba83db30b6b9aa2b770070f729d8d194a55b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2ku1" cloneof="simcit2k">
+		<description>Sim City 2000 (USA, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>DSI Games</publisher>
+		<info name="serial" value="AGB-A5CE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-a5ce-1.u1" size="4194304" crc="097e8628" sha1="d3842f8ee2f82998fc3baf0c6dd18f7cfc442b11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30685,7 +31124,7 @@
 		<description>The Sims 2 - Pets (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="AGB-B4OE-USA, AGB-B4OP-UKV"/>
+		<info name="serial" value="AGB-B4OE-USA, AGB-B4OP-UKV (MXE03305412C)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E02-30" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -30886,6 +31325,19 @@
 			<feature name="u1" value="U1 32M MROM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="agb-a7sp-0.u1" size="4194304" crc="516ce770" sha1="846996f49910121b1dd2915c3bf203a767c6408a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snsystem">
+		<description>SN Systems (Jpn)</description>
+		<year>19xx</year>
+		<publisher>Nintendo?</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="DMG CARTRIDGE PROBE 2( )" />
+			<feature name="u1" value="U1 [unknown]" />
+			<dataarea name="rom" size="33554432">
+				<rom name="snsystems.bin" size="33554432" crc="00f5687a" sha1="7ff5a2ca66562f3fa53ab2efca5d7ad435adba3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32432,6 +32884,22 @@
 	</software>
 
 	<software name="strawrc">
+		<description>Strawberry Shortcake - Ice Cream Island - Riding Camp (Euro, Rev. 1)</description>
+		<year>2006</year>
+		<publisher>The Game Factory</publisher>
+		<info name="serial" value="AGB-B35P-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-b35p-1.u1" size="8388608" crc="f3f2e465" sha1="dbce7927e477feafa0d624b91ebed490a786bf08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strawrc1" cloneof="strawrc">
 		<description>Strawberry Shortcake - Ice Cream Island - Riding Camp (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
@@ -32908,6 +33376,25 @@
 		</part>
 	</software>
 
+	<software name="sdodgebu1" cloneof="sdodgeb">
+		<description>Super Dodge Ball Advance (USA, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="AGB-ADFE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081EDG70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-adfe-1.u1" size="4194304" crc="63ca5050" sha1="29561789fcb3bcd106a5d27dea47f29b393191f6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sdodgebu" cloneof="sdodgeb">
 		<description>Super Dodge Ball Advance (USA)</description>
 		<year>2001</year>
@@ -33369,6 +33856,22 @@
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="super puzzle fighter ii turbo (europe).bin" size="8388608" crc="aac3e9ca" sha1="54426ebd60d910f604a32405b439eff3c43c74ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spuzlfgtu1" cloneof="spuzlfgt">
+		<description>Super Puzzle Fighter II Turbo (USA, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="AGB-AZ8E-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-az8e-1.u1" size="8388608" crc="62066fc9" sha1="02dd6145bcf6647d9c8a68c5b56c44d190a6bd92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33951,7 +34454,7 @@
 		<description>Tales of Phantasia (USA, Aus)</description>
 		<year>2006</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="AGB-AN8E-USA"/>
+		<info name="serial" value="AGB-AN8E-USA, AGB-AN8U-AUS"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
@@ -34800,11 +35303,14 @@
 		<year>2007</year>
 		<publisher>Ubisoft</publisher>
 		<info name="alt_title" value="TMNT - Teenage Mutant Ninja Turtles (Box)" />
-		<info name="serial" value="AGB-BEXP"/>
+		<info name="serial" value="AGB-BEXP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="tmnt - teenage mutant ninja turtles (europe) (en,fr,de,es,it).bin" size="8388608" crc="89103893" sha1="3fbb10b419bcd6327c5bdb678a8ebe149d160b6f"/>
+				<rom name="agb-bexp-0.u1" size="8388608" crc="89103893" sha1="3fbb10b419bcd6327c5bdb678a8ebe149d160b6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35646,7 +36152,7 @@
 		<description>Disney's Treasure Planet (Euro, Rev. 1)</description>
 		<year>2003</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="serial" value="AGB-AZQP"/>
+		<info name="serial" value="AGB-AZQP-EUR-1"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="treasure planet (europe) (en,fr,de,es,it,nl) (rev 1).bin" size="8388608" crc="794b2602" sha1="c703edaee8a2bad09c2298e2c92a14d459fe664a"/>
@@ -35905,6 +36411,25 @@
 		</part>
 	</software>
 
+	<software name="tweetymgnd" cloneof="tweetymg">
+		<description>Tweety and the Magic Gems (Ned)</description>
+		<year>2001</year>
+		<publisher>Kemco</publisher>
+		<info name="serial" value="AGB-ATMH-HOL"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-01" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [GM76V256CLLFW10]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="abg-atmh-0.u1" size="4194304" crc="f1a49d56" sha1="bee090519538cb539fc1a5a9f66130f53418888a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="titibijm" cloneof="tweetymg">
 		<description>Titi et les Bijoux Magiques (Fra)</description>
 		<year>2001</year>
@@ -35983,6 +36508,7 @@
 		</part>
 	</software>
 
+	<!-- Released by the developer as a digital download on the web. -->
 	<software name="tyrian2k">
 		<description>Tyrian 2000 (USA, Prototype)</description>
 		<year>19??</year>
@@ -36095,6 +36621,38 @@
 	</software>
 
 	<software name="ultcard">
+		<description>Ultimate Card Games (USA, Rev. 2)</description>
+		<year>2004</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="AGB-BUCE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-buce-2.u1" size="4194304" crc="94863423" sha1="b44a36ef8b76d220172750650095ed2a3f3693ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultcard2">
+		<description>Ultimate Card Games (USA, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="AGB-BUCE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-buce-1.u1" size="4194304" crc="300f5d25" sha1="cd1caa649bdfa43c838aac8370d0e00ca746ab8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultcard1" cloneof="ultcard">
 		<description>Ultimate Card Games (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Telegames</publisher>
@@ -36137,14 +36695,14 @@
 		<description>Ultimate Spider-Man (Euro)</description>
 		<year>2005</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="AGB-BULP-UKV"/>
+		<info name="serial" value="AGB-BULP-UKV (80899.133.UK)"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-E03-21" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="ultimate spider-man (europe).bin" size="16777216" crc="97e1727f" sha1="5db15933ac18877a61bf8df4d1aced51035a7d84"/>
+				<rom name="agb-bulp-0.u1" size="16777216" crc="97e1727f" sha1="5db15933ac18877a61bf8df4d1aced51035a7d84"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37057,9 +37615,12 @@
 		<publisher>Buena Vista Games</publisher>
 		<info name="serial" value="AGB-BWLE-USA, AGB-BWLP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [HT01]" />
 			<feature name="slot" value="gba_eeprom_4k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="wild, the (usa, europe) (en,fr,de,es).bin" size="8388608" crc="de79edc3" sha1="a7cf830919081655544a7beb2c1a94bdbab6a72e"/>
+				<rom name="agb-bwlp-0.u1" size="8388608" crc="de79edc3" sha1="a7cf830919081655544a7beb2c1a94bdbab6a72e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37426,11 +37987,14 @@
 		<description>WPT - World Poker Tour (Euro)</description>
 		<year>2006</year>
 		<publisher>2K Sports</publisher>
-		<info name="serial" value="AGB-B26P"/>
+		<info name="serial" value="AGB-BWOP-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="4194304">
-				<rom name="world poker tour (europe) (en,fr,de).bin" size="4194304" crc="8fa26a97" sha1="2f2983d33c547f09cca512b06880bc1faf1d4f54"/>
+				<rom name="agb-bwop-0.u1" size="4194304" crc="8fa26a97" sha1="2f2983d33c547f09cca512b06880bc1faf1d4f54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37448,6 +38012,7 @@
 		</part>
 	</software>
 
+	<!-- Released by the developer as a digital download on the web. -->
 	<software name="worldreb">
 		<description>World Reborn (USA, Prototype)</description>
 		<year>2004</year>
@@ -37753,9 +38318,12 @@
 		<info name="release" value="20060323"/>
 		<info name="alt_title" value="ユグドラ・ユニオン"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E24-01" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="33554432">
-				<rom name="yggdra union (japan).bin" size="33554432" crc="a86f844a" sha1="4ac5874b98f0fa3c3aad4c3ebe927f7fbc5b3267"/>
+				<rom name="agb-byuj-0.u1" size="33554432" crc="a86f844a" sha1="4ac5874b98f0fa3c3aad4c3ebe927f7fbc5b3267"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39333,12 +39901,14 @@
 
 	<software name="2nemo12">
 		<description>2 Games in 1: Finding Nemo + Finding Nemo - The Continuing Adventures (Euro)</description>
-		<year>200?</year>
+		<year>2005</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BFWP"/>
+		<info name="serial" value="AGB-BFWP-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="16777216">
-				<rom name="2 games in 1 - finding nemo + finding nemo - the continuing adventures (europe) (en+en,es,it,sv,da).bin" size="16777216" crc="72d5f428" sha1="5d7d2f148d7a35906e9ecb3408a5658a8c8040e8"/>
+				<rom name="agb-bfwp-0.u1" size="16777216" crc="72d5f428" sha1="5d7d2f148d7a35906e9ecb3408a5658a8c8040e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39369,10 +39939,12 @@
 		<description>2 Games in 1: Finding Nemo + The Incredibles (Euro)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BINP-EUR"/>
+		<info name="serial" value="AGB-BINP-EUR, AGB-BINP-UKV"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="16777216">
-				<rom name="2 games in 1 - finding nemo + the incredibles (europe).bin" size="16777216" crc="9702abce" sha1="5899447fc865afb716e189fabc9315489985d010"/>
+				<rom name="agb-binp-0.u1" size="16777216" crc="9702abce" sha1="5899447fc865afb716e189fabc9315489985d010"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40121,8 +40693,10 @@
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-BX6E-USA"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E01-41" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="16777216">
-				<rom name="2 games in 1 - spongebob squarepants - battle for bikini bottom + the fairly oddparents! - breakin' da rules (usa).bin" size="16777216" crc="82c21322" sha1="d9ba8b21696b3fe2ce5dc31b7f7a8837f52acab0"/>
+				<rom name="agb-bx6e-0.u1" size="16777216" crc="82c21322" sha1="d9ba8b21696b3fe2ce5dc31b7f7a8837f52acab0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40282,9 +40856,12 @@
 		<publisher>Konami</publisher>
 		<info name="serial" value="AGB-BT8P-EUR"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="16777216">
-				<rom name="teenage mutant ninja turtles double pack (europe) (en,fr,de,es,it).bin" size="16777216" crc="e902880f" sha1="68309670f0bb0a5496dde3fcbb193eef10c06f87"/>
+				<rom name="agb-bt8p-0.u1" size="16777216" crc="e902880f" sha1="68309670f0bb0a5496dde3fcbb193eef10c06f87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40359,7 +40936,7 @@
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-Y11-02" />
 			<feature name="u1" value="U1 GPIO MASKROM" />
-			<feature name="u2" value="U2 256K FRAM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
 			<feature name="u3" value="U3 [empty]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
@@ -40422,11 +40999,15 @@
 		<description>4 Games on One Game Pak (Nicktoons) (USA)</description>
 		<year>2007</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BI7E-USA"/>
+		<info name="serial" value="AGB-BI7E-USA, AGB-BI7E-USA-1"/>
 		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-02" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
+			<feature name="u3" value="U3 [empty]" />
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
-				<rom name="4 games on one game pak (nicktoons) (usa).bin" size="33554432" crc="cac0c0d8" sha1="c906145594de76a1d03578fb03635de62cce44ba"/>
+				<rom name="agb-bi7e-0.u1" size="33554432" crc="cac0c0d8" sha1="c906145594de76a1d03578fb03635de62cce44ba"/>
 			</dataarea>
 		</part>
 	</software>
