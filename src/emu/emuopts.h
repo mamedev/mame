@@ -480,6 +480,7 @@ public:
 	bool has_slot_option(const std::string &device_name) const { return find_slot_option(device_name) ? true : false; }
 	const ::image_option &image_option(const std::string &device_name) const;
 	::image_option &image_option(const std::string &device_name);
+	bool has_image_option(const std::string &device_name) const { return m_image_options.find(device_name) != m_image_options.end(); }
 
 protected:
 	virtual void command_argument_processed() override;
