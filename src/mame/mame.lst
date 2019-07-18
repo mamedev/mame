@@ -9827,6 +9827,7 @@ changela                        // ??? (c) 1983 Taito Corporation
 
 @source:changyu.cpp
 changyu
+changyu2
 
 @source:channelf.cpp
 channelf                        // Fairchild Channel F VES - 1976

@@ -2,6 +2,11 @@
 // copyright-holders:
 
 /*
+This skeleton driver hosts 2 unidentified Chang Yu Electronic (CYE) games. The PCBs,
+while sharing most components, differ, so they may very well go in different drivers when emulated.
+
+unknown Chang Yu Electronic gambling game 1:
+
 main components:
 
 main PCB (FAN-21 sticker):
@@ -17,6 +22,23 @@ small sub PCB (HY-8902):
 1 x D8751H
 1 x 8 MHz XTAL
 1 x TIBPAL16L8
+
+
+unknown Chang Yu Electronic gambling game 2:
+
+main components:
+
+main PCB (marked 9101):
+1 x R6502AP
+1 x 12 MHz XTAL
+1 x 3.579545 MHz XTAL (near UM3567)
+3 x 8-dip banks (2x near AY8910)
+1 x HD46505RP-2
+1 x AY-3-8910A
+1 x UM5100
+1 x UM3567 (YM2413 clone)
+1 x D8253C
+1 x P87C51 MCU
 */
 
 #include "emu.h"
@@ -27,6 +49,7 @@ small sub PCB (HY-8902):
 #include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
+#include "sound/ym2413.h"
 #include "video/mc6845.h"
 
 class changyu_state : public driver_device
@@ -38,12 +61,12 @@ public:
 	}
 
 	void changyu(machine_config &config);
+	void changyu2(machine_config &config);
 
 private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
 	void main_map(address_map &map);
 
 	virtual void machine_start() override;
@@ -149,6 +172,14 @@ void changyu_state::changyu(machine_config &config)
 	HC55516(config, "voice", XTAL(12'000'000 / 6)).add_route(ALL_OUTPUTS, "mono", 1.00); // UM5100 is a HC55536 with ROM hook-up, divisor not verified
 }
 
+void changyu_state::changyu2(machine_config &config)
+{
+	changyu(config);
+
+	I87C51(config.replace(), "mcu", XTAL(8'000'000)).set_disable(); // not dumped yet
+
+	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( changyu )
 	ROM_REGION(0x8000, "maincpu", 0)
@@ -186,5 +217,27 @@ ROM_START( changyu )
 	ROM_LOAD( "tibpal16l8-25cn.sub", 0x000, 0x104, NO_DUMP )
 ROM_END
 
+ROM_START( changyu2 ) // 999 ROM999 II BY HUANGYEH string
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "95.bin", 0x00000, 0x10000, CRC(c3a8061f) SHA1(8e2b2509de32b90c0ac5f3eabb8d256a1fbb393e) ) // 27C512
 
-GAME( 1989, changyu, 0, changyu, changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game", MACHINE_IS_SKELETON ) // year taken from start of maincpu ROM
+	ROM_REGION(0x1000, "mcu", 0)
+	ROM_LOAD( "99c.bin", 0x00000, 0x1000, NO_DUMP ) // needs decap
+
+	ROM_REGION(0x50000, "unsorted", 0)
+	ROM_LOAD( "91.bin",  0x00000, 0x08000, CRC(747c98e3) SHA1(30926ee500c6ee21b7e73424afc76f34d84cb896) ) // 27256
+	ROM_LOAD( "92.bin",  0x08000, 0x08000, CRC(93ac967a) SHA1(41914ccdb6d07e7a74b4db3d5473f8949462ee1c) ) // 27256
+	ROM_LOAD( "93.bin",  0x10000, 0x08000, CRC(1d2b75de) SHA1(89b201b75691ee6ac3fc71fb8a998dbf05a1b0b2) ) // 27256
+	ROM_LOAD( "94.bin",  0x18000, 0x08000, CRC(f61a8410) SHA1(3c4df3e973322200aa72cf1d1df827c2ba69671b) ) // 27256
+
+	ROM_LOAD( "96c.bin", 0x20000, 0x10000, CRC(06d11350) SHA1(3c65d1d71010a3f10b00c799ede2debc96f6f3cf) ) // 27C512
+	ROM_LOAD( "97c.bin", 0x30000, 0x10000, CRC(e242ab79) SHA1(a7b14692556605eb039d1ef98fb3b8b007717c12) ) // 27C512
+	ROM_LOAD( "98c.bin", 0x40000, 0x10000, CRC(c8879f76) SHA1(6bcc686720dc63f50509f3f003b1f62ff43fc6b1) ) // 27C512
+
+	ROM_REGION(0x400, "pals", 0)
+	ROM_LOAD( "9a", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "9b", 0x200, 0x104, NO_DUMP )
+ROM_END
+
+GAME( 1989, changyu,  0, changyu,  changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 1", MACHINE_IS_SKELETON ) // year taken from start of maincpu ROM
+GAME( 19??, changyu2, 0, changyu2, changyu, changyu_state, empty_init, ROT0, "Chang Yu Electronic", "unknown Chang Yu Electronic gambling game 2", MACHINE_IS_SKELETON )
