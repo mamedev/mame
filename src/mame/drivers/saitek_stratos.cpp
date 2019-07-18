@@ -71,9 +71,9 @@ private:
 	uint32_t ind_leds;
 	bool m_lcd_written;
 
-	u8 m_lcd_address;
-	u8 m_lcd_ram[0x100];
-	u8 m_lcd_latch;
+	//u8 m_lcd_address;
+	//u8 m_lcd_ram[0x100];
+	//u8 m_lcd_latch;
 
 	u8 m_lcd_data;
 	void show_leds();
