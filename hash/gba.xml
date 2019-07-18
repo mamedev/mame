@@ -3205,7 +3205,7 @@
 	<!-- Released by the developer as a digital download on the web. -->
 	<software name="bluangel1" cloneof="bluangel">
 		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 1)</description>
-		<year>200x</year>
+		<year>200?</year>
 		<publisher>VetaSoft</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8140988">
@@ -3217,7 +3217,7 @@
 	<!-- Released by the developer as a digital download on the web. -->
 	<software name="bluangel">
 		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 2)</description>
-		<year>200x</year>
+		<year>200?</year>
 		<publisher>VetaSoft</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="19468416">
@@ -10845,7 +10845,7 @@
 
 	<software name="farbe" supported="no">
 		<description>Farbe (Ger)</description>
-		<year>200x</year>
+		<year>200?</year>
 		<publisher>Nintendo?</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="AGB-F01-01" />
@@ -31331,7 +31331,7 @@
 
 	<software name="snsystem">
 		<description>SN Systems (Jpn)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Nintendo?</publisher>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb" value="DMG CARTRIDGE PROBE 2( )" />
