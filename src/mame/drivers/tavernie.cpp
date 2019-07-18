@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders: Robbbert
-/***************************************************************************
+/*********************************************************************************
 
     Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
 
     2013-12-08 Skeleton driver.
 
-    This system was described in a French computer magazine.
+    This system was described in a French computer magazine "Micro-Informatique".
 
     CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
     IVG09 includes 6845, another 6821, beeper
@@ -18,35 +18,39 @@ ToDo:
     - Character rom is not dumped
     - Graphics rom is not dumped
     - 3x 7611 proms not dumped
-    - Fix cassette
     - Test FDC
     - Need software
+    - Cassette is coded correctly, but slight timing differences mean a byte
+      here and there gets corrupted on load. The file loads correctly on the
+      super80.
 
 List of commands (must be in UPPERCASE):
-A -
-B -
-C -
+A - Memory transfer
+B - breakpoint management
+C - call a user subroutine
 D - Dump memory (^X to break)
-G -
-I -
+G - coding of indexed addresses
+I - memory initialisation
 L - Load cassette
-M -
-N -
-O -
+M - examine/modify memory
+N - terminal adaptation (??)
+O - calculation of displacements
 P - Save cassette
-Q -
+Q - printer activation
 R - Display/Alter Registers
-S -
-T -
-U -
-V -
-W -
-X - 'erreur de chargement dos'
-Y -
+S - automatic inhibition of single-step
+T - single-step operation
+U - memory page change
+V - Verify cassette
+W - definition of a window
+X - DOS loading from TAVBUG09
+Y - launch of DOS since TAVBUG09
 Z - more scan lines per row (cursor is bigger)
+/ - fast memory exam
+  - multiple single-steps
 
 
-****************************************************************************/
+**********************************************************************************/
 
 #include "emu.h"
 
@@ -57,7 +61,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
-#include "machine/clock.h"
+#include "machine/timer.h"
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
@@ -76,7 +80,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
-		, m_pia_ivg(*this, "pia_ivg")
+		, m_pia0(*this, "pia0")
+		, m_pia1(*this, "pia1")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_beep(*this, "beeper")
@@ -95,6 +100,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE8_MEMBER(pa_ivg_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_READ8_MEMBER(pb_ivg_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(ds_w);
@@ -107,9 +113,11 @@ private:
 
 	uint8_t m_term_data;
 	uint8_t m_pa;
+	bool m_cassold;
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cassette_image_device> m_cass;
-	optional_device<pia6821_device> m_pia_ivg;
+	required_device<pia6821_device> m_pia0;
+	optional_device<pia6821_device> m_pia1;
 	optional_device<fd1795_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<beep_device> m_beep;
@@ -122,8 +130,8 @@ private:
 void tavernie_state::cpu09_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x1000, 0x1fff).noprw();
-	map(0xeb00, 0xeb03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x2081).noprw();
+	map(0xeb00, 0xeb03).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xeb04, 0xeb05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xeb08, 0xeb0f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xec00, 0xefff).ram(); // 1Kx8 RAM MK4118
@@ -133,17 +141,13 @@ void tavernie_state::cpu09_mem(address_map &map)
 void tavernie_state::ivg09_mem(address_map &map)
 {
 	map.unmap_value_high();
+	cpu09_mem(map);
 	map(0x1000, 0x1fff).ram().share("videoram");
-	map(0x2000, 0x2003).rw(m_pia_ivg, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x2003).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2080, 0x2080).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2081, 0x2081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe000, 0xe003).rw(m_fdc, FUNC(fd1795_device::read), FUNC(fd1795_device::write));
 	map(0xe080, 0xe080).w(FUNC(tavernie_state::ds_w));
-	map(0xeb00, 0xeb03).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xeb04, 0xeb05).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xeb08, 0xeb0f).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0xec00, 0xefff).ram(); // 1Kx8 RAM MK4118
-	map(0xf000, 0xffff).rom().region("roms", 0);
 }
 
 
@@ -187,7 +191,7 @@ MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 {
 	m_beep->set_state(1);
 	m_term_data = 0;
-	m_pia_ivg->cb1_w(1);
+	m_pia1->cb1_w(1);
 }
 
 static void ifd09_floppies(device_slot_interface &device)
@@ -274,7 +278,7 @@ WRITE8_MEMBER( tavernie_state::pb_w )
 // cass in
 READ_LINE_MEMBER( tavernie_state::ca1_r )
 {
-	return (m_cass->input() > +0.01);
+	return m_cassold;
 }
 
 READ8_MEMBER( tavernie_state::pb_ivg_r )
@@ -289,12 +293,34 @@ WRITE8_MEMBER( tavernie_state::pa_ivg_w )
 // bits 0-3 are attribute bits
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( tavernie_state::kansas_r )
+{
+	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
+		return;
+
+	bool cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	if (cass_ws != m_cassold)
+	{
+		m_cassold = cass_ws;
+		m_pia0->ca1_w(cass_ws);
+	}
+}
+
 void tavernie_state::kbd_put(u8 data)
 {
 	m_term_data = data;
-	m_pia_ivg->cb1_w(0);
-	m_pia_ivg->cb1_w(1);
+	m_pia1->cb1_w(0);
+	m_pia1->cb1_w(1);
 }
+
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
 
 void tavernie_state::cpu09(machine_config &config)
 {
@@ -308,19 +334,21 @@ void tavernie_state::cpu09(machine_config &config)
 
 	/* Devices */
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(tavernie_state::kansas_r), attotime::from_hz(10000));
 
-	pia6821_device &pia(PIA6821(config, "pia", 0));
-	pia.readpa_handler().set(FUNC(tavernie_state::pa_r));
-	pia.readca1_handler().set(FUNC(tavernie_state::ca1_r));
-	pia.writepa_handler().set(FUNC(tavernie_state::pa_w));
-	pia.writepb_handler().set(FUNC(tavernie_state::pb_w));
-	pia.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
-	pia.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set(FUNC(tavernie_state::pa_r));
+	m_pia0->readca1_handler().set(FUNC(tavernie_state::ca1_r));
+	m_pia0->writepa_handler().set(FUNC(tavernie_state::pa_w));
+	m_pia0->writepb_handler().set(FUNC(tavernie_state::pb_w));
 
 	ptm6840_device &ptm(PTM6840(config, "ptm", 4_MHz_XTAL / 4));
 	// all i/o lines connect to the 40-pin expansion connector
 	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set("acia", FUNC(acia6850_device::write_txc));
+	ptm.o1_callback().append("acia", FUNC(acia6850_device::write_rxc));
 	ptm.o2_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
@@ -331,10 +359,7 @@ void tavernie_state::cpu09(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
-	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
 void tavernie_state::ivg09(machine_config &config)
@@ -367,10 +392,10 @@ void tavernie_state::ivg09(machine_config &config)
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(tavernie_state::crtc_update_row), this);
 
-	PIA6821(config, m_pia_ivg, 0);
-	m_pia_ivg->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));
-	m_pia_ivg->writepa_handler().set(FUNC(tavernie_state::pa_ivg_w));
-	m_pia_ivg->cb2_handler().set(m_beep, FUNC(beep_device::set_state));
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));
+	m_pia1->writepa_handler().set(FUNC(tavernie_state::pa_ivg_w));
+	m_pia1->cb2_handler().set(m_beep, FUNC(beep_device::set_state));
 
 	FD1795(config, m_fdc, 8_MHz_XTAL / 8);
 	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
