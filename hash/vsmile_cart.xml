@@ -21,6 +21,7 @@ Language:
 *******14 = Sweden            Distributed by the company 'Top Toy A/S'
 *******15 = Norway
 *******?? = Finland
+*******?? = China
 
 Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
@@ -44,6 +45,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-067022(SP)     | V.Smile Estudio de Arte (orange)                                           |
 |        | 80-067033(NO)     | V.Smile Tegnestudio                                                        |
 |        | 80-067057(SP)     | V.Smile Estudio de Arte (pink)                                             |
+|        |          (CN)     | 智乐学习通小画室                                                             |
 +========+===================+============================================================================+
 |        | 80-091320(US)     | V.Smile Jamming Gym Class                                                  |
 |        | 80-091322(NL)     | V.Smile Muziek en Leer Mat                                                 |
@@ -133,6 +135,7 @@ Game cartridges
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                                                                          |
 |   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB, green sticker: "449 ○○○○")                                                         |
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent) (No # on label)                                                                                            |
+|        |          (CN)     | 英语乐园                                                                                                                                                  |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                                                                                                 |
 |        | 80-092023(UK)     | The Adventures of Little Red Riding Hood (no # on label, but box says 'colours')                                                                         |
@@ -143,6 +146,7 @@ Game cartridges
 |        | 80-092043(UK)     | Learnin' Wheels                                                                                                                                          |
 |   XX   | 80-092044(GE)     | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#)  80-092924(GE) on label                                                                |
 |   XX   | 80-092045(FR)     | Apprenti' Pilote                                                                                                                                         |
+|        |          (CN)     | 数学快车                                                                                                                                                  |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                                                                          |
 |   XX   | 80-092061(IT)     | Winnie the Pooh e la caccia al miele                                                                                                                     |
@@ -162,6 +166,7 @@ Game cartridges
 |        |          (NO)     | Winnie the Pooh - Honningjakten                                                                                                                          |
 |        |          (NO)     | Ole Brumm - Honningjakten                                                                                                                                |
 |        |          (FI)     | Winnie the Pooh - Hunajajahti                                                                                                                            |
+|        |          (CN)     | 小熊维尼                                                                                                                                                  |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventures                                                                                                               |
 |   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                                                                              |
@@ -175,6 +180,7 @@ Game cartridges
 |   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                                                                                      |
 |        |          (NO)     | Mickey                                                                                                                                                   |
 |        |          (FI)     | Mickey                                                                                                                                                   |
+|        |          (CN)     | 米奇魔幻历险记                                                                                                                                             |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092100(US)     | The Lion King - Simba's Big Adventure                                                                                                                    |
 |   XX   | 80-092101(IT)     | Il Re Leone - La Grande Avventura di Simba                                                                                                               |
@@ -188,6 +194,7 @@ Game cartridges
 |   XX   | 80-092114(SE)     | Lejonkungen - Simbas stora äventyr                                                                                                                       |
 |        |          (NO)     | Løvenes konge - Simbas store eventyr                                                                                                                     |
 |        |          (FI)     | Leijona kuningas - Simban suuri seikkailu                                                                                                                |
+|        |          (CN)     | 狮子王辛巴成长历险记                                                                                                                                        |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                                                                                                            |
 |   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                                                                                                |
@@ -201,6 +208,7 @@ Game cartridges
 |   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                                                                                        |
 |        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                                                                          |
 |        |          (FI)     | Pieni Merenneito - Arielin majesteettinen matka                                                                                                          |
+|        |          (CN)     | 美人鱼梦幻之旅                                                                                                                                             |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                                                                                   |
 |   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (ALT)                                                                                                             |
@@ -260,6 +268,7 @@ Game cartridges
 |   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                                                                                                    |
 |        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                                                                                                     |
 |        |          (FI)     | Toy Story 2                                                                                                                                              |
+|        |          (CN)     | 玩具总动员2：营救胡迪                                                                                                                                       |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                                                                                   |
 |   XX   | 80-092241(IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)                                                                                  |
@@ -281,6 +290,7 @@ Game cartridges
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                                                                                |
 |        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                                                                                    |
 |        |          (FI)     | Cinderella - Tuhkimon Taikatoiveet                                                                                                                       |
+|        |          (CN)     | 仙蒂                                                                                                                                                      |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                                                                                    |
 |   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                                                                                                   |
@@ -343,6 +353,7 @@ Game cartridges
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                                                                          |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                                                                                        |
 |   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label, green sticker: "531 ○○○○")                                                                    |
+|        |          (CN)     | 我的外星人同学                                                                                                                                             |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092380(US)     | Barney - The Land of Make Believe                                                                                                                        |
 |        | 80-092383(UK)     | Barney - The Land of Make Believe                                                                                                                        |
@@ -357,6 +368,7 @@ Game cartridges
 |        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                                                                                       |
 |        | 80-092426(PT)     | Nemo - A descoberta do Oceano  (Cart#92436)                                                                                                              |
 |   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label, green sticker: "542 ○○○●")                                                    |
+|        |          (CN)     | 海底总动员                                                                                                                                                |
 +========+===================+==========================================================================================================================================================+
 |   XX   | 80-092440(US)     | Spongebob Squarepants - A Day In The Life of A Sponge                                                                                                    |
 |        | 80-092442(NL)     | Spongebob Squarepants - Een Dag uit het Leven van een Spons                                                                                              |
@@ -378,6 +390,7 @@ Game cartridges
 |        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                                                                                     |
 |        | 80-092485(FR)     | The Batman - Panique a Gotham City                                                                                                                       |
 |        | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                                                                                      |
+|        |          (CN)     | 蝙蝠侠：拯救城市                                                                                                                                           |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                                                                                              |
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                                                                                                      |
@@ -443,6 +456,7 @@ Game cartridges
 |        | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (Misprinted label)                                                                                                       |
 |        |          (NO)     | Biler - Full gass i Radiator By                                                                                                                          |
 |        |          (FI)     | Autot - Aja kilpaa Syylari Cityssä                                                                                                                       |
+|        |          (CN)     | 汽车总动员                                                                                                                                                |
 +========+===================+==========================================================================================================================================================+
 |        | 80-092680(US) ->  |                                                                                                                                                          |
 |        | 80-092800(US)     | <Unknown>                                                                                                                                                |
