@@ -5,8 +5,8 @@
 Scisys Kasparov Stratos Chess Computer
 
 TODO:
-- add LCD, maybe Hughes serial chip? (188:88, 88:88, and 7*7 DMD bottom-left)
-- add Turbo King/Corona (same hardware family)
+- add LCD (188:88, 88:88, and 7*7 DMD bottom-left)
+- corona: different addressmap, 64 leds
 - add endgame rom (softwarelist?)
 - clean up driver
 - does nvram work? maybe both ram chips battery-backed
@@ -16,8 +16,10 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -36,6 +38,7 @@ public:
 		bank_8000(*this, "bank_8000"),
 		bank_4000(*this, "bank_4000"),
 		nvram_bank(*this, "nvram_bank"),
+		m_lcd_busy(*this, "lcd_busy"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -43,6 +46,9 @@ public:
 	{ }
 
 	void stratos(machine_config &config);
+	void corona(machine_config &config);
+	void tking(machine_config &config);
+	void tkingd(machine_config &config);
 
 	void init_stratos();
 
@@ -58,9 +64,18 @@ private:
 
 	void stratos_mem(address_map &map);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(helios_tick);
+
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, m_select;
 	uint32_t ind_leds;
+	bool m_lcd_written;
+
+	u8 m_lcd_address;
+	u8 m_lcd_ram[0x100];
+	u8 m_lcd_latch;
+
+	u8 m_lcd_data;
 	void show_leds();
 	virtual void machine_reset() override;
 
@@ -69,12 +84,11 @@ private:
 	required_memory_bank bank_8000;
 	required_memory_bank bank_4000;
 	required_memory_bank nvram_bank;
+	required_device<timer_device> m_lcd_busy;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8> m_inputs;
-
-	bool m_lcd_busy;
 };
 
 void stratos_state::init_stratos()
@@ -102,6 +116,12 @@ void stratos_state::show_leds()
 	m_display->matrix_partial(0, 2, 1 << (control >> 5 & 1), (~ind_leds & 0xff) | (~control << 6 & 0x100));
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(stratos_state::helios_tick)
+{
+
+
+	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
+}
 
 WRITE8_MEMBER(stratos_state::p2000_w)
 {
@@ -136,12 +156,16 @@ READ8_MEMBER(stratos_state::control_r)
 	if (sel == 8)
 	{
 		// lcd busy flag?
-		data = m_lcd_busy ? 0x20: 0;
-		m_lcd_busy = false;
+		if (m_lcd_busy->enabled())
+			data |= 0x20;
+
+		// battery low?
+		data |= 0x80;
 	}
 
 	if (sel < 8)
 		data |= m_inputs[sel]->read() << 5;
+
 
 	return data;
 }
@@ -149,7 +173,7 @@ READ8_MEMBER(stratos_state::control_r)
 WRITE8_MEMBER(stratos_state::control_w)
 {
 	control = data;
-	bank_8000->set_entry(data & 1);
+	bank_8000->set_entry(data >> 0 & 1);
 	bank_4000->set_entry(data >> 1 & 1); // ?
 	nvram_bank->set_entry((data >> 1) & 1);
 
@@ -164,9 +188,10 @@ READ8_MEMBER(stratos_state::lcd_r)
 
 WRITE8_MEMBER(stratos_state::lcd_w)
 {
-	m_lcd_busy = true; // ?
+	m_lcd_data = data;
+	m_lcd_written = true;
 
-	// TODO..
+	m_lcd_busy->adjust(attotime::from_usec(50)); // ?
 }
 
 void stratos_state::stratos_mem(address_map &map)
@@ -229,19 +254,18 @@ void stratos_state::stratos(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 5.67_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stratos_state::stratos_mem);
-	m_maincpu->set_periodic_int(FUNC(stratos_state::irq0_line_hold), attotime::from_hz(5.67_MHz_XTAL / 0x1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_delay(attotime::from_msec(350));
+
+	TIMER(config, "helios").configure_periodic(FUNC(stratos_state::helios_tick), attotime::from_hz(5.67_MHz_XTAL / 0x10000));
+	TIMER(config, "lcd_busy").configure_generic(timer_device::expired_delegate());
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(2+4, 8+1);
-	m_display->set_bri_levels(0.05); // leds supposed to flicker
-	m_display->set_bri_maximum(0.1); // "
-
 	config.set_default_layout(layout_saitek_stratos);
 
 	/* sound hardware */
@@ -250,14 +274,94 @@ void stratos_state::stratos(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-ROM_START( stratos )
-	ROM_REGION(0x10000, "roms_8000", 0)
-	ROM_LOAD("w1_728m_u3.u3",  0x0000, 0x8000, CRC(b58a7256) SHA1(75b3a3a65f4ca8d52aa5b17a06319bff59d9014f))
-	ROM_LOAD("bw1_918n_u4.u4", 0x8000, 0x8000, CRC(cb0de631) SHA1(f78d40213be21775966cbc832d64acd9b73de632))
+void stratos_state::corona(machine_config &config)
+{
+	stratos(config);
 
-	ROM_REGION(0x10000, "roms_4000", 0)
-	ROM_FILL(0x00000, 0x10000, 0xff)
+	m_board->set_type(sensorboard_device::MAGNETS);
+}
+
+void stratos_state::tking(machine_config &config)
+{
+	stratos(config);
+
+	/* basic machine hardware */
+	R65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // R65C02P4
+	m_maincpu->set_addrmap(AS_PROGRAM, &stratos_state::stratos_mem);
+
+	TIMER(config.replace(), "helios").configure_periodic(FUNC(stratos_state::helios_tick), attotime::from_hz(5_MHz_XTAL / 0x10000));
+}
+
+void stratos_state::tkingd(machine_config &config)
+{
+	tking(config);
+
+	// seems much more responsive
+	m_board->set_delay(attotime::from_msec(200));
+}
+
+
+ROM_START( stratos )
+	ROM_REGION( 0x10000, "roms_8000", 0 )
+	ROM_LOAD("w1y01f_728m_u3.u3", 0x0000, 0x8000, CRC(b58a7256) SHA1(75b3a3a65f4ca8d52aa5b17a06319bff59d9014f) )
+	ROM_LOAD("bw1_819n_u4.u4", 0x8000, 0x8000, CRC(cb0de631) SHA1(f78d40213be21775966cbc832d64acd9b73de632) )
+
+	ROM_REGION( 0x8000, "roms_4000", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
 ROM_END
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME            FLAGS */
-CONS( 1986, stratos, 0,      0,      stratos, stratos, stratos_state, init_stratos, "SciSys",  "Kasparov Stratos", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+ROM_START( stratosl )
+	ROM_REGION( 0x10000, "roms_8000", 0 )
+	ROM_LOAD("w1y01f_728l_u3.u3", 0x0000, 0x8000, CRC(19a22058) SHA1(a5ca54d870c70b7ce9c7be2951800bf49cc57527) )
+	ROM_LOAD("bw1_819n_u4.u4", 0x8000, 0x8000, CRC(cb0de631) SHA1(f78d40213be21775966cbc832d64acd9b73de632) )
+
+	ROM_REGION( 0x8000, "roms_4000", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+ROM_END
+
+ROM_START( tking )
+	ROM_REGION( 0x10000, "roms_8000", 0 )
+	ROM_LOAD("y01f_713d_u3.u3", 0x0000, 0x8000, CRC(b8c6d853) SHA1(98923f44bbbd2ea17c269850971d3df229e6057e) )
+	ROM_LOAD("y01f_712a_u4.u4", 0x8000, 0x8000, CRC(7d3f8f7b) SHA1(8be5d8d988ff0577ccfec0a773bfd94599f2534f) )
+
+	ROM_REGION( 0x8000, "roms_4000", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+ROM_END
+
+ROM_START( tkingl )
+	ROM_REGION( 0x10000, "roms_8000", 0 )
+	ROM_LOAD("w1y01f_728l_u3.u3", 0x0000, 0x8000, CRC(19a22058) SHA1(a5ca54d870c70b7ce9c7be2951800bf49cc57527) )
+	ROM_LOAD("y01f-b_819o_u4.u4", 0x8000, 0x8000, CRC(336040d4) SHA1(aca662b8cc4d6bafd61ca158c768ba8896117169) )
+
+	ROM_REGION( 0x8000, "roms_4000", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+ROM_END
+
+ROM_START( tkingp )
+	ROM_REGION( 0x10000, "roms_8000", 0 )
+	ROM_LOAD("w1y01f_728p_u3.u3", 0x0000, 0x8000, CRC(ad77f83e) SHA1(598fdb1e40267d9d43a3d8f287723070b9afa349) )
+	ROM_LOAD("y01f-b_819o_u4.u4", 0x8000, 0x8000, CRC(336040d4) SHA1(aca662b8cc4d6bafd61ca158c768ba8896117169) )
+
+	ROM_REGION( 0x8000, "roms_4000", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+ROM_END
+
+ROM_START( corona )
+	ROM_REGION( 0x10000, "roms_8000", 0 )
+	ROM_LOAD("w2_708g_u2-a.u2", 0x0000, 0x8000, CRC(52568bb4) SHA1(83fe91787e17bbefc2b3ec651ddb11c88990060d) )
+	ROM_LOAD("bw2_708a_u3-b.u3", 0x8000, 0x8000, CRC(32848f73) SHA1(a447543e3eb4757f9afed26fde77b66985eb96a7) )
+
+	ROM_REGION( 0x8000, "roms_4000", 0 )
+	ROM_FILL( 0x0000, 0x8000, 0xff )
+ROM_END
+
+
+/*    YEAR  NAME      PARENT  CMP MACHINE  INPUT    CLASS          INIT          COMPANY, FULLNAME, FLAGS */
+CONS( 1986, stratos,  0,       0, stratos, stratos, stratos_state, init_stratos, "SciSys", "Kasparov Stratos (rev. M)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, stratosl, stratos, 0, stratos, stratos, stratos_state, init_stratos, "SciSys", "Kasparov Stratos (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1990, tking,   0,        0, tkingd,  stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. D)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
+CONS( 1988, tkingl,  tking,    0, tking,   stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, tkingp,  tking,    0, tking,   stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. P)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1988, corona,  0,        0, corona,  stratos, stratos_state, init_stratos, "Saitek", "Kasparov Corona (rev. G)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

@@ -34115,7 +34115,12 @@ risc2500                        //
 montreux                        //
 
 @source:saitek_stratos.cpp
-stratos                         // Kasparov Stratos Chess Computer
+corona
+stratos
+stratosl
+tking
+tkingl
+tkingp
 
 @source:sam.cpp
 24_130                          //
