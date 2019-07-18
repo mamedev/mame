@@ -126,7 +126,7 @@ protected:
 //private:
 	u8 m_portc, m_to_68k, m_from_68k;
 	u8 m_porta_in, m_porta_out;
-	u8 m_portb_in, m_portb_out;
+	u8 m_portb_out;
 };
 
 class ncd16_state : public ncd68k_state
@@ -200,7 +200,7 @@ private:
 
 void ncd68k_state::machine_reset()
 {
-	m_porta_in = m_porta_out = m_portb_in = m_portb_out = m_portc = 0;
+	m_porta_in = m_porta_out = m_portb_out = m_portc = 0;
 	m_to_68k = m_from_68k = 0;
 
 	m_porta_in |= 0x20;
@@ -300,7 +300,7 @@ u8 ncd68k_state::mcu_portb_r()
 		return m_from_68k;
 	}
 	else
-		return m_portb_in;
+		return m_eeprom->do_read() ? 0x04 : 0x00;
 }
 
 void ncd68k_state::mcu_porta_w(u8 data)
@@ -657,14 +657,6 @@ void ncd68k_state::common(machine_config &config)
 
 	// eeprom
 	EEPROM_93C46_16BIT(config, m_eeprom);
-	m_eeprom->do_callback().set(
-		[this](int state)
-		{
-			if (state)
-				m_portb_in |= 0x04;
-			else
-				m_portb_in &= ~0x04;
-		});
 }
 
 static INPUT_PORTS_START(ncd68k)
