@@ -4,7 +4,7 @@
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
-	<element name="text_mode"><text string="Mode" align="1"><color red="0.21" green="0.2" blue="0.2" /></text></element>
+	<element name="text_mode"><text string="Mode" align="1"><color red="0.36" green="0.35" blue="0.35" /></text></element>
 
 	<element name="ledo">
 		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>

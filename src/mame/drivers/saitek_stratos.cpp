@@ -10,13 +10,11 @@ TODO:
 - add endgame rom (softwarelist?)
 - clean up driver
 - does nvram work? maybe both ram chips battery-backed
-- add soft power off with STOP button(writes 0 to control_w), power-on with GO button
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
-#include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
@@ -38,6 +36,7 @@ public:
 		bank_8000(*this, "bank_8000"),
 		bank_4000(*this, "bank_4000"),
 		nvram_bank(*this, "nvram_bank"),
+		m_irqtimer(*this, "irqtimer"),
 		m_lcd_busy(*this, "lcd_busy"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -47,10 +46,12 @@ public:
 
 	void stratos(machine_config &config);
 	void corona(machine_config &config);
-	void tking(machine_config &config);
-	void tkingd(machine_config &config);
+	void tking2(machine_config &config);
 
 	void init_stratos();
+
+	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 private:
 	DECLARE_WRITE8_MEMBER(p2000_w);
@@ -64,7 +65,8 @@ private:
 
 	void stratos_mem(address_map &map);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(helios_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void set_cpu_freq();
 
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, m_select;
@@ -78,12 +80,14 @@ private:
 	u8 m_lcd_data;
 	void show_leds();
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 	required_device<m65c02_device> m_maincpu;
 	required_device<nvram_device> nvram;
 	required_memory_bank bank_8000;
 	required_memory_bank bank_4000;
 	required_memory_bank nvram_bank;
+	required_device<timer_device> m_irqtimer;
 	required_device<timer_device> m_lcd_busy;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
@@ -101,13 +105,28 @@ void stratos_state::init_stratos()
 	nvram_bank->configure_entries(0, 2, nvram_data.get(),               0x1000);
 }
 
+
+void stratos_state::machine_start()
+{
+	control = 0x40;
+}
+
 void stratos_state::machine_reset()
 {
-	control = 0x00;
+	set_cpu_freq();
+	control = 0x40;
 	m_select = 0x00;
 	bank_8000 ->set_entry(0);
 	bank_4000 ->set_entry(0);
 	nvram_bank->set_entry(0);
+}
+
+void stratos_state::set_cpu_freq()
+{
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? 5.67_MHz_XTAL : 5_MHz_XTAL);
+
+	attotime period = attotime::from_hz(m_maincpu->unscaled_clock() / 0x10000);
+	m_irqtimer->adjust(period, 0, period);
 }
 
 void stratos_state::show_leds()
@@ -116,11 +135,18 @@ void stratos_state::show_leds()
 	m_display->matrix_partial(0, 2, 1 << (control >> 5 & 1), (~ind_leds & 0xff) | (~control << 6 & 0x100));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(stratos_state::helios_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(stratos_state::interrupt)
 {
-
-
 	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
+}
+
+INPUT_CHANGED_MEMBER(stratos_state::go_button)
+{
+	if (newval && ~control & 0x40)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		machine_reset();
+	}
 }
 
 WRITE8_MEMBER(stratos_state::p2000_w)
@@ -172,12 +198,23 @@ READ8_MEMBER(stratos_state::control_r)
 
 WRITE8_MEMBER(stratos_state::control_w)
 {
+	u8 prev = control;
+
 	control = data;
 	bank_8000->set_entry(data >> 0 & 1);
 	bank_4000->set_entry(data >> 1 & 1); // ?
 	nvram_bank->set_entry((data >> 1) & 1);
 
 	show_leds();
+
+	// d6 falling edge: power-off request
+	if (~data & prev & 0x40)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+		// clear display
+		m_display->matrix(0, 0);
+	}
 }
 
 
@@ -209,50 +246,58 @@ void stratos_state::stratos_mem(address_map &map)
 
 static INPUT_PORTS_START( stratos )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // setup
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // level
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Set Up")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // sound
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // stop?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // new game?
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Sound")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // rook
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // pawn
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) // bishop
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // queen
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // knight
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // king
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // play
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // tab/color
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // -
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Play")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Tab / Color")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // +
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // function
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Function")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // library
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // info
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Library")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Info")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // analysis
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) // normal
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Analysis")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Normal")
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, stratos_state, go_button, nullptr) PORT_NAME("Go")
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, stratos_state, cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "5MHz" )
+	PORT_CONFSETTING(    0x01, "5.67MHz" )
 INPUT_PORTS_END
 
 void stratos_state::stratos(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 5.67_MHz_XTAL);
+	M65C02(config, m_maincpu, 5_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &stratos_state::stratos_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -261,7 +306,7 @@ void stratos_state::stratos(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(350));
 
-	TIMER(config, "helios").configure_periodic(FUNC(stratos_state::helios_tick), attotime::from_hz(5.67_MHz_XTAL / 0x10000));
+	TIMER(config, "irqtimer").configure_generic(FUNC(stratos_state::interrupt));
 	TIMER(config, "lcd_busy").configure_generic(timer_device::expired_delegate());
 
 	/* video hardware */
@@ -281,20 +326,9 @@ void stratos_state::corona(machine_config &config)
 	m_board->set_type(sensorboard_device::MAGNETS);
 }
 
-void stratos_state::tking(machine_config &config)
+void stratos_state::tking2(machine_config &config)
 {
 	stratos(config);
-
-	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 5_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &stratos_state::stratos_mem);
-
-	TIMER(config.replace(), "helios").configure_periodic(FUNC(stratos_state::helios_tick), attotime::from_hz(5_MHz_XTAL / 0x10000));
-}
-
-void stratos_state::tkingd(machine_config &config)
-{
-	tking(config);
 
 	// seems much more responsive
 	m_board->set_delay(attotime::from_msec(200));
@@ -360,8 +394,8 @@ ROM_END
 CONS( 1986, stratos,  0,       0, stratos, stratos, stratos_state, init_stratos, "SciSys", "Kasparov Stratos (rev. M)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, stratosl, stratos, 0, stratos, stratos, stratos_state, init_stratos, "SciSys", "Kasparov Stratos (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, tking,   0,        0, tkingd,  stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. D)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
-CONS( 1988, tkingl,  tking,    0, tking,   stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, tkingp,  tking,    0, tking,   stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. P)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, tking,   0,        0, tking2,  stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. D)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
+CONS( 1988, tkingl,  tking,    0, stratos, stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, tkingp,  tking,    0, stratos, stratos, stratos_state, init_stratos, "Saitek", "Kasparov Turbo King (rev. P)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1988, corona,  0,        0, corona,  stratos, stratos_state, init_stratos, "Saitek", "Kasparov Corona (rev. G)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
