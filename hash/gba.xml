@@ -748,6 +748,22 @@
 		</part>
 	</software>
 
+	<software name="agecart">
+		<description>Aging Cartridge (World, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="エージングカートリッジ"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="2097152">
+				<rom name="agb-tchk-1.u1" size="2097152" crc="bbb6a960" sha1="c67e0a5e26ea5eba2bc11c99d003027a96e44060"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aggrinln">
 		<description>Aggressive Inline (Euro)</description>
 		<year>2002</year>
@@ -2783,6 +2799,22 @@
 	</software>
 
 	<software name="bibitina">
+		<description>Bibi und Tina - Ferien auf dem Martinshof (Ger, Rev. 1)</description>
+		<year>2006</year>
+		<publisher>Kiddinx</publisher>
+		<info name="serial" value="AGB-BUXD-NOE (Art.-Nr.: 32252)"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-buxd-1.u1" size="16777216" crc="fd8c06ee" sha1="29b46f4728d55db0e0d4092a9bf85f143adc7e22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bibitina1" cloneof="bibitina">
 		<description>Bibi und Tina - Ferien auf dem Martinshof (Ger)</description>
 		<year>2006</year>
 		<publisher>Kiddinx</publisher>
@@ -3166,6 +3198,30 @@
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="8388608">
 				<rom name="blender bros. (usa).bin" size="8388608" crc="9a91d7f1" sha1="485b1698b4005bc15a83982b85bac68bbbae40ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Released by the developer as a digital download on the web. -->
+	<software name="bluangel1" cloneof="bluangel">
+		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 1)</description>
+		<year>200x</year>
+		<publisher>VetaSoft</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8140988">
+				<rom name="blue angelo proto 1.bin" size="8140988" crc="0cec865b" sha1="d57b1f717ee65a8e45cf5c2a38a9fc542a1d1d20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Released by the developer as a digital download on the web. -->
+	<software name="bluangel">
+		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 2)</description>
+		<year>200x</year>
+		<publisher>VetaSoft</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="19468416">
+				<rom name="blue angelo proto 2.bin" size="19468416" crc="f1b924dc" sha1="b238acd325d8a53ead8e72a95c29922e31d0012e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9690,6 +9746,27 @@
 	</software>
 
 	<software name="exmonply">
+		<description>EX Monopoly (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="AGB-AMOJ-JPN"/>
+		<info name="release" value="20010713"/>
+		<info name="alt_title" value="EXモノポリー"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [HY62WT081ED70C]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="4194304">
+				<rom name="agb-amoj-1.u1" size="4194304" crc="d45abf21" sha1="29e1e9037ada40d6a81360794c9aff13ffaa7135"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exmonply1" cloneof="exmonply">
 		<description>EX Monopoly (Jpn)</description>
 		<year>2001</year>
 		<publisher>Takara</publisher>
@@ -10762,6 +10839,29 @@
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
 				<rom name="fantastic maerchen - cake-ya-san monogatari (japan).bin" size="8388608" crc="ec60d573" sha1="826c247ef4e5b831aa0d75e97cfdfe06c48ad7af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farbe" supported="no">
+		<description>Farbe (Ger)</description>
+		<year>200x</year>
+		<publisher>Nintendo?</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-F01-01" />
+			<feature name="u1" value="U1 [AGB-MBA1]" />
+			<feature name="u2" value="U2 [LH28F320BJE-PTTL90]" />
+			<feature name="u3" value="U3 [LH28F320BJE-PTTL90]" />
+			<feature name="u4" value="U4 [empty]" />
+			<feature name="u5" value="U5 [empty]" />
+			<feature name="u6" value="U6 [empty]" />
+			<feature name="u7" value="U7 [empty]" />
+			<feature name="u8" value="U8 [empty]" />
+			<feature name="u9" value="U9 [empty]" />
+			<feature name="s1" value="S1 [dipswitch]" /> <!-- -.-. -->
+			<dataarea name="rom" size="8388608">
+				<rom name="u2" size="4194304" crc="3dfe6d2b" sha1="d33323f86d16135a3cc8f956fa4e71f2c2dfced4"/>
+				<rom name="u3" size="4194304" crc="7d5b6975" sha1="d92e064abb09a1a5a5f9f9ac6b165c82844668c8" offset="0x400000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15489,6 +15589,27 @@
 	</software>
 
 	<software name="hxhmintd">
+		<description>Hunter X Hunter - Minna Tomodachi Daisakusen!! (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="AGB-A8NJ-JPN (RK319-J1)"/>
+		<info name="release" value="20030424"/>
+		<info name="alt_title" value="ハンター×ハンター みんな友だち大作戦!!"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E06-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 256K SRAM [BS62LV256SC-70]" />
+			<feature name="u3" value="U3 9803F [LV2416]" />
+			<feature name="u4" value="U4 PST3425" />
+			<feature name="bt1" value="CR1616" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-a8nj-1.u1" size="16777216" crc="86c21aeb" sha1="5a327073c67ee6a29bdd595f0c4031f055804e32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hxhmintd1" cloneof="hxhmintd">
 		<description>Hunter X Hunter - Minna Tomodachi Daisakusen!! (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -20620,6 +20741,24 @@
 	</software>
 
 	<software name="mataloki">
+		<description>Matantei Loki Ragnarok - Gensou no Labyrinth (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>J-Wing</publisher>
+		<info name="serial" value="AGB-BMRJ-JPN"/>
+		<info name="release" value="20031016"/>
+		<info name="alt_title" value="魔探偵ロキラグナロク 〜幻想のラビリンス〜"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-20" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9854]" />
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-bmrj-1.u1" size="8388608" crc="d647ab18" sha1="3489569fa8a3c6a750c5cb0048915da78c5f40ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mataloki1" cloneof="mataloki">
 		<description>Matantei Loki Ragnarok - Gensou no Labyrinth (Jpn)</description>
 		<year>2003</year>
 		<publisher>J-Wing</publisher>
@@ -24838,6 +24977,7 @@
 		</part>
 	</software>
 
+	<!-- Released by the developer as a digital download on the web. -->
 	<software name="overstrm">
 		<description>Overstorm (Euro, Prototype Demo)</description>
 		<year>2003</year>
@@ -28197,6 +28337,25 @@
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="33554432">
 				<rom name="riviera - the promised land (usa).bin" size="33554432" crc="4fb6958d" sha1="30ee6610aaa77bce2ffd8911058078147d61b925"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rivieraj1" cloneof="riviera">
+		<description>Riviera - Yakusoku no Chi Riviera (Jpn, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>Sting</publisher>
+		<info name="serial" value="AGB-BREJ-JPN"/>
+		<info name="release" value="20041125"/>
+		<info name="alt_title" value="Riviera 〜約束の地リヴィエラ〜"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-Y11-01" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 256K FRAM [MB85R256S]" />
+			<feature name="u3" value="U3 [empty]" />
+			<feature name="slot" value="gba_sram" />
+			<dataarea name="rom" size="16777216">
+				<rom name="agb-brej-1.u1" size="16777216" crc="146097f2" sha1="7a053463964af2fe03faaa541b35a5f15e5e7bd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32725,6 +32884,22 @@
 	</software>
 
 	<software name="strawrc">
+		<description>Strawberry Shortcake - Ice Cream Island - Riding Camp (Euro, Rev. 1)</description>
+		<year>2006</year>
+		<publisher>The Game Factory</publisher>
+		<info name="serial" value="AGB-B35P-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb" value="AGB-E03-21" />
+			<feature name="u1" value="U1 GPIO MASKROM" />
+			<feature name="u2" value="U2 4K/64K EEPROM [9853]" />
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="agb-b35p-1.u1" size="8388608" crc="f3f2e465" sha1="dbce7927e477feafa0d624b91ebed490a786bf08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strawrc1" cloneof="strawrc">
 		<description>Strawberry Shortcake - Ice Cream Island - Riding Camp (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
@@ -36333,6 +36508,7 @@
 		</part>
 	</software>
 
+	<!-- Released by the developer as a digital download on the web. -->
 	<software name="tyrian2k">
 		<description>Tyrian 2000 (USA, Prototype)</description>
 		<year>19??</year>
@@ -37836,6 +38012,7 @@
 		</part>
 	</software>
 
+	<!-- Released by the developer as a digital download on the web. -->
 	<software name="worldreb">
 		<description>World Reborn (USA, Prototype)</description>
 		<year>2004</year>
