@@ -14,6 +14,7 @@ public:
 
 	// input lines
 	template <unsigned Coprocessor> auto in_brcond() { return m_in_brcond[Coprocessor].bind(); }
+	void berr_w(int state) { m_bus_error = bool(state); }
 
 protected:
 	mips1core_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
@@ -235,6 +236,7 @@ protected:
 
 	// I/O
 	devcb_read_line m_in_brcond[4];
+	bool m_bus_error;
 };
 
 class mips1_device_base : public mips1core_device_base
