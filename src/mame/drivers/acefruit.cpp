@@ -179,7 +179,7 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 				for( x = 0; x < 16; x++ )
 				{
 					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
-					const uint8_t *gfxdata = gfx->get_data(sprite);
+					const uint16_t *gfxdata = gfx->get_data(sprite);
 
 					for( y = 0; y < 8; y++ )
 					{

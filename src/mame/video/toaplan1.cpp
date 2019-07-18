@@ -676,7 +676,7 @@ void toaplan1_state::draw_sprite_custom(screen_device &screen, bitmap_rgb32 &des
 		int priority)
 {
 	const u32 pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u8 *source_base = gfx->get_data(code % gfx->elements());
+	const u16 *source_base = gfx->get_data(code % gfx->elements());
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	const int sprite_screen_height = ((1 << 16) * gfx->height() + 0x8000) >> 16;
 	const int sprite_screen_width = ((1 << 16) * gfx->width() + 0x8000) >> 16;
@@ -742,14 +742,14 @@ void toaplan1_state::draw_sprite_custom(screen_device &screen, bitmap_rgb32 &des
 		{ /* skip if inner loop doesn't draw anything */
 			for (int y = sy; y < ey; y++)
 			{
-				const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
+				const u16 *source = source_base + (y_index >> 16) * gfx->rowbytes();
 				u32 *dest = &dest_bmp.pix32(y);
 				u8 *pri = &priority_bitmap.pix8(y);
 
 				int x_index = x_index_base;
 				for (int x = sx; x < ex; x++)
 				{
-					const u8 c = source[x_index >> 16];
+					const u16 c = source[x_index >> 16];
 					if (c != 0)
 					{
 						if (pri[x] < priority)

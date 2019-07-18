@@ -286,7 +286,7 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 		u32 code, u32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley)
 {
 	const u16 pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u8 *source_base = gfx->get_data(code % gfx->elements());
+	const u16 *source_base = gfx->get_data(code % gfx->elements());
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	const int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
 	const int sprite_screen_width = (scalex * gfx->width() + 0x8000) >> 16;
@@ -355,14 +355,14 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 			/* skip if inner loop doesn't draw anything */
 			for (int y = sy; y < ey; y++)
 			{
-				const u8 *source = source_base + (y_index >> 16) * gfx->rowbytes();
+				const u16 *source = source_base + (y_index >> 16) * gfx->rowbytes();
 				u16 *dest = &dest_bmp.pix16(y);
 				u8 *pri = &priority_bitmap.pix8(y);
 
 				int x_index = x_index_base;
 				for (int x = sx; x < ex; x++)
 				{
-					const u8 c = source[x_index >> 16];
+					const u16 c = source[x_index >> 16];
 					if (c && (pri[x] & 0x80) == 0)
 					{
 						u8 tilemap_priority = 0, sprite_priority = 0;

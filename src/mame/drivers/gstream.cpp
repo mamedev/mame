@@ -183,6 +183,7 @@ private:
 	int       m_oki_bank[2];
 	int       m_toggle;
 	int       m_xoffset;
+	bool      m_is_rgb;
 
 	DECLARE_WRITE32_MEMBER(vram_w);
 	template<int Layer> DECLARE_WRITE16_MEMBER(scrollx_w);
@@ -198,11 +199,8 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram);
-	void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
-	uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty);
-
-	void rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t* NEW2);
-	void rearrange_tile_data(uint8_t* ROM, uint32_t* NEW, uint32_t* NEW2);
+	void drawgfx_rgb(bitmap_rgb32 &bitmap,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -549,23 +547,44 @@ static const gfx_layout layout32x32 =
 	32*32*8,
 };
 
+
+static const gfx_layout layout16x16x16 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	16,
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
+	{ STEP16(0,16*16) },
+	16*16*16,
+};
+
+
+static const gfx_layout layout32x32x16 =
+{
+	32,32,
+	RGN_FRAC(1,1),
+	16,
+	{ STEP16(0,1) },
+	{ STEP32(0,16) },
+	{ STEP32(0,16*32) },
+	32*32*16,
+};
+
+
 static GFXDECODE_START( gfx_gstream )
-	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0x1000, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0x1400, 4 )
-	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0x1800, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0x1000,  4 )
+	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0x1400,  4 )
+	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0x1800,  4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0,      32 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( gfx_x2222 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx1_lower", 0, layout16x16, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx2_lower", 0, layout32x32, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx3_lower", 0, layout32x32, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx4_lower", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout32x32x16, 0, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, layout32x32x16, 0, 1 )
+	GFXDECODE_ENTRY( "gfx4", 0, layout32x32x16, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16x16, 0, 1 )
 GFXDECODE_END
 
 
@@ -574,152 +593,67 @@ void gstream_state::video_start()
 }
 
 
-// custom drawgfx function for x2222 to draw RGB data instead of indexed data, needed because our regular drawgfx and tilemap code don't support that
-void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
-		uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty)
+void gstream_state::drawgfx_rgb(bitmap_rgb32 &bitmap,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy)
 {
-	// use pen usage to optimize
-	code %= gfx->elements();
-	const pen_t *rgb = m_palette->pens(); // 16 bit BGR
+	/* Start drawing */
+	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+	const u16 *source_base = gfx->get_data(code % gfx->elements());
 
-	// render
+	int xinc = flipx ? -1 : 1;
+	int yinc = flipy ? -1 : 1;
 
-	do {
-		g_profiler.start(PROFILER_DRAWGFX);
-		do {
-			const uint8_t *srcdata, *srcdata2;
-			int32_t destendx, destendy;
-			int32_t srcx, srcy;
-			int32_t curx, cury;
-			int32_t dy;
+	int x_index_base = flipx ? gfx->width() - 1 : 0;
+	int y_index = flipy ? gfx->height() - 1 : 0;
 
-			assert(dest.valid());
-			assert(gfx != nullptr);
-			assert(dest.cliprect().contains(cliprect));
-			assert(code < gfx->elements());
+	// start coordinates
+	int sx = offsx;
+	int sy = offsy;
 
-			/* ignore empty/invalid cliprects */
-			if (cliprect.empty())
-				break;
+	// end coordinates
+	int ex = sx + gfx->width();
+	int ey = sy + gfx->height();
 
-			/* compute final pixel in X and exit if we are entirely clipped */
-			destendx = destx + gfx->width() - 1;
-			if (destx > cliprect.max_x || destendx < cliprect.min_x)
-				break;
+	if (sx < clip.min_x)
+	{ // clip left
+		int pixels = clip.min_x - sx;
+		sx += pixels;
+		x_index_base += xinc * pixels;
+	}
+	if (sy < clip.min_y)
+	{ // clip top
+		int pixels = clip.min_y - sy;
+		sy += pixels;
+		y_index += yinc * pixels;
+	}
+	// NS 980211 - fixed incorrect clipping
+	if (ex > clip.max_x + 1)
+	{ // clip right
+		ex = clip.max_x + 1;
+	}
+	if (ey > clip.max_y + 1)
+	{ // clip bottom
+		ey = clip.max_y + 1;
+	}
 
-			/* apply left clip */
-			srcx = 0;
-			if (destx < cliprect.min_x)
+	if (ex > sx)
+	{ // skip if inner loop doesn't draw anything
+		for (int y = sy; y < ey; y++)
+		{
+			const u16 *source = source_base + y_index * gfx->rowbytes();
+			u32 *dest = &bitmap.pix32(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
 			{
-				srcx = cliprect.min_x - destx;
-				destx = cliprect.min_x;
+				const u16 c = source[x_index];
+				if (c != 0) // draw this pixel when rom data is not 0
+					dest[x] = pal[c];
+
+				x_index += xinc;
 			}
-
-			/* apply right clip */
-			if (destendx > cliprect.max_x)
-				destendx = cliprect.max_x;
-
-			/* compute final pixel in Y and exit if we are entirely clipped */
-			destendy = desty + gfx->height() - 1;
-			if (desty > cliprect.max_y || destendy < cliprect.min_y)
-				break;
-
-			/* apply top clip */
-			srcy = 0;
-			if (desty < cliprect.min_y)
-			{
-				srcy = cliprect.min_y - desty;
-				desty = cliprect.min_y;
-			}
-
-			/* apply bottom clip */
-			if (destendy > cliprect.max_y)
-				destendy = cliprect.max_y;
-
-			/* apply X flipping */
-			if (flipx)
-				srcx = gfx->width() - 1 - srcx;
-
-			/* apply Y flipping */
-			dy = gfx->rowbytes();
-			if (flipy)
-			{
-				srcy = gfx->height() - 1 - srcy;
-				dy = -dy;
-			}
-
-			/* fetch the source data */
-			srcdata = gfx->get_data(code);
-			srcdata2 = gfx2->get_data(code);
-
-			/* compute how many blocks of 4 pixels we have */
-			uint32_t leftovers = (destendx + 1 - destx);
-
-			/* adjust srcdata to point to the first source pixel of the row */
-			srcdata += srcy * gfx->rowbytes() + srcx;
-			srcdata2 += srcy * gfx->rowbytes() + srcx;
-
-			/* non-flipped 16bpp case */
-			if (!flipx)
-			{
-				/* iterate over pixels in Y */
-				for (cury = desty; cury <= destendy; cury++)
-				{
-					uint32_t *destptr = &dest.pix32(cury, destx);
-					const uint8_t *srcptr = srcdata;
-					const uint8_t *srcptr2 = srcdata2;
-					srcdata += dy;
-					srcdata2 += dy;
-
-					/* iterate over leftover pixels */
-					for (curx = 0; curx < leftovers; curx++)
-					{
-						uint32_t srcdata = (srcptr[0]);
-						uint32_t srcdata2 = (srcptr2[0]);
-
-						uint16_t full = (srcdata | (srcdata2 << 8));
-						if (full != 0)
-							destptr[0] = rgb[full];
-
-						srcptr++;
-						srcptr2++;
-						destptr++;
-					}
-				}
-			}
-
-			/* flipped 16bpp case */
-			else
-			{
-				/* iterate over pixels in Y */
-				for (cury = desty; cury <= destendy; cury++)
-				{
-					uint32_t *destptr = &dest.pix32(cury, destx);
-					const uint8_t *srcptr = srcdata;
-					const uint8_t *srcptr2 = srcdata2;
-
-					srcdata += dy;
-					srcdata2 += dy;
-
-					/* iterate over leftover pixels */
-					for (curx = 0; curx < leftovers; curx++)
-					{
-						uint32_t srcdata = (srcptr[0]);
-						uint32_t srcdata2 = (srcptr2[0]);
-
-						uint16_t full = (srcdata | (srcdata2 << 8));
-						if (full != 0)
-							destptr[0] = rgb[full];
-
-						srcptr--;
-						srcptr2--;
-						destptr++;
-					}
-				}
-			}
-		} while (0);
-		g_profiler.stop();
-	} while (0);
+			y_index += yinc;
+		}
+	}
 }
 
 void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram )
@@ -740,8 +674,8 @@ void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 			int pal = (vram_data & 0xc000) >> 14;
 			int code = (vram_data & 0x0fff);
 
-			if (m_gfxdecode->gfx(map+5))
-				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f));
+			if (m_is_rgb)
+				drawgfx_rgb(bitmap,cliprect,m_gfxdecode->gfx(map),code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f));
 			else
 				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 
@@ -775,11 +709,9 @@ uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", m_scrollx[0], m_scrolly[0], m_scrollx[1], m_scrolly[1], m_scrollx[2], m_scrolly[2] );
 	bitmap.fill(0,cliprect);
 
-
 	draw_bg(bitmap, cliprect, 2, m_vram + 0x800/4);
 	draw_bg(bitmap, cliprect, 1, m_vram + 0x400/4);
 	draw_bg(bitmap, cliprect, 0, m_vram + 0x000/4); // move on top for x2222 , check
-
 
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{
@@ -789,13 +721,12 @@ uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		int y = m_vram[i + 2] & 0xff;
 		int col = m_vram[i + 3] & 0x1f;
 
-		if (m_gfxdecode->gfx(4))
+		if (m_is_rgb)
 		{
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset, y);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset, y-0x100);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset - 0x200, y);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, 0, 0, x - m_xoffset - 0x200 , y-0x100);
-
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset, y);
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset, y-0x100);
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset - 0x200, y);
+			drawgfx_rgb(bitmap, cliprect, m_gfxdecode->gfx(3), code, col, 0, 0, x - m_xoffset - 0x200, y-0x100);
 		}
 		else
 		{
@@ -803,7 +734,6 @@ uint32_t gstream_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
 			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
 			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
-
 		}
 	}
 	return 0;
@@ -938,53 +868,28 @@ ROM_START( x2222 )
 	ROM_REGION32_BE( 0x0200000, "misc", 0 ) /* other code */
 	ROM_LOAD( "test.hye", 0x000000, 0x0112dda, CRC(c1142b2f) SHA1(5807930820a53604013a6ac66e4d4ebe3628e1fc) ) // the above binary was built from this
 
-	/* x2222 uses raw rgb16 data rather than 8bpp indexed, in order to use the same gfx decodes with a custom draw routine we arrange the data into 2 8bpp regions on init */
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
-	/* filled in at init*/
+	/* x2222 uses raw rgb16 data rather than 8bpp indexed */
+	ROM_REGION( 0x1000000, "gfx1", 0 )  /* sprite tiles (16x16x16) */
+	ROM_LOAD64_WORD_SWAP( "spr11.bin", 0x000000, 0x200000, CRC(1d15b444) SHA1(27ace509a7e4ec2e62453636acf444a861bb85ce) )
+	ROM_LOAD64_WORD_SWAP( "spr21.bin", 0x800000, 0x1b8b00, CRC(1c392be2) SHA1(775882f588a8bef33a79fa4f25754a47dc82cb30) )
+	ROM_LOAD64_WORD_SWAP( "spr12.bin", 0x000002, 0x200000, CRC(73225936) SHA1(50507c52b932198659e08d22d3c0a92e7c69e5ba) )
+	ROM_LOAD64_WORD_SWAP( "spr22.bin", 0x800002, 0x1b8b00, CRC(cf7ebfa1) SHA1(c968dcf768e5598240f5a131414a5607899b4bef) )
+	ROM_LOAD64_WORD_SWAP( "spr13.bin", 0x000004, 0x200000, CRC(52595c51) SHA1(a161a5f433aa7aa2f7824ea6b9b70d73ca63b62d) )
+	ROM_LOAD64_WORD_SWAP( "spr23.bin", 0x800004, 0x1b8b00, CRC(d894461e) SHA1(14dccfa8c762d928eaea0ac4cfff7d1272b69fdd) )
+	ROM_LOAD64_WORD_SWAP( "spr14.bin", 0x000006, 0x200000, CRC(f6cd6599) SHA1(170ea7a9a26fd8038df53fb333357766dabbe7c2) )
+	ROM_LOAD64_WORD_SWAP( "spr24.bin", 0x800006, 0x1b8b00, CRC(9542cb08) SHA1(d40c1f0b7d3e9deb12284c2f2c2df0ac43cb6cd2) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
+	ROM_REGION( 0x400000, "gfx2", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD32_WORD_SWAP( "bg31.bin", 0x000000, 0x11ac00, CRC(12e67bc2) SHA1(18618a8931af3b3aeab34fd50424a7ffb3da6458) )
+	ROM_LOAD32_WORD_SWAP( "bg32.bin", 0x000002, 0x11ac00, CRC(95afa0da) SHA1(e534bc0874329475ce7efa836000fe29fc76c44c) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
+	ROM_REGION( 0x400000, "gfx3", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD32_WORD_SWAP( "bg21.bin", 0x000000, 0x1c8400, CRC(a10220f8) SHA1(9aa43a8e23cdf55d8623d2694b04971eaced9ba9) )
+	ROM_LOAD32_WORD_SWAP( "bg22.bin", 0x000002, 0x1c8400, CRC(966f7c1d) SHA1(4699a3014c7e66d0dabd8d7982f43114b71181b7) )
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	/* 2nd 8-bits */
-	ROM_REGION( 0x800000, "gfx1_lower", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x200000, "gfx2_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x200000, "gfx3_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x200000, "gfx4_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x1000000, "sprites", 0 )  /* sprite tiles (16x16x16) */
-	ROM_LOAD( "spr11.bin", 0x000000, 0x200000, CRC(1d15b444) SHA1(27ace509a7e4ec2e62453636acf444a861bb85ce) )
-	ROM_LOAD( "spr21.bin", 0x200000, 0x1b8b00, CRC(1c392be2) SHA1(775882f588a8bef33a79fa4f25754a47dc82cb30) )
-	ROM_LOAD( "spr12.bin", 0x400000, 0x200000, CRC(73225936) SHA1(50507c52b932198659e08d22d3c0a92e7c69e5ba) )
-	ROM_LOAD( "spr22.bin", 0x600000, 0x1b8b00, CRC(cf7ebfa1) SHA1(c968dcf768e5598240f5a131414a5607899b4bef) )
-	ROM_LOAD( "spr13.bin", 0x800000, 0x200000, CRC(52595c51) SHA1(a161a5f433aa7aa2f7824ea6b9b70d73ca63b62d) )
-	ROM_LOAD( "spr23.bin", 0xa00000, 0x1b8b00, CRC(d894461e) SHA1(14dccfa8c762d928eaea0ac4cfff7d1272b69fdd) )
-	ROM_LOAD( "spr14.bin", 0xc00000, 0x200000, CRC(f6cd6599) SHA1(170ea7a9a26fd8038df53fb333357766dabbe7c2) )
-	ROM_LOAD( "spr24.bin", 0xe00000, 0x1b8b00, CRC(9542cb08) SHA1(d40c1f0b7d3e9deb12284c2f2c2df0ac43cb6cd2) )
-
-	ROM_REGION( 0x400000, "bg1", 0 )  /* bg tiles (32x32x16) */
-	ROM_LOAD16_BYTE( "bg31.bin", 0x000000, 0x11ac00, CRC(12e67bc2) SHA1(18618a8931af3b3aeab34fd50424a7ffb3da6458) )
-	ROM_LOAD16_BYTE( "bg32.bin", 0x000001, 0x11ac00, CRC(95afa0da) SHA1(e534bc0874329475ce7efa836000fe29fc76c44c) )
-
-	ROM_REGION( 0x400000, "bg2", 0 )  /* bg tiles (32x32x16) */
-	ROM_LOAD16_BYTE( "bg21.bin", 0x000000, 0x1c8400, CRC(a10220f8) SHA1(9aa43a8e23cdf55d8623d2694b04971eaced9ba9) )
-	ROM_LOAD16_BYTE( "bg22.bin", 0x000001, 0x1c8400, CRC(966f7c1d) SHA1(4699a3014c7e66d0dabd8d7982f43114b71181b7) )
-
-	ROM_REGION( 0x400000, "bg3", 0 )  /* bg tiles (32x32x16) */
-	ROM_LOAD16_BYTE( "bg11.bin", 0x000000, 0x1bc800, CRC(68975462) SHA1(7a2458a3d2465b727f4f5bf45685f35eb4885975) )
-	ROM_LOAD16_BYTE( "bg12.bin", 0x000001, 0x1bc800, CRC(feef1240) SHA1(9eb123a19ade74d8b3ce4df0b04ca97c03fb9fdc) )
+	ROM_REGION( 0x400000, "gfx4", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD32_WORD_SWAP( "bg11.bin", 0x000000, 0x1bc800, CRC(68975462) SHA1(7a2458a3d2465b727f4f5bf45685f35eb4885975) )
+	ROM_LOAD32_WORD_SWAP( "bg12.bin", 0x000002, 0x1bc800, CRC(feef1240) SHA1(9eb123a19ade74d8b3ce4df0b04ca97c03fb9fdc) )
 
 	// no idea what the sound hw is?
 	ROM_REGION( 0x100000, "oki1", ROMREGION_ERASE00 )
@@ -1000,53 +905,28 @@ ROM_START( x2222o )
 	ROM_REGION32_BE( 0x0200000, "misc", 0 ) /* other code */
 	ROM_LOAD( "older.hye", 0x000000, 0x010892f, CRC(cf3a004e) SHA1(1cba64cfa235b9540f33a5ee0cc02dfd267e00fc) ) // this corresponds to the older.bin we're using, for reference
 
-	/* x2222 uses raw rgb16 data rather than 8bpp indexed, in order to use the same gfx decodes with a custom draw routine we arrange the data into 2 8bpp regions on init */
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
-	/* filled in at init*/
+	/* x2222 uses raw rgb16 data rather than 8bpp indexed */
+	ROM_REGION( 0x1000000, "gfx1", 0 )  /* sprite tiles (16x16x16) */ // these sprite ROMs have the Boss tiles in the wrong location for the prototype program rom
+	ROM_LOAD64_WORD_SWAP( "spr11.bin", 0x000000, 0x200000, BAD_DUMP CRC(1d15b444) SHA1(27ace509a7e4ec2e62453636acf444a861bb85ce) )
+	ROM_LOAD64_WORD_SWAP( "spr21.bin", 0x800000, 0x1b8b00, BAD_DUMP CRC(1c392be2) SHA1(775882f588a8bef33a79fa4f25754a47dc82cb30) )
+	ROM_LOAD64_WORD_SWAP( "spr12.bin", 0x000002, 0x200000, BAD_DUMP CRC(73225936) SHA1(50507c52b932198659e08d22d3c0a92e7c69e5ba) )
+	ROM_LOAD64_WORD_SWAP( "spr22.bin", 0x800002, 0x1b8b00, BAD_DUMP CRC(cf7ebfa1) SHA1(c968dcf768e5598240f5a131414a5607899b4bef) )
+	ROM_LOAD64_WORD_SWAP( "spr13.bin", 0x000004, 0x200000, BAD_DUMP CRC(52595c51) SHA1(a161a5f433aa7aa2f7824ea6b9b70d73ca63b62d) )
+	ROM_LOAD64_WORD_SWAP( "spr23.bin", 0x800004, 0x1b8b00, BAD_DUMP CRC(d894461e) SHA1(14dccfa8c762d928eaea0ac4cfff7d1272b69fdd) )
+	ROM_LOAD64_WORD_SWAP( "spr14.bin", 0x000006, 0x200000, BAD_DUMP CRC(f6cd6599) SHA1(170ea7a9a26fd8038df53fb333357766dabbe7c2) )
+	ROM_LOAD64_WORD_SWAP( "spr24.bin", 0x800006, 0x1b8b00, BAD_DUMP CRC(9542cb08) SHA1(d40c1f0b7d3e9deb12284c2f2c2df0ac43cb6cd2) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
+	ROM_REGION( 0x400000, "gfx2", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD32_WORD_SWAP( "bg31.bin", 0x000000, 0x11ac00, CRC(12e67bc2) SHA1(18618a8931af3b3aeab34fd50424a7ffb3da6458) )
+	ROM_LOAD32_WORD_SWAP( "bg32.bin", 0x000002, 0x11ac00, CRC(95afa0da) SHA1(e534bc0874329475ce7efa836000fe29fc76c44c) )
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
+	ROM_REGION( 0x400000, "gfx3", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD32_WORD_SWAP( "bg21.bin", 0x000000, 0x1c8400, CRC(a10220f8) SHA1(9aa43a8e23cdf55d8623d2694b04971eaced9ba9) )
+	ROM_LOAD32_WORD_SWAP( "bg22.bin", 0x000002, 0x1c8400, CRC(966f7c1d) SHA1(4699a3014c7e66d0dabd8d7982f43114b71181b7) )
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	/* 2nd 8-bits */
-	ROM_REGION( 0x800000, "gfx1_lower", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x200000, "gfx2_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x200000, "gfx3_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x200000, "gfx4_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
-	/* filled in at init*/
-
-	ROM_REGION( 0x1000000, "sprites", 0 )  /* sprite tiles (16x16x16) */ // these sprite ROMs have the Boss tiles in the wrong location for the prototype program rom
-	ROM_LOAD( "spr11.bin", 0x000000, 0x200000, BAD_DUMP CRC(1d15b444) SHA1(27ace509a7e4ec2e62453636acf444a861bb85ce) )
-	ROM_LOAD( "spr21.bin", 0x200000, 0x1b8b00, BAD_DUMP CRC(1c392be2) SHA1(775882f588a8bef33a79fa4f25754a47dc82cb30) )
-	ROM_LOAD( "spr12.bin", 0x400000, 0x200000, BAD_DUMP CRC(73225936) SHA1(50507c52b932198659e08d22d3c0a92e7c69e5ba) )
-	ROM_LOAD( "spr22.bin", 0x600000, 0x1b8b00, BAD_DUMP CRC(cf7ebfa1) SHA1(c968dcf768e5598240f5a131414a5607899b4bef) )
-	ROM_LOAD( "spr13.bin", 0x800000, 0x200000, BAD_DUMP CRC(52595c51) SHA1(a161a5f433aa7aa2f7824ea6b9b70d73ca63b62d) )
-	ROM_LOAD( "spr23.bin", 0xa00000, 0x1b8b00, BAD_DUMP CRC(d894461e) SHA1(14dccfa8c762d928eaea0ac4cfff7d1272b69fdd) )
-	ROM_LOAD( "spr14.bin", 0xc00000, 0x200000, BAD_DUMP CRC(f6cd6599) SHA1(170ea7a9a26fd8038df53fb333357766dabbe7c2) )
-	ROM_LOAD( "spr24.bin", 0xe00000, 0x1b8b00, BAD_DUMP CRC(9542cb08) SHA1(d40c1f0b7d3e9deb12284c2f2c2df0ac43cb6cd2) )
-
-	ROM_REGION( 0x400000, "bg1", 0 )  /* bg tiles (32x32x16) */
-	ROM_LOAD16_BYTE( "bg31.bin", 0x000000, 0x11ac00, CRC(12e67bc2) SHA1(18618a8931af3b3aeab34fd50424a7ffb3da6458) )
-	ROM_LOAD16_BYTE( "bg32.bin", 0x000001, 0x11ac00, CRC(95afa0da) SHA1(e534bc0874329475ce7efa836000fe29fc76c44c) )
-
-	ROM_REGION( 0x400000, "bg2", 0 )  /* bg tiles (32x32x16) */
-	ROM_LOAD16_BYTE( "bg21.bin", 0x000000, 0x1c8400, CRC(a10220f8) SHA1(9aa43a8e23cdf55d8623d2694b04971eaced9ba9) )
-	ROM_LOAD16_BYTE( "bg22.bin", 0x000001, 0x1c8400, CRC(966f7c1d) SHA1(4699a3014c7e66d0dabd8d7982f43114b71181b7) )
-
-	ROM_REGION( 0x400000, "bg3", 0 )  /* bg tiles (32x32x16) */
-	ROM_LOAD16_BYTE( "bg11.bin", 0x000000, 0x1bc800, CRC(68975462) SHA1(7a2458a3d2465b727f4f5bf45685f35eb4885975) )
-	ROM_LOAD16_BYTE( "bg12.bin", 0x000001, 0x1bc800, CRC(feef1240) SHA1(9eb123a19ade74d8b3ce4df0b04ca97c03fb9fdc) )
+	ROM_REGION( 0x400000, "gfx4", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD32_WORD_SWAP( "bg11.bin", 0x000000, 0x1bc800, CRC(68975462) SHA1(7a2458a3d2465b727f4f5bf45685f35eb4885975) )
+	ROM_LOAD32_WORD_SWAP( "bg12.bin", 0x000002, 0x1bc800, CRC(feef1240) SHA1(9eb123a19ade74d8b3ce4df0b04ca97c03fb9fdc) )
 
 	// no idea what the sound hw is?
 	ROM_REGION( 0x100000, "oki1", ROMREGION_ERASE00 )
@@ -1091,40 +971,17 @@ void gstream_state::init_gstream()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
 
 	m_xoffset = 2;
+	m_is_rgb = false;
 }
 
-
-void gstream_state::rearrange_tile_data(uint8_t* ROM, uint32_t* NEW, uint32_t* NEW2)
-{
-	int i;
-	for (i = 0; i < 0x80000; i++)
-	{
-		NEW[i]  = (ROM[(i * 8) + 0x000000] << 0) | (ROM[(i * 8) + 0x000001] << 8) | (ROM[(i * 8) + 0x000004] << 16) | (ROM[(i * 8) + 0x000005] << 24);
-		NEW2[i] = (ROM[(i * 8) + 0x000002] << 0) | (ROM[(i * 8) + 0x000003] << 8) | (ROM[(i * 8) + 0x000006] << 16) | (ROM[(i * 8) + 0x000007] << 24);
-	}
-}
-
-void gstream_state::rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t* NEW2)
-{
-	int i;
-	for (i = 0; i < 0x200000; i++)
-	{
-		NEW[i]  = (ROM[(i * 2) + 0xc00000] << 24) | (ROM[(i * 2) + 0x800000] << 16) | (ROM[(i * 2) + 0x400000] << 8) | (ROM[(i * 2) + 0x000000] << 0);
-		NEW2[i] = (ROM[(i * 2) + 0xc00001] << 24) | (ROM[(i * 2) + 0x800001] << 16) | (ROM[(i * 2) + 0x400001] << 8) | (ROM[(i * 2) + 0x000001] << 0);
-	}
-}
 
 void gstream_state::init_x2222()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this)); // older
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(FUNC(gstream_state::x2222_speedup2_r), this)); // newer
 
-	rearrange_sprite_data(memregion("sprites")->base(), (uint32_t*)memregion("gfx1")->base(), (uint32_t*)memregion("gfx1_lower")->base()  );
-	rearrange_tile_data(memregion("bg1")->base(), (uint32_t*)memregion("gfx2")->base(), (uint32_t*)memregion("gfx2_lower")->base());
-	rearrange_tile_data(memregion("bg2")->base(), (uint32_t*)memregion("gfx3")->base(), (uint32_t*)memregion("gfx3_lower")->base());
-	rearrange_tile_data(memregion("bg3")->base(), (uint32_t*)memregion("gfx4")->base(), (uint32_t*)memregion("gfx4_lower")->base());
-
 	m_xoffset = 0;
+	m_is_rgb = true;
 }
 
 

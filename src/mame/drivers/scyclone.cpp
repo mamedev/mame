@@ -126,7 +126,7 @@ private:
 	uint8_t m_hascollided;
 
 	/* video-related */
-	const uint8_t get_sprite_pixel(int x, int y);
+	const uint16_t get_sprite_pixel(int x, int y);
 	const uint8_t get_bitmap_pixel(int x, int y);
 	uint32_t draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t draw_bitmap_and_sprite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -158,7 +158,7 @@ void scyclone_state::video_start()
 	}
 }
 
-const uint8_t scyclone_state::get_sprite_pixel(int x, int y)
+const uint16_t scyclone_state::get_sprite_pixel(int x, int y)
 {
 	int minx = 0xe0-m_sprite_xpos;
 	int miny = 0xe0-m_sprite_ypos;
@@ -178,9 +178,9 @@ const uint8_t scyclone_state::get_sprite_pixel(int x, int y)
 	int sprx = x-minx;
 	int spry = y-miny;
 
-	const uint8_t* srcdata = m_gfxdecode->gfx(0)->get_data(code);
+	const uint16_t* srcdata = m_gfxdecode->gfx(0)->get_data(code);
 
-	uint8_t pix = srcdata[spry*32 + sprx] + col*4;
+	uint16_t pix = srcdata[spry*32 + sprx] + col*4;
 
 	return pix;
 }
@@ -275,7 +275,7 @@ uint32_t scyclone_state::draw_bitmap_and_sprite(screen_device &screen, bitmap_rg
 
 				if (pal) bitmap.pix32(y, (x*8)+i) = paldata[pal];
 
-				uint8_t pal2 = get_sprite_pixel(realx, realy);
+				uint16_t pal2 = get_sprite_pixel(realx, realy);
 
 				if (pal2 & 0x3)
 				{

@@ -94,7 +94,7 @@ void mechatt_state::video_start()
 		else if (dy&0x40) code+=32;             \
 		else if (dx&0x40) code+=16
 
-inline const uint8_t *bbusters_state_base::get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block)
+inline const uint16_t *bbusters_state_base::get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block)
 {
 	int code=0;
 
@@ -147,7 +147,7 @@ void bbusters_state_base::draw_block(screen_device &screen, bitmap_ind16 &dest,i
 			uint16_t *destline = &dest.pix16(dy);
 			uint8_t *priorityline = &screen.priority().pix8(dy);
 			uint8_t srcline=*m_scale_table_ptr;
-			const uint8_t *srcptr=nullptr;
+			const uint16_t *srcptr=nullptr;
 
 			if (!flipy)
 				srcline=size-srcline-1;

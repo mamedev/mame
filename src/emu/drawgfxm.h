@@ -470,7 +470,7 @@ while (0)
 do {                                                                                \
 	g_profiler.start(PROFILER_DRAWGFX);                                             \
 	do {                                                                            \
-		const u8 *srcdata;                                                          \
+		const u16 *srcdata;                                                         \
 		s32 destendx, destendy;                                                     \
 		s32 srcx, srcy;                                                             \
 		s32 curx, cury;                                                             \
@@ -549,7 +549,7 @@ do {                                                                            
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const u8 *srcptr = srcdata;                                         \
+				const u16 *srcptr = srcdata;                                        \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -584,7 +584,7 @@ do {                                                                            
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const u8 *srcptr = srcdata;                                         \
+				const u16 *srcptr = srcdata;                                        \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -642,7 +642,7 @@ do {                                                                            
 do {                                                                                \
 	g_profiler.start(PROFILER_DRAWGFX);                                             \
 	do {                                                                            \
-		const u8 *srcdata;                                                          \
+		const u16 *srcdata;                                                         \
 		u32 dstwidth, dstheight;                                                    \
 		s32 destendx, destendy;                                                     \
 		s32 srcx, srcy;                                                             \
@@ -730,7 +730,7 @@ do {                                                                            
 		{                                                                           \
 			PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 			PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);              \
-			const u8 *srcptr = srcdata + (srcy >> 16) * rowbytes();                 \
+			const u16 *srcptr = srcdata + (srcy >> 16) * rowbytes();                \
 			s32 cursrcx = srcx;                                                     \
 			srcy += dy;                                                             \
 																					\

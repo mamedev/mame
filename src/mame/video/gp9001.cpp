@@ -727,7 +727,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 					color %= total_colors;
 					const pen_t *paldata = &palette().pen(color * 16);
 					{
-						const u8* srcdata = gfx(1)->get_data(sprite);
+						const u16* srcdata = gfx(1)->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
 						int xstart, xend, xinc;
@@ -768,7 +768,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 
 								if (cliprect.contains(drawxx, drawyy))
 								{
-									const u8 pix = srcdata[count];
+									const u16 pix = srcdata[count];
 									u16* dstptr = &bitmap.pix16(drawyy, drawxx);
 									u8* dstpri = &this->custom_priority_bitmap->pix8(drawyy, drawxx);
 

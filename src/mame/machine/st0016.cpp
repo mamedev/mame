@@ -496,7 +496,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 						int yloop, xloop;
 						int ypos, xpos;
 						int tileno;
-						const uint8_t *srcgfx;
+						const uint16_t *srcgfx;
 						int gfxoffs;
 						ypos = sy + y0 * 8 + spr_dy;
 						xpos = sx + x0 * 8 + spr_dx;
@@ -641,7 +641,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 						uint16_t *destline;
 						int yloop, xloop;
 						int ypos, xpos;
-						const uint8_t *srcgfx;
+						const uint16_t *srcgfx;
 						int gfxoffs;
 						ypos = y * 8 + spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
 						xpos = x * 8 + spr_dx;

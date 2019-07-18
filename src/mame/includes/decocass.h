@@ -98,7 +98,7 @@ private:
 	tilemap_t   *m_fg_tilemap;
 	tilemap_t   *m_bg_tilemap_l;
 	tilemap_t   *m_bg_tilemap_r;
-	uint8_t     m_empty_tile[16*16];
+	uint16_t    m_empty_tile[16*16];
 	int32_t     m_watchdog_count;
 	int32_t     m_watchdog_flip;
 	int32_t     m_color_missiles;

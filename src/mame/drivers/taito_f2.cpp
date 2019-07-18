@@ -5298,14 +5298,14 @@ void taitof2_state::init_finalb()
 	u8 *dest = srcdata;
 	for (int c = 0; c < gx0->elements(); c++)
 	{
-		const u8 *c0base = gx0->get_data(c);
-		const u8 *c1base = gx1->get_data(c);
+		const u16 *c0base = gx0->get_data(c);
+		const u16 *c1base = gx1->get_data(c);
 
 		// loop over height
 		for (int y = 0; y < gx0->height(); y++)
 		{
-			const u8 *c0 = c0base;
-			const u8 *c1 = c1base;
+			const u16 *c0 = c0base;
+			const u16 *c1 = c1base;
 
 			for (int x = 0; x < gx0->width(); x++)
 			{

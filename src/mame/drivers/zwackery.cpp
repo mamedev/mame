@@ -210,14 +210,14 @@ void zwackery_state::video_start()
 	for (int code = 0; code < gfx0->elements(); code++)
 	{
 		const uint8_t *coldata = colordatabase + code * 32;
-		const uint8_t *gfxdata0 = gfx0->get_data(code);
-		const uint8_t *gfxdata2 = gfx2->get_data(code);
+		const uint16_t *gfxdata0 = gfx0->get_data(code);
+		const uint16_t *gfxdata2 = gfx2->get_data(code);
 
 		// assume 16 rows
 		for (int y = 0; y < 16; y++)
 		{
-			const uint8_t *gd0 = gfxdata0;
-			const uint8_t *gd2 = gfxdata2;
+			const uint16_t *gd0 = gfxdata0;
+			const uint16_t *gd2 = gfxdata2;
 
 			// 16 columns
 			for (int x = 0; x < 16; x++, gd0++, gd2++)

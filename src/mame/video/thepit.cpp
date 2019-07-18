@@ -133,7 +133,7 @@ void thepit_state::video_start()
 	m_solid_tilemap->set_scroll_cols(32);
 	m_tilemap->set_scroll_cols(32);
 
-	m_dummy_tile = make_unique_clear<uint8_t[]>(8*8);
+	m_dummy_tile = make_unique_clear<uint16_t[]>(8*8);
 
 	m_graphics_bank = 0;    /* only used in intrepid */
 

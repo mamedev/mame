@@ -52,7 +52,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 			const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
 			const pen_t black = palette.black_pen();
 			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const u8 *source_base = gfx->get_data(code % gfx->elements());
+			const u16 *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
 			int sprite_screen_width = (scalex * gfx->width() + 0x8000) >> 16;
 			if (sprite_screen_width && sprite_screen_height)
@@ -117,7 +117,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
+							const u16 *source = source_base + (y_index>>16) * gfx->rowbytes();
 							u16 *dest = &dest_bmp.pix16(y);
 							u8 *pri = &priority_bitmap.pix8(y);
 							int x_index = x_index_base;
@@ -125,7 +125,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 							{
 								for (int x = sx; x < ex; x++)
 								{
-									const u8 c = source[x_index>>16];
+									const u16 c = source[x_index>>16];
 									if (c != 0xff)
 									{
 										if (pri[x] <= zpos)
@@ -153,7 +153,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 							{
 								for (int x = sx; x < ex; x++)
 								{
-									const u8 c = source[x_index>>16];
+									const u16 c = source[x_index>>16];
 									if (c != 0xff)
 									{
 										if (pri[x] <= zpos)

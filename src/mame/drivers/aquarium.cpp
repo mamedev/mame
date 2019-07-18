@@ -341,14 +341,14 @@ void aquarium_state::expand_gfx(int low, int hi)
 	u8 *dest = srcdata;
 	for (int c = 0; c < gfx_l->elements(); c++)
 	{
-		const u8 *c0base = gfx_l->get_data(c);
-		const u8 *c1base = gfx_h->get_data(c);
+		const u16 *c0base = gfx_l->get_data(c);
+		const u16 *c1base = gfx_h->get_data(c);
 
 		// loop over height
 		for (int y = 0; y < gfx_l->height(); y++)
 		{
-			const u8 *c0 = c0base;
-			const u8 *c1 = c1base;
+			const u16 *c0 = c0base;
+			const u16 *c1 = c1base;
 
 			for (int x = 0; x < gfx_l->width(); x++)
 			{

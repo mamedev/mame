@@ -58,7 +58,7 @@ protected:
 	template<int Layer> DECLARE_WRITE16_MEMBER(pf_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
-	const uint8_t *get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block);
+	const uint16_t *get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block);
 	void draw_block(screen_device &screen, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block,int priority);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const uint16_t *source, int bank);
 

@@ -233,8 +233,8 @@ void namcona1_state::pdraw_tile(
 	gfx_element *mask = m_gfxdecode->gfx(2);
 
 	const u16 pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u8 *source_base = gfx->get_data((code % gfx->elements()));
-	const u8 *mask_base = mask->get_data((code % mask->elements()));
+	const u16 *source_base = gfx->get_data((code % gfx->elements()));
+	const u16 *mask_base = mask->get_data((code % mask->elements()));
 
 	/* compute sprite increment per screen pixel */
 	int dx, dy;
@@ -295,8 +295,8 @@ void namcona1_state::pdraw_tile(
 	{ /* skip if inner loop doesn't draw anything */
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * gfx->rowbytes();
-			const u8 *mask_addr = mask_base + y_index * mask->rowbytes();
+			const u16 *source = source_base + y_index * gfx->rowbytes();
+			const u16 *mask_addr = mask_base + y_index * mask->rowbytes();
 			u16 *dest = &dest_bmp.pix16(y);
 			u8 *pri = &screen.priority().pix8(y);
 
@@ -307,7 +307,7 @@ void namcona1_state::pdraw_tile(
 				{
 					if (pri[x] <= priority)
 					{
-						const u8 c = source[x_index];
+						const u16 c = source[x_index];
 						dest[x] = pal_base + c;
 					}
 					pri[x] = 0xff;
@@ -319,7 +319,7 @@ void namcona1_state::pdraw_tile(
 					{
 						if (pri[x] <= priority)
 						{
-							const u8 c = source[x_index];
+							const u16 c = source[x_index];
 
 							/* render a shadow only if the sprites color is $F (8bpp) or $FF (4bpp) */
 							if (bShadow)

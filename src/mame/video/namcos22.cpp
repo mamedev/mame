@@ -56,7 +56,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 	u8 *primap = &extra.primap->pix8(scanline);
 	u16 *ttmap = m_state.m_texture_tilemap;
 	u8 *ttattr = m_state.m_texture_tileattr.get();
-	u8 *ttdata = m_state.m_texture_tiledata;
+	u16 *ttdata = m_state.m_texture_tiledata;
 	u8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
 
 	if (extra.cmode & 4)
@@ -194,7 +194,7 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 	int fadefactor = 0xff - extra.fadefactor;
 	rgbaint_t fogcolor(extra.fogcolor);
 	rgbaint_t fadecolor(extra.fadecolor);
-	u8 *source = (u8 *)extra.source + y_index * extra.line_modulo;
+	u16 *source = (u16 *)extra.source + y_index * extra.line_modulo;
 	u32 *dest = &extra.destbase->pix32(scanline);
 	u8 *primap = &extra.primap->pix8(scanline);
 
@@ -2478,7 +2478,7 @@ void namcos22_state::init_tables()
 		m_gfxdecode->gfx(1)->get_data(i);
 
 	m_texture_tilemap = (u16 *)memregion("textilemap")->base();
-	m_texture_tiledata = (u8 *)m_gfxdecode->gfx(1)->get_data(0);
+	m_texture_tiledata = (u16 *)m_gfxdecode->gfx(1)->get_data(0);
 	m_texture_tileattr = std::make_unique<u8[]>(0x080000*2);
 
 	// unpack textures

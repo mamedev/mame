@@ -135,7 +135,7 @@ protected:
 	std::unique_ptr<uint16_t[]> m_private_spriteram;
 
 private:
-	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int shadow, int realline, int line, int opaque);
+	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, const uint16_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int shadow, int realline, int line, int opaque);
 	inline void get_tile(uint16_t* spriteram, int is_16x16, int x, int y, int page, int& code, int& attr, int& flipx, int& flipy, int& color);
 
 	std::unique_ptr<uint32_t[]> m_realtilenumber;

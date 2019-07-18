@@ -249,16 +249,33 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 		// otherwise, just use the line modulo
 		else
 		{
-			int base = gfx.start;
-			int end = region_length/8;
-			int linemod = glcopy.yoffset[0];
-			while (glcopy.total > 0)
+			if (glcopy.planeoffset[1] != GFX_RAW) // 8bpp RAW case
 			{
-				int elementbase = base + (glcopy.total - 1) * glcopy.charincrement / 8;
-				int lastpixelbase = elementbase + glcopy.height * linemod / 8 - 1;
-				if (lastpixelbase < end)
-					break;
-				glcopy.total--;
+				int base = gfx.start;
+				int end = region_length/8;
+				int linemod = glcopy.yoffset[0];
+				while (glcopy.total > 0)
+				{
+					int elementbase = base + (glcopy.total - 1) * glcopy.charincrement / 8;
+					int lastpixelbase = elementbase + glcopy.height * linemod / 8 - 1;
+					if (lastpixelbase < end)
+						break;
+					glcopy.total--;
+				}
+			}
+			else // 16bpp RAW case
+			{
+				int base = gfx.start;
+				int end = region_length/16;
+				int linemod = glcopy.yoffset[0];
+				while (glcopy.total > 0)
+				{
+					int elementbase = base + (glcopy.total - 1) * glcopy.charincrement / 16;
+					int lastpixelbase = elementbase + glcopy.height * linemod / 16 - 1;
+					if (lastpixelbase < end)
+						break;
+					glcopy.total--;
+				}
 			}
 		}
 

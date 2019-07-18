@@ -372,13 +372,13 @@ typedef u32 tilemap_memory_index;
 struct tile_data
 {
 	device_gfx_interface *decoder;  // set in tilemap_t::init()
-	const u8 *      pen_data;       // required
+	const u16 *     pen_data;       // required
 	const u8 *      mask_data;      // required
 	pen_t           palette_base;   // defaults to 0
 	u8              category;       // defaults to 0; range from 0..15
 	u8              group;          // defaults to 0; range from 0..TILEMAP_NUM_GROUPS
 	u8              flags;          // defaults to 0; one or more of TILE_* flags above
-	u8              pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
+	u16             pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
 	u8              gfxnum;         // defaults to 0xff; specify index of gfx for auto-invalidation on dirty
 	u32             code;
 
@@ -421,7 +421,7 @@ class tilemap_t
 	static const logical_index INVALID_LOGICAL_INDEX = (logical_index)~0;
 
 	// maximum index in each array
-	static const pen_t MAX_PEN_TO_FLAGS = 256;
+	static const pen_t MAX_PEN_TO_FLAGS = 65536;
 
 protected:
 	// tilemap_manager controls our allocations
@@ -548,7 +548,7 @@ private:
 	// internal drawing
 	void pixmap_update();
 	void tile_update(logical_index logindex, u32 col, u32 row);
-	u8 tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u8 pen_mask);
+	u8 tile_draw(const u16 *pendata, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u16 pen_mask);
 	u8 tile_apply_bitmask(const u8 *maskdata, u32 x0, u32 y0, u8 category, u8 flags);
 	void configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask);
 	template<class _BitmapClass> void draw_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask);

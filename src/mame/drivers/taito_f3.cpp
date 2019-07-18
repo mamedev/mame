@@ -4217,14 +4217,14 @@ void taito_f3_state::tile_decode()
 		dest = srcdata;
 		for (int c = 0; c < spr_gfx->elements(); c++)
 		{
-			const u8 *c1base = spr_gfx->get_data(c);
-			const u8 *c3base = spr_gfx_hi->get_data(c);
+			const u16 *c1base = spr_gfx->get_data(c);
+			const u16 *c3base = spr_gfx_hi->get_data(c);
 
 			// loop over height
 			for (int y = 0; y < spr_gfx->height(); y++)
 			{
-				const u8 *c1 = c1base;
-				const u8 *c3 = c3base;
+				const u16 *c1 = c1base;
+				const u16 *c3 = c3base;
 
 				/* Expand 2bits into 4bits format */
 				for (int x = 0; x < spr_gfx->width(); x++)
@@ -4251,14 +4251,14 @@ void taito_f3_state::tile_decode()
 		dest = srcdata;
 		for (int c = 0; c < pf_gfx->elements(); c++)
 		{
-			const u8 *c0base = pf_gfx->get_data(c);
-			const u8 *c2base = pf_gfx_hi->get_data(c);
+			const u16 *c0base = pf_gfx->get_data(c);
+			const u16 *c2base = pf_gfx_hi->get_data(c);
 
 			// loop over height
 			for (int y = 0; y < pf_gfx->height(); y++)
 			{
-				const u8 *c0 = c0base;
-				const u8 *c2 = c2base;
+				const u16 *c0 = c0base;
+				const u16 *c2 = c2base;
 
 				for (int x = 0; x < pf_gfx->width(); x++)
 					*dest++ = (*c0++ & 0xf) | (*c2++ & 0x30);
