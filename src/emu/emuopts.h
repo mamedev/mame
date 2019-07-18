@@ -240,7 +240,7 @@ private:
 class image_option
 {
 public:
-	image_option(emu_options &host, const std::string &canonical_instance_name);
+	image_option(emu_options &host, std::string &&canonical_instance_name);
 	image_option(const image_option &that) = delete;
 	image_option(image_option &&that) = default;
 
@@ -480,6 +480,8 @@ public:
 	bool has_slot_option(const std::string &device_name) const { return find_slot_option(device_name) ? true : false; }
 	const ::image_option &image_option(const std::string &device_name) const;
 	::image_option &image_option(const std::string &device_name);
+	const ::image_option *find_image_option_canonical(const std::string &device_name) const;
+	::image_option *find_image_option_canonical(const std::string &device_name);
 
 protected:
 	virtual void command_argument_processed() override;
