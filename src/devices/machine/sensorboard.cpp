@@ -14,7 +14,7 @@ can be made to look completely different with external artwork.
 This device 'steals' the Shift and Ctrl keys, so don't use them in the driver.
 But if you must, these inputs can be disabled with set_mod_enable(false).
 In here, they're used for forcing sensor/piece inputs (a normal click activates
-both at the same time).
+both at the same time). Also used with board initialization.
 
 If you use this device in a slot, or add multiple of them, make sure to override
 the outputs with output_cb() to avoid collisions.
@@ -51,6 +51,7 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 	m_custom_spawn_cb(*this),
 	m_custom_output_cb(*this)
 {
+	m_nosensors = false;
 	m_magnets = false;
 	m_inductive = false;
 	m_ui_enabled = 3;
@@ -186,17 +187,9 @@ void sensorboard_device::device_reset()
 
 sensorboard_device &sensorboard_device::set_type(sb_type type)
 {
+	m_nosensors = (type == NOSENSORS);
 	m_inductive = (type == INDUCTIVE);
 	m_magnets = (type == MAGNETS) || m_inductive;
-
-	if (type == NOSENSORS)
-	{
-		set_mod_enable(false);
-		set_delay(attotime::never);
-	}
-
-	if (m_inductive)
-		set_mod_enable(false);
 
 	return *this;
 }
@@ -401,7 +394,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 	if (!newval)
 		return;
 
-	if (m_sensorpos != -1 || m_inp_ui->read() & 1)
+	if (m_sensorpos != -1 || (m_inp_ui->read() & 1 && !m_inductive && !m_nosensors))
 		return;
 
 	u8 pos = (u8)(uintptr_t)param;
@@ -537,6 +530,27 @@ INPUT_CHANGED_MEMBER(sensorboard_device::ui_init)
 
 	if (init)
 		m_custom_init_cb(0);
+
+	// rotate pieces
+	if (m_inp_ui->read() & 2)
+	{
+		u8 tempstate[0x100];
+		for (int y = 0; y < m_height; y++)
+			for (int x = 0; x < m_width; x++)
+				tempstate[m_width * (m_height - 1 - y) + (m_width - 1 - x)] = m_curstate[m_width * y + x];
+
+		memcpy(m_curstate, tempstate, m_height * m_width);
+	}
+
+	// reset undo
+	if (m_inp_ui->read() & 1)
+	{
+		memcpy(m_history[0], m_curstate, m_height * m_width);
+
+		m_upointer = 0;
+		m_ufirst = 0;
+		m_ulast = 0;
+	}
 
 	refresh();
 }
@@ -687,8 +701,8 @@ static INPUT_PORTS_START( sensorboard )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("SS_CHECK", 1<<15, EQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_spawn, 16) PORT_NAME("Spawn Piece 16")
 
 	PORT_START("UI")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Modifier Force Sensor") // hold while clicking to force sensor (ignore piece)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Modifier Force Piece") // hold while clicking to force piece (ignore sensor)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Modifier 2 / Force Sensor") // hold while clicking to force sensor (ignore piece)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 1, NOTEQUALS, 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME("Modifier 1 / Force Piece") // hold while clicking to force piece (ignore sensor)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sensorboard_device, check_sensor_busy, nullptr) // check if any sensor is busy / pressed (read-only)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_hand, 0) PORT_NAME("Remove Piece")
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CONDITION("UI_CHECK", 2, NOTEQUALS, 0) PORT_CHANGED_MEMBER(DEVICE_SELF, sensorboard_device, ui_undo, 0) PORT_NAME("Undo Buffer First")

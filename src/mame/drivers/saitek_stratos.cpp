@@ -61,7 +61,7 @@ private:
 	DECLARE_READ8_MEMBER(lcd_r);
 	DECLARE_WRITE8_MEMBER(lcd_w);
 
-	void stratos_mem(address_map &map);
+	void main_map(address_map &map);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void set_cpu_freq();
@@ -146,7 +146,6 @@ INPUT_CHANGED_MEMBER(stratos_state::go_button)
 
 WRITE8_MEMBER(stratos_state::p2000_w)
 {
-	m_dac->write(0); // guessed
 	m_select = data;
 
 	m_display->matrix_partial(2, 4, ~m_select >> 4 & 0xf, 1 << (m_select & 0xf));
@@ -164,6 +163,8 @@ WRITE8_MEMBER(stratos_state::p2200_w)
 
 WRITE8_MEMBER(stratos_state::p2400_w)
 {
+	m_dac->write(0); // guessed
+
 	m_led_data = data;
 
 	show_leds();
@@ -186,7 +187,6 @@ READ8_MEMBER(stratos_state::control_r)
 
 	if (sel < 8)
 		data |= m_inputs[sel]->read() << 5;
-
 
 	return data;
 }
@@ -226,7 +226,7 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	m_lcd_busy->adjust(attotime::from_usec(50)); // ?
 }
 
-void stratos_state::stratos_mem(address_map &map)
+void stratos_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram.u6");
 	map(0x2000, 0x2000).w(FUNC(stratos_state::p2000_w));
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( stratos )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Set Up")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) // freq sel
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Sound")
@@ -268,12 +268,12 @@ static INPUT_PORTS_START( stratos )
 	PORT_START("IN.5")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Function")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) // freq sel
 
 	PORT_START("IN.6")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Library")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Info")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM) // freq sel
 
 	PORT_START("IN.7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -289,11 +289,18 @@ static INPUT_PORTS_START( stratos )
 	PORT_CONFSETTING(    0x01, "5.67MHz" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tking2 )
+	PORT_INCLUDE( stratos )
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM)
+INPUT_PORTS_END
+
 void stratos_state::stratos(machine_config &config)
 {
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 5_MHz_XTAL); // see set_cpu_freq
-	m_maincpu->set_addrmap(AS_PROGRAM, &stratos_state::stratos_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stratos_state::main_map);
 
 	NVRAM(config, "nvram.u6", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram.u7", nvram_device::DEFAULT_ALL_0);
@@ -390,8 +397,8 @@ ROM_END
 CONS( 1986, stratos,  0,       0, stratos, stratos, stratos_state, empty_init, "SciSys", "Kasparov Stratos (rev. M)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, stratosl, stratos, 0, stratos, stratos, stratos_state, empty_init, "SciSys", "Kasparov Stratos (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, tking,   0,        0, tking2,  stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (rev. D)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
-CONS( 1988, tkingl,  tking,    0, stratos, stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, tkingp,  tking,    0, stratos, stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (rev. P)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, tking,    0,       0, tking2,  tking2,  stratos_state, empty_init, "Saitek", "Kasparov Turbo King (rev. D)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
+CONS( 1988, tkingl,   tking,   0, stratos, stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (rev. L)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, tkingp,   tking,   0, stratos, stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (rev. P)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, corona,  0,        0, corona,  stratos, stratos_state, empty_init, "Saitek", "Kasparov Corona (rev. G)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, corona,   0,       0, corona,  stratos, stratos_state, empty_init, "Saitek", "Kasparov Corona (rev. G)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

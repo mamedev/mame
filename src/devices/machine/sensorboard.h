@@ -92,6 +92,7 @@ private:
 	devcb_read8 m_custom_spawn_cb;
 	devcb_write16 m_custom_output_cb;
 
+	bool m_nosensors;
 	bool m_magnets;
 	bool m_inductive;
 	u8 m_width;
