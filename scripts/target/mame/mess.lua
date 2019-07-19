@@ -4035,6 +4035,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",
 	MAME_DIR .. "src/mame/drivers/sartorius.cpp",
+	MAME_DIR .. "src/mame/drivers/sb8085.cpp",
 	MAME_DIR .. "src/mame/drivers/sbrain.cpp",
 	MAME_DIR .. "src/mame/drivers/seattlecmp.cpp",
 	MAME_DIR .. "src/mame/drivers/sh4robot.cpp",

@@ -34383,6 +34383,9 @@ savia84                         //
 @source:savquest.cpp
 savquest                        //
 
+@source:sb8085.cpp
+sb8085                          //
+
 @source:sbasketb.cpp
 sbasketb                        // GX405 (c) 1984 (Version I, Encrypted)
 sbaskete                        // GX405 (c) 1984 (Version E, Encrypted)

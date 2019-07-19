@@ -702,6 +702,7 @@ sapi1.cpp
 sartorius.cpp
 saturn.cpp
 savia84.cpp
+sb8085.cpp
 sbc6510.cpp
 sbrain.cpp
 sc2.cpp
