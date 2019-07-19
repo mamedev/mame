@@ -1218,6 +1218,7 @@ void lua_engine::initialize()
 			"load", &running_machine::schedule_load,
 			"system", &running_machine::system,
 			"video", &running_machine::video,
+			"sound", &running_machine::sound,
 			"render", &running_machine::render,
 			"ioport", &running_machine::ioport,
 			"parameters", &running_machine::parameters,
@@ -1870,6 +1871,23 @@ void lua_engine::initialize()
 			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
 
+/*  sound_manager library
+ *
+ * manager:machine():sound()
+ *
+ * sound:start_recording() - begin audio recording
+ * sound:stop_recording() - end audio recording
+ * sound:ui_mute(turn_off) - turns on/off UI sound
+ * sound:system_mute() - turns on/off system sound
+ * sound:attenuation - sound attenuation
+ */
+	sol().registry().new_usertype<sound_manager>("sound", "new", sol::no_constructor,
+			"start_recording", &sound_manager::start_recording,
+			"stop_recording", &sound_manager::stop_recording,
+			"ui_mute", &sound_manager::ui_mute,
+			"debugger_mute", &sound_manager::debugger_mute,
+			"system_mute", &sound_manager::system_mute,
+			"attenuation", sol::property(&sound_manager::attenuation, &sound_manager::set_attenuation));
 
 /*  input_manager library
  *
