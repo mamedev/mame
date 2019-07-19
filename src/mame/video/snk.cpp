@@ -3,7 +3,6 @@
 // thanks-to:Marco Cassili
 #include "emu.h"
 #include "includes/snk.h"
-#include <algorithm>
 
 /*******************************************************************************
  Shadow Handling Notes
@@ -343,7 +342,7 @@ VIDEO_START_MEMBER(snk_state,gwar)
 	for(i = 0; i <= 14; i++) m_drawmode_table[i] = DRAWMODE_SOURCE;
 	m_drawmode_table[15] = DRAWMODE_NONE;
 
-	std::fill(std::begin(m_empty_tile), std::end(m_empty_tile), 0xf);
+	memset(m_empty_tile, 0xf, sizeof(m_empty_tile));
 
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::gwar_get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 50, 32);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::gwar_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);

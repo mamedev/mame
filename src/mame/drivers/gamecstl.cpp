@@ -138,7 +138,7 @@ void gamecstl_state::video_start()
 void gamecstl_state::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
-	const uint16_t *dp;
+	const uint8_t *dp;
 	int index = 0;
 	dp = gfx->get_data(ch);
 

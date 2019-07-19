@@ -244,7 +244,7 @@ void kaneko16_sprite_device::draw_sprites_custom(_BitmapClass &dest_bmp,const re
 		bitmap_ind8 &priority_bitmap, int priority)
 {
 	const pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u16 *source_base = gfx->get_data(code % gfx->elements());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
 	int dx, dy;
 
 	int ex = sx+gfx->width();
@@ -309,14 +309,14 @@ void kaneko16_sprite_device::draw_sprites_custom(_BitmapClass &dest_bmp,const re
 		const pen_t *pal = gfx->palette().pens();
 		for (int y = sy; y < ey; y++)
 		{
-			const u16 *source = source_base + y_index * gfx->rowbytes();
+			const u8 *source = source_base + y_index * gfx->rowbytes();
 			dest = &dest_bmp.pix(y);
 			u8 *pri = &priority_bitmap.pix8(y);
 
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{
-				const u16 c = source[x_index];
+				const u8 c = source[x_index];
 				if (c != 0)
 				{
 					if (pri[x] < priority)

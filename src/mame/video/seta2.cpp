@@ -282,7 +282,7 @@ WRITE16_MEMBER(seta2_state::spriteram_w)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint16_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int use_shadow, int realline, int line, int opaque)
+inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int which_gfx, const uint8_t* const addr, const uint32_t realcolor, int flipx, int flipy, int base_sx, int use_shadow, int realline, int line, int opaque)
 {
 	struct drawmodes
 	{
@@ -310,7 +310,7 @@ inline void seta2_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cli
 	if (!use_shadow)
 		shadow = 0;
 
-	const uint16_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
+	const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
 
 
 	uint16_t* dest = &bitmap.pix16(realline);

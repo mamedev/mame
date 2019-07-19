@@ -263,7 +263,7 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 							int transparent_color)
 {
 	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-	const uint16_t *source_base = gfx->get_data(code % gfx->elements());
+	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
 
@@ -310,7 +310,7 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 		{
 			for (y = sy; y < ey; y++)
 			{
-				const uint16_t *source = source_base + y_index*gfx->rowbytes();
+				const uint8_t *source = source_base + y_index*gfx->rowbytes();
 				uint16_t *dest = &dest_bmp.pix16(y);
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)

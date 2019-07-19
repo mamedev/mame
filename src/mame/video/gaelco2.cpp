@@ -387,7 +387,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 					{ /* last palette entry is reserved for shadows and highlights */
 
 						/* get a pointer to the current sprite's gfx data */
-						const uint16_t *gfx_src = gfx->get_data(number % gfx->elements());
+						const uint8_t *gfx_src = gfx->get_data(number % gfx->elements());
 
 						for (int py = 0; py < gfx->height(); py++)
 						{
@@ -409,7 +409,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 								const int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
 
 								/* get asociated pen for the current sprite pixel */
-								const u16 gfx_pen = gfx_src[gfx->rowbytes() * gfx_py + gfx_px];
+								const u8 gfx_pen = gfx_src[gfx->rowbytes() * gfx_py + gfx_px];
 
 								if ((gfx_pen == 0) || (gfx_pen >= 16)) continue;
 

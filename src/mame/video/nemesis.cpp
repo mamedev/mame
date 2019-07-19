@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/nemesis.h"
 #include "video/resnet.h"
-#include <algorithm>
+
 
 static const struct
 {
@@ -262,7 +262,7 @@ void nemesis_state::video_start()
 	m_foreground->set_scroll_rows(256);
 
 	memset(m_charram, 0, m_charram.bytes());
-	std::fill(std::begin(m_blank_tile), std::end(m_blank_tile), 0);
+	memset(m_blank_tile, 0, ARRAY_LENGTH(m_blank_tile));
 
 	/* Set up save state */
 	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_state::nemesis_postload), this));

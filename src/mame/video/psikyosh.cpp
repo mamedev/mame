@@ -408,7 +408,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 				for (int xtile = xstart; xtile != xend; xtile += xinc)
 				{
 					const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-					const u16 *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
+					const u8 *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
 
 					int x_index_base, y_index;
 
@@ -458,7 +458,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							if (z > 0)
 							{
-								const u16 *source = code_base + (y_index) * gfx->rowbytes() + x_index_base;
+								const u8 *source = code_base + (y_index) * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								u16 *pri = &m_z_bitmap.pix16(sy, sx);
 								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
@@ -470,7 +470,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 									{
 										if (z >= *pri)
 										{
-											const u16 c = *source;
+											const u8 c = *source;
 											if (c != 0)
 											{
 												*dest = pal[c];
@@ -488,7 +488,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							}
 							else
 							{
-								const u16 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
+								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
@@ -497,7 +497,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										const u16 c = *source;
+										const u8 c = *source;
 										if (c != 0)
 											*dest = pal[c];
 
@@ -515,7 +515,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							if (z > 0)
 							{
-								const u16 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
+								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								u16 *pri = &m_z_bitmap.pix16(sy, sx);
 								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
@@ -527,7 +527,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 									{
 										if (z >= *pri)
 										{
-											const u16 c = *source;
+											const u8 c = *source;
 											if (c != 0)
 											{
 												*dest = alpha_blend_r32(*dest, pal[c], alpha);
@@ -545,7 +545,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							}
 							else
 							{
-								const u16 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
+								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
@@ -554,7 +554,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										const u16 c = *source;
+										const u8 c = *source;
 										if (c != 0)
 											*dest = alpha_blend_r32(*dest, pal[c], alpha);
 
@@ -573,7 +573,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						{
 							if (z > 0)
 							{
-								const u16 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
+								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								u16 *pri = &m_z_bitmap.pix16(sy, sx);
 								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
@@ -585,7 +585,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 									{
 										if (z >= *pri)
 										{
-											const u16 c = *source;
+											const u8 c = *source;
 											if (c != 0)
 											{
 												if (m_alphatable[c] == 0xff)
@@ -607,7 +607,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							}
 							else
 							{
-								const u16 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
+								const u8 *source = code_base + y_index * gfx->rowbytes() + x_index_base;
 								u32 *dest = &dest_bmp.pix32(sy, sx);
 								int src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
 								int dst_modulo = dest_bmp.rowpixels() - (ex - sx);
@@ -616,7 +616,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 								{
 									for (int x = sx; x < ex; x++)
 									{
-										const u16 c = *source;
+										const u8 c = *source;
 										if (c != 0)
 										{
 											if (m_alphatable[c] == 0xff)
@@ -646,10 +646,10 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 		{
 			for (int xtile = 0; xtile < wide; xtile++)
 			{
-				const u16 *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
+				const u8 *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
 				for (int ypixel = 0; ypixel < gfx->height(); ypixel++)
 				{
-					const u16 *source = code_base + ypixel * gfx->rowbytes();
+					const u8 *source = code_base + ypixel * gfx->rowbytes();
 					u8 *dest = &m_zoom_bitmap.pix8(ypixel + ytile*gfx->height());
 
 					for (int xpixel = 0; xpixel < gfx->width(); xpixel++)

@@ -714,7 +714,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 				ypixel = (cellypix - 2) - ypixel;
 			if (info.rotate[set] & ORIENTATION_SWAP_XY)
 				std::swap(xpixel, ypixel);
-			uint16_t pixdata = gfx.get_data(code)[xpixel + ypixel * gfx.rowbytes()];
+			uint8_t pixdata = gfx.get_data(code)[xpixel + ypixel * gfx.rowbytes()];
 			util::stream_format(title_buf, " #%X:%X @ %d,%d = %X",
 								code, info.color[set], xpixel, ypixel,
 								gfx.colorbase() + info.color[set] * gfx.granularity() + pixdata);
@@ -982,13 +982,13 @@ static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int ind
 	for (y = 0; y < height; y++)
 	{
 		uint32_t *dest = &bitmap.pix32(dsty + y, dstx);
-		const uint16_t *src = gfx.get_data(index);
+		const uint8_t *src = gfx.get_data(index);
 
 		// loop over columns in the cell
 		for (x = 0; x < width; x++)
 		{
 			int effx = x, effy = y;
-			const uint16_t *s;
+			const uint8_t *s;
 
 			// compute effective x,y values after rotation
 			if (!(rotate & ORIENTATION_SWAP_XY))

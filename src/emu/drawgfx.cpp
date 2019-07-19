@@ -86,61 +86,53 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 //  gfx_element - constructor
 //-------------------------------------------------
 
-gfx_element::gfx_element(device_palette_interface *palette, const u8 *base, u32 total, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity)
-	: m_palette(palette)
-	, m_width(0)
-	, m_height(0)
-	, m_startx(0)
-	, m_starty(0)
-	, m_origwidth(0)
-	, m_origheight(0)
-	, m_total_elements(1)
-	, m_color_base(0)
-	, m_color_depth(0)
-	, m_color_granularity(0)
-	, m_total_colors(0)
-	, m_line_modulo(0)
-	, m_char_modulo(0)
-	, m_srcdata(nullptr)
-	, m_dirtyseq(1)
-	, m_gfxdata(nullptr)
-	, m_layout_is_raw(true)
-	, m_layout_is_16bpp(false)
-	, m_layout_planes(0)
-	, m_layout_xormask(0)
-	, m_layout_charincrement(0)
+gfx_element::gfx_element(device_palette_interface *palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity)
+	: m_palette(palette),
+		m_width(width),
+		m_height(height),
+		m_startx(0),
+		m_starty(0),
+		m_origwidth(width),
+		m_origheight(height),
+		m_total_elements(1),
+		m_color_base(color_base),
+		m_color_depth(color_granularity),
+		m_color_granularity(color_granularity),
+		m_total_colors((total_colors - color_base) / color_granularity),
+		m_line_modulo(rowbytes),
+		m_char_modulo(0),
+		m_srcdata(base),
+		m_dirtyseq(1),
+		m_gfxdata(base),
+		m_layout_is_raw(true),
+		m_layout_planes(0),
+		m_layout_xormask(0),
+		m_layout_charincrement(0)
 {
-	if (!total) total = 1;
-	// set the layout
-	set_raw_layout(base, width, height, total, rowbytes*8, width*height*8);
-	m_color_base = color_base;
-	m_color_depth = m_color_granularity = color_granularity;
-	m_total_colors = (total_colors - color_base) / color_granularity;
 }
 
 gfx_element::gfx_element(device_palette_interface *palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base)
-	: m_palette(palette)
-	, m_width(0)
-	, m_height(0)
-	, m_startx(0)
-	, m_starty(0)
-	, m_origwidth(0)
-	, m_origheight(0)
-	, m_total_elements(0)
-	, m_color_base(color_base)
-	, m_color_depth(0)
-	, m_color_granularity(0)
-	, m_total_colors(total_colors)
-	, m_line_modulo(0)
-	, m_char_modulo(0)
-	, m_srcdata(nullptr)
-	, m_dirtyseq(1)
-	, m_gfxdata(nullptr)
-	, m_layout_is_raw(false)
-	, m_layout_is_16bpp(false)
-	, m_layout_planes(0)
-	, m_layout_xormask(xormask)
-	, m_layout_charincrement(0)
+	: m_palette(palette),
+		m_width(0),
+		m_height(0),
+		m_startx(0),
+		m_starty(0),
+		m_origwidth(0),
+		m_origheight(0),
+		m_total_elements(0),
+		m_color_base(color_base),
+		m_color_depth(0),
+		m_color_granularity(0),
+		m_total_colors(total_colors),
+		m_line_modulo(0),
+		m_char_modulo(0),
+		m_srcdata(nullptr),
+		m_dirtyseq(1),
+		m_gfxdata(nullptr),
+		m_layout_is_raw(false),
+		m_layout_planes(0),
+		m_layout_xormask(xormask),
+		m_layout_charincrement(0)
 {
 	// set the layout
 	set_layout(gl, srcdata);
@@ -164,7 +156,6 @@ void gfx_element::set_layout(const gfx_layout &gl, const u8 *srcdata)
 
 	// copy data from the layout
 	m_layout_is_raw = (gl.planeoffset[0] == GFX_RAW);
-	m_layout_is_16bpp = (gl.planeoffset[1] == GFX_RAW);
 	m_layout_planes = gl.planes;
 	m_layout_charincrement = gl.charincrement;
 
@@ -175,22 +166,15 @@ void gfx_element::set_layout(const gfx_layout &gl, const u8 *srcdata)
 		m_layout_planeoffset.clear();
 		m_layout_xoffset.clear();
 		m_layout_yoffset.clear();
+		m_gfxdata_allocated.clear();
 
 		// modulos are determined for us by the layout
-		if (m_layout_is_16bpp)
-		{
-			m_line_modulo = gl.yoffs(0) / 16;
-			m_char_modulo = gl.charincrement / 16;
-		}
-		else
-		{
-			m_line_modulo = gl.yoffs(0) / 8;
-			m_char_modulo = gl.charincrement / 8;
-		}
+		m_line_modulo = gl.yoffs(0) / 8;
+		m_char_modulo = gl.charincrement / 8;
 
-		// allocate memory for the data
-		m_gfxdata_allocated.resize(m_total_elements * m_char_modulo);
-		m_gfxdata = &m_gfxdata_allocated[0];
+		// RAW graphics must have a pointer up front
+		assert(srcdata != nullptr);
+		m_gfxdata = const_cast<u8 *>(srcdata);
 	}
 
 	// decoded graphics case
@@ -241,24 +225,9 @@ void gfx_element::set_raw_layout(const u8 *srcdata, u32 width, u32 height, u32 t
 	layout.total = total;
 	layout.planes = 8;
 	layout.planeoffset[0] = GFX_RAW;
-	layout.planeoffset[1] = 0;
 	layout.yoffset[0] = linemod;
 	layout.charincrement = charmod;
 	set_layout(layout, srcdata);
-}
-
-void gfx_element::set_raw_layout(const u16 *srcdata, u32 width, u32 height, u32 total, u32 linemod, u32 charmod)
-{
-	gfx_layout layout = { 0 };
-	layout.width = width;
-	layout.height = height;
-	layout.total = total;
-	layout.planes = 8;
-	layout.planeoffset[0] = GFX_RAW;
-	layout.planeoffset[1] = GFX_RAW;
-	layout.yoffset[0] = linemod;
-	layout.charincrement = charmod;
-	set_layout(layout, (const u8 *)srcdata);
 }
 
 
@@ -270,6 +239,7 @@ void gfx_element::set_source(const u8 *source)
 {
 	m_srcdata = source;
 	memset(&m_dirty[0], 1, elements());
+	if (m_layout_is_raw) m_gfxdata = const_cast<u8 *>(source);
 }
 
 
@@ -291,9 +261,16 @@ void gfx_element::set_source_and_total(const u8 *source, u32 total)
 	if (m_color_depth <= 32)
 		m_pen_usage.resize(m_total_elements);
 
-	// allocate memory for the data
-	m_gfxdata_allocated.resize(m_total_elements * m_char_modulo);
-	m_gfxdata = &m_gfxdata_allocated[0];
+	if (m_layout_is_raw)
+	{
+		m_gfxdata = const_cast<u8 *>(source);
+	}
+	else
+	{
+		// allocate memory for the data
+		m_gfxdata_allocated.resize(m_total_elements * m_char_modulo);
+		m_gfxdata = &m_gfxdata_allocated[0];
+	}
 }
 
 
@@ -322,49 +299,10 @@ void gfx_element::set_source_clip(u32 xoffs, u32 width, u32 yoffs, u32 height)
 void gfx_element::decode(u32 code)
 {
 	// don't decode GFX_RAW
-	if (m_layout_is_raw)
-	{
-		if (m_layout_is_16bpp)
-		{
-			// zap the data to 0
-			u16 *decode_base = m_gfxdata + code * m_char_modulo;
-			const u16 *base = ((const u16 *)m_srcdata) + code * m_char_modulo;
-			memset(decode_base, 0, m_char_modulo);
-
-			// iterate over rows
-			for (int y = 0; y < m_origheight; y++)
-			{
-				const u16 *sp = base + y * m_line_modulo;
-				u16 *dp = decode_base + y * m_line_modulo;
-
-				// iterate over columns
-				for (int x = 0; x < m_origwidth; x++)
-					dp[x] = sp[x];
-			}
-		}
-		else
-		{
-			// zap the data to 0
-			u16 *decode_base = m_gfxdata + code * m_char_modulo;
-			const u8 *base = m_srcdata + code * m_char_modulo;
-			memset(decode_base, 0, m_char_modulo);
-
-			// iterate over rows
-			for (int y = 0; y < m_origheight; y++)
-			{
-				const u8 *sp = base + y * m_line_modulo;
-				u16 *dp = decode_base + y * m_line_modulo;
-
-				// iterate over columns
-				for (int x = 0; x < m_origwidth; x++)
-					dp[x] = sp[x];
-			}
-		}
-	}
-	else
+	if (!m_layout_is_raw)
 	{
 		// zap the data to 0
-		u16 *decode_base = m_gfxdata + code * m_char_modulo;
+		u8 *decode_base = m_gfxdata + code * m_char_modulo;
 		memset(decode_base, 0, m_char_modulo);
 
 		// iterate over planes
@@ -379,7 +317,7 @@ void gfx_element::decode(u32 code)
 			for (int y = 0; y < m_origheight; y++)
 			{
 				int yoffs = planeoffs + m_layout_yoffset[y];
-				u16 *dp = decode_base + y * m_line_modulo;
+				u8 *dp = decode_base + y * m_line_modulo;
 
 				// iterate over columns
 				for (int x = 0; x < m_origwidth; x++)
@@ -393,7 +331,7 @@ void gfx_element::decode(u32 code)
 	if (code < m_pen_usage.size())
 	{
 		// iterate over data, creating a bitmask of live pens
-		const u16 *dp = m_gfxdata + code * m_char_modulo;
+		const u8 *dp = m_gfxdata + code * m_char_modulo;
 		u32 usage = 0;
 		for (int y = 0; y < m_origheight; y++)
 		{
@@ -450,7 +388,7 @@ void gfx_element::transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
@@ -478,7 +416,7 @@ void gfx_element::transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
 
 	// use pen usage to optimize
@@ -716,7 +654,7 @@ void gfx_element::zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		return transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
@@ -748,7 +686,7 @@ void gfx_element::zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		return transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
 
 	// use pen usage to optimize
@@ -1008,7 +946,7 @@ void gfx_element::prio_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
@@ -1038,7 +976,7 @@ void gfx_element::prio_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// use pen usage to optimize
@@ -1301,7 +1239,7 @@ void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &clipre
 		return prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize
@@ -1336,7 +1274,7 @@ void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &clipre
 		return prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
-	if (trans_pen > 0xffff)
+	if (trans_pen > 0xff)
 		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
 
 	// use pen usage to optimize

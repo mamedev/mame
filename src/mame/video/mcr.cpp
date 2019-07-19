@@ -272,7 +272,7 @@ void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const uint16_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				uint16_t *dst = &bitmap.pix16(sy);
 				uint8_t *pri = &screen.priority().pix8(sy);
 
@@ -339,7 +339,7 @@ void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= 2 && sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const uint16_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				uint16_t *dst = &bitmap.pix16(sy);
 				uint8_t *pri = &screen.priority().pix8(sy);
 

@@ -318,8 +318,8 @@ void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				gfx_element *gfx = m_gfxdecode->gfx(1);
 				const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (a->color % gfx->colors()));
-				const uint16_t *source_base = gfx->get_data(a->code % gfx->elements());
-				const uint16_t *source = source_base + (a->row ^ a->flipy) * gfx->rowbytes();
+				const uint8_t *source_base = gfx->get_data(a->code % gfx->elements());
+				const uint8_t *source = source_base + (a->row ^ a->flipy) * gfx->rowbytes();
 
 				if (bootleg_sprites() && flipx != a->flipx)
 				{

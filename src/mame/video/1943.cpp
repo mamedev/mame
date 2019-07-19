@@ -215,7 +215,7 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 	bitmap_ind8 &priority_bitmap = m_screen->priority();
 	/* Start drawing */
 	const u16 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const u16 *source_base = gfx->get_data(code % gfx->elements());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
 
 	const int xinc = flipx ? -1 : 1;
 	const int yinc = flipy ? -1 : 1;
@@ -257,7 +257,7 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 	{ // skip if inner loop doesn't draw anything
 		for (int y = sy; y < ey; y++)
 		{
-			const u16 *source = source_base + y_index * gfx->rowbytes();
+			const u8 *source = source_base + y_index * gfx->rowbytes();
 			u16 *dest = &dest_bmp.pix16(y);
 			u8 *pri = &priority_bitmap.pix8(y);
 			int x_index = x_index_base;
@@ -265,7 +265,7 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 			{
 				if (!(pri[x] & 0x80))
 				{
-					const u16 c = source[x_index];
+					u8 c = source[x_index];
 					if (c != transparent_color)
 					{
 						// the priority is actually selected by bit 3 of BMPROM.07

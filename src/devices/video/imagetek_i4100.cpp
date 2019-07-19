@@ -1082,7 +1082,7 @@ inline uint8_t imagetek_i4100_device::get_tile_pix( uint16_t code, uint8_t x, ui
 		gfx_element *gfx1 = gfx(big ? 3 : 1);
 		uint32_t tile2 = big ? ((tile & 0xfffff) + ((code & 0xf) << 3)) :
 								((tile & 0xfffff) + ((code & 0xf) << 1));
-		const uint16_t* data;
+		const uint8_t* data;
 		uint8_t flipxy = (code & 0x6000) >> 13;
 
 		if (tile2 < gfx1->elements())
@@ -1115,7 +1115,7 @@ inline uint8_t imagetek_i4100_device::get_tile_pix( uint16_t code, uint8_t x, ui
 		gfx_element *gfx1 = gfx(big ? 2 : 0);
 		uint32_t tile2 = big ? ((tile & 0xfffff) + ((code & 0xf) << 2)) :
 								((tile & 0xfffff) + (code & 0xf));
-		const uint16_t* data;
+		const uint8_t* data;
 		uint8_t flipxy = (code & 0x6000) >> 13;
 
 		if (tile2 < gfx1->elements())

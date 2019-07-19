@@ -353,7 +353,7 @@ GFXDECODE_END
 
 void hp9k_state::putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap)
 {
-	const uint16_t* pchar=m_gfxdecode->gfx(0)->get_data(thec);
+	const uint8_t* pchar=m_gfxdecode->gfx(0)->get_data(thec);
 
 	for (int py=0;py<HP9816_CHDIMY;py++)
 	{

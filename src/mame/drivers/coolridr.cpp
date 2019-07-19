@@ -589,7 +589,7 @@ void coolridr_state::video_start()
 #define COOLRIDERS_DRAWGFX_CORE(PIXEL_TYPE, COOL_PIXEL_OP)                               \
 do {                                                                                    \
 	do {                                                                                \
-		const uint16_t *srcdata;                                                          \
+		const uint8_t *srcdata;                                                           \
 		int32_t destendx, destendy;                                                       \
 		int32_t srcx, srcy;                                                               \
 		int32_t curx, cury;                                                               \
@@ -667,7 +667,7 @@ do {                                                                            
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint16_t *srcptr = srcdata;                                     \
+				const uint8_t *srcptr = srcdata;                                      \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -699,7 +699,7 @@ do {                                                                            
 			for (cury = desty; cury <= destendy; cury++)                            \
 			{                                                                       \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint16_t *srcptr = srcdata;                                     \
+				const uint8_t *srcptr = srcdata;                                      \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \

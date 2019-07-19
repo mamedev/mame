@@ -90,10 +90,10 @@ void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_el
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
 			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const uint16_t *code_base1 = gfx->get_data(code1 % gfx->elements());
-			const uint16_t *code_base2 = gfx->get_data(code2 % gfx->elements());
-			const uint16_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
-			const uint16_t *source2 = code_base2 + (srcline) * gfx->rowbytes();
+			const uint8_t *code_base1 = gfx->get_data(code1 % gfx->elements());
+			const uint8_t *code_base2 = gfx->get_data(code2 % gfx->elements());
+			const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
+			const uint8_t *source2 = code_base2 + (srcline) * gfx->rowbytes();
 			/* no alpha */
 			if ((alpha == 0xff) && (!shadowMode))
 			{

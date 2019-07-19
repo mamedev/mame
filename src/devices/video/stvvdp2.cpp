@@ -2458,7 +2458,7 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 	if( gfx )
 	{
 		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-		const uint16_t *source_base = gfx->get_data(code % gfx->elements());
+		const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 
 		//int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 		//int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -2530,7 +2530,7 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint16_t *source = source_base + (y_index>>16) * gfx->rowbytes();
+						const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
 						uint32_t *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
@@ -2552,7 +2552,7 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint16_t *source = source_base + (y_index>>16) * gfx->rowbytes();
+						const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
 						uint32_t *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
@@ -2574,7 +2574,7 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				{
 					for( y=sy; y<ey; y++ )
 					{
-						const uint16_t *source = source_base + (y_index>>16) * gfx->rowbytes();
+						const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
 						uint32_t *dest = &dest_bmp.pix32(y);
 
 						int x, x_index = x_index_base;
@@ -3031,7 +3031,7 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 							int transparency, int alpha)
 {
 	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-	const uint16_t *source_base = gfx->get_data(code % gfx->elements());
+	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
 
@@ -3083,7 +3083,7 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 		{
 			for (y = sy; y < ey; y++)
 			{
-				const uint16_t *source = source_base + y_index*gfx->rowbytes();
+				const uint8_t *source = source_base + y_index*gfx->rowbytes();
 				uint32_t *dest = &dest_bmp.pix32(y);
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
@@ -3108,7 +3108,7 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 							int transparency)
 {
 	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-	const uint16_t *source_base = gfx->get_data(code % gfx->elements());
+	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
 
@@ -3160,7 +3160,7 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 		{
 			for (y = sy; y < ey; y++)
 			{
-				const uint16_t *source = source_base + y_index*gfx->rowbytes();
+				const uint8_t *source = source_base + y_index*gfx->rowbytes();
 				uint32_t *dest = &dest_bmp.pix32(y);
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
