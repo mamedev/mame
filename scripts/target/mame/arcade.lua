@@ -4376,6 +4376,7 @@ files {
 
 createMAMEProjects(_target, _subtarget, "wing")
 files {
+	MAME_DIR .. "src/mame/drivers/lucky37.cpp",
 	MAME_DIR .. "src/mame/drivers/lucky74.cpp",
 	MAME_DIR .. "src/mame/includes/lucky74.h",
 	MAME_DIR .. "src/mame/video/lucky74.cpp",
