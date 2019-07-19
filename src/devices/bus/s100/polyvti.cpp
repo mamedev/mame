@@ -63,6 +63,8 @@ private:
 
 	// internal state
 	std::unique_ptr<u8[]> m_video_ram;
+	bool m_kbd_int;
+	bool m_kbd_stb;
 };
 
 DEFINE_DEVICE_TYPE_PRIVATE(S100_POLY_VTI, device_s100_card_interface, poly_vti_device, "polyvti", "PolyMorphic Systems Video Terminal Interface")
@@ -78,8 +80,13 @@ poly_vti_device::poly_vti_device(const machine_config &mconfig, const char *tag,
 
 void poly_vti_device::device_start()
 {
+	m_kbd_int = true;
+	m_kbd_stb = false; // TODO: 8212 strobe input
+
 	m_video_ram = make_unique_clear<u8[]>(0x400);
 	save_pointer(NAME(m_video_ram), 0x400);
+	save_item(NAME(m_kbd_int));
+	save_item(NAME(m_kbd_stb));
 }
 
 const u8 poly_vti_device::s_mcm6571a_shift[] =
@@ -179,7 +186,12 @@ void poly_vti_device::s100_mwrt_w(offs_t offset, u8 data)
 u8 poly_vti_device::s100_sinp_r(offs_t offset)
 {
 	if ((offset & 0xfc00) >> 10 == m_address->read())
-		return m_kbdlatch->read();
+	{
+		if (BIT(offset, 0))
+			return m_kbd_stb << 7 | 0x7e | m_kbd_int;
+		else
+			return m_kbdlatch->read();
+	}
 
 	return 0xff;
 }
@@ -196,6 +208,8 @@ void poly_vti_device::kbd_put(u8 data)
 
 WRITE_LINE_MEMBER(poly_vti_device::kbd_int_w)
 {
+	m_kbd_int = !state;
+
 	// TODO: jumper selectable
 	m_bus->vi2_w(state);
 }
