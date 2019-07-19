@@ -239,7 +239,8 @@ SNAPSHOT_LOAD_MEMBER(poly88_state::snapshot_cb)
 		switch(recordType) {
 			case 0 :
 					/* 00 Absolute */
-					memcpy(space.get_read_ptr(address ), data + pos ,recordLen);
+					for (uint16_t j = 0; j < recordLen; j++)
+						space.write_byte(address + j, data[pos + j]);
 					break;
 			case 1 :
 					/* 01 Comment */
