@@ -9,9 +9,9 @@ Poly-88 driver by Miodrag Milanovic
 
 All input must be UPPERcase.
 
-16K is the minimal amount of user RAM required to run BASIC. PolyMorphic's
-"System 16" package shipped with this much RAM (as did the 8813), though
-some of their lesser systems did not.
+11K is the minimal amount of user RAM required to run BASIC. PolyMorphic's
+"System 16" package shipped with 16K of RAM (as did the 8813), though some
+of their lesser systems did not.
 
 ToDo:
 - Polyphase format not working because 8251 device doesn't support sync.
