@@ -13022,7 +13022,7 @@
 			<feature name="u1" value="U1 GPIO MASKROM" />
 			<dataarea name="rom" size="16777216">
 			<!-- 2nd half (8MB) filled with 0xff, verified on the real cart -->
-				<rom name="agb-bgop-2.u1" size="16777216" crc="0c3aa538" sha1="3e38901cecad2c8ae3e5d91375af6fa5d7734c19"/>
+				<rom name="agb-bgop-2.u1" size="16777216" crc="f7cd830c" sha1="c3ab25e65f59c5d80d45b605a2c55ba666362be5"/>
 			</dataarea>
 		</part>
 	</software>
