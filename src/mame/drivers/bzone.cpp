@@ -242,7 +242,7 @@ void redbaron_state::machine_start()
 
 void redbaron_state::machine_reset()
 {
-	earom_control_w(machine().dummy_space(), 0, 0);
+	earom_control_w(0);
 }
 
 
@@ -273,7 +273,7 @@ CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
 }
 
 
-WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
+void bzone_state::bzone_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
@@ -286,15 +286,15 @@ WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
  *
  *************************************/
 
-READ8_MEMBER(redbaron_state::redbaron_joy_r)
+uint8_t redbaron_state::redbaron_joy_r()
 {
 	return m_fake_ports[m_rb_input_select ? 0 : 1]->read();
 }
 
-WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
+void redbaron_state::redbaron_joysound_w(uint8_t data)
 {
 	m_rb_input_select = data & 1;
-	m_redbaronsound->sounds_w(space, offset, data);
+	m_redbaronsound->sounds_w(data);
 }
 
 
@@ -305,18 +305,18 @@ WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
  *
  *************************************/
 
-READ8_MEMBER(redbaron_state::earom_read)
+uint8_t redbaron_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(redbaron_state::earom_write)
+void redbaron_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address((offset ^ 0x20) & 0x3f);
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(redbaron_state::earom_control_w)
+void redbaron_state::earom_control_w(uint8_t data)
 {
 	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
@@ -369,10 +369,10 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x1806, 0x1806).r("mathbox", FUNC(mathbox_device::hi_r));
 	map(0x1808, 0x1808).w(FUNC(redbaron_state::redbaron_joysound_w));  /* and select joystick pot also */
 	map(0x180a, 0x180a).nopw();                /* sound reset, yet todo */
-	map(0x180c, 0x180c).w(FUNC(redbaron_state::earom_control_w));
+	map(0x180c, 0x180c).nopr().w(FUNC(redbaron_state::earom_control_w));
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
-	map(0x1860, 0x187f).w("mathbox", FUNC(mathbox_device::go_w));
+	map(0x1860, 0x187f).nopr().w("mathbox", FUNC(mathbox_device::go_w));
 	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x7fff).rom();
 }
@@ -875,13 +875,13 @@ ROM_END
  *
  *************************************/
 
-READ8_MEMBER(bzone_state::analog_data_r)
+uint8_t bzone_state::analog_data_r()
 {
 	return m_analog_data;
 }
 
 
-WRITE8_MEMBER(bzone_state::analog_select_w)
+void bzone_state::analog_select_w(offs_t offset, uint8_t data)
 {
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
@@ -896,8 +896,8 @@ void bzone_state::init_bradley()
 	space.install_ram(0x400, 0x7ff);
 	space.install_read_port(0x1808, 0x1808, "1808");
 	space.install_read_port(0x1809, 0x1809, "1809");
-	space.install_read_handler(0x180a, 0x180a, read8_delegate(FUNC(bzone_state::analog_data_r),this));
-	space.install_write_handler(0x1848, 0x1850, write8_delegate(FUNC(bzone_state::analog_select_w),this));
+	space.install_read_handler(0x180a, 0x180a, read8smo_delegate(FUNC(bzone_state::analog_data_r),this));
+	space.install_write_handler(0x1848, 0x1850, write8sm_delegate(FUNC(bzone_state::analog_select_w),this));
 }
 
 
