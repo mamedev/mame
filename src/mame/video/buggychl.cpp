@@ -196,7 +196,7 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				for (ch = 0; ch < 4; ch++)
 				{
 					int pos, code, realflipy;
-					const uint16_t *pendata;
+					const uint8_t *pendata;
 
 					pos = base_pos + 2 * ch;
 					code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));

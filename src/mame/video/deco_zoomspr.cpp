@@ -59,7 +59,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 		if( gfx )
 		{
 			const pen_t *pal = &m_gfxdecode->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const uint16_t *code_base = gfx->get_data(code % gfx->elements());
+			const uint8_t *code_base = gfx->get_data(code % gfx->elements());
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
@@ -127,7 +127,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const uint16_t *source = code_base + (y_index>>16) * gfx->rowbytes();
+								const uint8_t *source = code_base + (y_index>>16) * gfx->rowbytes();
 								uint32_t *dest = &temp_bitmap.pix32(y);
 								uint8_t *pri = &pri_bitmap.pix8(y);
 
@@ -163,7 +163,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								const uint16_t *source = code_base + (y_index>>16) * gfx->rowbytes();
+								const uint8_t *source = code_base + (y_index>>16) * gfx->rowbytes();
 								uint32_t *dest = &temp_bitmap.pix32(y);
 								uint8_t *pri = &pri_bitmap.pix8(y);
 								uint32_t *tmapcolor = &dest_bmp.pix32(y);

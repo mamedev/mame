@@ -442,8 +442,6 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #include "emu.h"
 #include "includes/cps1.h"
 
-#include <algorithm>
-
 #define VERBOSE 0
 
 /********************************************************************
@@ -2274,7 +2272,7 @@ void cps_state::video_start()
 	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cps_state::get_tile2_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap2_scan),this), 32, 32, 64, 64);
 
 	/* create empty tiles */
-	std::fill(std::begin(m_empty_tile), std::end(m_empty_tile), 0x0f);
+	memset(m_empty_tile, 0x0f, sizeof(m_empty_tile));
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();

@@ -542,7 +542,7 @@ void wecleman_state::wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &c
 	};
 
 
-	const uint16_t *src_ptr;
+	const uint8_t *src_ptr;
 	const pen_t *pal_ptr, *rgb_ptr;
 
 	int scrollx, sy, sx;
@@ -643,7 +643,7 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 					int tmw_l2, int tmh_l2,     // tilemap width and height in log(2)
 					int alpha, int pal_offset ) // alpha(0-3f), # of color codes to shift
 {
-	const uint16_t *src_ptr;
+	const uint8_t *src_ptr;
 	uint16_t *tmap_ptr;
 	uint32_t *dst_base, *dst_ptr;
 	const pen_t *pal_base, *pal_ptr;
@@ -944,7 +944,7 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 	m_txt_tilemap->set_scrolly(0, -BMP_PAD );
 
 	// patches out a mysterious pixel floating in the sky (tile decoding bug?)
-	*const_cast<uint16_t *>(m_gfxdecode->gfx(0)->get_data(0xaca)+7) = 0;
+	*const_cast<uint8_t *>(m_gfxdecode->gfx(0)->get_data(0xaca)+7) = 0;
 }
 
 //  Callbacks for the K051316

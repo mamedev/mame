@@ -126,7 +126,7 @@ struct namcos22_object_data
 	const u8 *czram;
 
 	/* sprites */
-	const u16 *source;
+	const u8 *source;
 	int alpha;
 	int line_modulo;
 	int flipx;
@@ -234,7 +234,7 @@ public:
 	int m_poly_translucency;
 	u16 *m_texture_tilemap;
 	std::unique_ptr<u8[]> m_texture_tileattr;
-	u16 *m_texture_tiledata;
+	u8 *m_texture_tiledata;
 	std::unique_ptr<u8[]> m_texture_ayx_to_pixel;
 	int m_is_ss22;
 	int m_mixer_flags;

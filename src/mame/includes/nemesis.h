@@ -85,7 +85,7 @@ private:
 	int       m_tilemap_flip;
 	int       m_flipscreen;
 	uint8_t     m_irq_port_last;
-	uint16_t    m_blank_tile[8*8];
+	uint8_t     m_blank_tile[8*8];
 	uint8_t     m_palette_lookup[32];
 
 	/* misc */

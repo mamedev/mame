@@ -177,12 +177,12 @@ protected:
 	void SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& tileno, int tile_index );
 	void SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& tileno, int tile_index );
 
-	uint16_t get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos);
-	uint16_t get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos);
-	uint16_t get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos);
-	uint16_t get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos);
 
-	uint16_t read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y);
+	uint8_t read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

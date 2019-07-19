@@ -437,7 +437,7 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 	color = gfx->colorbase() + (color % gfx->colors()) * gfx->granularity();
 	const pen_t *pens = m_palette->pens();
-	const u16 *src = gfx->get_data(code % gfx->elements());
+	const u8 *src = gfx->get_data(code % gfx->elements());
 	const u8 trans_pen = (1 << m_sprite_bpp) - 1;
 
 	// draw
@@ -450,7 +450,7 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		for (int x = x1; x <= x2; x++)
 		{
-			const u16 pen = src[src_i];
+			const u8 pen = src[src_i];
 			if (!(pri[x] & primask) && pen != trans_pen)
 			{
 				pri[x] |= primask;

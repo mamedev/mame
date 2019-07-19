@@ -376,12 +376,12 @@ protected:
 	int          m_palette_align;
 	int          m_palette_size;
 	int          m_stars_rom_size;
-	uint16_t     m_empty_tile[32*32];
+	uint8_t        m_empty_tile[32*32];
 	int          m_cps_version;
 
 	/* fcrash video config */
-	uint8_t      m_layer_enable_reg;
-	uint8_t      m_layer_mask_reg[4];
+	uint8_t        m_layer_enable_reg;
+	uint8_t        m_layer_mask_reg[4];
 	int          m_layer_scroll1x_offset;
 	int          m_layer_scroll2x_offset;
 	int          m_layer_scroll3x_offset;

@@ -1068,7 +1068,7 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_16x16_tile_info )
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
 
-inline uint16_t sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0x0f;
@@ -1102,11 +1102,11 @@ inline uint16_t sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int x
 
 	if (tileno==0) return 0x00;
 
-	const uint16_t* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline uint16_t sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x07;
@@ -1140,11 +1140,11 @@ inline uint16_t sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int x
 
 	if (tileno==0) return 0x00; // does this apply in this mode?
 
-	const uint16_t* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline uint16_t sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0xff;
@@ -1178,11 +1178,11 @@ inline uint16_t sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int
 
 	if (tileno==0) return 0x00; // does this apply in this mode
 
-	const uint16_t* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline uint16_t sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x7f;
@@ -1216,7 +1216,7 @@ inline uint16_t sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int
 
 	if (tileno==0) return 0x00;
 
-	const uint16_t* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -1464,7 +1464,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_stampsize_w )
 // the lower 3 bits of segacd_imagebuffer_hdot_size are set
 
 // this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
-inline uint16_t sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y)
+inline uint8_t sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y)
 {
 /*
     if (!srcbitmap)
@@ -1547,7 +1547,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 			for (count=0;count<(segacd_imagebuffer_hdot_size);count++)
 			{
 				//int i;
-				uint16_t pix = 0x0;
+				uint8_t pix = 0x0;
 
 				pix = read_pixel_from_stampmap(srcbitmap, xbase>>(3+8), ybase>>(3+8));
 

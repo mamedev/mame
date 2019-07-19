@@ -24,7 +24,7 @@
 //**************************************************************************
 
 constexpr u8 MAX_GFX_ELEMENTS = 32;
-constexpr u16 MAX_GFX_PLANES = 16;
+constexpr u16 MAX_GFX_PLANES = 8;
 constexpr u16 MAX_GFX_SIZE = 32;
 
 
@@ -38,9 +38,7 @@ constexpr u16 MAX_GFX_SIZE = 32;
 
 #define GFX_RAW                 0x12345678
 #define GFXLAYOUT_RAW( name, width, height, linemod, charmod ) \
-const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW, 0 }, { 0 }, { linemod }, charmod };
-#define GFXLAYOUT_RAW16( name, width, height, linemod, charmod ) \
-const gfx_layout name = { width, height, RGN_FRAC(1,1), 16, { GFX_RAW, GFX_RAW }, { 0 }, { linemod }, charmod };
+const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, { linemod }, charmod };
 // When planeoffset[0] is set to GFX_RAW, the gfx data is left as-is, with no conversion.
 // No buffer is allocated for the decoded data, and gfxdata is set to point to the source
 // data.

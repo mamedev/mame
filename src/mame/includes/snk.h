@@ -116,7 +116,7 @@ private:
 	int m_is_psychos;
 
 	uint8_t m_drawmode_table[16];
-	uint16_t m_empty_tile[16*16];
+	uint8_t m_empty_tile[16*16];
 	int m_hf_posy;
 	int m_hf_posx;
 	int m_tc16_posy;

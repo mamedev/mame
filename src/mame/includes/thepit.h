@@ -52,7 +52,7 @@ private:
 	uint8_t m_flip_y;
 	tilemap_t *m_solid_tilemap;
 	tilemap_t *m_tilemap;
-	std::unique_ptr<uint16_t[]> m_dummy_tile;
+	std::unique_ptr<uint8_t[]> m_dummy_tile;
 	uint8_t m_nmi_mask;
 
 	int m_question_address;

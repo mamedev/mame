@@ -166,7 +166,7 @@ void pinball2k_state::video_start()
 void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
-	const uint16_t *dp;
+	const uint8_t *dp;
 	int index = 0;
 	const pen_t *pens = m_palette->pens();
 
@@ -177,7 +177,7 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		uint32_t *p = &bitmap.pix32(j);
 		for (i=x; i < x+8; i++)
 		{
-			uint16_t pen = dp[index++];
+			uint8_t pen = dp[index++];
 			if (pen)
 				p[i] = pens[gfx->colorbase() + (att & 0xf)];
 			else

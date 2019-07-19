@@ -529,7 +529,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 //          const pen_t *pal = &gfx->colortable[gfx->granularity() * (color % gfx->colors())];
 			u32 palbase = (gfx->granularity() * color) & 0x1ffff;
 			const pen_t *pal = &m_mame_colours[palbase];
-			const u16 *source_base = gfx->get_data(code % gfx->elements());
+			const u8 *source_base = gfx->get_data(code % gfx->elements());
 
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -595,7 +595,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u16 *source = source_base + (y_index>>16) * gfx->rowbytes();
+							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 							u32 *dest = &dest_bmp.pix32(y);
 
 							int x_index = x_index_base;
@@ -611,7 +611,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u16 *source = source_base + (y_index>>16) * gfx->rowbytes();
+							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 							u32 *dest = &dest_bmp.pix32(y);
 
 							int x_index = x_index_base;
@@ -628,7 +628,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u16 *source = source_base + (y_index>>16) * gfx->rowbytes();
+							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 							u32 *dest = &dest_bmp.pix32(y);
 
 							int x_index = x_index_base;
@@ -645,7 +645,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u16 *source = source_base + (y_index>>16) * gfx->rowbytes();
+							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 							u32 *dest = &dest_bmp.pix32(y);
 
 							int x_index = x_index_base;

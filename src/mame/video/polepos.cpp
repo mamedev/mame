@@ -386,7 +386,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 		int sizex,int sizey)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(big ? 3 : 2);
-	const uint16_t *gfxdata = gfx->get_data(code % gfx->elements());
+	const uint8_t *gfxdata = gfx->get_data(code % gfx->elements());
 	uint8_t *scaling_rom = memregion("gfx6")->base();
 	uint32_t transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
 	int coloroffs = gfx->colorbase() + color * gfx->granularity();
@@ -404,7 +404,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 			int xx = sx & 0x3ff;
 			int siz = 0;
 			int offs = 0;
-			const uint16_t *src;
+			const uint8_t *src;
 
 			if (!big) dy >>= 1;
 			src = gfxdata + dy * gfx->rowbytes();

@@ -101,7 +101,7 @@ void jaleco_blend_device::drawgfx_common(palette_device &palette,_BitmapClass &d
 {
 	/* Start drawing */
 	const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-	const u16 *source_base = gfx->get_data(code % gfx->elements());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
 
 	const int xinc = flipx ? -1 : 1;
 	const int yinc = flipy ? -1 : 1;
@@ -145,12 +145,12 @@ void jaleco_blend_device::drawgfx_common(palette_device &palette,_BitmapClass &d
 		// taken from case : TRANSPARENCY_ALPHARANGE
 		for (int y = sy; y < ey; y++)
 		{
-			const u16 *source = source_base + y_index*gfx->rowbytes();
+			const u8 *source = source_base + y_index*gfx->rowbytes();
 			typename _BitmapClass::pixel_t *dest = &dest_bmp.pix(y);
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{
-				const u16 c = source[x_index];
+				const u8 c = source[x_index];
 				if (c != transparent_color)
 				{
 					dest[x] = jaleco_blend_device::func(dest[x], pal[c]);
