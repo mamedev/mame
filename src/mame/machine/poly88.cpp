@@ -195,7 +195,7 @@ WRITE_LINE_MEMBER(poly88_state::usart_ready_w)
 {
 	if (state)
 	{
-		m_int_vector = 0xdf;
+		m_int_vector = 0xe7;
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
