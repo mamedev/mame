@@ -313,8 +313,19 @@ void mindset_state::dispctrl_w(u16 data)
 {
 	u16 chg = m_dispctrl ^ data;
 	m_dispctrl = data;
-	if(chg & 0xff00)
-		logerror("display control %04x\n", m_dispctrl);
+	if(chg & 0xff88)
+		logerror("display control %s bank=%c %s %s h=%d ppx=%d w=%s interlace=%d rreg=%d indicator=%s wreg=%d\n",
+				 m_dispctrl & 0x8000 ? "?15" : "?!15",
+				 m_dispctrl & 0x4000 ? '1' : '0',
+				 m_dispctrl & 0x2000 ? "ibm" : "native",
+				 m_dispctrl & 0x1000 ? "?12" : "?!12",
+				 m_dispctrl & 0x0800 ? "400" : "200",
+				 (m_dispctrl & 0x0600) >> 9,
+				 m_dispctrl & 0x0100 ? "320" : "640",
+				 m_dispctrl & 0x0080 ? "on" : "off",
+				 (m_dispctrl & 0x0070) >> 4,
+				 m_dispctrl & 0x0008 ? "on" : "off",
+				 m_dispctrl & 7);
 }
 
 u16 mindset_state::dispreg_r()
@@ -329,6 +340,7 @@ u16 mindset_state::dispreg_r()
 	}
 	case 5: {
 		// wants 0080 set to be able to upload the palette
+		// may be a field indicator
 		return 0x0080;
 	}
 	}
@@ -339,7 +351,7 @@ u16 mindset_state::dispreg_r()
 
 void mindset_state::dispreg_w(u16 data)
 {
-	switch(m_dispctrl & 0xf) {
+	switch(m_dispctrl & 0x7) {
 	case 0:
 		m_screenpos = data;
 		logerror("screen position (%d, %d)\n", (data >> 8) & 15, (data >> 12) & 15);
@@ -377,19 +389,18 @@ void mindset_state::dispreg_w(u16 data)
 	}
 	case 4: {
 		data = sw(data);
-		u8 r = 0x11*(((data & 0x4000) >> 11) | (data & 7));
-		u8 g = 0x11*(((data & 0x2000) >> 10) | ((data & 0x38) >> 3));
-		u8 b = 0x11*(((data & 0x1000) >>  9) | ((data & 0x1c0) >> 6));
+		u8 r = (0x49*(data & 7)) >> 1;
+		u8 g = (0x49*((data & 0x38) >> 3)) >> 1;
+		u8 b = (0x49*((data & 0x1c0) >> 6)) >> 1;
 
-		if(!(data & 0x8000)) {
-			r = r * 0.75;
-			g = g * 0.75;
-			b = b * 0.75;
-		}
 		m_palette[m_borderidx] = (r << 16) | (g << 8) | b;
 		m_genlock[m_borderidx] = data & 0x0200;
 		logerror("palette[%x] = %04x -> %06x.%d\n", m_borderidx, data, m_palette[m_borderidx], m_genlock[m_borderidx]);
 		m_borderidx = (m_borderidx + 1) & 0xf;
+		break;
+	}
+	case 5: {
+		logerror("genlock %s%s, extra=%c\n", data & 0x0200 ? "on" : "off", data & 0x0100 ? " fixed" : "", data & 0x0400 ? '1' : '0');
 		break;
 	}
 
