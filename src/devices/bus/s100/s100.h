@@ -228,6 +228,7 @@ public:
 	}
 	s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 

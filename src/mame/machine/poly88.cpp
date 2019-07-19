@@ -13,11 +13,60 @@
 #include "includes/poly88.h"
 
 
+bool poly88_state::is_onboard(offs_t offset)
+{
+	return (offset & 0xf000) == m_onboard_config->read() << 13;
+}
+
+uint8_t poly88_state::mem_r(offs_t offset)
+{
+	if (!m_onboard_disable && is_onboard(offset))
+	{
+		if ((offset & 0xfff) >= 0xc00)
+			return m_onboard_ram[offset & 0x1ff]; // mirrored
+		else
+			return m_onboard_rom[offset & 0xfff];
+	}
+	else
+		return m_s100->smemr_r(offset);
+}
+
+void poly88_state::mem_w(offs_t offset, uint8_t data)
+{
+	if (!m_onboard_disable && is_onboard(offset))
+	{
+		if ((offset & 0xfff) >= 0xc00)
+			m_onboard_ram[offset & 0x1ff] = data; // mirrored
+	}
+	else
+		m_s100->mwrt_w(offset, data);
+}
+
+uint8_t poly88_state::in_r(offs_t offset)
+{
+	offset |= offset << 8;
+	if (is_onboard(offset))
+		return m_onboard_io->read8(offset & 0x0f);
+	else
+		return m_s100->sinp_r(offset);
+}
+
+void poly88_state::out_w(offs_t offset, uint8_t data)
+{
+	offset |= offset << 8;
+	if (is_onboard(offset))
+		m_onboard_io->write8(offset & 0x0f, data);
+	else
+		m_s100->sout_w(offset, data);
+}
+
 // bits 0-3 baud rate; bit 4 (0=cassette, 1=rs232); bit 5 (1=disable rom and ram)
 void poly88_state::baud_rate_w(uint8_t data)
 {
 	logerror("poly88_baud_rate_w %02x\n",data);
 	m_brg->control_w(data & 15);
+
+	m_onboard_disable = BIT(data, 5);
 }
 
 IRQ_CALLBACK_MEMBER(poly88_state::poly88_irq_callback)
@@ -104,40 +153,51 @@ WRITE_LINE_MEMBER(poly88_state::cassette_clock_w)
 }
 
 
-void poly88_state::init_poly88()
+void poly88_state::machine_start()
 {
+	m_onboard_ram = make_unique_clear<u8[]>(0x200);
 }
 
 void poly88_state::machine_reset()
 {
-	m_last_code = 0;
 	m_usart->write_rxd(1);
 	m_usart->write_cts(0);
 	m_brg->control_w(0);
+	m_onboard_disable = false;
 	m_dtr = m_rts = m_txd = m_rxd = m_cassold = 1;
 }
 
-INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(poly88_state::rtc_tick)
 {
 	m_int_vector = 0xf7;
-	device.execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+WRITE_LINE_MEMBER(poly88_state::vi2_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_int_vector = 0xef;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(poly88_state::vi5_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_int_vector = 0xd7;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER(poly88_state::usart_ready_w)
 {
 	if (state)
 	{
-		m_int_vector = 0xe7;
+		m_int_vector = 0xdf;
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
-}
-
-uint8_t poly88_state::keyboard_r()
-{
-	uint8_t retVal = m_last_code;
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	m_last_code = 0x00;
-	return retVal;
 }
 
 void poly88_state::intr_w(uint8_t data)
