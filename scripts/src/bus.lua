@@ -1686,6 +1686,8 @@ if (BUSES["S100"]~=null) then
 		MAME_DIR .. "src/devices/bus/s100/nsmdsa.h",
 		MAME_DIR .. "src/devices/bus/s100/nsmdsad.cpp",
 		MAME_DIR .. "src/devices/bus/s100/nsmdsad.h",
+		MAME_DIR .. "src/devices/bus/s100/poly16k.cpp",
+		MAME_DIR .. "src/devices/bus/s100/poly16k.h",
 		MAME_DIR .. "src/devices/bus/s100/polyfdc.cpp",
 		MAME_DIR .. "src/devices/bus/s100/polyfdc.h",
 		MAME_DIR .. "src/devices/bus/s100/polyvti.cpp",

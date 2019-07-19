@@ -43,6 +43,7 @@ at least some models of the Poly-88 are known to have used.)
 #include "emu.h"
 #include "includes/poly88.h"
 
+#include "bus/s100/poly16k.h"
 #include "bus/s100/polyfdc.h"
 #include "bus/s100/polyvti.h"
 #include "bus/s100/seals8k.h"
@@ -99,6 +100,7 @@ static void poly88_s100_devices(device_slot_interface &device)
 	device.option_add("vti", S100_POLY_VTI);
 	device.option_add("8ksc", S100_8K_SC);
 	device.option_add("8kscbb", S100_8K_SC_BB);
+	device.option_add("poly16k", S100_POLY_16K);
 	device.option_add("polyfdc", S100_POLY_FDC);
 }
 
@@ -106,8 +108,16 @@ DEVICE_INPUT_DEFAULTS_START(poly88_vti_1800)
 	DEVICE_INPUT_DEFAULTS("ADDRESS", 0x3f, 0x06) // 1800-1FFF
 DEVICE_INPUT_DEFAULTS_END
 
-DEVICE_INPUT_DEFAULTS_START(poly88_8ksc_2000)
-	DEVICE_INPUT_DEFAULTS("DSW", 0xff, 0xfd) // 2000-3FFF
+DEVICE_INPUT_DEFAULTS_START(poly88_16k_2000)
+	DEVICE_INPUT_DEFAULTS("DSW", 0xf, 0xd) // 2000-5FFF
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START(poly88_16k_6000)
+	DEVICE_INPUT_DEFAULTS("DSW", 0xf, 0x9) // 6000-9FFF
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START(poly88_16k_a000)
+	DEVICE_INPUT_DEFAULTS("DSW", 0xf, 0x5) // A000-DFFF
 DEVICE_INPUT_DEFAULTS_END
 
 void poly88_state::poly88(machine_config &config)
@@ -152,10 +162,15 @@ void poly88_state::poly88(machine_config &config)
 	m_s100->vi2().set(FUNC(poly88_state::vi2_w));
 	m_s100->vi5().set(FUNC(poly88_state::vi5_w));
 
+	// Poly-88 backplane has 5 slots, but CPU uses one
 	S100_SLOT(config, m_s100_slot[0], poly88_s100_devices, "vti");
-	S100_SLOT(config, m_s100_slot[1], poly88_s100_devices, nullptr);
+	S100_SLOT(config, m_s100_slot[1], poly88_s100_devices, "poly16k");
 	S100_SLOT(config, m_s100_slot[2], poly88_s100_devices, nullptr);
 	S100_SLOT(config, m_s100_slot[3], poly88_s100_devices, nullptr);
+
+	m_s100_slot[1]->set_option_device_input_defaults("poly16k", DEVICE_INPUT_DEFAULTS_NAME(poly88_16k_2000));
+	m_s100_slot[2]->set_option_device_input_defaults("poly16k", DEVICE_INPUT_DEFAULTS_NAME(poly88_16k_6000));
+	m_s100_slot[3]->set_option_device_input_defaults("poly16k", DEVICE_INPUT_DEFAULTS_NAME(poly88_16k_a000));
 }
 
 void poly88_state::poly8813(machine_config &config)
@@ -164,9 +179,8 @@ void poly88_state::poly8813(machine_config &config)
 	m_onboard_io->set_addrmap(0, &poly88_state::poly8813_io);
 
 	m_s100_slot[0]->set_option_device_input_defaults("vti", DEVICE_INPUT_DEFAULTS_NAME(poly88_vti_1800));
-	m_s100_slot[1]->set_default_option("8ksc");
-	m_s100_slot[1]->set_option_device_input_defaults("8ksc", DEVICE_INPUT_DEFAULTS_NAME(poly88_8ksc_2000));
-	m_s100_slot[2]->set_default_option("polyfdc");
+	m_s100_slot[1]->set_default_option("polyfdc");
+	m_s100_slot[2]->set_default_option("poly16k");
 
 	// Poly-8813 backplane has 10 slots, but CPU uses one
 	S100_SLOT(config, m_s100_slot[4], poly88_s100_devices, nullptr);
@@ -174,6 +188,10 @@ void poly88_state::poly8813(machine_config &config)
 	S100_SLOT(config, m_s100_slot[6], poly88_s100_devices, nullptr);
 	S100_SLOT(config, m_s100_slot[7], poly88_s100_devices, nullptr);
 	S100_SLOT(config, m_s100_slot[8], poly88_s100_devices, nullptr);
+
+	m_s100_slot[2]->set_option_device_input_defaults("poly16k", DEVICE_INPUT_DEFAULTS_NAME(poly88_16k_2000));
+	m_s100_slot[3]->set_option_device_input_defaults("poly16k", DEVICE_INPUT_DEFAULTS_NAME(poly88_16k_6000));
+	m_s100_slot[4]->set_option_device_input_defaults("poly16k", DEVICE_INPUT_DEFAULTS_NAME(poly88_16k_a000));
 }
 
 /* ROM definition */
