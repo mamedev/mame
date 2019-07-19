@@ -95,7 +95,7 @@ void pk8020_state::memory_w(offs_t offset, uint8_t data)
 
 uint8_t pk8020_state::ppi_porta_r()
 {
-	return 0xf0 | (m_takt <<1) | (m_text_attr)<<3;
+	return 0xf0 | (m_takt <<1) | (m_text_attr<<3) | ((m_cass->input() > +0.04) ? 1 : 0);
 }
 
 void pk8020_state::floppy_control_w(uint8_t data)
@@ -125,6 +125,9 @@ void pk8020_state::floppy_control_w(uint8_t data)
 
 void pk8020_state::ppi_2_portc_w(uint8_t data)
 {
+	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	m_cass->output(levels[data & 3]);
+
 	m_sound_gate = BIT(data,3);
 	m_speaker->level_w(m_sound_gate ? m_sound_level : 0);
 

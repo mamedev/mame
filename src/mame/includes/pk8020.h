@@ -26,22 +26,23 @@
 class pk8020_state : public driver_device
 {
 public:
-	pk8020_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_decplm(*this, "decplm"),
-		m_devbank(*this, "devbank"),
-		m_ram(*this, RAM_TAG),
-		m_ios(*this, "ios%u", 1U),
-		m_fdc(*this, "fdc"),
-		m_floppy(*this, "fdc:%u", 0U),
-		m_inr(*this, "inr"),
-		m_speaker(*this, "speaker"),
-		m_printer(*this, "printer"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_gfx1(*this, "gfx1"),
-		m_io_port(*this, "LINE%u", 0U),
-		m_palette(*this, "palette")
+	pk8020_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_decplm(*this, "decplm")
+		, m_devbank(*this, "devbank")
+		, m_ram(*this, RAM_TAG)
+		, m_ios(*this, "ios%u", 1U)
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
+		, m_cass(*this, "cassette")
+		, m_inr(*this, "inr")
+		, m_speaker(*this, "speaker")
+		, m_printer(*this, "printer")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_gfx1(*this, "gfx1")
+		, m_io_port(*this, "LINE%u", 0U)
+		, m_palette(*this, "palette")
 	{ }
 
 	void pk8020(machine_config &config);
@@ -101,6 +102,7 @@ private:
 	required_device_array<i8251_device, 2> m_ios;
 	required_device<kr1818vg93_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
+	required_device<cassette_image_device> m_cass;
 	required_device<pic8259_device> m_inr;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_printer;
