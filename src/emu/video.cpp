@@ -788,7 +788,7 @@ inline bool video_manager::effective_autoframeskip() const
 //  forward
 //-------------------------------------------------
 
-inline int video_manager::effective_frameskip() const
+int video_manager::effective_frameskip() const
 {
 	// if we're fast forwarding, use the maximum frameskip
 	if (m_fastforward)
