@@ -37085,6 +37085,47 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 -->
 
+	<!-- http://redump.org/disc/38429/ http://redump.org/disc/38430/ -->
+	<software name="crshock">
+		<description>Creature Shock (Jpn)</description>
+		<year>1996</year>
+		<publisher>Data East</publisher>
+		<info name="serial" value="SLPS-00120~SLPS-00121" />
+		<info name="release" value="19960823" />
+		<info name="alt_title" value="クリーチャーショック"/>
+		<info name="ring_code" value="SLPS-00120   1 (Disc 1), SLPS-00121   1 (Disc 2)">
+		<info name="barcode" value="4 961082 300081">
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 1"/>
+			<diskarea name="cdrom">
+				<disk name="creature shock (japan) (disc 1)" sha1="6ad034fc074961aa737009b6f1adc6c2ff8d8e34"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 2"/>
+			<diskarea name="cdrom">
+				<disk name="creature shock (japan) (disc 2)" sha1="7d369e6c0aea545b6443eecd8c1a272d2e9e0d14"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/15743/ -->
+	<software name="depth">
+		<description>Depth (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sony Computer Entertainment</publisher>
+		<info name="serial" value="SCPS 18003"/>
+		<info name="release" value="19961206" />
+		<info name="barcode" value="4 948872 180030">
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="depth (japan)" sha1="f525fb1fe7dbe9b7748756f181903a4269b8f842"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="frontmis">
 		<!-- Original images (Redump)
 		<rom name="Front Mission 1st (Japan).cue" size="91" crc="df5cd1a4" sha1="2eece9918369c18dab5cd62bd89b34886b8e123d"/>
@@ -40526,33 +40567,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="croc adventure (japan) [slpm-86310]" sha1="3b750c67fab7a1ec9347cb03bdd29d0fb7c5b219"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="crshock" supported="no">
-		<!-- Unknown source
-		<rom name="Creature Shock (Japan) (Disc 1) [SLPS-00120].bin" size="640898832" crc="bae46f52" sha1="d3b5f2a0dc6d1ed01532a6f9db47c8f38fde68a0"/>
-		<rom name="Creature Shock (Japan) (Disc 1) [SLPS-00120].cue" size="213" crc="723aabc0" sha1="b39827b563a77d30620df5da3cba32740d3a6b03"/>
-
-		<rom name="Creature Shock (Japan) (Disc 2) [SLPS-00121].bin" size="645748656" crc="f54fb485" sha1="a96debc9a644675ce69da283644db905ec4b4937"/>
-		<rom name="Creature Shock (Japan) (Disc 2) [SLPS-00121].cue" size="213" crc="4636ff27" sha1="bbe8be98407d26d44d12a49db23e345f4f0861fa"/>
-		-->
-		<description>Creature Shock (Jpn)</description>
-		<year>1996</year>
-		<publisher>Data East</publisher>
-		<info name="serial" value="SLPS-00120~SLPS-00121" />
-		<info name="release" value="19960823" />
-		<info name="alt_title" value="クリーチャーショック"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom1" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="creature shock (japan) (disc 1) [slps-00120]" sha1="c8a578c0edb4a8bdd62b98f4e82c92db35b3b953"/>
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="creature shock (japan) (disc 2) [slps-00121]" sha1="e75be88c09e1dd886142ecab17d92fbc9b7fd898"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57570,7 +57584,221 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- Redump PAL (Europe) -->
 
+	<!-- http://redump.org/disc/19444/ -->
+	<!-- Bundled with "Action Replay 2 Version 2" for PlayStation 2. Should be moved to that list when possible. -->
+	<software name="ar2_223" cloneof="ar2_230">
+		<description>Action Replay 2 Version 2.23 - Bonus PSone Codes! (Euro)</description>
+		<year>2002</year>
+		<publisher>&lt;unlicensed&gt;</publisher> <!-- Datel -->
+		<info name="ring_code" value="ACTION REPLAY 2 - VERSION 2 EUROPEAN CODE ARCHIVE DISC 01110501 THIN ICE MEDIA">
+		<info name="barcode" value="7 19480 10843 52">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="action replay 2 version 2.23 (europe) (en,fr,de,it) (disc 2) (bonus psone codes!) (unl)" sha1="0b9dc08b337fc82620540a87165299013bb6dbe1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/6147/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="apescapee" cloneof="apescape">
+		<description>Ape Escape (Euro)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-01564"/>
+		<info name="release" value="19990701" />
+		<info name="barcode" value="7 11719 78752 5">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ape escape (europe)" sha1="4e7ed4caaaabbf57b2b137f2e7f67fa2849c5d08" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1036/ -->
+	<!-- Came bundled with releases of "Crash Bandicoot" and "Tekken 2" -->
+	<software name="acrels96">
+		<description>Autumn/Christmas Releases '96 (Euro)</description>
+		<year>1996</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-00273 (9636229)"/>
+		<info name="release" value="199610xx" />
+		<info name="ring_code" value="DADC AUSTRIA   A0100197331-0101   15, DADC AUSTRIA   A0100197331-0101   35">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="autumn-christmas releases '96 (europe)" sha1="21f49d294575dec485c24866508fe40c3c0c2728"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3407/ -->
+	<software name="bm">
+		<description>Beatmania (Euro)</description>
+		<year>2000</year>
+		<publisher>Konami of Europe</publisher>
+		<info name="serial" value="SLES-02096"/>
+		<info name="ring_code" value="Sony DADC   A0100317486-0101   13">
+		<info name="barcode" value="4 988602 759334">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="beatmania (europe)" sha1="c517b30a53c6f2a00bd811cae6d929b665ac7b11"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/27257/ http://redump.org/disc/27258/ -->
+	<software name="cte" cloneof="covertop">
+		<description>Chase the Express (Euro)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-02812 (9184829)"/>
+		<info name="release" value="200009xx" />
+		<info name="ring_code" value="Sony DADC   A0100327637-0102   13 (Disc 1), Sony DADC   A0100327637-0202   23 (Disc 2)">
+		<info name="barcode" value="7 11719 18442 3, 7 11719 18432 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 1 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="chase the express (europe) (disc 1)" sha1="544e81642c51408491a49657a3f5ff1bfe522f8d"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 2 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="chase the express (europe) (disc 2)" sha1="89da12c05d32872c25292527b830228ca25c34f6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/5483/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="crashbshe" cloneof="crashbsh">
+		<description>Crash Bash (Euro)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-02834, SCES-02834-P"/>
+		<info name="release" value="200012xx" />
+		<info name="barcode" value="7 11719 23282 7, 7 11719 28422 2, 7 11719 28472 7">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="crash bash (europe) (en,fr,de,es,it)" sha1="80c8fb1e7e14419fd1d1bbdd1c01c7e69ddeadb3" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/531/ -->
+	<software name="demo1_1">
+		<description>Demo One (Version 1) (Euro)</description>
+		<year>1995?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-00048"/>
+		<info name="ring_code" value="DADC AUSTRIA   A0000171157-0101   25">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="demo one (version 1) (europe)" sha1="21fe51307cdbb28291b7737a215383bd4a17e2a9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/526/ -->
+	<software name="demo1_2">
+		<description>Demo One (Version 2) (Euro)</description>
+		<year>1995?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-00120"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="demo one (version 2) (europe)" sha1="b1c17547337b97e9e52da808ad59808c9d9eec2e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1038/ -->
+	<software name="demo1_4g">
+		<description>Demo One (Version 4) (Ger)</description>
+		<year>1996?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-00457 (9644224)"/>
+		<info name="barcode" value="7 11719 64422 4">
+		<info name="ring_code" value="DADC AUSTRIA   A0100201111-0101   25">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="demo one (version 4) (germany)" sha1="61e2f82aebbed4a44887554cc99d0779ce6973e6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/55136/ -->
+	<software name="monstincsw" cloneof="monstinc">
+		<description>Disney/Pixar Monsters, Inc.: Skrämmarön (Swe)</description>
+		<year>2002</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-03768 (9315629)"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="disney-pixar monsters, inc. - skraemmaroen (sweden)" sha1="bbcea4e0701203cc23c42cb5b3a40dc82bc8bbc5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/562/ http://redump.org/disc/563/ -->
+	<software name="draculae" cloneof="dracula">
+		<description>Dracula: The Resurrection (Euro)</description>
+		<year>2000</year>
+		<publisher>Microïds</publisher>
+		<info name="serial" value="SLES-02757"/>
+		<info name="release" value="20000206" />
+		<info name="ring_code" value="Sony DADC   A0100320928-0102   45 (Disc 1), Sony DADC   A0100320928-0202   15 (Disc 2)">
+		<info name="barcode" value="3 342185 276601">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 1 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="dracula - the resurrection (europe) (disc 1)" sha1="a06d9ed304babc993ba62f760c0979876f9d34d6"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 2 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="dracula - the resurrection (europe) (disc 2)" sha1="72c3e904b3397583989d2e9871c8a98f6bebafac"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1095/ http://redump.org/disc/1180/ -->
+	<software name="driver2e" cloneof="driver2">
+		<description>Driver 2: Back on the Streets (Euro, Rev. 1)</description>
+		<year>2000</year>
+		<publisher>Infogrames Europe</publisher>
+		<info name="serial" value="SLES-02993#, SLES-02993-P"/>
+		<info name="release" value="20001117" />
+		<info name="ring_code" value="Sony DADC   A0100343709-0102   65 (Disc 1), Sony DADC   A0100343709-0202   33 (Disc 2)">
+		<info name="barcode" value="3 546430 012703, 3 546430 021552">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 1 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="driver 2 - back on the streets (europe) (disc 1) (rev 1)" sha1="ce4045fa43c89606b1d51b10edc1d3361c3eaa72"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 2 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="driver 2 - back on the streets (europe) (disc 2) (rev 1)" sha1="2dd746873d57ccbfd62f70f4f63c637186600e58"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- Non-redump PAL (Europe) -->
 
