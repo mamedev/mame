@@ -54,6 +54,7 @@ public:
 	void post(const char32_t *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void paste();
 
 	// debugging
 	void dump(std::ostream &str) const;

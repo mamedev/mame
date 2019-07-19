@@ -223,7 +223,6 @@ public:
 	void show_mouse(bool status);
 	virtual bool is_menu_active() override;
 	bool can_paste();
-	void paste();
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
