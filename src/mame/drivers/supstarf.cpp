@@ -19,27 +19,27 @@ class supstarf_state : public driver_device
 {
 public:
 	supstarf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_psg(*this, {"psg1", "psg2"}),
-			m_soundlatch(*this, {"soundlatch1", "soundlatch2"})
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_psg(*this, "psg%u", 1U)
+		, m_soundlatch(*this, "soundlatch%u", 1U)
 	{
 	}
 
 	void supstarf(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(psg_latch_r);
-	DECLARE_WRITE8_MEMBER(psg_latch_w);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	u8 psg_latch_r(offs_t offset);
+	void psg_latch_w(offs_t offset, u8 data);
+	void port1_w(u8 data);
+	void port2_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(contacts_r);
 	DECLARE_WRITE_LINE_MEMBER(displays_w);
-	DECLARE_WRITE8_MEMBER(driver_clk_w);
+	void driver_clk_w(offs_t offset, u8 data);
 	DECLARE_READ_LINE_MEMBER(phase_detect_r);
-	DECLARE_WRITE8_MEMBER(lights_a_w);
-	DECLARE_WRITE8_MEMBER(lights_b_w);
+	void lights_a_w(u8 data);
+	void lights_b_w(u8 data);
 
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
@@ -81,7 +81,7 @@ void supstarf_state::sound_io_map(address_map &map)
 	map(0x00, 0xff).rw(FUNC(supstarf_state::psg_latch_r), FUNC(supstarf_state::psg_latch_w));
 }
 
-READ8_MEMBER(supstarf_state::psg_latch_r)
+u8 supstarf_state::psg_latch_r(offs_t offset)
 {
 	u8 result = 0xff; // AR3 +5v pullup
 
@@ -95,12 +95,12 @@ READ8_MEMBER(supstarf_state::psg_latch_r)
 	}
 
 	if (m_latch_select)
-		result &= m_soundlatch[1]->read(space, 0);
+		result &= m_soundlatch[1]->read();
 
 	return result;
 }
 
-WRITE8_MEMBER(supstarf_state::psg_latch_w)
+void supstarf_state::psg_latch_w(offs_t offset, u8 data)
 {
 	for (int d = 0; d < 2; d++)
 	{
@@ -112,15 +112,15 @@ WRITE8_MEMBER(supstarf_state::psg_latch_w)
 	}
 
 	if (m_latch_select)
-		m_soundlatch[0]->strobe(space, 0, data);
+		m_soundlatch[0]->strobe(data);
 }
 
-WRITE8_MEMBER(supstarf_state::port1_w)
+void supstarf_state::port1_w(u8 data)
 {
 	m_port1_data = data;
 }
 
-WRITE8_MEMBER(supstarf_state::port2_w)
+void supstarf_state::port2_w(u8 data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 	if (!BIT(data, 4))
@@ -145,7 +145,7 @@ WRITE_LINE_MEMBER(supstarf_state::displays_w)
 {
 }
 
-WRITE8_MEMBER(supstarf_state::driver_clk_w)
+void supstarf_state::driver_clk_w(offs_t offset, u8 data)
 {
 }
 
@@ -154,11 +154,11 @@ READ_LINE_MEMBER(supstarf_state::phase_detect_r)
 	return 0;
 }
 
-WRITE8_MEMBER(supstarf_state::lights_a_w)
+void supstarf_state::lights_a_w(u8 data)
 {
 }
 
-WRITE8_MEMBER(supstarf_state::lights_b_w)
+void supstarf_state::lights_b_w(u8 data)
 {
 }
 
@@ -175,36 +175,36 @@ void supstarf_state::machine_start()
 
 void supstarf_state::supstarf(machine_config &config)
 {
-	I8085A(config, m_maincpu, XTAL(5'068'800));
+	I8085A(config, m_maincpu, 5.0688_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &supstarf_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &supstarf_state::main_io_map);
 	m_maincpu->in_sid_func().set(FUNC(supstarf_state::contacts_r));
 	m_maincpu->out_sod_func().set(FUNC(supstarf_state::displays_w));
 
-	I8035(config, m_soundcpu, XTAL(5'068'800) / 2); // from 8085 pin 37 (CLK OUT)
+	I8035(config, m_soundcpu, 5.0688_MHz_XTAL / 2); // from 8085 pin 37 (CLK OUT)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supstarf_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &supstarf_state::sound_io_map);
 	m_soundcpu->p1_out_cb().set(FUNC(supstarf_state::port1_w));
 	m_soundcpu->p2_out_cb().set(FUNC(supstarf_state::port2_w));
 	m_soundcpu->t1_in_cb().set(FUNC(supstarf_state::phase_detect_r));
 
-	I8212(config, m_soundlatch[0], 0);
+	I8212(config, m_soundlatch[0]);
 	m_soundlatch[0]->md_rd_callback().set_constant(0);
 	m_soundlatch[0]->int_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
 
-	I8212(config, m_soundlatch[1], 0);
+	I8212(config, m_soundlatch[1]);
 	m_soundlatch[1]->md_rd_callback().set_constant(0);
 	m_soundlatch[1]->int_wr_callback().set_inputline("soundcpu", MCS48_INPUT_IRQ);
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_psg[0], XTAL(5'068'800) / 6); // from 8035 pin 1 (T0)
+	AY8910(config, m_psg[0], 5.0688_MHz_XTAL / 6); // from 8035 pin 1 (T0)
 	m_psg[0]->port_a_write_callback().set(FUNC(supstarf_state::lights_a_w));
 	m_psg[0]->port_b_write_callback().set(FUNC(supstarf_state::lights_b_w));
 	m_psg[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	AY8910(config, m_psg[1],  XTAL(5'068'800) / 6); // from 8035 pin 1 (T0)
+	AY8910(config, m_psg[1],  5.0688_MHz_XTAL / 6); // from 8035 pin 1 (T0)
 	m_psg[1]->port_a_read_callback().set_ioport("JO");
 	m_psg[1]->port_b_read_callback().set_ioport("I1");
 	m_psg[1]->add_route(ALL_OUTPUTS, "mono", 0.50);

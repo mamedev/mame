@@ -44,12 +44,12 @@ public:
 	auto md_rd_callback() { return m_read_md.bind(); }
 
 	// data read handlers
-	DECLARE_READ8_MEMBER(read);
+	uint8_t read();
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 	// data write handlers
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(strobe);
+	void write(uint8_t data);
+	void strobe(uint8_t data);
 
 	// line write handlers
 	DECLARE_WRITE_LINE_MEMBER(stb_w);

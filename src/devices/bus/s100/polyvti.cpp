@@ -179,7 +179,7 @@ void poly_vti_device::s100_mwrt_w(offs_t offset, u8 data)
 u8 poly_vti_device::s100_sinp_r(offs_t offset)
 {
 	if ((offset & 0xfc00) >> 10 == m_address->read())
-		return m_kbdlatch->read(machine().dummy_space(), 0);
+		return m_kbdlatch->read();
 
 	return 0xff;
 }
@@ -190,7 +190,7 @@ void poly_vti_device::kbd_put(u8 data)
 	{
 		if (data==8)
 			data=127;  // fix backspace
-		m_kbdlatch->strobe(machine().dummy_space(), 0, data);
+		m_kbdlatch->strobe(data);
 	}
 }
 
