@@ -58100,6 +58100,75 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/1751/ -->
+	<software name="f1cs2ke" cloneof="f1cs2k">
+		<description>F1 Championship Season 2000 (Euro)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-03119, SLES-03119-P"/>
+		<info name="release" value="20000929" />
+		<info name="ring_code" value="Sony DADC   A0100333924-0101   33">
+		<info name="barcode" value="5 030930 025366, 5 030945 029045">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="f1 championship season 2000 (europe) (en,es,sv,fi)" sha1="65d32655e37ed3c92558e1caf0471c8525c19480"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/866/ http://redump.org/disc/875/ http://redump.org/disc/873/ http://redump.org/disc/874/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHDs. -->
+	<software name="ffant8e" cloneof="ffant8">
+		<description>Final Fantasy VIII (Euro, Aus)</description>
+		<year>1999</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-02080 ANZ-P, SLES-02080"/>
+		<info name="release" value="19991001" />
+		<info name="ring_code" value="DADC   A0100288304-0104   15, Sony DADC   A0100288304-0104   45 (Disc 1), DADC   A0100288304-0204   15, Sony DADC   A0100288304-0204   65 (Disc 2), DADC   A0100288304-0304   25, Sony DADC   A0100288304-0304   85 (Disc 3), DADC   A0100288304-0404   15 (Disc 4)">
+		<info name="barcode" value="7 11719 19392 0, 7 11719 85842 3, 7 11719 85902 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 1 of 4"/>
+			<diskarea name="cdrom">
+				<disk name="final fantasy viii (europe, australia) (disc 1)" sha1="9c3f21dce9f47f1d1aeb50fd7578af10aca521df" status="baddump"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 2 of 4"/>
+			<diskarea name="cdrom">
+				<disk name="final fantasy viii (europe, australia) (disc 2)" sha1="a1082f610441d956c8d01e8049d7a781cf4bf29e" status="baddump"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 3 of 4"/>
+			<diskarea name="cdrom">
+				<disk name="final fantasy viii (europe, australia) (disc 3)" sha1="879a484a072e075d6b62a8314b4fdb0dffdb965d" status="baddump"/>
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 4 of 4"/>
+			<diskarea name="cdrom">
+				<disk name="final fantasy viii (europe, australia) (disc 4)" sha1="9aaa1bd33763e6cba9ccfcd44a6ff36c5a0008c9" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/61313/ -->
+	<software name="frontms3e" cloneof="frontms3">
+		<description>Front Mission 3 (Euro, Prototype 20000616)</description>
+		<year>2000</year>
+		<publisher>Square Europe</publisher>
+		<info name="release" value="20000616" />
+		<info name="ring_code" value="R012-3848-2968">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="front mission 3 (europe) (beta)" sha1="0163d00935a210c70b7454956a3e05332cacb44d"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Non-redump PAL (Europe) -->
 
 	<!-- corrupt text -->
