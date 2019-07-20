@@ -2387,6 +2387,7 @@ void lua_engine::initialize()
  * image:load()
  * image:unload()
  * image:crc()
+ * image:display()
  *
  * image.device - get associated device_t
  * image.software_parent
@@ -2394,6 +2395,7 @@ void lua_engine::initialize()
  * image.is_writeable
  * image.is_creatable
  * image.is_reset_on_load
+ * image.must_be_loaded
  */
 
 	sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor,
@@ -2408,11 +2410,14 @@ void lua_engine::initialize()
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,
 			"crc", &device_image_interface::crc,
+			"display", [](device_image_interface &di) { return di.call_display(); },
 			"device", sol::property(static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device)),
 			"is_readable", sol::property(&device_image_interface::is_readable),
 			"is_writeable", sol::property(&device_image_interface::is_writeable),
 			"is_creatable", sol::property(&device_image_interface::is_creatable),
-			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
+			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load),
+			"must_be_loaded", sol::property(&device_image_interface::must_be_loaded)
+		);
 
 
 /*  mame_machine_manager library
