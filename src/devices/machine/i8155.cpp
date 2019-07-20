@@ -458,9 +458,9 @@ void i8155_device::write_command(uint8_t data)
 	LOGMASKED(LOG_PORT, "Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
 	LOGMASKED(LOG_PORT, "Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
 
-	if ((data & COMMAND_PA) && (!old_command & COMMAND_PA))
+	if ((data & COMMAND_PA) && (~old_command & COMMAND_PA))
 		m_out_pa_cb((offs_t)0, m_output[PORT_A]);
-	if ((data & COMMAND_PB) && (!old_command & COMMAND_PB))
+	if ((data & COMMAND_PB) && (~old_command & COMMAND_PB))
 		m_out_pb_cb((offs_t)0, m_output[PORT_B]);
 
 	switch (data & COMMAND_PC_MASK)
