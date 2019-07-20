@@ -34112,6 +34112,10 @@ sage2                           //
 @source:saitek_chesstrv.cpp
 chesstrv                        //
 
+@source:saitek_corona.cpp
+corona
+coronaa
+
 @source:saitek_cp2000.cpp
 cp2000                          //
 
@@ -34123,8 +34127,6 @@ risc2500                        //
 montreux                        //
 
 @source:saitek_stratos.cpp
-corona
-coronaa
 stratos
 stratosa
 tking
