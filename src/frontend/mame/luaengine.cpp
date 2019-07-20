@@ -766,7 +766,6 @@ void lua_engine::initialize()
 	emu["romname"] = [this](){ return machine().basename(); };
 	emu["softname"] = [this]() { return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
-	emu["paste"] = [this](){ machine().ioport().natkeyboard().paste(); };
 	emu["time"] = [this](){ return machine().time().as_double(); };
 	emu["start"] = [this](const char *driver) {
 			int i = driver_list::find(driver);
@@ -1672,6 +1671,7 @@ void lua_engine::initialize()
 
 	sol().registry().new_usertype<ioport_manager>("ioport", "new", sol::no_constructor,
 			"count_players", &ioport_manager::count_players,
+			"natkeyboard", &ioport_manager::natkeyboard,
 			"ports", sol::property([this](ioport_manager &im) {
 					sol::table port_table = sol().create_table();
 					for (auto &port : im.ports())
@@ -1679,6 +1679,23 @@ void lua_engine::initialize()
 					return port_table;
 				}));
 
+/*  natkeyboard library
+ *
+ * manager:machine():ioport():natkeyboard()
+ *
+ * natkeyboard.empty - is the natural keyboard buffer empty?
+ * natkeyboard.in_use - is the natural keyboard in use?
+ * natkeyboard:paste() - paste clipboard data
+ * natkeyboard:post() - post data to natural keyboard
+ * natkeyboard:post_coded() - post data to natural keyboard
+ */
+
+	sol().registry().new_usertype<natural_keyboard>("natkeyboard", "new", sol::no_constructor,
+			"empty", sol::property(&natural_keyboard::empty),
+			"in_use", sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use),
+			"paste", &natural_keyboard::paste,
+			"post", [](natural_keyboard &nat, const std::string &text)			{ nat.post_utf8(text); },
+			"post_coded", [](natural_keyboard &nat, const std::string &text)	{ nat.post_coded(text); });
 
 /*  ioport_port library
  *

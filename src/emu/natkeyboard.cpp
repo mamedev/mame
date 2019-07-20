@@ -486,6 +486,13 @@ void natural_keyboard::post_utf8(const char *text, size_t length, const attotime
 }
 
 
+void natural_keyboard::post_utf8(const std::string &text, const attotime &rate)
+{
+	if (!text.empty())
+		post_utf8(text.c_str(), text.size(), rate);
+}
+
+
 //-------------------------------------------------
 //  post_coded - post a coded string
 //-------------------------------------------------
@@ -561,6 +568,13 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 			post(ch);
 		curpos += increment;
 	}
+}
+
+
+void natural_keyboard::post_coded(const std::string &text, const attotime &rate)
+{
+	if (!text.empty())
+		post_coded(text.c_str(), text.size(), rate);
 }
 
 
