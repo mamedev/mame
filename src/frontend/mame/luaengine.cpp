@@ -766,6 +766,7 @@ void lua_engine::initialize()
 	emu["romname"] = [this](){ return machine().basename(); };
 	emu["softname"] = [this]() { return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
+	emu["paste"] = [this](){ machine().ioport().natkeyboard().paste(); };
 	emu["time"] = [this](){ return machine().time().as_double(); };
 	emu["start"] = [this](const char *driver) {
 			int i = driver_list::find(driver);

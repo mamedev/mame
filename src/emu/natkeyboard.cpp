@@ -565,6 +565,27 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 
 
 //-------------------------------------------------
+//  paste - does a paste from the keyboard
+//-------------------------------------------------
+
+void natural_keyboard::paste()
+{
+	// retrieve the clipboard text
+	char *text = osd_get_clipboard_text();
+
+	// was a result returned?
+	if (text != nullptr)
+	{
+		// post the text
+		post_utf8(text);
+
+		// free the string
+		free(text);
+	}
+}
+
+
+//-------------------------------------------------
 //  build_codes - given an input port table, create
 //  an input code table useful for mapping unicode
 //  chars

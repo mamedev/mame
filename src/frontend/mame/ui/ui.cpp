@@ -905,27 +905,6 @@ bool mame_ui_manager::can_paste()
 
 
 //-------------------------------------------------
-//  paste - does a paste from the keyboard
-//-------------------------------------------------
-
-void mame_ui_manager::paste()
-{
-	// retrieve the clipboard text
-	char *text = osd_get_clipboard_text();
-
-	// was a result returned?
-	if (text != nullptr)
-	{
-		// post the text
-		machine().ioport().natkeyboard().post_utf8(text);
-
-		// free the string
-		free(text);
-	}
-}
-
-
-//-------------------------------------------------
 //  draw_fps_counter
 //-------------------------------------------------
 
@@ -1105,7 +1084,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	{
 		// paste command
 		if (machine().ui_input().pressed(IPT_UI_PASTE))
-			paste();
+			machine().ioport().natkeyboard().paste();
 	}
 
 	image_handler_ingame();
