@@ -2153,19 +2153,31 @@ void lua_engine::initialize()
 			"refresh", [](screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); },
 			"refresh_attoseconds", [](screen_device &sdev) { return sdev.refresh_attoseconds(); },
 			"snapshot", [this](screen_device &sdev, sol::object filename) -> sol::object {
-					emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-					osd_file::error filerr;
-					if(filename.is<const char *>())
+					std::string snapstr;
+					bool is_absolute_path = false;
+					if (filename.is<const char *>())
 					{
-						std::string snapstr(filename.as<const char *>());
-						strreplace(snapstr, "/", PATH_SEPARATOR);
-						strreplace(snapstr, "%g", machine().basename());
-						filerr = file.open(snapstr.c_str());
+						// a filename was specified; if it isn't absolute postprocess it
+						snapstr = filename.as<const char *>();
+						is_absolute_path = osd_is_absolute_path(snapstr);
+						if (!is_absolute_path)
+						{
+							strreplace(snapstr, "/", PATH_SEPARATOR);
+							strreplace(snapstr, "%g", machine().basename());
+						}
 					}
+
+					// open the file
+					emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					osd_file::error filerr;
+					if (!snapstr.empty())
+						filerr = file.open(snapstr);
 					else
 						filerr = machine().video().open_next(file, "png");
-					if(filerr != osd_file::error::NONE)
+					if (filerr != osd_file::error::NONE)
 						return sol::make_object(sol(), filerr);
+
+					// and save the snapshot
 					machine().video().save_snapshot(&sdev, file);
 					return sol::make_object(sol(), sol::nil);
 				},
