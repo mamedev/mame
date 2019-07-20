@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-  This hardware seems to be an evolution of the one found in lucky37.cpp. Its main components are:
+  This hardware seems to be an evolution of the one found in lucky74.cpp. Its main components are:
   * A001 CPU block, containing probably a Z80 or compatible CPU and ROM(s) (not dumped).
     Dumper description after opening it: 3 unknown/white chips, which had no pins, with no markings.
   * HD647180X0P6 MCU with internal ROM (not dumped)
@@ -130,7 +130,7 @@ ROM_START( lucky21 )
 	ROM_REGION( 0x8000, "mcu", 0 )
 	ROM_LOAD( "internal_rom", 0x0000, 0x8000, NO_DUMP )
 
-	ROM_REGION( 0xc0000, "unsorted", 0 )
+	ROM_REGION( 0xc0000, "unsorted", 0 ) // no ROM 6 present
 	ROM_LOAD( "1.bin", 0x00000, 0x20000, CRC(2198b736) SHA1(556fd89dc9d1183a672324b7e1bb6350331459d2) )
 	ROM_LOAD( "2.bin", 0x20000, 0x20000, CRC(fe7bbfef) SHA1(5b1413d26049e4e5c04e05a71f552d2999d57ed5) )
 	ROM_LOAD( "3.bin", 0x40000, 0x20000, CRC(c4c3f642) SHA1(4dba751f74717e4ef158f21c3e2a1b2d4802bb51) )
