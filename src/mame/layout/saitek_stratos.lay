@@ -4,7 +4,18 @@
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
+	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="text_mode"><text string="Mode" align="1"><color red="0.36" green="0.35" blue="0.35" /></text></element>
+
+	<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="1.0" blue="1.0" /></led7seg>
+	</element>
+	<element name="ldot" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.12157" green="0.12157" blue="0.12157" /></rect>
+	</element>
 
 	<element name="ledo">
 		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
@@ -462,6 +473,30 @@
 	</group>
 
 
+<!-- lcd panel -->
+
+	<group name="lcd1">
+		<bounds x="15.5" y="0" width="22.5" height="14" />
+
+		<bezel name="digit0" element="digit"><bounds x="15.5" y="0" width="4" height="6" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="20" y="0" width="4" height="6" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="24" y="0" width="4" height="6" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="30" y="0" width="4" height="6" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="34" y="0" width="4" height="6" /></bezel>
+
+		<bezel name="lcd0.0.0" element="ldot"><bounds x="28.91" y="1.8" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd0.0.0" element="ldot"><bounds x="28.69" y="3.65" width="0.6" height="0.6" /></bezel>
+
+		<bezel name="digit5" element="digit"><bounds x="20" y="8" width="4" height="6" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="24" y="8" width="4" height="6" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="30" y="8" width="4" height="6" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="34" y="8" width="4" height="6" /></bezel>
+
+		<bezel name="lcd1.0.0" element="ldot"><bounds x="28.91" y="9.8" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd1.0.0" element="ldot"><bounds x="28.69" y="11.65" width="0.6" height="0.6" /></bezel>
+	</group>
+
+
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -469,6 +504,9 @@
 
 		<group ref="sb_board"><bounds x="10" y="10" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-3" y="10" width="10" height="80" /></group>
+
+		<group ref="lcd1"><bounds x="26.64" y="93" width="12.86" height="8" /></group>
+		<bezel element="whitew"><bounds x="25.14" y="92.5" width="14.86" height="9" /><color alpha="0.125" /></bezel>
 
 		<!-- chessboard leds -->
 		<element ref="ledo"><bounds x="8.6" y="14.2" width="0.6" height="1.6" /></element>

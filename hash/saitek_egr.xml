@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="saitek_egr" description="Saitek Endgame ROM">
+
+<!-- Extension ROM, sold separately, placed in ROM socket through hatch on the back -->
+<!-- Used in: Stratos, Turbo King, Corona, Simultano chess computers, Maestro and Analyst modules -->
+
+	<software name="egr">
+		<description>Endgame ROM (ver. 1)</description>
+		<year>1988</year>
+		<publisher>Saitek</publisher>
+		<part name="extrom" interface="saitek_egr">
+			<dataarea name="rom" size="0x8000">
+				<rom name="egr.bin" size="0x8000" crc="1f9800c8" sha1="6147ad3de65b897fa5f6ab06b2f8597403d6e32e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="egr2" cloneof="egr">
+		<description>Endgame ROM (ver. 2)</description>
+		<year>1988</year>
+		<publisher>Saitek</publisher>
+		<part name="extrom" interface="saitek_egr">
+			<dataarea name="rom" size="0x8000">
+				<rom name="egr2.bin" size="0x8000" crc="9f751516" sha1="c46053b0af55856f2a6871d4aa65b3bd0e7d865f" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
