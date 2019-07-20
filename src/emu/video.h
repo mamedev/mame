@@ -82,6 +82,7 @@ public:
 	// current speed helpers
 	std::string speed_text();
 	double speed_percent() const { return m_speed_percent; }
+	int effective_frameskip() const;
 
 	// snapshots
 	void save_snapshot(screen_device *screen, emu_file &file);
@@ -116,7 +117,6 @@ private:
 
 	// effective value helpers
 	bool effective_autoframeskip() const;
-	int effective_frameskip() const;
 	bool effective_throttle() const;
 
 	// speed and throttling helpers

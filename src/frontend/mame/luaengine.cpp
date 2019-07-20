@@ -1851,6 +1851,7 @@ void lua_engine::initialize()
 			"skip_this_frame", &video_manager::skip_this_frame,
 			"speed_factor", &video_manager::speed_factor,
 			"speed_percent", &video_manager::speed_percent,
+			"effective_frameskip", &video_manager::effective_frameskip,
 			"frame_update", &video_manager::frame_update,
 			"size", [](video_manager &vm) {
 					s32 width, height;
