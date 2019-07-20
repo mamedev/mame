@@ -57800,6 +57800,306 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/1022/ -->
+	<software name="edemo21">
+		<description>Euro Demo 21 (Euro)</description>
+		<year>1996?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-00817 (9668626)"/>
+		<info name="alt_title" value="Italian demo issue n° 11 - Luglio 1997 (Ita Box), Edición Oficial Española PlayStation Magazine Disco 8 (Spa Box), Official UK PlayStation Magazine CD 04 Vol. 2 (UK Box)"/>
+		<info name="ring_code" value="DADC AUSTRIA   A0100218411-0101   15">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 21 (europe)" sha1="16a64ca7e0c23b6e8e29e11a2b12fcfcfe8acb54"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/649/ -->
+	<software name="edemo22">
+		<description>Euro Demo 22 (Euro)</description>
+		<year>1996?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-00818 (9678823)"/>
+		<info name="alt_title" value="Italian demo issue n° 12 - Agosto 1997 (Ita Box), Edición Oficial Española PlayStation Magazine Disco 9 (Spa Box), Official UK PlayStation Magazine CD 05 Vol. 2 (UK Box)"/>
+		<info name="ring_code" value="DADC AUSTRIA   A0100221271-0101   15">
+		<info name="barcode" value="7 11719 66822 0, 7 11719 67882 3">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 22 (europe)" sha1="70a6365856b45872b802af591a0220a9d8c99f7c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/331/ -->
+	<software name="edemo28">
+		<description>Euro Demo 28 (Euro)</description>
+		<year>1997?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-00824 (9680420)"/>
+		<info name="alt_title" value="Italian demo issue n° 18 - Febbraio 1998 (Ita Box), Edición Oficial Española PlayStation Magazine Disco 15 (Spa Box), Official UK PlayStation Magazine CD 11 Vol. 2 (UK Box)"/>
+		<info name="ring_code" value="DADC AUSTRIA   A0100233103-0101   25">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 28 (europe)" sha1="96e0da1751b9c3ac9b75fd4ba2d729d6a6a15141"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/314/ -->
+	<software name="edemo58">
+		<description>Euro Demo 58 (Euro)</description>
+		<year>2000?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02632 (9151425)"/>
+		<info name="alt_title" value="Edición Oficial Española PlayStation Magazine Disco 43 (Spa Box), Official UK PlayStation Magazine Disc 58 (UK Box)"/>
+		<info name="ring_code" value="Sony DADC   A0100315421-0101   15">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 58 (europe)" sha1="ae012d4dff12ab076196b50faaae9b2365a4232c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/316/ -->
+	<software name="edemo60">
+		<description>Euro Demo 60 (Euro)</description>
+		<year>2000?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02634"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 60 (UK Box)"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 60 (europe)" sha1="2300bcfc53b00b00144f471515317984d9665dca"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/574/ -->
+	<software name="edemo62">
+		<description>Euro Demo 62 (Euro)</description>
+		<year>2000?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02636 (9151821)"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 62 (UK Box)"/>
+		<info name="ring_code" value="Sony DADC   A0100327000-0101   15">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 62 (europe)" sha1="17708e1133b7eb1c56317c2a90b68ff100a0b816"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/319/ -->
+	<software name="edemo63">
+		<description>Euro Demo 63 (Euro)</description>
+		<year>2000?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02637 (9151920)"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 63 (UK Box)"/>
+		<info name="ring_code" value="Sony DADC   A0100331338-0101   13">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 63 (europe)" sha1="c0fef6742e7345822fb8a0eab405d841c1ff75e7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/291/ -->
+	<software name="edemo64">
+		<description>Euro Demo 64 (Euro)</description>
+		<year>2000?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02638 (9152026)"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 64 (UK Box)"/>
+		<info name="ring_code" value="Sony DADC   A0100335156-0101   43">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 64 (europe)" sha1="0d272266e4c158b774d6d6d19d5118b91d3dbabe"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/288/ -->
+	<software name="edemo65">
+		<description>Euro Demo 65 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02639"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 65 (UK Box)"/>
+		<info name="ring_code" value="Sony DADC   A0100339028-0101   23">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 65 (europe)" sha1="a3ca6261c813f0d000949525ac3b11d4382465ba"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/289/ -->
+	<software name="edemo66">
+		<description>Euro Demo 66 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02640"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 66 (UK Box)"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 66 (europe)" sha1="e8d0b91c0605c1f3a543f5f560cc8c337bca8906"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/290/ -->
+	<software name="edemo67">
+		<description>Euro Demo 67 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02641"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 67 (UK Box)"/>
+		<info name="barcode" value="7 11719 15082 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 67 (europe)" sha1="0afbf97128bd0086e6f66c4d8472d0ebcc929f25"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1236/ -->
+	<software name="edemo68">
+		<description>Euro Demo 68 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02642"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 68 (UK Box)"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 68 (europe)" sha1="3c6a58563ea0a8e931e7d17ab75c796df8ae0d50"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/322/ -->
+	<software name="edemo69">
+		<description>Euro Demo 69 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02643"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 69 (UK Box)"/>
+		<info name="barcode" value="7 11719 15102 9">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 69 (europe)" sha1="37fd7a016fffcfae44085c7460d9c79ef0326b1d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/292/ -->
+	<software name="edemo70">
+		<description>Euro Demo 70 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02644"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 70 (UK Box)"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 70 (europe)" sha1="0a948b38ea68d4a4bd13aae410a1323daf7f5dfc"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/293/ -->
+	<software name="edemo71">
+		<description>Euro Demo 71 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02645"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 71 (UK Box)"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 71 (europe)" sha1="fd01e2b609877f1bb7469f925ff11bf76e016427"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/294/ -->
+	<software name="edemo72">
+		<description>Euro Demo 72 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-02646"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 72 (UK Box)"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 72 (europe)" sha1="2653028074e01fd31c70edd5804b3a784df3ba02"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/19604/ -->
+	<software name="edemo73">
+		<description>Euro Demo 73 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-03450"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 73 (UK Box)"/>
+		<info name="barcode" value="7 11719 26652 5">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 73 (europe)" sha1="36bdd937ad3f0af1640a3f725f97a28dd2c1e240"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1262/ -->
+	<software name="edemo74">
+		<description>Euro Demo 74 (Euro)</description>
+		<year>2001?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-03451"/>
+		<info name="alt_title" value="Official UK PlayStation Magazine Disc 74 (UK Box)"/>
+		<info name="barcode" value="7 11719 26662 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="euro demo 74 (europe)" sha1="eaaa2d8a709f26c14487d8f661c0a94ac42921b9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/19905/ -->
+	<software name="evryglf2" cloneof="hotshot2">
+		<description>Everybody's Golf 2 (Euro)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-02146"/>
+		<info name="release" value="20000419" />
+		<info name="ring_code" value="Sony DADC   A0100316368-0101   13">
+		<info name="barcode" value="7 11719 16572 9, 7 11719 16612 2">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="everybody's golf 2 (europe)" sha1="6495826c2ac710c572b7cba7e8d6ccbc4e8ebe17"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Non-redump PAL (Europe) -->
 
 	<!-- corrupt text -->
