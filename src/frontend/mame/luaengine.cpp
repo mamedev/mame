@@ -2386,6 +2386,7 @@ void lua_engine::initialize()
  * image:image_type_name() - floppy/cart/cdrom/tape/hdd etc
  * image:load()
  * image:unload()
+ * image:create()
  * image:crc()
  * image:display()
  *
@@ -2409,6 +2410,7 @@ void lua_engine::initialize()
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,
+			"create", [](device_image_interface &di, const std::string &filename) { return di.create(filename); },
 			"crc", &device_image_interface::crc,
 			"display", [](device_image_interface &di) { return di.call_display(); },
 			"device", sol::property(static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device)),
