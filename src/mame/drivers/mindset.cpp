@@ -7,6 +7,7 @@
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
+#include "sound/dac.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -36,8 +37,9 @@ protected:
 	output_finder<> m_red_led;
 	output_finder<> m_yellow_led;
 	output_finder<> m_green_led;
+	required_device<dac_byte_interface> m_dac;
 
-	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcos;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_gcps;
 
 	floppy_image_device *m_floppy[2];
 	u32 m_palette[16];
@@ -50,16 +52,16 @@ protected:
 	u16 m_trap_data[8];
 	u32 m_trap_pos, m_trap_len;
 
-	static u16 gco_blend_0(u16, u16);
-	static u16 gco_blend_1(u16, u16);
-	static u16 gco_blend_2(u16, u16);
-	static u16 gco_blend_3(u16, u16);
-	static u16 gco_blend_4(u16, u16);
-	static u16 gco_blend_5(u16, u16);
-	static u16 gco_blend_6(u16, u16);
-	static u16 gco_blend_7(u16, u16);
+	static u16 gcp_blend_0(u16, u16);
+	static u16 gcp_blend_1(u16, u16);
+	static u16 gcp_blend_2(u16, u16);
+	static u16 gcp_blend_3(u16, u16);
+	static u16 gcp_blend_4(u16, u16);
+	static u16 gcp_blend_5(u16, u16);
+	static u16 gcp_blend_6(u16, u16);
+	static u16 gcp_blend_7(u16, u16);
 
-	static u16 (*const gco_blend[8])(u16, u16);
+	static u16 (*const gcp_blend[8])(u16, u16);
 
 	static inline u16 msk(int bit) { return (1U << bit) - 1; }
 	static inline u16 sw(u16 data) { return (data >> 8) | (data << 8); }
@@ -70,7 +72,7 @@ protected:
 	void display_mode();
 	void blit(u16 packet_seg, u16 packet_adr);
 
-	void gco_w(u16);
+	void gcp_w(u16);
 	u16 dispctrl_r();
 	void dispctrl_w(u16 data);
 	u16 dispreg_r();
@@ -137,7 +139,8 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 	m_floppy_leds(*this, "drive%u_led", 0U),
 	m_red_led(*this, "red_led"),
 	m_yellow_led(*this, "yellow_led"),
-	m_green_led(*this, "green_led")
+	m_green_led(*this, "green_led"),
+	m_dac(*this, "dac")
 {
 }
 
@@ -153,7 +156,7 @@ void mindset_state::machine_start()
 	m_yellow_led.resolve();
 	m_green_led.resolve();
 
-	m_gcos = m_maincpu->space(AS_PROGRAM).cache<1, 0, ENDIANNESS_LITTLE>();
+	m_gcps = m_maincpu->space(AS_PROGRAM).cache<1, 0, ENDIANNESS_LITTLE>();
 	for(int i=0; i<2; i++)
 		m_floppy[i] = m_fdco[i]->get_device();
 
@@ -231,10 +234,10 @@ void mindset_state::sys_p2_w(u8 data)
 {
 	m_maincpu->int3_w(!(data & 0x80));
 	m_red_led = !BIT(data, 2);
-	m_yellow_led = !BIT(data, 1);
-	m_green_led = !BIT(data, 0);
+	m_yellow_led = !BIT(data, 0);
+	m_green_led = !BIT(data, 1);
 	//  logerror("power %s\n", data & 0x40 ?
-	//  logerror("SYS: write p2 %02x\n", data);
+	logerror("SYS: write p2 %02x\n", data);
 }
 
 void mindset_state::kbd_p1_w(u8 data)
@@ -261,8 +264,9 @@ int mindset_state::kbd_t1_r()
 
 void mindset_state::snd_p1_w(u8 data)
 {
+	m_dac->write(data);
 	if(data != 0x80)
-		logerror("snd p1 %02x\n", data);
+		logerror("%02x\n", data);
 }
 
 void mindset_state::snd_p2_w(u8 data)
@@ -425,7 +429,6 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	int dx = ((m_screenpos >>  8) & 15) * (751 - 640) / 15;
 	int dy = ((m_screenpos >> 12) & 15) * (480 - 400) / 15;
 
-
 	if(ibm_mode) {
 		if(large_pixels) {
 			static int palind[4] = { 0, 1, 4, 5 };
@@ -470,17 +473,18 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			if(!interleave) {
 				switch(pixels_per_byte_order) {
 				case 0: {
-					for(int field=0; field<2; field++) {
-						const u16 *src = bank;
-						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
-							for(u32 x=0; x<320; x+=4) {
-								u16 sv = sw(*src++);
-								for(u32 xx=0; xx<4; xx++) {
-									u32 color = m_palette[(sv >> (12-4*xx)) & 15];
-									*dest++ = color;
-									*dest++ = color;
-								}
+					const u16 *src = bank;
+					for(u32 y=0; y<200; y++) {
+						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						for(u32 x=0; x<320; x+=4) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<4; xx++) {
+								u32 color = m_palette[(sv >> (12-4*xx)) & 15];
+								*dest0++ = color;
+								*dest0++ = color;
+								*dest1++ = color;
+								*dest1++ = color;
 							}
 						}
 					}
@@ -488,34 +492,70 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				}
 				case 1: {
 					static int palind[4] = { 0, 1, 4, 5 };
-					for(int field=0; field<2; field++) {
-						const u16 *src = bank;
-						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
-							for(u32 x=0; x<320; x+=8) {
-								u16 sv = sw(*src++);
-								for(u32 xx=0; xx<8; xx++) {
-									u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
-									*dest++ = color;
-									*dest++ = color;
-								}
+					const u16 *src = bank;
+					for(u32 y=0; y<200; y++) {
+						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						for(u32 x=0; x<320; x+=8) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<8; xx++) {
+								u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
+								*dest0++ = color;
+								*dest0++ = color;
+								*dest1++ = color;
+								*dest1++ = color;
 							}
 						}
 					}
 					return 0;
 				}
 				case 2: {
-					for(int field=0; field<2; field++) {
-						const u16 *src = bank;
-						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
-							for(u32 x=0; x<320; x+=16) {
-								u16 sv = sw(*src++);
-								for(u32 xx=0; xx<16; xx++) {
-									u32 color = m_palette[(sv >> (15-xx)) & 1];
-									*dest++ = color;
-									*dest++ = color;
-								}
+					const u16 *src = bank;
+					for(u32 y=0; y<200; y++) {
+						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						for(u32 x=0; x<320; x+=16) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<16; xx++) {
+								u32 color = m_palette[(sv >> (15-xx)) & 1];
+								*dest0++ = color;
+								*dest0++ = color;
+								*dest1++ = color;
+								*dest1++ = color;
+							}
+						}
+					}
+					return 0;
+				}
+				}
+			} else {
+				switch(pixels_per_byte_order) {
+				case 0: {
+					const u16 *src = bank;
+					for(u32 y=0; y<400; y++) {
+						u32 *dest = &bitmap.pix32(y+dy, dx);
+						for(u32 x=0; x<320; x+=4) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<4; xx++) {
+								u32 color = m_palette[(sv >> (12-4*xx)) & 15];
+								*dest++ = color;
+								*dest++ = color;
+							}
+						}
+					}
+					return 0;
+				}
+				case 1: {
+					static int palind[4] = { 0, 1, 4, 5 };
+					const u16 *src = bank;
+					for(u32 y=0; y<400; y++) {
+						u32 *dest = &bitmap.pix32(y+dy, dx);
+						for(u32 x=0; x<320; x+=8) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<8; xx++) {
+								u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
+								*dest++ = color;
+								*dest++ = color;
 							}
 						}
 					}
@@ -528,17 +568,16 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				switch(pixels_per_byte_order) {
 				case 0: {
 					static int palind[4] = { 0, 4, 8, 12 };
-					for(int field=0; field<2; field++) {
-						m_palette[1] = 0xffffff;
-						const u16 *src = bank;
-						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
-							for(u32 x=0; x<640; x+=8) {
-								u16 sv = sw(*src++);
-								for(u32 xx=0; xx<8; xx++) {
-									u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
-									*dest++ = color;
-								}
+					const u16 *src = bank;
+					for(u32 y=0; y<200; y++) {
+						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						for(u32 x=0; x<640; x+=8) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<8; xx++) {
+								u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
+								*dest0++ = color;
+								*dest1++ = color;
 							}
 						}
 					}
@@ -546,22 +585,36 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 				}
 				case 1: {
 					static int palind[4] = { 0, 4 };
-					for(int field=0; field<2; field++) {
-						const u16 *src = bank;
-						for(u32 y=0; y<200; y++) {
-							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
-							for(u32 x=0; x<640; x+=16) {
-								u16 sv = sw(*src++);
-								for(u32 xx=0; xx<16; xx++) {
-									u32 color = m_palette[palind[(sv >> (15-xx)) & 1]];
-									*dest++ = color;
-								}
+					const u16 *src = bank;
+					for(u32 y=0; y<200; y++) {
+						u32 *dest0 = &bitmap.pix32(2*y+dy, dx);
+						u32 *dest1 = &bitmap.pix32(2*y+1+dy, dx);
+						for(u32 x=0; x<640; x+=16) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<16; xx++) {
+								u32 color = m_palette[palind[(sv >> (15-xx)) & 1]];
+								*dest0++ = color;
+								*dest1++ = color;
 							}
 						}
 					}
 					return 0;
 				}
 				}
+			} else {
+				static int palind[4] = { 0, 4 };
+				const u16 *src = bank;
+				for(u32 y=0; y<400; y++) {
+					u32 *dest = &bitmap.pix32(y+dy, dx);
+					for(u32 x=0; x<640; x+=16) {
+						u16 sv = sw(*src++);
+						for(u32 xx=0; xx<16; xx++) {
+							u32 color = m_palette[palind[(sv >> (15-xx)) & 1]];
+							*dest++ = color;
+						}
+					}
+				}
+				return 0;
 			}
 		}
 
@@ -573,104 +626,123 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	return 0;
 }
 
-u16 mindset_state::gco_blend_0(u16 src, u16)
+u16 mindset_state::gcp_blend_0(u16 src, u16)
 {
 	return src;
 }
 
-u16 mindset_state::gco_blend_1(u16 src, u16 dst)
+u16 mindset_state::gcp_blend_1(u16 src, u16 dst)
 {
 	return src & dst;
 }
 
-u16 mindset_state::gco_blend_2(u16 src, u16 dst)
+u16 mindset_state::gcp_blend_2(u16 src, u16 dst)
 {
 	return src | dst;
 }
 
-u16 mindset_state::gco_blend_3(u16 src, u16 dst)
+u16 mindset_state::gcp_blend_3(u16 src, u16 dst)
 {
 	return src ^ dst;
 }
 
-u16 mindset_state::gco_blend_4(u16 src, u16)
+u16 mindset_state::gcp_blend_4(u16 src, u16)
 {
 	return ~src;
 }
 
-u16 mindset_state::gco_blend_5(u16 src, u16 dst)
+u16 mindset_state::gcp_blend_5(u16 src, u16 dst)
 {
 	return (~src) & dst;
 }
 
-u16 mindset_state::gco_blend_6(u16 src, u16 dst)
+u16 mindset_state::gcp_blend_6(u16 src, u16 dst)
 {
 	return (~src) | dst;
 }
 
-u16 mindset_state::gco_blend_7(u16 src, u16 dst)
+u16 mindset_state::gcp_blend_7(u16 src, u16 dst)
 {
 	return (~src) ^ dst;
 }
 
-u16 (*const mindset_state::gco_blend[8])(u16, u16) = {
-	gco_blend_0,
-	gco_blend_1,
-	gco_blend_2,
-	gco_blend_3,
-	gco_blend_4,
-	gco_blend_5,
-	gco_blend_6,
-	gco_blend_7
+u16 (*const mindset_state::gcp_blend[8])(u16, u16) = {
+	gcp_blend_0,
+	gcp_blend_1,
+	gcp_blend_2,
+	gcp_blend_3,
+	gcp_blend_4,
+	gcp_blend_5,
+	gcp_blend_6,
+	gcp_blend_7
 };
 
 
 void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 {
-	u16 mode    = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr +  0) & 0xffff)));
-	u16 src_adr = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr +  2) & 0xffff)));
-	u16 src_sft = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr +  4) & 0xffff)));
-	u16 dst_adr = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr +  6) & 0xffff)));
-	u16 dst_sft = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr +  8) & 0xffff)));
-	u16 width   = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 10) & 0xffff)));
-	u16 height  = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 12) & 0xffff)));
-	u16 sy      = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 14) & 0xffff)));
-	u16 dy      = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 16) & 0xffff)));
-	u16 rmask   = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 18) & 0xffff)));
-	u16 src_seg = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 20) & 0xffff)));
-	u16 dst_seg = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 22) & 0xffff)));
-	u16 wmask   = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 24) & 0xffff)));
-	u16 kmask   = sw(m_gcos->read_word((packet_seg << 4) + ((packet_adr + 26) & 0xffff)));
+	u16 mode    = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  0) & 0xffff)));
+	u16 src_adr = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  2) & 0xffff)));
+	u16 src_sft = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  4) & 0xffff)));
+	u16 dst_adr = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  6) & 0xffff)));
+	u16 dst_sft = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr +  8) & 0xffff)));
+	u16 width   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 10) & 0xffff)));
+	u16 height  = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 12) & 0xffff)));
+	u16 sy      = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 14) & 0xffff)));
+	u16 dy      = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 16) & 0xffff)));
+	u16 rmask   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 18) & 0xffff)));
+	u16 src_seg = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 20) & 0xffff)));
+	u16 dst_seg = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 22) & 0xffff)));
+	u16 wmask   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 24) & 0xffff)));
+	u16 kmask   = sw(m_gcps->read_word((packet_seg << 4) + ((packet_adr + 26) & 0xffff)));
+
+	// -f-w wnpi ktxm mm--
+	// f = fast (pure word copy)
+	// w = pixel width (1/2/4/8 bits)
+	// n = invert collision flag (unimplemented)
+	// p = pattern fill (used by fill_dest_buffer)
+	// i/f = increment source / don't (used by blt_copy_word)
+	// t/o = transparent/opaque
+	// k = detect collision (unimplemented)
+	// x = go right to left (unimplemented)
+	// m = blending mode
+
 	if(1)
-	logerror("GCO: p src %04x:%04x.%x dst %04x:%04x.%x sz %xx%x step %x:%x mask %04x:%04x k %x:%x mode %c%c%c%d%c%d%c%c%c\n", src_seg, src_adr, src_sft, dst_seg, dst_adr, dst_sft, width, height, sy, dy, rmask, wmask, (kmask >> 8) & 15, kmask & 15,
-			 mode & 0x80 ? 'k' : '-',
-			 mode & 0x40 ? 't' : 'o',
-			 mode & 0x20 ? 'x' : '-',
-			 (mode >> 2) & 7,
+	logerror("GCP: p src %04x:%04x.%x dst %04x:%04x.%x sz %xx%x step %x:%x mask %04x:%04x k %x:%x mode %c%d%c%c%c%c%c%c%d\n", src_seg, src_adr, src_sft, dst_seg, dst_adr, dst_sft, width, height, sy, dy, rmask, wmask, (kmask >> 8) & 15, kmask & 15,
 			 mode & 0x4000 ? 'f' : '-',
 			 (mode >> 11) & 3,
 			 mode & 0x400 ? 'n' : '-',
 			 mode & 0x200 ? 'p' : '-',
-			 mode & 0x100 ? 'i' : 'f');
-
-	// k = detect collision (unimplemented)
-	// t/o = transparent/opaque
-	// x = go right to left (unimplemented)
-	// f = fast (no idea what it means)
-	// n = invert collision flag (unimplemented)
-	// p = pattern fill (used by fill_dest_buffer)
-	// i/f = increment source / don't (used by blt_copy_word)
+			 mode & 0x100 ? 'i' : 'f',
+			 mode & 0x80 ? 'k' : '-',
+			 mode & 0x40 ? 't' : 'o',
+			 mode & 0x20 ? 'x' : '-',
+			 (mode >> 2) & 7);
 
 	if(mode & 0x200) {
 		// pattern fill
-		u16 src = m_gcos->read_word((src_seg << 4) + src_adr);
+		u16 src = m_gcps->read_word((src_seg << 4) + src_adr);
 		for(u16 w=0; w != width/2; w++) {
-			m_gcos->write_word((dst_seg << 4) + dst_adr, src);
+			m_gcps->write_word((dst_seg << 4) + dst_adr, src);
 			dst_adr += 2;
 		}
 
+	} else if(mode & 0x4000) {
+		// fast mode
+		u32 nw = (width+15) >> 4;
+		for(u32 y=0; y<height; y++) {
+			u16 src_cadr = src_adr;
+			u16 dst_cadr = dst_adr;
+			for(u32 w=0; w!=nw; w++) {
+				m_gcps->write_word((dst_seg << 4) + dst_cadr, m_gcps->read_word((src_seg << 4) + src_cadr));
+				src_cadr += 2;
+				dst_cadr += 2;
+			}
+			src_adr += sy;
+			dst_adr += dy;
+		}
+
 	} else {
-		auto blend = gco_blend[(mode >> 2) & 7];
+		auto blend = gcp_blend[(mode >> 2) & 7];
 
 		// Need to rotate rmask depending on the shifts too
 		u16 awmask = ((wmask << 16) | wmask) >> (15 - dst_sft);
@@ -703,35 +775,35 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 			u16 nw1 = nw;
 			u32 srcs = 0;
 			if(preload) {
-				srcs = sw(m_gcos->read_word((src_seg << 4) + src_cadr)) << src_do_sft;
+				srcs = sw(m_gcps->read_word((src_seg << 4) + src_cadr)) << src_do_sft;
 				if(mode & 0x100)
 					src_cadr += 2;
 			}
 			do {
-				srcs = (srcs << 16) | (sw(m_gcos->read_word((src_seg << 4) + src_cadr)) << src_do_sft);
+				srcs = (srcs << 16) | (sw(m_gcps->read_word((src_seg << 4) + src_cadr)) << src_do_sft);
 				u16 src = (srcs >> dst_do_sft) & rmask;
-				u16 dst = sw(m_gcos->read_word((dst_seg << 4) + dst_cadr));
+				u16 dst = sw(m_gcps->read_word((dst_seg << 4) + dst_cadr));
 				u16 res = blend(src, dst);
 				if(mode & 0x40) {
 					u16 tmask;
-					switch((mode >> 10) & 3) {
+					switch((mode >> 11) & 3) {
 					case 0:
 						tmask = dst;
 						break;
 					case 1:
-						tmask = ((dst & 0xaaaa) >> 1) | (dst & 0x5555);
-						tmask = tmask * 0x3;
+						tmask = (dst >> 1) | dst;
+						tmask = (tmask & 0x5555) * 0x3;
 						break;
 					case 2:
-						tmask = ((dst & 0xcccc) >> 2) | (dst & 0x3333);
-						tmask = ((dst & 0x2222) >> 1) | (dst & 0x1111);
-						tmask = tmask * 0xf;
+						tmask = (dst >> 2) | dst;
+						tmask = (dst >> 1) | dst;
+						tmask = (tmask & 0x1111) * 0xf;
 						break;
 					case 3:
-						tmask = ((dst & 0xf0f0) >> 4) | (dst & 0x0f0f);
-						tmask = ((dst & 0x0c0c) >> 2) | (dst & 0x0303);
-						tmask = ((dst & 0x0202) >> 1) | (dst & 0x0101);
-						tmask = tmask * 0xff;
+						tmask = (dst >> 4) | dst;
+						tmask = (dst >> 2) | dst;
+						tmask = (dst >> 1) | dst;
+						tmask = (tmask & 0x0101) * 0xff;
 						break;
 					}
 					cmask &= ~tmask;
@@ -739,7 +811,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 
 				res = (dst & ~cmask) | (res & cmask);
 
-				m_gcos->write_word((dst_seg << 4) + dst_cadr, sw(res));
+				m_gcps->write_word((dst_seg << 4) + dst_cadr, sw(res));
 				if(mode & 0x100)
 					src_cadr += 2;
 				dst_cadr += 2;
@@ -756,14 +828,14 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 	}
 }
 
-void mindset_state::gco_w(u16)
+void mindset_state::gcp_w(u16)
 {
-	u16 packet_seg  = sw(m_gcos->read_word(0xbfd7a));
-	u16 packet_adr  = sw(m_gcos->read_word(0xbfd78));
-	u16 global_mode = sw(m_gcos->read_word(0xbfd76));
+	u16 packet_seg  = sw(m_gcps->read_word(0xbfd7a));
+	u16 packet_adr  = sw(m_gcps->read_word(0xbfd78));
+	u16 global_mode = sw(m_gcps->read_word(0xbfd76));
 
 	if(0)
-	logerror("GCO: start %04x:%04x mode %04x (%05x)\n", packet_seg, packet_adr, global_mode, m_maincpu->pc());
+	logerror("GCP: start %04x:%04x mode %04x (%05x)\n", packet_seg, packet_adr, global_mode, m_maincpu->pc());
 
 	switch(global_mode) {
 	case 0x0005:
@@ -773,7 +845,7 @@ void mindset_state::gco_w(u16)
 	}
 
 	// 100 = done, 200 = done too???, 400 = collision?
-	m_gcos->write_word(0xbfd74, m_gcos->read_word(0xbfd74) | 0x0700);
+	m_gcps->write_word(0xbfd74, m_gcps->read_word(0xbfd74) | 0x0700);
 
 	// Can trigger an irq, on mode & 2 (or is it 200?) (0x40 on 8282, ack on 0x41, which means the system 8042...)
 }
@@ -873,7 +945,7 @@ u16 mindset_state::trap_dma_r(offs_t, u16 mem_mask)
 
 void mindset_state::maincpu_mem(address_map &map)
 {
-	map(0x00000, 0x3ffff).ram();
+	map(0x00000, 0x7ffff).ram();
 	map(0xb8000, 0xbffff).ram().share("vram");
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
@@ -891,15 +963,17 @@ void mindset_state::maincpu_io(address_map &map)
 	map(0x8060, 0x8060).r(m_fdc, FUNC(i8272a_device::msr_r));
 	map(0x8062, 0x8062).rw(m_fdc, FUNC(i8272a_device::fifo_r), FUNC(i8272a_device::fifo_w));
 
+#if 0
 	map(0x8080, 0x8080).lr8("id13", []() -> u8 { return 0x13; }); // sound
 	map(0x80c0, 0x80c0).lr8("id3f", []() -> u8 { return 0x3f; }); // serial type 1, maybe?
 	map(0x8100, 0x8100).lr8("id5f", []() -> u8 { return 0x5f; }); // serial type 2
 	map(0x8140, 0x8140).lr8("id70", []() -> u8 { return 0x70; }); // parallel printer, init writes 0x82 at +6
 	map(0x8180, 0x8180).lr8("rs232-id", []() -> u8 { return 0x73; }); // rs232
+#endif
 
 	map(0x8280, 0x8283).rw(m_syscpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
 	map(0x82a0, 0x82a3).rw(m_soundcpu, FUNC(i8042_device::upi41_master_r), FUNC(i8042_device::upi41_master_w)).umask16(0x00ff);
-	map(0x8300, 0x8301).w(FUNC(mindset_state::gco_w));
+	map(0x8300, 0x8301).w(FUNC(mindset_state::gcp_w));
 	map(0x8320, 0x8321).rw(FUNC(mindset_state::dispreg_r), FUNC(mindset_state::dispreg_w));
 	map(0x8322, 0x8323).rw(FUNC(mindset_state::dispctrl_r), FUNC(mindset_state::dispctrl_w));
 }
@@ -955,6 +1029,9 @@ void mindset_state::mindset(machine_config &config)
 	m_fdc->set_ready_line_connected(false);
 	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
+
+	SPEAKER(config, "lspeaker").front_left();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1);
 }
 
 static INPUT_PORTS_START(mindset)
@@ -1115,5 +1192,5 @@ ROM_START(mindset)
 	ROM_LOAD("kbd_v3.0.bin", 0, 0x800, CRC(1c6aa433) SHA1(1d01dbda4730f26125ba2564a608c2f8ddfc05b3))
 ROM_END
 
-COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Video Production System", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1984, mindset, 0, 0, mindset, mindset, mindset_state, empty_init, "Mindset Corporation", "Mindset Video Production System", MACHINE_NOT_WORKING)
 
