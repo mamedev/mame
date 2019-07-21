@@ -87,7 +87,7 @@ ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppe
 ROM_END
 
 
-ROM_START( swtpc8212 ) // MC6802P, 2xMC6821P, INS8250N, MCM66750, MC6845P, bank of 8 dips, crystals unknown. On the back is a 25-pin RS-232 port, and a 25-pin printer port.
+ROM_START( swtpc8212 ) // MC6802P, 2xMC6821P, INS8250N, MCM66750, MC6845P, bank of 8 dips, crystals 17.0748 (video), 1.8432 (cpu/uart). On the back is a 25-pin RS-232 port, and a 25-pin printer port.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8224g_ver.1.1_6oct80.ic1", 0xf000, 0x0800, CRC(7d7f3c21) SHA1(f7e6e20b36a1c724a4e348bc784d0b7b5fb462a3) )
 	ROM_LOAD( "8224g_ver.1.1_6oct80.ic2", 0xf800, 0x0800, CRC(2b118c22) SHA1(5fa031c834c7c582d5715764941499fcef51f477) )
