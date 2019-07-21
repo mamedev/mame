@@ -1775,6 +1775,18 @@ void lua_engine::initialize()
 
 	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
 			"set_value", &ioport_field::set_value,
+			"set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
+				input_seq_type seq_type = SEQ_TYPE_STANDARD;
+				if (seq_type_string == "increment")
+					seq_type = SEQ_TYPE_INCREMENT;
+				else if (seq_type_string == "decrement")
+					seq_type = SEQ_TYPE_DECREMENT;
+
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				settings.seq[seq_type] = seq;
+				f.set_user_settings(settings);
+			},
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
 			"default_name", sol::property([](ioport_field &f) {
