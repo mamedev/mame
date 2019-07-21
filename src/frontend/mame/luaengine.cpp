@@ -229,6 +229,22 @@ namespace sol
 	}
 }
 
+
+//-------------------------------------------------
+// parse_seq_type - parses a string into an input_seq_type
+//-------------------------------------------------
+
+static input_seq_type parse_seq_type(const std::string &s)
+{
+	input_seq_type result = SEQ_TYPE_STANDARD;
+	if (s == "increment")
+		result = SEQ_TYPE_INCREMENT;
+	else if (s == "decrement")
+		result = SEQ_TYPE_DECREMENT;
+	return result;
+}
+
+
 //-------------------------------------------------
 //  mem_read - templated memory readers for <sign>,<size>
 //  -> manager:machine().devices[":maincpu"].spaces["program"]:read_i8(0xC000)
@@ -1745,6 +1761,8 @@ void lua_engine::initialize()
  * manager:machine():ioport().ports[port_tag].fields[field_name]
  *
  * field:set_value(value)
+ * field:set_input_seq(seq_type, seq)
+ * field:input_seq(seq_type)
  *
  * field.device - get associated device_t
  * field.live - get ioport_field_live
@@ -1777,16 +1795,15 @@ void lua_engine::initialize()
 	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
 			"set_value", &ioport_field::set_value,
 			"set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
-				input_seq_type seq_type = SEQ_TYPE_STANDARD;
-				if (seq_type_string == "increment")
-					seq_type = SEQ_TYPE_INCREMENT;
-				else if (seq_type_string == "decrement")
-					seq_type = SEQ_TYPE_DECREMENT;
-
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
 				ioport_field::user_settings settings;
 				f.get_user_settings(settings);
 				settings.seq[seq_type] = seq;
 				f.set_user_settings(settings);
+			},
+			"input_seq", [](ioport_field &f, const std::string &seq_type_string) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				return sol::make_user(f.seq(seq_type));
 			},
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
