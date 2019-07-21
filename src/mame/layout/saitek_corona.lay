@@ -626,8 +626,8 @@
 
 		<element ref="ledr" name="2.1" blend="add"><bounds x="93" y="41" width="1.8" height="0.7" /></element>
 		<element ref="ledr" name="2.0" blend="add"><bounds x="93" y="46" width="1.8" height="0.7" /></element>
-		<element ref="ledr" name="0.0" blend="add"><bounds x="93" y="51" width="1.8" height="0.7" /></element>
-		<element ref="ledr" name="1.0" blend="add"><bounds x="93" y="56" width="1.8" height="0.7" /></element>
+		<element ref="ledr" name="1.0" blend="add"><bounds x="93" y="51" width="1.8" height="0.7" /></element>
+		<element ref="ledr" name="0.0" blend="add"><bounds x="93" y="56" width="1.8" height="0.7" /></element>
 
 		<element ref="ledg" name="0.1" blend="add"><bounds x="93" y="61" width="1.8" height="0.7" /></element>
 		<element ref="ledr" name="1.1" blend="add"><bounds x="93" y="61" width="1.8" height="0.7" /></element>
