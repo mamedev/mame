@@ -1756,6 +1756,7 @@ void lua_engine::initialize()
  * field.defvalue
  * field.sensitivity
  * field.way - amount of available directions
+ * field.type_class
  * field.is_analog
  * field.is_digital_joystick
  * field.enabled
@@ -1797,6 +1798,18 @@ void lua_engine::initialize()
 			"defvalue", sol::property(&ioport_field::defvalue),
 			"sensitivity", sol::property(&ioport_field::sensitivity),
 			"way", sol::property(&ioport_field::way),
+			"type_class", sol::property([](ioport_field &f) {
+					switch (f.type_class())
+					{
+					case INPUT_CLASS_KEYBOARD:		return "keyboard";
+					case INPUT_CLASS_CONTROLLER:	return "controller";
+					case INPUT_CLASS_CONFIG:		return "config";
+					case INPUT_CLASS_DIPSWITCH:		return "dipswitch";
+					case INPUT_CLASS_MISC:			return "misc";
+					default:						break;
+					}
+					throw false;
+				}),
 			"is_analog", sol::property(&ioport_field::is_analog),
 			"is_digital_joystick", sol::property(&ioport_field::is_digital_joystick),
 			"enabled", sol::property(&ioport_field::enabled),
