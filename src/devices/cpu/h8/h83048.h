@@ -34,6 +34,9 @@ class h83048_device : public h8h_device {
 public:
 	h83048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_mode_a20() { mode_a20 = true; }
+	void set_mode_a24() { mode_a20 = false; }
+
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
 
@@ -62,6 +65,8 @@ protected:
 	required_device<h8_sci_device> sci0;
 	required_device<h8_sci_device> sci1;
 	required_device<h8_watchdog_device> watchdog;
+
+	bool mode_a20;
 
 	uint32_t ram_start;
 	uint8_t syscr;
