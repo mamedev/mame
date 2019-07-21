@@ -2415,6 +2415,8 @@ void lua_engine::initialize()
  * image:display()
  *
  * image.device - get associated device_t
+ * image.instance_name
+ * image.brief_instance_name
  * image.software_parent
  * image.is_readable
  * image.is_writeable
@@ -2438,6 +2440,8 @@ void lua_engine::initialize()
 			"crc", &device_image_interface::crc,
 			"display", [](device_image_interface &di) { return di.call_display(); },
 			"device", sol::property(static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device)),
+			"instance_name", sol::property(&device_image_interface::instance_name),
+			"brief_instance_name", sol::property(&device_image_interface::brief_instance_name),
 			"is_readable", sol::property(&device_image_interface::is_readable),
 			"is_writeable", sol::property(&device_image_interface::is_writeable),
 			"is_creatable", sol::property(&device_image_interface::is_creatable),
