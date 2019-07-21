@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-Saitek Corona. This is a subclass of saitek_corona_state.
+Saitek Corona. This is a subclass of saitek_stratos_state.
 Please refer to saitek_stratos.cpp for driver notes.
 
 To be brief, Saitek Corona has two "HELIOS" chips, I/O addressing is completely
@@ -26,10 +26,10 @@ different compared to Stratos/Turbo King.
 #include "saitek_corona.lh" // clickable
 
 
-class corona_state : public saitek_stratos_state
+class saitek_corona_state : public saitek_stratos_state
 {
 public:
-	corona_state(const machine_config &mconfig, device_type type, const char *tag) :
+	saitek_corona_state(const machine_config &mconfig, device_type type, const char *tag) :
 		saitek_stratos_state(mconfig, type, tag),
 		m_board(*this, "board"),
 		m_dac(*this, "dac")
@@ -50,12 +50,12 @@ private:
 	void main_map(address_map &map);
 };
 
-void corona_state::machine_start()
+void saitek_corona_state::machine_start()
 {
 	saitek_stratos_state::machine_start();
 }
 
-void corona_state::machine_reset()
+void saitek_corona_state::machine_reset()
 {
 	saitek_stratos_state::machine_reset();
 }
@@ -73,7 +73,7 @@ void corona_state::machine_reset()
     Address Maps
 ******************************************************************************/
 
-void corona_state::main_map(address_map &map)
+void saitek_corona_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0xffff).rom();
@@ -98,12 +98,12 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void corona_state::corona(machine_config &config)
+void saitek_corona_state::corona(machine_config &config)
 {
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 5_MHz_XTAL); // see set_cpu_freq
-	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(100));
+	m_maincpu->set_addrmap(AS_PROGRAM, &saitek_corona_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(saitek_corona_state::irq0_line_hold), attotime::from_hz(100));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -122,7 +122,7 @@ void corona_state::corona(machine_config &config)
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
-	m_extrom->set_device_load(FUNC(corona_state::extrom_load), this);
+	m_extrom->set_device_load(FUNC(saitek_corona_state::extrom_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }
@@ -152,5 +152,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1988, corona,   0,       0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
-CONS( 1988, coronaa,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, corona,   0,       0, corona,  corona, saitek_corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
+CONS( 1988, coronaa,  corona,  0, corona,  corona, saitek_corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
