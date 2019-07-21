@@ -168,12 +168,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( dg680_state::kansas_r )
 
 READ8_MEMBER( dg680_state::mem_r )
 {
-	return m_s100->smemr_r(offset);
+	return m_s100->smemr_r(offset + 0xf000);
 }
 
 WRITE8_MEMBER( dg680_state::mem_w )
 {
-	m_s100->mwrt_w(offset, data);
+	m_s100->mwrt_w(offset + 0xf000, data);
 }
 
 
@@ -183,7 +183,7 @@ void dg680_state::dg680_mem(address_map &map)
 	map(0x0000, 0xcfff).ram();
 	map(0xd000, 0xd7ff).rom();
 	map(0xd800, 0xefff).ram();
-	map(0xf000, 0xf7ff).rw(FUNC(dg680_state::mem_r),FUNC(dg680_state::mem_w));
+	map(0xf000, 0xffff).rw(FUNC(dg680_state::mem_r),FUNC(dg680_state::mem_w));
 }
 
 void dg680_state::dg680_io(address_map &map)
@@ -261,18 +261,14 @@ WRITE8_MEMBER( dg680_state::port08_w )
 }
 
 
-static DEVICE_INPUT_DEFAULTS_START( keyboard )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_300 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
-
 static void dg680_s100_devices(device_slot_interface &device)
 {
 	device.option_add("dg640", S100_DG640);
 }
+
+DEVICE_INPUT_DEFAULTS_START(dg680_dg640_f000)
+	DEVICE_INPUT_DEFAULTS("DSW", 0x1f, 0x1e) // F000-F7FF
+DEVICE_INPUT_DEFAULTS_END
 
 void dg680_state::dg680(machine_config &config)
 {
@@ -313,7 +309,8 @@ void dg680_state::dg680(machine_config &config)
 	m_pio->out_pb_callback().set(FUNC(dg680_state::portb_w));
 
 	S100_BUS(config, m_s100, 1_MHz_XTAL);
-	S100_SLOT(config, "s100:1", dg680_s100_devices, "dg640");
+	S100_SLOT(config, "s100:1", dg680_s100_devices, "dg640")
+		.set_option_device_input_defaults("dg640", DEVICE_INPUT_DEFAULTS_NAME(dg680_dg640_f000));
 }
 
 /* ROM definition */

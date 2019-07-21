@@ -144,12 +144,12 @@ WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 
 READ8_MEMBER( binbug_state::mem_r )
 {
-	return m_s100->smemr_r(offset);
+	return m_s100->smemr_r(offset + 0x7800);
 }
 
 WRITE8_MEMBER( binbug_state::mem_w )
 {
-	m_s100->mwrt_w(offset, data);
+	m_s100->mwrt_w(offset + 0x7800, data);
 }
 
 void binbug_state::binbug_mem(address_map &map)

@@ -2,11 +2,12 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-David Griffiths DG640 board.
+David Griffiths DG640 Video Display Unit.
 
 It was sold by Applied Technology. It uses a MCM6574 as a character generator.
 The DG640 also supports blinking, reverse-video, and LORES graphics.
-It is a S100 card, also known as ETI-640.
+It is a S100 card, originally called "ETI 640" when it was first described
+in the April 1978 issue of Electronics Today International (Australia).
 
 ****************************************************************************/
 
@@ -18,12 +19,13 @@ It is a S100 card, also known as ETI-640.
 
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(S100_DG640, device_s100_card_interface, dg640_device, "dg640", "S100_DG640")
+DEFINE_DEVICE_TYPE(S100_DG640, dg640_device, "dg640", "DG640 VDU")
 
 dg640_device::dg640_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, S100_DG640, tag, owner, clock)
 	, device_s100_card_interface(mconfig, *this)
 	, m_p_chargen(*this, "chargen")
+	, m_dsw(*this, "DSW")
 {}
 
 void dg640_device::device_start()
@@ -112,7 +114,10 @@ uint32_t dg640_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 u8 dg640_device::s100_smemr_r(offs_t offset)
 {
-	if ((offset & 0xfc00) == 0)
+	if (m_dsw->read() != (offset & 0xf800) >> 11)
+		return 0xff;
+
+	if ((offset & 0x400) == 0)
 		return m_p_videoram[offset & 0x3ff];
 	else
 		return m_p_attribram[offset & 0x3ff];
@@ -120,10 +125,56 @@ u8 dg640_device::s100_smemr_r(offs_t offset)
 
 void dg640_device::s100_mwrt_w(offs_t offset, u8 data)
 {
-	if ((offset & 0xfc00) == 0)
+	if (m_dsw->read() != (offset & 0xf800) >> 11)
+		return;
+
+	if ((offset & 0x400) == 0)
 		m_p_videoram[offset & 0x3ff] = data;
 	else
 		m_p_attribram[offset & 0x3ff] = data;
+}
+
+
+static INPUT_PORTS_START(dg640)
+	PORT_START("DSW")
+	PORT_DIPNAME(0x1f, 0x0f, "Base Address") PORT_DIPLOCATION("SW1:1,2,3,4,5")
+	PORT_DIPSETTING(0x00, "0000")
+	PORT_DIPSETTING(0x01, "0800")
+	PORT_DIPSETTING(0x02, "1000")
+	PORT_DIPSETTING(0x03, "1800")
+	PORT_DIPSETTING(0x04, "2000")
+	PORT_DIPSETTING(0x05, "2800")
+	PORT_DIPSETTING(0x06, "3000")
+	PORT_DIPSETTING(0x07, "3800")
+	PORT_DIPSETTING(0x08, "4000")
+	PORT_DIPSETTING(0x09, "4800")
+	PORT_DIPSETTING(0x0a, "5000")
+	PORT_DIPSETTING(0x0b, "5800")
+	PORT_DIPSETTING(0x0c, "6000")
+	PORT_DIPSETTING(0x0d, "6800")
+	PORT_DIPSETTING(0x0e, "7000")
+	PORT_DIPSETTING(0x0f, "7800")
+	PORT_DIPSETTING(0x10, "8000")
+	PORT_DIPSETTING(0x11, "8800")
+	PORT_DIPSETTING(0x12, "9000")
+	PORT_DIPSETTING(0x13, "9800")
+	PORT_DIPSETTING(0x14, "A000")
+	PORT_DIPSETTING(0x15, "A800")
+	PORT_DIPSETTING(0x16, "B000")
+	PORT_DIPSETTING(0x17, "B800")
+	PORT_DIPSETTING(0x18, "C000")
+	PORT_DIPSETTING(0x19, "C800")
+	PORT_DIPSETTING(0x1a, "D000")
+	PORT_DIPSETTING(0x1b, "D800")
+	PORT_DIPSETTING(0x1c, "E000")
+	PORT_DIPSETTING(0x1d, "E800")
+	PORT_DIPSETTING(0x1e, "F000")
+	PORT_DIPSETTING(0x1f, "F800")
+INPUT_PORTS_END
+
+ioport_constructor dg640_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(dg640);
 }
 
 
@@ -149,11 +200,8 @@ void dg640_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::amber());
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256); // 15625 Hz horizontal
 	screen.set_screen_update(FUNC(dg640_device::screen_update));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 511, 0, 255);
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dg640);

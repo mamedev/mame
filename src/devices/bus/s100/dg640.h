@@ -22,6 +22,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -34,6 +35,7 @@ private:
 
 	// object finders
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport m_dsw;
 
 	// internal state
 	std::unique_ptr<u8[]> m_p_videoram;
@@ -42,6 +44,6 @@ private:
 };
 
 
-DECLARE_DEVICE_TYPE(S100_DG640, device_s100_card_interface)
+DECLARE_DEVICE_TYPE(S100_DG640, dg640_device)
 
 #endif // MAME_BUS_S100_DG640_H
