@@ -54,6 +54,8 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_wheel_board_output));
 	save_item(NAME(m_wheel_board_last));
 	save_item(NAME(m_wheel_board_u8_latch));
+	save_item(NAME(m_comm_flags));
+	save_item(NAME(m_comm_data));
 
 	m_optional_drivers.resolve();
 }
@@ -505,8 +507,10 @@ READ32_MEMBER(midvunit_state::midvunit_intcs_r)
 
 uint16_t midvunit_state::comm_bus_out()
 {
-	uint16_t mask = (m_comm_data >> 4) & 0xf00;
-	if (m_comm_flags == 0x60)
+	uint16_t mask = 0;
+	if (m_comm_flags & 0x20) // COMCOE
+		mask |= (m_comm_data >> 4) & 0xf00;
+	if (m_comm_flags & 0x40) // COMDOE
 		mask |= 0xff;
 	return m_comm_data & mask;
 }
@@ -529,8 +533,9 @@ READ32_MEMBER(midvunit_state::midvunit_comcs_r)
 	else
 	{
 		uint16_t data = comm_bus_in();
-		data &= ~((m_comm_data >> 4) & 0xf00);
-		if (m_comm_flags != 0x20)
+		if (m_comm_flags & 0x20) // COMCOE
+			data &= ~((m_comm_data >> 4) & 0xf00);
+		if (m_comm_flags & 0x40) // COMDOE
 			data &= ~0xff;
 		return data << 16;
 	}
@@ -542,7 +547,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_comcs_w)
 	{
 		default: logerror("midvunit_comcs_w(%d) = %08X\n", offset, data); break;
 		case 0: m_comm_data = data >> 16; break;
-		case 1: m_comm_flags = (data >> 24) & 0xE8; break;
+		case 1: m_comm_flags = (data >> 24) & 0xe0; break;
 	}
 }
 
