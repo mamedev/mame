@@ -3169,7 +3169,7 @@ static INPUT_PORTS_START( gnw_bsweep )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level skip (Cheat)") // " -- Controller keys skips level when activated
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Controller keys skips level when activated
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3323,7 +3323,7 @@ ROM_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Gold Cliff  (model MV-64)
+  Nintendo Game & Watch: Gold Cliff (model MV-64)
   * PCB label MV-64
   * Sharp SM512 label MV-64 9027 A (no decap)
   * vertical dual lcd screens with custom segments, 1-bit sound
@@ -3368,7 +3368,7 @@ static INPUT_PORTS_START( gnw_gcliff )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level skip (Cheat)") // " -- Left or right skips level when activated
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Left or right skips level when activated
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
