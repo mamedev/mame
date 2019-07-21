@@ -58169,6 +58169,98 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/19600/ -->
+	<software name="ghlpanic">
+		<description>Ghoul Panic (Euro)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-02543"/>
+		<info name="release" value="20000420" />
+		<info name="barcode" value="7 11719 16332 9, 7 11719 16402 9">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ghoul panic (europe) (en,fr,de,es,it)" sha1="bdd1d2dcf0b49d3882331f82f11d897f8db67242"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/81/ -->
+	<software name="gt1e" cloneof="gt1">
+		<description>Gran Turismo (Euro)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-00984, SCES-00984#"/>
+		<info name="release" value="19980505" />
+		<info name="ring_code" value="DADC   A0100242488-0101   35, DADC   A0100242488-0101   45, DADC AUSTRIA   A0100242488-0101   25">
+		<info name="barcode" value="7 11719 72352 3, 7 11719 72392 9, 7 11719 74232 6, 7 11719 74252 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gran turismo (europe) (en,fr,de,es,it)" sha1="1a5166c205b0e572f4a91a7b5c4e6168aeccdbe2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/82/ http://redump.org/disc/83/ -->
+	<software name="gt2e" cloneof="gt2">
+		<description>Gran Turismo 2 (Euro)</description>
+		<year>2000</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-02380"/>
+		<info name="release" value="20000128" />
+		<info name="ring_code" value="DADC   A0100306121-0102   15, DADC   A0100306121-0102   25 (Disc 1), DADC   A0100306121-0202   15, DADC   A0100306121-0202   25, DADC   A0100306121-0202   35 (Disc 2)">
+		<info name="barcode" value="7 11719 22012 1, 7 11719 22192 0, 7 11719 87822 3, 7 11719 87832 2, 7 11719 87842 1">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Arcade Mode"/>
+			<diskarea name="cdrom">
+				<disk name="gran turismo 2 (europe) (en,fr,de,es,it) (disc 1) (arcade mode)" sha1="4ce676e0d8e1cffecbdf2a709159c5bb9d50a0d3"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Gran Turismo Mode"/>
+			<diskarea name="cdrom">
+				<disk name="gran turismo 2 (europe) (en,fr,de,es,it) (disc 2) (gran turismo mode)" sha1="62eb67790e817e4d6b1ad6e968640990a7f321ff"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/188/ -->
+	<software name="gta2e" cloneof="gta2">
+		<description>Grand Theft Auto 2 (Euro, Rev. 1)</description>
+		<year>1999</year>
+		<publisher>Rockstar Games</publisher>
+		<info name="serial" value="SLES-01404#"/>
+		<info name="release" value="199910xx" />
+		<info name="ring_code" value="DADC   A0100294705-0101   15">
+		<info name="barcode" value="5 026555 190206, 5 026555 190794">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="grand theft auto 2 (europe) (en,fr,de,es,it) (rev 1)" sha1="28dd9a5bb7d73487f69be6614fe895f7a0461baa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1659/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="lemans24" cloneof="tdlemans">
+		<description>Le Mans 24 Hours (Euro)</description>
+		<year>1999</year>
+		<publisher>Infogrames Europe</publisher>
+		<info name="serial" value="SLES-01362 (0006672), SLES-01362#"/>
+		<info name="release" value="19991126" />
+		<info name="ring_code" value="DADC   A0100300873-0101   15">
+		<info name="barcode" value="3 546430 011850, 3 546430 013830, 5 013156 900518, 5 013156 900563">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="le mans 24 hours (europe) (en,fr,de,es,it,pt)" sha1="7deed0644d1b0418bf0cb583ee09280385ed740b" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Non-redump PAL (Europe) -->
 
 	<!-- corrupt text -->
