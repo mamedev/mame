@@ -26,12 +26,10 @@ public:
 	saitek_stratos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_lcd_busy(*this, "lcd_busy"),
 		m_display(*this, "display"),
 		m_extrom(*this, "extrom"),
 		m_out_digit(*this, "digit%u", 0U),
-		m_out_lcd(*this, "lcd%u.%u.%u", 0U, 0U, 0U),
-		m_inputs(*this, "IN.%u", 0)
+		m_out_lcd(*this, "lcd%u.%u.%u", 0U, 0U, 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
@@ -45,12 +43,10 @@ protected:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_lcd_busy;
 	required_device<pwm_display_device> m_display;
 	required_device<generic_slot_device> m_extrom;
 	output_finder<8+1> m_out_digit;
 	output_finder<4, 16, 4> m_out_lcd;
-	required_ioport_array<8+1> m_inputs;
 
 	// common handlers
 	void clear_lcd() { std::fill_n(m_lcd_data, ARRAY_LENGTH(m_lcd_data), 0); }
@@ -59,9 +55,11 @@ protected:
 	void set_cpu_freq();
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
-	void lcd_w(u8 data);
+	void lcd_data_w(u8 data);
+	void lcd_reset_w(u8 data = 0);
 
 	bool m_power;
+	bool m_lcd_ready;
 	u8 m_lcd_count;
 	u8 m_lcd_address;
 	u8 m_lcd_data[0x40];
