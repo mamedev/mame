@@ -102,6 +102,8 @@ c0   8 data bits, Rx disabled
 #include "softlist.h"
 #include "speaker.h"
 
+#include "bus/macpds/hyperdrive.h"
+
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
@@ -1337,6 +1339,11 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
+static void mac_pds_cards(device_slot_interface &device)
+{
+	device.option_add("hyperdrive", PDS_HYPERDRIVE);  // GCC HyperDrive ST-506 interface
+}
+
 void mac128_state::mac512ke(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1389,6 +1396,9 @@ void mac128_state::mac512ke(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram);
 	m_ram->set_default_size("512K");
+
+	MACPDS(config, "macpds", "maincpu");
+	MACPDS_SLOT(config, "pds", "macpds", mac_pds_cards, nullptr);
 
 	// software list
 	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);

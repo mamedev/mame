@@ -3208,6 +3208,8 @@ if (BUSES["MACPDS"]~=null) then
 		MAME_DIR .. "src/devices/bus/macpds/macpds.h",
 		MAME_DIR .. "src/devices/bus/macpds/pds_tpdfpd.cpp",
 		MAME_DIR .. "src/devices/bus/macpds/pds_tpdfpd.h",
+		MAME_DIR .. "src/devices/bus/macpds/hyperdrive.cpp",
+		MAME_DIR .. "src/devices/bus/macpds/hyperdrive.h",
 	}
 end
 
