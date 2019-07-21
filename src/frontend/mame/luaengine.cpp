@@ -1790,6 +1790,7 @@ void lua_engine::initialize()
  * field.type
  * field.crosshair_scale
  * field.crosshair_offset
+ * field.user_value
  */
 
 	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
@@ -1842,7 +1843,12 @@ void lua_engine::initialize()
 			"type", sol::property(&ioport_field::type),
 			"live", sol::property(&ioport_field::live),
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
-			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset),
+			"user_value", sol::property([](ioport_field &f) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				return settings.value;
+			}));
 
 
 /*  ioport_field_live library
