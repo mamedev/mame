@@ -58261,6 +58261,195 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/1204/ -->
+	<software name="mhonrunde" cloneof="mhonrund">
+		<description>Medal of Honor: Underground (Euro)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-03124, SLES-03124/P"/>
+		<info name="release" value="20001201" />
+		<info name="ring_code" value="Sony DADC   A0100343956-0101   15">
+		<info name="barcode" value="5 030930 024659, 5 030930 028152, 5 030935 024654 >">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="medal of honor - underground (europe)" sha1="ceb0fd3fd4c4328d4493a8ae2934cc9bfb93e706"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/597/ http://redump.org/disc/598/ -->
+	<software name="mgse" cloneof="mgs">
+		<description>Metal Gear Solid (Euro)</description>
+		<year>1999</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SLES-01370"/>
+		<info name="release" value="19990226" />
+		<info name="ring_code" value="DADC   A0100267025-0102   15, DADC   A0100267025-0102   35 (Disc 1), DADC   A0100267025-0202   25, Sony DADC   A0100267025-0202   55 (Disc 2)">
+		<info name="barcode" value="4 012927 020067, 4 988602 749786">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 1 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="metal gear solid (europe) (disc 1)" sha1="d0fff23299bdba6505877648d89003eeaaca027e"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<feature name="part_id" value="Disc 2 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="metal gear solid (europe) (disc 2)" sha1="dc12993c5337cf1f967c3e6f9f3308c67f21632d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1167/ -->
+	<software name="mgssm" cloneof="mgsvr">
+		<description>Metal Gear Solid: Special Missions (Euro)</description>
+		<year>1999</year>
+		<publisher>Konami of Europe</publisher>
+		<info name="serial" value="SLES-02136"/>
+		<info name="release" value="199910xx" />
+		<info name="barcode" value="4 988602 676297">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="metal gear solid - special missions (europe) (en,fr,de,es,it)" sha1="898c595cfe9643d9251bdcf4a97ec64bf15375ec"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/19601/ -->
+	<software name="micromc3e" cloneof="micromc3">
+		<description>Micro Machines V3 (Euro, EDC)</description>
+		<year>1997</year>
+		<publisher>The Codemasters Software Company</publisher>
+		<info name="serial" value="SLES-00016#"/>
+		<info name="release" value="199703xx" />
+		<info name="barcode" value="5 024866 241532, 5 024866 241563">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="micro machines v3 (europe) (en,fr,de,es,it) (edc)" sha1="c70cc67aec0f81632cd785a0bfac087073fe8257"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1001/ -->
+	<software name="motorcre" cloneof="motorcr">
+		<description>Moto Racer (Euro)</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-00469"/>
+		<info name="release" value="19971103" />
+		<info name="ring_code" value="DADC AUSTRIA   A0100228657-0101   25, DADC AUSTRIA   A0100228657-0101   35">
+		<info name="barcode" value="5 030930 013257 >, 5 030935 013252 >">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="moto racer (europe) (en,fr,de,es,it,sv)" sha1="19f9986547e180fe0a9cec64948065de2717cd3a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1201/ -->
+	<software name="motorcwte" cloneof="motorcwt">
+		<description>Moto Racer World Tour (Euro)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<info name="serial" value="SCES-03037"/>
+		<info name="release" value="200011xx" />
+		<info name="ring_code" value="Sony DADC   A0100333381-0101   15">
+		<info name="barcode" value="7 11719 19482 8">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="moto racer world tour (europe) (en,fr,de,es,it,sv)" sha1="6fbf0ff3e95af1163386aa66c81adebdf8bc2739"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/110/ -->
+	<software name="music">
+		<description>Music: Music Creation for the PlayStation (Euro)</description>
+		<year>1998</year>
+		<publisher>Codemasters</publisher>
+		<info name="serial" value="SLES-01356"/>
+		<info name="release" value="199811xx" />
+		<info name="ring_code" value="DADC   A0100261573-0101   15">
+		<info name="barcode" value="5 024866 240504, 5 024866 240511, 5 024866 240542">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="music - music creation for the playstation (europe) (en,fr,de,es,it)" sha1="649244a6b54e3759871ab7dc6bcd0841a3471570"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/367/ -->
+	<software name="nfs2e" cloneof="nfs2">
+		<description>Need for Speed II (Euro)</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-00658"/>
+		<info name="release" value="199705xx" />
+		<info name="barcode" value="5 030945 012634">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="need for speed ii (europe) (en,fr,de,es,it,sv)" sha1="ba26a40dfd3f530655b5499d42b17c1f15d4d90e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1169/ -->
+	<software name="nfs3e" cloneof="nfs3">
+		<description>Need for Speed III: Hot Pursuit (Euro)</description>
+		<year>1998</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-01154"/>
+		<info name="release" value="199804xx" />
+		<info name="barcode" value="5 030930 022723">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="need for speed iii - hot pursuit (europe) (en,fr,de,es,it,sv)" sha1="fc8706dc94af235d0f7de529dee77f4ea0ef359e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/606/ -->
+	<software name="nofeare" cloneof="nofear">
+		<description>No Fear Downhill Mountain Biking (Euro)</description>
+		<year>1999</year>
+		<publisher>The Codemasters Software Company</publisher>
+		<info name="serial" value="SLES-00849, SLES-00849#"/>
+		<info name="ring_code" value="DADC   A0100299348-0101   25">
+		<info name="barcode" value="5 024866 241839">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="no fear downhill mountain biking (europe) (en,fr,de,es,it,sv)" sha1="3aa2e25ec8ff6095db46534968a1d703d55349d5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/702/ -->
+	<software name="abeodysse" cloneof="abeodyss">
+		<description>Oddworld: Abe's Oddysee (Euro)</description>
+		<year>1997</year>
+		<publisher>GT Interactive Software Europe / Infogrames</publisher>
+		<info name="serial" value="SLES-00664, SLES-00664#"/>
+		<info name="release" value="199709xx" />
+		<info name="ring_code" value="DADC   A0100225498-0101   15, DADC   A0100225498-0101   35">
+		<info name="barcode" value="3 546430 010112 >, 5 029988 004676 >">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oddworld - abe's oddysee (europe)" sha1="e0e660c1f05415c6e5a433842a9587255f41a4ef"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Non-redump PAL (Europe) -->
 
 	<!-- corrupt text -->
