@@ -8884,7 +8884,6 @@ bigstrkba                       // alt set of 'bigstrkb' with Italian teams
 
 @source:binbug.cpp
 binbug                          //
-dg680                           //
 
 @source:bingo.cpp
 brooklyn                        //
@@ -11619,6 +11618,9 @@ destroyr1                       // 030131-030136    1977/10 [6800]
 @source:dfruit.cpp
 dfruit                          //
 gemcrush
+
+@source:dg680.cpp
+dg680                           //
 
 @source:dgn_beta.cpp
 dgnbeta                         // Dragon Beta
