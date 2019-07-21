@@ -143,9 +143,42 @@ void renderer_d3d9::toggle_fsfx()
 
 void renderer_d3d9::record()
 {
-	if (m_shaders != nullptr)
+	//if (m_shaders != nullptr)
+	//{
+	//	m_shaders->record_movie();
+	//}
+	play_avi("pacman.avi");
+}
+
+void renderer_d3d9::play_avi(const char *file_name)
+{
+	avi_file::error avierr = avi_file::open(file_name, m_playing_avi);
+	if (avierr != avi_file::error::NONE)
+		return;
+
+	const avi_file::movie_info &info = m_playing_avi->get_movie_info();
+	m_avi_bitmap.resize(info.video_width, info.video_height);
+	m_avi_frame = 0;
+	m_avi_frames = info.video_numsamples;
+	m_avi_playing = true;
+}
+
+void renderer_d3d9::update_avi()
+{
+	avi_file::error err = m_playing_avi->read_uncompressed_video_frame(m_avi_frame, m_avi_bitmap);
+	if (err != avi_file::error::NONE)
 	{
-		m_shaders->record_movie();
+		osd_printf_verbose("AVI error %d\n", (int)err);
+		m_avi_playing = false;
+		m_playing_avi.reset();
+		return;
+	}
+
+	m_avi_frame++;
+	if (m_avi_frame >= m_avi_frames)
+	{
+		m_avi_playing = false;
+		m_playing_avi.reset();
 	}
 }
 
@@ -534,6 +567,9 @@ int renderer_d3d9::initialize()
 		return false;
 	}
 
+	m_playing_avi = nullptr;
+	m_avi_frame = 0;
+
 	return true;
 }
 
@@ -589,7 +625,7 @@ int renderer_d3d9::pre_window_draw_check()
 	return -1;
 }
 
-void d3d_texture_manager::update_textures()
+void d3d_texture_manager::update_textures(bool avi_playing, bitmap_rgb32 *avi_bitmap)
 {
 	auto win = m_renderer->assert_window();
 
@@ -611,8 +647,16 @@ void d3d_texture_manager::update_textures()
 				// if there is one, but with a different seqid, copy the data
 				if (texture->get_texinfo().seqid != prim.texture.seqid)
 				{
-					texture->set_data(&prim.texture, prim.flags);
-					texture->get_texinfo().seqid = prim.texture.seqid;
+					if (avi_playing)
+					{
+						texture->set_data(*avi_bitmap, PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32));
+						texture->get_texinfo().seqid = prim.texture.seqid;
+					}
+					else
+					{
+						texture->set_data(&prim.texture, prim.flags);
+						texture->get_texinfo().seqid = prim.texture.seqid;
+					}
 				}
 			}
 		}
@@ -663,8 +707,62 @@ void renderer_d3d9::begin_frame()
 
 	win->m_primlist->acquire_lock();
 
+	// first update any playing AVI
+	if (m_avi_playing)
+	{
+		update_avi();
+		bool orientation_swap_xy =
+			(win->machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool rotation_swap_xy =
+			(win->target()->orientation() & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+		bool swap_xy = orientation_swap_xy ^ rotation_swap_xy;
+
+		bool rotation_0 = win->target()->orientation() == ROT0;
+		bool rotation_90 = win->target()->orientation() == ROT90;
+		bool rotation_180 = win->target()->orientation() == ROT180;
+		bool rotation_270 = win->target()->orientation() == ROT270;
+
+		bool flip_x =
+			((rotation_0 || rotation_270) && orientation_swap_xy) ||
+			((rotation_180 || rotation_270) && !orientation_swap_xy);
+		bool flip_y =
+			((rotation_0 || rotation_90) && orientation_swap_xy) ||
+			((rotation_180 || rotation_90) && !orientation_swap_xy);
+
+		int in_size_x = m_avi_bitmap.width();
+		int in_size_y = m_avi_bitmap.height();
+		int out_size_x = in_size_x;
+		int out_size_y = in_size_y;
+
+		if (swap_xy)
+			std::swap(out_size_x, out_size_y);
+
+		m_rotated_avi_bitmap.resize(out_size_x, out_size_y);
+
+		for (int in_y = 0; in_y < in_size_y; in_y++)
+		{
+			u32 *src = &m_avi_bitmap.pix32(in_y);
+			for (int in_x = 0; in_x < in_size_x; in_x++)
+			{
+				int out_x = in_x;
+				int out_y = in_y;
+
+				if (swap_xy)
+					std::swap(out_x, out_y);
+
+				if (flip_x)
+					out_x = (out_size_x - 1) - out_x;
+
+				if (flip_y)
+					out_y = (out_size_y - 1) - out_y;
+
+				m_rotated_avi_bitmap.pix32(out_y, out_x) = *src++;
+			}
+		}
+	}
+
 	// first update any textures
-	m_texture_manager->update_textures();
+	m_texture_manager->update_textures(m_avi_playing, &m_rotated_avi_bitmap);
 
 	// begin the scene
 	result = m_device->BeginScene();
@@ -2399,7 +2497,7 @@ inline void texture_info::copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *
 //  texture_set_data
 //============================================================
 
-void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
+void texture_info::set_data(void *data, int width, int height, int rowpixels, const rgb_t *palette, int tex_format, bool debug_log)
 {
 	D3DLOCKED_RECT rect;
 	HRESULT result;
@@ -2417,52 +2515,41 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 		return;
 	}
 
-	// loop over Y
-	int tex_format = PRIMFLAG_GET_TEXFORMAT(flags);
-#if 0
-	if (tex_format == TEXFORMAT_ARGB32 && texsource->palette == nullptr && texsource->width == texsource->rowpixels && m_xborderpix == 0 && m_yborderpix == 0)
-	{
-		memcpy((BYTE *)rect.pBits, texsource->base, sizeof(uint32_t) * texsource->width * texsource->height);
-	}
-	else
-#endif
-	{
-		int miny = 0 - m_yborderpix;
-		int maxy = texsource->height + m_yborderpix;
+	int miny = 0 - m_yborderpix;
+	int maxy = height + m_yborderpix;
 
-		for (int dsty = miny; dsty < maxy; dsty++)
+	for (int dsty = miny; dsty < maxy; dsty++)
+	{
+		int srcy = (dsty < 0) ? 0 : (dsty >= height) ? height - 1 : dsty;
+
+		void *dst = (BYTE *)rect.pBits + (dsty + m_yborderpix) * rect.Pitch;
+
+		switch (tex_format)
 		{
-			int srcy = (dsty < 0) ? 0 : (dsty >= texsource->height) ? texsource->height - 1 : dsty;
+			case TEXFORMAT_PALETTE16:
+				copyline_palette16((uint32_t *)dst, (uint16_t *)data + srcy * rowpixels, width, palette, m_xborderpix);
+				break;
 
-			void *dst = (BYTE *)rect.pBits + (dsty + m_yborderpix) * rect.Pitch;
+			case TEXFORMAT_RGB32:
+				copyline_rgb32((uint32_t *)dst, (uint32_t *)data + srcy * rowpixels, width, palette, m_xborderpix);
+				break;
 
-			switch (tex_format)
-			{
-				case TEXFORMAT_PALETTE16:
-					copyline_palette16((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
-					break;
+			case TEXFORMAT_ARGB32:
+				copyline_argb32((uint32_t *)dst, (uint32_t *)data + srcy * rowpixels, width, palette, m_xborderpix);
+				break;
 
-				case TEXFORMAT_RGB32:
-					copyline_rgb32((uint32_t *)dst, (uint32_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
-					break;
+			case TEXFORMAT_YUY16:
+				if (m_texture_manager->get_yuv_format() == D3DFMT_YUY2)
+					copyline_yuy16_to_yuy2((uint16_t *)dst, (uint16_t *)data + srcy * rowpixels, width, palette);
+				else if (m_texture_manager->get_yuv_format() == D3DFMT_UYVY)
+					copyline_yuy16_to_uyvy((uint16_t *)dst, (uint16_t *)data + srcy * rowpixels, width, palette);
+				else
+					copyline_yuy16_to_argb((uint32_t *)dst, (uint16_t *)data + srcy * rowpixels, width, palette);
+				break;
 
-				case TEXFORMAT_ARGB32:
-					copyline_argb32((uint32_t *)dst, (uint32_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
-					break;
-
-				case TEXFORMAT_YUY16:
-					if (m_texture_manager->get_yuv_format() == D3DFMT_YUY2)
-						copyline_yuy16_to_yuy2((uint16_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette);
-					else if (m_texture_manager->get_yuv_format() == D3DFMT_UYVY)
-						copyline_yuy16_to_uyvy((uint16_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette);
-					else
-						copyline_yuy16_to_argb((uint32_t *)dst, (uint16_t *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette);
-					break;
-
-				default:
-					osd_printf_error("Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
-					break;
-			}
+			default:
+				osd_printf_error("Unknown texture format=%d\n", tex_format);
+				break;
 		}
 	}
 
@@ -2479,6 +2566,16 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 
 	// prescale
 	prescale();
+}
+
+void texture_info::set_data(bitmap_rgb32 &texsource, uint32_t flags)
+{
+	set_data(texsource.raw_pixptr(0), texsource.width(), texsource.height(), texsource.rowpixels(), nullptr, PRIMFLAG_GET_TEXFORMAT(flags), true);
+}
+
+void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
+{
+	set_data(texsource->base, texsource->width, texsource->height, texsource->rowpixels, texsource->palette, PRIMFLAG_GET_TEXFORMAT(flags), false);
 }
 
 

@@ -65,7 +65,7 @@ public:
 
 	d3d_texture_manager(renderer_d3d9 *d3d);
 
-	void                    update_textures();
+	void                    update_textures(bool avi_playing = false, bitmap_rgb32 *avi_bitmap = nullptr);
 
 	void                    create_resources();
 	void                    delete_resources();
@@ -121,7 +121,9 @@ public:
 
 	uint32_t                get_flags() const { return m_flags; }
 
+	void					set_data(void *data, int width, int height, int rowpixels, const rgb_t *palette, int tex_format, bool debug_log);
 	void                    set_data(const render_texinfo *texsource, uint32_t flags);
+	void                    set_data(bitmap_rgb32 &texsource, uint32_t flags);
 
 	uint32_t                get_hash() const { return m_hash; }
 

@@ -21,6 +21,7 @@
 #include <math.h>
 #undef interface
 
+#include "aviio.h"
 #include "d3d/d3dcomm.h"
 #include "sliderdirtynotifier.h"
 #include "modules/lib/osdlib.h"
@@ -172,6 +173,15 @@ private:
 	shaders *               m_shaders;                  // HLSL interface
 
 	d3d_texture_manager *   m_texture_manager;          // texture manager
+
+	void					update_avi();
+	void					play_avi(const char *file_name);
+	avi_file::ptr			m_playing_avi;
+	uint32_t				m_avi_frame;
+	uint32_t				m_avi_frames;
+	bitmap_rgb32			m_avi_bitmap;
+	bitmap_rgb32			m_rotated_avi_bitmap;
+	bool					m_avi_playing;
 };
 
 #endif // OSD_WINDOWS
