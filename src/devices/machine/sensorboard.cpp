@@ -5,6 +5,14 @@
 Generic sensorboard device, meant for tracking pieces, primarily made for
 electronic chessboards. It supports buttons, magnets, and inductive sensors.
 
+TODO:
+- dynamically generate input defs instead of all those PORT_CONDITION, input ports
+  need to be in the class first instead of static
+- increase board size when needed, theoretical maximum is 16*16, and even larger
+  if input ports are modernized in MAME core
+
+*******************************************************************************
+
 Concept/idea by Ralph Schaefer, but his code got removed from MAME when he
 couldn't be reached for source relicensing. This device is made from scratch.
 It uses similar I/O methods as before: MAME keeps track of sensor clicks and
@@ -19,12 +27,31 @@ both at the same time). Also used with board initialization.
 If you use this device in a slot, or add multiple of them, make sure to override
 the outputs with output_cb() to avoid collisions.
 
+*******************************************************************************
 
-TODO:
-- dynamically generate input defs instead of all those PORT_CONDITION, input ports
-  need to be in the class first instead of static
-- increase board size when needed, theoretical maximum is 16*16, and even larger
-  if input ports are modernized in MAME core
+Usage notes:
+
+At reset, the board is in its default starting position. RESET button works the
+same way, and holding CTRL while pressing it will rotate the board, eg. for placing
+black at the bottom with chess.
+
+Click on a piece to pick it up, click on a board position to drop it. Only 1 piece
+can be selected at the same time. Drag & drop is not supported. To remove a piece,
+select the piece and then click on REMOVE, or overwrite it with another piece.
+
+Magnet boards are simulated faithfully. Picking up a piece is the same as picking
+it up on a real board. The only helper feature is when dropping a piece, a delay is
+added, so the machine can detect when a piece is 'captured'.
+
+For button boards:
+
+To prevent the possibility of a piece/sensor having opposite states (iow: piece
+selected but sensor deactivated, the button is not clicked when dropping a piece
+at the same position it was before.
+
+Hold CTRL while clicking to activate the piece but ignore the sensor beneath it.
+Hold SHIFT while clicking to activate the sensor but ignore the piece (sidenote:
+it will invert the sensor state for magnet boards).
 
 */
 
