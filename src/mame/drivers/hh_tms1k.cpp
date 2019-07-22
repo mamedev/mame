@@ -3958,13 +3958,14 @@ void einvader_state::einvader(machine_config &config)
 	m_maincpu->o().set(FUNC(einvader_state::write_o));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(60);
-	screen.set_size(939, 1080);
-	screen.set_visarea_full();
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(945, 1080);
+	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(0x380, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // ufo/player explosion is brighter
 	config.set_default_layout(layout_einvader);
 
 	/* sound hardware */
@@ -3984,8 +3985,8 @@ ROM_START( einvader )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_einvader_output.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
 
-	ROM_REGION( 44398, "screen", 0)
-	ROM_LOAD( "einvader.svg", 0, 44398, CRC(48de88fd) SHA1(56a2b9c997a447277b45902ab542eda54e7d5a2f) )
+	ROM_REGION( 45196, "mask", 0)
+	ROM_LOAD( "einvader.svg", 0, 45196, CRC(35a1c744) SHA1(6beb9767454b9bc8f2ccf9fee25e7be209eefd22) )
 ROM_END
 
 
@@ -3996,7 +3997,9 @@ ROM_END
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die label MP7551)
-  * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1-bit sound
+  * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
+
+  Two versions exist, one with a VFD 7seg display, and one with a LED(red) 7seg display.
 
 ***************************************************************************/
 
@@ -4088,7 +4091,7 @@ INPUT_PORTS_END
 void efootb4_state::efootb4(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1670(config, m_maincpu, 475000); // approximation - RC osc. R=42K, C=47pF
+	TMS1670(config, m_maincpu, 400000); // approximation - RC osc. R=42K, C=47pF
 	m_maincpu->k().set(FUNC(efootb4_state::read_k));
 	m_maincpu->r().set(FUNC(efootb4_state::write_r));
 	m_maincpu->o().set(FUNC(efootb4_state::write_o));
@@ -4815,7 +4818,7 @@ INPUT_PORTS_END
 void gpoker_state::gpoker(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1370(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(gpoker_state::read_k));
 	m_maincpu->r().set(FUNC(gpoker_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
@@ -4944,7 +4947,7 @@ void gjackpot_state::gjackpot(machine_config &config)
 	gpoker(config);
 
 	/* basic machine hardware */
-	TMS1670(config.replace(), m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	TMS1670(config.replace(), m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(gpoker_state::read_k));
 	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
