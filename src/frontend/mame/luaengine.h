@@ -28,6 +28,7 @@
 #include "sol2/sol.hpp"
 
 struct lua_State;
+class mame_ui_manager;
 
 class lua_engine
 {
@@ -166,6 +167,8 @@ private:
 		bool busy;
 		bool yield;
 	};
+
+	mame_ui_manager *mame_ui();
 };
 
 #endif // MAME_FRONTEND_MAME_LUAENGINE_H
