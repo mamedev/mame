@@ -229,6 +229,22 @@ namespace sol
 	}
 }
 
+
+//-------------------------------------------------
+// parse_seq_type - parses a string into an input_seq_type
+//-------------------------------------------------
+
+static input_seq_type parse_seq_type(const std::string &s)
+{
+	input_seq_type result = SEQ_TYPE_STANDARD;
+	if (s == "increment")
+		result = SEQ_TYPE_INCREMENT;
+	else if (s == "decrement")
+		result = SEQ_TYPE_DECREMENT;
+	return result;
+}
+
+
 //-------------------------------------------------
 //  mem_read - templated memory readers for <sign>,<size>
 //  -> manager:machine().devices[":maincpu"].spaces["program"]:read_i8(0xC000)
@@ -1745,6 +1761,8 @@ void lua_engine::initialize()
  * manager:machine():ioport().ports[port_tag].fields[field_name]
  *
  * field:set_value(value)
+ * field:set_input_seq(seq_type, seq)
+ * field:input_seq(seq_type)
  *
  * field.device - get associated device_t
  * field.live - get ioport_field_live
@@ -1756,6 +1774,7 @@ void lua_engine::initialize()
  * field.defvalue
  * field.sensitivity
  * field.way - amount of available directions
+ * field.type_class
  * field.is_analog
  * field.is_digital_joystick
  * field.enabled
@@ -1771,21 +1790,21 @@ void lua_engine::initialize()
  * field.type
  * field.crosshair_scale
  * field.crosshair_offset
+ * field.user_value
  */
 
 	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
 			"set_value", &ioport_field::set_value,
 			"set_input_seq", [](ioport_field &f, const std::string &seq_type_string, sol::user<input_seq> seq) {
-				input_seq_type seq_type = SEQ_TYPE_STANDARD;
-				if (seq_type_string == "increment")
-					seq_type = SEQ_TYPE_INCREMENT;
-				else if (seq_type_string == "decrement")
-					seq_type = SEQ_TYPE_DECREMENT;
-
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
 				ioport_field::user_settings settings;
 				f.get_user_settings(settings);
 				settings.seq[seq_type] = seq;
 				f.set_user_settings(settings);
+			},
+			"input_seq", [](ioport_field &f, const std::string &seq_type_string) {
+				input_seq_type seq_type = parse_seq_type(seq_type_string);
+				return sol::make_user(f.seq(seq_type));
 			},
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
@@ -1797,6 +1816,18 @@ void lua_engine::initialize()
 			"defvalue", sol::property(&ioport_field::defvalue),
 			"sensitivity", sol::property(&ioport_field::sensitivity),
 			"way", sol::property(&ioport_field::way),
+			"type_class", sol::property([](ioport_field &f) {
+					switch (f.type_class())
+					{
+					case INPUT_CLASS_KEYBOARD:		return "keyboard";
+					case INPUT_CLASS_CONTROLLER:	return "controller";
+					case INPUT_CLASS_CONFIG:		return "config";
+					case INPUT_CLASS_DIPSWITCH:		return "dipswitch";
+					case INPUT_CLASS_MISC:			return "misc";
+					default:						break;
+					}
+					throw false;
+				}),
 			"is_analog", sol::property(&ioport_field::is_analog),
 			"is_digital_joystick", sol::property(&ioport_field::is_digital_joystick),
 			"enabled", sol::property(&ioport_field::enabled),
@@ -1812,7 +1843,17 @@ void lua_engine::initialize()
 			"type", sol::property(&ioport_field::type),
 			"live", sol::property(&ioport_field::live),
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
-			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset),
+			"user_value", sol::property([](ioport_field &f) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				return settings.value;
+			}, [](ioport_field &f, ioport_value val) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				settings.value = val;
+				f.set_user_settings(settings);
+			}));
 
 
 /*  ioport_field_live library
