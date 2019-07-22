@@ -2004,6 +2004,7 @@ void lua_engine::initialize()
  *
  * uiinput:find_mouse() - return x, y, button state, ui render target
  * uiinput:pressed(key) - get pressed state for ui key
+ * uiinput.presses_enabled - enable/disable ui key presses
  */
 
 	sol().registry().new_usertype<ui_input_manager>("uiinput", "new", sol::no_constructor,
@@ -2013,7 +2014,8 @@ void lua_engine::initialize()
 					render_target *rt = ui.find_mouse(&x, &y, &button);
 					return std::tuple<int32_t, int32_t, bool, render_target *>(x, y, button, rt);
 				},
-			"pressed", &ui_input_manager::pressed);
+			"pressed", &ui_input_manager::pressed,
+			"presses_enabled", sol::property(&ui_input_manager::presses_enabled, &ui_input_manager::set_presses_enabled));
 
 
 /*  render_target library
