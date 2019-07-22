@@ -37164,6 +37164,23 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/1539/ -->
+	<software name="pitomail">
+		<description>Pi to Mail (Jpn)</description>
+		<year>1999</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="SLPS-01866"/>
+		<info name="alt_title" value="Piとメール"/>
+		<info name="release" value="19990211" />
+		<info name="barcode" value="4 988607 050252">
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pi to mail (japan)" sha1="7f089c9d62f1dbb32c7bd44abe8685d6085848ce"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="raidendx" supported="yes">
 		<!-- Original images (Redump)
 		<rom name="Raiden DX (Japan) (v1.1).bin" size="218183280" crc="c1ce0640" sha1="9c6a6dd26906c71fdb1829461ed5abfba6568262"/>
@@ -58446,6 +58463,103 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="oddworld - abe's oddysee (europe)" sha1="e0e660c1f05415c6e5a433842a9587255f41a4ef"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/323/ -->
+	<!-- Came bundled with releases of "Treasures of the Deep", "Klonoa: Door to Phantomile" and "Tekken 2" -->
+	<software name="ptblanked" cloneof="ptblank">
+		<description>Point Blank (Euro, Demo)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCED-00287 (9721925)"/>
+		<info name="ring_code" value="DADC AUSTRIA   A0100238994-0101   15">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="point blank (europe) (demo)" sha1="5a00cff0fc1fa9d3bfa69d666d87a0778f333c74"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1542/ -->
+	<software name="ptblanke" cloneof="ptblank">
+		<description>Point Blank (Euro, Rev. 1)</description>
+		<year>1997</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-00886#"/>
+		<info name="release" value="19971101" />
+		<info name="barcode" value="7 11719 73022 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="point blank (europe) (en,fr,de) (rev 1)" sha1="dcd9d56491473c56c6276e252e12e26ddf080d20"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/226/ -->
+	<software name="ptblank2e" cloneof="ptblank2">
+		<description>Point Blank 2 (Euro, Aus)</description>
+		<year>1999?</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SCES-02180"/>
+		<info name="ring_code" value="DADC   A0100288551-0101   25">
+		<info name="barcode" value="7 11719 84102 9, 7 11719 84812 7">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="point blank 2 (europe, australia) (en,fr,de,es,it)" sha1="53d9e495f1cf5d30bbe3c5048fb264d0e3eb56ec"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/684/ -->
+	<software name="porschece" cloneof="porschec">
+		<description>Porsche Challenge (Euro)</description>
+		<year>1997</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-00409, SCES-00409#"/>
+		<info name="release" value="19970701" />
+		<info name="ring_code" value="DADC AUSTRIA   A0100212393-0101   15, DADC AUSTRIA   A0100212393-0101   25, DADC AUSTRIA   A0100212393-0101   35">
+		<info name="barcode" value="7 11719 18722 6, 7 11719 18732 5, 7 11719 65932 7, 7 11719 65942 6, 7 11719 71082 0">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="porsche challenge (europe) (en,fr,de,es,it)" sha1="d6979ddbf1bd51775c1eaeacce86036b06767bf9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/31217/ -->
+	<software name="powrsrc">
+		<description>Power Source (Euro)</description>
+		<year>1997?</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-00667"/>
+		<info name="ring_code" value="DADC AUSTRIA   A0100220841-0101   15">
+		<info name="barcode" value="7 11719 65922 8">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="power source (europe)" sha1="90302fb6f2d1d0b91b019a6c9dd733d42efec95f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/26738/ -->
+	<software name="ppinbrue" cloneof="ppinbru">
+		<description>Pro Pinball: Big Race USA (Euro)</description>
+		<year>1998</year>
+		<publisher>Empire Interactive Entertainment</publisher>
+		<info name="serial" value="SLES-01211"/>
+		<info name="ring_code" value="DADC   A0100266896-0101   15">
+		<info name="barcode" value="5 017783 401530, 5 017783 401547">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pro pinball - big race usa (europe) (en,fr,de,es)" sha1="f2a6cae7dda4f87e53536c434f47269b5dc1031c"/>
 			</diskarea>
 		</part>
 	</software>
