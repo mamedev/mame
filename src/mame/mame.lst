@@ -2445,8 +2445,8 @@ dsys200                         // Dell System 200
 pcd2                            // 1986 Siemens PCD-2
 pcd3nsx                         // Siemens-Nixdorf PCD-3Nsx
 pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops and towers
-pcd4nl                          // Siemens-Nixdorf PCD-4NL 486 subnotebook
-pcd4nd                          // Siemens-Nixdorf 486 notebook
+pcd4nl                          // 1995 Siemens-Nixdorf PCD-4NL 486 subnotebook
+pcd4nd                          // 1993 Siemens-Nixdorf 486 notebook
 ct386sx                         //
 cxsxd                           //
 ec1842                          //
@@ -2474,10 +2474,10 @@ megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
 neat                            // 1989 New Enhanced AT chipset, AMI BIOS
 ncrpc8                          // 1986 NCR PC-8
-n8810m15                        // Nixdorf 8810 M15 Laptop - PC07
-n8810m16c                       // Nixdorf 8810 M16 Laptop - PC17 - CGA version
-n8810m16v                       // Nixdorf 8810 M16 Laptop - PC17 - VGA version
-n8810m30                        // Nixdorf 8810 M30
+n8810m15                        // 1987 Nixdorf 8810 M15 Laptop - PC07
+n8810m16c                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - CGA version
+n8810m16v                       // 1990 Nixdorf 8810 M16 Laptop - PC17 - VGA version
+n8810m30                        // 1990 Nixdorf 8810 M30
 n8810m55                        // 1986 Nixdorf 8810 M55
 //nws286                          // 1988 Nokia WS286
 pc2386                          //
@@ -2486,13 +2486,14 @@ qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
 sarcpc                          //
 t2000sx                         //
 toptek286                       //
-walk386sx                       // Triumph-Adler Walkstation 386 SX
-walk386dx                       // Triumph-Adler Walkstation 386 DX
+walk386sx                       // 1992 Triumph-Adler Walkstation 386 SX
+walk386dx                       // 1992 Triumph-Adler Walkstation 386 DX
 xb42639                         // 1989 Apricot XEN-S (Venus I Motherboard 286) (Bios:3.10.17i)
 xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286) (Bios:1.02.17)
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
+lion3500						// 1993 Lion 3500C/T notebook
 
 @source:atari_s1.cpp
 aavenger                        //
