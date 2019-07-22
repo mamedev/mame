@@ -211,6 +211,7 @@ public:
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) { return 0; };
 	virtual void save() { };
 	virtual void record() { };
+	virtual void play() {};
 	virtual void toggle_fsfx() { };
 	virtual bool sliders_dirty() { return m_sliders_dirty; }
 

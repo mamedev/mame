@@ -160,6 +160,7 @@ public:
 #ifdef OSD_WINDOWS
 	virtual void save() override { }
 	virtual void record() override { }
+	virtual void play() override { }
 	virtual void toggle_fsfx() override { }
 #endif
 

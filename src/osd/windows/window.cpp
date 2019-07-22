@@ -630,6 +630,24 @@ void winwindow_take_video(void)
 
 
 //============================================================
+//  winwindow_play_video
+//  (main thread)
+//============================================================
+
+void winwindow_play_video(void)
+{
+	assert(GetCurrentThreadId() == main_threadid);
+
+	// iterate over windows and request a snap
+	for (auto window : osd_common_t::s_window_list)
+	{
+		window->renderer().play();
+	}
+}
+
+
+
+//============================================================
 //  winwindow_toggle_full_screen
 //  (main thread)
 //============================================================

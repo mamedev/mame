@@ -143,10 +143,14 @@ void renderer_d3d9::toggle_fsfx()
 
 void renderer_d3d9::record()
 {
-	//if (m_shaders != nullptr)
-	//{
-	//	m_shaders->record_movie();
-	//}
+	if (m_shaders != nullptr)
+	{
+		m_shaders->record_movie();
+	}
+}
+
+void renderer_d3d9::play()
+{
 	play_avi("pacman.avi");
 }
 

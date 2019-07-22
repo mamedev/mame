@@ -126,6 +126,10 @@ void windows_osd_interface::check_osd_inputs()
 	// check for taking fullscreen video
 	if (machine().ui_input().pressed(IPT_OSD_4))
 		winwindow_toggle_fsfx();
+
+	// check for taking fullscreen video
+	if (machine().ui_input().pressed(IPT_OSD_5))
+		winwindow_play_video();
 }
 
 

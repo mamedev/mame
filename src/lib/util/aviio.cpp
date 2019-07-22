@@ -1687,7 +1687,10 @@ avi_file::error avi_file_impl::read_uncompressed_video_frame(std::uint32_t frame
 		return error::INVALID_STREAM;
 
 	if (stream->format() != FORMAT_UNCOMPRESSED && stream->format() != FORMAT_DIB && stream->format() != FORMAT_RGB && stream->format() != FORMAT_RAW && stream->format() != FORMAT_I420)
+	{
+		printf("Invalid format: %08x\n", stream->format());
 		return error::UNSUPPORTED_VIDEO_FORMAT;
+	}
 
 	if (bitmap.width() < stream->width() || bitmap.height() < stream->height())
 		bitmap.resize(stream->width(), stream->height());

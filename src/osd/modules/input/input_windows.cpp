@@ -156,6 +156,11 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 				entry.configure_osd("POST_PROCESS", "Toggle Post-Processing");
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LALT, KEYCODE_LCONTROL);
 				break;
+			// lctrl-lalt-F10 to play avi
+			case IPT_OSD_5:
+				entry.configure_osd("PLAY_AVI", "Play AVI");
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, KEYCODE_LALT, KEYCODE_LCONTROL);
+				break;
 			// add a NOT-lctrl-lalt to our default F5
 			case IPT_UI_TOGGLE_DEBUG: // emu/input.c: input_seq(KEYCODE_F5)
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LALT);

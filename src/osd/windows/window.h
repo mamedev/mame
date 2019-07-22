@@ -165,6 +165,7 @@ extern LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, W
 void winwindow_toggle_full_screen(void);
 void winwindow_take_snap(void);
 void winwindow_take_video(void);
+void winwindow_play_video(void);
 void winwindow_toggle_fsfx(void);
 
 void winwindow_process_events_periodic(running_machine &machine);
