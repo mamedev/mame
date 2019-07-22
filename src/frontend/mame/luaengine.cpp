@@ -1848,6 +1848,11 @@ void lua_engine::initialize()
 				ioport_field::user_settings settings;
 				f.get_user_settings(settings);
 				return settings.value;
+			}, [](ioport_field &f, ioport_value val) {
+				ioport_field::user_settings settings;
+				f.get_user_settings(settings);
+				settings.value = val;
+				f.set_user_settings(settings);
 			}));
 
 
