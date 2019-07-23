@@ -188,6 +188,7 @@ dct11em.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+dg680.cpp
 dgn_beta.cpp
 diablo1300.cpp
 didact.cpp
