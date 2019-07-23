@@ -1091,7 +1091,7 @@ int win_window_info::complete_create()
 
 	// are we in worker UI mode?
 	HWND hwnd;
-	const char *attach_window_name = machine().options().attach_window();
+	const char *attach_window_name = downcast<windows_options &>(machine().options()).attach_window();
 	m_attached_mode = attach_window_name && *attach_window_name ? true : false;
 	if (m_attached_mode)
 	{

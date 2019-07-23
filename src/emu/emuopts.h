@@ -177,7 +177,6 @@
 
 #define OPTION_CONFIRM_QUIT         "confirm_quit"
 #define OPTION_UI_MOUSE             "ui_mouse"
-#define OPTION_ATTACH_WINDOW        "attach_window"
 
 #define OPTION_AUTOBOOT_COMMAND     "autoboot_command"
 #define OPTION_AUTOBOOT_DELAY       "autoboot_delay"
@@ -455,7 +454,6 @@ public:
 
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
-	const char *attach_window() const { return value(OPTION_ATTACH_WINDOW); }
 
 	const char *autoboot_command() const { return value(OPTION_AUTOBOOT_COMMAND); }
 	int autoboot_delay() const { return int_value(OPTION_AUTOBOOT_DELAY); }
