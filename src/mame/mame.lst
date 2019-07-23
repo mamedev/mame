@@ -2493,7 +2493,7 @@ xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286)
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
-lion3500						// 1993 Lion 3500C/T notebook
+lion3500                        // 1993 Lion 3500C/T notebook
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -30956,6 +30956,7 @@ noki8890                        //
 @source:norautp.cpp
 bjpoker                         // (c) M. Kramer Inc.
 cgip30cs                        // (c) 1999, CGI
+cgidjp                          // (c) 1999, CGI
 df_djpkr                        // (c) DellFern Ltd.
 dphl                            // (c) 1983 M. Kramer Inc.
 dphla                           // unknown
