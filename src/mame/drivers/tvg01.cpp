@@ -50,21 +50,18 @@
   (*) Note: The CE line of the extra ROM that should be located in the
       empty socket, is tied to PPI port B, D3.
 
-*******************************************************************************
-
-  Todo:
-  - hopper for payout
-
 *******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 class tvg01_state : public driver_device
 {
@@ -73,6 +70,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_player_inputs{{*this, "INP1.%u", 0U}, {*this, "INP2.%u", 0U}}
 		, m_banked_rom(*this, "banked_rom")
+		, m_hopper(*this, "hopper")
 	{
 	}
 
@@ -92,10 +90,20 @@ private:
 
 	required_ioport_array<6> m_player_inputs[2];
 	required_region_ptr<u8> m_banked_rom;
+	required_device<ticket_dispenser_device> m_hopper;
 
 	u8 m_input_select[2];
 	u8 m_bank_select;
 };
+
+#define MAIN_CLOCK      XTAL(21'477'272)
+#define VDP_CLOCK       MAIN_CLOCK
+#define CPU_CLOCK       MAIN_CLOCK / 6
+#define PSG_CLOCK       MAIN_CLOCK / 12
+
+#define VDP_MEM         0x20000     // 4x MB81464-15
+#define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
+
 
 void tvg01_state::machine_start()
 {
@@ -124,6 +132,7 @@ u8 tvg01_state::player_inputs_r()
 void tvg01_state::bank_select_w(u8 data)
 {
 	m_bank_select = data;
+	m_hopper->motor_w(BIT(data, 4));
 }
 
 u8 tvg01_state::bank_r(offs_t offset)
@@ -136,6 +145,7 @@ u8 tvg01_state::bank_r(offs_t offset)
 
 	return result;
 }
+
 
 void tvg01_state::mem_map(address_map &map)
 {
@@ -154,16 +164,17 @@ void tvg01_state::io_map(address_map &map)
 	map(0xa0, 0xa3).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
+
 static INPUT_PORTS_START(theboat)
 	PORT_START("INP0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )       PORT_NAME("P1 Coin (1 credit)")                  // P1 - coin (1 credit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )       PORT_NAME("P2 Key Up (10 credits)")              // P2 - keyup (10 credits)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)  PORT_NAME("Analyze / Bookkeeping")               // analyze (bookkeeping)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Pay Out")  PORT_CODE(KEYCODE_I)    // P2 - keyout
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )       PORT_NAME("P1 Key Up (10 credits)")              // P1 - keyup (10 credits)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Hopper")        PORT_CODE(KEYCODE_L)  // hopper line
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )       PORT_NAME("P2 Coin (1 credit)")                  // P2 - coin (1 credit)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Pay Out")  PORT_CODE(KEYCODE_U)    // P1 - keyout
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )       PORT_IMPULSE(3)  PORT_NAME("P1 Coin (1 credit)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )       PORT_IMPULSE(10)  PORT_NAME("P2 Key Up (10 credits)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)  PORT_NAME("Analyze / Bookkeeping")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P2 Pay Out")  PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )       PORT_IMPULSE(10)  PORT_NAME("P1 Key Up (10 credits)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )      PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )       PORT_IMPULSE(3)  PORT_NAME("P2 Coin (1 credit)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Pay Out")  PORT_CODE(KEYCODE_U)
 
 	PORT_START("INP1.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("P1 Bet 1-2") PORT_CODE(KEYCODE_Q)
@@ -256,13 +267,13 @@ static INPUT_PORTS_START(theboat)
 	PORT_DIPSETTING(0x08, "1 Coin 2 Credit / 1 Pulse 20 Credits")
 	PORT_DIPSETTING(0x04, "1 Coin 5 Credit / 1 Pulse 50 Credits")
 	PORT_DIPSETTING(0x00, "1 Coin 10 Credit / 1 Pulse 100 Credits")
-	PORT_DIPNAME(0x10, 0x10, "Key Out")         PORT_DIPLOCATION("DSW:4")
-	PORT_DIPSETTING(0x10, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x10, "Payment")         PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(0x10, "Pay Out")
+	PORT_DIPSETTING(0x00, "Hopper")
 	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))  PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(0x20, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x40, 0x40, "Unknown (Should be OFF)")  PORT_DIPLOCATION("DSW:2")
+	PORT_DIPNAME(0x40, 0x40, "Clear Memory")    PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(0x40, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPNAME(0x80, 0x80, "Test Mode")       PORT_DIPLOCATION("DSW:1")
@@ -270,36 +281,40 @@ static INPUT_PORTS_START(theboat)
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
 
+
 void tvg01_state::theboat(machine_config &config)
 {
-	z80_device &maincpu(Z80(config, "maincpu", 21.477272_MHz_XTAL / 6)); // LH0080A
+	z80_device &maincpu(Z80(config, "maincpu", CPU_CLOCK));  // LH0080A
 	maincpu.set_addrmap(AS_PROGRAM, &tvg01_state::mem_map);
 	maincpu.set_addrmap(AS_IO, &tvg01_state::io_map);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D449C-2 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);  // D449C-2 + battery
 
-	i8255_device &ppi1(I8255(config, "ppi1")); // D8255AC-2
+	i8255_device &ppi1(I8255(config, "ppi1"));  // D8255AC-2
 	ppi1.in_pa_callback().set_ioport("INP0");
 	ppi1.out_pb_callback().set(FUNC(tvg01_state::bank_select_w));
 
-	i8255_device &ppi2(I8255(config, "ppi2")); // D8255AC-2
+	i8255_device &ppi2(I8255(config, "ppi2"));  // D8255AC-2
 	ppi2.out_pa_callback().set(FUNC(tvg01_state::input_select_w<0>));
 	ppi2.out_pb_callback().set(FUNC(tvg01_state::input_select_w<1>));
 	ppi2.in_pc_callback().set(FUNC(tvg01_state::player_inputs_r));
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	v9938_device &vdp(V9938(config, "vdp", 21.477272_MHz_XTAL)); // unknown type (surface-scratched 64-pin SDIP)
+	v9938_device &vdp(V9938(config, "vdp", VDP_CLOCK));  // unknown type (surface-scratched 64-pin SDIP)
 	vdp.set_screen_ntsc("screen");
-	vdp.set_vram_size(0x20000); // 4x MB81464-15
+	vdp.set_vram_size(VDP_MEM);  // 4x MB81464-15
 	vdp.int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &psg(AY8910(config, "psg", 21.477272_MHz_XTAL / 12)); // GI AY-3-8910A
+	ay8910_device &psg(AY8910(config, "psg", PSG_CLOCK));  // GI AY-3-8910A
 	psg.port_a_read_callback().set_ioport("DSW");
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
+
 
 ROM_START(theboat)
 	ROM_REGION(0x8000, "program", 0)
@@ -312,6 +327,7 @@ ROM_START(theboat)
 	ROM_LOAD("5.ic14", 0x8000, 0x4000, CRC(7899a587) SHA1(13cbb7e837e14bc49d8b34dbf876b666cdf48979))
 	// Empty socket for one more ROM (IC16), 
 ROM_END
+
 
 //   YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT        ROT    COMPANY            FULLNAME   FLAGS
 GAME(1987, theboat,  0,      theboat,  theboat,  tvg01_state, empty_init, ROT0, "Hit Gun Co, LTD", "The Boat", MACHINE_SUPPORTS_SAVE)
