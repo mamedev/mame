@@ -1150,7 +1150,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		{
 			PAINTSTRUCT pstruct;
 			HDC hdc = BeginPaint(wnd, &pstruct);
-			window->draw_video_contents(hdc, TRUE);
+			window->draw_video_contents(hdc, true);
 			if (window->win_has_menu())
 				DrawMenuBar(window->platform_window());
 			EndPaint(wnd, &pstruct);
@@ -1315,7 +1315,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			HDC hdc = GetDC(wnd);
 
 			window->m_primlist = (render_primitive_list *)lparam;
-			window->draw_video_contents(hdc, FALSE);
+			window->draw_video_contents(hdc, false);
 
 			ReleaseDC(wnd, hdc);
 			break;
@@ -1370,7 +1370,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 //  (window thread)
 //============================================================
 
-void win_window_info::draw_video_contents(HDC dc, int update)
+void win_window_info::draw_video_contents(HDC dc, bool update)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
