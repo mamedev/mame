@@ -958,7 +958,7 @@ void lua_engine::initialize()
  *
  * emu.thread()
  *
- * thread:start(scr) - run scr (lua code as string) in a seperate thread
+ * thread:start(scr) - run scr (lua code as string) in a separate thread
  *                     in a new empty (other than modules) lua context.
  *                     thread runs until yield() and/or terminates on return.
  * thread:continue(val) - resume thread that has yielded and pass val to it
