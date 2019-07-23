@@ -319,10 +319,10 @@ void winwindow_process_events_periodic(running_machine &machine)
 //  (main or window thread)
 //============================================================
 
-BOOL winwindow_has_focus(void)
+bool winwindow_has_focus(void)
 {
 	// For now always act like we have focus
-	return TRUE;
+	return true;
 }
 
 //============================================================
