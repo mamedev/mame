@@ -100,9 +100,6 @@ static int win_physical_height;
 // event handling
 static std::chrono::system_clock::time_point last_event_check;
 
-// debugger
-static int in_background;
-
 static int ui_temp_pause;
 static int ui_temp_was_paused;
 
@@ -1292,11 +1289,6 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			}
 			return DefWindowProc(wnd, message, wparam, lparam);
 		}
-
-		// track whether we are in the foreground
-		case WM_ACTIVATEAPP:
-			in_background = !wparam;
-			break;
 
 		// close: cause MAME to exit
 		case WM_CLOSE:
