@@ -144,7 +144,7 @@ struct osd_draw_callbacks
 //  PROTOTYPES
 //============================================================
 
-BOOL winwindow_has_focus(void);
+bool winwindow_has_focus(void);
 void winwindow_process_events(running_machine &machine, bool ingame, bool nodispatch);
 void winwindow_process_events_periodic(running_machine &machine);
 

@@ -661,16 +661,16 @@ void winwindow_toggle_full_screen(void)
 //  (main or window thread)
 //============================================================
 
-BOOL winwindow_has_focus(void)
+bool winwindow_has_focus(void)
 {
 	HWND focuswnd = GetFocus();
 
 	// see if one of the video windows has focus
 	for (auto window : osd_common_t::s_window_list)
 		if (focuswnd == std::static_pointer_cast<win_window_info>(window)->platform_window())
-			return TRUE;
+			return true;
 
-	return FALSE;
+	return false;
 }
 
 
