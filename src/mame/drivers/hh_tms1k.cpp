@@ -3999,7 +3999,7 @@ ROM_END
   * TMS1670 6009 MP7551 (die label MP7551)
   * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
 
-  Two versions exist, one with a VFD 7seg display, and one with a LED(red) 7seg display.
+  Another version exist, one with a LED(red) 7seg display.
 
 ***************************************************************************/
 
@@ -4097,6 +4097,11 @@ void efootb4_state::efootb4(machine_config &config)
 	m_maincpu->o().set(FUNC(efootb4_state::write_o));
 
 	/* video hardware */
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(1920, 904);
+	mask.set_visarea_full();
+
 	PWM_DISPLAY(config, m_display).set_size(16, 7);
 	m_display->set_segmask(0xfc00, 0x7f);
 	config.set_default_layout(layout_efootb4);
@@ -4117,6 +4122,9 @@ ROM_START( efootb4 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_efootb4_output.pla", 0, 557, CRC(5c87c753) SHA1(bde9d4aa1e57a718affd969475c0a1edcf60f444) )
+
+	ROM_REGION( 67472, "mask", 0)
+	ROM_LOAD( "efootb4.svg", 0, 67472, CRC(ba0abcda) SHA1(6066e4cbae5404e4db17fae0153808b044adc823) )
 ROM_END
 
 
