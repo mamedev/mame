@@ -15178,7 +15178,6 @@ hec2mx80                        //
 victor                          //
 
 @source:hektor.cpp
-hektor2                         // Hektor II
 hektor3                         // Hektor III
 
 @source:hexion.cpp

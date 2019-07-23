@@ -472,8 +472,8 @@ ROM_START(hektor2)
 	ROM_LOAD("hek1a_skt1.rom", 0x1000, 0x1000, NO_DUMP)
 	ROM_LOAD("hek1a_ic5.rom",  0x7000, 0x1000, NO_DUMP)
 
-	ROM_REGION(0x400, "ef9364", 0)
-	ROM_LOAD("charset.bin", 0x0000, 0x0400, CRC(8b6da54b) SHA1(ac2204600f45c6dd0df1e759b62ed25928f02a12))
+	ROM_REGION(0x800, "ef9364", 0)
+	ROM_LOAD("charset.bin", 0x0000, 0x0800, NO_DUMP)
 ROM_END
 
 ROM_START(hektor3)
@@ -486,5 +486,5 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME             FLAGS */
-COMP( 1982, hektor2, 0,      0,       hektor2,  hektor2,  hektor2_state,  empty_init, "The Open University",  "Hektor II (PT502)", MACHINE_NOT_WORKING )
+//COMP( 1982, hektor2, 0,      0,       hektor2,  hektor2,  hektor2_state,  empty_init, "The Open University",  "Hektor II (PT502)", MACHINE_NOT_WORKING )
 COMP( 1984, hektor3, 0,      0,       hektor3,  hektor3,  hektor3_state,  empty_init, "The Open University",  "Hektor III",        MACHINE_IMPERFECT_GRAPHICS )
