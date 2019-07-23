@@ -231,7 +231,7 @@ u32 ncd17c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 		for (unsigned x = 0; x < 1024; x++)
 		{
 			u8 const pixels = m_vram->read((y * 1024) + BYTE4_XOR_BE(x));
-			*scanline++ = m_ramdac->palette_lookup(pixels);
+			*scanline++ = m_ramdac->lookup(pixels);
 		}
 	}
 

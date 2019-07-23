@@ -755,9 +755,9 @@ u32 edge2plus_framebuffer_device_base::screen_update(screen_device &screen, bitm
 			const u8 index = *pixel_data++;
 
 			bitmap.pix(y, x) = rgb_t(
-				m_ramdac[0]->palette_lookup(index),
-				m_ramdac[1]->palette_lookup(index),
-				m_ramdac[2]->palette_lookup(index));
+				m_ramdac[0]->lookup(index),
+				m_ramdac[1]->lookup(index),
+				m_ramdac[2]->lookup(index));
 		}
 
 	return 0;
