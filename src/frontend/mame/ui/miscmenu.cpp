@@ -880,9 +880,12 @@ void menu_plugins_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
-			int oldval = plugins.int_value((const char*)menu_event->itemref);
-			plugins.set_value((const char*)menu_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE);
-			changed = true;
+			plugin *p = plugins.find((const char*)menu_event->itemref);
+			if (p)
+			{
+				p->m_start = !p->m_start;
+				changed = true;
+			}
 		}
 	}
 	if (changed)
@@ -897,13 +900,10 @@ void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
 	plugin_options& plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins.entries())
+	for (auto &curentry : plugins.plugins())
 	{
-		if (curentry->type() != OPTION_HEADER)
-		{
-			auto enabled = !strcmp(curentry->value(), "1");
-			item_append_on_off(curentry->description(), enabled, 0, (void *)(uintptr_t)curentry->name().c_str());
-		}
+		bool enabled = curentry.m_start;
+		item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
 	}
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
