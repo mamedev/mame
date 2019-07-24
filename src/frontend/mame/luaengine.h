@@ -166,6 +166,9 @@ private:
 		bool busy;
 		bool yield;
 	};
+
+	template<typename TFunc, typename... TArgs>
+	sol::protected_function_result invoke(TFunc &&func, TArgs&&... args);
 };
 
 #endif // MAME_FRONTEND_MAME_LUAENGINE_H
