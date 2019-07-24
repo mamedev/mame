@@ -1253,6 +1253,7 @@ void lua_engine::initialize()
  *
  * machine:system() - get game_driver for running driver
  * machine:video() - get video_manager
+ * machine:sound() - get sound_manager
  * machine:render() - get render_manager
  * machine:ioport() - get ioport_manager
  * machine:parameters() - get parameter_manager
@@ -1264,6 +1265,7 @@ void lua_engine::initialize()
  * machine:debugger() - get debugger_manager
  *
  * machine.paused - get paused state
+ * machine.samplerate - get audio sample rate
  *
  * machine.devices[] - get device table (k=tag, v=device_t)
  * machine.screens[] - get screens table (k=tag, v=screen_device)
@@ -1293,6 +1295,7 @@ void lua_engine::initialize()
 					return sol::make_object(sol(), &m.debugger());
 				},
 			"paused", sol::property(&running_machine::paused),
+			"samplerate", sol::property(&running_machine::sample_rate),
 			"devices", sol::property([this](running_machine &m) {
 					std::function<void(device_t &, sol::table)> tree;
 					sol::table table = sol().create_table();
@@ -1995,15 +1998,28 @@ void lua_engine::initialize()
  * sound:stop_recording() - end audio recording
  * sound:ui_mute(turn_off) - turns on/off UI sound
  * sound:system_mute() - turns on/off system sound
- * sound:attenuation - sound attenuation
+ * sound:samples() - get current frame's audio buffer contents in binary form as string
+ *
+ * sound.attenuation - sound attenuation
  */
+
 	sol().registry().new_usertype<sound_manager>("sound", "new", sol::no_constructor,
 			"start_recording", &sound_manager::start_recording,
 			"stop_recording", &sound_manager::stop_recording,
 			"ui_mute", &sound_manager::ui_mute,
 			"debugger_mute", &sound_manager::debugger_mute,
 			"system_mute", &sound_manager::system_mute,
+			"samples", [this](sound_manager &sm, sol::this_state s) {
+					lua_State *L = s;
+					luaL_Buffer buff;
+					s32 count = sm.sample_count() * 2 * 2; // 2 channels, 2 bytes per sample
+					s16 *ptr = (s16 *)luaL_buffinitsize(L, &buff, count);
+					sm.samples(ptr);
+					luaL_pushresultsize(&buff, count);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				},
 			"attenuation", sol::property(&sound_manager::attenuation, &sound_manager::set_attenuation));
+
 
 /*  input_manager library
  *
