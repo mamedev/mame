@@ -2507,7 +2507,20 @@ void lua_engine::initialize()
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
 			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
-			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },
+			"plugins", [this](mame_machine_manager &m) {
+				sol::table table = sol().create_table();
+				for (auto &curentry : m.plugins().plugins())
+				{
+					sol::table plugin_table = sol().create_table();
+					plugin_table["name"] = curentry.m_name;
+					plugin_table["description"] = curentry.m_description;
+					plugin_table["type"] = curentry.m_type;
+					plugin_table["directory"] = curentry.m_directory;
+					plugin_table["start"] = curentry.m_start;
+					table[curentry.m_name] = plugin_table;
+				}
+				return table;
+			},
 			"ui", &mame_machine_manager::ui);
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());
 	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());

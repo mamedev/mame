@@ -1666,7 +1666,8 @@ void cli_frontend::execute_commands(const char *exename)
 		std::string pluginpath;
 		while (iter.next(pluginpath))
 		{
-			plugin_opts.parse_json(pluginpath);
+			osd_subst_env(pluginpath, pluginpath);
+			plugin_opts.scan_directory(pluginpath, true);
 		}
 		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
