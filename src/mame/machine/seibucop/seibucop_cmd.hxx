@@ -532,6 +532,7 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 
 	offs = (offset & 3) * 4;
 
+	// TODO: upper bits of DMA params seems to go into sprite priority?
 	m_host_space->write_word(cop_regs[4] + offs + 0, m_host_space->read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f));
 	//m_host_space->write_word(cop_regs[4] + offs + 2,m_host_space->read_word(m_cop_sprite_dma_src+2 + offs));
 
