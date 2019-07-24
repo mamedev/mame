@@ -2611,8 +2611,8 @@ ROM_START( m5gstriks )
 	ROM_REGION( 0x000800, "nvram", 0 ) // RTC
 	ROM_LOAD( "bilso_b-14_gold_strike_v1.00_cvb_0200a_11-1562.p7a", 0x000000, 0x000800, CRC(8942fba8) SHA1(e9264a386bd2f3fbb3c53434b94314d29c32b6f9) ) // ST M48T02-150PC1 dumped as DS1642
 
-	ROM_REGION( 0x200, "pic", 0 ) // Protected
-	ROM_LOAD( "105_rgsg_pic16c54c.ic1", 0x000000, 0x200, NO_DUMP )
+	ROM_REGION( 0x407, "pic", 0 ) // Decapped
+	ROM_LOAD( "105_rgsg_pic16c54c.ic1", 0x000000, 0x407, CRC(2f910e58) SHA1(1d4857f25ec7db7da5ab29bc8be2f45aaacfca45))
 ROM_END
 
 ROM_START( m5gstrik11 )
