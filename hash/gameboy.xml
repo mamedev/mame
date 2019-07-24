@@ -140,11 +140,14 @@
 		<description>The Addams Family (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-AF-(UKV/ESP)"/>
+		<info name="serial" value="DMG-AF-UKV, DMG-AF-FAH, DMG-AF-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="addams family, the (europe) (en,fr,de).bin" size="131072" crc="28fa451e" sha1="2246dbdb6c58c77814cf034ae9224be8e73c5084"/>
+				<rom name="dmg-afx-0.u1" size="131072" crc="28fa451e" sha1="2246dbdb6c58c77814cf034ae9224be8e73c5084"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,9 +173,12 @@
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-AF-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="addams family, the (usa).bin" size="131072" crc="c170a732" sha1="8710ceecbe3e7ade67c0362cc3b455aceb67a90d"/>
+				<rom name="dmg-afe-0.u1" size="131072" crc="c170a732" sha1="8710ceecbe3e7ade67c0362cc3b455aceb67a90d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -313,10 +319,10 @@
 	</software>
 
 	<software name="aerostar">
-		<description>Aerostar (Euro, USA)</description>
+		<description>Aerostar (Euro, USA, Aus)</description>
 		<year>1991</year>
 		<publisher>Vic Tokai</publisher>
-		<info name="serial" value="DMG-AE-USA, DMG-AE-(ITA/AUS)"/>
+		<info name="serial" value="DMG-AE-USA, DMG-AE-ITA, DMG-AE-AUS"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- ITA cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -456,7 +462,7 @@
 		<description>Alfred Chicken (Euro)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
-		<info name="serial" value="DMG-C3-(FAH/UKV)"/>
+		<info name="serial" value="DMG-C3-FAH, DMG-C3-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -632,9 +638,12 @@
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="DMG-AL-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="altered space - a 3-d alien adventure (usa).bin" size="131072" crc="141675d3" sha1="ca586c59b2473a8bec2f0f37504cb74e3a1e4d11"/>
+				<rom name="dmg-ale-0.u1" size="131072" crc="141675d3" sha1="ca586c59b2473a8bec2f0f37504cb74e3a1e4d11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -904,7 +913,7 @@
 		<description>Arcade Classic No. 1 - Asteroids &amp; Missile Command (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-AMCE-USA, DMG-AMCP-(NOE/UKV)"/>
+		<info name="serial" value="DMG-AMCE-USA, DMG-AMCP-NOE, DMG-AMCP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- UKV & USA carts -->
 			<feature name="u1" value="U1 PRG" />
@@ -938,7 +947,7 @@
 		<description>Arcade Classic No. 3 - Galaga &amp; Galaxian (Euro)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-AGCP-(NOE/UKV)"/>
+		<info name="serial" value="DMG-AGCP-NOE, DMG-AGCP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -1089,8 +1098,12 @@
 		<info name="serial" value="DMG-AXOS-EUR"/>
 		<info name="alt_title" value="Astérix &amp; Obélix (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1" />
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="asterix &amp; obelix (europe) (en,es).bin" size="262144" crc="b1fd41d0" sha1="b6cd446962357d0f560a5c9fae4c917e039fbb77"/>
+				<rom name="dmg-ax▯s-0.u1" size="262144" crc="b1fd41d0" sha1="b6cd446962357d0f560a5c9fae4c917e039fbb77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1103,8 +1116,12 @@
 		<info name="serial" value="DMG-AXOP-FAH"/>
 		<info name="alt_title" value="Astérix &amp; Obélix (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="asterix &amp; obelix (europe) (fr,de).bin" size="262144" crc="5143e227" sha1="ebc68b180680c7037b151b9a1b511b681499ba30"/>
+				<rom name="dmg-axop-0.u1" size="262144" crc="5143e227" sha1="ebc68b180680c7037b151b9a1b511b681499ba30"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1113,11 +1130,14 @@
 		<description>Astérix (Euro)</description>
 		<year>1993</year>
 		<publisher>Infogrames</publisher>
-		<info name="serial" value="DMG-XA-FAH"/>
+		<info name="serial" value="DMG-XA-FAH, DMG-XA-NOE, DMG-XA-UKV"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" /> <!-- Also with [DMG MBC1B] and [DMG MBC1-B] -->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="asterix (europe) (en,fr,de,es,it).bin" size="131072" crc="097ffe2c" sha1="7d4ca6925826c0ffca3e3004479b5e9a5b6b311b"/>
+				<rom name="dmg-xax-0.u1" size="131072" crc="097ffe2c" sha1="7d4ca6925826c0ffca3e3004479b5e9a5b6b311b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1144,9 +1164,12 @@
 		<info name="release" value="19901012"/>
 		<info name="alt_title" value="アストロラビー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="astro rabby (japan).bin" size="65536" crc="61e48eef" sha1="3e53fd25f350c78a29e0642ee6de80208930d469"/>
+				<rom name="dmg-ara-0.u1" size="65536" crc="61e48eef" sha1="3e53fd25f350c78a29e0642ee6de80208930d469"/>
 			</dataarea>
 		</part>
 	</software>
