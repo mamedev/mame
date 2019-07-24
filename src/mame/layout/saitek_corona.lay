@@ -497,7 +497,7 @@
 <!-- lcd panel -->
 
 	<group name="lcd1">
-		<bounds x="15.5" y="0" width="22.5" height="14" />
+		<bounds x="15" y="0" width="23" height="14" />
 
 		<bezel name="digit0" element="digit"><bounds x="15" y="0" width="4" height="6" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="20" y="0" width="4" height="6" /></bezel>
@@ -586,7 +586,7 @@
 		<group ref="sb_board"><bounds x="10" y="10" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-1.5" y="10" width="10" height="80" /></group>
 
-		<group ref="lcd1"><bounds x="26.64" y="92" width="12.86" height="8" /></group>
+		<group ref="lcd1"><bounds x="26.36" y="92" width="13.14" height="8" /></group>
 		<group ref="lcd2"><bounds x="25.14" y="96.5714" width="3.42857" height="3.42857" /></group>
 		<bezel element="whitew"><bounds x="24.64" y="91.5" width="15.36" height="9" /><color alpha="0.125" /></bezel>
 

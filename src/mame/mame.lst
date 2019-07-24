@@ -11410,6 +11410,9 @@ leadang                         // (c) 1988 Seibu Kaihatsu
 popnrun                         // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
 popnruna                        // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
 
+@source:debut.cpp
+debutm
+
 @source:dec0.cpp
 automat                         // bootleg
 baddudes                        // EI (c) 1988 Data East USA (US)
