@@ -388,8 +388,8 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc00b, 0xc00b).r(FUNC(pwrview_state::err_r));
 	map(0xc00c, 0xc00d).ram();
 	map(0xc080, 0xc080).rw(FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
-	map(0xc088, 0xc088).w("crtc", FUNC(hd6845_device::address_w));
-	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
+	map(0xc088, 0xc088).w("crtc", FUNC(hd6845s_device::address_w));
+	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
@@ -413,7 +413,7 @@ void pwrview_state::pwrview(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960);  // clock unknown
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(XTAL(16'000'000)/16); // clocks unknown, fix above when found
@@ -431,7 +431,7 @@ void pwrview_state::pwrview(machine_config &config)
 
 	Z80SIO2(config, "sio", 4000000);
 
-	hd6845_device &crtc(HD6845(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
 	crtc.set_char_width(32);   /* ? */
 	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
 

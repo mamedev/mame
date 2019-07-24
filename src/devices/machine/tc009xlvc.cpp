@@ -14,186 +14,122 @@
 #include "emu.h"
 #include "machine/tc009xlvc.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
 DEFINE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device, "tc009xlvc", "Taito TC0091LVC")
 
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_r)
+void tc0091lvc_device::vram_w(offs_t offset, u8 data)
 {
-	return m_palette_ram[offset & 0x1ff];
-}
+	// TODO : offset 0x0000 - 0x3fff is not used?
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
-{
-	m_palette_ram[offset & 0x1ff] = data;
-
+	m_vram[offset] = data;
+	gfx(2)->mark_dirty(offset / 32);
+	if (offset >= 0x8000 && offset < 0x9000) // 0x8000-0x9000 bg 0
 	{
-		uint8_t r,g,b,i;
-		uint16_t pal;
-
-		pal = (m_palette_ram[offset & ~1]<<0) | (m_palette_ram[offset | 1]<<8);
-
-		i = (pal & 0x7000) >> 12;
-		b = (pal & 0x0f00) >> 8;
-		g = (pal & 0x00f0) >> 4;
-		r = (pal & 0x000f) >> 0;
-
-		r <<= 1;
-		g <<= 1;
-		b <<= 1;
-
-		/* TODO: correct? */
-		b |= ((i & 4) >> 2);
-		g |= ((i & 2) >> 1);
-		r |= (i & 1);
-
-		m_gfxdecode->palette().set_pen_color(offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
+		offset -= 0x8000;
+		bg_tilemap[0]->mark_tile_dirty(offset/2);
+	}
+	else if (offset >= 0x9000 && offset < 0xa000) // 0x9000-0xa000 bg 1
+	{
+		offset -= 0x9000;
+		bg_tilemap[1]->mark_tile_dirty(offset/2);
+	}
+	else if (offset >= 0xa000 && offset < 0xb000) // 0xa000-0xb000 text
+	{
+		offset -= 0xa000;
+		tx_tilemap->mark_tile_dirty(offset/2);
 	}
 }
 
-READ8_MEMBER(tc0091lvc_device::vregs_r)
+void tc0091lvc_device::vregs_w(offs_t offset, u8 data)
 {
-	return m_vregs[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::vregs_w)
-{
-	if((offset & 0xfc) == 0)
+	if ((offset & 0xfc) == 0)
 	{
-		bg0_tilemap->mark_all_dirty();
-		bg1_tilemap->mark_all_dirty();
+		bg_tilemap[0]->mark_all_dirty();
+		bg_tilemap[1]->mark_all_dirty();
 	}
 
 	m_vregs[offset] = data;
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_r)
+void tc0091lvc_device::ram_bank_w(offs_t offset, u8 data)
 {
-	return m_bitmap_ram[offset];
+	m_ram_bank[offset] = data;
+	m_bankdev[offset]->set_bank(m_ram_bank[offset]);
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_w)
+static const gfx_layout layout_8x8 =
 {
-	m_bitmap_ram[offset] = data;
+	8, 8,
+	RGN_FRAC(1,1),
+	4,
+	{ 8, 12, 0, 4 },
+	{ STEP4(3,-1), STEP4(4*4+3,-1) },
+	{ STEP8(0,4*4*2) },
+	8*8*4
+};
+
+static const gfx_layout layout_16x16 =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	4,
+	{ 8, 12, 0, 4 },
+	{ STEP4(3,-1), STEP4(4*4+3,-1), STEP4(8*8*4+3,-1), STEP4(8*8*4+4*4+3,-1) },
+	{ STEP8(0,4*4*2), STEP8(8*8*4*2,4*4*2) },
+	8*8*4*4
+};
+
+GFXDECODE_MEMBER(tc0091lvc_device::gfxinfo)
+	GFXDECODE_DEVICE("gfx",      0, layout_8x8,   0, 16)
+	GFXDECODE_DEVICE("gfx",      0, layout_16x16, 0, 16)
+	GFXDECODE_DEVICE_RAM("vram", 0, layout_8x8,   0, 16)
+GFXDECODE_END
+
+void tc0091lvc_device::cpu_map(address_map &map)
+{
+	// 0x0000-0x7fff ROM (0x0000-0x5fff Fixed, 0x6000-0x7fff Bankswitched)
+	map(0x0000, 0x5fff).r(FUNC(tc0091lvc_device::rom_r));
+	map(0x6000, 0x7fff).lr8("banked_rom_r", [this](offs_t offset) { return rom_r((m_rom_bank << 13) | (offset & 0x1fff)); });
+
+	// 0x8000-0xbfff External mappable area
+
+	// 0xc000-0xfdff RAM banks (Connected in VRAMs, 4KB boundary)
+	map(0xc000, 0xcfff).m(m_bankdev[0], FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xdfff).m(m_bankdev[1], FUNC(address_map_bank_device::amap8));
+	map(0xe000, 0xefff).m(m_bankdev[2], FUNC(address_map_bank_device::amap8));
+	map(0xf000, 0xfdff).m(m_bankdev[3], FUNC(address_map_bank_device::amap8));
+
+	// 0xfe00-0xffff Internal functions
 }
 
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_r)
+void tc0091lvc_device::banked_map(address_map &map)
 {
-	return m_pcg1_ram[offset];
+	map(0x010000, 0x01ffff).readonly().share("vram");
+	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
+	//       but we don't map it anywhere, so the first tiles are always blank at the moment.
+	map(0x014000, 0x01ffff).lw8("vram_w", [this](offs_t offset, u8 data) { vram_w(offset + 0x4000, data); });
+	map(0x040000, 0x05ffff).ram().share("bitmap_ram");
+	map(0x080000, 0x0801ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_w)
-{
-	m_pcg1_ram[offset] = data;
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0x4000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_r)
-{
-	return m_pcg2_ram[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_w)
-{
-	m_pcg2_ram[offset] = data;
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xc000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_r)
-{
-	return m_vram0[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_w)
-{
-	m_vram0[offset] = data;
-	bg0_tilemap->mark_tile_dirty(offset/2);
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0x8000) / 32);
-	tx_tilemap->mark_all_dirty();
-
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_r)
-{
-	return m_vram1[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_w)
-{
-	m_vram1[offset] = data;
-	bg1_tilemap->mark_tile_dirty(offset/2);
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0x9000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_r)
-{
-	return m_tvram[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_w)
-{
-	m_tvram[offset] = data;
-	tx_tilemap->mark_tile_dirty(offset/2);
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xa000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_spr_r)
-{
-	return m_sprram[offset];
-}
-
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
-{
-	m_sprram[offset] = data;
-	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xb000) / 32);
-	tx_tilemap->mark_all_dirty();
-}
-
-void tc0091lvc_device::tc0091lvc_map8(address_map &map)
-{
-	map(0x014000, 0x017fff).rw(FUNC(tc0091lvc_device::tc0091lvc_pcg1_r), FUNC(tc0091lvc_device::tc0091lvc_pcg1_w));
-	map(0x018000, 0x018fff).rw(FUNC(tc0091lvc_device::tc0091lvc_vram0_r), FUNC(tc0091lvc_device::tc0091lvc_vram0_w));
-	map(0x019000, 0x019fff).rw(FUNC(tc0091lvc_device::tc0091lvc_vram1_r), FUNC(tc0091lvc_device::tc0091lvc_vram1_w));
-	map(0x01a000, 0x01afff).rw(FUNC(tc0091lvc_device::tc0091lvc_tvram_r), FUNC(tc0091lvc_device::tc0091lvc_tvram_w));
-	map(0x01b000, 0x01bfff).rw(FUNC(tc0091lvc_device::tc0091lvc_spr_r), FUNC(tc0091lvc_device::tc0091lvc_spr_w));
-	map(0x01c000, 0x01ffff).rw(FUNC(tc0091lvc_device::tc0091lvc_pcg2_r), FUNC(tc0091lvc_device::tc0091lvc_pcg2_w));
-	map(0x040000, 0x05ffff).rw(FUNC(tc0091lvc_device::tc0091lvc_bitmap_r), FUNC(tc0091lvc_device::tc0091lvc_bitmap_w));
-	map(0x080000, 0x0801ff).rw(FUNC(tc0091lvc_device::tc0091lvc_paletteram_r), FUNC(tc0091lvc_device::tc0091lvc_paletteram_w));
-}
-
-tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TC0091LVC, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, address_map_constructor(FUNC(tc0091lvc_device::tc0091lvc_map8), this))
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, device_gfx_interface(mconfig, *this, gfxinfo, "palette")
+	, m_bankdev(*this, "bankdev_%u", 0U)
+	, m_vram(*this, "vram")
+	, m_bitmap_ram(*this, "bitmap_ram")
+	, m_rom(*this, DEVICE_SELF)
 {
 }
 
-TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg0_tile_info)
+template<unsigned Offset>
+TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tile_info)
 {
-	int attr = m_vram0[2 * tile_index + 1];
-	int code = m_vram0[2 * tile_index]
-			| ((attr & 0x03) << 8)
-			| ((m_vregs[(attr & 0xc) >> 2]) << 10);
-//          | (state->m_horshoes_gfxbank << 12);
-
-	SET_TILE_INFO_MEMBER(0,
-			code,
-			(attr & 0xf0) >> 4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
-{
-	int attr = m_vram1[2 * tile_index + 1];
-	int code = m_vram1[2 * tile_index]
+	const u16 attr = m_vram[Offset + (2 * tile_index) + 1];
+	const u16 code = m_vram[Offset + (2 * tile_index)]
 			| ((attr & 0x03) << 8)
 			| ((m_vregs[(attr & 0xc) >> 2]) << 10);
 //          | (state->m_horshoes_gfxbank << 12);
@@ -206,96 +142,80 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
 
 TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 {
-	int attr = m_tvram[2 * tile_index + 1];
-	uint16_t code = m_tvram[2 * tile_index]
+	const u16 attr = m_vram[0xa000 + (2 * tile_index) + 1];
+	const u16 code = m_vram[0xa000 + (2 * tile_index)]
 			| ((attr & 0x07) << 8);
 
-	SET_TILE_INFO_MEMBER(m_gfx_index,
+	SET_TILE_INFO_MEMBER(2,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
 }
 
 
-static const gfx_layout char_layout =
+void tc0091lvc_device::device_add_mconfig(machine_config &config)
 {
-	8, 8,
-	0x10000 / (8 * 4), // need to specify exact number because we create dynamically
-	4,
-	{ 8, 12, 0, 4 },
-	{ 3, 2, 1, 0, 19, 18, 17, 16},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
-};
+	for (int i = 0; i < 4; i++)
+	{
+		ADDRESS_MAP_BANK(config, m_bankdev[i]).set_map(&tc0091lvc_device::banked_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x1000);
+	}
+	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 0x100);
+}
+
+
+void tc0091lvc_device::device_post_load()
+{
+	for (int i = 0; i < 4; i++)
+		m_bankdev[i]->set_bank(m_ram_bank[i]);
+}
 
 
 void tc0091lvc_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
+	std::fill_n(&m_vram[0], m_vram.bytes(), 0);
+	std::fill_n(&m_bitmap_ram[0], m_bitmap_ram.bytes(), 0);
+	std::fill(std::begin(m_ram_bank), std::end(m_ram_bank), 0);
+	for (int i = 0; i < 4; i++)
+		m_bankdev[i]->set_bank(m_ram_bank[i]);
 
-	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
-	memset(m_vregs, 0, ARRAY_LENGTH(m_vregs));
-	memset(m_bitmap_ram, 0, ARRAY_LENGTH(m_bitmap_ram));
-	memset(m_pcg_ram, 0, ARRAY_LENGTH(m_pcg_ram));
-	memset(m_sprram_buffer, 0, ARRAY_LENGTH(m_sprram_buffer));
+	m_rom_bank = 0;
 
-	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
-	//       but we don't map it anywhere, so the first tiles are always blank at the moment.
-	m_pcg1_ram = m_pcg_ram + 0x4000;
-	m_pcg2_ram = m_pcg_ram + 0xc000;
-	m_vram0 = m_pcg_ram + 0x8000;
-	m_vram1 = m_pcg_ram + 0x9000;
-	m_tvram = m_pcg_ram + 0xa000;
-	m_sprram = m_pcg_ram + 0xb000;
+	m_vregs = make_unique_clear<u8[]>(0x100);
+	m_sprram_buffer = make_unique_clear<u8[]>(0x400);
 
-	tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	tx_tilemap    = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info), this),      TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	bg_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tile_info<0x8000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tile_info<0x9000>), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	tx_tilemap->set_transparent_pen(0);
-	bg0_tilemap->set_transparent_pen(0);
-	bg1_tilemap->set_transparent_pen(0);
+	bg_tilemap[0]->set_transparent_pen(0);
+	bg_tilemap[1]->set_transparent_pen(0);
 
 	tx_tilemap->set_scrolldx(-8, -8);
-	bg0_tilemap->set_scrolldx(28, -11);
-	bg1_tilemap->set_scrolldx(38, -21);
+	bg_tilemap[0]->set_scrolldx(28, -11);
+	bg_tilemap[1]->set_scrolldx(38, -21);
 
-	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
-			break;
-
-	//printf("m_gfx_index %d\n", m_gfx_index);
-
-	device_palette_interface &palette = m_gfxdecode->palette();
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(&palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
-}
-
-device_memory_interface::space_config_vector tc0091lvc_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
+	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_rom_bank));
+	save_pointer(NAME(m_vregs), 0x100);
+	save_pointer(NAME(m_sprram_buffer), 0x400);
 }
 
 
-void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip )
+void tc0091lvc_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 global_flip)
 {
-	gfx_element *gfx = m_gfxdecode->gfx(1);
-	int count;
-
-	for(count=0;count<0x3e7;count+=8)
+	for (int count = 0; count < 0x3e7; count += 8)
 	{
-		int x,y,spr_offs,col,fx,fy;
-
-		spr_offs = m_sprram_buffer[count+0]|(m_sprram_buffer[count+1]<<8);
-		x = m_sprram_buffer[count+4]|(m_sprram_buffer[count+5]<<8);
+		const u32 code = m_sprram_buffer[count + 0] | (m_sprram_buffer[count + 1] << 8);
+		int x = m_sprram_buffer[count + 4] | (m_sprram_buffer[count + 5] << 8);
 		if (x >= 320)
 			x -= 512;
-		y = m_sprram_buffer[count+6];
-		col = (m_sprram_buffer[count+2])&0x0f;
-		fx = m_sprram_buffer[count+3] & 0x1;
-		fy = m_sprram_buffer[count+3] & 0x2;
+		int y = m_sprram_buffer[count + 6];
+		const u32 col = (m_sprram_buffer[count + 2]) & 0x0f;
+		int fx = m_sprram_buffer[count + 3] & 0x1;
+		int fy = m_sprram_buffer[count + 3] & 0x2;
 
 		if (global_flip)
 		{
@@ -305,38 +225,32 @@ void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			fy = !fy;
 		}
 
-		gfx->prio_transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
+		gfx(1)->prio_transpen(bitmap, cliprect, code, col, fx, fy, x, y, screen.priority(), (col & 0x08) ? 0xaa : 0x00, 0);
 	}
 }
 
-uint32_t tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint32_t count;
-	int x,y;
-	uint8_t global_flip;
+	bitmap.fill(palette().black_pen(), cliprect);
 
-	bitmap.fill(m_gfxdecode->palette().black_pen(), cliprect);
-
-	if((m_vregs[4] & 0x20) == 0)
+	if ((m_vregs[4] & 0x20) == 0)
 		return 0;
 
-	global_flip = m_vregs[4] & 0x10;
+	const u8 global_flip = m_vregs[4] & 0x10;
 
-	if((m_vregs[4] & 0x7) == 7) // 8bpp bitmap enabled
+	if ((m_vregs[4] & 0x7) == 7) // 8bpp bitmap enabled
 	{
-		count = 0;
+		u32 count = 0;
 
-		for (y=0;y<256;y++)
+		for (int y = 0; y < 256; y++)
 		{
-			for (x=0;x<512;x++)
+			for (int x = 0; x < 512; x++)
 			{
-				int res_x, res_y;
+				const int res_x = (global_flip) ? 320 - x : x;
+				const int res_y = (global_flip) ? 256 - y : y;
 
-				res_x = (global_flip) ? 320-x : x;
-				res_y = (global_flip) ? 256-y : y;
-
-				if(screen.visible_area().contains(res_x, res_y))
-					bitmap.pix16(res_y, res_x) = m_gfxdecode->palette().pen(m_bitmap_ram[count]);
+				if (cliprect.contains(res_x, res_y))
+					bitmap.pix16(res_y, res_x) = palette().pen(m_bitmap_ram[count]);
 
 				count++;
 			}
@@ -344,43 +258,41 @@ uint32_t tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bi
 	}
 	else
 	{
-		int dx, dy;
-
 		machine().tilemap().set_flip_all(global_flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-		dx = m_bg0_scroll[0] | (m_bg0_scroll[1] << 8);
+		int dx = m_bg_scroll[0][0] | (m_bg_scroll[0][1] << 8);
 		if (global_flip) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; dx += 192; }
-		dy = m_bg0_scroll[2];
+		int dy = m_bg_scroll[0][2];
 
-		bg0_tilemap->set_scrollx(0, -dx);
-		bg0_tilemap->set_scrolly(0, -dy);
+		bg_tilemap[0]->set_scrollx(0, -dx);
+		bg_tilemap[0]->set_scrolly(0, -dy);
 
-		dx = m_bg1_scroll[0] | (m_bg1_scroll[1] << 8);
+		dx = m_bg_scroll[1][0] | (m_bg_scroll[1][1] << 8);
 		if (global_flip) { dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf; dx += 192; }
-		dy = m_bg1_scroll[2];
+		dy = m_bg_scroll[1][2];
 
-		bg1_tilemap->set_scrollx(0, -dx);
-		bg1_tilemap->set_scrolly(0, -dy);
+		bg_tilemap[1]->set_scrollx(0, -dx);
+		bg_tilemap[1]->set_scrolly(0, -dy);
 
 		tx_tilemap->set_scrollx(0, (global_flip) ? -192 : 0);
 
 		screen.priority().fill(0, cliprect);
-		bg1_tilemap->draw(screen, bitmap, cliprect, 0,0);
-		bg0_tilemap->draw(screen, bitmap, cliprect, 0,(m_vregs[4] & 0x8) ? 0 : 1);
+		bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, (m_vregs[4] & 0x8) ? 0 : 1);
 		draw_sprites(screen, bitmap, cliprect, global_flip);
-		tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
+		tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	return 0;
 }
 
 void tc0091lvc_device::screen_eof(void)
 {
-	memcpy(m_sprram_buffer,m_sprram,0x400);
-	m_bg0_scroll[0] = m_sprram_buffer[0x3f4];
-	m_bg0_scroll[1] = m_sprram_buffer[0x3f5];
-	m_bg0_scroll[2] = m_sprram_buffer[0x3f6];
+	std::copy_n(&m_vram[0xb000], 0x400, &m_sprram_buffer[0]);
+	m_bg_scroll[0][0] = m_sprram_buffer[0x3f4];
+	m_bg_scroll[0][1] = m_sprram_buffer[0x3f5];
+	m_bg_scroll[0][2] = m_sprram_buffer[0x3f6];
 
-	m_bg1_scroll[0] = m_sprram_buffer[0x3fc];
-	m_bg1_scroll[1] = m_sprram_buffer[0x3fd];
-	m_bg1_scroll[2] = m_sprram_buffer[0x3fe];
+	m_bg_scroll[1][0] = m_sprram_buffer[0x3fc];
+	m_bg_scroll[1][1] = m_sprram_buffer[0x3fd];
+	m_bg_scroll[1][2] = m_sprram_buffer[0x3fe];
 }

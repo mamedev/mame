@@ -37,26 +37,28 @@
 
 #include "netlist/nl_setup.h"
 
-#define PARAMS_7475_7477(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)    \
-		NET_CONNECT(name, C1C2, cC1C2)      \
-		NET_CONNECT(name, C3C4, cC3C4)      \
-		NET_CONNECT(name, D1,   cD1)        \
-		NET_CONNECT(name, D2,   cD2)        \
-		NET_CONNECT(name, D3,   cD3)        \
+#define PARAMS_7475_7477(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)               \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, C1C2, cC1C2)                                         \
+		NET_CONNECT(name, C3C4, cC3C4)                                         \
+		NET_CONNECT(name, D1,   cD1)                                           \
+		NET_CONNECT(name, D2,   cD2)                                           \
+		NET_CONNECT(name, D3,   cD3)                                           \
 		NET_CONNECT(name, D4,   cD4)
 
-#define TTL_7475(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)    \
-		NET_REGISTER_DEV(TTL_7475, name)    \
+#define TTL_7475(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)                       \
+		NET_REGISTER_DEV(TTL_7475, name)                                       \
 		PARAMS_7475_7477(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)
 
-#define TTL_7477(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)    \
-		NET_REGISTER_DEV(TTL_7477, name)    \
+#define TTL_7477(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)                       \
+		NET_REGISTER_DEV(TTL_7477, name)                                       \
 		PARAMS_7475_7477(name, cC1C2, cC3C4, cD1, cD2, cD3, cD4)
 
-#define TTL_7475_DIP(name)                      \
+#define TTL_7475_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7475_DIP, name)
 
-#define TTL_7477_DIP(name)                      \
+#define TTL_7477_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7477_DIP, name)
 
 #endif /* NLD_7475_H_ */

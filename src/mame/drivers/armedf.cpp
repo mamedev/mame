@@ -418,11 +418,9 @@ WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
  *
  *************************************/
 
-void armedf_state::terraf_map(address_map &map)
+void armedf_state::common_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x0603ff).ram().share("spriteram");
-	map(0x060400, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::nb1414m4_text_videoram_r), FUNC(armedf_state::nb1414m4_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
@@ -441,9 +439,16 @@ void armedf_state::terraf_map(address_map &map)
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv1_ack_w));
 }
 
+void armedf_state::terraf_map(address_map &map)
+{
+	common_map(map);
+	map(0x060000, 0x0603ff).ram().share("spriteram");
+	map(0x060400, 0x063fff).ram();
+}
+
 void armedf_state::kozure_map(address_map &map)
 {
-	terraf_map(map);
+	common_map(map);
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x063fff).ram();
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)

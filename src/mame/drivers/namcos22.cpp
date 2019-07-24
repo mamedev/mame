@@ -2855,9 +2855,9 @@ READ8_MEMBER(namcos22s_state::mcu_port6_r)
 }
 
 template <int Channel>
-u16 namcos22s_state::mcu_adc_r(offs_t offset)
+u16 namcos22s_state::mcu_adc_r()
 {
-	return m_adc_ports[offset].read_safe(0);
+	return m_adc_ports[Channel].read_safe(0);
 }
 
 void namcos22s_state::mcu_program(address_map &map)

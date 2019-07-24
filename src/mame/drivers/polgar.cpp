@@ -2,18 +2,23 @@
 // copyright-holders:Sandro Ronco
 /**************************************************************************************************
 
-    Mephisto Polgar and RISC
+Mephisto Polgar and RISC
+
+The chess engine in Mephisto Risc is also compatible with Tasc's The ChessMachine.
+
+TODO:
+- Mephisto Risc maincpu is more likely 5MHz, but LCD doesn't like it
 
 **************************************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
-#include "cpu/arm/arm.h"
+#include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
-#include "machine/ram.h"
+#include "machine/chessmachine.h"
 #include "video/hd44780.h"
 #include "speaker.h"
 
@@ -44,34 +49,22 @@ class mephisto_risc_state : public mephisto_polgar_state
 public:
 	mephisto_risc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mephisto_polgar_state(mconfig, type, tag)
-		, m_subcpu(*this, "subcpu")
+		, m_chessm(*this, "chessm")
 		, m_rombank(*this, "rombank")
-		, m_ram(*this, "ram")
 	{ }
 
-	DECLARE_READ8_MEMBER(latch0_r);
-	DECLARE_WRITE8_MEMBER(latch0_w);
-	DECLARE_WRITE8_MEMBER(latch1_w);
-	DECLARE_READ8_MEMBER(latch1_r);
-	DECLARE_READ32_MEMBER(disable_boot_rom_r);
+	DECLARE_READ8_MEMBER(chessm_r);
+	DECLARE_WRITE8_MEMBER(chessm_w);
 
 	void mrisc(machine_config &config);
-	void mrisc_arm_mem(address_map &map);
 	void mrisc_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void remove_boot_rom();
-	TIMER_CALLBACK_MEMBER(disable_boot_rom);
 
 private:
-	required_device<arm_cpu_device> m_subcpu;
+	required_device<chessmachine_device> m_chessm;
 	required_memory_bank m_rombank;
-	required_device<ram_device> m_ram;
 	uint8_t m_bank;
-	uint8_t m_com_latch0;
-	uint8_t m_com_latch1;
-	emu_timer* m_disable_boot_rom_timer;
 };
 
 class mephisto_milano_state : public mephisto_polgar_state
@@ -146,47 +139,16 @@ void mephisto_polgar_state::polgar_mem(address_map &map)
 }
 
 
-WRITE8_MEMBER(mephisto_risc_state::latch1_w)
+READ8_MEMBER(mephisto_risc_state::chessm_r)
 {
-	m_com_latch1 = data;
-	m_subcpu->set_input_line(ARM_FIRQ_LINE, ASSERT_LINE);
-	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-	if (data & 0x02)
-		m_subcpu->space(AS_PROGRAM).install_rom(0x00000000, 0x0000007f, memregion("arm_bootstrap")->base());
+	return m_chessm->data_r();
 }
 
-
-READ8_MEMBER(mephisto_risc_state::latch1_r)
+WRITE8_MEMBER(mephisto_risc_state::chessm_w)
 {
-	return m_com_latch1;
-}
-
-WRITE8_MEMBER(mephisto_risc_state::latch0_w)
-{
-	m_subcpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
-	m_com_latch0 = data;
-}
-
-READ8_MEMBER(mephisto_risc_state::latch0_r)
-{
-	return m_com_latch0;
-}
-
-READ32_MEMBER(mephisto_risc_state::disable_boot_rom_r)
-{
-	m_disable_boot_rom_timer->adjust(m_subcpu->cycles_to_attotime(10));
-	return space.unmap();
-}
-
-void mephisto_risc_state::remove_boot_rom()
-{
-	m_subcpu->space(AS_PROGRAM).install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
-}
-
-
-TIMER_CALLBACK_MEMBER(mephisto_risc_state::disable_boot_rom)
-{
-	remove_boot_rom();
+	m_chessm->data0_w(data & 1);
+	m_chessm->data1_w(data & 0x80);
+	m_chessm->reset_w(data & 2);
 }
 
 void mephisto_risc_state::mrisc_mem(address_map &map)
@@ -199,19 +161,11 @@ void mephisto_risc_state::mrisc_mem(address_map &map)
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));
-	map(0x3800, 0x3800).w(FUNC(mephisto_risc_state::latch1_w));
-	map(0x3c00, 0x3c00).r(FUNC(mephisto_risc_state::latch0_r));
+	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
+	map(0x3800, 0x3800).w(FUNC(mephisto_risc_state::chessm_w));
+	map(0x3c00, 0x3c00).r(FUNC(mephisto_risc_state::chessm_r));
 	map(0x4000, 0x7fff).rom();
 	map(0x8000, 0xffff).bankr("rombank");
-}
-
-
-void mephisto_risc_state::mrisc_arm_mem(address_map &map)
-{
-	map(0x00000000, 0x000fffff).ram();
-	map(0x00400000, 0x007fffff).rw(FUNC(mephisto_risc_state::latch1_r), FUNC(mephisto_risc_state::latch0_w)).umask32(0x000000ff);
-	map(0x01800000, 0x01800003).r(FUNC(mephisto_risc_state::disable_boot_rom_r));
 }
 
 
@@ -316,24 +270,8 @@ INPUT_PORTS_END
 
 void mephisto_risc_state::machine_start()
 {
-	m_disable_boot_rom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_risc_state::disable_boot_rom), this));
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x8000);
-
 	save_item(NAME(m_bank));
-	save_item(NAME(m_com_latch0));
-	save_item(NAME(m_com_latch1));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(mephisto_risc_state::remove_boot_rom), this));
-}
-
-void mephisto_risc_state::machine_reset()
-{
-	m_com_latch0 = 0;
-	m_com_latch1 = 0;
-	m_subcpu->space(AS_PROGRAM).install_ram(0x00, m_ram->size() - 1, m_ram->pointer());
-
-	// ARM bootstrap code
-	m_subcpu->space(AS_PROGRAM).install_rom(0x00000000, 0x0000007f, memregion("arm_bootstrap")->base());
 }
 
 void mephisto_milano_state::machine_start()
@@ -386,14 +324,11 @@ void mephisto_polgar_state::polgar10(machine_config &config)
 
 void mephisto_risc_state::mrisc(machine_config &config)
 {
-	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(10'000'000) / 4)); // G65SC02
+	m65sc02_device &maincpu(M65SC02(config, "maincpu", XTAL(10'000'000) / 4)); // G65SC02P-4
 	maincpu.set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_mem);
 	maincpu.set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(XTAL(10'000'000) / (1 << 14)));
 
-	ARM(config, m_subcpu, XTAL(14'000'000)); // VY86C010
-	m_subcpu->set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_arm_mem);
-	m_subcpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
-
+	CHESSMACHINE(config, m_chessm, 14'000'000); // Tasc ChessMachine EC PCB, Mephisto manual says 14MHz (no XTAL)
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -406,8 +341,6 @@ void mephisto_risc_state::mrisc(machine_config &config)
 	outlatch.q_out_cb<4>().set_output("led104");
 	outlatch.q_out_cb<5>().set_output("led105");
 	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
-
-	RAM(config, "ram").set_default_size("1M");
 
 	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
@@ -452,24 +385,16 @@ ROM_END
 
 ROM_START(mrisc)
 	ROM_REGION(0x20000, "maincpu", 0)
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1c74f, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L ver. HG-021 03-04-92
 	ROM_LOAD("meph-risci-v1-2.bin", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5))
-
-	ROM_REGION32_LE(0x80, "arm_bootstrap", 0)
-	ROM_LOAD32_BYTE( "74s288.1", 0x00, 0x20, CRC(284114e2) SHA1(df4037536d505d7240bb1d70dc58f59a34ab77b4) )
-	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, CRC(9f239c75) SHA1(aafaf30dac90f36b01f9ee89903649fc4ea0480d) )
-	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, CRC(0455360b) SHA1(f1486142330f2c39a4d6c479646030d31443d1c8) )
-	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, CRC(c7c9aba8) SHA1(cbb5b12b5917e36679d45bcbc36ea9285223a75d) )
 ROM_END
 
 ROM_START(mrisc2)
 	ROM_REGION(0x20000, "maincpu", 0)
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1cb7f, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L ver. 2.31 22-07-93, world champion Madrid 1992
 	ROM_LOAD("meph-riscii-v2.bin", 0x00000, 0x20000, CRC(9ecf9cd3) SHA1(7bfc628183037a172242c9589f15aca218d8fb12))
-
-	ROM_REGION32_LE(0x80, "arm_bootstrap", 0)
-	ROM_LOAD32_BYTE( "74s288.1", 0x00, 0x20, CRC(284114e2) SHA1(df4037536d505d7240bb1d70dc58f59a34ab77b4) )
-	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, CRC(9f239c75) SHA1(aafaf30dac90f36b01f9ee89903649fc4ea0480d) )
-	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, CRC(0455360b) SHA1(f1486142330f2c39a4d6c479646030d31443d1c8) )
-	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, CRC(c7c9aba8) SHA1(cbb5b12b5917e36679d45bcbc36ea9285223a75d) )
 ROM_END
 
 ROM_START(academy)

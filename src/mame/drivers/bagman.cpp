@@ -133,14 +133,11 @@ void bagman_state::main_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram();
 	map(0x9000, 0x93ff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram"); // Includes spriteram
 	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
 	map(0xa000, 0xa000).r(FUNC(bagman_state::pal16r6_r));
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xc000, 0xffff).rom(); /* Super Bagman only */
-	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
-									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
 	map(0xa800, 0xa807).w(FUNC(bagman_state::ls259_w)); /* TMS5110 driving state machine */
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb800, 0xb800).nopr();                             /* looks like watchdog from schematics */
@@ -158,10 +155,7 @@ void bagman_state::pickin_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x7000, 0x77ff).ram();
 	map(0x8800, 0x8bff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram");
-	map(0x9800, 0x981f).writeonly().share("spriteram"); /* hidden portion of color RAM */
-									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
+	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram"); // Includes spriteram
 	map(0x9c00, 0x9fff).nopw();    /* written to, but unused */
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).portr("DSW");
@@ -249,11 +243,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pickin )
 	PORT_INCLUDE( bagman )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+
+	PORT_MODIFY ("P2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
 	PORT_DIPSETTING(    0x01, "1C/1C 1C/2C 1C/6C 1C/14C" )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -262,10 +268,16 @@ static INPUT_PORTS_START( pickin )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x20, "30000" )
+	PORT_DIPSETTING(    0x00, "40000" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x40, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) /* Cabinet type set through edge connector, not dip switch (verified on real pcb) */
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botanicf )

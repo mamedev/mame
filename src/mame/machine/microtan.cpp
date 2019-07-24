@@ -8,9 +8,9 @@
  *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
- *  for his site http:://www.geo255.redhotant.com
+ *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
- *  for his site http://www.ifrance.com/oric/microtan.html
+ *  for his site http://oric.free.fr/microtan.html
  *
  *****************************************************************************/
 
@@ -119,18 +119,6 @@ static const char keyboard[8][9][8] = {
 	},
 };
 
-uint8_t microtan_state::read_dsw()
-{
-	switch(machine().phase())
-	{
-	case machine_phase::RESET:
-	case machine_phase::RUNNING:
-		return ioport("DSW")->read();
-
-	default:
-		return 0x00;
-	}
-}
 
 /**************************************************************
  * VIA callback functions for VIA #0
@@ -192,9 +180,6 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-	case TIMER_READ_CASSETTE:
-		read_cassette(ptr, param);
-		break;
 	case TIMER_PULSE_NMI:
 		pulse_nmi(ptr, param);
 		break;
@@ -204,7 +189,7 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(microtan_state::read_cassette)
+TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::read_cassette)
 {
 	double level = m_cassette->input();
 
@@ -291,7 +276,6 @@ void microtan_state::store_key(int key)
 INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
 {
 	int mod, row, col, chg, newvar;
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
 	if( m_repeat )
 	{
@@ -303,14 +287,13 @@ INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
 		m_repeat = m_repeater;
 	}
 
-
 	row = 9;
-	newvar = ioport("ROW8")->read();
+	newvar = m_io_keyboard[8]->read();
 	chg = m_keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		newvar = ioport(keynames[row - 1])->read();
+		newvar = m_io_keyboard[row - 1]->read();
 		chg = m_keyrows[--row] ^ newvar;
 	}
 	if (!chg)
@@ -380,7 +363,6 @@ INTERRUPT_GEN_MEMBER(microtan_state::interrupt)
 void microtan_state::init_microtan()
 {
 	uint8_t *dst = memregion("gfx2")->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -418,21 +400,7 @@ void microtan_state::init_microtan()
 		dst += 4;
 	}
 
-	switch (read_dsw() & 3)
-	{
-		case 0:  // 1K only :)
-			space.nop_readwrite(0x0400, 0xbbff);
-			break;
-		case 1:  // +7K TANEX
-			space.install_ram(0x0400, 0x1fff,nullptr);
-			space.nop_readwrite(0x2000, 0xbbff);
-			break;
-		default: // +7K TANEX + 40K TANRAM
-			space.install_ram(0x0400, 0xbbff, nullptr);
-			break;
-	}
 
-	m_read_cassette_timer = timer_alloc(TIMER_READ_CASSETTE);
 	m_pulse_nmi_timer = timer_alloc(TIMER_PULSE_NMI);
 
 	m_via6522[0]->write_ca1(1);
@@ -467,12 +435,24 @@ void microtan_state::machine_start()
 
 void microtan_state::machine_reset()
 {
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	switch (ioport("DSW")->read() & 3)
+	{
+		case 0:  // 1K only :)
+			space.nop_readwrite(0x0400, 0xbbff);
+			break;
+		case 1:  // +7K TANEX
+			space.install_ram(0x0400, 0x1fff,nullptr);
+			space.nop_readwrite(0x2000, 0xbbff);
+			break;
+		default: // +7K TANEX + 40K TANRAM
+			space.install_ram(0x0400, 0xbbff, nullptr);
+			break;
+	}
 
 	for (int i = 1; i < 10;  i++)
-	{
-		m_keyrows[i] = ioport(keynames[i-1])->read();
-	}
+		m_keyrows[i] = m_io_keyboard[i-1]->read();
+
 	m_led = BIT(~m_keyrows[3], 7);
 }
 
@@ -661,20 +641,19 @@ image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char
 
 void microtan_state::set_cpu_regs(const uint8_t *snapshot_buff, int base)
 {
-	logerror("snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
+	logerror("snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X\n",
 		snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
 		snapshot_buff[base+4], snapshot_buff[base+5], snapshot_buff[base+6]);
-	m_maincpu->set_state_int(M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]);
+	m_maincpu->set_state_int(M6502_PC, snapshot_buff[base+0] + (snapshot_buff[base+1] << 8));
 	m_maincpu->set_state_int(M6502_P, snapshot_buff[base+2]);
 	m_maincpu->set_state_int(M6502_A, snapshot_buff[base+3]);
 	m_maincpu->set_state_int(M6502_X, snapshot_buff[base+4]);
 	m_maincpu->set_state_int(M6502_Y, snapshot_buff[base+5]);
-	m_maincpu->set_state_int(M6502_S, snapshot_buff[base+6]);
+	m_maincpu->set_state_int(M6502_S, snapshot_buff[base+6] + 0x100);
 }
 
 void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 {
-	uint8_t *RAM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* check for .DMP file format */
@@ -685,11 +664,12 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 		 * 64 bytes of chunky graphics bits (first byte bit is for character at 0200, bit 1=0201, etc)
 		 * 7 bytes of CPU registers (PCL, PCH, PSW, A, IX, IY, SP)
 		 */
-		logerror("snapshot_copy: magic size %d found, assuming *.DMP format\n", snapshot_size);
 
 		int base = 0;
 		/* 8K of RAM from 0000 to 1fff */
-		memcpy(RAM, &snapshot_buff[base], 8192);
+		for (int i = 0; i < 0x2000; i++)
+			space.write_byte(i, snapshot_buff[base + i]);
+
 		base += 8192;
 		/* 64 bytes of chunky graphics info */
 		for (int i = 0; i < 32*16; i++)
@@ -706,9 +686,9 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 		 *  2 bytes: RAM size
 		 *  n bytes: RAM (0000 to RAM Size)
 		 * 16 bytes: 1st 6522 (0xbfc0 to 0xbfcf)
-		 * 16 bytes: 2ns 6522 (0xbfe0 to 0xbfef)
+		 * 16 bytes: 2nd 6522 (0xbfe0 to 0xbfef)
 		 * 16 bytes: Microtan IO (0xbff0 to 0xbfff)
-		 *  1 byte : Invaders sound (0xbc04)
+		 *  1 byte : Space Invasion sound (0xbc04)
 		 *  1 byte : Chunky graphics state (0=off, 1=on)
 		 * 16 bytes: 1st AY8910 registers
 		 * 16 bytes: 2nd AY8910 registers
@@ -722,25 +702,24 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 			return;
 		}
 
-		logerror("snapshot_copy: size %d found, assuming *.M65 format\n", snapshot_size);
 		int base = 4;
-		memcpy(RAM, &snapshot_buff[base], snapshot_buff[2] + 256 * snapshot_buff[3] + 1);
+		for (int i = 0; i < snapshot_buff[2] + 256 * snapshot_buff[3] + 1; i++)
+			space.write_byte(i, snapshot_buff[base + i]);
 		base += ramend + 1;
 
 		/* first set of VIA6522 registers */
 		for (int i = 0; i < 16; i++ )
-			m_via6522[0]->write(i, snapshot_buff[base++]);
+			space.write_byte(0xbfc0 + i, snapshot_buff[base++]);
 
 		/* second set of VIA6522 registers */
 		for (int i = 0; i < 16; i++ )
-			m_via6522[1]->write(i, snapshot_buff[base++]);
+			space.write_byte(0xbfe0 + i, snapshot_buff[base++]);
 
 		/* microtan IO bff0-bfff */
 		for (int i = 0; i < 16; i++ )
 		{
-			RAM[0xbff0+i] = snapshot_buff[base++];
 			if (i < 4)
-				bffx_w(space, i, RAM[0xbff0+i]);
+				bffx_w(space, i, snapshot_buff[base++]);
 		}
 
 		sound_w(space, 0, snapshot_buff[base++]);
@@ -749,15 +728,15 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 		/* first set of AY8910 registers */
 		for (int i = 0; i < 16; i++ )
 		{
-			m_ay8910[0]->address_w(i);
-			m_ay8910[0]->data_w(snapshot_buff[base++]);
+			space.write_byte(0xbc00, i);
+			space.write_byte(0xbc01, snapshot_buff[base++]);
 		}
 
 		/* second set of AY8910 registers */
 		for (int i = 0; i < 16; i++ )
 		{
-			m_ay8910[0]->address_w(i);
-			m_ay8910[0]->data_w(snapshot_buff[base++]);
+			space.write_byte(0xbc02, i);
+			space.write_byte(0xbc03, snapshot_buff[base++]);
 		}
 
 		for (int i = 0; i < 32*16; i++)

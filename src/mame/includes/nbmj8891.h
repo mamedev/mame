@@ -63,7 +63,6 @@ public:
 	void init_pairsnb();
 	void init_mjnanpas();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_outcoin_flag_r);
 
 private:

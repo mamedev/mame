@@ -418,7 +418,7 @@ public:
 	DECLARE_VIDEO_START( amiga_aga );
 	void amiga_palette(palette_device &palette) const;
 
-	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
@@ -630,7 +630,7 @@ private:
 	void fetch_bitplane_data(int plane);
 	int update_ham(int newpix);
 	void update_display_window();
-	void render_scanline(bitmap_ind16 &bitmap, int scanline);
+	void render_scanline(bitmap_rgb32 &bitmap, int scanline);
 
 	// AGA video helpers
 	void aga_palette_write(int color_reg, uint16_t data);
@@ -699,8 +699,7 @@ private:
 	bool m_diwhigh_valid;
 
 	bool m_previous_lof;
-	bitmap_ind16 m_flickerfixer;
-	bitmap_ind32 m_flickerfixer32;
+	bitmap_rgb32 m_flickerfixer;
 
 	uint16_t m_rx_shift;
 	uint16_t m_tx_shift;

@@ -672,7 +672,7 @@ WRITE8_MEMBER( isa8_hercules_device::mode_control_w )
 		m_update_row_type = -1;
 	}
 
-	m_crtc->set_clock( m_mode_control & 0x02 ? MDA_CLOCK / 16 : MDA_CLOCK / 9 );
+	m_crtc->set_unscaled_clock( MDA_CLOCK / (m_mode_control & 0x02 ? 16 : 9) );
 	m_crtc->set_hpixels_per_column( m_mode_control & 0x02 ? 16 : 9 );
 }
 

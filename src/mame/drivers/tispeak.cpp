@@ -405,6 +405,7 @@ K28 modules:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "machine/timer.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
 #include "softlist.h"
@@ -441,8 +442,6 @@ public:
 		m_ol_out(*this, "ol%u", 1U)
 	{ }
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
-
 	void init_snspell();
 	void init_tntell();
 	void init_lantutor();
@@ -465,8 +464,7 @@ public:
 
 private:
 	virtual void power_off() override;
-	void prepare_display();
-	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
+	void update_display();
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
 	DECLARE_WRITE16_MEMBER(snmath_write_o);
@@ -479,7 +477,7 @@ private:
 	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
 
-	void k28_prepare_display(u8 old, u8 data);
+	void k28_update_display(u8 old, u8 data);
 	DECLARE_READ8_MEMBER(k28_read_k);
 	DECLARE_WRITE16_MEMBER(k28_write_o);
 	DECLARE_WRITE16_MEMBER(k28_write_r);
@@ -588,11 +586,10 @@ void tispeak_state::power_off()
 	m_tms5100->reset();
 }
 
-void tispeak_state::prepare_display()
+void tispeak_state::update_display()
 {
-	u16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
-	set_display_segmask(0x21ff, 0x3fff);
-	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
+	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
+	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
@@ -606,7 +603,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	// other bits: MCU internal use
 	m_r = m_inp_mux = data;
 	m_grid = data & 0x81ff;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
@@ -615,13 +612,13 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// note: lantutor and snread VFD has an accent triangle instead of DP, and no AP
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
 	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tispeak_state::snspell_read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[8]->read() | read_inputs(8);
+	return m_inputs[8]->read() | read_inputs(8);
 }
 
 
@@ -632,7 +629,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 	// reorder opla to led14seg, plus DP as d14 and CT as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
 	m_plate = bitswap<16>(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
-	prepare_display();
+	update_display();
 }
 
 
@@ -643,7 +640,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
 	m_grid = data & 0xa1ff;
-	prepare_display();
+	update_display();
 }
 
 
@@ -675,7 +672,7 @@ READ8_MEMBER(tispeak_state::snspellc_read_k)
 	u8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
 
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return k4 | m_inp_matrix[9]->read() | read_inputs(9);
+	return k4 | m_inputs[9]->read() | read_inputs(9);
 }
 
 
@@ -706,7 +703,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// external module, the game continues.
 
 	// pick overlay code from machine config, see comment section above for reference
-	m_overlay = m_inp_matrix[10]->read();
+	m_overlay = m_inputs[10]->read();
 
 	// try to get it from (external) layout
 	if (m_overlay == 0x20)
@@ -731,7 +728,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 
 // k28 specific
 
-void tispeak_state::k28_prepare_display(u8 old, u8 data)
+void tispeak_state::k28_update_display(u8 old, u8 data)
 {
 	// ?
 }
@@ -753,7 +750,7 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 		power_off();
 
 	// R7-R10: LCD data
-	k28_prepare_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
+	k28_update_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
 	m_r = r;
 }
 
@@ -776,19 +773,6 @@ READ8_MEMBER(tispeak_state::k28_read_k)
   Inputs
 
 ***************************************************************************/
-
-INPUT_CHANGED_MEMBER(tispeak_state::power_button)
-{
-	int on = (int)(uintptr_t)param;
-
-	if (on && !m_power_on)
-	{
-		m_power_on = true;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else if (!on && m_power_on)
-		power_off();
-}
 
 static INPUT_PORTS_START( snspell )
 	PORT_START("IN.0") // R0
@@ -1319,7 +1303,9 @@ void tispeak_state::snmath(machine_config &config)
 	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
 	m_maincpu->write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0x21ff, 0x3fff);
 	config.set_default_layout(layout_snmath);
 
 	/* sound hardware */
@@ -1460,7 +1446,6 @@ void tispeak_state::vocaid(machine_config &config)
 	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
 	config.set_default_layout(layout_tntell);
 
@@ -1492,7 +1477,6 @@ void tispeak_state::k28m2(machine_config &config)
 	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
 	m_maincpu->r().set(FUNC(tispeak_state::k28_write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_k28m2);
 
 	/* sound hardware */

@@ -62,9 +62,34 @@
     * Expose power fuse failure.
 
 ***************************************************************************/
+/*
+ * References:
+ *
+ *   http://bitsavers.org/pdf/ibm/pc/at/6183355_PC_AT_Technical_Reference_Mar86.pdf
+ *   http://bitsavers.org/pdf/ibm/pc/ps2/84X1508_PS2_Model_80_Technical_Reference_Apr87.pdf
+ *   http://halicery.com/Hardware/Intel%208042%20and%208048/index.html
+ *   https://web.archive.org/web/20180124085559/http://computer-engineering.org/ps2protocol
+ *
+ * The Intel UPI-41AH/42AH datasheet identifies the following variants:
+ *
+ *   Device  Firmware              Application          Ports
+ *   8242PC  Phoenix Technologies  AT, PS/2, EISA       kbd+aux
+ *   8242BB  IBM                   AT, PS/2, EISA, PCI  kbd+aux
+ *   8242WA  Award Software        AT                   kbd
+ *   8242WB  Award Software        AT                   kbd+aux
+ *
+ */
 
 #include "emu.h"
 #include "at_keybc.h"
+
+#define LOG_GENERAL (1U << 0)
+#define LOG_COMMAND (1U << 1)
+#define LOG_STATUS  (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL|LOG_COMMAND)
+
+#include "logmacro.h"
 
 namespace {
 
@@ -80,7 +105,10 @@ ROM_END
 
 ROM_START(ps2_kbc)
 	ROM_REGION(0x0800, "mcu", 0)
-	ROM_LOAD("72x8455.zm82", 0x0000, 0x0800, CRC(7da223d3) SHA1(54c52ff6c6a2310f79b2c7e6d1259be9de868f0e))
+	ROM_SYSTEM_BIOS(0, "ibm", "IBM 1987") // IBM PS/2 Model 50
+	ROMX_LOAD("72x8455.zm82", 0x0000, 0x0800, CRC(7da223d3) SHA1(54c52ff6c6a2310f79b2c7e6d1259be9de868f0e), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "compaq", "Compaq 1987") // Compaq Portable 486
+	ROMX_LOAD("128251-001.u3", 0x0000, 0x0800, CRC(da968f1e) SHA1(ac45a4d0f30b046ada300f1d105bcf0fb2db318a), ROM_BIOS(1))
 ROM_END
 
 INPUT_PORTS_START(at_kbc)
@@ -112,21 +140,128 @@ DEFINE_DEVICE_TYPE(PS2_KEYBOARD_CONTROLLER, ps2_keyboard_controller_device, "ps2
 
 uint8_t at_kbc_device_base::data_r()
 {
-	return m_mcu->upi41_master_r(machine().dummy_space(), 0U);
+	u8 const data = m_mcu->upi41_master_r(machine().dummy_space(), 0U);
+	LOG("data_r 0x%02x (%s)\n", data, machine().describe_context());
+	return data;
 }
 
 uint8_t at_kbc_device_base::status_r()
 {
-	return m_mcu->upi41_master_r(machine().dummy_space(), 1U);
+	u8 const data = m_mcu->upi41_master_r(machine().dummy_space(), 1U);
+	LOGMASKED(LOG_STATUS, "status_r 0x%02x%s%s%s%s%s%s%s%s (%s)\n", data,
+		BIT(data, 7) ? " PER" : "", BIT(data, 6) ? " RTO" : "",
+		BIT(data, 5) ? " TTO" : "", BIT(data, 4) ? "" : " INH",
+		BIT(data, 3) ? " CMD" : "", BIT(data, 2) ? " SYS" : "",
+		BIT(data, 1) ? " IBF" : "", BIT(data, 0) ? " OBF" : "",
+		machine().describe_context());
+	return data;
 }
 
 void at_kbc_device_base::data_w(uint8_t data)
 {
+	LOG("data_w 0x%02x (%s)\n", data, machine().describe_context());
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::write_data), this), unsigned(data));
 }
 
 void at_kbc_device_base::command_w(uint8_t data)
 {
+	if (VERBOSE & LOG_COMMAND)
+	{
+		switch (data)
+		{
+		case 0x00: case 0x01: case 0x02: case 0x03:
+		case 0x04: case 0x05: case 0x06: case 0x07:
+		case 0x08: case 0x09: case 0x0a: case 0x0b:
+		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+		case 0x10: case 0x11: case 0x12: case 0x13:
+		case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x18: case 0x19: case 0x1a: case 0x1b:
+		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+			LOGMASKED(LOG_COMMAND, "read controller ram indirect 0x%02x (%s)\n", data & 0x3f, machine().describe_context());
+			break;
+
+		case 0x20: LOGMASKED(LOG_COMMAND, "read command byte (%s)\n", machine().describe_context()); break;
+
+				   case 0x21: case 0x22: case 0x23:
+		case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x28: case 0x29: case 0x2a: case 0x2b:
+		case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x38: case 0x39: case 0x3a: case 0x3b:
+		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+			LOGMASKED(LOG_COMMAND, "read controller ram offset 0x%02x (%s)\n", data & 0x3f, machine().describe_context());
+			break;
+
+		case 0x40: case 0x41: case 0x42: case 0x43:
+		case 0x44: case 0x45: case 0x46: case 0x47:
+		case 0x48: case 0x49: case 0x4a: case 0x4b:
+		case 0x4c: case 0x4d: case 0x4e: case 0x4f:
+		case 0x50: case 0x51: case 0x52: case 0x53:
+		case 0x54: case 0x55: case 0x56: case 0x57:
+		case 0x58: case 0x59: case 0x5a: case 0x5b:
+		case 0x5c: case 0x5d: case 0x5e: case 0x5f:
+			LOGMASKED(LOG_COMMAND, "write controller ram indirect 0x%02x (%s)\n", data & 0x3f, machine().describe_context());
+			break;
+
+		case 0x60: LOGMASKED(LOG_COMMAND, "write command byte (%s)\n", machine().describe_context()); break;
+
+				   case 0x61: case 0x62: case 0x63:
+		case 0x64: case 0x65: case 0x66: case 0x67:
+		case 0x68: case 0x69: case 0x6a: case 0x6b:
+		case 0x6c: case 0x6d: case 0x6e: case 0x6f:
+		case 0x70: case 0x71: case 0x72: case 0x73:
+		case 0x74: case 0x75: case 0x76: case 0x77:
+		case 0x78: case 0x79: case 0x7a: case 0x7b:
+		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
+			LOGMASKED(LOG_COMMAND, "write controller ram offset 0x%02x (%s)\n", data & 0x3f, machine().describe_context());
+			break;
+
+		case 0x90: case 0x91: case 0x92: case 0x93:
+		case 0x94: case 0x95: case 0x96: case 0x97:
+		case 0x98: case 0x99: case 0x9a: case 0x9b:
+		case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+			LOGMASKED(LOG_COMMAND, "write output port 0x%1x (%s)\n", data & 0xf, machine().describe_context());
+			break;
+
+		case 0xa1: LOGMASKED(LOG_COMMAND, "get version number (%s)\n", machine().describe_context()); break;
+		case 0xa4: LOGMASKED(LOG_COMMAND, "test password installed (%s)\n", machine().describe_context()); break;
+		case 0xa5: LOGMASKED(LOG_COMMAND, "load security (%s)\n", machine().describe_context()); break;
+		case 0xa6: LOGMASKED(LOG_COMMAND, "enable security (%s)\n", machine().describe_context()); break;
+		case 0xa7: LOGMASKED(LOG_COMMAND, "disable auxiliary interface (%s)\n", machine().describe_context()); break;
+		case 0xa8: LOGMASKED(LOG_COMMAND, "enable auxiliary interface (%s)\n", machine().describe_context()); break;
+		case 0xa9: LOGMASKED(LOG_COMMAND, "auxiliary interface test (%s)\n", machine().describe_context()); break;
+		case 0xaa: LOGMASKED(LOG_COMMAND, "controller self-test (%s)\n", machine().describe_context()); break;
+		case 0xab: LOGMASKED(LOG_COMMAND, "keyboard interface test (%s)\n", machine().describe_context()); break;
+		case 0xac: LOGMASKED(LOG_COMMAND, "diagnostic dump (%s)\n", machine().describe_context()); break;
+		case 0xad: LOGMASKED(LOG_COMMAND, "disable keyboard interface (%s)\n", machine().describe_context()); break;
+		case 0xae: LOGMASKED(LOG_COMMAND, "enable keyboard interface (%s)\n", machine().describe_context()); break;
+		case 0xaf: LOGMASKED(LOG_COMMAND, "get version (%s)\n", machine().describe_context()); break;
+		case 0xc0: LOGMASKED(LOG_COMMAND, "read input port (%s)\n", machine().describe_context()); break;
+		case 0xc1: LOGMASKED(LOG_COMMAND, "poll input port low (%s)\n", machine().describe_context()); break;
+		case 0xc2: LOGMASKED(LOG_COMMAND, "poll input port high (%s)\n", machine().describe_context()); break;
+		case 0xd0: LOGMASKED(LOG_COMMAND, "read output port (%s)\n", machine().describe_context()); break;
+		case 0xd1: LOGMASKED(LOG_COMMAND, "write output port (%s)\n", machine().describe_context()); break;
+		case 0xd2: LOGMASKED(LOG_COMMAND, "write keyboard output buffer (%s)\n", machine().describe_context()); break;
+		case 0xd3: LOGMASKED(LOG_COMMAND, "write auxiliary output buffer (%s)\n", machine().describe_context()); break;
+		case 0xd4: LOGMASKED(LOG_COMMAND, "write auxiliary device (%s)\n", machine().describe_context()); break;
+		case 0xe0: LOGMASKED(LOG_COMMAND, "read test inputs (%s)\n", machine().describe_context()); break;
+
+		case 0xf0: case 0xf1: case 0xf2: case 0xf3:
+		case 0xf4: case 0xf5: case 0xf6: case 0xf7:
+		case 0xf8: case 0xf9: case 0xfa: case 0xfb:
+		case 0xfc: case 0xfd: case 0xfe: case 0xff:
+			LOGMASKED(LOG_COMMAND, "pulse output port 0x%1x (%s)\n", data & 0xf, machine().describe_context());
+			break;
+
+		default:
+			LOGMASKED(LOG_COMMAND, "unknown command 0x%02x (%s)\n", data, machine().describe_context());
+			break;
+		}
+	}
+	else
+		LOG("command_w 0x%02x (%s)\n", data, machine().describe_context());
+
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::write_command), this), unsigned(data));
 }
 
@@ -251,7 +386,7 @@ tiny_rom_entry const *at_keyboard_controller_device::device_rom_region() const
 
 void at_keyboard_controller_device::device_add_mconfig(machine_config &config)
 {
-	I8042(config, m_mcu, DERIVED_CLOCK(1, 1));
+	I8042AH(config, m_mcu, DERIVED_CLOCK(1, 1));
 	m_mcu->p1_in_cb().set_ioport("P1");
 	m_mcu->p1_out_cb().set_nop();
 	m_mcu->p2_in_cb().set_constant(0xffU);
@@ -282,26 +417,40 @@ void at_keyboard_controller_device::p2_w(uint8_t data)
 uint8_t ps2_keyboard_controller_device::data_r()
 {
 	set_kbd_irq(0U);
-	set_mouse_irq(0U);
-	return m_mcu->upi41_master_r(machine().dummy_space(), 0U);
+	set_aux_irq(0U);
+	u8 const data = m_mcu->upi41_master_r(machine().dummy_space(), 0U);
+	LOG("data_r 0x%02x (%s)\n", data, machine().describe_context());
+	return data;
 }
 
-WRITE_LINE_MEMBER(ps2_keyboard_controller_device::mouse_clk_w)
+uint8_t ps2_keyboard_controller_device::status_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_mouse_clk_in), this), state);
+	u8 const data = m_mcu->upi41_master_r(machine().dummy_space(), 1U);
+	LOGMASKED(LOG_STATUS, "status_r 0x%02x%s%s%s%s%s%s%s%s (%s)\n", data,
+		BIT(data, 7) ? " PER" : "",     BIT(data, 6) ? " GTO" : "",
+		BIT(data, 5) ? " AUX_OBF" : "", BIT(data, 4) ? "" : " INH",
+		BIT(data, 3) ? " CMD" : "",     BIT(data, 2) ? " SYS" : "",
+		BIT(data, 1) ? " IBF" : "",     BIT(data, 0) ? " OBF" : "",
+		machine().describe_context());
+	return data;
 }
 
-WRITE_LINE_MEMBER(ps2_keyboard_controller_device::mouse_data_w)
+WRITE_LINE_MEMBER(ps2_keyboard_controller_device::aux_clk_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_mouse_data_in), this), state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_aux_clk_in), this), state);
+}
+
+WRITE_LINE_MEMBER(ps2_keyboard_controller_device::aux_data_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_aux_data_in), this), state);
 }
 
 ps2_keyboard_controller_device::ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: at_kbc_device_base(mconfig, PS2_KEYBOARD_CONTROLLER, tag, owner, clock)
-	, m_mouse_irq_cb(*this)
-	, m_mouse_clk_cb(*this), m_mouse_data_cb(*this)
-	, m_mouse_irq(0U)
-	, m_mouse_clk_in(1U), m_mouse_clk_out(1U), m_mouse_data_in(1U), m_mouse_data_out(1U)
+	, m_aux_irq_cb(*this)
+	, m_aux_clk_cb(*this), m_aux_data_cb(*this)
+	, m_aux_irq(0U)
+	, m_aux_clk_in(1U), m_aux_clk_out(1U), m_aux_data_in(1U), m_aux_data_out(1U)
 	, m_p2_data(0xffU)
 {
 }
@@ -313,95 +462,96 @@ tiny_rom_entry const *ps2_keyboard_controller_device::device_rom_region() const
 
 void ps2_keyboard_controller_device::device_add_mconfig(machine_config &config)
 {
-	I8042(config, m_mcu, DERIVED_CLOCK(1, 1));
+	I8042AH(config, m_mcu, DERIVED_CLOCK(1, 1));
 	m_mcu->p1_in_cb().set(FUNC(ps2_keyboard_controller_device::p1_r));
 	m_mcu->p1_out_cb().set_nop();
 	m_mcu->p2_in_cb().set_constant(0xffU);
 	m_mcu->p2_out_cb().set(FUNC(ps2_keyboard_controller_device::p2_w));
 	m_mcu->t0_in_cb().set([this] () { return kbd_clk_r(); });
-	m_mcu->t1_in_cb().set([this] () { return mouse_clk_r(); });
+	m_mcu->t1_in_cb().set([this] () { return aux_clk_r(); });
 }
 
 void ps2_keyboard_controller_device::device_resolve_objects()
 {
 	at_kbc_device_base::device_resolve_objects();
 
-	m_mouse_clk_cb.resolve_safe();
-	m_mouse_data_cb.resolve_safe();
+	m_aux_irq_cb.resolve_safe();
+	m_aux_clk_cb.resolve_safe();
+	m_aux_data_cb.resolve_safe();
 }
 
 void ps2_keyboard_controller_device::device_start()
 {
 	at_kbc_device_base::device_start();
 
-	save_item(NAME(m_mouse_irq));
-	save_item(NAME(m_mouse_clk_in));
-	save_item(NAME(m_mouse_clk_out));
-	save_item(NAME(m_mouse_data_in));
-	save_item(NAME(m_mouse_data_out));
+	save_item(NAME(m_aux_irq));
+	save_item(NAME(m_aux_clk_in));
+	save_item(NAME(m_aux_clk_out));
+	save_item(NAME(m_aux_data_in));
+	save_item(NAME(m_aux_data_out));
 	save_item(NAME(m_p2_data));
 
-	m_mouse_irq = 0U;
-	m_mouse_clk_in = m_mouse_clk_out = 1U;
-	m_mouse_data_in = m_mouse_data_out = 1U;
+	m_aux_irq = 0U;
+	m_aux_clk_in = m_aux_clk_out = 1U;
+	m_aux_data_in = m_aux_data_out = 1U;
 	m_p2_data = 0xffU;
 }
 
-inline void ps2_keyboard_controller_device::set_mouse_irq(u8 state)
+inline void ps2_keyboard_controller_device::set_aux_irq(u8 state)
 {
-	if (state != m_mouse_irq)
-		m_mouse_irq_cb((m_mouse_irq = state) ? ASSERT_LINE : CLEAR_LINE);
+	if (state != m_aux_irq)
+		m_aux_irq_cb((m_aux_irq = state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-inline void ps2_keyboard_controller_device::set_mouse_clk_out(u8 state)
+inline void ps2_keyboard_controller_device::set_aux_clk_out(u8 state)
 {
-	if (state != m_mouse_clk_out)
-		m_mouse_clk_cb(m_mouse_clk_out = state);
+	if (state != m_aux_clk_out)
+		m_aux_clk_cb(m_aux_clk_out = state);
 }
 
-inline void ps2_keyboard_controller_device::set_mouse_data_out(u8 state)
+inline void ps2_keyboard_controller_device::set_aux_data_out(u8 state)
 {
-	if (state != m_mouse_data_out)
-		m_mouse_data_cb(m_mouse_data_out = state);
+	if (state != m_aux_data_out)
+		m_aux_data_cb(m_aux_data_out = state);
 }
 
-inline u8 ps2_keyboard_controller_device::mouse_clk_r() const
+inline u8 ps2_keyboard_controller_device::aux_clk_r() const
 {
-	return m_mouse_clk_in & m_mouse_clk_out;
+	return m_aux_clk_in & m_aux_clk_out;
 }
 
-inline u8 ps2_keyboard_controller_device::mouse_data_r() const
+inline u8 ps2_keyboard_controller_device::aux_data_r() const
 {
-	return m_mouse_data_in & m_mouse_data_out;
+	return m_aux_data_in & m_aux_data_out;
 }
 
-TIMER_CALLBACK_MEMBER(ps2_keyboard_controller_device::set_mouse_clk_in)
+TIMER_CALLBACK_MEMBER(ps2_keyboard_controller_device::set_aux_clk_in)
 {
-	m_mouse_clk_in = param ? 1U : 0U;
+	m_aux_clk_in = param ? 1U : 0U;
 }
 
-TIMER_CALLBACK_MEMBER(ps2_keyboard_controller_device::set_mouse_data_in)
+TIMER_CALLBACK_MEMBER(ps2_keyboard_controller_device::set_aux_data_in)
 {
-	m_mouse_data_in = param ? 1U : 0U;
+	m_aux_data_in = param ? 1U : 0U;
 }
 
 uint8_t ps2_keyboard_controller_device::p1_r()
 {
-	return kbd_data_r() | (mouse_data_r() << 1) | 0xfcU;
+	return kbd_data_r() | (aux_data_r() << 1) | 0xfcU;
 }
 
 void ps2_keyboard_controller_device::p2_w(uint8_t data)
 {
 	set_hot_res(BIT(~data, 0));
 	set_gate_a20(BIT(data, 1));
-	set_mouse_data_out(BIT(~data, 2));
-	set_mouse_clk_out(BIT(~data, 3));
+	set_aux_data_out(BIT(~data, 2));
+	set_aux_clk_out(BIT(~data, 3));
 	set_kbd_clk_out(BIT(~data, 6));
 	set_kbd_data_out(BIT(~data, 7));
 
 	if (BIT(data & ~m_p2_data, 4))
 		set_kbd_irq(1U);
 	if (BIT(data & ~m_p2_data, 5))
-		set_mouse_irq(1U);
+		set_aux_irq(1U);
 	m_p2_data = data;
 }

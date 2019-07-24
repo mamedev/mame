@@ -10,7 +10,7 @@
         * Akka Arrh (1982)
 
     Known issues:
-        * none at this time
+        * Default earam has corrupt Top 3 scores showing upon first use.
 
 ***************************************************************************/
 

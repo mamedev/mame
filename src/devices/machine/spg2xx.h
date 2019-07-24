@@ -41,15 +41,11 @@
 #include "spg2xx_video.h"
 #include "screen.h"
 
-class spg2xx_device : public device_t, public device_mixer_interface
+class spg2xx_device : public unsp_device, public device_mixer_interface
 {
 public:
-	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	void set_pal(bool pal) { m_pal_flag = pal ? 1 : 0; }
 	void set_rowscroll_offset(int offset) { m_rowscrolloffset = offset; }
-
-	void map(address_map &map);
 
 	auto porta_out() { return m_porta_out.bind(); }
 	auto portb_out() { return m_portb_out.bind(); }
@@ -79,11 +75,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
 protected:
-	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
-		: spg2xx_device(mconfig, type, tag, owner, clock)
-	{
-		m_sprite_limit = sprite_limit;
-	}
+	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal);
+
+	void internal_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(videoirq_w);
 	DECLARE_WRITE_LINE_MEMBER(audioirq_w);
@@ -94,8 +88,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(ffreq2_w);
 
 	DECLARE_READ16_MEMBER(space_r);
-
-	void spg2xx_map(address_map &map);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -126,7 +118,6 @@ protected:
 
 	emu_timer *m_screenpos_timer;
 
-	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 
 	void configure_spg_io(spg2xx_io_device* io);
@@ -149,12 +140,11 @@ protected:
 class spg24x_device : public spg2xx_device
 {
 public:
-	template <typename T, typename U>
-	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	template <typename T>
+	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
 		: spg24x_device(mconfig, tag, owner, clock)
 	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_screen.set_tag(std::forward<U>(screen_tag));
+		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
 	spg24x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -166,12 +156,11 @@ public:
 class spg28x_device : public spg2xx_device
 {
 public:
-	template <typename T, typename U>
-	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&screen_tag)
+	template <typename T>
+	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
 		: spg28x_device(mconfig, tag, owner, clock)
 	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_screen.set_tag(std::forward<U>(screen_tag));
+		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
 	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

@@ -529,8 +529,8 @@ void interpro_state::interpro_common_map(address_map &map)
 	map(0x7f000308, 0x7f000309).rw(FUNC(interpro_state::ctrl1_r), FUNC(interpro_state::ctrl1_w));
 	map(0x7f00030c, 0x7f00030d).rw(FUNC(interpro_state::ctrl2_r), FUNC(interpro_state::ctrl2_w));
 
-	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
-	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
+	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 	map(0x7f000500, 0x7f000503).lrw8("rtc_rw",
 									 [this](offs_t offset) {
 										 return m_rtc->read(offset^1);

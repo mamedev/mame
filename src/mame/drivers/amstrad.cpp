@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 
 	PALETTE(config, m_palette, FUNC(amstrad_state::amstrad_cpc_palette), 32);
 
-	HD6845(config, m_crtc, 16_MHz_XTAL / 16);
+	HD6845S(config, m_crtc, 16_MHz_XTAL / 16);
 	m_crtc->set_screen(nullptr);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(16);

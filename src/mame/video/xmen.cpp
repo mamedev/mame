@@ -151,7 +151,6 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
 
-		address_space &space = machine().dummy_space();
 		if (m_screen->frame_number() & 0x01)
 		{
 			/* copy the desired spritelist to the chip */
@@ -163,8 +162,7 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 			   */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
-	//          m_k052109->lsb_w
-				m_k052109->write(space, offset, m_xmen6p_tilemapright[offset] & 0x00ff);
+				m_k052109->write(offset, m_xmen6p_tilemapright[offset] & 0x00ff);
 			}
 
 
@@ -182,8 +180,7 @@ WRITE_LINE_MEMBER(xmen_state::screen_vblank_xmen6p)
 			   */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
-	//          m_k052109->lsb_w
-				m_k052109->write(space, offset, m_xmen6p_tilemapleft[offset] & 0x00ff);
+				m_k052109->write(offset, m_xmen6p_tilemapleft[offset] & 0x00ff);
 			}
 
 

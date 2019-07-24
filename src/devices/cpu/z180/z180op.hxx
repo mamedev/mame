@@ -362,7 +362,7 @@ int z180_device::take_interrupt(int irq)
 	}
 	else
 	{
-		irq_vector = (IO(Z180_IL) & Z180_IL_IL) + (irq - Z180_INT_IRQ1) * 2;
+		irq_vector = (m_il & Z180_IL_IL) + (irq - Z180_INT_IRQ1) * 2;
 		irq_vector = (m_I << 8) + (irq_vector & 0xff);
 		PUSH( PC );
 		RM16(irq_vector, &m_PC );

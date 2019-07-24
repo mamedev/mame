@@ -145,7 +145,7 @@ sounds.
 #include "darius.lh"
 
 
-void darius_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
+void darius_state::parse_control()   /* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
@@ -153,7 +153,7 @@ void darius_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 	m_cpub->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(darius_state::cpua_ctrl_w)
+void darius_state::cpua_ctrl_w(u16 data)
 {
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;
@@ -170,12 +170,12 @@ WRITE16_MEMBER(darius_state::cpua_ctrl_w)
                         GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(darius_state::coin_r)
+u16 darius_state::coin_r()
 {
 	return m_coin_word; /* bits 3&4 coin lockouts, must return zero */
 }
 
-WRITE16_MEMBER(darius_state::coin_w)
+void darius_state::coin_w(u16 data)
 {
 	/* coin control */
 	/* bits 7,5,4,0 used on reset */
@@ -215,7 +215,7 @@ void darius_state::darius_map(address_map &map)
 	map(0xd80000, 0xd80fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* palette */
 	map(0xe00100, 0xe00fff).ram().share("spriteram");
 	map(0xe01000, 0xe02fff).ram().share("share2");
-	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::fg_layer_w)).share("fg_ram");
 	map(0xe10000, 0xe10fff).ram();                                             /* ??? */
 }
 
@@ -227,7 +227,7 @@ void darius_state::darius_cpub_map(address_map &map)
 	map(0xd80000, 0xd80fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe00100, 0xe00fff).ram().share("spriteram");
 	map(0xe01000, 0xe02fff).ram().share("share2");
-	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::fg_layer_w)).share("fg_ram");
 }
 
 
@@ -235,19 +235,19 @@ void darius_state::darius_cpub_map(address_map &map)
                         SOUND
 *****************************************************/
 
-WRITE8_MEMBER(darius_state::sound_bankswitch_w)
+void darius_state::sound_bankswitch_w(u8 data)
 {
-	membank("bank1")->set_entry(data & 3);
+	m_audiobank->set_entry(data & 3);
 }
 
-WRITE8_MEMBER(darius_state::adpcm_command_w)
+void darius_state::adpcm_command_w(u8 data)
 {
 	m_adpcm_command = data;
 	/* logerror("#ADPCM command write =%2x\n",data); */
 }
 
 #if 0
-WRITE8_MEMBER(darius_state::display_value)
+void darius_state::display_value(u8 data)
 {
 	popmessage("d800=%x", data);
 }
@@ -258,43 +258,42 @@ WRITE8_MEMBER(darius_state::display_value)
                Sound mixer/pan control
 *****************************************************/
 
-void darius_state::update_fm0(  )
+void darius_state::update_fm0()
 {
-	int left  = (        m_pan[0]  * m_vol[6]) >> 8;
-	int right = ((0xff - m_pan[0]) * m_vol[6]) >> 8;
+	const int left  = (        m_pan[0]  * m_vol[6]) >> 8;
+	const int right = ((0xff - m_pan[0]) * m_vol[6]) >> 8;
 
-	if (m_filter0_3l != nullptr)
-		m_filter0_3l->flt_volume_set_volume(left / 100.0);
-	if (m_filter0_3r != nullptr)
-		m_filter0_3r->flt_volume_set_volume(right / 100.0); /* FM #0 */
+	if (m_filter_l[0][3] != nullptr)
+		m_filter_l[0][3]->flt_volume_set_volume(left / 100.0);
+	if (m_filter_r[0][3] != nullptr)
+		m_filter_r[0][3]->flt_volume_set_volume(right / 100.0); /* FM #0 */
 }
 
-void darius_state::update_fm1(  )
+void darius_state::update_fm1()
 {
-	int left  = (        m_pan[1]  * m_vol[7]) >> 8;
-	int right = ((0xff - m_pan[1]) * m_vol[7]) >> 8;
+	const int left  = (        m_pan[1]  * m_vol[7]) >> 8;
+	const int right = ((0xff - m_pan[1]) * m_vol[7]) >> 8;
 
-	if (m_filter1_3l != nullptr)
-		m_filter1_3l->flt_volume_set_volume(left / 100.0);
-	if (m_filter1_3r != nullptr)
-		m_filter1_3r->flt_volume_set_volume(right / 100.0); /* FM #1 */
+	if (m_filter_l[1][3] != nullptr)
+		m_filter_l[1][3]->flt_volume_set_volume(left / 100.0);
+	if (m_filter_r[1][3] != nullptr)
+		m_filter_r[1][3]->flt_volume_set_volume(right / 100.0); /* FM #1 */
 }
 
-void darius_state::update_psg0( int port )
+void darius_state::update_psg0(int port)
 {
 	filter_volume_device *lvol = nullptr, *rvol = nullptr;
-	int left, right;
 
 	switch (port)
 	{
-		case 0: lvol = m_filter0_0l; rvol = m_filter0_0r; break;
-		case 1: lvol = m_filter0_1l; rvol = m_filter0_1r; break;
-		case 2: lvol = m_filter0_2l; rvol = m_filter0_2r; break;
+		case 0: lvol = m_filter_l[0][0]; rvol = m_filter_r[0][0]; break;
+		case 1: lvol = m_filter_l[0][1]; rvol = m_filter_r[0][1]; break;
+		case 2: lvol = m_filter_l[0][2]; rvol = m_filter_r[0][2]; break;
 		default: break;
 	}
 
-	left  = (        m_pan[2]  * m_vol[port]) >> 8;
-	right = ((0xff - m_pan[2]) * m_vol[port]) >> 8;
+	const int left  = (        m_pan[2]  * m_vol[port]) >> 8;
+	const int right = ((0xff - m_pan[2]) * m_vol[port]) >> 8;
 
 	if (lvol != nullptr)
 		lvol->flt_volume_set_volume(left / 100.0);
@@ -302,21 +301,20 @@ void darius_state::update_psg0( int port )
 		rvol->flt_volume_set_volume(right / 100.0);
 }
 
-void darius_state::update_psg1( int port )
+void darius_state::update_psg1(int port)
 {
 	filter_volume_device *lvol = nullptr, *rvol = nullptr;
-	int left, right;
 
 	switch (port)
 	{
-		case 0: lvol = m_filter1_0l; rvol = m_filter1_0r; break;
-		case 1: lvol = m_filter1_1l; rvol = m_filter1_1r; break;
-		case 2: lvol = m_filter1_2l; rvol = m_filter1_2r; break;
+		case 0: lvol = m_filter_l[1][0]; rvol = m_filter_r[1][0]; break;
+		case 1: lvol = m_filter_l[1][1]; rvol = m_filter_r[1][1]; break;
+		case 2: lvol = m_filter_l[1][2]; rvol = m_filter_r[1][2]; break;
 		default: break;
 	}
 
-	left  = (        m_pan[3]  * m_vol[port + 3]) >> 8;
-	right = ((0xff - m_pan[3]) * m_vol[port + 3]) >> 8;
+	const int left  = (        m_pan[3]  * m_vol[port + 3]) >> 8;
+	const int right = ((0xff - m_pan[3]) * m_vol[port + 3]) >> 8;
 
 	if (lvol != nullptr)
 		lvol->flt_volume_set_volume(left / 100.0);
@@ -324,10 +322,10 @@ void darius_state::update_psg1( int port )
 		rvol->flt_volume_set_volume(right / 100.0);
 }
 
-void darius_state::update_da(  )
+void darius_state::update_da()
 {
-	int left  = m_def_vol[(m_pan[4] >> 4) & 0x0f];
-	int right = m_def_vol[(m_pan[4] >> 0) & 0x0f];
+	const int left  = m_def_vol[(m_pan[4] >> 4) & 0x0f];
+	const int right = m_def_vol[(m_pan[4] >> 0) & 0x0f];
 
 	if (m_msm5205_l != nullptr)
 		m_msm5205_l->flt_volume_set_volume(left / 100.0);
@@ -335,19 +333,19 @@ void darius_state::update_da(  )
 		m_msm5205_r->flt_volume_set_volume(right / 100.0);
 }
 
-WRITE8_MEMBER(darius_state::darius_fm0_pan)
+void darius_state::fm0_pan_w(u8 data)
 {
 	m_pan[0] = data & 0xff;  /* data 0x00:right 0xff:left */
 	update_fm0();
 }
 
-WRITE8_MEMBER(darius_state::darius_fm1_pan)
+void darius_state::fm1_pan_w(u8 data)
 {
 	m_pan[1] = data & 0xff;
 	update_fm1();
 }
 
-WRITE8_MEMBER(darius_state::darius_psg0_pan)
+void darius_state::psg0_pan_w(u8 data)
 {
 	m_pan[2] = data & 0xff;
 	update_psg0(0);
@@ -355,15 +353,15 @@ WRITE8_MEMBER(darius_state::darius_psg0_pan)
 	update_psg0(2);
 }
 
-WRITE8_MEMBER(darius_state::darius_psg1_pan)
+void darius_state::psg1_pan_w(u8 data)
 {
 	m_pan[3] = data & 0xff;
-	update_psg1( 0);
-	update_psg1( 1);
-	update_psg1( 2);
+	update_psg1(0);
+	update_psg1(1);
+	update_psg1(2);
 }
 
-WRITE8_MEMBER(darius_state::darius_da_pan)
+void darius_state::da_pan_w(u8 data)
 {
 	m_pan[4] = data & 0xff;
 	update_da();
@@ -371,7 +369,7 @@ WRITE8_MEMBER(darius_state::darius_da_pan)
 
 /**** Mixer Control ****/
 
-WRITE8_MEMBER(darius_state::darius_write_portA0)
+void darius_state::write_portA0(u8 data)
 {
 	// volume control FM #0 PSG #0 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
@@ -383,7 +381,7 @@ WRITE8_MEMBER(darius_state::darius_write_portA0)
 	update_psg0(0);
 }
 
-WRITE8_MEMBER(darius_state::darius_write_portA1)
+void darius_state::write_portA1(u8 data)
 {
 	// volume control FM #1 PSG #1 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
@@ -391,10 +389,10 @@ WRITE8_MEMBER(darius_state::darius_write_portA1)
 	m_vol[3] = m_def_vol[(data >> 4) & 0x0f];
 	m_vol[7] = m_def_vol[(data >> 0) & 0x0f];
 	update_fm1();
-	update_psg1( 0);
+	update_psg1(0);
 }
 
-WRITE8_MEMBER(darius_state::darius_write_portB0)
+void darius_state::write_portB0(u8 data)
 {
 	// volume control PSG #0 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
@@ -405,15 +403,15 @@ WRITE8_MEMBER(darius_state::darius_write_portB0)
 	update_psg0(2);
 }
 
-WRITE8_MEMBER(darius_state::darius_write_portB1)
+void darius_state::write_portB1(u8 data)
 {
 	// volume control PSG #1 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 
 	m_vol[4] = m_def_vol[(data >> 4) & 0x0f];
 	m_vol[5] = m_def_vol[(data >> 0) & 0x0f];
-	update_psg1( 1);
-	update_psg1( 2);
+	update_psg1(1);
+	update_psg1(2);
 }
 
 
@@ -424,19 +422,19 @@ WRITE8_MEMBER(darius_state::darius_write_portB1)
 void darius_state::darius_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xb001, 0xb001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xc000, 0xc000).w(FUNC(darius_state::darius_fm0_pan));
-	map(0xc400, 0xc400).w(FUNC(darius_state::darius_fm1_pan));
-	map(0xc800, 0xc800).w(FUNC(darius_state::darius_psg0_pan));
-	map(0xcc00, 0xcc00).w(FUNC(darius_state::darius_psg1_pan));
-	map(0xd000, 0xd000).w(FUNC(darius_state::darius_da_pan));
+	map(0xc000, 0xc000).w(FUNC(darius_state::fm0_pan_w));
+	map(0xc400, 0xc400).w(FUNC(darius_state::fm1_pan_w));
+	map(0xc800, 0xc800).w(FUNC(darius_state::psg0_pan_w));
+	map(0xcc00, 0xcc00).w(FUNC(darius_state::psg1_pan_w));
+	map(0xd000, 0xd000).w(FUNC(darius_state::da_pan_w));
 	map(0xd400, 0xd400).w(FUNC(darius_state::adpcm_command_w));  /* ADPCM command for second Z80 to read from port 0x00 */
-//  AM_RANGE(0xd800, 0xd800) AM_WRITE(display_value)    /* ??? */
+//  map(0xd800, 0xd800).w(FUNC(darius_state::(display_value));    /* ??? */
 	map(0xdc00, 0xdc00).w(FUNC(darius_state::sound_bankswitch_w));
 }
 
@@ -447,41 +445,41 @@ void darius_state::darius_sound2_map(address_map &map)
 }
 
 
-WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
+WRITE_LINE_MEMBER(darius_state::adpcm_int)
 {
 	if (m_nmi_enable)
 		m_adpcm->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ8_MEMBER(darius_state::adpcm_command_read)
+u8 darius_state::adpcm_command_r()
 {
 	/* logerror("%s read port 0: %02x\n", machine().describe_context(), adpcm_command ); */
 	return m_adpcm_command;
 }
 
-READ8_MEMBER(darius_state::readport2)
+u8 darius_state::readport2()
 {
 	return 0;
 }
 
-READ8_MEMBER(darius_state::readport3)
+u8 darius_state::readport3()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(darius_state::adpcm_nmi_disable)
+void darius_state::adpcm_nmi_disable(u8 data)
 {
 	m_nmi_enable = 0;
 	/* logerror("%s write port 0: NMI DISABLE\n", machine().describe_context(), data ); */
 }
 
-WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
+void darius_state::adpcm_nmi_enable(u8 data)
 {
 	m_nmi_enable = 1;
 	/* logerror("%s write port 1: NMI ENABLE\n", machine().describe_context() ); */
 }
 
-WRITE8_MEMBER(darius_state::adpcm_data_w)
+void darius_state::adpcm_data_w(u8 data)
 {
 	m_msm->write_data(data);
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
@@ -490,7 +488,7 @@ WRITE8_MEMBER(darius_state::adpcm_data_w)
 void darius_state::darius_sound2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(FUNC(darius_state::adpcm_command_read), FUNC(darius_state::adpcm_nmi_disable));
+	map(0x00, 0x00).rw(FUNC(darius_state::adpcm_command_r), FUNC(darius_state::adpcm_nmi_disable));
 	map(0x01, 0x01).w(FUNC(darius_state::adpcm_nmi_enable));
 	map(0x02, 0x02).r(FUNC(darius_state::readport2)).w(FUNC(darius_state::adpcm_data_w));  /* readport2 ??? */
 	map(0x03, 0x03).r(FUNC(darius_state::readport3)); /* ??? */
@@ -617,41 +615,27 @@ static const gfx_layout tilelayout =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-		{ 24, 8, 16, 0 },       /* pixel bits separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		0+ 32*8, 1+ 32*8, 2+ 32*8, 3+ 32*8, 4+ 32*8, 5+ 32*8, 6+ 32*8, 7+ 32*8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		64*8 + 0*32, 64*8 + 1*32, 64*8 + 2*32, 64*8 + 3*32,
-		64*8 + 4*32, 64*8 + 5*32, 64*8 + 6*32, 64*8 + 7*32 },
+	{ STEP4(0,8) },       /* pixel bits separated */
+	{ STEP8(0,1), STEP8(8*4*8,1) },
+	{ STEP8(0,8*4), STEP8(8*4*8*2,8*4) },
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
-static const gfx_layout char2layout =
+static const gfx_layout textlayout =
 {
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
 	2,  /* 2 bits per pixel */
-	{ 0, 8 },   /* pixel bits separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP2(0,8) },   /* pixel bits separated */
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_darius )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 128 )  /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )  /* scr tiles */
-	GFXDECODE_ENTRY( "gfx3", 0, char2layout,  0, 128 )  /* top layer scr tiles */
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout,           0, 128 )  /* sprites */
+	GFXDECODE_ENTRY( "pc080sn", 0, gfx_8x8x4_packed_msb, 0, 128 )  /* scr tiles */
+	GFXDECODE_ENTRY( "text",    0, textlayout,           0, 128 )  /* top layer scr tiles */
 GFXDECODE_END
 
 
@@ -659,14 +643,20 @@ GFXDECODE_END
                        MACHINE DRIVERS
 ***********************************************************/
 
-void darius_state::darius_postload()
+void darius_state::device_post_load()
 {
 	parse_control();
 }
 
 void darius_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+
+	for (int i = 0; i < 0x10; i++)
+	{
+		//logerror( "calc %d = %d\n", i, (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f)) );
+		m_def_vol[i] = (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f));
+	}
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_coin_word));
@@ -675,13 +665,12 @@ void darius_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vol));
 	save_item(NAME(m_pan));
-	machine().save().register_postload(save_prepost_delegate(FUNC(darius_state::darius_postload), this));
 }
 
 
 void darius_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
+	m_audiobank->set_entry(0);
 
 	m_cpua_ctrl = 0xff;
 	m_coin_word = 0;
@@ -696,11 +685,6 @@ void darius_state::machine_reset()
 	for (auto & elem : m_pan)
 		elem = 0x80;    /* center */
 
-	for (int i = 0; i < 0x10; i++)
-	{
-		//logerror( "calc %d = %d\n", i, (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f)) );
-		m_def_vol[i] = (int)(100.0f / (float)pow(10.0f, (32.0f - (i * (32.0f / (float)(0xf)))) / 20.0f));
-	}
 }
 
 void darius_state::darius(machine_config &config)
@@ -735,7 +719,7 @@ void darius_state::darius(machine_config &config)
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(36*8, 32*8);
 	lscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
-	lscreen.set_screen_update(FUNC(darius_state::screen_update_darius_left));
+	lscreen.set_screen_update(FUNC(darius_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
 	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
@@ -743,7 +727,7 @@ void darius_state::darius(machine_config &config)
 	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	mscreen.set_size(36*8, 32*8);
 	mscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
-	mscreen.set_screen_update(FUNC(darius_state::screen_update_darius_middle));
+	mscreen.set_screen_update(FUNC(darius_state::screen_update_middle));
 	mscreen.set_palette(m_palette);
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
@@ -751,7 +735,7 @@ void darius_state::darius(machine_config &config)
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(36*8, 32*8);
 	rscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
-	rscreen.set_screen_update(FUNC(darius_state::screen_update_darius_right));
+	rscreen.set_screen_update(FUNC(darius_state::screen_update_right));
 	rscreen.set_palette(m_palette);
 
 	PC080SN(config, m_pc080sn, 0);
@@ -767,8 +751,8 @@ void darius_state::darius(machine_config &config)
 
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(8'000'000)/2)); /* 4 MHz */
 	ym1.irq_handler().set_inputline(m_audiocpu, 0); /* assumes Z80 sandwiched between 68Ks */
-	ym1.port_a_write_callback().set(FUNC(darius_state::darius_write_portA0));
-	ym1.port_b_write_callback().set(FUNC(darius_state::darius_write_portB0));
+	ym1.port_a_write_callback().set(FUNC(darius_state::write_portA0));
+	ym1.port_b_write_callback().set(FUNC(darius_state::write_portB0));
 	ym1.add_route(0, "filter0.0l", 0.08);
 	ym1.add_route(0, "filter0.0r", 0.08);
 	ym1.add_route(1, "filter0.1l", 0.08);
@@ -779,8 +763,8 @@ void darius_state::darius(machine_config &config)
 	ym1.add_route(3, "filter0.3r", 0.60);
 
 	ym2203_device &ym2(YM2203(config, "ym2", XTAL(8'000'000)/2)); /* 4 MHz */
-	ym2.port_a_write_callback().set(FUNC(darius_state::darius_write_portA1));
-	ym2.port_b_write_callback().set(FUNC(darius_state::darius_write_portB1));
+	ym2.port_a_write_callback().set(FUNC(darius_state::write_portA1));
+	ym2.port_b_write_callback().set(FUNC(darius_state::write_portB1));
 	ym2.add_route(0, "filter1.0l", 0.08);
 	ym2.add_route(0, "filter1.0r", 0.08);
 	ym2.add_route(1, "filter1.1l", 0.08);
@@ -791,28 +775,19 @@ void darius_state::darius(machine_config &config)
 	ym2.add_route(3, "filter1.3r", 0.60);
 
 	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_legacy_callback().set(FUNC(darius_state::darius_adpcm_int));   /* interrupt function */
+	m_msm->vck_legacy_callback().set(FUNC(darius_state::adpcm_int));   /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz   */
 	m_msm->add_route(ALL_OUTPUTS, "msm5205.l", 1.0);
 	m_msm->add_route(ALL_OUTPUTS, "msm5205.r", 1.0);
 
-	FILTER_VOLUME(config, m_filter0_0l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter0_0r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter0_1l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter0_1r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter0_2l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter0_2r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter0_3l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter0_3r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
-	FILTER_VOLUME(config, m_filter1_0l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter1_0r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter1_1l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter1_1r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter1_2l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter1_2r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter1_3l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_filter1_3r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	for (int chip = 0; chip < 2; chip++)
+	{
+		for (int out = 0; out < 4; out++)
+		{
+			FILTER_VOLUME(config, m_filter_l[chip][out]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+			FILTER_VOLUME(config, m_filter_r[chip][out]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+		}
+	}
 
 	FILTER_VOLUME(config, m_msm5205_l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -849,7 +824,7 @@ ROM_START( darius )
 	ROM_REGION( 0x10000, "adpcm", 0 )   /* second Z80 driving the ADPCM chip */
 	ROM_LOAD( "a96_56.18", 0x00000, 0x10000, CRC(292ef55c) SHA1(67bfe3693e43daece06d4795645d54cd66419e5b) )        /* Z80 prog + ADPCM samples */
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "pc080sn", 0 )
 	/* There are THREE of each SCR gfx rom on the actual board, making a complete set for every PC080SN tilemap chip */
 	ROM_LOAD16_BYTE( "a96_48.24",  0x00000, 0x10000, CRC(39c9b3aa) SHA1(43a91d916c5a09207dfa37413feb5025636f37ae) )   /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_49.25",  0x20000, 0x10000, CRC(37a7d88a) SHA1(cede0d810d74ec460dcc4b391bb1acd5a669a7b4) )
@@ -858,23 +833,23 @@ ROM_START( darius )
 	ROM_LOAD16_BYTE( "a96_52.48",  0x20001, 0x10000, CRC(2d9b2128) SHA1(9b72936fbd9dca6ef8302ac6c40a1cec019cebb5) )
 	ROM_LOAD16_BYTE( "a96_53.49",  0x40001, 0x10000, CRC(0173484c) SHA1(41d70039bda0965afe89251696ceaec7b7f40c24) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "a96_44.179", 0x00000, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
+	ROM_REGION( 0xc0000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "a96_44.179", 0x00003, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
 	ROM_LOAD32_BYTE( "a96_45.200", 0x00001, 0x10000, CRC(616cdd8b) SHA1(74e0c483a68d984a689ea1381ed3a9da2f8a410a) )
 	ROM_LOAD32_BYTE( "a96_46.180", 0x00002, 0x10000, CRC(fec35418) SHA1(f0f401c3634e91b81cb8484b7b03f350d382e889) )
-	ROM_LOAD32_BYTE( "a96_47.201", 0x00003, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
+	ROM_LOAD32_BYTE( "a96_47.201", 0x00000, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
 
-	ROM_LOAD32_BYTE( "a96_40.177", 0x40000, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
+	ROM_LOAD32_BYTE( "a96_40.177", 0x40003, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
 	ROM_LOAD32_BYTE( "a96_41.198", 0x40001, 0x10000, CRC(97128a3a) SHA1(257ddd1ba71e6beeaf18e0c5d7006d1d2b6a5edf) )
 	ROM_LOAD32_BYTE( "a96_42.178", 0x40002, 0x10000, CRC(7f55ee0f) SHA1(d9ba7b8fbf59308a08613d67e92da6829f6b6db3) )
-	ROM_LOAD32_BYTE( "a96_43.199", 0x40003, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
+	ROM_LOAD32_BYTE( "a96_43.199", 0x40000, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
 
-	ROM_LOAD32_BYTE( "a96_62.175", 0x80000, 0x10000, CRC(9179862c) SHA1(be94c7d213a34baf82f974ee1092aba44b072623) )
+	ROM_LOAD32_BYTE( "a96_62.175", 0x80003, 0x10000, CRC(9179862c) SHA1(be94c7d213a34baf82f974ee1092aba44b072623) )
 	ROM_LOAD32_BYTE( "a96_63.196", 0x80001, 0x10000, CRC(fa19cfff) SHA1(58a3ae3270ebe5a162cd62df06da7199843707cf) )
 	ROM_LOAD32_BYTE( "a96_64.176", 0x80002, 0x10000, CRC(814c676f) SHA1(a6a64e65a3c163ecfede14b48ea70c20050248c3) )
-	ROM_LOAD32_BYTE( "a96_65.197", 0x80003, 0x10000, CRC(14eee326) SHA1(41760fada2a5e34ee6c9250af927baf650d9cfc4) )
+	ROM_LOAD32_BYTE( "a96_65.197", 0x80000, 0x10000, CRC(14eee326) SHA1(41760fada2a5e34ee6c9250af927baf650d9cfc4) )
 
-	ROM_REGION( 0x8000, "gfx3", 0 )         /* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "text", 0 )         /* 8x8 SCR tiles */
 	/* There's only one of each of these on a real board */
 	ROM_LOAD16_BYTE( "a96_54.143", 0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144", 0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
@@ -908,7 +883,7 @@ ROM_START( dariusu )
 	ROM_REGION( 0x10000, "adpcm", 0 )   /* second Z80 driving the ADPCM chip */
 	ROM_LOAD( "a96_56.18", 0x00000, 0x10000, CRC(292ef55c) SHA1(67bfe3693e43daece06d4795645d54cd66419e5b) )        /* Z80 prog + ADPCM samples */
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "pc080sn", 0 )
 	/* There are THREE of each SCR gfx rom on the actual board, making a complete set for every PC080SN tilemap chip */
 	ROM_LOAD16_BYTE( "a96_48.24",  0x00000, 0x10000, CRC(39c9b3aa) SHA1(43a91d916c5a09207dfa37413feb5025636f37ae) )   /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_49.25",  0x20000, 0x10000, CRC(37a7d88a) SHA1(cede0d810d74ec460dcc4b391bb1acd5a669a7b4) )
@@ -917,23 +892,23 @@ ROM_START( dariusu )
 	ROM_LOAD16_BYTE( "a96_52.48",  0x20001, 0x10000, CRC(2d9b2128) SHA1(9b72936fbd9dca6ef8302ac6c40a1cec019cebb5) )
 	ROM_LOAD16_BYTE( "a96_53.49",  0x40001, 0x10000, CRC(0173484c) SHA1(41d70039bda0965afe89251696ceaec7b7f40c24) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "a96_44.179", 0x00000, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
+	ROM_REGION( 0xc0000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "a96_44.179", 0x00003, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
 	ROM_LOAD32_BYTE( "a96_45.200", 0x00001, 0x10000, CRC(616cdd8b) SHA1(74e0c483a68d984a689ea1381ed3a9da2f8a410a) )
 	ROM_LOAD32_BYTE( "a96_46.180", 0x00002, 0x10000, CRC(fec35418) SHA1(f0f401c3634e91b81cb8484b7b03f350d382e889) )
-	ROM_LOAD32_BYTE( "a96_47.201", 0x00003, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
+	ROM_LOAD32_BYTE( "a96_47.201", 0x00000, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
 
-	ROM_LOAD32_BYTE( "a96_40.177", 0x40000, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
+	ROM_LOAD32_BYTE( "a96_40.177", 0x40003, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
 	ROM_LOAD32_BYTE( "a96_41.198", 0x40001, 0x10000, CRC(97128a3a) SHA1(257ddd1ba71e6beeaf18e0c5d7006d1d2b6a5edf) )
 	ROM_LOAD32_BYTE( "a96_42.178", 0x40002, 0x10000, CRC(7f55ee0f) SHA1(d9ba7b8fbf59308a08613d67e92da6829f6b6db3) )
-	ROM_LOAD32_BYTE( "a96_43.199", 0x40003, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
+	ROM_LOAD32_BYTE( "a96_43.199", 0x40000, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
 
-	ROM_LOAD32_BYTE( "a96_62.175", 0x80000, 0x10000, CRC(9179862c) SHA1(be94c7d213a34baf82f974ee1092aba44b072623) )
+	ROM_LOAD32_BYTE( "a96_62.175", 0x80003, 0x10000, CRC(9179862c) SHA1(be94c7d213a34baf82f974ee1092aba44b072623) )
 	ROM_LOAD32_BYTE( "a96_63.196", 0x80001, 0x10000, CRC(fa19cfff) SHA1(58a3ae3270ebe5a162cd62df06da7199843707cf) )
 	ROM_LOAD32_BYTE( "a96_64.176", 0x80002, 0x10000, CRC(814c676f) SHA1(a6a64e65a3c163ecfede14b48ea70c20050248c3) )
-	ROM_LOAD32_BYTE( "a96_65.197", 0x80003, 0x10000, CRC(14eee326) SHA1(41760fada2a5e34ee6c9250af927baf650d9cfc4) )
+	ROM_LOAD32_BYTE( "a96_65.197", 0x80000, 0x10000, CRC(14eee326) SHA1(41760fada2a5e34ee6c9250af927baf650d9cfc4) )
 
-	ROM_REGION( 0x8000, "gfx3", 0 )         /* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "text", 0 )         /* 8x8 SCR tiles */
 	/* There's only one of each of these on a real board */
 	ROM_LOAD16_BYTE( "a96_54.143", 0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144", 0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
@@ -966,7 +941,7 @@ ROM_START( dariusj )
 	ROM_REGION( 0x10000, "adpcm", 0 )   /* second Z80 driving the ADPCM chip */
 	ROM_LOAD( "a96_56.18", 0x00000, 0x10000, CRC(292ef55c) SHA1(67bfe3693e43daece06d4795645d54cd66419e5b) )        /* Z80 prog + ADPCM samples */
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "pc080sn", 0 )
 	ROM_LOAD16_BYTE( "a96_48.24",  0x00000, 0x10000, CRC(39c9b3aa) SHA1(43a91d916c5a09207dfa37413feb5025636f37ae) )   /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_49.25",  0x20000, 0x10000, CRC(37a7d88a) SHA1(cede0d810d74ec460dcc4b391bb1acd5a669a7b4) )
 	ROM_LOAD16_BYTE( "a96_50.26",  0x40000, 0x10000, CRC(75d738e4) SHA1(634606da46136ab605f5477af5639a20e39b44c4) )
@@ -974,23 +949,23 @@ ROM_START( dariusj )
 	ROM_LOAD16_BYTE( "a96_52.48",  0x20001, 0x10000, CRC(2d9b2128) SHA1(9b72936fbd9dca6ef8302ac6c40a1cec019cebb5) )
 	ROM_LOAD16_BYTE( "a96_53.49",  0x40001, 0x10000, CRC(0173484c) SHA1(41d70039bda0965afe89251696ceaec7b7f40c24) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "a96_44.179", 0x00000, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
+	ROM_REGION( 0xc0000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "a96_44.179", 0x00003, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
 	ROM_LOAD32_BYTE( "a96_45.200", 0x00001, 0x10000, CRC(616cdd8b) SHA1(74e0c483a68d984a689ea1381ed3a9da2f8a410a) )
 	ROM_LOAD32_BYTE( "a96_46.180", 0x00002, 0x10000, CRC(fec35418) SHA1(f0f401c3634e91b81cb8484b7b03f350d382e889) )
-	ROM_LOAD32_BYTE( "a96_47.201", 0x00003, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
+	ROM_LOAD32_BYTE( "a96_47.201", 0x00000, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
 
-	ROM_LOAD32_BYTE( "a96_40.177", 0x40000, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
+	ROM_LOAD32_BYTE( "a96_40.177", 0x40003, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
 	ROM_LOAD32_BYTE( "a96_41.198", 0x40001, 0x10000, CRC(97128a3a) SHA1(257ddd1ba71e6beeaf18e0c5d7006d1d2b6a5edf) )
 	ROM_LOAD32_BYTE( "a96_42.178", 0x40002, 0x10000, CRC(7f55ee0f) SHA1(d9ba7b8fbf59308a08613d67e92da6829f6b6db3) )
-	ROM_LOAD32_BYTE( "a96_43.199", 0x40003, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
+	ROM_LOAD32_BYTE( "a96_43.199", 0x40000, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
 
-	ROM_LOAD32_BYTE( "a96_36.175", 0x80000, 0x10000, CRC(af598141) SHA1(f3b888bcbd4560cca48187055cbe4107e2b392a6) )
+	ROM_LOAD32_BYTE( "a96_36.175", 0x80003, 0x10000, CRC(af598141) SHA1(f3b888bcbd4560cca48187055cbe4107e2b392a6) )
 	ROM_LOAD32_BYTE( "a96_37.196", 0x80001, 0x10000, CRC(b48137c8) SHA1(03e98a93f4fa19dfe77da244c002abc84b936a22) )
 	ROM_LOAD32_BYTE( "a96_38.176", 0x80002, 0x10000, CRC(e4f3e3a7) SHA1(0baa8a672516bcc4f17f40f429ac3d227de16625) )
-	ROM_LOAD32_BYTE( "a96_39.197", 0x80003, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
+	ROM_LOAD32_BYTE( "a96_39.197", 0x80000, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
 
-	ROM_REGION( 0x8000, "gfx3", 0 )         /* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "text", 0 )         /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_54.143", 0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144", 0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
 
@@ -1021,7 +996,7 @@ ROM_START( dariuso )
 	ROM_REGION( 0x10000, "adpcm", 0 )   /* second Z80 driving the ADPCM chip */
 	ROM_LOAD( "a96_56.18", 0x00000, 0x10000, CRC(292ef55c) SHA1(67bfe3693e43daece06d4795645d54cd66419e5b) )        /* Z80 prog + ADPCM samples */
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "pc080sn", 0 )
 	ROM_LOAD16_BYTE( "a96_48.24",  0x00000, 0x10000, CRC(39c9b3aa) SHA1(43a91d916c5a09207dfa37413feb5025636f37ae) )   /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_49.25",  0x20000, 0x10000, CRC(37a7d88a) SHA1(cede0d810d74ec460dcc4b391bb1acd5a669a7b4) )
 	ROM_LOAD16_BYTE( "a96_50.26",  0x40000, 0x10000, CRC(75d738e4) SHA1(634606da46136ab605f5477af5639a20e39b44c4) )
@@ -1029,23 +1004,23 @@ ROM_START( dariuso )
 	ROM_LOAD16_BYTE( "a96_52.48",  0x20001, 0x10000, CRC(2d9b2128) SHA1(9b72936fbd9dca6ef8302ac6c40a1cec019cebb5) )
 	ROM_LOAD16_BYTE( "a96_53.49",  0x40001, 0x10000, CRC(0173484c) SHA1(41d70039bda0965afe89251696ceaec7b7f40c24) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "a96_44.179", 0x00000, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
+	ROM_REGION( 0xc0000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "a96_44.179", 0x00003, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
 	ROM_LOAD32_BYTE( "a96_45.200", 0x00001, 0x10000, CRC(616cdd8b) SHA1(74e0c483a68d984a689ea1381ed3a9da2f8a410a) )
 	ROM_LOAD32_BYTE( "a96_46.180", 0x00002, 0x10000, CRC(fec35418) SHA1(f0f401c3634e91b81cb8484b7b03f350d382e889) )
-	ROM_LOAD32_BYTE( "a96_47.201", 0x00003, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
+	ROM_LOAD32_BYTE( "a96_47.201", 0x00000, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
 
-	ROM_LOAD32_BYTE( "a96_40.177", 0x40000, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
+	ROM_LOAD32_BYTE( "a96_40.177", 0x40003, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
 	ROM_LOAD32_BYTE( "a96_41.198", 0x40001, 0x10000, CRC(97128a3a) SHA1(257ddd1ba71e6beeaf18e0c5d7006d1d2b6a5edf) )
 	ROM_LOAD32_BYTE( "a96_42.178", 0x40002, 0x10000, CRC(7f55ee0f) SHA1(d9ba7b8fbf59308a08613d67e92da6829f6b6db3) )
-	ROM_LOAD32_BYTE( "a96_43.199", 0x40003, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
+	ROM_LOAD32_BYTE( "a96_43.199", 0x40000, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
 
-	ROM_LOAD32_BYTE( "a96_36.175", 0x80000, 0x10000, CRC(af598141) SHA1(f3b888bcbd4560cca48187055cbe4107e2b392a6) )
+	ROM_LOAD32_BYTE( "a96_36.175", 0x80003, 0x10000, CRC(af598141) SHA1(f3b888bcbd4560cca48187055cbe4107e2b392a6) )
 	ROM_LOAD32_BYTE( "a96_37.196", 0x80001, 0x10000, CRC(b48137c8) SHA1(03e98a93f4fa19dfe77da244c002abc84b936a22) )
 	ROM_LOAD32_BYTE( "a96_38.176", 0x80002, 0x10000, CRC(e4f3e3a7) SHA1(0baa8a672516bcc4f17f40f429ac3d227de16625) )
-	ROM_LOAD32_BYTE( "a96_39.197", 0x80003, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
+	ROM_LOAD32_BYTE( "a96_39.197", 0x80000, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
 
-	ROM_REGION( 0x8000, "gfx3", 0 )         /* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "text", 0 )         /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_54.143", 0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144", 0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
 
@@ -1076,7 +1051,7 @@ ROM_START( dariuse )
 	ROM_REGION( 0x10000, "adpcm", 0 )   /* second Z80 driving the ADPCM chip */
 	ROM_LOAD( "a96_56.18", 0x00000, 0x10000, CRC(292ef55c) SHA1(67bfe3693e43daece06d4795645d54cd66419e5b) )        /* Z80 prog + ADPCM samples */
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "pc080sn", 0 )
 	ROM_LOAD16_BYTE( "a96_48.24",  0x00000, 0x10000, CRC(39c9b3aa) SHA1(43a91d916c5a09207dfa37413feb5025636f37ae) )   /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_49.25",  0x20000, 0x10000, CRC(37a7d88a) SHA1(cede0d810d74ec460dcc4b391bb1acd5a669a7b4) )
 	ROM_LOAD16_BYTE( "a96_50.26",  0x40000, 0x10000, CRC(75d738e4) SHA1(634606da46136ab605f5477af5639a20e39b44c4) )
@@ -1084,23 +1059,23 @@ ROM_START( dariuse )
 	ROM_LOAD16_BYTE( "a96_52.48",  0x20001, 0x10000, CRC(2d9b2128) SHA1(9b72936fbd9dca6ef8302ac6c40a1cec019cebb5) )
 	ROM_LOAD16_BYTE( "a96_53.49",  0x40001, 0x10000, CRC(0173484c) SHA1(41d70039bda0965afe89251696ceaec7b7f40c24) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "a96_44.179", 0x00000, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
+	ROM_REGION( 0xc0000, "sprites", 0 )
+	ROM_LOAD32_BYTE( "a96_44.179", 0x00003, 0x10000, CRC(bbc18878) SHA1(7732ab2a3002f8b500615377dab42ac75451cb3b) )   /* 16x16 sprites */
 	ROM_LOAD32_BYTE( "a96_45.200", 0x00001, 0x10000, CRC(616cdd8b) SHA1(74e0c483a68d984a689ea1381ed3a9da2f8a410a) )
 	ROM_LOAD32_BYTE( "a96_46.180", 0x00002, 0x10000, CRC(fec35418) SHA1(f0f401c3634e91b81cb8484b7b03f350d382e889) )
-	ROM_LOAD32_BYTE( "a96_47.201", 0x00003, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
+	ROM_LOAD32_BYTE( "a96_47.201", 0x00000, 0x10000, CRC(8df9286a) SHA1(4a197e4c38d1750cc316b8710f4a0fef4316be14) )
 
-	ROM_LOAD32_BYTE( "a96_40.177", 0x40000, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
+	ROM_LOAD32_BYTE( "a96_40.177", 0x40003, 0x10000, CRC(b699a51e) SHA1(5fd751dd44618743dc8a3df04cf0a987753a868b) )
 	ROM_LOAD32_BYTE( "a96_41.198", 0x40001, 0x10000, CRC(97128a3a) SHA1(257ddd1ba71e6beeaf18e0c5d7006d1d2b6a5edf) )
 	ROM_LOAD32_BYTE( "a96_42.178", 0x40002, 0x10000, CRC(7f55ee0f) SHA1(d9ba7b8fbf59308a08613d67e92da6829f6b6db3) )
-	ROM_LOAD32_BYTE( "a96_43.199", 0x40003, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
+	ROM_LOAD32_BYTE( "a96_43.199", 0x40000, 0x10000, CRC(c7cad469) SHA1(dbd37aa10f12e4950f8ec6bcd7d150fa55e64742) )
 
-	ROM_LOAD32_BYTE( "a96_36.175", 0x80000, 0x10000, CRC(af598141) SHA1(f3b888bcbd4560cca48187055cbe4107e2b392a6) )
+	ROM_LOAD32_BYTE( "a96_36.175", 0x80003, 0x10000, CRC(af598141) SHA1(f3b888bcbd4560cca48187055cbe4107e2b392a6) )
 	ROM_LOAD32_BYTE( "a96_37.196", 0x80001, 0x10000, CRC(b48137c8) SHA1(03e98a93f4fa19dfe77da244c002abc84b936a22) )
 	ROM_LOAD32_BYTE( "a96_38.176", 0x80002, 0x10000, CRC(e4f3e3a7) SHA1(0baa8a672516bcc4f17f40f429ac3d227de16625) )
-	ROM_LOAD32_BYTE( "a96_39.197", 0x80003, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
+	ROM_LOAD32_BYTE( "a96_39.197", 0x80000, 0x10000, CRC(ea30920f) SHA1(91d47b10886d6c243bc676435e300cb3b5fcca33) )
 
-	ROM_REGION( 0x8000, "gfx3", 0 )         /* 8x8 SCR tiles */
+	ROM_REGION( 0x8000, "text", 0 )         /* 8x8 SCR tiles */
 	ROM_LOAD16_BYTE( "a96_54.143", 0x0000, 0x4000, CRC(51c02ae2) SHA1(27d2a6c649d047da1f22758569cb36531e3bf8bc) )
 	ROM_LOAD16_BYTE( "a96_55.144", 0x0001, 0x4000, CRC(771e4d98) SHA1(0e8ce5d569775883f4bc777b9bd49eb23ba7b42e) )
 

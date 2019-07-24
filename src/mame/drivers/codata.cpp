@@ -59,7 +59,6 @@ void codata_state::machine_reset()
 {
 	uint8_t* RAM = memregion("user1")->base();
 	memcpy(m_p_base, RAM, 16);
-	m_maincpu->reset();
 }
 
 void codata_state::codata(machine_config &config)

@@ -1592,13 +1592,13 @@ void galaxian_state::galaxian_map(address_map &map)
 void galaxian_state::frogg_map(address_map &map)
 {
 	galaxian_map(map);
-	map(0x4000, 0x47ff).ram(); // needs a full 2k of RAM
+	map(0x4400, 0x47ff).ram(); // needs a full 2k of RAM
 }
 
 void galaxian_state::mandingarf_map(address_map &map)
 {
 	galaxian_map(map);
-	map(0x4000, 0x47ff).ram(); // needs a full 2k of RAM
+	map(0x4400, 0x47ff).ram(); // needs a full 2k of RAM
 	map(0xc000, 0xc7ff).rom().region("maincpu", 0xc000); // extend ROM
 }
 
@@ -1654,7 +1654,7 @@ void galaxian_state::mooncrst_map(address_map &map)
 void galaxian_state::froggermc_map(address_map &map)
 {
 	mooncrst_map_base(map); // no discrete sound
-	map(0x8000, 0x87ff).ram(); // actually needs 2k of RAM
+	map(0x8400, 0x87ff).ram(); // actually needs 2k of RAM
 	map(0xa800, 0xa800).mirror(0x7ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::froggermc_sound_control_w));
 }
@@ -1672,7 +1672,7 @@ void galaxian_state::skybase_map(address_map &map)
 {
 	mooncrst_map(map);
 	map(0x0000, 0x5fff).rom().region("maincpu", 0); // extend ROM
-	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
+	map(0x8400, 0x87ff).ram(); // needs a full 2k of RAM
 	map(0xa002, 0xa002).mirror(0x7f8).w(FUNC(galaxian_state::galaxian_gfxbank_w)); // coin lockout replaced by graphics bank
 }
 
@@ -1680,7 +1680,7 @@ void galaxian_state::kong_map(address_map &map)
 {
 	mooncrst_map(map);
 	map(0x0000, 0x7fff).rom().region("maincpu", 0); // extend ROM
-	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
+	map(0x8400, 0x87ff).ram(); // needs a full 2k of RAM
 }
 
 void galaxian_state::scorpnmc_map(address_map &map)
@@ -1688,7 +1688,7 @@ void galaxian_state::scorpnmc_map(address_map &map)
 	mooncrst_map(map);
 	map(0x4000, 0x47ff).ram();
 	map(0x5000, 0x67ff).rom().region("maincpu", 0x5000); // extra ROM
-	map(0x8000, 0x87ff).unmaprw(); // doesn't appear to use original RAM
+	map(0x8400, 0x87ff).unmaprw(); // doesn't appear to use original RAM
 	map(0xb000, 0xb000).mirror(0x7f8).nopw(); // interrupt enable moved
 	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::irq_enable_w));
 }
@@ -1723,7 +1723,7 @@ void galaxian_state::zigzag_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x2fff).bankr("bank1");
 	map(0x3000, 0x3fff).bankr("bank2");
-	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4000, 0x47ff).ram(); // needs a full 2K of RAM
 	map(0x4800, 0x4fff).w(FUNC(galaxian_state::zigzag_ay8910_w));
 	map(0x5000, 0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x5800, 0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
@@ -4062,6 +4062,9 @@ static INPUT_PORTS_START( skybase )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
@@ -9775,6 +9778,33 @@ ROM_START( mooncrs4 )
 	ROM_LOAD( "prom.6l",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( mooncrs5 )
+	ROM_REGION( 0x8000, "maincpu", 0 ) // only the first program ROM differ from mooncrs2. The last is identical but for being double size with identical halves.
+	ROM_LOAD( "f_r_a.bin", 0x0000, 0x0800, CRC(73cd07cf) SHA1(489d14846f5a4ad55a1b4ab55dff312e4ffc68c0) )
+	ROM_LOAD( "f_f_a.bin", 0x0800, 0x0800, CRC(ee262ff2) SHA1(4e2202023ad53109ea58304071735d2425a617f3) )
+	ROM_LOAD( "f_f_b.bin", 0x1000, 0x0800, CRC(29a2b0ab) SHA1(e9fc7161d0566e36307c45b7132e2262c0af4845) )
+	ROM_LOAD( "f_r_c.bin", 0x1800, 0x0800, CRC(4c6a5a6d) SHA1(366516f63c9b5239e703e4dfb672659049ddbf44) )
+	ROM_LOAD( "f_r_d.bin", 0x2000, 0x0800, CRC(06d378a6) SHA1(99dbe9fc7f95f8fdce86eb5c32bd1ca1bea0ca3c) )
+	ROM_LOAD( "f_f_e.bin", 0x2800, 0x0800, CRC(6e84a927) SHA1(82e8e825d157c3c947a3a222bca059a735169c7d) )
+	ROM_LOAD( "f_f_f.bin", 0x3000, 0x0800, CRC(b45af1e8) SHA1(d7020774707234acdaef5c655f667d5ee9e54a13) )
+	ROM_LOAD( "f_r_f.bin", 0x3800, 0x0800, CRC(2d36a3e6) SHA1(9b7b5203dd421a4d9bb310594edd30f5111e9e40) ) // 1st and 2nd half identical
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "r_r_a.bin", 0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )
+	ROM_LOAD( "r_f_a.bin", 0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(          0x0c00, 0x0200 )  /* this version of the gfx ROMs has two */
+	ROM_CONTINUE(          0x0a00, 0x0200 )  /* groups of 16 sprites swapped */
+	ROM_CONTINUE(          0x0e00, 0x0200 )
+	ROM_LOAD( "r_r_b.bin", 0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
+	ROM_LOAD( "r_f_b.bin", 0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_CONTINUE(          0x1c00, 0x0200 )
+	ROM_CONTINUE(          0x1a00, 0x0200 )
+	ROM_CONTINUE(          0x1e00, 0x0200 )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( mooncrstso )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",       0x0000, 0x0800, CRC(0357ab1a) SHA1(153c3134b7d09817230b4d18a4ba713022c1887e) )
@@ -12117,6 +12147,29 @@ ROM_START( scobrae ) // main program is identical to the scobras set once decryp
 ROM_END
 
 
+ROM_START( scobrae2 ) // same encryption as scobrae
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2c",   0x0000, 0x1000, CRC(5f38340b) SHA1(8479a294e3dd20192896fc13607a048a2a738878) )
+	ROM_LOAD( "2e",   0x1000, 0x1000, CRC(a3edcdb4) SHA1(3c11701621b868a8a08dca981d13349bea70be8d) )
+	ROM_LOAD( "2f",   0x2000, 0x1000, CRC(c6291ea6) SHA1(df1dc819ead011b0d5b64f62c1ac301794195b99) )
+	ROM_LOAD( "2h",   0x3000, 0x1000, CRC(c2197fac) SHA1(937e0652a73fae69f0a0b79c93f48facd6706af6) )
+	ROM_LOAD( "2j",   0x4000, 0x1000, CRC(80b8270f) SHA1(7f73d43e436fe2ef59058aa9e5791fd9940ea302) )
+	ROM_LOAD( "2l",   0x5000, 0x1000, CRC(f03475f6) SHA1(d2d7807fc4bb72465a4ccb78ac672f8aec9e00f1) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "5f",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) )
+	ROM_LOAD( "5h",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5c",   0x0000, 0x0800, CRC(d4346959) SHA1(5eab4505beb69a5bdd88b23db60e1193371250cf) )
+	ROM_LOAD( "5d",   0x0800, 0x0800, CRC(cc025d95) SHA1(2b0784c4d05c466e0b7648f16e14f34393d792c3) )
+	ROM_LOAD( "5e",   0x1000, 0x0800, CRC(1628c53f) SHA1(ec79a73e4a2d7373454b227dd7eff255f1cc60cc) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
+ROM_END
+
+
 // two board stack MU1 and MU2A. Has different colors and level sequence. Came from an A.V.G. by Zaccaria cabinet with Konami license, but still has only Konami copyright.
 // https://www.youtube.com/watch?v=CZRRVACtC3A
 ROM_START( scobrag )
@@ -12688,10 +12741,10 @@ GAME( 19??, omni,        pisces,   galaxian,   piscesb,    galaxian_state, init_
 GAME( 1980, uniwars,     0,        galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "UniWar S", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, uniwarsa,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Karateco)", "UniWar S (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mltiwars,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Gayton Games)", "Multi Wars (bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikoku,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "Gingateikoku No Gyakushu", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub,   uniwars,  galaxian,   gteikokub,  galaxian_state, init_pisces,     ROT270, "bootleg", "Gingateikoku No Gyakushu (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub2,  uniwars,  galaxian,   gteikokub2, galaxian_state, init_pisces,     ROT90,  "bootleg", "Gingateikoku No Gyakushu (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub3,  uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Honly)", "Gingateikoku No Gyakushu (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikoku,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "Gingateikoku no Gyakushu", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub,   uniwars,  galaxian,   gteikokub,  galaxian_state, init_pisces,     ROT270, "bootleg", "Gingateikoku no Gyakushu (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub2,  uniwars,  galaxian,   gteikokub2, galaxian_state, init_pisces,     ROT90,  "bootleg", "Gingateikoku no Gyakushu (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub3,  uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Honly)", "Gingateikoku no Gyakushu (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbatt,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbat2,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacempr,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Empire (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -12754,6 +12807,7 @@ GAME( 1980, mooncrsb,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_
 GAME( 1980, mooncrs2,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mooncrs3,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", MACHINE_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
 GAME( 1980, mooncrs4,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (SG-Florence)", "Moon Crest (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrs5,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, fantazia,    mooncrst, mooncrst,   fantazia,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Subelectro)", "Fantazia (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Fortrek)", "Space Thunderbird", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Gremlin)", "Super Moon Cresta (Gremlin, bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a bootleg, still has the 'POR' text in the bottom right corner that the Sonic version has?!
@@ -12909,6 +12963,7 @@ GAME( 1981, scobra,      0,        scobra,     scobra,     galaxian_state, init_
 GAME( 1981, scobrase,    scobra,   scobra,     scobra,     galaxian_state, init_scobra,     ROT90,  "Konami (Sega license)",              "Super Cobra (Sega)",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobras,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobrae,     scobra,   scobra,     scobras,    galaxian_state, init_scobrae,    ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics) (encrypted, KONATEC XC-103SS CPU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobrae2,    scobra,   scobra,     scobras,    galaxian_state, init_scobrae,    ROT90,  "Konami",                             "Super Cobra (encrypted)",                                           MACHINE_SUPPORTS_SAVE ) // same encryption as scobrae, no PCB pic so not sure it has the Konatec CPU or only some logic to simulate it
 GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Karateco)",                 "Super Cobra (bootleg, set 1)",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobrag,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (A.V.G. by Zaccaria)",       "Super Cobra (bootleg, set 2)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM
 GAME( 1981, scobraggi,   scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Cocamatic)",                "Super Cobra (bootleg, set 3)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM

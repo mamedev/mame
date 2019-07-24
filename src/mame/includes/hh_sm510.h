@@ -10,7 +10,6 @@
 #define MAME_INCLUDES_HH_SM510_H
 
 #include "cpu/sm510/sm510.h"
-#include "machine/timer.h"
 #include "sound/spkrdev.h"
 
 
@@ -20,9 +19,9 @@ public:
 	hh_sm510_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u.%u", 0U, 0U, 0U),
 		m_inp_lines(0),
 		m_inp_fixed(-1),
 		m_display_wait(33)
@@ -30,9 +29,9 @@ public:
 
 	// devices
 	required_device<sm510_base_device> m_maincpu;
-	optional_ioport_array<8+1> m_inp_matrix; // max 8
-	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<8+1> m_inputs; // max 8
+	output_finder<16, 16, 4> m_out_x;
 
 	// misc common
 	u16 m_inp_mux;                  // multiplexed inputs mask
@@ -67,7 +66,8 @@ public:
 	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	void set_display_size(u8 x, u8 y, u8 z);
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	TIMER_CALLBACK_MEMBER(display_decay_tick);
+	emu_timer *m_display_decay_timer;
 
 protected:
 	virtual void machine_start() override;

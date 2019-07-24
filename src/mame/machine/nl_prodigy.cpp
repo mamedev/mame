@@ -14,6 +14,8 @@ NETLIST_START(prodigy)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
+	ANALOG_INPUT(VCC, 5) // For TTL chips
+
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
 

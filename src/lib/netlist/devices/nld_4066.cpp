@@ -9,7 +9,7 @@
 
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/solver/nld_solver.h"
-#include "nlid_cmos.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -19,7 +19,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(CD4066_GATE)
 		NETLIB_FAMILY("CD4XXX")
-		, m_supply(*this, "PS")
+		, m_supply(*this, "VDD", "VSS", true)
 		, m_R(*this, "R")
 		, m_control(*this, "CTL")
 		, m_base_r(*this, "BASER", 270.0)
@@ -30,7 +30,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		NETLIB_SUB(vdd_vss)        m_supply;
+		nld_power_pins             m_supply;
 		analog::NETLIB_SUB(R_base) m_R;
 
 		analog_input_t             m_control;
@@ -47,10 +47,10 @@ namespace netlist
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{
-		nl_double sup = (m_supply.vdd() - m_supply.vss());
+		nl_double sup = (m_supply.VCC() - m_supply.GND());
 		nl_double low = plib::constants<nl_double>::cast(0.45) * sup;
 		nl_double high = plib::constants<nl_double>::cast(0.55) * sup;
-		nl_double in = m_control() - m_supply.vss();
+		nl_double in = m_control() - m_supply.GND();
 		nl_double rON = m_base_r() * plib::constants<nl_double>::cast(5.0) / sup;
 		nl_double R = -1.0;
 

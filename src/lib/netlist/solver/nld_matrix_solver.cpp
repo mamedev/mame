@@ -592,7 +592,6 @@ namespace devices
 			}
 			if (new_solver_timestep < m_params.m_min_timestep)
 			{
-				//log().warning("Dynamic timestep below min timestep. Consider decreasing MIN_TIMESTEP: {1} us", new_solver_timestep*1.0e6);
 				new_solver_timestep = m_params.m_min_timestep;
 			}
 		}
@@ -606,7 +605,7 @@ namespace devices
 
 	void matrix_solver_t::log_stats()
 	{
-		if (this->m_stat_calculations != 0 && this->m_stat_vsolver_calls && this->m_params.m_log_stats)
+		if (this->m_stat_calculations != 0 && this->m_stat_vsolver_calls && log().verbose.is_enabled())
 		{
 			log().verbose("==============================================");
 			log().verbose("Solver {1}", this->name());

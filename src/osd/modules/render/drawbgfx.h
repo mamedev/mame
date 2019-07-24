@@ -30,7 +30,7 @@ class bgfx_view;
 class osd_options;
 class avi_write;
 
-/* sdl_info is the information about SDL for the current screen */
+/* renderer_bgfx is the information about BGFX for the current screen */
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
@@ -75,7 +75,9 @@ public:
 		}
 
 		osd_dim wdim = win->get_size();
-		win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
+		if (wdim.width() > 0 && wdim.height() > 0)
+			win->target()->set_bounds(wdim.width(), wdim.height(), win->pixel_aspect());
+
 		win->target()->set_transform_container(!chain_transform);
 		return &win->target()->get_primitives();
 	}

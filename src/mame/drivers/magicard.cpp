@@ -808,7 +808,6 @@ void magicard_state::machine_reset()
 	memcpy (dst + 0x40000 * 1, src, 0x80000);
 	memcpy (dst + 0x40000 * 2, src, 0x80000);
 	memcpy (dst + 0x40000 * 3, src, 0x7fc00);
-	m_maincpu->reset();
 }
 
 

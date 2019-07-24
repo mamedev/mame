@@ -266,7 +266,7 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<i8741_device> m_kbdmcu;
+	required_device<i8741a_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
 	required_device<address_map_bank_device> m_48kbank;
@@ -311,7 +311,7 @@ void itt3030_state::itt3030_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x20, 0x2f).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write));
-	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 	map(0x32, 0x32).w(FUNC(itt3030_state::beep_w));
 	map(0x35, 0x35).r(FUNC(itt3030_state::vsync_r));
 	map(0x50, 0x53).rw(FUNC(itt3030_state::fdc_r), FUNC(itt3030_state::fdc_w));
@@ -707,7 +707,7 @@ void itt3030_state::itt3030(machine_config &config)
 	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 	// T0 is the key matrix return
 	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-	I8741(config, m_kbdmcu, 6_MHz_XTAL);
+	I8741A(config, m_kbdmcu, 6_MHz_XTAL);
 	m_kbdmcu->t0_in_cb().set(FUNC(itt3030_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(itt3030_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(itt3030_state::kbd_port2_r));

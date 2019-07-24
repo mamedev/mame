@@ -38,18 +38,17 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "screen.h"
 #include "speaker.h"
 
 
 /* Protection Handlers */
 
-WRITE8_MEMBER(_1943_state::c1943_protection_w)
+void _1943_state::protection_w(u8 data)
 {
 	m_prot_value = data;
 }
 
-READ8_MEMBER(_1943_state::c1943_protection_r)
+u8 _1943_state::protection_r()
 {
 	// The game crashes (through a jump to 0x8000) if the return value is not what it expects..
 
@@ -94,7 +93,7 @@ READ8_MEMBER(_1943_state::c1943_protection_r)
 }
 
 // The bootleg expects 0x00 to be returned from the protection reads because the protection has been patched out.
-READ8_MEMBER(_1943_state::_1943b_c007_r)
+u8 _1943_state::_1943b_c007_r()
 {
 	return 0;
 }
@@ -105,23 +104,23 @@ READ8_MEMBER(_1943_state::_1943b_c007_r)
 void _1943_state::c1943_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xc000).portr("SYSTEM");
 	map(0xc001, 0xc001).portr("P1");
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
-	map(0xc007, 0xc007).r(FUNC(_1943_state::c1943_protection_r));
+	map(0xc007, 0xc007).r(FUNC(_1943_state::protection_r));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(_1943_state::c1943_c804_w)); // ROM bank switch, screen flip
+	map(0xc804, 0xc804).w(FUNC(_1943_state::c804_w)); // ROM bank switch, screen flip
 	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xc807, 0xc807).w(FUNC(_1943_state::c1943_protection_w));
-	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::c1943_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::c1943_colorram_w)).share("colorram");
+	map(0xc807, 0xc807).w(FUNC(_1943_state::protection_w));
+	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::colorram_w)).share("colorram");
 	map(0xd800, 0xd801).ram().share("scrollx");
 	map(0xd802, 0xd802).ram().share("scrolly");
 	map(0xd803, 0xd804).ram().share("bgscrollx");
-	map(0xd806, 0xd806).w(FUNC(_1943_state::c1943_d806_w)); // sprites, bg1, bg2 enable
+	map(0xd806, 0xd806).w(FUNC(_1943_state::d806_w)); // sprites, bg1, bg2 enable
 	map(0xd808, 0xd808).nopw(); // ???
 	map(0xd868, 0xd868).nopw(); // ???
 	map(0xd888, 0xd888).nopw(); // ???
@@ -230,58 +229,34 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	2048,   /* 2048 characters */
+	RGN_FRAC(1,1),   /* 2048 characters */
 	2,  /* 2 bits per pixel */
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	16*8    /* every char takes 16 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
 	32,32,  /* 32*32 tiles */
-	512,    /* 512 tiles */
+	RGN_FRAC(1,2),
 	4,      /* 4 bits per pixel */
-	{ 512*256*8+4, 512*256*8+0, 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-			64*8+0, 64*8+1, 64*8+2, 64*8+3, 65*8+0, 65*8+1, 65*8+2, 65*8+3,
-			128*8+0, 128*8+1, 128*8+2, 128*8+3, 129*8+0, 129*8+1, 129*8+2, 129*8+3,
-			192*8+0, 192*8+1, 192*8+2, 192*8+3, 193*8+0, 193*8+1, 193*8+2, 193*8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16,
-			16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16,
-			24*16, 25*16, 26*16, 27*16, 28*16, 29*16, 30*16, 31*16 },
-	256*8   /* every tile takes 256 consecutive bytes */
-};
-
-static const gfx_layout bgtilelayout =
-{
-	32,32,  /* 32*32 tiles */
-	128,    /* 128 tiles */
-	4,      /* 4 bits per pixel */
-	{ 128*256*8+4, 128*256*8+0, 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-			64*8+0, 64*8+1, 64*8+2, 64*8+3, 65*8+0, 65*8+1, 65*8+2, 65*8+3,
-			128*8+0, 128*8+1, 128*8+2, 128*8+3, 129*8+0, 129*8+1, 129*8+2, 129*8+3,
-			192*8+0, 192*8+1, 192*8+2, 192*8+3, 193*8+0, 193*8+1, 193*8+2, 193*8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16,
-			16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16,
-			24*16, 25*16, 26*16, 27*16, 28*16, 29*16, 30*16, 31*16 },
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
+	{ STEP4(0,1),        STEP4(4*2,1),          STEP4(4*2*2*32,1), STEP4(4*2*2*32+4*2,1),
+	  STEP4(4*2*2*64,1), STEP4(4*2*2*64+4*2,1), STEP4(4*2*2*96,1), STEP4(4*2*2*96+4*2,1) },
+	{ STEP32(0,4*2*2) },
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
-	2048,   /* 2048 sprites */
+	RGN_FRAC(1,2),   /* 2048 sprites */
 	4,      /* 4 bits per pixel */
-	{ 2048*64*8+4, 2048*64*8+0, 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-			32*8+0, 32*8+1, 32*8+2, 32*8+3, 33*8+0, 33*8+1, 33*8+2, 33*8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
+	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*16,1), STEP4(4*2*2*16+4*2,1) },
+	{ STEP16(0,4*2*2) },
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
@@ -290,7 +265,7 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gfx_1943 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                  0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,               32*4, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, bgtilelayout,       32*4+16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         32*4+16*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 32*4+16*16+16*16, 16 )
 GFXDECODE_END
 
@@ -325,13 +300,13 @@ void _1943_state::_1943(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(_1943_state::screen_update_1943));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(_1943_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1943);
 	PALETTE(config, m_palette, FUNC(_1943_state::_1943_palette), 32*4+16*16+16*16+16*16, 256);
@@ -395,7 +370,7 @@ ROM_START( 1943 )
 	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) ) /* front background */
 	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) ) /* back background */
 
@@ -453,7 +428,7 @@ ROM_START( 1943u )
 	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) ) /* front background */
 	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) ) /* back background */
 
@@ -511,7 +486,7 @@ ROM_START( 1943ua )
 	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) ) /* front background */
 	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) ) /* back background */
 
@@ -569,7 +544,7 @@ ROM_START( 1943j )
 	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) ) /* front background */
 	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) ) /* back background */
 
@@ -627,7 +602,7 @@ ROM_START( 1943ja )
 	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) ) /* front background */
 	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) ) /* back background */
 
@@ -685,7 +660,7 @@ ROM_START( 1943jah )
 	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) ) /* front background */
 	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) ) /* back background */
 
@@ -743,7 +718,7 @@ ROM_START( 1943kai )
 	ROM_LOAD( "bmk12.12c", 0x30000, 0x8000, CRC(0f50c001) SHA1(0e6367d3f0ba39a00ee0fa6e42ae9d43d12da23d) )
 	ROM_LOAD( "bmk13.14c", 0x38000, 0x8000, CRC(fd1acf8e) SHA1(88477ff1e5fbbca251d8cd4f241b42618ba64a80) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bmk14.5f", 0x0000, 0x8000, CRC(cf0f5a53) SHA1(dc50f3f937f52910dbd0cedbc232acfed0aa6a42) )    /* front background */
 	ROM_LOAD( "bmk23.8k", 0x8000, 0x8000, CRC(17f77ef9) SHA1(8ebb4b440042436ec2db52bad808cced832db77c) )    /* back background */
 
@@ -801,7 +776,7 @@ ROM_START( 1943mii ) /* Prototype, location test or limited release? - PCB had g
 	ROM_LOAD( "12.12c", 0x30000, 0x8000, CRC(0f50c001) SHA1(0e6367d3f0ba39a00ee0fa6e42ae9d43d12da23d) )
 	ROM_LOAD( "13.14c", 0x38000, 0x8000, CRC(f065f619) SHA1(d45b3a7ce306b3dc7b2ccea2484c13c1ff08a0f7) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "14.5f", 0x0000, 0x8000, CRC(02a899f1) SHA1(0f094d925a6e38e922eb487af80da9c9ee7613aa) )    /* front background */
 	ROM_LOAD( "23.8k", 0x8000, 0x8000, CRC(b6dfdf85) SHA1(c223ae136f67e5f9910cbfa49b9827e5122e018e) )    /* back background */
 
@@ -855,7 +830,7 @@ ROM_START( 1943b )
 	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) ) /* front background */
 	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) ) /* back background */
 
@@ -911,7 +886,7 @@ ROM_START( 1943bj )
 	ROM_LOAD( "bm12.12c",  0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
 	ROM_LOAD( "bm13.14c",  0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* tilemaps */
+	ROM_REGION( 0x10000, "tilerom", 0 )    /* tilemaps */
 	/* front background */
 	ROM_LOAD( "bm14.5f",   0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) )
 	/* back background probably same gfx different layout */
@@ -935,15 +910,15 @@ ROM_END
 
 void _1943_state::init_1943()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	u8 *ROM = memregion("maincpu")->base();
+	m_mainbank->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
 void _1943_state::init_1943b()
 {
 	init_1943();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8smo_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 }
 
 /* Game Drivers */

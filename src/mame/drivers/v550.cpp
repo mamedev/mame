@@ -15,12 +15,12 @@
 #include "emu.h"
 //include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/com8116.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/v102_kbd.h"
 #include "machine/z80sio.h"
 #include "video/scn2674.h"
 #include "video/upd7220.h"
@@ -44,7 +44,6 @@ private:
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
-	void kbd_map(address_map &map);
 	void pvtc_char_map(address_map &map);
 	void pvtc_attr_map(address_map &map);
 
@@ -81,11 +80,6 @@ void v550_state::io_map(address_map &map)
 	map(0x71, 0x71).rw("pvtc", FUNC(scn2672_device::attr_buffer_r), FUNC(scn2672_device::attr_buffer_w));
 }
 
-void v550_state::kbd_map(address_map &map)
-{
-	map(0x0000, 0x07ff).rom().region("keyboard", 0);
-}
-
 void v550_state::pvtc_char_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
@@ -120,6 +114,7 @@ void v550_state::v550(machine_config &config)
 	I8255(config, "ppi"); // NEC D8255AC-5
 
 	I8251(config, m_usart, 34.846_MHz_XTAL / 16); // NEC D8251AC
+	m_usart->txd_handler().set("keyboard", FUNC(v550_keyboard_device::write_rxd));
 	m_usart->rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
 	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 34.846_MHz_XTAL / 16)); // NEC D7201C
@@ -128,17 +123,17 @@ void v550_state::v550(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	com8116_device &brg1(COM8116_020(config, "brg1", 1.8432_MHz_XTAL)); // SMC COM8116T-020
-	brg1.ft_handler().set("mpsc", FUNC(upd7201_new_device::txca_w));
-	brg1.fr_handler().set("mpsc", FUNC(upd7201_new_device::rxca_w));
+	brg1.ft_handler().set("mpsc", FUNC(upd7201_new_device::txcb_w));
+	brg1.ft_handler().append("mpsc", FUNC(upd7201_new_device::rxcb_w));
+	brg1.fr_handler().set("usart", FUNC(i8251_device::write_txc));
+	brg1.fr_handler().append("usart", FUNC(i8251_device::write_rxc));
 
 	com8116_device &brg2(COM8116_020(config, "brg2", 1.8432_MHz_XTAL)); // SMC COM8116T-020
-	brg2.ft_handler().set("mpsc", FUNC(upd7201_new_device::txcb_w));
-	brg2.ft_handler().append("mpsc", FUNC(upd7201_new_device::rxcb_w));
-	brg2.fr_handler().set("usart", FUNC(i8251_device::write_txc));
-	brg2.fr_handler().append("usart", FUNC(i8251_device::write_rxc));
+	brg2.ft_handler().set("mpsc", FUNC(upd7201_new_device::txca_w));
+	brg2.fr_handler().set("mpsc", FUNC(upd7201_new_device::rxca_w));
 
-	mcs48_cpu_device &kbdmcu(I8035(config, "kbdmcu", 4'608'000));
-	kbdmcu.set_addrmap(AS_PROGRAM, &v550_state::kbd_map);
+	v550_keyboard_device &keyboard(V550_KEYBOARD(config, "keyboard"));
+	keyboard.txd_callback().set(m_usart, FUNC(i8251_device::write_rxd));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(34.846_MHz_XTAL, 19 * 102, 0, 19 * 80, 295, 0, 272);
@@ -165,9 +160,6 @@ ROM_START( v550 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("e242-085_r03_u97.bin", 0x0000, 0x1000, CRC(8a491cee) SHA1(d8a9546a7dd2ffc0a5e54524ee16068dde56975c))
-
-	ROM_REGION(0x0800, "keyboard", 0)
-	ROM_LOAD("v550kb.bin", 0x0000, 0x0800, CRC(d11d19a3) SHA1(2d88202d0548e934800f07667c8d13a3762b12fa))
 ROM_END
 
 COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_IS_SKELETON )

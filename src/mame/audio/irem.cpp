@@ -458,12 +458,9 @@ void m62_audio_device::device_add_mconfig(machine_config &config)
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin4", 4, "R_AY45L_B.R");
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin5", 5, "R_AY45L_C.R");
 
-
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin6", 6, "I_MSM2K0.IN").set_mult_offset(5.0/65535.0, 2.5);
 	NETLIST_STREAM_INPUT(config, "snd_nl:cin7", 7, "I_MSM3K0.IN").set_mult_offset(5.0/65535.0, 2.5);
 
-	//MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "RV1.1")
-	//MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0, -35000.0)
 	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "R26.1").set_mult_offset(30000.0 * 10.0, 0.0);
 }
 

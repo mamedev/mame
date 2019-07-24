@@ -132,8 +132,8 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 
 READ16_MEMBER(qdrmfgp_state::v_rom_r)
 {
-	uint8_t *mem8 = memregion("gfx1")->base();
-	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
+	uint8_t *mem8 = memregion("k056832")->base();
+	int bank = m_k056832->word_r(0x34/2);
 
 	offset += bank * 0x800 * 4;
 
@@ -147,33 +147,33 @@ READ16_MEMBER(qdrmfgp_state::v_rom_r)
 READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
 {
 	if (offset < 0x1000 / 2)
-		return m_k056832->ram_word_r(space, offset * 2 + 1, mem_mask);
+		return m_k056832->ram_word_r(offset * 2 + 1);
 	else
-		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2, mem_mask);
+		return m_k056832->ram_word_r((offset - 0x1000 / 2) * 2);
 }
 
 READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
 {
 	if (offset < 0x1000 / 2)
-		return m_k056832->ram_word_r(space, offset * 2, mem_mask);
+		return m_k056832->ram_word_r(offset * 2);
 	else
-		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
+		return m_k056832->ram_word_r((offset - 0x1000 / 2) * 2 + 1);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
 {
 	if (offset < 0x1000 / 2)
-		m_k056832->ram_word_w(space, offset * 2 + 1, data, mem_mask);
+		m_k056832->ram_word_w(offset * 2 + 1, data, mem_mask);
 	else
-		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2, data, mem_mask);
+		m_k056832->ram_word_w((offset - 0x1000 / 2) * 2, data, mem_mask);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
 {
 	if (offset < 0x1000 / 2)
-		m_k056832->ram_word_w(space, offset * 2, data, mem_mask);
+		m_k056832->ram_word_w(offset * 2, data, mem_mask);
 	else
-		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
+		m_k056832->ram_word_w((offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
 }
 
 
@@ -553,7 +553,7 @@ void qdrmfgp_state::qdrmfgp(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp_tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4dj, 1, 0);
+	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
@@ -598,7 +598,7 @@ void qdrmfgp_state::qdrmfgp2(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp2_tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4dj, 1, 0);
+	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K053252(config, m_k053252, XTAL(32'000'000)/4);
@@ -626,7 +626,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD16_WORD_SWAP( "gq_460_b04.20e", 0x000000, 0x80000, CRC(293d8174) SHA1(cf507d0b29dab161190f0160c05c640f16306bae) )
 	ROM_LOAD16_WORD_SWAP( "gq_460_a05.22e", 0x080000, 0x80000, CRC(4128cb3c) SHA1(4a16d85a66934a20afd074546de362c40a1ea785) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )       /* TILEMAP */
+	ROM_REGION( 0x100000, "k056832", 0 )       /* TILEMAP */
 	ROM_LOAD( "gq_460_a01.15e", 0x000000, 0x80000, CRC(6536b700) SHA1(47ffe0cfbf80810179560150b23d825fe1a5c5ca) )
 	ROM_LOAD( "gq_460_a02.17e", 0x080000, 0x80000, CRC(ac01d675) SHA1(bf66433ace95f4ef14699d03add7cbc2e5d90eea) )
 
@@ -643,7 +643,7 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD16_WORD_SWAP( "ge_557_c05.20e", 0x000000, 0x80000, CRC(336df99f) SHA1(46fb36d40371761be0cfa17b34f28cc893a44a22) )
 	ROM_LOAD16_WORD_SWAP( "ge_557_a06.22e", 0x080000, 0x80000, CRC(ad77e10f) SHA1(4a762a59fe3096d48e3cbf0da3bb0d75c5087e78) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )       /* TILEMAP */
+	ROM_REGION( 0x100000, "k056832", 0 )       /* TILEMAP */
 	ROM_LOAD( "ge_557_a01.13e", 0x000000, 0x80000, CRC(c301d406) SHA1(5fad8cc611edd83380972abf37ec80561b9317a6) )
 	ROM_LOAD( "ge_557_a02.15e", 0x080000, 0x80000, CRC(3bfe1e56) SHA1(9e4df512a804a96fcb545d4e0eb58b5421d65ea4) )
 

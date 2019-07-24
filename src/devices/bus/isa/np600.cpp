@@ -11,6 +11,7 @@
 
 #include "cpu/i86/i186.h"
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 
 DEFINE_DEVICE_TYPE(NP600A3, np600a3_device, "np600a3", "InterLan NP600A-3 Intelligent Protocol Processor")
 
@@ -32,10 +33,9 @@ void np600a3_device::lcc_ca_w(u16 data)
 	m_lcc->ca(1);
 }
 
-WRITE_LINE_MEMBER(np600a3_device::lcc_reset_w)
+WRITE_LINE_MEMBER(np600a3_device::host_int_w)
 {
-	if (!state)
-		m_lcc->reset();
+	logerror("%s: Host interrupt %s\n", machine().describe_context(), state ? "asserted" : "cleared");
 }
 
 u16 np600a3_device::status_r()
@@ -46,6 +46,8 @@ u16 np600a3_device::status_r()
 void np600a3_device::mem_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).ram().share("netram"); // GM71256-12 x16
+	map(0xc0000, 0xc0001).mirror(0xfffe).r("fromhost", FUNC(generic_latch_16_device::read));
+	map(0xc0000, 0xc0001).mirror(0xfffe).w("tohost", FUNC(generic_latch_16_device::write));
 	map(0xfc000, 0xfffff).rom().region("npcpu", 0);
 }
 
@@ -69,9 +71,13 @@ void np600a3_device::device_add_mconfig(machine_config &config)
 	m_npcpu->set_addrmap(AS_IO, &np600a3_device::io_map);
 
 	ls259_device &bitlatch(LS259(config, "bitlatch")); // U28
-	bitlatch.q_out_cb<4>().set(FUNC(np600a3_device::lcc_reset_w));
+	bitlatch.q_out_cb<1>().set(FUNC(np600a3_device::host_int_w));
+	bitlatch.q_out_cb<4>().set(m_lcc, FUNC(i82586_device::reset_w)).invert();
 
-	I82586(config, m_lcc, 20_MHz_XTAL);
+	GENERIC_LATCH_16(config, "fromhost");
+	GENERIC_LATCH_16(config, "tohost");
+
+	I82586(config, m_lcc, 16_MHz_XTAL / 2); // clock presumed (20 MHz XTAL also present for SEEQ DQ8023A transceiver)
 	m_lcc->set_addrmap(0, &np600a3_device::lcc_map);
 	m_lcc->out_irq_cb().set(m_npcpu, FUNC(i80186_cpu_device::tmrin1_w));
 }

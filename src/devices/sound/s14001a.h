@@ -14,8 +14,6 @@ public:
 	s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_bsy_handler(Object &&cb) { return m_bsy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ext_read_handler(Object &&cb) { return m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
 	auto bsy() { return m_bsy_handler.bind(); }
 	auto ext_read() { return m_ext_read_handler.bind(); }
 

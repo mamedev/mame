@@ -13,6 +13,11 @@
     1fc00000 - 1fc7ffff      Boot ROM
     40000000 - 7fffffff      RAM
 
+NOTE: The default Sgi O2 Keyboard (Model No. RT6856T, Part No. 121472-101-B,
+      Sgi No. 062-0002-001) has a Zilog "RT101+228A" MCU, which is really a
+      Zilog Z8615 (a Z8-based PC keyboard controller) with 4K ROM (undumped).
+      It might have a custom ROM, since it had special marking.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -44,7 +49,6 @@ protected:
 void o2_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("bank1");
-	map(0x00000000, 0x00000fff).ram();
 	map(0x14000000, 0x15ffffff).m(m_crime, FUNC(crime_device::map));
 	map(0x1f000000, 0x1f3fffff).m(m_mace, FUNC(mace_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);

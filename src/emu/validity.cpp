@@ -2047,6 +2047,9 @@ void validity_checker::validate_device_types()
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
 		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
 
+		if (m_print_verbose)
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating device %s...\n", description.c_str());
+
 		// ensure shortname exists
 		if (!dev->shortname() || !*dev->shortname())
 		{

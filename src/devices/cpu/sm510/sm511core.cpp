@@ -54,20 +54,17 @@ std::unique_ptr<util::disasm_interface> sm511_device::create_disassembler()
 
 
 // device definitions
-sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm511_device::program_4k), this), 7 /* data width */, address_map_constructor(FUNC(sm511_device::data_96_32x4), this))
-{
-}
+sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm511_device::program_4k), this), 7 /* data width */, address_map_constructor(FUNC(sm511_device::data_96_32x4), this))
+{ }
 
-sm511_device::sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
-	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
-{
-}
+sm511_device::sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
+{ }
 
-sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm511_device(mconfig, SM512, tag, owner, clock, 2, 12, address_map_constructor(FUNC(sm512_device::program_4k), this), 7, address_map_constructor(FUNC(sm512_device::data_80_48x4), this))
-{
-}
+sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm511_device(mconfig, SM512, tag, owner, clock, 2, 12, address_map_constructor(FUNC(sm512_device::program_4k), this), 7, address_map_constructor(FUNC(sm512_device::data_80_48x4), this))
+{ }
 
 
 

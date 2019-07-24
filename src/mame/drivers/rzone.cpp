@@ -32,6 +32,7 @@
 #include "includes/hh_sm510.h"
 
 #include "cpu/sm510/sm510.h"
+#include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -130,7 +131,7 @@ WRITE_LINE_MEMBER(rzone_state::sctrl_w)
 {
 	// SCTRL: 74165 SH/LD: reload inputs while low
 	if (!state || !m_sctrl)
-		m_inp_mux = m_inp_matrix[0]->read();
+		m_inp_mux = m_inputs[0]->read();
 
 	m_sctrl = state;
 }
@@ -253,13 +254,12 @@ void rzone_state::rzbatfor(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", "svg"));
-	screen.set_refresh_hz(50);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
 	screen.set_size(1368, 1080);
-	screen.set_visarea(0, 1368-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
@@ -278,13 +278,12 @@ void rzone_state::rztoshden(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", "svg"));
-	screen.set_refresh_hz(50);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
 	screen.set_size(1392, 1080);
-	screen.set_visarea(0, 1392-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
@@ -303,13 +302,12 @@ void rzone_state::rzindy500(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", "svg"));
-	screen.set_refresh_hz(50);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
 	screen.set_size(1425, 1080);
-	screen.set_visarea(0, 1425-1, 0, 1080-1);
+	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_rzone);
 
 	/* sound hardware */
@@ -332,7 +330,7 @@ ROM_START( rzbatfor )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "12_02.melody", 0x000, 0x100, CRC(d794746c) SHA1(f0706c5100c090c65fcb2d768b5a5b4a55b29e04) )
 
-	ROM_REGION( 652556, "svg", 0)
+	ROM_REGION( 652556, "screen", 0)
 	ROM_LOAD( "rzbatfor.svg", 0, 652556, CRC(4d850489) SHA1(31a2a1e9209c0f77dbc268cddbfa4a67478734a7) )
 ROM_END
 
@@ -340,7 +338,7 @@ ROM_START( rztoshden )
 	ROM_REGION( 0x1000, "maincpu", 0 ) // model 71-241, SM510 under epoxy (die label ML4)
 	ROM_LOAD( "ml4", 0x0000, 0x1000, CRC(282c641f) SHA1(f94e4a17ffe90adcc6046070034be9b777f72288) )
 
-	ROM_REGION( 857474, "svg", 0)
+	ROM_REGION( 857474, "screen", 0)
 	ROM_LOAD( "rztoshden.svg", 0, 857474, CRC(e4340f84) SHA1(4f040d3c7dc06d66b4f06942e610a64c11e5cd4d) )
 ROM_END
 
@@ -348,7 +346,7 @@ ROM_START( rzindy500 )
 	ROM_REGION( 0x1000, "maincpu", 0 ) // model 71-312, SM510 under epoxy (die label KMS10 22)
 	ROM_LOAD( "10_22", 0x0000, 0x1000, CRC(99a746d0) SHA1(64264499d45a566fa9a0801c20e7fa27eac18da6) )
 
-	ROM_REGION( 533411, "svg", 0)
+	ROM_REGION( 533411, "screen", 0)
 	ROM_LOAD( "rzindy500.svg", 0, 533411, CRC(cfc85677) SHA1(014b9123d81fba1488b4a22a6b6fd0c09e22c1ea) )
 ROM_END
 

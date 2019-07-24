@@ -144,6 +144,9 @@ void cromptons_state::cromptons(machine_config &config)
 ROM_START( ffruits )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "frntf5v6.ic11", 0x00000, 0x10000, CRC(ca60c557) SHA1(6f356827f0c93ec0376a7edc03963ef0748dccdb) ) // 27c512
+
+	ROM_REGION(0x2000, "timekpr", 0)
+	ROM_LOAD( "frntf_m48t08-100pc1.ic12", 0x0000, 0x2000, CRC(19f1c93a) SHA1(4fb01299c72e50c91af80939f8ffa8a8447f5211) )
 ROM_END
 
 

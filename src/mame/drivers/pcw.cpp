@@ -215,22 +215,17 @@ WRITE_LINE_MEMBER( pcw_state::pcw_fdc_interrupt )
 */
 void pcw_state::pcw_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1").bankw("bank5");
-	map(0x4000, 0x7fff).bankr("bank2").bankw("bank6");
-	map(0x8000, 0xbfff).bankr("bank3").bankw("bank7");
-	map(0xc000, 0xffff).bankr("bank4").bankw("bank8");
+	map(0x0000, 0x3fff).bankr(m_rdbanks[0]).bankw(m_wrbanks[0]);
+	map(0x4000, 0x7fff).bankr(m_rdbanks[1]).bankw(m_wrbanks[1]);
+	map(0x8000, 0xbfff).bankr(m_rdbanks[2]).bankw(m_wrbanks[2]);
+	map(0xc000, 0xffff).bankr(m_rdbanks[3]).bankw(m_wrbanks[3]);
 }
 
 
 /* Keyboard is read by the MCU and sent as serial data to the gate array ASIC */
 READ8_MEMBER(pcw_state::pcw_keyboard_r)
 {
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15"
-	};
-
-	return ioport(keynames[offset])->read();
+	return m_iptlines[offset]->read();
 }
 
 READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
@@ -245,9 +240,7 @@ READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
 void pcw_state::pcw_update_read_memory_block(int block, int bank)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	char block_name[32];
 
-	snprintf(block_name, sizeof(block_name), "bank%d", block + 1);
 	/* bank 3? */
 	if (bank == 3)
 	{
@@ -258,18 +251,15 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	else
 	{
 		/* restore bank handler across entire block */
-		space.install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
+		space.install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, m_rdbanks[block].target());
 		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
-	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
+	m_rdbanks[block]->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
 }
 
 void pcw_state::pcw_update_write_memory_block(int block, int bank)
 {
-	char block_name[10];
-
-	sprintf(block_name,"bank%d",block+5);
-	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
+	m_wrbanks[block]->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
 	LOGMEM("MEM: write block %i -> bank %i\n", block, bank);
 }
 
@@ -350,7 +340,7 @@ void pcw_state::pcw_update_mem(int block, int data)
 
         FakeROM = &memregion("maincpu")->base()[0x010000];
 
-        membank("bank1")->set_base(FakeROM);
+        m_rdbanks[0]->set_base(FakeROM);
     }*/
 }
 
@@ -959,7 +949,7 @@ void pcw_state::pcw_io(address_map &map)
 	map(0x0f6, 0x0f6).w(FUNC(pcw_state::pcw_pointer_table_top_scan_w));
 	map(0x0f7, 0x0f7).w(FUNC(pcw_state::pcw_vdu_video_control_register_w));
 	map(0x0f8, 0x0f8).rw(FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
-	map(0x0fc, 0x0fd).rw(m_printer_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x0fc, 0x0fd).rw(m_printer_mcu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 }
 
 
@@ -1259,7 +1249,7 @@ void pcw_state::pcw(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw_state::pcw_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw_io);
 
-	I8041(config, m_printer_mcu, 11000000);  // 11MHz
+	I8041AH(config, m_printer_mcu, 11000000);  // 11MHz
 	m_printer_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_printer_p2_r));
 	m_printer_mcu->p2_out_cb().set(FUNC(pcw_state::mcu_printer_p2_w));
 	m_printer_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_printer_p1_r));

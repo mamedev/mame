@@ -34,7 +34,6 @@
 
 
 #define A2_CPU_TAG "maincpu"
-#define A2_SPEAKER_TAG "speaker"
 #define A2_VIDEO_TAG "a2video"
 
 class superga2_state : public driver_device
@@ -47,7 +46,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_video(*this, A2_VIDEO_TAG),
 		m_a2common(*this, "a2common"),
-		m_speaker(*this, A2_SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_softlatch(*this, "softlatch")
 	{ }
 
@@ -71,11 +70,6 @@ public:
 	DECLARE_READ8_MEMBER(speaker_toggle_r);
 	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
 	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_WRITE_LINE_MEMBER(txt_w);
-	DECLARE_WRITE_LINE_MEMBER(mix_w);
-	DECLARE_WRITE_LINE_MEMBER(scr_w);
-	DECLARE_WRITE_LINE_MEMBER(res_w);
-	DECLARE_WRITE_LINE_MEMBER(an2_w);
 	DECLARE_READ8_MEMBER(reset_r);
 
 	void kuzmich(machine_config &config);
@@ -117,9 +111,6 @@ void superga2_state::machine_reset()
 	uint8_t *user1 = memregion("maincpu")->base();
 
 	memcpy(&m_ram_ptr[0x1100], user1, 0x8000);
-	mix_w(false);
-	scr_w(false);
-	res_w(true);
 }
 
 /***************************************************************************
@@ -136,42 +127,6 @@ uint32_t superga2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 /***************************************************************************
     I/O
 ***************************************************************************/
-
-WRITE_LINE_MEMBER(superga2_state::txt_w)
-{
-	if (m_video->m_graphics == state) // avoid flickering from II+ refresh polling
-	{
-		// select graphics or text mode
-		m_screen->update_now();
-		m_video->m_graphics = !state;
-	}
-}
-
-WRITE_LINE_MEMBER(superga2_state::mix_w)
-{
-	// select mixed mode or nomix
-	m_screen->update_now();
-	m_video->m_mix = state;
-}
-
-WRITE_LINE_MEMBER(superga2_state::scr_w)
-{
-	// select primary or secondary page
-	m_screen->update_now();
-	m_video->m_page2 = state;
-}
-
-WRITE_LINE_MEMBER(superga2_state::res_w)
-{
-	// select lo-res or hi-res
-	m_screen->update_now();
-	m_video->m_hires = state;
-}
-
-WRITE_LINE_MEMBER(superga2_state::an2_w)
-{
-	m_video->m_an2 = state;
-}
 
 READ8_MEMBER(superga2_state::speaker_toggle_r)
 {
@@ -263,7 +218,7 @@ void superga2_state::kuzmich(machine_config &config)
 	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &superga2_state::kuzmich_map);
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -273,15 +228,14 @@ void superga2_state::kuzmich(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* soft switches */
 	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
-	m_softlatch->q_out_cb<0>().set(FUNC(superga2_state::txt_w));
-	m_softlatch->q_out_cb<1>().set(FUNC(superga2_state::mix_w));
-	m_softlatch->q_out_cb<2>().set(FUNC(superga2_state::scr_w));
-	m_softlatch->q_out_cb<3>().set(FUNC(superga2_state::res_w));
-	m_softlatch->q_out_cb<6>().set(FUNC(superga2_state::an2_w));
+	m_softlatch->q_out_cb<0>().set(m_video, FUNC(a2_video_device::txt_w));
+	m_softlatch->q_out_cb<1>().set(m_video, FUNC(a2_video_device::mix_w));
+	m_softlatch->q_out_cb<2>().set(m_video, FUNC(a2_video_device::scr_w));
+	m_softlatch->q_out_cb<3>().set(m_video, FUNC(a2_video_device::res_w));
 
 	RAM(config, RAM_TAG).set_default_size("48K").set_default_value(0x00);
 }

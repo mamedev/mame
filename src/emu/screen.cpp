@@ -546,7 +546,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_video_attributes(0)
-	, m_svg_region(nullptr)
+	, m_svg_region(tag)
 	, m_container(nullptr)
 	, m_width(100)
 	, m_height(100)
@@ -608,10 +608,6 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
 			osd_printf_error("Missing SCREEN_UPDATE function\n");
 	}
-
-	// check for svg region
-	if (m_type == SCREEN_TYPE_SVG && !m_svg_region)
-		osd_printf_error("Missing SVG region information\n");
 
 	// check for zero frame rate
 	if (m_refresh == 0)
@@ -1151,20 +1147,12 @@ void screen_device::update_now()
 		// if the line before us was incomplete, we must do it in two pieces
 		if (m_partial_scan_hpos > 0)
 		{
-			if (current_vpos > 1)
-			{
-				s32 save_scan = m_partial_scan_hpos;
-				update_partial(current_vpos - 2);
-				m_partial_scan_hpos = save_scan;
-			}
-
 			// now finish the previous partial scanline
-			int scanline = current_vpos - 1;
 			clip.set(
 					(std::max)(clip.left(), m_partial_scan_hpos),
-					(std::min)(clip.right(), current_hpos),
+					clip.right(),
 					(std::max)(clip.top(), m_last_partial_scan),
-					(std::min)(clip.bottom(), scanline));
+					(std::min)(clip.bottom(), m_last_partial_scan));
 
 			// if there's something to draw, do it
 			if (!clip.empty())
@@ -1182,10 +1170,10 @@ void screen_device::update_now()
 				m_partial_updates_this_frame++;
 				g_profiler.stop();
 				m_partial_scan_hpos = 0;
-				m_last_partial_scan = current_vpos + 1;
+				m_last_partial_scan++;
 			}
 		}
-		else
+		if (current_vpos > m_last_partial_scan)
 		{
 			update_partial(current_vpos - 1);
 		}
@@ -1257,7 +1245,7 @@ void screen_device::reset_partial_updates()
 
 u32 screen_device::pixel(s32 x, s32 y)
 {
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 	if (!curbitmap.valid())
 		return 0;
 
@@ -1297,7 +1285,7 @@ u32 screen_device::pixel(s32 x, s32 y)
 
 void screen_device::pixels(u32 *buffer)
 {
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 	if (!curbitmap.valid())
 		return;
 

@@ -8,16 +8,14 @@
  *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
- *  for his site http:://www.geo255.redhotant.com
+ *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
- *  for his site http://www.ifrance.com/oric/microtan.html
+ *  for his site http://oric.free.fr/microtan.html
  *
  ***************************************************************************/
 
 #include "emu.h"
 #include "includes/microtan.h"
-
-
 
 
 WRITE8_MEMBER(microtan_state::videoram_w)
@@ -40,6 +38,10 @@ TILE_GET_INFO_MEMBER(microtan_state::get_bg_tile_info)
 
 void microtan_state::video_start()
 {
+	/* randomize video memory contents */
+	for (uint16_t addr = 0; addr < m_videoram.bytes(); addr++)
+		m_videoram[addr] = machine().rand() & 0xff;
+
 	m_bg_tilemap = &machine().tilemap().create(*
 			m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(microtan_state::get_bg_tile_info),this),

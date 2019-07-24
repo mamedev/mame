@@ -233,7 +233,7 @@ private:
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void gluck2_map(address_map &map);
 };
 
@@ -279,7 +279,7 @@ void gluck2_state::video_start()
 }
 
 
-uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -503,7 +503,6 @@ void gluck2_state::gluck2(machine_config &config)
 	screen.set_size((39+1)*8, (38+1)*8);                /* from MC6845 init, registers 00 & 04. (value - 1) */
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  /* from MC6845 init, registers 01 & 06. */
 	screen.set_screen_update(FUNC(gluck2_state::screen_update));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gluck2);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);

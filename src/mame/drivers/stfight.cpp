@@ -315,7 +315,7 @@ void stfight_state::cshooter_cpu1_map(address_map &map)
 	map(0xc801, 0xc801).w(FUNC(stfight_state::stfight_bank_w));
 	map(0xd000, 0xd7ff).ram().w("airraid_vid", FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd80f).ram().w("airraid_vid", FUNC(airraid_video_device::vregs_w)).share("vregs"); // wrong?
-	map(0xe000, 0xfdff).ram();
+	map(0xf000, 0xfdff).ram();
 	map(0xfe00, 0xffff).ram().share("sprite_ram");
 }
 

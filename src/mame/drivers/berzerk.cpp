@@ -1291,7 +1291,7 @@ ROM_END
 
 
 /*
-   The original / prototype version of moon war runs on Frenzy Hardware.
+   The original / prototype version of Moon War runs on Frenzy Hardware.
 
    The more common version of Moon War runs on modified Super Cobra (galaxian.cpp) hardware and is often called
    'Moon War II' because it is the second version, and the ROMs as well as many of the PCBs are labeled as such.
@@ -1299,6 +1299,12 @@ ROM_END
    So far only 2 original boards of this have been found, one with only the sound ROMs on it, and the other
    with only the program ROMs on it.  This set is a combination of dumps from those two boards, so there
    is a small chance they could be mismatched.
+
+Sound ROMs for Moon War:
+
+MOON WAR       MOON WAR
+RVO  1C        RVO  2C
+1981 STERN     1981 STERN
 */
 ROM_START( moonwarp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1309,8 +1315,8 @@ ROM_START( moonwarp )
 	ROM_LOAD( "5c.bin",      0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
-	ROM_LOAD( "moonwar.1c.bin", 0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) ) /* VSU-1000 board */
-	ROM_LOAD( "moonwar.2c.bin", 0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) ) /* ditto */
+	ROM_LOAD( "moon_war_rv0_1c.1c", 0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) ) /* VSU-1000 board */
+	ROM_LOAD( "moon_war_rv0_2c.2c", 0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) ) /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "n82s123.6e",    0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/ROM select PROM - from board with prg ROMs, same as Frenzy */

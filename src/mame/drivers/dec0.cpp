@@ -1752,19 +1752,17 @@ void dec0_state::dec0_base(machine_config &config)
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
-	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_BAC06(config, m_tilegen[1], 0);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
-	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_BAC06(config, m_tilegen[2], 0);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
-	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
+	m_tilegen[2]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(3);
-	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1898,8 +1896,7 @@ void dec0_automat_state::automat(machine_config &config)
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(3);
-	m_spritegen->set_gfxdecode_tag("gfxdecode");
+	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb), this);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_automat);
@@ -1975,8 +1972,6 @@ void dec0_automat_state::secretab(machine_config &config)
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(3);
-	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
@@ -2027,6 +2022,7 @@ void dec0_state::hbarrel(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::hbarrel_colpri_cb), this);
 }
 
 void dec0_state::bandit(machine_config &config)
@@ -2052,6 +2048,7 @@ void dec0_state::bandit(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb), this);
 }
 
 void dec0_state::baddudes(machine_config &config)
@@ -2109,6 +2106,7 @@ void dec0_state::robocop(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
 }
 
 void dec0_state::robocopb(machine_config &config)
@@ -2117,6 +2115,7 @@ void dec0_state::robocopb(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
 }
 
 void dec0_state::hippodrm(machine_config &config)
@@ -2198,6 +2197,7 @@ void dec0_state::midres(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_midres));
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb), this);
 
 	m_gfxdecode->set_info(gfx_midres);
 }
@@ -3980,8 +3980,8 @@ GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, empty_init
 GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state, init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state, init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   dec0_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasyj,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", MACHINE_SUPPORTS_SAVE )

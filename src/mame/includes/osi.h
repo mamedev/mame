@@ -12,6 +12,7 @@
 #include "imagedev/floppy.h"
 #include "machine/6850acia.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "machine/ram.h"
 #include "sound/discrete.h"
 #include "sound/beep.h"
@@ -32,9 +33,11 @@ class sb2m600_state : public driver_device
 public:
 	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cassbit(0)
+		, m_cassold(0)
 		, m_maincpu(*this, M6502_TAG)
-		, m_acia_0(*this, "acia_0")
-		, m_cassette(*this, "cassette")
+		, m_acia(*this, "acia")
+		, m_cass(*this, "cassette")
 		, m_discrete(*this, DISCRETE_TAG)
 		, m_ram(*this, RAM_TAG)
 		, m_video_ram(*this, "video_ram")
@@ -55,8 +58,8 @@ protected:
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
-	DECLARE_WRITE_LINE_MEMBER( cassette_tx );
-	DECLARE_WRITE_LINE_MEMBER( write_cassette_clock );
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void floppy_index_callback(floppy_image_device *floppy, int state);
 
@@ -66,9 +69,12 @@ protected:
 	void osi630_video(machine_config &config);
 	void osi600_mem(address_map &map);
 
+	uint8_t m_cass_data[4];
+	bool m_cassbit;
+	bool m_cassold;
 	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia_0;
-	required_device<cassette_image_device> m_cassette;
+	required_device<acia6850_device> m_acia;
+	required_device<cassette_image_device> m_cass;
 	optional_device<discrete_sound_device> m_discrete;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint8_t> m_video_ram;

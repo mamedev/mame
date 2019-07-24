@@ -31,12 +31,12 @@ public:
 	auto read_1_callback() { return m_read_1_cb.bind(); }
 	auto write_1_callback() { return m_write_1_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( io_read );
-	DECLARE_WRITE8_MEMBER( io_write );
-	DECLARE_READ16_MEMBER( next_pixel );
-	DECLARE_READ16_MEMBER( time_until_next_event );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 io_read(offs_t offset);
+	void io_write(offs_t offset, u8 data);
+	u16 next_pixel();
+	u16 time_until_next_event();
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 

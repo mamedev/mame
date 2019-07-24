@@ -778,7 +778,118 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1840 motherboard")
+DEFINE_DEVICE_TYPE(EC1840_MOTHERBOARD, ec1840_mb_device, "ec1840_mb", "EC-1840 motherboard")
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void ec1840_mb_device::device_add_mconfig(machine_config &config)
+{
+	ec1841_mb_device::device_add_mconfig(config);
+
+	m_ppi8255->in_pc_callback().set(FUNC(ec1840_mb_device::pc_ppi_portc_r));
+}
+
+// via http://oldpc.su/pc/ec1840/ec1840rep.html
+static INPUT_PORTS_START( ec1840_mb )
+	PORT_START("DSW0") /* SA1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x30, "Graphics adapter")
+	PORT_DIPSETTING(    0x00, "Reserved" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
+	PORT_BIT(     0x0c, 0x0c, IPT_UNUSED )
+	PORT_DIPNAME( 0x02, 0x02, "DMAC installed")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+
+	PORT_START("SA2")
+	PORT_BIT(     0xcf, 0x00, IPT_UNUSED )
+	PORT_DIPNAME( 0x20, 0x20, "SA2.5")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x10, 0x10, "SA2.4")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes) )
+INPUT_PORTS_END
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor ec1840_mb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ec1840_mb );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  ec1840_mb_device - constructor
+//-------------------------------------------------
+
+ec1840_mb_device::ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ec1841_mb_device(mconfig, EC1840_MOTHERBOARD, tag, owner, clock)
+{
+}
+
+void ec1840_mb_device::device_start()
+{
+}
+
+READ8_MEMBER( ec1840_mb_device::pc_ppi_portc_r )
+{
+	int data = 0xff;
+
+	data &= ~0x80; // no parity error
+	data &= ~0x40; // no error on expansion board
+
+	if (m_ppi_portc_switch_high)
+	{
+		/* read hi nibble of SW2 */
+		data = data & 0xf0;
+
+		switch (m_ram->size())
+		{
+		case 128 * 1024:    data |= 0x00; break;
+		case 256 * 1024:    data |= 0x01; break;
+		case 384 * 1024:    data |= 0x02; break;
+		case 512 * 1024:    data |= 0x03; break;
+		case 640 * 1024:    data |= 0x04; break;
+		}
+
+		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
+	}
+	else
+	{
+		/* read lo nibble of S2 */
+		data = (data & 0xf0) | (ioport("DSW0")->read() >> 4);
+		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
+	}
+
+	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
+
+	return data;
+}
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1841 motherboard")
 
 
 //-------------------------------------------------
@@ -820,6 +931,7 @@ static INPUT_PORTS_START( ec1841_mb )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 
 	PORT_START("SA2")
+	PORT_BIT(     0xcb, 0x00, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x04, "Speech synthesizer")
 	PORT_DIPSETTING(    0x00, "Installed" )
 	PORT_DIPSETTING(    0x04, "Not installed" )
@@ -844,6 +956,11 @@ ioport_constructor ec1841_mb_device::device_input_ports() const
 
 ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ibm5160_mb_device(mconfig, EC1841_MOTHERBOARD, tag, owner, clock)
+{
+}
+
+ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ibm5160_mb_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -875,7 +992,7 @@ WRITE8_MEMBER( ec1841_mb_device::pc_ppi_portb_w )
 	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 }
 
-READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
+READ8_MEMBER( ec1841_mb_device::pc_ppi_portc_r )
 {
 	int data=0xff;
 

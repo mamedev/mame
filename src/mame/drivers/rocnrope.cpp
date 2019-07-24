@@ -68,9 +68,10 @@ void rocnrope_state::rocnrope_map(address_map &map)
 	map(0x3083, 0x3083).portr("DSW1");
 	map(0x3000, 0x3000).portr("DSW2");
 	map(0x3100, 0x3100).portr("DSW3");
-	map(0x4000, 0x47ff).ram();
 	map(0x4000, 0x402f).ram().share("spriteram2");
+	map(0x4030, 0x43ff).ram();
 	map(0x4400, 0x442f).ram().share("spriteram");
+	map(0x4430, 0x47ff).ram();
 	map(0x4800, 0x4bff).ram().w(FUNC(rocnrope_state::rocnrope_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram().w(FUNC(rocnrope_state::rocnrope_videoram_w)).share("videoram");
 	map(0x5000, 0x5fff).ram();

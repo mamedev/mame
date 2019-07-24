@@ -8,7 +8,7 @@
 		<publisher>VTech</publisher>
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5364-00.u6" size="0x40000" crc="203f0461" sha1="dfc8bb341f703c5f018a7222c24d4a2195316387" offset="0" />
+				<rom name="27-5364-00.u6" size="0x40000" crc="203f0461" sha1="dfc8bb341f703c5f018a7222c24d4a2195316387"/>
 			</dataarea>
 		</part>
 	</software>

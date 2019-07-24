@@ -11,7 +11,7 @@
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0xe0"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="rom340.bin" size="0x2000" crc="41441333" sha1="6e166b7b0723da126021e2b2cd572660931e066d" offset="0"/>
+				<rom name="rom340.bin" size="0x2000" crc="41441333" sha1="6e166b7b0723da126021e2b2cd572660931e066d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0xe0"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="rom340_fixed.bin" size="0x2000" crc="3ebdd60a" sha1="efa3d3cc9e593f6fe74b1189ea4c2dd0660ae698" offset="0"/>
+				<rom name="rom340_fixed.bin" size="0x2000" crc="3ebdd60a" sha1="efa3d3cc9e593f6fe74b1189ea4c2dd0660ae698"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37,7 +37,7 @@
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0x28"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="rom050.bin" size="0x2000" crc="9827cc3c" sha1="018d6a8df68a839b4e192da957f38a5db20f8bfc" offset="0"/>
+				<rom name="rom050.bin" size="0x2000" crc="9827cc3c" sha1="018d6a8df68a839b4e192da957f38a5db20f8bfc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,7 +50,7 @@
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0xB0"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="rom260.bin" size="0x2000" crc="70f83074" sha1="3ef192ecff71b967ba747bea8df483e0596988b1" offset="0"/>
+				<rom name="rom260.bin" size="0x2000" crc="70f83074" sha1="3ef192ecff71b967ba747bea8df483e0596988b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0xC0"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="rom300.bin" size="0x2000" crc="6f904a4c" sha1="6f90899fa983e2fd63088ce516c35d07e5942f2b" offset="0"/>
+				<rom name="rom300.bin" size="0x2000" crc="6f904a4c" sha1="6f90899fa983e2fd63088ce516c35d07e5942f2b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -76,7 +76,7 @@
 		<part name="rom" interface="hp80_rom">
 			<feature name="sc" value="0xD0"/>
 			<dataarea name="rom" size="0x2000">
-				<rom name="rom320.bin" size="0x2000" crc="9c03582c" sha1="1cc9a5013739821cd1d7e2a52e8abbd29045e850" offset="0"/>
+				<rom name="rom320.bin" size="0x2000" crc="9c03582c" sha1="1cc9a5013739821cd1d7e2a52e8abbd29045e850"/>
 			</dataarea>
 		</part>
 	</software>

@@ -102,6 +102,7 @@ besta.cpp
 beta.cpp
 bigbord2.cpp
 binbug.cpp
+bitel.cpp
 bitgraph.cpp
 bk.cpp
 blw700i.cpp
@@ -140,7 +141,6 @@ cgenie.cpp
 channelf.cpp
 chaos.cpp
 chessmst.cpp
-chesstrv.cpp
 cit101.cpp
 cit220.cpp
 cking_master.cpp
@@ -197,6 +197,7 @@ dms5000.cpp
 dms86.cpp
 dmv.cpp
 dolphunk.cpp
+dpb7000.cpp
 dps1.cpp
 dragon.cpp
 dsb46.cpp
@@ -211,6 +212,8 @@ ec184x.cpp
 ec65.cpp
 ec7915.cpp
 einstein.cpp
+elan_eu3a05.cpp
+elan_eu3a14.cpp
 electron.cpp
 elekscmp.cpp
 elektronmono.cpp
@@ -377,6 +380,7 @@ isbc8030.cpp
 iskr103x.cpp
 itt1700.cpp
 itt3030.cpp
+itt9216.cpp
 jade.cpp
 jazz.cpp
 jensen.cpp
@@ -397,8 +401,10 @@ kdt6.cpp
 kim1.cpp
 konin.cpp
 kramermc.cpp
+krokha.cpp
 kron.cpp
 krz2000.cpp
+ktm3.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
@@ -428,6 +434,7 @@ mac.cpp
 mac128.cpp
 macpci.cpp
 magnum.cpp
+mattelchess.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
@@ -464,6 +471,7 @@ mikrosha.cpp
 mightyframe.cpp
 milton6805.cpp
 milwaukee.cpp
+mindset.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
@@ -471,9 +479,7 @@ miniframe.cpp
 minitel_2_rpic.cpp
 mips.cpp
 mits680b.cpp
-mk1.cpp
 mk14.cpp
-mk2.cpp
 mk85.cpp
 mk90.cpp
 mkit09.cpp
@@ -501,6 +507,7 @@ multi16.cpp
 multi8.cpp
 mupid2.cpp
 mvme147.cpp
+mvme162.cpp
 mx2178.cpp
 myb3k.cpp
 mycom.cpp
@@ -517,7 +524,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
-ncd17c.cpp
+ncd68k.cpp
 ncdmips.cpp
 ncdppc.cpp
 nds.cpp
@@ -534,6 +541,8 @@ notetaker.cpp
 novag_cforte.cpp
 novag_delta1.cpp
 novag_diablo.cpp
+novag_mk1.cpp
+novag_mk2.cpp
 novag_presto.cpp
 novag_scon.cpp
 novag_sexpert.cpp
@@ -652,8 +661,8 @@ qtsbc.cpp
 qvt70.cpp
 qvt102.cpp
 qvt103.cpp
+qvt190.cpp
 qvt201.cpp
-qvt6800.cpp
 qx10.cpp
 r9751.cpp
 rad_eu3a05.cpp
@@ -690,6 +699,8 @@ savia84.cpp
 sbc6510.cpp
 sbrain.cpp
 sc2.cpp
+scisys_chesstrv.cpp
+scisys_cp2000.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
@@ -758,9 +769,13 @@ symbolics.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp
+systel1.cpp
+talkingbb.cpp
+talkingfb.cpp
 tamag1.cpp
 tandy1t.cpp
 tandy2k.cpp
+tasc.cpp
 tavernie.cpp
 tb303.cpp
 tdv2324.cpp
@@ -770,6 +785,9 @@ tek405x.cpp
 tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
+telex1192.cpp
+telex274.cpp
+telex277d.cpp
 terak.cpp
 terco.cpp
 terminal.cpp
@@ -790,7 +808,6 @@ ti99_4x.cpp
 ti99_8.cpp
 ti990_10.cpp
 ti990_4.cpp
-ticalc1x.cpp
 tiki100.cpp
 titan_soc.cpp
 tim011.cpp
@@ -806,6 +823,7 @@ tmc1800.cpp
 tmc2000e.cpp
 tmc600.cpp
 tosh1000.cpp
+tomy_princ.cpp
 tr175.cpp
 tr606.cpp
 tranz330.cpp

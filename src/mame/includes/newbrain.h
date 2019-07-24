@@ -19,8 +19,6 @@
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "409"
 #define COP420_TAG      "419"
-#define CASSETTE_TAG    "cassette"
-#define CASSETTE2_TAG   "cassette2"
 #define RS232_V24_TAG   "to"
 #define RS232_PRN_TAG   "po"
 
@@ -33,8 +31,8 @@ public:
 		m_cop(*this, COP420_TAG),
 		m_palette(*this, "palette"),
 		m_exp(*this, NEWBRAIN_EXPANSION_SLOT_TAG),
-		m_cassette1(*this, CASSETTE_TAG),
-		m_cassette2(*this, CASSETTE2_TAG),
+		m_cassette1(*this, "cassette1"),
+		m_cassette2(*this, "cassette2"),
 		m_rs232_v24(*this, RS232_V24_TAG),
 		m_rs232_prn(*this, RS232_PRN_TAG),
 		m_ram(*this, RAM_TAG),

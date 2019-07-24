@@ -109,8 +109,13 @@ private:
 
 	DECLARE_READ32_MEMBER(sngkace_input_r);
 	DECLARE_READ32_MEMBER(gunbird_input_r);
-	DECLARE_WRITE32_MEMBER(s1945_mcu_w);
-	DECLARE_READ32_MEMBER(s1945_mcu_r);
+	void s1945_mcu_data_w(uint8_t data);
+	void s1945_mcu_control_w(uint8_t data);
+	void s1945_mcu_direction_w(uint8_t data);
+	void s1945_mcu_bctrl_w(uint8_t data);
+	void s1945_mcu_command_w(uint8_t data);
+	uint32_t s1945_mcu_data_r();
+	uint8_t s1945_mcu_control_r();
 	DECLARE_READ32_MEMBER(s1945_input_r);
 	DECLARE_WRITE8_MEMBER(s1945bl_okibank_w);
 	template<int Shift> DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

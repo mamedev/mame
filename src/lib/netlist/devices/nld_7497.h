@@ -38,20 +38,22 @@
 #include "netlist/nl_setup.h"
 
 #define TTL_7497(name, cCLK, cSTRB, cEN, cUNITY, cCLR, cB0, cB1, cB2, cB3, cB4, cB5) \
-		NET_REGISTER_DEV(TTL_7497, name)                                             \
-		NET_CONNECT(name, CLK,   cCLK)                                               \
-		NET_CONNECT(name, STRBQ, cSTRB)                                              \
-		NET_CONNECT(name, ENQ,   cEN)                                                \
-		NET_CONNECT(name, UNITYQ,cUNITY)                                             \
-		NET_CONNECT(name, CLR,   cCLR)                                               \
-		NET_CONNECT(name, B0,    cB0)                                                \
-		NET_CONNECT(name, B1,    cB1)                                                \
-		NET_CONNECT(name, B2,    cB2)                                                \
-		NET_CONNECT(name, B3,    cB3)                                                \
-		NET_CONNECT(name, B4,    cB4)                                                \
+		NET_REGISTER_DEV(TTL_7497, name)                                       \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CLK,   cCLK)                                         \
+		NET_CONNECT(name, STRBQ, cSTRB)                                        \
+		NET_CONNECT(name, ENQ,   cEN)                                          \
+		NET_CONNECT(name, UNITYQ,cUNITY)                                       \
+		NET_CONNECT(name, CLR,   cCLR)                                         \
+		NET_CONNECT(name, B0,    cB0)                                          \
+		NET_CONNECT(name, B1,    cB1)                                          \
+		NET_CONNECT(name, B2,    cB2)                                          \
+		NET_CONNECT(name, B3,    cB3)                                          \
+		NET_CONNECT(name, B4,    cB4)                                          \
 		NET_CONNECT(name, B5,    cB5)
 
-#define TTL_7497_DIP(name)                                                      \
+#define TTL_7497_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7497_DIP, name)
 
 #endif /* NLD_7497_H_ */

@@ -23,13 +23,6 @@ public:
 	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dtr_handler(Object &&cb) { return m_dtr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rts_handler(Object &&cb) { return m_rts_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rxrdy_handler(Object &&cb) { return m_rxrdy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_txrdy_handler(Object &&cb) { return m_txrdy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_txempty_handler(Object &&cb) { return m_txempty_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_syndet_handler(Object &&cb) { return m_syndet_handler.set_callback(std::forward<Object>(cb)); }
 	auto txd_handler() { return m_txd_handler.bind(); }
 	auto dtr_handler() { return m_dtr_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }

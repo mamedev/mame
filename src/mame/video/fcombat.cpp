@@ -16,8 +16,8 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 	//palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
 
-	tileno = memregion("user1")->base()[tile_index];
-	palno = 0x18; //memregion("user2")->base()[tile_index] >> 3;
+	tileno = m_bgdata_rom[tile_index];
+	palno = 0x18; //m_user2_region[tile_index] >> 3;
 	SET_TILE_INFO_MEMBER(2, tileno, palno, 0);
 }
 
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 void fcombat_state::fcombat_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	const u8 *color_prom = memregion("proms")->base();
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x20; i++)
@@ -52,19 +52,19 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		const u8 r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		const u8 g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
 		bit0 = 0;
 		bit1 = BIT(color_prom[i], 6);
 		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		const u8 b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -75,18 +75,17 @@ void fcombat_state::fcombat_palette(palette_device &palette) const
 	// fg chars/sprites
 	for (int i = 0; i < 0x200; i++)
 	{
-		uint8_t const ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
+		const u8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	// bg chars (this is not the full story... there are four layers mixed using another PROM
 	for (int i = 0x200; i < 0x300; i++)
 	{
-		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		const u8 ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
-
 
 
 /*************************************
@@ -101,14 +100,13 @@ void fcombat_state::video_start()
 }
 
 
-
 /*************************************
  *
  *  Video register I/O
  *
  *************************************/
 
-WRITE8_MEMBER(fcombat_state::fcombat_videoreg_w)
+void fcombat_state::videoreg_w(u8 data)
 {
 	/* bit 0 = flip screen and joystick input multiplexor */
 	m_cocktail_flip = data & 1;
@@ -127,11 +125,8 @@ WRITE8_MEMBER(fcombat_state::fcombat_videoreg_w)
 }
 
 
-
-uint32_t fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int sx, sy, offs, i;
-
 	/* draw background */
 	m_bgmap->set_scrolly(0, m_fcombat_sh);
 	m_bgmap->set_scrollx(0, m_fcombat_sv - 24);
@@ -141,7 +136,7 @@ uint32_t fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind1
 	//draw_background(bitmap, cliprect);
 
 	/* draw sprites */
-	for (i = 0; i < m_spriteram.bytes(); i += 4)
+	for (int i = 0; i < m_spriteram.bytes(); i += 4)
 	{
 		int flags = m_spriteram[i + 0];
 		int y = m_spriteram[i + 1] ^ 255;
@@ -150,12 +145,12 @@ uint32_t fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind1
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
-		int doubled =0;// flags & 0x10;
-		int wide = flags & 0x08;
+		bool doubled = false;// flags & 0x10;
+		const bool wide = flags & 0x08;
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (m_sprite_palette * 16);
-				gfx_element *gfx = m_gfxdecode->gfx(1);
+		gfx_element *gfx = m_gfxdecode->gfx(1);
 
 		if (m_cocktail_flip)
 		{
@@ -176,7 +171,7 @@ uint32_t fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind1
 			gfx->transpen(bitmap,cliprect, code2, color, xflip, yflip, x, y + gfx->height(), 0);
 		}
 
-		if(flags&0x10)
+		if (flags & 0x10)
 		{
 			gfx->transpen(bitmap,cliprect, code2 + 16, color, xflip, yflip, x, y + gfx->height(), 0);
 			gfx->transpen(bitmap,cliprect, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height(), 0);
@@ -190,13 +185,13 @@ uint32_t fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind1
 	}
 
 	/* draw the visible text layer */
-	for (sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)
-		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
+	for (int sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)
+		for (int sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
 			int x = m_cocktail_flip ? (63 * 8 - 8 * sx) : 8 * sx;
 			int y = m_cocktail_flip ? (31 * 8 - 8 * sy) : 8 * sy;
 
-			offs = sx + sy * 64;
+			const int offs = sx + sy * 64;
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				m_videoram[offs] + 256 * m_char_bank,
 				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,

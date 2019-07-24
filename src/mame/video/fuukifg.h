@@ -5,45 +5,32 @@
 
 #pragma once
 
+typedef device_delegate<void (u32 &code)> fuukivid_tile_delegate;
+typedef device_delegate<void (u32 &colour, u32 &pri_mask)> fuukivid_colpri_cb_delegate;
 
-class fuukivid_device : public device_t, public device_video_interface
+class fuukivid_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
-	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <typename T>
-	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gfx)
-		: fuukivid_device(mconfig, tag, owner, clock)
-	{
-		set_gfxdecode_tag(std::forward<T>(gfx));
-	}
+	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_color_base(u16 base) { m_colbase = base; }
+	void set_color_num(u16 num) { m_colnum = num; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_tile_cb = fuukivid_tile_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = fuukivid_colpri_cb_delegate(std::forward<T>(args)...); }
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip_screen, uint32_t* tilebank);
-	std::unique_ptr<uint16_t[]> m_sprram;
-	std::unique_ptr<uint16_t[]> m_sprram_old;
-	std::unique_ptr<uint16_t[]> m_sprram_old2;
-
-
-	DECLARE_WRITE16_MEMBER(fuuki_sprram_w)
-	{
-		COMBINE_DATA(&m_sprram[offset]);
-	};
-
-	DECLARE_READ16_MEMBER(fuuki_sprram_r)
-	{
-		return m_sprram[offset];
-	}
-
-	void buffer_sprites(void);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip_screen, u16 *spriteram, u32 size);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	required_device<gfxdecode_device> m_gfxdecode;
+	fuukivid_tile_delegate m_tile_cb;
+	fuukivid_colpri_cb_delegate m_colpri_cb;
+	required_memory_region m_gfx_region;
+	u16 m_colbase;
+	u16 m_colnum;
 };
 
 DECLARE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device)

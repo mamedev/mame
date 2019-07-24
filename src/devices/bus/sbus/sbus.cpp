@@ -44,11 +44,15 @@ sbus_slot_device::sbus_slot_device(const machine_config &mconfig, device_type ty
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_sbus(*this, finder_base::DUMMY_TAG)
+	, m_slot(-1)
 {
 }
 
 void sbus_slot_device::device_validity_check(validity_checker &valid) const
 {
+	if (m_slot < 0 || m_slot > 2)
+		osd_printf_error("Slot %d out of range for Sun SBus\n", m_slot);
+
 	device_t *const card(get_card_device());
 	if (card && !dynamic_cast<device_sbus_card_interface *>(card))
 		osd_printf_error("Card device %s (%s) does not implement device_sbus_card_interface\n", card->tag(), card->name());
@@ -58,7 +62,7 @@ void sbus_slot_device::device_resolve_objects()
 {
 	device_sbus_card_interface *const sbus_card(dynamic_cast<device_sbus_card_interface *>(get_card_device()));
 	if (sbus_card)
-		sbus_card->set_sbus(m_sbus, tag());
+		sbus_card->set_sbus(m_sbus, m_slot);
 }
 
 void sbus_slot_device::device_start()
@@ -169,7 +173,6 @@ device_sbus_card_interface::device_sbus_card_interface(const machine_config &mco
 	: device_slot_card_interface(mconfig, device)
 	, m_sbus_finder(device, finder_base::DUMMY_TAG)
 	, m_sbus(nullptr)
-	, m_sbus_slottag(nullptr)
 	, m_slot(-1)
 	, m_base(0)
 {
@@ -196,25 +199,18 @@ void device_sbus_card_interface::interface_pre_start()
 			fatalerror("Can't find Sun SBus device %s\n", m_sbus_finder.finder_tag());
 	}
 
-	if (0 > m_slot)
-	{
-		if (!m_sbus->started())
-			throw device_missing_dependencies();
-
-		// extract the slot number from the last digit of the slot tag
-		size_t const tlen = strlen(m_sbus_slottag);
-
-		m_slot = (m_sbus_slottag[tlen - 1] - '1');
-		if (m_slot < 0 || m_slot > 2)
-			fatalerror("Slot %x out of range for Sun SBus\n", m_slot);
-
-		m_base = m_slot << 25;
-		m_sbus->add_sbus_card(m_slot, this);
-	}
+	if (!m_sbus->started())
+		throw device_missing_dependencies();
 }
 
-void device_sbus_card_interface::set_sbus(sbus_device *sbus, const char *slottag)
+void device_sbus_card_interface::interface_post_start()
+{
+	m_base = m_slot << 25;
+	m_sbus->add_sbus_card(m_slot, this);
+}
+
+void device_sbus_card_interface::set_sbus(sbus_device *sbus, int slot)
 {
 	m_sbus = sbus;
-	m_sbus_slottag = slottag;
+	m_slot = slot;
 }

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 /******************************************************************************
-*
+
 * fidel_card.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity electronic card games
@@ -206,7 +206,7 @@ private:
 	void brc_base(machine_config &config);
 
 	// devices/pointers
-	required_device<i8041_device> m_mcu;
+	required_device<i8041a_device> m_mcu;
 	required_device<i8243_device> m_i8243;
 
 	// address maps
@@ -217,7 +217,7 @@ private:
 	u32 m_barcode;
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(speech_w);
 	DECLARE_WRITE8_MEMBER(mcu_p1_w);
 	DECLARE_READ8_MEMBER(mcu_p2_r);
@@ -241,7 +241,7 @@ void card_state::machine_start()
 
 // misc handlers
 
-void card_state::prepare_display()
+void card_state::update_display()
 {
 	// 14seg led segments, d15(12) is extra led
 	u16 outdata = bitswap<16>(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
@@ -267,7 +267,7 @@ void card_state::ioexp_port_w(uint8_t data)
 {
 	// P4x-P7x: digit segment data
 	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
-	prepare_display();
+	update_display();
 
 	// P71 is tone (not on speech model)
 	if (P == 3 && m_dac != nullptr)
@@ -281,7 +281,7 @@ WRITE8_MEMBER(card_state::mcu_p1_w)
 {
 	// P10-P17: select digits, input mux
 	m_inp_mux = m_led_select = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(card_state::mcu_p2_r)
@@ -314,7 +314,7 @@ void card_state::main_map(address_map &map)
 void card_state::main_io(address_map &map)
 {
 	map.global_mask(0x01);
-	map(0x00, 0x01).rw(m_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x00, 0x01).rw(m_mcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 }
 
 
@@ -548,7 +548,7 @@ void card_state::brc_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &card_state::main_io);
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	I8041(config, m_mcu, 5_MHz_XTAL);
+	I8041A(config, m_mcu, 5_MHz_XTAL);
 	m_mcu->p1_out_cb().set(FUNC(card_state::mcu_p1_w));
 	m_mcu->p2_in_cb().set(FUNC(card_state::mcu_p2_r));
 	m_mcu->p2_out_cb().set(m_i8243, FUNC(i8243_device::p2_w));

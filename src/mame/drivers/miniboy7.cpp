@@ -2,20 +2,25 @@
 // copyright-holders:Roberto Fresca
 /******************************************************************************
 
-  MINI-BOY 7
+  MINI-BOY 7 / SUPER MINI-BOY.
+  Bonanza Enterprises, Ltd.
 
   Driver by Roberto Fresca.
 
+
   Games running on this hardware:
 
-  * Mini-Boy 7 - 1983, Bonanza Enterprises, Ltd.
+  * Mini-Boy 7,      1983,  Bonanza Enterprises, Ltd.
+  * Super Mini-Boy,  1984,  Bonanza Enterprises, Ltd.
 
 
 *******************************************************************************
 
   Game Notes:
 
-  Mini-Boy 7. Seven games in one, plus Ad message support.
+  * Mini-Boy 7.
+
+  Seven games in one, plus Ad message support.
   http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4275
 
   - Draw Poker.
@@ -29,10 +34,24 @@
   During attract mode display, pressing the service menu will allow you to
   add a custom ad to scroll during attract mode display. Up to 120 characters
 
+
+  * Super Mini-Boy
+
+  Five games in one.
+
+  - Poker.
+  - Black Jack.
+  - Hi-Lo.
+  - Golden Fruits.
+  - Baccarat.
+
+
 *******************************************************************************
 
   Hardware Notes:
   --------------
+
+  * Mini-Boy 7:
 
   Board silkscreened on top:
   be MVX-001-01  ('be' is a Bonanza Enterprises logo).
@@ -60,6 +79,35 @@
   - 2x pots to handle the B-G background color/intensity.
 
 
+  * Super Mini-Boy:
+
+  Board silkscreened on top:
+  be MVX-001-02  ('be' is a Bonanza Enterprises logo).
+
+  - CPU:            1x R6502P.
+  - Sound:          1x AY-3-8910.
+  - Video:          1x HD46505SP HD6845SP.
+  - RAM:            4x MSM2128-15
+  - I/O             1x MC6821P PIA.
+  - PRG ROMs:       5x 2764 (8Kb).
+  - GFX ROMs:       1x 2764 (8Kb) for text layer.
+                    3x 2764 (8Kb) for gfx tiles.
+
+  - Clock:          1x 12.4725 MHz. Crystal.
+
+  - Battery backup: (unknown)
+
+  - 1x normal switch (SW1)
+  - 1x 8 DIP switches bank (SW2)
+  - 1x 4 DIP switches bank (SW3)
+
+  - 1x 2x28 pins edge connector.
+  - 1x 2x20 pins female connector.
+
+  - 6x variable resistor to handle B-G background color/intensity
+    and other things.
+
+
 *******************************************************************************
 
   --------------------
@@ -75,11 +123,11 @@
   $1800 - $1FFF   Video RAM B
   $2000 - $27FF   Color RAM B
 
-  $2800 - $2801   MC6845  ; MC6845 use $2800 for register addressing and $2801 for register values.
+  $2800 - $2801   MC6845  ; $2800 for register addressing & $2801 for register values.
 
-  $3000 - $3001   ?????   ; R/W. AY8910?
-  $3080 - $3083   MC6821  ; R/W. PIA
-  $3800 - $3800   ?????   ; R.
+  $3000 - $3001   AY-3-8910   ; R/W.
+  $3080 - $3083   MC6821 PIA  ; R/W.
+  $3800 - $3800   ?????       ; R.
 
   $4000 - $FFFF   ROM     ; ROM space.
 
@@ -90,7 +138,6 @@
 
 
 *******************************************************************************
-
 
   DRIVER UPDATES:
 
@@ -123,12 +170,23 @@
   - Added debug and technical notes.
 
 
+  [2011... 2019]
+
+  - Wired PIA and AY8910 properly.
+  - Implemented and documented the PIA port B multiplexion.
+  - Lot of fixes, getting Mini-Boy 7 working.
+  - Added support for Super Mini-Boy.
+  - Added technical and games notes.
+  - Some clean-up.
+
+
   TODO:
 
-  - Find the way to clean the lamps writes.
-    (there are alternate writes that mess the lamps)
-
+  - Find the Super Mini-Boy missing input(s): HOLD 1 and SMALL.
+    maybe these are the same line/button.
+  - Lamps support for Super Mini-Boy.
   - Implement fake pots for B-G background color
+
 
 *******************************************************************************/
 
@@ -170,20 +228,22 @@ public:
 
 	void miniboy7(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_WRITE8_MEMBER(ay_pa_w);
-	DECLARE_WRITE8_MEMBER(ay_pb_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
+	void ay_pa_w(uint8_t data);
+	void ay_pb_w(uint8_t data);
+	uint8_t pia_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+	uint8_t lamp_latch_r();
 
 	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void miniboy7_palette(palette_device &palette) const;
 
 	void miniboy7_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;
@@ -199,6 +259,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<5> m_lamps;
 
+	uint8_t m_ay_pa;
 	uint8_t m_ay_pb;
 	int m_gpri;
 };
@@ -268,7 +329,7 @@ void miniboy7_state::miniboy7_palette(palette_device &palette) const
 	    xxxx ----   unused.
 	*/
 
-	/* 0000IBGR */
+	// 0000IBGR
 	if (!m_proms)
 		return;
 
@@ -294,52 +355,92 @@ void miniboy7_state::miniboy7_palette(palette_device &palette) const
 	}
 }
 
+
+/***********************************
+*      Machine Start & Reset       *
+***********************************/
+
 void miniboy7_state::machine_start()
 {
 	m_lamps.resolve();
 
+	save_item(NAME(m_ay_pa));
 	save_item(NAME(m_ay_pb));
 	save_item(NAME(m_gpri));
 }
 
 void miniboy7_state::machine_reset()
 {
+	m_ay_pa = 0;
 	m_ay_pb = 0;
 	m_gpri = 0;
 }
 
-WRITE8_MEMBER(miniboy7_state::ay_pa_w)
+
+/***********************************
+*          R/W Handlers            *
+***********************************/
+
+void miniboy7_state::ay_pa_w(uint8_t data)
 {
-	// ---x xxxx    lamps
-	// --x- ----    coins lockout
-	// -x-- ----    coins meter
-	// x--- ----    unused
+/*  ---x xxxx    lamps
+    --x- ----    coins lockout
+    -x-- ----    coins meter
+    x--- ----    unused
+*/
 
-	data = data ^ 0xff;
+	m_ay_pa = data;
+}
 
-//    m_lamps[0] = BIT(data, 0);    // [----x]
-//    m_lamps[1] = BIT(data, 1);    // [---x-]
-//    m_lamps[2] = BIT(data, 2);    // [--x--]
-//    m_lamps[3] = BIT(data, 3);    // [-x---]
-//    m_lamps[4] = BIT(data, 4);    // [x----]
+uint8_t miniboy7_state::lamp_latch_r()
+{
+	if (machine().side_effects_disabled())
+		return 0xff;
+
+	uint8_t data = m_ay_pa ^ 0xff;
+
+	m_lamps[0] = BIT(data, 4);  // [----x]
+	m_lamps[1] = BIT(data, 3);  // [---x-]
+	m_lamps[2] = BIT(data, 2);  // [--x--]
+	m_lamps[3] = BIT(data, 1);  // [-x---]
+	m_lamps[4] = BIT(data, 0);  // [x----]
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 
 //  popmessage("Out Lamps: %02x", data);
 //  logerror("Out Lamps: %02x\n", data);
 
+	// value is unused
+	return 0xff;
 }
 
-WRITE8_MEMBER(miniboy7_state::ay_pb_w)
+void miniboy7_state::ay_pb_w(uint8_t data)
 {
-	// ---- xxxx    unused
-	// -xxx ----    HCD
-	// x--- ----    DSW2 select
-
+/*  ---- xxxx    unused
+    -xxx ----    HCD
+    x--- ----    DSW2 select
+*/
 	m_ay_pb = data;
 }
 
-READ8_MEMBER(miniboy7_state::pia_pb_r)
+uint8_t miniboy7_state::pia_pb_r()
+/*
+  PIA PB0-3 are connected to regular inputs.
+  AY8910, PortB-D7, is the selector of a 74LS157 that multiplexes the PIA PB4-7 input lines
+  to read the 8 DIP switches bank lines. See the following diagram.
+
+                   74LS157
+              .-------V-------.
+  AY8910 PB7 -|01 SEL    B0 03|- DSW2-8
+             -|          B1 06|- DSW2-7
+     PIA PB7 -|04 Y0     B3 13|- DSW2-6
+     PIA PB6 -|07 Y1     B2 10|- DSW2-5
+     PIA PB5 -|12 Y3     A0 02|- DSW2-4
+     PIA PB4 -|09 Y2     A1 05|- DSW2-3
+             -|          A3 14|- DSW2-2
+             -|          A2 11|- DSW2-1
+              '---------------'
+*/
 {
 	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
 }
@@ -356,69 +457,27 @@ WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
 
 void miniboy7_state::miniboy7_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram"); /* battery backed RAM? */
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM?
 	map(0x0800, 0x0fff).ram().share("videoram_a");
 	map(0x1000, 0x17ff).ram().share("colorram_a");
 	map(0x1800, 0x1fff).ram().share("videoram_b");
 	map(0x2000, 0x27ff).ram().share("colorram_b");
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x3000, 0x3001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));  // FIXME
+	map(0x3000, 0x3001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x3080, 0x3083).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x3800, 0x3800).nopr(); // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
+	map(0x3800, 0x3800).r(FUNC(miniboy7_state::lamp_latch_r));
 	map(0x4000, 0xffff).rom();
 }
 
 /*
-
-'maincpu' (E190): unmapped program memory byte read from 3800
-'maincpu' (E190): unmapped program memory byte read from 3800
-'maincpu' (E190): unmapped program memory byte read from 3800
-'maincpu' (E190): unmapped program memory byte read from 3800
-
-'maincpu' (CF41): unmapped program memory byte read from 3081
-'maincpu' (CF41): unmapped program memory byte write to 3081 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3083
-'maincpu' (CF41): unmapped program memory byte write to 3083 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3080
-'maincpu' (CF41): unmapped program memory byte write to 3080 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3082
-'maincpu' (CF41): unmapped program memory byte write to 3082 = 00
-'maincpu' (CF41): unmapped program memory byte read from 3081
-'maincpu' (CF41): unmapped program memory byte write to 3081 = 3F
-'maincpu' (CF41): unmapped program memory byte read from 3083
-'maincpu' (CF41): unmapped program memory byte write to 3083 = 34
-
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0E
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0F
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 07
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0E
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-'maincpu' (CF5A): unmapped program memory byte write to 3000 = 0F
-'maincpu' (CF61): unmapped program memory byte write to 3001 = FF
-
   ... CRTC init (snap) --> $CF2D: JSR $CF76
 
-'maincpu' (E189): unmapped program memory byte read from 3800
-
-'maincpu' (E1A0): unmapped program memory byte write to 3000 = 0E
-'maincpu' (E1A3): unmapped program memory byte read from 3000
-'maincpu' (E1A8): unmapped program memory byte write to 3001 = 00
-'maincpu' (E1BF): unmapped program memory byte write to 3000 = 0E
-'maincpu' (E1C2): unmapped program memory byte read from 3000
-'maincpu' (E1CA): unmapped program memory byte write to 3001 = 1F
-
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
-'maincpu' (E189): unmapped program memory byte read from 3800
+  3800: Lamps latch. ; right after each read, another value is loaded
+                       into the ACCU, losing the previous loaded value.
 
 */
+
 
 /***********************************
 *           Input Ports            *
@@ -467,6 +526,61 @@ static INPUT_PORTS_START( miniboy7 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sminiboy )
+
+//  Hold2/Small button is missing.
+//  Just tried on PIA PB4-7, both AY8910 ports,
+//  but nothing...
+
+	PORT_START("INPUT1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Big")                    PORT_CODE(KEYCODE_S)  // big
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Cancel / D-UP / Hit")    PORT_CODE(KEYCODE_N)  // cancel / d-up / hit
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hold 5 / Take / Stand")  PORT_CODE(KEYCODE_B)  // hold 5 / take / stand
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hold 4")                 PORT_CODE(KEYCODE_V)  // hold 4
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hold 3")                 PORT_CODE(KEYCODE_C)  // hold 3
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+
+	PORT_START("INPUT2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Start / Double")       PORT_CODE(KEYCODE_1)  // start
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hold 1 / Play")        PORT_CODE(KEYCODE_Z)  // hold 1 / play
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service / Books")      PORT_CODE(KEYCODE_0)  // service / books
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("08 - changes screen")  PORT_CODE(KEYCODE_E)  // (changes in screen)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10")   PORT_CODE(KEYCODE_R)  //
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("20")   PORT_CODE(KEYCODE_T)  //
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("40")   PORT_CODE(KEYCODE_Y)  //
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("80")   PORT_CODE(KEYCODE_U)  //
+
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin A" )                    PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "1 Point" )
+	PORT_DIPSETTING(    0x00, "10.000 Points" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /***********************************
 *         Graphics Layouts         *
 ***********************************/
@@ -499,15 +613,17 @@ static const gfx_layout tilelayout =
 ****************************************/
 
 static GFXDECODE_START( gfx_miniboy7 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 ) /* text layer */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 )  // text layer
 
-	/* 0x000 cards
-	   0x100 joker
-	   0x200 dices
-	   0x300 bigtxt */
+	/*  0x000 cards
+	    0x100 joker
+	    0x200 dices
+	    0x300 bigtxt
+	*/
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 
 GFXDECODE_END
+
 
 /***********************************
 *         Machine Drivers          *
@@ -532,8 +648,8 @@ void miniboy7_state::miniboy7(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((47+1)*8, (39+1)*8);                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
-	screen.set_visarea(0*8, 37*8-1, 0*8, 37*8-1);    /* Taken from MC6845, registers 01 & 06 */
+	screen.set_size((47+1)*8, (39+1)*8);             // taken from MC6845, registers 00 & 04 (normally programmed with value - 1).
+	screen.set_visarea(0*8, 37*8-1, 0*8, 37*8-1);    // taken from MC6845, registers 01 & 06.
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_miniboy7);
@@ -561,7 +677,7 @@ void miniboy7_state::miniboy7(machine_config &config)
 ***********************************/
 
 /*
-
+  Mini-Boy 7.
   Board silkscreened on top:
   be MVX-001-01  ('be' is a Bonanza Enterprises logo).
 
@@ -630,11 +746,43 @@ ROM_START( miniboy7a ) /* The term CREDIT has been changed to POINT is this vers
 	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
 
+/*
+  Bonanza's Super Mini Boy.
+  PCB: MVX-001-02
+
+  1x 6502
+  1x 6845
+  1x 6522
+  1x AY8910
+
+*/
+ROM_START( sminiboy )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sm5_1-9.7a",  0x6000, 0x2000, CRC(e245e1d4) SHA1(69266bbc0a0d3acb98cecebf931f42d5e8ff29f5) )
+	ROM_LOAD( "sm5_2-9.6a",  0x8000, 0x2000, CRC(0b240c50) SHA1(af53a969d34aaf959b5a8e74f920fe895f6c68a0) )
+	ROM_LOAD( "sm5_3-9.4a",  0xa000, 0x2000, CRC(1e389107) SHA1(085f56a544cfec54ea14619af8ae09d7aaf85083) )
+	ROM_LOAD( "sm5_4-9.3a",  0xc000, 0x2000, CRC(2fee506a) SHA1(ddcf87ccc061338ca4ccf2f434903ec0c53dee46) )
+	ROM_LOAD( "sm5_5-9.1a",  0xe000, 0x2000, CRC(c518b16c) SHA1(3f6249fa40a5e95ad3d565f73cfc45fcad4c5a6e) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "sm5_0.11d",   0x0000, 0x2000, CRC(295d8146) SHA1(c5b55e10d04d55ba3a5087b588e697a7a89dd02e) )    /* text layer */
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "sm5_1.12d",   0x0000, 0x2000, CRC(1967974e) SHA1(66e06f549d413dcd84d82245cf3bd918bf012209) )  /* bitplane 1 */
+	ROM_LOAD( "sm5_2.13d",   0x2000, 0x2000, CRC(eae3f05a) SHA1(a401fc63f1d9667ceb85c9a8c7cc2bd5d7ab7fcd) )  /* bitplane 2 */
+	ROM_LOAD( "sm5_3.15d",   0x4000, 0x2000, CRC(0f19964f) SHA1(2dba35e3770d8254c65ba82b4d062e4873a6fd8f) )  /* bitplane 3 */
+
+	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* bipolar PROMs */
+	ROM_LOAD( "j1.7e",    0x0000, 0x0100, CRC(a89e1d80) SHA1(f3f4842729df1fc379a7281edcceb67c4e9558b4) )
+	ROM_LOAD( "j-3.10f",  0x0100, 0x0100, CRC(042ae2c5) SHA1(dad6ace493a2e36c6e8ac1f35e871e1e5071c1ed) )
+ROM_END
+
 
 /***********************************
 *           Game Drivers           *
 ***********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                     FULLNAME             FLAGS                LAYOUT
+GAME(  1984, sminiboy,  0,        miniboy7, sminiboy, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Super Mini-Boy",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_miniboy7 )

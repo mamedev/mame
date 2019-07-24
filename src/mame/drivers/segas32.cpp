@@ -4006,6 +4006,7 @@ ROM_END
 /**************************************************************************************************************************
     Golden Axe: The Revenge of Death Adder (Japan)
     protected via a custom V25 with encrypted code
+ROM board: 833-8933
 Sub board: 834-8529-02
 A/D board: 837-7968
 */
@@ -4844,6 +4845,13 @@ ROM_END
  **************************************************************************************************************************
     Spiderman (Export)
     not protected
+
+    Sega Game ID codes:
+     Game: 833-8331-05 SPIDER-MAN
+ROM board: 834-8332-02
+
+ ROM board type: 837-7429-01
+Input sub board: 837-7968
 */
 ROM_START( spidman )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -4923,6 +4931,9 @@ ROM_END
 
      Game: 833-8331 SPIDER-MAN
 ROM board: 834-8332
+
+ ROM board type: 837-7429-01
+Input sub board: 837-7968
 
 */
 ROM_START( spidmanj )

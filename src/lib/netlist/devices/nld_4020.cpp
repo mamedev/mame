@@ -5,8 +5,9 @@
  *
  */
 
-#include "nlid_cmos.h"
+//#include "nlid_cmos.h"
 #include "nld_4020.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -20,6 +21,7 @@ namespace netlist
 		, m_Q(*this, {{"Q1", "_Q2", "_Q3", "Q4", "Q5", "Q6", "Q7", "Q8", "Q9",
 				"Q10", "Q11", "Q12", "Q13", "Q14"}})
 		, m_cnt(*this, "m_cnt", 0)
+		, m_supply(*this, "VDD", "VSS")
 		{
 		}
 
@@ -38,6 +40,7 @@ namespace netlist
 		object_array_t<logic_output_t, 14> m_Q;
 
 		state_var<unsigned> m_cnt;
+		nld_power_pins m_supply;
 	};
 
 	NETLIB_OBJECT(CD4020)
@@ -45,7 +48,6 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(CD4020)
 		NETLIB_FAMILY("CD4XXX")
 		, m_sub(*this, "sub")
-		, m_supply(*this, "supply")
 		, m_RESET(*this, "RESET")
 		{
 			register_subalias("IP", m_sub.m_IP);
@@ -61,15 +63,14 @@ namespace netlist
 			register_subalias("Q12", m_sub.m_Q[11]);
 			register_subalias("Q13", m_sub.m_Q[12]);
 			register_subalias("Q14", m_sub.m_Q[13]);
-			register_subalias("VDD", m_supply.m_vdd);
-			register_subalias("VSS", m_supply.m_vss);
+			register_subalias("VDD", "sub.VDD");
+			register_subalias("VSS", "sub.VSS");
 		}
 		NETLIB_RESETI() { }
 		NETLIB_UPDATEI();
 
 	private:
 		NETLIB_SUB(CD4020_sub) m_sub;
-		NETLIB_SUB(vdd_vss) m_supply;
 		logic_input_t m_RESET;
 	};
 

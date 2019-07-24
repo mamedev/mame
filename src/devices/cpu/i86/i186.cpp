@@ -524,6 +524,16 @@ void i80186_cpu_device::execute_run()
 					m_regs.w[AX] = 0xffff;  // FPU not present
 				break;
 
+			case 0xe6: // i_outal
+				write_port_byte_al(fetch());
+				CLK(OUT_IMM8);
+				break;
+
+			case 0xee: // i_outdxal
+				write_port_byte_al(m_regs.w[DX]);
+				CLK(OUT_DX8);
+				break;
+
 			case 0xf2: // i_repne
 			case 0xf3:
 				{
@@ -577,44 +587,45 @@ void i80186_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
-	// Most of these mnemonics are not official and only chosen as convenient shorthand.
-	state_add( I80186_RELOC, "RELOC", m_reloc ).formatstr("%04X");
+	// Most of these mnemonics are borrowed from the Intel 80C186EA/80C188EA User's Manual.
+	// (The 80C186EA/80C188EA's peripheral block is mapped incompatibly but mostly functionally analogous.)
+	state_add( I80186_RELREG, "RELREG", m_reloc ).formatstr("%04X");
 	state_add( I80186_UMCS, "UMCS", m_mem.upper ).formatstr("%04X");
 	state_add( I80186_LMCS, "LMCS", m_mem.lower ).formatstr("%04X");
 	state_add( I80186_PACS, "PACS", m_mem.peripheral ).formatstr("%04X");
 	state_add( I80186_MMCS, "MMCS", m_mem.middle ).formatstr("%04X");
 	state_add( I80186_MPCS, "MPCS", m_mem.middle_size ).formatstr("%04X");
-	state_add( I80186_DMA_SP + 0, "DMA0_SP", m_dma[0].source ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_DP + 0, "DMA0_DP", m_dma[0].dest ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_TC + 0, "DMA0_TC", m_dma[0].count ).formatstr("%04X");
-	state_add( I80186_DMA_CR + 0, "DMA0_CR", m_dma[0].control ).formatstr("%04X");
-	state_add( I80186_DMA_SP + 1, "DMA1_SP", m_dma[1].source ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_DP + 1, "DMA1_DP", m_dma[1].dest ).formatstr("%05X").mask(0xfffff);
-	state_add( I80186_DMA_TC + 1, "DMA1_TC", m_dma[1].count ).formatstr("%04X");
-	state_add( I80186_DMA_CR + 1, "DMA1_CR", m_dma[1].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 0, "T0_COUNT", m_timer[0].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 0, "T0_MAX_A", m_timer[0].maxA ).formatstr("%04X");
-	state_add( I80186_T_MAX_B + 0, "T0_MAX_B", m_timer[0].maxB ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 0, "T0_CONTROL", m_timer[0].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 1, "T1_COUNT", m_timer[1].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 1, "T1_MAX_A", m_timer[1].maxA ).formatstr("%04X");
-	state_add( I80186_T_MAX_B + 1, "T1_MAX_B", m_timer[1].maxB ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 1, "T1_CONTROL", m_timer[1].control ).formatstr("%04X");
-	state_add( I80186_T_COUNT + 2, "T2_COUNT", m_timer[2].count ).formatstr("%04X");
-	state_add( I80186_T_MAX_A + 2, "T2_MAX", m_timer[2].maxA ).formatstr("%04X");
-	state_add( I80186_T_CONTROL + 2, "T2_CONTROL", m_timer[2].control ).formatstr("%04X");
-	state_add( I80186_ISR, "ISR", m_intr.in_service ).formatstr("%04X");
-	state_add( I80186_IRR, "IRR", m_intr.request ).formatstr("%04X");
-	state_add( I80186_PMR, "PMR", m_intr.priority_mask ).formatstr("%04X");
-	state_add( I80186_ICSR, "ICSR", m_intr.status ).formatstr("%04X");
-	state_add( I80186_TMRCR, "TMRCR", m_intr.timer ).formatstr("%04X");
-	state_add( I80186_D0CR, "D0CR", m_intr.dma[0] ).formatstr("%04X");
-	state_add( I80186_D1CR, "D1CR", m_intr.dma[1] ).formatstr("%04X");
-	state_add( I80186_I0CR, "I0CR", m_intr.ext[0] ).formatstr("%04X");
-	state_add( I80186_I1CR, "I1CR", m_intr.ext[1] ).formatstr("%04X");
-	state_add( I80186_I2CR, "I2CR", m_intr.ext[2] ).formatstr("%04X");
-	state_add( I80186_I3CR, "I3CR", m_intr.ext[3] ).formatstr("%04X");
-	state_add( I80186_POLL, "POLL", m_intr.poll_status ).formatstr("%04X");
+	state_add( I80186_DxSRC + 0, "D0SRC", m_dma[0].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxDST + 0, "D0DST", m_dma[0].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxTC + 0, "D0TC", m_dma[0].count ).formatstr("%04X");
+	state_add( I80186_DxCON + 0, "D0CON", m_dma[0].control ).formatstr("%04X");
+	state_add( I80186_DxSRC + 1, "D1SRC", m_dma[1].source ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxDST + 1, "D1DST", m_dma[1].dest ).formatstr("%05X").mask(0xfffff);
+	state_add( I80186_DxTC + 1, "D1TC", m_dma[1].count ).formatstr("%04X");
+	state_add( I80186_DxCON + 1, "D1CON", m_dma[1].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 0, "T0CNT", m_timer[0].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 0, "T0CMPA", m_timer[0].maxA ).formatstr("%04X");
+	state_add( I80186_TxCMPB + 0, "T0CMPB", m_timer[0].maxB ).formatstr("%04X");
+	state_add( I80186_TxCON + 0, "T0CON", m_timer[0].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 1, "T1CNT", m_timer[1].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 1, "T1CMPA", m_timer[1].maxA ).formatstr("%04X");
+	state_add( I80186_TxCMPB + 1, "T1CMPB", m_timer[1].maxB ).formatstr("%04X");
+	state_add( I80186_TxCON + 1, "T1CON", m_timer[1].control ).formatstr("%04X");
+	state_add( I80186_TxCNT + 2, "T2CNT", m_timer[2].count ).formatstr("%04X");
+	state_add( I80186_TxCMPA + 2, "T2CMPA", m_timer[2].maxA ).formatstr("%04X");
+	state_add( I80186_TxCON + 2, "T2CON", m_timer[2].control ).formatstr("%04X");
+	state_add( I80186_INSERV, "INSERV", m_intr.in_service ).formatstr("%04X");
+	state_add( I80186_REQST, "REQST", m_intr.request ).formatstr("%04X");
+	state_add( I80186_PRIMSK, "PRIMSK", m_intr.priority_mask ).formatstr("%04X");
+	state_add( I80186_INTSTS, "INTSTS", m_intr.status ).formatstr("%04X");
+	state_add( I80186_TCUCON, "TCUCON", m_intr.timer ).formatstr("%04X");
+	state_add( I80186_DMA0CON, "DMA0CON", m_intr.dma[0] ).formatstr("%04X");
+	state_add( I80186_DMA1CON, "DMA1CON", m_intr.dma[1] ).formatstr("%04X");
+	state_add( I80186_I0CON, "I0CON", m_intr.ext[0] ).formatstr("%04X");
+	state_add( I80186_I1CON, "I1CON", m_intr.ext[1] ).formatstr("%04X");
+	state_add( I80186_I2CON, "I2CON", m_intr.ext[2] ).formatstr("%04X");
+	state_add( I80186_I3CON, "I3CON", m_intr.ext[3] ).formatstr("%04X");
+	state_add( I80186_POLLSTS, "POLLSTS", m_intr.poll_status ).formatstr("%04X");
 
 	// register for savestates
 	save_item(NAME(m_timer[0].control));
@@ -718,8 +729,10 @@ uint8_t i80186_cpu_device::read_port_byte(uint16_t port)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
-		uint16_t ret = internal_port_r(*m_io, (port >> 1) & 0x7f, (port & 1) ? 0xff00 : 0x00ff);
-		return (port & 1) ? (ret >> 8) : (ret & 0xff);
+		if(port & 1)
+			return internal_port_r(*m_io, (port >> 1) & 0x7f, 0xff00) >> 8;
+		else
+			return internal_port_r(*m_io, (port >> 1) & 0x7f, 0x00ff) & 0xff;
 	}
 	return m_io->read_byte(port);
 }
@@ -728,12 +741,11 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
+		// Unaligned reads from the internal bus are swapped rather than split
 		if(port & 1)
-		{
-			uint8_t low = read_port_byte(port);
-			return read_port_byte(port + 1) << 8 | low;
-		}
-		return internal_port_r(*m_io, (port >> 1) & 0x7f);
+			return swapendian_int16(internal_port_r(*m_io, (port >> 1) & 0x7f));
+		else
+			return internal_port_r(*m_io, (port >> 1) & 0x7f);
 	}
 	return m_io->read_word_unaligned(port);
 }
@@ -741,20 +753,37 @@ uint16_t i80186_cpu_device::read_port_word(uint16_t port)
 void i80186_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
-		internal_port_w(*m_io, (port >> 1) & 0x7f, (port & 1) ? (data << 8) : data, (port & 1) ? 0xff00 : 0x00ff);
+	{
+		if(port & 1)
+			internal_port_w(*m_io, (port >> 1) & 0x7f, data << 8, 0xff00);
+		else
+			internal_port_w(*m_io, (port >> 1) & 0x7f, data, 0x00ff);
+	}
 	else
 		m_io->write_byte(port, data);
+}
+
+void i80186_cpu_device::write_port_byte_al(uint16_t port)
+{
+	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
+	{
+		// Both AH and AL are written onto the internal bus
+		if(port & 1)
+			internal_port_w(*m_io, (port >> 1) & 0x7f, swapendian_int16(m_regs.w[AX]), 0xff00);
+		else
+			internal_port_w(*m_io, (port >> 1) & 0x7f, m_regs.w[AX], 0x00ff);
+	}
+	else
+		m_io->write_byte(port, m_regs.w[AL]);
 }
 
 void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
 {
 	if(!(m_reloc & 0x1000) && (port >> 8) == (m_reloc & 0xff))
 	{
+		// Unaligned writes to the internal bus are swapped rather than split
 		if(port & 1)
-		{
-			write_port_byte(port, data & 0xff);
-			write_port_byte(port + 1, data >> 8);
-		}
+			internal_port_w(*m_io, (port >> 1) & 0x7f, swapendian_int16(data));
 		else
 			internal_port_w(*m_io, (port >> 1) & 0x7f, data);
 	}
@@ -776,12 +805,11 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
 	{
+		// Unaligned reads from the internal bus are swapped rather than split
 		if(addr & 1)
-		{
-			uint8_t low = read_byte(addr);
-			return read_byte(addr + 1) << 8 | low;
-		}
-		return internal_port_r(*m_program, (addr >> 1) & 0x7f);
+			return swapendian_int16(internal_port_r(*m_program, (addr >> 1) & 0x7f));
+		else
+			return internal_port_r(*m_program, (addr >> 1) & 0x7f);
 	}
 	return m_program->read_word_unaligned(addr);
 }
@@ -798,11 +826,9 @@ void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
 {
 	if((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
 	{
+		// Unaligned writes from the internal bus are swapped rather than split
 		if(addr & 1)
-		{
-			write_byte(addr, data & 0xff);
-			write_byte(addr + 1, data >> 8);
-		}
+			internal_port_w(*m_program, (addr >> 1) & 0x7f, swapendian_int16(data));
 		else
 			internal_port_w(*m_program, (addr >> 1) & 0x7f, data);
 	}
@@ -1809,9 +1835,9 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 			break;
 
 		case 0x7f:
+			// 80188 byte output to this port is *not* masked!
 			if (LOG_PORTS) logerror("%05X:80186 relocation register = %04X\n", m_pc, data);
 			m_reloc = data;
-
 			break;
 
 		default:

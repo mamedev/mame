@@ -18,11 +18,17 @@
 #define ENABLE_EXT_RAM   0x10
 
 
+TIMER_CALLBACK_MEMBER(sms_state::lphaser_th_generate)
+{
+	m_vdp->hcount_latch();
+}
+
+
 void sms_state::lphaser_hcount_latch()
 {
 	/* A delay seems to occur when the Light Phaser latches the
 	   VDP hcount, then an offset is added here to the hpos. */
-	m_vdp->hcount_latch_at_hpos(m_main_scr->hpos() + m_lphaser_x_offs);
+	m_lphaser_th_timer->adjust(m_main_scr->time_until_pos(m_main_scr->vpos(), m_main_scr->hpos() + m_lphaser_x_offs));
 }
 
 
@@ -210,47 +216,39 @@ READ8_MEMBER(sms_state::sms_count_r)
 
 
 /*
- Check if the pause button is pressed.
- If the gamegear is in sms mode, check if the start button is pressed.
+ If the gamegear is in sms mode, the start button performs the pause function.
  */
-WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
+WRITE_LINE_MEMBER(sms_state::gg_pause_callback)
 {
-	bool pause_pressed = false;
-
-	if (!m_is_mark_iii)
+	if (!state)
 	{
-		// clear TH latch of the controller ports
-		m_ctrl1_th_latch = 0;
-		m_ctrl2_th_latch = 0;
-	}
+		bool pause_pressed = false;
 
-	if (m_is_gamegear)
-	{
-		if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
-			return;
+		if (m_cartslot->exists() && m_cartslot->get_sms_mode())
+		{
+			if (!(m_port_start->read() & 0x80))
+				pause_pressed = true;
+		}
 
-		if (!(m_port_start->read() & 0x80))
-			pause_pressed = true;
-	}
-	else
-	{
-		if (!(m_port_pause->read() & 0x80))
-			pause_pressed = true;
-	}
+		if (pause_pressed)
+		{
+			if (!m_gg_paused)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	if (pause_pressed)
-	{
-		if (!m_paused)
-			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_gg_paused = 1;
+		}
+		else
+		{
+			if (m_gg_paused)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-		m_paused = 1;
+			m_gg_paused = 0;
+		}
 	}
-	else
-		m_paused = 0;
 }
 
 
-WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
+WRITE_LINE_MEMBER(sms_state::sms_n_csync_callback)
 {
 	if (m_port_rapid.found())
 	{
@@ -414,7 +412,9 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		if (m_ctrl1_th_latch)
 		{
-			m_port_dd_reg &= ~0x40;
+			if (m_vdp->hcount_latched())
+				m_port_dd_reg &= ~0x40;
+
 			m_ctrl1_th_latch = 0;
 		}
 	}
@@ -436,7 +436,9 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	{
 		if (m_ctrl2_th_latch)
 		{
-			m_port_dd_reg &= ~0x80;
+			if (m_vdp->hcount_latched())
+				m_port_dd_reg &= ~0x80;
+
 			m_ctrl2_th_latch = 0;
 		}
 	}
@@ -1047,7 +1049,9 @@ void sms_state::machine_start()
 		}
 	}
 
-	save_item(NAME(m_paused));
+	m_lphaser_th_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_th_generate),this));
+
+	save_item(NAME(m_gg_paused));
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_port_dc_reg));
 	save_item(NAME(m_port_dd_reg));

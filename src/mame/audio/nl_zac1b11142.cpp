@@ -419,6 +419,13 @@ NETLIST_START(zac1b11142)
 	OPTIMIZE_FRONTIER(R96.1, RES_K(4.7), 50)
 	#endif
 
+	/* -----------------------------------------------------------------------
+	 * Power terminals
+	 * -----------------------------------------------------------------------*/
+
+	NET_C(VCC, U3A.14)
+	NET_C(GND, U3A.7)
+
 	// Reverse so that volume raises with raising percentage in ui
 	PARAM(P1.REVERSE, 1)
 	PARAM(P2.REVERSE, 1)

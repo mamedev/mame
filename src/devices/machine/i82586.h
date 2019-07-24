@@ -158,6 +158,7 @@ public:
 	auto out_irq_cb() { return m_out_irq.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(ca);
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
 	i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth);
@@ -219,6 +220,7 @@ protected:
 	bool m_cna;         // command unit became inactive
 	bool m_rnr;         // receive unit became not ready
 	bool m_initialised;
+	bool m_reset;
 	int m_irq_assert;   // configurable interrupt polarity
 
 	// receive/command unit state

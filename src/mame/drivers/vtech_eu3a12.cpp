@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
 
-// CPU die is an Elan EU3A12, it isn't clear what it is compatible with (16-bit?)
+// CPU die is an Elan EU3A12 (Elan "RISC II Series" quasi-PIC with 16-bit opcodes)
 
 #include "emu.h"
+#include "cpu/rii/riscii.h"
 #include "screen.h"
 
 class vreadere_state : public driver_device
@@ -11,12 +12,17 @@ class vreadere_state : public driver_device
 public:
 	vreadere_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void vreadere(machine_config &config);
 
 private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void prog_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 };
 
 uint32_t vreadere_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -24,12 +30,18 @@ uint32_t vreadere_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
+void vreadere_state::prog_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().region("maincpu", 0);
+}
+
 static INPUT_PORTS_START( vreadere )
 INPUT_PORTS_END
 
 void vreadere_state::vreadere(machine_config &config)
 {
-	// UNKNOWN(config, "maincpu", unknown); // CPU type is unknown, epoxy blob
+	RISCII(config, m_maincpu, 10'000'000); // CPU type is unknown, epoxy blob
+	m_maincpu->set_addrmap(AS_PROGRAM, &vreadere_state::prog_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

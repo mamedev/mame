@@ -69,6 +69,7 @@ Ocha-Ken Hot Medal                          837-14790    G            ROM  JP   
 Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY    253-5508-0604   AAFE-01G03025212
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
+Unknown                                     834-14865                      JAP
 
 REV PCB       IC6s      Flash       AU1500
 C  171-8278C  315-6370  8x 128Mbit  AMD

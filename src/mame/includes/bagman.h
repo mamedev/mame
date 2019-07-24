@@ -22,8 +22,7 @@ public:
 		m_tmsprom(*this, "tmsprom"),
 		m_tmslatch(*this, "tmslatch"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram")
+		m_colorram(*this, "colorram")
 	{ }
 
 	void botanic(machine_config &config);
@@ -77,7 +76,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_spriteram;
 
 	bool m_irq_mask;
 	bool m_video_enable;

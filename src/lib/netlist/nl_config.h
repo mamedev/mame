@@ -28,7 +28,20 @@
  * Your mileage may vary.
  *
  */
+#ifndef USE_MEMPOOL
 #define USE_MEMPOOL                 (1)
+#endif
+
+/*! Enable queue statistics.
+ *
+ * Queue statistics come at a performance cost. Although
+ * the cost is low, we disable them here since they are
+ * only needed during development.
+ *
+ */
+#ifndef USE_QUEUE_STATS
+#define USE_QUEUE_STATS             (0)
+#endif
 
 /*! Store input values in logic_terminal_t.
  *
@@ -40,7 +53,9 @@
  * the default approach. It is up to 5% slower.
  *
  */
+#ifndef USE_COPY_INSTEAD_OF_REFERENCE
 #define USE_COPY_INSTEAD_OF_REFERENCE (0)
+#endif
 
 /*
  * FIXME: Using truthtable is a lot slower than the explicit device
@@ -50,41 +65,27 @@
 
 #define USE_TRUTHTABLE_7448 (0)
 
-// How many times do we try to resolve links (connections)
-#define NL_MAX_LINK_RESOLVE_LOOPS   (100)
+/*
+ * FIXME: The truthtable implementation of 74107 (JK-Flipflop)
+ *        is included for educational purposes to demonstrate how
+ *        to implement state holding devices as truthtables.
+ *        It will completely nuke performance for pong.
+ */
+
+#define USE_TRUTHTABLE_74107 (0)
 
 //============================================================
 //  DEBUGGING
 //============================================================
 
+#ifndef NL_DEBUG
 #define NL_DEBUG                    (false)
-#define NL_KEEP_STATISTICS          (0)
 //#define NL_DEBUG                    (true)
-//#define NL_KEEP_STATISTICS          (1)
-
-//============================================================
-//  General Macros
-//============================================================
-
-#if defined(OPENMP)
-#define HAS_OPENMP ( OPENMP >= 200805 )
-#elif defined(_OPENMP)
-#define HAS_OPENMP ( _OPENMP >= 200805 )
-#else
-#define HAS_OPENMP (0)
 #endif
 
 //============================================================
-//  General
+// Time resolution
 //============================================================
-
-/* The following adds about 10% to 20% performance for analog
- * netlists like kidniki.
- */
-
-#if !defined(USE_OPENMP)
-#define USE_OPENMP              (0)
-#endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
 
@@ -100,15 +101,5 @@ static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
 //#define nl_double float
 using nl_double = double;
-
-//============================================================
-//  WARNINGS
-//============================================================
-
-#if (USE_OPENMP)
-#if (!(HAS_OPENMP))
-#error To use openmp compile and link with "-fopenmp"
-#endif
-#endif
 
 #endif /* NLCONFIG_H_ */

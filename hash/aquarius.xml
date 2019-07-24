@@ -10,7 +10,7 @@
 		<info name="serial" value="4023" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="treasue of tarmin.bin" size="0x4000" crc="2fe95594" sha1="e3e494b9dd9623c92f54cc7d12af29b1103f000f" offset="0x0000" />
+				<rom name="treasue of tarmin.bin" size="0x4000" crc="2fe95594" sha1="e3e494b9dd9623c92f54cc7d12af29b1103f000f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="basic.bin" size="0x2000" crc="5cfa5b42" sha1="02c8ee11e911d1aa346812492d14284b6870cb3e" offset="0x0000" />
+				<rom name="basic.bin" size="0x2000" crc="5cfa5b42" sha1="02c8ee11e911d1aa346812492d14284b6870cb3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 		<info name="serial" value="4003" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="astrosmash.bin" size="0x4000" crc="ce76c898" sha1="f47034bbfacd3042090388f0e459d48a830ab9c6" offset="0x0000" />
+				<rom name="astrosmash.bin" size="0x4000" crc="ce76c898" sha1="f47034bbfacd3042090388f0e459d48a830ab9c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<info name="serial" value="4673" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="biorhythms.bin" size="0x4000" crc="47e1c47b" sha1="68fccc2c2cb0841496ea1c5681b17cb689ac102a" offset="0x0000" />
+				<rom name="biorhythms.bin" size="0x4000" crc="47e1c47b" sha1="68fccc2c2cb0841496ea1c5681b17cb689ac102a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 		<info name="serial" value="4653" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="burgertime.bin" size="0x4000" crc="be678f07" sha1="8b72793cd9cfdd3bd17412bdaf2411ca06bb1abd" offset="0x0000" />
+				<rom name="burgertime.bin" size="0x4000" crc="be678f07" sha1="8b72793cd9cfdd3bd17412bdaf2411ca06bb1abd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<info name="serial" value="4594" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="chess.bin" size="0x4000" crc="0243e59f" sha1="7e7a47071d915c6e1408b3618d172daea889f02b" offset="0x0000" />
+				<rom name="chess.bin" size="0x4000" crc="0243e59f" sha1="7e7a47071d915c6e1408b3618d172daea889f02b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 		<info name="serial" value="4392" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="extended basic.bin" size="0x4000" crc="0dba1241" sha1="3559249c4ed6ed0662d44df64283cf15cdbd2561" offset="0x0000" />
+				<rom name="extended basic.bin" size="0x4000" crc="0dba1241" sha1="3559249c4ed6ed0662d44df64283cf15cdbd2561"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,7 +92,7 @@
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="dos basic.bin" size="0x4000" crc="10fb3dca" sha1="ea38ce45628c9d9e4e633c7638e8d860a40c3ffa" offset="0x0000" />
+				<rom name="dos basic.bin" size="0x4000" crc="10fb3dca" sha1="ea38ce45628c9d9e4e633c7638e8d860a40c3ffa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -104,7 +104,7 @@
 		<info name="serial" value="4177" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="fileform.bin" size="0x4000" crc="a7d29abd" sha1="e46a258628a38fe8b13f85fc56e9e687963a74a3" offset="0x0000" />
+				<rom name="fileform.bin" size="0x4000" crc="a7d29abd" sha1="e46a258628a38fe8b13f85fc56e9e687963a74a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -116,7 +116,7 @@
 		<info name="serial" value="4178" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="finform.bin" size="0x4000" crc="366a6a5b" sha1="c6224efc44e5974684be88e093e6fc6d9a7ea2a8" offset="0x0000" />
+				<rom name="finform.bin" size="0x4000" crc="366a6a5b" sha1="c6224efc44e5974684be88e093e6fc6d9a7ea2a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,7 +128,7 @@
 		<info name="serial" value="4391" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="logo.bin" size="0x4000" crc="0b8d198e" sha1="8e1fa06e81f9cc02d00fceb33a794591d5ea83cd" offset="0x0000" />
+				<rom name="logo.bin" size="0x4000" crc="0b8d198e" sha1="8e1fa06e81f9cc02d00fceb33a794591d5ea83cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -139,7 +139,7 @@
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="demo.bin" size="0x4000" crc="bb922570" sha1="049efcd7771c3108e4ba6ed60434f8237fb60307" offset="0x0000" />
+				<rom name="demo.bin" size="0x4000" crc="bb922570" sha1="049efcd7771c3108e4ba6ed60434f8237fb60307"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,7 +151,7 @@
 		<info name="serial" value="4652" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="melodychase.bin" size="0x4000" crc="6f99dbaf" sha1="8d0742149bf71620b2dd471bd5d05f1156fbd6a6" offset="0x0000" />
+				<rom name="melodychase.bin" size="0x4000" crc="6f99dbaf" sha1="8d0742149bf71620b2dd471bd5d05f1156fbd6a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -163,7 +163,7 @@
 		<info name="usage" value="Modem required" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="modem terminal software.bin" size="0x4000" crc="052dd522" sha1="35230b695470d9df1c37233107c2b29a18124f7b" offset="0x0000" />
+				<rom name="modem terminal software.bin" size="0x4000" crc="052dd522" sha1="35230b695470d9df1c37233107c2b29a18124f7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,7 +175,7 @@
 		<info name="serial" value="4595" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="night stalker.bin" size="0x4000" crc="032ae514" sha1="3183bb81a428ce68c9919d96d91be29fcc1aad3f" offset="0x0000" />
+				<rom name="night stalker.bin" size="0x4000" crc="032ae514" sha1="3183bb81a428ce68c9919d96d91be29fcc1aad3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="shark.bin" size="0x4000" crc="ee805a79" sha1="ddcc085699c3862ad41155e7f1a7b72396129cc5" offset="0x0000" />
+				<rom name="shark.bin" size="0x4000" crc="ee805a79" sha1="ddcc085699c3862ad41155e7f1a7b72396129cc5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -198,7 +198,7 @@
 		<info name="serial" value="4028" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="snafu.bin" size="0x4000" crc="aed0ea34" sha1="d65b3d4b0e3abdc844ecabbaecc6d095a27aa982" offset="0x0000" />
+				<rom name="snafu.bin" size="0x4000" crc="aed0ea34" sha1="d65b3d4b0e3abdc844ecabbaecc6d095a27aa982"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,7 +210,7 @@
 		<info name="serial" value="4682" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="space speller.bin" size="0x4000" crc="49a88710" sha1="9fc967addeba5280e5e5390eaf81c3fe9ff8ab10" offset="0x0000" />
+				<rom name="space speller.bin" size="0x4000" crc="49a88710" sha1="9fc967addeba5280e5e5390eaf81c3fe9ff8ab10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -222,7 +222,7 @@
 		<info name="serial" value="4024" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="tron deadly discs.bin" size="0x4000" crc="6d6ebd1d" sha1="8750fea11e97ae754be6134d9849e3b039b78f55" offset="0x0000" />
+				<rom name="tron deadly discs.bin" size="0x4000" crc="6d6ebd1d" sha1="8750fea11e97ae754be6134d9849e3b039b78f55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -234,7 +234,7 @@
 		<info name="serial" value="4596" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="utopia.bin" size="0x4000" crc="1fc3002e" sha1="b9244274929cad68afb978e991edde1fc282f172" offset="0x0000" />
+				<rom name="utopia.bin" size="0x4000" crc="1fc3002e" sha1="b9244274929cad68afb978e991edde1fc282f172"/>
 			</dataarea>
 		</part>
 	</software>
@@ -245,7 +245,7 @@
 		<publisher>Balen</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
-				<rom name="word processor.bin" size="0x4000" crc="807557d7" sha1="38ae9507c0d4b7765a678458acf6a894b8b47d29" offset="0x0000" />
+				<rom name="word processor.bin" size="0x4000" crc="807557d7" sha1="38ae9507c0d4b7765a678458acf6a894b8b47d29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -257,7 +257,7 @@
 		<info name="serial" value="4895C" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x2000">
-				<rom name="zeroin.bin" size="0x2000" crc="277f1716" sha1="a256a18d5e9c5d03a8610c5de58cb8725de0247c" offset="0x0000" />
+				<rom name="zeroin.bin" size="0x2000" crc="277f1716" sha1="a256a18d5e9c5d03a8610c5de58cb8725de0247c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -268,7 +268,7 @@
 		<publisher>Radofin Electronics</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="qd1_01.bin" size="0x4000" crc="06dc0ef3" sha1="94b18c2f3f4baca8f5ab0feb2458c88b1682f8b2" offset="0x0000" />
+				<rom name="qd1_01.bin" size="0x4000" crc="06dc0ef3" sha1="94b18c2f3f4baca8f5ab0feb2458c88b1682f8b2"/>
 				<rom name="qd1_02.bin" size="0x4000" crc="10fb3dca" sha1="ea38ce45628c9d9e4e633c7638e8d860a40c3ffa" offset="0x4000" />
 			</dataarea>
 		</part>

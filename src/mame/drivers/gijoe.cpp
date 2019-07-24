@@ -79,17 +79,17 @@ Change Log
 
 AT070403:
 
-tilemap.h,tilemap.c
+tilemap.h,tilemap.cpp
 - added tilemap_get_transparency_data() for transparency cache manipulation
 
-video\konamiic.c
+video\konamiic.cpp
 - added preliminary K056832 tilemap<->linemap switching and tileline code
 
-drivers\gijoe.c
+drivers\gijoe.cpp
 - updated video settings, memory map and irq handler
 - added object blitter
 
-video\gijoe.c
+video\gijoe.cpp
 - completed K054157 to K056832 migration
 - added ground scroll emulation
 - fixed sprite and BG priority
@@ -201,7 +201,7 @@ void gijoe_state::gijoe_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x100fff).ram().share("spriteram");                               // Sprites
-	map(0x110000, 0x110007).w(m_k053246, FUNC(k053247_device::k053246_word_w));
+	map(0x110000, 0x110007).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x120000, 0x121fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));      // Graphic planes
 	map(0x122000, 0x123fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));      // Graphic planes mirror read
 	map(0x130000, 0x131fff).r(m_k056832, FUNC(k056832_device::rom_word_r));                               // Passthrough to tile roms
@@ -209,7 +209,7 @@ void gijoe_state::gijoe_map(address_map &map)
 	map(0x170000, 0x170001).nopw();                                                // Watchdog
 	map(0x180000, 0x18ffff).ram().share("workram");                 // Main RAM.  Spec. 180000-1803ff, 180400-187fff
 	map(0x190000, 0x190fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x1a0000, 0x1a001f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x1a0000, 0x1a001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x1b0000, 0x1b003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x1c0000, 0x1c001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x1d0000, 0x1d0001).w(FUNC(gijoe_state::sound_irq_w));
@@ -218,11 +218,11 @@ void gijoe_state::gijoe_map(address_map &map)
 	map(0x1e4000, 0x1e4001).portr("SYSTEM");
 	map(0x1e4002, 0x1e4003).portr("START");
 	map(0x1e8000, 0x1e8001).rw(FUNC(gijoe_state::control2_r), FUNC(gijoe_state::control2_w));
-	map(0x1f0000, 0x1f0001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
+	map(0x1f0000, 0x1f0001).r(m_k053246, FUNC(k053247_device::k053246_r));
 #if JOE_DEBUG
-	map(0x110000, 0x110007).r(m_k053246, FUNC(k053247_device::k053246_reg_word_r));
+	map(0x110000, 0x110007).r(m_k053246, FUNC(k053247_device::k053246_read_register));
 	map(0x160000, 0x160007).r(m_k056832, FUNC(k056832_device::b_word_r));
-	map(0x1a0000, 0x1a001f).r(m_k053251, FUNC(k053251_device::lsb_r));
+	map(0x1a0000, 0x1a001f).r(m_k053251, FUNC(k053251_device::read)).umask16(0x00ff);
 	map(0x1b0000, 0x1b003f).r(m_k056832, FUNC(k056832_device::word_r));
 #endif
 }
@@ -317,12 +317,12 @@ void gijoe_state::gijoe(machine_config &config)
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(gijoe_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -37, 20);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, -37, 20);
 	m_k053246->set_palette(m_palette);
 
 	K053251(config, m_k053251, 0);
@@ -350,11 +350,11 @@ ROM_START( gijoe )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
 	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
@@ -383,11 +383,11 @@ ROM_START( gijoeea )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
 	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
@@ -410,11 +410,11 @@ ROM_START( gijoeu )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
 	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
@@ -437,11 +437,11 @@ ROM_START( gijoej )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
 	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
@@ -464,11 +464,11 @@ ROM_START( gijoea )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "k056832", 0 )
 	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
 	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "k053246", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )

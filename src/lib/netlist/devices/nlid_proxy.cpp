@@ -7,9 +7,6 @@
 
 #include "nlid_proxy.h"
 #include "netlist/solver/nld_solver.h"
-//#include "plib/pstream.h"
-//#include "plib/pfmtlog.h"
-//#include "nld_log.h"
 
 namespace netlist
 {
@@ -79,36 +76,71 @@ namespace netlist
 	}
 
 	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *out_proxied)
-	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)
-	, m_GNDHack(*this, "_Q")
-	, m_RV(*this, "RV")
+	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RN.m_P)
+	, m_RP(*this, "RP")
+	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", -1)
 	, m_is_timestep(false)
 	{
 		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
 
-		register_subalias("Q", m_RV.m_P);
+		register_subalias("Q", m_RN.m_P);
 
-		connect(m_RV.m_N, m_GNDHack);
 		bool f = false;
+		detail::core_terminal_t *tp(nullptr);
+		detail::core_terminal_t *tn(nullptr);
 		for (auto & pwr_sym : power_syms)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = setup().find_terminal(devname + "." + pwr_sym.first,
-					detail::terminal_type::INPUT, false);
-			auto tn = setup().find_terminal(devname + "." + pwr_sym.second,
-					detail::terminal_type::INPUT, false);
-			if (tp != nullptr && tn != nullptr)
+			auto tp_t = setup().find_terminal(devname + "." + pwr_sym.first,
+					/*detail::terminal_type::INPUT,*/ false);
+			auto tn_t = setup().find_terminal(devname + "." + pwr_sym.second,
+					/*detail::terminal_type::INPUT,*/ false);
+			if (f && (tp_t != nullptr && tn_t != nullptr))
+				log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(out_proxied->device().name(),
+					tp->name(), tn->name(),
+					tp_t ? tp_t->name() : "",
+					tn_t ? tn_t->name() : ""));
+			else if (tp_t != nullptr && tn_t != nullptr)
 			{
 				/* alternative logic */
+				tp = tp_t;
+				tn = tn_t;
 				f = true;
 			}
 		}
 		//FIXME: Use power terminals and change info to warning or error
 		if (!f)
-			log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(out_proxied->device().name()));
+		{
+			if (logic_family()->fixed_V() == 0.0)
+				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_1(setup().de_alias(out_proxied->device().name())));
+			else
+				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(setup().de_alias(out_proxied->device().name())));
+			m_GNDHack = plib::make_unique<analog_output_t>(*this, "_QGND");
+			m_VCCHack = plib::make_unique<analog_output_t>(*this, "_QVCC");
+
+			connect(m_RN.m_N, *m_GNDHack);
+			connect(m_RP.m_P, *m_VCCHack);
+			connect(m_RN.m_P, m_RP.m_N);
+		}
 		else
+		{
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
+			if (setup().is_validation())
+			{
+				// During validation, don't connect to terminals found
+				// This will cause terminals not connected to a rail net to
+				// fail connection stage.
+				connect(m_RN.m_N, m_RP.m_P);
+			}
+			else
+			{
+				connect(m_RN.m_N, *tn);
+				connect(m_RP.m_P, *tp);
+			}
+			connect(m_RN.m_P, m_RP.m_N);
+		}
+		//printf("vcc: %f\n", logic_family()->fixed_V());
 	}
 
 
@@ -120,10 +152,17 @@ namespace netlist
 
 		//m_Q.initial(0.0);
 		m_last_state = -1;
-		m_RV.reset();
-		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
-		m_RV.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_low(),
-				logic_family()->low_V(0.0, supply_V), 0.0);
+		m_RN.reset();
+		m_RP.reset();
+		if (m_GNDHack)
+			m_GNDHack->initial(0);
+		if (m_VCCHack)
+			m_VCCHack->initial(supply_V);
+		m_is_timestep = m_RN.m_P.net().solver()->has_timestep_devices();
+		m_RN.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_low(),
+				logic_family()->low_offset_V(), 0.0);
+		m_RP.set_G_V_I(G_OFF,
+				0.0, 0.0);
 	}
 
 	NETLIB_UPDATE(d_to_a_proxy)
@@ -131,20 +170,27 @@ namespace netlist
 		const auto state = static_cast<int>(m_I());
 		if (state != m_last_state)
 		{
-			// FIXME: Variable voltage
-			double supply_V = logic_family()->fixed_V();
-			if (supply_V == 0.0) supply_V = 5.0;
-			m_last_state = state;
-			const nl_double R = state ? logic_family()->R_high() : logic_family()->R_low();
-			const nl_double V = state ? logic_family()->high_V(0.0, supply_V) : logic_family()->low_V(0.0, supply_V);
-
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
 			{
-				m_RV.update();
+				m_RN.update(); // RN, RP are connected ...
 			}
-			m_RV.set_G_V_I(plib::constants<nl_double>::one() / R, V, 0.0);
-			m_RV.solve_later();
+			if (state)
+			{
+				m_RN.set_G_V_I(G_OFF,
+						0.0, 0.0);
+				m_RP.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_high(),
+						logic_family()->high_offset_V(), 0.0);
+			}
+			else
+			{
+				m_RN.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_low(),
+						logic_family()->low_offset_V(), 0.0);
+				m_RP.set_G_V_I(G_OFF,
+						0.0, 0.0);
+			}
+			m_RN.solve_later(); // RN, RP are connected ...
+			m_last_state = state;
 		}
 	}
 

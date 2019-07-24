@@ -11,6 +11,9 @@ greatly affecting user playability of emulated electronic board games.
 As workaround for the chess games, use an external chess GUI on the side,
 such as Arena(in editmode).
 
+TODO:
+- use pwm_display_device, this file will be removed eventually
+
 ******************************************************************************/
 
 #include "emu.h"

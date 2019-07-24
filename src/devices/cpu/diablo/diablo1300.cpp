@@ -15,13 +15,15 @@
 //  CONFIGURABLE LOGGING
 //**************************************************************************
 #define LOG_OP   (1U <<  1)
+#define LOG_TABLE   (1U <<  2)
 
-#define VERBOSE (LOG_GENERAL | LOG_OP)
+#define VERBOSE (LOG_GENERAL | LOG_OP | LOG_TABLE)
 //#define LOG_OUTPUT_FUNC printf
 
 #include "logmacro.h"
 
-#define LOGOP(...) LOGMASKED(LOG_OP,   __VA_ARGS__)
+#define LOGOP(...)    LOGMASKED(LOG_OP,    __VA_ARGS__)
+#define LOGTABLE(...) LOGMASKED(LOG_TABLE, __VA_ARGS__)
 
 /*****************************************************************************/
 
@@ -62,6 +64,23 @@ inline void diablo1300_cpu_device::write_reg(uint16_t reg, uint8_t data)
 	data_write8(reg, data);
 }
 
+inline void diablo1300_cpu_device::write_port(uint16_t port, uint16_t data)
+{
+	// TODO: interact with mechanics/layout engine
+}
+
+inline uint8_t diablo1300_cpu_device::read_table(uint16_t offset)
+{
+	LOGTABLE("Read %02x from table ROM offset %04x[%04x]\n", m_table->base()[offset & 0x1ff], offset & 0x1ff, offset);
+	return m_table->base()[offset & 0x1ff];
+}
+
+inline uint16_t diablo1300_cpu_device::read_ibus()
+{
+	// TODO: get signals from other boards
+	return 0;
+}
+
 /*****************************************************************************/
 
 DEFINE_DEVICE_TYPE(DIABLO1300, diablo1300_cpu_device, "diablo1300", "DIABLO 1300")
@@ -82,7 +101,7 @@ diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, cons
 	, m_program(nullptr)
 	, m_data(nullptr)
 	, m_cache(nullptr)
-
+	, m_table(nullptr)
 {
 	// Allocate & setup
 }
@@ -92,7 +111,8 @@ void diablo1300_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_data    = &space(AS_DATA);
-	m_cache  = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
+	m_cache   = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
+	m_table   = memregion("trom");
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -101,11 +121,13 @@ void diablo1300_cpu_device::device_start()
 	state_add(DIABLO_PC,         "PC",        m_pc).mask(0x1ff);
 	state_add(DIABLO_A,          "A",         m_a).mask(0xff);
 	state_add(DIABLO_B,          "B",         m_b).mask(0xff);
+	state_add(DIABLO_CARRY,      "CARRY",     m_carry).formatstr("%1u");
 
 	/* setup regtable */
 	save_item(NAME(m_pc));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
+	save_item(NAME(m_carry));
 	save_item(NAME(m_power_on));
 
 	// set our instruction counter
@@ -216,7 +238,7 @@ void diablo1300_cpu_device::execute_run()
 				write_port((op & 0x0070) >> 4, m_a);
 				break;
 			case 1:
-				/* JNC Addr: Set PC to address H AAAA AAAA, reg B and carry are cleared
+				/* JNC Addr: If carry not set: set PC to address H AAAA AAAA, reg B and carry are cleared
 				   AAAA AAAA 0000 HIII
 				   AAAA AAAA           = 8 low bits in Destination Address
 				                  H    = The 9th hi address bit
@@ -225,8 +247,11 @@ void diablo1300_cpu_device::execute_run()
 				LOGOP("JNC    %03X\n", ((op & 0xff00) >> 8) + ((op & 0x0008) ? 0x100 : 0));
 				m_a = (op & 0xff00) >> 8;
 				m_b = 0;
+				if (m_carry == 0)
+				{
+					m_pc = ((op & 0x0008) + m_a);
+				}
 				m_carry = 0;
-				m_pc = ((op & 0x0008) + m_a);
 				break;
 			case 2:
 				/* RST Dport : Reset Port
@@ -268,7 +293,7 @@ void diablo1300_cpu_device::execute_run()
 					*/
 					LOGOP("XLAT   r%02X\n",
 						((op & 0x00f0) >> 4) + ((op & 0x0008) ? 0x10 : 0));
-					m_a = read_table(m_b + m_carry);
+					m_a = read_table(m_b + (m_carry != 0 ? 0x100 : 0x000));
 					m_b = 0;
 					m_carry = 0;
 					write_reg(((op & 0x0008) != 0 ? 0x10 : 0) + ((op & 0x00f0) >> 4), m_a);

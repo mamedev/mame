@@ -4,6 +4,36 @@
 
     RCA CDP1861 Video Display Controller emulation
 
+Timing: The 1861 interrupts the CPU to signal that DMA will be starting
+in exactly 29 cycles. The CPU must set R0 as the pointer to the first of
+8 sequential bytes to be transferred. After the DMA, exactly 6 cycles will
+elapse before the next DMA. This process continues until the 1861 is within
+4 lines of the end of the visible area, when it will assert EFx. When the
+CPU sees this, it can finish up the interrupt routine. The 1861 will clear
+EFx at the last visible line. The original IRQ request is cleared 28 cycles
+after it was asserted. EFx is also asserted 4 lines before the first visible
+scanline and ends 4 lines later, but this is usually ignored.
+
+Timing as it applies to the Studio II:
+- The usage of EFx before the visible area is not used.
+- R1 is preset with the value 001C, the interrupt vector.
+- When the interrupt from the 1861 occurs, R1 becomes the P register, so
+  causing a jump to 001C.
+- This is followed by 13 2-cycle instructions and one 3-cycle instruction,
+  giving us the required 29 cycles.
+- The first DMA therefore will occur just after the PLO at 002D.
+- This is followed by 3 2-cycle instructions, giving the required 6 cycles.
+- The 1861 will draw 128 scanlines, but due to memory constraints, the
+  Studio II can only do 32 lines, and so each group of 4 scanlines is
+  DMA'd from the same part of memory.
+- Each DMA will automatically add 8 to R0, and so this needs to be reset
+  for each of the 4 lines. After this, the new R0 value can be used for
+  the next group of 4 scanlines.
+- After the 4 scanlines are done, EF1 is checked to see if the bottom of
+  the display is being reached. If not, more lines can be processed.
+- At the end, the random number seed (not part of video drawing) gets
+  updated and the interrupt routine ends.
+
 **********************************************************************/
 
 #include "emu.h"

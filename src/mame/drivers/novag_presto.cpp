@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger
 /******************************************************************************
-*
+
 * novag_presto.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
 
 TODO:

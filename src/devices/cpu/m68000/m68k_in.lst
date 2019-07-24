@@ -1,0 +1,8082 @@
+# Opcode handlers
+#
+# One-line header followed by indented code
+#
+# Header:
+# - Base value to match for the opcode
+# - Base mask to use in matching
+# - Name of the opcode
+# - Size of the opcode b/w/l/. (. for unsized)
+# - Derivations to generate
+# - CPU coverage, cycles and priviledge level
+#
+
+# The derivations are the addressing-mode variants to generate (with
+# value/mask/cycles adjusted accordingly):
+#   A: (an)
+#   +: (an)+
+#   -: -(an)
+#   D: d(an)
+#   X: d(an, ix)
+#   W: adr.w
+#   L: adr.l
+#   d: d(pc)
+#   x: d(pc, ix)
+#   I: #val
+#
+# Opcodes with names ending in 'cc' are automatically derived on the
+# different possible condition codes.
+#
+# CPU coverage is a series of blocks with structure (cpu codes):base cycles[p]
+# CPU codes are:
+#   0: 68000/68008
+#   7: 68070
+#   1: 68010
+#   2: 68020
+#   3: 68030
+#   4: 68040
+#   f: fcpu
+#   c: coldfire
+#
+# A suffix of 'p' indicates the instruction is priviledged for these
+# particular CPU variants.
+#
+# The body is C++ code with automatic substitutions:
+#   M68KMAKE_CC: condition code test
+#   M68KMAKE_NOT_CC: inverted condition code test
+#   M68KMAKE_GET_EA_AY_8: compute the effective address for the current addressing mode knowing the size is byte
+#   M68KMAKE_GET_EA_AY_16: compute the effective address for the current addressing mode knowing the size is word
+#   M68KMAKE_GET_EA_AY_32: compute the effective address for the current addressing mode knowing the size is long
+#   M68KMAKE_GET_OPER_AY_8: retrieve the source value for the current addressing mode knowing the size is byte
+#   M68KMAKE_GET_OPER_AY_16: retrieve the source value for the current addressing mode knowing the size is word
+#   M68KMAKE_GET_OPER_AY_32: retrieve the source value for the current addressing mode knowing the size is long
+
+a000 f000 1010     . .          071234fc:4
+	m68ki_exception_1010();
+
+
+f000 f000 1111     . .          071234fc:4
+	m68ki_exception_1111();
+
+
+f200 ff00 040fpu0  l .          234f:0
+	if(m_has_fpu) {
+		m68040_fpu_op0();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f300 ff00 040fpu1  l .          234f:0
+	if(m_has_fpu) {
+		m68040_fpu_op1();
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+c100 f1f8 abcd     b .          071:6 234fc:4
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 9)
+		corf = 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	m_v_flag = ~res; /* Undefined V behavior */
+	res += corf;
+	m_x_flag = m_c_flag = (res > 0x9f) << 8;
+	if(m_c_flag)
+		res -= 0xa0;
+
+	m_v_flag &= res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+
+cf08 fff8 abcd     b .          071:18 234fc:16
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 9)
+		corf = 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	m_v_flag = ~res; /* Undefined V behavior */
+	res += corf;
+	m_x_flag = m_c_flag = (res > 0x9f) << 8;
+	if(m_c_flag)
+		res -= 0xa0;
+
+	m_v_flag &= res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+c10f f1ff abcd     b .          071:18 234fc:16
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 9)
+		corf = 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	m_v_flag = ~res; /* Undefined V behavior */
+	res += corf;
+	m_x_flag = m_c_flag = (res > 0x9f) << 8;
+	if(m_c_flag)
+		res -= 0xa0;
+
+	m_v_flag &= res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+cf0f ffff abcd     b .          071:18 234fc:16
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 9)
+		corf = 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	m_v_flag = ~res; /* Undefined V behavior */
+	res += corf;
+	m_x_flag = m_c_flag = (res > 0x9f) << 8;
+	if(m_c_flag)
+		res -= 0xa0;
+
+	m_v_flag &= res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+c108 f1f8 abcd     b .          071:18 234fc:16
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(src) + LOW_NIBBLE(dst) + XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 9)
+		corf = 6;
+	res += HIGH_NIBBLE(src) + HIGH_NIBBLE(dst);
+	m_v_flag = ~res; /* Undefined V behavior */
+	res += corf;
+	m_x_flag = m_c_flag = (res > 0x9f) << 8;
+	if(m_c_flag)
+		res -= 0xa0;
+
+	m_v_flag &= res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+d000 f1f8 add      b .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+d000 f1c0 add      b A+-DXWLdxI 071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_8;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+d040 f1f8 add      w .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+d048 f1f8 add      w .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(AY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+d040 f1c0 add      w A+-DXWLdxI 071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_16;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+d080 f1f8 add      l .          071:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+d088 f1f8 add      l .          071:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = AY();
+	u32 dst = *r_dst;
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+d080 f1c0 add      l A+-DXWLdxI 071:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = *r_dst;
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+d100 f1c0 add      b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = MASK_OUT_ABOVE_8(DX());
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+d140 f1c0 add      w A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = MASK_OUT_ABOVE_16(DX());
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+d180 f1c0 add      l A+-DXWL    071:12 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 src = DX();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	m68ki_write_32(ea, m_not_z_flag);
+
+
+d0c0 f1f8 adda     w .          071:8 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(DY()));
+
+
+d0c8 f1f8 adda     w .          071:8 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(AY()));
+
+
+d0c0 f1c0 adda     w A+-DXWLdxI 071:8 234fc:2
+	u32* r_dst = &AX();
+	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + src);
+
+
+d1c0 f1f8 adda     l .          071:6 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + DY());
+
+
+d1c8 f1f8 adda     l .          071:6 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + AY());
+
+
+d1c0 f1c0 adda     l A+-DXWLdxI 071:6 234fc:2
+	u32* r_dst = &AX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + src);
+
+
+0600 fff8 addi     b .          071:8 234fc:2
+	u32* r_dst = &DY();
+	u32 src = OPER_I_8();
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+0600 ffc0 addi     b A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+0640 fff8 addi     w .          071:8 234fc:2
+	u32* r_dst = &DY();
+	u32 src = OPER_I_16();
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+0640 ffc0 addi     w A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+0680 fff8 addi     l .          07:16 1:14 234fc:2
+	u32* r_dst = &DY();
+	u32 src = OPER_I_32();
+	u32 dst = *r_dst;
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+0680 ffc0 addi     l A+-DXWL    071:20 234fc:4
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	m68ki_write_32(ea, m_not_z_flag);
+
+
+5000 f1f8 addq     b .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+5000 f1c0 addq     b A+-DXWL    071:8 234fc:4
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+5040 f1f8 addq     w .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+5048 f1f8 addq     w .          071:4 234fc:2
+	u32* r_dst = &AY();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + (((m_ir >> 9) - 1) & 7) + 1);
+
+
+5040 f1c0 addq     w A+-DXWL    071:8 234fc:4
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+5080 f1f8 addq     l .          071:8 234fc:2
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = *r_dst;
+	u32 res = src + dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+5088 f1f8 addq     l .          071:8 234fc:2
+	u32* r_dst = &AY();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst + (((m_ir >> 9) - 1) & 7) + 1);
+
+
+5080 f1c0 addq     l A+-DXWL    071:12 234fc:4
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst;
+
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	m68ki_write_32(ea, m_not_z_flag);
+
+
+d100 f1f8 addx     b .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+
+d140 f1f8 addx     w .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+
+	res = MASK_OUT_ABOVE_16(res);
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+
+d180 f1f8 addx     l .          07:8 1:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+
+	res = MASK_OUT_ABOVE_32(res);
+	m_not_z_flag |= res;
+
+	*r_dst = res;
+
+
+df08 fff8 addx     b .          071:18 234fc:12
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+d10f f1ff addx     b .          071:18 234fc:12
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+df0f ffff addx     b .          071:18 234fc:12
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+d108 f1f8 addx     b .          071:18 234fc:12
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_v_flag = VFLAG_ADD_8(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+d148 f1f8 addx     w .          071:18 234fc:12
+	u32 src = OPER_AY_PD_16();
+	u32 ea  = EA_AX_PD_16();
+	u32 dst = m68ki_read_16(ea);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_16(res);
+	m_v_flag = VFLAG_ADD_16(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+
+	res = MASK_OUT_ABOVE_16(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_16(ea, res);
+
+
+d188 f1f8 addx     l .          071:30 234fc:12
+	u32 src = OPER_AY_PD_32();
+	u32 ea  = EA_AX_PD_32();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = src + dst + XFLAG_1();
+
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_ADD_32(src, dst, res);
+	m_x_flag = m_c_flag = CFLAG_ADD_32(src, dst, res);
+
+	res = MASK_OUT_ABOVE_32(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_32(ea, res);
+
+
+c000 f1f8 and      b .          071:4 234fc:2
+	m_not_z_flag = MASK_OUT_ABOVE_8(DX() &= (DY() | 0xffffff00));
+
+	m_n_flag = NFLAG_8(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+c000 f1c0 and      b A+-DXWLdxI 071:4 234fc:2
+	m_not_z_flag = MASK_OUT_ABOVE_8(DX() &= (M68KMAKE_GET_OPER_AY_8 | 0xffffff00));
+
+	m_n_flag = NFLAG_8(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+c040 f1f8 and      w .          071:4 234fc:2
+	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (DY() | 0xffff0000));
+
+	m_n_flag = NFLAG_16(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+c040 f1c0 and      w A+-DXWLdxI 071:4 234fc:2
+	m_not_z_flag = MASK_OUT_ABOVE_16(DX() &= (M68KMAKE_GET_OPER_AY_16 | 0xffff0000));
+
+	m_n_flag = NFLAG_16(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+c080 f1f8 and      l .          071:6 234fc:2
+	m_not_z_flag = DX() &= DY();
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+c080 f1c0 and      l A+-DXWLdxI 071:6 234fc:2
+	m_not_z_flag = DX() &= M68KMAKE_GET_OPER_AY_32;
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+c100 f1c0 and      b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = DX() & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+c140 f1c0 and      w A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = DX() & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+c180 f1c0 and      l A+-DXWL    071:12 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = DX() & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+0200 fff8 andi     b .          071:8 234fc:2
+	m_not_z_flag = MASK_OUT_ABOVE_8(DY() &= (OPER_I_8() | 0xffffff00));
+
+	m_n_flag = NFLAG_8(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0200 ffc0 andi     b A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = src & m68ki_read_8(ea);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_8(ea, res);
+
+
+0240 fff8 andi     w .          071:8 234fc:2
+	m_not_z_flag = MASK_OUT_ABOVE_16(DY() &= (OPER_I_16() | 0xffff0000));
+
+	m_n_flag = NFLAG_16(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0240 ffc0 andi     w A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = src & m68ki_read_16(ea);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_16(ea, res);
+
+
+0280 fff8 andi     l .          071:14 234fc:2
+	m_not_z_flag = DY() &= (OPER_I_32());
+
+	m_n_flag = NFLAG_32(m_not_z_flag);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0280 ffc0 andi     l A+-DXWL    071:20 234fc:4
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = src & m68ki_read_32(ea);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+	m68ki_write_32(ea, res);
+
+
+023c ffff andi     w .          07:20 1:16 234fc:12
+	m68ki_set_ccr(m68ki_get_ccr() & OPER_I_8());
+
+
+027c ffff andi     w .          07:20p 1:16p 234fc:12p
+	if(m_s_flag) {
+		u32 src = OPER_I_16();
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_set_sr(m68ki_get_sr() & src);
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+e000 f1f8 asr      b .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	if(GET_MSB_8(src))
+		res |= m68ki_shift_8_table[shift];
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_x_flag = m_c_flag = src << (9-shift);
+
+
+e040 f1f8 asr      w .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	if(GET_MSB_16(src))
+		res |= m68ki_shift_16_table[shift];
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_x_flag = m_c_flag = src << (9-shift);
+
+
+e080 f1f8 asr      l .          071:8 234fc:6
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	if(GET_MSB_32(src))
+		res |= m68ki_shift_32_table[shift];
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_x_flag = m_c_flag = src << (9-shift);
+
+
+e020 f1f8 asr      b .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 8) {
+			if(GET_MSB_8(src))
+				res |= m68ki_shift_8_table[shift];
+
+			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+			m_x_flag = m_c_flag = src << (9-shift);
+			m_n_flag = NFLAG_8(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+
+		} else if(GET_MSB_8(src)) {
+			*r_dst |= 0xff;
+			m_c_flag = CFLAG_SET;
+			m_x_flag = XFLAG_SET;
+			m_n_flag = NFLAG_SET;
+			m_not_z_flag = ZFLAG_CLEAR;
+			m_v_flag = VFLAG_CLEAR;
+
+		} else {
+			*r_dst &= 0xffffff00;
+			m_c_flag = CFLAG_CLEAR;
+			m_x_flag = XFLAG_CLEAR;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_8(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e060 f1f8 asr      w .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 16) {
+			if(GET_MSB_16(src))
+				res |= m68ki_shift_16_table[shift];
+
+			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+			m_c_flag = m_x_flag = (src >> (shift - 1))<<8;
+			m_n_flag = NFLAG_16(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+
+		} else if(GET_MSB_16(src)) {
+			*r_dst |= 0xffff;
+			m_c_flag = CFLAG_SET;
+			m_x_flag = XFLAG_SET;
+			m_n_flag = NFLAG_SET;
+			m_not_z_flag = ZFLAG_CLEAR;
+			m_v_flag = VFLAG_CLEAR;
+
+		} else {
+			*r_dst &= 0xffff0000;
+			m_c_flag = CFLAG_CLEAR;
+			m_x_flag = XFLAG_CLEAR;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_16(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e0a0 f1f8 asr      l .          071:8 234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 32) {
+			if(GET_MSB_32(src))
+				res |= m68ki_shift_32_table[shift];
+
+			*r_dst = res;
+
+			m_c_flag = m_x_flag = (src >> (shift - 1))<<8;
+			m_n_flag = NFLAG_32(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+
+		} else if(GET_MSB_32(src)) {
+			*r_dst = 0xffffffff;
+			m_c_flag = CFLAG_SET;
+			m_x_flag = XFLAG_SET;
+			m_n_flag = NFLAG_SET;
+			m_not_z_flag = ZFLAG_CLEAR;
+			m_v_flag = VFLAG_CLEAR;
+
+		} else {
+			*r_dst = 0;
+			m_c_flag = CFLAG_CLEAR;
+			m_x_flag = XFLAG_CLEAR;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_32(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e0c0 ffc0 asr      w A+-DXWL    071:8 234fc:5
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = src >> 1;
+
+	if(GET_MSB_16(src))
+		res |= 0x8000;
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = m_x_flag = src << 8;
+
+
+e100 f1f8 asl      b .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_x_flag = m_c_flag = src << shift;
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	src &= m68ki_shift_8_table[shift + 1];
+	m_v_flag = (!(src == 0 || (src == m68ki_shift_8_table[shift + 1] && shift < 8)))<<7;
+
+
+e140 f1f8 asl      w .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src >> (8-shift);
+	src &= m68ki_shift_16_table[shift + 1];
+	m_v_flag = (!(src == 0 || src == m68ki_shift_16_table[shift + 1]))<<7;
+
+
+e180 f1f8 asl      l .          071234fc:8
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src >> (24-shift);
+	src &= m68ki_shift_32_table[shift + 1];
+	m_v_flag = (!(src == 0 || src == m68ki_shift_32_table[shift + 1]))<<7;
+
+
+e120 f1f8 asl      b .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 8) {
+			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+			m_x_flag = m_c_flag = src << shift;
+			m_n_flag = NFLAG_8(res);
+			m_not_z_flag = res;
+			src &= m68ki_shift_8_table[shift + 1];
+			m_v_flag = (!(src == 0 || src == m68ki_shift_8_table[shift + 1]))<<7;
+
+		} else {
+			*r_dst &= 0xffffff00;
+			m_x_flag = m_c_flag = ((shift == 8 ? src & 1 : 0))<<8;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = (!(src == 0))<<7;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_8(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e160 f1f8 asl      w .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 16) {
+			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+			m_x_flag = m_c_flag = (src << shift) >> 8;
+			m_n_flag = NFLAG_16(res);
+			m_not_z_flag = res;
+			src &= m68ki_shift_16_table[shift + 1];
+			m_v_flag = (!(src == 0 || src == m68ki_shift_16_table[shift + 1]))<<7;
+		} else {
+			*r_dst &= 0xffff0000;
+			m_x_flag = m_c_flag = ((shift == 16 ? src & 1 : 0))<<8;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = (!(src == 0))<<7;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_16(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e1a0 f1f8 asl      l .          071234fc:8
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 32) {
+			*r_dst = res;
+			m_x_flag = m_c_flag = (src >> (32 - shift)) << 8;
+			m_n_flag = NFLAG_32(res);
+			m_not_z_flag = res;
+			src &= m68ki_shift_32_table[shift + 1];
+			m_v_flag = (!(src == 0 || src == m68ki_shift_32_table[shift + 1]))<<7;
+		} else {
+			*r_dst = 0;
+			m_x_flag = m_c_flag = ((shift == 32 ? src & 1 : 0))<<8;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = (!(src == 0))<<7;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_32(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e1c0 ffc0 asl      w A+-DXWL    071:8 234fc:6
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = MASK_OUT_ABOVE_16(src << 1);
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src >> 7;
+	src &= 0xc000;
+	m_v_flag = (!(src == 0 || src == 0xc000))<<7;
+
+
+6000 f000 bcc      b .          071:10 234fc:6
+	if(M68KMAKE_CC) {
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
+
+	} else {
+		m_icount -= m_cyc_bcc_notake_b;
+	}
+
+
+6000 f0ff bcc      w .          071:10 234fc:6
+	if(M68KMAKE_CC) {
+		u32 offset = OPER_I_16();
+		m_pc -= 2;
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_branch_16(offset);
+
+	} else {
+		m_pc += 2;
+		m_icount -= m_cyc_bcc_notake_w;
+	}
+
+
+60ff f0ff bcc      l .          071:10
+	if(M68KMAKE_CC) {
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
+	} else
+		m_icount -= m_cyc_bcc_notake_b;
+
+
+60ff f0ff bcc      l .          234fc:6
+	if(M68KMAKE_CC) {
+		u32 offset = OPER_I_32();
+		m_pc -= 4;
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_branch_32(offset);
+
+	} else
+		m_pc += 4;
+
+
+0140 f1f8 bchg     l .          071:8 234fc:4
+	u32* r_dst = &DY();
+	u32 mask = 1 << (DX() & 0x1f);
+
+	m_not_z_flag = *r_dst & mask;
+	*r_dst ^= mask;
+
+
+0140 f1c0 bchg     b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 mask = 1 << (DX() & 7);
+
+	m_not_z_flag = src & mask;
+	m68ki_write_8(ea, src ^ mask);
+
+
+0840 fff8 bchg     l .          071:12 234fc:4
+	u32* r_dst = &DY();
+	u32 mask = 1 << (OPER_I_8() & 0x1f);
+
+	m_not_z_flag = *r_dst & mask;
+	*r_dst ^= mask;
+
+
+0840 ffc0 bchg     b A+-DXWL    071:12 234fc:4
+	u32 mask = 1 << (OPER_I_8() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+
+	m_not_z_flag = src & mask;
+	m68ki_write_8(ea, src ^ mask);
+
+
+0180 f1f8 bclr     l .          071:10 234fc:4
+	u32* r_dst = &DY();
+	u32 mask = 1 << (DX() & 0x1f);
+
+	m_not_z_flag = *r_dst & mask;
+	*r_dst &= ~mask;
+
+
+0180 f1c0 bclr     b A+-DXWL    07:8 1:10 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 mask = 1 << (DX() & 7);
+
+	m_not_z_flag = src & mask;
+	m68ki_write_8(ea, src & ~mask);
+
+
+0880 fff8 bclr     l .          071:14 234fc:4
+	u32* r_dst = &DY();
+	u32 mask = 1 << (OPER_I_8() & 0x1f);
+
+	m_not_z_flag = *r_dst & mask;
+	*r_dst &= ~mask;
+
+
+0880 ffc0 bclr     b A+-DXWL    071:12 234fc:4
+	u32 mask = 1 << (OPER_I_8() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+
+	m_not_z_flag = src & mask;
+	m68ki_write_8(ea, src & ~mask);
+
+
+eac0 fff8 bfchg    l .          234fc:12
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32* data = &DY();
+	u64 mask;
+
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	mask = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask = ROR_32(mask, offset);
+
+	m_n_flag = NFLAG_32(*data<<offset);
+	m_not_z_flag = *data & mask;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	*data ^= mask;
+
+
+eac0 ffc0 bfchg    l ADXWL      234fc:20
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32 mask_base;
+	u32 data_long;
+	u32 mask_long;
+	u32 data_byte = 0;
+	u32 mask_byte = 0;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
+	}
+	width = ((width-1) & 31) + 1;
+
+	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask_long = mask_base >> offset;
+
+	data_long = m68ki_read_32(ea);
+	m_n_flag = NFLAG_32(data_long << offset);
+	m_not_z_flag = data_long & mask_long;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	m68ki_write_32(ea, data_long ^ mask_long);
+
+	if((width + offset) > 32) {
+		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
+		data_byte = m68ki_read_8(ea+4);
+		m_not_z_flag |= (data_byte & mask_byte);
+		m68ki_write_8(ea+4, data_byte ^ mask_byte);
+	}
+
+
+ecc0 fff8 bfclr    l .          234fc:12
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32* data = &DY();
+	u64 mask;
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	mask = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask = ROR_32(mask, offset);
+
+	m_n_flag = NFLAG_32(*data<<offset);
+	m_not_z_flag = *data & mask;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	*data &= ~mask;
+
+
+ecc0 ffc0 bfclr    l ADXWL      234fc:20
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32 mask_base;
+	u32 data_long;
+	u32 mask_long;
+	u32 data_byte = 0;
+	u32 mask_byte = 0;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
+	}
+	width = ((width-1) & 31) + 1;
+
+	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask_long = mask_base >> offset;
+
+	data_long = m68ki_read_32(ea);
+	m_n_flag = NFLAG_32(data_long << offset);
+	m_not_z_flag = data_long & mask_long;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	m68ki_write_32(ea, data_long & ~mask_long);
+
+	if((width + offset) > 32) {
+		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
+		data_byte = m68ki_read_8(ea+4);
+		m_not_z_flag |= (data_byte & mask_byte);
+		m68ki_write_8(ea+4, data_byte & ~mask_byte);
+	}
+
+
+ebc0 fff8 bfexts   l .          234fc:8
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u64 data = DY();
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	data = ROL_32(data, offset);
+	m_n_flag = NFLAG_32(data);
+	data = MAKE_INT_32(data) >> (32 - width);
+
+	m_not_z_flag = data;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	REG_D()[(word2>>12)&7] = data;
+
+
+ebc0 ffc0 bfexts   l ADXWLdx    234fc:15
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32 data;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	if(BIT_B(word2)) {
+		/* Offset is signed so we have to use ugly math =( */
+		ea += offset / 8;
+		offset %= 8;
+		if(offset < 0) {
+			offset += 8;
+			ea--;
+		}
+	}
+	width = ((width-1) & 31) + 1;
+
+	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+
+	data = MASK_OUT_ABOVE_32(data<<offset);
+
+	if((offset+width) > 32)
+		data |= (m68ki_read_8(ea+4) << offset) >> 8;
+
+	m_n_flag = NFLAG_32(data);
+	data  = MAKE_INT_32(data) >> (32 - width);
+
+	m_not_z_flag = data;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	REG_D()[(word2 >> 12) & 7] = data;
+
+
+e9c0 fff8 bfextu   l .          234fc:8
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u64 data = DY();
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	data = ROL_32(data, offset);
+	m_n_flag = NFLAG_32(data);
+	data >>= 32 - width;
+
+	m_not_z_flag = data;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	REG_D()[(word2>>12)&7] = data;
+
+
+e9c0 ffc0 bfextu   l ADXWLdx    234fc:15
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32 data;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	if(BIT_B(word2)) {
+		/* Offset is signed so we have to use ugly math =( */
+		ea += offset / 8;
+		offset %= 8;
+		if(offset < 0) {
+			offset += 8;
+			ea--;
+		}
+	}
+	width = ((width-1) & 31) + 1;
+
+	data = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = MASK_OUT_ABOVE_32(data<<offset);
+
+	if((offset+width) > 32)
+		data |= (m68ki_read_8(ea+4) << offset) >> 8;
+
+	m_n_flag = NFLAG_32(data);
+	data  >>= (32 - width);
+
+	m_not_z_flag = data;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	REG_D()[(word2 >> 12) & 7] = data;
+
+
+edc0 fff8 bfffo    l .          234fc:18
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u64 data = DY();
+	u32 bit;
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	data = ROL_32(data, offset);
+	m_n_flag = NFLAG_32(data);
+	data >>= 32 - width;
+
+	m_not_z_flag = data;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	for(bit = 1<<(width-1);bit && !(data & bit);bit>>= 1)
+		offset++;
+
+	REG_D()[(word2>>12)&7] = offset;
+
+
+edc0 ffc0 bfffo    l ADXWLdx    234fc:28
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	s32 local_offset;
+	u32 width = word2;
+	u32 data;
+	u32 bit;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	local_offset = offset % 8;
+	if(local_offset < 0) {
+		local_offset += 8;
+		ea--;
+	}
+	width = ((width-1) & 31) + 1;
+
+	data = (offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = MASK_OUT_ABOVE_32(data<<local_offset);
+
+	if((local_offset+width) > 32)
+		data |= (m68ki_read_8(ea+4) << local_offset) >> 8;
+
+	m_n_flag = NFLAG_32(data);
+	data  >>= (32 - width);
+
+	m_not_z_flag = data;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	for(bit = 1<<(width-1);bit && !(data & bit);bit>>= 1)
+		offset++;
+
+	REG_D()[(word2>>12)&7] = offset;
+
+
+efc0 fff8 bfins    l .          234fc:10
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32* data = &DY();
+	u64 mask;
+	u64 insert = REG_D()[(word2>>12)&7];
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	mask = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask = ROR_32(mask, offset);
+
+	insert = MASK_OUT_ABOVE_32(insert << (32 - width));
+	m_n_flag = NFLAG_32(insert);
+	m_not_z_flag = insert;
+	insert = ROR_32(insert, offset);
+
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	*data &= ~mask;
+	*data |= insert;
+
+
+efc0 ffc0 bfins    l ADXWL      234fc:17
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32 insert_base = REG_D()[(word2>>12)&7];
+	u32 insert_long;
+	u32 insert_byte;
+	u32 mask_base;
+	u32 data_long;
+	u32 mask_long;
+	u32 data_byte = 0;
+	u32 mask_byte = 0;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	if(BIT_B(word2)) {
+		/* Offset is signed so we have to use ugly math =( */
+		ea += offset / 8;
+		offset %= 8;
+		if(offset < 0) {
+			offset += 8;
+			ea--;
+		}
+	}
+	width = ((width-1) & 31) + 1;
+
+	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask_long = mask_base >> offset;
+
+	insert_base = MASK_OUT_ABOVE_32(insert_base << (32 - width));
+	m_n_flag = NFLAG_32(insert_base);
+	m_not_z_flag = insert_base;
+	insert_long = insert_base >> offset;
+
+	data_long = (offset+width) < 8 ? (m68ki_read_8(ea) << 24) :
+			(offset+width) < 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	if((width + offset) < 8) {
+		m68ki_write_8(ea, ((data_long & ~mask_long) | insert_long) >> 24);
+	} else if((width + offset) < 16) {
+		m68ki_write_16(ea, ((data_long & ~mask_long) | insert_long) >> 16);
+	} else {
+		m68ki_write_32(ea, (data_long & ~mask_long) | insert_long);
+	}
+
+	if((width + offset) > 32) {
+		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
+		insert_byte = MASK_OUT_ABOVE_8(insert_base) << (8-offset);
+		data_byte = m68ki_read_8(ea+4);
+		m_not_z_flag |= (insert_byte & mask_byte);
+		m68ki_write_8(ea+4, (data_byte & ~mask_byte) | insert_byte);
+	}
+
+
+eec0 fff8 bfset    l .          234fc:12
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32* data = &DY();
+	u64 mask;
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	mask = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask = ROR_32(mask, offset);
+
+	m_n_flag = NFLAG_32(*data<<offset);
+	m_not_z_flag = *data & mask;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	*data |= mask;
+
+
+eec0 ffc0 bfset    l ADXWL      234fc:20
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32 mask_base;
+	u32 data_long;
+	u32 mask_long;
+	u32 data_byte = 0;
+	u32 mask_byte = 0;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
+	}
+	width = ((width-1) & 31) + 1;
+
+	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask_long = mask_base >> offset;
+
+	data_long = m68ki_read_32(ea);
+	m_n_flag = NFLAG_32(data_long << offset);
+	m_not_z_flag = data_long & mask_long;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	m68ki_write_32(ea, data_long | mask_long);
+
+	if((width + offset) > 32) {
+		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
+		data_byte = m68ki_read_8(ea+4);
+		m_not_z_flag |= (data_byte & mask_byte);
+		m68ki_write_8(ea+4, data_byte | mask_byte);
+	}
+
+
+e8c0 fff8 bftst    l .          234fc:6
+	u32 word2 = OPER_I_16();
+	u32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32* data = &DY();
+	u64 mask;
+
+	if(BIT_B(word2))
+		offset = REG_D()[offset&7];
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	offset &= 31;
+	width = ((width-1) & 31) + 1;
+
+	mask = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask = ROR_32(mask, offset);
+
+	m_n_flag = NFLAG_32(*data<<offset);
+	m_not_z_flag = *data & mask;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+e8c0 ffc0 bftst    l ADXWLdx    234fc:13
+	u32 word2 = OPER_I_16();
+	s32 offset = (word2>>6)&31;
+	u32 width = word2;
+	u32 mask_base;
+	u32 data_long;
+	u32 mask_long;
+	u32 data_byte = 0;
+	u32 mask_byte = 0;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	if(BIT_B(word2))
+		offset = MAKE_INT_32(REG_D()[offset&7]);
+	if(BIT_5(word2))
+		width = REG_D()[width&7];
+
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
+	}
+	width = ((width-1) & 31) + 1;
+
+	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
+	mask_long = mask_base >> offset;
+
+	data_long = m68ki_read_32(ea);
+	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
+	m_not_z_flag = data_long & mask_long;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	if((width + offset) > 32) {
+		mask_byte = MASK_OUT_ABOVE_8(mask_base) << (8-offset);
+		data_byte = m68ki_read_8(ea+4);
+		m_not_z_flag |= (data_byte & mask_byte);
+	}
+
+
+4848 fff8 bkpt     . .          1:10
+	(void)m_cpu_space->read_word(0x000000, 0xffff);
+	m68ki_exception_illegal();
+
+4848 fff8 bkpt     . .          234fc:10
+	(void)m_cpu_space->read_word((m_ir & 7) << 2, 0xffff);
+	m68ki_exception_illegal();
+
+
+6000 ff00 bra      b .          071234fc:10
+	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
+	m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
+
+
+6000 ffff bra      w .          071234fc:10
+	u32 offset = OPER_I_16();
+	m_pc -= 2;
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m68ki_branch_16(offset);
+
+
+60ff ffff bra      l .          234fc:10
+	u32 offset = OPER_I_32();
+	m_pc -= 4;
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m68ki_branch_32(offset);
+
+
+01c0 f1f8 bset     l .          071:8 234fc:4
+	u32* r_dst = &DY();
+	u32 mask = 1 << (DX() & 0x1f);
+
+	m_not_z_flag = *r_dst & mask;
+	*r_dst |= mask;
+
+
+01c0 f1c0 bset     b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 mask = 1 << (DX() & 7);
+
+	m_not_z_flag = src & mask;
+	m68ki_write_8(ea, src | mask);
+
+
+08c0 fff8 bset     l .          071:12 234fc:4
+	u32* r_dst = &DY();
+	u32 mask = 1 << (OPER_I_8() & 0x1f);
+
+	m_not_z_flag = *r_dst & mask;
+	*r_dst |= mask;
+
+
+08c0 ffc0 bset     b A+-DXWL    071:12 234fc:4
+	u32 mask = 1 << (OPER_I_8() & 7);
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+
+	m_not_z_flag = src & mask;
+	m68ki_write_8(ea, src | mask);
+
+
+6100 ff00 bsr      b .          071:18 234fc:7
+	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
+	m68ki_push_32(m_pc);
+	m68ki_branch_8(MASK_OUT_ABOVE_8(m_ir));
+
+
+6100 ffff bsr      w .          071:18 234fc:7
+	u32 offset = OPER_I_16();
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m68ki_push_32(m_pc);
+	m_pc -= 2;
+	m68ki_branch_16(offset);
+
+
+61ff ffff bsr      l .          234fc:7
+	u32 offset = OPER_I_32();
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m68ki_push_32(m_pc);
+	m_pc -= 4;
+	m68ki_branch_32(offset);
+
+
+0100 f1f8 btst     l .          071:6 234fc:4
+	m_not_z_flag = DY() & (1 << (DX() & 0x1f));
+
+
+0100 f1c0 btst     b A+-DXWLdxI 071234fc:4
+	m_not_z_flag = M68KMAKE_GET_OPER_AY_8 & (1 << (DX() & 7));
+
+
+0800 fff8 btst     l .          071:10 234fc:4
+	m_not_z_flag = DY() & (1 << (OPER_I_8() & 0x1f));
+
+
+0800 ffc0 btst     b A+-DXWLdx  071:8 234fc:4
+	u32 bit = OPER_I_8() & 7;
+
+	m_not_z_flag = M68KMAKE_GET_OPER_AY_8 & (1 << bit);
+
+
+06c0 ffc0 callm    l ADXWLdx    2f:60
+	/* note: watch out for pcrelative modes */
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_pc += 2;
+	(void)ea;   /* just to avoid an 'unused variable' warning */
+	logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+					tag(), m_ppc, m_ir);
+
+
+0ac0 ffc0 cas      b A+-DXWL    234fc:12
+	u32 word2 = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dest = m68ki_read_8(ea);
+	u32* compare = &REG_D()[word2 & 7];
+	u32 res = dest - MASK_OUT_ABOVE_8(*compare);
+
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(*compare, dest, res);
+	m_c_flag = CFLAG_8(res);
+
+	if(COND_NE())
+		*compare = MASK_OUT_BELOW_8(*compare) | dest;
+	else {
+		m_icount -= 3;
+		m68ki_write_8(ea, MASK_OUT_ABOVE_8(REG_D()[(word2 >> 6) & 7]));
+	}
+
+
+0cc0 ffc0 cas      w A+-DXWL    234fc:12
+	u32 word2 = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dest = m68ki_read_16(ea);
+	u32* compare = &REG_D()[word2 & 7];
+	u32 res = dest - MASK_OUT_ABOVE_16(*compare);
+
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(*compare, dest, res);
+	m_c_flag = CFLAG_16(res);
+
+	if(COND_NE())
+		*compare = MASK_OUT_BELOW_16(*compare) | dest;
+	else {
+		m_icount -= 3;
+		m68ki_write_16(ea, MASK_OUT_ABOVE_16(REG_D()[(word2 >> 6) & 7]));
+	}
+
+
+0ec0 ffc0 cas      l A+-DXWL    234fc:12
+	u32 word2 = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dest = m68ki_read_32(ea);
+	u32* compare = &REG_D()[word2 & 7];
+	u32 res = dest - *compare;
+
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(*compare, dest, res);
+	m_c_flag = CFLAG_SUB_32(*compare, dest, res);
+
+	if(COND_NE())
+		*compare = dest;
+	else {
+		m_icount -= 3;
+		m68ki_write_32(ea, REG_D()[(word2 >> 6) & 7]);
+	}
+
+
+0cfc ffff cas2     w .          234fc:12
+	u32 word2 = OPER_I_32();
+	u32* compare1 = &REG_D()[(word2 >> 16) & 7];
+	u32 ea1 = REG_DA()[(word2 >> 28) & 15];
+	u32 dest1 = m68ki_read_16(ea1);
+	u32 res1 = dest1 - MASK_OUT_ABOVE_16(*compare1);
+	u32* compare2 = &REG_D()[word2 & 7];
+	u32 ea2 = REG_DA()[(word2 >> 12) & 15];
+	u32 dest2 = m68ki_read_16(ea2);
+	u32 res2;
+
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_n_flag = NFLAG_16(res1);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res1);
+	m_v_flag = VFLAG_SUB_16(*compare1, dest1, res1);
+	m_c_flag = CFLAG_16(res1);
+
+	if(COND_EQ()) {
+		res2 = dest2 - MASK_OUT_ABOVE_16(*compare2);
+
+		m_n_flag = NFLAG_16(res2);
+		m_not_z_flag = MASK_OUT_ABOVE_16(res2);
+		m_v_flag = VFLAG_SUB_16(*compare2, dest2, res2);
+		m_c_flag = CFLAG_16(res2);
+
+		if(COND_EQ()) {
+			m_icount -= 3;
+			m68ki_write_16(ea1, REG_D()[(word2 >> 22) & 7]);
+			m68ki_write_16(ea2, REG_D()[(word2 >> 6) & 7]);
+			goto done;
+		}
+	}
+	*compare1 = BIT_1F(word2) ? MAKE_INT_16(dest1) : MASK_OUT_BELOW_16(*compare1) | dest1;
+	*compare2 = BIT_F(word2) ? MAKE_INT_16(dest2) : MASK_OUT_BELOW_16(*compare2) | dest2;
+	done: ;
+
+
+0efc ffff cas2     l .          234fc:12
+	u32 word2 = OPER_I_32();
+	u32* compare1 = &REG_D()[(word2 >> 16) & 7];
+	u32 ea1 = REG_DA()[(word2 >> 28) & 15];
+	u32 dest1 = m68ki_read_32(ea1);
+	u32 res1 = dest1 - *compare1;
+	u32* compare2 = &REG_D()[word2 & 7];
+	u32 ea2 = REG_DA()[(word2 >> 12) & 15];
+	u32 dest2 = m68ki_read_32(ea2);
+	u32 res2;
+
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_n_flag = NFLAG_32(res1);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res1);
+	m_v_flag = VFLAG_SUB_32(*compare1, dest1, res1);
+	m_c_flag = CFLAG_SUB_32(*compare1, dest1, res1);
+
+	if(COND_EQ()) {
+		res2 = dest2 - *compare2;
+
+		m_n_flag = NFLAG_32(res2);
+		m_not_z_flag = MASK_OUT_ABOVE_32(res2);
+		m_v_flag = VFLAG_SUB_32(*compare2, dest2, res2);
+		m_c_flag = CFLAG_SUB_32(*compare2, dest2, res2);
+
+		if(COND_EQ()) {
+			m_icount -= 3;
+			m68ki_write_32(ea1, REG_D()[(word2 >> 22) & 7]);
+			m68ki_write_32(ea2, REG_D()[(word2 >> 6) & 7]);
+			goto done;
+		}
+	}
+	*compare1 = dest1;
+	*compare2 = dest2;
+	done: ;
+
+
+4180 f1f8 chk      w .          07:10 1234fc:8
+	s32 src = MAKE_INT_16(DX());
+	s32 bound = MAKE_INT_16(DY());
+
+	m_not_z_flag = ZFLAG_16(src); /* Undocumented */
+	m_v_flag = VFLAG_CLEAR;   /* Undocumented */
+	m_c_flag = CFLAG_CLEAR;   /* Undocumented */
+
+	if(src < 0 || src > bound)
+	{
+		m_n_flag = (src < 0)<<7;
+		m68ki_exception_trap(EXCEPTION_CHK);
+	}
+
+
+4180 f1c0 chk      w A+-DXWLdxI 07:10 1234fc:8
+	s32 src = MAKE_INT_16(DX());
+	s32 bound = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+
+	m_not_z_flag = ZFLAG_16(src); /* Undocumented */
+	m_v_flag = VFLAG_CLEAR;   /* Undocumented */
+	m_c_flag = CFLAG_CLEAR;   /* Undocumented */
+
+	if(src < 0 || src > bound) {
+		m_n_flag = (src < 0)<<7;
+		m68ki_exception_trap(EXCEPTION_CHK);
+	}
+
+
+4100 f1f8 chk      l .          234fc:8
+	s32 src = MAKE_INT_32(DX());
+	s32 bound = MAKE_INT_32(DY());
+
+	m_not_z_flag = ZFLAG_32(src); /* Undocumented */
+	m_v_flag = VFLAG_CLEAR;   /* Undocumented */
+	m_c_flag = CFLAG_CLEAR;   /* Undocumented */
+
+	if(src < 0 || src > bound) {
+		m_n_flag = (src < 0)<<7;
+		m68ki_exception_trap(EXCEPTION_CHK);
+	}
+
+
+4100 f1c0 chk      l A+-DXWLdxI 234fc:8
+	s32 src = MAKE_INT_32(DX());
+	s32 bound = MAKE_INT_32(M68KMAKE_GET_OPER_AY_32);
+
+	m_not_z_flag = ZFLAG_32(src); /* Undocumented */
+	m_v_flag = VFLAG_CLEAR;   /* Undocumented */
+	m_c_flag = CFLAG_CLEAR;   /* Undocumented */
+
+	if(src < 0 || src > bound) {
+		m_n_flag = (src < 0)<<7;
+		m68ki_exception_trap(EXCEPTION_CHK);
+	}
+
+
+00fa ffff chk2cmp2 b .          234fc:23
+	u32 word2 = OPER_I_16();
+	s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
+	if(!BIT_F(word2))
+		compare &= 0xff;
+
+	u32 ea = EA_PCDI_8();
+	s32 lower_bound = m68ki_read_pcrel_8(ea);
+	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x80) {
+		lower_bound = (s32)(s8)lower_bound;
+		upper_bound = (s32)(s8)upper_bound;
+
+		if(!BIT_F(word2))
+			compare = (s32)(s8)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+00fb ffff chk2cmp2 b .          234fc:23
+	u32 word2 = OPER_I_16();
+	s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
+	if(!BIT_F(word2))
+		compare &= 0xff;
+
+	u32 ea = EA_PCIX_8();
+	s32 lower_bound = m68ki_read_pcrel_8(ea);
+	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
+
+		// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x80) {
+		lower_bound = (s32)(s8)lower_bound;
+		upper_bound = (s32)(s8)upper_bound;
+
+		if(!BIT_F(word2))
+			compare = (s32)(s8)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+00c0 ffc0 chk2cmp2 b ADXWL      234fc:18
+	u32 word2 = OPER_I_16();
+	s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
+	if(!BIT_F(word2))
+		compare &= 0xff;
+
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	s32 lower_bound = m68ki_read_8(ea);
+	s32 upper_bound = m68ki_read_8(ea + 1);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x80) {
+		lower_bound = (s32)(s8)lower_bound;
+		upper_bound = (s32)(s8)upper_bound;
+
+		if(!BIT_F(word2))
+			compare = (s32)(s8)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+02fa ffff chk2cmp2 w .          234fc:23
+	u32 word2 = OPER_I_16();
+	s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
+	if(!BIT_F(word2))
+		compare &= 0xffff;
+
+	u32 ea = EA_PCDI_16();
+	s32 lower_bound = m68ki_read_pcrel_16(ea);
+	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x8000) {
+		lower_bound = (s32)(s16)lower_bound;
+		upper_bound = (s32)(s16)upper_bound;
+
+		if(!BIT_F(word2))
+			compare = (s32)(s16)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+02fb ffff chk2cmp2 w .          234fc:23
+	u32 word2 = OPER_I_16();
+	s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
+	if(!BIT_F(word2))
+		compare &= 0xffff;
+
+	u32 ea = EA_PCIX_16();
+	s32 lower_bound = m68ki_read_pcrel_16(ea);
+	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x8000) {
+		lower_bound = (s32)(s16)lower_bound;
+		upper_bound = (s32)(s16)upper_bound;
+
+		if(!BIT_F(word2))
+			compare = (s32)(s16)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+02c0 ffc0 chk2cmp2 w ADXWL      234fc:18
+	u32 word2 = OPER_I_16();
+	s32 compare = (s32)REG_DA()[(word2 >> 12) & 15];
+	if(!BIT_F(word2))
+		compare &= 0xffff;
+
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	s32 lower_bound = m68ki_read_16(ea);
+	s32 upper_bound = m68ki_read_16(ea + 2);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x8000) {
+		lower_bound = (s32)(s16)lower_bound;
+		upper_bound = (s32)(s16)upper_bound;
+
+		if(!BIT_F(word2))
+			compare = (s32)(s16)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+04fa ffff chk2cmp2 l .          234fc:23
+	u32 word2 = OPER_I_16();
+	s64 compare = REG_DA()[(word2 >> 12) & 15];
+	u32 ea = EA_PCDI_32();
+	s64 lower_bound = m68ki_read_pcrel_32(ea);
+	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x80000000) {
+		lower_bound = (s64)(s32)lower_bound;
+		upper_bound = (s64)(s32)upper_bound;
+		compare = (s64)(s32)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+04fb ffff chk2cmp2 l .          234fc:23
+	u32 word2 = OPER_I_16();
+	s64 compare = REG_DA()[(word2 >> 12) & 15];
+	u32 ea = EA_PCIX_32();
+	s64 lower_bound = m68ki_read_pcrel_32(ea);
+	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x80000000) {
+		lower_bound = (s64)(s32)lower_bound;
+		upper_bound = (s64)(s32)upper_bound;
+		compare = (s64)(s32)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+04c0 ffc0 chk2cmp2 l ADXWL      234fc:18
+	u32 word2 = OPER_I_16();
+	s64 compare = REG_DA()[(word2 >> 12) & 15];
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	s64 lower_bound = m68ki_read_32(ea);
+	s64 upper_bound = m68ki_read_32(ea + 4);
+
+	// for signed compare, the arithmetically smaller value is the lower bound
+	if (lower_bound & 0x80000000) {
+		lower_bound = (s64)(s32)lower_bound;
+		upper_bound = (s64)(s32)upper_bound;
+		compare = (s64)(s32)compare;
+	}
+
+	m_c_flag = (compare >= lower_bound && compare <= upper_bound) ? CFLAG_CLEAR : CFLAG_SET;
+	m_not_z_flag = ((upper_bound == compare) || (lower_bound == compare)) ? 0 : 1;
+
+	if(COND_CS() && BIT_B(word2))
+		m68ki_exception_trap(EXCEPTION_CHK);
+
+
+4200 fff8 clr      b .          071:4 234fc:2
+	DY() &= 0xffffff00;
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4200 ffc0 clr      b A+-DXWL    0:8
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	m68ki_read_8(ea);   /* the 68000 does a dummy read, the value is discarded */
+	m68ki_write_8(ea, 0);
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4200 ffc0 clr      b A+-DXWL    71234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+
+	m68ki_write_8(ea, 0);
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4240 fff8 clr      w .          071:4 234fc:2
+	DY() &= 0xffff0000;
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4240 ffc0 clr      w A+-DXWL    0:8
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+
+	m68ki_read_16(ea);  /* the 68000 does a dummy read, the value is discarded */
+
+	m68ki_write_16(ea, 0);
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4240 ffc0 clr      w A+-DXWL    71234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+
+	m68ki_write_16(ea, 0);
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4280 fff8 clr      l .          071:6 234fc:2
+	DY() = 0;
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4280 ffc0 clr      l A+-DXWL    0:12
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+
+	m68ki_read_32(ea);  /* the 68000 does a dummy read, the value is discarded */
+	m68ki_write_32(ea, 0);
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+4280 ffc0 clr      l A+-DXWL    71:6 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+
+	m68ki_write_32(ea, 0);
+
+	m_n_flag = NFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	m_not_z_flag = ZFLAG_SET;
+
+
+b000 f1f8 cmp      b .          071:4 234fc:2
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(DX());
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+b000 f1c0 cmp      b A+-DXWLdxI 071:4 234fc:2
+	u32 src = M68KMAKE_GET_OPER_AY_8;
+	u32 dst = MASK_OUT_ABOVE_8(DX());
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+b040 f1f8 cmp      w .          071:4 234fc:2
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(DX());
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+b048 f1f8 cmp      w .          071:4 234fc:2
+	u32 src = MASK_OUT_ABOVE_16(AY());
+	u32 dst = MASK_OUT_ABOVE_16(DX());
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+b040 f1c0 cmp      w A+-DXWLdxI 071:4 234fc:2
+	u32 src = M68KMAKE_GET_OPER_AY_16;
+	u32 dst = MASK_OUT_ABOVE_16(DX());
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+b080 f1f8 cmp      l .          071:6 234fc:2
+	u32 src = DY();
+	u32 dst = DX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b088 f1f8 cmp      l .          071:6 234fc:2
+	u32 src = AY();
+	u32 dst = DX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b080 f1c0 cmp      l A+-DXWLdxI 071:6 234fc:2
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = DX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b0c0 f1f8 cmpa     w .          071:6 234fc:4
+	u32 src = MAKE_INT_16(DY());
+	u32 dst = AX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b0c8 f1f8 cmpa     w .          071:6 234fc:4
+	u32 src = MAKE_INT_16(AY());
+	u32 dst = AX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b0c0 f1c0 cmpa     w A+-DXWLdxI 071:6 234fc:4
+	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+	u32 dst = AX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b1c0 f1f8 cmpa     l .          071:6 234fc:4
+	u32 src = DY();
+	u32 dst = AX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b1c8 f1f8 cmpa     l .          071:6 234fc:4
+	u32 src = AY();
+	u32 dst = AX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+b1c0 f1c0 cmpa     l A+-DXWLdxI 071:6 234fc:4
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = AX();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+0c00 fff8 cmpi     b .          071:8 234fc:2
+	u32 src = OPER_I_8();
+	u32 dst = MASK_OUT_ABOVE_8(DY());
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+0c00 ffc0 cmpi     b A+-DXWL    071:8 234fc:2
+	u32 src = OPER_I_8();
+	u32 dst = M68KMAKE_GET_OPER_AY_8;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+0c3a ffff cmpi     b .          234fc:7
+	u32 src = OPER_I_8();
+	u32 dst = OPER_PCDI_8();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+0c3b ffff cmpi     b .          234fc:9
+	u32 src = OPER_I_8();
+	u32 dst = OPER_PCIX_8();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+0c40 fff8 cmpi     w .          071:8 234fc:2
+	u32 src = OPER_I_16();
+	u32 dst = MASK_OUT_ABOVE_16(DY());
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+0c40 ffc0 cmpi     w A+-DXWL    071:8 234fc:2
+	u32 src = OPER_I_16();
+	u32 dst = M68KMAKE_GET_OPER_AY_16;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+0c7a ffff cmpi     w .          234fc:7
+	u32 src = OPER_I_16();
+	u32 dst = OPER_PCDI_16();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+0c7b ffff cmpi     w .          234fc:9
+	u32 src = OPER_I_16();
+	u32 dst = OPER_PCIX_16();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+0c80 fff8 cmpi     l .          07:14 1:12 234fc:2
+	u32 src = OPER_I_32();
+	u32 dst = DY();
+	u32 res = dst - src;
+
+	if (!m_cmpild_instr_callback.isnull())
+		(m_cmpild_instr_callback)(*m_program, m_ir & 7, src, 0xffffffff);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+0c80 ffc0 cmpi     l A+-DXWL    071:12 234fc:2
+	u32 src = OPER_I_32();
+	u32 dst = M68KMAKE_GET_OPER_AY_32;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+0cba ffff cmpi     l .          234fc:7
+	u32 src = OPER_I_32();
+	u32 dst = OPER_PCDI_32();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+0cbb ffff cmpi     l .          234fc:9
+	u32 src = OPER_I_32();
+	u32 dst = OPER_PCIX_32();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+bf08 fff8 cmpm     b .          071:12 234fc:9
+	u32 src = OPER_AY_PI_8();
+	u32 dst = OPER_A7_PI_8();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+b10f f1ff cmpm     b .          071:12 234fc:9
+	u32 src = OPER_A7_PI_8();
+	u32 dst = OPER_AX_PI_8();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+bf0f ffff cmpm     b .          071:12 234fc:9
+	u32 src = OPER_A7_PI_8();
+	u32 dst = OPER_A7_PI_8();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+b108 f1f8 cmpm     b .          071:12 234fc:9
+	u32 src = OPER_AY_PI_8();
+	u32 dst = OPER_AX_PI_8();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_c_flag = CFLAG_8(res);
+
+
+b148 f1f8 cmpm     w .          071:12 234fc:9
+	u32 src = OPER_AY_PI_16();
+	u32 dst = OPER_AX_PI_16();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_c_flag = CFLAG_16(res);
+
+
+b188 f1f8 cmpm     l .          071:20 234fc:9
+	u32 src = OPER_AY_PI_32();
+	u32 dst = OPER_AX_PI_32();
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_c_flag = CFLAG_SUB_32(src, dst, res);
+
+
+f080 f180 cpbcc    l .          23:4
+	logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
+					tag(), m_ppc, m_ir);
+
+
+f048 f1f8 cpdbcc   l .          23:4
+	logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
+					tag(), m_ppc, m_ir);
+
+
+f000 f1c0 cpgen    l .          23:4
+	if(m_has_fpu || m_has_pmmu)
+	{
+		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
+						tag(), m_ppc, m_ir);
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f040 f1c0 cpscc    l .          23:4
+	logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
+					tag(), m_ppc, m_ir);
+
+
+f078 f1f8 cptrapcc l .          23:4
+	logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
+					tag(), m_ppc, m_ir);
+
+
+f278 fff8 ftrapcc  l .          23:4
+	if(m_has_fpu)
+	{
+		m68881_ftrap();
+	} else {
+		m68ki_exception_1111();
+	}
+
+50c8 fff8 dbt      w .          071:12 234fc:6
+	m_pc += 2;
+
+
+51c8 fff8 dbf      w .          071:12 2:6 34fc:4
+	u32* r_dst = &DY();
+	u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+	if(res != 0xffff) {
+		u32 offset = OPER_I_16();
+		m_pc -= 2;
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_branch_16(offset);
+		m_icount -= m_cyc_dbcc_f_noexp;
+	} else {
+		m_pc += 2;
+		m_icount -= m_cyc_dbcc_f_exp;
+	}
+
+
+50c8 f0f8 dbcc     w .          071:12 234fc:6
+	if(M68KMAKE_NOT_CC) {
+		u32* r_dst = &DY();
+		u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
+
+		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+		if(res != 0xffff) {
+			u32 offset = OPER_I_16();
+			m_pc -= 2;
+			m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+			m68ki_branch_16(offset);
+			m_icount -= m_cyc_dbcc_f_noexp;
+		} else {
+			m_pc += 2;
+			m_icount -= m_cyc_dbcc_f_exp;
+		}
+	} else {
+		m_pc += 2;
+	}
+
+
+81c0 f1f8 divs     w .          07:158 1:122 234fc:56
+	u32* r_dst = &DX();
+	s32 src = MAKE_INT_16(DY());
+	s32 quotient;
+	s32 remainder;
+
+	if(src != 0) {
+		m_c_flag = CFLAG_CLEAR;
+		if((u32)*r_dst == 0x80000000 && src == -1) {
+			m_not_z_flag = 0;
+			m_n_flag = NFLAG_CLEAR;
+			m_v_flag = VFLAG_CLEAR;
+			*r_dst = 0;
+		} else {
+			quotient = MAKE_INT_32(*r_dst) / src;
+			remainder = MAKE_INT_32(*r_dst) % src;
+
+			if(quotient == MAKE_INT_16(quotient)) {
+				m_not_z_flag = quotient;
+				m_n_flag = NFLAG_16(quotient);
+				m_v_flag = VFLAG_CLEAR;
+				*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
+			} else
+				m_v_flag = VFLAG_SET;
+		}
+	} else {
+		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	}
+
+81c0 f1c0 divs     w A+-DXWLdxI 07:158 1:122 234fc:56
+	u32* r_dst = &DX();
+	s32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+	s32 quotient;
+	s32 remainder;
+
+	if(src != 0) {
+		m_c_flag = CFLAG_CLEAR;
+		if((u32)*r_dst == 0x80000000 && src == -1) {
+			m_not_z_flag = 0;
+			m_n_flag = NFLAG_CLEAR;
+			m_v_flag = VFLAG_CLEAR;
+			*r_dst = 0;
+		} else {
+			quotient = MAKE_INT_32(*r_dst) / src;
+			remainder = MAKE_INT_32(*r_dst) % src;
+
+			if(quotient == MAKE_INT_16(quotient)) {
+				m_not_z_flag = quotient;
+				m_n_flag = NFLAG_16(quotient);
+				m_v_flag = VFLAG_CLEAR;
+				*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
+			} else
+				m_v_flag = VFLAG_SET;
+		}
+	} else {
+		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	}
+
+
+80c0 f1f8 divu     w .          07:140 1:108 234fc:44
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+
+	if(src != 0) {
+		m_c_flag = CFLAG_CLEAR;
+		u32 quotient = *r_dst / src;
+		u32 remainder = *r_dst % src;
+
+		if(quotient < 0x10000) {
+			m_not_z_flag = quotient;
+			m_n_flag = NFLAG_16(quotient);
+			m_v_flag = VFLAG_CLEAR;
+			*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
+		} else
+			m_v_flag = VFLAG_SET;
+	} else {
+		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	}
+
+
+80c0 f1c0 divu     w A+-DXWLdxI 07:140 1:108 234fc:44
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_16;
+
+	if(src != 0) {
+		m_c_flag = CFLAG_CLEAR;
+		u32 quotient = *r_dst / src;
+		u32 remainder = *r_dst % src;
+
+		if(quotient < 0x10000) {
+			m_not_z_flag = quotient;
+			m_n_flag = NFLAG_16(quotient);
+			m_v_flag = VFLAG_CLEAR;
+			*r_dst = MASK_OUT_ABOVE_32(MASK_OUT_ABOVE_16(quotient) | (remainder << 16));
+		} else
+			m_v_flag = VFLAG_SET;
+	} else {
+		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	}
+
+
+4c40 fff8 divl     l .          234fc:84
+	u32 word2 = OPER_I_16();
+	u64 divisor   = DY();
+	u64 dividend  = 0;
+	u64 quotient  = 0;
+	u64 remainder = 0;
+
+	if(divisor != 0) {
+		if(BIT_A(word2)) {   /* 64 bit */
+			dividend = REG_D()[word2 & 7];
+			dividend <<= 32;
+			dividend |= REG_D()[(word2 >> 12) & 7];
+
+			if(BIT_B(word2)) {       /* signed */
+				quotient  = (u64)((s64)dividend / (s64)((s32)divisor));
+				remainder = (u64)((s64)dividend % (s64)((s32)divisor));
+				if((s64)quotient != (s64)((s32)quotient)) {
+					m_v_flag = VFLAG_SET;
+					goto done;
+				}
+			} else {                 /* unsigned */
+				quotient = dividend / divisor;
+				if(quotient > 0xffffffff) {
+					m_v_flag = VFLAG_SET;
+					goto done;
+				}
+				remainder = dividend % divisor;
+			}
+		} else {    /* 32 bit */
+			dividend = REG_D()[(word2 >> 12) & 7];
+			if(BIT_B(word2)) {       /* signed */
+				quotient  = (u64)((s64)((s32)dividend) / (s64)((s32)divisor));
+				remainder = (u64)((s64)((s32)dividend) % (s64)((s32)divisor));
+			} else {                 /* unsigned */
+				quotient = dividend / divisor;
+				remainder = dividend % divisor;
+			}
+		}
+
+		REG_D()[word2 & 7] = remainder;
+		REG_D()[(word2 >> 12) & 7] = quotient;
+
+		m_n_flag = NFLAG_32(quotient);
+		m_not_z_flag = quotient;
+		m_v_flag = VFLAG_CLEAR;
+		m_c_flag = CFLAG_CLEAR;
+		done: ;
+	} else {
+		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	}
+
+
+4c40 ffc0 divl     l A+-DXWLdxI 234fc:84
+	u32 word2 = OPER_I_16();
+	u64 divisor = M68KMAKE_GET_OPER_AY_32;
+	u64 dividend  = 0;
+	u64 quotient  = 0;
+	u64 remainder = 0;
+
+	if(divisor != 0) {
+		if(BIT_A(word2)) {   /* 64 bit */
+			dividend = REG_D()[word2 & 7];
+			dividend <<= 32;
+			dividend |= REG_D()[(word2 >> 12) & 7];
+
+			if(BIT_B(word2)) {       /* signed */
+				quotient  = (u64)((s64)dividend / (s64)((s32)divisor));
+				remainder = (u64)((s64)dividend % (s64)((s32)divisor));
+				if((s64)quotient != (s64)((s32)quotient)) {
+					m_v_flag = VFLAG_SET;
+					goto done;
+				}
+			} else {                 /* unsigned */
+				quotient = dividend / divisor;
+				if(quotient > 0xffffffff) {
+					m_v_flag = VFLAG_SET;
+					goto done;
+				}
+				remainder = dividend % divisor;
+			}
+		} else {    /* 32 bit */
+			dividend = REG_D()[(word2 >> 12) & 7];
+			if(BIT_B(word2)) {       /* signed */
+				quotient  = (u64)((s64)((s32)dividend) / (s64)((s32)divisor));
+				remainder = (u64)((s64)((s32)dividend) % (s64)((s32)divisor));
+			} else {                 /* unsigned */
+				quotient = dividend / divisor;
+				remainder = dividend % divisor;
+			}
+		}
+		REG_D()[word2 & 7] = remainder;
+		REG_D()[(word2 >> 12) & 7] = quotient;
+
+		m_n_flag = NFLAG_32(quotient);
+		m_not_z_flag = quotient;
+		m_v_flag = VFLAG_CLEAR;
+		m_c_flag = CFLAG_CLEAR;
+		done: ;
+	} else {
+		m68ki_exception_trap(EXCEPTION_ZERO_DIVIDE);
+	}
+
+
+b100 f1f8 eor      b .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_8(DY() ^= MASK_OUT_ABOVE_8(DX()));
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+b100 f1c0 eor      b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(DX() ^ m68ki_read_8(ea));
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+b140 f1f8 eor      w .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_16(DY() ^= MASK_OUT_ABOVE_16(DX()));
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+b140 f1c0 eor      w A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(DX() ^ m68ki_read_16(ea));
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+b180 f1f8 eor      l .          07:8 1:6 234fc:2
+	u32 res = DY() ^= DX();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+b180 f1c0 eor      l A+-DXWL    071:12 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = DX() ^ m68ki_read_32(ea);
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0a00 fff8 eori     b .          071:8 234fc:2
+	u32 res = MASK_OUT_ABOVE_8(DY() ^= OPER_I_8());
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0a00 ffc0 eori     b A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = src ^ m68ki_read_8(ea);
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0a40 fff8 eori     w .          071:8 234fc:2
+	u32 res = MASK_OUT_ABOVE_16(DY() ^= OPER_I_16());
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0a40 ffc0 eori     w A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = src ^ m68ki_read_16(ea);
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0a80 fff8 eori     l .          07:16 1:14 234fc:2
+	u32 res = DY() ^= OPER_I_32();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0a80 ffc0 eori     l A+-DXWL    071:20 234fc:4
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = src ^ m68ki_read_32(ea);
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0a3c ffff eori     w .          07:20 1:16 234fc:12
+	m68ki_set_ccr(m68ki_get_ccr() ^ OPER_I_8());
+
+
+0a7c ffff eori     w .          07:20p 1:16p 234fc:12p
+	if(m_s_flag) {
+		u32 src = OPER_I_16();
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_set_sr(m68ki_get_sr() ^ src);
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+c140 f1f8 exg      l .          071:6 234fc:2
+	u32* reg_a = &DX();
+	u32* reg_b = &DY();
+	u32 tmp = *reg_a;
+	*reg_a = *reg_b;
+	*reg_b = tmp;
+
+
+c148 f1f8 exg      l .          071:6 234fc:2
+	u32* reg_a = &AX();
+	u32* reg_b = &AY();
+	u32 tmp = *reg_a;
+	*reg_a = *reg_b;
+	*reg_b = tmp;
+
+
+c188 f1f8 exg      l .          071:6 234fc:2
+	u32* reg_a = &DX();
+	u32* reg_b = &AY();
+	u32 tmp = *reg_a;
+	*reg_a = *reg_b;
+	*reg_b = tmp;
+
+
+4880 fff8 ext      w .          071234fc:4
+	u32* r_dst = &DY();
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | MASK_OUT_ABOVE_8(*r_dst) | (GET_MSB_8(*r_dst) ? 0xff00 : 0);
+
+	m_n_flag = NFLAG_16(*r_dst);
+	m_not_z_flag = MASK_OUT_ABOVE_16(*r_dst);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+48c0 fff8 ext      l .          071234fc:4
+	u32* r_dst = &DY();
+
+	*r_dst = MASK_OUT_ABOVE_16(*r_dst) | (GET_MSB_16(*r_dst) ? 0xffff0000 : 0);
+
+	m_n_flag = NFLAG_32(*r_dst);
+	m_not_z_flag = *r_dst;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+49c0 fff8 extb     l .          234fc:4
+	u32* r_dst = &DY();
+
+	*r_dst = MASK_OUT_ABOVE_8(*r_dst) | (GET_MSB_8(*r_dst) ? 0xffffff00 : 0);
+
+	m_n_flag = NFLAG_32(*r_dst);
+	m_not_z_flag = *r_dst;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4afc ffff illegal  . .          071234fc:4
+	m68ki_exception_illegal();
+
+
+4ec0 ffc0 jmp      l ADXWLdx    071:4 234fc:0
+	m68ki_jump(M68KMAKE_GET_EA_AY_32);
+	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
+
+
+4e80 ffc0 jsr      l ADXWLdx    071:12 234fc:0
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
+	m68ki_push_32(m_pc);
+	m68ki_jump(ea);
+
+
+41c0 f1c0 lea      l ADXWLdx    071:0 234fc:2
+	AX() = M68KMAKE_GET_EA_AY_32;
+
+
+4e57 ffff link     w .          071:16 234fc:5
+	REG_A()[7] -= 4;
+	m68ki_write_32(REG_A()[7], REG_A()[7]);
+	REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + MAKE_INT_16(OPER_I_16()));
+
+
+4e50 fff8 link     w .          071:16 234fc:5
+	u32* r_dst = &AY();
+
+	m68ki_push_32(*r_dst);
+	*r_dst = REG_A()[7];
+	REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + MAKE_INT_16(OPER_I_16()));
+
+
+480f ffff link     l .          234fc:6
+	REG_A()[7] -= 4;
+	m68ki_write_32(REG_A()[7], REG_A()[7]);
+	REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + OPER_I_32());
+
+
+4808 fff8 link     l .          234fc:6
+	u32* r_dst = &AY();
+
+	m68ki_push_32(*r_dst);
+	*r_dst = REG_A()[7];
+	REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + OPER_I_32());
+
+
+e008 f1f8 lsr      b .          071:6 234fc:4
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_CLEAR;
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src << (9-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e048 f1f8 lsr      w .          071:6 234fc:4
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_CLEAR;
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src << (9-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e088 f1f8 lsr      l .          071:8 234fc:4
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_CLEAR;
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src << (9-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e028 f1f8 lsr      b .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift <= 8) {
+			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+			m_x_flag = m_c_flag = src << (9-shift);
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+
+		} else {
+			*r_dst &= 0xffffff00;
+			m_x_flag = XFLAG_CLEAR;
+			m_c_flag = CFLAG_CLEAR;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_8(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e068 f1f8 lsr      w .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = src >> shift;
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift <= 16) {
+			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+			m_c_flag = m_x_flag = (src >> (shift - 1))<<8;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+		} else {
+			*r_dst &= 0xffff0000;
+			m_x_flag = XFLAG_CLEAR;
+			m_c_flag = CFLAG_CLEAR;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_16(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+e0a8 f1f8 lsr      l .          071:8 234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = src >> shift;
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 32) {
+			*r_dst = res;
+			m_c_flag = m_x_flag = (src >> (shift - 1))<<8;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+		} else {
+			*r_dst = 0;
+			m_x_flag = m_c_flag = (shift == 32 ? GET_MSB_32(src)>>23 : 0);
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_32(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e2c0 ffc0 lsr      w A+-DXWL    071:8 234fc:5
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = src >> 1;
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_CLEAR;
+	m_not_z_flag = res;
+	m_c_flag = m_x_flag = src << 8;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e108 f1f8 lsl      b .          071:6 234fc:4
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src << shift;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e148 f1f8 lsl      w .          071:6 234fc:4
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src >> (8-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e188 f1f8 lsl      l .          071:8 234fc:4
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src >> (24-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e128 f1f8 lsl      b .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = MASK_OUT_ABOVE_8(src << shift);
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift <= 8) {
+			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+			m_x_flag = m_c_flag = src << shift;
+			m_n_flag = NFLAG_8(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+		} else {
+			*r_dst &= 0xffffff00;
+			m_x_flag = XFLAG_CLEAR;
+			m_c_flag = CFLAG_CLEAR;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_8(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e168 f1f8 lsl      w .          071234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(src << shift);
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift <= 16) {
+			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+			m_x_flag = m_c_flag = (src << shift) >> 8;
+			m_n_flag = NFLAG_16(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+		} else {
+			*r_dst &= 0xffff0000;
+			m_x_flag = XFLAG_CLEAR;
+			m_c_flag = CFLAG_CLEAR;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_16(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e1a8 f1f8 lsl      l .          071:8 234fc:6
+	u32* r_dst = &DY();
+	u32 shift = DX() & 0x3f;
+	u32 src = *r_dst;
+	u32 res = MASK_OUT_ABOVE_32(src << shift);
+
+	if(shift != 0) {
+		m_icount -= shift<<m_cyc_shift;
+
+		if(shift < 32) {
+			*r_dst = res;
+			m_x_flag = m_c_flag = (src >> (32 - shift)) << 8;
+			m_n_flag = NFLAG_32(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+		} else {
+			*r_dst = 0;
+			m_x_flag = m_c_flag = ((shift == 32 ? src & 1 : 0))<<8;
+			m_n_flag = NFLAG_CLEAR;
+			m_not_z_flag = ZFLAG_SET;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_32(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e3c0 ffc0 lsl      w A+-DXWL    071:8 234fc:5
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = MASK_OUT_ABOVE_16(src << 1);
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_x_flag = m_c_flag = src >> 7;
+	m_v_flag = VFLAG_CLEAR;
+
+
+1000 f1f8 move     b .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1000 f1c0 move     b A+-DXWLdxI 071:4 234fc:2
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1080 f1f8 move     b .          071:8 234fc:4
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_AI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1080 f1c0 move     b A+-DXWLdxI 071:8 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_AI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1ec0 fff8 move     b .          071:8 234fc:4
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_A7_PI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+10c0 f1f8 move     b .          071:8 234fc:4
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_PI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1ec0 ffc0 move     b A+-DXWLdxI 071:8 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_A7_PI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+10c0 f1c0 move     b A+-DXWLdxI 071:8 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_PI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1f00 fff8 move     b .          071:8 234fc:5
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_A7_PD_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1100 f1f8 move     b .          071:8 234fc:5
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_PD_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1f00 ffc0 move     b A+-DXWLdxI 071:8 234fc:5
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_A7_PD_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1100 f1c0 move     b A+-DXWLdxI 071:8 234fc:5
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_PD_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1140 f1f8 move     b .          071:12 234fc:5
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_DI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1140 f1c0 move     b A+-DXWLdxI 071:12 234fc:5
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_DI_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1180 f1f8 move     b .          071:14 234fc:7
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AX_IX_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+1180 f1c0 move     b A+-DXWLdxI 071:14 234fc:7
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AX_IX_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+11c0 fff8 move     b .          071:12 234fc:4
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AW_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+11c0 ffc0 move     b A+-DXWLdxI 071:12 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AW_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+13c0 fff8 move     b .          071:16 234fc:6
+	u32 res = MASK_OUT_ABOVE_8(DY());
+	u32 ea = EA_AL_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+13c0 ffc0 move     b A+-DXWLdxI 071:16 234fc:6
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+	u32 ea = EA_AL_8();
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3000 f1f8 move     w .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3008 f1f8 move     w .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3000 f1c0 move     w A+-DXWLdxI 071:4 234fc:2
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3080 f1f8 move     w .          071:8 234fc:4
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_AI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3088 f1f8 move     w .          071:8 234fc:4
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_AI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3080 f1c0 move     w A+-DXWLdxI 071:8 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_AI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+30c0 f1f8 move     w .          071:8 234fc:4
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_PI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+30c8 f1f8 move     w .          071:8 234fc:4
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_PI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+30c0 f1c0 move     w A+-DXWLdxI 071:8 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_PI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3100 f1f8 move     w .          071:8 234fc:5
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_PD_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3108 f1f8 move     w .          071:8 234fc:5
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_PD_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3100 f1c0 move     w A+-DXWLdxI 071:8 234fc:5
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_PD_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3140 f1f8 move     w .          071:12 234fc:5
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_DI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3148 f1f8 move     w .          071:12 234fc:5
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_DI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3140 f1c0 move     w A+-DXWLdxI 071:12 234fc:5
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_DI_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3180 f1f8 move     w .          071:14 234fc:7
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AX_IX_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3188 f1f8 move     w .          071:14 234fc:7
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AX_IX_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3180 f1c0 move     w A+-DXWLdxI 071:14 234fc:7
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AX_IX_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+31c0 fff8 move     w .          071:12 234fc:4
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AW_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+31c8 fff8 move     w .          071:12 234fc:4
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AW_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+31c0 ffc0 move     w A+-DXWLdxI 071:12 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AW_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+33c0 fff8 move     w .          071:16 234fc:6
+	u32 res = MASK_OUT_ABOVE_16(DY());
+	u32 ea = EA_AL_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+33c8 fff8 move     w .          071:16 234fc:6
+	u32 res = MASK_OUT_ABOVE_16(AY());
+	u32 ea = EA_AL_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+33c0 ffc0 move     w A+-DXWLdxI 071:16 234fc:6
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+	u32 ea = EA_AL_16();
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2000 f1f8 move     l .          071:4 234fc:2
+	u32 res = DY();
+	u32* r_dst = &DX();
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2008 f1f8 move     l .          071:4 234fc:2
+	u32 res = AY();
+	u32* r_dst = &DX();
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2000 f1c0 move     l A+-DXWLdxI 071:4 234fc:2
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32* r_dst = &DX();
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2080 f1f8 move     l .          071:12 234fc:4
+	u32 res = DY();
+	u32 ea = EA_AX_AI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2088 f1f8 move     l .          071:12 234fc:4
+	u32 res = AY();
+	u32 ea = EA_AX_AI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2080 f1c0 move     l A+-DXWLdxI 071:12 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_AI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+20c0 f1f8 move     l .          071:12 234fc:4
+	u32 res = DY();
+	u32 ea = EA_AX_PI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+20c8 f1f8 move     l .          071:12 234fc:4
+	u32 res = AY();
+	u32 ea = EA_AX_PI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+20c0 f1c0 move     l A+-DXWLdxI 071:12 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_PI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2100 f1f8 move     l .          07:12 1:14 234fc:5
+	u32 res = DY();
+	u32 ea = EA_AX_PD_32();
+
+	m68ki_write_16(ea+2, res & 0xFFFF );
+	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2108 f1f8 move     l .          07:12 1:14 234fc:5
+	u32 res = AY();
+	u32 ea = EA_AX_PD_32();
+
+	m68ki_write_16(ea+2, res & 0xFFFF );
+	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2100 f1c0 move     l A+-DXWLdxI 07:12 1:14 234fc:5
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_PD_32();
+
+	m68ki_write_16(ea+2, res & 0xFFFF );
+	m68ki_write_16(ea, (res >> 16) & 0xFFFF );
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2140 f1f8 move     l .          071:16 234fc:5
+	u32 res = DY();
+	u32 ea = EA_AX_DI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2148 f1f8 move     l .          071:16 234fc:5
+	u32 res = AY();
+	u32 ea = EA_AX_DI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2140 f1c0 move     l A+-DXWLdxI 071:16 234fc:5
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_DI_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2180 f1f8 move     l .          071:18 234fc:7
+	u32 res = DY();
+	u32 ea = EA_AX_IX_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2188 f1f8 move     l .          071:18 234fc:7
+	u32 res = AY();
+	u32 ea = EA_AX_IX_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+2180 f1c0 move     l A+-DXWLdxI 071:18 234fc:7
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AX_IX_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+21c0 fff8 move     l .          071:16 234fc:4
+	u32 res = DY();
+	u32 ea = EA_AW_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+21c8 fff8 move     l .          071:16 234fc:4
+	u32 res = AY();
+	u32 ea = EA_AW_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+21c0 ffc0 move     l A+-DXWLdxI 071:16 234fc:4
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AW_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+23c0 fff8 move     l .          071:20 234fc:6
+	u32 res = DY();
+	u32 ea = EA_AL_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+23c8 fff8 move     l .          071:20 234fc:6
+	u32 res = AY();
+	u32 ea = EA_AL_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+23c0 ffc0 move     l A+-DXWLdxI 071:20 234fc:6
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+	u32 ea = EA_AL_32();
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+3040 f1f8 movea    w .          071:4 234fc:2
+	AX() = MAKE_INT_16(DY());
+
+
+3048 f1f8 movea    w .          071:4 234fc:2
+	AX() = MAKE_INT_16(AY());
+
+
+3040 f1c0 movea    w A+-DXWLdxI 071:4 234fc:2
+	AX() = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+
+
+2040 f1f8 movea    l .          071:4 234fc:2
+	AX() = DY();
+
+
+2048 f1f8 movea    l .          071:4 234fc:2
+	AX() = AY();
+
+
+2040 f1c0 movea    l A+-DXWLdxI 071:4 234fc:2
+	AX() = M68KMAKE_GET_OPER_AY_32;
+
+
+42c0 fff8 move     w .          1234fc:4
+	DY() = MASK_OUT_BELOW_16(DY()) | m68ki_get_ccr();
+
+
+42c0 ffc0 move     w A+-DXWL    1:8 234fc:4
+	m68ki_write_16(M68KMAKE_GET_EA_AY_16, m68ki_get_ccr());
+
+
+44c0 fff8 move     w .          071:12 234fc:4
+	m68ki_set_ccr(DY());
+
+
+44c0 ffc0 move     w A+-DXWLdxI 071:12 234fc:4
+	m68ki_set_ccr(M68KMAKE_GET_OPER_AY_16);
+
+
+40c0 fff8 move     w .          07:6
+	DY() = MASK_OUT_BELOW_16(DY()) | m68ki_get_sr();
+
+
+40c0 fff8 move     w .          1:4p 234fc:8p
+	if(m_s_flag) { /* NS990408 */
+		DY() = MASK_OUT_BELOW_16(DY()) | m68ki_get_sr();
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+40c0 ffc0 move     w A+-DXWL    07:8
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	m68ki_write_16(ea, m68ki_get_sr());
+
+
+40c0 ffc0 move     w A+-DXWL    1234fc:8p
+	if(m_s_flag) { /* NS990408 */
+		u32 ea = M68KMAKE_GET_EA_AY_16;
+		m68ki_write_16(ea, m68ki_get_sr());
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+46c0 fff8 move     w .          071:12p 234fc:8p
+	if(m_s_flag) {
+		m68ki_set_sr(DY());
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+46c0 ffc0 move     w A+-DXWLdxI 071:12p 234fc:8p
+	if(m_s_flag) {
+		u32 new_sr = M68KMAKE_GET_OPER_AY_16;
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_set_sr(new_sr);
+
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e68 fff8 move     l .          07:4p 1:6p 234fc:2p
+	if(m_s_flag) {
+		AY() = REG_USP();
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e60 fff8 move     l .          07:4p 1:6p 234fc:2p
+	if(m_s_flag) {
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		REG_USP() = AY();
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7a ffff movec    l .          1:12p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch(word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			REG_DA()[(word2 >> 12) & 15] = m_sfc;
+			break;
+		case 0x001:            /* DFC */
+			REG_DA()[(word2 >> 12) & 15] = m_dfc;
+			break;
+		case 0x800:            /* USP */
+			REG_DA()[(word2 >> 12) & 15] = REG_USP();
+			break;
+		case 0x801:            /* VBR */
+			REG_DA()[(word2 >> 12) & 15] = m_vbr;
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7a ffff movec    l .          23f:6p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch(word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			REG_DA()[(word2 >> 12) & 15] = m_sfc;
+			break;
+		case 0x001:            /* DFC */
+			REG_DA()[(word2 >> 12) & 15] = m_dfc;
+			break;
+		case 0x002:            /* CACR */
+			REG_DA()[(word2 >> 12) & 15] = m_cacr;
+			break;
+		case 0x800:            /* USP */
+			REG_DA()[(word2 >> 12) & 15] = REG_USP();
+			break;
+		case 0x801:            /* VBR */
+			REG_DA()[(word2 >> 12) & 15] = m_vbr;
+			break;
+		case 0x802:            /* CAAR */
+			REG_DA()[(word2 >> 12) & 15] = m_caar;
+			break;
+		case 0x803:            /* MSP */
+			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_SP() : REG_MSP();
+			break;
+		case 0x804:            /* ISP */
+			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_ISP() : REG_SP();
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7a ffff movec    l .          4:6p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch(word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			REG_DA()[(word2 >> 12) & 15] = m_sfc;
+			break;
+		case 0x001:            /* DFC */
+			REG_DA()[(word2 >> 12) & 15] = m_dfc;
+			break;
+		case 0x002:            /* CACR */
+			REG_DA()[(word2 >> 12) & 15] = m_cacr;
+			break;
+		case 0x800:            /* USP */
+			REG_DA()[(word2 >> 12) & 15] = REG_USP();
+			break;
+		case 0x801:            /* VBR */
+			REG_DA()[(word2 >> 12) & 15] = m_vbr;
+			break;
+		case 0x802:            /* CAAR */
+			REG_DA()[(word2 >> 12) & 15] = m_caar;
+			break;
+		case 0x803:            /* MSP */
+			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_SP() : REG_MSP();
+			break;
+		case 0x804:            /* ISP */
+			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_ISP() : REG_SP();
+			break;
+		case 0x003:             /* TC */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_tc;
+			break;
+		case 0x004:             /* ITT0 (040+, ACR0 on ColdFire) */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_itt0;
+			break;
+		case 0x005:             /* ITT1 (040+, ACR1 on ColdFire) */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_itt1;
+			break;
+		case 0x006:             /* DTT0 */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_dtt0;
+			break;
+		case 0x007:             /* DTT1 */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_dtt1;
+			break;
+		case 0x805:             /* MMUSR */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_sr_040;
+			break;
+		case 0x806:             /* URP */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_urp_aptr;
+			break;
+		case 0x807:             /* SRP */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_srp_aptr;
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7a ffff movec    l .          c:6p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch(word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			REG_DA()[(word2 >> 12) & 15] = m_sfc;
+			break;
+		case 0x001:            /* DFC */
+			REG_DA()[(word2 >> 12) & 15] = m_dfc;
+			break;
+		case 0x002:            /* CACR */
+			REG_DA()[(word2 >> 12) & 15] = m_cacr;
+			break;
+		case 0x800:            /* USP */
+			REG_DA()[(word2 >> 12) & 15] = REG_USP();
+			break;
+		case 0x801:            /* VBR */
+			REG_DA()[(word2 >> 12) & 15] = m_vbr;
+			break;
+		case 0x802:            /* CAAR */
+			REG_DA()[(word2 >> 12) & 15] = m_caar;
+			break;
+		case 0x803:            /* MSP */
+			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_SP() : REG_MSP();
+			break;
+		case 0x804:            /* ISP */
+			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_ISP() : REG_SP();
+			break;
+		case 0x004:             /* ITT0 (040+, ACR0 on ColdFire) */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr0;
+			break;
+		case 0x005:             /* ITT1 (040+, ACR1 on ColdFire) */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr1;
+			break;
+		case 0x006:             /* DTT0 */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr2;
+			break;
+		case 0x007:             /* DTT1 */
+			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr3;
+			break;
+		case 0xc00: // ROMBAR0
+			/* TODO */
+			break;
+		case 0xc01: // ROMBAR1
+			/* TODO */
+			break;
+		case 0xc04: // RAMBAR0
+			/* TODO */
+			break;
+		case 0xc05: // RAMBAR1
+			/* TODO */
+			break;
+		case 0xc0c: // MPCR
+			/* TODO */
+			break;
+		case 0xc0d: // EDRAMBAR
+			/* TODO */
+			break;
+		case 0xc0e: // SECMBAR
+			/* TODO */
+			break;
+		case 0xc0f: // MBAR
+			/* TODO */
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7b ffff movec    l .          1:10p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch (word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x001:            /* DFC */
+			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x800:            /* USP */
+			REG_USP() = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x801:            /* VBR */
+			m_vbr = REG_DA()[(word2 >> 12) & 15];
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7b ffff movec    l .          2f:12p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch (word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x001:            /* DFC */
+			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x002:            /* CACR */
+			/* 68030 can write all bits except 5-7, 040 can write all */
+			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
+
+			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+				m68ki_ic_clear();
+			}
+			break;
+			break;
+		case 0x800:            /* USP */
+			REG_USP() = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x801:            /* VBR */
+			m_vbr = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x802:            /* CAAR */
+			m_caar = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x803:            /* MSP */
+			/* we are in supervisor mode so just check for M flag */
+			if(!m_m_flag) {
+				REG_MSP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		case 0x804:            /* ISP */
+			if(!m_m_flag) {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_ISP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7b ffff movec    l .          3:12p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch (word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x001:            /* DFC */
+			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x002:            /* CACR */
+			/* 68030 can write all bits except 5-7, 040 can write all */
+			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0xff1f;
+
+			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+				m68ki_ic_clear();
+			}
+			break;
+			break;
+		case 0x800:            /* USP */
+			REG_USP() = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x801:            /* VBR */
+			m_vbr = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x802:            /* CAAR */
+			m_caar = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x803:            /* MSP */
+			/* we are in supervisor mode so just check for M flag */
+			if(!m_m_flag) {
+				REG_MSP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		case 0x804:            /* ISP */
+			if(!m_m_flag) {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_ISP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7b ffff movec    l .          4:12p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch (word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x001:            /* DFC */
+			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x002:            /* CACR */
+			/* 68030 can write all bits except 5-7, 040 can write all */
+			m_cacr = REG_DA()[(word2 >> 12) & 15];
+			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+				m68ki_ic_clear();
+			}
+			break;
+		case 0x800:            /* USP */
+			REG_USP() = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x801:            /* VBR */
+			m_vbr = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x802:            /* CAAR */
+			m_caar = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x803:            /* MSP */
+			/* we are in supervisor mode so just check for M flag */
+			if(!m_m_flag) {
+				REG_MSP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		case 0x804:            /* ISP */
+			if(!m_m_flag) {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_ISP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		case 0x003:         /* TC */
+			m_mmu_tc = REG_DA()[(word2 >> 12) & 15];
+
+			if (m_mmu_tc & 0x8000)
+			{
+				m_pmmu_enabled = 1;
+			}
+			else
+			{
+				m_pmmu_enabled = 0;
+			}
+			break;
+		case 0x004:         /* ITT0 */
+			m_mmu_itt0 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x005:         /* ITT1 */
+			m_mmu_itt1 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x006:         /* DTT0 */
+			m_mmu_dtt0 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x007:         /* DTT1 */
+			m_mmu_dtt1 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x805:         /* MMUSR */
+			m_mmu_sr_040 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x806:         /* URP */
+			m_mmu_urp_aptr = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x807:         /* SRP */
+			m_mmu_srp_aptr = REG_DA()[(word2 >> 12) & 15];
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e7b ffff movec    l .          c:12p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+
+		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
+		switch (word2 & 0xfff) {
+		case 0x000:            /* SFC */
+			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x001:            /* DFC */
+			m_dfc = REG_DA()[(word2 >> 12) & 15] & 7;
+			break;
+		case 0x002:            /* CACR */
+			/* 68030 can write all bits except 5-7, 040 can write all */
+			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
+
+			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+				m68ki_ic_clear();
+			}
+			break;
+		case 0x800:            /* USP */
+			REG_USP() = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x801:            /* VBR */
+			m_vbr = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x802:            /* CAAR */
+			m_caar = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x803:            /* MSP */
+			/* we are in supervisor mode so just check for M flag */
+			if(!m_m_flag) {
+				REG_MSP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		case 0x804:            /* ISP */
+			if(!m_m_flag) {
+				REG_SP() = REG_DA()[(word2 >> 12) & 15];
+			} else {
+				REG_ISP() = REG_DA()[(word2 >> 12) & 15];
+			}
+			break;
+		case 0x004:         /* ITT0 */
+			m_mmu_acr0 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x005:         /* ITT1 */
+			m_mmu_acr1 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x006:         /* DTT0 */
+			m_mmu_acr2 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0x007:         /* DTT1 */
+			m_mmu_acr3 = REG_DA()[(word2 >> 12) & 15];
+			break;
+		case 0xc00: // ROMBAR0
+			/* TODO */
+			break;
+		case 0xc01: // ROMBAR1
+			/* TODO */
+			break;
+		case 0xc04: // RAMBAR0
+			/* TODO */
+			break;
+		case 0xc05: // RAMBAR1
+			/* TODO */
+			break;
+		case 0xc0c: // MPCR
+			/* TODO */
+			break;
+		case 0xc0d: // EDRAMBAR
+			/* TODO */
+			break;
+		case 0xc0e: // SECMBAR
+			/* TODO */
+			break;
+		case 0xc0f: // MBAR
+			/* TODO */
+			break;
+		default:
+			m68ki_exception_illegal();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+48a0 fff8 movem    w .          071:8 234fc:4
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			ea -= 2;
+			m68ki_write_16(ea, MASK_OUT_ABOVE_16(REG_DA()[15-i]));
+			count++;
+		}
+	AY() = ea;
+
+	m_icount -= count<<m_cyc_movem_w;
+
+
+4880 ffc0 movem    w ADXWL      071:8 234fc:4
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			m68ki_write_16(ea, MASK_OUT_ABOVE_16(REG_DA()[i]));
+			ea += 2;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_w;
+
+
+48e0 fff8 movem    l .          071:8 234fc:4
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			ea -= 4;
+			m68ki_write_16(ea+2, REG_DA()[15-i] & 0xFFFF );
+			m68ki_write_16(ea, (REG_DA()[15-i] >> 16) & 0xFFFF );
+			count++;
+		}
+	AY() = ea;
+
+	m_icount -= count<<m_cyc_movem_l;
+
+
+48c0 ffc0 movem    l ADXWL      071:8 234fc:4
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			m68ki_write_32(ea, REG_DA()[i]);
+			ea += 4;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_l;
+
+
+4c98 fff8 movem    w .          071:12 234fc:8
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_16(ea)));
+			ea += 2;
+			count++;
+		}
+	AY() = ea;
+
+	m_icount -= count<<m_cyc_movem_w;
+
+
+4cba ffff movem    w .          071:16 234fc:9
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCDI_16();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_pcrel_16(ea)));
+			ea += 2;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_w;
+
+
+4cbb ffff movem    w .          071:18 234fc:11
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCIX_16();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_pcrel_16(ea)));
+			ea += 2;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_w;
+
+
+4c80 ffc0 movem    w ADXWL      071:12 234fc:8
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = MAKE_INT_16(MASK_OUT_ABOVE_16(m68ki_read_16(ea)));
+			ea += 2;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_w;
+
+
+4cd8 fff8 movem    l .          071:12 234fc:8
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = AY();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = m68ki_read_32(ea);
+			ea += 4;
+			count++;
+		}
+	AY() = ea;
+
+	m_icount -= count<<m_cyc_movem_l;
+
+
+4cfa ffff movem    l .          071:16 234fc:9
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCDI_32();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = m68ki_read_pcrel_32(ea);
+			ea += 4;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_l;
+
+
+4cfb ffff movem    l .          071:18 234fc:11
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = EA_PCIX_32();
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = m68ki_read_pcrel_32(ea);
+			ea += 4;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_l;
+
+
+4cc0 ffc0 movem    l ADXWL      071:12 234fc:8
+	u32 i = 0;
+	u32 register_list = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 count = 0;
+
+	for(; i < 16; i++)
+		if(register_list & (1 << i)) {
+			REG_DA()[i] = m68ki_read_32(ea);
+			ea += 4;
+			count++;
+		}
+
+	m_icount -= count<<m_cyc_movem_l;
+
+
+0188 f1f8 movep    w .          071:16 234fc:11
+	u32 ea = EA_AY_DI_16();
+	u32 src = DX();
+
+	m68ki_write_8(ea, MASK_OUT_ABOVE_8(src >> 8));
+	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src));
+
+
+01c8 f1f8 movep    l .          071:24 234fc:17
+	u32 ea = EA_AY_DI_32();
+	u32 src = DX();
+
+	m68ki_write_8(ea, MASK_OUT_ABOVE_8(src >> 24));
+	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src >> 16));
+	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src >> 8));
+	m68ki_write_8(ea += 2, MASK_OUT_ABOVE_8(src));
+
+
+0108 f1f8 movep    w .          071:16 234fc:12
+	u32 ea = EA_AY_DI_16();
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | ((m68ki_read_8(ea) << 8) + m68ki_read_8(ea + 2));
+
+
+0148 f1f8 movep    l .          071:24 234fc:18
+	u32 ea = EA_AY_DI_32();
+
+	DX() = (m68ki_read_8(ea) << 24) + (m68ki_read_8(ea + 2) << 16)
+		+ (m68ki_read_8(ea + 4) << 8) + m68ki_read_8(ea + 6);
+
+
+0e00 ffc0 moves    b A+-DXWL    1:14p 34fc:5p
+	if(m_s_flag)
+	{
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_8;
+
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		if(BIT_B(word2)) {             /* Register to memory */
+			m68ki_write_8_fc(ea, m_dfc, MASK_OUT_ABOVE_8(REG_DA()[(word2 >> 12) & 15]));
+		} else if(BIT_F(word2)) {      /* Memory to address register */
+			REG_A()[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, m_sfc));
+		} else {
+			/* Memory to data register */
+			REG_D()[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D()[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, m_sfc);
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+0e00 ffc0 moves    b A+-DXWL    2:5p
+	if(m_s_flag)
+	{
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_8;
+
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		if(BIT_B(word2)) {             /* Register to memory */
+			m68ki_write_8_fc(ea, m_dfc, MASK_OUT_ABOVE_8(REG_DA()[(word2 >> 12) & 15]));
+		} else if(BIT_F(word2)) {      /* Memory to address register */
+			REG_A()[(word2 >> 12) & 7] = MAKE_INT_8(m68ki_read_8_fc(ea, m_sfc));
+			m_icount -= 2;
+		} else {
+			/* Memory to data register */
+			REG_D()[(word2 >> 12) & 7] = MASK_OUT_BELOW_8(REG_D()[(word2 >> 12) & 7]) | m68ki_read_8_fc(ea, m_sfc);
+			m_icount -= 2;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+0e40 ffc0 moves    w A+-DXWL    1:14p 34fc:5p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_16;
+
+		m68ki_trace_t0();            /* auto-disable (see m68kcpu.h) */
+		if(BIT_B(word2)) {           /* Register to memory */
+			m68ki_write_16_fc(ea, m_dfc, MASK_OUT_ABOVE_16(REG_DA()[(word2 >> 12) & 15]));
+		} else if(BIT_F(word2)) {    /* Memory to address register */
+			REG_A()[(word2 >> 12) & 7] = MAKE_INT_16(m68ki_read_16_fc(ea, m_sfc));
+		} else {
+			/* Memory to data register */
+			REG_D()[(word2 >> 12) & 7] = MASK_OUT_BELOW_16(REG_D()[(word2 >> 12) & 7]) | m68ki_read_16_fc(ea, m_sfc);
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+0e40 ffc0 moves    w A+-DXWL    2:5p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_16;
+
+		m68ki_trace_t0();            /* auto-disable (see m68kcpu.h) */
+		if(BIT_B(word2)) {           /* Register to memory */
+			m68ki_write_16_fc(ea, m_dfc, MASK_OUT_ABOVE_16(REG_DA()[(word2 >> 12) & 15]));
+		} else if(BIT_F(word2)) {    /* Memory to address register */
+			REG_A()[(word2 >> 12) & 7] = MAKE_INT_16(m68ki_read_16_fc(ea, m_sfc));
+			m_icount -= 2;
+		} else {
+			/* Memory to data register */
+			REG_D()[(word2 >> 12) & 7] = MASK_OUT_BELOW_16(REG_D()[(word2 >> 12) & 7]) | m68ki_read_16_fc(ea, m_sfc);
+			m_icount -= 2;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+0e80 ffc0 moves    l A+-DXWL    1:16p 34fc:5p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_32;
+
+		m68ki_trace_t0();            /* auto-disable (see m68kcpu.h) */
+		if(BIT_B(word2)) {           /* Register to memory */
+			m68ki_write_32_fc(ea, m_dfc, REG_DA()[(word2 >> 12) & 15]);
+		} else {
+			/* Memory to register */
+			REG_DA()[(word2 >> 12) & 15] = m68ki_read_32_fc(ea, m_sfc);
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+0e80 ffc0 moves    l A+-DXWL    2:5p
+	if(m_s_flag) {
+		u32 word2 = OPER_I_16();
+		u32 ea = M68KMAKE_GET_EA_AY_32;
+
+		m68ki_trace_t0();            /* auto-disable (see m68kcpu.h) */
+		if(BIT_B(word2)) {           /* Register to memory */
+			m68ki_write_32_fc(ea, m_dfc, REG_DA()[(word2 >> 12) & 15]);
+			m_icount -= 2;
+		} else {
+			/* Memory to register */
+			REG_DA()[(word2 >> 12) & 15] = m68ki_read_32_fc(ea, m_sfc);
+			m_icount -= 2;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+7000 f100 moveq    l .          071:4 234fc:2
+	u32 res = DX() = MAKE_INT_8(MASK_OUT_ABOVE_8(m_ir));
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+f620 fff8 move16   l .          4f:4 c:4p
+	u16 w2 = OPER_I_16();
+	int ax = m_ir & 7;
+	int ay = (w2 >> 12) & 7;
+	m68ki_write_32(REG_A()[ay],    m68ki_read_32(REG_A()[ax]));
+	m68ki_write_32(REG_A()[ay]+4,  m68ki_read_32(REG_A()[ax]+4));
+	m68ki_write_32(REG_A()[ay]+8,  m68ki_read_32(REG_A()[ax]+8));
+	m68ki_write_32(REG_A()[ay]+12, m68ki_read_32(REG_A()[ax]+12));
+
+	REG_A()[ax] += 16;
+	REG_A()[ay] += 16;
+
+
+c1c0 f1f8 muls     w .          07:54 1:32 234fc:27
+	u32* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_32(MAKE_INT_16(DY()) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+
+	*r_dst = res;
+
+	m_not_z_flag = res;
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+c1c0 f1c0 muls     w A+-DXWLdxI 07:54 1:32 234fc:27
+	u32* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_32(MAKE_INT_16(M68KMAKE_GET_OPER_AY_16) * MAKE_INT_16(MASK_OUT_ABOVE_16(*r_dst)));
+
+	*r_dst = res;
+
+	m_not_z_flag = res;
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+c0c0 f1f8 mulu     w .          07:54 1:30 234fc:27
+	u32* r_dst = &DX();
+	u32 res = MASK_OUT_ABOVE_16(DY()) * MASK_OUT_ABOVE_16(*r_dst);
+
+	*r_dst = res;
+
+	m_not_z_flag = res;
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+c0c0 f1c0 mulu     w A+-DXWLdxI 07:54 1:30 234fc:27
+	u32* r_dst = &DX();
+	u32 res = M68KMAKE_GET_OPER_AY_16 * MASK_OUT_ABOVE_16(*r_dst);
+
+	*r_dst = res;
+
+	m_not_z_flag = res;
+	m_n_flag = NFLAG_32(res);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4c00 fff8 mull     l .          234fc:43
+	u32 word2 = OPER_I_16();
+	u64 src = DY();
+	u64 dst = REG_D()[(word2 >> 12) & 7];
+	u64 res;
+
+	m_c_flag = CFLAG_CLEAR;
+
+	if(BIT_B(word2)) {               /* signed */
+		res = (s64)((s32)src) * (s64)((s32)dst);
+		if(!BIT_A(word2)) {
+			m_not_z_flag = MASK_OUT_ABOVE_32(res);
+			m_n_flag = NFLAG_32(res);
+			m_v_flag = ((s64)res != (s32)res)<<7;
+			REG_D()[(word2 >> 12) & 7] = m_not_z_flag;
+			goto done;
+		}
+		m_not_z_flag = MASK_OUT_ABOVE_32(res) | (res>>32);
+		m_n_flag = NFLAG_64(res);
+		m_v_flag = VFLAG_CLEAR;
+		REG_D()[word2 & 7] = (res >> 32);
+		REG_D()[(word2 >> 12) & 7] = MASK_OUT_ABOVE_32(res);
+		goto done;
+	}
+
+	res = src * dst;
+	if(!BIT_A(word2)) {
+		m_not_z_flag = MASK_OUT_ABOVE_32(res);
+		m_n_flag = NFLAG_32(res);
+		m_v_flag = (res > 0xffffffff)<<7;
+		REG_D()[(word2 >> 12) & 7] = m_not_z_flag;
+		goto done;
+	}
+	m_not_z_flag = MASK_OUT_ABOVE_32(res) | (res>>32);
+	m_n_flag = NFLAG_64(res);
+	m_v_flag = VFLAG_CLEAR;
+	REG_D()[word2 & 7] = (res >> 32);
+	REG_D()[(word2 >> 12) & 7] = MASK_OUT_ABOVE_32(res);
+
+	done: ;
+
+
+4c00 ffc0 mull     l A+-DXWLdxI 234fc:43
+	u32 word2 = OPER_I_16();
+	u64 src = M68KMAKE_GET_OPER_AY_32;
+	u64 dst = REG_D()[(word2 >> 12) & 7];
+	u64 res;
+
+	m_c_flag = CFLAG_CLEAR;
+
+	if(BIT_B(word2)) {               /* signed */
+		res = (s64)((s32)src) * (s64)((s32)dst);
+		if(!BIT_A(word2)) {
+			m_not_z_flag = MASK_OUT_ABOVE_32(res);
+			m_n_flag = NFLAG_32(res);
+			m_v_flag = ((s64)res != (s32)res)<<7;
+			REG_D()[(word2 >> 12) & 7] = m_not_z_flag;
+			goto done;
+		}
+		m_not_z_flag = MASK_OUT_ABOVE_32(res) | (res>>32);
+		m_n_flag = NFLAG_64(res);
+		m_v_flag = VFLAG_CLEAR;
+		REG_D()[word2 & 7] = (res >> 32);
+		REG_D()[(word2 >> 12) & 7] = MASK_OUT_ABOVE_32(res);
+		goto done;
+	}
+
+	res = src * dst;
+	if(!BIT_A(word2)) {
+		m_not_z_flag = MASK_OUT_ABOVE_32(res);
+		m_n_flag = NFLAG_32(res);
+		m_v_flag = (res > 0xffffffff)<<7;
+		REG_D()[(word2 >> 12) & 7] = m_not_z_flag;
+		goto done;
+	}
+	m_not_z_flag = MASK_OUT_ABOVE_32(res) | (res>>32);
+	m_n_flag = NFLAG_64(res);
+	m_v_flag = VFLAG_CLEAR;
+	REG_D()[word2 & 7] = (res >> 32);
+	REG_D()[(word2 >> 12) & 7] = MASK_OUT_ABOVE_32(res);
+	done: ;
+
+4800 fff8 nbcd     b .          071234fc:6
+	u32* r_dst = &DY();
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = -dst - XFLAG_1();
+
+	if(res != 0) {
+		m_v_flag = res; /* Undefined V behavior */
+
+		if(((res|dst) & 0x0f) == 0)
+			res = (res & 0xf0) | 6;
+
+		res = MASK_OUT_ABOVE_8(res + 0x9a);
+
+		m_v_flag &= ~res; /* Undefined V behavior part II */
+
+		*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+		m_not_z_flag |= res;
+		m_c_flag = CFLAG_SET;
+		m_x_flag = XFLAG_SET;
+	} else {
+		m_v_flag = VFLAG_CLEAR;
+		m_c_flag = CFLAG_CLEAR;
+		m_x_flag = XFLAG_CLEAR;
+	}
+	m_n_flag = NFLAG_8(res);  /* Undefined N behavior */
+
+
+4800 ffc0 nbcd     b A+-DXWL    071:8 234fc:6
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = -dst - XFLAG_1();
+
+	if(res != 0) {
+		m_v_flag = res; /* Undefined V behavior */
+
+		if(((res|dst) & 0x0f) == 0)
+			res = (res & 0xf0) | 6;
+
+		res = MASK_OUT_ABOVE_8(res + 0x9a);
+
+		m_v_flag &= ~res; /* Undefined V behavior part II */
+
+		m68ki_write_8(ea, MASK_OUT_ABOVE_8(res));
+
+		m_not_z_flag |= res;
+		m_c_flag = CFLAG_SET;
+		m_x_flag = XFLAG_SET;
+	} else {
+		m_v_flag = VFLAG_CLEAR;
+		m_c_flag = CFLAG_CLEAR;
+		m_x_flag = XFLAG_CLEAR;
+	}
+	m_n_flag = NFLAG_8(res);  /* Undefined N behavior */
+
+
+4400 fff8 neg      b .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_8(*r_dst);
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = m_x_flag = CFLAG_8(res);
+	m_v_flag = *r_dst & res;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+4400 ffc0 neg      b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 res = 0 - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_c_flag = m_x_flag = CFLAG_8(res);
+	m_v_flag = src & res;
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+4440 fff8 neg      w .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_16(*r_dst);
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = m_x_flag = CFLAG_16(res);
+	m_v_flag = (*r_dst & res)>>8;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+4440 ffc0 neg      w A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = 0 - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_c_flag = m_x_flag = CFLAG_16(res);
+	m_v_flag = (src & res)>>8;
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+4480 fff8 neg      l .          071:6 234fc:2
+	u32* r_dst = &DY();
+	u32 res = 0 - *r_dst;
+
+	m_n_flag = NFLAG_32(res);
+	m_c_flag = m_x_flag = CFLAG_SUB_32(*r_dst, 0, res);
+	m_v_flag = (*r_dst & res)>>24;
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+4480 ffc0 neg      l A+-DXWL    071:12 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 src = m68ki_read_32(ea);
+	u32 res = 0 - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_c_flag = m_x_flag = CFLAG_SUB_32(src, 0, res);
+	m_v_flag = (src & res)>>24;
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	m68ki_write_32(ea, m_not_z_flag);
+
+
+4000 fff8 negx     b .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_8(*r_dst) - XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = *r_dst & res;
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+
+4000 ffc0 negx     b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = m68ki_read_8(ea);
+	u32 res = 0 - src - XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = src & res;
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+4040 fff8 negx     w .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_16(*r_dst) - XFLAG_1();
+
+	m_n_flag = NFLAG_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = (*r_dst & res)>>8;
+
+	res = MASK_OUT_ABOVE_16(res);
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+
+4040 ffc0 negx     w A+-DXWL    071:8 234fc:4
+	u32 ea  = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = 0 - MASK_OUT_ABOVE_16(src) - XFLAG_1();
+
+	m_n_flag = NFLAG_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = (src & res)>>8;
+
+	res = MASK_OUT_ABOVE_16(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_16(ea, res);
+
+
+4080 fff8 negx     l .          071:6 234fc:2
+	u32* r_dst = &DY();
+	u32 res = 0 - MASK_OUT_ABOVE_32(*r_dst) - XFLAG_1();
+
+	m_n_flag = NFLAG_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(*r_dst, 0, res);
+	m_v_flag = (*r_dst & res)>>24;
+
+	res = MASK_OUT_ABOVE_32(res);
+	m_not_z_flag |= res;
+
+	*r_dst = res;
+
+
+4080 ffc0 negx     l A+-DXWL    071:12 234fc:4
+	u32 ea  = M68KMAKE_GET_EA_AY_32;
+	u32 src = m68ki_read_32(ea);
+	u32 res = 0 - MASK_OUT_ABOVE_32(src) - XFLAG_1();
+
+	m_n_flag = NFLAG_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, 0, res);
+	m_v_flag = (src & res)>>24;
+
+	res = MASK_OUT_ABOVE_32(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_32(ea, res);
+
+
+4e71 ffff nop      . .          071:4 234fc:2
+	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
+
+
+4600 fff8 not      b .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 res = MASK_OUT_ABOVE_8(~*r_dst);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+4600 ffc0 not      b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(~m68ki_read_8(ea));
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+4640 fff8 not      w .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 res = MASK_OUT_ABOVE_16(~*r_dst);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+4640 ffc0 not      w A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(~m68ki_read_16(ea));
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+4680 fff8 not      l .          071:6 234fc:2
+	u32* r_dst = &DY();
+	u32 res = *r_dst = MASK_OUT_ABOVE_32(~*r_dst);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+4680 ffc0 not      l A+-DXWL    071:12 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = MASK_OUT_ABOVE_32(~m68ki_read_32(ea));
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8000 f1f8 or       b .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_8((DX() |= MASK_OUT_ABOVE_8(DY())));
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8000 f1c0 or       b A+-DXWLdxI 071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_8((DX() |= M68KMAKE_GET_OPER_AY_8));
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8040 f1f8 or       w .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_16((DX() |= MASK_OUT_ABOVE_16(DY())));
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8040 f1c0 or       w A+-DXWLdxI 071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_16((DX() |= M68KMAKE_GET_OPER_AY_16));
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8080 f1f8 or       l .          071:6 234fc:2
+	u32 res = DX() |= DY();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8080 f1c0 or       l A+-DXWLdxI 071:6 234fc:2
+	u32 res = DX() |= M68KMAKE_GET_OPER_AY_32;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8100 f1c0 or       b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(DX() | m68ki_read_8(ea));
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8140 f1c0 or       w A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(DX() | m68ki_read_16(ea));
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+8180 f1c0 or       l A+-DXWL    071:12 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = DX() | m68ki_read_32(ea);
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0000 fff8 ori      b .          071:8 234fc:2
+	u32 res = MASK_OUT_ABOVE_8((DY() |= OPER_I_8()));
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0000 ffc0 ori      b A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 res = MASK_OUT_ABOVE_8(src | m68ki_read_8(ea));
+
+	m68ki_write_8(ea, res);
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0040 fff8 ori      w .          071:8 234fc:2
+	u32 res = MASK_OUT_ABOVE_16(DY() |= OPER_I_16());
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0040 ffc0 ori      w A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 res = MASK_OUT_ABOVE_16(src | m68ki_read_16(ea));
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0080 fff8 ori      l .          07:16 1:14 234fc:2
+	u32 res = DY() |= OPER_I_32();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+0080 ffc0 ori      l A+-DXWL    071:20 234fc:4
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 res = src | m68ki_read_32(ea);
+
+	m68ki_write_32(ea, res);
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+003c ffff ori      w .          07:20 1:16 234fc:12
+	m68ki_set_ccr(m68ki_get_ccr() | OPER_I_8());
+
+
+007c ffff ori      w .          07:20p 1:16p 234fc:12p
+	if(m_s_flag) {
+		u32 src = OPER_I_16();
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m68ki_set_sr(m68ki_get_sr() | src);
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+8140 f1f8 pack     w .          234fc:6
+	/* Note: DX() and DY() are reversed in Motorola's docs */
+	u32 src = DY() + OPER_I_16();
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | ((src >> 4) & 0x00f0) | (src & 0x000f);
+
+
+8f48 fff8 pack     w .          234fc:13
+	/* Note: AX and AY are reversed in Motorola's docs */
+	u32 ea_src = EA_AY_PD_8();
+	u32 src = m68ki_read_8(ea_src);
+	ea_src = EA_AY_PD_8();
+	src = ((src << 8) | m68ki_read_8(ea_src)) + OPER_I_16();
+
+	m68ki_write_8(EA_A7_PD_8(), ((src >> 8) & 0x000f) | ((src<<4) & 0x00f0));
+
+
+814f f1ff pack     w .          234fc:13
+	/* Note: AX and AY are reversed in Motorola's docs */
+	u32 ea_src = EA_A7_PD_8();
+	u32 src = m68ki_read_8(ea_src);
+	ea_src = EA_A7_PD_8();
+	src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
+
+	m68ki_write_8(EA_AX_PD_8(), ((src >> 4) & 0x00f0) | (src & 0x00f));
+
+
+8f4f ffff pack     w .          234fc:13
+	u32 ea_src = EA_A7_PD_8();
+	u32 src = m68ki_read_8(ea_src);
+	ea_src = EA_A7_PD_8();
+	src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
+
+	m68ki_write_8(EA_A7_PD_8(), ((src >> 4) & 0x00f0) | (src & 0x000f));
+
+
+8148 f1f8 pack     w .          234fc:13
+	/* Note: AX and AY are reversed in Motorola's docs */
+	u32 ea_src = EA_AY_PD_8();
+	u32 src = m68ki_read_8(ea_src);
+	ea_src = EA_AY_PD_8();
+	src = (src | (m68ki_read_8(ea_src) << 8)) + OPER_I_16();
+
+	m68ki_write_8(EA_AX_PD_8(), ((src >> 4) & 0x00f0) | (src & 0x000f));
+
+
+4840 ffc0 pea      l ADXWLdx    071:6 234fc:5
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+
+	m68ki_push_32(ea);
+
+
+f518 fff8 pflusha  l .          4fc:4p
+	if(m_has_pmmu) {
+		logerror("68040: unhandled PFLUSHA (ir=%04x)\n", m_ir);
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f510 fff8 pflushan l .          4fc:4p
+	if(m_has_pmmu) {
+		logerror("68040: unhandled PFLUSHAN (ir=%04x)\n", m_ir);
+	} else {
+		m68ki_exception_1111();
+	}
+
+
+f000 fe00 pmmu     l .          234fc:8p
+	if (m_has_pmmu)
+	{
+		m68851_mmu_ops();
+	}
+	else
+	{
+		m68ki_exception_1111();
+	}
+
+
+f548 ffd8 ptest    l .          4:8p
+	if(m_has_pmmu)
+	{
+		logerror("68040: unhandled PTEST\n");
+	}
+	else
+	{
+		m68ki_exception_1111();
+	}
+
+
+4e70 ffff reset    . .          071234fc:0p
+	if(m_s_flag) {
+		if(!m_reset_instr_callback.isnull())
+			(m_reset_instr_callback)(1);
+		m68k_reset_peripherals();
+		m_icount -= m_cyc_reset;
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+e018 f1f8 ror      b .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROR_8(src, shift);
+
+	if(orig_shift != 0)
+		m_icount -= orig_shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = src << (9-orig_shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e058 f1f8 ror      w .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROR_16(src, shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = src << (9-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e098 f1f8 ror      l .          071234fc:8
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src = *r_dst;
+	u32 res = ROR_32(src, shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = src << (9-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e038 f1f8 ror      b .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROR_8(src, shift);
+
+	if(orig_shift != 0) {
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+		m_c_flag = src << (8-((shift-1)&7));
+		m_n_flag = NFLAG_8(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_8(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e078 f1f8 ror      w .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 15;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROR_16(src, shift);
+
+	if(orig_shift != 0) {
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+		m_c_flag = (src >> ((shift - 1) & 15)) << 8;
+		m_n_flag = NFLAG_16(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_16(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e0b8 f1f8 ror      l .          071234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 31;
+	u64 src = *r_dst;
+	u32 res = ROR_32(src, shift);
+
+	if(orig_shift != 0) {
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		*r_dst = res;
+		m_c_flag = (src >> ((shift - 1) & 31)) << 8;
+		m_n_flag = NFLAG_32(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_32(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e6c0 ffc0 ror      w A+-DXWL    071:8 234fc:7
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = ROR_16(src, 1);
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = src << 8;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e118 f1f8 rol      b .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROL_8(src, shift);
+
+	if(orig_shift != 0)
+		m_icount -= orig_shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_c_flag = src << orig_shift;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e158 f1f8 rol      w .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROL_16(src, shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = src >> (8-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e198 f1f8 rol      l .          071234fc:8
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src = *r_dst;
+	u32 res = ROL_32(src, shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_c_flag = src >> (24-shift);
+	m_v_flag = VFLAG_CLEAR;
+
+
+e138 f1f8 rol      b .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 7;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROL_8(src, shift);
+
+	if(orig_shift != 0) {
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		if(shift != 0) {
+			*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+			m_c_flag = src << shift;
+			m_n_flag = NFLAG_8(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+		} else {
+			m_c_flag = (src & 1)<<8;
+			m_n_flag = NFLAG_8(src);
+			m_not_z_flag = src;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_8(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e178 f1f8 rol      w .          071:6 234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 15;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, shift));
+
+	if(orig_shift != 0) {
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		if(shift != 0) {
+			*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+			m_c_flag = (src << shift) >> 8;
+			m_n_flag = NFLAG_16(res);
+			m_not_z_flag = res;
+			m_v_flag = VFLAG_CLEAR;
+		} else {
+			m_c_flag = (src & 1)<<8;
+			m_n_flag = NFLAG_16(src);
+			m_not_z_flag = src;
+			m_v_flag = VFLAG_CLEAR;
+		}
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_16(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e1b8 f1f8 rol      l .          071234fc:8
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+	u32 shift = orig_shift & 31;
+	u64 src = *r_dst;
+	u32 res = ROL_32(src, shift);
+
+	if(orig_shift != 0) {
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		*r_dst = res;
+
+		m_c_flag = (src >> ((32 - shift) & 0x1f)) << 8;
+		m_n_flag = NFLAG_32(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = CFLAG_CLEAR;
+		m_n_flag = NFLAG_32(src);
+		m_not_z_flag = src;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e7c0 ffc0 rol      w A+-DXWL    071:8 234fc:7
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = MASK_OUT_ABOVE_16(ROL_16(src, 1));
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_c_flag = src >> 7;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e010 f1f8 roxr     b .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROR_9(src | (XFLAG_1() << 8), shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	m_c_flag = m_x_flag = res;
+	res = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e050 f1f8 roxr     w .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROR_17(src | (XFLAG_1() << 16), shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	m_c_flag = m_x_flag = res >> 8;
+	res = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e090 f1f8 roxr     l .          071:8 234fc:12
+	u32*  r_dst = &DY();
+	u32   shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src   = *r_dst;
+	u64 res   = src | (((u64)XFLAG_1()) << 32);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	res = ROR_33_64(res, shift);
+
+	m_c_flag = m_x_flag = res >> 24;
+	res = MASK_OUT_ABOVE_32(res);
+
+	*r_dst =  res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e030 f1f8 roxr     b .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+
+	if(orig_shift != 0) {
+		u32 shift = orig_shift % 9;
+		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
+		u32 res   = ROR_9(src | (XFLAG_1() << 8), shift);
+
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		m_c_flag = m_x_flag = res;
+		res = MASK_OUT_ABOVE_8(res);
+
+		*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+		m_n_flag = NFLAG_8(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = m_x_flag;
+		m_n_flag = NFLAG_8(*r_dst);
+		m_not_z_flag = MASK_OUT_ABOVE_8(*r_dst);
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e070 f1f8 roxr     w .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+
+	if(orig_shift != 0)
+	{
+		u32 shift = orig_shift % 17;
+		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
+		u32 res   = ROR_17(src | (XFLAG_1() << 16), shift);
+
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		m_c_flag = m_x_flag = res >> 8;
+		res = MASK_OUT_ABOVE_16(res);
+
+		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+		m_n_flag = NFLAG_16(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = m_x_flag;
+		m_n_flag = NFLAG_16(*r_dst);
+		m_not_z_flag = MASK_OUT_ABOVE_16(*r_dst);
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e0b0 f1f8 roxr     l .          071:8 234fc:12
+	u32*  r_dst = &DY();
+	u32   orig_shift = DX() & 0x3f;
+
+	if(orig_shift != 0) {
+		u32   shift = orig_shift % 33;
+		u64 src   = *r_dst;
+		u64 res   = src | (((u64)XFLAG_1()) << 32);
+
+		res = ROR_33_64(res, shift);
+
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		m_c_flag = m_x_flag = res >> 24;
+		res = MASK_OUT_ABOVE_32(res);
+
+		*r_dst = res;
+		m_n_flag = NFLAG_32(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = m_x_flag;
+		m_n_flag = NFLAG_32(*r_dst);
+		m_not_z_flag = *r_dst;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e4c0 ffc0 roxr     w A+-DXWL    071:8 234fc:5
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = ROR_17(src | (XFLAG_1() << 16), 1);
+
+	m_c_flag = m_x_flag = res >> 8;
+	res = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e110 f1f8 roxl     b .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = ROL_9(src | (XFLAG_1() << 8), shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	m_c_flag = m_x_flag = res;
+	res = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e150 f1f8 roxl     w .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 src = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = ROL_17(src | (XFLAG_1() << 16), shift);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	m_c_flag = m_x_flag = res >> 8;
+	res = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e190 f1f8 roxl     l .          071:8 234fc:12
+	u32*  r_dst = &DY();
+	u32   shift = (((m_ir >> 9) - 1) & 7) + 1;
+	u64 src   = *r_dst;
+	u64 res   = src | (((u64)XFLAG_1()) << 32);
+
+	if(shift != 0)
+		m_icount -= shift<<m_cyc_shift;
+
+	res = ROL_33_64(res, shift);
+
+	m_c_flag = m_x_flag = res >> 24;
+	res = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = res;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+e130 f1f8 roxl     b .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+
+
+	if(orig_shift != 0) {
+		u32 shift = orig_shift % 9;
+		u32 src   = MASK_OUT_ABOVE_8(*r_dst);
+		u32 res   = ROL_9(src | (XFLAG_1() << 8), shift);
+
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		m_c_flag = m_x_flag = res;
+		res = MASK_OUT_ABOVE_8(res);
+
+		*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+		m_n_flag = NFLAG_8(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = m_x_flag;
+		m_n_flag = NFLAG_8(*r_dst);
+		m_not_z_flag = MASK_OUT_ABOVE_8(*r_dst);
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e170 f1f8 roxl     w .          071:6 234fc:12
+	u32* r_dst = &DY();
+	u32 orig_shift = DX() & 0x3f;
+
+	if(orig_shift != 0) {
+		u32 shift = orig_shift % 17;
+		u32 src   = MASK_OUT_ABOVE_16(*r_dst);
+		u32 res   = ROL_17(src | (XFLAG_1() << 16), shift);
+
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		m_c_flag = m_x_flag = res >> 8;
+		res = MASK_OUT_ABOVE_16(res);
+
+		*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+		m_n_flag = NFLAG_16(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = m_x_flag;
+		m_n_flag = NFLAG_16(*r_dst);
+		m_not_z_flag = MASK_OUT_ABOVE_16(*r_dst);
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e1b0 f1f8 roxl     l .          071:8 234fc:12
+	u32*  r_dst = &DY();
+	u32   orig_shift = DX() & 0x3f;
+
+	if(orig_shift != 0) {
+		u32   shift = orig_shift % 33;
+		u64 src   = *r_dst;
+		u64 res   = src | (((u64)XFLAG_1()) << 32);
+
+		res = ROL_33_64(res, shift);
+
+		m_icount -= orig_shift<<m_cyc_shift;
+
+		m_c_flag = m_x_flag = res >> 24;
+		res = MASK_OUT_ABOVE_32(res);
+
+		*r_dst = res;
+		m_n_flag = NFLAG_32(res);
+		m_not_z_flag = res;
+		m_v_flag = VFLAG_CLEAR;
+	} else {
+		m_c_flag = m_x_flag;
+		m_n_flag = NFLAG_32(*r_dst);
+		m_not_z_flag = *r_dst;
+		m_v_flag = VFLAG_CLEAR;
+	}
+
+
+e5c0 ffc0 roxl     w A+-DXWL    071:8 234fc:5
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = m68ki_read_16(ea);
+	u32 res = ROL_17(src | (XFLAG_1() << 16), 1);
+
+	m_c_flag = m_x_flag = res >> 8;
+	res = MASK_OUT_ABOVE_16(res);
+
+	m68ki_write_16(ea, res);
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+
+
+4e74 ffff rtd      l .          1:16 234fc:10
+	u32 new_pc = m68ki_pull_32();
+
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	REG_A()[7] = MASK_OUT_ABOVE_32(REG_A()[7] + MAKE_INT_16(OPER_I_16()));
+	m68ki_jump(new_pc);
+
+
+4e73 ffff rte      l .          0:20p
+	if(m_s_flag) {
+		u32 new_sr;
+		u32 new_pc;
+
+		if (!m_rte_instr_callback.isnull())
+			(m_rte_instr_callback)(1);
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+
+		new_sr = m68ki_pull_16();
+		new_pc = m68ki_pull_32();
+		m68ki_jump(new_pc);
+		m68ki_set_sr(new_sr);
+
+		m_instr_mode = INSTRUCTION_YES;
+		m_run_mode = RUN_MODE_NORMAL;
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+4e73 ffff rte      l .          71:24p
+	if(m_s_flag) {
+		u32 new_sr;
+		u32 new_pc;
+		u32 format_word;
+
+		if (!m_rte_instr_callback.isnull())
+			(m_rte_instr_callback)(1);
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+
+		format_word = m68ki_read_16(REG_A()[7]+6) >> 12;
+		if(format_word == 0) {
+			new_sr = m68ki_pull_16();
+			new_pc = m68ki_pull_32();
+			m68ki_fake_pull_16();   /* format word */
+			m68ki_jump(new_pc);
+			m68ki_set_sr(new_sr);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+		} else {
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			/* Not handling bus fault (9) */
+			m68ki_exception_format_error();
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+4e73 ffff rte      l .          234fc:20p
+	if(m_s_flag) {
+		u32 new_sr;
+		u32 new_pc;
+		u32 format_word;
+
+		if (!m_rte_instr_callback.isnull())
+			(m_rte_instr_callback)(1);
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+
+	rte_loop:
+		format_word = m68ki_read_16(REG_A()[7]+6) >> 12;
+		switch(format_word) {
+		case 0: /* Normal */
+			new_sr = m68ki_pull_16();
+			new_pc = m68ki_pull_32();
+			m68ki_fake_pull_16();   /* format word */
+			m68ki_jump(new_pc);
+			m68ki_set_sr(new_sr);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			break;
+
+		case 1: /* Throwaway */
+			new_sr = m68ki_pull_16();
+			m68ki_fake_pull_32();   /* program counter */
+			m68ki_fake_pull_16();   /* format word */
+			m68ki_set_sr_noint(new_sr);
+			goto rte_loop;
+
+		case 2: /* Trap */
+			new_sr = m68ki_pull_16();
+			new_pc = m68ki_pull_32();
+			m68ki_fake_pull_16();   /* format word */
+			m68ki_fake_pull_32();   /* address */
+			m68ki_jump(new_pc);
+			m68ki_set_sr(new_sr);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			break;
+
+		case 7: /* 68040 access error */
+			new_sr = m68ki_pull_16();
+			new_pc = m68ki_pull_32();
+			m68ki_fake_pull_16();   /* $06: format word */
+			m68ki_fake_pull_32();   /* $08: effective address */
+			m68ki_fake_pull_16();   /* $0c: special status word */
+			m68ki_fake_pull_16();   /* $0e: wb3s */
+			m68ki_fake_pull_16();   /* $10: wb2s */
+			m68ki_fake_pull_16();   /* $12: wb1s */
+			m68ki_fake_pull_32();   /* $14: data fault address */
+			m68ki_fake_pull_32();   /* $18: wb3a */
+			m68ki_fake_pull_32();   /* $1c: wb3d */
+			m68ki_fake_pull_32();   /* $20: wb2a */
+			m68ki_fake_pull_32();   /* $24: wb2d */
+			m68ki_fake_pull_32();   /* $28: wb1a */
+			m68ki_fake_pull_32();   /* $2c: wb1d/pd0 */
+			m68ki_fake_pull_32();   /* $30: pd1 */
+			m68ki_fake_pull_32();   /* $34: pd2 */
+			m68ki_fake_pull_32();   /* $38: pd3 */
+			m68ki_jump(new_pc);
+			m68ki_set_sr(new_sr);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			break;
+
+		case 0x0a: /* Bus Error at instruction boundary */
+			new_sr = m68ki_pull_16();
+			new_pc = m68ki_pull_32();
+			m68ki_fake_pull_16();   /* $06: format word */
+			m68ki_fake_pull_16();   /* $08: internal register */
+			m68ki_fake_pull_16();   /* $0a: special status word */
+			m68ki_fake_pull_16();   /* $0c: instruction pipe stage c */
+			m68ki_fake_pull_16();   /* $0e: instruction pipe stage b */
+			m68ki_fake_pull_32();   /* $10: data fault address */
+			m68ki_fake_pull_32();   /* $14: internal registers */
+			m68ki_fake_pull_32();   /* $18: data output buffer */
+			m68ki_fake_pull_32();   /* $1c: internal registers */
+
+			m68ki_jump(new_pc);
+			m68ki_set_sr(new_sr);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			break;
+
+		case 0x0b: /* Bus Error - Instruction Execution in Progress */
+			new_sr = m68ki_pull_16();
+			new_pc = m68ki_pull_32();
+			m68ki_fake_pull_16();   /* $06: format word */
+			m68ki_fake_pull_16();   /* $08: internal register */
+			m68ki_fake_pull_16();   /* $0a: special status word */
+			m68ki_fake_pull_16();   /* $0c: instruction pipe stage c */
+			m68ki_fake_pull_16();   /* $0e: instruction pipe stage b */
+			m68ki_fake_pull_32();   /* $10: data fault address */
+			m68ki_fake_pull_32();   /* $14: internal registers */
+			m68ki_fake_pull_32();   /* $18: data output buffer */
+			m68ki_fake_pull_32();   /* $1c: internal registers */
+			m68ki_fake_pull_32();   /* $20:  */
+			m68ki_fake_pull_32();   /* $24: stage B address */
+			m68ki_fake_pull_32();   /* $28:  */
+			m68ki_fake_pull_32();   /* $2c: data input buffer */
+			m68ki_fake_pull_32();   /* $30:  */
+			m68ki_fake_pull_16();   /* $34:  */
+			m68ki_fake_pull_16();   /* $36: version #, internal information */
+			m68ki_fake_pull_32();   /* $38:  */
+			m68ki_fake_pull_32();   /* $3c:  */
+			m68ki_fake_pull_32();   /* $40:  */
+			m68ki_fake_pull_32();   /* $44:  */
+			m68ki_fake_pull_32();   /* $48:  */
+			m68ki_fake_pull_32();   /* $4c:  */
+			m68ki_fake_pull_32();   /* $50:  */
+			m68ki_fake_pull_32();   /* $54:  */
+			m68ki_fake_pull_32();   /* $58:  */
+
+			m68ki_jump(new_pc);
+			m68ki_set_sr(new_sr);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			break;
+
+		default:
+			/* Not handling long or short bus fault */
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			m68ki_exception_format_error();
+			break;
+		}
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+06c0 fff0 rtm      l .          234fc:19
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	logerror("%s at %08x: called unimplemented instruction %04x (rtm)\n",
+					tag(), m_ppc, m_ir);
+
+
+4e77 ffff rtr      l .          071:20 234fc:14
+	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
+	m68ki_set_ccr(m68ki_pull_16());
+	m68ki_jump(m68ki_pull_32());
+
+
+4e75 ffff rts      l .          071:16 234fc:10
+	m68ki_trace_t0();                  /* auto-disable (see m68kcpu.h) */
+	m68ki_jump(m68ki_pull_32());
+
+
+8100 f1f8 sbcd     b .          071:6 234fc:4
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 0xf)
+		corf = 6;
+	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
+	m_v_flag = res; /* Undefined V behavior */
+	if(res > 0xff) {
+		res += 0xa0;
+		m_x_flag = m_c_flag = CFLAG_SET;
+	} else if(res < corf)
+		m_x_flag = m_c_flag = CFLAG_SET;
+	else
+		m_n_flag = m_x_flag = m_c_flag = 0;
+
+	res = MASK_OUT_ABOVE_8(res - corf);
+
+	m_v_flag &= ~res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+
+8f08 fff8 sbcd     b .          071:18 234fc:16
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 0xf)
+		corf = 6;
+	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
+	m_v_flag = res; /* Undefined V behavior */
+	if(res > 0xff) {
+		res += 0xa0;
+		m_x_flag = m_c_flag = CFLAG_SET;
+	} else if(res < corf)
+		m_x_flag = m_c_flag = CFLAG_SET;
+	else
+		m_n_flag = m_x_flag = m_c_flag = 0;
+
+	res = MASK_OUT_ABOVE_8(res - corf);
+
+	m_v_flag &= ~res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+810f f1ff sbcd     b .          071:18 234fc:16
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 0xf)
+		corf = 6;
+	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
+	m_v_flag = res; /* Undefined V behavior */
+	if(res > 0xff) {
+		res += 0xa0;
+		m_x_flag = m_c_flag = CFLAG_SET;
+	} else if(res < corf)
+		m_x_flag = m_c_flag = CFLAG_SET;
+	else
+		m_n_flag = m_x_flag = m_c_flag = 0;
+
+	res = MASK_OUT_ABOVE_8(res - corf);
+
+	m_v_flag &= ~res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+8f0f ffff sbcd     b .          071:18 234fc:16
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 0xf)
+		corf = 6;
+	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
+	m_v_flag = res; /* Undefined V behavior */
+	if(res > 0xff) {
+		res += 0xa0;
+		m_x_flag = m_c_flag = CFLAG_SET;
+	} else if(res < corf)
+		m_x_flag = m_c_flag = CFLAG_SET;
+	else
+		m_n_flag = m_x_flag = m_c_flag = 0;
+
+	res = MASK_OUT_ABOVE_8(res - corf);
+
+	m_v_flag &= ~res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+8108 f1f8 sbcd     b .          071:18 234fc:16
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = LOW_NIBBLE(dst) - LOW_NIBBLE(src) - XFLAG_1();
+	u32 corf = 0;
+
+	if(res > 0xf)
+		corf = 6;
+	res += HIGH_NIBBLE(dst) - HIGH_NIBBLE(src);
+	m_v_flag = res; /* Undefined V behavior */
+	if(res > 0xff) {
+		res += 0xa0;
+		m_x_flag = m_c_flag = CFLAG_SET;
+	} else if(res < corf)
+		m_x_flag = m_c_flag = CFLAG_SET;
+	else
+		m_n_flag = m_x_flag = m_c_flag = 0;
+
+	res = MASK_OUT_ABOVE_8(res - corf);
+
+	m_v_flag &= ~res; /* Undefined V behavior part II */
+	m_n_flag = NFLAG_8(res); /* Undefined N behavior */
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+50c0 fff8 st       b .          07:6 1234fc:4
+	DY() |= 0xff;
+
+
+50c0 ffc0 st       b A+-DXWL    071:8 234fc:6
+	m68ki_write_8(M68KMAKE_GET_EA_AY_8, 0xff);
+
+
+51c0 fff8 sf       b .          071234fc:4
+	DY() &= 0xffffff00;
+
+
+51c0 ffc0 sf       b A+-DXWL    071:8 234fc:6
+	m68ki_write_8(M68KMAKE_GET_EA_AY_8, 0);
+
+
+50c0 f0f8 scc      b .          071234fc:4
+	if(M68KMAKE_CC) {
+		DY() |= 0xff;
+		m_icount -= m_cyc_scc_r_true;
+
+	} else {
+		DY() &= 0xffffff00;
+	}
+
+
+50c0 f0c0 scc      b A+-DXWL    071:8 234fc:6
+	m68ki_write_8(M68KMAKE_GET_EA_AY_8, M68KMAKE_CC ? 0xff : 0);
+
+
+4e72 ffff stop     . .          071:4p 234fc:8p
+	if(m_s_flag) {
+		u32 new_sr = OPER_I_16();
+		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+		m_stopped |= STOP_LEVEL_STOP;
+		m68ki_set_sr(new_sr);
+		m_icount = 0;
+	} else {
+		m68ki_exception_privilege_violation();
+	}
+
+
+9000 f1f8 sub      b .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+9000 f1c0 sub      b A+-DXWLdxI 071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_8;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+9040 f1f8 sub      w .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+9048 f1f8 sub      w .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(AY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+9040 f1c0 sub      w A+-DXWLdxI 071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_16;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+9080 f1f8 sub      l .          071:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+9088 f1f8 sub      l .          071:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = AY();
+	u32 dst = *r_dst;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+9080 f1c0 sub      l A+-DXWLdxI 071:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+	u32 dst = *r_dst;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+
+	*r_dst = m_not_z_flag;
+
+
+9100 f1c0 sub      b A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 src = MASK_OUT_ABOVE_8(DX());
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+9140 f1c0 sub      w A+-DXWL    071:8 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 src = MASK_OUT_ABOVE_16(DX());
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+9180 f1c0 sub      l A+-DXWL    071:12 234fc:4
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 src = DX();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+
+	m68ki_write_32(ea, m_not_z_flag);
+
+
+90c0 f1f8 suba     w .          071:8 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(DY()));
+
+
+90c8 f1f8 suba     w .          071:8 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - MAKE_INT_16(AY()));
+
+
+90c0 f1c0 suba     w A+-DXWLdxI 071:8 234fc:2
+	u32* r_dst = &AX();
+	u32 src = MAKE_INT_16(M68KMAKE_GET_OPER_AY_16);
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - src);
+
+
+91c0 f1f8 suba     l .          071:6 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - DY());
+
+
+91c8 f1f8 suba     l .          071:6 234fc:2
+	u32* r_dst = &AX();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - AY());
+
+
+91c0 f1c0 suba     l A+-DXWLdxI 071:6 234fc:2
+	u32* r_dst = &AX();
+	u32 src = M68KMAKE_GET_OPER_AY_32;
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - src);
+
+
+0400 fff8 subi     b .          071:8 234fc:2
+	u32* r_dst = &DY();
+	u32 src = OPER_I_8();
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+0400 ffc0 subi     b A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_8();
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+0440 fff8 subi     w .          071:8 234fc:2
+	u32* r_dst = &DY();
+	u32 src = OPER_I_16();
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+0440 ffc0 subi     w A+-DXWL    071:12 234fc:4
+	u32 src = OPER_I_16();
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+0480 fff8 subi     l .          07:16 1:14 234fc:2
+	u32* r_dst = &DY();
+	u32 src = OPER_I_32();
+	u32 dst = *r_dst;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+
+	*r_dst = m_not_z_flag;
+
+
+0480 ffc0 subi     l A+-DXWL    071:20 234fc:4
+	u32 src = OPER_I_32();
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+
+	m68ki_write_32(ea, m_not_z_flag);
+
+
+5100 f1f8 subq     b .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | m_not_z_flag;
+
+
+5100 f1c0 subq     b A+-DXWL    071:8 234fc:4
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = MASK_OUT_ABOVE_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	m68ki_write_8(ea, m_not_z_flag);
+
+
+5140 f1f8 subq     w .          071:4 234fc:2
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | m_not_z_flag;
+
+
+5148 f1f8 subq     w .          07:8 1:4 234fc:2
+	u32* r_dst = &AY();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - ((((m_ir >> 9) - 1) & 7) + 1));
+
+
+5140 f1c0 subq     w A+-DXWL    071:8 234fc:4
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_16;
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = MASK_OUT_ABOVE_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+
+	m68ki_write_16(ea, m_not_z_flag);
+
+
+5180 f1f8 subq     l .          071:8 234fc:2
+	u32* r_dst = &DY();
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 dst = *r_dst;
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+
+	*r_dst = m_not_z_flag;
+
+
+5188 f1f8 subq     l .          071:8 234fc:2
+	u32* r_dst = &AY();
+
+	*r_dst = MASK_OUT_ABOVE_32(*r_dst - ((((m_ir >> 9) - 1) & 7) + 1));
+
+
+5180 f1c0 subq     l A+-DXWL    071:12 234fc:4
+	u32 src = (((m_ir >> 9) - 1) & 7) + 1;
+	u32 ea = M68KMAKE_GET_EA_AY_32;
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = MASK_OUT_ABOVE_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+
+	m68ki_write_32(ea, m_not_z_flag);
+
+
+9100 f1f8 subx     b .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_8(DY());
+	u32 dst = MASK_OUT_ABOVE_8(*r_dst);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_8(*r_dst) | res;
+
+
+9140 f1f8 subx     w .          071:4 234fc:2
+	u32* r_dst = &DX();
+	u32 src = MASK_OUT_ABOVE_16(DY());
+	u32 dst = MASK_OUT_ABOVE_16(*r_dst);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+
+	res = MASK_OUT_ABOVE_16(res);
+	m_not_z_flag |= res;
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | res;
+
+
+9180 f1f8 subx     l .          07:8 1:6 234fc:2
+	u32* r_dst = &DX();
+	u32 src = DY();
+	u32 dst = *r_dst;
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+
+	res = MASK_OUT_ABOVE_32(res);
+	m_not_z_flag |= res;
+
+	*r_dst = res;
+
+
+9f08 fff8 subx     b .          071:18 234fc:12
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+910f f1ff subx     b .          071:18 234fc:12
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+9f0f ffff subx     b .          071:18 234fc:12
+	u32 src = OPER_A7_PD_8();
+	u32 ea  = EA_A7_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+9108 f1f8 subx     b .          071:18 234fc:12
+	u32 src = OPER_AY_PD_8();
+	u32 ea  = EA_AX_PD_8();
+	u32 dst = m68ki_read_8(ea);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_8(res);
+	m_x_flag = m_c_flag = CFLAG_8(res);
+	m_v_flag = VFLAG_SUB_8(src, dst, res);
+
+	res = MASK_OUT_ABOVE_8(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_8(ea, res);
+
+
+9148 f1f8 subx     w .          071:18 234fc:12
+	u32 src = OPER_AY_PD_16();
+	u32 ea  = EA_AX_PD_16();
+	u32 dst = m68ki_read_16(ea);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_16(res);
+	m_x_flag = m_c_flag = CFLAG_16(res);
+	m_v_flag = VFLAG_SUB_16(src, dst, res);
+
+	res = MASK_OUT_ABOVE_16(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_16(ea, res);
+
+
+9188 f1f8 subx     l .          071:30 234fc:12
+	u32 src = OPER_AY_PD_32();
+	u32 ea  = EA_AX_PD_32();
+	u32 dst = m68ki_read_32(ea);
+	u32 res = dst - src - XFLAG_1();
+
+	m_n_flag = NFLAG_32(res);
+	m_x_flag = m_c_flag = CFLAG_SUB_32(src, dst, res);
+	m_v_flag = VFLAG_SUB_32(src, dst, res);
+
+	res = MASK_OUT_ABOVE_32(res);
+	m_not_z_flag |= res;
+
+	m68ki_write_32(ea, res);
+
+
+4840 fff8 swap     l .          071234fc:4
+	u32* r_dst = &DY();
+
+	m_not_z_flag = MASK_OUT_ABOVE_32(*r_dst<<16);
+	*r_dst = (*r_dst>>16) | m_not_z_flag;
+
+	m_not_z_flag = *r_dst;
+	m_n_flag = NFLAG_32(*r_dst);
+	m_c_flag = CFLAG_CLEAR;
+	m_v_flag = VFLAG_CLEAR;
+
+
+4ac0 fff8 tas      b .          071234fc:4
+	u32* r_dst = &DY();
+
+	m_not_z_flag = MASK_OUT_ABOVE_8(*r_dst);
+	m_n_flag = NFLAG_8(*r_dst);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+	*r_dst |= 0x80;
+
+
+4ac0 ffc0 tas      b A+-DXWL    071:14 234fc:12
+	u32 ea = M68KMAKE_GET_EA_AY_8;
+	u32 dst = m68ki_read_8(ea);
+
+	m_not_z_flag = dst;
+	m_n_flag = NFLAG_8(dst);
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
+	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
+	   bus implementation.
+	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
+	   to fail to write back in order to function properly. */
+	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
+		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+	else
+		m68ki_write_8(ea, dst | 0x80);
+
+
+4e40 fff0 trap     . .          071234fc:4
+	/* Trap#n stacks exception frame type 0 */
+	m68ki_exception_trapN(EXCEPTION_TRAP_BASE + (m_ir & 0xf));    /* HJB 990403 */
+
+
+50fc ffff trapt    . .          234fc:4
+	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+
+
+50fa ffff trapt    w .          234fc:6
+	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+
+
+50fb ffff trapt    l .          234fc:8
+	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+
+
+51fc ffff trapf    . .          234fc:4
+
+
+51fa ffff trapf    w .          234fc:6
+	m_pc += 2;
+
+
+51fb ffff trapf    l .          234fc:8
+	m_pc += 4;
+
+
+50fc f0ff trapcc   . .          234fc:4
+	if(M68KMAKE_CC)
+		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+
+
+50fa f0ff trapcc   w .          234fc:6
+	if(M68KMAKE_CC) {
+		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+	} else {
+		m_pc += 2;
+	}
+
+
+50fb f0ff trapcc   l .          234fc:8
+	if(M68KMAKE_CC) {
+		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+	} else {
+		m_pc += 4;
+	}
+
+
+4e76 ffff trapv    . .          071234fc:4
+	if(!COND_VC()) {
+		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
+	}
+
+
+4a00 fff8 tst      b .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_8(DY());
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a00 ffc0 tst      b A+-DXWL    071:4 234fc:2
+	u32 res = M68KMAKE_GET_OPER_AY_8;
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a3a ffff tst      b .          234fc:7
+	u32 res = OPER_PCDI_8();
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a3b ffff tst      b .          234fc:9
+	u32 res = OPER_PCIX_8();
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a3c ffff tst      b .          234fc:6
+	u32 res = OPER_I_8();
+
+	m_n_flag = NFLAG_8(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a40 fff8 tst      w .          071:4 234fc:2
+	u32 res = MASK_OUT_ABOVE_16(DY());
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a48 fff8 tst      w .          234fc:2
+	u32 res = MAKE_INT_16(AY());
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a40 ffc0 tst      w A+-DXWL    071:4 234fc:2
+	u32 res = M68KMAKE_GET_OPER_AY_16;
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a7a ffff tst      w .          234fc:7
+	u32 res = OPER_PCDI_16();
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a7b ffff tst      w .          234fc:9
+	u32 res = OPER_PCIX_16();
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a7c ffff tst      w .          234fc:6
+	u32 res = OPER_I_16();
+
+	m_n_flag = NFLAG_16(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a80 fff8 tst      l .          071:4 234fc:2
+	u32 res = DY();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a88 fff8 tst      l .          234fc:2
+	u32 res = AY();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4a80 ffc0 tst      l A+-DXWL    071:4 234fc:2
+	u32 res = M68KMAKE_GET_OPER_AY_32;
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4aba ffff tst      l .          234fc:7
+	u32 res = OPER_PCDI_32();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4abb ffff tst      l .          234fc:9
+	u32 res = OPER_PCIX_32();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4abc ffff tst      l .          234fc:6
+	u32 res = OPER_I_32();
+
+	m_n_flag = NFLAG_32(res);
+	m_not_z_flag = res;
+	m_v_flag = VFLAG_CLEAR;
+	m_c_flag = CFLAG_CLEAR;
+
+
+4e5f ffff unlk     l .          071:12 234fc:6
+	REG_A()[7] = m68ki_read_32(REG_A()[7]);
+
+
+4e58 fff8 unlk     l .          071:12 234fc:6
+	u32* r_dst = &AY();
+
+	REG_A()[7] = *r_dst;
+	*r_dst = m68ki_pull_32();
+
+
+8180 f1f8 unpk     w .          234fc:8
+	/* Note: DX() and DY() are reversed in Motorola's docs */
+	u32 src = DY();
+	u32* r_dst = &DX();
+
+	*r_dst = MASK_OUT_BELOW_16(*r_dst) | (((((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16()) & 0xffff);
+
+
+8f88 fff8 unpk     w .          234fc:13
+	/* Note: AX and AY are reversed in Motorola's docs */
+	u32 src = OPER_AY_PD_8();
+	u32 ea_dst;
+
+	src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
+		ea_dst = EA_A7_PD_8();
+	m68ki_write_8(ea_dst, src & 0xff);
+	ea_dst = EA_A7_PD_8();
+	m68ki_write_8(ea_dst, (src >> 8) & 0xff);
+
+
+818f f1ff unpk     w .          234fc:13
+	/* Note: AX and AY are reversed in Motorola's docs */
+	u32 src = OPER_A7_PD_8();
+	u32 ea_dst;
+
+	src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
+	ea_dst = EA_AX_PD_8();
+	m68ki_write_8(ea_dst, src & 0xff);
+	ea_dst = EA_AX_PD_8();
+	m68ki_write_8(ea_dst, (src >> 8) & 0xff);
+
+
+8f8f ffff unpk     w .          234fc:13
+	u32 src = OPER_A7_PD_8();
+	u32 ea_dst;
+
+	src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
+	ea_dst = EA_A7_PD_8();
+	m68ki_write_8(ea_dst, src & 0xff);
+	ea_dst = EA_A7_PD_8();
+	m68ki_write_8(ea_dst, (src >> 8) & 0xff);
+
+
+8188 f1f8 unpk     w .          234fc:13
+	/* Note: AX and AY are reversed in Motorola's docs */
+	u32 src = OPER_AY_PD_8();
+	u32 ea_dst;
+
+	src = (((src << 4) & 0x0f00) | (src & 0x000f)) + OPER_I_16();
+	ea_dst = EA_AX_PD_8();
+	m68ki_write_8(ea_dst, src & 0xff);
+	ea_dst = EA_AX_PD_8();
+	m68ki_write_8(ea_dst, (src >> 8) & 0xff);
+
+
+f400 ff20 cinv     l .          4:16
+	u16 ir = m_ir;
+	u8 cache = (ir >> 6) & 3;
+	//  u8 scope = (ir >> 3) & 3;
+	//  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
+	switch (cache) {
+	case 2:
+	case 3:
+		// we invalidate/push the whole instruction cache
+		m68ki_ic_clear();
+		break;
+	default:
+		m68ki_exception_1111();
+		break;
+	}
+
+
+f420 ff20 cpush    l .          4:16
+	logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
+					tag(), m_ppc, m_ir);
+
+

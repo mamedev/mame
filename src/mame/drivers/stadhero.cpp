@@ -213,8 +213,6 @@ void stadhero_state::stadhero(machine_config &config)
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_gfx_region(2);
-	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

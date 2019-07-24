@@ -775,18 +775,18 @@ public:
 	memory_array &extmem() { return m_extmem; }
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(write8);
-	DECLARE_WRITE16_MEMBER(write16);
-	DECLARE_WRITE32_MEMBER(write32);
-	DECLARE_WRITE8_MEMBER(write8_ext);
-	DECLARE_WRITE16_MEMBER(write16_ext);
-	DECLARE_WRITE32_MEMBER(write32_ext);
+	void write8(offs_t offset, u8 data);
+	void write16(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void write32(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void write8_ext(offs_t offset, u8 data);
+	void write16_ext(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void write32_ext(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	// optional memory accessors
-	u32 basemem_read(int index) { return m_basemem.read(index); }
-	u32 extmem_read(int index) { return m_extmem.read(index); }
-	void basemem_write(int index, u32 data) { m_basemem.write(index, data); mark_tile_dirty(index); }
-	void extmem_write(int index, u32 data) { m_extmem.write(index, data); mark_tile_dirty(index); }
+	u32 basemem_read(offs_t offset) { return m_basemem.read(offset); }
+	u32 extmem_read(offs_t offset) { return m_extmem.read(offset); }
+	void basemem_write(offs_t offset, u32 data) { m_basemem.write(offset, data); mark_tile_dirty(offset); }
+	void extmem_write(offs_t offset, u32 data) { m_extmem.write(offset, data); mark_tile_dirty(offset); }
 
 	// pick one to use to avoid ambiguity errors
 	using device_t::machine;

@@ -57,59 +57,56 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_post_load() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_READ16_MEMBER(lan_status_r);
-	DECLARE_WRITE16_MEMBER(rotate_port_w);
-	DECLARE_READ16_MEMBER(adinput_r);
-	DECLARE_WRITE16_MEMBER(adinput_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(pivram_word_w);
-	DECLARE_WRITE16_MEMBER(piv_ctrl_word_w);
+	void coins_w(u8 data);
+	void cpua_ctrl_w(u16 data);
+	u16 lan_status_r();
+	void rotate_port_w(offs_t offset, u16 data);
+	u16 adinput_r(offs_t offset);
+	void adinput_w(u16 data);
+	void sound_bankswitch_w(u8 data);
+	void pivram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void piv_ctrl_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	DECLARE_VIDEO_START(wgp2);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpub_interrupt);
 
 	void cpu2_map(address_map &map);
 	void main_map(address_map &map);
 	void z80_sound_map(address_map &map);
 
-	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
-	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
-	TILE_GET_INFO_MEMBER(get_piv2_tile_info);
+	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_piv_tile_info);
 
-	void postload();
-	inline void common_get_piv_tile_info(tile_data &tileinfo, int tile_index, int num);
 	void core_vh_start(int piv_xoffs, int piv_yoffs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
-	void piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
+	void piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority);
 	void parse_control();
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_spritemap;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_pivram;
-	required_shared_ptr<uint16_t> m_piv_ctrlram;
+	required_shared_ptr<u16> m_spritemap;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_pivram;
+	required_shared_ptr<u16> m_piv_ctrlram;
 
 	/* video-related */
-	tilemap_t   *m_piv_tilemap[3];
-	uint16_t      m_piv_ctrl_reg;
-	uint16_t      m_piv_zoom[3];
-	uint16_t      m_piv_scrollx[3];
-	uint16_t      m_piv_scrolly[3];
-	uint16_t      m_rotate_ctrl[8];
-	int         m_piv_xoffs;
-	int         m_piv_yoffs;
-	uint8_t       m_dislayer[4];
+	tilemap_t *m_piv_tilemap[3];
+	u16       m_piv_ctrl_reg;
+	u16       m_piv_zoom[3];
+	u16       m_piv_scrollx[3];
+	u16       m_piv_scrolly[3];
+	u16       m_rotate_ctrl[8];
+	int       m_piv_xoffs;
+	int       m_piv_yoffs;
+	u8        m_dislayer[4];
 
 	/* misc */
-	uint16_t      m_cpua_ctrl;
-	uint16_t      m_port_sel;
-	emu_timer     *m_int6_timer;
-	emu_timer     *m_cpub_int6_timer;
+	u16       m_cpua_ctrl;
+	u16       m_port_sel;
+	emu_timer *m_int6_timer;
+	emu_timer *m_cpub_int6_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

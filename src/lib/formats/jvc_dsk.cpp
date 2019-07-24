@@ -164,34 +164,6 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 		break;
 	}
 
-	// os-9 format disk images often don't have a header, but can contain
-	// various geometries. we try to open the file as os-9 image here and
-	// see if the values we get make sense
-	if (header_size == 0 && size > 0x20)
-	{
-		uint8_t os9_header[0x20];
-		io_generic_read(io, os9_header, 0, 0x20);
-
-		int os9_total_sectors = pick_integer_be(os9_header, 0x00, 3);
-		int os9_heads = BIT(os9_header[0x10], 0) ? 2 : 1;
-		int os9_sectors = pick_integer_be(os9_header, 0x11, 2);
-
-		if (os9_total_sectors > 0 && os9_heads > 0 && os9_sectors > 0)
-		{
-			int os9_tracks = os9_total_sectors / os9_sectors / os9_heads;
-
-			// now let's see if we have valid info
-			if ((os9_tracks * os9_heads * os9_sectors * 256) == size)
-			{
-				tracks = os9_tracks;
-				heads = os9_heads;
-				sectors = os9_sectors;
-
-				osd_printf_verbose("OS-9 format disk image detected.\n");
-			}
-		}
-	}
-
 	osd_printf_verbose("Floppy disk image geometry: %d tracks, %d head(s), %d sectors with %d bytes.\n", tracks, heads, sectors, sector_size);
 
 	return tracks * heads * sectors * sector_size == (size - header_size);
@@ -223,19 +195,20 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			desc_pc_sector sectors[256];
 			uint8_t sector_data[10000];
 			int sector_offset = 0;
-
+			// standard RS-DOS interleave
+			static constexpr int interleave[18] = { 0, 11, 4, 15, 8, 1, 12, 5, 16, 9, 2, 13, 6, 17, 10, 3, 14, 7 };
 			for (int i = 0; i < sector_count; i++)
 			{
-				sectors[i].track = track;
-				sectors[i].head = head;
-				sectors[i].sector = sector_base_id + i;
-				sectors[i].actual_size = sector_size;
-				sectors[i].size = sector_size >> 8;
-				sectors[i].deleted = false;
-				sectors[i].bad_crc = false;
-				sectors[i].data = &sector_data[sector_offset];
+				sectors[interleave[i]].track = track;
+				sectors[interleave[i]].head = head;
+				sectors[interleave[i]].sector = sector_base_id + i;
+				sectors[interleave[i]].actual_size = sector_size;
+				sectors[interleave[i]].size = sector_size >> 8;
+				sectors[interleave[i]].deleted = false;
+				sectors[interleave[i]].bad_crc = false;
+				sectors[interleave[i]].data = &sector_data[sector_offset];
 
-				io_generic_read(io, sectors[i].data, file_offset, sector_size);
+				io_generic_read(io, sectors[interleave[i]].data, file_offset, sector_size);
 
 				sector_offset += sector_size;
 				file_offset += sector_size;

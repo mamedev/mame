@@ -7,6 +7,7 @@
 
 #include "nld_2102A.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 #define ADDR2BYTE(a)    ((a) >> 3)
 #define ADDR2BIT(a)     ((a) & 0x7)
@@ -25,6 +26,7 @@ namespace netlist
 		, m_DO(*this, "DO")
 		, m_ram(*this, "m_ram", 0)
 		, m_RAM(*this, "m_RAM", &m_ram[0])
+		, m_power_pins(*this)
 		{
 		}
 
@@ -41,6 +43,7 @@ namespace netlist
 
 		state_array<uint8_t, 128> m_ram; // 1024x1 bits
 		param_ptr_t m_RAM;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(2102A_dip, 2102A)
@@ -63,6 +66,10 @@ namespace netlist
 
 			register_subalias("11",    m_DI);
 			register_subalias("12",    m_DO);
+
+			register_subalias("10",    "VCC");
+			register_subalias("9",     "GND");
+
 		}
 	};
 
@@ -97,7 +104,7 @@ namespace netlist
 			m_ram[i] = 0;
 	}
 
-	NETLIB_DEVICE_IMPL(2102A,    "RAM_2102A",   "+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI")
+	NETLIB_DEVICE_IMPL(2102A,    "RAM_2102A",   "+CEQ,+A0,+A1,+A2,+A3,+A4,+A5,+A6,+A7,+A8,+A9,+RWQ,+DI,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(2102A_dip,"RAM_2102A_DIP","")
 
 	} //namespace devices

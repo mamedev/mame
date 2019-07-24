@@ -72,17 +72,20 @@ public:
 	void k3(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(bgram_w);
-	DECLARE_WRITE16_MEMBER(scrollx_w);
-	DECLARE_WRITE16_MEMBER(scrolly_w);
-	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
-	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
+	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scrollx_w(u16 data);
+	void scrolly_w(u16 data);
+	void k3_soundbanks_w(u16 data);
+	void flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void video_start() override;
 
+	void k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color, bool flicker);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void k3_map(address_map &map);
 	void flagrall_map(address_map &map);
@@ -91,8 +94,8 @@ private:
 	/* devices */
 	optional_device_array<okim6295_device, 2> m_oki;
 	/* memory pointers */
-	required_shared_ptr_array<uint16_t, 2> m_spriteram;
-	required_shared_ptr<uint16_t> m_bgram;
+	required_shared_ptr_array<u16, 2> m_spriteram;
+	required_shared_ptr<u16> m_bgram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -103,7 +106,7 @@ private:
 };
 
 
-WRITE16_MEMBER(k3_state::bgram_w)
+void k3_state::bgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -120,31 +123,103 @@ void k3_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
+void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color, bool flicker)
+{
+	/* Start drawing */
+	const u16 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
+
+	int xinc = flipx ? -1 : 1;
+	int yinc = flipy ? -1 : 1;
+
+	int x_index_base = flipx ? gfx->width() - 1 : 0;
+	int y_index = flipy ? gfx->height() - 1 : 0;
+
+	// start coordinates
+	int sx = offsx;
+	int sy = offsy;
+
+	// end coordinates
+	int ex = sx + gfx->width();
+	int ey = sy + gfx->height();
+
+	if (sx < clip.min_x)
+	{ // clip left
+		int pixels = clip.min_x - sx;
+		sx += pixels;
+		x_index_base += xinc * pixels;
+	}
+	if (sy < clip.min_y)
+	{ // clip top
+		int pixels = clip.min_y - sy;
+		sy += pixels;
+		y_index += yinc * pixels;
+	}
+	// NS 980211 - fixed incorrect clipping
+	if (ex > clip.max_x + 1)
+	{ // clip right
+		ex = clip.max_x + 1;
+	}
+	if (ey > clip.max_y + 1)
+	{ // clip bottom
+		ey = clip.max_y + 1;
+	}
+
+	if (ex > sx)
+	{ // skip if inner loop doesn't draw anything
+		for (int y = sy; y < ey; y++)
+		{
+			const u8 *source = source_base + y_index * gfx->rowbytes();
+			u16 *dest = &dest_bmp.pix16(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
+			{
+				u8 c = source[x_index];
+				if (c != transparent_color)
+				{
+					if (flicker) // verified from PCB (reference : https://www.youtube.com/watch?v=ooXyyvpW1O0)
+					{
+						dest[x] = pal | 0xff;
+					}
+					else
+					{
+						dest[x] = pal | c;
+					}
+				}
+				x_index += xinc;
+			}
+			y_index += yinc;
+		}
+	}
+}
+
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint16_t *source = m_spriteram[0];
-	uint16_t *source2 = m_spriteram[1];
-	uint16_t *finish = source + 0x1000 / 2; // TODO : Not of all spriteram are used
+	u16 *source = m_spriteram[0];
+	u16 *source2 = m_spriteram[1];
+	u16 *finish = source + 0x1000 / 2; // TODO : Not of all spriteram are used
 
 	while (source < finish)
 	{
 		int xpos = (source[0] & 0xff00) >> 8 | (source2[0] & 0x0001) << 8;
 		int ypos = (source[0] & 0x00ff) >> 0;
-		int tileno = (source2[0] & 0x7ffe) >> 1;
-		int color = BIT(source2[0], 15) ? 0 : 1;
+		u32 tileno = (source2[0] & 0x7ffe) >> 1;
+		bool flicker = BIT(source2[0], 15);
 
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos, 0);
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos - 0x100, 0); // wrap
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos, 0); // wrap
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos, ypos, 0, flicker);
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos, ypos - 0x100, 0, flicker); // wrap
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos - 0x200, ypos, 0, flicker); // wrap
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos - 0x200, ypos - 0x100, 0, flicker); // wrap
 
 		source++;
 		source2++;
 	}
 }
 
-uint32_t k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -152,23 +227,23 @@ uint32_t k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-WRITE16_MEMBER(k3_state::scrollx_w)
+void k3_state::scrollx_w(u16 data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(k3_state::scrolly_w)
+void k3_state::scrolly_w(u16 data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE16_MEMBER(k3_state::k3_soundbanks_w)
+void k3_state::k3_soundbanks_w(u16 data)
 {
 	m_oki[1]->set_rom_bank(BIT(data, 2));
 	m_oki[0]->set_rom_bank(BIT(data, 1));
 }
 
-WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
+void k3_state::flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data &= mem_mask;
 

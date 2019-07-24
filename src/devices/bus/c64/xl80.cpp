@@ -126,7 +126,7 @@ GFXDECODE_END
 void c64_xl80_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::white()));
-	screen.set_screen_update(HD46505SP_TAG, FUNC(h46505_device::screen_update));
+	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_size(80*8, 24*8);
 	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
 	screen.set_refresh_hz(50);
@@ -134,7 +134,7 @@ void c64_xl80_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_c64_xl80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	H46505(config, m_crtc, XTAL(14'318'181) / 8);
+	HD6845S(config, m_crtc, XTAL(14'318'181) / 8);
 	m_crtc->set_screen(MC6845_SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);

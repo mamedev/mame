@@ -213,7 +213,7 @@ READ8_MEMBER( vtech1_state::vtech1_keyboard_r )
 	if (!BIT(offset, 7)) result &= ioport("keyboard_7")->read();
 
 	// bit 6, cassette input
-	result |= ((m_cassette->input()) > 0 ? 1 : 0) << 6;
+	result |= (m_cassette->input() > 0.04) ? 0 : 0x40;
 
 	// bit 7, field sync
 	result |= m_mc6847->fs_r() << 7;
@@ -239,7 +239,7 @@ WRITE8_MEMBER( vtech1_state::vtech1_latch_w )
 	}
 
 	// bit 2, cassette out (actually bits 1 and 2 perform this function, so either can be used)
-	m_cassette->output( BIT(data, 2) ? -1.0 : +1.0);
+	m_cassette->output( BIT(data, 2) ? 1.0 : -1.0);
 
 	// bit 3 and 4, vdc mode control lines
 	m_mc6847->ag_w(BIT(data, 3));
@@ -446,13 +446,14 @@ void vtech1_state::laser110(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, m_speaker).set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// peripheral and memory expansion slots
 	VTECH_IOEXP_SLOT(config, m_ioexp);
 	m_ioexp->set_io_space(m_maincpu, AS_IO);
+
 	VTECH_MEMEXP_SLOT(config, m_memexp);
 	m_memexp->set_program_space(m_maincpu, AS_PROGRAM);
 	m_memexp->set_io_space(m_maincpu, AS_IO);
@@ -463,7 +464,7 @@ void vtech1_state::laser110(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(vtech1_cassette_formats);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY));
+	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("vtech1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("vz_cass");

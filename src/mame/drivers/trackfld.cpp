@@ -1106,7 +1106,7 @@ void trackfld_state::wizzquiz(machine_config &config)
 	M6800(config.replace(), m_maincpu, 2048000);    /* 1.400 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::wizzquiz_map);
 
-	m_screen->set_screen_vblank(DEVCB_WRITELINE(*this, trackfld_state, vblank_nmi));
+	m_screen->screen_vblank().set(FUNC(trackfld_state::vblank_nmi));
 
 	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::nmi_mask_w));
 }

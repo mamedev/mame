@@ -7,18 +7,25 @@
 
 #include "emupal.h"
 
+enum {
+	TC0100SCN_LAYOUT_DEFAULT = 0,
+	TC0100SCN_LAYOUT_1BPP
+};
+
+enum {
+	TC0620SCC_LAYOUT_DEFAULT = 0 // default TC0620SCC layout is 6bpp
+};
+
 typedef device_delegate<void (u32 *code, u16 *color)> tc0100scn_cb_delegate;
 #define TC0100SCN_CB_MEMBER(_name)   void _name(u32 *code, u16 *color)
 
-class tc0100scn_device : public device_t, public device_gfx_interface
+class tc0100scn_base_device : public device_t, public device_gfx_interface
 {
 public:
-	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfxlayout(int layout) { m_gfxlayout = layout; }
+	void set_color_base(u16 base) { m_col_base = base; }
 	template <typename... T> void set_tile_callback(T &&... args) { m_tc0100scn_cb = tc0100scn_cb_delegate(std::forward<T>(args)...); }
-	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_multiscr_xoffs(int xoffs) { m_multiscrn_xoffs = xoffs; }
 	void set_multiscr_hack(int hack) { m_multiscrn_hack = hack; }
 	void set_offsets(int x_offset, int y_offset)
@@ -57,11 +64,14 @@ public:
 	int bottomlayer();
 
 protected:
+	tc0100scn_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
+	int          m_gfxlayout;
 private:
 	// internal state
 	tc0100scn_cb_delegate   m_tc0100scn_cb;
@@ -82,14 +92,13 @@ private:
 	int          m_dblwidth;
 	bool         m_dirty;
 
-	int          m_gfxnum;
 	int          m_x_offset, m_y_offset;
 	int          m_flip_xoffs, m_flip_yoffs;
 	int          m_flip_text_xoffs, m_flip_text_yoffs;
 	int          m_multiscrn_xoffs;
 	int          m_multiscrn_hack;
 
-	required_device<gfxdecode_device> m_gfxdecode;
+	u16          m_col_base;
 
 	template<unsigned Offset, unsigned Colbank> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	template<unsigned Offset, unsigned Gfx> TILE_GET_INFO_MEMBER(get_tx_tile_info);
@@ -99,6 +108,36 @@ private:
 	void restore_scroll();
 };
 
+class tc0100scn_device : public tc0100scn_base_device
+{
+public:
+	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_default);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_1bpp);
+};
+
+class tc0620scc_device : public tc0100scn_base_device
+{
+public:
+	tc0620scc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_6bpp);
+};
+
 DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
+DECLARE_DEVICE_TYPE(TC0620SCC, tc0620scc_device)
 
 #endif // MAME_VIDEO_TC0100SCN_H

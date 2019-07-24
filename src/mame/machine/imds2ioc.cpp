@@ -626,13 +626,13 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	m_iocfdc->drq_wr_callback().set(m_iocdma, FUNC(i8257_device::dreq1_w));
 	FLOPPY_CONNECTOR(config, "iocfdc:0", imds2_floppies, "8sssd", floppy_image_device::default_floppy_formats, true);
 
-	I8041(config, m_iocpio, IOC_XTAL_Y3);
+	I8041A(config, m_iocpio, IOC_XTAL_Y3);
 	m_iocpio->p1_in_cb().set(FUNC(imds2ioc_device::pio_port_p1_r));
 	m_iocpio->p1_out_cb().set(FUNC(imds2ioc_device::pio_port_p1_w));
 	m_iocpio->p2_in_cb().set(FUNC(imds2ioc_device::pio_port_p2_r));
 	m_iocpio->p2_out_cb().set(FUNC(imds2ioc_device::pio_port_p2_w));
 
-	I8741(config, m_kbcpu, 3.579545_MHz_XTAL);
+	I8741A(config, m_kbcpu, 3.579545_MHz_XTAL);
 	m_kbcpu->p1_out_cb().set(FUNC(imds2ioc_device::kb_port_p1_w));
 	m_kbcpu->p2_in_cb().set(FUNC(imds2ioc_device::kb_port_p2_r));
 	m_kbcpu->t0_in_cb().set(FUNC(imds2ioc_device::kb_port_t0_r));

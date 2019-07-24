@@ -338,8 +338,6 @@ void pt68k4_state::machine_reset()
 	uint8_t* user1 = memregion("roms")->base();
 	memcpy((uint8_t*)m_p_base.target(), user1, 8);
 
-	m_maincpu->reset();
-
 	m_kclk = true;
 	m_kbit = 0;
 	m_scancode = 0;

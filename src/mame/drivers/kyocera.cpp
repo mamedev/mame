@@ -24,12 +24,6 @@
         * NEC PC-8300 (similar hardware to PC-8201)
         * NEC PC-8300 w/BradyWriter II ROMs
 
-******************************************************************************************/
-
-/*
-
-    TODO:
-
     - bar code reader (!RxDB -> RST5.5, Hewlett-Packard HREDS-3050 interface)
     - un-Y2K-hack tandy200
     - keyboard is unresponsive for couple of seconds after boot
@@ -44,14 +38,12 @@
     - tandy200 RTC alarm
     - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
+    - cassette is not working on pc8201, pc8201a, npc8300
 
     10 FOR A=0 TO 255
     20 PRINT CHR$(A);
     30 NEXT A
 
-*/
-
-/*
 
                           * PC-8201/8300 HARDWARE PORT DEFINITIONS *
 
@@ -63,7 +55,7 @@
     C8255      072  114   Video interface port C (8255)
     CW8255     073  115   Video interface command/mode port (8255)
 
-*/
+******************************************************************************************/
 
 
 #include "emu.h"
@@ -1303,7 +1295,7 @@ WRITE_LINE_MEMBER( kc85_state::kc85_sod_w )
 
 READ_LINE_MEMBER( kc85_state::kc85_sid_r )
 {
-	return m_cassette->input() > 0.0;
+	return (m_cassette->input() > 0.04) ? 0 : 1;
 }
 
 WRITE_LINE_MEMBER( tandy200_state::kc85_sod_w )
@@ -1313,7 +1305,7 @@ WRITE_LINE_MEMBER( tandy200_state::kc85_sod_w )
 
 READ_LINE_MEMBER( tandy200_state::kc85_sid_r )
 {
-	return m_cassette->input() > 0.0;
+	return (m_cassette->input() > 0.04) ? 0 : 1;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)

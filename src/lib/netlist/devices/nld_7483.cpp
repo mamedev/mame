@@ -7,6 +7,7 @@
 
 #include "nld_7483.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -32,6 +33,7 @@ namespace netlist
 		, m_S3(*this, "S3")
 		, m_S4(*this, "S4")
 		, m_C4(*this, "C4")
+		, m_power_pins(*this)
 		{
 		}
 		NETLIB_RESETI();
@@ -59,7 +61,7 @@ namespace netlist
 		logic_output_t m_S3;
 		logic_output_t m_S4;
 		logic_output_t m_C4;
-
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(7483_dip, 7483)
@@ -70,7 +72,7 @@ namespace netlist
 			register_subalias("2", m_S3);
 			register_subalias("3", m_A3);
 			register_subalias("4", m_B3);
-			// register_subalias("5", ); --> VCC
+			register_subalias("5", "VCC");
 			register_subalias("6", m_S2);
 			register_subalias("7", m_B2);
 			register_subalias("8", m_A2);
@@ -78,7 +80,7 @@ namespace netlist
 			register_subalias("9", m_S1);
 			register_subalias("10", m_A1);
 			register_subalias("11", m_B1);
-			// register_subalias("12", ); --> GND
+			register_subalias("12", "GND");
 			register_subalias("13", m_C0);
 			register_subalias("14", m_C4);
 			register_subalias("15", m_S4);
@@ -120,7 +122,7 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(7483, "TTL_7483", "+A1,+A2,+A3,+A4,+B1,+B2,+B3,+B4,+C0")
+	NETLIB_DEVICE_IMPL(7483, "TTL_7483", "+A1,+A2,+A3,+A4,+B1,+B2,+B3,+B4,+C0,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(7483_dip, "TTL_7483_DIP", "")
 
 	} //namespace devices

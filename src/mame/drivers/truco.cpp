@@ -442,7 +442,6 @@ void truco_state::truco(machine_config &config)
 	screen.set_size(256, 192);
 	screen.set_visarea(0, 256-1, 0, 192-1);
 	screen.set_screen_update(FUNC(truco_state::screen_update));
-	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(truco_state::truco_palette), 16);
 

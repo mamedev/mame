@@ -114,9 +114,8 @@ private:
 	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mekd2_quik);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void mekd2_mem(address_map &map);
 
@@ -125,7 +124,7 @@ private:
 	uint8_t m_segment;
 	uint8_t m_digit;
 	uint8_t m_keydata;
-	bool m_cass_state;
+	bool m_cassbit;
 	bool m_cassold;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -304,11 +303,6 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( mekd2_state::cass_w )
-{
-	m_cass_state = state;
-}
-
 QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 {
 	static const char magic[] = "MEK6800D2";
@@ -334,23 +328,23 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 	return image_init_result::PASS;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_w)
 {
 	m_cass_data[3]++;
 
-	if (m_cass_state != m_cassold)
+	if (m_cassbit != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cass_state;
+		m_cassold = m_cassbit;
 	}
 
-	if (m_cass_state)
+	if (m_cassbit)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -404,7 +398,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set(FUNC(mekd2_state::cass_w));
+	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	clock_device &acia_tx_clock(CLOCK(config, "acia_tx_clock", XTAL_MEKD2 / 256)); // 4800Hz
 	acia_tx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
@@ -412,8 +406,8 @@ void mekd2_state::mekd2(machine_config &config)
 	clock_device &acia_rx_clock(CLOCK(config, "acia_rx_clock", 300)); // toggled by cassette circuit
 	acia_rx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_rxc));
 
-	TIMER(config, "mekd2_c").configure_periodic(FUNC(mekd2_state::mekd2_c), attotime::from_hz(4800));
-	TIMER(config, "mekd2_p").configure_periodic(FUNC(mekd2_state::mekd2_p), attotime::from_hz(40000));
+	TIMER(config, "kansas_w").configure_periodic(FUNC(mekd2_state::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(mekd2_state::kansas_r), attotime::from_hz(40000));
 
 	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(mekd2_state, mekd2_quik), this), "d2", attotime::from_seconds(1));
 }

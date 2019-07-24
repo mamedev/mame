@@ -18,8 +18,6 @@
         * in Cruis'n World attract mode, right side of sky looks like it has wrapped
         * Off Road Challenge has polygon sorting issues, among other problems
         * Issues for the Wargods sets:
-           Sound D/RAM      ERROR EE (during boot diag)
-           Listen for Tone  ERROR E1 (during boot diag)
            All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
 
 Known to exist but not dumped:
@@ -590,7 +588,6 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x400000, 0x41ffff).ram();
 	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
 	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
-	map(0x809800, 0x809fff).ram();
 	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
 	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));
@@ -622,7 +619,6 @@ void midvunit_state::midvplus_map(address_map &map)
 	map(0x400000, 0x41ffff).ram().share("fastram_base");
 	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
 	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
-	map(0x809800, 0x809fff).ram();
 	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
 	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));

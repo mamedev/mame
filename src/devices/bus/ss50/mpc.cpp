@@ -136,7 +136,7 @@ void ss50_mpc_device::device_start()
 
 WRITE_LINE_MEMBER(ss50_mpc_device::serial_input_w)
 {
-	m_pia->set_a_input(state << 7, 0x7f);
+	m_pia->write_porta_line(7, state);
 	m_loopback->in_w<0>(state);
 }
 

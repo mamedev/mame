@@ -36,7 +36,7 @@
     - VFD does not receive data from main CPU
     - bitmapped video
     - accurate video timing
-    - cassette
+    - cassette motor control seems to have a COP cpu problem
     - EIM
     - floppy
     - CP/M 2.2 ROMs
@@ -50,7 +50,8 @@
 
 #include "emu.h"
 #include "includes/newbrain.h"
-
+#include "sound/wave.h"
+#include "speaker.h"
 #include "screen.h"
 
 #include "newbrain.lh"
@@ -425,13 +426,17 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 //  cop_g_w -
 //-------------------------------------------------
 
+// m_cop_g1 and m_cop_g3, when activated, have 20 zeros and a 1 in a continuous sequence.
+// m_cop_k6 randomly alternates between 0 and 1, spending more time at 1.
+// The outcome is the cassette is unreadable.
+// Therefore the motors are left permanently on until the above issues can be fixed.
 void newbrain_state::tm()
 {
-	cassette_state tm1 = (!m_cop_g3 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
-	cassette_state tm2 = (!m_cop_g1 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
+//  cassette_state tm1 = (!m_cop_g1 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
+//  cassette_state tm2 = (!m_cop_g3 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
 
-	m_cassette1->change_state(tm1, CASSETTE_MASK_MOTOR);
-	m_cassette2->change_state(tm2, CASSETTE_MASK_MOTOR);
+//  m_cassette1->change_state(tm1, CASSETTE_MASK_MOTOR);
+//  m_cassette2->change_state(tm2, CASSETTE_MASK_MOTOR);
 }
 
 WRITE8_MEMBER( newbrain_state::cop_g_w )
@@ -559,7 +564,7 @@ WRITE_LINE_MEMBER( newbrain_state::k2_w )
 
 int newbrain_state::tpin()
 {
-	return (m_cassette1->input() > +1.0) || (m_cassette2->input() > +1.0);
+	return (m_cassette1->input() > +0.04) || (m_cassette2->input() > +0.04);
 }
 
 READ_LINE_MEMBER( newbrain_state::tdi_r )
@@ -833,16 +838,20 @@ void newbrain_state::newbrain(machine_config &config)
 	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim");
 
 	CASSETTE(config, m_cassette1);
-	m_cassette1->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette1->set_default_state(cassette_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 
 	CASSETTE(config, m_cassette2);
-	m_cassette2->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette2->set_default_state(cassette_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 
 	RS232_PORT(config, RS232_V24_TAG, default_rs232_devices, nullptr);
 	RS232_PORT(config, RS232_PRN_TAG, default_rs232_devices, nullptr);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K");
+
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave1", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

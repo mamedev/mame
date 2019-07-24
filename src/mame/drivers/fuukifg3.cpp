@@ -9,7 +9,7 @@
 
 Hardware is similar to FG-2 used for :
 "Go Go! Mile Smile", "Susume! Mile Smile (Japan)" & "Gyakuten!! Puzzle Bancho (Japan)"
-See fuukifg2.c
+See fuukifg2.cpp
 
 Main  CPU   :   M68020
 
@@ -174,37 +174,57 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 /* Sound comms */
-READ8_MEMBER(fuuki32_state::snd_020_r)
+u8 fuuki32_state::snd_020_r(offs_t offset)
 {
 	machine().scheduler().synchronize();
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER(fuuki32_state::snd_020_w)
+void fuuki32_state::snd_020_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	machine().scheduler().synchronize();
 	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
-WRITE32_MEMBER(fuuki32_state::vregs_w)
+u16 fuuki32_state::vregs_r(offs_t offset)
 {
-	if (m_vregs[offset] != data)
+	return m_vregs[offset];
+}
+
+void fuuki32_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const u16 old = m_vregs[offset];
+	data = COMBINE_DATA(&m_vregs[offset]);
+	if (old != data)
 	{
-		COMBINE_DATA(&m_vregs[offset]);
-		if (offset == 0x1c / 4)
+		if (offset == 0x1c / 2)
 		{
 			const rectangle &visarea = m_screen->visible_area();
 			attotime period = m_screen->frame_period();
-			m_raster_interrupt_timer->adjust(m_screen->time_until_pos(m_vregs[0x1c / 4] >> 16, visarea.max_x + 1), 0, period);
+			m_raster_interrupt_timer->adjust(m_screen->time_until_pos(data, visarea.max_x + 1), 0, period);
+		}
+		if (offset == 0x1e / 2)
+		{
+			if ((old ^ data) & 0x40)
+				m_tilemap[2]->mark_all_dirty();
 		}
 	}
 }
 
 template<int Layer>
-WRITE32_MEMBER(fuuki32_state::vram_w)
+void fuuki32_state::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset);
+}
+
+template<int Layer>
+void fuuki32_state::vram_buffered_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	const int buffer = (m_vregs[0x1e / 2] & 0x40) >> 6;
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	if ((Layer & 1) == buffer)
+		m_tilemap[2]->mark_tile_dirty(offset);
 }
 
 void fuuki32_state::fuuki32_map(address_map &map)
@@ -215,18 +235,18 @@ void fuuki32_state::fuuki32_map(address_map &map)
 
 	map(0x500000, 0x501fff).ram().w(FUNC(fuuki32_state::vram_w<0>)).share("vram.0");  // Tilemap 1
 	map(0x502000, 0x503fff).ram().w(FUNC(fuuki32_state::vram_w<1>)).share("vram.1");  // Tilemap 2
-	map(0x504000, 0x505fff).ram().w(FUNC(fuuki32_state::vram_w<2>)).share("vram.2");  // Tilemap bg
-	map(0x506000, 0x507fff).ram().w(FUNC(fuuki32_state::vram_w<3>)).share("vram.3");  // Tilemap bg2
+	map(0x504000, 0x505fff).ram().w(FUNC(fuuki32_state::vram_buffered_w<2>)).share("vram.2");  // Tilemap bg
+	map(0x506000, 0x507fff).ram().w(FUNC(fuuki32_state::vram_buffered_w<3>)).share("vram.3");  // Tilemap bg2
 	map(0x508000, 0x517fff).ram();                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
-	map(0x600000, 0x601fff).ram().rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)); // Sprites
+	map(0x600000, 0x601fff).rw(FUNC(fuuki32_state::sprram_r), FUNC(fuuki32_state::sprram_w)).share("spriteram"); // Sprites
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // Palette
 
-	map(0x800000, 0x800003).lr16("800000", [this]() { return uint16_t(m_system->read()); }).nopw();  // Coin
-	map(0x810000, 0x810003).lr16("810000", [this]() { return uint16_t(m_inputs->read()); }).nopw();  // Player Inputs
-	map(0x880000, 0x880003).lr16("880000", [this]() { return uint16_t(m_dsw1->read()); });           // Service + DIPS
-	map(0x890000, 0x890003).lr16("890000", [this]() { return uint16_t(m_dsw2->read()); });           // More DIPS
+	map(0x800000, 0x800003).lr16("800000", [this]() { return u16(m_system->read()); }).nopw();  // Coin
+	map(0x810000, 0x810003).lr16("810000", [this]() { return u16(m_inputs->read()); }).nopw();  // Player Inputs
+	map(0x880000, 0x880003).lr16("880000", [this]() { return u16(m_dsw1->read()); });           // Service + DIPS
+	map(0x890000, 0x890003).lr16("890000", [this]() { return u16(m_dsw2->read()); });           // More DIPS
 
-	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
+	map(0x8c0000, 0x8c001f).rw(FUNC(fuuki32_state::vregs_r), FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
 	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen Related
 	map(0x8e0000, 0x8e0003).ram().share("priority");                            // Controls layer order
 	map(0x903fe0, 0x903fff).rw(FUNC(fuuki32_state::snd_020_r), FUNC(fuuki32_state::snd_020_w)).umask32(0x00ff00ff);                                         // Shared with Z80
@@ -240,7 +260,7 @@ void fuuki32_state::fuuki32_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fuuki32_state::sound_bw_w)
+void fuuki32_state::sound_bw_w(u8 data)
 {
 	m_soundbank->set_entry(data);
 }
@@ -427,18 +447,6 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-/* 16x16x4 */
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(0,4) },
-	{ STEP16(0,16*4) },
-	16*16*4
-};
-
 /* 16x16x8 */
 static const gfx_layout layout_16x16x8 =
 {
@@ -452,10 +460,9 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_fuuki32 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x400*2, 0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x400*0, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [2] Layer 2
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x4,   0x400*3, 0x40 ) // [3] BG Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x400*0, 0x40 ) // [0] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [1] Layer 2
+	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x4,   0x400*3, 0x40 ) // [2] BG Layer
 GFXDECODE_END
 
 
@@ -492,7 +499,7 @@ void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void fuuki32_state::machine_start()
 {
-	uint8_t *ROM = memregion("soundcpu")->base();
+	u8 *ROM = memregion("soundcpu")->base();
 
 	m_soundbank->configure_entries(0, 0x10, &ROM[0], 0x8000);
 
@@ -535,13 +542,18 @@ void fuuki32_state::fuuki32(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki32);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	FUUKI_VIDEO(config, m_fuukivid, 0, m_gfxdecode);
+	FUUKI_VIDEO(config, m_fuukivid, 0);
+	m_fuukivid->set_palette(m_palette);
+	m_fuukivid->set_color_base(0x400*2);
+	m_fuukivid->set_color_num(0x40);
+	m_fuukivid->set_tile_callback(FUNC(fuuki32_state::fuuki32_tile_cb), this);
+	m_fuukivid->set_colpri_callback(FUNC(fuuki32_state::fuuki32_colpri_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK)); // 33.8688MHz
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
 	ymf.irq_handler().set_inputline("soundcpu", 0);
 	ymf.add_route(0, "lspeaker", 0.50);
 	ymf.add_route(1, "rspeaker", 0.50);
@@ -579,7 +591,7 @@ ROM_START( asurabld )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(bb1deb89) SHA1(b1c70abddc0b9a88beb69a592376ff69a7e091eb) )
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_REGION( 0x2000000, "fuukivid", 0 )
 	/* 0x0000000 - 0x03fffff empty */ /* spXX.uYY - XX is the bank number! */
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(7df492eb) SHA1(30b88a3cd025ffc8c28fef06e0784755be37ef8e) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(1890f42a) SHA1(22254fe38fd83f4602a25e1ccba32df16edaf3f9) )
@@ -621,7 +633,7 @@ ROM_START( asurabus )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_REGION( 0x2000000, "fuukivid", 0 )
 	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
@@ -656,7 +668,7 @@ ROM_START( asurabusa )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_REGION( 0x2000000, "fuukivid", 0 )
 	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )

@@ -2,7 +2,7 @@
 // copyright-holders:hap
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
-*
+
 * fidel_vsc.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 Fidelity Excellence series hardware

@@ -473,7 +473,7 @@ OP_HANDLER( tstx )
 OP_HANDLER( clrx )
 {
 	X = 0;
-	clr_nzc();
+	clr_nz();
 	SEZ;
 }
 

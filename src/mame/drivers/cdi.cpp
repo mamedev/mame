@@ -276,8 +276,6 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 	memcpy(dst, src, 0x8);
 	memset(m_servo_io_regs, 0, 0x20);
 	memset(m_slave_io_regs, 0, 0x20);
-
-	m_maincpu->reset();
 }
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono2 )

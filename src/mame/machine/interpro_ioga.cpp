@@ -462,7 +462,7 @@ void interpro_ioga_device::irq(int state, u8 irq_vector)
 	if (m_irq_state != state)
 	{
 		LOGIRQ(m_active_interrupt_number, "irq: %s interrupt type %d number %d\n",
-			state ? "asserting" : "clearing",m_active_interrupt_type, m_active_interrupt_number);
+			state ? "asserting" : "clearing", m_active_interrupt_type, m_active_interrupt_number);
 
 		m_irq_state = state;
 		m_out_irq_func(state);
@@ -709,13 +709,14 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 				if (dma_channel.control & DMA_CTRL_VIRTUAL)
 				{
 					const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
-					dma_channel.virtual_address += 4;
 
 					// FIXME: ignore the page fault flag?
 					dma_channel.real_address = ptde & ~0xfff;
 
 					LOGDMA(dma_channel.channel, "dma: translated virtual 0x%08x real 0x%08x\n",
 						dma_channel.virtual_address, dma_channel.real_address);
+
+					dma_channel.virtual_address += 4;
 				}
 			}
 		}
@@ -886,13 +887,14 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 		if (data & DMA_CTRL_VIRTUAL)
 		{
 			const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
-			dma_channel.virtual_address += 4;
 
 			// FIXME: ignore the page fault flag?
 			dma_channel.real_address = (ptde & ~0xfff) | (dma_channel.real_address & 0xfff);
 
 			LOGDMA(dma_channel.channel, "dma: translated virtual 0x%08x real 0x%08x\n",
 				dma_channel.virtual_address, dma_channel.real_address);
+
+			dma_channel.virtual_address += 4;
 		}
 
 		// (7.0272) if bus error flag is written, clear existing bus error (otherwise retain existing state)
@@ -1066,6 +1068,12 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer_60hz)
 {
 	set_int_line(IRQ_60HZ, ASSERT_LINE);
 	set_int_line(IRQ_60HZ, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(sapphire_ioga_device::timer_60hz)
+{
+	set_int_line(IRQ_TIMER0, ASSERT_LINE);
+	set_int_line(IRQ_TIMER0, CLEAR_LINE);
 }
 
 READ32_MEMBER(interpro_ioga_device::timer1_r)

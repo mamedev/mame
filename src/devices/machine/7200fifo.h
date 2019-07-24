@@ -33,6 +33,7 @@ The following chips are functionally equivalent and pin-compatible.
 
     AM7200    AM7201    AM7202    AM7203    AM7204
     MS7200    MS7201    MS7202    MS7203    MS7204
+              QS7201    QS7202    QS7203    QS7204
 
     LH5495    LH5496    LH5497    LH5498    LH5499
               LH540201  LH540202  LH540203  LH540204  LH540205  LH540206
@@ -61,18 +62,9 @@ The following chips are functionally equivalent and pin-compatible.
 class fifo7200_device : public device_t
 {
 public:
-	fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, int size)
-		: fifo7200_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		set_ram_size(size);
-	}
-
-	fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	auto ef_handler() { return m_ef_handler.bind(); }
 	auto ff_handler() { return m_ff_handler.bind(); }
 	auto hf_handler() { return m_hf_handler.bind(); }
-	void set_ram_size(int size) { m_ram_size = size; }
 
 	DECLARE_READ_LINE_MEMBER( ef_r ) { return !m_ef; } // _EF
 	DECLARE_READ_LINE_MEMBER( ff_r ) { return !m_ff; } // _FF
@@ -87,6 +79,8 @@ public:
 	DECLARE_READ8_MEMBER( data_byte_r ) { return (uint8_t)fifo_read(); }
 
 protected:
+	fifo7200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int size);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -96,7 +90,7 @@ private:
 	uint16_t fifo_read();
 
 	std::vector<uint16_t> m_buffer;
-	int m_ram_size;
+	const int m_ram_size;
 
 	int m_read_ptr;
 	int m_write_ptr;
@@ -110,7 +104,33 @@ private:
 	devcb_write_line m_hf_handler;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(FIFO7200, fifo7200_device)
+// ======================> idt7200_device
+
+class idt7200_device : public fifo7200_device
+{
+public:
+	idt7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+// ======================> idt7201_device
+
+class idt7201_device : public fifo7200_device
+{
+public:
+	idt7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+// ======================> idt7202_device
+
+class idt7202_device : public fifo7200_device
+{
+public:
+	idt7202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+// device type definitions
+DECLARE_DEVICE_TYPE(IDT7200, idt7200_device)
+DECLARE_DEVICE_TYPE(IDT7201, idt7201_device)
+DECLARE_DEVICE_TYPE(IDT7202, idt7202_device)
 
 #endif // MAME_MACHINE_7200FIFO_H
