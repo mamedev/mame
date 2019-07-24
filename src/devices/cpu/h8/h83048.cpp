@@ -32,7 +32,6 @@ h83048_device::h83048_device(const machine_config &mconfig, device_type type, co
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
 	watchdog(*this, "watchdog"),
-	mode_a20(false),
 	ram_start(start),
 	syscr(0)
 {

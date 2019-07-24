@@ -66,8 +66,6 @@ protected:
 	required_device<h8_sci_device> sci1;
 	required_device<h8_watchdog_device> watchdog;
 
-	bool mode_a20;
-
 	uint32_t ram_start;
 	uint8_t syscr;
 
