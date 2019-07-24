@@ -466,6 +466,7 @@ void hektor3_state::hektor3(machine_config &config)
 }
 
 
+#ifdef UNUSED_DEFINITION
 ROM_START(hektor2)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("hek1a_skt0.rom", 0x0000, 0x1000, NO_DUMP)
@@ -475,6 +476,7 @@ ROM_START(hektor2)
 	ROM_REGION(0x800, "ef9364", 0)
 	ROM_LOAD("charset.bin", 0x0000, 0x0800, NO_DUMP)
 ROM_END
+#endif
 
 ROM_START(hektor3)
 	ROM_REGION(0x10000, "maincpu", 0)
