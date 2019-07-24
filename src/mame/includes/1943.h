@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/mcs51/mcs51.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -19,6 +20,7 @@ public:
 	_1943_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_scrollx(*this, "scrollx"),
@@ -34,13 +36,14 @@ public:
 	{ }
 
 	void _1943(machine_config &config);
+	void _1943b(machine_config &config);
 
-	void init_1943b();
 	void init_1943();
 
 private:
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
+	optional_device<i8751_device> m_mcu;
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_colorram;
 	required_shared_ptr<u8> m_scrollx;
@@ -64,10 +67,16 @@ private:
 	int     m_bg2_on;
 
 	/* protection */
-	u8   m_prot_value;
-	void protection_w(u8 data);
-	u8 protection_r();
-	u8 _1943b_c007_r();
+	u8 m_cpu_to_mcu; // ls374 at 5k
+	u8 m_mcu_to_cpu; // ls374 at 6k
+	u8 m_audiocpu_to_mcu; // ls374 at 5l
+	u8 m_mcu_to_audiocpu; // ls374 at 6l
+	u8 m_mcu_p0;
+	u8 m_mcu_p2;
+	u8 m_mcu_p3;
+
+	INTERRUPT_GEN_MEMBER(mcu_irq);
+	void mcu_p3_w(u8 data);
 
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);
@@ -88,6 +97,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void c1943_map(address_map &map);
+	void c1943b_map(address_map &map);
 	void sound_map(address_map &map);
 };
 
