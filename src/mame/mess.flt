@@ -185,6 +185,7 @@ datum.cpp
 dbox.cpp
 dccons.cpp
 dct11em.cpp
+debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
