@@ -709,7 +709,7 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_16.ic26", 0x0000, 0x4000, CRC(5a681fb4) SHA1(e31e751a54fa9853acb462ce22dd2ff5286808f0) )
 	ROM_FILL(                0xe000, 0x2000, 0xff ) // diagnostics ROM
 
-	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // protected 68705P5 MCU
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // 68705P5 MCU
 	ROM_LOAD( "a39_mc68705p5s.ic23", 0x0000, 0x0800, CRC(14bff574) SHA1(c91446540e7628b3e62135e2f560a118f7e0dad4) ) /* from other set, appears to be correct */
 
 	ROM_REGION( 0x10000, "sprites", 0 ) // sprites
@@ -740,8 +740,8 @@ ROM_START( wyvernf0a ) /* Possibly the first version or even an earlier developm
 	ROM_LOAD( "sound_4182.ic26", 0x0000, 0x4000, CRC(5a681fb4) SHA1(e31e751a54fa9853acb462ce22dd2ff5286808f0) ) /* == a39_16.ic26 */
 	ROM_FILL(                    0xe000, 0x2000, 0xff ) // diagnostics ROM
 
-	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // protected 68705P5 MCU
-	ROM_LOAD( "a39_mc68705p5s.ic23", 0x0000, 0x0800, CRC(14bff574) SHA1(c91446540e7628b3e62135e2f560a118f7e0dad4) ) /* hand written label P5 5/1 */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // 68705P5 MCU
+	ROM_LOAD( "a39_mc68705p5s.ic23", 0x0000, 0x0800, CRC(14bff574) SHA1(c91446540e7628b3e62135e2f560a118f7e0dad4) ) /* hand written label P5 5/1 - part was unprotected */
 
 	ROM_REGION( 0x10000, "sprites", 0 ) // sprites - These 4 ROMs had hand written labels
 	ROM_LOAD( "obj4_d779.ic99", 0x0000, 0x4000, CRC(af70e1dc) SHA1(98dba673750cdfdf25c119c24da10428eff6591b) ) /* == a39_11.ic99 */
