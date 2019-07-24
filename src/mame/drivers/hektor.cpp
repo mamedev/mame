@@ -9,10 +9,6 @@
     - Dump the ROMs, maybe 2 or 3 versions.
     - Emulate Peripheral Boards.
 
-    Hektor III
-    - Screen scroll causes display issues.
-
-
 **********************************************************************/
 
 
@@ -209,7 +205,7 @@ MC6845_UPDATE_ROW(hektor3_state::crtc_update_row)
 
 	for (int x = 0; x < x_count; x++)
 	{
-		uint16_t offset = (ra << 11) | (ma + x);
+		uint16_t offset = (ra << 11) | ((ma + x) & 0x7ff);
 		uint8_t data = m_ram->pointer()[~offset & 0xffff];
 		if (x == cursor_x) data ^= 0xff;
 
@@ -489,4 +485,4 @@ ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME             FLAGS */
 //COMP( 1982, hektor2, 0,      0,       hektor2,  hektor2,  hektor2_state,  empty_init, "The Open University",  "Hektor II (PT502)", MACHINE_NOT_WORKING )
-COMP( 1984, hektor3, 0,      0,       hektor3,  hektor3,  hektor3_state,  empty_init, "The Open University",  "Hektor III",        MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, hektor3, 0,      0,       hektor3,  hektor3,  hektor3_state,  empty_init, "The Open University",  "Hektor III",        0 )
