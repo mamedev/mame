@@ -620,7 +620,7 @@ void wd33c9x_base_device::indir_reg_w(uint8_t data)
 
 	case COMMAND: {
 		if (m_regs[AUXILIARY_STATUS] & (AUXILIARY_STATUS_INT | AUXILIARY_STATUS_CIP)) {
-			fatalerror("%s: The host should never write to the command register when INT or CIP are set.\n", shortname());
+			logerror("%s: The host should never write to the command register when INT or CIP are set.\n", shortname());
 		}
 
 		const uint8_t cc = (data & COMMAND_CC);
