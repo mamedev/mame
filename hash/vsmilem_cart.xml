@@ -28,7 +28,7 @@ Language:
 |        |          (IT)     | ?????                                                                                     |
 |        | 80-084002(NL)     | Sports Games                                                                              |
 |        | 80-084003(UK)     | Action Mania                                                                              |
-|        | 80-084004(GE)     | Sportskanone                                                                              |
+|   XX   | 80-084004(GE)     | Sportskanone (blue sticker: "P ○○○○")                                                     |
 |        | 80-084005(FR)     | Sporti Folies                                                                             |
 |        | 80-084006(PT)     | Action Mania (84016 on cart)                                                              |
 |   XX   | 80-084007(SP)     | Action Manía                                                                              |
@@ -83,7 +83,7 @@ Language:
 |   XX   | 80-084180(US)     | Mickey Mouse Clubhouse                                                                    |
 |        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                                    |
 |        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                                    |
-|        | 80-084184(GE)     | Micky Maus Wunderhaus                                                                     |
+|   XX   | 80-084184(GE)     | Micky Maus Wunderhaus (blue sticker: "P ○○○○")                                            |
 |        | 80-084185(FR)     | La Maison de Mickey                                                                       |
 |        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                                    |
 |        | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
@@ -99,7 +99,7 @@ Language:
 |   XX   | 80-084240(US)     | Ni Hao Kai Lan                                                                            |
 |        | 80-084245(FR)     | Ni Hao Kai Lan                                                                            |
 +========+===================+===========================================================================================+
-|        | 80-084260(US)     | My Pet Puppy (unreleased in USA?? UK version plays AOK on NTSC console)                   |
+|        | 80-084260(US)     | My Pet Puppy (unreleased in USA? UK version plays OK on NTSC console)                     |
 |        | 80-084262(NL)     | Mijn Puppy!                                                                               |
 |        | 80-084263(UK)     | My Pet Puppy                                                                              |
 |   XX   | 80-084264(GE)     | Mein erster Hund                                                                          |
@@ -114,7 +114,7 @@ Language:
 +========+===================+===========================================================================================+
 |        | 80-084300(US)     | Soccer Challenge                                                                          |
 |        | 80-084303(UK)     | Football Challenge                                                                        |
-|        | 80-084304(GE)     | Fussball Meisterschaft                                                                    |
+|   XX   | 80-084304(GE)     | Fussball Meisterschaft (blue sticker: "P ○○○○")                                           |
 |        | 80-084305(FR)     | Football Challenge                                                                        |
 |        | 80-084306(PT)     | Football Challenge  (cart#??)                                                             |
 |        | 80-084307(SP)     | Campeonato de Fútbol                                                                      |
@@ -243,7 +243,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 <softwarelist name="vsmilem_cart" description="VTech V.Smile Motion cartridges">
 
 	<software name="actnmniam" supported="no">
-		<description>Action Mania (US, Rev. 4?)</description>
+		<description>Action Mania (USA, Rev. 4?)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084000(US)" />
@@ -252,26 +252,26 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84000-4.bin" size="8388608" crc="9732d6c4" sha1="6973e473fc9b274fe8e1151a27bdd02df67a23eb" offset="0" />
+				<rom name="vsmile84000-4.bin" size="8388608" crc="9732d6c4" sha1="6973e473fc9b274fe8e1151a27bdd02df67a23eb" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="actnmniama" cloneof="actnmniam" supported="no">
-		<description>Action Mania (US, Rev. 6?)</description>
+		<description>Action Mania (USA, Rev. 6?)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084000(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84000-6.bin" size="8388608" crc="ea4aeb1a" sha1="74807f9306ccc691735acdca66588a80467bebbd" offset="0" />
+				<rom name="vsmile84000-6.bin" size="8388608" crc="ea4aeb1a" sha1="74807f9306ccc691735acdca66588a80467bebbd" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="actnmniams" cloneof="actnmniam" supported="no">
-		<description>Action Manía (Sp)</description>
+	<software name="actnmniamg" cloneof="actnmniam" supported="no">
+		<description>Sportskanone (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084007(SP)" />
@@ -280,13 +280,28 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="84007 G.u1" size="8388608" crc="c14a04d2" sha1="6db09fd90f88773aafd5d95c4ea403dacddc9e58" offset="0" />
+				<rom name="80-084004 - Sportskanone (GER) (Motion).bin" size="8388608" crc="004ad4e5" sha1="7cbc9e5a27fac455ea2b03cebad7f1694937f790" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnmniams" cloneof="actnmniam" supported="no">
+		<description>Action Manía (Spain)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084007(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84007 G.u1" size="8388608" crc="c14a04d2" sha1="6db09fd90f88773aafd5d95c4ea403dacddc9e58" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="carsmg" supported="no">
-		<description>Cars: Vollgas in Radiator Springs (Ger)</description>
+		<description>Cars: Vollgas in Radiator Springs (Germany)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084404(GE)" />
@@ -295,13 +310,13 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="A84404(2).u1" size="8388608" crc="beaa1b6a" sha1="c6e68da7935642035e13cc7922b0193cc6e5272c" offset="0" />
+				<rom name="A84404(2).u1" size="8388608" crc="beaa1b6a" sha1="c6e68da7935642035e13cc7922b0193cc6e5272c" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cars2mg" supported="no">
-		<description>Disney/Pixar Cars 2 (Ger)</description>
+		<description>Disney/Pixar Cars 2 (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084404(GE)" />
@@ -317,7 +332,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 	</software>
 
 	<software name="cinderlamg" supported="no">
-		<description>Disneys Princess Cinderella - Lernen im Märchenland (Ger)</description>
+		<description>Disneys Princess Cinderella - Lernen im Märchenland (Germany)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084604(GE)" />
@@ -326,25 +341,25 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="C84604.u1" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" offset="0" />
+				<rom name="C84604.u1" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cinderlam2g" cloneof="cinderlamg" supported="no">
-		<description>Disneys Princess Cinderella - Lernen im Märchenland (Ger, Rev. 2?)</description>
+		<description>Disneys Princess Cinderella - Lernen im Märchenland (Germany, Rev. 2?)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084604(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="80-084604.bin" size="8388608" crc="9170597a" sha1="2c3235e7e8986b1c62af6b218a8ba49bb3571345" offset="0" />
+				<rom name="80-084604.bin" size="8388608" crc="9170597a" sha1="2c3235e7e8986b1c62af6b218a8ba49bb3571345" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="kfpandamg" supported="no">
-		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Ger)</description>
+		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Germany)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084124(GE)" />
@@ -353,26 +368,26 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" offset="0" />
+				<rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="doram" supported="no">
-		<description>Nickelodeon Dora the Explorer: Dora's Fix It Adventure (US, Rev. 3?)</description>
+		<description>Nickelodeon Dora the Explorer: Dora's Fix It Adventure (USA, Rev. 3?)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084020(US)" /> <!-- Same ROM as 084021(US) -->
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84020-3.bin" size="8388608" crc="73a3c852" sha1="8ca7255ab3e45ef670d09cfb4959bc8769415dc2" offset="0" />
+				<rom name="vsmile84020-3.bin" size="8388608" crc="73a3c852" sha1="8ca7255ab3e45ef670d09cfb4959bc8769415dc2" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="doramg" cloneof="doram" supported="no">
-		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger)</description>
+		<description>Nick Dora - Doras Reparatur-Abenteuer (Germany)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084024(GE)" />
@@ -381,13 +396,13 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="84024 OK.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" offset="0" />
+				<rom name="84024 OK.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="doramg2" cloneof="doram" supported="no">
-		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger, Rev. 2)</description>
+		<description>Nick Dora - Doras Reparatur-Abenteuer (Germany, Rev. 2)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084024(GE)" />
@@ -396,100 +411,115 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="84024 OK.u1" size="8388608" crc="7848fa93" sha1="567a337f27cc5ff0ce832afa903efafc8a305f17" offset="0" />
+				<rom name="84024 OK.u1" size="8388608" crc="7848fa93" sha1="567a337f27cc5ff0ce832afa903efafc8a305f17" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="hmannym" cloneof="doram" supported="no">
-		<description>Disney Handy Manny (US, Rev. 2?)</description>
+		<description>Disney Handy Manny (USA, Rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084360(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84360-2.bin" size="8388608" crc="a6ee705b" sha1="50a94ca17efbeb3a69decab948c945df272f9c69" offset="0" />
+				<rom name="vsmile84360-2.bin" size="8388608" crc="a6ee705b" sha1="50a94ca17efbeb3a69decab948c945df272f9c69" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ltleinstnm" supported="no">
-		<description>Disney's Little Einsteins (US, Rev. 2?)</description>
+		<description>Disney's Little Einsteins (USA, Rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084160(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84160-2.bin" size="8388608" crc="add7cc23" sha1="561e496ecbbc1e387ec343069ac19ae9aa2f234e" offset="0" />
+				<rom name="vsmile84160-2.bin" size="8388608" crc="add7cc23" sha1="561e496ecbbc1e387ec343069ac19ae9aa2f234e" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ltleinstnma" cloneof="ltleinstnm" supported="no">
-		<description>Disney's Little Einsteins (US, Rev. 5?)</description>
+		<description>Disney's Little Einsteins (USA, Rev. 5?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084160(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84160-5.bin" size="8388608" crc="e81159c9" sha1="dc96120d27de83e37edae6620ac40ab11b56d871" offset="0" />
+				<rom name="vsmile84160-5.bin" size="8388608" crc="e81159c9" sha1="dc96120d27de83e37edae6620ac40ab11b56d871" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ltleinstnmg" cloneof="ltleinstnm" supported="no">
-		<description>Disney's Kleine Einsteins (Ger)</description>
+		<description>Disney's Kleine Einsteins (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084164(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" offset="0" />
+				<rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ltleinstnm2g" cloneof="ltleinstnm" supported="no">
-		<description>Disney's Kleine Einsteins (Ger, Rev. 2?)</description>
+		<description>Disney's Kleine Einsteins (Germany, Rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084164(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="80-084164.bin" size="8388608" crc="6bb78a9b" sha1="341d773b774af3153e2490605d8d3d9d88fb6903" offset="0" />
+				<rom name="80-084164.bin" size="8388608" crc="6bb78a9b" sha1="341d773b774af3153e2490605d8d3d9d88fb6903" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mickeychm" supported="no">
-		<description>Disney Mickey Mouse Clubhouse (US)</description>
+		<description>Disney Mickey Mouse Clubhouse (USA)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084180(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84180.bin" size="8388608" crc="2538c1d2" sha1="481af1fe5de995854068329aabf08ae9c197d175" offset="0" />
+				<rom name="vsmile84180.bin" size="8388608" crc="2538c1d2" sha1="481af1fe5de995854068329aabf08ae9c197d175" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeychmg" cloneof="mickeychm" supported="no">
+		<description>Disney Micky Maus Wunderhaus (Germany)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084184(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084184 - Micky Maus Wunderhaus (GER) (Motion).bin" size="8388608" crc="64dcc828" sha1="5759bf07ba4b79d58baec9418e3cd9b9f5f9fa7f" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="monvsalienm" supported="no">
-		<description>DreamWorks Monsters vs. Aliens (US, Rev. 3?)</description>
+		<description>DreamWorks Monsters vs. Aliens (USA, Rev. 3?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084440(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84440-3.bin" size="8388608" crc="81f7affb" sha1="3208b5f2d6616396b2bd3a5446bd4e3ee277dc9a" offset="0" />
+				<rom name="vsmile84440-3.bin" size="8388608" crc="81f7affb" sha1="3208b5f2d6616396b2bd3a5446bd4e3ee277dc9a" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mypuppymg" supported="no">
-		<description>Mein erster Hund (Ger)</description>
+		<description>Mein erster Hund (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084264(GE)" />
@@ -498,39 +528,39 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="C84264.u1" size="8388608" crc="ca98e437" sha1="8c4964a671c6c3d3c8bd5859b14143b901d54021" offset="0" />
+				<rom name="C84264.u1" size="8388608" crc="ca98e437" sha1="8c4964a671c6c3d3c8bd5859b14143b901d54021" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nascarm" supported="no">
-		<description>NASCAR Academy - Race Car Superstar (US)</description>
+		<description>NASCAR Academy - Race Car Superstar (USA)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084200(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84200.bin" size="8388608" crc="55db5a32" sha1="8345985019ceaeb26bad1d0fa1236807ba054fac" offset="0" />
+				<rom name="vsmile84200.bin" size="8388608" crc="55db5a32" sha1="8345985019ceaeb26bad1d0fa1236807ba054fac" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nihaoklm" supported="no">
-		<description>Nickelodeon Ni Hao Kai Lan - Happy Chinese New Year! (US)</description>
+		<description>Nickelodeon Ni Hao Kai Lan - Happy Chinese New Year! (USA)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084240(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84240.bin" size="8388608" crc="3c3ddb1a" sha1="1a37f28f8893e130f55e6cae964490a9b3a60528" offset="0" />
+				<rom name="vsmile84240.bin" size="8388608" crc="3c3ddb1a" sha1="1a37f28f8893e130f55e6cae964490a9b3a60528" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="poohmg" supported="no">
-		<description>Winnie Puuh - Die Honigjagd (Ger)</description>
+		<description>Winnie Puuh - Die Honigjagd (Germany)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084384(GE)" />
@@ -539,25 +569,25 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" offset="0" />
+				<rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="prinfrogmg" supported="no">
-		<description>Küss den Frosch - Tianas großer Traum (Ger)</description>
+		<description>Küss den Frosch - Tianas großer Traum (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084484(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="C84484.bin" size="8388608" crc="8abc088c" sha1="3637de0af0371a4bb473ae28b35141b10bbb047f" offset="0" />
+				<rom name="C84484.bin" size="8388608" crc="8abc088c" sha1="3637de0af0371a4bb473ae28b35141b10bbb047f" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="shrekfam" supported="no">
-		<description>Shrek Forever After (US)</description>
+		<description>Shrek Forever After (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084500(US)" />
@@ -573,7 +603,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 	</software>
 
 	<software name="shrekfamg" cloneof="shrekfam" supported="no">
-		<description>Für immer Shrek (Ger)</description>
+		<description>Für immer Shrek (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084504(GE)" />
@@ -588,8 +618,24 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
+	<!-- Soccer Challenge -->
+	<software name="soccerchmg" supported="no">
+		<description>Fussball Meisterschaft (Germany)</description>
+		<year>20??</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084304(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084304 - Fussball Meisterschaft (GER) (Motion).bin" size="8388608" crc="17ff1dd6" sha1="2a071d6bc43c9b2922ec82739ba4b3b661c7cf57" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spidermnmg" supported="no">
-		<description>Marvel Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
+		<description>Marvel Spider-Man &amp; Freunde - Geheime Missionen (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084144(GE)" />
@@ -598,13 +644,13 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="C84144.u1" size="8388608" crc="93d129ef" sha1="8e67e2ad36104c34b6fd944e25bbfbf0313a1d7c" offset="0" />
+				<rom name="C84144.u1" size="8388608" crc="93d129ef" sha1="8e67e2ad36104c34b6fd944e25bbfbf0313a1d7c" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongebmg" supported="no">
-		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084644(GE)" />
@@ -613,38 +659,38 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="C84644.u1" size="8388608" crc="c89d9c51" sha1="11836295ebfd0a8c62e0d5f482a3c7dc18b71d1f" offset="0" />
+				<rom name="C84644.u1" size="8388608" crc="c89d9c51" sha1="11836295ebfd0a8c62e0d5f482a3c7dc18b71d1f" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="thomasmg" supported="no">
-		<description>Thomas - Freunde halten zusammen (Ger)</description>
+		<description>Thomas - Freunde halten zusammen (Germany)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084064(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="80-084064.bin" size="8388608" crc="40b28ac8" sha1="ed67e92e25dbc64c78a6e0d28c9632e9b57bd60b" offset="0" />
+				<rom name="80-084064.bin" size="8388608" crc="40b28ac8" sha1="ed67e92e25dbc64c78a6e0d28c9632e9b57bd60b" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tinkerm" supported="no">
-		<description>TinkerBell (US, Rev. 2?)</description>
+		<description>TinkerBell (USA, Rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084320(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="vsmile84320-2.bin" size="8388608" crc="fa8d9640" sha1="23a69fbc2b70658b827f1b8196ee55e3efd85ef5" offset="0" />
+				<rom name="vsmile84320-2.bin" size="8388608" crc="fa8d9640" sha1="23a69fbc2b70658b827f1b8196ee55e3efd85ef5" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tinkermg" cloneof="tinkerm" supported="no">
-		<description>TinkerBell (Ger)</description>
+		<description>TinkerBell (Germany)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084324(GE)" />
@@ -653,13 +699,13 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
+				<rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="toystor3mg" supported="no">
-		<description>Toy Story 3 (Ger)</description>
+		<description>Toy Story 3 (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084424(GE)" />
@@ -690,13 +736,13 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 	</software>
 
 	<software name="wintrsptmg" supported="no">
-		<description>Wintersport (Ger)</description>
+		<description>Wintersport (Germany)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084224(GE)" />
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" offset="0" />
+				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" />
 			</dataarea>
 		</part>
 	</software>
