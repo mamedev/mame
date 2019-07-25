@@ -14,6 +14,8 @@
 class f2mc16_device : public cpu_device
 {
 public:
+	friend class mb9061x_device;
+
 	enum
 	{
 		F2MC16_PC, F2MC16_PS, F2MC16_USP, F2MC16_SSP, F2MC16_ACC,
@@ -223,6 +225,12 @@ private:
 		}
 	}
 
+	inline void push_16_ssp(u16 val)
+	{
+		m_ssp-=2;
+		write_16((m_ssb << 16) | m_ssp, val);
+	}
+
 	inline void push_32(u32 val)
 	{
 		if (m_ps & F_S)
@@ -267,6 +275,14 @@ private:
 			rv = read_16((m_usb << 16) | m_usp);
 			m_usp += 2;
 		}
+
+		return rv;
+	}
+
+	inline u16 pull_16_ssp()
+	{
+		u16 rv = read_16((m_ssb << 16) | m_ssp);
+		m_ssp += 2;
 
 		return rv;
 	}
@@ -431,6 +447,13 @@ private:
 	void opcodes_ea76(u8 operand);
 	void opcodes_ea77(u8 operand);
 	void opcodes_ea78(u8 operand);
+
+	void set_irq(int vector, int level);
+	void clear_irq(int vector);
+	void take_irq(int vector, int level);
+
+	int m_vector_level[256];
+	int m_outstanding_irqs;
 };
 
 DECLARE_DEVICE_TYPE(F2MC16, f2mc16_device)

@@ -25,6 +25,12 @@ class mb9061x_device :  public f2mc16_device
 public:
 	const address_space_config m_program_config;
 
+	// interrupts handled by the interrupt controller
+	enum
+	{
+		ICR0 = 0, ICR1, ICR2, ICR3, ICR4, ICR5, ICR6, ICR7, ICR8, ICR9, ICR10, ICR11, ICR12, ICR13, ICR14, ICR15
+	};
+
 protected:
 	// construction/destruction
 	mb9061x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
@@ -36,6 +42,21 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
+	// TBC
+	TIMER_CALLBACK_MEMBER(tbtc_tick);
+	READ8_MEMBER(tbtc_r);
+	WRITE8_MEMBER(tbtc_w);
+
+	// INTC
+	READ8_MEMBER(intc_r);
+	WRITE8_MEMBER(intc_w);
+	void intc_trigger_irq(int icr, int vector);
+	void intc_clear_irq(int icr, int vector);
+
+	u8 m_tbtc;
+	emu_timer *m_tbtc_timer;
+
+	u8 m_intc[0x10];
 };
 
 class mb90610_device : public mb9061x_device
