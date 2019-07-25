@@ -92,6 +92,7 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		<description>System Software Basic v1.1</description>
 		<year>1982</year>
 		<publisher>System Software</publisher>
+		<info name="developer" value="John Carragher"/>
 		<part name="cart" interface="sorcerer_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="ssbasic1.bin" size="2048" crc="46f00e0d" sha1="9fff640a3bc1737815cdfa81ced73f4ff961817e" offset="0x0000" />
