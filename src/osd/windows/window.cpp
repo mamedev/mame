@@ -111,6 +111,8 @@ static DWORD last_update_time;
 
 static HANDLE ui_pause_event;
 
+static bool s_aggressive_focus;
+
 
 
 //============================================================
@@ -662,31 +664,37 @@ void winwindow_toggle_full_screen(void)
 
 bool winwindow_has_focus(void)
 {
-	HWND focuswnd = GetFocus();
-
 	// see if one of the video windows has focus
 	for (auto window : osd_common_t::s_window_list)
 	{
-		std::shared_ptr<win_window_info> win_window = std::static_pointer_cast<win_window_info>(window);
-		if (focuswnd == win_window->platform_window())
+		switch (std::static_pointer_cast<win_window_info>(window)->focus())
+		{
+		case win_window_focus::NONE:
+			break;
+
+		case win_window_focus::THREAD:
+			if (s_aggressive_focus)
+				return true;
+			break;
+
+		case win_window_focus::WINDOW:
 			return true;
 
-		// if this window is in attached mode, we need to see if it has
-		// focus in its context
-		if (win_window->attached_mode())
-		{
-			GUITHREADINFO gti;
-			gti.cbSize = sizeof(gti);
-			DWORD window_thread_id = GetWindowThreadProcessId(win_window->platform_window(), nullptr);
-			if (GetGUIThreadInfo(window_thread_id, &gti))
-			{
-				if (gti.hwndFocus == win_window->platform_window())
-					return true;
-			}
+		default:
+			throw false;
 		}
 	}
-
 	return false;
+}
+
+
+//============================================================
+//  osd_set_aggressive_input_focus
+//============================================================
+
+void osd_set_aggressive_input_focus(bool aggressive_focus)
+{
+	s_aggressive_focus = aggressive_focus;
 }
 
 
@@ -1880,6 +1888,47 @@ void win_window_info::set_fullscreen(int fullscreen)
 	// ensure we're still adjusted correctly
 	adjust_window_position_after_major_change();
 }
+
+
+//============================================================
+//  focus
+//  (main or window thread)
+//============================================================
+
+win_window_focus win_window_info::focus() const
+{
+	HWND focuswnd = nullptr;
+	if (attached_mode())
+	{
+		// if this window is in attached mode, we need to see if it has
+		// focus in its context; first find out what thread owns it
+		DWORD window_thread_id = GetWindowThreadProcessId(platform_window(), nullptr);
+
+		// and then identify which window has focus in that thread's context
+		GUITHREADINFO gti;
+		gti.cbSize = sizeof(gti);
+		focuswnd = GetGUIThreadInfo(window_thread_id, &gti)
+			? gti.hwndFocus
+			: nullptr;
+	}
+	else
+	{
+		// life is simpler in non-attached mode
+		focuswnd = GetFocus();
+	}
+
+	if (focuswnd == platform_window())
+		return win_window_focus::WINDOW;
+	else if (focuswnd)
+		return win_window_focus::THREAD;
+	else
+		return win_window_focus::NONE;
+}
+
+
+//============================================================
+//  winwindow_qt_filter
+//============================================================
 
 #if (USE_QTDEBUG)
 bool winwindow_qt_filter(void *message)
