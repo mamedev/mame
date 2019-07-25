@@ -953,8 +953,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// flip the tilemap around the center of the visible area
 	rectangle visarea = screen.visible_area();
-	u32 width = visarea.left() + visarea.right() + 1;
-	u32 height = visarea.top() + visarea.bottom() + 1;
+	u32 width = visarea.right() - visarea.left() + 1;
+	u32 height = visarea.bottom() - visarea.top() + 1;
 
 	// XY scrolling playfield
 	if (m_scrollrows == 1 && m_scrollcols == 1)
