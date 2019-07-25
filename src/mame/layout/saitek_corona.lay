@@ -521,60 +521,60 @@
 		<bounds x="0" y="0" width="6.6" height="6.6" />
 
 		<bezel name="lcd3.11.2" element="ldot"><bounds x="0" y="0" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.11.3" element="ldot"><bounds x="1" y="0" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.11.1" element="ldot"><bounds x="2" y="0" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.11.1" element="ldot"><bounds x="1" y="0" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.11.3" element="ldot"><bounds x="2" y="0" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.0.3" element="ldot"><bounds x="3" y="0" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.0.0" element="ldot"><bounds x="4" y="0" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.0.1" element="ldot"><bounds x="5" y="0" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.0.2" element="ldot"><bounds x="6" y="0" width="0.6" height="0.6" /></bezel>
 
 		<bezel name="lcd3.10.2" element="ldot"><bounds x="0" y="1" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.10.3" element="ldot"><bounds x="1" y="1" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.11.0" element="ldot"><bounds x="1" y="1" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.10.1" element="ldot"><bounds x="2" y="1" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.1.3" element="ldot"><bounds x="3" y="1" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.1.0" element="ldot"><bounds x="4" y="1" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.1.1" element="ldot"><bounds x="5" y="1" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.1.2" element="ldot"><bounds x="6" y="1" width="0.6" height="0.6" /></bezel>
 
-		<bezel name="lcd3.9.2" element="ldot"><bounds x="0" y="2" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.9.3" element="ldot"><bounds x="1" y="2" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.9.1" element="ldot"><bounds x="2" y="2" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.9.0" element="ldot"><bounds x="0" y="2" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.10.0" element="ldot"><bounds x="1" y="2" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.10.3" element="ldot"><bounds x="2" y="2" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.2.3" element="ldot"><bounds x="3" y="2" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.5.3" element="ldot"><bounds x="4" y="2" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.4.3" element="ldot"><bounds x="5" y="2" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.3.3" element="ldot"><bounds x="6" y="2" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.2.0" element="ldot"><bounds x="4" y="2" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.2.1" element="ldot"><bounds x="5" y="2" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.2.2" element="ldot"><bounds x="6" y="2" width="0.6" height="0.6" /></bezel>
 
-		<bezel name="lcd3.8.2" element="ldot"><bounds x="0" y="3" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.8.3" element="ldot"><bounds x="1" y="3" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.8.1" element="ldot"><bounds x="2" y="3" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.2.0" element="ldot"><bounds x="3" y="3" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.9.2" element="ldot"><bounds x="0" y="3" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.8.0" element="ldot"><bounds x="1" y="3" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.7.0" element="ldot"><bounds x="2" y="3" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.6.0" element="ldot"><bounds x="3" y="3" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.5.0" element="ldot"><bounds x="4" y="3" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.4.0" element="ldot"><bounds x="5" y="3" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.3.0" element="ldot"><bounds x="6" y="3" width="0.6" height="0.6" /></bezel>
 
-		<bezel name="lcd3.7.2" element="ldot"><bounds x="0" y="4" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.7.3" element="ldot"><bounds x="1" y="4" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.9.1" element="ldot"><bounds x="0" y="4" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.8.1" element="ldot"><bounds x="1" y="4" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.7.1" element="ldot"><bounds x="2" y="4" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.2.1" element="ldot"><bounds x="3" y="4" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.6.1" element="ldot"><bounds x="3" y="4" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.5.1" element="ldot"><bounds x="4" y="4" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.4.1" element="ldot"><bounds x="5" y="4" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.3.1" element="ldot"><bounds x="6" y="4" width="0.6" height="0.6" /></bezel>
 
-		<bezel name="lcd3.6.2" element="ldot"><bounds x="0" y="5" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.6.3" element="ldot"><bounds x="1" y="5" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.6.1" element="ldot"><bounds x="2" y="5" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.2.2" element="ldot"><bounds x="3" y="5" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.9.1" element="ldot"><bounds x="0" y="5" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.8.2" element="ldot"><bounds x="1" y="5" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.7.2" element="ldot"><bounds x="2" y="5" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.6.2" element="ldot"><bounds x="3" y="5" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.5.2" element="ldot"><bounds x="4" y="5" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.4.2" element="ldot"><bounds x="5" y="5" width="0.6" height="0.6" /></bezel>
 		<bezel name="lcd3.3.2" element="ldot"><bounds x="6" y="5" width="0.6" height="0.6" /></bezel>
 
-		<bezel name="lcd3.11.0" element="ldot"><bounds x="0" y="6" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.10.0" element="ldot"><bounds x="1" y="6" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.9.0" element="ldot"><bounds x="2" y="6" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.8.0" element="ldot"><bounds x="3" y="6" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.7.0" element="ldot"><bounds x="4" y="6" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd3.6.0" element="ldot"><bounds x="5" y="6" width="0.6" height="0.6" /></bezel>
-		<bezel name="lcd?.?.?" element="ldot"><bounds x="6" y="6" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.9.3" element="ldot"><bounds x="0" y="6" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.8.3" element="ldot"><bounds x="1" y="6" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.7.3" element="ldot"><bounds x="2" y="6" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.6.3" element="ldot"><bounds x="3" y="6" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.5.3" element="ldot"><bounds x="4" y="6" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.4.3" element="ldot"><bounds x="5" y="6" width="0.6" height="0.6" /></bezel>
+		<bezel name="lcd3.3.3" element="ldot"><bounds x="6" y="6" width="0.6" height="0.6" /></bezel>
 	</group>
 
 
