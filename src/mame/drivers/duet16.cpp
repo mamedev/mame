@@ -233,7 +233,7 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 				color = m_pal->pen_color((BIT(g2, 7 - xi) << 2) | (BIT(g1, 7 - xi) << 1) | BIT(g0, 7 - xi));
 			else
 				color = 0;
-			bitmap.pix32(y, (i * 8) + xi) = color;
+			bitmap.pix32(y, hbp + (i * 8) + xi) = color;
 		}
 	}
 }
@@ -421,6 +421,7 @@ void duet16_state::duet16(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
+	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
 
@@ -431,8 +432,6 @@ void duet16_state::duet16(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea_full();
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	MSM58321(config, m_rtc, 32768_Hz_XTAL);

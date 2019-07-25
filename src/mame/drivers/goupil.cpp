@@ -489,7 +489,7 @@ WRITE_LINE_MEMBER( goupil_g1_state::via_video_ca2_w )
 MC6845_UPDATE_ROW(goupil_g2_state::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	for (uint8_t x = 0; x < x_count; ++x)
 	{
 		uint16_t const offset = ( 0x400 + ( ma + x ) ) & 0x7FF;
@@ -594,8 +594,6 @@ void goupil_g2_state::goupil_g2(machine_config &config)
 	m_visu24x80_ram->set_default_size("2K");    // visu24x80 2K ram
 
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	m_screen->set_size((80*8), (24*(8+4)));
-	m_screen->set_visarea(0, (80*8)-1, 0, (24*(8+4))-1);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 

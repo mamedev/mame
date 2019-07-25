@@ -427,7 +427,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 			{
 				int x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix32(y, hbp + x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -440,7 +440,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix32(y, hbp + (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}
@@ -467,7 +467,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 			{
 				int x = (column * 8) + bit;
 
-				bitmap.pix32(y, x) = palette[BIT(data, 7)];
+				bitmap.pix32(y, hbp + x) = palette[BIT(data, 7)];
 
 				data <<= 1;
 			}
@@ -480,7 +480,7 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 			data = m_ram->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7)];
+				bitmap.pix32(y, hbp + (i * 8) + bit) = palette[BIT(data, 7)];
 				data <<= 1;
 			}
 		}
@@ -555,8 +555,6 @@ void pyl601_state::pyl601(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 200);
-	screen.set_visarea(0, 640 - 1, 0, 200 - 1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pyl601);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);

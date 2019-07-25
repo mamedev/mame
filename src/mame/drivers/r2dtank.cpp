@@ -308,7 +308,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 			}
 
 			color = bit ? fore_color : 0;
-			bitmap.pix32(y, x) = m_palette->pen_color(color);
+			bitmap.pix32(y, hbp + x) = m_palette->pen_color(color);
 
 			x = x + 1;
 		}

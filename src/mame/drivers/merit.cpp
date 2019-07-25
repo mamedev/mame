@@ -333,7 +333,7 @@ MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 				col |= 0x03;
 
 			col = m_ram_palette[col & 0x3ff];
-			bitmap.pix32(y, x) = m_pens[col ? col & (NUM_PENS-1) : (m_lscnblk ? 8 : 0)];
+			bitmap.pix32(y, hbp + x) = m_pens[col ? col & (NUM_PENS-1) : (m_lscnblk ? 8 : 0)];
 
 			x++;
 		}
@@ -1433,6 +1433,7 @@ void merit_state::pitboss(machine_config &config)
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
+	crtc.set_show_border_area(true);
 	crtc.set_char_width(8);
 	crtc.set_begin_update_callback(FUNC(merit_state::crtc_begin_update), this);
 	crtc.set_update_row_callback(FUNC(merit_state::crtc_update_row), this);

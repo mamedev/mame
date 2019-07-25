@@ -138,22 +138,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 {
 	int x = 0;
-	int x_max = 0x100;
+	int x_end = 0x100; /* x_count * 8 ? */
 	int dx = 1;
 
+	m_flipscreen = 0;
 	if (m_flipscreen)
 	{
-		y = 0xdf - y;
+		y = 0xdf - (y - vbp) + vbp;
 		x = 0xff;
-		x_max = -1;
+		x_end = -1;
 		dx = -1;
 	}
 
-	int pixaddr = y << 8;
+	int pixaddr = (y - vbp) << 8;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *b = &bitmap.pix32(y);
+	uint32_t *b = &bitmap.pix32(y, hbp);
 
-	while (x != x_max)
+	while (x != x_end)
 	{
 		int offset = (pixaddr >> 1) & 0x7fff;
 		int shift = (pixaddr & 1) * 4; // two 4 bit pixels in one byte

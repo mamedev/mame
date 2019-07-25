@@ -73,7 +73,7 @@ MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 {
 	for (int sx = 0; sx < 50; sx++)
 	{
-		offs_t addr = (y * 50) + sx;
+		offs_t addr = ((y - vbp) * 50) + sx;
 		uint16_t data = m_bitmap_ram[addr];
 
 		for (int bit = 0; bit < 16; bit++)
@@ -81,7 +81,7 @@ MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 			int x = (sx * 16) + bit;
 			int color = BIT(data, 15) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = PALETTE_MVC[color];
+			bitmap.pix32(y, hbp + x) = PALETTE_MVC[color];
 
 			data <<= 1;
 		}
@@ -116,8 +116,8 @@ MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 			int x = (column * 10) + bit;
 			int color = ((BIT(data, 9) & ~ATTR_BLANK) ^ ATTR_REVERSE);
 
-			if ((color | bitmap.pix32(vbp + y, hbp + x)) & ATTR_BOLD) color = 2;
-			if (color) bitmap.pix32(vbp + y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black();
+			if ((color | bitmap.pix32(y, hbp + x)) & ATTR_BOLD) color = 2;
+			if (color) bitmap.pix32(y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black();
 
 			data <<= 1;
 		}
@@ -140,14 +140,12 @@ void wangpc_mvc_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	screen.set_size(80*10, 25*12);
-	screen.set_visarea(0, 80*10-1, 0, 25*12-1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_refresh_hz(60);
 
 	MC6845_1(config, m_crtc, XTAL(14'318'181)/16);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
 	m_crtc->set_update_row_callback(FUNC(wangpc_mvc_device::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(wangpc_mvc_device::vsync_w));

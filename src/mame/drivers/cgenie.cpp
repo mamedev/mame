@@ -6,8 +6,6 @@
 
     TODO:
     - System is too fast, there should be one wait cycle every five cycles?
-    - Adjust visible area so that the borders aren't that large (needs
-      MC6845 changes)
     - Verify BASIC and character set versions
 
 ***************************************************************************/
@@ -344,10 +342,10 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 		{
 			const rgb_t map[] = { m_background_color, m_palette[8], m_palette[6], m_palette[5] };
 
-			bitmap.pix32(y + vbp, column * 4 + hbp + 0) = map[code >> 6 & 0x03];
-			bitmap.pix32(y + vbp, column * 4 + hbp + 1) = map[code >> 4 & 0x03];
-			bitmap.pix32(y + vbp, column * 4 + hbp + 2) = map[code >> 2 & 0x03];
-			bitmap.pix32(y + vbp, column * 4 + hbp + 3) = map[code >> 0 & 0x03];
+			bitmap.pix32(y, column * 4 + hbp + 0) = map[code >> 6 & 0x03];
+			bitmap.pix32(y, column * 4 + hbp + 1) = map[code >> 4 & 0x03];
+			bitmap.pix32(y, column * 4 + hbp + 2) = map[code >> 2 & 0x03];
+			bitmap.pix32(y, column * 4 + hbp + 3) = map[code >> 0 & 0x03];
 		}
 		else
 		{
@@ -367,7 +365,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 
 			// 8 pixel chars
 			for (int p = 0; p < 8; p++)
-				bitmap.pix32(y + vbp, column * 8 + hbp + p) = BIT(gfx, 7 - p) ? m_palette[color] : m_background_color;
+				bitmap.pix32(y, column * 8 + hbp + p) = BIT(gfx, 7 - p) ? m_palette[color] : m_background_color;
 		}
 	}
 }
@@ -448,7 +446,7 @@ void cgenie_state::cgenie(machine_config &config)
 
 	HD6845S(config, m_crtc, XTAL(17'734'470) / 16);
 	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update), this);
 	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row), this);

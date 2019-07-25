@@ -60,11 +60,11 @@ MC6845_UPDATE_ROW(qvt190_state::update_row)
 		uint8_t chr = m_videoram[mem];
 		uint16_t gfx = m_p_chargen[(chr << 4) | ra];
 
-		if (x == cursor_x)
+		if (x == cursor_x && de)
 			gfx = ~gfx;
 
 		for (int i = 0; i < 9; i++)
-			bitmap.pix32(y, x*9 + (8-i)) = palette[BIT(gfx, i) ? 2 : 0];
+			bitmap.pix32(y, hbp + x*9 + (8-i)) = palette[BIT(gfx, i) ? 2 : 0];
 	}
 }
 
@@ -134,6 +134,7 @@ void qvt190_state::qvt190(machine_config &config)
 
 	mc6845_device &crtc(MC6845(config, "crtc", 16.6698_MHz_XTAL / 9));
 	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
 	crtc.set_char_width(9);
 	crtc.set_update_row_callback(FUNC(qvt190_state::update_row), this);
 }

@@ -231,7 +231,7 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 x,gfx;
 	u16 mem;
-	u32 *p = &bitmap.pix32(y);
+	u32 *p = &bitmap.pix32(y, hbp);
 	ma &= 0x7ff;
 
 	for (x = 0; x < x_count; x++)
@@ -307,8 +307,6 @@ void lola8a_state::lola8a(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845s_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	hd6845s_device &crtc(HD6845S(config, HD46505SP_TAG, XTAL(8'000'000) / 8)); // HD6845 == HD46505S
 	crtc.set_screen("screen");

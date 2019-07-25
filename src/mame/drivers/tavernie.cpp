@@ -222,7 +222,7 @@ MC6845_UPDATE_ROW( tavernie_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx=0;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -373,8 +373,6 @@ void tavernie_state::ivg09(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(80*8, 25*10);
-	screen.set_visarea(0, 80*8-1, 0, 25*10-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_tavernie);

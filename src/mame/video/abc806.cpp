@@ -229,7 +229,7 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 	int e6 = m_40;
 	int th = 0;
 
-	y += m_sync + vbp;
+	y += m_sync;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -299,7 +299,7 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 
 		uint16_t chargen_addr = (th << 12) | (data << 4) | rad_data;
 		uint8_t chargen_data = m_char_rom->base()[chargen_addr & 0xfff] << 2;
-		int x = hbp + (column + 4) * ABC800_CHAR_WIDTH;
+		int x = hbp + column * ABC800_CHAR_WIDTH;
 
 		for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
@@ -481,7 +481,7 @@ void abc806_state::abc806_video(machine_config &config)
 {
 	MC6845(config, m_crtc, ABC800_CCLK);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(ABC800_CHAR_WIDTH);
 	m_crtc->set_update_row_callback(FUNC(abc806_state::abc806_update_row), this);
 	m_crtc->out_hsync_callback().set(FUNC(abc806_state::hs_w));

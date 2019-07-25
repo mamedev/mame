@@ -305,7 +305,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 		{
 			for (int pxl = 0; pxl < 8; pxl++)
 			{
-				bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+				bitmap.pix32(y, hbp + ( x_pos * 8) + pxl) = rgb_t::black();
 			}
 		}
 		else
@@ -332,7 +332,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						//pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Create the grey scale */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix32(y, hbp + ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -372,7 +372,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						pind ^= ((cursor_x != -1 && x_pos == cursor_x && ra == 7) ? 7 : 0);
 
 						/* Pick up the color */
-						bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
+						bitmap.pix32(y, hbp + ( x_pos * 8) + pxl) = (*m_pal)[pind & 0x07];
 					}
 				}
 				break;
@@ -394,11 +394,11 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 					{
 						if ((pdat & (0x80 >> pxl)) != 0)
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = (*m_pal)[0x07];
+							bitmap.pix32(y, hbp + ( x_pos * 8) + pxl) = (*m_pal)[0x07];
 						}
 						else
 						{
-							bitmap.pix32(y, ( x_pos * 8) + pxl) = rgb_t::black();
+							bitmap.pix32(y, hbp + ( x_pos * 8) + pxl) = rgb_t::black();
 						}
 					}
 				}
@@ -453,24 +453,21 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	case 0: // Disambiguity between reality and the service manual. Reality is 640x200 in 8 color or tones!
 			{
 			LOGVMOD(" - 640x200 on 80x25  \n");
-			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_crtc->set_char_width(16);
 			break;
 		}
 
 	case 1: /* 320x200 */
 		{
 			LOGVMOD(" - 320x200, 40 char, 8 color or 8 tones of green...\n");
-			rectangle rect(0, 320 - 1, 0, 200 - 1);
-			m_screen->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_crtc->set_char_width(8);
 		}
 		break;
 
 	case 2: /* 640x200 - boots up in this mode */
 		{
 			LOGVMOD(" - 640x200, 80 char, white on black...\n");
-			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_crtc->set_char_width(16);
 		}
 		break;
 
@@ -485,16 +482,14 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	case 5: /* 320x400 */
 		{
 			LOGVMOD("320x400, 40 char, white on black\n");
-			rectangle rect(0, 320 - 1, 0, 400 - 1);
-			m_screen->configure(320, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_crtc->set_char_width(8);
 		}
 		break;
 
 	case 6: /* 640x400 */
 		{
 			LOGVMOD("640x400, 80 char, white on black\n");
-			rectangle rect(0, 640 - 1, 0, 400 - 1);
-			m_screen->configure(640, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_crtc->set_char_width(16);
 		}
 		break;
 

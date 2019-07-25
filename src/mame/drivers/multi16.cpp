@@ -101,7 +101,7 @@ MC6845_UPDATE_ROW(multi16_state::crtc_update_row)
 			color |= BIT(data_g, 7 - x) << 1;
 			color |= BIT(data_b, 7 - x) << 2;
 
-			bitmap.pix32(y, x + i * 8) = m_palette->pens()[color];
+			bitmap.pix32(y, hbp + x + i * 8) = m_palette->pens()[color];
 		}
 	}
 }

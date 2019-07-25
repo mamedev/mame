@@ -63,7 +63,7 @@ private:
 	MC6845_UPDATE_ROW(untoucha_update_row);
 	void common_vh_start( int num_pixmaps );
 	void copy_pixel( int x, int y, int pen );
-	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
+	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint16_t hbp, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;

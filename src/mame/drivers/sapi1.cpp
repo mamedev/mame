@@ -455,7 +455,7 @@ MC6845_UPDATE_ROW( sapi1_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,inv;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{

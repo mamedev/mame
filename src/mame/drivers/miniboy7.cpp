@@ -332,9 +332,9 @@ MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 			uint8_t color_b = m_proms[offset_b] & 0x0f;
 
 			if (color_a && (m_gpri || !color_b))          // videoram A has priority
-				bitmap.pix32(y, (cx << 3) + px) = palette[offset_a];
+				bitmap.pix32(y, hbp + (cx << 3) + px) = palette[offset_a];
 			else if (color_b && (!m_gpri || !color_a))    // videoram B has priority
-				bitmap.pix32(y, (cx << 3) + px) = palette[offset_b];
+				bitmap.pix32(y, hbp + (cx << 3) + px) = palette[offset_b];
 		}
 	}
 }
@@ -670,8 +670,6 @@ void miniboy7_state::miniboy7(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((47+1)*8, (39+1)*8);             // taken from MC6845, registers 00 & 04 (normally programmed with value - 1).
-	screen.set_visarea(0*8, 37*8-1, 0*8, 37*8-1);    // taken from MC6845, registers 01 & 06.
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_miniboy7);

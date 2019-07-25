@@ -663,8 +663,6 @@ void mbee_state::mbee(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250)); /* not accurate */
-	m_screen->set_size(64*8, 19*16);           /* need at least 17 lines for NET */
-	m_screen->set_visarea(0*8, 64*8-1, 0, 19*16-1);
 	m_screen->set_screen_update(FUNC(mbee_state::screen_update_mbee));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mono);

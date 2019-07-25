@@ -80,7 +80,7 @@ MC6845_UPDATE_ROW( sys9002_state::crtc_update_row )
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -133,8 +133,6 @@ void sys9002_state::sys9002(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not correct
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_mx2178);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

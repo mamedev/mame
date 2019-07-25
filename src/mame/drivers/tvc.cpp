@@ -643,7 +643,7 @@ void tvc_state::machine_reset()
 MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint8_t *vram = m_vram->base() + ((m_vram_bank & 0x30)<<10);
 	uint16_t offset = ((ma*4 + ra*0x40) & 0x3fff);
 	int i;
@@ -777,8 +777,6 @@ void tvc_state::tvc(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 240);
-	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(tvc_state::tvc_palette), 16);

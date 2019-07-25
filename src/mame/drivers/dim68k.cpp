@@ -236,7 +236,7 @@ MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 chr,gfx,x,xx,inv;
 	uint16_t chr16=0x2020; // set to spaces if screen is off
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	u8 screen_on = ~m_video_control & 4;
 	u8 dot8 = ~m_video_control & 40;
 
@@ -321,8 +321,6 @@ void dim68k_state::dim68k(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 250-1);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 

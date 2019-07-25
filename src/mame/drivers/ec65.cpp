@@ -116,7 +116,7 @@ MC6845_UPDATE_ROW( ec65_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,inv;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -167,8 +167,6 @@ void ec65_state::ec65(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 200);
-	screen.set_visarea_full();
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_ec65);
@@ -206,8 +204,6 @@ void ec65k_state::ec65k(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 200);
-	screen.set_visarea_full();
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ec65);

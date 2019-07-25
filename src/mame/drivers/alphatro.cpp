@@ -340,11 +340,11 @@ MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
 	bool palette = BIT(m_config->read(), 5);
-	if (y==0) m_flashcnt++;
+	if (y==vbp) m_flashcnt++;
 	bool inv;
 	u8 chr,gfx,attr,bg,fg;
 	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	u32 *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{

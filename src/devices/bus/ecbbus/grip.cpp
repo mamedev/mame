@@ -187,7 +187,7 @@ MC6845_UPDATE_ROW( ecb_grip21_device::crtc_update_row )
 			int x = (column * 8) + bit;
 			int color = (m_flash ? 0 : BIT(data, bit)) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(color);
+			bitmap.pix32(y, hbp + x) = m_palette->pen(color);
 		}
 	}
 }
@@ -207,7 +207,7 @@ MC6845_UPDATE_ROW( ecb_grip21_device::grip5_update_row )
             int x = (column * 8) + bit;
             int color = m_flash ? 0 : BIT(data, bit);
 
-            bitmap.pix32(y, x) = palette[color];
+            bitmap.pix32(y, hbp + x) = palette[color];
         }
     }
 }
@@ -419,8 +419,6 @@ void ecb_grip21_device::device_add_mconfig(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -433,7 +431,7 @@ void ecb_grip21_device::device_add_mconfig(machine_config &config)
 	// devices
 	MC6845(config, m_crtc, XTAL(16'000'000)/4);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(ecb_grip21_device::crtc_update_row), this);
 	m_crtc->out_de_callback().set(m_sti, FUNC(z80sti_device::i1_w));

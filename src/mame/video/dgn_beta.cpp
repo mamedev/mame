@@ -102,7 +102,7 @@ MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t *videoram = m_videoram;
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	int i;
 	if(IsTextMode)
 	{

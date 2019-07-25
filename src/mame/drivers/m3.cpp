@@ -65,7 +65,7 @@ MC6845_UPDATE_ROW( m3_state::crtc_update_row )
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,inv;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -126,8 +126,6 @@ void m3_state::m3(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not correct
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 639, 0, 479);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_f4disp);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

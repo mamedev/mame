@@ -590,7 +590,7 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 	if (interlace)
 	{
 		ra >>= 1;
-		if (y > 0x191) return;
+		if ((y - vbp) > 0x191) return;
 	}
 
 	// redundant initializers to keep compiler happy
@@ -650,9 +650,9 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 				else
 					pen = (dots[hf] >> (7-xi) & 1) ? color : bgcolor;
 
-				bitmap.pix32(y, x*8+xi) = palette[pen];
+				bitmap.pix32(y, hbp + x*8+xi) = palette[pen];
 				// when the mc6845 device gains full interlace&video support, replace the line above with the line below
-				// bitmap.pix32(y*(interlace+1)+hf, x*8+xi) = palette[pen];
+				// bitmap.pix32(y*(interlace+1)+hf, hbp + x*8+xi) = palette[pen];
 			}
 		}
 	}
@@ -925,8 +925,6 @@ void bml3_state::bml3_common(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
-	screen.set_size(640, 400);
-	screen.set_visarea(0, 320-1, 0, 200-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 

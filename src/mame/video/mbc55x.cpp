@@ -147,7 +147,7 @@ MC6845_UPDATE_ROW( mbc55x_state::crtc_update_row )
 
 			colour=(rb<<2) | (gb<<1) | (bb<<0);
 
-			bitmap.pix32(y, (x_pos*8)+pixelno)=palette[colour];
+			bitmap.pix32(y, hbp + (x_pos*8)+pixelno)=palette[colour];
 			//logerror("set pixel (%d,%d)=%d\n",y, ((x_pos*8)+pixelno),colour);
 			bitno=bitno>>1;
 			shifts--;

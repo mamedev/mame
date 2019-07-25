@@ -169,7 +169,7 @@ MC6845_UPDATE_ROW( aussiebyte_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,attr;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	ra &= 15;
 	m_cnt++;
 

@@ -245,7 +245,7 @@ MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix32(y, hbp + ((cx << 3) | x)) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}
@@ -281,7 +281,7 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 
 		for (int x = 7; x >= 0; --x)
 		{
-			bitmap.pix32(y, (cx << 3) | x) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
+			bitmap.pix32(y, hbp + ((cx << 3) | x)) = m_pens[palette + ((b1 & 1) | ((b0 & 1) << 1))];
 			b0 >>= 1;
 			b1 >>= 1;
 		}

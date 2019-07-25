@@ -314,7 +314,7 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 			for (int x = 0; x < 8; x++)
 			{
 				int color = BIT(data, 7 - x);
-				bitmap.pix32(y, x + i*8) = pen[blink ? 0 : (color ^ inverse)];
+				bitmap.pix32(y, hbp + x + i*8) = pen[blink ? 0 : (color ^ inverse)];
 			}
 		}
 		else
@@ -324,7 +324,7 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 
 			// draw 8 pixels of the cell
 			for (int x = 0; x < 8; x++)
-				bitmap.pix32(y, x + i*8) = pen[BIT(data, 7 - x)];
+				bitmap.pix32(y, hbp + x + i*8) = pen[BIT(data, 7 - x)];
 		}
 	}
 }

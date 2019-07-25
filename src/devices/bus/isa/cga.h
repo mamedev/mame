@@ -69,7 +69,7 @@ public:
 	uint8_t   m_color_select;  /* wo 0x3d9 */
 	//uint8_t   m_status;   //unused?     /* ro 0x3da */
 
-	int     m_update_row_type, m_y;
+	int     m_update_row_type;
 	uint8_t   m_palette_lut_2bpp[4];
 	offs_t  m_chr_gen_offset[4];
 	uint8_t   m_font_selection_mask;
@@ -88,7 +88,6 @@ public:
 private:
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
-	MC6845_RECONFIGURE(reconfigure);
 };
 
 // device type definition
@@ -279,7 +278,6 @@ public:
 	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( m24_gfx_1bpp_m24_update_row );
-	MC6845_RECONFIGURE(reconfigure);
 
 protected:
 	isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

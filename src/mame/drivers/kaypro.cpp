@@ -298,8 +298,6 @@ void kaypro_state::kaypro484(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(80*8, 25*16);
-	m_screen->set_visarea(0,80*8-1,0,25*16-1);
 	m_screen->set_screen_update(FUNC(kaypro_state::screen_update_kaypro484));
 
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
@@ -315,7 +313,7 @@ void kaypro_state::kaypro484(machine_config &config)
 	MC6845(config, m_crtc, 2000000); // comes out of ULA - needs to be measured
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(7);
+	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
 
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(kaypro_state::quickload_cb), this);

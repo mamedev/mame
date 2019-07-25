@@ -72,7 +72,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
+				bitmap.pix32(y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}
@@ -94,7 +94,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
+				bitmap.pix32(y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}
@@ -120,14 +120,12 @@ void wangpc_lvc_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	screen.set_size(80*8, 25*9);
-	screen.set_visarea(0, 80*8-1, 0, 25*9-1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_refresh_hz(60);
 
 	MC6845_1(config, m_crtc, XTAL(14'318'181)/16);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(wangpc_lvc_device::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(wangpc_lvc_device::vsync_w));

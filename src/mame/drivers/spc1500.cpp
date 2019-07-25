@@ -536,8 +536,9 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	int i;
 	int j;
 	int h1, h2, h3;
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 
+	y -= vbp; /* Could it better use ma? */
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	bool inv = false;
@@ -890,8 +891,6 @@ void spc1500_state::spc1500(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 400);
-	screen.set_visarea(0,640-1,0,400-1);
 	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(spc1500_state::spc_palette), 8);
@@ -901,7 +900,6 @@ void spc1500_state::spc1500(machine_config &config)
 	m_vdg->set_show_border_area(false);
 	m_vdg->set_char_width(8);
 	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row), this);
-	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig), this);
 
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 

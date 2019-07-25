@@ -117,8 +117,8 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t i,chr,gfx=0,color,pen,attr;
-	uint16_t mem = y*80,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint16_t mem = (y - vbp) * 80, x;  /* Could it better use ma? */
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for(x = 0; x < x_count; x++)
 	{
@@ -146,7 +146,7 @@ MC6845_UPDATE_ROW( multi8_state::crtc_update_row )
 	u8 x_width = BIT(m_display_reg, 6) ? 80 : 40;
 	u8 x_step = BIT(m_display_reg, 6) ? 1 : 2;
 	mem = 0xc000 + ma;
-	p = &bitmap.pix32(y);
+	p = &bitmap.pix32(y, hbp);
 
 	for(x = 0; x < x_width; x++)
 	{
@@ -625,8 +625,6 @@ void multi8_state::multi8(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 200);
-	screen.set_visarea(0, 320-1, 0, 200-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);

@@ -500,7 +500,7 @@ MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint16_t const base = (ma >> 1) & 0xF80;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	for (uint8_t x = 0; x < x_count; ++x)
 	{
 		uint16_t const offset = base | ((ma + x) & 0x7F);

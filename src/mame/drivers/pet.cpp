@@ -1381,7 +1381,6 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 	int x = 0;
 	int char_rom_mask = m_char_rom->bytes() - 1;
 	const pen_t *pen = m_palette->pens();
-	hbp = 80;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -1401,7 +1400,7 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			bitmap.pix32(y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1414,7 +1413,7 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			bitmap.pix32(y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1429,7 +1428,6 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 	int x = 0;
 	int char_rom_mask = m_char_rom->bytes() - 1;
 	const pen_t *pen = m_palette->pens();
-	hbp = 41;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -1447,7 +1445,7 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			bitmap.pix32(y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1483,7 +1481,7 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			bitmap.pix32(y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1496,7 +1494,7 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+			bitmap.pix32(y, hbp + x++) = pen[video];
 		}
 	}
 }
@@ -1887,14 +1885,12 @@ void pet2001b_state::pet4032f(machine_config &config)
 	// video hardware
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 250);
-	m_screen->set_visarea(0, 320 - 1, 0, 250 - 1);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	m_sync_period = attotime::never;
 
 	MC6845(config, m_crtc, XTAL(16'000'000)/16);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
 	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
@@ -1943,14 +1939,12 @@ void pet_state::cbm4032f(machine_config &config)
 	// video hardware
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 250);
-	m_screen->set_visarea(0, 320 - 1, 0, 250 - 1);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	m_sync_period = attotime::never;
 
 	MC6845(config, m_crtc, XTAL(16'000'000)/16);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
 	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
@@ -2010,13 +2004,11 @@ void pet80_state::pet80(machine_config &config)
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(640, 250);
-	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 
 	MC6845(config, m_crtc, XTAL(16'000'000)/16);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(2*8);
 	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
 	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row), this);
@@ -2071,7 +2063,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	PLS100(config, PLA2_TAG);
 
 	m_crtc->set_clock(XTAL(16'000'000)/16);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(2*8);
 	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row), this);
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));

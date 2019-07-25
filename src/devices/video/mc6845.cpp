@@ -507,6 +507,7 @@ void mc6845_device::recompute_parameters(bool postload)
 
 	/* determine the visible area, avoid division by 0 */
 	uint16_t max_visible_x = m_horiz_disp * m_hpixels_per_column - 1;
+	// Offset from the first character, not within the bitmap.
 	uint16_t max_visible_y = m_vert_disp * video_char_height - 1;
 
 	/* determine the syncing positions */
@@ -526,6 +527,20 @@ void mc6845_device::recompute_parameters(bool postload)
 	hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * m_hpixels_per_column);
 	vsync_on_pos = m_vert_sync_pos * video_char_height;
 	vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
+
+	// Some devices, LCD displays, can use earlier sync pulses but the
+	// calculation below assume that the sync pulses are after the visible
+	// area so adjust sync position if necessary.
+	if (hsync_on_pos <= max_visible_x)
+	{
+		hsync_on_pos = max_visible_x + 1;
+		hsync_off_pos = horiz_pix_total;
+	}
+	if (vsync_on_pos <= max_visible_y)
+	{
+		vsync_on_pos = max_visible_y + 1;
+		vsync_off_pos = vert_pix_total;
+	}
 
 	// the Commodore PET computers have a non-standard 20kHz monitor which
 	// requires a wider HSYNC pulse that extends past the scanline width
@@ -566,10 +581,44 @@ void mc6845_device::recompute_parameters(bool postload)
 				//vert_pix_total *= 2;
 			}
 
+			int vbp = vert_pix_total - vsync_off_pos;
+			if (vbp < 0) vbp = 0;
+			int hbp = horiz_pix_total - hsync_off_pos;
+			if (hbp < 0) hbp = 0;
+
 			if(m_show_border_area)
-				visarea.set(0, horiz_pix_total-2, 0, vert_pix_total-2);
-			else
+			{
+				// Show the borders, but cut the sync area,
+				// keeping all otherwise visible characters.
+				uint16_t max_x = std::max(hsync_on_pos - 1, hbp + max_visible_x);
+				uint16_t max_y = std::max(vsync_on_pos - 1, vbp + max_visible_y);
+				visarea.set(0, max_x, 0, max_y);
+			}
+			else if (m_update_row_cb.isnull())
+			{
+				// If there is no row update callback then
+				// expect the visible area to be at the screen
+				// zero origin with no border. There are a lot
+				// of emulators that implement their own
+				// screen update code without using the mc6845
+				// driver screen update and row drawing code
+				// paths and these do not support a border
+				// offset.
 				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
+			} else
+			{
+				// If there is a row update callback then it
+				// is expected to offset the displayable
+				// pixels placed in the bitmap from the
+				// border. The mc6845 driver supplies the vbp
+				// and hbp offests to the row update callback
+				// so this is not a large burden, and this
+				// also makes it trivial for these emulators
+				// to switch between showing the border and
+				// not, and with the displayable area
+				// correctly placed.
+				visarea.set(hbp + m_visarea_adjust_min_x, hbp + max_visible_x + m_visarea_adjust_max_x, vbp + m_visarea_adjust_min_y, vbp + max_visible_y + m_visarea_adjust_max_y);
+			}
 
 			LOGMASKED(LOG_CONFIG, "M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
@@ -691,6 +740,40 @@ bool mc6845_device::match_line()
 	return false;
 }
 
+bool mc6845_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
+{
+	if (!m_cursor_state)
+		return false;
+
+	if ((m_cursor_addr < line_addr) ||
+	    (m_cursor_addr >= (line_addr + m_horiz_disp)))
+	{
+		// Not a cursor character line.
+		return false;
+	}
+
+	uint16_t cursor_start_ras = m_cursor_start_ras & 0x1f;
+
+	if (cursor_start_ras > m_max_ras_addr)
+	{
+		// No cursor possible.
+		return false;
+	}
+
+	if (cursor_start_ras <= m_cursor_end_ras)
+	{
+		if (m_cursor_end_ras > m_max_ras_addr)
+		{
+			// Full cursor.
+			return true;
+		}
+		// Cursor from start to end inclusive.
+		return (ra >= cursor_start_ras) && (ra <= m_cursor_end_ras);
+	}
+
+	// Otherwise cursor_start_ras > m_cursor_end_ras giving a split cursor.
+	return (ra <= m_cursor_end_ras) || (ra >= cursor_start_ras);
+}
 
 void mc6845_device::handle_line_timer()
 {
@@ -776,11 +859,7 @@ void mc6845_device::handle_line_timer()
 		m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
 
 		/* Is cursor visible on this line? */
-		if ( m_cursor_state &&
-			(m_raster_counter >= (m_cursor_start_ras & 0x1f)) &&
-			(m_raster_counter <= m_cursor_end_ras) &&
-			(m_cursor_addr >= m_line_address) &&
-			(m_cursor_addr < (m_line_address + m_horiz_disp)) )
+		if (check_cursor_visible(m_raster_counter, m_line_address))
 		{
 			m_cursor_x = m_cursor_addr - m_line_address;
 
@@ -964,23 +1043,47 @@ void mc6845_device::update_cursor_state()
 }
 
 
-uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+// Draw a scaline using a supplied callback. This is called by the screen
+// update paths, and not from the machine drivers, so it appears to not be
+// synchronized with the machine driver. This means that this code can not
+// rely on the machine's current display address, and that this code should
+// not be modifying the machines state. The cliprect supplied is not
+// necessarily the whole displayable area and might be as small as part of a
+// screen line. The y offset supplied is an offset within the destination
+// bitmap, not an offset in the displayable region. */
+void mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* compute the current raster line */
-	uint8_t ra = y % (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
-
-	/* check if the cursor is visible and is on this scanline */
-	int cursor_visible = m_cursor_state &&
-						(ra >= (m_cursor_start_ras & 0x1f)) &&
-						(ra <= m_cursor_end_ras) &&
-						(m_cursor_addr >= m_current_disp_addr) &&
-						(m_cursor_addr < (m_current_disp_addr + m_horiz_disp));
-
-	/* compute the cursor X position, or -1 if not visible */
-	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
-	int de = (y < m_max_visible_y) ? 1 : 0;
+	// Compute the current displayable raster line from the supplied
+	// screen y index and the driver configuration - not from the driver
+	// dynamic state.
 	int vbp = m_vert_pix_total - m_vsync_off_pos;
 	if (vbp < 0) vbp = 0;
+
+	if (y < vbp)
+	{
+		// Skip early if the y index is above displayable lines, in the top border.
+		return;
+	}
+
+	// Raster line offset in the diplayable area.
+	uint16_t yd = y - vbp;
+	// Character line and raster offset.
+	int16_t line = yd / (m_max_ras_addr  + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
+	uint8_t ra = yd % (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
+
+	// Display address of the start of the character line.
+	uint16_t current_disp_addr = ((line * m_horiz_disp) & 0x3fff) + m_disp_start_addr;
+
+	// Check if the cursor is visible and is on this scanline.
+	int cursor_visible = check_cursor_visible(ra, current_disp_addr);
+
+	// Compute the cursor X position, or -1 if not visible. This position
+	// is in units of characters and is relative to the start of the
+	// displayable area, not relative to the screen bitmap origin.
+	int8_t cursor_x = cursor_visible ? (m_cursor_addr - current_disp_addr) : -1;
+	int de = (yd <= m_max_visible_y) ? 1 : 0;
+
+	// Horizontal border offset, relative to the screen bitmap origin.
 	int hbp = m_horiz_pix_total - m_hsync_off_pos;
 	if (hbp < 0) hbp = 0;
 
@@ -988,24 +1091,22 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 	if (MODE_ROW_COLUMN_ADDRESSING)
 	{
 		uint8_t cc = 0;
-		uint8_t cr = y / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
+		uint8_t cr = yd / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 		uint16_t ma = (cr << 8) | cc;
 
 		m_update_row_cb(bitmap, cliprect, ma + m_disp_start_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
 	else
 	{
-		m_update_row_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+		m_update_row_cb(bitmap, cliprect, current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
-
-	/* update MA if the last raster address */
-	if (ra == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1)
-		m_current_disp_addr = (m_current_disp_addr + m_horiz_disp) & 0x3fff;
-
-	return ra;
 }
 
 
+// The default screen update function. This is called via the screen code, and
+// not from the machine drivers, so it appears to not be synchronized with the
+// machine driver. The cliprect supplied is not necessarily the whole
+// displayable area and might be as small as part of a screen line.
 uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	assert(bitmap.valid());
@@ -1018,14 +1119,10 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		if (!m_begin_update_cb.isnull())
 			m_begin_update_cb(bitmap, cliprect);
 
-		if (cliprect.min_y == 0)
-		{
-			/* read the start address at the beginning of the frame */
-			m_current_disp_addr = m_disp_start_addr;
-		}
-
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y && y <= m_max_visible_y; y++)
+		int vbp = m_vert_pix_total - m_vsync_off_pos;
+		if (vbp < 0) vbp = 0;
+		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y && y <= vbp + m_max_visible_y; y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}
@@ -1540,18 +1637,6 @@ void mos8563_device::update_cursor_state()
 	}
 }
 
-
-uint8_t mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t ra = mc6845_device::draw_scanline(y, bitmap, cliprect);
-
-	if (ra == m_max_ras_addr)
-		m_current_disp_addr = (m_current_disp_addr + m_row_addr_incr) & 0x3fff;
-
-	return ra;
-}
-
-
 MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
 	ra += (m_vert_scroll & 0x0f);
@@ -1591,7 +1676,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
+				bitmap.pix32(y, hbp + x) = pen(de ? color : 0);
 			}
 		}
 		else
@@ -1627,7 +1712,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
 
-				bitmap.pix32(vbp + y, hbp + x) = pen(de ? color : 0);
+				bitmap.pix32(y, hbp + x) = pen(de ? color : 0);
 
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}

@@ -750,7 +750,7 @@ MACHINE_RESET_MEMBER(camplynx_state, lynx128k)
 MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 {
 	uint8_t r,g,b,x;
-	uint32_t green_bank, *p = &bitmap.pix32(y);
+	uint32_t green_bank, *p = &bitmap.pix32(y, hbp);
 	uint16_t mem = ((ma << 2) + (ra << 5)) & 0x1fff;
 
 	// determine green bank
@@ -779,7 +779,7 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 {
 	uint8_t r,g,b,x;
-	uint32_t green_bank, *p = &bitmap.pix32(y);
+	uint32_t green_bank, *p = &bitmap.pix32(y, hbp);
 	uint16_t mem = ((ma << 2) + (ra << 6)) & 0x3fff;
 	// determine green bank
 	if (BIT(m_port80, 4))
@@ -878,8 +878,6 @@ void camplynx_state::lynx48k(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 480);
-	screen.set_visarea_full();
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	lynx_common(config);
@@ -927,8 +925,6 @@ void camplynx_state::lynx128k(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 480);
-	screen.set_visarea_full();
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	lynx_common(config);

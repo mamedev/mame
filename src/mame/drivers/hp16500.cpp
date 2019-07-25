@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER( hp16500_state::vsync_changed )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 {
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	int i, pos;
 
 	pos =  y * 144;
@@ -165,7 +165,7 @@ MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row_1650 )
 {
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	int i, pos;
 
 	pos =  y * 148;

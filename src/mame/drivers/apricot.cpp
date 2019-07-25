@@ -298,14 +298,14 @@ MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 			{
 				int color = fill ? 1 : BIT(data, x);
 				color ^= BIT(code, 15); // reverse?
-				bitmap.pix32(y, x + i*10) = pen[color ? 1 + BIT(code, 14) : 0];
+				bitmap.pix32(y, hbp + x + i*10) = pen[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
 		else
 		{
 			// draw 16 pixels of the cell
 			for (int x = 0; x <= 16; x++)
-				bitmap.pix32(y, x + i*16) = pen[BIT(data, x)];
+				bitmap.pix32(y, hbp + x + i*16) = pen[BIT(data, x)];
 		}
 	}
 }
@@ -382,8 +382,6 @@ void apricot_state::apricot(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
-	screen.set_size(800, 400);
-	screen.set_visarea(0, 800-1, 0, 400-1);
 	screen.set_refresh_hz(72);
 	screen.set_screen_update(FUNC(apricot_state::screen_update_apricot));
 

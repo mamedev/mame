@@ -154,7 +154,7 @@ MC6845_UPDATE_ROW( slotcarn_state::crtc_update_row )
 				col |= 0x03;
 
 			col = m_ram_palette[col & 0x3ff];
-			bitmap.pix32(y, x) = m_pens[col ? col & (NUM_PENS-1) : (lscnblk ? 8 : 0)];
+			bitmap.pix32(y, hbp + x) = m_pens[col ? col & (NUM_PENS-1) : (lscnblk ? 8 : 0)];
 
 			x++;
 		}

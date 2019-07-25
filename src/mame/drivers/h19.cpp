@@ -472,7 +472,7 @@ WRITE_LINE_MEMBER(h19_state::mm5740_data_ready_w)
 MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (uint16_t x = 0; x < x_count; x++)
 	{
@@ -533,15 +533,13 @@ void h19_state::h19(machine_config &config)
 	screen.set_refresh_hz(60);   // TODO- this is adjustable by dipswitch.
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 250);
-	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, MC6845_CLOCK);
 	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse

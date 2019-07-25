@@ -517,7 +517,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 	uint8_t chr,gfx,col,bg,fg;
 	uint16_t mem,x;
 	uint8_t col_base = BIT(m_sys_status, 3) ? 16 : 0;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -584,8 +584,6 @@ void excali64_state::excali64(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(80*8, 24*12);
-	screen.set_visarea_full();
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(excali64_state::excali64_palette), 40);

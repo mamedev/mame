@@ -759,17 +759,18 @@ WRITE8_MEMBER(ngen_state::dma_write_word)
 
 MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 {
-	uint16_t addr = ma;
+	int x = 0;
 
-	for(int x=0;x<bitmap.width();x+=9)
+	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t ch = m_vram.read16(addr++) & 0xff;
-		for(int z=0;z<9;z++)
+		uint16_t addr = (ma + column) & 0x1fff;
+		uint8_t ch = m_vram.read16(addr) & 0xff;
+		for (int z=0; z<9; z++)
 		{
-			if(BIT(m_fontram.read16(ch*16+ra),8-z))
-				bitmap.pix32(y,x+z) = rgb_t(0,0xff,0);
+			if (BIT(m_fontram.read16(ch*16+ra),8-z))
+				bitmap.pix32(y, hbp + x++) = rgb_t(0,0xff,0);
 			else
-				bitmap.pix32(y,x+z) = rgb_t(0,0,0);
+				bitmap.pix32(y, hbp + x++) = rgb_t(0,0,0);
 		}
 	}
 }
@@ -990,8 +991,6 @@ void ngen_state::ngen(machine_config &config)
 
 	// video board
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_size(720, 348);
-	screen.set_visarea(0, 719, 0, 347);
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -1103,8 +1102,6 @@ void ngen386_state::ngen386(machine_config &config)
 
 	// video board
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_size(720, 348);
-	screen.set_visarea(0, 719, 0, 347);
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

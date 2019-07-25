@@ -87,7 +87,7 @@ MC6845_UPDATE_ROW( mx2178_state::crtc_update_row )
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{

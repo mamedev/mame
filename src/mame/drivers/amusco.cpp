@@ -474,13 +474,17 @@ MC6845_ON_UPDATE_ADDR_CHANGED(amusco_state::crtc_addr)
 MC6845_UPDATE_ROW(amusco_state::update_row)
 {
 	// Latch blink state at start of first line, where cursor is always positioned
-	if (y == 0 && ma == 0 && m_blink_state != (cursor_x == 0))
+	if (y == vbp && ma == 0 && m_blink_state != (cursor_x == 0))
 	{
 		m_blink_state = (cursor_x == 0);
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	const rectangle rowrect(0, 8 * x_count - 1, y, y);
+	// The texture wraps and a scroll offset is applied to offset the
+	// texture to the visible area, offset from the border.
+	const rectangle rowrect(hbp + 0, hbp + 8 * x_count - 1, y, y);
+	m_bg_tilemap->set_scrollx(-hbp);
+	m_bg_tilemap->set_scrolly(-vbp);
 	m_bg_tilemap->draw(*m_screen, bitmap, rowrect, 0, 0);
 }
 
@@ -577,8 +581,6 @@ void amusco_state::amusco(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(88*8, 27*10);                           // screen size: 88*8 27*10
-	m_screen->set_visarea(0*8, 74*8-1, 0*10, 24*10-1);    // visible scr: 74*8 24*10
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_amusco);

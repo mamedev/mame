@@ -82,7 +82,7 @@ MC6845_UPDATE_ROW( v1050_state::crtc_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(de ? color : 0);
+			bitmap.pix32(y, hbp + x) = m_palette->pen(de ? color : 0);
 
 			data <<= 1;
 		}
@@ -113,7 +113,7 @@ void v1050_state::v1050_video(machine_config &config)
 {
 	HD6845S(config, m_crtc, 15.36_MHz_XTAL/8); // HD6845SP according to Programmer's Technical Document
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(v1050_state::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(v1050_state::crtc_vs_w));
@@ -122,8 +122,6 @@ void v1050_state::v1050_video(machine_config &config)
 	screen.set_screen_update(H46505_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(640, 400);
-	screen.set_visarea(0,640-1, 0, 400-1);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 }

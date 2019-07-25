@@ -846,7 +846,7 @@ WRITE8_MEMBER(fanucspmg_state::memory_write_byte)
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 {
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	int i;
 	uint8_t *chargen = m_chargen->base();
 
@@ -894,7 +894,7 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 {
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	int i;
 	uint8_t *chargen = m_chargen->base();
 

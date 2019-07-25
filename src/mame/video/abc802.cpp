@@ -61,8 +61,6 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 
 	int rf = 0, rc = 0, rg = 0;
 
-	y += vbp;
-
 	for (int column = 0; column < x_count; column++)
 	{
 		uint8_t code = m_char_ram[(ma + column) & 0x7ff];
@@ -124,7 +122,7 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 			{
 				for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
+					int x = hbp + (column * ABC800_CHAR_WIDTH) + bit;
 					int color = (BIT(data, 7) ^ ri) && de;
 
 					bitmap.pix32(y, x) = pen[color];
@@ -136,7 +134,7 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 			{
 				for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
+					int x = hbp + (column * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = (BIT(data, 7) ^ ri) && de;
 
 					bitmap.pix32(y, x) = pen[color];
@@ -182,7 +180,7 @@ void abc802_state::abc802_video(machine_config &config)
 {
 	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
 	mc6845.set_screen(SCREEN_TAG);
-	mc6845.set_show_border_area(true);
+	mc6845.set_show_border_area(false);
 	mc6845.set_char_width(ABC800_CHAR_WIDTH);
 	mc6845.set_update_row_callback(FUNC(abc802_state::abc802_update_row), this);
 	mc6845.out_vsync_callback().set(FUNC(abc802_state::vs_w));

@@ -355,7 +355,7 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) && de;
 
-			bitmap.pix32(vbp + y, hbp + x) = pen[color];
+			bitmap.pix32(y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}
@@ -561,15 +561,13 @@ void bw12_state::common(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 200);
-	screen.set_visarea(0, 640-1, 0, 200-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_bw12);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, XTAL(16'000'000)/8);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(bw12_state::crtc_update_row), this);
 

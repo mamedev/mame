@@ -170,6 +170,7 @@ READ8_MEMBER( pc1512_state::vdu_r )
 		//data |= m_vdu->vsync_r();
 		int flyback = 0;
 
+		// XX not sure this can work, perhaps use the mc6845 state.
 		if (m_screen->vpos() < VFP_LORES - 16) flyback = 1;
 		if (m_screen->vpos() > VFP_LORES + 200) flyback = 1;
 
@@ -399,12 +400,9 @@ offs_t pc1512_state::get_char_rom_offset()
 MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 {
 	offs_t char_rom_offset = get_char_rom_offset();
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
-	if (get_display_mode(m_vdu_mode) == ALPHA_40)
-		p = &bitmap.pix32(y + vbp, hbp);
-
-	if (y > 199) return;
+	if ((y - vbp) > 199) return;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -467,9 +465,9 @@ int pc1512_state::get_color(uint8_t data)
 
 MC6845_UPDATE_ROW( pc1512_state::draw_graphics_1 )
 {
-	if (y > 199) return;
+	if ((y - vbp) > 199) return;
 
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -487,9 +485,9 @@ MC6845_UPDATE_ROW( pc1512_state::draw_graphics_1 )
 
 MC6845_UPDATE_ROW( pc1512_state::draw_graphics_2 )
 {
-	if (y > 199) return;
+	if ((y - vbp) > 199) return;
 
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -556,12 +554,12 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		{
 		case ALPHA_40:
 		case GRAPHICS_1:
-			screen.set_visible_area(0, 359, 0, 245);
+			// Does the character width change?
 			break;
 
 		case ALPHA_80:
 		case GRAPHICS_2:
-			screen.set_visible_area(0, 831, 0, 245);
+			// Does the character width change?
 			break;
 		}
 
@@ -597,14 +595,12 @@ void pc1512_state::pc1512_video(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(pc1512_state::screen_update));
-	m_screen->set_size(80*8, 24*8);
-	m_screen->set_visarea(0, 80*8-1, 0, 24*8-1);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_refresh_hz(50);
 
 	AMS40041(config, m_vdu, XTAL(28'636'363)/32);
 	m_vdu->set_screen(m_screen);
-	m_vdu->set_show_border_area(true);
+	m_vdu->set_show_border_area(false);
 	m_vdu->set_char_width(8);
 	m_vdu->set_update_row_callback(FUNC(pc1512_state::crtc_update_row), this);
 }

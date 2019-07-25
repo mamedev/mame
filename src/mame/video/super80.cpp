@@ -396,7 +396,7 @@ uint32_t super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb
 MC6845_UPDATE_ROW( super80_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (uint16_t x = 0; x < x_count; x++)               // for each character
 	{

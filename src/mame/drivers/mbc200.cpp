@@ -269,7 +269,7 @@ MC6845_UPDATE_ROW( mbc200_state::update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t gfx;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -317,8 +317,6 @@ void mbc200_state::mbc200(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 400);
-	screen.set_visarea(0, 640-1, 0, 400-1);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mbc200);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);

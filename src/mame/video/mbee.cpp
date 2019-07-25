@@ -340,7 +340,7 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 	if (!monopal && !m_p_colorram)
 		monopal = 2;
 
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	uint8_t inv, attr=0, gfx, fg=96+monopal, bg=96, col=0;
 	uint16_t mem, x, chr;
 

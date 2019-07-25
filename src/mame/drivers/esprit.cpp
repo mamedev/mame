@@ -83,7 +83,7 @@ INPUT_PORTS_END
 MC6845_UPDATE_ROW(esprit_state::crtc_update_row)
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (uint16_t x = 0; x < x_count; x++)
 	{

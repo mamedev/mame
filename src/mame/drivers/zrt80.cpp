@@ -221,7 +221,7 @@ MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,inv;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 	uint8_t polarity = ioport("DIPSW1")->read() & 4 ? 0xff : 0;
 
 	for (x = 0; x < x_count; x++)
@@ -287,8 +287,6 @@ void zrt80_state::zrt80(machine_config &config)
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 200);
-	screen.set_visarea(0, 640-1, 0, 200-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_zrt80);

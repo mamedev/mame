@@ -183,7 +183,7 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 			{
 				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
 
-				bitmap.pix32(vbp + y, hbp + x++) = pen[color];
+				bitmap.pix32(y, hbp + x++) = pen[color];
 
 				data <<= 1;
 			}
@@ -211,7 +211,7 @@ void abc1600_mover_device::device_add_mconfig(machine_config &config)
 
 	SY6845E(config, m_crtc, XTAL(64'000'000)/32);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(32);
 	m_crtc->set_update_row_callback(FUNC(abc1600_mover_device::crtc_update_row), this);
 	m_crtc->set_on_update_addr_change_callback(FUNC(abc1600_mover_device::crtc_update), this);

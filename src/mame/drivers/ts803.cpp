@@ -330,7 +330,7 @@ MC6845_UPDATE_ROW( ts803_state::crtc_update_row )
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,inv;
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -432,8 +432,6 @@ void ts803_state::ts803(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(60);
-	screen.set_size(640,240);
-	screen.set_visarea(0, 640-1, 0, 240-1);
 	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

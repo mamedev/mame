@@ -809,8 +809,6 @@ void super80_state::super80v(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_size(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT);
-	m_screen->set_visarea(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1);
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80v));
 	m_screen->screen_vblank().set(FUNC(super80_state::screen_vblank_super80m));
 

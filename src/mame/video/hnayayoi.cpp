@@ -199,11 +199,11 @@ WRITE8_MEMBER(hnayayoi_state::hnayayoi_palbank_w)
 }
 
 
-void hnayayoi_state::draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp)
+void hnayayoi_state::draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint16_t hbp, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp)
 {
 	uint8_t *src1 = &m_pixmap[left_pixmap][(row & 255) * 256];
 	uint8_t *src2 = &m_pixmap[right_pixmap][(row & 255) * 256];
-	uint32_t *dst = &bitmap.pix32(y);
+	uint32_t *dst = &bitmap.pix32(y, hbp);
 
 	const pen_t *pal = &m_palette->pens()[palbase * 16];
 
@@ -233,8 +233,8 @@ MC6845_UPDATE_ROW(hnayayoi_state::hnayayoi_update_row)
 	int col0 = (m_palbank >>  0) & 0x0f;
 	int col1 = (m_palbank >>  4) & 0x0f;
 
-	draw_layer_interleaved(bitmap, cliprect, y, y, x_count, 3, 2, col1, false);
-	draw_layer_interleaved(bitmap, cliprect, y, y, x_count, 1, 0, col0, true);
+	draw_layer_interleaved(bitmap, cliprect, y - vbp, y, hbp, x_count, 3, 2, col1, false);
+	draw_layer_interleaved(bitmap, cliprect, y - vbp, y, hbp, x_count, 1, 0, col0, true);
 }
 
 
@@ -245,8 +245,8 @@ MC6845_UPDATE_ROW(hnayayoi_state::untoucha_update_row)
 	int col2 = (m_palbank >>  8) & 0x0f;
 	int col3 = (m_palbank >> 12) & 0x0f;
 
-	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 7, 6, col3, false);
-	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 5, 4, col2, true);
-	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 3, 2, col1, true);
-	draw_layer_interleaved(bitmap, cliprect, y + 16, y, x_count, 1, 0, col0, true);
+	draw_layer_interleaved(bitmap, cliprect, y - vbp + 16, y, hbp, x_count, 7, 6, col3, false);
+	draw_layer_interleaved(bitmap, cliprect, y - vbp + 16, y, hbp, x_count, 5, 4, col2, true);
+	draw_layer_interleaved(bitmap, cliprect, y - vbp + 16, y, hbp, x_count, 3, 2, col1, true);
+	draw_layer_interleaved(bitmap, cliprect, y - vbp + 16, y, hbp, x_count, 1, 0, col0, true);
 }

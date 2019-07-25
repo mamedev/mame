@@ -141,7 +141,7 @@ void fs3216_state::machine_reset()
 
 MC6845_UPDATE_ROW(fs3216_state::crt_update_row)
 {
-	u32 *px = &bitmap.pix32(y);
+	u32 *px = &bitmap.pix32(y, hbp);
 
 	for (int i = 0; i < x_count; i++)
 	{

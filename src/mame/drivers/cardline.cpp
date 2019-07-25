@@ -145,9 +145,9 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 			int fg_col = gfx[fg_tile * 64 + ra * 8 + i];
 
 			if (fg_col == 1)
-				bitmap.pix32(y, x) = palette[bg_pal_ofs + bg_col];
+				bitmap.pix32(y, hbp + x) = palette[bg_pal_ofs + bg_col];
 			else
-				bitmap.pix32(y, x) = palette[fg_pal_ofs + fg_col];
+				bitmap.pix32(y, hbp + x) = palette[fg_pal_ofs + fg_col];
 
 			x++;
 		}
@@ -349,10 +349,6 @@ void cardline_state::cardline(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 35*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	//screen.set_screen_update(FUNC(cardline_state::screen_update_cardline));
-	//screen.set_palette(m_palette);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cardline);

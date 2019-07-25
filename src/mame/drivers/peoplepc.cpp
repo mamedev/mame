@@ -101,13 +101,13 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 			uint8_t data = m_gvram[offset] >> (offset & 1 ? 8 : 0);
 
 			for(j = 8; j >= 0; j--)
-				bitmap.pix32(y, (i * 8) + j) = palette[( data & 1 << j ) ? 1 : 0];
+				bitmap.pix32(y, hbp + (i * 8) + j) = palette[( data & 1 << j ) ? 1 : 0];
 		}
 		else
 		{
 			uint8_t data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
 			for(j = 0; j < 8; j++)
-				bitmap.pix32(y, (i * 8) + j) = palette[(data & (1 << j)) ? 1 : 0];
+				bitmap.pix32(y, hbp + (i * 8) + j) = palette[(data & (1 << j)) ? 1 : 0];
 		}
 	}
 }

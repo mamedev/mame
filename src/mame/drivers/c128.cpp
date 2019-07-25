@@ -1853,13 +1853,11 @@ void c128_state::pal(machine_config &config)
 	MOS8563(config, m_vdc, XTAL(16'000'000));
 	m_vdc->set_screen(SCREEN_VDC_TAG);
 	m_vdc->set_addrmap(0, &c128_state::vdc_videoram_map);
-	m_vdc->set_show_border_area(true);
+	m_vdc->set_show_border_area(false);
 	m_vdc->set_char_width(8);
 
 	screen_device &screen_vdc(SCREEN(config, SCREEN_VDC_TAG, SCREEN_TYPE_RASTER));
 	screen_vdc.set_refresh_hz(60);
-	screen_vdc.set_size(640, 200);
-	screen_vdc.set_visarea(0, 640-1, 0, 200-1);
 	screen_vdc.set_screen_update(MOS8563_TAG, FUNC(mos8563_device::screen_update));
 
 	mos8566_device &mos8566(MOS8566(config, MOS8566_TAG, XTAL(17'734'472)*2/4.5));

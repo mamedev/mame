@@ -96,7 +96,7 @@ MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chr,gfx,fg=7,bg=0; // colours need to be determined
 	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -299,8 +299,6 @@ void pasopia_state::pasopia(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia);
 	PALETTE(config, m_palette).set_entries(8);

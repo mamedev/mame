@@ -465,7 +465,7 @@ void tv910_state::vbl_ack_w(uint8_t data)
 
 MC6845_UPDATE_ROW( tv910_state::crtc_update_row )
 {
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint16_t  chr_base = (ra & 7) | m_charset->read() << 10;
 	uint8_t   chr = m_vram[0x7ff];
 	uint8_t   att = (chr & 0xf0) == 0x90 ? chr & 0x0f : 0;

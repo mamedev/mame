@@ -143,7 +143,7 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 
 		for(int x = 0; x < TILE_WIDTH; ++x)
 		{
-			bitmap.pix32(y, (cx * TILE_WIDTH + x) ^ 1) = palette[tmp & 0x0f];
+			bitmap.pix32(y, hbp + ((+ cx * TILE_WIDTH + x) ^ 1)) = palette[tmp & 0x0f];
 			tmp >>= 4;
 		}
 	}
@@ -413,8 +413,6 @@ void othello_state::othello(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*6, 64*8);
-	screen.set_visarea(0*8, 64*6-1, 0*8, 64*8-1);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, FUNC(othello_state::othello_palette), 0x10);

@@ -90,7 +90,7 @@ MC6845_UPDATE_ROW( banctec_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 chr,gfx;
 	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	u32 *p = &bitmap.pix32(y, hbp);
 
 	for (x = 0; x < x_count; x++)
 	{

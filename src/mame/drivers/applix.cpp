@@ -797,7 +797,7 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 	// The 6845 cursor signal is not used at all.
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t const vidbase = (m_video_latch & 15) << 14 | (ra & 7) << 12;
-	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix32(y, hbp);
 
 	for (uint16_t x = 0; x < x_count; x++)
 	{
@@ -877,8 +877,6 @@ void applix_state::applix(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 200);
-	screen.set_visarea_full();
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, FUNC(applix_state::applix_palette), 16);
 
@@ -894,7 +892,7 @@ void applix_state::applix(machine_config &config)
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
 	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row), this);
 	m_crtc->set_begin_update_callback(FUNC(applix_state::crtc_update_border), this);

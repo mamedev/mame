@@ -12,8 +12,10 @@
 
 
 
-// these are needed because the MC6845 emulation does
-// not position the active display area correctly
+// These are needed because the MC6845 emulation implements the borders,
+// but the offsets to the displayable area, vbp and hbp, are not available
+// to the screen_update function. The high resolution screen update code
+// might be better integrated into abc800m_update_row.
 #define HORIZONTAL_PORCH_HACK   115
 #define VERTICAL_PORCH_HACK     29
 
@@ -220,8 +222,6 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 	int column;
 	rgb_t fgpen = m_palette->pen(1);
 
-	y += vbp;
-
 	for (column = 0; column < x_count; column++)
 	{
 		int bit;
@@ -281,7 +281,7 @@ void abc800m_state::abc800m_video(machine_config &config)
 {
 	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
 	mc6845.set_screen(SCREEN_TAG);
-	mc6845.set_show_border_area(true);
+	mc6845.set_show_border_area(false);
 	mc6845.set_char_width(ABC800_CHAR_WIDTH);
 	mc6845.set_update_row_callback(FUNC(abc800m_state::abc800m_update_row), this);
 	mc6845.out_vsync_callback().set(m_dart, FUNC(z80dart_device::rib_w)).invert();

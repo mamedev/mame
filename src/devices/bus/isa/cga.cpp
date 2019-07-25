@@ -183,8 +183,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::crtc_update_row )
 	if (m_update_row_type == -1)
 		return;
 
-	y = m_y;
-	if(m_y >= bitmap.height())
+	if (y >= bitmap.height())
 		return;
 
 	switch (m_update_row_type)
@@ -270,13 +269,12 @@ void isa8_cga_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette).set_entries(/* CGA_PALETTE_SETS * 16*/ 65536);
 
 	MC6845(config, m_crtc, XTAL(14'318'181)/16);
-	m_crtc->set_screen(nullptr);
+	m_crtc->set_screen(CGA_SCREEN_NAME);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(isa8_cga_device::crtc_update_row), this);
 	m_crtc->out_hsync_callback().set(FUNC(isa8_cga_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_cga_device::vsync_changed));
-	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_device::reconfigure), this);
 }
 
 ioport_constructor isa8_cga_device::device_input_ports() const
@@ -307,7 +305,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc(*this, CGA_MC6845_NAME), m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
-	m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+	m_update_row_type(-1), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
 	m_vram_size( 0x4000 ), m_plantronics(0),
 	m_palette(*this, "palette"),
 	m_screen(*this, "screen")
@@ -370,7 +368,6 @@ void isa8_cga_device::device_start()
 	save_item(NAME(m_hsync));
 	save_item(NAME(m_vram));
 	save_item(NAME(m_plantronics));
-	save_item(NAME(m_y));
 }
 
 
@@ -385,7 +382,6 @@ void isa8_cga_device::device_reset()
 	m_vsync = 0;
 	m_hsync = 0;
 	m_color_select = 0;
-	m_y = 0;
 	memset(m_palette_lut_2bpp, 0, sizeof(m_palette_lut_2bpp));
 }
 
@@ -470,7 +466,7 @@ template<bool blink, bool si, bool comp, bool alt, int width>
 MC6845_UPDATE_ROW( isa8_cga_device::cga_text )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
@@ -522,7 +518,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_text )
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bppl_update_row )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
@@ -581,7 +577,7 @@ static const uint8_t yc_lut[16][8] =
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bpph_update_row )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
@@ -624,7 +620,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bpph_update_row )
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_2bpp_update_row )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
@@ -659,7 +655,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_2bpp_update_row )
 MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_1bpp_update_row )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t   fg = m_color_select & 0x0F;
 	int i;
@@ -696,11 +692,15 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_1bpp_update_row )
 WRITE_LINE_MEMBER( isa8_cga_device::hsync_changed )
 {
 	m_hsync = state ? 1 : 0;
+#if 0
+	/* This is not necessary if the device is linked to a screen,
+	 * and no other 6845 device does this, so disable these and
+	 * consider another approach if really necessary. */
 	if(state && !m_vsync)
 	{
 		m_screen->update_now();
-		m_y++;
 	}
+#endif
 }
 
 
@@ -710,18 +710,13 @@ WRITE_LINE_MEMBER( isa8_cga_device::vsync_changed )
 	{
 		m_framecnt++;
 	}
+#if 0
 	else
 	{
 		m_screen->reset_origin();
-		m_y = 0;
 	}
+#endif
 	m_vsync = state ? 9 : 0;
-}
-
-MC6845_RECONFIGURE( isa8_cga_device::reconfigure )
-{
-	rectangle curvisarea = m_screen->visible_area();
-	m_screen->set_visible_area(visarea.min_x, visarea.max_x, curvisarea.min_y, curvisarea.max_y);
 }
 
 void isa8_cga_device::set_palette_luts(void)
@@ -1138,7 +1133,7 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 MC6845_UPDATE_ROW( isa8_cga_pc1512_device::pc1512_gfx_4bpp_update_row )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t  offset_base = ra << 13;
 	int j;
@@ -1380,6 +1375,7 @@ void isa8_wyse700_device::change_resolution(uint8_t mode)
 	}
 	if ((m_control & 0xf0) == (mode & 0xf0)) return;
 
+	/* This might not be necessary now, the 6845 device should do this. */
 	switch(mode & 0xf0) {
 		case 0xc0: width = 1280; height = 800; break;
 		case 0xa0: width = 1280; height = 400; break;
@@ -1699,7 +1695,6 @@ void isa8_cga_m24_device::device_add_mconfig(machine_config &config)
 	isa8_cga_device::device_add_mconfig(config);
 
 	subdevice<screen_device>(CGA_SCREEN_NAME)->set_raw(XTAL(14'318'181), 912, 0, 640, 462, 0, 400);
-	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_m24_device::reconfigure), this);
 }
 
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -1733,12 +1728,6 @@ void isa8_cga_m24_device::device_reset()
 	m_start_offset = 0;
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x0000;
-}
-
-MC6845_RECONFIGURE( isa8_cga_m24_device::reconfigure )
-{
-	// just reconfigure the screen, the apb sets it to 256 lines rather than 400
-	m_screen->configure(width, height, visarea, frame_period);
 }
 
 WRITE8_MEMBER( isa8_cga_m24_device::io_write )
@@ -1812,8 +1801,7 @@ MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 	if (m_update_row_type == -1)
 		return;
 
-	y = m_y;
-	if(m_y >= bitmap.height())
+	if(y >= bitmap.height())
 		return;
 
 	switch (m_update_row_type)
@@ -1852,7 +1840,7 @@ MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t   fg = m_color_select & 0x0F;
 	int i;

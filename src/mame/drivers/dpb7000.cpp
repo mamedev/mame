@@ -547,7 +547,7 @@ MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) && de;
 
-			bitmap.pix32(y, x) = pen[color];
+			bitmap.pix32(y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}

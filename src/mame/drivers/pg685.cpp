@@ -339,7 +339,7 @@ void pg685_state::video_start()
 MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 {
 	static const uint32_t palette[2] = { 0x00d000, 0 };
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint16_t  chr_base = ra;
 	int i;
 	uint8_t *vram = (uint8_t *)m_vram.target();
@@ -367,7 +367,7 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 {
 	static const uint32_t palette[2] = { 0x00d000, 0 };
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint16_t  chr_base = ra;
 	int i;
 	uint16_t *vram = (uint16_t *)m_vram16.target();

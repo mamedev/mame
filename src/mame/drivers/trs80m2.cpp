@@ -409,7 +409,7 @@ MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 			int dout = BIT(data, 7);
 			int color = (dcursor ^ drevid ^ dout) && de;
 
-			bitmap.pix32(vbp + y, hbp + x++) = pen[color];
+			bitmap.pix32(y, hbp + x++) = pen[color];
 
 			data <<= 1;
 		}
@@ -720,14 +720,12 @@ void trs80m2_state::trs80m2(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(trs80m2_state::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 639, 0, 479);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
 	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));
@@ -812,14 +810,12 @@ void trs80m16_state::trs80m16(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(trs80m2_state::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 639, 0, 479);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, 12.48_MHz_XTAL / 8);
 	m_crtc->set_screen(SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
+	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(trs80m2_state::crtc_update_row), this);
 	m_crtc->out_de_callback().set(FUNC(trs80m2_state::de_w));

@@ -186,7 +186,7 @@ void pc_t1t_device::pcjr_palette(palette_device &palette) const
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 
 	if ( y == 0 ) logerror("t1000_text_inten_update_row\n");
 	for (int i = 0; i < x_count; i++)
@@ -218,7 +218,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_inten_update_row )
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_blink_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -258,7 +258,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_text_blink_update_row )
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
@@ -299,7 +299,7 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_4bpp_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint8_t   *vid = m_displayram + ( ra << 13 );
 	int i;
 
@@ -326,7 +326,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_4bpp_update_row )
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint8_t   *vid = m_displayram + ( ra << 13 );
 	int i;
 
@@ -353,7 +353,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_update_row )
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjr_gfx_2bpp_high_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint8_t   *vid = m_displayram + ( ra << 13 );
 	int i;
 
@@ -378,7 +378,7 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjr_gfx_2bpp_high_update_row )
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_tga_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint8_t   *vid = m_displayram + ( ra << 13 );
 	int i;
 
@@ -405,7 +405,7 @@ MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_2bpp_tga_update_row )
 MC6845_UPDATE_ROW( pc_t1t_device::t1000_gfx_1bpp_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint8_t   *vid = m_displayram + ( ra << 13 );
 	uint8_t   fg = m_palette_base + m_reg.data[0x11];
 	uint8_t   bg = m_palette_base + m_reg.data[0x10];

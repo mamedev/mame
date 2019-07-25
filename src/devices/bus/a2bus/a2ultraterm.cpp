@@ -304,7 +304,7 @@ void a2bus_videx160_device::write_c800(uint16_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW( a2bus_videx160_device::crtc_update_row )
 {
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y, hbp);
 	uint16_t  chr_base = ra;
 	int i;
 

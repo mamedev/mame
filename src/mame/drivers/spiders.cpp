@@ -324,7 +324,7 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 				data3 = data3 >> 1;
 			}
 
-			bitmap.pix32(y, x) = m_palette->pen_color(color);
+			bitmap.pix32(y, hbp + x) = m_palette->pen_color(color);
 
 			x = x + 1;
 		}

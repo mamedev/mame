@@ -111,7 +111,7 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 		for (int dot = 0; dot < 8; dot++)
 		{
 			intensity = ((RAM[addr] >> (7-dot) & 0x01) << 1) | (RAM[addr + 0x200] >> (7-dot) & 0x01);
-			bitmap.pix32(y, x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
+			bitmap.pix32(y, hbp + x + dot) = rgb_t(0x3f * intensity, 0x2a * intensity, 0x00);
 		}
 		addr++;
 	}

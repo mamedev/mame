@@ -593,7 +593,6 @@ void fp_state::fp(machine_config &config)
 	screen_crt.set_refresh_hz(50);
 	screen_crt.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen_crt.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	screen_crt.set_size(640, 256);
 	screen_crt.set_visarea_full();
 
 	PALETTE(config, "palette").set_entries(16);
