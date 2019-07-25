@@ -56,12 +56,11 @@ protected:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
 	void lcd_data_w(u8 data);
-	void lcd_reset_w(u8 data = 0);
 
 	bool m_power;
 	bool m_lcd_ready;
 	u8 m_lcd_count;
-	u8 m_lcd_address;
+	u8 m_lcd_command;
 	u8 m_lcd_data[0x40];
 };
 

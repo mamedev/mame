@@ -42,6 +42,8 @@ very few bytes difference between revisions. The first Corona is engine version 
 
 TODO:
 - emulate LCD at lower level, probably an MCU with embedded LCDC
+- LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
+  but tking(D) won't work if it's done that way
 - fix LCD 7*7 DMD, it's in m_lcd_data[0x30 to 0x3b] but scrambled
 - tking different internal artwork
 - irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
@@ -81,6 +83,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	int lcd_ready_r() { return m_lcd_ready ? 1 : 0; }
+
 	// machine drivers
 	void stratos(machine_config &config);
 	void tking2(machine_config &config);
@@ -96,7 +100,7 @@ private:
 	required_memory_bank m_nvrambank;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
-	required_ioport_array<8+1> m_inputs;
+	required_ioport_array<8+2> m_inputs;
 
 	void main_map(address_map &map);
 
@@ -130,13 +134,13 @@ void saitek_stratos_state::machine_start()
 	m_power = false;
 	m_lcd_ready = false;
 	m_lcd_count = 0;
-	m_lcd_address = 0;
+	m_lcd_command = 0;
 
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_lcd_ready));
 	save_item(NAME(m_lcd_count));
-	save_item(NAME(m_lcd_address));
+	save_item(NAME(m_lcd_command));
 	save_item(NAME(m_lcd_data));
 }
 
@@ -273,29 +277,27 @@ void saitek_stratos_state::lcd_data_w(u8 data)
 	data &= 0xf;
 
 	if (m_lcd_count == 0)
-		m_lcd_address = data;
+		m_lcd_command = data;
 	else
 	{
 		// write to lcd row
-		if (m_lcd_address > 0 && m_lcd_address <= 4)
-			m_lcd_data[(((m_lcd_address - 1) << 4) + (m_lcd_count - 1)) & 0x3f] = data;
+		if (m_lcd_command > 0 && m_lcd_command <= 4)
+			m_lcd_data[(((m_lcd_command - 1) << 4) + (m_lcd_count - 1)) & 0x3f] = data;
 	}
 
 	// it expects a specific number of writes for each row
-	const u8 maxcount[5] = { 1, 9, 9, 1, 12 };
-	if (m_lcd_address > 4 || m_lcd_count == maxcount[m_lcd_address])
+	const u8 maxcount[5] = { 0, 9, 9, 1, 12 };
+	if (m_lcd_command > 4 || m_lcd_count == maxcount[m_lcd_command])
 	{
+		// reset/start?
+		if (m_lcd_command & 8)
+			m_lcd_ready = true;
+
 		m_lcd_count = 0;
 		update_lcd();
 	}
 	else
 		m_lcd_count++;
-}
-
-void saitek_stratos_state::lcd_reset_w(u8 data)
-{
-	m_lcd_count = 0;
-	m_lcd_ready = true;
 }
 
 
@@ -342,12 +344,10 @@ READ8_MEMBER(stratos_state::control_r)
 	if (sel == 8)
 	{
 		// d5: lcd status flag?
-		if (m_lcd_ready)
-		{
-			data |= 0x20;
-			if (!machine().side_effects_disabled())
-				m_lcd_ready = false;
-		}
+		data |= m_inputs[9]->read();
+
+		if (!machine().side_effects_disabled())
+			m_lcd_ready = false;
 
 		// d7: battery low
 		data |= m_inputs[8]->read();
@@ -380,15 +380,6 @@ WRITE8_MEMBER(stratos_state::control_w)
 		power_off();
 }
 
-READ8_MEMBER(stratos_state::lcd_data_r)
-{
-	// reset lcd?
-	if (!machine().side_effects_disabled())
-		lcd_reset_w();
-
-	return 0;
-}
-
 
 
 /******************************************************************************
@@ -403,7 +394,7 @@ void stratos_state::main_map(address_map &map)
 	map(0x2400, 0x2400).w(FUNC(stratos_state::leds_w));
 	map(0x2600, 0x2600).rw(FUNC(stratos_state::control_r), FUNC(stratos_state::control_w));
 	map(0x2800, 0x37ff).bankrw("nvrambank");
-	map(0x3800, 0x3800).rw(FUNC(stratos_state::lcd_data_r), FUNC(stratos_state::lcd_data_w));
+	map(0x3800, 0x3800).w(FUNC(stratos_state::lcd_data_w));
 	map(0x4000, 0x7fff).r(FUNC(stratos_state::extrom_r));
 	map(0x8000, 0xffff).bankr("rombank");
 }
@@ -476,6 +467,9 @@ static INPUT_PORTS_START( stratos )
 
 	PORT_MODIFY("IN.6")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM)
+
+	PORT_START("IN.9")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, stratos_state, lcd_ready_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tking2 )
@@ -483,6 +477,9 @@ static INPUT_PORTS_START( tking2 )
 
 	PORT_MODIFY("IN.5")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_CUSTOM)
+
+	PORT_MODIFY("IN.9")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM)
 INPUT_PORTS_END
 
 

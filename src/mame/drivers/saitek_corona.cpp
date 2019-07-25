@@ -227,7 +227,7 @@ void corona_state::main_map(address_map &map)
 	map(0x2400, 0x2400).rw(FUNC(corona_state::chessboard_r), FUNC(corona_state::leds1_w));
 	map(0x2600, 0x2600).rw(FUNC(corona_state::control1_r), FUNC(corona_state::control1_w));
 	map(0x6000, 0x6000).w(FUNC(corona_state::select2_w));
-	map(0x6200, 0x6200).w(FUNC(corona_state::lcd_reset_w));
+	map(0x6200, 0x6200).unmapw(); // ?
 	map(0x6400, 0x6400).w(FUNC(corona_state::leds2_w));
 	map(0x6600, 0x6600).rw(FUNC(corona_state::control2_r), FUNC(corona_state::control2_w));
 	map(0x8000, 0xffff).m(m_rombank, FUNC(address_map_bank_device::amap8));

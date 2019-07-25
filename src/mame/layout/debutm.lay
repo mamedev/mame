@@ -469,10 +469,10 @@
 
 		<bezel element="gray"><bounds x="3" y="89.4" width="27" height="12" /></bezel>
 		<bezel element="blackb"><bounds x="5" y="91.4" width="23" height="8" /></bezel>
-		<bezel name="digit0" element="digit"><bounds x="7"  y="92.4" width="4" height="6" /></bezel>
-		<bezel name="digit1" element="digit"><bounds x="12" y="92.4" width="4" height="6" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="17" y="92.4" width="4" height="6" /></bezel>
-		<bezel name="digit3" element="digit"><bounds x="22" y="92.4" width="4" height="6" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="7"    y="92.625" width="3.7" height="5.55" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="12.1" y="92.625" width="3.7" height="5.55" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="17.2" y="92.625" width="3.7" height="5.55" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="22.3" y="92.625" width="3.7" height="5.55" /></bezel>
 
 		<bezel element="text_8"><bounds x="-0.5" y="6.5"  width="3" height="3" /></bezel>
 		<bezel element="text_7"><bounds x="-0.5" y="16.5" width="3" height="3" /></bezel>
