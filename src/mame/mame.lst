@@ -21685,7 +21685,10 @@ pentacup                        //
 pentacup2                       //
 
 @source:microtan.cpp
-microtan                        // 1979 Microtan 65
+mt65                            // 1979 Microtan 65
+micron                          // 1980 Micron
+spinveti                        // 1980 Space Invasion (ETI)
+mt6809                          // 1984 Microtan 65 (6809 CPU)
 
 @source:microterm.cpp
 mt420                           //

@@ -60,3 +60,7 @@ uint32_t microtan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
+
+void mt6809_state::video_start()
+{
+}

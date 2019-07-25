@@ -19,62 +19,60 @@
 
 #pragma once
 
-#include "imagedev/snapquik.h"
-#include "machine/6522via.h"
-#include "machine/timer.h"
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/input_merger.h"
-#include "sound/ay8910.h"
-#include "imagedev/cassette.h"
+#include "machine/timer.h"
+#include "bus/tanbus/tanbus.h"
+#include "imagedev/snapquik.h"
 
 class microtan_state : public driver_device
 {
 public:
 	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_irq_line(*this, "irq_line")
-		, m_cassette(*this, "cassette")
-		, m_via6522(*this, "via6522%u", 0)
-		, m_ay8910(*this, "ay8910%u", 0)
-		, m_io_keyboard(*this, "ROW%u", 0)
+		, m_config(*this, "CONFIG")
+		, m_io_keyboard(*this, "KBD%u", 0)
+		, m_io_keypad(*this, "KPAD%u", 0)
+		, m_keypad(*this, "KEYPAD")
+		, m_tanbus(*this, "tanbus")
+		, m_videoram(*this, "videoram")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_gfx1(*this, "gfx1")
 		, m_led(*this, "led1")
 	{ }
 
-	void microtan(machine_config &config);
+	void mt65(machine_config &config);
+	void micron(machine_config &config);
+	void spinveti(machine_config &config);
 
+	void init_gfx2();
 	void init_microtan();
 
+	TIMER_DEVICE_CALLBACK_MEMBER(kbd_scan);
+	DECLARE_READ8_MEMBER(bffx_r);
+	DECLARE_WRITE8_MEMBER(bffx_w);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+
 protected:
-	enum
-	{
-		TIMER_PULSE_NMI
-	};
+	enum { IRQ_KBD, IRQ_TANBUS };
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
-	enum { IRQ_VIA_0, IRQ_VIA_1, IRQ_KBD };
-
-	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_irq_line;
-	required_device<cassette_image_device> m_cassette;
-	required_device_array<via6522_device, 2> m_via6522;
-	required_device_array<ay8910_device, 2> m_ay8910;
-	required_ioport_array<9> m_io_keyboard;
-	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<> m_led;
+	required_ioport m_config;
+	optional_ioport_array<9> m_io_keyboard;
+	optional_ioport_array<4> m_io_keypad;
+	optional_ioport m_keypad;
+	optional_device<tanbus_device> m_tanbus;
 
-	uint8_t m_chunky_graphics;
-	std::unique_ptr<uint8_t[]> m_chunky_buffer;
 	uint8_t m_keypad_column;
 	uint8_t m_keyboard_ascii;
-	emu_timer *m_read_cassette_timer;
 	emu_timer *m_pulse_nmi_timer;
 	uint8_t m_keyrows[10];
 	int m_lastrow;
@@ -82,28 +80,27 @@ private:
 	int m_key;
 	int m_repeat;
 	int m_repeater;
+
+	virtual void store_key(int key);
+
+private:
+	optional_shared_ptr<uint8_t> m_videoram;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_memory_region m_gfx1;
+	output_finder<> m_led;
+
+	uint8_t m_chunky_graphics;
+	std::unique_ptr<uint8_t[]> m_chunky_buffer;
 	tilemap_t *m_bg_tilemap;
 
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(bffx_r);
-	DECLARE_WRITE8_MEMBER(bffx_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_WRITE8_MEMBER(pgm_chargen_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(read_cassette);
 	TIMER_CALLBACK_MEMBER(pulse_nmi);
-	DECLARE_READ8_MEMBER(via_0_in_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_b);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
-	DECLARE_WRITE8_MEMBER(via_1_out_a);
-	DECLARE_WRITE8_MEMBER(via_1_out_b);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
-	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
-	void store_key(int key);
+
 	image_verify_result verify_snapshot(uint8_t *data, int size);
 	image_init_result parse_intel_hex(uint8_t *snapshot_buff, char *src);
 	image_init_result parse_zillion_hex(uint8_t *snapshot_buff, char *src);
@@ -112,7 +109,27 @@ private:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void main_map(address_map &map);
+	void mt65_map(address_map &map);
+	void spinv_map(address_map &map);
+};
+
+
+class mt6809_state : public microtan_state
+{
+public:
+	using microtan_state::microtan_state;
+
+	void mt6809(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+	virtual void store_key(int key) override;
+
+private:
+	DECLARE_READ8_MEMBER(keyboard_r);
+
+	void mt6809_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MICROTAN_H
