@@ -592,7 +592,7 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())(in);
+		auto res = invoke(obj.as<sol::protected_function>(), in);
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -610,7 +610,7 @@ void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<s
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())();
+		auto res = invoke(obj.as<sol::protected_function>());
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -638,7 +638,7 @@ bool lua_engine::menu_callback(const std::string &menu, int index, const std::st
 	sol::object obj = sol().registry()[field];
 	if(obj.is<sol::protected_function>())
 	{
-		auto res = (obj.as<sol::protected_function>())(index, event);
+		auto res = invoke(obj.as<sol::protected_function>(), index, event);
 		if(!res.valid())
 		{
 			sol::error err = res;
@@ -659,7 +659,7 @@ bool lua_engine::execute_function(const char *id)
 		{
 			if(func.second.is<sol::protected_function>())
 			{
-				auto ret = (func.second.as<sol::protected_function>())();
+				auto ret = invoke(func.second.as<sol::protected_function>());
 				if(!ret.valid())
 				{
 					sol::error err = ret;
@@ -2509,7 +2509,20 @@ void lua_engine::initialize()
 	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
 			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
-			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },
+			"plugins", [this](mame_machine_manager &m) {
+				sol::table table = sol().create_table();
+				for (auto &curentry : m.plugins().plugins())
+				{
+					sol::table plugin_table = sol().create_table();
+					plugin_table["name"] = curentry.m_name;
+					plugin_table["description"] = curentry.m_description;
+					plugin_table["type"] = curentry.m_type;
+					plugin_table["directory"] = curentry.m_directory;
+					plugin_table["start"] = curentry.m_start;
+					table[curentry.m_name] = plugin_table;
+				}
+				return table;
+			},
 			"ui", &mame_machine_manager::ui);
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());
 	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());
@@ -2556,7 +2569,7 @@ void lua_engine::run(sol::load_result res)
 {
 	if(res.valid())
 	{
-		auto ret = (res.get<sol::protected_function>())();
+		auto ret = invoke(res.get<sol::protected_function>());
 		if(!ret.valid())
 		{
 			sol::error err = ret;
@@ -2583,4 +2596,17 @@ void lua_engine::load_script(const char *filename)
 void lua_engine::load_string(const char *value)
 {
 	run(sol().load(value));
+}
+
+//-------------------------------------------------
+//  invoke - invokes a function, wrapping profiler
+//-------------------------------------------------
+
+template<typename TFunc, typename... TArgs>
+sol::protected_function_result lua_engine::invoke(TFunc &&func, TArgs&&... args)
+{
+	g_profiler.start(PROFILER_LUA);
+	sol::protected_function_result result = func(std::forward<TArgs>(args)...);
+	g_profiler.stop();
+	return result;
 }

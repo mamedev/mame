@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, hap
+// thanks-to:Berger
 /***************************************************************************
 
 SciSys/Saitek Stratos chesscomputer family (1987-1990)
@@ -342,8 +343,11 @@ READ8_MEMBER(stratos_state::control_r)
 	{
 		// d5: lcd status flag?
 		if (m_lcd_ready)
+		{
 			data |= 0x20;
-		m_lcd_ready = false;
+			if (!machine().side_effects_disabled())
+				m_lcd_ready = false;
+		}
 
 		// d7: battery low
 		data |= m_inputs[8]->read();
@@ -379,7 +383,9 @@ WRITE8_MEMBER(stratos_state::control_w)
 READ8_MEMBER(stratos_state::lcd_data_r)
 {
 	// reset lcd?
-	lcd_reset_w();
+	if (!machine().side_effects_disabled())
+		lcd_reset_w();
+
 	return 0;
 }
 

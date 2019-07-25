@@ -398,6 +398,7 @@
 
 	<group name="sb_ui">
 		<bounds x="0" y="0" width="10" height="80" />
+
 		<bezel element="cblack"><bounds x="0" y="0" width="10" height="1" /></bezel>
 		<bezel element="cblack"><bounds x="0" y="7" width="10" height="1" /></bezel>
 		<bezel element="cblack"><bounds x="0" y="79" width="10" height="1" /></bezel>
@@ -480,7 +481,7 @@
 <!-- display, buttons -->
 
 	<group name="panel">
-		<bounds x="0" y="5" width="270" height="390" />
+		<bounds x="5" y="15" width="270" height="370" />
 
 		<bezel name="digit0" element="digit"><bounds x="10" y="15" width="50" height="75" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="70" y="15" width="50" height="75" /></bezel>
@@ -555,9 +556,9 @@
 <!-- build screen -->
 
 	<view name="Internal Layout (Full)">
-		<bounds left="-13" right="131.8" top="-1.5" bottom="87.5" />
+		<bounds left="-13" right="131.14" top="-1.5" bottom="87.5" />
 
-		<group ref="panel"><bounds x="91" y="29.4" width="38.0769" height="55" /></group>
+		<group ref="panel"><bounds x="91.297" y="31" width="37.946" height="52" /></group>
 
 		<bezel element="white"><bounds x="-1" y="-1.5" width="89" height="89" /></bezel>
 		<bezel element="black2"><bounds x="3" y="2.5" width="81" height="81" /></bezel>
@@ -587,7 +588,7 @@
 
 	<view name="Internal Layout (Buttons)">
 		<bounds left="0" right="270" top="0" bottom="390" />
-		<group ref="panel"><bounds x="0" y="0" width="270" height="390" /></group>
+		<group ref="panel"><bounds x="5" y="10" width="270" height="370" /></group>
 	</view>
 
 </mamelayout>

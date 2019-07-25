@@ -381,24 +381,30 @@ void raiden2cop_device::LEGACY_execute_6200(int offset, uint16_t data) // this i
 void raiden2cop_device::LEGACY_execute_6980(int offset, uint16_t data)
 {
 	uint8_t offs;
-	int abs_x, abs_y, rel_xy;
+//	int abs_x, abs_y, rel_xy;
+	int rel_xy;
 
 	offs = (offset & 3) * 4;
 
 	/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
-	abs_x = m_host_space->read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
-	abs_y = m_host_space->read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
+//	abs_x = m_host_space->read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
+//	abs_y = m_host_space->read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
 	rel_xy = m_host_space->read_word(m_cop_sprite_dma_src + 4 + offs);
 
 	//if(rel_xy & 0x0706)
 	//  printf("sprite rel_xy = %04x\n",rel_xy);
 
-	if (rel_xy & 1)
-		m_host_space->write_word(cop_regs[4] + offs + 4, 0xc0 + abs_x - (rel_xy & 0xf8));
-	else
-		m_host_space->write_word(cop_regs[4] + offs + 4, (((rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0))));
+	m_sprite_dma_rel_x = (rel_xy & 0xff);
+	m_sprite_dma_rel_y = ((rel_xy & 0xff00) >> 8);
+//	m_sprite_dma_rel_x = (rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0);
+//	m_sprite_dma_rel_y = ((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0);
 
-	m_host_space->write_word(cop_regs[4] + offs + 6, (((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0)));
+//	if (rel_xy & 1)
+//		m_host_space->write_word(cop_regs[4] + offs + 4, 0xc0 + abs_x - (rel_xy & 0xf8));
+//	else
+//		m_host_space->write_word(cop_regs[4] + offs + 4, (((rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0))));
+
+//	m_host_space->write_word(cop_regs[4] + offs + 6, (((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0)));
 }
 
 /*
@@ -526,15 +532,51 @@ void raiden2cop_device::execute_b900(int offset, uint16_t data)
 18 - 7c80 ( 0f) (  480) :  (080, 882, 000, 000, 000, 000, 000, 000)  a     ff00   (zeroteam, xsedae)
 */
 
+// SD Gundam single step sprite DMA
+// Notes of interest:
+// - bit 0 of rel_x is enabled at stage 2 boss for the flipped ray but seems left-over;
+// - stage 3 midboss has some garbage sprites, that's because game incorrectly sets up a size of 8 for one transfer, prolly more left-over;
 void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 {
 	uint8_t offs;
+	uint16_t sprite_info;
+	uint16_t sprite_x, sprite_y;
+	int abs_x, abs_y;
 
 	offs = (offset & 3) * 4;
 
-	m_host_space->write_word(cop_regs[4] + offs + 0, m_host_space->read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f));
-	//m_host_space->write_word(cop_regs[4] + offs + 2,m_host_space->read_word(m_cop_sprite_dma_src+2 + offs));
+	// TODO: upper bits of DMA params seems to go into sprite priority?
+	sprite_info = m_host_space->read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f);
+	m_host_space->write_word(cop_regs[4] + offs + 0, sprite_info);
+	
+	abs_x = m_host_space->read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
+	abs_y = m_host_space->read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
+	
+	const u8 fx     =  (sprite_info & 0x4000) >> 14;
+	const u8 fy     =  (sprite_info & 0x2000) >> 13;
+	const u8 dx     = ((sprite_info & 0x1c00) >> 10) + 1;
+	//const u8 dy     = ((sprite_info & 0x0380) >> 7)  + 1;
+	
+	if (fx)
+	{
+		sprite_x = (0x100 - (dx*16));
+		sprite_x += (abs_x)-(m_sprite_dma_rel_x & 0x78);
+		if (m_sprite_dma_rel_x & 0x80)
+			sprite_x -= 0x80;
+		else
+			sprite_x -= 0x100;
+	}
+	else
+		sprite_x = (m_sprite_dma_rel_x & 0x78) + (abs_x)-((m_sprite_dma_rel_x & 0x80) ? 0x80 : 0);
 
+	if (fy)
+		sprite_y = (abs_y)+((m_sprite_dma_rel_y & 0x80) ? 0x80 : 0)-(m_sprite_dma_rel_y & 0x78);
+	else
+		sprite_y = (m_sprite_dma_rel_y & 0x78) + (abs_y)-((m_sprite_dma_rel_y & 0x80) ? 0x80 : 0);
+		
+	//m_host_space->write_word(cop_regs[4] + offs + 2,m_host_space->read_word(m_cop_sprite_dma_src+2 + offs));
+	m_host_space->write_word(cop_regs[4] + offs + 4, sprite_x);
+	m_host_space->write_word(cop_regs[4] + offs + 6, sprite_y);
 }
 
 /*

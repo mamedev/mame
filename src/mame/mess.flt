@@ -185,9 +185,11 @@ datum.cpp
 dbox.cpp
 dccons.cpp
 dct11em.cpp
+debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+dg680.cpp
 dgn_beta.cpp
 diablo1300.cpp
 didact.cpp
@@ -311,6 +313,7 @@ harriet.cpp
 hazeltin.cpp
 hazl1420.cpp
 hec2hrp.cpp
+hektor.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp

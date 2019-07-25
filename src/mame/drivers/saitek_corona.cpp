@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Berger
 /***************************************************************************
 
 Saitek Corona. Please refer to saitek_stratos.cpp for driver notes.

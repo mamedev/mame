@@ -2493,7 +2493,7 @@ xb42639a                        // 1990 Apricot XEN-S (Venus II Motherboard 286)
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
-lion3500						// 1993 Lion 3500C/T notebook
+lion3500                        // 1993 Lion 3500C/T notebook
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -11410,6 +11410,9 @@ leadang                         // (c) 1988 Seibu Kaihatsu
 popnrun                         // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
 popnruna                        // (c) 1987 Seibu Kaihatsu + Yukai Tsukai
 
+@source:debut.cpp
+debutm
+
 @source:dec0.cpp
 automat                         // bootleg
 baddudes                        // EI (c) 1988 Data East USA (US)
@@ -14442,6 +14445,7 @@ megadpkrb                       // (c) 1990 Blitz System Inc
 ngold                           // 198? Unknown
 ngolda                          // 198? Unknown
 ngoldb                          // 198? Unknown
+paradiss                        // 1987 Paradise
 pmpoker                         // (c) 1981 PlayMan
 poker91                         // 1991, Unknown
 pokerdub                        // 198?, Unknown
@@ -15176,6 +15180,9 @@ hec2mdhrx                       //
 hec2mx40                        //
 hec2mx80                        //
 victor                          //
+
+@source:hektor.cpp
+hektor3                         // Hektor III
 
 @source:hexion.cpp
 hexion                          // GX122 (c) 1992
@@ -30952,6 +30959,7 @@ noki8890                        //
 @source:norautp.cpp
 bjpoker                         // (c) M. Kramer Inc.
 cgip30cs                        // (c) 1999, CGI
+cgidjp                          // (c) 1999, CGI
 df_djpkr                        // (c) DellFern Ltd.
 dphl                            // (c) 1983 M. Kramer Inc.
 dphla                           // unknown

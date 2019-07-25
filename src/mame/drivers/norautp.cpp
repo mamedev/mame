@@ -911,6 +911,19 @@ void norautp_state::newhilop_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().share("nvram");   /* 6116 */
 }
 
+void norautp_state::cgidjp_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1fff).rom().region("maincpu", 0x2000);
+	map(0x2000, 0x27ff).ram().share("nvram");   /* 6116 */
+}
+
+void norautp_state::cgidjp_opcodes_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+}
+
 /*********** 8080 based **********/
 
 void norautp_state::dphl_map(address_map &map)
@@ -1364,6 +1377,16 @@ void norautp_state::newhilop(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::newhilop_map);
 //  m_maincpu->set_addrmap(AS_IO, &norautp_state::newhilop_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+}
+
+void norautp_state::cgidjp(machine_config &config)
+{
+	noraut_base(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::cgidjp_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &norautp_state::cgidjp_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 }
 
@@ -2199,6 +2222,17 @@ ROM_START( cgip30cs )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_FILL(                     0x0000, 0x0800, 0xff )
 	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+// PCB has a sticker: Casino Games Innovation Incorporating GS Research POKER PCB
+ROM_START( cgidjp )
+	ROM_REGION( 0x08000, "maincpu", 0 ) /* Program ROM is 0000-3fff, duplicated to fit the ROM size, opcodes are 0000-1fff, data 2000-3fff */
+	ROM_LOAD( "27c256.bin", 0x0000, 0x8000, CRC(6e0b8999) SHA1(5219b38292e531589d90ae3df08990f8d8664cc3) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "27c32.bin",        0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )    /* first half 0xff filled */
+	ROM_CONTINUE(                 0x0800, 0x0800 )
 ROM_END
 
 /*
@@ -3633,6 +3667,7 @@ GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, R
 GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)", 0,                   layout_noraut12 )
 GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (Noraut Deluxe hack)",   0,                   layout_noraut12 )
 GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                   layout_noraut12 )
+GAMEL( 19??, cgidjp,   0,       cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",            0,                   layout_noraut12 ) // very similar to df_djpkr
 GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   MACHINE_NOT_WORKING )
 GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                           MACHINE_NOT_WORKING )
 GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     MACHINE_NOT_WORKING, layout_noraut12 )
