@@ -1,32 +1,83 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 /***************************************************************************
+This entire hardware series is generally called 'GX400'
 
-    Nemesis (Hacked?)       GX400
-    Nemesis (World?)        GX400
-    Twin Bee                GX412
-    Gradius                 GX456
-    Galactic Warriors       GX578
-    Konami GT               GX561
-    RF2                     GX561
-    Salamander (Version D)  GX587
-    Salamander (Version J)  GX587
-    Lifeforce (US)          GX587
-    Lifeforce (Japan)       GX587
-    Black Panther           GX604
-    City Bomber (World)     GX787
-    City Bomber (Japan)     GX787
-    Hyper Crash (Version D) GX790
-    Hyper Crash (Version C) GX790
-    Kitten Kaboodle         GX712
-    Nyan Nyan Panic (Japan) GX712
-    Bubble System
+    Bubble System           (various games) GX400 PWB(B) 200207F
+    Twin Bee                (Game 412) PWB(B) 352473
+    Gradius                 (Game 456) PWB(B) 352473
+    Galactic Warriors       (Game 578) unknown board
+    Konami GT               (Game 561) PWB(B) 352473
+    RF2                     (Game 561) PWB(B) 352473
+    Nemesis (Hacked?)       (Game 456) GX400 PWB(B) 201000A
+    Nemesis (World?)        (Game 456) GX400 PWB(B) 201000A
+    Salamander (Version D)  (Game 587) PWB(B) 201012A GX587
+    Salamander (Version J)  (Game 587) PWB(B) 201012A GX587
+    Lifeforce (US)          (Game 587) PWB(B) 201012A GX587
+    Lifeforce (Japan)       (Game 587) PWB(B) 201012A GX587
+TODO: find pcb pics for below
+    Black Panther           (Game 604)
+    City Bomber (World)     (Game 787)
+    City Bomber (Japan)     (Game 787)
+    Hyper Crash (Version D) (Game 790)
+    Hyper Crash (Version C) (Game 790)
+    Kitten Kaboodle         (Game 712)
+    Nyan Nyan Panic (Japan) (Game 712)
+Most of these boards share the same bottom/gfx board, labeled 'GX400PWB // (A)200204B'
 
 driver by Bryan McPhail
 
+Boards, from earliest to latest:
+* GX400 PWB(B) 200207F - The Bubble System top board: (DATA VERIFIED THRU TRACING)
+    Uses an 0x800 long block of shared SRAM at 0x000-0x7ff with the bubble MCU used for block transfers and boot
+    Uses Program RAM (0x10000-0x1ffff), data uploaded from bubble cart
+    Uses 8-bit RAM at (0x20000-0x27fff) on the lower half of the bus (upper half is ???)
+    Uses Graphics RAM (0x30000-0x3ffff) data uploaded from bubble cart
+    Uses Work RAM at 0x70000-0x73fff
+    Uses an unknown SDIP64 'Bubble MCU' to handle all bubble access and refresh and system init; the bubble MCU
+      uploads a 0x1e0 long BIOS/Bootloader to the shared ram at 0x000-0x800 and controls the 68k /RESET and /BR lines
+      and only releases these lines after the bubble memory has warmed up and is ready.
+    Has 4 Interrupts: ODD/EVEN frame, VBLANK, MCU done, and 220hz timer, through a priority encoder
+    Has VLM5030
+    VLM5030 voice data is at ram at Sound CPU 0x8000
+    Sound CPU clocked at 1.789772MHz
+    MainCPU can force NMI on Sound CPU, and sound NMI is also (optionally) tied to (VBLANK?)
+* PWB(B) 352473 - The 'ROM-Gradius/ROM-Twinbee/ROM-RF2 board' (NOT VERIFIED YET)
+    Uses a 0x1000 long 'BIOS/Bootloader ROM' at 0x0000-0x1000 which at least partially emulates the functionality
+      of the bubble system BIOS/Bootloader
+    Uses Program RAM (0x10000-0x1ffff), data uploaded from 0x80000 by the BIOS/Bootloader
+    Uses 8-bit work RAM at (0x20000-0x27fff) on the lower half of the bus (upper half is ???)
+    Uses Graphics RAM (0x30000-0x3ffff) data uploaded from 0x80000 by the BIOS/Bootloader
+    Has 3 Interrupts: ODD/EVEN frame, VBLANK, and 220hz(?) timer, through a priority encoder
+    Has VLM5030
+    VLM5030 voice data is at ram at Sound CPU 0x8000
+    Sound CPU clocked at 1.789772MHz
+    Unknown whether MainCPU can force a sound NMI or not.
+* Unknown board - The 'ROM-Gwarrior board' (NOT VERIFIED YET)
+    Slightly different to the board above, see driver memory maps for details, exact differences are unknown
+* GX400 PWB(B) 201000A - The 'Nemesis board' (FROM SCHEMATICS)
+    We have schematics for this PCB, though they do not show the unpopulated hookup for the VLM5030
+    Uses fixed roms at 0x00000-0x3ffff
+    Has 2 Interrupts: ODD/EVEN frame, VBLANK, through a priority encoder
+    Sound CPU clocked at 1.789772MHz
+    Has a spot on the PCB for a VLM5030 and ROM(RAM?) but unpopulated and not shown on schematics
+* PWB(B) 201012A GX587 - The 'Salamander board' (FROM SCHEMATICS)
+    We have schematics for this PCB
+    Uses fixed roms at 0x00000-0x7ffff
+    Has 2 Interrupts: ODD/EVEN frame, VBLANK, and does away with the priority encoder in favor of implementing
+     it using discrete logic gates
+    Sound CPU clocked at 3.579545MHz
+    Has VLM5030
+    VLM5030 voice data is in 0x4000 of ROM
+TODO: others.
+
+
 TODO:
+- exact cycles/scanlines for VBLANK and 256V int assert/clear need to be figured out and implemented.
+- bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually plays before the simulated MCU releases the 68k and the load (and morning music) begins.
 - hcrash: coin insertion isn't always recognized.
 - hcrash: Konami GT-type inputs doesn't work properly.
+- gradiusb: still needs proper MCU emulation;
 
 modified by Hau
 03/27/2009
@@ -84,6 +135,32 @@ WRITE_LINE_MEMBER(nemesis_state::bubsys_vblank_irq)
 {
 	if (state && m_irq_on)
 		m_maincpu->set_input_line(4, HOLD_LINE);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::bubsys_interrupt)
+{
+	// process these in priority order
+
+	int scanline = param;
+	m_scanline_counter++;
+	if (m_scanline_counter >= 72)
+	{
+		m_scanline_counter = 0;
+		if (m_irq4_on) // the int4 fires every 72 scanlines of a counter that is NOT reset by VBLANK, and acts as a sort of constant timer
+			m_maincpu->set_input_line(4, HOLD_LINE);
+	}
+
+	// based on tracing, the VBLANK int rising edge is 16 full scanlines before the rising edge of the VSYNC pulse on CSYNC, and the VBLANK int falling edge is 16 full scanlines after the falling edge of the VSYNC pulse on CSYNC. What we don't know is where exactly "scanline 0" is within that block.
+	// we know from traces of VBLANK vs 256V below (which is inverted the same cycle that the VBLANK int edge rises) that that cycle must be the transition from scanline 255 to 256, so presumably the vblank area is 'after' the display lines of a particular frame.
+	// TODO: actually implement this. The behavior may differ in the (unused(?) and untested) 288 scanline mode, as well.
+	if (scanline == 0 && m_irq2_on)
+		m_maincpu->set_input_line(2, HOLD_LINE);
+
+	if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) == 0) // 'INT32' is tied to 256V, which is inverted exactly at the same time as the rising edge of the VBLANK int above in 256 scanline mode. Its behavior in 288 scanline mode is unknown/untested.
+		m_maincpu->set_input_line(1, ASSERT_LINE);
+	else if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) != 0)
+		m_maincpu->set_input_line(1, CLEAR_LINE);
+
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
@@ -144,14 +221,17 @@ WRITE_LINE_MEMBER(nemesis_state::coin2_lockout_w)
 
 WRITE_LINE_MEMBER(nemesis_state::sound_irq_w)
 {
+	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt, which clears the latch automatically, so HOLD_LINE is correct in this case
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
 {
-	if (state) // On Bubble System this goes to an LS02 NOR before the Z80, so there may be a disable somewhere
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter. Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
+	// the ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
+	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work, since it requires a sequence of NMIs in order to function.
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
@@ -179,8 +259,7 @@ WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
 
 			// The last 2 bytes of the block are loaded into the control register
 			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
-
-			m_maincpu->set_input_line(5, HOLD_LINE);
+			m_maincpu->set_input_line(5, HOLD_LINE); // This presumably gets asserted (under mcu control) whenever the MCU has completed a command
 		}
 		// Write?
 		else if (m_bubsys_control_ram[1]==2)
@@ -191,7 +270,7 @@ WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
 	else
 	{
 		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
-		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here
+		m_maincpu->set_input_line(5, CLEAR_LINE); // Not confirmed the clear happens here; clear is done by the MCU code itself, presumably some number of cycles after the assert.
 	}
 }
 
@@ -285,9 +364,9 @@ READ8_MEMBER(nemesis_state::nemesis_portA_r)
    bit 0-3:   timer
    bit 4 6:   unused (always high)
    bit 5:     vlm5030 busy
-   bit 7:     unused by this software version. Bubble Memory version uses this bit.
+   bit 7:     unused by this software version. Bubble Memory version uses this bit (TODO: verify this?)
 */
-	int res = (m_audiocpu->total_cycles() / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
+	int res = (m_audiocpu->total_cycles() / 512) & 0x0f;
 
 	res |= 0xd0;
 
@@ -475,7 +554,7 @@ void nemesis_state::sound_map(address_map &map)
 	map(0xe004, 0xe004).w(m_k005289, FUNC(k005289_device::tg2_w));
 	map(0xe005, 0xe005).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xe006, 0xe006).w("ay1", FUNC(ay8910_device::address_w));
-	map(0xe007, 0xe007).select(0x1ff8).w(FUNC(nemesis_state::nemesis_filter_w));
+	map(0xe007, 0xe007).w(FUNC(nemesis_state::nemesis_filter_w));
 	map(0xe086, 0xe086).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xe106, 0xe106).w("ay1", FUNC(ay8910_device::data_w));
 	map(0xe205, 0xe205).r("ay2", FUNC(ay8910_device::data_r));
@@ -1603,6 +1682,7 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_irq2_on));
 	save_item(NAME(m_irq4_on));
 	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_scanline_counter));
 	save_item(NAME(m_gx400_irq1_cnt));
 	save_item(NAME(m_selected_ip));
 	save_item(NAME(m_tilemap_flip));
@@ -1615,6 +1695,7 @@ void nemesis_state::machine_reset()
 	m_irq_on = 0;
 	m_gx400_irq1_cnt = 0;
 	m_frame_counter = 1;
+	m_scanline_counter = 0;
 	m_selected_ip = 0;
 
 	m_flipscreen = 0;
@@ -1629,7 +1710,7 @@ void nemesis_state::nemesis(machine_config &config)
 //  14318180/2, /* From schematics, should be accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::nemesis_map);
 
-	Z80(config, m_audiocpu, 14318180/4); /* From schematics, should be accurate */
+	Z80(config, m_audiocpu, 14318180/8); /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map); /* fixed */
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // 13J
@@ -1694,7 +1775,7 @@ void nemesis_state::gx400(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/4);        /* 3.579545 MHz */
+	Z80(config, m_audiocpu, 14318180/8);        /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -1765,7 +1846,7 @@ void nemesis_state::konamigt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::konamigt_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::konamigt_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/4);        /* 3.579545 MHz */
+	Z80(config, m_audiocpu, 14318180/8);        /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -1830,7 +1911,7 @@ void nemesis_state::rf2_gx400(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::rf2_gx400_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	Z80(config, m_audiocpu, 14318180/8); /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -2326,7 +2407,7 @@ ROM_START( lifefrcej )
 	ROM_LOAD(      "587-n09.11j",  0x00000, 0x08000, CRC(e8496150) SHA1(c7d40b6dc56849dfd8d080f1aaebad36c88d93df) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
-	ROM_LOAD(      "587-k08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
+	ROM_LOAD(      "587-n08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) BAD_DUMP ) // TODO: verify if contents are different from K08
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
 	ROM_LOAD(      "587-c01.10a", 0x00000, 0x20000, CRC(09fe0632) SHA1(4c3b29c623d70bbe8a938a0beb4638912c46fb6a) ) /* Mask rom */
@@ -2825,6 +2906,24 @@ Default = *
 |------------------|---|
 Manual says SW4, 5, 6, 7 & 8 not used, leave off
 
+Interrupt source info from ArcadeHacker:
+74LS147 @ 17E
+PIN1 INPUT 4 -> 14H 74LS74 PIN 5
+PIN2 INPUT 5 -> MCU PIN  31
+PIN3 INPUT 6 -> VCC
+PIN4 INPUT 7 -> VCC
+PIN5 INPUT 8 -> VCC
+PIN6 OUTPUT C -> 68K IPL2
+PIN7 OUTPUT B -> 68K IPL1
+PIN8 GND
+PIN9 OUTPUT A -> 68K IPL0
+PIN10 INPUT 9 -> VCC
+PIN11 INPUT 1 -> 18E 74LS74 PIN 5
+PIN12 INPUT 2 -> 18E 74LS74 PIN 9
+PIN13 INPUT 3 -> VCC
+PIN14 OUTPUT D -> N.C.
+PIN15 N.C.
+PIN16 VCC
 
 */
 
@@ -2833,9 +2932,9 @@ void nemesis_state::bubsys(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 18432000/2); /* 9.216MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::bubsys_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::gx400_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::bubsys_interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
+	Z80(config, m_audiocpu, 14318180/8); /* 1.7897725MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::gx400_sound_map);
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
@@ -2843,7 +2942,7 @@ void nemesis_state::bubsys(machine_config &config)
 	outlatch.q_out_cb<1>().set(FUNC(nemesis_state::coin2_lockout_w));
 	outlatch.q_out_cb<2>().set(FUNC(nemesis_state::sound_irq_w));
 	outlatch.q_out_cb<4>().set(FUNC(nemesis_state::sound_nmi_w));
-	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w)); // ??
+	outlatch.q_out_cb<7>().set(FUNC(nemesis_state::irq4_enable_w));
 
 	ls259_device &intlatch(LS259(config, "intlatch"));
 	intlatch.q_out_cb<0>().set(FUNC(nemesis_state::irq2_enable_w));
@@ -2861,7 +2960,7 @@ void nemesis_state::bubsys(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
+	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI); // TODO: This is supposed to be gated by something on bubble system, unclear what. it should only be active while the bubble memory is warming up, and disabled after the bubble mcu 'releases' the 68k from reset.
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_entries(2048);
@@ -2941,12 +3040,16 @@ ROM_END
 void nemesis_state::bubsys_init()
 {
 	/*
-	    The MCU is the master of the system and controls the /RESET and /HALT lines of the 68000.
-	    At boot the MCU halts the 68000 and copies the 68000 boot program to shared RAM which
-	    takes 30.65 milliseconds then the 68000 starts execution.
-
-	    As the MCU is not dumped we effectively start the simulation at the point the 68000
-	    is released, and manually copy the boot program to 68000 address space.
+		The MCU is the master of the system and controls the /RESET and /BS lines of the 68000.
+		At boot the MCU asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
+		During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
+		countdown via the vlm5030. Once the bubble memory is ready, the MCU copies the 68000 boot program
+		to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
+		
+		As the MCU is not dumped we effectively start the simulation at the point the 68000
+		is released, and manually copy the boot program to 68000 address space.
+		
+		TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
 	*/
 
 	const uint8_t *src = memregion("maincpu")->base();
@@ -2954,13 +3057,14 @@ void nemesis_state::bubsys_init()
 
 	/*
 	    The MCU sets this flag once the boot program is copied.  The 68000 will reset
-	    if the value is not correct.
+	    if the value is not correct. Presumably this was done for safety in case somehow the
+	    68000 was released from reset when the MCU wasn't yet ready.
 	*/
 	m_bubsys_control_ram[3]=0x240;
 }
 
 GAME( 1985, bubsys,   0,         bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", 0 )
+GAME( 1985, gradiusb, bubsys,    bubsys,    bubsys, nemesis_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
 // Bubble System Twinbee
 // Bubble System RF2
 // Bubble System Galactic Warriors

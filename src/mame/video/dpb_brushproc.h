@@ -106,6 +106,10 @@ protected:
 	uint8_t *m_prom_base;
 	uint8_t m_prom_out;
 
+	uint16_t m_pal_in;
+	uint8_t *m_pal_base;
+	uint16_t m_pal_out;
+
 	devcb_write8 m_store1;
 	devcb_write8 m_store2;
 
@@ -117,6 +121,7 @@ protected:
 	required_device<sn74s381_device> m_alu_fe;
 	required_device<sn74s381_device> m_alu_ee;
 	required_memory_region m_prom;
+	required_memory_region m_pal;
 };
 
 // device type definition

@@ -2330,6 +2330,7 @@ void seta2_state::seta2(machine_config &config)
 void seta2_state::gundamex(machine_config &config)
 {
 	seta2(config);
+	m_maincpu->set_clock(XTAL(32'530'400)/2); // verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::gundamex_map);
 
 	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
@@ -2339,16 +2340,21 @@ void seta2_state::gundamex(machine_config &config)
 
 	// video hardware
 	m_screen->set_visarea(0x00, 0x180-1, 0x000, 0x0e0-1);
+
+	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'400)/2); // verified; reference : https://youtu.be/6f-znVzcrmg
 }
 
 
 void seta2_state::grdians(machine_config &config)
 {
 	seta2(config);
+	m_maincpu->set_clock(XTAL(32'530'400)/2); // verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::grdians_map);
 
 	// video hardware
 	m_screen->set_visarea(0x00, 0x130-1, 0x00, 0xe8 -1);
+
+	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'400)/2); // verified; reference : https://youtu.be/Ung9XeLisV0
 }
 
 

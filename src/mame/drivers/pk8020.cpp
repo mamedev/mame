@@ -2,10 +2,20 @@
 // copyright-holders:Miodrag Milanovic, AJR
 /***************************************************************************
 
-        PK-8020 driver by Miodrag Milanovic
-            based on work of Sergey Erokhin from pk8020.narod.ru
+PK-8020 driver by Miodrag Milanovic
+    based on work of Sergey Erokhin from pk8020.narod.ru
 
-        18/07/2008 Preliminary driver.
+2008-07-18 Preliminary driver.
+
+Cassette is "best guess", as I was unable to locate any recordings, and
+also do not know the commands to save and load. SAVE and LOAD appear when
+F2 or shift-F2 pressed (in Korvet), but only produce errors.
+
+Status as at 2019-07-19:
+Korvet - can boot CP/M, but the keyboard then doesn't work.
+Neiva - keyboard not working
+BK8T - keyboard not working, stuck at a "config" screen.
+Kontur - needs to boot from a floppy and we don't have any that work
 
 ****************************************************************************/
 
@@ -306,8 +316,9 @@ void pk8020_state::pk8020(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	//CASSETTE(config, m_cass).set_default_state(CASSETTE_PLAY);
-	//m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CENTRONICS(config, m_printer, centronics_devices, nullptr);
 	m_printer->busy_handler().set(m_inr, FUNC(pic8259_device::ir6_w)).invert();
@@ -378,7 +389,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME         FLAGS */
-COMP( 1987, korvet, 0,      0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Korvet", MACHINE_SUPPORTS_SAVE)
-COMP( 1987, neiva,  korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Neiva",  MACHINE_SUPPORTS_SAVE)
-COMP( 1987, kontur, korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Kontur", MACHINE_SUPPORTS_SAVE)
-COMP( 1987, bk8t,   korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "BK-8T",         MACHINE_SUPPORTS_SAVE)
+COMP( 1987, korvet, 0,      0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Korvet", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP( 1987, neiva,  korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Neiva",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP( 1987, kontur, korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Kontur", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP( 1987, bk8t,   korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "BK-8T",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

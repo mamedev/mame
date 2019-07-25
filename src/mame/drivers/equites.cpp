@@ -1036,7 +1036,7 @@ static const char *const alphamc07_sample_names[] =
 
 #define MSM5232_BASE_VOLUME 1.0
 
-// the sound board is the same in all games but clsunk
+// the sound board is the same in all games but bngotime
 void equites_state::common_sound(machine_config &config)
 {
 	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); /* verified on pcb */
@@ -1201,7 +1201,7 @@ void gekisou_state::gekisou(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
-void gekisou_state::clsunk(machine_config &config)
+void gekisou_state::bngotime(machine_config &config)
 {
 	gekisou(config);
 
@@ -1962,7 +1962,7 @@ Sound:AY-3-8910A (unpopulated: another 8910 and a YM2203)
 OSC  :6.000MHz
 */
 
-ROM_START( clsunk )
+ROM_START( bngotime )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 68000 ROMs
 	ROM_LOAD16_BYTE( "1.b15", 0x00001, 0x4000, CRC(34a27f5c) SHA1(d30ac37d8665ccc92f6a10f6b0f55783096df687) )
 	ROM_LOAD16_BYTE( "0.d15", 0x00000, 0x4000, CRC(21c738ee) SHA1(8c14265fe1ea44945555b37cb13ff6b72c747053) )
@@ -2048,7 +2048,7 @@ GAME( 1984, bullfgtr,  0,        equites,  bullfgtr, equites_state,  init_equite
 GAME( 1984, bullfgtrs, bullfgtr, equites,  bullfgtr, equites_state,  init_equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, kouyakyu,  0,        equites,  kouyakyu, equites_state,  init_equites,  ROT0,  "Alpha Denshi Co.", "The Koukou Yakyuu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gekisou,   0,        gekisou,  gekisou,  gekisou_state,  init_equites,  ROT90, "Eastern Corp.", "Gekisou (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clsunk,    0,        clsunk,   gekisou,  gekisou_state,  init_equites,  ROT90, "CLS?", "unknown CLS bingo game", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 8505 MCU isn't dumped
+GAME( 1986, bngotime,  0,        bngotime, gekisou,  gekisou_state,  init_equites,  ROT90, "CLS", "Bingo Time", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 8505 MCU isn't dumped
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt,  0,        splndrbt, splndrbt, splndrbt_state, init_splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

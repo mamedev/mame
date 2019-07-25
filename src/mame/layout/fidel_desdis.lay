@@ -17,7 +17,7 @@
 	</element>
 	<element name="ldot" defstate="0">
 		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="0"><color red="0.12157" green="0.12157" blue="0.12157" /></rect>
 	</element>
 
 	<element name="led" defstate="0">
@@ -606,8 +606,8 @@
 		<bezel name="3.7" element="ldot"><bounds x="42.5" y="96.5" width="0.6" height="0.6" /></bezel>
 		<bezel name="4.7" element="ldot"><bounds x="48.5" y="96.5" width="0.6" height="0.6" /></bezel>
 
-		<bezel name="5.7" element="ldot"><bounds x="42.9" y="92.8" width="0.6" height="0.6" /></bezel>
-		<bezel name="5.7" element="ldot"><bounds x="42.7" y="94.65" width="0.6" height="0.6" /></bezel>
+		<bezel name="5.7" element="ldot"><bounds x="42.91" y="92.8" width="0.6" height="0.6" /></bezel>
+		<bezel name="5.7" element="ldot"><bounds x="42.69" y="94.65" width="0.6" height="0.6" /></bezel>
 
 	</view>
 </mamelayout>

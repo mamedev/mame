@@ -32,6 +32,9 @@ public:
 	auto tend0() { return tend0_cb.bind(); }
 	auto tend1() { return tend1_cb.bind(); }
 
+	void set_mode_a20() { mode_a20 = true; }
+	void set_mode_a24() { mode_a20 = false; }
+
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
 

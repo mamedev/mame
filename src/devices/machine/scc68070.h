@@ -139,6 +139,7 @@ public:
 	auto iack4_callback() { return m_iack4_callback.bind(); }
 	auto iack5_callback() { return m_iack5_callback.bind(); }
 	auto iack7_callback() { return m_iack7_callback.bind(); }
+	auto uart_tx_callback() { return m_uart_tx_callback.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(in2_w);
 	DECLARE_WRITE_LINE_MEMBER(in4_w);
@@ -149,14 +150,6 @@ public:
 
 	// external callbacks
 	void uart_rx(uint8_t data);
-	void uart_tx(uint8_t data);
-
-	// UART Access for Quizard
-	void set_quizard_mcu_value(uint16_t value);
-	void set_quizard_mcu_ack(uint8_t ack);
-	void quizard_rx(uint8_t data);
-
-	void mcu_frame();
 
 	TIMER_CALLBACK_MEMBER( timer0_callback );
 	TIMER_CALLBACK_MEMBER( rx_callback );
@@ -285,6 +278,7 @@ private:
 
 	void uart_rx_check();
 	void uart_tx_check();
+	void uart_tx(uint8_t data);
 	void set_timer_callback(int channel);
 
 	// callbacks
@@ -292,14 +286,9 @@ private:
 	devcb_read8 m_iack4_callback;
 	devcb_read8 m_iack5_callback;
 	devcb_read8 m_iack7_callback;
+	devcb_write8 m_uart_tx_callback;
 
 	// internal state
-	uint16_t m_seeds[10];
-	uint8_t m_state[8];
-
-	uint16_t m_mcu_value;
-	uint8_t m_mcu_ack;
-
 	uint8_t m_ipl;
 	int m_in2_line;
 	int m_in4_line;
@@ -321,11 +310,6 @@ private:
 	timer_regs_t m_timers;
 	dma_regs_t m_dma;
 	mmu_regs_t m_mmu;
-
-	// non-static internal members
-	void quizard_calculate_state();
-	void quizard_set_seeds(uint8_t *rx);
-	void quizard_handle_byte_tx();
 };
 
 // device type definition

@@ -224,7 +224,7 @@ inline uint32_t towns_state::msf_to_lbafm(uint32_t val)  // because the CDROM co
 	f = bcd_to_byte(val & 0x0000ff);
 	s = (bcd_to_byte((val & 0x00ff00) >> 8));
 	m = (bcd_to_byte((val & 0xff0000) >> 16));
-	return ((m * (60 * 75)) + (s * 75) + f);
+	return ((m * (60 * 75)) + (s * 75) + f) - 150;
 }
 
 void towns_state::init_serial_rom()
@@ -1481,13 +1481,7 @@ void towns_state::towns_cdrom_read(cdrom_image_device* device)
 	m_towns_cd.lba_current = msf_to_lbafm(lba1);
 	m_towns_cd.lba_last = msf_to_lbafm(lba2);
 
-	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
 	track = cdrom_get_track(device->get_cdrom_file(),m_towns_cd.lba_current);
-	if(track < 2)
-	{  // recalculate LBA
-		m_towns_cd.lba_current -= 150;
-		m_towns_cd.lba_last -= 150;
-	}
 
 	// parameter 7 = sector count?
 	// lemmings 2 sets this to 4 but hates 4 extra sectors being read

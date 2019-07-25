@@ -7,8 +7,8 @@ Ravensburger Selbstbaucomputer
 This is a project described in "Ravensburger" magazine. You had to make
 the entire thing (including the circuit boards) yourself.
 
-http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
 
+https://web.archive.org/web/20160321001634/http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
         2013-04-23 Skeleton driver.
 
 

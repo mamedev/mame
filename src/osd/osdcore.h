@@ -864,6 +864,157 @@ enum osd_output_channel
 	OSD_OUTPUT_CHANNEL_COUNT
 };
 
+class osd_gpu
+{
+public:
+	osd_gpu() { }
+	virtual ~osd_gpu() { }
+
+	typedef uint64_t handle_t;
+
+	class vertex_decl
+	{
+	public:
+		enum attr_type : uint32_t
+		{
+			FLOAT32,
+			FLOAT16,
+			UINT32,
+			UINT16,
+			UINT8,
+
+			MAX_TYPES
+		};
+
+		static constexpr size_t TYPE_SIZES[MAX_TYPES] = { 4, 2, 4, 2, 1 };
+
+		static constexpr uint32_t MAX_COLORS = 2;
+		static constexpr uint32_t MAX_TEXCOORDS = 8;
+
+		enum attr_usage : uint32_t
+		{
+			POSITION,
+			COLOR,
+			TEXCOORD = COLOR + MAX_COLORS,
+			NORMAL = TEXCOORD + MAX_TEXCOORDS,
+			BINORMAL,
+			TANGENT,
+
+			MAX_ATTRS
+		};
+
+		class attr_entry
+		{
+		public:
+			attr_entry() : m_usage(POSITION), m_type(FLOAT32), m_count(3), m_size(12) { }
+			attr_entry(attr_usage usage, attr_type type, size_t count) : m_usage(usage), m_type(type), m_count(count), m_size(TYPE_SIZES[type] * count) { }
+
+			attr_usage usage() const { return m_usage; }
+			attr_type type() const { return m_type; }
+			size_t count() const { return m_count; }
+			size_t size() const { return m_size; }
+
+		private:
+			attr_usage m_usage;
+			attr_type m_type;
+			size_t m_count;
+			size_t m_size;
+		};
+
+		vertex_decl()
+			: m_entry_count(0)
+			, m_size(0)
+		{
+		}
+
+		vertex_decl & add_attr(attr_usage usage, attr_type type, size_t count)
+		{
+			m_entries[m_entry_count] = attr_entry(usage, type, count);
+			m_size += m_entries[m_entry_count].size();
+			m_entry_count++;
+			return *this;
+		}
+
+		size_t entry_count() const { return m_entry_count; }
+		size_t size() const { return m_size; }
+		const attr_entry &entry(const uint32_t index) const { return m_entries[index]; }
+
+	protected:
+		attr_entry m_entries[MAX_ATTRS];
+		size_t m_entry_count;
+		size_t m_size;
+	};
+
+	class vertex_buffer_interface
+	{
+	public:
+		vertex_buffer_interface(vertex_decl &decl, uint32_t flags)
+			: m_decl(decl)
+			, m_flags(flags)
+		{
+		}
+		virtual ~vertex_buffer_interface() {}
+
+		const vertex_decl &decl() const { return m_decl; }
+		uint32_t flags() const { return m_flags; }
+		handle_t handle() { return m_handle; }
+
+		virtual size_t count() const = 0;
+		virtual size_t size() const = 0;
+		virtual void upload() = 0;
+
+	protected:
+		const vertex_decl &m_decl;
+		const uint32_t m_flags;
+		handle_t m_handle;
+	};
+
+	class static_vertex_buffer_interface : public vertex_buffer_interface
+	{
+	public:
+		enum vertex_buffer_flags : uint32_t
+		{
+			RETAIN_ON_CPU = 0x00000001
+		};
+
+		static_vertex_buffer_interface(vertex_decl &decl, size_t count, uint32_t flags)
+			: vertex_buffer_interface(decl, flags)
+			, m_count(count)
+			, m_size(decl.size() * count)
+		{
+		}
+
+		virtual ~static_vertex_buffer_interface()
+		{
+			if (m_data)
+				delete [] m_data;
+		}
+
+		size_t count() const override { return m_count; }
+		size_t size() const override { return m_size; }
+
+		void set_data(void *data)
+		{
+			allocate_if_needed();
+			memcpy(m_data, data, m_size);
+		}
+
+	protected:
+		void allocate_if_needed()
+		{
+			if ((m_flags & RETAIN_ON_CPU) != 0 && m_data == nullptr)
+				m_data = new uint8_t[m_size];
+		}
+
+		const size_t m_count;
+		const size_t m_size;
+		uint8_t *m_data;
+	};
+
+	virtual void bind_buffer(vertex_buffer_interface *vb) = 0;
+	virtual void unbind_buffer(vertex_buffer_interface *vb) = 0;
+};
+
 class osd_output
 {
 public:

@@ -1,12 +1,21 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="blackb"><rect><color red="0.00" green="0.00" blue="0.00" /></rect></element>
+	<element name="blackd"><disk><color red="0.00" green="0.00" blue="0.00" /></disk></element>
+	<element name="black2b"><rect><color red="0.12" green="0.11" blue="0.11" /></rect></element>
+	<element name="black2d"><disk><color red="0.12" green="0.11" blue="0.11" /></disk></element>
+	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
+
 	<element name="ledr" defstate="0">
-		<disk state="0">	<color red="0.15" green="0.15" blue="0.15" />	</disk>
-		<disk state="1">	<color red="0.75" green="0.00" blue="0.00" />	</disk>
+		<disk state="0">	<color red="0.15" green="0.05" blue="0.05" />	</disk>
+		<disk state="1">	<color red="1" green="0.01" blue="0.15" />	</disk>
 	</element>
 	<element name="ledg" defstate="0">
-		<disk state="0">	<color red="0.15" green="0.15" blue="0.15" />	</disk>
-		<disk state="1">	<color red="0.00" green="0.75" blue="0.00" />	</disk>
+		<disk state="0">	<color red="0.05" green="0.15" blue="0.05" />	</disk>
+		<disk state="1">	<color red="0.1" green="1" blue="0.15" />	</disk>
 	</element>
 
 	<element name="hlb">
@@ -15,8 +24,8 @@
 	</element>
 
 	<element name="hlbr">
-		<disk state="0"> <color red="0.56" green="0.33" blue="0.12" /> </disk>
-		<disk state="1"> <color red="0.76" green="0.53" blue="0.32" /> </disk>
+		<disk state="0"> <color red="0.75" green="0.5" blue="0.25" /> </disk>
+		<disk state="1"> <color red="0.65" green="0.4" blue="0.2" /> </disk>
 	</element>
 
 	<element name="piece" defstate="0">
@@ -111,40 +120,55 @@
 	<element name="text_gt">    <rect><color red="0.89" green="0.85" blue="0.66" /></rect>    <text string="&gt;">      <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_lt">    <rect><color red="0.89" green="0.85" blue="0.66" /></rect>    <text string="&lt;">      <color red="0" green="0" blue="0" /></text> </element>
 
-	<element name="background"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
 	<element name="background_cp">  <rect><color red="0.89" green="0.85" blue="0.66" /></rect></element>
+	<element name="background_cp2">  <rect><color red="0.1" green="0.1" blue="0.2" /></rect></element>
+
+	<element name="text_tasc">
+		<rect><color red="0.89" green="0.85" blue="0.66" /></rect>
+		<text string="T a s c   C h e s s S y s t e m" align="1"><color red="0.1" green="0.1" blue="0.2" /></text>
+	</element>
+
+
+<!-- cpanel -->
 
 	<group name="control_panel">
-		<screen index="0"><bounds x="30" y="40" width="240" height="64" /></screen>
-		<bezel element="background_cp"><bounds x="0" y="00"    width="300" height="39" /></bezel>
-		<bezel element="background_cp"><bounds x="0" y="105"   width="300" height="80" /></bezel>
-		<bezel element="background_cp"><bounds x="0" y="20"    width="29" height="90" /></bezel>
-		<bezel element="background_cp"><bounds x="271" y="20"  width="29" height="90" /></bezel>
+		<element ref="cblack"><bounds x="-2.613" y="-15" width="305.226" height="207.613" /></element>
+		<element ref="background_cp"><bounds x="10" y="15" width="281" height="165" /></element>
+		<element ref="background_cp2"><bounds x="10" y="15" width="10" height="165" /></element>
+		<element ref="background_cp2"><bounds x="152.5" y="15" width="138.5" height="57" /></element>
+		<element ref="background_cp2"><bounds x="60" y="100" width="92.5" height="13.5" /></element>
+		<element ref="cblack"><bounds x="290" y="10" width="3" height="175" /></element>
 
-		<bezel element="hlbr" inputtag="IN.2" inputmask="0x80"><bounds x="50"   y="11"   width="15" height="15" /></bezel>
-		<bezel element="hlbr" inputtag="IN.3" inputmask="0x80"><bounds x="235"  y="11"   width="15" height="15" /></bezel>
+		<element ref="hlbr" inputtag="IN.2" inputmask="0x80"><bounds x="43"   y="-7.5"   width="15" height="15" /></element>
+		<element ref="hlbr" inputtag="IN.3" inputmask="0x80"><bounds x="242"  y="-7.5"   width="15" height="15" /></element>
 
-		<bezel name="pled0" element="ledg"><bounds x="20"   y="15"   width="8" height="8" /></bezel>
-		<bezel name="pled1" element="ledg"><bounds x="272"  y="15"   width="8" height="8" /></bezel>
+		<element ref="ledg" name="pled0" ><bounds x="18"   y="-4"   width="8" height="8" /></element>
+		<element ref="ledg" name="pled1" ><bounds x="274"  y="-4"   width="8" height="8" /></element>
 
-		<bezel element="text_play" ><bounds x="30" y="125" width="20" height="6" /></bezel>
-		<bezel element="text_back" ><bounds x="60" y="125" width="20" height="6" /></bezel>
-		<bezel element="text_menu" ><bounds x="90" y="125" width="20" height="6" /></bezel>
+		<element ref="text_tasc" ><bounds x="29" y="17.5" width="100" height="12" /></element>
 
-		<bezel element="text_lt" ><bounds x="145" y="135" width="6" height="15" /></bezel>
-		<bezel element="text_gt" ><bounds x="233" y="135" width="6" height="15" /></bezel>
-		<bezel element="text_lt" ><bounds x="182.5" y="114" width="20" height="6" /><orientation rotate="90" /></bezel>
-		<bezel element="text_gt" ><bounds x="182.5" y="165" width="20" height="6" /><orientation rotate="90" /></bezel>
-		<bezel element="text_enter" ><bounds x="250" y="125" width="20" height="6" /></bezel>
+		<element ref="text_play" ><bounds x="30" y="125" width="20" height="6" /></element>
+		<element ref="text_back" ><bounds x="60" y="125" width="20" height="6" /></element>
+		<element ref="text_menu" ><bounds x="90" y="125" width="20" height="6" /></element>
 
-		<bezel element="hlb" inputtag="IN.0" inputmask="0x20"><bounds x="30" y="135" width="20" height="15" /></bezel>
-		<bezel element="hlb" inputtag="IN.1" inputmask="0x20"><bounds x="60" y="135" width="20" height="15" /></bezel>
-		<bezel element="hlb" inputtag="IN.2" inputmask="0x20"><bounds x="90" y="135" width="20" height="15" /></bezel>
-		<bezel element="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="152.5" y="135" width="20" height="15" /></bezel>
-		<bezel element="hlb" inputtag="IN.3" inputmask="0x40"><bounds x="182.5" y="148" width="20" height="15" /></bezel>
-		<bezel element="hlb" inputtag="IN.2" inputmask="0x40"><bounds x="182.5" y="123" width="20" height="15" /></bezel>
-		<bezel element="hlb" inputtag="IN.1" inputmask="0x40"><bounds x="212.5" y="135" width="20" height="15" /></bezel>
-		<bezel element="hlb" inputtag="IN.3" inputmask="0x20"><bounds x="250" y="135" width="20" height="15" /></bezel>
+		<element ref="text_lt" ><bounds x="145" y="135" width="6" height="15" /></element>
+		<element ref="text_gt" ><bounds x="234" y="135" width="6" height="15" /></element>
+		<element ref="text_lt" ><bounds x="183.5" y="115" width="20" height="6" /><orientation rotate="90" /></element>
+		<element ref="text_gt" ><bounds x="183.5" y="165" width="20" height="6" /><orientation rotate="90" /></element>
+		<element ref="text_enter" ><bounds x="250" y="125" width="20" height="6" /></element>
+
+		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds x="30" y="135" width="20" height="15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x20"><bounds x="60" y="135" width="20" height="15" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x20"><bounds x="90" y="135" width="20" height="15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="152.5" y="135" width="20" height="15" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x40"><bounds x="182.5" y="148" width="20" height="15" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x40"><bounds x="182.5" y="123" width="20" height="15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds x="212.5" y="135" width="20" height="15" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x20"><bounds x="250" y="135" width="20" height="15" /></element>
+
+		<element ref="blackb"><bounds x="29" y="37" width="242" height="70" /></element>
+		<element ref="static_lcd"><bounds x="30" y="38" width="240" height="68" /></element>
+		<screen index="0" blend="alpha"><bounds x="31" y="40.2666" width="238" height="62.9333" /></screen> <!-- aspect ratio 240*64 -->
 	</group>
 
 
@@ -152,7 +176,6 @@
 
 	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
 	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
-	<element name="board_border"><rect><color red="0.00" green="0.00" blue="0.00" /></rect></element>
 
 	<element name="hlbb" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
@@ -163,11 +186,28 @@
 	</element>
 
 	<group name="sb_board">
-		<bounds x="0" y="0" width="82" height="82" />
-		<bezel element="board_border"><bounds x="0.7" y="0.7" width="0.3"  height="80.6" /></bezel>
-		<bezel element="board_border"><bounds x="81"  y="0.7" width="0.3"  height="80.6" /></bezel>
-		<bezel element="board_border"><bounds x="0.7" y="0.7" width="80.6" height="0.3"  /></bezel>
-		<bezel element="board_border"><bounds x="0.7" y="81"  width="80.6" height="0.3"  /></bezel>
+		<bounds x="-3.4" y="-3.4" width="88.8" height="88.8" />
+
+		<bezel element="cblack"><bounds x="-3.4" y="-3.4" width="88.8" height="88.8" /></bezel>
+		<bezel element="blackb"><bounds x="0.6" y="0.6" width="80.8" height="80.8" /></bezel>
+
+		<!-- chessboard coords -->
+		<bezel element="text_8"><bounds x="-2.3" y="5"  width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="-2.3" y="15" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="-2.3" y="25" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="-2.3" y="35" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="-2.3" y="45" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="-2.3" y="55" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="-2.3" y="65" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="-2.3" y="75" width="2" height="2" /></bezel>
+		<bezel element="text_a"><bounds x="5"  y="82.5" width="2" height="2" /></bezel>
+		<bezel element="text_b"><bounds x="15" y="82.5" width="2" height="2" /></bezel>
+		<bezel element="text_c"><bounds x="25" y="82.5" width="2" height="2" /></bezel>
+		<bezel element="text_d"><bounds x="35" y="82.5" width="2" height="2" /></bezel>
+		<bezel element="text_e"><bounds x="45" y="82.5" width="2" height="2" /></bezel>
+		<bezel element="text_f"><bounds x="55" y="82.5" width="2" height="2" /></bezel>
+		<bezel element="text_g"><bounds x="65" y="82.5" width="2" height="2" /></bezel>
+		<bezel element="text_h"><bounds x="75" y="82.5" width="2" height="2" /></bezel>
 
 		<!-- squares (avoid seams) -->
 		<bezel element="cwhite"><bounds x="1"  y="1" width="11" height="11" /></bezel>
@@ -316,12 +356,14 @@
 		<image file="chess/bq.png" state="23"><color alpha="0.5" /></image>
 		<image file="chess/bk.png" state="24"><color alpha="0.5" /></image>
 	</element>
+
 	<element name="hlub" defstate="0">
 		<rect state="1"><color red="0" green="0" blue="0" /></rect>
 	</element>
-	<element name="text_uit1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uit2"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
+	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib2">
 		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
@@ -330,13 +372,13 @@
 		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
-	<element name="text_uis1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih2">
 		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
-	<element name="text_uiu1"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu2a">
 		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
 		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
@@ -354,14 +396,12 @@
 		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 	<element name="text_uiu3a" defstate="0">
-		 <rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
-		 <rect><color red="0.56" green="0.33" blue="0.12" /></rect>
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
@@ -369,9 +409,9 @@
 
 	<group name="sb_ui">
 		<bounds x="0" y="0" width="10" height="80" />
-		<bezel element="cwhite"><bounds x="0" y="0" width="10" height="1" /></bezel>
-		<bezel element="cwhite"><bounds x="0" y="7" width="10" height="1" /></bezel>
-		<bezel element="cwhite"><bounds x="0" y="79" width="10" height="1" /></bezel>
+		<bezel element="cblack"><bounds x="0" y="0" width="10" height="1" /></bezel>
+		<bezel element="cblack"><bounds x="0" y="7" width="10" height="1" /></bezel>
+		<bezel element="cblack"><bounds x="0" y="79" width="10" height="1" /></bezel>
 		<bezel element="text_uit1"><bounds x="0" y="2" width="10" height="2" /></bezel>
 		<bezel element="text_uit2"><bounds x="0" y="4" width="10" height="2" /></bezel>
 
@@ -419,7 +459,7 @@
 
 		<!-- hand -->
 		<bezel element="text_uih1"><bounds x="0" y="51" width="10" height="2" /></bezel>
-		<bezel element="cwhite"><bounds x="1" y="53.5" width="8" height="6" /></bezel>
+		<bezel element="cblack"><bounds x="1" y="53.5" width="8" height="6" /></bezel>
 		<bezel name="piece_ui0" element="piece"><bounds x="2" y="53.5" width="6" height="6" /></bezel>
 
 		<bezel element="cwhite"><bounds x="1" y="60.5" width="8" height="2.5" /></bezel>
@@ -447,34 +487,41 @@
 		<bezel element="text_uiu3b"><bounds x="4" y="75" width="2" height="2" /></bezel>
 	</group>
 
-	<view name="Chessboard + Control Panel">
-		<bezel element="background"><bounds x="0" y="0"   width="108" height="95" /></bezel>
 
-	<!-- chessboard coords -->
+<!-- build screen -->
 
-		<bezel element="text_8" ><bounds x="14.5" y="12" width="2" height="2" /></bezel>
-		<bezel element="text_7" ><bounds x="14.5" y="22" width="2" height="2" /></bezel>
-		<bezel element="text_6" ><bounds x="14.5" y="32" width="2" height="2" /></bezel>
-		<bezel element="text_5" ><bounds x="14.5" y="42" width="2" height="2" /></bezel>
-		<bezel element="text_4" ><bounds x="14.5" y="52" width="2" height="2" /></bezel>
-		<bezel element="text_3" ><bounds x="14.5" y="62" width="2" height="2" /></bezel>
-		<bezel element="text_2" ><bounds x="14.5" y="72" width="2" height="2" /></bezel>
-		<bezel element="text_1" ><bounds x="14.5" y="82" width="2" height="2" /></bezel>
-		<bezel element="text_a" ><bounds x="22"   y="90" width="2" height="2" /></bezel>
-		<bezel element="text_b" ><bounds x="32"   y="90" width="2" height="2" /></bezel>
-		<bezel element="text_c" ><bounds x="42"   y="90" width="2" height="2" /></bezel>
-		<bezel element="text_d" ><bounds x="52"   y="90" width="2" height="2" /></bezel>
-		<bezel element="text_e" ><bounds x="62"   y="90" width="2" height="2" /></bezel>
-		<bezel element="text_f" ><bounds x="72"   y="90" width="2" height="2" /></bezel>
-		<bezel element="text_g" ><bounds x="82"   y="90" width="2" height="2" /></bezel>
-		<bezel element="text_h" ><bounds x="92"   y="90" width="2" height="2" /></bezel>
+	<view name="Internal Layout (Full H)">
+		<bounds left="0" right="191.6" top="0" bottom="88.8" />
 
-		<group ref="sb_board"><bounds x="17" y="7" width="82" height="82" /></group>
-		<group ref="sb_ui"><bounds x="2" y="8" width="10" height="80" /></group>
-		<group ref="control_panel"><bounds x="0" y="95" width="108" height="67" /></group>
+		<!-- draw connection wire -->
+		<element ref="black2d"><bounds x="174.5" y="4" width="7" height="7" /></element>
+		<element ref="blackd"><bounds x="176" y="5.5" width="4" height="4" /></element>
+		<element ref="blackb"><bounds x="168" y="5.45" width="10" height="10" /></element>
+		<element ref="blackb"><bounds x="170" y="7.5" width="10.05" height="10" /></element>
+		<element ref="black2b"><bounds x="180" y="8.2" width="1.5" height="50" /></element>
+		<element ref="black2b"><bounds x="28" y="4" width="151" height="1.5" /></element>
+
+		<group ref="sb_board"><bounds x="12" y="0" width="88.8" height="88.8" /></group>
+		<group ref="sb_ui"><bounds x="1" y="4.4" width="10" height="80" /></group>
+		<group ref="control_panel"><bounds x="102.8" y="28.399" width="88.8" height="60.401" /></group>
 	</view>
 
-	<view name="Control Panel">
-		<group ref="control_panel"><bounds x="0" y="0" width="300" height="185" /></group>
+	<view name="Internal Layout (Full V)">
+		<bounds left="0" right="100.8" top="0" bottom="151.201" />
+
+		<group ref="sb_board"><bounds x="12" y="0" width="88.8" height="88.8" /></group>
+		<group ref="sb_ui"><bounds x="1" y="4.4" width="10" height="80" /></group>
+		<group ref="control_panel"><bounds x="12" y="90.8" width="88.8" height="60.401" /></group>
+	</view>
+
+	<view name="Internal Layout (Board)">
+		<bounds left="0" right="100.8" top="0" bottom="88.8" />
+
+		<group ref="sb_board"><bounds x="12" y="0" width="88.8" height="88.8" /></group>
+		<group ref="sb_ui"><bounds x="1" y="4.4" width="10" height="80" /></group>
+	</view>
+
+	<view name="Internal Layout (CPanel)">
+		<group ref="control_panel"><bounds x="0" y="0" width="305.226" height="207.613" /></group>
 	</view>
 </mamelayout>

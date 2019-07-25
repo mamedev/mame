@@ -48,6 +48,7 @@ void mas3507d_device::device_reset()
 	mp3_count = 0;
 	sample_count = 0;
 	total_frame_count = 0;
+	buffered_frame_count = 0;
 }
 
 void mas3507d_device::i2c_scl_w(bool line)
@@ -356,14 +357,14 @@ void mas3507d_device::fill_buffer()
 		current_rate = mp3_info.hz;
 		stream->set_sample_rate(current_rate);
 	}
-
-	total_frame_count += scount;
 }
 
 void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int scount)
 {
 	if(!sample_count)
 		return;
+
+	buffered_frame_count = scount;
 
 	int s1 = scount - pos;
 	if(s1 > sample_count)
@@ -385,6 +386,7 @@ void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int sco
 	if(s1 == sample_count) {
 		pos += s1;
 		sample_count = 0;
+		total_frame_count += s1;
 		return;
 	}
 
@@ -395,6 +397,7 @@ void mas3507d_device::append_buffer(stream_sample_t **outputs, int &pos, int sco
 
 	pos += s1;
 	sample_count -= s1;
+	total_frame_count += s1;
 }
 
 void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int csamples)
@@ -414,6 +417,7 @@ void mas3507d_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			mp3_count = 0;
 			sample_count = 0;
 			total_frame_count = 0;
+			buffered_frame_count = 0;
 
 			for(int i=pos; i != csamples; i++) {
 				outputs[0][i] = 0;

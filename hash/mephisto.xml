@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mephisto" description="Mephisto Modular Board Modules">
+	<software name="hg240">
+		<description>Mephisto HG 240 Opening Library</description>
+		<year>1984</year>
+		<publisher>Hegener &amp; Glaser</publisher>
+		<sharedfeat name="compatibility" value="MM2" />
+		<part name="cart" interface="mephisto_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="hg240.rom" size="0x4000" crc="38f62597" sha1="39ccc0f5d1b895e5334df0944639a886f9300f74" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hg440">
+		<description>Mephisto HG 440 Opening Library</description>
+		<year>1987</year>
+		<publisher>Hegener &amp; Glaser</publisher>
+		<sharedfeat name="compatibility" value="MM4" />
+		<part name="cart" interface="mephisto_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="hg440.rom" size="0x4000" crc="81ffcdfd" sha1="b0f7bcc11d1e821daf92cde31e3446c8be0bbe19" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hg550">
+		<description>Mephisto HG 550 Opening Library</description>
+		<year>1990</year>
+		<publisher>Hegener &amp; Glaser</publisher>
+		<sharedfeat name="compatibility" value="MM5" />
+		<part name="cart" interface="mephisto_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="hg550.rom" size="0x4000" crc="0359f13d" sha1="833cef8302ad8d283d3f95b1d325353c7e3b8614" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

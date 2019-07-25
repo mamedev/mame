@@ -401,7 +401,7 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 
 	case SC_RECIEVE_DIAG_RES: {
-		LOG("command RECIEVE DIAGNOSTICS RESULTS");
+		LOG("command RECIEVE DIAGNOSTICS RESULTS\n");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		int pos = 0;
 		scsi_cmdbuf[pos++] = 0;
@@ -419,7 +419,7 @@ void nscsi_harddisk_device::scsi_command()
 	}
 
 	case SC_SEND_DIAGNOSTICS: {
-		LOG("command SEND DIAGNOSTICS");
+		LOG("command SEND DIAGNOSTICS\n");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		if(scsi_cmdbuf[1] & 4) {
 			// Self-test

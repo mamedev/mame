@@ -105,12 +105,17 @@ u8 legionna_state::denjinmk_sound_comms_r(offs_t offset)
 
 void legionna_state::legionna_cop_map(address_map &map)
 {
-	map(0x100400, 0x100401).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_lo_w)); // grainbow
-	map(0x100402, 0x100403).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_hi_w)); // grainbow
-	map(0x10040c, 0x10040d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_size_w)); // grainbow
-	map(0x100410, 0x100411).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_inc_w)); // grainbow
-	map(0x100412, 0x100413).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_hi_w)); // grainbow
-	map(0x100414, 0x100415).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_lo_w)); // grainbow
+	// grainbow sprite DMA
+	// the three NOP writes are initied before every sprite DMA
+	map(0x100400, 0x100401).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_lo_w));
+	map(0x100402, 0x100403).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_param_hi_w));
+	map(0x100404, 0x100405).nopw(); // $0002
+	map(0x10040a, 0x10040b).nopw(); // $ffff
+	map(0x10040c, 0x10040d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_size_w));
+	map(0x10040e, 0x10040f).nopw(); // $0023
+	map(0x100410, 0x100411).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_inc_w));
+	map(0x100412, 0x100413).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_hi_w));
+	map(0x100414, 0x100415).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_src_lo_w));
 
 	map(0x10041c, 0x10041d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_target_w)); // angle target (for 0x6200 COP macro)
 	map(0x10041e, 0x10041f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_step_w));   // angle step   (for 0x6200 COP macro)
@@ -153,6 +158,8 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x10047c, 0x10047d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_dst_w));
 	map(0x10047e, 0x10047f).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_mode_r), FUNC(raiden2cop_device::cop_dma_mode_w));
 
+//	map(0x100488, 0x100489).nopw(); grainbow $0010
+//	map(0x10048a, 0x10048b).nopw(); grainbow $0000
 	map(0x10048c, 0x10048d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_y_w)); // 68k
 	map(0x10048e, 0x10048f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_x_w)); // 68k
 
@@ -780,9 +787,9 @@ static INPUT_PORTS_START( grainbow )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) // Dead code?
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

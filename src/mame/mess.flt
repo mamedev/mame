@@ -185,9 +185,11 @@ datum.cpp
 dbox.cpp
 dccons.cpp
 dct11em.cpp
+debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+dg680.cpp
 dgn_beta.cpp
 diablo1300.cpp
 didact.cpp
@@ -311,6 +313,7 @@ harriet.cpp
 hazeltin.cpp
 hazl1420.cpp
 hec2hrp.cpp
+hektor.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp
@@ -692,6 +695,7 @@ rzone.cpp
 sacstate.cpp
 sage2.cpp
 saitek_chesstrv.cpp
+saitek_corona.cpp
 saitek_cp2000.cpp
 saitek_delta1.cpp
 saitek_risc2500.cpp
@@ -702,6 +706,7 @@ sapi1.cpp
 sartorius.cpp
 saturn.cpp
 savia84.cpp
+sb8085.cpp
 sbc6510.cpp
 sbrain.cpp
 sc2.cpp

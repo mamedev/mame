@@ -98,10 +98,12 @@ private:
 	}
 	inline void write_8(u32 addr, u8 data)
 	{
+//      printf("write %02x to %08x\n", data, addr);
 		m_program->write_byte(addr, data);
 	}
 	inline void write_16(u32 addr, u16 data)
 	{
+//      printf("write %04x to %08x\n", data, addr);
 		if (addr & 1)
 		{
 			m_program->write_byte(addr, data & 0xff);
@@ -114,6 +116,7 @@ private:
 	}
 	inline void write_32(u32 addr, u32 data)
 	{
+		//printf("write %08x to %08x\n", data, addr);
 		if (addr & 3)
 		{
 			m_program->write_byte(addr, data & 0xff);
@@ -313,6 +316,20 @@ private:
 			m_ps |= F_V;
 		}
 	}
+	inline void doCMP_32(u32 lhs, u32 rhs)
+	{
+		m_tmp64 = lhs - rhs;
+		setNZ_32(m_tmp64 & 0xffffffff);
+		m_ps &= ~(F_C|F_V);
+		if (m_tmp64 & 0x100000000)
+		{
+			m_ps |= F_C;
+		}
+		if ((lhs ^ rhs) & (lhs ^ (m_tmp64 & 0xffffffff)) & 0x80000000)
+		{
+			m_ps |= F_V;
+		}
+	}
 
 	inline u8 doSUB_8(u8 lhs, u8 rhs)
 	{
@@ -402,6 +419,7 @@ private:
 		m_icount -= 4;
 	}
 
+	void opcodes_bo6c(u8 operand);
 	void opcodes_str6e(u8 operand);
 	void opcodes_2b6f(u8 operand);
 	void opcodes_ea70(u8 operand);

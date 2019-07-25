@@ -4117,14 +4117,15 @@ void nmk16_state::set_hacky_screen_hires(machine_config &config)
 	m_screen->set_palette(m_palette);
 }
 
+// OSC : 10MHz, 12MHz, 4MHz, 4.9152MHz
 void nmk16_state::tharrier(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10_MHz_XTAL); // TMP68000P-12, 10 MHz
+	M68000(config, m_maincpu, XTAL(10'000'000)); // TMP68000P-12, 10 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tharrier_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 3000000); // Z0840006PSC, Unknown MHz
+	Z80(config, m_audiocpu, XTAL(4'915'200)); // Z0840006PSC, 4.9152 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::tharrier_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
@@ -4142,18 +4143,18 @@ void nmk16_state::tharrier(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL / 8));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 4_MHz_XTAL, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], XTAL(4'000'000), okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 4_MHz_XTAL, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], XTAL(4'000'000), okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4231,13 +4232,10 @@ void nmk16_state::mustangb(machine_config &config)
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
 
-#define BIOSHIP_CRYSTAL1 10000000
-#define BIOSHIP_CRYSTAL2 12000000
-
 void nmk16_state::bioship(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, BIOSHIP_CRYSTAL1); /* 10.0 MHz (verified) */
+	M68000(config, m_maincpu, XTAL(10'000'000)); /* 10.0 MHz (verified) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::bioship_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4252,21 +4250,21 @@ void nmk16_state::bioship(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL(8'000'000));
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", BIOSHIP_CRYSTAL2 / 8)); /* 1.5 Mhz (verified) */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); /* 1.5 Mhz (verified) */
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], BIOSHIP_CRYSTAL2 / 3,  okim6295_device::PIN7_LOW); /* 4.0 Mhz, Pin 7 High (verified) */
+	OKIM6295(config, m_oki[0], XTAL(8'000'000) / 2, okim6295_device::PIN7_LOW); /* 4.0 Mhz, Pin 7 High (verified) */
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], BIOSHIP_CRYSTAL2 / 3,  okim6295_device::PIN7_LOW); /* 4.0 Mhz, Pin 7 High (verified) */
+	OKIM6295(config, m_oki[1], XTAL(8'000'000) / 2, okim6295_device::PIN7_LOW); /* 4.0 Mhz, Pin 7 High (verified) */
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4336,7 +4334,7 @@ void nmk16_state::vandykeb(machine_config &config)
 void nmk16_state::acrobatm(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000); /* 10 MHz (verified on pcb) */
+	M68000(config, m_maincpu, XTAL(10'000'000)); /* 10 MHz (verified on pcb) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::acrobatm_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4351,21 +4349,21 @@ void nmk16_state::acrobatm(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, XTAL(16'000'000)/2);
 	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000)); /* (verified on pcb) */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); /* (verified on pcb) */
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW); /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW); /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4830,7 +4828,7 @@ void nmk16_state::raphero(machine_config &config)
 void nmk16_state::bjtwin(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000); /* verified on pcb */
+	M68000(config, m_maincpu, XTAL(10'000'000)); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::bjtwin_map);
 	set_hacky_interrupt_timing(config);
 
@@ -4845,10 +4843,10 @@ void nmk16_state::bjtwin(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW); /* verified on pcb */
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); /* verified on pcb */
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW); /* verified on pcb */
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); /* verified on pcb */
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));

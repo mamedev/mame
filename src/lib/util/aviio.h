@@ -29,7 +29,11 @@
 #define FORMAT_VYUY             AVI_FOURCC('V','Y','U','Y')
 #define FORMAT_YUY2             AVI_FOURCC('Y','U','Y','2')
 #define FORMAT_HFYU             AVI_FOURCC('H','F','Y','U')
-
+#define FORMAT_I420				AVI_FOURCC('I','4','2','0')
+#define FORMAT_DIB              AVI_FOURCC('D','I','B',' ')
+#define FORMAT_RGB              AVI_FOURCC('R','G','B',' ')
+#define FORMAT_RAW              AVI_FOURCC('R','A','W',' ')
+#define FORMAT_UNCOMPRESSED		0x00000000
 
 
 class avi_file
@@ -115,6 +119,7 @@ public:
 	virtual movie_info const &get_movie_info() const = 0;
 	virtual std::uint32_t first_sample_in_frame(std::uint32_t framenum) const = 0;
 
+	virtual error read_uncompressed_video_frame(std::uint32_t framenum, bitmap_rgb32 &bitmap) = 0;
 	virtual error read_video_frame(std::uint32_t framenum, bitmap_yuy16 &bitmap) = 0;
 	virtual error read_sound_samples(int channel, std::uint32_t firstsample, std::uint32_t numsamples, std::int16_t *output) = 0;
 

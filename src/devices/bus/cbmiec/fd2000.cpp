@@ -239,7 +239,7 @@ void fd4000_device::device_add_mconfig(machine_config &config)
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd4000_device::fd4000_mem);
 	PC8477A(config, m_fdc, 24_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
 

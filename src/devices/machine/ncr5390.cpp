@@ -472,6 +472,7 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_ATN_SEND_BYTE:
+		command_length--;
 		if(c == CD_SELECT_ATN_STOP) {
 			seq = 1;
 			function_bus_complete();

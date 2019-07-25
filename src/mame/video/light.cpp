@@ -213,7 +213,7 @@ WRITE32_MEMBER(light_video_device::entry_w)
 	case (REX15_PAGE0_SET+REX15_P0REG_COLORBACK)/4:
 	case (REX15_PAGE0_GO+REX15_P0REG_COLORBACK)/4:
 		m_lg1.m_color_back = data;
-		LOGMASKED(LOG_REX, "%s: LG1 REX1.5 ColorBlueI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+		LOGMASKED(LOG_REX, "%s: LG1 REX1.5 ColorBackI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
 		break;
 	case (REX15_PAGE0_SET+REX15_P0REG_ZPATTERN)/4:
 	case (REX15_PAGE0_GO+REX15_P0REG_ZPATTERN)/4:

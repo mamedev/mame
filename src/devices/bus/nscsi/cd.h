@@ -39,6 +39,9 @@ protected:
 
 	cdrom_file *cdrom;
 
+	uint8_t periph_qt;
+	bool removable;
+
 private:
 	static constexpr uint32_t bytes_per_sector = 2048;
 
@@ -64,6 +67,8 @@ public:
 	nscsi_cdrom_sgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
+	virtual void device_reset() override;
+
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 };

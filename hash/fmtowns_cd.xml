@@ -210,7 +210,6 @@ Functioning in Business Part 1                                DynEd Japan       
 Functioning in Business Part 2                                DynEd Japan                       1992/7     SET(CD+FD)
 Fuzzy Kakeibo                                                 GAM                               1993/4     SET(CD+FD)
 Fuzzy Kakeibo 3                                               GAM                               1995/11    CD
-G5                                                            AMR                               1989/7     CD
 Gadget                                                        Toshiba EMI                       1993/12    CD
 Gakuen Bakuretsu Tenkousei!                                   ZyX                               1996/3     CD
 Gakuen Bomber                                                 Active                            1994/6     CD
@@ -374,7 +373,6 @@ Kouryuuki                                                     Koei              
 Kousoku Choujin                                               Foster                            1996/8     CD
 Kusuriyubi no Kyoukasho                                       Active                            1996/4     CD
 Kyouko no Ijiwaru!! Hachamecha Daishingeki                    Ponytail Soft                     1994/10    CD
-Leading Company                                               Koei                              1992/4     SET(CD+FD)
 Lemon Cocktail Collection                                     Cocktail Soft                     1993/3     CD
 L'Empereur                                                    Koei                              1991/1     SET(CD+FD)
 Let's go 1-1                                                  DynEd Japan                       1995/7     SET(CD+FD)
@@ -583,7 +581,6 @@ Seikatsu Simulation: Watashi no Machi                         Gakushuu Kenkyuush
 Seikatsuka 1-nen: Asobou Mitsukeyou                           Uchida Youkou                     1994/4     CD
 Seikatsuka 2-nen: Wakuwaku Tanken                             Uchida Youkou                     1994/5     CD
 Sekai no Ohanashi                                             Gyousei                           1992/5     CD
-Sekigahara                                                    Artdink                           1992/4     CD
 Sensual Angels                                                Japan Home Video (JHV)            1994/1     SET(CD+FD)
 Sexy in the Hawaii: Nice Gal Hawaii Ban                       Birdy Soft                        1994/12    CD
 Sexy PK 2 World Cup Ban                                       Birdy Soft                        1995/6     CD
@@ -599,7 +596,6 @@ Shiki wo Irodoru Nihon no Shouka: Fuyu-hen                    Toshiba EMI       
 Shiki wo Irodoru Nihon no Shouka: Haru-hen                    Toshiba EMI                       1991/4     CD
 Shiki wo Irodoru Nihon no Shouka: Natsu-hen                   Toshiba EMI                       1991/4     CD
 Shin Eiwa / Waei Chuujiten                                    Fujitsu                           1993/11    CD
-Shinjuku Labyrinth                                            Tokuma Shoten Intermedia          1994/12    CD
 Shooting Towns                                                Amorphous                         1990/3     CD
 Shoubunsha Area Guide: 74 Zenkoku Pension Guide               Com Staff                         1989/12    CD
 Shougakkou 4-nen Kyouzai Set                                  Uchida Youkou                     1993/5     CD
@@ -3737,8 +3733,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
-	<software name="emit1" supported="partial">
+	<software name="emit1">
 		<!--
 		Origin: redump.org
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
@@ -3768,8 +3763,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
-	<software name="emit2" supported="partial">
+	
+	<software name="emit2">
 		<!--
 		Origin: redump.org
 		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja).cue" size="1260" crc="92e3280f" sha1="f86c316920455ad3be2769edee7a33cdc890fb65"/>
@@ -4505,6 +4500,31 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="g5">
+		<!--
+		Origin: redump.org
+		<rom name="G5 (Japan) (Track 1).bin" size="27875904" crc="5c1f8806" sha1="6bdb36d9a38c50615d9cffca9456e0b49dd9ff78"/>
+		<rom name="G5 (Japan) (Track 2).bin" size="36145536" crc="ce0cb02c" sha1="9176e536a1e8ba977f9a05455f159dadd726af6b"/>
+		<rom name="G5 (Japan) (Track 3).bin" size="156972480" crc="4362731b" sha1="1b9bc817f9cd9450db048989aa0dca0ef06205c8"/>
+		<rom name="G5 (Japan) (Track 4).bin" size="41759760" crc="27534dbf" sha1="1cf94204f04a3f06d8bfd4319e409d1df2716779"/>
+		<rom name="G5 (Japan) (Track 5).bin" size="63685104" crc="4f819e54" sha1="b6c7c708d9f5e935ecbc024c894b95d2482a68d3"/>
+		<rom name="G5 (Japan) (Track 6).bin" size="39901680" crc="fc0d37bd" sha1="19bd225c4f54630cab6cf1018bf9182bbd077a07"/>
+		<rom name="G5 (Japan) (Track 7).bin" size="41277600" crc="8d676919" sha1="edea880a03554aced8b180d44ddf75c251ebdf95"/>
+		<rom name="G5 (Japan) (Track 8).bin" size="164976336" crc="ec9f23a9" sha1="fc7dbf3d7c6194221038581cd439caac5b9261a9"/>
+		<rom name="G5 (Japan).cue" size="814" crc="1568c89d" sha1="290eb5d5299379a25240bef8b3fa43dc4beee7c0"/>
+		-->
+		<description>G5</description>
+		<year>1989</year>
+		<publisher>エー・エム・アール (AMR)</publisher>
+		<info name="alt_title" value="ジーファイヴ" />
+		<info name="release" value="198907xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="g5 (japan)" sha1="3038fd11e7c7f58b17ef96fb9c872f4c7924915a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="gakuking">
 		<!--
 		Origin: Neo Kobe Collection
@@ -4513,7 +4533,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Gakuen King.img" size="623980896" crc="5caecd8f" sha1="ddeffc003d00c39e36ae9dee007df34a0cae903c"/>
 		<rom name="Gakuen King.sub" size="25468608" crc="1eaa81f9" sha1="22fee18d3ea2b10125dceca54e051246a1bc814a"/>
 		-->
-		<description>Gakuen King: Hidehiko Gakkou wo Tsukuru</description>
+		<description>Gakuen King - Hidehiko Gakkou wo Tsukuru</description>
 		<year>1996</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="学園KING -日出彦学校を作る-" />
@@ -4563,7 +4583,7 @@ User/save disks that can be created from the game itself are not included.
 		-->
 		<description>Game Technopolis Super Collection 1</description>
 		<year>1992</year>
-		<publisher>徳間書店 (Tokuma Shoten)</publisher>
+		<publisher>徳間書店インターメディア (Tokuma Shoten Intermedia)</publisher>
 		<info name="alt_title" value="GAMEテクノポリス スーパーコレクション1" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
@@ -4580,7 +4600,7 @@ User/save disks that can be created from the game itself are not included.
 		-->
 		<description>Game Technopolis Super Collection 2</description>
 		<year>1993</year>
-		<publisher>徳間書店 (Tokuma Shoten)</publisher>
+		<publisher>徳間書店インターメディア (Tokuma Shoten Intermedia)</publisher>
 		<info name="alt_title" value="GAMEテクノポリス スーパーコレクション2" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
@@ -6313,6 +6333,42 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="lunatic dawn ii" sha1="2e724da365c6d53e2d94f8bfb1e348a2f5b709d4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="leadingc">
+		<!--
+		Origin: redump.org
+		<rom name="Leading Company - Keys of the City (Japan) (Track 01).bin" size="10231200" crc="f5340185" sha1="40553b9ba41be09f437949bff2daf91ffc907093"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 02).bin" size="38198832" crc="fbb720ce" sha1="a2ad54a6ec1f5bf2d7dae2cd02205916f5c98645"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 03).bin" size="36470112" crc="74aaed4d" sha1="5c45f08fb7ec7a94ff74f4094e511a5f9eb6ebcc"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 04).bin" size="41548080" crc="1b56a266" sha1="fe0764cb0dda42e483e99689a60511a83178e61b"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 05).bin" size="43888320" crc="48ac684a" sha1="d1a3c0dad6de98ba356869e4264b3a8b29993e98"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 06).bin" size="46858896" crc="43330874" sha1="2dbf4d6d631c0ca546fe039aca02fe7b02c2b3cc"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 07).bin" size="43963584" crc="b6c0e4af" sha1="5a3aabb1ac52c92b43616670d440654254645fa2"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 08).bin" size="36227856" crc="b6fa6160" sha1="c2229dbe829285c060e3cc525ad14c9fd52daefc"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 09).bin" size="42735840" crc="8f6dd716" sha1="41fd073fae3a3c96306cca643caee30eb6d408c5"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 10).bin" size="33579504" crc="43a0fa23" sha1="e5abe212d6ce1885aeea17b63729e4c8989e1de4"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 11).bin" size="50351616" crc="de6e0ec3" sha1="af100d7c70cacbc804bf038aac1d0276201a7b9e"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 12).bin" size="52125024" crc="ec1daff0" sha1="2b819b231feb7a75e57b3783571747e42589cb00"/>
+		<rom name="Leading Company - Keys of the City (Japan) (Track 13).bin" size="48982752" crc="fc01fdcf" sha1="4f32e20f0305bc0f15475cb13b6b666e6b815830"/>
+		<rom name="Leading Company - Keys of the City (Japan).cue" size="1556" crc="925a2368" sha1="b62fd1b6e0793279ee2abca83e5acc1e1f16e978"/>
+		-->
+		<description>Leading Company</description>
+		<year>1992</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="リーディングカンパニー" />
+		<info name="release" value="199204xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="leading company.hdm" size="1261568" crc="c4ab1147" sha1="8a3e197458a190daa505868338cac65129515d4b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<feature name="part_id" value="Keys of the City" />
+			<diskarea name="cdrom">
+				<disk name="leading company - keys of the city (japan)" sha1="a38625e1a9c1b5dbb61eb49b615754023e967c52" />
 			</diskarea>
 		</part>
 	</software>
@@ -9299,6 +9355,32 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="sekigaha">
+		<!--
+		Origin: redump.org
+		<rom name="Sekigahara (Japan) (Track 1).bin" size="9702000" crc="f027c795" sha1="f6456c6e7fbf92c54aef34bee6252a86ab5bae76"/>
+		<rom name="Sekigahara (Japan) (Track 2).bin" size="13422864" crc="7b4eb643" sha1="f03ffa9062dae155c1e25baa2592fe973fbed060"/>
+		<rom name="Sekigahara (Japan) (Track 3).bin" size="27760656" crc="945d8148" sha1="d22dd7cfe6876782e9722bd4cd3521476d9d423d"/>
+		<rom name="Sekigahara (Japan) (Track 4).bin" size="15052800" crc="357bdd6b" sha1="b9b9972eebbc3186ba80a3c1fbd7113710cc2fb4"/>
+		<rom name="Sekigahara (Japan) (Track 5).bin" size="90133344" crc="8f7d5988" sha1="0933c6f1a7d4ee71f9649bd18ab22408293e36bf"/>
+		<rom name="Sekigahara (Japan) (Track 6).bin" size="56800800" crc="911708b3" sha1="06f2c4ea44cdb3158fc2c8baa71ad214e2381099"/>
+		<rom name="Sekigahara (Japan) (Track 7).bin" size="60006576" crc="59c497ff" sha1="ec5fc60796ec840dc1f6017f2f23b7b36f942046"/>
+		<rom name="Sekigahara (Japan) (Track 8).bin" size="14316624" crc="86838e2c" sha1="08818868d39ba6c7002305572b1a2958af1715a1"/>
+		<rom name="Sekigahara (Japan) (Track 9).bin" size="312623136" crc="66a561e0" sha1="eafb91c4380c98b31718f87a7f126fc7fa15a01b"/>
+		<rom name="Sekigahara (Japan).cue" size="990" crc="e8dff421" sha1="5f3fe7f4289da96cb2d613945d1306e9a643c00f"/>
+		-->
+		<description>Sekigahara</description>
+		<year>1992</year>
+		<publisher>アートディンク (Artdink)</publisher>
+		<info name="alt_title" value="関ヶ原" />
+		<info name="release" value="199204xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sekigahara (japan)" sha1="04f0bda6d14765dacaa339145c3920cf0ae8332b" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="shangrl2">
 		<!--
 		Origin: Neo Kobe Collection
@@ -9355,6 +9437,55 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="shinc" sha1="5cb5158e300c504e987d0ab9564ddffa902c28ed" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- 
+	The Master Disk contains data on track 81. This data isn't used by the game at all, in fact the manual
+	recommends making a copy of the disk with the standard TownsOS copy tools and using the copy to play.
+	The image included here is in HxC MFM format just for the purpose of preserving that track.
+	-->
+	<software name="shinjuku">
+		<!--
+		Origin: redump.org
+		<rom name="Shinjuku Labyrinth (Japan) (Track 01).bin" size="62826624" crc="e1262400" sha1="db2c764d02848621d5e22b73cba64deba999fd3b"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 02).bin" size="44817360" crc="96787473" sha1="43c64caa500aeb6a51c7e55f26e39b7ca6292039"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 03).bin" size="53978400" crc="833242f7" sha1="6b9366dae5ac924a6af02278b950954e227ae748"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 04).bin" size="35343504" crc="1d6345c7" sha1="6fbf2779a24fbcff1d31bd0bc8ff2635e29aca2e"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 05).bin" size="38078880" crc="140806f5" sha1="c5a31203a2a7d3274882a9ba3958e379c8efec80"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 06).bin" size="40520256" crc="5ef1f966" sha1="382ca16d7898e635c9444313ad24a0058e42d4d2"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 07).bin" size="22261680" crc="aa3dbf0f" sha1="b221314ed8ab74aa6e8c5ad21ecda5ce9e8bdffd"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 08).bin" size="22261680" crc="100a2a0a" sha1="debe4ea25e5fcc94cd54feed76c40f40b5f60ab5"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 09).bin" size="29764560" crc="982385b8" sha1="061fc9313a35fecca454776ff1be247fd9988ef3"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 10).bin" size="42717024" crc="180ff476" sha1="2cf739493ea1c3f0e83cf5ad2855c68abaa37b9b"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 11).bin" size="24291456" crc="dec3f9a3" sha1="fad0ed7317e3788e59644aead160cb4069275019"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 12).bin" size="27177360" crc="dba7bac4" sha1="575497a0b63316b44534b3c5b760758eac8e2182"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 13).bin" size="17475360" crc="70a69623" sha1="3ffa7baddd3fbd716902cf1cade120be3d446ace"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 14).bin" size="27918240" crc="6a697113" sha1="1abf629701f602d380c01bc9bdc832d17e823d27"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 15).bin" size="24124464" crc="34fd927a" sha1="c5441246cf29f56a36aba4a5c6e3937d70c5e4f3"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 16).bin" size="7474656" crc="ad0a1470" sha1="f575518fc32033f317685d310f79060ca549d478"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 17).bin" size="5402544" crc="52e70298" sha1="5ca8cbb6d602562b15cecf82541d495e2d31b2b7"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 18).bin" size="35769216" crc="8dcf0df9" sha1="d6ed46bb77fed2addc3dc02c85474b329228cde9"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 19).bin" size="52038000" crc="6d9fd756" sha1="a4ac8a55862d75a4b6b32dda906ab8f71cd2c8c3"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 20).bin" size="26883360" crc="3441af37" sha1="ebdc4f7630b233e15f99e7329883a62a8487e712"/>
+		<rom name="Shinjuku Labyrinth (Japan) (Track 21).bin" size="1540560" crc="c7823b5a" sha1="a83fd048a5fdaf3c09855f6a44bc18e73ed2fe37"/>
+		<rom name="Shinjuku Labyrinth (Japan).cue" size="2523" crc="395a3d31" sha1="68ecf5cbe8103f19ad12374135aa7ccf469bb5b2"/>
+		-->
+		<description>Shinjuku Labyrinth</description>
+		<year>1994</year>
+		<publisher>徳間書店インターメディア (Tokuma Shoten Intermedia)</publisher>
+		<info name="alt_title" value="新宿ラビリンス" />
+		<info name="release" value="199412xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Master Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="shinjuku labyrinth (master disk).mfm" size="3583660" crc="78b7c26c" sha1="778befacd1534dc22edffccaebb2957823e488e7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shinjuku labyrinth (japan)" sha1="23a3a3c543b58ff9a2b50600b9b4803883cb43cf" />
 			</diskarea>
 		</part>
 	</software>
@@ -10858,7 +10989,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Screen shaking, CDDA desync -->
+	<!-- Screen shaking -->
 	<software name="vaindrem" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
@@ -10885,7 +11016,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Screen shaking, CDDA desync -->
+	<!-- Screen shaking -->
 	<software name="vaindrm2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
@@ -10912,8 +11043,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- CDDA desync -->
-	<software name="vastness" supported="partial">
+	<software name="vastness">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Vastness.ccd" size="1525" crc="41bb06da" sha1="764c09836fc45e09f6efe47ed2b9da4c49a97e7f"/>
@@ -11513,7 +11643,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Xenon.img" size="326937408" crc="594213b2" sha1="1307189e44ccca2154486421f82b9b1df393b73a"/>
 		<rom name="Xenon.sub" size="13344384" crc="257b6cd3" sha1="51a3f6a3ff4646cce4f7130a4ae550d95e79330b"/>
 		-->
-		<description>Xenon</description>
+		<description>Xenon - Mugen no Shitai</description>
 		<year>1995</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="alt_title" value="XENON ～無限の肢体～" />

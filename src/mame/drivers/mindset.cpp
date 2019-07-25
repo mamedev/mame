@@ -30,6 +30,8 @@ protected:
 	required_device<floppy_connector> m_fdco[2];
 	required_shared_ptr<u16> m_vram;
 	required_ioport_array<11> m_kbd_row;
+	required_ioport_array<2> m_mouse_axis;
+	required_ioport m_mouse_btn, m_joystick;
 	output_finder<2> m_floppy_leds;
 	output_finder<> m_red_led;
 	output_finder<> m_yellow_led;
@@ -42,6 +44,7 @@ protected:
 	bool m_genlock[16];
 	u16 m_dispctrl, m_screenpos, m_intpos, m_intaddr, m_fdc_dma_count;
 	u8 m_kbd_p1, m_kbd_p2, m_borderidx;
+	u8 m_mouse_last_read[2], m_mouse_counter[2];
 	bool m_fdc_intext, m_fdc_int, m_fdc_drq, m_trap_int, m_trap_drq;
 
 	u16 m_trap_data[8];
@@ -128,6 +131,9 @@ mindset_state::mindset_state(const machine_config &mconfig, device_type type, co
 	m_fdco{{*this, "fdc:0"}, {*this, "fdc:1"}},
 	m_vram(*this, "vram"),
 	m_kbd_row(*this, "K%02u", 0U),
+	m_mouse_axis(*this, "MOUSEAXIS%u", 0U),
+	m_mouse_btn(*this, "MOUSEBTN"),
+	m_joystick(*this, "JOYSTICK"),
 	m_floppy_leds(*this, "drive%u_led", 0U),
 	m_red_led(*this, "red_led"),
 	m_yellow_led(*this, "yellow_led"),
@@ -174,6 +180,8 @@ void mindset_state::machine_start()
 	save_item(NAME(m_kbd_p1));
 	save_item(NAME(m_kbd_p2));
 	save_item(NAME(m_borderidx));
+	save_item(NAME(m_mouse_last_read));
+	save_item(NAME(m_mouse_counter));
 }
 
 void mindset_state::machine_reset()
@@ -185,6 +193,8 @@ void mindset_state::machine_reset()
 	memset(m_genlock, 0, sizeof(m_genlock));
 	m_dispctrl = m_screenpos = m_intpos = m_intaddr = m_fdc_dma_count = 0;
 	m_kbd_p1 = m_kbd_p2 = m_borderidx = 0;
+	memset(m_mouse_last_read, 0, sizeof(m_mouse_last_read));
+	memset(m_mouse_counter, 0, sizeof(m_mouse_counter));
 }
 
 int mindset_state::sys_t0_r()
@@ -251,7 +261,8 @@ int mindset_state::kbd_t1_r()
 
 void mindset_state::snd_p1_w(u8 data)
 {
-	//	logerror("snd p1 %02x\n", data);
+	if(data != 0x80)
+		logerror("snd p1 %02x\n", data);
 }
 
 void mindset_state::snd_p2_w(u8 data)
@@ -266,40 +277,28 @@ u16 mindset_state::keyscan()
 	for(unsigned int i=0; i<11; i++)
 		if(!(src & (1 << i)))
 			res &= m_kbd_row[i]->read();
-	if(!(src & 0x2000)) {
-		switch((src >> 1) & 3) {
-		case 0:
-			res &= 0xc0;
-			break;
-		case 1:
-			res &= 0xc0;
-			break;
-		case 2:
-			res &= 0xc0;
-			break;
-		case 3:
-			res &= 0xc0;
-			break;
-		}
-	}
+
 	if(!(src & 0x8000)) {
-		switch((src >> 1) & 3) {
-		case 0:
-			res &= 0xc0;
-			break;
-		case 1:
-			res &= 0xc0;
-			break;
-		case 2:
-			res &= 0xc0;
-			break;
-		case 3:
-			res &= 0xc0;
-			break;
+		int axis = (src >> 12) & 1;
+		u8 aval = m_mouse_axis[axis]->read();
+		m_mouse_counter[axis] += aval - m_mouse_last_read[axis];
+		m_mouse_last_read[axis] = aval;
+
+		u8 nib;
+		if((src >> 11) & 1) {
+			nib = m_mouse_counter[axis] & 0xf;
+			m_mouse_counter[axis] &= 0xf0;
+		} else {
+			nib = m_mouse_counter[axis] >> 4;
+			m_mouse_counter[axis] &= 0x0f;
 		}
+
+		res &= m_mouse_btn->read() & (nib | 0x1f0);
 	}
 
-	//	logerror("scan src=%04x %04x %d%d/%d(%03x)\n", src, 0xffff ^ src, (src >> 15) & 1, (src >> 13) & 1, (src >> 11) & 3, m_kbdcpu->pc());
+	if(!(src & 0x2000))
+		res &= m_joystick->read();
+
 	return res;
 }
 
@@ -314,8 +313,19 @@ void mindset_state::dispctrl_w(u16 data)
 {
 	u16 chg = m_dispctrl ^ data;
 	m_dispctrl = data;
-	if(chg & 0xff00)
-		logerror("display control %04x\n", m_dispctrl);
+	if(chg & 0xff88)
+		logerror("display control %s bank=%c %s %s h=%d ppx=%d w=%s interlace=%d rreg=%d indicator=%s wreg=%d\n",
+				 m_dispctrl & 0x8000 ? "?15" : "?!15",
+				 m_dispctrl & 0x4000 ? '1' : '0',
+				 m_dispctrl & 0x2000 ? "ibm" : "native",
+				 m_dispctrl & 0x1000 ? "?12" : "?!12",
+				 m_dispctrl & 0x0800 ? "400" : "200",
+				 (m_dispctrl & 0x0600) >> 9,
+				 m_dispctrl & 0x0100 ? "320" : "640",
+				 m_dispctrl & 0x0080 ? "on" : "off",
+				 (m_dispctrl & 0x0070) >> 4,
+				 m_dispctrl & 0x0008 ? "on" : "off",
+				 m_dispctrl & 7);
 }
 
 u16 mindset_state::dispreg_r()
@@ -330,6 +340,7 @@ u16 mindset_state::dispreg_r()
 	}
 	case 5: {
 		// wants 0080 set to be able to upload the palette
+		// may be a field indicator
 		return 0x0080;
 	}
 	}
@@ -340,7 +351,7 @@ u16 mindset_state::dispreg_r()
 
 void mindset_state::dispreg_w(u16 data)
 {
-	switch(m_dispctrl & 0xf) {
+	switch(m_dispctrl & 0x7) {
 	case 0:
 		m_screenpos = data;
 		logerror("screen position (%d, %d)\n", (data >> 8) & 15, (data >> 12) & 15);
@@ -378,19 +389,18 @@ void mindset_state::dispreg_w(u16 data)
 	}
 	case 4: {
 		data = sw(data);
-		u8 r = 0x11*(((data & 0x4000) >> 11) | (data & 7));
-		u8 g = 0x11*(((data & 0x2000) >> 10) | ((data & 0x38) >> 3));
-		u8 b = 0x11*(((data & 0x1000) >>  9) | ((data & 0x1c0) >> 6));
+		u8 r = (0x49*(data & 7)) >> 1;
+		u8 g = (0x49*((data & 0x38) >> 3)) >> 1;
+		u8 b = (0x49*((data & 0x1c0) >> 6)) >> 1;
 
-		if(!(data & 0x8000)) {
-			r = r * 0.75;
-			g = g * 0.75;
-			b = b * 0.75;
-		}
 		m_palette[m_borderidx] = (r << 16) | (g << 8) | b;
 		m_genlock[m_borderidx] = data & 0x0200;
 		logerror("palette[%x] = %04x -> %06x.%d\n", m_borderidx, data, m_palette[m_borderidx], m_genlock[m_borderidx]);
 		m_borderidx = (m_borderidx + 1) & 0xf;
+		break;
+	}
+	case 5: {
+		logerror("genlock %s%s, extra=%c\n", data & 0x0200 ? "on" : "off", data & 0x0100 ? " fixed" : "", data & 0x0400 ? '1' : '0');
 		break;
 	}
 
@@ -418,44 +428,43 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 	if(ibm_mode) {
 		if(large_pixels) {
-			if(!interleave) {
-				switch(pixels_per_byte_order) {
-				case 1: {
-					static int palind[4] = { 0, 1, 4, 5 };
-					for(int field=0; field<2; field++) {
-						for(u32 yy=0; yy<2; yy++) {
-							const u16 *src = bank + 4096*yy;
-							for(u32 y=yy; y<200; y+=2) {
-								u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
-								for(u32 x=0; x<320; x+=8) {
-									u16 sv = *src++;
-									*dest++ = m_palette[palind[(sv >>  6) & 3]];
-									*dest++ = m_palette[palind[(sv >>  6) & 3]];
-									*dest++ = m_palette[palind[(sv >>  4) & 3]];
-									*dest++ = m_palette[palind[(sv >>  4) & 3]];
-									*dest++ = m_palette[palind[(sv >>  2) & 3]];
-									*dest++ = m_palette[palind[(sv >>  2) & 3]];
-									*dest++ = m_palette[palind[(sv >>  0) & 3]];
-									*dest++ = m_palette[palind[(sv >>  0) & 3]];
-									*dest++ = m_palette[palind[(sv >> 14) & 3]];
-									*dest++ = m_palette[palind[(sv >> 14) & 3]];
-									*dest++ = m_palette[palind[(sv >> 12) & 3]];
-									*dest++ = m_palette[palind[(sv >> 12) & 3]];
-									*dest++ = m_palette[palind[(sv >> 10) & 3]];
-									*dest++ = m_palette[palind[(sv >> 10) & 3]];
-									*dest++ = m_palette[palind[(sv >>  8) & 3]];
-									*dest++ = m_palette[palind[(sv >>  8) & 3]];
-								}
+			static int palind[4] = { 0, 1, 4, 5 };
+			for(int field=0; field<2; field++) {
+				for(u32 yy=0; yy<2; yy++) {
+					const u16 *src = bank + 4096*yy;
+					for(u32 y=yy; y<200; y+=2) {
+						u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
+						for(u32 x=0; x<320; x+=8) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<8; xx++) {
+								u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
+								*dest++ = color;
+								*dest++ = color;
 							}
 						}
 					}
-					return 0;
-				}
 				}
 			}
+			return 0;
+		} else {
+			static int palind[4] = { 0, 4 };
+			for(int field=0; field<2; field++) {
+				for(u32 yy=0; yy<2; yy++) {
+					const u16 *src = bank + 4096*yy;
+					for(u32 y=yy; y<200; y+=2) {
+						u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
+						for(u32 x=0; x<640; x+=16) {
+							u16 sv = sw(*src++);
+							for(u32 xx=0; xx<16; xx++) {
+								u32 color = m_palette[palind[(sv >> (15-xx)) & 1]];
+								*dest++ = color;
+							}
+						}
+					}
+				}
+			}
+			return 0;
 		}
-
-		logerror("Unimplemented ibm-compatible graphics mode (%dx%d, ppb=%d)\n", large_pixels ? 320 : 640, interleave ? 400 : 200, 2 << pixels_per_byte_order);
 	} else {
 		if(large_pixels) {
 			if(!interleave) {
@@ -466,15 +475,12 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 						for(u32 y=0; y<200; y++) {
 							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<320; x+=4) {
-								u16 sv = *src++;
-								*dest++ = m_palette[(sv >>  4) & 15];
-								*dest++ = m_palette[(sv >>  4) & 15];
-								*dest++ = m_palette[(sv >>  0) & 15];
-								*dest++ = m_palette[(sv >>  0) & 15];
-								*dest++ = m_palette[(sv >> 12) & 15];
-								*dest++ = m_palette[(sv >> 12) & 15];
-								*dest++ = m_palette[(sv >>  8) & 15];
-								*dest++ = m_palette[(sv >>  8) & 15];
+								u16 sv = sw(*src++);
+								for(u32 xx=0; xx<4; xx++) {
+									u32 color = m_palette[(sv >> (12-4*xx)) & 15];
+									*dest++ = color;
+									*dest++ = color;
+								}
 							}
 						}
 					}
@@ -487,68 +493,29 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 						for(u32 y=0; y<200; y++) {
 							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<320; x+=8) {
-								u16 sv = *src++;
-								*dest++ = m_palette[palind[(sv >>  6) & 3]];
-								*dest++ = m_palette[palind[(sv >>  6) & 3]];
-								*dest++ = m_palette[palind[(sv >>  4) & 3]];
-								*dest++ = m_palette[palind[(sv >>  4) & 3]];
-								*dest++ = m_palette[palind[(sv >>  2) & 3]];
-								*dest++ = m_palette[palind[(sv >>  2) & 3]];
-								*dest++ = m_palette[palind[(sv >>  0) & 3]];
-								*dest++ = m_palette[palind[(sv >>  0) & 3]];
-								*dest++ = m_palette[palind[(sv >> 14) & 3]];
-								*dest++ = m_palette[palind[(sv >> 14) & 3]];
-								*dest++ = m_palette[palind[(sv >> 12) & 3]];
-								*dest++ = m_palette[palind[(sv >> 12) & 3]];
-								*dest++ = m_palette[palind[(sv >> 10) & 3]];
-								*dest++ = m_palette[palind[(sv >> 10) & 3]];
-								*dest++ = m_palette[palind[(sv >>  8) & 3]];
-								*dest++ = m_palette[palind[(sv >>  8) & 3]];
+								u16 sv = sw(*src++);
+								for(u32 xx=0; xx<8; xx++) {
+									u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
+									*dest++ = color;
+									*dest++ = color;
+								}
 							}
 						}
 					}
 					return 0;
 				}
 				case 2: {
-					static int palind[4] = { 0, 1 };
 					for(int field=0; field<2; field++) {
 						const u16 *src = bank;
 						for(u32 y=0; y<200; y++) {
 							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<320; x+=16) {
-								u16 sv = *src++;
-								*dest++ = m_palette[palind[(sv >>  7) & 1]];
-								*dest++ = m_palette[palind[(sv >>  7) & 1]];
-								*dest++ = m_palette[palind[(sv >>  6) & 1]];
-								*dest++ = m_palette[palind[(sv >>  6) & 1]];
-								*dest++ = m_palette[palind[(sv >>  5) & 1]];
-								*dest++ = m_palette[palind[(sv >>  5) & 1]];
-								*dest++ = m_palette[palind[(sv >>  4) & 1]];
-								*dest++ = m_palette[palind[(sv >>  4) & 1]];
-								*dest++ = m_palette[palind[(sv >>  3) & 1]];
-								*dest++ = m_palette[palind[(sv >>  3) & 1]];
-								*dest++ = m_palette[palind[(sv >>  2) & 1]];
-								*dest++ = m_palette[palind[(sv >>  2) & 1]];
-								*dest++ = m_palette[palind[(sv >>  1) & 1]];
-								*dest++ = m_palette[palind[(sv >>  1) & 1]];
-								*dest++ = m_palette[palind[(sv >>  0) & 1]];
-								*dest++ = m_palette[palind[(sv >>  0) & 1]];
-								*dest++ = m_palette[palind[(sv >> 15) & 1]];
-								*dest++ = m_palette[palind[(sv >> 15) & 1]];
-								*dest++ = m_palette[palind[(sv >> 14) & 1]];
-								*dest++ = m_palette[palind[(sv >> 14) & 1]];
-								*dest++ = m_palette[palind[(sv >> 13) & 1]];
-								*dest++ = m_palette[palind[(sv >> 13) & 1]];
-								*dest++ = m_palette[palind[(sv >> 12) & 1]];
-								*dest++ = m_palette[palind[(sv >> 12) & 1]];
-								*dest++ = m_palette[palind[(sv >> 11) & 1]];
-								*dest++ = m_palette[palind[(sv >> 11) & 1]];
-								*dest++ = m_palette[palind[(sv >> 10) & 1]];
-								*dest++ = m_palette[palind[(sv >> 10) & 1]];
-								*dest++ = m_palette[palind[(sv >>  9) & 1]];
-								*dest++ = m_palette[palind[(sv >>  9) & 1]];
-								*dest++ = m_palette[palind[(sv >>  8) & 1]];
-								*dest++ = m_palette[palind[(sv >>  8) & 1]];
+								u16 sv = sw(*src++);
+								for(u32 xx=0; xx<16; xx++) {
+									u32 color = m_palette[(sv >> (15-xx)) & 1];
+									*dest++ = color;
+									*dest++ = color;
+								}
 							}
 						}
 					}
@@ -560,22 +527,18 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			if(!interleave) {
 				switch(pixels_per_byte_order) {
 				case 0: {
-					static int palind[4] = { 0, 1, 4, 5 };
+					static int palind[4] = { 0, 4, 8, 12 };
 					for(int field=0; field<2; field++) {
 						m_palette[1] = 0xffffff;
 						const u16 *src = bank;
 						for(u32 y=0; y<200; y++) {
 							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<640; x+=8) {
-								u16 sv = *src++;
-								*dest++ = m_palette[palind[(sv >>  6) & 3]];
-								*dest++ = m_palette[palind[(sv >>  4) & 3]];
-								*dest++ = m_palette[palind[(sv >>  2) & 3]];
-								*dest++ = m_palette[palind[(sv >>  0) & 3]];
-								*dest++ = m_palette[palind[(sv >> 14) & 3]];
-								*dest++ = m_palette[palind[(sv >> 12) & 3]];
-								*dest++ = m_palette[palind[(sv >> 10) & 3]];
-								*dest++ = m_palette[palind[(sv >>  8) & 3]];
+								u16 sv = sw(*src++);
+								for(u32 xx=0; xx<8; xx++) {
+									u32 color = m_palette[palind[(sv >> (14-2*xx)) & 3]];
+									*dest++ = color;
+								}
 							}
 						}
 					}
@@ -588,23 +551,11 @@ u32 mindset_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 						for(u32 y=0; y<200; y++) {
 							u32 *dest = &bitmap.pix32(2*y+field+dy, dx);
 							for(u32 x=0; x<640; x+=16) {
-								u16 sv = *src++;
-								*dest++ = m_palette[palind[(sv >>  7) & 1]];
-								*dest++ = m_palette[palind[(sv >>  6) & 1]];
-								*dest++ = m_palette[palind[(sv >>  5) & 1]];
-								*dest++ = m_palette[palind[(sv >>  4) & 1]];
-								*dest++ = m_palette[palind[(sv >>  3) & 1]];
-								*dest++ = m_palette[palind[(sv >>  2) & 1]];
-								*dest++ = m_palette[palind[(sv >>  1) & 1]];
-								*dest++ = m_palette[palind[(sv >>  0) & 1]];
-								*dest++ = m_palette[palind[(sv >> 15) & 1]];
-								*dest++ = m_palette[palind[(sv >> 14) & 1]];
-								*dest++ = m_palette[palind[(sv >> 13) & 1]];
-								*dest++ = m_palette[palind[(sv >> 12) & 1]];
-								*dest++ = m_palette[palind[(sv >> 11) & 1]];
-								*dest++ = m_palette[palind[(sv >> 10) & 1]];
-								*dest++ = m_palette[palind[(sv >>  9) & 1]];
-								*dest++ = m_palette[palind[(sv >>  8) & 1]];
+								u16 sv = sw(*src++);
+								for(u32 xx=0; xx<16; xx++) {
+									u32 color = m_palette[palind[(sv >> (15-xx)) & 1]];
+									*dest++ = color;
+								}
 							}
 						}
 					}
@@ -1127,6 +1078,26 @@ static INPUT_PORTS_START(mindset)
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("MOUSEAXIS1")
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+
+	PORT_START("MOUSEAXIS0")
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+
+	PORT_START("MOUSEBTN")
+	PORT_BIT(0x1cf, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+
+	PORT_START("JOYSTICK")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x1c0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 ROM_START(mindset)

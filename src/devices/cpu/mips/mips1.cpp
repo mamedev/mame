@@ -207,6 +207,7 @@ void mips1core_device_base::device_reset()
 	m_cop0[COP0_Status] = SR_BEV | SR_TS;
 
 	m_data_spacenum = 0;
+	m_bus_error = false;
 }
 
 void mips1core_device_base::execute_run()
@@ -1069,12 +1070,18 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 {
 	if (memory_translate(m_data_spacenum, TRANSLATE_READ, address))
 	{
-		switch (sizeof(T))
+		T const data
+			= (sizeof(T) == 1) ? space(m_data_spacenum).read_byte(address)
+			: (sizeof(T) == 2) ? space(m_data_spacenum).read_word(address)
+			: space(m_data_spacenum).read_dword(address);
+
+		if (m_bus_error)
 		{
-		case 1: apply(T(space(m_data_spacenum).read_byte(address))); break;
-		case 2: apply(T(space(m_data_spacenum).read_word(address))); break;
-		case 4: apply(T(space(m_data_spacenum).read_dword(address))); break;
+			m_bus_error = false;
+			generate_exception(EXCEPTION_BUSDATA);
 		}
+		else
+			apply(data);
 	}
 }
 
@@ -1095,8 +1102,17 @@ bool mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
 {
 	if (memory_translate(0, TRANSLATE_FETCH, address))
 	{
-		apply(space(0).read_dword(address));
+		u32 const data = space(0).read_dword(address);
 
+		if (m_bus_error)
+		{
+			m_bus_error = false;
+			generate_exception(EXCEPTION_BUSINST);
+
+			return false;
+		}
+
+		apply(data);
 		return true;
 	}
 	else

@@ -26,8 +26,17 @@
     TODO:
 
     - use priority PROM for drawing sprites
-    - dump / decap the C8751H-88 MCU and use it's code to emulate the protection
     - find and dump an unmodified bme01.12d to correct the 1943 Euro set
+	- Accurate interrupt handling
+	- Screen raw parameters
+
+	Notes:
+
+	- The MCU is actually hooked up to a lot more than it actually uses.
+	  It can potentially communicate with the audio CPU, read the current
+	  vertical line and has a vblank counter. All this isn't used by the MCU
+	  program, it only exchanges a value with the main CPU.
+
 
 */
 
@@ -43,59 +52,21 @@
 
 /* Protection Handlers */
 
-void _1943_state::protection_w(u8 data)
+INTERRUPT_GEN_MEMBER(_1943_state::mcu_irq)
 {
-	m_prot_value = data;
+	m_mcu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
 }
 
-u8 _1943_state::protection_r()
+void _1943_state::mcu_p3_w(u8 data)
 {
-	// The game crashes (through a jump to 0x8000) if the return value is not what it expects..
-
-	switch (m_prot_value)
+	// write strobe
+	if (BIT(m_mcu_p3, 6) == 1 && BIT(data, 6) == 0)
 	{
-		// This data comes from a table at $21a containing 64 entries, even is "case", odd is return value.
-		case 0x24: return 0x1d;
-		case 0x60: return 0xf7;
-		case 0x01: return 0xac;
-		case 0x55: return 0x50;
-		case 0x56: return 0xe2;
-		case 0x2a: return 0x58;
-		case 0xa8: return 0x13;
-		case 0x22: return 0x3e;
-		case 0x3b: return 0x5a;
-		case 0x1e: return 0x1b;
-		case 0xe9: return 0x41;
-		case 0x7d: return 0xd5;
-		case 0x43: return 0x54;
-		case 0x37: return 0x6f;
-		case 0x4c: return 0x59;
-		case 0x5f: return 0x56;
-		case 0x3f: return 0x2f;
-		case 0x3e: return 0x3d;
-		case 0xfb: return 0x36;
-		case 0x1d: return 0x3b;
-		case 0x27: return 0xae;
-		case 0x26: return 0x39;
-		case 0x58: return 0x3c;
-		case 0x32: return 0x51;
-		case 0x1a: return 0xa8;
-		case 0xbc: return 0x33;
-		case 0x30: return 0x4a;
-		case 0x64: return 0x12;
-		case 0x11: return 0x40;
-		case 0x33: return 0x35;
-		case 0x09: return 0x17;
-		case 0x25: return 0x04;
+		m_mcu_to_cpu = m_mcu_p0;
+		m_mcu_to_audiocpu = m_mcu_p2;
 	}
 
-	return 0;
-}
-
-// The bootleg expects 0x00 to be returned from the protection reads because the protection has been patched out.
-u8 _1943_state::_1943b_c007_r()
-{
-	return 0;
+	m_mcu_p3 = data;
 }
 
 
@@ -110,11 +81,11 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
-	map(0xc007, 0xc007).r(FUNC(_1943_state::protection_r));
+	map(0xc007, 0xc007).lr8("mcu_r", [this]() -> u8 { return m_mcu_to_cpu; });
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(_1943_state::c804_w)); // ROM bank switch, screen flip
 	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xc807, 0xc807).w(FUNC(_1943_state::protection_w));
+	map(0xc807, 0xc807).lw8("mcu_w", [this](u8 data) { m_cpu_to_mcu = data; });
 	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::colorram_w)).share("colorram");
 	map(0xd800, 0xd801).ram().share("scrollx");
@@ -129,11 +100,22 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
 
+void _1943_state::c1943b_map(address_map &map)
+{
+	c1943_map(map);
+
+	// the bootleg expects 0x00 to be returned from the protection reads
+	// because the protection has been patched out
+	map(0xc007, 0xc007).lr8("mcu_r", [this]() -> u8 { return 0x00; });
+	map(0xc807, 0xc807).noprw();
+}
+
 void _1943_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xc800).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xd800, 0xd800).lrw8("mcu", [this]() { return m_mcu_to_audiocpu; }, [this](u8 data) { m_audiocpu_to_mcu = data; });
 	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w("ym2", FUNC(ym2203_device::write));
 }
@@ -274,7 +256,13 @@ GFXDECODE_END
 
 void _1943_state::machine_start()
 {
-	save_item(NAME(m_prot_value));
+	save_item(NAME(m_cpu_to_mcu));
+	save_item(NAME(m_mcu_to_cpu));
+	save_item(NAME(m_audiocpu_to_mcu));
+	save_item(NAME(m_mcu_to_audiocpu));
+	save_item(NAME(m_mcu_p0));
+	save_item(NAME(m_mcu_p2));
+	save_item(NAME(m_mcu_p3));
 }
 
 void _1943_state::machine_reset()
@@ -283,7 +271,6 @@ void _1943_state::machine_reset()
 	m_obj_on = 0;
 	m_bg1_on = 0;
 	m_bg2_on = 0;
-	m_prot_value = 0;
 }
 
 void _1943_state::_1943(machine_config &config)
@@ -296,6 +283,15 @@ void _1943_state::_1943(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/8)); /* verified on pcb */
 	audiocpu.set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
 	audiocpu.set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
+
+	I8751(config, m_mcu, XTAL(24'000'000)/4); // clock unknown
+	m_mcu->port_in_cb<0>().set([this](){ return m_cpu_to_mcu; });
+	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
+	m_mcu->port_in_cb<1>().set([this]{ return m_screen->vpos(); });
+	m_mcu->port_in_cb<2>().set([this](){ return m_audiocpu_to_mcu; });
+	m_mcu->port_out_cb<2>().set([this](u8 data){ m_mcu_p2 = data; });
+	m_mcu->port_out_cb<3>().set(FUNC(_1943_state::mcu_p3_w));
+	m_mcu->set_vblank_int("screen", FUNC(_1943_state::mcu_irq));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -329,6 +325,15 @@ void _1943_state::_1943(machine_config &config)
 	ym2.add_route(3, "mono", 0.10);
 }
 
+void _1943_state::_1943b(machine_config &config)
+{
+	_1943(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &_1943_state::c1943b_map);
+
+	config.device_remove("mcu");
+}
+
 /* ROMs */
 
 ROM_START( 1943 )
@@ -340,8 +345,8 @@ ROM_START( 1943 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
@@ -398,8 +403,8 @@ ROM_START( 1943u )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
@@ -456,8 +461,8 @@ ROM_START( 1943ua )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
@@ -514,8 +519,8 @@ ROM_START( 1943j )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
@@ -572,8 +577,8 @@ ROM_START( 1943ja )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
@@ -630,8 +635,8 @@ ROM_START( 1943jah )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bm05.4k", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(46cb9d3d) SHA1(96fd0e714b91fe13a2ca0d185ada9e4b4baa0c0b) )    /* characters */
@@ -688,8 +693,8 @@ ROM_START( 1943kai )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bmk05.4k", 0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bmk04.5h", 0x00000, 0x8000, CRC(884a8692) SHA1(027aa8c868dc07ccd9e27705031107881aef4b91) )   /* characters */
@@ -746,8 +751,8 @@ ROM_START( 1943mii ) /* Prototype, location test or limited release? - PCB had g
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "05.4k", 0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /*  C8751H-88 MCU Code */
-	ROM_LOAD( "bm.7k", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) /*  C8751H-88 MCU Code */
+	ROM_LOAD( "bm.7k", 0x0000, 0x1000 , CRC(cf4781bf) SHA1(4d63da5bf39a892499c02a79c7daf33d3a94234a) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "04.5h", 0x00000, 0x8000, CRC(8190e092) SHA1(17ca0fa8e61cc6f478d4807262a0333fdb3e4f94) )   /* characters - had USA hand written in pencil on label */
@@ -914,21 +919,15 @@ void _1943_state::init_1943()
 	m_mainbank->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-void _1943_state::init_1943b()
-{
-	init_1943();
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8smo_delegate(FUNC(_1943_state::_1943b_c007_r),this));
-}
 
 /* Game Drivers */
-GAME( 1987, 1943,    0,    _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway (Euro)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943u,   1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway (US, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943ua,  1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943j,   1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: Midway Kaisen (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943ja,  1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943jah, 1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: Midway Kaisen (Japan, no protection hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943b,   1943, _1943, 1943, _1943_state, init_1943b, ROT270, "bootleg", "1943: Battle of Midway (bootleg, hack of Japan set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943bj,  1943, _1943, 1943, _1943_state, init_1943b, ROT270, "bootleg", "1943: Midway Kaisen (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943kai, 0,    _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943 Kai: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943mii, 0,    _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway Mark II (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943,    0,    _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943: The Battle of Midway (Euro)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943u,   1943, _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943: The Battle of Midway (US, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943ua,  1943, _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943: The Battle of Midway (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943j,   1943, _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943: Midway Kaisen (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943ja,  1943, _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943jah, 1943, _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943: Midway Kaisen (Japan, no protection hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943b,   1943, _1943b, 1943, _1943_state, init_1943, ROT270, "bootleg", "1943: Battle of Midway (bootleg, hack of Japan set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943bj,  1943, _1943b, 1943, _1943_state, init_1943, ROT270, "bootleg", "1943: Midway Kaisen (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943kai, 0,    _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943 Kai: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943mii, 0,    _1943,  1943, _1943_state, init_1943, ROT270, "Capcom",  "1943: The Battle of Midway Mark II (US)", MACHINE_SUPPORTS_SAVE )

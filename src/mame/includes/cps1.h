@@ -167,6 +167,7 @@ public:
 	void init_sf2thndr();
 	void init_dinohunt();
 	void init_sf2hack();
+	void init_sf2rk();
 	void init_slammast();
 	void init_pang3b();
 	void init_pang3();

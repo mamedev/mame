@@ -64,6 +64,8 @@ nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_full_device(mconfig, type, tag, owner, clock)
 	, cdrom(nullptr)
+	, periph_qt(0x05)
+	, removable(true)
 	, bytes_per_block(bytes_per_sector)
 	, lba(0)
 	, cur_sector(0)
@@ -223,8 +225,8 @@ void nscsi_cdrom_device::scsi_command()
 			if (lun != 0)
 				scsi_cmdbuf[0] = 0x7f;
 			else
-				scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
-			scsi_cmdbuf[1] = 0x80; // media is removable
+				scsi_cmdbuf[0] = periph_qt;
+			scsi_cmdbuf[1] = removable ? 0x80 : 0;
 			scsi_cmdbuf[2] = compliance; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x02; // response data format = SPC-3 standard
 			scsi_cmdbuf[4] = 0x20; // additional length
@@ -264,7 +266,7 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 
 	case SC_RECIEVE_DIAG_RES: {
-		LOG("command RECIEVE DIAGNOSTICS RESULTS");
+		LOG("command RECEIVE DIAGNOSTICS RESULTS\n");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		int pos = 0;
 		scsi_cmdbuf[pos++] = 0;
@@ -282,7 +284,7 @@ void nscsi_cdrom_device::scsi_command()
 	}
 
 	case SC_SEND_DIAGNOSTICS: {
-		LOG("command SEND DIAGNOSTICS");
+		LOG("command SEND DIAGNOSTICS\n");
 		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
 		if(scsi_cmdbuf[1] & 4) {
 			// Self-test
@@ -605,12 +607,25 @@ enum sgi_scsi_command_e : uint8_t {
 	SGI_HD2CDROM = 0xc9,
 };
 
+void nscsi_cdrom_sgi_device::device_reset()
+{
+	nscsi_cdrom_device::device_reset();
+
+	// identify as non-removable hard disk after reset
+	periph_qt = 0x00;
+	removable = false;
+}
+
 void nscsi_cdrom_sgi_device::scsi_command()
 {
 	switch (scsi_cmdbuf[0]) {
 	case SGI_HD2CDROM:
-		LOG("command SGI_HD2CDROM");
-		// No need to do anything (yet). Just acknowledge the command.
+		LOG("command SGI_HD2CDROM\n");
+
+		// now identify as removable cdrom
+		periph_qt = 0x05;
+		removable = true;
+
 		scsi_status_complete(SS_GOOD);
 		break;
 
