@@ -17,11 +17,13 @@ Language:
 ********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
 ********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
 ********7 = Spain             (Green labels on back)
+*******10 = Korea
 *******13 = Denmark           Distributed by the company 'Top Toy A/S'
 *******14 = Sweden            Distributed by the company 'Top Toy A/S'
 *******15 = Norway
 *******?? = Finland
 *******?? = China
+
 
 Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
@@ -135,6 +137,7 @@ Game cartridges
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                |
 |   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB, green sticker: "449 ○○○○")
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent) (No # on label)                                  |
+|        |          (KOR)    | Alphabet Park Adventure - 알파벳 공원 대탐험                                                     |
 |        |          (CN)     | 英语乐园                                                                                        |
 +========+===================+================================================================================================+
 |        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                                       |
@@ -146,7 +149,6 @@ Game cartridges
 |        | 80-092043(UK)     | Learnin' Wheels                                                                                |
 |   XX   | 80-092044(GE)     | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#)  80-092924(GE) on label      |
 |   XX   | 80-092045(FR)     | Apprenti' Pilote                                                                               |
-|        |          (CN)     | 数学快车                                                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                |
 |   XX   | 80-092061(IT)     | Winnie the Pooh e la caccia al miele                                                           |
@@ -166,12 +168,13 @@ Game cartridges
 |        |          (NO)     | Winnie the Pooh - Honningjakten                                                                |
 |        |          (NO)     | Ole Brumm - Honningjakten                                                                      |
 |        |          (FI)     | Winnie the Pooh - Hunajajahti                                                                  |
+|        |          (KOR)    | Winnie The Pooh: The Honey Hunt - 푸우와 함께하는 꿀사냥놀이                                      |
 |        |          (CN)     | 小熊维尼                                                                                        |
 +========+===================+================================================================================================+
-|   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventures                                                     |
+|   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
 |   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                    |
 |        | 80-092082(NL)     | Mickey Mouse - De wonderwereld van Mickey                                                      |
-|        | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventures                                                     |
+|        | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
 |   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                             |
 |        | 80-092085(FR)     | Mickey - Mickey a la recherche de Pluto                                                        |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
@@ -180,6 +183,7 @@ Game cartridges
 |   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                            |
 |        |          (NO)     | Mickey                                                                                         |
 |        |          (FI)     | Mickey                                                                                         |
+|        |          (KOR)    | Mickey Mouse - Mickey's Magical Adventure - 미키마우스의 신비한 마술여행                           |
 |        |          (CN)     | 米奇魔幻历险记                                                                                   |
 +========+===================+================================================================================================+
 |   XX   | 80-092100(US)     | The Lion King - Simba's Big Adventure                                                          |
@@ -208,6 +212,7 @@ Game cartridges
 |   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                              |
 |        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                |
 |        |          (FI)     | Pieni Merenneito - Arielin majesteettinen matka                                                |
+|        |          (KOR)    | The Little Mermaid - Ariel's Majestic Journey - 인어공주의 신나는 탐험여행                        |
 |        |          (CN)     | 美人鱼梦幻之旅                                                                                   |
 +========+===================+================================================================================================+
 |        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                         |
@@ -255,6 +260,7 @@ Game cartridges
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                             |
 |        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
 |   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label, green sticker: "534 ○○○○")
+|        | 80-092210(KOR)    | Aladdin - 알라딘의 신비한 모험 게임 (50-92210(KOR) on back label)                                 |
 +========+===================+================================================================================================+
 |   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody!                                                          |
 |   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody! (ALT)                                                    |
@@ -401,6 +407,8 @@ Game cartridges
 |        | 80-092505(FR)     | Mission Pilote                                                                                 |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
 |   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label, green sticker: "534 ○○○○")                   |
+|        | 80-092510(KOR)    | Whiz Kid Wheels - 꼬마 자동차 트러클 (50-92510(KOR) on back label)                               |
+|        |          (CN)     | 数学快车                                                                                        |
 +========+===================+================================================================================================+
 |        | 80-092520(US)     | Spider-Man & Friends Doc Ock's Challenge                                                       |
 |        |          (IT)     | Spider-Man la sfida del dottor Ock  (V.Smile pocket bundle only?)                              |
@@ -460,7 +468,7 @@ Game cartridges
 |        |          (FI)     | Autot - Aja kilpaa Syylari Cityssä                                                             |
 |        |          (CN)     | 汽车总动员                                                                                      |
 +========+===================+================================================================================================+
-|        | 80-092680(US) ->  |                                                                                                |
+|        | 80-092680(US)     | <Unknown>                                                                                      |
 |        | 80-092800(US)     | <Unknown>                                                                                      |
 +========+===================+================================================================================================+
 |   XX   | 80-092820(US)     | Soccer Challenge                                                                               |
