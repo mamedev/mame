@@ -22,9 +22,18 @@ function lfs.env_replace(str)
 end
 
 _G._ = emu.lang_translate
-local dir = lfs.env_replace(manager:options().entries.pluginspath:value())
 
-package.path = dir .. "/?.lua;" .. dir .. "/?/init.lua"
+-- substitute environment variables in the plugins path from options
+local dirs = lfs.env_replace(manager:options().entries.pluginspath:value())
+
+-- and split the paths apart and make them suitable for package.path
+package.path = ""
+for dir in string.gmatch(dirs, "([^;]+)") do
+	if (package.path ~= "") then
+		package.path = package.path .. ";"
+	end
+	package.path = package.path .. dir .. "/?.lua;" .. dir .. "/?/init.lua"
+end
 
 for _,entry in pairs(manager:plugins()) do
 	if (entry.type == "plugin" and entry.start) then
