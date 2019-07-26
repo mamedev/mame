@@ -692,15 +692,10 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_1bpp_update_row )
 WRITE_LINE_MEMBER( isa8_cga_device::hsync_changed )
 {
 	m_hsync = state ? 1 : 0;
-#if 0
-	/* This is not necessary if the device is linked to a screen,
-	 * and no other 6845 device does this, so disable these and
-	 * consider another approach if really necessary. */
 	if(state && !m_vsync)
 	{
 		m_screen->update_now();
 	}
-#endif
 }
 
 
@@ -710,12 +705,11 @@ WRITE_LINE_MEMBER( isa8_cga_device::vsync_changed )
 	{
 		m_framecnt++;
 	}
-#if 0
 	else
 	{
 		m_screen->reset_origin();
 	}
-#endif
+
 	m_vsync = state ? 9 : 0;
 }
 
