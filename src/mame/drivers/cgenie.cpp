@@ -446,7 +446,7 @@ void cgenie_state::cgenie(machine_config &config)
 
 	HD6845S(config, m_crtc, XTAL(17'734'470) / 16);
 	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
+	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update), this);
 	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row), this);
