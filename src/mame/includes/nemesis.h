@@ -158,6 +158,7 @@ private:
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void set_screen_raw_params(machine_config &config);
 
 	void blkpnthr_map(address_map &map);
 	void blkpnthr_sound_map(address_map &map);

@@ -1703,6 +1703,12 @@ void nemesis_state::machine_reset()
 	m_irq_port_last = 0;
 }
 
+void nemesis_state::set_screen_raw_params(machine_config &config)
+{
+	// 60.606060 Hz for 256x224
+	m_screen->set_raw(XTAL(18432000.0)/4,288,0,256,264,2*8,30*8);
+}
+
 void nemesis_state::nemesis(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1727,10 +1733,7 @@ void nemesis_state::nemesis(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264));      /* ??? */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -1794,10 +1797,7 @@ void nemesis_state::gx400(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
@@ -1864,10 +1864,7 @@ void nemesis_state::konamigt(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 
@@ -1930,10 +1927,7 @@ void nemesis_state::rf2_gx400(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
@@ -1989,10 +1983,7 @@ void nemesis_state::salamand(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((264-256)*125/2));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -2039,10 +2030,7 @@ void nemesis_state::blkpnthr(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::blkpnthr_vblank_irq));
@@ -2084,10 +2072,7 @@ void nemesis_state::citybomb(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -2133,10 +2118,7 @@ void nemesis_state::nyanpani(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -2187,10 +2169,7 @@ void nemesis_state::hcrash(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 
@@ -2954,10 +2933,7 @@ void nemesis_state::bubsys(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI); // TODO: This is supposed to be gated by something on bubble system, unclear what. it should only be active while the bubble memory is warming up, and disabled after the bubble mcu 'releases' the 68k from reset.
