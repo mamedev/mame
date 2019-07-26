@@ -103,7 +103,7 @@
 
 	<software name="hbells">
 		<description>Hell's Bells</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Geoff Macdonald</publisher>
 		<info name="usage" value="Requires Joystick" />
 		<part name="snap" interface="mt65_snap">
