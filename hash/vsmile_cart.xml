@@ -194,6 +194,7 @@ Game cartridges
 |   XX   | 80-092105(FR)     | Le Roi Lion - Simba Découvre la Jungle                                                         |
 |        | 80-092106(PT)     | O Rei Leao - A grande aventura de Simba (92116 on cart)                                        |
 |   XX   | 80-092107(SP)     | El Rey León - La Gran Aventura de Simba (no # on label, 92187 on PCB)                          |
+|        |          (KOR)    | The Lion King - Simba's Big Adventure                                                          |
 |   XX   | 80-092113(DK)     | Løvernes Konge - Simbas store eventyr                                                          |
 |   XX   | 80-092114(SE)     | Lejonkungen - Simbas stora äventyr                                                             |
 |        |          (NO)     | Løvenes konge - Simbas store eventyr                                                           |
@@ -291,7 +292,7 @@ Game cartridges
 |        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                    |
 |        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
 |        | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
-|        | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
+|  SOON  | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
 |   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222(SP) on back label, green sticker: "P ○○○○", non motion#, but V.Motion in spanish catalog)
 |   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
@@ -442,14 +443,14 @@ Game cartridges
 +========+===================+================================================================================================+
 |        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
 |        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
-|        | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
+|  SOON  | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
 +========+===================+================================================================================================+
 |   XX   | 80-092640(US)     | Superman - The Greatest Hero                                                                   |
 |   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                                    |
 |        | 80-092643(UK)     | Superman - The Greatest Hero                                                                   |
 |   XX   | 80-092644(GE)     | Superman - Der Superheld                                                                       |
 |   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                                    |
-|        | 80-092647(SP)     | Superman - El Hombre de Acero                                                                  |
+|  SOON  | 80-092647(SP)     | Superman - El Hombre de Acero                                                                  |
 |        |          (CN)     | 超人 - 超级英雄                                                                                  |
 +========+===================+================================================================================================+
 |   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
@@ -543,7 +544,7 @@ Game cartridges
 |        | 80-092983(UK)     | Disney's Little Einsteins: The Glass Slipper Ball (purple cart on front of UK box, but V.Motion listed)
 |   XX   | 80-092984(GE)     | Kleine Einsteins                                                                               |
 |        | 80-092985(FR)     | Disney - Les petits Einsteins: Le bal du soulier de verre                                      |
-|        | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                   |
+|  SOON  | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                   |
 +========+===================+================================================================================================+
 |        |          (CN)     | 小学英语 - Primary English                                                                      |
 +========+===================+================================================================================================+
