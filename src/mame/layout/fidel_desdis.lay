@@ -3,21 +3,19 @@
 
 <!-- define elements -->
 
-	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 	<element name="redb"><rect><color red="0.81" green="0.3" blue="0.29" /></rect></element>
 	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
 	<element name="disk_white"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
-
-	<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
+	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="1.0" blue="1.0" /></led7seg>
+		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
 	</element>
 	<element name="ldot" defstate="0">
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><color red="0.12157" green="0.12157" blue="0.12157" /></rect>
+		<rect state="1"><color red="0.31" green="0.28" blue="0.29" /></rect>
+		<rect state="0"><color red="0.5098" green="0.5333" blue="0.5412" /></rect>
 	</element>
 
 	<element name="led" defstate="0">
@@ -595,7 +593,8 @@
 
 	<!-- lcd panel -->
 
-		<bezel element="static_black"><bounds x="30.5" y="90" width="25" height="8" /></bezel>
+		<bezel element="black"><bounds x="30.5" y="90" width="25" height="8" /></bezel>
+		<bezel element="lcd_bg"><bounds x="31" y="90.5" width="24" height="7" /></bezel>
 
 		<bezel name="digit2" element="digit"><bounds x="32" y="91" width="4" height="6" /></bezel>
 		<bezel name="digit3" element="digit"><bounds x="38" y="91" width="4" height="6" /></bezel>

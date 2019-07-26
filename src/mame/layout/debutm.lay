@@ -4,12 +4,11 @@
 <!-- define elements -->
 
 	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="gray"><rect><color red="0.5" green="0.54" blue="0.52" /></rect></element>
-
-	<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
+	<element name="black2"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
+	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="1.0" blue="1.0" /></led7seg>
+		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
@@ -467,8 +466,9 @@
 	<group name="shared">
 		<bounds x="-0.5" y="6.5" width="83" height="94.9" />
 
-		<bezel element="gray"><bounds x="3" y="89.4" width="27" height="12" /></bezel>
-		<bezel element="blackb"><bounds x="5" y="91.4" width="23" height="8" /></bezel>
+		<bezel element="cblack"><bounds x="3" y="89.4" width="27" height="12" /></bezel>
+		<bezel element="black2"><bounds x="5" y="91.4" width="23" height="8" /></bezel>
+		<bezel element="lcd_bg"><bounds x="5.3" y="91.7" width="22.4" height="7.4" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="7"    y="92.625" width="3.7" height="5.55" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="12.1" y="92.625" width="3.7" height="5.55" /></bezel>
 		<bezel name="digit2" element="digit"><bounds x="17.2" y="92.625" width="3.7" height="5.55" /></bezel>
