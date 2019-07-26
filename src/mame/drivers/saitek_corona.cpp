@@ -219,6 +219,7 @@ WRITE8_MEMBER(corona_state::lcd_reset_w)
 {
 	// reset lcd?
 	m_lcd_ready = true;
+	m_lcd_count = 0;
 }
 
 
