@@ -36,7 +36,7 @@ public:
 	static constexpr unsigned WIDTH                      = 342;    /* 342 pixels */
 	static constexpr unsigned HEIGHT_NTSC                = 262;    /* 262 lines */
 	static constexpr unsigned HEIGHT_PAL                 = 313;    /* 313 lines */
-	static constexpr unsigned LBORDER_START              = 9 + 2 + 14 + 8;
+	static constexpr unsigned LBORDER_START              = 26 + 2 + 14 + 8;
 	static constexpr unsigned LBORDER_WIDTH              = 13;     /* 13 pixels */
 	static constexpr unsigned RBORDER_WIDTH              = 15;     /* 15 pixels */
 	static constexpr unsigned TBORDER_START              = 3 + 13;

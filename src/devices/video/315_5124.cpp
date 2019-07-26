@@ -24,23 +24,22 @@ SMS Display Timing
 ------------------
     For more information, please see:
     - http://cgfm2.emuviews.com/txt/msvdp.txt
-    - http://www.smspower.org/forums/viewtopic.php?p=44198
+    - http://www.smspower.org/forums/viewtopic.php?p=37142
+    - http://www.smspower.org/forums/viewtopic.php?p=92925
 
 A scanline contains the following sections:
-  - horizontal sync     9  E9-ED   => HSYNC high
-  - left blanking       2  ED-EE
-  - color burst        14  EE-F5   => increment line counter/generate interrupts/etc
-  - left blanking       8  F5-F9
-  - left border        13  F9-FF
-  - active display    256  00-7F
-  - right border       15  80-87
-  - right blanking      8  87-8B
-  - horizontal sync    17  8B-93   => HSYNC low
+  - horizontal sync    26  E9-F5   => HSYNC low
+  - left blanking       2  F6-F6   => HSYNC high
+  - color burst        14  F7-FD
+  - left blanking       8  FE-01
+  - left border        13  02-08
+  - active display    256  08-88
+  - right border       15  88-8F
+  - right blanking      8  90-93
 
-  Although the processing done for a section happens when HCount is in the
-  specified range (e.g. 00-7F for active display), probably there is a delay
-  until its signal is shown on screen, as happens on the TMS9918 chip
-  according to this timing diagram:
+  Probably the processing done for the active display occurs when HCount
+  is in the 00-7F range and there is a delay until its signal is shown on
+  screen, as happens on the TMS9918 chip according to this timing diagram:
       http://www.smspower.org/Development/TMS9918MasterTimingDiagram
 
 
@@ -110,8 +109,8 @@ static constexpr u8 line_315_5377[8] = { 26, 26, 27, 28 /* not verified */, 24, 
 #define DISPLAY_DISABLED_HPOS 24 /* not verified, works if above 18 (for 'pstrike2') and below 25 (for 'fantdizzy') */
 #define DISPLAY_CB_HPOS       2  /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
 
-#define DRAW_TIME_GG          94      /* 9 + 2 + 14 + 8 + 13 + 96/2 */
-#define DRAW_TIME_SMS         46      /* 9 + 2 + 14 + 8 + 13 */
+#define DRAW_TIME_GG         111      /* 26 + 2 + 14 + 8 + 13 + 96/2 */
+#define DRAW_TIME_SMS         63      /* 26 + 2 + 14 + 8 + 13 */
 
 
 DEFINE_DEVICE_TYPE(SEGA315_5124, sega315_5124_device, "sega315_5124", "Sega 315-5124 SMS1 VDP")
@@ -382,14 +381,12 @@ u8 sega315_5124_device::hcount_read()
 
 void sega315_5124_device::hcount_latch()
 {
-	const int active_scr_start = 46;      /* 9 + 2 + 14 + 8 + 13 */
-
 	/* The hcount value returned by the VDP seems to be based on the previous hpos */
 	int hclock = screen().hpos() - 1;
 	if (hclock < 0)
 		hclock += WIDTH;
 
-	m_hcounter = ((hclock - active_scr_start) >> 1) & 0xff;
+	m_hcounter = ((hclock - 46) >> 1) & 0xff;
 	m_hcounter_latched = true;
 }
 
