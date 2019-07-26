@@ -953,8 +953,9 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// flip the tilemap around the center of the visible area
 	rectangle visarea = screen.visible_area();
-	// These are not the width and height, rather 2 * left + width + 1,
-	// and 2 * top + height + 1, and these are inputs to the
+	// TODO: is this correct or are drivers relying on a bug here?
+	// These are not the width and height, rather 2 * left + width,
+	// and 2 * top + height, and these are inputs to the
 	// effective_*scroll functions used in the case of a flip.
 	u32 width = visarea.right() + visarea.left() + 1;
 	u32 height = visarea.bottom() + visarea.top() + 1;
