@@ -33,22 +33,23 @@
 	<element name="background"><rect><color red="0.59" green="0.39" blue="0.20" /></rect></element>
 	<element name="white"><rect><color red="0.80" green="0.73" blue="0.63" /></rect></element>
 
-	<element name="text_1">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="1">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_2">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="2">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_3">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="3">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_4">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="4">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_5">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="5">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_6">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="6">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_7">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="7">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_8">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="8">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_a">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="A">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_b">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="B">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_c">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="C">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_d">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="D">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_e">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="E">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_f">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="F">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_g">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="G">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
-	<element name="text_h">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="H">             <color red="0.01" green="0.01" blue="0.01" /></text> </element>
+	<element name="text_1">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="1">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_2">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="2">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_3">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="3">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_4">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="4">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_5">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="5">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_6">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="6">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_7">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="7">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_8">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="8">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_a">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="A">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_b">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="B">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_c">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="C">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_d">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="D">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_e">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="E">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_f">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="F">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_g">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="G">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_h">         <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="H">             <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+
 	<element name="text_black">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="&#x25a1;">      <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_white">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="&#x25a0;">      <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_train">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>    <text string="TRAIN">         <color red="1" green="1" blue="1" /></text> </element>
