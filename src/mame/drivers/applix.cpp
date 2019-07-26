@@ -892,7 +892,7 @@ void applix_state::applix(machine_config &config)
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
 	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
+	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row), this);
 	m_crtc->set_begin_update_callback(FUNC(applix_state::crtc_update_border), this);
