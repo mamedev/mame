@@ -17,11 +17,13 @@ Language:
 ********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
 ********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
 ********7 = Spain             (Green labels on back)
+*******10 = Korea
 *******13 = Denmark           Distributed by the company 'Top Toy A/S'
 *******14 = Sweden            Distributed by the company 'Top Toy A/S'
 *******15 = Norway
 *******?? = Finland
 *******?? = China
+
 
 Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
@@ -57,487 +59,495 @@ Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
 
 Game cartridges
-+========+===================+==========================================================================================================================================================+
-| Dumped |      Serial       |                                    Name                                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-| VTech ran out of UPC codes at 92999, these are wraparound and newer than 92xxx series.                                                                                                |
-| They also say 'V.Link compatible' on the back though not all are V.Motion compatible                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090000(US)     | Up (need pic)                                                                                                                                            |
-|        | 80-090000-001(US) | Up                                                                                                                                                       |
-|   XX   | 80-090003-003(UK) | Up                                                                                                                                                       |
-|        | 80-090004(GE)     | Oben                                                                                                                                                     |
-|   XX   | 80-090004-004(GE) | Oben                                                                                                                                                     |
-|        | 80-090005(FR)     | La Haut                                                                                                                                                  |
-|   XX   | 80-090007-022(SP) | Up                                                                                                                                                       |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090020(US)     | Handy Manny                                                                                                                                              |
-|        | 80-090023(UK)     | Handy Manny                                                                                                                                              |
-|   XX   | 80-090024(GE)     | Meister Manny's Werkzeugkiste                                                                                                                            |
-|        | 80-090025(FR)     | Manny Et Ses Outils                                                                                                                                      |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090040(US)     | Wow! Wow! Wubbzy! - Attack of the 50-Foot Fleegle                                                                                                        |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090060(US)     | <Unknown>                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090080(US)     | <Unknown>                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090100(US)     | <Unknown>                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090120(US)     | <Unknown>                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090140(US)     | <Unknown>  (Should be My Pet Puppy)                                                                                                                      |
-|        | 80-090142(NL)     | Mijn Puppy!                                                                                                                                              |
-|   XX   | 80-090144(GE)     | Mein erster Hund                                                                                                                                         |
-|        | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                                                                                     |
-|        | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475)                                                                                                                  |
-|        |          (DK)     | Min hundehvalp                                                                                                                                           |
-|   XX   | 80-090154(SE)     | Min hundvalp                                                                                                                                             |
-|        |          (NO)     | Min valp                                                                                                                                                 |
-|        |          (FI)     | Koiranpentuni                                                                                                                                            |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090160(US)     | <unknown> (Should be Monsters vs. Aliens #80-084440, exists in VTech V.Link database)                                                                    |
-|        | 80-090163(UK)     | Monsters vs. Aliens                                                                                                                                      |
-|   XX   | 80-090164(GE)     | Monsters vs. Aliens                                                                                                                                      |
-|        | 80-090165(FR)     | Monsters Contre Aliens                                                                                                                                   |
-|   XX   | 80-090167(SP)     | Monstruos contra Alienígenas  (52-090167(SP) on back label, green sticker: "P ○○○○")                                                                     |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090180(US)     | <Unknown>                                                                                                                                                |
-|        | 80-090183(UK)     | Wonder Pets! - Save the Animals                                                                                                                          |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090200(US)     | <Unknown>                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090220(US)     | <Unknown> should be Wild Waves (purple)                                                                                                                  |
-|        | 80-090224(GE)     | Dolphis Wasser-abenteuer                                                                                                                                 |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090240(US)     | <Unknown>                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-090260(US)     | Disney Fairies - Tinker Bell                                                                                                                             |
-|        |          (DK)     | Disney Fairies - Tingeling                                                                                                                               |
-|   XX   | 80-090274(SE)     | Disney Fairies - Tingeling                                                                                                                               |
-|        | 80-090275(NO)     | Disney Fairies - Tingeling                                                                                                                               |
-|        |          (FI)     | Disney Fairies - Helinä-keiju                                                                                                                            |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 52-091444(GE)     | Schreibspaß                                                                                                                                              |
-+========+===================+==========================================================================================================================================================+
-|                                                                                                                                                                                       |
-|  Oldest Smartidges start here                                                                                                                                                         |
-|                                                                                                                                                                                       |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version)                                                                                                        |
-|   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version, ALT)                                                                                                   |
-|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version)                                                                                                      |
-|        |          (IT)     | Avventura nel parco dell'alfabeto                                                                                                                        |
-|        | 80-092002(NL)     | Alfabet Pretpark                                                                                                                                         |
-|        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                                                                                        |
-|   XX   | 80-092004(GE)     | Abenteuer im ABC Park                                                                                                                                    |
-|   XX   | 80-092005(FR)     | ABC Land Aventure                                                                                                                                        |
-|        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                                                                          |
-|   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB, green sticker: "449 ○○○○")                                                         |
-|        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent) (No # on label)                                                                                            |
-|        |          (CN)     | 英语乐园                                                                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                                                                                                 |
-|        | 80-092023(UK)     | The Adventures of Little Red Riding Hood (no # on label, but box says 'colours')                                                                         |
-|   XX   | 80-092024(GE)     | Entdecke die Welt von Rotkäppchen                                                                                                                        |
-|        | 80-092025(FR)     | Les aventures du Le Petit Chaperon Rouge                                                                                                                 |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092040(US)     | Learnin' Wheels  (blue car with guy driving)                                                                                                             |
-|        | 80-092043(UK)     | Learnin' Wheels                                                                                                                                          |
-|   XX   | 80-092044(GE)     | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#)  80-092924(GE) on label                                                                |
-|   XX   | 80-092045(FR)     | Apprenti' Pilote                                                                                                                                         |
-|        |          (CN)     | 数学快车                                                                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                                                                          |
-|   XX   | 80-092061(IT)     | Winnie the Pooh e la caccia al miele                                                                                                                     |
-|        | 80-092062(NL)     | Winnie de Poeh - De winderwereld van Poeh                                                                                                                |
-|        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                                                                          |
-|   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                                                                                     |
-|        | 80-092064(GE)     | Pooh - Die Honigjagd (ALT-no# on label)                                                                                                                  |
-|        | 80-092064(GE)     | My Friends Tigger and Pooh - Die Honigjagd                                                                                                               |
-|   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd                                                                                                               |
-|   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                                                                            |
-|   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (ALT)                                                                                                      |
-|        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                                                                                        |
-|   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB, green sticker: "449 ○○○○")                                                           |
-|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (092067-1 on PCB, green sticker: "732 ○○○○")                                                            |
-|   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                                                                                               |
-|   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                                                                                                |
-|        |          (NO)     | Winnie the Pooh - Honningjakten                                                                                                                          |
-|        |          (NO)     | Ole Brumm - Honningjakten                                                                                                                                |
-|        |          (FI)     | Winnie the Pooh - Hunajajahti                                                                                                                            |
-|        |          (CN)     | 小熊维尼                                                                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventures                                                                                                               |
-|   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                                                                              |
-|        | 80-092082(NL)     | Mickey Mouse - De wonderwereld van Mickey                                                                                                                |
-|        | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventures                                                                                                               |
-|   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                                                                                       |
-|        | 80-092085(FR)     | Mickey - Mickey a la recherche de Pluto                                                                                                                  |
-|        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                                                                                   |
-|   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB, green sticker: "528 ○●○○")                                                           |
-|        |          (DK)     | Mickey                                                                                                                                                   |
-|   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                                                                                      |
-|        |          (NO)     | Mickey                                                                                                                                                   |
-|        |          (FI)     | Mickey                                                                                                                                                   |
-|        |          (CN)     | 米奇魔幻历险记                                                                                                                                            |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092100(US)     | The Lion King - Simba's Big Adventure                                                                                                                    |
-|   XX   | 80-092101(IT)     | Il Re Leone - La Grande Avventura di Simba                                                                                                               |
-|        | 80-092102(NL)     | Leeuwenkoning - De wonderwereld van Simba                                                                                                                |
-|        | 80-092103(UK)     | The Lion King - Simba's Big Adventure                                                                                                                    |
-|   XX   | 80-092104(GE)     | Der Koenig der Loewen - Simbas grosses Abenteuer (Rev.2 dumped)                                                                                          |
-|   XX   | 80-092105(FR)     | Le Roi Lion - Simba Découvre la Jungle                                                                                                                   |
-|        | 80-092106(PT)     | O Rei Leao - A grande aventura de Simba (92116 on cart)                                                                                                  |
-|   XX   | 80-092107(SP)     | El Rey León - La Gran Aventura de Simba (no # on label, 92187 on PCB)                                                                                    |
-|   XX   | 80-092113(DK)     | Løvernes Konge - Simbas store eventyr                                                                                                                    |
-|   XX   | 80-092114(SE)     | Lejonkungen - Simbas stora äventyr                                                                                                                       |
-|        |          (NO)     | Løvenes konge - Simbas store eventyr                                                                                                                     |
-|        |          (FI)     | Leijona kuningas - Simban suuri seikkailu                                                                                                                |
-|        |          (CN)     | 狮子王辛巴成长历险记                                                                                                                                      |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                                                                                                            |
-|   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                                                                                                |
-|        | 80-092122(NL)     | De Kleine Zeemeermin - De Wunderwereld von Ariel                                                                                                         |
-|   XX   | 80-092123(UK)     | The Little Mermaid - Ariel's Majestic Journey                                                                                                            |
-|   XX   | 80-092124(GE)     | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer                                                                                                |
-|   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                                                                           |
-|        | 80-092126(PT)     |                                                                                                                                                          |
-|   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label, green sticker: "451 ○●○○")                                                                    |
-|   XX   | 80-092133(DK)     | Den Lille Havfrue - Ariels majestætiske rejse!                                                                                                           |
-|   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                                                                                        |
-|        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                                                                          |
-|        |          (FI)     | Pieni Merenneito - Arielin majesteettinen matka                                                                                                          |
-|        |          (CN)     | 美人鱼梦幻之旅                                                                                                                                            |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                                                                                   |
-|   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (ALT)                                                                                                             |
-|   XX   | 80-092141(IT)     | Spider-Man & Friends - Missioni Segrete                                                                                                                  |
-|        | 80-092142(NL)     | Spider-Man en Vrienden! - Geheime Missies (white Webs)                                                                                                   |
-|        | 80-092142-123(NL) | Spider-Man en Vrienden! - Geheime Missies (Yellow webs)                                                                                                  |
-|        | 80-092143(UK)     | Spider-Man & Friends - Secret Missions (no # on front label)                                                                                             |
-|        | 80-092143-103(UK) | Spider-Man & Friends - Secret Missions (ALT)                                                                                                             |
-|        | 80-092144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                                                                                 |
-|   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                                                                                   |
-|        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                                                                                  |
-|        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                                                                                   |
-|   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, green sticker: "518 ○○○○")                                                                          |
-|        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs)                                                                                                    |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                                                                                                             |
-|        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (ALT)                                                                                                                       |
-|   XX   | 80-092160-301(US) | Scooby-Doo! - Funland Frenzy (ALT 2)                                                                                                                     |
-|   XX   | 80-092161(IT)     | Scooby-Doo! - Avventura a Funland                                                                                                                        |
-|        | 80-092162(NL)     | Scooby-Doo griezelen in het pretpark                                                                                                                     |
-|   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy                                                                                                                             |
-|        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy                                                                                                                             |
-|        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (Yellow, only Scooby on label might be motion version)                                                                      |
-|   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                                                                                |
-|   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland                                                                                                                          |
-|        | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (translucent purple, packin)                                                                                             |
-|        | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent purple)                                                                                                  |
-|   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (purple, # on back label)                                                                                             |
-|   XX   | 80-092173(DK)     | Scooby-Doo! - Sjov i forlystelsesparken                                                                                                                  |
-|   XX   | 80-092174(SE)     | Scooby-Doo! - Tivoli-tokerier                                                                                                                            |
-|        |          (NO)     | Scooby-Doo! - Moro i fornøyelsesparken                                                                                                                   |
-|        |          (FI)     | Scooby-Doo!                                                                                                                                              |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092180(US)     | Care Bears - A Lesson in Caring                                                                                                                          |
-|        | 80-092183(UK)     | Care Bears - A Lesson in Caring                                                                                                                          |
-|        | 80-092184(GE)     | Gluecksbarchis  <- existance not proven                                                                                                                  |
-|        | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                                                                                     |
-|   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB, green sticker: "522 ○○○○")                                                                            |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                                                                                 |
-|   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                                                                                     |
-|        | 80-092202(NL)     | Aladdin - De Wunderwereld van Aladdin                                                                                                                    |
-|        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                                                                                 |
-|   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                                                                                       |
-|        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                                                                             |
-|   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label, green sticker: "534 ○○○○")                                                        |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody!                                                                                                                    |
-|   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody! (ALT)                                                                                                              |
-|        |          (IT)     | Toy Story 2 - Operazione: Salvataggio di Woody! (GPZ06503)                                                                                               |
-|   XX   | 80-092223(UK)     | Toy Story 2 - Operation Rescue Woody!                                                                                                                    |
-|   XX   | 80-092224(GE)     | Toy Story 2 - Woodys Spannende Rettung                                                                                                                   |
-|        | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                                                                                       |
-|        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                                                                                         |
-|   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label, green sticker: "528 ○○○○")                                                                |
-|        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                                                                                                      |
-|   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                                                                                                    |
-|        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                                                                                                     |
-|        |          (FI)     | Toy Story 2                                                                                                                                              |
-|        |          (CN)     | 玩具总动员2 - 营救胡迪                                                                                                                                    |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                                                                                   |
-|   XX   | 80-092241(IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)                                                                                  |
-|        | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester                                                                                                            |
-|        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester (2007)                                                                                                     |
-|   XX   | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                                                                                                   |
-|        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes (2007)                                                                                                            |
-|        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes (2008)                                                                                                            |
-|   XX   | 80-092244(GE)     | Cinderella - Lernen im Märchenland (2005)                                                                                                                |
-|   XX   | 80-092244-104(GE) | Cinderella - Lernen im Märchenland (2007)                                                                                                                |
-|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label, white sticker: "827 ○○○○")                                                  |
-|   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                                                                              |
-|        | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                                                                              |
-|        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                                                                              |
-|        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                                                                                  |
-|        | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)                                                          |
-|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222-222(SP) on back label, green sticker: "P ○○○○", non motion#, but V.Motion in spanish catalog)
-|   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                                                                                     |
-|   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                                                                                |
-|        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                                                                                    |
-|        |          (FI)     | Cinderella - Tuhkimon Taikatoiveet                                                                                                                       |
-|        |          (CN)     | 仙蒂                                                                                                                                                     |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                                                                                    |
-|   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                                                                                                   |
-|   XX   | 80-092265(FR)     | Le Monde d'Elmo - Les Grandes Découvertes D'Elmo                                                                                                         |
-|   XX   | 80.092267(SP)     | Mundo Elmo - Grandes descubrimientos de Elmo (52-92267(SP) on back label, green sticker: "529 ○○○○")                                                     |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092280(US)     | Dora The Explorer - Dora's Fit-it Adventure                                                                                                              |
-|        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                                                                                        |
-|   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT 2)                                                                                                      |
-|        | 80-092282(NL)     | Dora - Doras Reparatie Avontuur!                                                                                                                         |
-|   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                                                                                 |
-|        | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                                                                                        |
-|        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                                                                                         |
-|   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer                                                                                                                         |
-|   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                                                                             |
-|        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (NTSC French-Canadian)                                                                      |
-|        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                                                                                                         |
-|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label, green sticker: "P ○○○○")           |
-|        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                                                                                   |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                                                                                         |
-|   XX   | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                                                                                         |
-|        | 80-092303-103(UK) | Bob the Builder - Bob's Busy Day (Yellow Label)                                                                                                          |
-|   XX   | 80-092304(GE)     | Bob der Baumeister - Bobs Spannender Arbeitstag                                                                                                          |
-|        | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag                                                                                                          |
-|        | 80-092305(FR)     | Bob le Bricoleur: Les P'tits Chantiers de Bob                                                                                                            |
-|        | 80-092305-105(FR) | Bob le Bricoleur: Les P'tits Chantiers de Bob (ALT)                                                                                                      |
-|        | 80-092306(PT)     | Bob o Construtor - Um dia Atarefado (92316 on cart)                                                                                                      |
-|        | 80-092307(SP)     | Bob y sus Amigos - Un día de trabajo                                                                                                                     |
-|   XX   | 80-092313(DK)     | Byggemand Bob - Bobs travle dag                                                                                                                          |
-|   XX   | 80-092314(SE)     | Byggare Bob - Bobs stressiga dag                                                                                                                         |
-|        |          (NO)     | Byggmester Bob - Bobs travle dag                                                                                                                         |
-|        |          (FI)     | Puuha-Pete - Peten kiirenes päivä                                                                                                                        |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092320(US)     | The Wiggles - It's Wiggle Time!                                                                                                                          |
-|        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                                                                          |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                                                                               |
-|        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (ALT)                                                                                                         |
-|        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen  (need pic, even the manual has -123 on cover)                                                    |
-|        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen                                                                                                   |
-|   XX   | 80-092343(UK)     | Thomas and Friends: Engines Working Together                                                                                                             |
-|        | 80-092343-103(UK) | Thomas and Friends: Engines Working Together (ALT)                                                                                                       |
-|        | 80-092343-203(UK) | Thomas and Friends: Engines Working Together (ALT)                                                                                                       |
-|   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                                                                                                       |
-|   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen                                                                                                       |
-|   XX   | 80-092345(FR)     | Thomas et ses Amis - Les locomotives s'entraident                                                                                                        |
-|        | 80-092347(SP)     | Thomas and Friends - Juego de Aprendizaje                                                                                                                |
-|        |          (DK)     | Thomas and Friends - Togene arbejder sammen                                                                                                              |
-|   XX   | 80-092354(SE)     | Thomas and Friends - Tågen hjälps åt                                                                                                                     |
-|        |          (NO)     | Thomas and Friends - Togene samarbeider (494097(NO) printed on cart)                                                                                     |
-|        |          (FI)     | Thomas and Friends                                                                                                                                       |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092360(US)     | Zayzoo - My Alien Classmate                                                                                                                              |
-|   XX   | 80-092360-101(US) | Zayzoo: An Earth Adventure                                                                                                                               |
-|        | 80-092362(NL)     | Zayzoo - Mijn Buitenaardse Vriendje                                                                                                                      |
-|        | 80-092363(UK)     | Zayzoo - My Alien Classmate (yes, duped#)                                                                                                                |
-|        | 80-092363(UK)     | Zayzoo: An Earth Adventure (saw it, can't find pic again)                                                                                                |
-|   XX   | 80-092363-103(UK) | Zayzoo: An Earth Adventure                                                                                                                               |
-|   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                                                                          |
-|   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                                                                                        |
-|   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label, green sticker: "531 ○○○○")                                                                    |
-|        |          (CN)     | 我的外星人同学                                                                                                                                            |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092380(US)     | Barney - The Land of Make Believe                                                                                                                        |
-|        | 80-092383(UK)     | Barney - The Land of Make Believe                                                                                                                        |
-|   XX   | 80-092384(GE)     | Barney - Erlebnis-Reise                                                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092400(US)     | Blue's Clues - Collection Day                                                                                                                            |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092420(US)     | Finding Nemo - Nemo's Ocean Discoveries                                                                                                                  |
-|   XX   | 80-092422(NL)     | Finding Nemo - De wonderwereld van Nemo                                                                                                                  |
-|        | 80-092423(UK)     | Finding Nemo - Nemo's Ocean Discoveries                                                                                                                  |
-|   XX   | 50-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, blue sticker: "P ○○○○", "VT8321" silscreened on the cart)                         |
-|        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                                                                                       |
-|        | 80-092426(PT)     | Nemo - A descoberta do Oceano  (Cart#92436)                                                                                                              |
-|   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label, green sticker: "542 ○○○●")                                                    |
-|        |          (CN)     | 海底总动员                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092440(US)     | Spongebob Squarepants - A Day In The Life of A Sponge                                                                                                    |
-|        | 80-092442(NL)     | Spongebob Squarepants - Een Dag uit het Leven van een Spons                                                                                              |
-|        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                                                                                                    |
-|   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                                                                                             |
-|        | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                                                                                      |
-|   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label, green sticker: "634 ○○○○")                                                   |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                                                                                   |
-|        | 80-092462(NL)     | Sesamstraat - Bert and Ernie's Fantasie Avontuur                                                                                                         |
-|   XX   | 80-092464(GE)     | Sesame Street - Ernie and Berts Fantastisches Abenteuer                                                                                                  |
-|        | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                                                                                               |
-|   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label, green sticker: "735 ○○○○")                           |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                                                                          |
-|        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                                                                                       |
-|        | 80-092482(NL)     | The Batman - De Redding van Gotham City                                                                                                                  |
-|   XX   | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                                                                          |
-|        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                                                                                     |
-|        | 80-092485(FR)     | The Batman - Panique a Gotham City                                                                                                                       |
-|        | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                                                                                      |
-|        |          (CN)     | 蝙蝠侠 - 拯救城市                                                                                                                                         |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                                                                                              |
-|        | 80-092502(NL)     | Truckie's Rekenrace                                                                                                                                      |
-|        | 80-092503(UK)     | Whiz Kid Wheels                                                                                                                                          |
-|        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (diff color)                                                                                                                |
-|        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (normal purple)                                                                                                             |
-|        | 80-092505(FR)     | Mission Pilote                                                                                                                                           |
-|        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                                                                                         |
-|   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label, green sticker: "534 ○○○○")                                                                             |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092520(US)     | Spider-Man & Friends Doc Ock's Challenge                                                                                                                 |
-|        |          (IT)     | Spider-Man la sfida del dottor Ock  (V.Smile pocket bundle only?)                                                                                        |
-|        | 80-092523(UK)     | Spider-Man & Friends Doc Ock's Challenge                                                                                                                 |
-|   XX   | 80-092524(GE)     | Spider-Man & Freunde Wettkampf im Space Labor                                                                                                            |
-|        | 80-092525(FR)     | Spider-Man & ses amis Le défi du docteur Ock                                                                                                             |
-|   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label, green sticker: "624 ○○○○")                                             |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092540(US)     | Noddy - Detective for a Day                                                                                                                              |
-|   XX   | 80-092543(UK)     | Noddy - Detective for a Day                                                                                                                              |
-|        | 80-092543-103(UK) | Noddy - Detective for a Day (ALT)                                                                                                                        |
-|        | 80-092544(GE)     | Noddy - Detektiv fuer einen Tag (need pic to confirm, manual cover says -104)                                                                            |
-|   XX   | 80-092544-104(GE) | Noddy - Detektiv fuer einen Tag (ALT)                                                                                                                    |
-|   XX   | 80-092545(FR)     | Oui-Oui - Détective d'un Jour                                                                                                                            |
-|        | 80-092545-105(FR) | Oui-Oui - Détective d'un Jour (ALT)                                                                                                                      |
-|        | 80-092546(PT)     | Noddy - Detective por um dia (92556 on cart)                                                                                                             |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092560(US)     | 101 Dalmations (one pic on german site with USA code)                                                                                                    |
-|        | 80-092564(GE)     | 101 Dalmatiner (EAN on german site with USA pic... wtf)                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092580(US)     | Backyardigans - Viking Voyage                                                                                                                            |
-|        | 80-092580-201(US) | Backyardigans - Viking Voyage (ALT)                                                                                                                      |
-|        | 80-092583(UK)     | Backyardigans - Viking Voyage                                                                                                                            |
-|   XX   | 80-092585(FR)     | Les Melodilous - Les explorateurs vikings                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092600(US)     | Shrek - Dragon's Tale                                                                                                                                    |
-|   XX   | 80-092602(NL)     | Shrek - Het verhaal van Draakje                                                                                                                          |
-|   XX   | 80-092604(GE)     | Shrek - Die Geschichte des Drachen                                                                                                                       |
-|   XX   | 80-092605(FR)     | Shrek - Le Rhume de Dragonne                                                                                                                             |
-|        | 80-092607(SP)     | Shrek - El Cuento de la Dragona                                                                                                                          |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                                                                                    |
-|        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                                                                                    |
-|        | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                                                                                    |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092640(US)     | Superman - The Greatest Hero                                                                                                                             |
-|   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                                                                                              |
-|        | 80-092643(UK)     | Superman - The Greatest Hero                                                                                                                             |
-|   XX   | 80-092644(GE)     | Superman - Der Superheld                                                                                                                                 |
-|   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                                                                                              |
-|        | 80-092647(SP)     | Superman - El Hombre de Acero                                                                                                                            |
-|        |          (CN)     | 超人 - 超级英雄                                                                                                                                           |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                                                                                     |
-|   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (ALT)                                                                                                               |
-|        |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                                                                                        |
-|        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                                                                                                     |
-|   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                                                                                     |
-|   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                                                                                                       |
-|   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                                                                                                      |
-|        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                                                                                    |
-|        | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                                                                              |
-|   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                                                                                                           |
-|   XX   | 80-092674(SE)     | Bilar - Kör ikapp i Kylarköping                                                                                                                          |
-|        | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (Misprinted label)                                                                                                       |
-|        |          (NO)     | Biler - Full gass i Radiator By                                                                                                                          |
-|        |          (FI)     | Autot - Aja kilpaa Syylari Cityssä                                                                                                                       |
-|        |          (CN)     | 汽车总动员                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092680(US) ->  |                                                                                                                                                          |
-|        | 80-092800(US)     | <Unknown>                                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092820(US)     | Soccer Challenge                                                                                                                                         |
-|        | 80-092821(IT)     | Football Club  (cart is 92831) (EAN 8001444067538)                                                                                                       |
-|        | 80-092822(NL)     | Voetbal                                                                                                                                                  |
-|        | 80-092823(UK)     | Football Challenge                                                                                                                                       |
-|   XX   | 80-092824(GE)     | Fußball Schule                                                                                                                                           |
-|        | 80-092825(FR)     | Football Challenge                                                                                                                                       |
-|        | 80-092826(PT)     | Football Challenge (cart# 92836)                                                                                                                         |
-|        | 80-092827(SP)     | Campeonato de Fútbol                                                                                                                                     |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092840(US)     | Wall-E                                                                                                                                                   |
-|        |          (IT)     | Wall-E  (GPZ07996)                                                                                                                                       |
-|        | 80-092842(NL)     | Wall-E                                                                                                                                                   |
-|        | 80-092843(UK)     | Wall-E                                                                                                                                                   |
-|   XX   | 80-092844(GE)     | Wall-E                                                                                                                                                   |
-|        | 80-092845(FR)     | Wall-E                                                                                                                                                   |
-|   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label, green sticker: "P ○○○○")                                                                                                |
-|        |          (DK)     | Wall-E                                                                                                                                                   |
-|   XX   | 80-092854(SE)     | Wall-E                                                                                                                                                   |
-|        |          (NO)     | Wall-E                                                                                                                                                   |
-|        |          (FI)     | Wall-E                                                                                                                                                   |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure                                                                                                           |
-|   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure (ALT)                                                                                                     |
-|        |          (IT)     | Shrek Terzo L'Advventura Do Artu in un Giorno di Scuola                                                                                                  |
-|   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                                                                                              |
-|   XX   | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                                                                           |
-|   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                                                                                               |
-|        | 80-092865(FR)     | Shrek Troisieme - L'aventure d'Arthur                                                                                                                    |
-|        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                                                                                       |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                                                                                         |
-|   XX   | 80-092881(IT)     | Ratatouille - Le nuove Ricette di Remy                                                                                                                   |
-|        | 80-092882(NL)     | Ratatouille - Remy's Nieuwe Recepten                                                                                                                     |
-|        | 80-092883(UK)     | Ratatouille - Remy's New Recipes                                                                                                                         |
-|   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                                                                                                         |
-|        | 80-092884-104(GE) | Ratatouille - Remys neue Rezepte (ALT)                                                                                                                   |
-|        | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                                                                             |
-|   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label, green sticker: "735 ○○○○")                                                              |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Familes!                                                                                                                  |
-|        | 80-092902(NL)     | Go Diego Go! - Red de dierenfamilies!                                                                                                                    |
-|        | 80-092903(UK)     | Go Diego Go! - Save the Animal Familes!                                                                                                                  |
-|        | 80-092905(FR)     | Go Diego! - À la rescousse des animaux!                                                                                                                  |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092920(US)     | Cranium - Partyland Park                                                                                                                                 |
-|        | 80-092922(UK)     | Cranium - Partyland Park                                                                                                                                 |
-|        | 80-092924(GE)     | Cranium - Freizeit Park                                                                                                                                  |
-|        | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                                                                          |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092940(US)     | <Unknown> (should be Mickey Mouse Clubhouse, 80-084180 exists in V.Link database)                                                                        |
-|        |          (IT)     | La Casa di Topolino                                                                                                                                      |
-|   XX   | 80-092942(NL)     | Mickey Mouse Clubhause                                                                                                                                   |
-|        | 80-092943(UK)     | Mickey Mouse Clubhouse                                                                                                                                   |
-|   XX   | 80-092944(GE)     | Micky Maus Wunderhaus                                                                                                                                    |
-|        | 80-092945(FR)     | La Maison de Mickey                                                                                                                                      |
-|   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label, green sticker: "P ○○○○")                                                                           |
-|        |          (DK)     | Mickey Mouse Clubhouse                                                                                                                                   |
-|   XX   | 80-092954(SE)     | Mickey Mouse Clubhouse                                                                                                                                   |
-|        |          (NO)     | Mickey Mouse Clubhouse                                                                                                                                   |
-|        |          (FI)     | Mickey Mouse Clubhouse                                                                                                                                   |
-+========+===================+==========================================================================================================================================================+
-|        | 80-092960(US)     | Kung Fu Panda - Path of the Panda                                                                                                                        |
-|        | 80-092962(NL)     | Kung Fu Panda - Het pad van de panda                                                                                                                     |
-|   XX   | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                                                                                                        |
-|   XX   | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                                                                                                        |
-|        | 80-092965(FR)     | Kung Fu Panda - La Mission de Po                                                                                                                         |
-|        | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz                                                                                                           |
-+========+===================+==========================================================================================================================================================+
-|   XX   | 80-092980(US)     | Disney's Little Einsteins: The Glass Slipper Ball                                                                                                        |
-|        | 80-092983(UK)     | Disney's Little Einsteins: The Glass Slipper Ball (purple cart on front of UK box, but V.Motion listed)                                                  |
-|   XX   | 80-092984(GE)     | Kleine Einsteins                                                                                                                                         |
-|        | 80-092985(FR)     | Disney - Les petits Einsteins: Le bal du soulier de verre                                                                                                |
-|        | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                                                                             |
-+========+===================+==========================================================================================================================================================+
-|        |          (CN)     | 小学英语 - Primary English                                                                                                                                |
-+========+===================+==========================================================================================================================================================+
++========+===================+================================================================================================+
+| Dumped |      Serial       |                                    Name                                                        |
++========+===================+================================================================================================+
+| VTech ran out of UPC codes at 92999, these are wraparound and newer than 92xxx series.                                      |
+| They also say 'V.Link compatible' on the back though not all are V.Motion compatible                                        |
++========+===================+================================================================================================+
+|        | 80-090000(US)     | Up (need pic)                                                                                  |
+|        | 80-090000-001(US) | Up                                                                                             |
+|   XX   | 80-090003-003(UK) | Up                                                                                             |
+|        | 80-090004(GE)     | Oben                                                                                           |
+|   XX   | 80-090004-004(GE) | Oben                                                                                           |
+|        | 80-090005(FR)     | La Haut                                                                                        |
+|   XX   | 80-090007-022(SP) | Up                                                                                             |
++========+===================+================================================================================================+
+|        | 80-090020(US)     | Handy Manny                                                                                    |
+|        | 80-090023(UK)     | Handy Manny                                                                                    |
+|   XX   | 80-090024(GE)     | Meister Manny's Werkzeugkiste                                                                  |
+|        | 80-090025(FR)     | Manny Et Ses Outils                                                                            |
++========+===================+================================================================================================+
+|        | 80-090040(US)     | Wow! Wow! Wubbzy! - Attack of the 50-Foot Fleegle                                              |
++========+===================+================================================================================================+
+|        | 80-090060(US)     | <Unknown>                                                                                      |
++========+===================+================================================================================================+
+|        | 80-090080(US)     | <Unknown>                                                                                      |
++========+===================+================================================================================================+
+|        | 80-090100(US)     | <Unknown>                                                                                      |
++========+===================+================================================================================================+
+|        | 80-090120(US)     | <Unknown>                                                                                      |
++========+===================+================================================================================================+
+|        | 80-090140(US)     | <Unknown>  (Should be My Pet Puppy)                                                            |
+|        | 80-090142(NL)     | Mijn Puppy!                                                                                    |
+|   XX   | 80-090144(GE)     | Mein erster Hund                                                                               |
+|        | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
+|        | 80-090147(SP)     | Dakota y su mascota (EAN 3417766901475)                                                        |
+|        |          (DK)     | Min hundehvalp                                                                                 |
+|   XX   | 80-090154(SE)     | Min hundvalp                                                                                   |
+|        |          (NO)     | Min valp                                                                                       |
+|        |          (FI)     | Koiranpentuni                                                                                  |
++========+===================+================================================================================================+
+|        | 80-090160(US)     | <unknown> (Should be Monsters vs. Aliens #80-084440, exists in VTech V.Link database)          |
+|        | 80-090163(UK)     | Monsters vs. Aliens                                                                            |
+|   XX   | 80-090164(GE)     | Monsters vs. Aliens                                                                            |
+|        | 80-090165(FR)     | Monsters Contre Aliens                                                                         |
+|   XX   | 80-090167(SP)     | Monstruos contra Alienígenas  (52-090167(SP) on back label, green sticker: "P ○○○○")           |
++========+===================+================================================================================================+
+|        | 80-090180(US)     | <Unknown>                                                                                      |
+|        | 80-090183(UK)     | Wonder Pets! - Save the Animals                                                                |
++========+===================+================================================================================================+
+|        | 80-090200(US)     | <Unknown>                                                                                      |
++========+===================+================================================================================================+
+|        | 80-090220(US)     | <Unknown> should be Wild Waves (purple)                                                        |
+|        | 80-090224(GE)     | Dolphis Wasser-abenteuer                                                                       |
++========+===================+================================================================================================+
+|        | 80-090240(US)     | <Unknown>                                                                                      |
++========+===================+================================================================================================+
+|        | 80-090260(US)     | Disney Fairies - Tinker Bell                                                                   |
+|        |          (DK)     | Disney Fairies - Tingeling                                                                     |
+|   XX   | 80-090274(SE)     | Disney Fairies - Tingeling                                                                     |
+|        | 80-090275(NO)     | Disney Fairies - Tingeling                                                                     |
+|        |          (FI)     | Disney Fairies - Helinä-keiju                                                                  |
++========+===================+================================================================================================+
+|   XX   | 52-091444(GE)     | Schreibspaß                                                                                    |
++========+===================+================================================================================================+
+|                                                                                                                             |
+|  Oldest Smartidges start here                                                                                               |
+|                                                                                                                             |
++========+===================+================================================================================================+
+|   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version)                                              |
+|   XX   | 80-092000(US)     | Alphabet Park Adventure (Red Haired Girl Version, ALT)                                         |
+|   XX   | 80-092000-101(US) | Alphabet Park Adventure (Blond Haired Girl Version)                                            |
+|        |          (IT)     | Avventura nel parco dell'alfabeto                                                              |
+|        | 80-092002(NL)     | Alfabet Pretpark                                                                               |
+|        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                              |
+|   XX   | 80-092004(GE)     | Abenteuer im ABC Park                                                                          |
+|   XX   | 80-092005(FR)     | ABC Land Aventure                                                                              |
+|        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                                                |
+|   XX   | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB, green sticker: "449 ○○○○")
+|        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent) (No # on label)                                  |
+|        |          (KOR)    | Alphabet Park Adventure - 알파벳 공원 대탐험                                                     |
+|        |          (CN)     | 英语乐园                                                                                        |
++========+===================+================================================================================================+
+|        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                                       |
+|        | 80-092023(UK)     | The Adventures of Little Red Riding Hood (no # on label, but box says 'colours')               |
+|   XX   | 80-092024(GE)     | Entdecke die Welt von Rotkäppchen                                                              |
+|        | 80-092025(FR)     | Les aventures du Le Petit Chaperon Rouge                                                       |
++========+===================+================================================================================================+
+|        | 80-092040(US)     | Learnin' Wheels  (blue car with guy driving)                                                   |
+|        | 80-092043(UK)     | Learnin' Wheels                                                                                |
+|   XX   | 80-092044(GE)     | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#)  80-092924(GE) on label      |
+|   XX   | 80-092045(FR)     | Apprenti' Pilote                                                                               |
++========+===================+================================================================================================+
+|   XX   | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                |
+|   XX   | 80-092061(IT)     | Winnie the Pooh e la caccia al miele                                                           |
+|        | 80-092062(NL)     | Winnie de Poeh - De winderwereld van Poeh                                                      |
+|        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                |
+|   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                           |
+|        | 80-092064(GE)     | Pooh - Die Honigjagd (ALT-no# on label)                                                        |
+|        | 80-092064(GE)     | My Friends Tigger and Pooh - Die Honigjagd                                                     |
+|   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd                                                     |
+|   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                  |
+|   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (ALT)                                            |
+|        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                              |
+|   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB, green sticker: "449 ○○○○") |
+|   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (092067-1 on PCB, green sticker: "732 ○○○○")  |
+|   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                                     |
+|   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                                      |
+|        |          (NO)     | Winnie the Pooh - Honningjakten                                                                |
+|        |          (NO)     | Ole Brumm - Honningjakten                                                                      |
+|        |          (FI)     | Winnie the Pooh - Hunajajahti                                                                  |
+|        |          (KOR)    | Winnie The Pooh: The Honey Hunt - 푸우와 함께하는 꿀사냥놀이                                      |
+|        |          (CN)     | 小熊维尼                                                                                        |
++========+===================+================================================================================================+
+|   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
+|   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                    |
+|        | 80-092082(NL)     | Mickey Mouse - De wonderwereld van Mickey                                                      |
+|        | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
+|   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                             |
+|        | 80-092085(FR)     | Mickey - Mickey a la recherche de Pluto                                                        |
+|        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
+|   XX   | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB, green sticker: "528 ○●○○") |
+|        |          (DK)     | Mickey                                                                                         |
+|   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                                            |
+|        |          (NO)     | Mickey                                                                                         |
+|        |          (FI)     | Mickey                                                                                         |
+|        |          (KOR)    | Mickey Mouse - Mickey's Magical Adventure - 미키마우스의 신비한 마술여행                           |
+|        |          (CN)     | 米奇魔幻历险记                                                                                   |
++========+===================+================================================================================================+
+|   XX   | 80-092100(US)     | The Lion King - Simba's Big Adventure                                                          |
+|   XX   | 80-092101(IT)     | Il Re Leone - La Grande Avventura di Simba                                                     |
+|        | 80-092102(NL)     | Leeuwenkoning - De wonderwereld van Simba                                                      |
+|        | 80-092103(UK)     | The Lion King - Simba's Big Adventure                                                          |
+|   XX   | 80-092104(GE)     | Der Koenig der Loewen - Simbas grosses Abenteuer (Rev.2 dumped)                                |
+|   XX   | 80-092105(FR)     | Le Roi Lion - Simba Découvre la Jungle                                                         |
+|        | 80-092106(PT)     | O Rei Leao - A grande aventura de Simba (92116 on cart)                                        |
+|   XX   | 80-092107(SP)     | El Rey León - La Gran Aventura de Simba (no # on label, 92187 on PCB)                          |
+|        |          (KOR)    | The Lion King - Simba's Big Adventure                                                          |
+|   XX   | 80-092113(DK)     | Løvernes Konge - Simbas store eventyr                                                          |
+|   XX   | 80-092114(SE)     | Lejonkungen - Simbas stora äventyr                                                             |
+|        |          (NO)     | Løvenes konge - Simbas store eventyr                                                           |
+|        |          (FI)     | Leijona kuningas - Simban suuri seikkailu                                                      |
+|        |          (CN)     | 狮子王辛巴成长历险记                                                                              |
++========+===================+================================================================================================+
+|        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                                                  |
+|   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                                      |
+|        | 80-092122(NL)     | De Kleine Zeemeermin - De Wunderwereld von Ariel                                               |
+|   XX   | 80-092123(UK)     | The Little Mermaid - Ariel's Majestic Journey                                                  |
+|   XX   | 80-092124(GE)     | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer                                      |
+|   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                 |
+|        | 80-092126(PT)     |                                                                                                |
+|   XX   | 80-092127(SP)     | La Sirenita - El Viaje Fantástico de Ariel (no # on label, green sticker: "451 ○●○○")          |
+|   XX   | 80-092133(DK)     | Den Lille Havfrue - Ariels majestætiske rejse!                                                 |
+|   XX   | 80-092134(SE)     | Den Lilla Sjöjungfrun - Ariels majestätiska resa!                                              |
+|        |          (NO)     | Den Lille Havfruen - Ariels majestetiske reise!                                                |
+|        |          (FI)     | Pieni Merenneito - Arielin majesteettinen matka                                                |
+|        |          (KOR)    | The Little Mermaid - Ariel's Majestic Journey - 인어공주의 신나는 탐험여행                        |
+|        |          (CN)     | 美人鱼梦幻之旅                                                                                   |
++========+===================+================================================================================================+
+|        | 80-092140(US)     | Spider-Man & Friends - Secret Missions                                                         |
+|   XX   | 80-092140-101(US) | Spider-Man & Friends - Secret Missions (ALT)                                                   |
+|   XX   | 80-092141(IT)     | Spider-Man & Friends - Missioni Segrete                                                        |
+|        | 80-092142(NL)     | Spider-Man en Vrienden! - Geheime Missies (white Webs)                                         |
+|        | 80-092142-123(NL) | Spider-Man en Vrienden! - Geheime Missies (Yellow webs)                                        |
+|        | 80-092143(UK)     | Spider-Man & Friends - Secret Missions (no # on front label)                                   |
+|        | 80-092143-103(UK) | Spider-Man & Friends - Secret Missions (ALT)                                                   |
+|        | 80-092144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                       |
+|   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                         |
+|        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                        |
+|        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                         |
+|   XX   | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs, green sticker: "518 ○○○○")                |
+|        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs)                                          |
++========+===================+================================================================================================+
+|   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                                                   |
+|        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (ALT)                                                             |
+|   XX   | 80-092160-301(US) | Scooby-Doo! - Funland Frenzy (ALT 2)                                                           |
+|   XX   | 80-092161(IT)     | Scooby-Doo! - Avventura a Funland                                                              |
+|        | 80-092162(NL)     | Scooby-Doo griezelen in het pretpark                                                           |
+|   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy                                                                   |
+|        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy                                                                   |
+|        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (Yellow, only Scooby on label might be motion version)            |
+|   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                      |
+|   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland                                                                |
+|        | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (translucent purple, packin)                                   |
+|        | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent purple)                                        |
+|   XX   | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (purple, # on back label)                                   |
+|   XX   | 80-092173(DK)     | Scooby-Doo! - Sjov i forlystelsesparken                                                        |
+|   XX   | 80-092174(SE)     | Scooby-Doo! - Tivoli-tokerier                                                                  |
+|        |          (NO)     | Scooby-Doo! - Moro i fornøyelsesparken                                                         |
+|        |          (FI)     | Scooby-Doo!                                                                                    |
++========+===================+================================================================================================+
+|        | 80-092180(US)     | Care Bears - A Lesson in Caring                                                                |
+|        | 80-092183(UK)     | Care Bears - A Lesson in Caring                                                                |
+|        | 80-092184(GE)     | Gluecksbarchis  <- existance not proven                                                        |
+|        | 80-092185(FR)     | Les Bisounours - Le Monde Merveilleux des Bisounours                                           |
+|   XX   | 80-092187(SP)     | Osos Amorosos - Una Lección de Amor (92187 on PCB, green sticker: "522 ○○○○")                  |
++========+===================+================================================================================================+
+|        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
+|   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                           |
+|        | 80-092202(NL)     | Aladdin - De Wunderwereld van Aladdin                                                          |
+|        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
+|   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                             |
+|        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
+|   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label, green sticker: "534 ○○○○")
+|        | 80-092210(KOR)    | Aladdin - 알라딘의 신비한 모험 게임 (50-92210(KOR) on back label)                                 |
++========+===================+================================================================================================+
+|   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody!                                                          |
+|   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody! (ALT)                                                    |
+|        |          (IT)     | Toy Story 2 - Operazione: Salvataggio di Woody! (GPZ06503)                                     |
+|   XX   | 80-092223(UK)     | Toy Story 2 - Operation Rescue Woody!                                                          |
+|   XX   | 80-092224(GE)     | Toy Story 2 - Woodys Spannende Rettung                                                         |
+|        | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                                             |
+|        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                                               |
+|   XX   | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label, green sticker: "528 ○○○○")      |
+|        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                                            |
+|   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                                          |
+|        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                                           |
+|        |          (FI)     | Toy Story 2                                                                                    |
+|        |          (CN)     | 玩具总动员2 - 营救胡迪                                                                            |
++========+===================+================================================================================================+
+|   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                                         |
+|   XX   | 80-092241(IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)                        |
+|        | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester                                                  |
+|        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester (2007)                                           |
+|   XX   | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                                         |
+|        | 80-092243-103(UK) | Cinderella - Cinderella's Magic Wishes (2007)                                                  |
+|        | 80-092243-203(UK) | Cinderella - Cinderella's Magic Wishes (2008)                                                  |
+|   XX   | 80-092244(GE)     | Cinderella - Lernen im Märchenland (2005)                                                      |
+|   XX   | 80-092244-104(GE) | Cinderella - Lernen im Märchenland (2007)                                                      |
+|   XX   | 80-092244-204(GE) | Cinderella - Lernen im Märchenland (2008) (52-092244-205(GER) on back label, white sticker: "827 ○○○○")
+|   XX   | 80-092245(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
+|        | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon                                                    |
+|        | 80-092245-205(FR) | Cendrillon - Le reve enchante de Cendrillon                                                    |
+|        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
+|        | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
+|  SOON  | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (white/light pink cart label background)      |
+|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (no # on front label, 52-092247-222(SP) on back label, green sticker: "P ○○○○", non motion#, but V.Motion in spanish catalog)
+|   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
+|   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
+|        | 80-092255(NO)     | Cinderella - Askepotts magiske ønsker                                                          |
+|        |          (FI)     | Cinderella - Tuhkimon Taikatoiveet                                                             |
+|        |          (CN)     | 仙蒂                                                                                            |
++========+===================+================================================================================================+
+|        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                                          |
+|   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                                         |
+|   XX   | 80-092265(FR)     | Le Monde d'Elmo - Les Grandes Découvertes D'Elmo                                               |
+|   XX   | 80-092267(SP)     | Mundo Elmo - Grandes descubrimientos de Elmo (52-92267(SP) on back label, green sticker: "529 ○○○○")
++========+===================+================================================================================================+
+|   XX   | 80-092280(US)     | Dora The Explorer - Dora's Fit-it Adventure                                                    |
+|        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                              |
+|   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT 2)                                            |
+|        | 80-092282(NL)     | Dora - Doras Reparatie Avontuur!                                                               |
+|   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                       |
+|        | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                              |
+|        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                               |
+|   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer                                                               |
+|   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
+|        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (NTSC French-Canadian)            |
+|        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                                               |
+|   XX   | 80-092287-222(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label, green sticker: "P ○○○○")
+|        | 80-092287-122(SP) | Dora La Exploradora - La Aventura arregla-todo de Dora                                         |
++========+===================+================================================================================================+
+|   XX   | 80-092300(US)     | Bob the Builder - Bob's Busy Day                                                               |
+|   XX   | 80-092303(UK)     | Bob the Builder - Bob's Busy Day                                                               |
+|        | 80-092303-103(UK) | Bob the Builder - Bob's Busy Day (Yellow Label)                                                |
+|   XX   | 80-092304(GE)     | Bob der Baumeister - Bobs Spannender Arbeitstag                                                |
+|        | 80-092304-104(GE) | Bob der Baumeister - Bobs Spannender Arbeitstag                                                |
+|        | 80-092305(FR)     | Bob le Bricoleur: Les P'tits Chantiers de Bob                                                  |
+|        | 80-092305-105(FR) | Bob le Bricoleur: Les P'tits Chantiers de Bob (ALT)                                            |
+|        | 80-092306(PT)     | Bob o Construtor - Um dia Atarefado (92316 on cart)                                            |
+|        | 80-092307(SP)     | Bob y sus Amigos - Un día de trabajo                                                           |
+|   XX   | 80-092313(DK)     | Byggemand Bob - Bobs travle dag                                                                |
+|   XX   | 80-092314(SE)     | Byggare Bob - Bobs stressiga dag                                                               |
+|        |          (NO)     | Byggmester Bob - Bobs travle dag                                                               |
+|        |          (FI)     | Puuha-Pete - Peten kiirenes päivä                                                              |
++========+===================+================================================================================================+
+|        | 80-092320(US)     | The Wiggles - It's Wiggle Time!                                                                |
+|        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                |
++========+===================+================================================================================================+
+|   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                     |
+|        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (ALT)                                               |
+|        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen  (need pic, even the manual has -123 on cover)
+|        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen                                         |
+|   XX   | 80-092343(UK)     | Thomas and Friends: Engines Working Together                                                   |
+|        | 80-092343-103(UK) | Thomas and Friends: Engines Working Together (ALT)                                             |
+|        | 80-092343-203(UK) | Thomas and Friends: Engines Working Together (ALT)                                             |
+|   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                                             |
+|   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen                                             |
+|   XX   | 80-092345(FR)     | Thomas et ses Amis - Les locomotives s'entraident                                              |
+|        | 80-092347(SP)     | Thomas and Friends - Juego de Aprendizaje                                                      |
+|        |          (DK)     | Thomas and Friends - Togene arbejder sammen                                                    |
+|   XX   | 80-092354(SE)     | Thomas and Friends - Tågen hjälps åt                                                           |
+|        |          (NO)     | Thomas and Friends - Togene samarbeider (494097(NO) printed on cart)                           |
+|        |          (FI)     | Thomas and Friends                                                                             |
++========+===================+================================================================================================+
+|   XX   | 80-092360(US)     | Zayzoo - My Alien Classmate                                                                    |
+|   XX   | 80-092360-101(US) | Zayzoo: An Earth Adventure                                                                     |
+|        | 80-092362(NL)     | Zayzoo - Mijn Buitenaardse Vriendje                                                            |
+|        | 80-092363(UK)     | Zayzoo - My Alien Classmate (yes, duped#)                                                      |
+|        | 80-092363(UK)     | Zayzoo: An Earth Adventure (saw it, can't find pic again)                                      |
+|   XX   | 80-092363-103(UK) | Zayzoo: An Earth Adventure                                                                     |
+|   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                |
+|   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                                              |
+|   XX   | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label, green sticker: "531 ○○○○")          |
+|        |          (CN)     | 我的外星人同学                                                                                   |
++========+===================+================================================================================================+
+|        | 80-092380(US)     | Barney - The Land of Make Believe                                                              |
+|        | 80-092383(UK)     | Barney - The Land of Make Believe                                                              |
+|   XX   | 80-092384(GE)     | Barney - Erlebnis-Reise                                                                        |
++========+===================+================================================================================================+
+|   XX   | 80-092400(US)     | Blue's Clues - Collection Day                                                                  |
++========+===================+================================================================================================+
+|   XX   | 80-092420(US)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
+|   XX   | 80-092422(NL)     | Finding Nemo - De wonderwereld van Nemo                                                        |
+|        | 80-092423(UK)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
+|   XX   | 50-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, blue sticker: "P ○○○○", "VT8321" silscreened on the cart)
+|        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                             |
+|        | 80-092426(PT)     | Nemo - A descoberta do Oceano  (Cart#92436)                                                    |
+|   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label, green sticker: "542 ○○○●")
+|        |          (CN)     | 海底总动员                                                                                      |
++========+===================+================================================================================================+
+|   XX   | 80-092440(US)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
+|        | 80-092442(NL)     | Spongebob Squarepants - Een Dag uit het Leven van een Spons                                    |
+|        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
+|   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                                   |
+|        | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
+|   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label, green sticker: "634 ○○○○")
++========+===================+================================================================================================+
+|        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                                         |
+|        | 80-092462(NL)     | Sesamstraat - Bert and Ernie's Fantasie Avontuur                                               |
+|   XX   | 80-092464(GE)     | Sesame Street - Ernie and Berts Fantastisches Abenteuer                                        |
+|        | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                                     |
+|   XX   | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas (no # on front label, 52-92467(SP) on back label, green sticker: "735 ○○○○")
++========+===================+================================================================================================+
+|        | 80-092480(US)     | The Batman - Gotham City Rescue                                                                |
+|        |          (IT)     | The Batman - Il Salvataggio di Gotham City (80-092492??, GPZ06629)                             |
+|        | 80-092482(NL)     | The Batman - De Redding van Gotham City                                                        |
+|   XX   | 80-092483(UK)     | The Batman - Gotham City Rescue                                                                |
+|        | 80-092484(GE)     | The Batman - Rettung von Gotham City                                                           |
+|        | 80-092485(FR)     | The Batman - Panique a Gotham City                                                             |
+|        | 80-092487(SP)     | The Batman - Rescate en Gotham City                                                            |
+|        |          (CN)     | 蝙蝠侠 - 拯救城市                                                                                |
++========+===================+================================================================================================+
+|        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                                    |
+|        | 80-092502(NL)     | Truckie's Rekenrace                                                                            |
+|        | 80-092503(UK)     | Whiz Kid Wheels                                                                                |
+|        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (diff color)                                                      |
+|        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (normal purple)                                                   |
+|        | 80-092505(FR)     | Mission Pilote                                                                                 |
+|        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
+|   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label, green sticker: "534 ○○○○")                   |
+|        | 80-092510(KOR)    | Whiz Kid Wheels - 꼬마 자동차 트러클 (50-92510(KOR) on back label)                               |
+|        |          (CN)     | 数学快车                                                                                        |
++========+===================+================================================================================================+
+|        | 80-092520(US)     | Spider-Man & Friends Doc Ock's Challenge                                                       |
+|        |          (IT)     | Spider-Man la sfida del dottor Ock  (V.Smile pocket bundle only?)                              |
+|        | 80-092523(UK)     | Spider-Man & Friends Doc Ock's Challenge                                                       |
+|   XX   | 80-092524(GE)     | Spider-Man & Freunde Wettkampf im Space Labor                                                  |
+|        | 80-092525(FR)     | Spider-Man & ses amis Le défi du docteur Ock                                                   |
+|   XX   | 80-092527(SP)     | Spider-Man y Amigos - La Aventura Del Doctor Octopus (52-92527(SP) on back label, green sticker: "624 ○○○○")
++========+===================+================================================================================================+
+|   XX   | 80-092540(US)     | Noddy - Detective for a Day                                                                    |
+|   XX   | 80-092543(UK)     | Noddy - Detective for a Day                                                                    |
+|        | 80-092543-103(UK) | Noddy - Detective for a Day (ALT)                                                              |
+|        | 80-092544(GE)     | Noddy - Detektiv fuer einen Tag (need pic to confirm, manual cover says -104)                  |
+|   XX   | 80-092544-104(GE) | Noddy - Detektiv fuer einen Tag (ALT)                                                          |
+|   XX   | 80-092545(FR)     | Oui-Oui - Détective d'un Jour                                                                  |
+|        | 80-092545-105(FR) | Oui-Oui - Détective d'un Jour (ALT)                                                            |
+|        | 80-092546(PT)     | Noddy - Detective por um dia (92556 on cart)                                                   |
++========+===================+================================================================================================+
+|        | 80-092560(US)     | 101 Dalmations (one pic on german site with USA code)                                          |
+|        | 80-092564(GE)     | 101 Dalmatiner (EAN on german site with USA pic... wtf)                                        |
++========+===================+================================================================================================+
+|        | 80-092580(US)     | Backyardigans - Viking Voyage                                                                  |
+|        | 80-092580-201(US) | Backyardigans - Viking Voyage (ALT)                                                            |
+|        | 80-092583(UK)     | Backyardigans - Viking Voyage                                                                  |
+|   XX   | 80-092585(FR)     | Les Melodilous - Les explorateurs vikings                                                      |
++========+===================+================================================================================================+
+|        | 80-092600(US)     | Shrek - Dragon's Tale                                                                          |
+|   XX   | 80-092602(NL)     | Shrek - Het verhaal van Draakje                                                                |
+|   XX   | 80-092604(GE)     | Shrek - Die Geschichte des Drachen                                                             |
+|   XX   | 80-092605(FR)     | Shrek - Le Rhume de Dragonne                                                                   |
+|        | 80-092607(SP)     | Shrek - El Cuento de la Dragona                                                                |
++========+===================+================================================================================================+
+|        | 80-092620(US)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
+|        | 80-092623(UK)     | Lil' Bratz - Friends, Fashion and Fun                                                          |
+|  SOON  | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversión                                                          |
++========+===================+================================================================================================+
+|   XX   | 80-092640(US)     | Superman - The Greatest Hero                                                                   |
+|   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                                    |
+|        | 80-092643(UK)     | Superman - The Greatest Hero                                                                   |
+|   XX   | 80-092644(GE)     | Superman - Der Superheld                                                                       |
+|   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                                    |
+|  SOON  | 80-092647(SP)     | Superman - El Hombre de Acero                                                                  |
+|        |          (CN)     | 超人 - 超级英雄                                                                                  |
++========+===================+================================================================================================+
+|   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                                           |
+|   XX   | 80-092660-201(US) | Cars - Rev It Up In Radiator Springs (ALT)                                                     |
+|        |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                              |
+|        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                                           |
+|   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                           |
+|   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                                             |
+|   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                                            |
+|        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                                          |
+|        | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                                    |
+|   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                                                 |
+|   XX   | 80-092674(SE)     | Bilar - Kör ikapp i Kylarköping                                                                |
+|        | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (Misprinted label)                                             |
+|        |          (NO)     | Biler - Full gass i Radiator By                                                                |
+|        |          (FI)     | Autot - Aja kilpaa Syylari Cityssä                                                             |
+|        |          (CN)     | 汽车总动员                                                                                      |
++========+===================+================================================================================================+
+|        | 80-092680(US)     | <Unknown>                                                                                      |
+|        | 80-092800(US)     | <Unknown>                                                                                      |
++========+===================+================================================================================================+
+|   XX   | 80-092820(US)     | Soccer Challenge                                                                               |
+|        | 80-092821(IT)     | Football Club  (cart is 92831) (EAN 8001444067538)                                             |
+|        | 80-092822(NL)     | Voetbal                                                                                        |
+|        | 80-092823(UK)     | Football Challenge                                                                             |
+|   XX   | 80-092824(GE)     | Fußball Schule                                                                                 |
+|        | 80-092825(FR)     | Football Challenge                                                                             |
+|        | 80-092826(PT)     | Football Challenge (cart# 92836)                                                               |
+|        | 80-092827(SP)     | Campeonato de Fútbol                                                                           |
++========+===================+================================================================================================+
+|        | 80-092840(US)     | Wall-E                                                                                         |
+|        |          (IT)     | Wall-E  (GPZ07996)                                                                             |
+|        | 80-092842(NL)     | Wall-E                                                                                         |
+|        | 80-092843(UK)     | Wall-E                                                                                         |
+|   XX   | 80-092844(GE)     | Wall-E                                                                                         |
+|        | 80-092845(FR)     | Wall-E                                                                                         |
+|   XX   | 80-092847(SP)     | Wall-E (52-092847 on back label, green sticker: "P ○○○○")                                      |
+|        |          (DK)     | Wall-E                                                                                         |
+|   XX   | 80-092854(SE)     | Wall-E                                                                                         |
+|        |          (NO)     | Wall-E                                                                                         |
+|        |          (FI)     | Wall-E                                                                                         |
++========+===================+================================================================================================+
+|   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure                                                 |
+|   XX   | 80-092860(US)     | Shrek the Third: Arthur's School Day Adventure (ALT)                                           |
+|        |          (IT)     | Shrek Terzo L'Advventura Do Artu in un Giorno di Scuola                                        |
+|   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                                    |
+|   XX   | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                                                 |
+|   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                                     |
+|        | 80-092865(FR)     | Shrek Troisieme - L'aventure d'Arthur                                                          |
+|        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                                             |
++========+===================+================================================================================================+
+|        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                                               |
+|   XX   | 80-092881(IT)     | Ratatouille - Le nuove Ricette di Remy                                                         |
+|        | 80-092882(NL)     | Ratatouille - Remy's Nieuwe Recepten                                                           |
+|        | 80-092883(UK)     | Ratatouille - Remy's New Recipes                                                               |
+|   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                                               |
+|        | 80-092884-104(GE) | Ratatouille - Remys neue Rezepte (ALT)                                                         |
+|        | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                   |
+|   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label, green sticker: "735 ○○○○")    |
++========+===================+================================================================================================+
+|   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Familes!                                                        |
+|        | 80-092902(NL)     | Go Diego Go! - Red de dierenfamilies!                                                          |
+|        | 80-092903(UK)     | Go Diego Go! - Save the Animal Familes!                                                        |
+|        | 80-092905(FR)     | Go Diego! - À la rescousse des animaux!                                                        |
++========+===================+================================================================================================+
+|   XX   | 80-092920(US)     | Cranium - Partyland Park                                                                       |
+|        | 80-092922(UK)     | Cranium - Partyland Park                                                                       |
+|        | 80-092924(GE)     | Cranium - Freizeit Park                                                                        |
+|        | 80-092925(FR)     | Cranium - Le Parc D'attractions                                                                |
++========+===================+================================================================================================+
+|        | 80-092940(US)     | <Unknown> (should be Mickey Mouse Clubhouse, 80-084180 exists in V.Link database)              |
+|        |          (IT)     | La Casa di Topolino                                                                            |
+|   XX   | 80-092942(NL)     | Mickey Mouse Clubhause                                                                         |
+|        | 80-092943(UK)     | Mickey Mouse Clubhouse                                                                         |
+|   XX   | 80-092944(GE)     | Micky Maus Wunderhaus                                                                          |
+|        | 80-092945(FR)     | La Maison de Mickey                                                                            |
+|   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label, green sticker: "P ○○○○")                 |
+|        |          (DK)     | Mickey Mouse Clubhouse                                                                         |
+|   XX   | 80-092954(SE)     | Mickey Mouse Clubhouse                                                                         |
+|        |          (NO)     | Mickey Mouse Clubhouse                                                                         |
+|        |          (FI)     | Mickey Mouse Clubhouse                                                                         |
++========+===================+================================================================================================+
+|        | 80-092960(US)     | Kung Fu Panda - Path of the Panda                                                              |
+|        | 80-092962(NL)     | Kung Fu Panda - Het pad van de panda                                                           |
+|   XX   | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                                              |
+|   XX   | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                                              |
+|        | 80-092965(FR)     | Kung Fu Panda - La Mission de Po                                                               |
+|        | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz                                                 |
++========+===================+================================================================================================+
+|   XX   | 80-092980(US)     | Disney's Little Einsteins: The Glass Slipper Ball                                              |
+|        | 80-092983(UK)     | Disney's Little Einsteins: The Glass Slipper Ball (purple cart on front of UK box, but V.Motion listed)
+|   XX   | 80-092984(GE)     | Kleine Einsteins                                                                               |
+|        | 80-092985(FR)     | Disney - Les petits Einsteins: Le bal du soulier de verre                                      |
+|  SOON  | 80-092987(SP)     | Little Einsteins de Disney: El baile del zapatito de cristal                                   |
++========+===================+================================================================================================+
+|        |          (CN)     | 小学英语 - Primary English                                                                      |
++========+===================+================================================================================================+
 
 -->
 
