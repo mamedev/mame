@@ -61,20 +61,16 @@
           MCU, however f1dream has a similar string, and is verified as being from
           a production board.
 
-          The MCU hookup is currently wrong, maybe IRQ4 related?
-
     ToDo:
+	- Proper IRQ2 (should be LVBL) and IRQ4 (V256) hookup
+
+	About IRQ:
         IRQ4 seems to be control related.
         On each interrupt, it reads 0xFE4000 (coin/start), shift the bits around
         and move the resulting byte into a dword RAM location. The dword RAM location
         is rotated by 8 bits each time this happens.
         This is probably done to be pedantic about coin insertions (might be protection
-        related). In fact, currently coin insertions are not consistently recognized.
-
-        We have the schematics for this board and the protection circuit, there
-        are a number of incorrect assumptions in the code which need fixing, especially
-        regarding the two MCU interrupt hookups.
-
+        related).
 
 ******************************************************************************************/
 
@@ -88,72 +84,66 @@
 #include "speaker.h"
 
 
-/*************************************
- *
- *  Memory handlers
- *
- *************************************/
+//**************************************************************************
+//  PROTECTION MCU
+//**************************************************************************
 
-
-READ8_MEMBER(bionicc_state::mcu_shared_r)
+u8 bionicc_state::mcu_dma_r(offs_t offset)
 {
-	uint8_t ret = m_ram16[(0x3000 / 2) + offset];
-	return ret;
-}
+	u8 data = 0xff;
 
-WRITE8_MEMBER(bionicc_state::mcu_shared_w)
-{
-	m_ram16[(0x3000 / 2) + offset] = (m_ram16[(0x3000 / 2) + offset] & 0xff00) | data;
-}
-
-WRITE8_MEMBER(bionicc_state::out1_w)
-{
-	m_soundlatch->write(data);
-}
-
-WRITE8_MEMBER(bionicc_state::out3_w)
-{
-	if ((m_old_p3 & 0x20) != (data & 0x20))
+	if (BIT(m_mcu_p3, 5) == 0)
 	{
-		// guess
-		if (!(data & 0x20))
-			m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+		// various address bits are pulled high because the mcu doesn't drive them
+		// the 3 upper address bits (p2.0, p2.1, p2.2) are connected to a14 to a16
+		offs_t address = 0xe3e01 | ((offset & 0x700) << 6) | ((offset & 0xff) << 1);
+		data = m_maincpu->space(AS_PROGRAM).read_byte(address);
 	}
 
-	if ((m_old_p3 & 0x40) != (data & 0x40))
-	{
-		// used, but for what?
-	}
-
-	if ((m_old_p3 & 0x01) != (data & 0x01))
-	{
-		// guess, toggles at the end of interrupt
-		if (!(data & 0x01))
-		{
-			m_maincpu->resume(SUSPEND_REASON_HALT);
-
-			// the MCU should be doing this but is writing to the wrong bits?!
-			data = ioport("SYSTEM")->read() >> 12;
-			m_ram16[0x3ffa/2] = /*(m_ram16[0x3ffa/2] & 0xff00) |*/ (data ^ 0x0f);
-
-			data = ioport("P2")->read();
-			m_ram16[0x3ffc/2] = /*(m_ram16[0x3ffc/2] & 0xff00) |*/ (data ^ 0xff);
-
-			data = ioport("P1")->read();
-			m_ram16[0x3ffe/2] = /*(m_ram16[0x3ffe/2] & 0xff00) |*/ (data ^ 0xff);
-		}
-	}
-
-	m_old_p3 = data;
+	return data;
 }
 
+void bionicc_state::mcu_dma_w(offs_t offset, u8 data)
+{
+	if (BIT(m_mcu_p3, 5) == 0)
+	{
+		offs_t address = 0xe3e01 | ((offset & 0x700) << 6) | ((offset & 0xff) << 1);
+		m_maincpu->space(AS_PROGRAM).write_byte(address, data);
+	}
+}
 
-WRITE16_MEMBER(bionicc_state::mpu_trigger_w)
+void bionicc_state::mcu_p3_w(u8 data)
+{
+	// 7-------  read strobe
+	// -6------  write strobe
+	// --5-----  dma
+	// ---4----  int1 ack
+	// ----3---  int1
+	// -----2--  int0
+	// ------1-  int0 flip-flop preset
+	// -------0  int0 ack
+
+	if (BIT(m_mcu_p3, 0) == 1 && BIT(data, 0) == 0)
+	{
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+
+	if (BIT(m_mcu_p3, 4) == 1 && BIT(data, 4) == 0)
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+
+	if (BIT(m_mcu_p3, 6) == 1 && BIT(data, 6) == 0)
+		m_mcu_to_audiocpu = m_mcu_p1;
+
+	m_mcu_p3 = data;
+}
+
+void bionicc_state::dmaon_w(u16 data)
 {
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-
-	m_maincpu->suspend(SUSPEND_REASON_HALT, true); // see notes in f1dream driver
+	m_maincpu->suspend(SUSPEND_REASON_HALT, true);
 }
+
 
 /********************************************************************
 
@@ -173,7 +163,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 128) // vblank-in or i8751 related irq (can't happen when the CPU is suspended)
+	if(scanline == 128) // vblank-in irq (can't happen when the CPU is suspended)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
@@ -185,36 +175,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
 
 void bionicc_state::main_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
-	map(0xfe0000, 0xfe07ff).ram(); /* RAM? */
-	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
-	map(0xfe0d00, 0xfe3fff).ram();              /* RAM? */
-	map(0xfe4000, 0xfe4001).portr("SYSTEM");
-	map(0xfe4000, 0xfe4001).w(FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
-	map(0xfe4002, 0xfe4003).portr("DSW").nopw();
-	map(0xfe8010, 0xfe8017).w(FUNC(bionicc_state::scroll_w));
-	map(0xfe8018, 0xfe8019).nopw(); // vblank irq ack?
-	map(0xfe801a, 0xfe801b).w(FUNC(bionicc_state::mpu_trigger_w)); // based on the code this looks like the MCU trigger if compared to F1 Dream, but 0xfe4002 would match up closer in terms of addresses.  Maybe this is IRQ4 related instead?
-	map(0xfec000, 0xfecfff).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
-	map(0xff0000, 0xff3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
-	map(0xff4000, 0xff7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
-	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xffc000, 0xffffff).ram().share("ram16");
+	map.global_mask(0xfffff);
+	map(0x00000, 0x3ffff).rom();
+	map(0xe0000, 0xe07ff).ram(); /* RAM? */
+	map(0xe0800, 0xe0cff).ram().share("spriteram");
+	map(0xe0d00, 0xe3fff).ram();              /* RAM? */
+	map(0xe4000, 0xe4001).mirror(0x3ffc).portr("INPUTS");
+	map(0xe4000, 0xe4001).mirror(0x3ffc).w(FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
+	map(0xe4002, 0xe4003).mirror(0x3ffc).portr("DSW").nopw();
+	map(0xe8010, 0xe8017).w(FUNC(bionicc_state::scroll_w));
+	map(0xe8018, 0xe8019).nopw(); // vblank irq ack?
+	map(0xe801a, 0xe801b).w(FUNC(bionicc_state::dmaon_w));
+	map(0xec000, 0xecfff).mirror(0x3000).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
+	map(0xf0000, 0xf3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
+	map(0xf4000, 0xf7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
+	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfc000, 0xfffff).ram(); // WRAM
 }
-
 
 void bionicc_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa000).lrw8("mcu", [this]() { return m_mcu_to_audiocpu; }, [this](u8 data) { m_audiocpu_to_mcu = data; });
 	map(0xc000, 0xc7ff).ram();
 }
 
 void bionicc_state::mcu_io(address_map &map)
 {
-	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_shared_r), FUNC(bionicc_state::mcu_shared_w));
+	map.global_mask(0x7ff);
+	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_dma_r), FUNC(bionicc_state::mcu_dma_w));
 }
+
 
 /*************************************
  *
@@ -223,12 +215,23 @@ void bionicc_state::mcu_io(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( bionicc )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_START("INPUTS")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_COCKTAIL
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_COCKTAIL
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_COCKTAIL PORT_8WAY
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_COIN1)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWB:1,2,3")
@@ -274,26 +277,6 @@ static INPUT_PORTS_START( bionicc )
 	PORT_DIPNAME( 0x8000, 0x8000, "Freeze" )                PORT_DIPLOCATION("SWA:8")     /* Listed as "Unused" */
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -352,6 +335,10 @@ GFXDECODE_END
 void bionicc_state::machine_start()
 {
 	save_item(NAME(m_scroll));
+	save_item(NAME(m_audiocpu_to_mcu));
+	save_item(NAME(m_mcu_to_audiocpu));
+	save_item(NAME(m_mcu_p1));
+	save_item(NAME(m_mcu_p3));
 }
 
 void bionicc_state::machine_reset()
@@ -367,8 +354,8 @@ void bionicc_state::bionicc(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2); /* 12 MHz - verified in schematics */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bionicc_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bionicc_state::scanline), "screen", 0, 1);
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(bionicc_state::scanline), "screen", 0, 1);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4));   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	audiocpu.set_addrmap(AS_PROGRAM, &bionicc_state::sound_map);
@@ -381,8 +368,9 @@ void bionicc_state::bionicc(machine_config &config)
 	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
 	I8751(config, m_mcu, XTAL(24'000'000) / 4);
 	m_mcu->set_addrmap(AS_IO, &bionicc_state::mcu_io);
-	m_mcu->port_out_cb<1>().set(FUNC(bionicc_state::out1_w));
-	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::out3_w));
+	m_mcu->port_in_cb<1>().set([this](){ return m_audiocpu_to_mcu; });
+	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
+	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::mcu_p3_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -403,8 +391,6 @@ void bionicc_state::bionicc(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 
 	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
 }
