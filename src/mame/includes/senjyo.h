@@ -89,7 +89,6 @@ private:
 	uint8_t m_sound_cmd;
 	int m_single_volume;
 	int m_sound_state;
-	int m_bgstripes;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_bg2_tilemap;
