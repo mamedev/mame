@@ -153,6 +153,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(blkpnthr_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(hcrash_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void create_palette_lookups();
 	void nemesis_postload();
