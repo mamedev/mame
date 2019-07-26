@@ -43,8 +43,7 @@ very few bytes difference between revisions. The first Corona is engine version 
 TODO:
 - emulate LCD at lower level, probably an MCU with embedded LCDC
 - LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
-  but tking(D) won't work if it's done that way
-- fix LCD 7*7 DMD, it's in m_lcd_data[0x30 to 0x3b] but scrambled
+  but tking2 won't work if it's done that way, and corona is different too
 - tking different internal artwork
 - irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
   there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports)
