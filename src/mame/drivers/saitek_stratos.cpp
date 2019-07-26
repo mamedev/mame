@@ -367,8 +367,8 @@ WRITE8_MEMBER(stratos_state::control_w)
 	// d0: main rom bank
 	// d1: ext rom bank
 	// d1: nvram bank?
-	m_rombank->set_entry(data >> 0 & 1);
-	m_nvrambank->set_entry((data >> 1) & 1);
+	m_rombank->set_entry(data & 1);
+	m_nvrambank->set_entry(data >> 1 & 1);
 
 	// d2: mode led state
 	// d5: button led select

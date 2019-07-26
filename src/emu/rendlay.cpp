@@ -1455,7 +1455,7 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff,0xff,0xff,0xff);
-		const rgb_t offpen = rgb_t(0xff,0x20,0x20,0x20);
+		const rgb_t offpen = rgb_t(0x20,0xff,0xff,0xff);
 
 		// sizes for computation
 		int bmwidth = 250;
@@ -1465,7 +1465,7 @@ protected:
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-		tempbitmap.fill(rgb_t(0xff,0x00,0x00,0x00));
+		tempbitmap.fill(rgb_t(0x00,0x00,0x00,0x00));
 
 		// top bar
 		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, BIT(state, 0) ? onpen : offpen);
@@ -1517,8 +1517,8 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff,0xff,0xff,0xff);
-		const rgb_t offpen = rgb_t(0xff,0x20,0x20,0x20);
-		const rgb_t backpen = rgb_t(0xff,0x00,0x00,0x00);
+		const rgb_t offpen = rgb_t(0x20,0xff,0xff,0xff);
+		const rgb_t backpen = rgb_t(0x00,0x00,0x00,0x00);
 
 		// sizes for computation
 		int bmwidth = 250;
@@ -1585,7 +1585,7 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
+		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int bmwidth = 250;
@@ -1595,7 +1595,7 @@ protected:
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-		tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
+		tempbitmap.fill(rgb_t(0x00, 0x00, 0x00, 0x00));
 
 		// top bar
 		draw_segment_horizontal(tempbitmap,
@@ -1697,7 +1697,7 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
+		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int bmwidth = 250;
@@ -1707,7 +1707,7 @@ protected:
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-		tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
+		tempbitmap.fill(rgb_t(0x00, 0x00, 0x00, 0x00));
 
 		// top-left bar
 		draw_segment_horizontal_caps(tempbitmap,
@@ -1819,7 +1819,7 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
+		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int bmwidth = 250;
@@ -1829,7 +1829,7 @@ protected:
 
 		// allocate a temporary bitmap for drawing, adding some extra space for the tail
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight + segwidth);
-		tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
+		tempbitmap.fill(rgb_t(0x00, 0x00, 0x00, 0x00));
 
 		// top bar
 		draw_segment_horizontal(tempbitmap,
@@ -1940,7 +1940,7 @@ protected:
 	virtual void draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
 		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
+		const rgb_t offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int bmwidth = 250;
@@ -1950,7 +1950,7 @@ protected:
 
 		// allocate a temporary bitmap for drawing
 		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight + segwidth);
-		tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
+		tempbitmap.fill(rgb_t(0x00, 0x00, 0x00, 0x00));
 
 		// top-left bar
 		draw_segment_horizontal_caps(tempbitmap,
@@ -2091,7 +2091,7 @@ protected:
 
 private:
 	// internal state
-	int                 m_dots;
+	int m_dots;
 };
 
 
