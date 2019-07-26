@@ -59,6 +59,7 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+#include "machine/keyboard.h"
 #include "machine/z80daisy.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
