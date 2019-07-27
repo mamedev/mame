@@ -23,6 +23,7 @@ public:
 	bionicc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -43,6 +44,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<i8751_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -75,6 +77,9 @@ private:
 	tilemap_t   *m_bg_tilemap;
 	tilemap_t   *m_fg_tilemap;
 	uint16_t    m_scroll[4];
+
+	// audio
+	void audiocpu_nmi_w(u8 data);
 
 	// protection mcu
 	u8 m_audiocpu_to_mcu; // ls374 at 4a

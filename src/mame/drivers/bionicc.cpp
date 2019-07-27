@@ -145,6 +145,17 @@ void bionicc_state::dmaon_w(u16 data)
 }
 
 
+//**************************************************************************
+//  AUDIO
+//**************************************************************************
+
+void bionicc_state::audiocpu_nmi_w(u8 data)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+
 /********************************************************************
 
   Interrupt
@@ -182,7 +193,7 @@ void bionicc_state::main_map(address_map &map)
 	map(0xe0d00, 0xe3fff).ram();              /* RAM? */
 	map(0xe4000, 0xe4001).mirror(0x3ffc).portr("INPUTS");
 	map(0xe4000, 0xe4001).mirror(0x3ffc).w(FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
-	map(0xe4002, 0xe4003).mirror(0x3ffc).portr("DSW").nopw();
+	map(0xe4002, 0xe4003).mirror(0x3ffc).portr("DSW").w(FUNC(bionicc_state::audiocpu_nmi_w));
 	map(0xe8010, 0xe8017).w(FUNC(bionicc_state::scroll_w));
 	map(0xe8018, 0xe8019).nopw(); // vblank irq ack?
 	map(0xe801a, 0xe801b).w(FUNC(bionicc_state::dmaon_w));
@@ -352,21 +363,16 @@ void bionicc_state::machine_reset()
 void bionicc_state::bionicc(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000) / 2); /* 12 MHz - verified in schematics */
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2); /* 12 MHz - verified in schematics */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bionicc_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(bionicc_state::scanline), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4));   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
+	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	audiocpu.set_addrmap(AS_PROGRAM, &bionicc_state::sound_map);
-	/* FIXME: interrupt timing
-	 * schematics indicate that nmi_line is set on  M680000 access with AB1=1
-	 * and IOCS=0 (active low), see pages A-1/10, A-4/10 in schematics
-	 */
-	audiocpu.set_periodic_int(FUNC(bionicc_state::nmi_line_pulse), attotime::from_hz(4*60));
 
 	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
-	I8751(config, m_mcu, XTAL(24'000'000) / 4);
+	I8751(config, m_mcu, 24_MHz_XTAL / 4);
 	m_mcu->set_addrmap(AS_IO, &bionicc_state::mcu_io);
 	m_mcu->port_in_cb<1>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
@@ -375,7 +381,7 @@ void bionicc_state::bionicc(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/* FIXME: should be 257 visible horizontal pixels, first visible pixel should be repeated, back porch/front porch should be separated */
-	screen.set_raw(XTAL(24'000'000) / 4, 386, 0, 256, 260, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 4, 386, 0, 256, 260, 16, 240);
 	screen.set_screen_update(FUNC(bionicc_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -392,7 +398,7 @@ void bionicc_state::bionicc(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
+	YM2151(config, "ymsnd", 14.318181_MHz_XTAL / 4).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
 }
 
 
