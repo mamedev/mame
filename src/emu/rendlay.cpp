@@ -2971,22 +2971,11 @@ layout_view::layout_view(
 	add_items(layers, local, viewnode, elemmap, groupmap, ROT0, identity_transform, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true, false, true);
 
 	// deal with legacy element groupings
-	bool legacy(true);
-	for (auto it = layers.screens.begin(); (layers.screens.end() != it) && legacy; ++it)
-	{
-		if (!it->screen())
-			legacy = false;
-	}
 	if (!layers.overlays.empty() || (layers.backdrops.size() <= 1))
 	{
-		// screens (none) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
+		// screens (-1) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 		for (item &backdrop : layers.backdrops)
 			backdrop.set_blend_mode(BLENDMODE_ADD);
-		if (legacy)
-		{
-			for (item &screen : layers.screens)
-				screen.set_blend_mode(BLENDMODE_NONE);
-		}
 		m_items.splice(m_items.end(), layers.screens);
 		m_items.splice(m_items.end(), layers.overlays);
 		m_items.splice(m_items.end(), layers.backdrops);
@@ -2998,6 +2987,11 @@ layout_view::layout_view(
 	{
 		// multiple backdrop pieces and no overlays (Golly! Ghost! mode):
 		// backdrop (alpha) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
+		for (item &screen : layers.screens)
+		{
+			if (screen.blend_mode() == -1)
+				screen.set_blend_mode(BLENDMODE_ADD);
+		}
 		m_items.splice(m_items.end(), layers.backdrops);
 		m_items.splice(m_items.end(), layers.screens);
 		m_items.splice(m_items.end(), layers.bezels);
@@ -3497,7 +3491,7 @@ int layout_view::item::get_blend_mode(environment &env, util::xml::data_node con
 
 	// fall back to implicit blend mode based on element type
 	if (!strcmp(itemnode.get_name(), "screen"))
-		return BLENDMODE_ADD;
+		return -1; // magic number recognised by render.cpp to allow per-element blend mode
 	else if (!strcmp(itemnode.get_name(), "overlay"))
 		return BLENDMODE_RGB_MULTIPLY;
 	else
