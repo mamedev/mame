@@ -240,7 +240,7 @@ void sconst_state::sconst(machine_config &config)
 
 ROM_START( supercon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("novag_8441", 0x0000, 0x8000, CRC(b853cf6e) SHA1(1a759072a5023b92c07f1fac01b7a21f7b5b45d0) ) // label obscured by Q.C. sticker
+	ROM_LOAD("novag_8443", 0x0000, 0x8000, CRC(b853cf6e) SHA1(1a759072a5023b92c07f1fac01b7a21f7b5b45d0) )
 	ROM_LOAD("novag_8442", 0x8000, 0x8000, CRC(c8f82331) SHA1(f7fd039f9a3344db9749931490ded9e9e309cfbe) )
 ROM_END
 

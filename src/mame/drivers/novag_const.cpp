@@ -12,8 +12,8 @@ Hardware notes:
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 
 TODO:
-- add 3.6MHz version, roms are the same, or label 845x? XTAL is probably a 3.57MHz,
-  but how is IRQ/beeper freq derived from it?
+- add 3.6MHz version: 7.2MHz XTAL, 65SC02 CPU, 1 maskrom(NOVAG-831A 6133-8316),
+  maybe 32KB? 1 RAM chip(TC5516AP) instead of silly daughterboard
 
 ******************************************************************************/
 
