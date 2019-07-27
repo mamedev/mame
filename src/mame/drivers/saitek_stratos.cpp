@@ -526,7 +526,7 @@ void stratos_state::tking(machine_config &config)
 
 void stratos_state::tking2(machine_config &config)
 {
-	stratos(config);
+	tking(config);
 	m_maincpu->set_periodic_int(FUNC(stratos_state::irq0_line_hold), attotime::from_hz(100));
 
 	// seems much more responsive (not just because of higher irq rate)
