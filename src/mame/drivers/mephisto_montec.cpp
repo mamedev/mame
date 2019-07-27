@@ -13,6 +13,11 @@
     smondialb notes:
     - holding CL+INFO+BOOK on boot load the test mode
 
+    TODO:
+    - split driver into several files?
+    - verify mondial beeper frequency
+    - why are megaiv/smondial2 beeps noisy?
+
 **************************************************************************************************/
 
 
@@ -21,6 +26,7 @@
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "machine/timer.h"
+#include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
@@ -44,6 +50,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
 		, m_dac(*this, "dac")
+		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
 		, m_low_leds(*this, "led%u", 0U)
@@ -93,7 +100,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	optional_device<dac_bit_interface> m_dac;
+	optional_device<beep_device> m_beeper;
 	optional_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 	output_finder<16> m_low_leds, m_high_leds;
@@ -398,7 +406,7 @@ WRITE8_MEMBER(mephisto_montec_state::mondial_input_mux_w)
 	}
 
 	m_input_mux = data;
-	m_dac->write(BIT(data, 7));
+	m_beeper->set_state(BIT(data, 7));
 	m_maincpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
 }
 
@@ -564,6 +572,10 @@ void mephisto_montec_state::mondial(machine_config &config)
 	mondial2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::mondial_mem);
 	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::irq0_line_assert), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
+
+	config.device_remove("dac");
+	config.device_remove("vref");
+	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 void mephisto_montec_state::smondial(machine_config &config)
@@ -635,12 +647,12 @@ ROM_START(mondial2)
 ROM_END
 
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                      FLAGS */
-CONS( 1985, mondial,   0,      0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondial,  0,      0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver A)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, smondialb, smondial, 0,    megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver B)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, montec,    0,      0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mondial2,  0,      0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, smondial2, 0,      0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, megaiv,    0,      0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, monteciv,  montec, 0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                      FLAGS */
+CONS( 1985, mondial,   0,        0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondial,  0,        0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver A)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondialb, smondial, 0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver B)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, montec,    0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mondial2,  0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, smondial2, 0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, megaiv,    0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, monteciv,  montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

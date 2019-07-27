@@ -8,6 +8,7 @@ The chess engine in Mephisto Risc is also compatible with Tasc's The ChessMachin
 
 TODO:
 - Mephisto Risc maincpu is more likely 5MHz, but LCD doesn't like it
+- split driver into several files? mrisc for example is completely different hw
 
 **************************************************************************************************/
 
