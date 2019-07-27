@@ -5,13 +5,10 @@
 Novag Super Constellation Chess Computer (model 844)
 
 Hardware notes:
-- UMC UM6502C @ 4 MHz (8MHz XTAL), 512Hz? IRQ(source unknown?)
+- UMC UM6502C @ 4 MHz (8MHz XTAL)
 - 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 - external ports for clock and printer, not emulated here
-
-TODO:
-- verify IRQ and beeper frequency
 
 ******************************************************************************/
 
@@ -19,6 +16,7 @@ TODO:
 #include "cpu/m6502/m6502.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
 #include "speaker.h"
@@ -29,14 +27,15 @@ TODO:
 
 namespace {
 
-class scon_state : public driver_device
+class sconst_state : public driver_device
 {
 public:
-	scon_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sconst_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_display(*this, "display"),
+		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
+		m_display(*this, "display"),
 		m_beeper(*this, "beeper"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -50,13 +49,18 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<pwm_display_device> m_display;
+	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_display;
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
+
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -69,7 +73,7 @@ private:
 	u8 m_led_select;
 };
 
-void scon_state::machine_start()
+void sconst_state::machine_start()
 {
 	// zerofill
 	m_inp_mux = 0;
@@ -88,19 +92,19 @@ void scon_state::machine_start()
 
 // TTL
 
-void scon_state::update_display()
+void sconst_state::update_display()
 {
 	m_display->matrix(m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(scon_state::mux_w)
+WRITE8_MEMBER(sconst_state::mux_w)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(scon_state::control_w)
+WRITE8_MEMBER(sconst_state::control_w)
 {
 	// d0-d3: ?
 	// d4-d6: select led row
@@ -111,7 +115,7 @@ WRITE8_MEMBER(scon_state::control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(scon_state::input1_r)
+READ8_MEMBER(sconst_state::input1_r)
 {
 	u8 data = 0;
 
@@ -123,7 +127,7 @@ READ8_MEMBER(scon_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(scon_state::input2_r)
+READ8_MEMBER(sconst_state::input2_r)
 {
 	u8 data = 0;
 
@@ -142,13 +146,13 @@ READ8_MEMBER(scon_state::input2_r)
     Address Maps
 ******************************************************************************/
 
-void scon_state::main_map(address_map &map)
+void sconst_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x1c00, 0x1c00).nopw(); // printer/clock?
 	map(0x1d00, 0x1d00).nopw(); // printer/clock?
-	map(0x1e00, 0x1e00).rw(FUNC(scon_state::input2_r), FUNC(scon_state::mux_w));
-	map(0x1f00, 0x1f00).rw(FUNC(scon_state::input1_r), FUNC(scon_state::control_w));
+	map(0x1e00, 0x1e00).rw(FUNC(sconst_state::input2_r), FUNC(sconst_state::mux_w));
+	map(0x1f00, 0x1f00).rw(FUNC(sconst_state::input1_r), FUNC(sconst_state::control_w));
 	map(0x2000, 0xffff).rom();
 }
 
@@ -198,12 +202,16 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void scon_state::scon(machine_config &config)
+void sconst_state::scon(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 8_MHz_XTAL/2); // UM6502C
-	m_maincpu->set_addrmap(AS_PROGRAM, &scon_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(scon_state::irq0_line_hold), attotime::from_hz(512)); // guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &sconst_state::main_map);
+
+	const attotime irq_period = attotime::from_hz(8_MHz_XTAL/4 / 0x1000); // through 4020 IC, ~488Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(sconst_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1020)); // active for 10.2us
+	TIMER(config, "irq_off").configure_periodic(FUNC(sconst_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -217,7 +225,7 @@ void scon_state::scon(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1024); // guessed
+	BEEP(config, m_beeper, 8_MHz_XTAL/4 / 0x800); // ~976Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -242,4 +250,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1984, supercon, 0,      0, scon,    scon,  scon_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, supercon, 0,      0, scon,    scon,  sconst_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

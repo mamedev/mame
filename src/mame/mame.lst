@@ -31029,7 +31029,7 @@ npresto                         //
 @source:novag_savant.cpp
 savant                          //
 
-@source:novag_scon.cpp
+@source:novag_sconst.cpp
 supercon                        //
 
 @source:novag_sexpert.cpp
