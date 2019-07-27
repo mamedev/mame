@@ -4616,7 +4616,7 @@
 	</software>
 
 	<software name="saadland">
-		<description>Adventureland (Version 2.0/416)</description>
+		<description>Scott Adams Graphic Adventure 1: Adventureland (Version 2.0/416)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-23"/>
@@ -4704,7 +4704,7 @@
 	</software>
 
 	<software name="satcount">
-		<description>The Count (Version 2.1/115)</description>
+		<description>Scott Adams Graphic Adventure 5: The Count (Version 2.1/115)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-25"/>
@@ -4726,7 +4726,7 @@
 	</software>
 
 	<software name="sastodys">
-		<description>Strange Odyssey (Version 2.1/119)</description>
+		<description>Scott Adams Graphic Adventure 6: Strange Odyssey (Version 2.1/119)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-26"/>
