@@ -44,7 +44,6 @@ TODO:
 - emulate LCD at lower level, probably an MCU with embedded LCDC
 - LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
   but tking2 won't work if it's done that way, and corona is different too
-- tking different internal artwork
 - irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
   there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports)
 - tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
@@ -67,6 +66,7 @@ TODO:
 
 // internal artwork
 #include "saitek_stratos.lh" // clickable
+#include "saitek_tking.lh" // clickable
 
 
 class stratos_state : public saitek_stratos_state
@@ -86,6 +86,7 @@ public:
 
 	// machine drivers
 	void stratos(machine_config &config);
+	void tking(machine_config &config);
 	void tking2(machine_config &config);
 
 protected:
@@ -517,6 +518,12 @@ void stratos_state::stratos(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }
 
+void stratos_state::tking(machine_config &config)
+{
+	stratos(config);
+	config.set_default_layout(layout_saitek_tking);
+}
+
 void stratos_state::tking2(machine_config &config)
 {
 	stratos(config);
@@ -574,5 +581,5 @@ CONS( 1987, stratos,  0,       0, stratos, stratos, stratos_state, empty_init, "
 CONS( 1987, stratosa, stratos, 0, stratos, stratos, stratos_state, empty_init, "SciSys", "Kasparov Stratos (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1990, tking,    0,       0, tking2,  tking2,  stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK ) // aka Turbo King II
-CONS( 1988, tkinga,   tking,   0, stratos, stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, tkingb,   tking,   0, stratos, stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, tkinga,   tking,   0, tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, tkingb,   tking,   0, tking,   stratos, stratos_state, empty_init, "Saitek", "Kasparov Turbo King (ver. B, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
