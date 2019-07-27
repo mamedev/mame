@@ -500,7 +500,7 @@ void at_state::ibm5170(machine_config &config)
 	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("1024K").set_extra_options("1664K,2M,4M,8M,15M");
+	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,1024K,2M,4M,8M,15M");
 }
 
 void at_state::ibm5170a(machine_config &config)
