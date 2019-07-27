@@ -10,7 +10,6 @@
 
     TODO:
 
-    - cassette
     - FDX floppy
     - HDX hard disk
     - HRX high resolution graphics
@@ -260,9 +259,14 @@ static const z80_daisy_config rs128_daisy_chain[] =
 
 TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
 {
-	int data = ((m_cassette)->input() > +0.0) ? 0 : 1;
+	bool cass_ws = (m_cassette->input() > +0.04) ? 1 : 0;
 
-	m_z80ctc->trg3(data);
+	if (cass_ws != m_cassold)
+	{
+		m_cassold = cass_ws;
+		m_z80ctc->trg3(1);
+		m_z80ctc->trg3(0);   // this causes interrupt
+	}
 }
 
 /*-------------------------------------------------

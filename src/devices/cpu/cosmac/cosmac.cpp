@@ -1215,8 +1215,6 @@ void cosmac_device::long_branch(int taken)
 		// S1#1, S1#2
 		R[P]++;
 	}
-
-	m_icount -= CLOCKS_EXECUTE;
 }
 
 void cosmac_device::lbr()   { long_branch(1); }

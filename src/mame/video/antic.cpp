@@ -12,13 +12,8 @@
 #include "antic.h"
 #include "screen.h"
 
-#ifdef MAME_DEBUG
-#define VERBOSE 1
-#else
-#define VERBOSE 0
-#endif
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 #define CYCLES_PER_LINE 114     /* total number of cpu cycles per scanline (incl. hblank) */
 #define CYCLES_REFRESH  9       /* number of cycles lost for ANTICs RAM refresh using DMA */
@@ -373,13 +368,13 @@ void antic_device::device_start()
 	m_uc_g2       = &m_used_colors[19 * 256];
 	m_uc_g3       = &m_used_colors[20 * 256];
 
-	LOG(("atari cclk_init\n"));
+	LOG("atari cclk_init\n");
 	cclk_init();
 
 	for (auto & elem : m_prio_table)
 		elem = make_unique_clear<uint8_t[]>(8*256);
 
-	LOG(("atari prio_init\n"));
+	LOG("atari prio_init\n");
 	prio_init();
 
 	for (int i = 0; i < screen().height(); i++)
@@ -1212,7 +1207,7 @@ WRITE8_MEMBER ( antic_device::write )
 	case  0:
 		if( data == m_w.dmactl )
 			break;
-		LOG(("ANTIC 00 write DMACTL $%02X\n", data));
+		LOG("ANTIC 00 write DMACTL $%02X\n", data);
 		m_w.dmactl = data;
 		switch (data & 3)
 		{
@@ -1225,20 +1220,20 @@ WRITE8_MEMBER ( antic_device::write )
 	case  1:
 		if( data == m_w.chactl )
 			break;
-		LOG(("ANTIC 01 write CHACTL $%02X\n", data));
+		LOG("ANTIC 01 write CHACTL $%02X\n", data);
 		m_w.chactl = data;
 		m_chand = (data & 1) ? 0x00 : 0xff;
 		m_chxor = (data & 2) ? 0xff : 0x00;
 		break;
 	case  2:
-		LOG(("ANTIC 02 write DLISTL $%02X\n", data));
+		LOG("ANTIC 02 write DLISTL $%02X\n", data);
 		m_w.dlistl = data;
 		temp = (m_w.dlisth << 8) + m_w.dlistl;
 		m_dpage = temp & DPAGE;
 		m_doffs = temp & DOFFS;
 		break;
 	case  3:
-		LOG(("ANTIC 03 write DLISTH $%02X\n", data));
+		LOG("ANTIC 03 write DLISTH $%02X\n", data);
 		m_w.dlisth = data;
 		temp = (m_w.dlisth << 8) + m_w.dlistl;
 		m_dpage = temp & DPAGE;
@@ -1247,25 +1242,25 @@ WRITE8_MEMBER ( antic_device::write )
 	case  4:
 		if( data == m_w.hscrol )
 			break;
-		LOG(("ANTIC 04 write HSCROL $%02X\n", data));
+		LOG("ANTIC 04 write HSCROL $%02X\n", data);
 		m_w.hscrol = data & 15;
 		break;
 	case  5:
 		if( data == m_w.vscrol )
 			break;
-		LOG(("ANTIC 05 write VSCROL $%02X\n", data));
+		LOG("ANTIC 05 write VSCROL $%02X\n", data);
 		m_w.vscrol = data & 15;
 		break;
 	case  6:
 		if( data == m_w.pmbasl )
 			break;
-		LOG(("ANTIC 06 write PMBASL $%02X\n", data));
+		LOG("ANTIC 06 write PMBASL $%02X\n", data);
 		/* m_w.pmbasl = data; */
 		break;
 	case  7:
 		if( data == m_w.pmbash )
 			break;
-		LOG(("ANTIC 07 write PMBASH $%02X\n", data));
+		LOG("ANTIC 07 write PMBASH $%02X\n", data);
 		m_w.pmbash = data;
 		m_pmbase_s = (data & 0xfc) << 8;
 		m_pmbase_d = (data & 0xf8) << 8;
@@ -1273,46 +1268,46 @@ WRITE8_MEMBER ( antic_device::write )
 	case  8:
 		if( data == m_w.chbasl )
 			break;
-		LOG(("ANTIC 08 write CHBASL $%02X\n", data));
+		LOG("ANTIC 08 write CHBASL $%02X\n", data);
 		/* m_w.chbasl = data; */
 		break;
 	case  9:
 		if( data == m_w.chbash )
 			break;
-		LOG(("ANTIC 09 write CHBASH $%02X\n", data));
+		LOG("ANTIC 09 write CHBASH $%02X\n", data);
 		m_w.chbash = data;
 		break;
 	case 10: /* WSYNC write */
-		LOG(("ANTIC 0A write WSYNC  $%02X\n", data));
+		LOG("ANTIC 0A write WSYNC  $%02X\n", data);
 		m_maincpu->spin_until_trigger(TRIGGER_HSYNC);
 		m_w.wsync = 1;
 		break;
 	case 11:
 		if( data == m_w.antic0b )
 			break;
-		LOG(("ANTIC 0B write ?????? $%02X\n", data));
+		LOG("ANTIC 0B write ?????? $%02X\n", data);
 		m_w.antic0b = data;
 		break;
 	case 12:
 		if( data == m_w.antic0c )
 			break;
-		LOG(("ANTIC 0C write ?????? $%02X\n", data));
+		LOG("ANTIC 0C write ?????? $%02X\n", data);
 		m_w.antic0c = data;
 		break;
 	case 13:
 		if( data == m_w.antic0d )
 			break;
-		LOG(("ANTIC 0D write ?????? $%02X\n", data));
+		LOG("ANTIC 0D write ?????? $%02X\n", data);
 		m_w.antic0d = data;
 		break;
 	case 14:
 		if( data == m_w.nmien )
 			break;
-		LOG(("ANTIC 0E write NMIEN  $%02X\n", data));
+		LOG("ANTIC 0E write NMIEN  $%02X\n", data);
 		m_w.nmien  = data;
 		break;
 	case 15:
-		LOG(("ANTIC 0F write NMIRES $%02X\n", data));
+		LOG("ANTIC 0F write NMIRES $%02X\n", data);
 		m_r.nmist = 0x1f;
 		m_w.nmires = data;
 		break;
@@ -1970,13 +1965,13 @@ TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
 {
 	if( m_w.nmien & DLI_NMI )
 	{
-		LOG(("           @cycle #%3d issue DLI\n", cycle()));
+		LOG("           @cycle #%3d issue DLI\n", cycle());
 		m_r.nmist |= DLI_NMI;
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 	{
-		LOG(("           @cycle #%3d DLI not enabled\n", cycle()));
+		LOG("           @cycle #%3d DLI not enabled\n", cycle());
 	}
 }
 
@@ -1988,16 +1983,16 @@ TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
  *****************************************************************************/
 TIMER_CALLBACK_MEMBER( antic_device::line_done )
 {
-	LOG(("           @cycle #%3d line_done\n", cycle()));
+	LOG("           @cycle #%3d line_done\n", cycle());
 	if( m_w.wsync )
 	{
-		LOG(("           @cycle #%3d release WSYNC\n", cycle()));
+		LOG("           @cycle #%3d release WSYNC\n", cycle());
 		/* release the CPU if it was actually waiting for HSYNC */
 		machine().scheduler().trigger(TRIGGER_HSYNC);
 		/* and turn off the 'wait for hsync' flag */
 		m_w.wsync = 0;
 	}
-	LOG(("           @cycle #%3d release CPU\n", cycle()));
+	LOG("           @cycle #%3d release CPU\n", cycle());
 	/* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
 	machine().scheduler().trigger(TRIGGER_STEAL);
 
@@ -2016,7 +2011,7 @@ TIMER_CALLBACK_MEMBER( antic_device::line_done )
  *****************************************************************************/
 TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
 {
-	LOG(("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles));
+	LOG("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles);
 	timer_set(ANTIC_TIME_FROM_CYCLES(m_steal_cycles), TIMER_LINE_DONE);
 	m_steal_cycles = 0;
 	m_maincpu->spin_until_trigger(TRIGGER_STEAL);
@@ -2035,7 +2030,7 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (m_cmd & 0x0f), m_modelines));
+	LOG("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (m_cmd & 0x0f), m_modelines);
 
 	render(space, m_render1, m_render2, m_render3);
 
@@ -2087,7 +2082,7 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 		m_gtia->render((uint8_t *)m_pmbits + PMOFFSET, (uint8_t *)m_cclock + PMOFFSET - m_hscrol_old, m_prio_table[m_gtia->get_w_prior() & 0x3f].get(), (uint8_t *)&m_pmbits);
 
 	m_steal_cycles += CYCLES_REFRESH;
-	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles));
+	LOG("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles);
 	timer_set(ANTIC_TIME_FROM_CYCLES(CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles), TIMER_CYCLE_STEAL);
 }
 
@@ -2110,7 +2105,7 @@ void antic_device::LMS(int new_cmd)
 		m_doffs = (m_doffs + 1) & DOFFS;
 		m_vpage = addr & VPAGE;
 		m_voffs = addr & VOFFS;
-		LOG(("           LMS $%04x\n", addr));
+		LOG("           LMS $%04x\n", addr);
 		/* steal two more clock cycles from the cpu */
 		m_steal_cycles += 2;
 	}
@@ -2129,7 +2124,7 @@ void antic_device::LMS(int new_cmd)
 void antic_device::scanline_dma(int param)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	LOG(("           @cycle #%3d DMA fetch\n", cycle()));
+	LOG("           @cycle #%3d DMA fetch\n", cycle());
 	if (m_scanline == VBL_END)
 		m_r.nmist &= ~VBL_NMI;
 	if( m_w.dmactl & DMA_ANTIC )
@@ -2147,7 +2142,7 @@ void antic_device::scanline_dma(int param)
 				m_doffs = (m_doffs + 1) & DOFFS;
 				/* steal at one clock cycle from the CPU for fetching the command */
 				m_steal_cycles += 1;
-				LOG(("           ANTIC CMD $%02x\n", new_cmd));
+				LOG("           ANTIC CMD $%02x\n", new_cmd);
 				/* command 1 .. 15 ? */
 				if (new_cmd & ANTIC_MODE)
 				{
@@ -2215,7 +2210,7 @@ void antic_device::scanline_dma(int param)
 							m_modelines = VBL_START + 1 - m_scanline;
 							if( m_modelines < 0 )
 								m_modelines = screen().height() - m_scanline;
-							LOG(("           JVB $%04x\n", m_dpage|m_doffs));
+							LOG("           JVB $%04x\n", m_dpage|m_doffs);
 						}
 						else
 						{
@@ -2226,7 +2221,7 @@ void antic_device::scanline_dma(int param)
 							m_doffs = addr & DOFFS;
 							/* produce a single empty scanline */
 							m_modelines = 1;
-							LOG(("           JMP $%04x\n", m_dpage|m_doffs));
+							LOG("           JMP $%04x\n", m_dpage|m_doffs);
 						}
 						break;
 					case 0x02:
@@ -2319,7 +2314,7 @@ void antic_device::scanline_dma(int param)
 		}
 		else
 		{
-			LOG(("           out of visible range\n"));
+			LOG("           out of visible range\n");
 			m_cmd = 0x00;
 			m_render1 = 0;
 			m_render2 = 0;
@@ -2328,7 +2323,7 @@ void antic_device::scanline_dma(int param)
 	}
 	else
 	{
-		LOG(("           DMA is off\n"));
+		LOG("           DMA is off\n");
 		m_cmd = 0x00;
 		m_render1 = 0;
 		m_render2 = 0;
@@ -2353,7 +2348,7 @@ void antic_device::scanline_dma(int param)
 
 void antic_device::generic_interrupt(int button_count)
 {
-	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", m_scanline, cycle()));
+	LOG("ANTIC #%3d @cycle #%d scanline interrupt\n", m_scanline, cycle());
 
 	if( m_scanline < VBL_START )
 	{
@@ -2375,7 +2370,7 @@ void antic_device::generic_interrupt(int button_count)
 		/* if the CPU want's to be interrupted at vertical blank... */
 		if( m_w.nmien & VBL_NMI )
 		{
-			LOG(("           cause VBL NMI\n"));
+			LOG("           cause VBL NMI\n");
 			/* set the VBL NMI status bit */
 			m_r.nmist |= VBL_NMI;
 			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);

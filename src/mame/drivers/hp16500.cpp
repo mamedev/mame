@@ -49,6 +49,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/ds1386.h"
 #include "machine/mc2661.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
@@ -314,7 +315,8 @@ void hp16500_state::hp16500_map(address_map &map)
 	map(0x00203000, 0x00203003).w(FUNC(hp16500_state::vbl_ack_w));
 	map(0x00209800, 0x00209803).r(FUNC(hp16500_state::vbl_state_r));
 
-	map(0x0020b800, 0x0020b8ff).ram(); // system ram test is really strange.
+	map(0x0020b800, 0x0020b83f).rw("rtc", FUNC(ds1286_device::data_r), FUNC(ds1286_device::data_w));
+	map(0x0020b840, 0x0020b843).noprw(); // system ram test is really strange.
 
 	map(0x0020f800, 0x0020f80f).rw(m_mlc, FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write));
 	map(0x00600000, 0x0061ffff).w(FUNC(hp16500_state::vram_w));
@@ -483,7 +485,7 @@ void hp16500_state::hp16500a(machine_config &config)
 void hp16500_state::hp16500b(machine_config &config)
 {
 	/* basic machine hardware */
-	M68EC030(config, m_maincpu, 25'000'000);
+	M68EC030(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -502,6 +504,7 @@ void hp16500_state::hp16500b(machine_config &config)
 	// later with a 16500b specific keyboard implementation
 	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
 
+	DS1286(config, "rtc", 32768);
 	//WD37C65C(config, "fdc", 16_MHz_XTAL);
 
 	SPEAKER(config, "lspeaker").front_left();

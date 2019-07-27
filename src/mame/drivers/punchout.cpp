@@ -146,10 +146,11 @@ void punchout_state::punchout_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc3ff).ram().share("nvram");
 	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfff).ram().w(FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
-	map(0xdff0, 0xdff7).share("spr1_ctrlram");
-	map(0xdff8, 0xdffc).share("spr2_ctrlram");
-	map(0xdffd, 0xdffd).share("palettebank");
+	map(0xd800, 0xdfef).ram().w(FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
+	map(0xdff0, 0xdff7).ram().share("spr1_ctrlram");
+	map(0xdff8, 0xdffc).ram().share("spr2_ctrlram");
+	map(0xdffd, 0xdffd).ram().share("palettebank");
+	map(0xdffe, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().w(FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
 	map(0xe800, 0xefff).ram().w(FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
 	map(0xf000, 0xffff).ram().w(FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");   // also contains scroll RAM
@@ -161,10 +162,11 @@ void punchout_state::armwrest_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc3ff).ram().share("nvram");
 	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfff).ram().w(FUNC(punchout_state::armwrest_fg_videoram_w)).share("armwrest_fgram");
-	map(0xdff0, 0xdff7).share("spr1_ctrlram");
-	map(0xdff8, 0xdffc).share("spr2_ctrlram");
-	map(0xdffd, 0xdffd).share("palettebank");
+	map(0xd800, 0xdfef).ram().w(FUNC(punchout_state::armwrest_fg_videoram_w)).share("armwrest_fgram");
+	map(0xdff0, 0xdff7).ram().share("spr1_ctrlram");
+	map(0xdff8, 0xdffc).ram().share("spr2_ctrlram");
+	map(0xdffd, 0xdffd).ram().share("palettebank");
+	map(0xdffe, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().w(FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
 	map(0xe800, 0xefff).ram().w(FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
 	map(0xf000, 0xf7ff).ram().w(FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");
@@ -571,40 +573,19 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout charlayout_2bpp =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(1,2), 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout charlayout_3bpp =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
 
 static GFXDECODE_START( gfx_punchout )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_2bpp, 0x000, 0x100/4 )   // bg chars (top monitor only)
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout_2bpp, 0x100, 0x100/4 )   // bg chars (bottom monitor only)
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout_3bpp, 0x000, 0x200/8 )   // big sprite #1 (top and bottom monitor)
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout_2bpp, 0x100, 0x100/4 )   // big sprite #2 (bottom monitor only)
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0x000, 0x100/4 )   // bg chars (top monitor only)
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x2_planar, 0x100, 0x100/4 )   // bg chars (bottom monitor only)
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x3_planar, 0x000, 0x200/8 )   // big sprite #1 (top and bottom monitor)
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x2_planar, 0x100, 0x100/4 )   // big sprite #2 (bottom monitor only)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_armwrest )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_2bpp, 0x000, 0x200/4 )   // bg chars (top and bottom monitor)
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp, 0x100, 0x100/8 )   // fg chars (bottom monitor only)
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout_3bpp, 0x000, 0x200/8 )   // big sprite #1 (top and bottom monitor)
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout_2bpp, 0x100, 0x100/4 )   // big sprite #2 (bottom monitor only)
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0x000, 0x200/4 )   // bg chars (top and bottom monitor)
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x3_planar, 0x100, 0x100/8 )   // fg chars (bottom monitor only)
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x3_planar, 0x000, 0x200/8 )   // big sprite #1 (top and bottom monitor)
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x2_planar, 0x100, 0x100/4 )   // big sprite #2 (bottom monitor only)
 GFXDECODE_END
 
 

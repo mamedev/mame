@@ -755,6 +755,22 @@ struct factory_sector
     uint8_t unused_2[0x420];    // FF filled
     uint8_t random[0xdc0];      // output of RNG {static u32 seed; seed=(seed*0x83d+0x2439)&0x7fff; return (u16)(seed+0xc000);}, where initial seed value is serial_number[7] & 0xf
 };
+
+Besides factory sector, each new Dreamcast have "Flash Partition 2" header in SA6 (@1C000) followed by "CID" record:
+struct cid_record
+{
+    uint16_t record_type;           // 0, can be 0-4
+    struct cid_data
+    {
+        uint8_t date[4];            // BCD YYYY/MM/DD
+        char t_inferior_code[4];    // '0'-filled in all dumps we have
+        char repair_voucher_no[8];  // '0'-filled in all dumps we have
+        uint8_t serial_no[8];
+        uint8_t factory_code;
+        uint8_t order_no[5];
+    } cid[2];
+    uint16_t crc16;
+};
 */
 
 ROM_START(dc)

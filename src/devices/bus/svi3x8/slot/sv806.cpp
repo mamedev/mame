@@ -44,11 +44,11 @@ void sv806_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, "80col", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
 	screen.set_raw((XTAL(12'000'000) / 6) * 8, 864, 0, 640, 317, 0, 192);
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	HD6845(config, m_crtc, XTAL(12'000'000) / 6);
+	HD6845S(config, m_crtc, XTAL(12'000'000) / 6); // HD6845 (variant not verified)
 	m_crtc->set_screen("80col");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);

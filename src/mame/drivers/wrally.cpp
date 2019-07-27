@@ -156,10 +156,7 @@ void wrally_state::wrally_map(address_map &map)
 	map(0x700002, 0x700003).portr("P1_P2");
 	map(0x700004, 0x700005).portr("WHEEL");
 	map(0x700008, 0x700009).portr("SYSTEM");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
+	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 3, data); });
 	map(0x70000d, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status/data register */
 	map(0xfec000, 0xfeffff).ram().share("shareram");                                        /* Work RAM (shared with DS5002FP) */

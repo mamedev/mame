@@ -28,6 +28,7 @@ using util::BIT;
 #include "cpu/arm7/arm7dasm.h"
 #include "cpu/asap/asapdasm.h"
 #include "cpu/avr8/avr8dasm.h"
+#include "cpu/bcp/bcpdasm.h"
 #include "cpu/capricorn/capricorn_dasm.h"
 #include "cpu/ccpu/ccpudasm.h"
 #include "cpu/clipper/clipperd.h"
@@ -110,6 +111,7 @@ using util::BIT;
 #include "cpu/powerpc/ppc_dasm.h"
 #include "cpu/pps4/pps4dasm.h"
 #include "cpu/psx/psxdasm.h"
+#include "cpu/rii/riidasm.h"
 #include "cpu/rsp/rsp_dasm.h"
 #include "cpu/s2650/2650dasm.h"
 #include "cpu/saturn/saturnds.h"
@@ -338,6 +340,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestlin",       be, -3, []() -> util::disasm_interface * { return new cquestlin_disassembler; } },
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
+	{ "dp8344",          le, -1, []() -> util::disasm_interface * { return new dp8344_disassembler; } },
 	{ "ds5002fp",        le,  0, []() -> util::disasm_interface * { return new ds5002fp_disassembler; } },
 	{ "dsp16",           le, -1, []() -> util::disasm_interface * { return new dsp16_disassembler; } },
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
@@ -434,6 +437,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "mips1be",         be,  0, []() -> util::disasm_interface * { return new mips1_disassembler; } },
 	{ "mips1le",         le,  0, []() -> util::disasm_interface * { return new mips1_disassembler; } },
+	{ "rii",             le, -1, []() -> util::disasm_interface * { return new riscii_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "s2650",           le,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },
@@ -489,8 +493,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "tx0_64kw",        be, -2, []() -> util::disasm_interface * { return new tx0_64kw_disassembler; } },
 	{ "tx0_8kw",         be, -2, []() -> util::disasm_interface * { return new tx0_8kw_disassembler; } },
 	{ "ucom4",           le,  0, []() -> util::disasm_interface * { return new ucom4_disassembler; } },
-	{ "unsp",            be,  0, []() -> util::disasm_interface * { return new unsp_disassembler; } },
-	{ "upd7725",         be,  0, []() -> util::disasm_interface * { return new necdsp_disassembler; } },
+	{ "unsp",            be, -1, []() -> util::disasm_interface * { return new unsp_disassembler; } },
+	{ "upd7725",         be, -2, []() -> util::disasm_interface * { return new necdsp_disassembler; } },
 	{ "upd7801",         le,  0, []() -> util::disasm_interface * { return new upd7801_disassembler; } },
 	{ "upd7807",         le,  0, []() -> util::disasm_interface * { return new upd7807_disassembler; } },
 	{ "upd7810",         le,  0, []() -> util::disasm_interface * { return new upd7810_disassembler; } },
@@ -975,7 +979,12 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 		// skip bytes
 		else if(pending_skip) {
-			if(sscanf(curarg, "%d", &opts->skip) != 1)
+			int result;
+			if(curarg[0] == '0' && curarg[1] == 'x')
+				result = sscanf(&curarg[2], "%x", &opts->skip);
+			else
+				result = sscanf(curarg, "%d", &opts->skip);
+			if(result != 1)
 				goto usage;
 			pending_skip = false;
 		}

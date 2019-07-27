@@ -22,11 +22,11 @@
 ****************************************************************************
 
     Known bugs:
-        * still seems to be some glitchiness in the games in general
+        * pdriftl's comms doesn't work
 
 ****************************************************************************
 
-Network Board (used for Power Drift)
+Network Board (used for Power Drift: Link Version)
 -------------
 
 Board: 834-6740
@@ -1330,7 +1330,7 @@ void segaybd_state::yboard(machine_config &config)
 	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
-	PALETTE(config, m_palette).set_entries(8192*3);
+	PALETTE(config, m_palette).set_entries(8192*2);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2790,7 +2790,7 @@ GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pd
 GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_pdrift)
 
 GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )

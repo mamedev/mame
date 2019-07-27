@@ -85,8 +85,8 @@ void hotstuff_state::hotstuff_map(address_map &map)
 
 	map(0x400000, 0x40ffff).ram();
 
-	map(0x600000, 0x600003).rw("scc1", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
-	map(0x620000, 0x620003).rw("scc2", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w));
+	map(0x600000, 0x600003).rw("scc1", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+	map(0x620000, 0x620003).rw("scc2", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 	map(0x680000, 0x680001).lrw8("rtc_rw",
 								 [this](offs_t offset) {
 									 return m_rtc->read(offset^1);

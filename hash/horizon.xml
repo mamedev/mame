@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="c145_54.nsi" size="358400" crc="b074cc41" sha1="5eed044ca7b09487bba64035046be2ccc1cc21c8" offset="0" />
+				<rom name="c145_54.nsi" size="358400" crc="b074cc41" sha1="5eed044ca7b09487bba64035046be2ccc1cc21c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="c223_52.nsi" size="179200" crc="30a08e90" sha1="d50a1c8f3074ee101d2f78c1681f415f699aad32" offset="0" />
+				<rom name="c223_52.nsi" size="179200" crc="30a08e90" sha1="d50a1c8f3074ee101d2f78c1681f415f699aad32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="c223_56.nsi" size="179200" crc="8ae20b57" sha1="2061d4f5feb88d714e6986ccf6c9ea2a5ffec291" offset="0" />
+				<rom name="c223_56.nsi" size="179200" crc="8ae20b57" sha1="2061d4f5feb88d714e6986ccf6c9ea2a5ffec291"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="c223a_24.nsi" size="179200" crc="c479a55a" sha1="bed22d2b04b2d2c1bc27a0b37748afea4a6dfaf1" offset="0" />
+				<rom name="c223a_24.nsi" size="179200" crc="c479a55a" sha1="bed22d2b04b2d2c1bc27a0b37748afea4a6dfaf1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,25 +57,25 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="dmf.nsi" size="89600" crc="5eaf5ef9" sha1="87d5de9125d936f5444a3266d8b8f1ca4b7c7e1f" offset="0" />
+				<rom name="dmf.nsi" size="89600" crc="5eaf5ef9" sha1="87d5de9125d936f5444a3266d8b8f1ca4b7c7e1f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="dmfdoc.nsi" size="89600" crc="829fc174" sha1="8c391916828a4a8e9f83804daf9cd083f5e9e730" offset="0" />
+				<rom name="dmfdoc.nsi" size="89600" crc="829fc174" sha1="8c391916828a4a8e9f83804daf9cd083f5e9e730"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="dmfsrc1.nsi" size="89600" crc="2a2cd518" sha1="9fb1089a90d3d1c89ba39bf8defba0febb5e93a2" offset="0" />
+				<rom name="dmfsrc1.nsi" size="89600" crc="2a2cd518" sha1="9fb1089a90d3d1c89ba39bf8defba0febb5e93a2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="dmfsrc2.nsi" size="89600" crc="c128aa3a" sha1="7bc9d959e45b29cf1eb73d8fb1fec9ecb1031833" offset="0" />
+				<rom name="dmfsrc2.nsi" size="89600" crc="c128aa3a" sha1="7bc9d959e45b29cf1eb73d8fb1fec9ecb1031833"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,13 +87,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="forth.nsi" size="89600" crc="ee1bf39f" sha1="8620ddfcdb98596d5cfc1fc171637b48f412b612" offset="0" />
+				<rom name="forth.nsi" size="89600" crc="ee1bf39f" sha1="8620ddfcdb98596d5cfc1fc171637b48f412b612"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="forthsrc.nsi" size="89600" crc="ab4971ce" sha1="565e1b79b0624e3e04caf394aed022fb83836f31" offset="0" />
+				<rom name="forthsrc.nsi" size="89600" crc="ab4971ce" sha1="565e1b79b0624e3e04caf394aed022fb83836f31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="hd221ird.nsi" size="358400" crc="017173d9" sha1="da66374229b1e3dee8156cdc7ed1637ee92c78db" offset="0" />
+				<rom name="hd221ird.nsi" size="358400" crc="017173d9" sha1="da66374229b1e3dee8156cdc7ed1637ee92c78db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="hd221sd.nsi" size="358400" crc="96fbb1b7" sha1="70c3ef926905ecd6d24aa79757168b2c3c6058bd" offset="0" />
+				<rom name="hd221sd.nsi" size="358400" crc="96fbb1b7" sha1="70c3ef926905ecd6d24aa79757168b2c3c6058bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="horhd1b.nsi" size="179200" crc="59d8da92" sha1="4adea8d9d00bb1add69714a0f6dbdd72e58b4de1" offset="0" />
+				<rom name="horhd1b.nsi" size="179200" crc="59d8da92" sha1="4adea8d9d00bb1add69714a0f6dbdd72e58b4de1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="insua211.nsi" size="179200" crc="ca021e0f" sha1="a32da65e25aab5cfce6d8d6642f293415fe78193" offset="0" />
+				<rom name="insua211.nsi" size="179200" crc="ca021e0f" sha1="a32da65e25aab5cfce6d8d6642f293415fe78193"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="mcd96r7.nsi" size="179200" crc="c5954cae" sha1="cb59896c05bd90aa3b9c53962a792f45dfba0ecb" offset="0" />
+				<rom name="mcd96r7.nsi" size="179200" crc="c5954cae" sha1="cb59896c05bd90aa3b9c53962a792f45dfba0ecb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,25 +165,25 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="mcdos.nsi" size="179200" crc="1a445513" sha1="c6368e06135a87c2f31b214ac58c3a7aa6fba86b" offset="0" />
+				<rom name="mcdos.nsi" size="179200" crc="1a445513" sha1="c6368e06135a87c2f31b214ac58c3a7aa6fba86b"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="devel1.nsi" size="179200" crc="ea60f455" sha1="0410346aa3e75dbecdd0d6fdac587db72c432a10" offset="0" />
+				<rom name="devel1.nsi" size="179200" crc="ea60f455" sha1="0410346aa3e75dbecdd0d6fdac587db72c432a10"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="devel2.nsi" size="179200" crc="abe1ecc3" sha1="dfb2fcd2f105a464f993163817ae4e95cbda694f" offset="0" />
+				<rom name="devel2.nsi" size="179200" crc="abe1ecc3" sha1="dfb2fcd2f105a464f993163817ae4e95cbda694f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="proc.nsi" size="179200" crc="5fd0f9c5" sha1="1aea0f990c606270eaca763a8a0eda33586b3343" offset="0" />
+				<rom name="proc.nsi" size="179200" crc="5fd0f9c5" sha1="1aea0f990c606270eaca763a8a0eda33586b3343"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="mcdos70d.nsi" size="179200" crc="111e45f0" sha1="bc7396b3d040fdd94ad5149940d78a2153dda85d" offset="0" />
+				<rom name="mcdos70d.nsi" size="179200" crc="111e45f0" sha1="bc7396b3d040fdd94ad5149940d78a2153dda85d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="n2212_64.nsi" size="358400" crc="91100bc5" sha1="54e625bf17fd3e2067b9e7b2789b1d27974607e8" offset="0" />
+				<rom name="n2212_64.nsi" size="358400" crc="91100bc5" sha1="54e625bf17fd3e2067b9e7b2789b1d27974607e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -219,7 +219,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="n22a_56.nsi" size="358400" crc="01cbd9bd" sha1="7094017c3150b48b3c5c07d08213f14ea91269d6" offset="0" />
+				<rom name="n22a_56.nsi" size="358400" crc="01cbd9bd" sha1="7094017c3150b48b3c5c07d08213f14ea91269d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -231,7 +231,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsdos20s.nsi" size="89600" crc="8ea66be9" sha1="94709b31b6bbb5910e01644df5daf3544a33ef20" offset="0" />
+				<rom name="nsdos20s.nsi" size="89600" crc="8ea66be9" sha1="94709b31b6bbb5910e01644df5daf3544a33ef20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +243,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsdos40s.nsi" size="89600" crc="c270d019" sha1="68ffa944c8d34262f5c757ec65276d527979b801" offset="0" />
+				<rom name="nsdos40s.nsi" size="89600" crc="c270d019" sha1="68ffa944c8d34262f5c757ec65276d527979b801"/>
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="nsdos50d.nsi" size="179200" crc="f5de495e" sha1="16406a46bc445903e310511726ab9922bf8c8641" offset="0" />
+				<rom name="nsdos50d.nsi" size="179200" crc="f5de495e" sha1="16406a46bc445903e310511726ab9922bf8c8641"/>
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +267,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="nsdos51q.nsi" size="179200" crc="98febaa3" sha1="20742efdff1f068ee1ccab2f865e76874c2f4e0d" offset="0" />
+				<rom name="nsdos51q.nsi" size="179200" crc="98febaa3" sha1="20742efdff1f068ee1ccab2f865e76874c2f4e0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -279,7 +279,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsdos51s.nsi" size="89600" crc="e13ed7bd" sha1="cf3f0a7a6956aa113ff7ae76cdcb73b6565b0669" offset="0" />
+				<rom name="nsdos51s.nsi" size="89600" crc="e13ed7bd" sha1="cf3f0a7a6956aa113ff7ae76cdcb73b6565b0669"/>
 			</dataarea>
 		</part>
 	</software>
@@ -291,7 +291,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="nsdos52q.nsi" size="358400" crc="83043049" sha1="4c403213a34053c791315107281b2f81de0b5a25" offset="0" />
+				<rom name="nsdos52q.nsi" size="358400" crc="83043049" sha1="4c403213a34053c791315107281b2f81de0b5a25"/>
 			</dataarea>
 		</part>
 	</software>
@@ -304,28 +304,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Original distribution disk #1"/>
 			<dataarea name="flop" size="179200">
-				<rom name="pasns.nsi" size="179200" crc="edd9ed9b" sha1="1d94ddc411a454946ec5b6501f7c60f283464370" offset="0" />
+				<rom name="pasns.nsi" size="179200" crc="edd9ed9b" sha1="1d94ddc411a454946ec5b6501f7c60f283464370"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Original distribution disk #2"/>
 			<dataarea name="flop" size="179200">
-				<rom name="pasaux.nsi" size="179200" crc="e8b7846d" sha1="3761eac77067438fc0ad8b42a08db0d0b7b4fdb0" offset="0" />
+				<rom name="pasaux.nsi" size="179200" crc="e8b7846d" sha1="3761eac77067438fc0ad8b42a08db0d0b7b4fdb0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="System disk"/>
 			<dataarea name="flop" size="179200">
-				<rom name="passys.nsi" size="179200" crc="fd9011bf" sha1="1fada88d333c912364813bc70e6eb250be1ca32d" offset="0" />
+				<rom name="passys.nsi" size="179200" crc="fd9011bf" sha1="1fada88d333c912364813bc70e6eb250be1ca32d"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="User disk"/>
 			<dataarea name="flop" size="179200">
-				<rom name="pasusr.nsi" size="179200" crc="e730fa8b" sha1="1973b27efa9fe760bec3443c844d99dcc2cad662" offset="0" />
+				<rom name="pasusr.nsi" size="179200" crc="e730fa8b" sha1="1973b27efa9fe760bec3443c844d99dcc2cad662"/>
 			</dataarea>
 		</part>
 	</software>
@@ -339,28 +339,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130sys.nsi" size="358400" crc="ce949891" sha1="5e710b183f7dba0c3cf1a5e45d06ace3dd0e21c9" offset="0" />
+				<rom name="td130sys.nsi" size="358400" crc="ce949891" sha1="5e710b183f7dba0c3cf1a5e45d06ace3dd0e21c9"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Config Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130cfg.nsi" size="358400" crc="ef407df5" sha1="123f46191f1d94cb5b4fc753318cf471033bdcce" offset="0" />
+				<rom name="td130cfg.nsi" size="358400" crc="ef407df5" sha1="123f46191f1d94cb5b4fc753318cf471033bdcce"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Help Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130hlp.nsi" size="358400" crc="35efe9f5" sha1="2a32a1dfc9a106abbb0c918b50766287620274a8" offset="0" />
+				<rom name="td130hlp.nsi" size="358400" crc="35efe9f5" sha1="2a32a1dfc9a106abbb0c918b50766287620274a8"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="SYS/CON Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130sc.nsi" size="358400" crc="19589349" sha1="a0e931ad62f7275cc5b3feb537476ad9dcaa9b62" offset="0" />
+				<rom name="td130sc.nsi" size="358400" crc="19589349" sha1="a0e931ad62f7275cc5b3feb537476ad9dcaa9b62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -374,28 +374,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130sys_.nsi" size="358400" crc="860a1aa4" sha1="c2cb833f95ed86d42faa67e8871c85d87993ae67" offset="0" />
+				<rom name="td130sys_.nsi" size="358400" crc="860a1aa4" sha1="c2cb833f95ed86d42faa67e8871c85d87993ae67"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Config Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130cfga_.nsi" size="358400" crc="f60b5980" sha1="b5187f8631dcd2e5e65497b0d0ec27d4213183f6" offset="0" />
+				<rom name="td130cfga_.nsi" size="358400" crc="f60b5980" sha1="b5187f8631dcd2e5e65497b0d0ec27d4213183f6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Help Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130sc_.nsi" size="358400" crc="c8bdba74" sha1="a1c7571b0a5d620bb4959072bb93048c92fdd270" offset="0" />
+				<rom name="td130sc_.nsi" size="358400" crc="c8bdba74" sha1="a1c7571b0a5d620bb4959072bb93048c92fdd270"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="SYS/CON Disk"/>
 			<dataarea name="flop" size="358400">
-				<rom name="td130hlp_.nsi" size="358400" crc="18a74438" sha1="de17aae8d991330e1470bf78969d6d966ad6eb46" offset="0" />
+				<rom name="td130hlp_.nsi" size="358400" crc="18a74438" sha1="de17aae8d991330e1470bf78969d6d966ad6eb46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +407,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="v2212_56.nsi" size="358400" crc="b54e58ef" sha1="52a579c7e1b1869ceb24d567391c1b0e9e792aa0" offset="0" />
+				<rom name="v2212_56.nsi" size="358400" crc="b54e58ef" sha1="52a579c7e1b1869ceb24d567391c1b0e9e792aa0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -419,7 +419,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="vinsua.nsi" size="358400" crc="5432bfd2" sha1="6bf2a757904a64947b652b2e299b4ce7b8c59ff0" offset="0" />
+				<rom name="vinsua.nsi" size="358400" crc="5432bfd2" sha1="6bf2a757904a64947b652b2e299b4ce7b8c59ff0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -431,7 +431,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="xitancpm.nsi" size="179200" crc="b442f8c2" sha1="de1a311d8fd6f490f76760787f6a8f6600aebe1f" offset="0" />
+				<rom name="xitancpm.nsi" size="179200" crc="b442f8c2" sha1="de1a311d8fd6f490f76760787f6a8f6600aebe1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -443,7 +443,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="aca.nsi" size="179200" crc="2e951e55" sha1="a13b09dc05a9d8397ed9ed28382c00e10eac65e5" offset="0" />
+				<rom name="aca.nsi" size="179200" crc="2e951e55" sha1="a13b09dc05a9d8397ed9ed28382c00e10eac65e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -455,13 +455,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="adven_a.nsi" size="179200" crc="7b8d8c6f" sha1="0ac9afd674ed4a5aeada10ddd6867cea1e68f9a6" offset="0" />
+				<rom name="adven_a.nsi" size="179200" crc="7b8d8c6f" sha1="0ac9afd674ed4a5aeada10ddd6867cea1e68f9a6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="adven_b.nsi" size="179200" crc="70a49430" sha1="3f2ab3be79903ee46ebbdb56aa8a3b3da259480e" offset="0" />
+				<rom name="adven_b.nsi" size="179200" crc="70a49430" sha1="3f2ab3be79903ee46ebbdb56aa8a3b3da259480e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -473,19 +473,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="alps.nsi" size="89600" crc="f6889658" sha1="6427bce95e41fdb671d575f4018fa1cac0491f7f" offset="0" />
+				<rom name="alps.nsi" size="89600" crc="f6889658" sha1="6427bce95e41fdb671d575f4018fa1cac0491f7f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="alpsdsrc.nsi" size="89600" crc="2b17c80e" sha1="93e66d6e002e4b198f5954259bf5f6546e91fbc9" offset="0" />
+				<rom name="alpsdsrc.nsi" size="89600" crc="2b17c80e" sha1="93e66d6e002e4b198f5954259bf5f6546e91fbc9"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="alpsnsrc.nsi" size="89600" crc="36217dd0" sha1="4209eb5c34d54163ce988b50ffe19691a59e1d86" offset="0" />
+				<rom name="alpsnsrc.nsi" size="89600" crc="36217dd0" sha1="4209eb5c34d54163ce988b50ffe19691a59e1d86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -497,7 +497,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="apcbasic.nsi" size="179200" crc="88496cd7" sha1="435d0d2bef31ba6053ac02bbb774e6533b35dd14" offset="0" />
+				<rom name="apcbasic.nsi" size="179200" crc="88496cd7" sha1="435d0d2bef31ba6053ac02bbb774e6533b35dd14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -509,7 +509,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="aztec.nsi" size="358400" crc="ebe2c0d9" sha1="b8b4744e145f6ee7c49eb78ad45445f8d30bc38b" offset="0" />
+				<rom name="aztec.nsi" size="358400" crc="ebe2c0d9" sha1="b8b4744e145f6ee7c49eb78ad45445f8d30bc38b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -522,14 +522,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Tape and Disk Programs"/>
 			<dataarea name="flop" size="89600">
-				<rom name="basex1.nsi" size="89600" crc="ae3d017e" sha1="a3d0e370dd7db10bccce4cf2fcf1da1d09214b12" offset="0" />
+				<rom name="basex1.nsi" size="89600" crc="ae3d017e" sha1="a3d0e370dd7db10bccce4cf2fcf1da1d09214b12"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Compiler and Loader"/>
 			<dataarea name="flop" size="89600">
-				<rom name="basex2.nsi" size="89600" crc="1b7c959b" sha1="d10e4b2166e2188eb7ba951df2d554b7ef98b307" offset="0" />
+				<rom name="basex2.nsi" size="89600" crc="1b7c959b" sha1="d10e4b2166e2188eb7ba951df2d554b7ef98b307"/>
 			</dataarea>
 		</part>
 	</software>
@@ -541,7 +541,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="bazic.nsi" size="179200" crc="c4d152af" sha1="9c173ccbd4f41bec07dde7e4d9cb4822f9b725e9" offset="0" />
+				<rom name="bazic.nsi" size="179200" crc="c4d152af" sha1="9c173ccbd4f41bec07dde7e4d9cb4822f9b725e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -553,13 +553,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="beamdef.nsi" size="89600" crc="1ebb2447" sha1="26acbcfb49dd40cab923170ad3d70ee35d675b9a" offset="0" />
+				<rom name="beamdef.nsi" size="89600" crc="1ebb2447" sha1="26acbcfb49dd40cab923170ad3d70ee35d675b9a"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="beamdefl.nsi" size="89600" crc="b9d5f78d" sha1="1a32f4bcc10a57bf282d02d2c14112bafd80a94d" offset="0" />
+				<rom name="beamdefl.nsi" size="89600" crc="b9d5f78d" sha1="1a32f4bcc10a57bf282d02d2c14112bafd80a94d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -571,7 +571,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="bridge.nsi" size="89600" crc="b8459a71" sha1="e25be1b28630a8241dac0a5a7e061ce06a193653" offset="0" />
+				<rom name="bridge.nsi" size="89600" crc="b8459a71" sha1="e25be1b28630a8241dac0a5a7e061ce06a193653"/>
 			</dataarea>
 		</part>
 	</software>
@@ -583,7 +583,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="bssv2ch4.nsi" size="89600" crc="2359f6ed" sha1="f29701ac9603e6eb053c922d5c775b5cd8164bbc" offset="0" />
+				<rom name="bssv2ch4.nsi" size="89600" crc="2359f6ed" sha1="f29701ac9603e6eb053c922d5c775b5cd8164bbc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -595,7 +595,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="butler.nsi" size="179200" crc="2c23c0cd" sha1="b0e38cd73a2335a64ab00b06280f3d5ae2cb85d0" offset="0" />
+				<rom name="butler.nsi" size="179200" crc="2c23c0cd" sha1="b0e38cd73a2335a64ab00b06280f3d5ae2cb85d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -607,7 +607,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="chess.nsi" size="89600" crc="c4edfe98" sha1="785f683f379dfbe166e201db08fd548dec10921f" offset="0" />
+				<rom name="chess.nsi" size="89600" crc="c4edfe98" sha1="785f683f379dfbe166e201db08fd548dec10921f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -619,7 +619,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="compare.nsi" size="89600" crc="3817be37" sha1="2298930ac38b17ebec5e431af1cdc896770aa621" offset="0" />
+				<rom name="compare.nsi" size="89600" crc="3817be37" sha1="2298930ac38b17ebec5e431af1cdc896770aa621"/>
 			</dataarea>
 		</part>
 	</software>
@@ -631,7 +631,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="compress.nsi" size="89600" crc="6d85c27b" sha1="0e14d21143b690d003742f31989aadf1d215e10c" offset="0" />
+				<rom name="compress.nsi" size="89600" crc="6d85c27b" sha1="0e14d21143b690d003742f31989aadf1d215e10c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -643,7 +643,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="copyall.nsi" size="179200" crc="a01d0155" sha1="2da7043def45b6c56b994f3122d4e482f548ff02" offset="0" />
+				<rom name="copyall.nsi" size="179200" crc="a01d0155" sha1="2da7043def45b6c56b994f3122d4e482f548ff02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -655,7 +655,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmgames.nsi" size="179200" crc="7c3096f7" sha1="279126919f4ced3def4ebdff37d338a7beb45241" offset="0" />
+				<rom name="cpmgames.nsi" size="179200" crc="7c3096f7" sha1="279126919f4ced3def4ebdff37d338a7beb45241"/>
 			</dataarea>
 		</part>
 	</software>
@@ -667,7 +667,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug23a.nsi" size="179200" crc="facc44a2" sha1="156c2fc569d7279376ff4901818881d9736ffb32" offset="0" />
+				<rom name="cpmug23a.nsi" size="179200" crc="facc44a2" sha1="156c2fc569d7279376ff4901818881d9736ffb32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -679,7 +679,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug24.nsi" size="179200" crc="c3933235" sha1="32e4c7c9cb4ee025cdbba7e3f5f7da6f31434a18" offset="0" />
+				<rom name="cpmug24.nsi" size="179200" crc="c3933235" sha1="32e4c7c9cb4ee025cdbba7e3f5f7da6f31434a18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -691,13 +691,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug25a.nsi" size="179200" crc="45e30cf7" sha1="9322008d29196f79582872b697063d1d352aa077" offset="0" />
+				<rom name="cpmug25a.nsi" size="179200" crc="45e30cf7" sha1="9322008d29196f79582872b697063d1d352aa077"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug25b.nsi" size="179200" crc="d17860db" sha1="d7ddd7c4e2e328305eb70119b9c3a376caa633b7" offset="0" />
+				<rom name="cpmug25b.nsi" size="179200" crc="d17860db" sha1="d7ddd7c4e2e328305eb70119b9c3a376caa633b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -709,13 +709,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug29a.nsi" size="179200" crc="bdda913d" sha1="0c4106bc47ad1e2f5940bf9b7f52cacf0d2ef255" offset="0" />
+				<rom name="cpmug29a.nsi" size="179200" crc="bdda913d" sha1="0c4106bc47ad1e2f5940bf9b7f52cacf0d2ef255"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug29b.nsi" size="179200" crc="c2edf4c8" sha1="ddaa79f4f1ee6a710f432bdd84dfdce8632f2d67" offset="0" />
+				<rom name="cpmug29b.nsi" size="179200" crc="c2edf4c8" sha1="ddaa79f4f1ee6a710f432bdd84dfdce8632f2d67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -727,13 +727,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug30a.nsi" size="179200" crc="e08e6eef" sha1="ca8e6e329b06d10afdf25afc860ff03d53053f15" offset="0" />
+				<rom name="cpmug30a.nsi" size="179200" crc="e08e6eef" sha1="ca8e6e329b06d10afdf25afc860ff03d53053f15"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug30b.nsi" size="179200" crc="e7ee18d8" sha1="4e8733cc2d9cb056a87e995b5baa8a35ecddf08a" offset="0" />
+				<rom name="cpmug30b.nsi" size="179200" crc="e7ee18d8" sha1="4e8733cc2d9cb056a87e995b5baa8a35ecddf08a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -745,13 +745,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug31a.nsi" size="179200" crc="2cace9c3" sha1="79debadcbdfcc8832322877fe1b3a92b7c5d9dbe" offset="0" />
+				<rom name="cpmug31a.nsi" size="179200" crc="2cace9c3" sha1="79debadcbdfcc8832322877fe1b3a92b7c5d9dbe"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug31b.nsi" size="179200" crc="bac46e15" sha1="96637b871f6783897fbe4479bfe5c88b6f7f6dee" offset="0" />
+				<rom name="cpmug31b.nsi" size="179200" crc="bac46e15" sha1="96637b871f6783897fbe4479bfe5c88b6f7f6dee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -763,7 +763,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug32.nsi" size="179200" crc="4dc0f0b2" sha1="302de0c09d8ca8f5555c6c73faa79af3d1a9b357" offset="0" />
+				<rom name="cpmug32.nsi" size="179200" crc="4dc0f0b2" sha1="302de0c09d8ca8f5555c6c73faa79af3d1a9b357"/>
 			</dataarea>
 		</part>
 	</software>
@@ -775,7 +775,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug34.nsi" size="179200" crc="0ccb00a7" sha1="82d25528795c5c9db7a989355b1da4012e8c8ad3" offset="0" />
+				<rom name="cpmug34.nsi" size="179200" crc="0ccb00a7" sha1="82d25528795c5c9db7a989355b1da4012e8c8ad3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -787,13 +787,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug36a.nsi" size="179200" crc="198fa43f" sha1="312453b55d035ef1bd526c759f90b57653fd0763" offset="0" />
+				<rom name="cpmug36a.nsi" size="179200" crc="198fa43f" sha1="312453b55d035ef1bd526c759f90b57653fd0763"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug36b.nsi" size="179200" crc="a4abf14b" sha1="1f1c965835730a5b96757de4adbf178b821094c3" offset="0" />
+				<rom name="cpmug36b.nsi" size="179200" crc="a4abf14b" sha1="1f1c965835730a5b96757de4adbf178b821094c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -805,7 +805,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="cpmug40a.nsi" size="179200" crc="a0f4527c" sha1="01eb800abd2ae3c7c3ee8530544d81f64b7c5802" offset="0" />
+				<rom name="cpmug40a.nsi" size="179200" crc="a0f4527c" sha1="01eb800abd2ae3c7c3ee8530544d81f64b7c5802"/>
 			</dataarea>
 		</part>
 	</software>
@@ -817,7 +817,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="crans.nsi" size="89600" crc="b9cc329e" sha1="740c282b1b71d04d73f96f9193f8d2d440b7c660" offset="0" />
+				<rom name="crans.nsi" size="89600" crc="b9cc329e" sha1="740c282b1b71d04d73f96f9193f8d2d440b7c660"/>
 			</dataarea>
 		</part>
 	</software>
@@ -829,7 +829,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="datasmth.nsi" size="89600" crc="c543be80" sha1="4bd543343739f06b03642ff2b3fb6d2ab5585c3f" offset="0" />
+				<rom name="datasmth.nsi" size="89600" crc="c543be80" sha1="4bd543343739f06b03642ff2b3fb6d2ab5585c3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -841,7 +841,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="datastar.nsi" size="358400" crc="78eb5420" sha1="bb3a0b5d2d6c00ef196f8ab6a91e4d3fcc87d8a7" offset="0" />
+				<rom name="datastar.nsi" size="358400" crc="78eb5420" sha1="bb3a0b5d2d6c00ef196f8ab6a91e4d3fcc87d8a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -853,7 +853,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="dmmutil.nsi" size="179200" crc="8dc745af" sha1="bf26de495ae3263e7d3d2b13a9093373c9698c1a" offset="0" />
+				<rom name="dmmutil.nsi" size="179200" crc="8dc745af" sha1="bf26de495ae3263e7d3d2b13a9093373c9698c1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -865,7 +865,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="dynabase.nsi" size="89600" crc="a6d4ffbc" sha1="194cf1d21141130a5cbcac414354639639cd2ad5" offset="0" />
+				<rom name="dynabase.nsi" size="89600" crc="a6d4ffbc" sha1="194cf1d21141130a5cbcac414354639639cd2ad5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -877,7 +877,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="f80.nsi" size="179200" crc="b8f1eab2" sha1="77c4fe9f573570afe214fc2d464a4ab52895d739" offset="0" />
+				<rom name="f80.nsi" size="179200" crc="b8f1eab2" sha1="77c4fe9f573570afe214fc2d464a4ab52895d739"/>
 			</dataarea>
 		</part>
 	</software>
@@ -889,7 +889,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="f80_1.nsi" size="179200" crc="944762d6" sha1="5e20a2f174f5c3f9a515e697ed093266275d38e4" offset="0" />
+				<rom name="f80_1.nsi" size="179200" crc="944762d6" sha1="5e20a2f174f5c3f9a515e697ed093266275d38e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -901,7 +901,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="fastgam.nsi" size="89600" crc="b60aa119" sha1="b5ad920b3c4a7725ca9c0fae9d2c3ff088d56b80" offset="0" />
+				<rom name="fastgam.nsi" size="89600" crc="b60aa119" sha1="b5ad920b3c4a7725ca9c0fae9d2c3ff088d56b80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -913,7 +913,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="finmgtsy.nsi" size="89600" crc="be3e4084" sha1="0456ea44f8d6ad801fcac3e8329febb41aba538c" offset="0" />
+				<rom name="finmgtsy.nsi" size="89600" crc="be3e4084" sha1="0456ea44f8d6ad801fcac3e8329febb41aba538c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -925,7 +925,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="gamepak2.nsi" size="89600" crc="f6d2f6be" sha1="c5b7120da2cdb642866ce9bc1126479a2df8ac85" offset="0" />
+				<rom name="gamepak2.nsi" size="89600" crc="f6d2f6be" sha1="c5b7120da2cdb642866ce9bc1126479a2df8ac85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -937,7 +937,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games.nsi" size="89600" crc="f4fb0bb7" sha1="abca42781d815f9314d146f740b5256e037dc3a7" offset="0" />
+				<rom name="games.nsi" size="89600" crc="f4fb0bb7" sha1="abca42781d815f9314d146f740b5256e037dc3a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -949,7 +949,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games1.nsi" size="89600" crc="b610c1df" sha1="9c0d79fd5eb7f4f94d242b10c90d4da6cbb60d7f" offset="0" />
+				<rom name="games1.nsi" size="89600" crc="b610c1df" sha1="9c0d79fd5eb7f4f94d242b10c90d4da6cbb60d7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -961,7 +961,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="games10.nsi" size="358400" crc="ce9a9e1b" sha1="0c694aa84ed4fe788fbb6f70ea3a07e4d1d940ba" offset="0" />
+				<rom name="games10.nsi" size="358400" crc="ce9a9e1b" sha1="0c694aa84ed4fe788fbb6f70ea3a07e4d1d940ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -973,7 +973,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="games11.nsi" size="358400" crc="e80d1576" sha1="f2ef93000d1c06a8abb6e34e23c3e62a2c88675e" offset="0" />
+				<rom name="games11.nsi" size="358400" crc="e80d1576" sha1="f2ef93000d1c06a8abb6e34e23c3e62a2c88675e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -985,7 +985,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games2.nsi" size="89600" crc="b8a8cd05" sha1="71cae09d1b1ddd4d2b5d42dc3de73fac1db25705" offset="0" />
+				<rom name="games2.nsi" size="89600" crc="b8a8cd05" sha1="71cae09d1b1ddd4d2b5d42dc3de73fac1db25705"/>
 			</dataarea>
 		</part>
 	</software>
@@ -997,7 +997,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games3.nsi" size="89600" crc="2e712162" sha1="0b0222598c2a3e030f3c96b7d3a48d80f114866c" offset="0" />
+				<rom name="games3.nsi" size="89600" crc="2e712162" sha1="0b0222598c2a3e030f3c96b7d3a48d80f114866c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1009,7 +1009,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games4.nsi" size="89600" crc="6c0a0193" sha1="1022cff9e0b49b94d7d85cc97f3c9904e54a52f4" offset="0" />
+				<rom name="games4.nsi" size="89600" crc="6c0a0193" sha1="1022cff9e0b49b94d7d85cc97f3c9904e54a52f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1021,7 +1021,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games5.nsi" size="89600" crc="aafded43" sha1="61ba541cfdf7ea6bbaf05e35f4d13f95f88da117" offset="0" />
+				<rom name="games5.nsi" size="89600" crc="aafded43" sha1="61ba541cfdf7ea6bbaf05e35f4d13f95f88da117"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1033,7 +1033,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games6.nsi" size="89600" crc="bd586e55" sha1="534af5b78c83d65e7775d02e56b18226ea8822f5" offset="0" />
+				<rom name="games6.nsi" size="89600" crc="bd586e55" sha1="534af5b78c83d65e7775d02e56b18226ea8822f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1045,7 +1045,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="games7.nsi" size="89600" crc="765fc149" sha1="1f9e182618091e5e65c5fab2b56afe25d8d9defd" offset="0" />
+				<rom name="games7.nsi" size="89600" crc="765fc149" sha1="1f9e182618091e5e65c5fab2b56afe25d8d9defd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1057,7 +1057,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="games8.nsi" size="358400" crc="e80d1576" sha1="f2ef93000d1c06a8abb6e34e23c3e62a2c88675e" offset="0" />
+				<rom name="games8.nsi" size="358400" crc="e80d1576" sha1="f2ef93000d1c06a8abb6e34e23c3e62a2c88675e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1069,7 +1069,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="games9.nsi" size="358400" crc="69b68978" sha1="74d3e97e757a2bb211397e2a3002a7bd9e77eebe" offset="0" />
+				<rom name="games9.nsi" size="358400" crc="69b68978" sha1="74d3e97e757a2bb211397e2a3002a7bd9e77eebe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1081,7 +1081,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="generate.nsi" size="89600" crc="5a6b27ff" sha1="aeeef6fb0e47beaef3c10b5198a946b3833572d4" offset="0" />
+				<rom name="generate.nsi" size="89600" crc="5a6b27ff" sha1="aeeef6fb0e47beaef3c10b5198a946b3833572d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1093,7 +1093,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="hancapii.nsi" size="179200" crc="67d68c0b" sha1="eb547e8ffa117c7d4818d85a19af490edd8caf95" offset="0" />
+				<rom name="hancapii.nsi" size="179200" crc="67d68c0b" sha1="eb547e8ffa117c7d4818d85a19af490edd8caf95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1105,7 +1105,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="handicap.nsi" size="89600" crc="d4b63647" sha1="e801305fc50811f854b603ea531ac5ec2d4fc53f" offset="0" />
+				<rom name="handicap.nsi" size="89600" crc="d4b63647" sha1="e801305fc50811f854b603ea531ac5ec2d4fc53f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1117,7 +1117,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="hearts.nsi" size="89600" crc="300dee45" sha1="d8e5ac5908d5a821593c5bf40c0032697a07b973" offset="0" />
+				<rom name="hearts.nsi" size="89600" crc="300dee45" sha1="d8e5ac5908d5a821593c5bf40c0032697a07b973"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1129,7 +1129,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="icatutil.nsi" size="179200" crc="6015c7ca" sha1="c573020d13215623d916c5b14057fb57970d2c88" offset="0" />
+				<rom name="icatutil.nsi" size="179200" crc="6015c7ca" sha1="c573020d13215623d916c5b14057fb57970d2c88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1141,7 +1141,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="inutil.nsi" size="179200" crc="5ad152d3" sha1="dba15b21b8be5d699acfa4b232914ef91fb530d4" offset="0" />
+				<rom name="inutil.nsi" size="179200" crc="5ad152d3" sha1="dba15b21b8be5d699acfa4b232914ef91fb530d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1153,7 +1153,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="keeptrak.nsi" size="179200" crc="7f902027" sha1="5ecabd24e3ca363f15ea6e3dd38144dd182f5638" offset="0" />
+				<rom name="keeptrak.nsi" size="179200" crc="7f902027" sha1="5ecabd24e3ca363f15ea6e3dd38144dd182f5638"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1165,7 +1165,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="keno.nsi" size="179200" crc="ec7e25bc" sha1="23049b8849d85d80eeb30bcc403b31f5666dbb26" offset="0" />
+				<rom name="keno.nsi" size="179200" crc="ec7e25bc" sha1="23049b8849d85d80eeb30bcc403b31f5666dbb26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1177,7 +1177,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="maillist.nsi" size="89600" crc="2c1d3649" sha1="f5549e5bd83d1ae26cd06de36024eeb83a1c75c9" offset="0" />
+				<rom name="maillist.nsi" size="89600" crc="2c1d3649" sha1="f5549e5bd83d1ae26cd06de36024eeb83a1c75c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1189,7 +1189,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="michart.nsi" size="179200" crc="446654b0" sha1="792b094cd3a99e7d54bbb17c3d95ff540c90401d" offset="0" />
+				<rom name="michart.nsi" size="179200" crc="446654b0" sha1="792b094cd3a99e7d54bbb17c3d95ff540c90401d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1201,7 +1201,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="monarch.nsi" size="89600" crc="2a8459f2" sha1="582455bbbe7eea735262d4a32acfff1e433b5262" offset="0" />
+				<rom name="monarch.nsi" size="89600" crc="2a8459f2" sha1="582455bbbe7eea735262d4a32acfff1e433b5262"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1213,7 +1213,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="mstuf.nsi" size="89600" crc="bc24e2e3" sha1="9f9bdcb40b68cb2ab5720eac9995afea7b709b9c" offset="0" />
+				<rom name="mstuf.nsi" size="89600" crc="bc24e2e3" sha1="9f9bdcb40b68cb2ab5720eac9995afea7b709b9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1225,7 +1225,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="multlinr.nsi" size="89600" crc="2c1d2075" sha1="66b96ffca3c480e70402e8ea44f6174d2bd5f94c" offset="0" />
+				<rom name="multlinr.nsi" size="89600" crc="2c1d2075" sha1="66b96ffca3c480e70402e8ea44f6174d2bd5f94c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1237,7 +1237,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse1.nsi" size="89600" crc="bbc20b7c" sha1="18fc3407ff609cce3a6bbe06dcc2ffa44a3ce2f2" offset="0" />
+				<rom name="nsse1.nsi" size="89600" crc="bbc20b7c" sha1="18fc3407ff609cce3a6bbe06dcc2ffa44a3ce2f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1249,7 +1249,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse16.nsi" size="89600" crc="65d1b73d" sha1="460a72c919844bfacc986f95b185f0507cb19fa9" offset="0" />
+				<rom name="nsse16.nsi" size="89600" crc="65d1b73d" sha1="460a72c919844bfacc986f95b185f0507cb19fa9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1261,7 +1261,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse17.nsi" size="89600" crc="ad1e557e" sha1="6c690e024aa28c89324c2ff1f09030a8e19096a0" offset="0" />
+				<rom name="nsse17.nsi" size="89600" crc="ad1e557e" sha1="6c690e024aa28c89324c2ff1f09030a8e19096a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1273,7 +1273,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse18.nsi" size="89600" crc="d13c7d90" sha1="e70d690fb1930dcf8506c4d1ac6089f4ce61766a" offset="0" />
+				<rom name="nsse18.nsi" size="89600" crc="d13c7d90" sha1="e70d690fb1930dcf8506c4d1ac6089f4ce61766a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1285,7 +1285,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse2.nsi" size="89600" crc="e3615a30" sha1="891d78febb0ee9ab6e7c29fa25cf25f1943e16e7" offset="0" />
+				<rom name="nsse2.nsi" size="89600" crc="e3615a30" sha1="891d78febb0ee9ab6e7c29fa25cf25f1943e16e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1297,7 +1297,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse20.nsi" size="89600" crc="db5dfbb5" sha1="d35e01060e98529fc3909151e2a61cab4ad7751b" offset="0" />
+				<rom name="nsse20.nsi" size="89600" crc="db5dfbb5" sha1="d35e01060e98529fc3909151e2a61cab4ad7751b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1309,7 +1309,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse21.nsi" size="89600" crc="4f6d1a13" sha1="8edb727ef6335bb05a959e845286e9a76007e9c8" offset="0" />
+				<rom name="nsse21.nsi" size="89600" crc="4f6d1a13" sha1="8edb727ef6335bb05a959e845286e9a76007e9c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1321,7 +1321,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse22.nsi" size="89600" crc="d6c6a9a7" sha1="2ee6cd4286fdfdc5592db7a379c14cdc6fb2495d" offset="0" />
+				<rom name="nsse22.nsi" size="89600" crc="d6c6a9a7" sha1="2ee6cd4286fdfdc5592db7a379c14cdc6fb2495d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1333,7 +1333,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse7.nsi" size="89600" crc="176e3d5d" sha1="df3ccac8045e5e26ed71745c73c6cfdb2f1ddfa2" offset="0" />
+				<rom name="nsse7.nsi" size="89600" crc="176e3d5d" sha1="df3ccac8045e5e26ed71745c73c6cfdb2f1ddfa2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1345,7 +1345,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse8.nsi" size="89600" crc="430df895" sha1="f3420eb1727fdbeff2ba34ed559bd351a9f9695a" offset="0" />
+				<rom name="nsse8.nsi" size="89600" crc="430df895" sha1="f3420eb1727fdbeff2ba34ed559bd351a9f9695a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1357,7 +1357,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsse9.nsi" size="89600" crc="44e2ec98" sha1="cea0ac0edb68c4a7fd3caeed5a5cc0d435563633" offset="0" />
+				<rom name="nsse9.nsi" size="89600" crc="44e2ec98" sha1="cea0ac0edb68c4a7fd3caeed5a5cc0d435563633"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1369,7 +1369,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="nsseg1r3.nsi" size="89600" crc="a1667011" sha1="eab521ae73a014b9a0a9177311c44d54e41876f6" offset="0" />
+				<rom name="nsseg1r3.nsi" size="89600" crc="a1667011" sha1="eab521ae73a014b9a0a9177311c44d54e41876f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1381,13 +1381,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179214">
-				<rom name="pds-dden.nsi" size="179214" crc="2080756d" sha1="9812ad0bbe2a139dd3ef316ed75610994643f577" offset="0" />
+				<rom name="pds-dden.nsi" size="179214" crc="2080756d" sha1="9812ad0bbe2a139dd3ef316ed75610994643f577"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="pds-sden.nsi" size="89600" crc="18346016" sha1="3b37ef307106943bea37da77e7785e81027dc09a" offset="0" />
+				<rom name="pds-sden.nsi" size="89600" crc="18346016" sha1="3b37ef307106943bea37da77e7785e81027dc09a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1399,7 +1399,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="pfm.nsi" size="179200" crc="0f30ea0f" sha1="a9550c4198f4437e247e1c80ac9673249421f7ad" offset="0" />
+				<rom name="pfm.nsi" size="179200" crc="0f30ea0f" sha1="a9550c4198f4437e247e1c80ac9673249421f7ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1411,7 +1411,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="power.nsi" size="179200" crc="abba757c" sha1="b363f15f0d46ead9383430d962f88cc45c965fda" offset="0" />
+				<rom name="power.nsi" size="179200" crc="abba757c" sha1="b363f15f0d46ead9383430d962f88cc45c965fda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1423,7 +1423,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89626">
-				<rom name="protext.nsi" size="89626" crc="93a03243" sha1="72bc6fc426cd3649cb4e76923986af34e9f9aa09" offset="0" />
+				<rom name="protext.nsi" size="89626" crc="93a03243" sha1="72bc6fc426cd3649cb4e76923986af34e9f9aa09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1435,7 +1435,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="quickref.nsi" size="89600" crc="c22390c7" sha1="7db7289756b94d672fe79c3157aa620478365cee" offset="0" />
+				<rom name="quickref.nsi" size="89600" crc="c22390c7" sha1="7db7289756b94d672fe79c3157aa620478365cee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1447,7 +1447,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="rmf.nsi" size="358400" crc="5adf989f" sha1="c59d440b54cbd6244770003daecbf9a40a2b4145" offset="0" />
+				<rom name="rmf.nsi" size="358400" crc="5adf989f" sha1="c59d440b54cbd6244770003daecbf9a40a2b4145"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1459,7 +1459,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="roots.nsi" size="89600" crc="d6dd927a" sha1="81abe50ee2bf72bc6da3beb98b9ca059bafc5905" offset="0" />
+				<rom name="roots.nsi" size="89600" crc="d6dd927a" sha1="81abe50ee2bf72bc6da3beb98b9ca059bafc5905"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1471,7 +1471,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="skpilot.nsi" size="179200" crc="2e57a6e3" sha1="9dd00d2368b6ac0959204fb229d16c2775f3052f" offset="0" />
+				<rom name="skpilot.nsi" size="179200" crc="2e57a6e3" sha1="9dd00d2368b6ac0959204fb229d16c2775f3052f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1483,7 +1483,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="smlinreg.nsi" size="89600" crc="989fdce3" sha1="fb9c13cc5c83c640f004cb936b2fe6a1905dc2d8" offset="0" />
+				<rom name="smlinreg.nsi" size="89600" crc="989fdce3" sha1="fb9c13cc5c83c640f004cb936b2fe6a1905dc2d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1495,7 +1495,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="smms.nsi" size="89600" crc="60089728" sha1="775601f5e16b8a0de77cc4e3af736196de21c1ab" offset="0" />
+				<rom name="smms.nsi" size="89600" crc="60089728" sha1="775601f5e16b8a0de77cc4e3af736196de21c1ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1507,7 +1507,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="spacelns.nsi" size="89600" crc="1ccaf3a1" sha1="50aea5f32affe52653a73f7a8c9c15657af08e5e" offset="0" />
+				<rom name="spacelns.nsi" size="89600" crc="1ccaf3a1" sha1="50aea5f32affe52653a73f7a8c9c15657af08e5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1519,7 +1519,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="spilot41.nsi" size="89600" crc="cc2ccc91" sha1="6434936809aacf5f98a7afa4fc2ecc67a13a0112" offset="0" />
+				<rom name="spilot41.nsi" size="89600" crc="cc2ccc91" sha1="6434936809aacf5f98a7afa4fc2ecc67a13a0112"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1531,7 +1531,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="statevar.nsi" size="179200" crc="023b73a8" sha1="cee9af023285723a279264a82c0f291e952f41f8" offset="0" />
+				<rom name="statevar.nsi" size="179200" crc="023b73a8" sha1="cee9af023285723a279264a82c0f291e952f41f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1543,7 +1543,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="stock.nsi" size="89600" crc="1e765ada" sha1="54c033a4f57f75f9923d412054704fe2c028fc66" offset="0" />
+				<rom name="stock.nsi" size="89600" crc="1e765ada" sha1="54c033a4f57f75f9923d412054704fe2c028fc66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1555,7 +1555,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="strace.nsi" size="89600" crc="2ad51e09" sha1="b5dd0177a14c39faaafc972e714fb3d002513133" offset="0" />
+				<rom name="strace.nsi" size="89600" crc="2ad51e09" sha1="b5dd0177a14c39faaafc972e714fb3d002513133"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1567,7 +1567,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="taxopt.nsi" size="179200" crc="d8b4b129" sha1="34e768c31161de01f7e94e6dcf9e80e2fa70c252" offset="0" />
+				<rom name="taxopt.nsi" size="179200" crc="d8b4b129" sha1="34e768c31161de01f7e94e6dcf9e80e2fa70c252"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1579,7 +1579,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="tpascal.nsi" size="179200" crc="2633f6de" sha1="a77bcd507c16338460517eb691b4f61e55a7eaa9" offset="0" />
+				<rom name="tpascal.nsi" size="179200" crc="2633f6de" sha1="a77bcd507c16338460517eb691b4f61e55a7eaa9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1591,7 +1591,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="trafunan.nsi" size="89600" crc="11263a7e" sha1="b26361ca1839d7dbfa2198abb5e2d95590dd8fdd" offset="0" />
+				<rom name="trafunan.nsi" size="89600" crc="11263a7e" sha1="b26361ca1839d7dbfa2198abb5e2d95590dd8fdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1603,7 +1603,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="uncharry.nsi" size="89600" crc="8f819d72" sha1="c2c0e30581d82c1e72ffce02d64a820f50c67775" offset="0" />
+				<rom name="uncharry.nsi" size="89600" crc="8f819d72" sha1="c2c0e30581d82c1e72ffce02d64a820f50c67775"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1615,7 +1615,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="valdez.nsi" size="89600" crc="9a284229" sha1="f3c4c0b1feb7eda05a154e51bf6f180471e4715d" offset="0" />
+				<rom name="valdez.nsi" size="89600" crc="9a284229" sha1="f3c4c0b1feb7eda05a154e51bf6f180471e4715d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1627,7 +1627,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="vedit.nsi" size="179200" crc="8569c16d" sha1="ccd7a2a7c4c43466cbd5d1145237f846bbce0af6" offset="0" />
+				<rom name="vedit.nsi" size="179200" crc="8569c16d" sha1="ccd7a2a7c4c43466cbd5d1145237f846bbce0af6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1639,7 +1639,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="windmere.nsi" size="89600" crc="deca5a21" sha1="a0074ec254b2d9361225d7b357ac5f7c34cab574" offset="0" />
+				<rom name="windmere.nsi" size="89600" crc="deca5a21" sha1="a0074ec254b2d9361225d7b357ac5f7c34cab574"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1651,7 +1651,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="ws30.nsi" size="358400" crc="ded0ebb6" sha1="a1df35ec0aa2301da2fa4c88106fa0b6ab371c24" offset="0" />
+				<rom name="ws30.nsi" size="358400" crc="ded0ebb6" sha1="a1df35ec0aa2301da2fa4c88106fa0b6ab371c24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1663,7 +1663,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="xek.nsi" size="89600" crc="56f0c74e" sha1="8dc7c9fe9f0f6d10fb87e6c38d79fcacc3ebd7d7" offset="0" />
+				<rom name="xek.nsi" size="89600" crc="56f0c74e" sha1="8dc7c9fe9f0f6d10fb87e6c38d79fcacc3ebd7d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1675,7 +1675,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="z80asm.nsi" size="179200" crc="0647ea6a" sha1="702df06249d702985b46f3fe1cac7ba1cd635131" offset="0" />
+				<rom name="z80asm.nsi" size="179200" crc="0647ea6a" sha1="702df06249d702985b46f3fe1cac7ba1cd635131"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1687,7 +1687,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="010disk.nsi" size="179200" crc="8bc7ae20" sha1="69ff3a9639028689d52b0515ccbb96e89b09be27" offset="0" />
+				<rom name="010disk.nsi" size="179200" crc="8bc7ae20" sha1="69ff3a9639028689d52b0515ccbb96e89b09be27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1699,7 +1699,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="011disk.nsi" size="179200" crc="343800ef" sha1="8f4036c850455399e77821cf02c57e8538b54c2c" offset="0" />
+				<rom name="011disk.nsi" size="179200" crc="343800ef" sha1="8f4036c850455399e77821cf02c57e8538b54c2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1711,7 +1711,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="012disk.nsi" size="179200" crc="ed2f9eae" sha1="352d00ebfe37fdaa1a45c31816298a8aa59b9737" offset="0" />
+				<rom name="012disk.nsi" size="179200" crc="ed2f9eae" sha1="352d00ebfe37fdaa1a45c31816298a8aa59b9737"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1723,7 +1723,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="013disk.nsi" size="179200" crc="ce73cbe1" sha1="b2f5e9e5055cb4954b12802d720f2fda05fadab7" offset="0" />
+				<rom name="013disk.nsi" size="179200" crc="ce73cbe1" sha1="b2f5e9e5055cb4954b12802d720f2fda05fadab7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1735,7 +1735,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="014disk.nsi" size="179200" crc="c23b0bf5" sha1="b447f28dd5fe9c901a4ef3ccbd15a5438d451b4a" offset="0" />
+				<rom name="014disk.nsi" size="179200" crc="c23b0bf5" sha1="b447f28dd5fe9c901a4ef3ccbd15a5438d451b4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1747,7 +1747,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="015disk.nsi" size="179200" crc="5cb460b5" sha1="3ac8a7d59fefd64e64d40fc3ae4c061a0a43eb85" offset="0" />
+				<rom name="015disk.nsi" size="179200" crc="5cb460b5" sha1="3ac8a7d59fefd64e64d40fc3ae4c061a0a43eb85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1759,7 +1759,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="016disk.nsi" size="179200" crc="6ce81f89" sha1="49e000cd84c67152b709d862a6d0b1c5a52ce594" offset="0" />
+				<rom name="016disk.nsi" size="179200" crc="6ce81f89" sha1="49e000cd84c67152b709d862a6d0b1c5a52ce594"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1771,7 +1771,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="017disk.nsi" size="179200" crc="73077f43" sha1="e8fab042e1ae961272ac847ac4d5026d465591cc" offset="0" />
+				<rom name="017disk.nsi" size="179200" crc="73077f43" sha1="e8fab042e1ae961272ac847ac4d5026d465591cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1783,7 +1783,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="018disk.nsi" size="179200" crc="6ed7a490" sha1="072ac847381c98c3bdff5986008364ca0350ac1e" offset="0" />
+				<rom name="018disk.nsi" size="179200" crc="6ed7a490" sha1="072ac847381c98c3bdff5986008364ca0350ac1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1795,7 +1795,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="019disk.nsi" size="179200" crc="5ece7133" sha1="02ab5b30db1d9b70557140ac4eb4f4a2a1a85ba8" offset="0" />
+				<rom name="019disk.nsi" size="179200" crc="5ece7133" sha1="02ab5b30db1d9b70557140ac4eb4f4a2a1a85ba8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1807,7 +1807,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="020disk.nsi" size="179200" crc="fc75979f" sha1="aa97590df2721e2ddb04ab935176d58644110152" offset="0" />
+				<rom name="020disk.nsi" size="179200" crc="fc75979f" sha1="aa97590df2721e2ddb04ab935176d58644110152"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1819,7 +1819,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="021disk.nsi" size="179200" crc="543c37e3" sha1="0e42f8f772a43cede962fff81971690bec3e25e7" offset="0" />
+				<rom name="021disk.nsi" size="179200" crc="543c37e3" sha1="0e42f8f772a43cede962fff81971690bec3e25e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1831,7 +1831,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="022disk.nsi" size="179200" crc="c971df34" sha1="ee30af2da36470da1dc24036ee12cdfd7ac24c37" offset="0" />
+				<rom name="022disk.nsi" size="179200" crc="c971df34" sha1="ee30af2da36470da1dc24036ee12cdfd7ac24c37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1843,7 +1843,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="023disk.nsi" size="179200" crc="72eef414" sha1="3529b3ad4e2857eb48564c3522e022e99122beb4" offset="0" />
+				<rom name="023disk.nsi" size="179200" crc="72eef414" sha1="3529b3ad4e2857eb48564c3522e022e99122beb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1855,7 +1855,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="024disk.nsi" size="179200" crc="1160c663" sha1="b078ca03fdd01743c7d63b86988adb47f7d55c09" offset="0" />
+				<rom name="024disk.nsi" size="179200" crc="1160c663" sha1="b078ca03fdd01743c7d63b86988adb47f7d55c09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1867,7 +1867,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="025disk.nsi" size="179200" crc="f6108ce6" sha1="ccfbb6bdd3665396f6e231625a362947ebaa71b5" offset="0" />
+				<rom name="025disk.nsi" size="179200" crc="f6108ce6" sha1="ccfbb6bdd3665396f6e231625a362947ebaa71b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1879,7 +1879,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="026disk.nsi" size="179200" crc="83b1b307" sha1="c2a465fccf531d422857f4409c0e4acd46603da8" offset="0" />
+				<rom name="026disk.nsi" size="179200" crc="83b1b307" sha1="c2a465fccf531d422857f4409c0e4acd46603da8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1891,7 +1891,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="027disk.nsi" size="179200" crc="b9585584" sha1="1bb42db73a32cc9bace8f370ebc6d660cad77d8d" offset="0" />
+				<rom name="027disk.nsi" size="179200" crc="b9585584" sha1="1bb42db73a32cc9bace8f370ebc6d660cad77d8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1903,7 +1903,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="028disk.nsi" size="179200" crc="76662967" sha1="82b34187ba2efba9eaadf7e5914a1130af9ddb40" offset="0" />
+				<rom name="028disk.nsi" size="179200" crc="76662967" sha1="82b34187ba2efba9eaadf7e5914a1130af9ddb40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1915,7 +1915,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="029disk.nsi" size="179200" crc="e3fdb427" sha1="52f946e1351fe9f038028412e02c1eb6eb944151" offset="0" />
+				<rom name="029disk.nsi" size="179200" crc="e3fdb427" sha1="52f946e1351fe9f038028412e02c1eb6eb944151"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1927,7 +1927,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="030disk.nsi" size="179200" crc="22fce681" sha1="7ad44e7a937a1ef39f99264d4db2cd863993e784" offset="0" />
+				<rom name="030disk.nsi" size="179200" crc="22fce681" sha1="7ad44e7a937a1ef39f99264d4db2cd863993e784"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1939,7 +1939,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="031disk.nsi" size="179200" crc="1d83dbd6" sha1="2009d221cc8bd74f53bad28d98b1abb186fbd601" offset="0" />
+				<rom name="031disk.nsi" size="179200" crc="1d83dbd6" sha1="2009d221cc8bd74f53bad28d98b1abb186fbd601"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1951,7 +1951,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="032disk.nsi" size="89600" crc="3a0e020a" sha1="c69b43c9b3b3b75f20848755f3f690b8b071612f" offset="0" />
+				<rom name="032disk.nsi" size="89600" crc="3a0e020a" sha1="c69b43c9b3b3b75f20848755f3f690b8b071612f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1963,7 +1963,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="033disk.nsi" size="89600" crc="db5f9ff7" sha1="1b7db22c0106dfba162121591e9b608afb15ac0f" offset="0" />
+				<rom name="033disk.nsi" size="89600" crc="db5f9ff7" sha1="1b7db22c0106dfba162121591e9b608afb15ac0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1975,7 +1975,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="034disk.nsi" size="89600" crc="0c1e88da" sha1="2712e0494a22ac69d8ed6e298319c22d2a18aebb" offset="0" />
+				<rom name="034disk.nsi" size="89600" crc="0c1e88da" sha1="2712e0494a22ac69d8ed6e298319c22d2a18aebb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1987,7 +1987,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="035disk.nsi" size="179200" crc="2a32157c" sha1="bd6609cdc7b37b57e0f99c4ceb83a8b3d731fc44" offset="0" />
+				<rom name="035disk.nsi" size="179200" crc="2a32157c" sha1="bd6609cdc7b37b57e0f99c4ceb83a8b3d731fc44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1999,7 +1999,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="036disk.nsi" size="179200" crc="45f239d2" sha1="369600185111649321da0f5337086f4d4557761c" offset="0" />
+				<rom name="036disk.nsi" size="179200" crc="45f239d2" sha1="369600185111649321da0f5337086f4d4557761c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2011,7 +2011,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="037disk.nsi" size="179200" crc="e4e55ecc" sha1="4026fa999e07a451da5b2df0cdd30a254b208949" offset="0" />
+				<rom name="037disk.nsi" size="179200" crc="e4e55ecc" sha1="4026fa999e07a451da5b2df0cdd30a254b208949"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2023,7 +2023,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="038disk.nsi" size="179200" crc="e1ac1749" sha1="1d9a8716fcfc42d754eb01fbdcd76860df2cb935" offset="0" />
+				<rom name="038disk.nsi" size="179200" crc="e1ac1749" sha1="1d9a8716fcfc42d754eb01fbdcd76860df2cb935"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2035,7 +2035,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="039disk.nsi" size="179200" crc="24576c69" sha1="e7db42a1a5e65ba26ae277466c75211a5065d4c6" offset="0" />
+				<rom name="039disk.nsi" size="179200" crc="24576c69" sha1="e7db42a1a5e65ba26ae277466c75211a5065d4c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2047,7 +2047,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="040disk.nsi" size="179200" crc="a9e6ff37" sha1="65b01d98e3ff0f62d409d534381d1651abc5a0fc" offset="0" />
+				<rom name="040disk.nsi" size="179200" crc="a9e6ff37" sha1="65b01d98e3ff0f62d409d534381d1651abc5a0fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2059,7 +2059,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="041disk.nsi" size="179200" crc="dd0967a7" sha1="af5dc4cc2dd4f1de72984165a11a4596985f769d" offset="0" />
+				<rom name="041disk.nsi" size="179200" crc="dd0967a7" sha1="af5dc4cc2dd4f1de72984165a11a4596985f769d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2071,7 +2071,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="042disk.nsi" size="179200" crc="5793a154" sha1="8b3cfa84e222212a988f503cfff0e7a1f57f6ef7" offset="0" />
+				<rom name="042disk.nsi" size="179200" crc="5793a154" sha1="8b3cfa84e222212a988f503cfff0e7a1f57f6ef7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2083,7 +2083,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="043disk.nsi" size="179200" crc="50e74ad9" sha1="4e67c35dab4fafb9ec2d17d869d6540996b5b2ec" offset="0" />
+				<rom name="043disk.nsi" size="179200" crc="50e74ad9" sha1="4e67c35dab4fafb9ec2d17d869d6540996b5b2ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2095,7 +2095,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="044disk.nsi" size="179200" crc="4b74f2f0" sha1="69775851c35c76057fb8f663826ae9eaa324927e" offset="0" />
+				<rom name="044disk.nsi" size="179200" crc="4b74f2f0" sha1="69775851c35c76057fb8f663826ae9eaa324927e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2107,7 +2107,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="045disk.nsi" size="179200" crc="2ba5c324" sha1="dbdf4c7ef9ca5aa5a60df9ac8a05ed747e473c5d" offset="0" />
+				<rom name="045disk.nsi" size="179200" crc="2ba5c324" sha1="dbdf4c7ef9ca5aa5a60df9ac8a05ed747e473c5d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2119,7 +2119,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="046disk.nsi" size="179200" crc="f6b69df2" sha1="0c1edc56b715c0ce0f8221e611bc916944baf713" offset="0" />
+				<rom name="046disk.nsi" size="179200" crc="f6b69df2" sha1="0c1edc56b715c0ce0f8221e611bc916944baf713"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2131,7 +2131,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="047disk.nsi" size="89600" crc="1807f94b" sha1="9d912ab95760a6f4403c6288ca6a3308d1f0bd65" offset="0" />
+				<rom name="047disk.nsi" size="89600" crc="1807f94b" sha1="9d912ab95760a6f4403c6288ca6a3308d1f0bd65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2143,7 +2143,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="048disk.nsi" size="89600" crc="c619b9c6" sha1="0de26dbe361508d0d2d020a9a5ff224613942649" offset="0" />
+				<rom name="048disk.nsi" size="89600" crc="c619b9c6" sha1="0de26dbe361508d0d2d020a9a5ff224613942649"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2155,7 +2155,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="049disk.nsi" size="179200" crc="3d055bd8" sha1="5ef49a119579f22b122572c7e1b65315d09a6f09" offset="0" />
+				<rom name="049disk.nsi" size="179200" crc="3d055bd8" sha1="5ef49a119579f22b122572c7e1b65315d09a6f09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2167,7 +2167,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="050disk.nsi" size="89600" crc="69365cd8" sha1="a071b795bc71f7fbf62d1fc6352136625517fea3" offset="0" />
+				<rom name="050disk.nsi" size="89600" crc="69365cd8" sha1="a071b795bc71f7fbf62d1fc6352136625517fea3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2179,7 +2179,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="051disk.nsi" size="89600" crc="10f70d25" sha1="2b23588d2e253f213c28c879f9b92dc4e59f4570" offset="0" />
+				<rom name="051disk.nsi" size="89600" crc="10f70d25" sha1="2b23588d2e253f213c28c879f9b92dc4e59f4570"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2191,7 +2191,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="052disk.nsi" size="89600" crc="aac847d3" sha1="76620bd02e2ae8b06b120fec51a992bd2fb0b7a6" offset="0" />
+				<rom name="052disk.nsi" size="89600" crc="aac847d3" sha1="76620bd02e2ae8b06b120fec51a992bd2fb0b7a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2203,7 +2203,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="053disk.nsi" size="89600" crc="20124471" sha1="c932241532a80e4bf97df3c907eac01b92c44754" offset="0" />
+				<rom name="053disk.nsi" size="89600" crc="20124471" sha1="c932241532a80e4bf97df3c907eac01b92c44754"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2215,7 +2215,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="054disk.nsi" size="89600" crc="9cbcaff1" sha1="bb2644d6dc6a73c90f69245388cbe90eda2ff270" offset="0" />
+				<rom name="054disk.nsi" size="89600" crc="9cbcaff1" sha1="bb2644d6dc6a73c90f69245388cbe90eda2ff270"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2227,7 +2227,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="055disk.nsi" size="89600" crc="fe57cd2a" sha1="1290a6bc9f603f52645c6d6dbfe09a73d6fa9978" offset="0" />
+				<rom name="055disk.nsi" size="89600" crc="fe57cd2a" sha1="1290a6bc9f603f52645c6d6dbfe09a73d6fa9978"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2239,7 +2239,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="056disk.nsi" size="89600" crc="0dfe79f2" sha1="31246269dfb70755cfd5aa9b6499cd97054a7732" offset="0" />
+				<rom name="056disk.nsi" size="89600" crc="0dfe79f2" sha1="31246269dfb70755cfd5aa9b6499cd97054a7732"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2251,7 +2251,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="057disk.nsi" size="89600" crc="a9fb7782" sha1="90d0448532493c2c87a0c0ae515475b5e97a9454" offset="0" />
+				<rom name="057disk.nsi" size="89600" crc="a9fb7782" sha1="90d0448532493c2c87a0c0ae515475b5e97a9454"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2263,7 +2263,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="058disk.nsi" size="89600" crc="6a750933" sha1="2987055930b561a3ca8f8c8d3f2367a5499f30d5" offset="0" />
+				<rom name="058disk.nsi" size="89600" crc="6a750933" sha1="2987055930b561a3ca8f8c8d3f2367a5499f30d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2275,7 +2275,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="059disk.nsi" size="89600" crc="676836bf" sha1="4ba45b0b25838593c21da12eabef86c84d1cc680" offset="0" />
+				<rom name="059disk.nsi" size="89600" crc="676836bf" sha1="4ba45b0b25838593c21da12eabef86c84d1cc680"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2287,7 +2287,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="060disk.nsi" size="89600" crc="bbc20b7c" sha1="18fc3407ff609cce3a6bbe06dcc2ffa44a3ce2f2" offset="0" />
+				<rom name="060disk.nsi" size="89600" crc="bbc20b7c" sha1="18fc3407ff609cce3a6bbe06dcc2ffa44a3ce2f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2299,7 +2299,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="061disk.nsi" size="89600" crc="e3615a30" sha1="891d78febb0ee9ab6e7c29fa25cf25f1943e16e7" offset="0" />
+				<rom name="061disk.nsi" size="89600" crc="e3615a30" sha1="891d78febb0ee9ab6e7c29fa25cf25f1943e16e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2311,7 +2311,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="062disk.nsi" size="89600" crc="2053e724" sha1="171e120ed96263efa5516512fb55e800db4d9dd0" offset="0" />
+				<rom name="062disk.nsi" size="89600" crc="2053e724" sha1="171e120ed96263efa5516512fb55e800db4d9dd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2323,7 +2323,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="063disk.nsi" size="89600" crc="6fe4faf0" sha1="dd1e558df4a018b5435fc5504e3853a402163457" offset="0" />
+				<rom name="063disk.nsi" size="89600" crc="6fe4faf0" sha1="dd1e558df4a018b5435fc5504e3853a402163457"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2335,7 +2335,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="064disk.nsi" size="89600" crc="f8d18bef" sha1="08dcebaed11f7141f7a638cce4e069090171fef5" offset="0" />
+				<rom name="064disk.nsi" size="89600" crc="f8d18bef" sha1="08dcebaed11f7141f7a638cce4e069090171fef5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2347,7 +2347,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="065disk.nsi" size="89600" crc="c60d227a" sha1="f278f5cd05a3c295edf6581607cb628768a337fb" offset="0" />
+				<rom name="065disk.nsi" size="89600" crc="c60d227a" sha1="f278f5cd05a3c295edf6581607cb628768a337fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2359,7 +2359,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="066disk.nsi" size="89600" crc="7d43c4a7" sha1="169464a1dca4ac3a59117ddb4f8859d8ad590a56" offset="0" />
+				<rom name="066disk.nsi" size="89600" crc="7d43c4a7" sha1="169464a1dca4ac3a59117ddb4f8859d8ad590a56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2371,7 +2371,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="067disk.nsi" size="89600" crc="430df895" sha1="f3420eb1727fdbeff2ba34ed559bd351a9f9695a" offset="0" />
+				<rom name="067disk.nsi" size="89600" crc="430df895" sha1="f3420eb1727fdbeff2ba34ed559bd351a9f9695a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2383,7 +2383,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="068disk.nsi" size="89600" crc="564931e2" sha1="d439c2dcb65964026cddb0c264afaf47c918bea4" offset="0" />
+				<rom name="068disk.nsi" size="89600" crc="564931e2" sha1="d439c2dcb65964026cddb0c264afaf47c918bea4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2395,7 +2395,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="069disk.nsi" size="89600" crc="ce8af2ad" sha1="0a6d581c9bd9cc02ebb6c4dd1df35375b2794b2a" offset="0" />
+				<rom name="069disk.nsi" size="89600" crc="ce8af2ad" sha1="0a6d581c9bd9cc02ebb6c4dd1df35375b2794b2a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2407,7 +2407,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="070disk.nsi" size="89600" crc="52741e29" sha1="34ccbe91cfe43c2508bbeb20dadd772d044e7001" offset="0" />
+				<rom name="070disk.nsi" size="89600" crc="52741e29" sha1="34ccbe91cfe43c2508bbeb20dadd772d044e7001"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2419,7 +2419,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="071disk.nsi" size="89600" crc="6000988f" sha1="8cdf538181d8069e2b0908a10edcc147aa031ede" offset="0" />
+				<rom name="071disk.nsi" size="89600" crc="6000988f" sha1="8cdf538181d8069e2b0908a10edcc147aa031ede"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2431,7 +2431,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="072disk.nsi" size="89600" crc="f7f9f10b" sha1="d15d6ab0d89d57003a014988152576e0920f1d72" offset="0" />
+				<rom name="072disk.nsi" size="89600" crc="f7f9f10b" sha1="d15d6ab0d89d57003a014988152576e0920f1d72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2443,7 +2443,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="073disk.nsi" size="89600" crc="5eedbe0f" sha1="f6e4d0149078eea525b77c21176576d4225aaa77" offset="0" />
+				<rom name="073disk.nsi" size="89600" crc="5eedbe0f" sha1="f6e4d0149078eea525b77c21176576d4225aaa77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2455,7 +2455,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="074disk.nsi" size="89600" crc="8192ab41" sha1="fefc6d14ef26b9b0974bb3335a93c3eab4846f50" offset="0" />
+				<rom name="074disk.nsi" size="89600" crc="8192ab41" sha1="fefc6d14ef26b9b0974bb3335a93c3eab4846f50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2467,7 +2467,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="075disk.nsi" size="89600" crc="2e79e711" sha1="a1c0718c74dc45bd231575b235e1973c29bb9e35" offset="0" />
+				<rom name="075disk.nsi" size="89600" crc="2e79e711" sha1="a1c0718c74dc45bd231575b235e1973c29bb9e35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2479,7 +2479,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89600">
-				<rom name="076disk.nsi" size="89600" crc="7000a0b3" sha1="0b83efb7ed370bb57d95d39e0b68cd92d8c98597" offset="0" />
+				<rom name="076disk.nsi" size="89600" crc="7000a0b3" sha1="0b83efb7ed370bb57d95d39e0b68cd92d8c98597"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2491,7 +2491,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="077disk.nsi" size="179200" crc="a9e6ff37" sha1="65b01d98e3ff0f62d409d534381d1651abc5a0fc" offset="0" />
+				<rom name="077disk.nsi" size="179200" crc="a9e6ff37" sha1="65b01d98e3ff0f62d409d534381d1651abc5a0fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2503,7 +2503,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="078disk.nsi" size="179200" crc="f50c58d7" sha1="6df124516bf90b40490a82a6e10a0d099f749d1a" offset="0" />
+				<rom name="078disk.nsi" size="179200" crc="f50c58d7" sha1="6df124516bf90b40490a82a6e10a0d099f749d1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2515,7 +2515,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="079disk.nsi" size="179200" crc="071f4aa1" sha1="40d00cd395227f75cefbcd86e99f5d995ef8d122" offset="0" />
+				<rom name="079disk.nsi" size="179200" crc="071f4aa1" sha1="40d00cd395227f75cefbcd86e99f5d995ef8d122"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2527,7 +2527,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="080disk.nsi" size="179200" crc="6a0460a7" sha1="ad100dfc092efdf039567f98d0a70dfc8407e5a1" offset="0" />
+				<rom name="080disk.nsi" size="179200" crc="6a0460a7" sha1="ad100dfc092efdf039567f98d0a70dfc8407e5a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2539,7 +2539,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="101disk.nsi" size="179200" crc="eec6923e" sha1="a513f1c30662ed7cbf88a71e22ebfd21425c50fe" offset="0" />
+				<rom name="101disk.nsi" size="179200" crc="eec6923e" sha1="a513f1c30662ed7cbf88a71e22ebfd21425c50fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2551,7 +2551,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="102disk.nsi" size="179200" crc="57f0fa36" sha1="26219bb4665817bc7eae06cf5b86f73eb5c5f22b" offset="0" />
+				<rom name="102disk.nsi" size="179200" crc="57f0fa36" sha1="26219bb4665817bc7eae06cf5b86f73eb5c5f22b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2563,7 +2563,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="103disk.nsi" size="179200" crc="4d07ace2" sha1="e416d1ceaa5f77b1c74827f9f43ed2305377122c" offset="0" />
+				<rom name="103disk.nsi" size="179200" crc="4d07ace2" sha1="e416d1ceaa5f77b1c74827f9f43ed2305377122c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2575,7 +2575,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="104disk.nsi" size="179200" crc="89477ad2" sha1="8261bdcd02798a08d3f6e7967f4e218e16f08c92" offset="0" />
+				<rom name="104disk.nsi" size="179200" crc="89477ad2" sha1="8261bdcd02798a08d3f6e7967f4e218e16f08c92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2587,7 +2587,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="105disk.nsi" size="179200" crc="b0b2b657" sha1="a3258a917ae7404c923fb332a83d00f703d7cf3f" offset="0" />
+				<rom name="105disk.nsi" size="179200" crc="b0b2b657" sha1="a3258a917ae7404c923fb332a83d00f703d7cf3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2599,7 +2599,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="106disk.nsi" size="179200" crc="502880c5" sha1="ec8bdd0a5689878e340afb0444bcb53b6329402d" offset="0" />
+				<rom name="106disk.nsi" size="179200" crc="502880c5" sha1="ec8bdd0a5689878e340afb0444bcb53b6329402d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2611,7 +2611,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="107disk.nsi" size="179200" crc="79b1f126" sha1="cc589a3f6409cf022ab2b213520a8db536ec9007" offset="0" />
+				<rom name="107disk.nsi" size="179200" crc="79b1f126" sha1="cc589a3f6409cf022ab2b213520a8db536ec9007"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2623,7 +2623,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="108disk.nsi" size="179200" crc="3a49d613" sha1="917321551321462187e45867dd2196cd185c1e57" offset="0" />
+				<rom name="108disk.nsi" size="179200" crc="3a49d613" sha1="917321551321462187e45867dd2196cd185c1e57"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2635,7 +2635,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="109disk.nsi" size="179200" crc="91d2f716" sha1="e542a7a61159b636c601de684c16a47d32dc7e0f" offset="0" />
+				<rom name="109disk.nsi" size="179200" crc="91d2f716" sha1="e542a7a61159b636c601de684c16a47d32dc7e0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2647,7 +2647,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="110disk.nsi" size="179200" crc="2602040e" sha1="685006273d70d21aa0e7d6fc089667bcd774b733" offset="0" />
+				<rom name="110disk.nsi" size="179200" crc="2602040e" sha1="685006273d70d21aa0e7d6fc089667bcd774b733"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2659,7 +2659,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="111disk.nsi" size="179200" crc="91d2f716" sha1="e542a7a61159b636c601de684c16a47d32dc7e0f" offset="0" />
+				<rom name="111disk.nsi" size="179200" crc="91d2f716" sha1="e542a7a61159b636c601de684c16a47d32dc7e0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2671,7 +2671,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="112disk.nsi" size="179200" crc="2602040e" sha1="685006273d70d21aa0e7d6fc089667bcd774b733" offset="0" />
+				<rom name="112disk.nsi" size="179200" crc="2602040e" sha1="685006273d70d21aa0e7d6fc089667bcd774b733"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2683,7 +2683,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="113disk.nsi" size="179200" crc="3bca147f" sha1="cd040ffd5d29001196704dd857f9603a87833cf2" offset="0" />
+				<rom name="113disk.nsi" size="179200" crc="3bca147f" sha1="cd040ffd5d29001196704dd857f9603a87833cf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2695,7 +2695,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="114disk.nsi" size="179200" crc="416677e2" sha1="41dbcf8b888a17be84aaf9cfeea0009bc5813f9d" offset="0" />
+				<rom name="114disk.nsi" size="179200" crc="416677e2" sha1="41dbcf8b888a17be84aaf9cfeea0009bc5813f9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2707,7 +2707,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="115disk.nsi" size="179200" crc="b56ba086" sha1="9ff8a972c574058540fa81de5198bf73aa4b59d9" offset="0" />
+				<rom name="115disk.nsi" size="179200" crc="b56ba086" sha1="9ff8a972c574058540fa81de5198bf73aa4b59d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2719,7 +2719,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="116disk.nsi" size="179200" crc="cc083aa1" sha1="ba1e02852b6079e97bbf7965bcff118527a0a03a" offset="0" />
+				<rom name="116disk.nsi" size="179200" crc="cc083aa1" sha1="ba1e02852b6079e97bbf7965bcff118527a0a03a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2731,7 +2731,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="117disk.nsi" size="179200" crc="b5f4c7f4" sha1="708d41cbd7bcf4e7aefef8d642596c0979fc5651" offset="0" />
+				<rom name="117disk.nsi" size="179200" crc="b5f4c7f4" sha1="708d41cbd7bcf4e7aefef8d642596c0979fc5651"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2743,7 +2743,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="118disk.nsi" size="358400" crc="29f505f6" sha1="a131d93d791bc26f165f39d4ec12ffaa252083d4" offset="0" />
+				<rom name="118disk.nsi" size="358400" crc="29f505f6" sha1="a131d93d791bc26f165f39d4ec12ffaa252083d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2755,7 +2755,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="119disk.nsi" size="179200" crc="4ae84221" sha1="8c5faac5e7c8cce4ac2e4b0d282ff15df538cd76" offset="0" />
+				<rom name="119disk.nsi" size="179200" crc="4ae84221" sha1="8c5faac5e7c8cce4ac2e4b0d282ff15df538cd76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2767,7 +2767,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="120disk.nsi" size="358400" crc="024f2f9e" sha1="2b8c8d35cf030ef8e0588284d5ea2375c4e9031c" offset="0" />
+				<rom name="120disk.nsi" size="358400" crc="024f2f9e" sha1="2b8c8d35cf030ef8e0588284d5ea2375c4e9031c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2779,7 +2779,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d01b01.nsi" size="179200" crc="2bfe39ea" sha1="7c6c7ecc89abdff5c0bc7e831bedb448c34e8f54" offset="0" />
+				<rom name="d01b01.nsi" size="179200" crc="2bfe39ea" sha1="7c6c7ecc89abdff5c0bc7e831bedb448c34e8f54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2791,7 +2791,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d01b02.nsi" size="358400" crc="ea3d8d5f" sha1="d9348238c94a4ec770d6143bb88017fe35f10fe6" offset="0" />
+				<rom name="d01b02.nsi" size="358400" crc="ea3d8d5f" sha1="d9348238c94a4ec770d6143bb88017fe35f10fe6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2803,7 +2803,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d01b03.nsi" size="179200" crc="7d8201de" sha1="9a25f3b9de5f6291fcfe655b32c8730d7eb95abd" offset="0" />
+				<rom name="d01b03.nsi" size="179200" crc="7d8201de" sha1="9a25f3b9de5f6291fcfe655b32c8730d7eb95abd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2815,7 +2815,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d02b01.nsi" size="179200" crc="8886f4b7" sha1="100ea1a3950c234e7e63aac5175b241afc9192c4" offset="0" />
+				<rom name="d02b01.nsi" size="179200" crc="8886f4b7" sha1="100ea1a3950c234e7e63aac5175b241afc9192c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2827,7 +2827,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d02b03.nsi" size="179200" crc="6f6d93a7" sha1="ee89f84b6aea18c753a621b00ae15b6bdfaee1ba" offset="0" />
+				<rom name="d02b03.nsi" size="179200" crc="6f6d93a7" sha1="ee89f84b6aea18c753a621b00ae15b6bdfaee1ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2839,7 +2839,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d03b01.nsi" size="179200" crc="aa1bd919" sha1="f9463ebe4da6c80fd99b930a10908b7e5464efa6" offset="0" />
+				<rom name="d03b01.nsi" size="179200" crc="aa1bd919" sha1="f9463ebe4da6c80fd99b930a10908b7e5464efa6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2851,7 +2851,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d03b03.nsi" size="179200" crc="8dc5da6d" sha1="b673eedf44ac92308ec7fe084d9a891150e337de" offset="0" />
+				<rom name="d03b03.nsi" size="179200" crc="8dc5da6d" sha1="b673eedf44ac92308ec7fe084d9a891150e337de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2863,7 +2863,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d04b01.nsi" size="358400" crc="96fbb1b7" sha1="70c3ef926905ecd6d24aa79757168b2c3c6058bd" offset="0" />
+				<rom name="d04b01.nsi" size="358400" crc="96fbb1b7" sha1="70c3ef926905ecd6d24aa79757168b2c3c6058bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2875,7 +2875,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d04b02.nsi" size="179200" crc="4268d449" sha1="fc571b9fa91ba679ba54ad845d1782617535d807" offset="0" />
+				<rom name="d04b02.nsi" size="179200" crc="4268d449" sha1="fc571b9fa91ba679ba54ad845d1782617535d807"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2887,7 +2887,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d04b03.nsi" size="179200" crc="18d2adaf" sha1="cbb5bf988a6ba8f4284b78abd7da47806f660a53" offset="0" />
+				<rom name="d04b03.nsi" size="179200" crc="18d2adaf" sha1="cbb5bf988a6ba8f4284b78abd7da47806f660a53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2899,7 +2899,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d05b01.nsi" size="358400" crc="f7c55e63" sha1="d18ad669c9217ac04d9a0e3ff947779a217df192" offset="0" />
+				<rom name="d05b01.nsi" size="358400" crc="f7c55e63" sha1="d18ad669c9217ac04d9a0e3ff947779a217df192"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2911,7 +2911,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d05b02.nsi" size="179200" crc="dfbfae31" sha1="0fd61cf3ba8b58327724e6d1cd7edadb3a8ed6b0" offset="0" />
+				<rom name="d05b02.nsi" size="179200" crc="dfbfae31" sha1="0fd61cf3ba8b58327724e6d1cd7edadb3a8ed6b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2923,7 +2923,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d05b03.nsi" size="179200" crc="0eb48d88" sha1="94bbfcb8e90ad94f6bd8ea398758d8345657544b" offset="0" />
+				<rom name="d05b03.nsi" size="179200" crc="0eb48d88" sha1="94bbfcb8e90ad94f6bd8ea398758d8345657544b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2935,7 +2935,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d06b01.nsi" size="358400" crc="17d90714" sha1="c9ebb8357c90b7cd7ef689b22259a6033d0fd335" offset="0" />
+				<rom name="d06b01.nsi" size="358400" crc="17d90714" sha1="c9ebb8357c90b7cd7ef689b22259a6033d0fd335"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2947,7 +2947,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d06b02.nsi" size="179200" crc="29bfffdf" sha1="0ff07f40f896646f45d4783ae2e23abfef255535" offset="0" />
+				<rom name="d06b02.nsi" size="179200" crc="29bfffdf" sha1="0ff07f40f896646f45d4783ae2e23abfef255535"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2959,7 +2959,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d06b03.nsi" size="179200" crc="b0ba07b2" sha1="c6100cf5928866336cc900011cd69ed4e301d554" offset="0" />
+				<rom name="d06b03.nsi" size="179200" crc="b0ba07b2" sha1="c6100cf5928866336cc900011cd69ed4e301d554"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2971,7 +2971,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d07b01.nsi" size="358400" crc="017173d9" sha1="da66374229b1e3dee8156cdc7ed1637ee92c78db" offset="0" />
+				<rom name="d07b01.nsi" size="358400" crc="017173d9" sha1="da66374229b1e3dee8156cdc7ed1637ee92c78db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2983,7 +2983,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d07b02.nsi" size="179200" crc="0e0e0b83" sha1="cd422bc1e8675cf93150c5278679aeab5e23c408" offset="0" />
+				<rom name="d07b02.nsi" size="179200" crc="0e0e0b83" sha1="cd422bc1e8675cf93150c5278679aeab5e23c408"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2995,7 +2995,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d07b03.nsi" size="179200" crc="c1be5783" sha1="ba0e89a59c0a08a4e5f1830111a21ed23dfb76ab" offset="0" />
+				<rom name="d07b03.nsi" size="179200" crc="c1be5783" sha1="ba0e89a59c0a08a4e5f1830111a21ed23dfb76ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3007,7 +3007,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d08b01.nsi" size="358400" crc="dd235ba3" sha1="dea43bfbe98a6759068e6c016979ebcd25857ca4" offset="0" />
+				<rom name="d08b01.nsi" size="358400" crc="dd235ba3" sha1="dea43bfbe98a6759068e6c016979ebcd25857ca4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3019,7 +3019,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d08b02.nsi" size="358400" crc="5938c796" sha1="ba13fdfb30dcb9308a333cfb17e14dc4db9508a2" offset="0" />
+				<rom name="d08b02.nsi" size="358400" crc="5938c796" sha1="ba13fdfb30dcb9308a333cfb17e14dc4db9508a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3031,7 +3031,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d08b03.nsi" size="179200" crc="f40d828c" sha1="bdecfc75850ea8880d3faa134eb1f37b0fd63dfb" offset="0" />
+				<rom name="d08b03.nsi" size="179200" crc="f40d828c" sha1="bdecfc75850ea8880d3faa134eb1f37b0fd63dfb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3043,7 +3043,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d09b01.nsi" size="358400" crc="839d3910" sha1="7cf81a305cec58f2d406f55105174ba203d387bd" offset="0" />
+				<rom name="d09b01.nsi" size="358400" crc="839d3910" sha1="7cf81a305cec58f2d406f55105174ba203d387bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3055,7 +3055,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d09b02.nsi" size="358400" crc="177f53ef" sha1="fbec35004b09f30111741dd758bf50958e31e69d" offset="0" />
+				<rom name="d09b02.nsi" size="358400" crc="177f53ef" sha1="fbec35004b09f30111741dd758bf50958e31e69d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3067,7 +3067,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d09b03.nsi" size="179200" crc="1e0f2e9b" sha1="1484c1d75f82926f4a954ceed4dbe2aafb9e3267" offset="0" />
+				<rom name="d09b03.nsi" size="179200" crc="1e0f2e9b" sha1="1484c1d75f82926f4a954ceed4dbe2aafb9e3267"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3079,7 +3079,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d10b01.nsi" size="179200" crc="1075bd80" sha1="467920cd8e20ee1208a2c71eb437d7c695f87c5a" offset="0" />
+				<rom name="d10b01.nsi" size="179200" crc="1075bd80" sha1="467920cd8e20ee1208a2c71eb437d7c695f87c5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3091,7 +3091,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="d10b02.nsi" size="358400" crc="ab137d1b" sha1="5e054b3396a2ad443993653f0a61949250db2854" offset="0" />
+				<rom name="d10b02.nsi" size="358400" crc="ab137d1b" sha1="5e054b3396a2ad443993653f0a61949250db2854"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3103,7 +3103,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d10b03.nsi" size="179200" crc="309c4ca4" sha1="92d1ba7c26637045c85db05b077729128522bf00" offset="0" />
+				<rom name="d10b03.nsi" size="179200" crc="309c4ca4" sha1="92d1ba7c26637045c85db05b077729128522bf00"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3115,7 +3115,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d11b01.nsi" size="179200" crc="d0f58c04" sha1="1433808f6ab95103987fc82190b77d14ba244925" offset="0" />
+				<rom name="d11b01.nsi" size="179200" crc="d0f58c04" sha1="1433808f6ab95103987fc82190b77d14ba244925"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3127,7 +3127,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d11b02.nsi" size="179200" crc="90760f6b" sha1="148350769c52a511cca5332d82d7c2ee65abe757" offset="0" />
+				<rom name="d11b02.nsi" size="179200" crc="90760f6b" sha1="148350769c52a511cca5332d82d7c2ee65abe757"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3139,7 +3139,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d11b03.nsi" size="179200" crc="d5d236b6" sha1="b1d6a9ebcb04b990defd268857682bf945ddeb8e" offset="0" />
+				<rom name="d11b03.nsi" size="179200" crc="d5d236b6" sha1="b1d6a9ebcb04b990defd268857682bf945ddeb8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3151,7 +3151,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d12b01.nsi" size="179200" crc="537b1872" sha1="0e89060479686db952d06c535210e3acb92e8cda" offset="0" />
+				<rom name="d12b01.nsi" size="179200" crc="537b1872" sha1="0e89060479686db952d06c535210e3acb92e8cda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3163,7 +3163,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d12b02.nsi" size="179200" crc="874b968d" sha1="45dc4c9d5c5119e61f82dbe7a8290b5e5574ece9" offset="0" />
+				<rom name="d12b02.nsi" size="179200" crc="874b968d" sha1="45dc4c9d5c5119e61f82dbe7a8290b5e5574ece9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3175,7 +3175,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d13b01.nsi" size="179200" crc="a00101f9" sha1="d1c45c5dc64916fc1c4f4aba94e0b8e2878f83e1" offset="0" />
+				<rom name="d13b01.nsi" size="179200" crc="a00101f9" sha1="d1c45c5dc64916fc1c4f4aba94e0b8e2878f83e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3187,7 +3187,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d14b01.nsi" size="179200" crc="0f802d79" sha1="a5d22a1e59eb7ecd1ae4bb2d1694193195586cf9" offset="0" />
+				<rom name="d14b01.nsi" size="179200" crc="0f802d79" sha1="a5d22a1e59eb7ecd1ae4bb2d1694193195586cf9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3199,7 +3199,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d15b01.nsi" size="179200" crc="a3104d2b" sha1="f58d7e5c00b35e10eab862b04ad28bf62eb9998d" offset="0" />
+				<rom name="d15b01.nsi" size="179200" crc="a3104d2b" sha1="f58d7e5c00b35e10eab862b04ad28bf62eb9998d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3211,7 +3211,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="d16b01.nsi" size="179200" crc="ce22c5cd" sha1="05f01d0cfbed306a1a9436647dc5fd3c20e19676" offset="0" />
+				<rom name="d16b01.nsi" size="179200" crc="ce22c5cd" sha1="05f01d0cfbed306a1a9436647dc5fd3c20e19676"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3223,7 +3223,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="r0.nsi" size="358400" crc="f130d4fd" sha1="0711ba1991557669e851f1277e2a878106c38f76" offset="0" />
+				<rom name="r0.nsi" size="358400" crc="f130d4fd" sha1="0711ba1991557669e851f1277e2a878106c38f76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3235,7 +3235,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="r1.nsi" size="358400" crc="8ae51fd8" sha1="fcf3834b3db47110704909797175fe6071855c3f" offset="0" />
+				<rom name="r1.nsi" size="358400" crc="8ae51fd8" sha1="fcf3834b3db47110704909797175fe6071855c3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3247,7 +3247,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="r2.nsi" size="179200" crc="ddd37545" sha1="2ed6ccd55d7b8a576e641efec88d30de3c0f3d4e" offset="0" />
+				<rom name="r2.nsi" size="179200" crc="ddd37545" sha1="2ed6ccd55d7b8a576e641efec88d30de3c0f3d4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3259,7 +3259,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="r3.nsi" size="358400" crc="49c5f52c" sha1="3671adef02cd20826a2531bfb9e2b5f4ab1eeaac" offset="0" />
+				<rom name="r3.nsi" size="358400" crc="49c5f52c" sha1="3671adef02cd20826a2531bfb9e2b5f4ab1eeaac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3271,7 +3271,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="r4.nsi" size="358400" crc="c2a0bcac" sha1="fb8c48324646fd8c2ac35255ef7b63b0519ea883" offset="0" />
+				<rom name="r4.nsi" size="358400" crc="c2a0bcac" sha1="fb8c48324646fd8c2ac35255ef7b63b0519ea883"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3283,7 +3283,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358400">
-				<rom name="r5.nsi" size="358400" crc="08283968" sha1="4ec5413fbf6b5bdf668407f120496625ed24880a" offset="0" />
+				<rom name="r5.nsi" size="358400" crc="08283968" sha1="4ec5413fbf6b5bdf668407f120496625ed24880a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3295,7 +3295,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="r6.nsi" size="179200" crc="088c3450" sha1="b1dc72af994e7d32e72d4c1162d3c2ade4967252" offset="0" />
+				<rom name="r6.nsi" size="179200" crc="088c3450" sha1="b1dc72af994e7d32e72d4c1162d3c2ade4967252"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3307,7 +3307,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="r7.nsi" size="179200" crc="7f70b20d" sha1="e709ce1c3a3b2cf6f77eaf16ea6b199b75e44732" offset="0" />
+				<rom name="r7.nsi" size="179200" crc="7f70b20d" sha1="e709ce1c3a3b2cf6f77eaf16ea6b199b75e44732"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3319,7 +3319,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
-				<rom name="r8.nsi" size="179200" crc="e0a4e269" sha1="24c53ff1ce76258112d9e355cbe668c2c164e3a4" offset="0" />
+				<rom name="r8.nsi" size="179200" crc="e0a4e269" sha1="24c53ff1ce76258112d9e355cbe668c2c164e3a4"/>
 			</dataarea>
 		</part>
 	</software>

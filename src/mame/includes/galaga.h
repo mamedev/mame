@@ -63,6 +63,8 @@ public:
 	void galaga_mem4(address_map &map);
 	void gatsbee_main_map(address_map &map);
 
+	void starfield_init();
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

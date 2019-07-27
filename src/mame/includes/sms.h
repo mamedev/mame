@@ -30,6 +30,7 @@
 #include "video/315_5124.h"
 
 #include "screen.h"
+#include "machine/timer.h"
 
 
 class sms_state : public driver_device
@@ -92,11 +93,15 @@ public:
 	void sms2_ntsc(machine_config &config);
 	void sms1_kr(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+	DECLARE_WRITE_LINE_MEMBER(gg_pause_callback);
 
 	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	template <typename X> static void screen_sms_pal_raw_params(screen_device &screen, X &&pixelclock);
+	template <typename X> static void screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock);
+	template <typename X> static void screen_gg_raw_params(screen_device &screen, X &&pixelclock);
+
 	DECLARE_READ8_MEMBER(read_0000);
 	DECLARE_READ8_MEMBER(read_4000);
 	DECLARE_READ8_MEMBER(read_8000);
@@ -124,7 +129,7 @@ protected:
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_n_csync_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
@@ -223,7 +228,7 @@ protected:
 	uint8_t m_port_dc_reg;
 	uint8_t m_port_dd_reg;
 	uint8_t m_gg_sio[5];
-	int m_paused;
+	int m_gg_paused;
 
 	uint8_t m_ctrl1_th_state;
 	uint8_t m_ctrl2_th_state;
@@ -232,6 +237,8 @@ protected:
 
 	// Data needed for Light Phaser
 	int m_lphaser_x_offs;   /* Needed to 'calibrate' lphaser; set at cart loading */
+	emu_timer *m_lphaser_th_timer;
+	TIMER_CALLBACK_MEMBER(lphaser_th_generate);
 
 	// Data needed for SegaScope (3D glasses)
 	uint8_t m_sscope_state;

@@ -244,7 +244,8 @@ void statriv2_state::check_coin_status()
 
 INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
 {
-	check_coin_status();
+	if (ioport("COIN"))
+		check_coin_status();
 
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
@@ -615,7 +616,33 @@ static INPUT_PORTS_START( sextriv )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bbchall )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button A")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button B")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button C")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button D")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -1170,6 +1197,7 @@ ROM_START( bbchall ) // ROMs came from a blister, Baby Boom Challenge title foun
 	ROM_LOAD( "bbu.2b",   0x1000, 0x1000, CRC(f5a0e022) SHA1(0224267cc500a45da86c881907c25a521b360f68) )
 	ROM_LOAD( "bbu.3b",   0x2000, 0x1000, CRC(e83ca1c9) SHA1(dd71c5e44f881b2a6067998882605abb0037182d) )
 	ROM_LOAD( "bbu.4b",   0x3000, 0x1000, CRC(dbad980c) SHA1(f4ec5f51185eeda7ed59b8cb7da9a293fe701389) )
+	//ROM_FILL(0x00bf, 0x0001, 0xc2) // HACK for testing! jz to jnz to skip "wrong satellite board" message. Alternatively via debugger: bpset 00bf, go, do PC=00d1, go
 
 	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "bbu.0b",   0x0000, 0x1000, CRC(4d2f5878) SHA1(8f6b7278e43c1c505580fd9a02f4bdec51dc2284) )
@@ -1705,7 +1733,7 @@ GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, statriv2_state, init_addr
 GAME( 1985, sextriv,    0,        statriv2,  sextriv,  statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1985, supertr,    0,        statriv2,  supertr2, statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
-GAME( 1986, bbchall,    0,        statriv2,  supertr2, statriv2_state, empty_init,     ROT0,  "Status Games",       "Baby Boom Challenge",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs?
+GAME( 1986, bbchall,    0,        statriv2,  bbchall,  statriv2_state, empty_init,     ROT0,  "Status Games",       "Baby Boom Challenge",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs.
 GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, init_addr_lmhe, ROT0,  "Status Games",       "Super Triv II",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Super Triv III",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems

@@ -86,6 +86,7 @@ public:
 	void init_hexaa();
 	void init_paddle2();
 	void init_tetrsark();
+	void init_tetrsark2();
 	void init_arkgcbl();
 	void init_arkangc2();
 	void init_arkbloc2();

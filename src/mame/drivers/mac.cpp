@@ -166,7 +166,7 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAM
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		m_rbv_colors[m_rbv_count++] = data>>16;
+		m_rbv_colors[m_rbv_count++] = (data>>16) & 0xff;
 
 		if (m_rbv_count == 3)
 		{

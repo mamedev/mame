@@ -128,7 +128,6 @@ void mps1230_state::mps1230_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0xc000, 0xdfff).ram(); // as per the service manual
-	map(0xff80, 0xffff).ram(); // internal in cpu
 }
 
 /***************************************************************************

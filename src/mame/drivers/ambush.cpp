@@ -154,11 +154,12 @@ void ambush_state::bootleg_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x7000, 0x77ff).ram();
-	map(0x7000, 0x71ff).share("sprite_ram");
-	map(0x7200, 0x72ff).share("attribute_ram");
-	map(0x7380, 0x739f).share("scroll_ram");  // not used on bootlegs?
-	map(0x7400, 0x77ff).share("video_ram");
+	map(0x7000, 0x71ff).ram().share("sprite_ram");
+	map(0x7200, 0x72ff).ram().share("attribute_ram");
+	map(0x7300, 0x737f).ram();
+	map(0x7380, 0x739f).ram().share("scroll_ram");  // not used on bootlegs?
+	map(0x73a0, 0x73ff).ram();
+	map(0x7400, 0x77ff).ram().share("video_ram");
 	map(0x8000, 0x9fff).rom();
 	map(0xa000, 0xa000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xa100, 0xa100).portr("sw1");

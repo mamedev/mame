@@ -202,12 +202,6 @@ protected:
 
 	int m_lpen;
 
-	int m_hlgt;
-	int m_vsp;
-	int m_gpa;
-	int m_rvv;
-	int m_lten;
-
 	int m_scanline;
 	int m_irq_scanline;
 	int m_vrtc_scanline;
@@ -219,6 +213,7 @@ protected:
 	int m_cursor_blink;
 	int m_char_blink;
 	uint8_t m_stored_attr;
+	uint8_t m_field_attr;
 
 	// timers
 	emu_timer *m_hrtc_on_timer;

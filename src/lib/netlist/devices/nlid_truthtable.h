@@ -10,22 +10,10 @@
 #ifndef NLID_TRUTHTABLE_H_
 #define NLID_TRUTHTABLE_H_
 
+#include "netlist/devices/nlid_system.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "plib/putil.h"
-
-#define NETLIB_TRUTHTABLE(cname, nIN, nOUT)                                    \
-	class NETLIB_NAME(cname) : public nld_truthtable_t<nIN, nOUT>              \
-	{                                                                          \
-	public:                                                                    \
-		template <class C>                                                     \
-		NETLIB_NAME(cname)(C &owner, const pstring &name)                      \
-		: nld_truthtable_t<nIN, nOUT>(owner, name, family_TTL(), &m_ttbl, m_desc) { }   \
-	private:                                                                   \
-		static truthtable_t m_ttbl;                                            \
-		static std::vector<pstring> m_desc;                                    \
-	}
-
 
 namespace netlist
 {
@@ -108,6 +96,8 @@ namespace devices
 		, m_fam(*this, fam)
 		, m_ign(*this, "m_ign", 0)
 		, m_ttp(ttp)
+		/* FIXME: the family should provide the names of the power-terminals! */
+		, m_power_pins(*this)
 		{
 			init(desc);
 		}
@@ -211,6 +201,8 @@ namespace devices
 		/* FIXME: check width */
 		state_var<type_t>   m_ign;
 		const truthtable_t &m_ttp;
+		/* FIXME: the family should provide the names of the power-terminals! */
+		nld_power_pins m_power_pins;
 	};
 
 	class netlist_base_factory_truthtable_t : public factory::element_t

@@ -223,8 +223,7 @@ void tankbust_state::map_cpu2(address_map &map)
 	map(0x2000, 0x3fff).nopw();    /* garbage, written in initialization loop */
 	//0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)
 	map(0x4000, 0x7fff).nopw();    /* garbage, written in initialization loop */
-	map(0x8000, 0x87ff).readonly();
-	map(0x8000, 0x87ff).writeonly();
+	map(0x8000, 0x87ff).ram();
 }
 
 

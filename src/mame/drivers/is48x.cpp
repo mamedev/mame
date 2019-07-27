@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-//#include "cpu/bcp/bcp.h"
+#include "cpu/bcp/dp8344.h"
 //#include "machine/eeprompar.h"
 //#include "video/mc6845.h"
 //#include "screen.h"
@@ -19,21 +19,46 @@ public:
 	is48x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bcp(*this, "bcp")
+		, m_bcpram(*this, "bcpram")
 	{ }
 
 	void is482(machine_config &config);
 
 private:
+	u8 bcpram_r(offs_t offset);
+	void bcpram_w(offs_t offset, u8 data);
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+	void bcp_inst_map(address_map &map);
+	void bcp_data_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<dp8344_device> m_bcp;
+	required_shared_ptr<u16> m_bcpram;
 };
+
+u8 is48x_state::bcpram_r(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return m_bcpram[offset >> 1] >> 8;
+	else
+		return m_bcpram[offset >> 1] & 0x00ff;
+}
+
+void is48x_state::bcpram_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_bcpram[offset >> 1] = (m_bcpram[offset >> 1] & 0x00ff) | data << 8;
+	else
+		m_bcpram[offset >> 1] = (m_bcpram[offset >> 1] & 0xff00) | data;
+}
 
 void is48x_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
-	map(0x40000, 0x47fff).ram();
+	map(0x40000, 0x47fff).rw(FUNC(is48x_state::bcpram_r), FUNC(is48x_state::bcpram_w));
 	map(0x50000, 0x51fff).ram();
 	map(0x54000, 0x55fff).ram();
 	map(0x60022, 0x60022).nopr();
@@ -50,6 +75,15 @@ void is48x_state::io_map(address_map &map)
 	map(0x8180, 0x8180).ram();
 }
 
+void is48x_state::bcp_inst_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("bcpram");
+}
+
+void is48x_state::bcp_data_map(address_map &map)
+{
+}
+
 static INPUT_PORTS_START(is482)
 INPUT_PORTS_END
 
@@ -59,7 +93,9 @@ void is48x_state::is482(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &is48x_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &is48x_state::io_map);
 
-	//DP8344(config, "bcp", 18.867_MHz_XTAL);
+	DP8344(config, m_bcp, 18.867_MHz_XTAL);
+	m_bcp->set_addrmap(AS_PROGRAM, &is48x_state::bcp_inst_map);
+	m_bcp->set_addrmap(AS_DATA, &is48x_state::bcp_data_map);
 }
 
 ROM_START(is482) // "IS-488-A" on case

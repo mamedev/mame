@@ -210,14 +210,14 @@ namespace netlist
 	class models_t
 	{
 	public:
-		void register_model(pstring model_in);
+		void register_model(const pstring &model_in);
 		/* model / family related */
 
-		pstring value_str(pstring model, pstring entity);
+		pstring value_str(const pstring &model, const pstring &entity);
 
-		nl_double value(pstring model, pstring entity);
+		nl_double value(const pstring &model, const pstring &entity);
 
-		pstring type(pstring model) { return value_str(model, "COREMODEL"); }
+		pstring type(const pstring &model) { return value_str(model, "COREMODEL"); }
 
 	private:
 		using model_map_t = std::unordered_map<pstring, pstring>;
@@ -369,16 +369,18 @@ namespace netlist
 		const factory::list_t &factory() const { return m_factory; }
 
 		/* helper - also used by nltool */
-		const pstring resolve_alias(const pstring &name) const;
+		pstring resolve_alias(const pstring &name) const;
+		pstring de_alias(const pstring &alias) const;
 
 		/* needed by nltool */
-		std::vector<pstring> get_terminals_for_device_name(const pstring &devname);
+		std::vector<pstring> get_terminals_for_device_name(const pstring &devname) const;
 
 		log_type &log();
 		const log_type &log() const;
 
 		/* needed by proxy */
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true);
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true) const;
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true) const;
 
 		/* core net handling */
 
@@ -388,9 +390,11 @@ namespace netlist
 
 		void prepare_to_run();
 
-	private:
+		/* validation */
 
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
+		void enable_validation() { m_validation = true; }
+		bool is_validation() const { return m_validation; }
+	private:
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
 
@@ -413,6 +417,7 @@ namespace netlist
 		std::unordered_map<pstring, param_ref_t>    m_params;
 
 		unsigned m_proxy_cnt;
+		bool m_validation;
 	};
 
 	// ----------------------------------------------------------------------------------------

@@ -192,7 +192,7 @@ void orao_state::orao(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(orao_cassette_formats);

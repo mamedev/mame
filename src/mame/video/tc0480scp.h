@@ -5,14 +5,19 @@
 
 #pragma once
 
+enum
+{
+	TC0480SCP_LAYOUT_COMMON = 0, // default layout
+	TC0480SCP_LAYOUT_BOOTLEG // bootleg layout (footchmpbl need this)
+};
+
 class tc0480scp_device : public device_t, public device_gfx_interface
 {
 public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
+	void set_gfxlayout(int gfxlayout) { m_gfxlayout = gfxlayout; }
 	void set_col_base(int col) { m_col_base = col; }
 	void set_offsets(int x_offset, int y_offset)
 	{
@@ -40,7 +45,7 @@ public:
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
 
 	/* Returns the priority order of the bg tilemaps set in the internal
 	register. The order in which the four layers should be drawn is
@@ -68,25 +73,27 @@ private:
 	int                m_bgscrolly[4];
 	int                m_pri_reg;
 
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_default);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo_bootleg);
+
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
 	tilemap_t          *m_tilemap[5][2];
 	s32                m_dblwidth;
 
-	int                m_gfxnum;
+	int                m_gfxlayout;
 	int                m_x_offset, m_y_offset;
 	int                m_text_xoffs, m_text_yoffs;
 	int                m_flip_xoffs, m_flip_yoffs;
 
 	int                m_col_base;
 
-	required_device<gfxdecode_device> m_gfxdecode;
-
 	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	void set_layer_ptrs();
-	void bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority );
-	void bg23_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority );
+	void bg01_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
+	void bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u8 priority, u8 pmask = 0xff);
 };
 
 DECLARE_DEVICE_TYPE(TC0480SCP, tc0480scp_device)

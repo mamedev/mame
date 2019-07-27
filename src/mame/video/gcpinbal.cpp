@@ -10,44 +10,40 @@
 
 TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg0_tile_info)
 {
-	uint16_t tilenum = m_tilemapram[0 + tile_index * 2];
-	uint16_t attr    = m_tilemapram[1 + tile_index * 2];
+	const u16 tile = m_tilemapram[0 + tile_index * 2];
+	const u16 attr = m_tilemapram[1 + tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(1,
-			(tilenum & 0xfff) + m_bg0_gfxset,
+	SET_TILE_INFO_MEMBER(0,
+			(tile & 0xfff) + m_bg0_gfxset,
 			(attr & 0x1f),
-			TILE_FLIPYX( (attr & 0x300) >> 8));
+			TILE_FLIPYX((attr & 0x300) >> 8));
 }
 
 TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg1_tile_info)
 {
-	uint16_t tilenum = m_tilemapram[0x800 + tile_index * 2];
-	uint16_t attr    = m_tilemapram[0x801 + tile_index * 2];
+	const u16 tile = m_tilemapram[0x800 + tile_index * 2];
+	const u16 attr = m_tilemapram[0x801 + tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(1,
-			(tilenum & 0xfff) + 0x2000 + m_bg1_gfxset,
+	SET_TILE_INFO_MEMBER(0,
+			(tile & 0xfff) + 0x2000 + m_bg1_gfxset,
 			(attr & 0x1f) + 0x30,
-			TILE_FLIPYX( (attr & 0x300) >> 8));
+			TILE_FLIPYX((attr & 0x300) >> 8));
 }
 
 TILE_GET_INFO_MEMBER(gcpinbal_state::get_fg_tile_info)
 {
-	uint16_t tilenum = m_tilemapram[0x1000 + tile_index];
-
-	SET_TILE_INFO_MEMBER(2,
-			(tilenum & 0xfff),
-			(tilenum >> 12) | 0x70,
-			0);
+	const u16 tile = m_tilemapram[0x1000 + tile_index];
+	SET_TILE_INFO_MEMBER(1, (tile & 0xfff), (tile >> 12), 0);
 }
 
-void gcpinbal_state::gcpinbal_core_vh_start(  )
+void gcpinbal_state::video_start()
 {
 	int xoffs = 0;
 	int yoffs = 0;
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gcpinbal_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -62,9 +58,9 @@ void gcpinbal_state::gcpinbal_core_vh_start(  )
 	m_tilemap[2]->set_scrolldy(-yoffs, 0);
 }
 
-void gcpinbal_state::video_start()
+void gcpinbal_state::gcpinbal_colpri_cb(u32 &colour, u32 &pri_mask)
 {
-	gcpinbal_core_vh_start();
+	pri_mask = (m_d80060_ram[0x8 / 2] & 0x8800) ? 0xf0 : 0xfc;
 }
 
 
@@ -72,12 +68,7 @@ void gcpinbal_state::video_start()
                    TILEMAP READ AND WRITE HANDLERS
 *******************************************************************/
 
-READ16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_r)
-{
-	return m_tilemapram[offset];
-}
-
-WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
+void gcpinbal_state::tilemaps_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tilemapram[offset]);
 
@@ -90,14 +81,12 @@ WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
 }
 
 
-
 /**************************************************************
                         SCREEN REFRESH
 **************************************************************/
 
-uint32_t gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gcpinbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	uint8_t layer[3];
 
 #ifdef MAME_DEBUG
@@ -127,7 +116,7 @@ uint32_t gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_in
 	m_scrollx[2] = m_d80010_ram[0xc / 2];
 	m_scrolly[2] = m_d80010_ram[0xe / 2];
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_tilemap[i]->set_scrollx(0, m_scrollx[i]);
 		m_tilemap[i]->set_scrolly(0, m_scrolly[i]);
@@ -156,8 +145,7 @@ uint32_t gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_in
 #endif
 	m_tilemap[layer[2]]->draw(screen, bitmap, cliprect, 0, 4);
 
-	int sprpri = (m_d80060_ram[0x8 / 2] & 0x8800) ? 0 : 1;
-	m_sprgen->gcpinbal_draw_sprites(screen, bitmap, cliprect, m_gfxdecode, 16, sprpri);
+	m_sprgen->gcpinbal_draw_sprites(screen, bitmap, cliprect, 16);
 
 #if 0
 	{

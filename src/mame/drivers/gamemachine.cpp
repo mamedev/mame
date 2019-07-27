@@ -415,4 +415,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1978, 2001tgm, 0,      0, tgm,     tgm,   tgm_state, empty_init, "Waddingtons", "2001: The Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1978, 2001tgm, 0,      0, tgm,     tgm,   tgm_state, empty_init, "Waddingtons", "2001: The Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

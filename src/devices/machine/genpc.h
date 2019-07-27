@@ -158,6 +158,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device)
 
+
 class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
@@ -165,6 +166,8 @@ public:
 	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -178,6 +181,26 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
+
+
+class ec1840_mb_device : public ec1841_mb_device
+{
+public:
+	// construction/destruction
+	ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+private:
+	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+};
+
+DECLARE_DEVICE_TYPE(EC1840_MOTHERBOARD, ec1840_mb_device)
 
 
 class pc_noppi_mb_device : public ibm5160_mb_device

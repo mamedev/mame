@@ -2,8 +2,6 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  ** subclass of hh_ucom4_state (includes/hh_ucom4.h, drivers/hh_ucom4.cpp) **
-
   Roland TB-303 Bass Line, 1982, designed by Tadao Kikumoto
   * NEC uCOM-43 MCU, labeled D650C 133
   * 3*uPD444C 1024x4 Static CMOS SRAM
@@ -15,40 +13,79 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_ucom4.h"
+#include "cpu/ucom4/ucom4.h"
+#include "video/pwm.h"
+#include "machine/timer.h"
 
 #include "tb303.lh"
 
 
-class tb303_state : public hh_ucom4_state
+class tb303_state : public driver_device
 {
 public:
 	tb303_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_ucom4_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void tb303(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	required_device<ucom4_cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<5> m_inputs;
+
 	u8 m_ram[0xc00];
+	u8 m_ram_addrset[3];
 	u16 m_ram_address;
+	u8 m_ram_data;
 	bool m_ram_ce;
 	bool m_ram_we;
+	u8 m_led_data;
+	u8 m_inp_mux;
 
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(strobe_w);
 	void refresh_ram();
+	template<int N> DECLARE_WRITE8_MEMBER(ram_address_w);
+	DECLARE_WRITE8_MEMBER(ram_data_w);
+	DECLARE_READ8_MEMBER(ram_data_r);
+	DECLARE_WRITE8_MEMBER(strobe_w);
 
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(input_r);
 	void update_leds();
+	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_READ8_MEMBER(input_r);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock) { m_maincpu->set_input_line(0, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
-
-	virtual void machine_start() override;
 };
+
+void tb303_state::machine_start()
+{
+	// zerofill
+	memset(m_ram, 0, sizeof(m_ram));
+	memset(m_ram_addrset, 0, sizeof(m_ram_addrset));
+	m_ram_address = 0;
+	m_ram_data = 0;
+	m_ram_ce = false;
+	m_ram_we = false;
+	m_led_data = 0;
+	m_inp_mux = 0;
+
+	// register for savestates
+	save_item(NAME(m_ram));
+	save_item(NAME(m_ram_addrset));
+	save_item(NAME(m_ram_address));
+	save_item(NAME(m_ram_data));
+	save_item(NAME(m_ram_ce));
+	save_item(NAME(m_ram_we));
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_inp_mux));
+}
 
 // TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
 #define TP2_HZ      454545
@@ -72,7 +109,7 @@ void tb303_state::refresh_ram()
 	// _Q0: N/C, _Q1: IC-5, _Q2: IC-3, _Q3: IC-4
 	m_ram_ce = true;
 	u8 hi = 0;
-	switch (m_port[NEC_UCOM4_PORTE] >> 2 & 3)
+	switch (m_ram_addrset[2] >> 2 & 3)
 	{
 		case 0: m_ram_ce = false; break;
 		case 1: hi = 0; break;
@@ -84,24 +121,31 @@ void tb303_state::refresh_ram()
 	{
 		// _WE must be high(read mode) for address transitions
 		if (!m_ram_we)
-			m_ram_address = hi << 10 | (m_port[NEC_UCOM4_PORTE] << 8 & 0x300) | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTD];
+			m_ram_address = hi << 10 | (m_ram_addrset[2] << 8 & 0x300) | m_ram_addrset[1] << 4 | m_ram_addrset[0];
 		else
-			m_ram[m_ram_address] = m_port[NEC_UCOM4_PORTC];
+			m_ram[m_ram_address] = m_ram_data;
 	}
 }
 
-WRITE8_MEMBER(tb303_state::ram_w)
+template<int N>
+WRITE8_MEMBER(tb303_state::ram_address_w)
 {
-	// MCU C: RAM data
 	// MCU D,F,E: RAM address
-	m_port[offset] = data;
+	m_ram_addrset[N] = data;
 	refresh_ram();
 
 	// MCU D,F01: pitch data
 	//..
 }
 
-READ8_MEMBER(tb303_state::ram_r)
+WRITE8_MEMBER(tb303_state::ram_data_w)
+{
+	// MCU C: RAM data
+	m_ram_data = data;
+	refresh_ram();
+}
+
+READ8_MEMBER(tb303_state::ram_data_r)
 {
 	// MCU C: RAM data
 	if (m_ram_ce && !m_ram_we)
@@ -118,8 +162,6 @@ WRITE8_MEMBER(tb303_state::strobe_w)
 
 	// MCU I1: pitch data latch strobe
 	// MCU I2: gate signal
-
-	m_port[offset] = data;
 }
 
 
@@ -134,34 +176,47 @@ void tb303_state::update_leds()
 	    0.2 D208    1.2 D215    2.2 D220    3.2 D210
 	    0.3 D209    1.3 D216    2.3 D221    3.3 D212
 	*/
-	display_matrix(4, 4, m_port[NEC_UCOM4_PORTG], m_port[NEC_UCOM4_PORTH]);
+	m_display->matrix(m_inp_mux, m_led_data);
 
 	// todo: battery led
 	// todo: 4 more leds(see top-left part)
 }
 
-WRITE8_MEMBER(tb303_state::switch_w)
+WRITE8_MEMBER(tb303_state::led_w)
 {
 	// MCU G: leds state
-	// MCU H: input/led mux
-	if (offset == NEC_UCOM4_PORTH)
-		m_inp_mux = data = data ^ 0xf;
+	m_led_data = data;
+	update_leds();
+}
 
-	m_port[offset] = data;
+WRITE8_MEMBER(tb303_state::input_w)
+{
+	// MCU H: input/led mux
+	m_inp_mux = data ^ 0xf;
 	update_leds();
 }
 
 READ8_MEMBER(tb303_state::input_r)
 {
+	u8 data = 0;
+
 	// MCU A,B: multiplexed inputs
 	// if input mux(port H) is 0, port A status buffer & gate is selected (via Q5 NAND)
-	if (offset == NEC_UCOM4_PORTA && m_inp_mux == 0)
+	if (offset == 0 && m_inp_mux == 0)
 	{
 		// todo..
-		return m_inp_matrix[4]->read();
+		data = m_inputs[4]->read();
 	}
 	else
-		return read_inputs(4) >> (offset*4) & 0xf;
+	{
+		for (int i = 0; i < 4; i++)
+			if (BIT(m_inp_mux, i))
+				data |=  m_inputs[i]->read();
+
+		data >>= (offset*4) & 0xf;
+	}
+
+	return data;
 }
 
 
@@ -232,36 +287,19 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void tb303_state::machine_start()
-{
-	hh_ucom4_state::machine_start();
-
-	// zerofill
-	memset(m_ram, 0, sizeof(m_ram));
-	m_ram_address = 0;
-	m_ram_ce = false;
-	m_ram_we = false;
-
-	// register for savestates
-	save_item(NAME(m_ram));
-	save_item(NAME(m_ram_address));
-	save_item(NAME(m_ram_ce));
-	save_item(NAME(m_ram_we));
-}
-
 void tb303_state::tb303(machine_config &config)
 {
 	/* basic machine hardware */
 	NEC_D650(config, m_maincpu, TP2_HZ);
 	m_maincpu->read_a().set(FUNC(tb303_state::input_r));
 	m_maincpu->read_b().set(FUNC(tb303_state::input_r));
-	m_maincpu->read_c().set(FUNC(tb303_state::ram_r));
-	m_maincpu->write_c().set(FUNC(tb303_state::ram_w));
-	m_maincpu->write_d().set(FUNC(tb303_state::ram_w));
-	m_maincpu->write_e().set(FUNC(tb303_state::ram_w));
-	m_maincpu->write_f().set(FUNC(tb303_state::ram_w));
-	m_maincpu->write_g().set(FUNC(tb303_state::switch_w));
-	m_maincpu->write_h().set(FUNC(tb303_state::switch_w));
+	m_maincpu->read_c().set(FUNC(tb303_state::ram_data_r));
+	m_maincpu->write_c().set(FUNC(tb303_state::ram_data_w));
+	m_maincpu->write_d().set(FUNC(tb303_state::ram_address_w<0>));
+	m_maincpu->write_e().set(FUNC(tb303_state::ram_address_w<2>));
+	m_maincpu->write_f().set(FUNC(tb303_state::ram_address_w<1>));
+	m_maincpu->write_g().set(FUNC(tb303_state::led_w));
+	m_maincpu->write_h().set(FUNC(tb303_state::input_w));
 	m_maincpu->write_i().set(FUNC(tb303_state::strobe_w));
 
 	timer_device &tp3_clock(TIMER(config, "tp3_clock"));
@@ -269,8 +307,8 @@ void tb303_state::tb303(machine_config &config)
 	tp3_clock.set_start_delay(TP3_PERIOD - TP3_LOW);
 	TIMER(config, "tp3_clear").configure_periodic(FUNC(tb303_state::tp3_clear), TP3_PERIOD);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_ucom4_state::display_decay_tick), attotime::from_msec(1));
-
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	config.set_default_layout(layout_tb303);
 
 	/* sound hardware */

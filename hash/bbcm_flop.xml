@@ -21,7 +21,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="masterwelcome.adl" size="655360" crc="606598eb" sha1="13cb8944fc6905bc601a94b5c271d1df2b0a4644" offset="0" />
+				<rom name="masterwelcome.adl" size="655360" crc="606598eb" sha1="13cb8944fc6905bc601a94b5c271d1df2b0a4644" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" offset="0" />
+				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="amx_superart_master.ssd" size="102400" crc="3dff4b7f" sha1="d67cb13474f2cf836ea0655f800c39ace6a1d0b2" offset="0" />
+				<rom name="amx_superart_master.ssd" size="102400" crc="3dff4b7f" sha1="d67cb13474f2cf836ea0655f800c39ace6a1d0b2" />
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="fsdd.adl" size="655360" crc="77560540" sha1="c60e1df1aff74cb491234140577137c65c55be0a" offset="0" />
+				<rom name="fsdd.adl" size="655360" crc="77560540" sha1="c60e1df1aff74cb491234140577137c65c55be0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
-				<rom name="HardDiscUtil80-MorleyElectronics.adm" size="327680" crc="f1f9d916" sha1="82f1d7da12250a6d5d232625784ac7e8bbc7bff2" offset="0" />
+				<rom name="HardDiscUtil80-MorleyElectronics.adm" size="327680" crc="f1f9d916" sha1="82f1d7da12250a6d5d232625784ac7e8bbc7bff2" />
 			</dataarea>
 		</part>
 	</software>
@@ -82,7 +82,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="201472">
-				<rom name="pop-beeb.ssd" size="201472" crc="4fcebaca" sha1="1b317c72a8fac9b2bcd0fcb5d8eab2bbbf7d035d" offset="0" />
+				<rom name="pop-beeb.ssd" size="201472" crc="4fcebaca" sha1="1b317c72a8fac9b2bcd0fcb5d8eab2bbbf7d035d" />
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="97280">
-				<rom name="tyb-enjoy.ssd" size="97280" crc="2f8dafe5" sha1="15c05a7e8c2b130ab99accee0a867467acda1774" offset="0"/>
+				<rom name="tyb-enjoy.ssd" size="97280" crc="2f8dafe5" sha1="15c05a7e8c2b130ab99accee0a867467acda1774"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,7 +108,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="tyb-retribution.dsd" size="409600" crc="33ee87cb" sha1="346e6b2f266b663845dc5f1d71666dcdcf5f1083" offset="0"/>
+				<rom name="tyb-retribution.dsd" size="409600" crc="33ee87cb" sha1="346e6b2f266b663845dc5f1d71666dcdcf5f1083"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="96256">
-				<rom name="bs-teletextr.ssd" size="96256" crc="ea864dda" sha1="a8c0ea5c0410e1afbb9338208d437885fb60e943" offset="0" />
+				<rom name="bs-teletextr.ssd" size="96256" crc="ea864dda" sha1="a8c0ea5c0410e1afbb9338208d437885fb60e943" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +136,7 @@
 		<sharedfeat name="1mhzbus_default" value="beebsid"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
-				<rom name="SID Music 1.dsd" size="409600" crc="16174039" sha1="c56297fc9dc5c664a66add30b8b8e1fa45ec7042" offset="0"/>
+				<rom name="SID Music 1.dsd" size="409600" crc="16174039" sha1="c56297fc9dc5c664a66add30b8b8e1fa45ec7042"/>
 			</dataarea>
 		</part>
 	</software>
@@ -150,7 +150,7 @@
 		<sharedfeat name="1mhzbus_default" value="beebsid"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="277761">
-				<rom name="SID Music 2.dsd" size="277761" crc="c9e4a751" sha1="aca511d63a5a74a2c3cb7a8bb9a3db57a9a5ac34" offset="0"/>
+				<rom name="SID Music 2.dsd" size="277761" crc="c9e4a751" sha1="aca511d63a5a74a2c3cb7a8bb9a3db57a9a5ac34"/>
 			</dataarea>
 		</part>
 	</software>

@@ -303,7 +303,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, istellar_state, vblank_irq))
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(istellar_state::vblank_irq));
 
 	// Daphne says "TODO: get the real interstellar resistor values"
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);

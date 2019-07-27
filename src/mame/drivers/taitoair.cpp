@@ -209,7 +209,7 @@ perhaps? The two writes seem to take only two values.
                 MEMORY handlers
 ***********************************************************/
 
-WRITE16_MEMBER(taitoair_state::system_control_w)
+void taitoair_state::system_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if ((ACCESSING_BITS_0_7 == 0) && ACCESSING_BITS_8_15)
 		data >>= 8;
@@ -222,32 +222,32 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", m_maincpu->pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
-READ16_MEMBER(taitoair_state::lineram_r)
+u16 taitoair_state::lineram_r(offs_t offset)
 {
 	return m_line_ram[offset];
 }
 
-WRITE16_MEMBER(taitoair_state::lineram_w)
+void taitoair_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		m_line_ram[offset] = data;
 
-	//if(offset == 0x3fff)
+	//if (offset == 0x3fff)
 	//  printf("LineRAM go %d\n",(int)m_screen->frame_number());
 }
 
-READ16_MEMBER(taitoair_state::dspram_r)
+u16 taitoair_state::dspram_r(offs_t offset)
 {
 	return m_dsp_ram[offset];
 }
 
-WRITE16_MEMBER(taitoair_state::dspram_w)
+void taitoair_state::dspram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		m_dsp_ram[offset] = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
+u16 taitoair_state::dsp_HOLD_signal_r()
 {
 	/* HOLD signal is active low */
 	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", m_dsp->pcbase(), m_dsp_hold_signal);
@@ -255,43 +255,39 @@ READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 	return m_dsp_hold_signal;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_HOLDA_signal_w)
+void taitoair_state::dsp_HOLDA_signal_w(offs_t offset, u16 data)
 {
 	if (offset)
 		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", m_dsp->pcbase(), data);
 }
 
 
-WRITE16_MEMBER(taitoair_state::airsys_paletteram16_w)/* xxBBBBxRRRRxGGGG */
+void taitoair_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)/* xxBBBBxRRRRxGGGG */
 {
-	int a;
-
 	COMBINE_DATA(&m_paletteram[offset]);
 
-	a = m_paletteram[offset];
+	const u16 a = m_paletteram[offset];
 	m_palette->set_pen_color(offset, pal4bit(a >> 0), pal4bit(a >> 5), pal4bit(a >> 10));
 }
 
-WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
+void taitoair_state::gradram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint32_t pen;
-	int r,g,b;
 	//int pal_r,pal_g,pal_b;
 
 	COMBINE_DATA(&m_gradram[offset]);
 	offset &= 0x1fff;
 
-	pen = (m_gradram[offset])|(m_gradram[(offset+0x2000)]<<16);
+	const u32 pen = (m_gradram[offset]) | (m_gradram[(offset + 0x2000)] << 16);
 	/* TODO: correct? */
-	r = (pen & 0x00007f) >> 0;
-	g = (pen & 0x007f00) >> (8);
-	b = (pen & 0x7f0000) >> (16);
+	u8 r = (pen & 0x00007f) >> 0;
+	u8 g = (pen & 0x007f00) >> (8);
+	u8 b = (pen & 0x7f0000) >> (16);
 
 	r = (r << 1) | (r & 1);
 	g = (g << 1) | (g & 1);
 	b = (b << 1) | (b & 1);
 
-	m_palette->set_pen_color(offset+0x2000, r, g, b);
+	m_palette->set_pen_color(offset + 0x2000, r, g, b);
 }
 
 
@@ -301,19 +297,19 @@ WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
 
 READ16_MEMBER(taitoair_state::stick_input_r)
 {
-	switch( offset )
+	switch (offset)
 	{
 		case 0x00:  /* "counter 1" lo */
-			return m_yoke->throttle_r(space,0) & 0xff;
+			return m_yoke->throttle_r() & 0xff;
 
 		case 0x01:  /* "counter 2" lo */
-			return m_yoke->stickx_r(space,0) & 0xff;
+			return m_yoke->stickx_r() & 0xff;
 
 		case 0x02:  /* "counter 1" hi */
-			return (m_yoke->throttle_r(space,0) & 0xff00) >> 8;
+			return (m_yoke->throttle_r() & 0xff00) >> 8;
 
 		case 0x03:  /* "counter 2" hi */
-			return (m_yoke->stickx_r(space,0) & 0xff00) >> 8;
+			return (m_yoke->stickx_r() & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -321,21 +317,21 @@ READ16_MEMBER(taitoair_state::stick_input_r)
 
 READ16_MEMBER(taitoair_state::stick2_input_r)
 {
-	switch( offset )
+	switch (offset)
 	{
 		case 0x00:  /* "counter 3" lo */
-			return m_yoke->sticky_r(space,0);
+			return m_yoke->sticky_r();
 
 		case 0x02:  /* "counter 3" hi */
-			return (m_yoke->sticky_r(space,0) & 0xff00) >> 8;
+			return (m_yoke->sticky_r() & 0xff00) >> 8;
 	}
 
 	return 0;
 }
 
-WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
+void taitoair_state::sound_bankswitch_w(u8 data)
 {
-	membank("z80bank")->set_entry(data & 3);
+	m_z80bank->set_entry(data & 3);
 }
 
 /*!
@@ -348,17 +344,17 @@ WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
           [2] (unused)
           [3] both games uses 0xb7, most likely a register setting.
 */
-WRITE16_MEMBER(taitoair_state::dma_regs_w)
+void taitoair_state::dma_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	printf("%08x %04x\n",offset,data);
 
-	if(offset == 0 && ACCESSING_BITS_8_15)
+	if (offset == 0 && ACCESSING_BITS_8_15)
 	{
-		if(data == 0x1fff)
+		if (data == 0x1fff)
 		{
 			fb_erase_op();
 		}
-		else if(data & 0x8000)
+		else if (data & 0x8000)
 		{
 			/*! @todo it also flushes current palette. */
 			fb_copy_op();
@@ -366,7 +362,7 @@ WRITE16_MEMBER(taitoair_state::dma_regs_w)
 	}
 }
 
-WRITE8_MEMBER(taitoair_state::coin_control_w)
+void taitoair_state::coin_control_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -383,8 +379,8 @@ void taitoair_state::airsys_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 	map(0x0c0000, 0x0cffff).ram().share("m68000_mainram");
 	map(0x140000, 0x140001).w(FUNC(taitoair_state::system_control_w)); /* Pause the TMS32025 */
-	map(0x180000, 0x187fff).ram().w(FUNC(taitoair_state::airsys_gradram_w)).share("gradram"); /* "gradiation ram (0/1)" */
-	map(0x188000, 0x189fff).mirror(0x2000).ram().w(FUNC(taitoair_state::airsys_paletteram16_w)).share("paletteram");
+	map(0x180000, 0x187fff).ram().w(FUNC(taitoair_state::gradram_w)).share("gradram"); /* "gradiation ram (0/1)" */
+	map(0x188000, 0x189fff).mirror(0x2000).ram().w(FUNC(taitoair_state::paletteram_w)).share("paletteram");
 	map(0x800000, 0x820fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));    /* tilemaps, sprites */
 	map(0x906000, 0x906007).w(FUNC(taitoair_state::dma_regs_w)); // DMA?
 	map(0x908000, 0x90ffff).ram().share("line_ram");    /* "line ram" */
@@ -418,38 +414,38 @@ void taitoair_state::sound_map(address_map &map)
 
 /********************************** TMS32025 ********************************/
 
-WRITE16_MEMBER(taitoair_state::dsp_test_start_w)
+void taitoair_state::dsp_test_start_w(u16 data)
 {
 	m_dsp_test_object_type = data;
 	m_dsp_test_or_clip = 0;
 	m_dsp_test_and_clip = 0xf;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_test_x_w)
+void taitoair_state::dsp_test_x_w(u16 data)
 {
 	m_dsp_test_x = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_test_y_w)
+void taitoair_state::dsp_test_y_w(u16 data)
 {
 	m_dsp_test_y = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_test_z_w)
+void taitoair_state::dsp_test_z_w(u16 data)
 {
 	m_dsp_test_z = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_test_point_r)
+u16 taitoair_state::dsp_test_point_r()
 {
-	uint16_t r = 0;
-	if(m_dsp_test_x < -m_dsp_test_z)
+	u16 r = 0;
+	if (m_dsp_test_x < -m_dsp_test_z)
 		r |= 1;
-	if(m_dsp_test_x >  m_dsp_test_z)
+	if (m_dsp_test_x >  m_dsp_test_z)
 		r |= 2;
-	if(m_dsp_test_y < -m_dsp_test_z)
+	if (m_dsp_test_y < -m_dsp_test_z)
 		r |= 4;
-	if(m_dsp_test_y >  m_dsp_test_z)
+	if (m_dsp_test_y >  m_dsp_test_z)
 		r |= 8;
 
 	m_dsp_test_or_clip |= r;
@@ -457,60 +453,60 @@ READ16_MEMBER(taitoair_state::dsp_test_point_r)
 	return r;
 }
 
-READ16_MEMBER(taitoair_state::dsp_test_or_clip_r)
+u16 taitoair_state::dsp_test_or_clip_r()
 {
 	return m_dsp_test_or_clip;
 }
 
-READ16_MEMBER(taitoair_state::dsp_test_and_clip_r)
+u16 taitoair_state::dsp_test_and_clip_r()
 {
 	return m_dsp_test_and_clip;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_a_1_w)
+void taitoair_state::dsp_muldiv_a_1_w(u16 data)
 {
 	m_dsp_muldiv_a_1 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_b_1_w)
+void taitoair_state::dsp_muldiv_b_1_w(u16 data)
 {
 	m_dsp_muldiv_b_1 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_1_w)
+void taitoair_state::dsp_muldiv_c_1_w(u16 data)
 {
 	m_dsp_muldiv_c_1 = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_muldiv_1_r)
+u16 taitoair_state::dsp_muldiv_1_r()
 {
-	if(m_dsp_muldiv_c_1 == 0)
+	if (m_dsp_muldiv_c_1 == 0)
 		return 0xffff; /**< @todo true value? */
 
-	return m_dsp_muldiv_a_1*m_dsp_muldiv_b_1/m_dsp_muldiv_c_1;
+	return m_dsp_muldiv_a_1 * m_dsp_muldiv_b_1 / m_dsp_muldiv_c_1;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_a_2_w)
+void taitoair_state::dsp_muldiv_a_2_w(u16 data)
 {
 	m_dsp_muldiv_a_2 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_b_2_w)
+void taitoair_state::dsp_muldiv_b_2_w(u16 data)
 {
 	m_dsp_muldiv_b_2 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_2_w)
+void taitoair_state::dsp_muldiv_c_2_w(u16 data)
 {
 	m_dsp_muldiv_c_2 = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_muldiv_2_r)
+u16 taitoair_state::dsp_muldiv_2_r()
 {
-	if(m_dsp_muldiv_c_2 == 0)
+	if (m_dsp_muldiv_c_2 == 0)
 		return 0xffff; /**< @todo true value? */
 
-	return m_dsp_muldiv_a_2*m_dsp_muldiv_b_2/m_dsp_muldiv_c_2;
+	return m_dsp_muldiv_a_2 * m_dsp_muldiv_b_2 / m_dsp_muldiv_c_2;
 }
 
 
@@ -647,36 +643,12 @@ INPUT_PORTS_END
 
 
 /************************************************************
-                GFX DECODING
-************************************************************/
-
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16x16 pixels */
-	RGN_FRAC(1,4),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8,
-		RGN_FRAC(1,4)+4, RGN_FRAC(1,4), RGN_FRAC(1,4)+12, RGN_FRAC(1,4)+8,
-		RGN_FRAC(2,4)+4, RGN_FRAC(2,4), RGN_FRAC(2,4)+12, RGN_FRAC(2,4)+8,
-		RGN_FRAC(3,4)+4, RGN_FRAC(3,4), RGN_FRAC(3,4)+12, RGN_FRAC(3,4)+8 },
-	{ 0*16, 1*16, 2*16,  3*16,  4*16,  5*16,  6*16,  7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
-static GFXDECODE_START( gfx_airsys )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 32*16 )
-GFXDECODE_END
-
-
-/************************************************************
                 MACHINE DRIVERS
 ************************************************************/
 
 void taitoair_state::machine_start()
 {
-	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_q.header));
 	save_item(NAME(m_q.pcount));
@@ -690,11 +662,9 @@ void taitoair_state::machine_start()
 
 void taitoair_state::machine_reset()
 {
-	int i;
-
 	m_dsp_hold_signal = ASSERT_LINE;
 
-	for (i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
+	for (int i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{
 		m_q.p[i].x = 0;
 		m_q.p[i].y = 0;
@@ -737,19 +707,15 @@ void taitoair_state::airsys(machine_config &config)
 //  m_screen->set_visarea(0*16, 32*16-1, 3*16, 28*16-1);
 	// Estimated, assume same as mlanding.cpp
 	m_screen->set_raw(16000000, 640, 0, 512, 462, 3*16, 28*16);
-	m_screen->set_screen_update(FUNC(taitoair_state::screen_update_taitoair));
+	m_screen->set_screen_update(FUNC(taitoair_state::screen_update));
 	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airsys);
 
 	PALETTE(config, m_palette, palette_device::BLACK, 512*16+512*16);
 
 	TC0080VCO(config, m_tc0080vco, 0);
-	m_tc0080vco->set_gfx_region(0);
-	m_tc0080vco->set_tx_region(1);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
-	m_tc0080vco->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0080vco->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -808,15 +774,15 @@ ROM_START( topland )
 	ROM_REGION( 0x10000, "mechacpu", 0 )
 	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
-	ROM_LOAD16_BYTE( "b62-33.39",  0x000000, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
-	ROM_LOAD16_BYTE( "b62-36.48",  0x000001, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
-	ROM_LOAD16_BYTE( "b62-29.27",  0x040000, 0x20000, CRC(efdd5c51) SHA1(6df3e9782946cf6f4a21ee3d335548c53cd21e3a) )
-	ROM_LOAD16_BYTE( "b62-34.40",  0x040001, 0x20000, CRC(a7e10ca4) SHA1(862c23c095f96f9e0cae00d70947782d5f4e45e6) )
-	ROM_LOAD16_BYTE( "b62-35.47",  0x080000, 0x20000, CRC(cba7bac5) SHA1(5305c84abcbcc23281744454803b849853b26632) )
-	ROM_LOAD16_BYTE( "b62-30.28",  0x080001, 0x20000, CRC(30e37cb8) SHA1(6bc777bdf1a56952dbfbe2f595279a43e2fa98fd) )
-	ROM_LOAD16_BYTE( "b62-31.29",  0x0c0000, 0x20000, CRC(3feebfe3) SHA1(5b014d7d6fa1daf400ac1a437f551281debfdba6) )
-	ROM_LOAD16_BYTE( "b62-32.30",  0x0c0001, 0x20000, CRC(66806646) SHA1(d8e0c37b5227d8583d523164ffc6828b4508d5a3) )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
+	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
+	ROM_LOAD64_BYTE( "b62-36.48",  0x000006, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
+	ROM_LOAD64_BYTE( "b62-29.27",  0x000005, 0x20000, CRC(efdd5c51) SHA1(6df3e9782946cf6f4a21ee3d335548c53cd21e3a) )
+	ROM_LOAD64_BYTE( "b62-34.40",  0x000004, 0x20000, CRC(a7e10ca4) SHA1(862c23c095f96f9e0cae00d70947782d5f4e45e6) )
+	ROM_LOAD64_BYTE( "b62-35.47",  0x000003, 0x20000, CRC(cba7bac5) SHA1(5305c84abcbcc23281744454803b849853b26632) )
+	ROM_LOAD64_BYTE( "b62-30.28",  0x000002, 0x20000, CRC(30e37cb8) SHA1(6bc777bdf1a56952dbfbe2f595279a43e2fa98fd) )
+	ROM_LOAD64_BYTE( "b62-31.29",  0x000001, 0x20000, CRC(3feebfe3) SHA1(5b014d7d6fa1daf400ac1a437f551281debfdba6) )
+	ROM_LOAD64_BYTE( "b62-32.30",  0x000000, 0x20000, CRC(66806646) SHA1(d8e0c37b5227d8583d523164ffc6828b4508d5a3) )
 
 	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b62-17.5",  0x00000, 0x20000, CRC(36447066) SHA1(91c8cc4e99534b2d533895a342abb22766a20090) )
@@ -857,15 +823,15 @@ ROM_START( toplandj )
 	ROM_REGION( 0x10000, "mechacpu", 0 )
 	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
-	ROM_LOAD16_BYTE( "b62-33.39",  0x000000, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
-	ROM_LOAD16_BYTE( "b62-36.48",  0x000001, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
-	ROM_LOAD16_BYTE( "b62-29.27",  0x040000, 0x20000, CRC(efdd5c51) SHA1(6df3e9782946cf6f4a21ee3d335548c53cd21e3a) )
-	ROM_LOAD16_BYTE( "b62-34.40",  0x040001, 0x20000, CRC(a7e10ca4) SHA1(862c23c095f96f9e0cae00d70947782d5f4e45e6) )
-	ROM_LOAD16_BYTE( "b62-35.47",  0x080000, 0x20000, CRC(cba7bac5) SHA1(5305c84abcbcc23281744454803b849853b26632) )
-	ROM_LOAD16_BYTE( "b62-30.28",  0x080001, 0x20000, CRC(30e37cb8) SHA1(6bc777bdf1a56952dbfbe2f595279a43e2fa98fd) )
-	ROM_LOAD16_BYTE( "b62-31.29",  0x0c0000, 0x20000, CRC(3feebfe3) SHA1(5b014d7d6fa1daf400ac1a437f551281debfdba6) )
-	ROM_LOAD16_BYTE( "b62-32.30",  0x0c0001, 0x20000, CRC(66806646) SHA1(d8e0c37b5227d8583d523164ffc6828b4508d5a3) )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
+	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
+	ROM_LOAD64_BYTE( "b62-36.48",  0x000006, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
+	ROM_LOAD64_BYTE( "b62-29.27",  0x000005, 0x20000, CRC(efdd5c51) SHA1(6df3e9782946cf6f4a21ee3d335548c53cd21e3a) )
+	ROM_LOAD64_BYTE( "b62-34.40",  0x000004, 0x20000, CRC(a7e10ca4) SHA1(862c23c095f96f9e0cae00d70947782d5f4e45e6) )
+	ROM_LOAD64_BYTE( "b62-35.47",  0x000003, 0x20000, CRC(cba7bac5) SHA1(5305c84abcbcc23281744454803b849853b26632) )
+	ROM_LOAD64_BYTE( "b62-30.28",  0x000002, 0x20000, CRC(30e37cb8) SHA1(6bc777bdf1a56952dbfbe2f595279a43e2fa98fd) )
+	ROM_LOAD64_BYTE( "b62-31.29",  0x000001, 0x20000, CRC(3feebfe3) SHA1(5b014d7d6fa1daf400ac1a437f551281debfdba6) )
+	ROM_LOAD64_BYTE( "b62-32.30",  0x000000, 0x20000, CRC(66806646) SHA1(d8e0c37b5227d8583d523164ffc6828b4508d5a3) )
 
 	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b62-17.5",  0x00000, 0x20000, CRC(36447066) SHA1(91c8cc4e99534b2d533895a342abb22766a20090) )
@@ -907,15 +873,15 @@ ROM_START( ainferno )
 	ROM_REGION( 0x10000, "mechacpu", 0 ) // on "Controller P.C.B."
 	ROM_LOAD( "c45-30.9", 0x00000, 0x10000, CRC(fa2db40f) SHA1(91c34a53d2fec619f2536ca79fdc6a17fb0d21e4) ) // 27c512, 1111xxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
-	ROM_LOAD16_BYTE( "c45-11.28", 0x000000, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
-	ROM_LOAD16_BYTE( "c45-15.40", 0x000001, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
-	ROM_LOAD16_BYTE( "c45-12.29", 0x040000, 0x20000, CRC(4ae305b8) SHA1(2bbb981853a7abbba90afb8eb58f6869357551d3) )
-	ROM_LOAD16_BYTE( "c45-16.41", 0x040001, 0x20000, CRC(c6eb93b0) SHA1(d0b1adfce5c1f4e21c5d84527d22ace14578f2d7) )
-	ROM_LOAD16_BYTE( "c45-13.30", 0x080000, 0x20000, CRC(69b82af6) SHA1(13c035e84affa59734c6dd1b07963c08654b5f5a) )
-	ROM_LOAD16_BYTE( "c45-17.42", 0x080001, 0x20000, CRC(0dbee000) SHA1(41073d5cf20df12d5ba1c424c9d9f0b2d9836d5d) )
-	ROM_LOAD16_BYTE( "c45-14.31", 0x0c0000, 0x20000, CRC(481b6f29) SHA1(0b047e805663b144dc2388c86438950fcdc29658) )
-	ROM_LOAD16_BYTE( "c45-18.43", 0x0c0001, 0x20000, CRC(ba7ecf3b) SHA1(dd073b7bfbf2f88432337027ae9fb6c4f02a538f) )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
+	ROM_LOAD64_BYTE( "c45-11.28", 0x000007, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
+	ROM_LOAD64_BYTE( "c45-15.40", 0x000006, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
+	ROM_LOAD64_BYTE( "c45-12.29", 0x000005, 0x20000, CRC(4ae305b8) SHA1(2bbb981853a7abbba90afb8eb58f6869357551d3) )
+	ROM_LOAD64_BYTE( "c45-16.41", 0x000004, 0x20000, CRC(c6eb93b0) SHA1(d0b1adfce5c1f4e21c5d84527d22ace14578f2d7) )
+	ROM_LOAD64_BYTE( "c45-13.30", 0x000003, 0x20000, CRC(69b82af6) SHA1(13c035e84affa59734c6dd1b07963c08654b5f5a) )
+	ROM_LOAD64_BYTE( "c45-17.42", 0x000002, 0x20000, CRC(0dbee000) SHA1(41073d5cf20df12d5ba1c424c9d9f0b2d9836d5d) )
+	ROM_LOAD64_BYTE( "c45-14.31", 0x000001, 0x20000, CRC(481b6f29) SHA1(0b047e805663b144dc2388c86438950fcdc29658) )
+	ROM_LOAD64_BYTE( "c45-18.43", 0x000000, 0x20000, CRC(ba7ecf3b) SHA1(dd073b7bfbf2f88432337027ae9fb6c4f02a538f) )
 
 	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c45-01.5",  0x00000, 0x20000, CRC(052997b2) SHA1(3aa8b4f759a1c196de39754a9ccdf4fabdbab388) )
@@ -962,15 +928,15 @@ ROM_START( ainfernoj )
 	ROM_REGION( 0x10000, "mechacpu", 0 ) // on "Controller P.C.B."
 	ROM_LOAD( "c45-30.9", 0x00000, 0x10000,  CRC(fa2db40f) SHA1(91c34a53d2fec619f2536ca79fdc6a17fb0d21e4) ) // 27c512, 1111xxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
-	ROM_LOAD16_BYTE( "c45-11.28", 0x000000, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
-	ROM_LOAD16_BYTE( "c45-15.40", 0x000001, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
-	ROM_LOAD16_BYTE( "c45-12.29", 0x040000, 0x20000, CRC(4ae305b8) SHA1(2bbb981853a7abbba90afb8eb58f6869357551d3) )
-	ROM_LOAD16_BYTE( "c45-16.41", 0x040001, 0x20000, CRC(c6eb93b0) SHA1(d0b1adfce5c1f4e21c5d84527d22ace14578f2d7) )
-	ROM_LOAD16_BYTE( "c45-13.30", 0x080000, 0x20000, CRC(69b82af6) SHA1(13c035e84affa59734c6dd1b07963c08654b5f5a) )
-	ROM_LOAD16_BYTE( "c45-17.42", 0x080001, 0x20000, CRC(0dbee000) SHA1(41073d5cf20df12d5ba1c424c9d9f0b2d9836d5d) )
-	ROM_LOAD16_BYTE( "c45-14.31", 0x0c0000, 0x20000, CRC(481b6f29) SHA1(0b047e805663b144dc2388c86438950fcdc29658) )
-	ROM_LOAD16_BYTE( "c45-18.43", 0x0c0001, 0x20000, CRC(ba7ecf3b) SHA1(dd073b7bfbf2f88432337027ae9fb6c4f02a538f) )
+	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
+	ROM_LOAD64_BYTE( "c45-11.28", 0x000007, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
+	ROM_LOAD64_BYTE( "c45-15.40", 0x000006, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
+	ROM_LOAD64_BYTE( "c45-12.29", 0x000005, 0x20000, CRC(4ae305b8) SHA1(2bbb981853a7abbba90afb8eb58f6869357551d3) )
+	ROM_LOAD64_BYTE( "c45-16.41", 0x000004, 0x20000, CRC(c6eb93b0) SHA1(d0b1adfce5c1f4e21c5d84527d22ace14578f2d7) )
+	ROM_LOAD64_BYTE( "c45-13.30", 0x000003, 0x20000, CRC(69b82af6) SHA1(13c035e84affa59734c6dd1b07963c08654b5f5a) )
+	ROM_LOAD64_BYTE( "c45-17.42", 0x000002, 0x20000, CRC(0dbee000) SHA1(41073d5cf20df12d5ba1c424c9d9f0b2d9836d5d) )
+	ROM_LOAD64_BYTE( "c45-14.31", 0x000001, 0x20000, CRC(481b6f29) SHA1(0b047e805663b144dc2388c86438950fcdc29658) )
+	ROM_LOAD64_BYTE( "c45-18.43", 0x000000, 0x20000, CRC(ba7ecf3b) SHA1(dd073b7bfbf2f88432337027ae9fb6c4f02a538f) )
 
 	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c45-01.5",  0x00000, 0x20000, CRC(052997b2) SHA1(3aa8b4f759a1c196de39754a9ccdf4fabdbab388) )

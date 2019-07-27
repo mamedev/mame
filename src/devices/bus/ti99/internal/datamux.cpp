@@ -78,7 +78,7 @@
 #define LOG_ADDRESS     (1U<<4)   // Address register
 #define LOG_WAITCOUNT   (1U<<5)   // Wait state counter
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_ADDRESS )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
 

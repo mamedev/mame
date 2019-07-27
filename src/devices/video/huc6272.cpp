@@ -8,6 +8,9 @@
     - Use NSCSI instead of legacy one!
     - ADPCM Transfer is correct?
 
+    ADPCM related patents:
+    - https://patents.google.com/patent/US5692099
+
 ***************************************************************************/
 
 #include "emu.h"

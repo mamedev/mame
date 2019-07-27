@@ -1225,6 +1225,8 @@ void snes_sound_device::state_register()
 	save_item(NAME(m_port_in));
 	save_item(NAME(m_port_out));
 
+	save_item(NAME(m_TnDIV));
+
 	for (int v = 0; v < 8; v++)
 	{
 		save_item(NAME(m_voice_state[v].mem_ptr), v);

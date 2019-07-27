@@ -78,6 +78,7 @@ NETLIST_START(rebound_schematics)
 	 PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
 	 PARAM(Solver.ACCURACY, 1e-9)
 	 PARAM(NETLIST.USE_DEACTIVATE, 1)
+	 HINT(F9.B, NO_DEACTIVATE)
 
 	 ANALOG_INPUT(V5, 5)
 
@@ -1264,9 +1265,31 @@ NETLIST_START(rebound_schematics)
 	 * Inputs not used
 	 * -----------------------------------------------------------------------*/
 
-	NET_C(V5, A1.s3.A, A1.s3.B, B5.s6.A)
-	NET_C(V5, B3.2.CLK, B3.2.CLRQ, B3.2.J, B3.2.K)
-	NET_C(V5, F3.2.CLK, F3.2.CLRQ, F3.2.J, F3.2.K)
-	NET_C(V5, F9.s1.A, F9.s5.A, F9.s6.A)
+	NET_C(V5, A1.C.A, A1.C.B, B5.F.A)
+	NET_C(V5, B3.B.CLK, B3.B.CLRQ, B3.B.J, B3.B.K)
+	NET_C(V5, F3.B.CLK, F3.B.CLRQ, F3.B.J, F3.B.K)
+	NET_C(V5, F9.A.A, F9.E.A, F9.F.A)
 
+	/* -----------------------------------------------------------------------
+	 * Power terminals
+	 * -----------------------------------------------------------------------*/
+
+	NET_C(V5,  A1.14,
+			   B1.14, B2.14, B3.14, B4.16, B5.14, B6.16, B7.16, B8.14,
+			   C1.5,  C2.14, C3.14, C4.16, C5.14, C6.14, C7.16, C8.14,
+					  D2.14, D3.16, D4.16, D5.14, D6.14, D7.14, D8.14,
+			   E1.14, E2.5,  E3.16, E4.16, E5.14, E6.14, E7.14, E8.14, E9.14,
+			   F1.14, F2.14, F3.14, F4.14, F5.5,  F6.14, F7.14, F8.14, F9.14,
+			   H1.14, H2.14, H3.5,  H4.14, H5.5,  H6.14, H7.14, H8.14, H9.14,
+			   J1.14, J2.14, J3.5,  J4.14, J5.14, J6.14, J7.14, J8.16, J9.5,
+					  K2.5,  K3.16, K4.14, K5.14, K6.14, K7.16, K8.16, K9.5)
+	NET_C(GND, A1.7,
+			   B1.7,  B2.7,  B3.7,  B4.8,  B5.7,  B6.8,  B7.8,  B8.7,
+			   C1.10, C2.7,  C3.7,  C4.8,  C5.7,  C6.7,  C7.8,  C8.7,
+					  D2.7,  D3.8,  D4.8,  D5.7,  D6.7,  D7.7,  D8.7,
+			   E1.7,  E2.12, E3.8,  E4.8,  E5.7,  E6.7,  E7.7,  E8.7,  E9.7,
+			   F1.7,  F2.7,  F3.7,  F4.7,  F5.10, F6.7,  F7.7,  F8.7,  F9.7,
+			   H1.7,  H2.7,  H3.10, H4.7,  H5.10, H6.7,  H7.7,  H8.7,  H9.7,
+			   J1.7,  J2.7,  J3.10, J4.7,  J5.7,  J6.7,  J7.7,  J8.8,  J9.10,
+					  K2.10, K3.8,  K4.7,  K5.7,  K6.7,  K7.8,  K8.8,  K9.10)
 NETLIST_END()

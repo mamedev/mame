@@ -19,7 +19,7 @@ It's so difficult to find any of these, that they are definitely worth preservat
 		<info name="usage" value="Requires BASIC v3" />
 		<part name="cass" interface="fc_cass">
 			<dataarea name="cass" size="3235916">
-				<rom name="hero.wav" size="3235916" crc="38bad4f5" sha1="696da9274a144cbc5e95b9c92df700014296f211" offset="0" />
+				<rom name="hero.wav" size="3235916" crc="38bad4f5" sha1="696da9274a144cbc5e95b9c92df700014296f211"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@ It's so difficult to find any of these, that they are definitely worth preservat
 		<info name="usage" value="Requires BASIC v3" />
 		<part name="cass" interface="fc_cass">
 			<dataarea name="cass" size="3255484">
-				<rom name="starkiller.wav" size="3255484" crc="597e2ab3" sha1="eafa3c0576dbf3ce4991abafd05e4d0bf7b3a8e4" offset="0" />
+				<rom name="starkiller.wav" size="3255484" crc="597e2ab3" sha1="eafa3c0576dbf3ce4991abafd05e4d0bf7b3a8e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@ It's so difficult to find any of these, that they are definitely worth preservat
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="fc_cass">
 			<dataarea name="cass" size="2318380">
-				<rom name="urbanchamp.wav" size="2318380" crc="1f5d0d6c" sha1="5d24f9cfa28f6cf5ee6c5188d1e9a425af0231ea" offset="0" />
+				<rom name="urbanchamp.wav" size="2318380" crc="1f5d0d6c" sha1="5d24f9cfa28f6cf5ee6c5188d1e9a425af0231ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -61,14 +61,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2836972">
-				<rom name="bg1.wav" size="2836972" crc="eecd4278" sha1="12999d07a3cb9784008e51f97fb22543d2ab050a" offset="0" />
+				<rom name="bg1.wav" size="2836972" crc="eecd4278" sha1="12999d07a3cb9784008e51f97fb22543d2ab050a"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="1063360">
-				<rom name="prog1.wav" size="1063360" crc="2ef3ed0e" sha1="3a7876bcc84e1d7b10739a4930cc248f853d1803" offset="0" />
+				<rom name="prog1.wav" size="1063360" crc="2ef3ed0e" sha1="3a7876bcc84e1d7b10739a4930cc248f853d1803"/>
 			</dataarea>
 		</part>
 	</software>
@@ -82,14 +82,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2856673">
-				<rom name="bg2.wav" size="2856673" crc="4b8cc5ba" sha1="5783bd1e220487e047b98ddc0d9c5a5ea8b3ce41" offset="0" />
+				<rom name="bg2.wav" size="2856673" crc="4b8cc5ba" sha1="5783bd1e220487e047b98ddc0d9c5a5ea8b3ce41"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="969115">
-				<rom name="prog2.wav" size="969115" crc="2237442b" sha1="956649d436bb4d5ac0d6f47c1c04da1ee75964e6" offset="0" />
+				<rom name="prog2.wav" size="969115" crc="2237442b" sha1="956649d436bb4d5ac0d6f47c1c04da1ee75964e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -103,14 +103,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2895991">
-				<rom name="bg3.wav" size="2895991" crc="e5dcb41f" sha1="11e0c2265b693861fb2b4f1c411799b8cd3d4be1" offset="0" />
+				<rom name="bg3.wav" size="2895991" crc="e5dcb41f" sha1="11e0c2265b693861fb2b4f1c411799b8cd3d4be1"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="1019166">
-				<rom name="prog3.wav" size="1019166" crc="3c8ba31c" sha1="efddded189dc5700d3be6113b679f0cfe491e6fd" offset="0" />
+				<rom name="prog3.wav" size="1019166" crc="3c8ba31c" sha1="efddded189dc5700d3be6113b679f0cfe491e6fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,14 +124,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2857206">
-				<rom name="bg4.wav" size="2857206" crc="0cf4637e" sha1="9dc1549662335f7b28e661ed86f809eea8c5d8ec" offset="0" />
+				<rom name="bg4.wav" size="2857206" crc="0cf4637e" sha1="9dc1549662335f7b28e661ed86f809eea8c5d8ec"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="1055373">
-				<rom name="prog4.wav" size="1055373" crc="ed38bc5d" sha1="70bbd042e9405f6b75aab5c9e483de272de3665a" offset="0" />
+				<rom name="prog4.wav" size="1055373" crc="ed38bc5d" sha1="70bbd042e9405f6b75aab5c9e483de272de3665a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@ tape by UglyJoe of famicomworld  -->
 		<info name="usage" value="Requires BASIC v2" />
 		<part name="cass" interface="fc_cass">
 			<dataarea name="cass" size="1064957">
-				<rom name="prog5.wav" size="1064957" crc="414aa041" sha1="57be005ead4a02edcf8354dc0e85eec83a150ed7" offset="0" />
+				<rom name="prog5.wav" size="1064957" crc="414aa041" sha1="57be005ead4a02edcf8354dc0e85eec83a150ed7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,14 +158,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2864660">
-				<rom name="bg6.wav" size="2864660" crc="d2a12690" sha1="467a34dc83f7e0607914cc0944e69c75c4a49498" offset="0" />
+				<rom name="bg6.wav" size="2864660" crc="d2a12690" sha1="467a34dc83f7e0607914cc0944e69c75c4a49498"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="1159735">
-				<rom name="prog6.wav" size="1159735" crc="41e213bd" sha1="baca7c510a57ffaac8a13b5c2140653d151212c2" offset="0" />
+				<rom name="prog6.wav" size="1159735" crc="41e213bd" sha1="baca7c510a57ffaac8a13b5c2140653d151212c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -179,14 +179,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2912049">
-				<rom name="bg7.wav" size="2912049" crc="998d0408" sha1="9e58958c03d742bd0e38322a399931c768dcea00" offset="0" />
+				<rom name="bg7.wav" size="2912049" crc="998d0408" sha1="9e58958c03d742bd0e38322a399931c768dcea00"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="1014374">
-				<rom name="prog7.wav" size="1014374" crc="217bb5db" sha1="601fdab3d9ad28657b16aa149f08e7880dc8c235" offset="0" />
+				<rom name="prog7.wav" size="1014374" crc="217bb5db" sha1="601fdab3d9ad28657b16aa149f08e7880dc8c235"/>
 			</dataarea>
 		</part>
 	</software>
@@ -200,14 +200,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2890750">
-				<rom name="bg8.wav" size="2890750" crc="669d942e" sha1="029e6ee88ae890c0072377557f2ddfd3112de57e" offset="0" />
+				<rom name="bg8.wav" size="2890750" crc="669d942e" sha1="029e6ee88ae890c0072377557f2ddfd3112de57e"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="1105424">
-				<rom name="prog8.wav" size="1105424" crc="efbe8b45" sha1="065b05e8b0fc35580b3afe1c67dd8b8c36601c80" offset="0" />
+				<rom name="prog8.wav" size="1105424" crc="efbe8b45" sha1="065b05e8b0fc35580b3afe1c67dd8b8c36601c80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,14 +221,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2847622">
-				<rom name="bg9.wav" size="2847622" crc="0521c342" sha1="ec84d54220e3647df92f02b1e9096ada6c1cf93e" offset="0" />
+				<rom name="bg9.wav" size="2847622" crc="0521c342" sha1="ec84d54220e3647df92f02b1e9096ada6c1cf93e"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="972310">
-				<rom name="prog9.wav" size="972310" crc="83f5aa2a" sha1="6d2de9de38d10ca6b55ef2daa86220af656a3768" offset="0" />
+				<rom name="prog9.wav" size="972310" crc="83f5aa2a" sha1="6d2de9de38d10ca6b55ef2daa86220af656a3768"/>
 			</dataarea>
 		</part>
 	</software>
@@ -242,14 +242,14 @@ tape by UglyJoe of famicomworld  -->
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
 			<dataarea name="cass" size="2847622">
-				<rom name="bg9.wav" size="2847622" crc="0521c342" sha1="ec84d54220e3647df92f02b1e9096ada6c1cf93e" offset="0" />
+				<rom name="bg9.wav" size="2847622" crc="0521c342" sha1="ec84d54220e3647df92f02b1e9096ada6c1cf93e"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="fc_cass">
 			<feature name="part_id" value="Program Data" />
 			<dataarea name="cass" size="1057503">
-				<rom name="prog10.wav" size="1057503" crc="54540a93" sha1="da84c92adb6f7efcff330b629b6166a1d38ec38f" offset="0" />
+				<rom name="prog10.wav" size="1057503" crc="54540a93" sha1="da84c92adb6f7efcff330b629b6166a1d38ec38f"/>
 			</dataarea>
 		</part>
 	</software>

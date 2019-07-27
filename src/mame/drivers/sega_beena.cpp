@@ -56,15 +56,18 @@ private:
 	void beena_arm7_map(address_map &map);
 
 	required_device<arm7_cpu_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
+	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
 	optional_memory_bank m_bank;
 };
 
 void sega_beena_state::beena_arm7_map(address_map &map)
 {
-	map(0x00000000, 0x000001ff).rom().bankr("cartbank");
-	map(0x80000000, 0x807fffff).rom().bankr("cartbank");
+	if (m_cart && m_cart->exists())
+	{
+		map(0x00000000, 0x000001ff).rom().bankr("cartbank");
+		map(0x80000000, 0x807fffff).rom().bankr("cartbank");
+	}
 }
 
 void sega_beena_state::machine_start()

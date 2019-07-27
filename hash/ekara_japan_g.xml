@@ -40,7 +40,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0001-bat.u1" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7" offset="0" />
+				<rom name="gc0001-bat.u1" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4" offset="0" />
+				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0003-bat.u1" size="0x100000" crc="49536d5a" sha1="c112b6ac62f586fc1d1615406362fc659e587772" offset="0" />
+				<rom name="gc0003-bat.u1" size="0x100000" crc="49536d5a" sha1="c112b6ac62f586fc1d1615406362fc659e587772"/>
 			</dataarea>
 		</part>
 	</software>
@@ -73,7 +73,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0004-bht.u1" size="0x100000" crc="6d2e9711" sha1="0478578c297f14d78a6612ecd61387129bd6df42" offset="0" />
+				<rom name="gc0004-bht.u1" size="0x100000" crc="6d2e9711" sha1="0478578c297f14d78a6612ecd61387129bd6df42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -84,7 +84,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0006-bht.u1" size="0x100000" crc="76bbefae" sha1="a2a41f58b5750fafa92d6e3094562dd05a5d9029" offset="0" />
+				<rom name="gc0006-bht.u1" size="0x100000" crc="76bbefae" sha1="a2a41f58b5750fafa92d6e3094562dd05a5d9029"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0007-bat.u1" size="0x100000" crc="27b49bdb" sha1="2b64d978fc5df5869bc3c27d16642727e2d38999" offset="0" />
+				<rom name="gc0007-bat.u1" size="0x100000" crc="27b49bdb" sha1="2b64d978fc5df5869bc3c27d16642727e2d38999"/>
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="gc0008-min.u1" size="0x200000" crc="8414c402" sha1="340c432eec8eb2108b8364b5936dd22dc34b51a9" offset="0" />
+				<rom name="gc0008-min.u1" size="0x200000" crc="8414c402" sha1="340c432eec8eb2108b8364b5936dd22dc34b51a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="gc0008-min(alt).u1" size="0x200000" crc="b34d1721" sha1="3621f02423f55c43d1b16855c01189719ddbcb6e" offset="0" />
+				<rom name="gc0008-min(alt).u1" size="0x200000" crc="b34d1721" sha1="3621f02423f55c43d1b16855c01189719ddbcb6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,7 +141,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02_gc0010"/>
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee" offset="0" />
+				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -154,7 +154,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="gc0014-min.u1" size="0x200000" crc="309e0337" sha1="ac68ad33fd15d7c2cc507efc645a04a2e6d08d49" offset="0" />
+				<rom name="gc0014-min.u1" size="0x200000" crc="309e0337" sha1="ac68ad33fd15d7c2cc507efc645a04a2e6d08d49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -167,7 +167,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0015-bat.u1" size="0x100000" crc="a839b745" sha1="a02bd29383baf1f92b3573aaa6343cc309a6f589" offset="0" />
+				<rom name="gc0015-bat.u1" size="0x100000" crc="a839b745" sha1="a02bd29383baf1f92b3573aaa6343cc309a6f589"/>
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +179,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0016-tpj.u1" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34" offset="0" />
+				<rom name="gc0016-tpj.u1" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34"/>
 			</dataarea>
 		</part>
 	</software>
@@ -191,7 +191,7 @@
 		<part name="cart" interface="ekara_cart">
 			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
-				<rom name="gc0017-tpj.u1" size="0x100000" crc="2c7d00a2" sha1="5976b9f3a95afb3b23f1d1d996de0b7aa41ee25c" offset="0" />
+				<rom name="gc0017-tpj.u1" size="0x100000" crc="2c7d00a2" sha1="5976b9f3a95afb3b23f1d1d996de0b7aa41ee25c"/>
 			</dataarea>
 		</part>
 	</software>

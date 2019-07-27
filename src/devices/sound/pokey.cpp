@@ -53,6 +53,7 @@
  *  - optional non-indexing pokey update functions.
  *
  *  TODO:  liberatr clipping
+ *  TODO:  bit-level serial I/O instead of fake byte read/write handlers
  *
  *
  *****************************************************************************/

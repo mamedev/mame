@@ -353,14 +353,10 @@ public:
 		m_txcb = txb;
 	}
 
-	DECLARE_READ8_MEMBER( cd_ab_r );
-	DECLARE_WRITE8_MEMBER( cd_ab_w );
-	DECLARE_READ8_MEMBER( cd_ba_r );
-	DECLARE_WRITE8_MEMBER( cd_ba_w );
-	DECLARE_READ8_MEMBER( ba_cd_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_w );
-	DECLARE_READ8_MEMBER( ba_cd_inv_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
+	uint8_t dc_ab_r(offs_t offset);
+	void dc_ab_w(offs_t offset, uint8_t data);
+	uint8_t ab_dc_r(offs_t offset);
+	void ab_dc_w(offs_t offset, uint8_t data);
 
 	/* Definitions moved to z80scc.c for enhancements */
 	uint8_t da_r(offs_t offset);

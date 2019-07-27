@@ -18,7 +18,7 @@
 		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="53760">
-				<rom name="6502development.ssd" size="53760" crc="219eefd1" sha1="d408d6d14d442c9e77be78fecef4b223e0c2404f" offset="0" />
+				<rom name="6502development.ssd" size="53760" crc="219eefd1" sha1="d408d6d14d442c9e77be78fecef4b223e0c2404f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="87040">
-				<rom name="Advanced BASIC 1.02.ssd" size="87040" crc="f54bd1dd" sha1="3ffb605dfa7e07f37d70364e06487b95a5ec427c" offset="0" />
+				<rom name="Advanced BASIC 1.02.ssd" size="87040" crc="f54bd1dd" sha1="3ffb605dfa7e07f37d70364e06487b95a5ec427c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,19 +44,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Master Disc"/>
 			<dataarea name="flop" size="204800">
-				<rom name="bitstik1.0_system_master.ssd" size="204800" crc="77996ac8" sha1="0de49dc2535dfe27915a58dfc71729ecd14f7515" offset="0" />
+				<rom name="bitstik1.0_system_master.ssd" size="204800" crc="77996ac8" sha1="0de49dc2535dfe27915a58dfc71729ecd14f7515"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Buffer Disc"/>
 			<dataarea name="flop" size="204800">
-				<rom name="bitstik1.0_buffer.ssd" size="204800" crc="2a58f413" sha1="2ab1f5da153d40517a9e68bcaf3e579b373d2dc6" offset="0" />
+				<rom name="bitstik1.0_buffer.ssd" size="204800" crc="2a58f413" sha1="2ab1f5da153d40517a9e68bcaf3e579b373d2dc6"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Introductory Library Disc 252/253"/>
 			<dataarea name="flop" size="409600">
-				<rom name="bitstik1.0_introductory_library.ssd" size="409600" crc="bba2cbdc" sha1="ec73cc3225b3d35285377b143c5d34213a46716d" offset="0" />
+				<rom name="bitstik1.0_introductory_library.ssd" size="409600" crc="bba2cbdc" sha1="ec73cc3225b3d35285377b143c5d34213a46716d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,13 +69,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Introductory Library Disc Vol.1"/>
 			<dataarea name="flop" size="204800">
-				<rom name="bitstik2.0_library_vol1.ssd" size="204800" crc="2d2ece29" sha1="390fcfee6efb7bf980d1a94dee03db42b8a34cba" offset="0" />
+				<rom name="bitstik2.0_library_vol1.ssd" size="204800" crc="2d2ece29" sha1="390fcfee6efb7bf980d1a94dee03db42b8a34cba"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Introductory Library Disc Vol.2"/>
 			<dataarea name="flop" size="204800">
-				<rom name="bitstik2.0_library_vol2.ssd" size="204800" crc="ddda8667" sha1="268799856bd19c06f4a3125d1f4164429d15e0dd" offset="0" />
+				<rom name="bitstik2.0_library_vol2.ssd" size="204800" crc="ddda8667" sha1="268799856bd19c06f4a3125d1f4164429d15e0dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@
 		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="25600">
-				<rom name="Hi-InterSheet.ssd" size="25600" crc="276aa20f" sha1="46d80cf02a649d3f43d6ef718b4d7ad03cc95646" offset="0" />
+				<rom name="Hi-InterSheet.ssd" size="25600" crc="276aa20f" sha1="46d80cf02a649d3f43d6ef718b4d7ad03cc95646"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
-				<rom name="Hi-View.ssd" size="102400" crc="f9e79e46" sha1="5b5653c890efc74c3d35d1ab82e51ba43d797346" offset="0" />
+				<rom name="Hi-View.ssd" size="102400" crc="f9e79e46" sha1="5b5653c890efc74c3d35d1ab82e51ba43d797346"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@
 		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="33280">
-				<rom name="Hi-WordWisePlus.ssd" size="33280" crc="e0c88da9" sha1="eeb95137ba5b8428795c552f484b07bf12f2e878" offset="0" />
+				<rom name="Hi-WordWisePlus.ssd" size="33280" crc="e0c88da9" sha1="eeb95137ba5b8428795c552f484b07bf12f2e878"/>
 			</dataarea>
 		</part>
 	</software>
@@ -125,7 +125,7 @@
 		<info name="usage" value="Requires 6502 2nd Processor" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
-				<rom name="econet_level_2_utils.ssd" size="204800" crc="c7039167" sha1="37a52b17138c1d84301ed23a04456939810f103c" offset="0" />
+				<rom name="econet_level_2_utils.ssd" size="204800" crc="c7039167" sha1="37a52b17138c1d84301ed23a04456939810f103c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -139,7 +139,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="P-System (1)"/>
 			<dataarea name="flop" size="204800">
-				<rom name="Acornsoft P-System.ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536" offset="0" />
+				<rom name="Acornsoft P-System.ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536"/>
 			</dataarea>
 		</part>
 	</software>

@@ -43,6 +43,7 @@ NETLIST_START(tp1985)
 	PARAM(NETLIST.USE_DEACTIVATE, 0)
 
 	ANALOG_INPUT(V5, 5)
+	ALIAS(VCC, V5) // no-ttl-dip devices need VCC!
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)

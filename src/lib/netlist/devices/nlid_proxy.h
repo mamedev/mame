@@ -103,8 +103,13 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		analog_output_t m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
-		analog::NETLIB_SUB(twoterm) m_RV;
+
+		static constexpr const nl_double G_OFF = 1e-9;
+
+		plib::unique_ptr<analog_output_t> m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
+		plib::unique_ptr<analog_output_t> m_VCCHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
+		analog::NETLIB_NAME(twoterm) m_RP;
+		analog::NETLIB_NAME(twoterm) m_RN;
 		state_var<int> m_last_state;
 		bool m_is_timestep;
 };

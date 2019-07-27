@@ -2,7 +2,9 @@
 // copyright-holders:Sandro Ronco
 /******************************************************************************
 
-    Saitek RISC 2500
+    Saitek RISC 2500, Mephisto Montreux
+
+    The chess engine is also compatible with Tasc's The ChessMachine software.
 
     TODO:
      - Sound is too short and high pitch, better when you underclock the cpu.
@@ -363,6 +365,6 @@ ROM_START( montreux )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                      FULLNAME             FLAGS */
-CONS( 1992, risc,     0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek",                    "RISC 2500",         MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME              FLAGS */
+CONS( 1992, risc,     0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // after Saitek bought Hegener & Glaser

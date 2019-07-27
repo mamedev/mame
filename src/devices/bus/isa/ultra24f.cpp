@@ -10,7 +10,6 @@
 #include "ultra24f.h"
 
 #include "cpu/m68000/m68000.h"
-//#include "machine/i82355.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_hd.h"
@@ -21,6 +20,7 @@ ultra24f_device::ultra24f_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, ULTRA24F, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_uscpu(*this, "uscpu")
+	, m_bmic(*this, "bmic")
 	, m_fdc(*this, "fdc")
 	, m_bios16(*this, "bios16")
 {
@@ -39,11 +39,21 @@ void ultra24f_device::device_start()
 	}
 }
 
+u8 ultra24f_device::bmic_r(offs_t offset)
+{
+	return m_bmic->local_r(offset >> 3);
+}
+
+void ultra24f_device::bmic_w(offs_t offset, u8 data)
+{
+	m_bmic->local_w(offset >> 3, data);
+}
+
 void ultra24f_device::uscpu_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region("firmware", 0);
 	map(0xa00000, 0xa00001).nopr();
-	//map(0xff8001, 0xff8001).select(0x18).rw(FUNC(ultra24f_device::bmic_r), FUNC(ultra24f_device::bmic_w));
+	map(0xff8001, 0xff8001).select(0x18).rw(FUNC(ultra24f_device::bmic_r), FUNC(ultra24f_device::bmic_w));
 	map(0xff9000, 0xff901f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0x00ff);
 	map(0xffc000, 0xffffff).ram();
 }
@@ -64,6 +74,8 @@ void ultra24f_device::device_add_mconfig(machine_config &config)
 {
 	M68000(config, m_uscpu, 32_MHz_XTAL / 4); // custom-marked as USC080-5-12A; clock guessed
 	m_uscpu->set_addrmap(AS_PROGRAM, &ultra24f_device::uscpu_map);
+
+	I82355(config, m_bmic, 0);
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", u24f_scsi_devices, nullptr);

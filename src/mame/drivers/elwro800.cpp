@@ -266,7 +266,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 			/* cassette input from wav */
 			if (m_cassette->input() > 0.0038 )
 			{
-				data &= ~0x40;
+				data |= 0x40;
 			}
 		}
 		else

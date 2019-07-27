@@ -128,16 +128,44 @@ namespace netlist
 			m_prof_call.inc();
 		}
 
+		void push_nostats(T && e) noexcept
+		{
+			/* Lock */
+			lock_guard_type lck(m_lock);
+#if 1
+			T * i(m_end-1);
+			for (; QueueOp::less(*(i), e); --i)
+			{
+				*(i+1) = *(i);
+			}
+			*(i+1) = std::move(e);
+			++m_end;
+#else
+			T * i(m_end++);
+			while (QueueOp::less(*(--i), e))
+			{
+				*(i+1) = *(i);
+			}
+			*(i+1) = std::move(e);
+#endif
+		}
+
 		T pop() noexcept       { return *(--m_end); }
 		const T &top() const noexcept { return *(m_end-1); }
 
 		template <class R>
 		void remove(const R &elem) noexcept
 		{
+			m_prof_remove.inc();
+			remove_nostats(elem);
+		}
+
+		template <class R>
+		void remove_nostats(const R &elem) noexcept
+		{
 			/* Lock */
 			lock_guard_type lck(m_lock);
-			m_prof_remove.inc();
-
+#if 1
 			for (T * i = m_end - 1; i > &m_list[0]; --i)
 			{
 				if (QueueOp::equal(*i, elem))
@@ -146,6 +174,16 @@ namespace netlist
 					return;
 				}
 			}
+#else
+			for (T * i = &m_list[1]; i < m_end; ++i)
+			{
+				if (QueueOp::equal(*i, elem))
+				{
+					std::copy(i+1, m_end--, i);
+					return;
+				}
+			}
+#endif
 		}
 
 		void retime(T && elem) noexcept

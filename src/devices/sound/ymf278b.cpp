@@ -511,9 +511,7 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 
 				// status register LD bit is on for approx 300us
 				m_status_ld = 1;
-				period = attotime::from_usec(300);
-				if (m_clock != YMF278B_STD_CLOCK)
-					period = (period * m_clock) / YMF278B_STD_CLOCK;
+				period = clocks_to_attotime(10);
 				m_timer_ld->adjust(period);
 
 				// retrigger if key is on

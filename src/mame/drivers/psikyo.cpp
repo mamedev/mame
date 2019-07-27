@@ -125,100 +125,89 @@ static const u8 s1945j_table[256] = {
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x64, 0x00, 0x00, 0x2b, 0xc0
 };
 
-WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
+void psikyo_state::s1945_mcu_data_w(uint8_t data)
 {
-	// Accesses are always bytes, so resolve it
-	int suboff;
-
-	for (suboff = 0; suboff < 3; suboff++)
-		if ((0xff << (8 * suboff)) & mem_mask)
-			break;
-	data >>= 8 * suboff;
-	offset = offset * 4 + 4 + (3 - suboff);
-
-	switch (offset)
-	{
-	case 0x06:
-		m_s1945_mcu_inlatch = data;
-		break;
-	case 0x08:
-		m_s1945_mcu_control = data;
-		break;
-	case 0x09:
-		m_s1945_mcu_direction = data;
-		break;
-	case 0x07:
-		switch_bgbanks(1, (data >> 6) & 3);
-		switch_bgbanks(0, (data >> 4) & 3);
-		m_s1945_mcu_bctrl = data;
-		break;
-	case 0x0b:
-		switch (data | (m_s1945_mcu_direction ? 0x100 : 0))
-		{
-		case 0x11c:
-			m_s1945_mcu_latching = 5;
-			m_s1945_mcu_index = m_s1945_mcu_inlatch;
-			break;
-		case 0x013:
-//          logerror("MCU: Table read index %02x\n", m_s1945_mcu_index);
-			m_s1945_mcu_latching = 1;
-			m_s1945_mcu_latch1 = m_s1945_mcu_table[m_s1945_mcu_index];
-			break;
-		case 0x113:
-			m_s1945_mcu_mode = m_s1945_mcu_inlatch;
-			if (m_s1945_mcu_mode == 1)
-			{
-				m_s1945_mcu_latching &= ~1;
-				m_s1945_mcu_latch2 = 0x55;
-			}
-			else
-			{
-				// Go figure.
-				m_s1945_mcu_latching &= ~1;
-				m_s1945_mcu_latching |= 2;
-			}
-			m_s1945_mcu_latching &= ~4;
-			m_s1945_mcu_latch1 = m_s1945_mcu_inlatch;
-			break;
-		case 0x010:
-		case 0x110:
-			m_s1945_mcu_latching |= 4;
-			break;
-		default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
-			break;
-		}
-		break;
-	default:
-//      logerror("MCU.w %x, %02x (%x)\n", offset, data, m_maincpu->pc());
-		;
-	}
+	m_s1945_mcu_inlatch = data;
 }
 
-READ32_MEMBER(psikyo_state::s1945_mcu_r)
+void psikyo_state::s1945_mcu_control_w(uint8_t data)
 {
-	switch (offset)
+	m_s1945_mcu_control = data;
+}
+
+void psikyo_state::s1945_mcu_direction_w(uint8_t data)
+{
+	m_s1945_mcu_direction = data;
+}
+
+void psikyo_state::s1945_mcu_bctrl_w(uint8_t data)
+{
+	switch_bgbanks(1, (data >> 6) & 3);
+	switch_bgbanks(0, (data >> 4) & 3);
+	m_s1945_mcu_bctrl = data;
+}
+
+void psikyo_state::s1945_mcu_command_w(uint8_t data)
+{
+	switch (data | (m_s1945_mcu_direction ? 0x100 : 0))
 	{
-	case 0:
+	case 0x11c:
+		m_s1945_mcu_latching = 5;
+		m_s1945_mcu_index = m_s1945_mcu_inlatch;
+		break;
+	case 0x013:
+//          logerror("MCU: Table read index %02x\n", m_s1945_mcu_index);
+		m_s1945_mcu_latching = 1;
+		if (m_s1945_mcu_table != nullptr)
+			m_s1945_mcu_latch1 = m_s1945_mcu_table[m_s1945_mcu_index];
+		break;
+	case 0x113:
+		m_s1945_mcu_mode = m_s1945_mcu_inlatch;
+		if (m_s1945_mcu_mode == 1)
 		{
-		u32 res;
-		if (m_s1945_mcu_control & 16)
-		{
-			res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
-			m_s1945_mcu_latching |= 4;
+			m_s1945_mcu_latching &= ~1;
+			m_s1945_mcu_latch2 = 0x55;
 		}
 		else
 		{
-			res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
-			m_s1945_mcu_latching |= 1;
+			// Go figure.
+			m_s1945_mcu_latching &= ~1;
+			m_s1945_mcu_latching |= 2;
 		}
-		res |= m_s1945_mcu_bctrl & 0xf0;
-		return res;
+		m_s1945_mcu_latching &= ~4;
+		m_s1945_mcu_latch1 = m_s1945_mcu_inlatch;
+		break;
+	case 0x010:
+	case 0x110:
+		m_s1945_mcu_latching |= 4;
+		break;
+	default:
+//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
+		break;
 	}
-	case 1:
-		return (m_s1945_mcu_latching << 24) | 0x08000000;
+}
+
+// TODO: make this handler 8-bit
+uint32_t psikyo_state::s1945_mcu_data_r()
+{
+	u32 res;
+	if (m_s1945_mcu_control & 16)
+	{
+		res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
+		m_s1945_mcu_latching |= 4;
 	}
-	return 0;
+	else
+	{
+		res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
+		m_s1945_mcu_latching |= 1;
+	}
+	res |= m_s1945_mcu_bctrl & 0xf0;
+	return res;
+}
+
+uint8_t psikyo_state::s1945_mcu_control_r()
+{
+	return m_s1945_mcu_latching | 0x08;
 }
 
 template<int Layer>
@@ -394,8 +383,7 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 	switch (offset)
 	{
 		case 0x0:   return m_in_p1_p2->read();
-		case 0x1:   return (m_in_dsw->read() & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
-		case 0x2:   return s1945_mcu_r(space, offset - 1, mem_mask);
+		case 0x1:   return (m_in_dsw->read() & 0xffff000f) | s1945_mcu_data_r();
 		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 					return 0;
 	}
@@ -404,8 +392,12 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 void psikyo_state::s1945_map(address_map &map)
 {
 	psikyo_map(map);
-	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::s1945_input_r)); // input ports
-	map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w)); // protection and tile bank switching
+	map(0xc00000, 0xc00007).r(FUNC(psikyo_state::s1945_input_r)); // input ports
+	map(0xc00006, 0xc00006).w(FUNC(psikyo_state::s1945_mcu_data_w));
+	map(0xc00007, 0xc00007).w(FUNC(psikyo_state::s1945_mcu_bctrl_w)); // tile bank switching
+	map(0xc00008, 0xc00008).rw(FUNC(psikyo_state::s1945_mcu_control_r), FUNC(psikyo_state::s1945_mcu_control_w));
+	map(0xc00009, 0xc00009).w(FUNC(psikyo_state::s1945_mcu_direction_w));
+	map(0xc0000b, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_command_w));
 	map(0xc00011, 0xc00011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -1188,7 +1180,7 @@ void psikyo_state::s1945(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK));
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
 	ymf.irq_handler().set_inputline("audiocpu", 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 

@@ -215,7 +215,6 @@ namespace devices
 		if (resched)
 		{
 			this->m_iterative_fail++;
-			//this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
 			return matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(newton_raphson);
 		}
 

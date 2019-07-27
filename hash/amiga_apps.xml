@@ -11,7 +11,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Appetizer (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="appetizer_de.adf" size="901120" crc="cea608ca" sha1="3b653f1d6925ebbf46141e111fd28b5eecadf58e" offset="0"/>
+				<rom name="appetizer_de.adf" size="901120" crc="cea608ca" sha1="3b653f1d6925ebbf46141e111fd28b5eecadf58e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Datastore 1.1 (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="datastore11_de.adf" size="901120" crc="8fc8bb62" sha1="05cc8175f2218532ad35b8fbb6c724b4bd0d9c3d" offset="0"/>
+				<rom name="datastore11_de.adf" size="901120" crc="8fc8bb62" sha1="05cc8175f2218532ad35b8fbb6c724b4bd0d9c3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Organiser 1.1 (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="organiser11_de.adf" size="901120" crc="0d8ac3ec" sha1="ce0453c1a48a648c968e84a9afe6bfb939d3817c" offset="0"/>
+				<rom name="organiser11_de.adf" size="901120" crc="0d8ac3ec" sha1="ce0453c1a48a648c968e84a9afe6bfb939d3817c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Photogenics 1.2a SE (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="photogenics12a_se_de.adf" size="901120" crc="11ec1456" sha1="2ecbeec2b3ef12c1aaf128cd9d1b1983673df462" offset="0"/>
+				<rom name="photogenics12a_se_de.adf" size="901120" crc="11ec1456" sha1="2ecbeec2b3ef12c1aaf128cd9d1b1983673df462"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,13 +67,13 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Disk 1 (Program)" />
 			<dataarea name="flop" size="901120">
-				<rom name="ppaint64_disk1.adf" size="901120" crc="58c7c6ad" sha1="55e5c6d7a4988f731a584e7ae3ebc929ca3a5984" offset="0"/>
+				<rom name="ppaint64_disk1.adf" size="901120" crc="58c7c6ad" sha1="55e5c6d7a4988f731a584e7ae3ebc929ca3a5984"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2 (Data)" />
 			<dataarea name="flop" size="901120">
-				<rom name="ppaint64_disk2.adf" size="901120" crc="b78b34ed" sha1="8f47af863647f86887cd37b5a89a641bd4d2e5e2" offset="0"/>
+				<rom name="ppaint64_disk2.adf" size="901120" crc="b78b34ed" sha1="8f47af863647f86887cd37b5a89a641bd4d2e5e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Simplex Tools 2 - RAP!TOP!COP! (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="simplex_tools_2.adf" size="901120" crc="9d211a17" sha1="a1021a34f6f95adc38021a24aed59300d6a211e6" offset="0"/>
+				<rom name="simplex_tools_2.adf" size="901120" crc="9d211a17" sha1="a1021a34f6f95adc38021a24aed59300d6a211e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -99,14 +99,14 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Disk 1 (Program)" />
 			<dataarea name="flop" size="901120">
-				<rom name="turbocalc35_disk1.adf" size="901120" crc="ed4f1434" sha1="1ab0caa3c96fecf37fd957dc5bfeb28b7d03adf1" offset="0"/>
+				<rom name="turbocalc35_disk1.adf" size="901120" crc="ed4f1434" sha1="1ab0caa3c96fecf37fd957dc5bfeb28b7d03adf1"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<!-- Verified dump -->
 			<feature name="part_id" value="Disk 2 (Docs)" />
 			<dataarea name="flop" size="901120">
-				<rom name="turbocalc35_disk2.adf" size="901120" crc="f2c79700" sha1="ffc1e8a955240d95a4b8d3569a5b055f6e03db46" offset="0"/>
+				<rom name="turbocalc35_disk2.adf" size="901120" crc="f2c79700" sha1="ffc1e8a955240d95a4b8d3569a5b055f6e03db46"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,20 +120,20 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="901120">
-				<rom name="ww4se_de_disk1.adf" size="901120" crc="d34fa519" sha1="f9da019829327055b0863abbcc102788e1acd86b" offset="0"/>
+				<rom name="ww4se_de_disk1.adf" size="901120" crc="d34fa519" sha1="f9da019829327055b0863abbcc102788e1acd86b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<!-- Verified dump -->
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="901120">
-				<rom name="ww4se_de_disk2.adf" size="901120" crc="16633d22" sha1="82098a7dc184eefae514e96896839fda07626787" offset="0"/>
+				<rom name="ww4se_de_disk2.adf" size="901120" crc="16633d22" sha1="82098a7dc184eefae514e96896839fda07626787"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="901120">
-				<rom name="ww4se_de_disk3.adf" size="901120" crc="4b365f60" sha1="63a60948c65ebb0c20c5da1b77ae8199271db403" offset="0"/>
+				<rom name="ww4se_de_disk3.adf" size="901120" crc="4b365f60" sha1="63a60948c65ebb0c20c5da1b77ae8199271db403"/>
 			</dataarea>
 		</part>
 	</software>
@@ -147,7 +147,7 @@
 			<!-- Verified dump -->
 			<feature name="part_id" value="Wordworth Printer Manager (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="wwpm_de.adf" size="901120" crc="7bedd129" sha1="e9c293c4d1b16dbada5b2092c90864634d0941e2" offset="0"/>
+				<rom name="wwpm_de.adf" size="901120" crc="7bedd129" sha1="e9c293c4d1b16dbada5b2092c90864634d0941e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -161,7 +161,7 @@
 			<!-- Probably good dump -->
 			<feature name="part_id" value="The Very First" />
 			<dataarea name="flop" size="901120">
-				<rom name="380921-02_veryfirst.adf" size="901120" crc="1ab58e91" sha1="6e925d6758125385b70447614e410d108478ed5e" offset="0"/>
+				<rom name="380921-02_veryfirst.adf" size="901120" crc="1ab58e91" sha1="6e925d6758125385b70447614e410d108478ed5e"/>
 			</dataarea>
 		</part>
 	</software>

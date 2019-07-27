@@ -448,6 +448,7 @@ function osdmodulestargetconf()
 			"dsound",
 			"dxguid",
 			"oleaut32",
+			"winmm",
 		}
 	elseif _OPTIONS["targetos"]=="macosx" then
 		links {

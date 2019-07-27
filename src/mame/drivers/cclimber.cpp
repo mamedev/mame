@@ -327,10 +327,12 @@ void cclimber_state::cclimber_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
@@ -355,10 +357,12 @@ void cclimber_state::cannonb_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
@@ -402,10 +406,12 @@ void cclimber_state::yamato_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");

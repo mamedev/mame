@@ -780,7 +780,7 @@ void dmv_state::dmv(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmv_state::dmv_mem);
 	m_maincpu->set_addrmap(AS_IO, &dmv_state::dmv_io);
 
-	i8741_device &kbmcu(I8741(config, "kb_ctrl_mcu", XTAL(6'000'000)));
+	i8741a_device &kbmcu(I8741A(config, "kb_ctrl_mcu", XTAL(6'000'000)));
 	kbmcu.p1_in_cb().set(FUNC(dmv_state::kb_mcu_port1_r)); // bit 0 data from kb
 	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
 	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Paul Priest
 //============================================================
 //
-//  ledutil.c - Win32 example code that tracks changing
+//  ledutil.cpp - Win32 example code that tracks changing
 //  outputs and updates the keyboard LEDs in response
 //
 //============================================================

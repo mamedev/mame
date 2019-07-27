@@ -8,7 +8,7 @@
 		<publisher>IBM</publisher>
 		<part name="cass1" interface="ibm5150_cass">
 			<dataarea name="cass" size="40121900">
-				<rom name="ibm_pc_diagnostics_cassette.wav" size="40121900" crc="59351cf6" sha1="b7f03fadb2ff8c7dfe8dd0ff9b694c1b437e23b1" offset="0" />
+				<rom name="ibm_pc_diagnostics_cassette.wav" size="40121900" crc="59351cf6" sha1="b7f03fadb2ff8c7dfe8dd0ff9b694c1b437e23b1"/>
 			</dataarea>
 		</part>
 	</software>

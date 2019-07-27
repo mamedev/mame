@@ -108,11 +108,6 @@ WRITE8_MEMBER(pastelg_state::threeds_inputportsel_w)
 	m_mux_data = ~data;
 }
 
-CUSTOM_INPUT_MEMBER( pastelg_state::nb1413m3_busyflag_r )
-{
-	return m_nb1413m3->m_busyflag & 0x01;
-}
-
 void pastelg_state::threeds_io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -202,7 +197,7 @@ static INPUT_PORTS_START( pastelg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -213,12 +208,6 @@ static INPUT_PORTS_START( pastelg )
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
-
-// stops the game hanging..
-CUSTOM_INPUT_MEMBER(pastelg_state::nb1413m3_hackbusyflag_r)
-{
-	return machine().rand() & 3;
-}
 
 static INPUT_PORTS_START( threeds )
 	PORT_START("DSWA")
@@ -372,7 +361,8 @@ static INPUT_PORTS_START( threeds )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state,nb1413m3_hackbusyflag_r, nullptr)  // DRAW BUSY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST

@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="128877">
-				<rom name="roycpm.td0" size="128877" crc="bf47c534" sha1="e69cc39d9a6229c5e5a2055e8950d085b34e607d" offset="0" />
+				<rom name="roycpm.td0" size="128877" crc="bf47c534" sha1="e69cc39d9a6229c5e5a2055e8950d085b34e607d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="64140">
-				<rom name="dskbasic.td0" size="64140" crc="38834574" sha1="27a813ba8f7bb7f024ff5ebc49374bd46e005c65" offset="0" />
+				<rom name="dskbasic.td0" size="64140" crc="38834574" sha1="27a813ba8f7bb7f024ff5ebc49374bd46e005c65"/>
 			</dataarea>
 		</part>
 	</software>

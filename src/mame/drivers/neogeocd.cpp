@@ -122,7 +122,7 @@ public:
 	void init_neocdz();
 	void init_neocdzj();
 
-	IRQ_CALLBACK_MEMBER(int_callback);
+	uint8_t cdc_irq_ack();
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
 	std::unique_ptr<uint8_t[]> m_sprite_ram;
@@ -132,6 +132,7 @@ public:
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
 	void neocd_main_map(address_map &map);
+	void neocd_vector_map(address_map &map);
 	void neocd_ym_map(address_map &map);
 
 protected:
@@ -899,6 +900,12 @@ void ngcd_state::neocd_main_map(address_map &map)
 	map(0xff0200, 0xffffff).r(FUNC(ngcd_state::unmapped_r));
 }
 
+void ngcd_state::neocd_vector_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff9, 0xfffff9).r(FUNC(ngcd_state::cdc_irq_ack));
+}
+
 
 /*************************************
  *
@@ -958,17 +965,14 @@ INPUT_PORTS_END
 
 /* NeoCD uses custom vectors on IRQ4 to handle various events from the CDC */
 
-IRQ_CALLBACK_MEMBER(ngcd_state::int_callback)
+uint8_t ngcd_state::cdc_irq_ack()
 {
-	if (irqline==4)
-	{
-		if (get_irq_vector_ack()) {
-			set_irq_vector_ack(0);
-			return get_irq_vector();
-		}
+	if (get_irq_vector_ack()) {
+		set_irq_vector_ack(0);
+		return get_irq_vector();
 	}
 
-	return (0x60+irqline*4)/4;
+	return (0x60+4*4)/4;
 }
 
 void ngcd_state::interrupt_callback_type1(void)
@@ -1039,7 +1043,7 @@ void ngcd_state::neocd(machine_config &config)
 	neogeo_stereo(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_main_map);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ngcd_state::int_callback), this));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &ngcd_state::neocd_vector_map);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ngcd_state::neocd_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &ngcd_state::neocd_audio_io_map);
@@ -1050,6 +1054,7 @@ void ngcd_state::neocd(machine_config &config)
 
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
+	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
 	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
 	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);

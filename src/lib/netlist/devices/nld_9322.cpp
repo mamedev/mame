@@ -7,6 +7,7 @@
 
 #include "nld_9322.h"
 #include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -21,6 +22,7 @@ namespace netlist
 		, m_A(*this, "A")
 		, m_B(*this, "B")
 		, m_Y(*this, "Y")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -31,6 +33,7 @@ namespace netlist
 		logic_input_t m_A;
 		logic_input_t m_B;
 		logic_output_t m_Y;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT(9322)
@@ -38,10 +41,10 @@ namespace netlist
 		NETLIB_CONSTRUCTOR(9322)
 		, m_SELECT(*this, "SELECT")
 		, m_STROBE(*this, "STROBE")
-		, m_1(*this, "1")
-		, m_2(*this, "2")
-		, m_3(*this, "3")
-		, m_4(*this, "4")
+		, m_1(*this, "A")
+		, m_2(*this, "B")
+		, m_3(*this, "C")
+		, m_4(*this, "D")
 		{
 			register_subalias("A1", m_1.m_A);
 			register_subalias("B1", m_1.m_B);
@@ -55,6 +58,17 @@ namespace netlist
 			register_subalias("A4", m_4.m_A);
 			register_subalias("B4", m_4.m_B);
 			register_subalias("Y4", m_4.m_Y);
+
+			connect("A.VCC", "B.VCC");
+			connect("A.VCC", "C.VCC");
+			connect("A.VCC", "D.VCC");
+			connect("A.GND", "B.GND");
+			connect("A.GND", "C.GND");
+			connect("A.GND", "D.GND");
+
+			register_subalias("GND", "A.GND");
+			register_subalias("VCC", "B.VCC");
+
 		}
 
 		NETLIB_UPDATEI();
@@ -81,6 +95,7 @@ namespace netlist
 			register_subalias("5", m_2.m_A);
 			register_subalias("6", m_2.m_B);
 			register_subalias("7", m_2.m_Y);
+			register_subalias("8", "GND");
 
 			register_subalias("9",  m_3.m_Y);
 			register_subalias("10", m_3.m_B);
@@ -89,6 +104,7 @@ namespace netlist
 			register_subalias("13", m_4.m_B);
 			register_subalias("14", m_4.m_A);
 			register_subalias("15", m_STROBE);
+			register_subalias("16", "VCC");
 		}
 	};
 
@@ -111,7 +127,7 @@ namespace netlist
 		m_4.update();
 	}
 
-	NETLIB_DEVICE_IMPL(9322,     "TTL_9322",     "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE")
+	NETLIB_DEVICE_IMPL(9322,     "TTL_9322",     "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(9322_dip, "TTL_9322_DIP", "")
 
 	} //namespace devices

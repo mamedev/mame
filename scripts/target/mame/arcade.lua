@@ -134,6 +134,8 @@ CPUS["HMCS40"] = true
 CPUS["ST62XX"] = true
 CPUS["DSPP"] = true
 CPUS["HPC"] = true
+--CPUS["RII"] = true
+--CPUS["BCP"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -336,11 +338,13 @@ VIDEOS["RAMDAC"] = true
 VIDEOS["SAA5050"] = true
 --VIDEOS["SDA5708"] = true
 VIDEOS["SCN2674"] = true
+--VIDEOS["PWM_DISPLAY"] = true
 --VIDEOS["SED1200"] = true
 --VIDEOS["SED1330"] = true
 --VIDEOS["SED1520"] = true
 VIDEOS["SNES_PPU"] = true
 VIDEOS["STVVDP"] = true
+--VIDEOS["T6963C"] = true
 --VIDEOS["T6A04"] = true
 VIDEOS["TLC34076"] = true
 VIDEOS["TMS34061"] = true
@@ -371,6 +375,7 @@ MACHINES["DMAC"] = true
 MACHINES["GAYLE"] = true
 MACHINES["NCR53C7XX"] = true
 MACHINES["LSI53C810"] = true
+MACHINES["2812FIFO"] = true
 MACHINES["6522VIA"] = true
 MACHINES["TPI6525"] = true
 MACHINES["RIOT6532"] = true
@@ -395,6 +400,7 @@ MACHINES["TTL74166"] = true
 --MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL74259"] = true
+--MACHINES["TTL74381"] = true
 MACHINES["TTL7474"] = true
 MACHINES["KBDC8042"] = true
 MACHINES["I8257"] = true
@@ -405,7 +411,9 @@ MACHINES["ADC083X"] = true
 MACHINES["ADC1038"] = true
 MACHINES["ADC1213X"] = true
 MACHINES["AICARTC"] = true
+--MACHINES["AM25S55X"] = true
 --MACHINES["AM2847"] = true
+--MACHINES["AM2910"] = true
 MACHINES["AM53CF96"] = true
 MACHINES["AM79C90"] = true
 --MACHINES["AM9513"] = true
@@ -422,6 +430,7 @@ MACHINES["BANKDEV"] = true
 --MACHINES["BIM68153"] = true
 MACHINES["CDP1852"] = true
 MACHINES["CDP1871"] = true
+MACHINES["CHESSMACHINE"] = true
 MACHINES["CMOS40105"] = true
 MACHINES["CDU76S"] = true
 MACHINES["COM8116"] = true
@@ -436,6 +445,7 @@ MACHINES["DS1205"] = true
 MACHINES["DS1302"] = true
 --MACHINES["DS1315"] = true
 --MACHINES["DS1386"] = true
+MACHINES["DS1994"] = true
 MACHINES["DS2401"] = true
 MACHINES["DS2404"] = true
 MACHINES["DS75160A"] = true
@@ -455,6 +465,7 @@ MACHINES["I2CMEM"] = true
 MACHINES["I8155"] = true
 MACHINES["I8212"] = true
 MACHINES["I8214"] = true
+MACHINES["I82355"] = true
 MACHINES["I8243"] = true
 MACHINES["I8251"] = true
 MACHINES["I8255"] = true
@@ -514,6 +525,7 @@ MACHINES["MCF5206E"] = true
 MACHINES["METERS"] = true
 MACHINES["MICROTOUCH"] = true
 --MACHINES["MIOT6530"] = true
+--MACHINES["MM5307"] = true
 --MACHINES["MM58167"] = true
 MACHINES["MM58274C"] = true
 MACHINES["MM74C922"] = true
@@ -531,7 +543,7 @@ MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
 MACHINES["MSM6253"] = true
 --MACHINES["NCR5380"] = true
---MACHINES["NCR5380N"] = true
+MACHINES["NCR5380N"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
 MACHINES["NETLIST"] = true
@@ -586,9 +598,11 @@ MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 --MACHINES["SUN4C_MMU"] = true
 MACHINES["TC0091LVC"] = true
+--MACHINES["TDC1008"] = true
 MACHINES["TE7750"] = true
 MACHINES["TICKET"] = true
 MACHINES["TIMEKPR"] = true
+--MACHINES["TMC208K"] = true
 MACHINES["TMP68301"] = true
 --MACHINES["TMS5501"] = true
 MACHINES["TMS6100"] = true
@@ -605,6 +619,7 @@ MACHINES["UPD1990A"] = true
 MACHINES["UPD4992"] = true
 MACHINES["UPD4701"] = true
 MACHINES["UPD7002"] = true
+MACHINES["UPD7004"] = true
 MACHINES["UPD71071"] = true
 MACHINES["UPD765"] = true
 MACHINES["FDC_PLL"] = true
@@ -658,6 +673,7 @@ MACHINES["PS2INTC"] = true
 --MACHINES["IOPINTC"] = true
 --MACHINES["IOPSIO2"] = true
 --MACHINES["IOPTIMER"] = true
+MACHINES["AIC565"] = true
 MACHINES["AIC6250"] = true
 
 --------------------------------------------------
@@ -1906,6 +1922,7 @@ files {
 	MAME_DIR .. "src/mame/machine/gaelco3d.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco3d.h",
 	MAME_DIR .. "src/mame/drivers/gaelcopc.cpp",
+	MAME_DIR .. "src/mame/drivers/goldart.cpp",
 	MAME_DIR .. "src/mame/drivers/glass.cpp",
 	MAME_DIR .. "src/mame/includes/glass.h",
 	MAME_DIR .. "src/mame/video/glass.cpp",
@@ -1935,6 +1952,7 @@ files {
 	MAME_DIR .. "src/mame/video/xorworld.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.h",
+	MAME_DIR .. "src/mame/drivers/bigkarnk_ms.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "gameplan")
@@ -2217,6 +2235,7 @@ files {
 	MAME_DIR .. "src/mame/video/djboy.cpp",
 	MAME_DIR .. "src/mame/drivers/expro02.cpp",
 	MAME_DIR .. "src/mame/drivers/galpanic.cpp",
+	MAME_DIR .. "src/mame/drivers/galpanic_ms.cpp",
 	MAME_DIR .. "src/mame/includes/galpnipt.h",
 	MAME_DIR .. "src/mame/includes/galpanic.h",
 	MAME_DIR .. "src/mame/video/galpanic.cpp",
@@ -2388,6 +2407,8 @@ files {
 	MAME_DIR .. "src/mame/machine/k573cass.h",
 	MAME_DIR .. "src/mame/machine/k573dio.cpp",
 	MAME_DIR .. "src/mame/machine/k573dio.h",
+	MAME_DIR .. "src/mame/machine/k573fpga.cpp",
+	MAME_DIR .. "src/mame/machine/k573fpga.h",
 	MAME_DIR .. "src/mame/machine/k573mcr.cpp",
 	MAME_DIR .. "src/mame/machine/k573mcr.h",
 	MAME_DIR .. "src/mame/machine/k573msu.cpp",
@@ -2713,6 +2734,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sspeedr.cpp",
 	MAME_DIR .. "src/mame/includes/sspeedr.h",
 	MAME_DIR .. "src/mame/video/sspeedr.cpp",
+	MAME_DIR .. "src/mame/drivers/starrider.cpp",
 	MAME_DIR .. "src/mame/drivers/tmaster.cpp",
 	MAME_DIR .. "src/mame/drivers/vegas.cpp",
 	MAME_DIR .. "src/mame/drivers/wmg.cpp",
@@ -3493,6 +3515,7 @@ files {
 	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
 	MAME_DIR .. "src/mame/machine/xbox_pci.cpp",
 	MAME_DIR .. "src/mame/drivers/flashbeats.cpp",
+	MAME_DIR .. "src/mame/drivers/segaatom.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "seibu")
@@ -3560,6 +3583,7 @@ files {
 	MAME_DIR .. "src/mame/machine/stfight.cpp",
 	MAME_DIR .. "src/mame/drivers/toki.cpp",
 	MAME_DIR .. "src/mame/includes/toki.h",
+	MAME_DIR .. "src/mame/drivers/toki_ms.cpp",
 	MAME_DIR .. "src/mame/video/toki.cpp",
 	MAME_DIR .. "src/mame/drivers/wiz.cpp",
 	MAME_DIR .. "src/mame/includes/wiz.h",
@@ -4498,6 +4522,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/wpc_s.cpp",
 	MAME_DIR .. "src/mame/machine/wpc.cpp",
 	MAME_DIR .. "src/mame/machine/wpc.h",
+	MAME_DIR .. "src/mame/audio/bally.cpp",
 	MAME_DIR .. "src/mame/audio/wpcsnd.cpp",
 	MAME_DIR .. "src/mame/audio/wpcsnd.h",
 	MAME_DIR .. "src/mame/video/wpc_dmd.cpp",

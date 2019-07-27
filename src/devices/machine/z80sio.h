@@ -167,8 +167,19 @@ protected:
 	enum : uint8_t
 	{
 		TX_FLAG_CRC     = 1U << 0,  // include in checksum calculation
-		TX_FLAG_FRAMING = 1U << 1,  // tranmitting framing bits
-		TX_FLAG_SPECIAL = 1U << 2   // transmitting checksum or abort sequence
+		TX_FLAG_FRAMING = 1U << 1,  // transmitting framing bits
+		TX_FLAG_ABORT_TX= 1U << 2,  // transmitting abort sequence
+		TX_FLAG_CRC_TX  = 1U << 3,  // transmitting CRC value
+		TX_FLAG_DATA_TX = 1U << 4   // transmitting frame data
+	};
+
+	// Sync/SDLC FSM states
+	enum
+	{
+		SYNC_FSM_HUNT = 0,  // Hunt for start sync/flag
+		SYNC_FSM_EVICT = 1, // Evict flag from sync SR
+		SYNC_FSM_1ST_CHAR = 2,  // Receiving 1st character
+		SYNC_FSM_IN_FRAME = 3   // Inside a frame
 	};
 
 	z80sio_channel(
@@ -191,7 +202,6 @@ protected:
 	int get_clock_mode();
 	int get_rx_word_length();
 	int get_tx_word_length() const;
-	int get_tx_word_length(uint8_t data) const;
 
 	// receiver state
 	int m_rx_fifo_depth;
@@ -200,26 +210,37 @@ protected:
 
 	int m_rx_clock;     // receive clock line state
 	int m_rx_count;     // clocks until next sample
+	bool m_dlyd_rxd;    // delayed RxD
 	int m_rx_bit;       // receive data bit (0 = start bit, 1 = LSB, etc.)
+	int m_rx_bit_limit; // bits to assemble for next character (sync/SDLC)
+	int m_rx_sync_fsm;  // Sync/SDLC FSM state
+	uint8_t m_rx_one_cnt;   // SDLC: counter to delete stuffed zeros
 	uint16_t m_rx_sr;   // receive shift register
+	uint8_t m_rx_sync_sr;   // rx sync SR
+	uint8_t m_rx_crc_delay; // rx CRC delay SR
+	uint16_t m_rx_crc;  // rx CRC accumulator
+	bool m_rx_crc_en;   // rx CRC enabled
+	bool m_rx_parity;   // accumulated parity
 
 	int m_rx_first;     // first character received
-	int m_rx_break;     // receive break condition
 
 	int m_rxd;
-	int m_sh;           // sync hunt
 
 	// transmitter state
 	uint8_t m_tx_data;
 
 	int m_tx_clock;     // transmit clock line state
 	int m_tx_count;     // clocks until next bit transition
-	int m_tx_bits;      // remaining bits in shift register
-	int m_tx_parity;    // parity bit position or zero if disabled
-	uint16_t m_tx_sr;   // transmit shift register
+	bool m_tx_phase;    // phase of bit clock
+	bool m_tx_parity;   // accumulated parity
+	bool m_tx_in_pkt;   // In active part of packet (sync mode)
+	bool m_tx_forced_sync;  // Force sync/flag
+	uint32_t m_tx_sr;   // transmit shift register
 	uint16_t m_tx_crc;  // calculated transmit checksum
 	uint8_t m_tx_hist;  // transmit history (for bitstuffing)
 	uint8_t m_tx_flags; // internal transmit control flags
+	uint8_t m_tx_delay; // 2-bit tx delay (4 half-bits)
+	uint8_t m_all_sent_delay;   // SR for all-sent delay
 
 	int m_txd;
 	int m_dtr;          // data terminal ready
@@ -247,17 +268,24 @@ private:
 	bool transmit_allowed() const;
 
 	void receive_enabled();
+	void enter_hunt_mode();
 	void sync_receive();
+	void sdlc_receive();
 	void receive_data();
 	void queue_received(uint16_t data, uint32_t error);
 	void advance_rx_fifo();
+	uint8_t get_special_rx_mask() const;
 
+	bool is_tx_idle() const;
 	void transmit_enable();
 	void transmit_complete();
 	void async_tx_setup();
 	void sync_tx_sr_empty();
-	void tx_setup(uint16_t data, int bits, int parity, bool framing, bool special);
+	void tx_setup(uint16_t data, int bits, bool framing, bool crc_tx, bool abort_tx);
 	void tx_setup_idle();
+	bool get_tx_empty() const;
+	void set_tx_empty(bool prev_state, bool new_state);
+	void update_crc(uint16_t& crc , bool bit);
 
 	void reset_ext_status();
 	void read_ext();

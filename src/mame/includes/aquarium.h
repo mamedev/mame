@@ -21,6 +21,7 @@ public:
 		m_bak_videoram(*this, "bak_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),
 		m_scroll(*this, "scroll"),
+		m_audiobank(*this, "bank1"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -32,11 +33,20 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
+	void init_aquarium();
+
+	void aquarium(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_mid_videoram;
-	required_shared_ptr<uint16_t> m_bak_videoram;
-	required_shared_ptr<uint16_t> m_txt_videoram;
-	required_shared_ptr<uint16_t> m_scroll;
+	required_shared_ptr<u16> m_mid_videoram;
+	required_shared_ptr<u16> m_bak_videoram;
+	required_shared_ptr<u16> m_txt_videoram;
+	required_shared_ptr<u16> m_scroll;
+	required_memory_bank m_audiobank;
 
 	/* video-related */
 	tilemap_t  *m_txt_tilemap;
@@ -54,23 +64,22 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<mb3773_device> m_watchdog;
 
-	DECLARE_WRITE8_MEMBER(aquarium_watchdog_w);
-	DECLARE_WRITE8_MEMBER(aquarium_z80_bank_w);
-	DECLARE_READ8_MEMBER(aquarium_oki_r);
-	DECLARE_WRITE8_MEMBER(aquarium_oki_w);
-	DECLARE_WRITE16_MEMBER(aquarium_txt_videoram_w);
-	DECLARE_WRITE16_MEMBER(aquarium_mid_videoram_w);
-	DECLARE_WRITE16_MEMBER(aquarium_bak_videoram_w);
-	void init_aquarium();
-	TILE_GET_INFO_MEMBER(get_aquarium_txt_tile_info);
-	TILE_GET_INFO_MEMBER(get_aquarium_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_aquarium_bak_tile_info);
-	virtual void video_start() override;
-	uint32_t screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t aquarium_snd_bitswap( uint8_t scrambled_data );
-	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_mask, int priority_value);
-	bitmap_ind16 m_temp_sprite_bitmap;
-	void aquarium(machine_config &config);
+	void watchdog_w(u8 data);
+	void z80_bank_w(u8 data);
+	u8 oki_r();
+	void oki_w(u8 data);
+
+	void expand_gfx(int low, int hi);
+	void txt_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void mid_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bak_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_txt_tile_info);
+	TILE_GET_INFO_MEMBER(get_mid_tile_info);
+	TILE_GET_INFO_MEMBER(get_bak_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 snd_bitswap(u8 scrambled_data);
+	void aquarium_colpri_cb(u32 &colour, u32 &pri_mask);
+
 	void main_map(address_map &map);
 	void snd_map(address_map &map);
 	void snd_portmap(address_map &map);

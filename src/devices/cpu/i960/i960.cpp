@@ -1530,6 +1530,12 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				set_rif(opcode, t2f*log(t1f+1.0)/log(2.0));
 				break;
 
+			case 0x2: // logr
+				m_icount -= 400; // checkme
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, log(t1f));
+				break;
+
 			case 0x3: // remr
 				m_icount -= 67; // (67 to 75878 depending on opcodes!!!)
 				t1f = get_1_rif(opcode);
@@ -1548,6 +1554,12 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount -= 104;
 				t1f = get_1_rif(opcode);
 				set_rif(opcode, sqrt(t1f));
+				break;
+
+			case 0x9: // expr
+				m_icount -= 334; // checkme
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, pow(2.0, t1f) - 1.0);
 				break;
 
 			case 0xa: // logbnr

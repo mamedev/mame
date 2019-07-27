@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:bataais
 /******************************************************************************
 
 Applied Concepts Great Game Machine (GGM), electronic board game computer.
@@ -74,7 +75,7 @@ public:
 		m_cart(*this, "cartslot"),
 		m_ca1_off(*this, "ca1_off"),
 		m_delay_update(*this, "delay_update"),
-		m_inp_matrix(*this, "IN.%u", 0),
+		m_inputs(*this, "IN.%u", 0),
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
@@ -94,7 +95,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_device<timer_device> m_ca1_off;
 	required_device<timer_device> m_delay_update;
-	required_ioport_array<6> m_inp_matrix;
+	required_ioport_array<6> m_inputs;
 	output_finder<8> m_out_digit;
 
 	void main_map(address_map &map);
@@ -142,7 +143,7 @@ void ggm_state::machine_start()
 void ggm_state::machine_reset()
 {
 	// it determines whether it's a cold boot or warm boot ("MEM" switch), with CA1
-	if (~m_inp_matrix[4]->read() & 2)
+	if (~m_inputs[4]->read() & 2)
 	{
 		m_via->write_ca1(1);
 		m_ca1_off->adjust(attotime::from_msec(10));
@@ -243,12 +244,12 @@ READ8_MEMBER(ggm_state::input_r)
 	// PB1-PB5: multiplexed inputs
 	for (int i = 0; i < 4; i++)
 		if (BIT(m_digit_select, i))
-			data |= m_inp_matrix[i]->read();
+			data |= m_inputs[i]->read();
 
 	data = ~data << 1 & 0x3e;
 
 	// PB6: hardware version
-	return 0x81 | data | (m_inp_matrix[4]->read() << 6 & 0x40);
+	return 0x81 | data | (m_inputs[4]->read() << 6 & 0x40);
 }
 
 
@@ -407,4 +408,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME  PARENT CMP MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1980, ggm,  0,      0, ggm,    ggm,  ggm_state, empty_init, "Applied Concepts", "Great Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, ggm,  0,      0, ggm,    ggm,  ggm_state, empty_init, "Applied Concepts", "Great Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

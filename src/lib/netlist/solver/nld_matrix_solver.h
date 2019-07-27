@@ -37,7 +37,6 @@ namespace devices
 		netlist_time m_nr_recalc_delay;
 		bool m_use_gabs;
 		bool m_use_linear_prediction;
-		bool m_log_stats;
 	};
 
 

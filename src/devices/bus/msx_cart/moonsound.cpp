@@ -42,7 +42,7 @@ void msx_cart_moonsound_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YMF278B(config, m_ymf278b, YMF278B_STD_CLOCK);
+	YMF278B(config, m_ymf278b, 33.8688_MHz_XTAL);
 	m_ymf278b->set_addrmap(0, &msx_cart_moonsound_device::ymf278b_map);
 	m_ymf278b->irq_handler().set(FUNC(msx_cart_moonsound_device::irq_w));
 	m_ymf278b->add_route(0, "lspeaker", 0.50);

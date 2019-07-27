@@ -2,7 +2,7 @@
 // copyright-holders:Jonathan Gevaryahu, Sandro Ronco, hap
 // thanks-to:Berger, Sean Riddle
 /******************************************************************************
-*
+
 * fidel_cc10.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
 
 TODO:
@@ -71,7 +71,7 @@ private:
 	void main_trampoline_w(offs_t offset, u8 data);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_READ8_MEMBER(ppi_portc_r);
@@ -85,7 +85,7 @@ private:
 
 // misc handlers
 
-void ccx_state::prepare_display()
+void ccx_state::update_display()
 {
 	// 4 7segs + 2 leds
 	set_display_segmask(0xf, 0x7f);
@@ -106,7 +106,7 @@ WRITE8_MEMBER(ccx_state::ppi_porta_w)
 
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ccx_state::ppi_portb_w)
@@ -114,7 +114,7 @@ WRITE8_MEMBER(ccx_state::ppi_portb_w)
 	// d0: lose led, d1: check(win) led
 	// d2-d5: digit select
 	m_led_select = bitswap<6>(data,0,1,5,4,3,2);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ccx_state::ppi_portc_r)
@@ -301,6 +301,11 @@ ROM_START( cc10 ) // model CCX, PCB label P241C-1
 	ROM_LOAD( "cn19053n_cc10b", 0x0000, 0x1000, CRC(afd3ca99) SHA1(870d09b2b52ccb8572d69642c59b5215d5fb26ab) ) // 2332
 ROM_END
 
+ROM_START( cc10a ) // model CCX
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cc-10", 0x0000, 0x1000, CRC(853db345) SHA1(36799e204eb0aef915eb483a5f43372fca5a0fc0) ) // MCM68A332P
+ROM_END
+
 
 ROM_START( checkc4 ) // model ACR, PCB label P241C
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -317,5 +322,6 @@ ROM_END
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1978, cc10,    0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, cc10a,   cc10,   0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version A
 
 CONS( 1978, checkc4, 0,      0, acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger 4", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

@@ -98,9 +98,8 @@ WRITE16_MEMBER(gradius3_state::gradius3_gfxram_w)
 uint32_t gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
-	address_space &space = machine().dummy_space();
-	m_k052109->write(space, 0x1d80, 0x10);
-	m_k052109->write(space, 0x1f00, 0x32);
+	m_k052109->write(0x1d80, 0x10);
+	m_k052109->write(0x1f00, 0x32);
 
 	m_k052109->tilemap_update();
 

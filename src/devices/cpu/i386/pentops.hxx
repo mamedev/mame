@@ -104,7 +104,6 @@ void i386_device::pentium_ud2()    // Opcode 0x0f 0b
 
 void i386_device::pentium_rsm()
 {
-	uint32_t smram_state = m_smbase + 0xfe00;
 	if(!m_smm)
 	{
 		logerror("i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
@@ -112,84 +111,10 @@ void i386_device::pentium_rsm()
 		return;
 	}
 
-	// load state, no sanity checks anywhere
-	m_smbase = READ32(smram_state+SMRAM_SMBASE);
-	m_cr[4] = READ32(smram_state+SMRAM_IP5_CR4);
-	m_sreg[ES].limit = READ32(smram_state+SMRAM_IP5_ESLIM);
-	m_sreg[ES].base = READ32(smram_state+SMRAM_IP5_ESBASE);
-	m_sreg[ES].flags = READ32(smram_state+SMRAM_IP5_ESACC);
-	m_sreg[CS].limit = READ32(smram_state+SMRAM_IP5_CSLIM);
-	m_sreg[CS].base = READ32(smram_state+SMRAM_IP5_CSBASE);
-	m_sreg[CS].flags = READ32(smram_state+SMRAM_IP5_CSACC);
-	m_sreg[SS].limit = READ32(smram_state+SMRAM_IP5_SSLIM);
-	m_sreg[SS].base = READ32(smram_state+SMRAM_IP5_SSBASE);
-	m_sreg[SS].flags = READ32(smram_state+SMRAM_IP5_SSACC);
-	m_sreg[DS].limit = READ32(smram_state+SMRAM_IP5_DSLIM);
-	m_sreg[DS].base = READ32(smram_state+SMRAM_IP5_DSBASE);
-	m_sreg[DS].flags = READ32(smram_state+SMRAM_IP5_DSACC);
-	m_sreg[FS].limit = READ32(smram_state+SMRAM_IP5_FSLIM);
-	m_sreg[FS].base = READ32(smram_state+SMRAM_IP5_FSBASE);
-	m_sreg[FS].flags = READ32(smram_state+SMRAM_IP5_FSACC);
-	m_sreg[GS].limit = READ32(smram_state+SMRAM_IP5_GSLIM);
-	m_sreg[GS].base = READ32(smram_state+SMRAM_IP5_GSBASE);
-	m_sreg[GS].flags = READ32(smram_state+SMRAM_IP5_GSACC);
-	m_ldtr.flags = READ32(smram_state+SMRAM_IP5_LDTACC);
-	m_ldtr.limit = READ32(smram_state+SMRAM_IP5_LDTLIM);
-	m_ldtr.base = READ32(smram_state+SMRAM_IP5_LDTBASE);
-	m_gdtr.limit = READ32(smram_state+SMRAM_IP5_GDTLIM);
-	m_gdtr.base = READ32(smram_state+SMRAM_IP5_GDTBASE);
-	m_idtr.limit = READ32(smram_state+SMRAM_IP5_IDTLIM);
-	m_idtr.base = READ32(smram_state+SMRAM_IP5_IDTBASE);
-	m_task.limit = READ32(smram_state+SMRAM_IP5_TRLIM);
-	m_task.base = READ32(smram_state+SMRAM_IP5_TRBASE);
-	m_task.flags = READ32(smram_state+SMRAM_IP5_TRACC);
-
-	m_sreg[ES].selector = READ32(smram_state+SMRAM_ES);
-	m_sreg[CS].selector = READ32(smram_state+SMRAM_CS);
-	m_sreg[SS].selector = READ32(smram_state+SMRAM_SS);
-	m_sreg[DS].selector = READ32(smram_state+SMRAM_DS);
-	m_sreg[FS].selector = READ32(smram_state+SMRAM_FS);
-	m_sreg[GS].selector = READ32(smram_state+SMRAM_GS);
-	m_ldtr.segment = READ32(smram_state+SMRAM_LDTR);
-	m_task.segment = READ32(smram_state+SMRAM_TR);
-
-	m_dr[7] = READ32(smram_state+SMRAM_DR7);
-	m_dr[6] = READ32(smram_state+SMRAM_DR6);
-	REG32(EAX) = READ32(smram_state+SMRAM_EAX);
-	REG32(ECX) = READ32(smram_state+SMRAM_ECX);
-	REG32(EDX) = READ32(smram_state+SMRAM_EDX);
-	REG32(EBX) = READ32(smram_state+SMRAM_EBX);
-	REG32(ESP) = READ32(smram_state+SMRAM_ESP);
-	REG32(EBP) = READ32(smram_state+SMRAM_EBP);
-	REG32(ESI) = READ32(smram_state+SMRAM_ESI);
-	REG32(EDI) = READ32(smram_state+SMRAM_EDI);
-	m_eip = READ32(smram_state+SMRAM_EIP);
-	m_eflags = READ32(smram_state+SMRAM_EFLAGS);
-	m_cr[3] = READ32(smram_state+SMRAM_CR3);
-	m_cr[0] = READ32(smram_state+SMRAM_CR0);
-
-	m_CPL = (m_sreg[SS].flags >> 13) & 3; // cpl == dpl of ss
-
-	for(int i = 0; i <= GS; i++)
-	{
-		if(PROTECTED_MODE && !V8086_MODE)
-		{
-			m_sreg[i].valid = m_sreg[i].selector ? true : false;
-			m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
-		}
-		else
-			m_sreg[i].valid = true;
-	}
-
-	if(!m_smiact.isnull())
-		m_smiact(false);
-	m_smm = false;
-
-	CHANGE_PC(m_eip);
-	m_nmi_masked = false;
+	leave_smm();
 	if(m_smi_latched)
 	{
-		pentium_smi();
+		enter_smm();
 		return;
 	}
 	if(m_nmi_latched)

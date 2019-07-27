@@ -621,7 +621,8 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	m_squawk_n_talk->write(space, offset, data);
+	m_squawk_n_talk->sound_select(machine().dummy_space(), offset, data & 0x0f);
+	m_squawk_n_talk->sound_int(BIT(data, 4));
 }
 
 
@@ -650,7 +651,8 @@ WRITE8_MEMBER(mcr_nflfoot_state::op4_w)
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
-	m_squawk_n_talk->write(space, offset, data);
+	m_squawk_n_talk->sound_select(machine().dummy_space(), offset, data & 0x0f);
+	m_squawk_n_talk->sound_int(BIT(data, 4));
 }
 
 
@@ -1861,7 +1863,7 @@ void mcr_state::mcr_91490_snt(machine_config &config)
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MIDWAY_SQUAWK_N_TALK(config, m_squawk_n_talk);
+	BALLY_SQUAWK_N_TALK(config, m_squawk_n_talk);
 	m_squawk_n_talk->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_squawk_n_talk->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }

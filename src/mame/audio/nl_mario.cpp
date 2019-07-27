@@ -226,6 +226,7 @@ NETLIST_START(mario)
 	PARAM(Solver.DYNAMIC_TS,  0)
 
 	ANALOG_INPUT(V5, 5)
+	ALIAS(VCC, V5) // no-ttl-dip devices need VCC!
 
 	TTL_INPUT(SOUND0, 1)
 	INCLUDE(nl_mario_snd0)

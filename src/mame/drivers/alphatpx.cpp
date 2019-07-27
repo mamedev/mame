@@ -135,7 +135,7 @@ private:
 	void alphatp2_mem(address_map &map);
 
 	required_device<address_map_bank_device> m_bankdev;
-	required_device<i8041_device> m_kbdmcu;
+	required_device<i8041a_device> m_kbdmcu;
 	required_device<crt5027_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -221,7 +221,7 @@ private:
 	void alphatp3_mem(address_map &map);
 
 	required_device<address_map_bank_device> m_bankdev;
-	required_device<i8041_device> m_kbdmcu;
+	required_device<i8041a_device> m_kbdmcu;
 	required_device<crt5037_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -271,7 +271,7 @@ void alphatp_12_state::alphatp2_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_12_state::beep_w));
 	map(0x50, 0x53).rw(FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
 	map(0x54, 0x54).rw(FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
@@ -311,7 +311,7 @@ void alphatp_34_state::alphatp3_io(address_map &map)
 	//AM_RANGE(0x00, 0x00) AM_READ // unknown
 	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
-	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041a_device::upi41_master_r), FUNC(i8041a_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
 	map(0x40, 0x41).r(FUNC(alphatp_34_state::start88_r));
 	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
@@ -1212,7 +1212,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_12_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_12_state::kbd_port2_r));
@@ -1290,7 +1290,7 @@ void alphatp_34_state::alphatp3(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));

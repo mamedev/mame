@@ -27,7 +27,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_spg(*this, "spg")
 	{ }
 
 	void spg110_base(machine_config &config);
@@ -35,10 +34,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(plunger_r);
 
 protected:
-
-	required_device<unsp_device> m_maincpu;
+	required_device<spg110_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<spg110_device> m_spg;
 
 	virtual void mem_map(address_map &map);
 };
@@ -50,7 +47,6 @@ protected:
 void spg110_game_state::mem_map(address_map &map)
 {
 	map(0x004000, 0x3fffff).rom().region("maincpu", 0x8000);
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg110_device::map));
 }
 
 static INPUT_PORTS_START( jak_capb )
@@ -336,27 +332,25 @@ INPUT_PORTS_END
 
 void spg110_game_state::spg110_base(machine_config &config)
 {
-	UNSP(config, m_maincpu, XTAL(27'000'000));
+	SPG110(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg110_game_state::mem_map);
+	m_maincpu->porta_in().set_ioport("PA");
+	m_maincpu->portb_in().set_ioport("PB");
+	m_maincpu->portc_in().set_ioport("PC");
+	m_maincpu->adc_in<0>().set_ioport("JOYX");
+	m_maincpu->adc_in<1>().set_ioport("JOYY");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update("spg", FUNC(spg110_device::screen_update));
-	m_screen->screen_vblank().set(m_spg, FUNC(spg110_device::vblank));
-
-	SPG110(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->porta_in().set_ioport("PA");
-	m_spg->portb_in().set_ioport("PB");
-	m_spg->portc_in().set_ioport("PC");
-	m_spg->adc_in<0>().set_ioport("JOYX");
-	m_spg->adc_in<1>().set_ioport("JOYY");
+	m_screen->set_screen_update("maincpu", FUNC(spg110_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(spg110_device::vblank));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 }
 
 ROM_START( jak_capb )

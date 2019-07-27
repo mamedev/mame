@@ -479,6 +479,10 @@ void hp9845_base_state::device_reset()
 		if ((sc = m_io_slot[i]->get_rw_handlers(rhandler , whandler)) >= 0) {
 			logerror("Install R/W handlers for slot %u @ SC = %d\n", i, sc);
 			m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
+			if (m_io_slot[ i ]->has_dual_sc()) {
+				logerror("Installing dual SC\n");
+				m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 + 4 , sc * 4 + 7 , rhandler , whandler);
+			}
 		}
 		m_slot_sc[ i ] = sc;
 	}
@@ -666,6 +670,27 @@ void hp9845_base_state::set_flg_slot(unsigned slot , int state)
 	int sc = m_slot_sc[ slot ];
 	assert(sc >= 0);
 	m_io_sys->set_flg(uint8_t(sc) , state);
+}
+
+void hp9845_base_state::set_irq_nextsc_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_irq(uint8_t(sc + 1) , state);
+}
+
+void hp9845_base_state::set_sts_nextsc_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_sts(uint8_t(sc + 1) , state);
+}
+
+void hp9845_base_state::set_flg_nextsc_slot(unsigned slot , int state)
+{
+	int sc = m_slot_sc[ slot ];
+	assert(sc >= 0);
+	m_io_sys->set_flg(uint8_t(sc + 1) , state);
 }
 
 void hp9845_base_state::set_dmar_slot(unsigned slot , int state)
@@ -3692,6 +3717,9 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 		tmp.irq().set([this , slot](int state) { set_irq_slot(slot , state); });
 		tmp.sts().set([this , slot](int state) { set_sts_slot(slot , state); });
 		tmp.flg().set([this , slot](int state) { set_flg_slot(slot , state); });
+		tmp.irq_nextsc().set([this , slot](int state) { set_irq_nextsc_slot(slot , state); });
+		tmp.sts_nextsc().set([this , slot](int state) { set_sts_nextsc_slot(slot , state); });
+		tmp.flg_nextsc().set([this , slot](int state) { set_flg_nextsc_slot(slot , state); });
 		tmp.dmar().set([this , slot](int state) { set_dmar_slot(slot , state); });
 	}
 

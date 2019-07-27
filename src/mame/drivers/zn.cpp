@@ -2717,8 +2717,8 @@ void zn_state::coh1002msnd(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zn_state::cbaj_z80_map);
 	m_audiocpu->set_addrmap(AS_IO, &zn_state::cbaj_z80_port_map);
 
-	FIFO7200(config, m_cbaj_fifo[0], 0x400); // LH540202
-	FIFO7200(config, m_cbaj_fifo[1], 0x400); // "
+	IDT7202(config, m_cbaj_fifo[0]); // LH540202
+	IDT7202(config, m_cbaj_fifo[1]); // "
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
@@ -3567,6 +3567,30 @@ ROM_END
 
 /* 97695-1 */
 ROM_START( sfex2 )
+	CPZN2_BIOS
+
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
+	ROM_LOAD( "ex2e_04.2h", 0x0000000, 0x080000, CRC(77e1622b) SHA1(626a6718e7e843b09075b652d4fcbd9c86eea02b) )
+
+	ROM_REGION32_LE( 0x3000000, "bankedroms", 0 )
+	ROM_LOAD( "ex2-05m.3h", 0x0000000, 0x800000, CRC(78726b17) SHA1(2da449df335ef133ebc3997bbad73ef4137f4771) )
+	ROM_LOAD( "ex2-06m.4h", 0x0800000, 0x800000, CRC(be1075ed) SHA1(36dc673372f30f8b3ff5689ae568c5cd01fe2c07) )
+	ROM_LOAD( "ex2-07m.5h", 0x1000000, 0x800000, CRC(6496c6ed) SHA1(054bcecbb04033abea14d9ffe6634b2bd11ca88b) )
+	ROM_LOAD( "ex2-08m.2k", 0x1800000, 0x800000, CRC(3194132e) SHA1(d1324fcf0a8528fc683791d6342697a7e08674f4) )
+	ROM_LOAD( "ex2-09m.3k", 0x2000000, 0x400000, CRC(075ae585) SHA1(6b88851db618fc3e96f1d740c46c1bc5be0ee21b) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ex2_02.2e",  0x00000, 0x20000, CRC(9489875e) SHA1(1fc9985ff98232c63ea8d05a69f7d77cdf72919f) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
+	ROM_LOAD16_WORD_SWAP( "ex2-01m.3a", 0x0000000, 0x400000, CRC(14a5bb0e) SHA1(dfe3c3a53bd4c58743d8039b5344d3afbe2a9c24) )
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "cp08", 0x000000, 0x000008, CRC(a63d6fa6) SHA1(68995438a1e90ff9aa59090e7e031d51c68c4d73) )
+ROM_END
+
+/* 97695-1 */
+ROM_START( sfex2u )
 	CPZN2_BIOS
 
 	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
@@ -5438,7 +5462,8 @@ GAME( 1997, rvschoolu, rvschool, coh3002c,    zn6b,     zn_state, empty_init, RO
 GAME( 1997, rvschoola, rvschool, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Asia 971117)",              MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen,   rvschool, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971216)", MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen1,  rvschool, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)",                          MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Euro 980312)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2u,    sfex2,    coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u1,   sfex2,    coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980312)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2a,    sfex2,    coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)",                         MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2h,    sfex2,    coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Hispanic 980312)",                     MACHINE_IMPERFECT_SOUND )

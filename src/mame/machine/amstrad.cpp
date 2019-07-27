@@ -2179,7 +2179,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	{
 		m_aleste_mode = data;
 		logerror("EXTEND: Port &FABF write 0x%02x\n",data);
-		m_crtc->set_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
+		m_crtc->set_unscaled_clock( ( m_aleste_mode & 0x02 ) ? ( XTAL(16'000'000) / 8 ) : ( XTAL(16'000'000) / 16 ) );
 	}
 
 	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));

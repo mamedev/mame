@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Shisen
+Tamtex Shisensho / Match It
 
 driver by Nicola Salmoria
 
@@ -20,35 +20,6 @@ driver by Nicola Salmoria
 #include "speaker.h"
 
 
-READ8_MEMBER(shisen_state::dsw1_r)
-{
-	int ret = ioport("DSW1")->read();
-
-	/* Based on the coin mode fill in the upper bits */
-	if (ioport("DSW2")->read() & 0x04)
-	{
-		/* Mode 1 */
-		ret |= (ioport("DSW1")->read() << 4);
-	}
-	else
-	{
-		/* Mode 2 */
-		ret |= (ioport("DSW1")->read() & 0xf0);
-	}
-
-	return ret;
-}
-
-WRITE8_MEMBER(shisen_state::coin_w)
-{
-	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
-
-	machine().bookkeeping().coin_counter_w(0, data & 0x02);
-	machine().bookkeeping().coin_counter_w(1, data & 0x04);
-}
-
-
-
 void shisen_state::shisen_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -58,15 +29,25 @@ void shisen_state::shisen_map(address_map &map)
 	map(0xe000, 0xffff).ram();
 }
 
+
+WRITE8_MEMBER(shisen_state::coin_w)
+{
+	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
+
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);
+}
+
 void shisen_state::shisen_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(FUNC(shisen_state::dsw1_r), FUNC(shisen_state::coin_w));
+	map(0x00, 0x00).portr("DSW1").w(FUNC(shisen_state::coin_w));
 	map(0x01, 0x01).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).portr("P1").w(FUNC(shisen_state::bankswitch_w));
 	map(0x03, 0x03).portr("P2");
 	map(0x04, 0x04).portr("COIN");
 }
+
 
 void shisen_state::shisen_sound_map(address_map &map)
 {

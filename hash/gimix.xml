@@ -8,7 +8,7 @@
 		<publisher>Technical System Consultants / Gimix Inc.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="gfx33dma.dsk" size="102400" crc="5548dd85" sha1="0e0a94908478cbcf1d9ab7430189bdf43e12355b" offset="0" />
+				<rom name="gfx33dma.dsk" size="102400" crc="5548dd85" sha1="0e0a94908478cbcf1d9ab7430189bdf43e12355b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Technical System Consultants / Gimix Inc.</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1265664">
-				<rom name="gflx_36.dsk" size="161280" crc="6cdd4198" sha1="307b635a3abb487c1295d8ef75afeecec9e61c39" offset="0" />
+				<rom name="gflx_36.dsk" size="161280" crc="6cdd4198" sha1="307b635a3abb487c1295d8ef75afeecec9e61c39"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>Technical System Consultants / Gimix Inc.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="flex_v4.3.imd" size="103190" crc="2685ca76" sha1="b297f8e774cf4253a2d2259cb1959c74911ceda3" offset="0" />
+				<rom name="flex_v4.3.imd" size="103190" crc="2685ca76" sha1="b297f8e774cf4253a2d2259cb1959c74911ceda3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<publisher>Microware Systems Corp. / Gimix Inc.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="os9_v1.2.imd" size="116070" crc="aa3791b9" sha1="29036b5a6d1e63801b7b9fe9b99f5a4b536f9f3d" offset="0" />
+				<rom name="os9_v1.2.imd" size="116070" crc="aa3791b9" sha1="29036b5a6d1e63801b7b9fe9b99f5a4b536f9f3d"/>
 			</dataarea>
 		</part>
 	</software>

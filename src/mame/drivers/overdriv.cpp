@@ -170,7 +170,7 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x180000, 0x180001).portr("PADDLE").nopw();  // writes 0 at POST and expect that motor busy flag is off, then checks if paddle is at center otherwise throws a "VOLUME ERROR".
 	map(0x1c0000, 0x1c001f).w(m_k051316_1, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
 	map(0x1c8000, 0x1c801f).w(m_k051316_2, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
-	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::msb_w));
+	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
 	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x1e8000, 0x1e8001).w(FUNC(overdriv_state::overdriv_soundirq_w));
@@ -186,9 +186,9 @@ void overdriv_state::overdriv_master_map(address_map &map)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
+WRITE8_MEMBER( overdriv_state::overdriv_k053246_w )
 {
-	m_k053246->k053246_word_w(space,offset,data,mem_mask);
+	m_k053246->k053246_w(offset,data);
 
 	uint16_t *src, *dst;
 
@@ -215,27 +215,27 @@ TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
 	m_subcpu->set_input_line(6, HOLD_LINE);
 }
 
-WRITE16_MEMBER(overdriv_state::objdma_w)
+WRITE8_MEMBER(overdriv_state::objdma_w)
 {
 	if(data & 0x10)
 		m_objdma_end_timer->adjust(attotime::from_usec(100));
 
-	m_k053246->k053246_w(space,5,data,mem_mask);
+	m_k053246->k053246_w(5,data);
 }
 
 void overdriv_state::overdriv_slave_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram(); /* work RAM */
-	map(0x0c0000, 0x0c1fff).ram(); //AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
+	map(0x0c0000, 0x0c1fff).ram(); //.rw("k053250_1", FUNC(k053250_device::ram_r), FUNC(k053250_device::ram_w));
 	map(0x100000, 0x10000f).rw("k053250_1", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x108000, 0x10800f).rw("k053250_2", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x118000, 0x118fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w)); // data gets copied to sprite chip with DMA..
-	map(0x120000, 0x120001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
+	map(0x120000, 0x120001).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x128000, 0x128001).rw(FUNC(overdriv_state::cpuB_ctrl_r), FUNC(overdriv_state::cpuB_ctrl_w)); /* enable K053247 ROM reading, plus something else */
 	map(0x130000, 0x130007).rw(m_k053246, FUNC(k053247_device::k053246_r), FUNC(k053247_device::k053246_w));
-	map(0x130004, 0x130005).w(FUNC(overdriv_state::objdma_w));
-	//AM_RANGE(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
+	map(0x130005, 0x130005).w(FUNC(overdriv_state::objdma_w));
+	//map(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
 	map(0x200000, 0x203fff).ram().share("share1");
 	map(0x208000, 0x20bfff).ram(); // sprite indirect table?
 	map(0x218000, 0x219fff).r("k053250_1", FUNC(k053250_device::rom_r));
@@ -257,11 +257,6 @@ void overdriv_state::overdriv_sound_map(address_map &map)
 	map(0x0600, 0x062f).rw("k053260_2", FUNC(k053260_device::read), FUNC(k053260_device::write));
 	map(0x0800, 0x0fff).ram();
 	map(0x1000, 0xffff).rom();
-}
-
-void overdriv_state::overdriv_k053260_map(address_map &map)
-{
-	map(0x00000000, 0x001fffff).rom().region("k053260", 0);
 }
 
 /* Both IPT_START1 assignments are needed. The game will reset during */
@@ -357,7 +352,7 @@ void overdriv_state::overdriv(machine_config &config)
 
 	K053246(config, m_k053246, 0);
 	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback), this);
-	m_k053246->set_config("gfx1", NORMAL_PLANE_ORDER, 77, 22);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 77, 22);
 	m_k053246->set_palette("palette");
 
 	K051316(config, m_k051316_1, 0);
@@ -386,12 +381,12 @@ void overdriv_state::overdriv(machine_config &config)
 	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
 
 	k053260_device &k053260_1(K053260(config, "k053260_1", XTAL(3'579'545)));
-	k053260_1.set_addrmap(0, &overdriv_state::overdriv_k053260_map);
+	k053260_1.set_device_rom_tag("k053260");
 	k053260_1.add_route(0, "lspeaker", 0.35);
 	k053260_1.add_route(1, "rspeaker", 0.35);
 
 	k053260_device &k053260_2(K053260(config, "k053260_2", XTAL(3'579'545)));
-	k053260_2.set_addrmap(0, &overdriv_state::overdriv_k053260_map);
+	k053260_2.set_device_rom_tag("k053260");
 	k053260_2.add_route(0, "lspeaker", 0.35);
 	k053260_2.add_route(1, "rspeaker", 0.35);
 }
@@ -416,7 +411,7 @@ ROM_START( overdriv )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "789_e01.e4", 0x00000, 0x10000, CRC(1085f069) SHA1(27228cedb357ff2e130a4bd6d8aa01cf537e034f) ) /* also found labeled as "5" */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* graphics (addressable by the CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the CPU) */
 	ROM_LOAD64_WORD( "789e12.r1",  0x000000, 0x100000, CRC(14a10fb2) SHA1(03fb9c15514c5ecc2d9ae4a53961c4bbb49cec73) )    /* sprites */
 	ROM_LOAD64_WORD( "789e13.r4",  0x000002, 0x100000, CRC(6314a628) SHA1(f8a8918998c266109348c77427a7696b503daeb3) )
 	ROM_LOAD64_WORD( "789e14.r10", 0x000004, 0x100000, CRC(b5eca14b) SHA1(a1c5f5e9cd8bbcfc875e2acb33be024724da63aa) )
@@ -454,7 +449,7 @@ ROM_START( overdriva )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "789_e01.e4", 0x00000, 0x10000, CRC(1085f069) SHA1(27228cedb357ff2e130a4bd6d8aa01cf537e034f) ) /* also found labeled as "5" */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* graphics (addressable by the CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the CPU) */
 	ROM_LOAD64_WORD( "789e12.r1",  0x000000, 0x100000, CRC(14a10fb2) SHA1(03fb9c15514c5ecc2d9ae4a53961c4bbb49cec73) )    /* sprites */
 	ROM_LOAD64_WORD( "789e13.r4",  0x000002, 0x100000, CRC(6314a628) SHA1(f8a8918998c266109348c77427a7696b503daeb3) )
 	ROM_LOAD64_WORD( "789e14.r10", 0x000004, 0x100000, CRC(b5eca14b) SHA1(a1c5f5e9cd8bbcfc875e2acb33be024724da63aa) )
@@ -492,7 +487,7 @@ ROM_START( overdrivb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "789_e01.e4", 0x00000, 0x10000, CRC(1085f069) SHA1(27228cedb357ff2e130a4bd6d8aa01cf537e034f) ) /* also found labeled as "5" */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* graphics (addressable by the CPU) */
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the CPU) */
 	ROM_LOAD64_WORD( "789e12.r1",  0x000000, 0x100000, CRC(14a10fb2) SHA1(03fb9c15514c5ecc2d9ae4a53961c4bbb49cec73) )    /* sprites */
 	ROM_LOAD64_WORD( "789e13.r4",  0x000002, 0x100000, CRC(6314a628) SHA1(f8a8918998c266109348c77427a7696b503daeb3) )
 	ROM_LOAD64_WORD( "789e14.r10", 0x000004, 0x100000, CRC(b5eca14b) SHA1(a1c5f5e9cd8bbcfc875e2acb33be024724da63aa) )

@@ -218,6 +218,7 @@ public:
 	enum gbrx_444_t     { GBRx_444, GGGGBBBBRRRRxxxx };
 	enum irgb_4444_t    { IRGB_4444, IIIIRRRRGGGGBBBB };
 	enum rgbi_4444_t    { RGBI_4444, RRRRGGGGBBBBIIII };
+	enum ibgr_4444_t    { IBGR_4444, IIIIBBBBGGGGRRRR };
 	enum xrgb_555_t     { xRGB_555, xRRRRRGGGGGBBBBB };
 	enum xgrb_555_t     { xGRB_555, xGGGGGRRRRRBBBBB };
 	enum xgbr_555_t     { xGBR_555, xGGGGGBBBBBRRRRR };
@@ -312,6 +313,7 @@ public:
 	palette_device &set_format(gbrx_444_t, u32 entries);
 	palette_device &set_format(irgb_4444_t, u32 entries);
 	palette_device &set_format(rgbi_4444_t, u32 entries);
+	palette_device &set_format(ibgr_4444_t, u32 entries);
 	palette_device &set_format(xrgb_555_t, u32 entries);
 	palette_device &set_format(xgrb_555_t, u32 entries);
 	palette_device &set_format(xgbr_555_t, u32 entries);

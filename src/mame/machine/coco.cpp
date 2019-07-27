@@ -874,10 +874,8 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 void coco_state::poll_keyboard(void)
 {
 	uint8_t pia0_pb = pia_0().b_output();
-	uint8_t pia0_pb_z = pia_0().port_b_z_mask();
 
 	uint8_t pia0_pa = 0x7F;
-	uint8_t pia0_pa_z = 0x7F;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
 	for (unsigned i = 0; i < m_keyboard.size(); i++)
@@ -886,10 +884,6 @@ void coco_state::poll_keyboard(void)
 		if ((value | pia0_pb) != 0xFF)
 		{
 			pia0_pa &= ~(0x01 << i);
-		}
-		if ((value | pia0_pb_z) != 0xFF)
-		{
-			pia0_pa_z &= ~(0x01 << i);
 		}
 	}
 
@@ -906,10 +900,9 @@ void coco_state::poll_keyboard(void)
 
 	/* mask out the buttons */
 	pia0_pa &= ~buttons;
-	pia0_pa_z &= ~buttons;
 
 	/* and write the result to PIA0 */
-	update_keyboard_input(pia0_pa, pia0_pa_z);
+	update_keyboard_input(pia0_pa);
 }
 
 
@@ -919,9 +912,9 @@ void coco_state::poll_keyboard(void)
 //  on the CoCo 3 controls a GIME input
 //-------------------------------------------------
 
-void coco_state::update_keyboard_input(uint8_t value, uint8_t z)
+void coco_state::update_keyboard_input(uint8_t value)
 {
-	pia_0().set_a_input(value, z);
+	pia_0().set_a_input(value);
 }
 
 

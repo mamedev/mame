@@ -131,20 +131,25 @@ void senjyo_state::senjyo_map(address_map &map)
 	map(0x9400, 0x97ff).ram().w(FUNC(senjyo_state::fgcolorram_w)).share("fgcolorram");
 	map(0x9800, 0x987f).ram().share("spriteram");
 	map(0x9c00, 0x9dff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9e00, 0x9e3f).ram();
 	map(0x9e00, 0x9e1f).ram().share("fgscroll");
 	map(0x9e20, 0x9e21).ram().share("scrolly3");
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
+	map(0x9e22, 0x9e24).ram();
 	map(0x9e25, 0x9e25).ram().share("scrollx3");
+	map(0x9e26, 0x9e26).ram();
 	map(0x9e27, 0x9e27).ram().share("bgstripesram");  /* controls width of background stripes */
 	map(0x9e28, 0x9e29).ram().share("scrolly2");
 /*  AM_RANGE(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
+	map(0x9e2a, 0x9e2c).ram();
 	map(0x9e2d, 0x9e2d).ram().share("scrollx2");
+	map(0x9e2e, 0x9e2f).ram();
 	map(0x9e30, 0x9e31).ram().share("scrolly1");
 /*  AM_RANGE(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100) */
+	map(0x9e32, 0x9e34).ram();
 	map(0x9e35, 0x9e35).ram().share("scrollx1");
 /*  AM_RANGE(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
 /*  AM_RANGE(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
+	map(0x9e36, 0x9e3f).ram();
 	map(0xa000, 0xa7ff).ram().w(FUNC(senjyo_state::bg3videoram_w)).share("bg3videoram");
 	map(0xa800, 0xafff).ram().w(FUNC(senjyo_state::bg2videoram_w)).share("bg2videoram");
 	map(0xb000, 0xb7ff).ram().w(FUNC(senjyo_state::bg1videoram_w)).share("bg1videoram");

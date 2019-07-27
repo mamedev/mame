@@ -40,7 +40,7 @@
     1994  Ichidant-R (World)         Sega              ?                C2
     1994  Ichidant-R (Korea)         Sega              ?                C2
     1994  Puyo Puyo 2                Compile           317-0228         C2
-    1994  Zunzunkyou No Yabou        Sega              ?                C2
+    1994  Zunzunkyou no Yabou        Sega              ?                C2
 
     1995  Print Club (Vol.1)         Atlus             ?                C2
     1995  Print Club (Vol.2)         Atlus             ?                C2
@@ -2029,7 +2029,7 @@ ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega */
 ROM_END
 
 
-ROM_START( zunkyou ) /* Zunzunkyou No Yabou  (c)1994 Sega */
+ROM_START( zunkyou ) /* Zunzunkyou no Yabou  (c)1994 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16812.ic32", 0x000000, 0x080000, CRC(eb088fb0) SHA1(69089a3516ad50f35e81971ef3c33eb3f5d52374) )
 	ROM_LOAD16_BYTE( "epr-16811.ic31", 0x000001, 0x080000, CRC(9ac7035b) SHA1(1803ffbadc1213e04646d483e27da1591e22cd06) )
@@ -2584,7 +2584,7 @@ GAME( 1994, ichirjbl,  ichir,    segac,  ichir,           segac2_state,    init_
 
 GAME( 1994, puyopuy2,  0,        segac2, puyopuy2,        segac2_state,    init_puyopuy2, ROT0, "Compile (Sega license)", "Puyo Puyo 2 (Japan)", 0 )
 
-GAME( 1994, zunkyou,   0,        segac2, zunkyou,         segac2_state,    init_zunkyou,  ROT0, "Sega", "Zunzunkyou No Yabou (Japan)", 0 )
+GAME( 1994, zunkyou,   0,        segac2, zunkyou,         segac2_state,    init_zunkyou,  ROT0, "Sega", "Zunzunkyou no Yabou (Japan)", 0 )
 
 /* Atlus Print Club 'Games' (C-2 Hardware) requires printer and camera emulation */
 GAME( 1995, pclubj,    0,        segac2, pclub,           segac2_pc_state, init_pclubj,   ROT0, "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )

@@ -80,7 +80,6 @@ void ft68m_state::machine_reset()
 {
 	uint8_t* ROM = memregion("roms")->base();
 	memcpy(m_p_base, ROM, 8);
-	m_maincpu->reset();
 }
 
 void ft68m_state::ft68m(machine_config &config)

@@ -345,7 +345,6 @@ MACHINE_START_MEMBER(md_cons_state, ms_megacd)
 
 MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 {
-	m_maincpu->reset();
 	MACHINE_RESET_CALL_MEMBER( megadriv );
 
 	// if the system has a 32x, pause the extra CPUs until they are actually turned on
@@ -581,22 +580,22 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 }
 
 
-void md_cons_state::_32x_scanline_callback(int x, uint32_t priority, uint16_t &lineptr)
+void md_cons_state::_32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr)
 {
 	if (m_32x)
-		m_32x->_32x_render_videobuffer_to_screenbuffer(x, priority, lineptr);
+		m_32x->render_videobuffer_to_screenbuffer(x, priority, lineptr);
 }
 
 void md_cons_state::_32x_interrupt_callback(int scanline, int irq6)
 {
 	if (m_32x)
-		m_32x->_32x_interrupt_cb(scanline, irq6);
+		m_32x->interrupt_cb(scanline, irq6);
 }
 
 void md_cons_state::_32x_scanline_helper_callback(int scanline)
 {
 	if (m_32x)
-		m_32x->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
+		m_32x->render_videobuffer_to_screenbuffer_helper(scanline);
 }
 
 MACHINE_CONFIG_START(md_cons_state::genesis_32x)
@@ -613,7 +612,6 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
-	m_32x->set_palette_tag("gen_vdp:palette");
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -648,7 +646,6 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
-	m_32x->set_palette_tag("gen_vdp:palette");
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -683,7 +680,6 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
-	m_32x->set_palette_tag("gen_vdp:palette");
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
@@ -882,6 +878,9 @@ ROM_START( megacdj )
 	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
 	ROM_SYSTEM_BIOS(4, "v100p", "v1.00P")   // CRC: e2e70bc8 when byteswapped
 	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(4) )
+	// EEPROM had no SEGA's label, might be 14088(no rev) or 14088A
+	ROM_SYSTEM_BIOS(5, "v100c", "v1.00C")   // CRC: c3b60c13 when byteswapped
+	ROMX_LOAD( "100c.bin",       0x000000,  0x020000, CRC(41af44c4) SHA1(f30d109d1c2f7c9feaf38600c65834261db73d1f), ROM_BIOS(5) )
 ROM_END
 
 /* Asia bios, when run in USA region will show :

@@ -1836,7 +1836,7 @@ void blitz68k_state::bankrob(machine_config &config)
 	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
@@ -1867,7 +1867,7 @@ void blitz68k_state::bankroba(machine_config &config)
 	screen.set_visarea(0, 512-1, 0+7, 256-1);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
@@ -1929,7 +1929,7 @@ void blitz68k_state::dualgame(machine_config &config)
 	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
@@ -1959,7 +1959,7 @@ void blitz68k_state::hermit(machine_config &config)
 	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
 
-	H46505(config, m_crtc, XTAL(22'118'400)/8);
+	HD6845S(config, m_crtc, XTAL(22'118'400)/8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
@@ -1993,7 +1993,7 @@ void blitz68k_state::maxidbl(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k_noblit));
 
-	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	HD6845S(config, m_crtc, XTAL(11'059'200)/4);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);

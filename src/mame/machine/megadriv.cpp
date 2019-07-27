@@ -752,17 +752,16 @@ uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t* desty = &bitmap.pix32(y, 0);
-		uint16_t* srcy;
+		uint32_t* srcy;
 
 		if (!m_vdp->m_use_alt_timing)
-			srcy = &m_vdp->m_render_bitmap->pix(y, 0);
+			srcy = &m_vdp->m_render_bitmap->pix32(y, 0);
 		else
 			srcy = m_vdp->m_render_line.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t src = srcy[x];
-			desty[x] = rgb_t(pal5bit(src >> 10), pal5bit(src >> 5), pal5bit(src >> 0));
+			desty[x] = srcy[x];
 		}
 	}
 

@@ -37,7 +37,7 @@ class com8116_device :  public device_t
 {
 public:
 	// construction/destruction
-	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto fx4_handler() { return m_fx4_handler.bind(); }
 	auto fr_handler() { return m_fr_handler.bind(); }
@@ -132,11 +132,22 @@ public:
 };
 
 
+// ======================> com8116_003_device
+
+class k1135ab_device : public com8116_device
+{
+public:
+	// construction/destruction
+	k1135ab_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(COM8116, com8116_device)
 DECLARE_DEVICE_TYPE(COM8116_003, com8116_003_device)
 DECLARE_DEVICE_TYPE(COM5016_5, com5016_5_device)
 DECLARE_DEVICE_TYPE(COM5016_013, com5016_013_device)
 DECLARE_DEVICE_TYPE(COM8116_020, com8116_020_device)
+DECLARE_DEVICE_TYPE(K1135AB, k1135ab_device)
 
 #endif // MAME_MACHINE_COM8116_H

@@ -24,9 +24,6 @@ void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case TIMER_KEYBOARD:
 		keyboard_callback(ptr, param);
 		break;
-	case TIMER_CASSETTE:
-		poly88_cassette_timer_callback(ptr, param);
-		break;
 	default:
 		assert_always(false, "Unknown id in poly88_state::device_timer");
 	}
@@ -39,12 +36,13 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_usart_timer_callback)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
+void poly88_state::baud_rate_w(uint8_t data)
 {
 	logerror("poly88_baud_rate_w %02x\n",data);
-	m_usart_timer = timer_alloc(TIMER_USART);
-	m_usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
+	m_brg->control_w(data & 15);
 
+	// FIXME
+	m_usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
 }
 
 uint8_t poly88_state::row_number(uint8_t code) {
@@ -149,8 +147,6 @@ TIMER_CALLBACK_MEMBER(poly88_state::keyboard_callback)
 	} else {
 		m_last_code = key_code;
 	}
-
-	timer_set(attotime::from_hz(24000), TIMER_KEYBOARD);
 }
 
 IRQ_CALLBACK_MEMBER(poly88_state::poly88_irq_callback)
@@ -163,7 +159,7 @@ WRITE_LINE_MEMBER(poly88_state::write_cas_tx)
 	m_cas_tx = state;
 }
 
-TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
+WRITE_LINE_MEMBER(poly88_state::cassette_txc_rxc_w)
 {
 	int data;
 	int current_level;
@@ -186,13 +182,13 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 				{
 					data = (!m_previous_level && current_level) ? 1 : 0;
 //data = current_level;
-					m_uart->write_rxd(data);
+					m_usart->write_rxd(data);
 
 					m_clk_level_tape = 1;
 				}
 			}
 
-			m_uart->write_rxc(m_clk_level_tape);
+			m_usart->write_rxc(m_clk_level_tape);
 		}
 
 		/* tape writing */
@@ -203,15 +199,14 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 			m_cassette->output(data&0x01 ? 1 : -1);
 
 			m_clk_level_tape = m_clk_level_tape ? 0 : 1;
-			m_uart->write_txc(m_clk_level_tape);
+			m_usart->write_txc(m_clk_level_tape);
 
 			return;
 		}
 
 		m_clk_level_tape = 1;
 
-		m_clk_level = m_clk_level ? 0 : 1;
-		m_uart->write_txc(m_clk_level);
+		m_usart->write_txc(state);
 //  }
 }
 
@@ -219,17 +214,19 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 void poly88_state::init_poly88()
 {
 	m_previous_level = 0;
-	m_clk_level = m_clk_level_tape = 1;
-	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-	m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(600));
+	m_clk_level_tape = 1;
 
-	timer_set(attotime::from_hz(24000), TIMER_KEYBOARD);
+	m_usart_timer = timer_alloc(TIMER_USART);
+	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
+	m_keyboard_timer->adjust(attotime::from_hz(24000), 0, attotime::from_hz(24000));
 }
 
 void poly88_state::machine_reset()
 {
 	m_intr = 0;
 	m_last_code = 0;
+	m_usart->write_cts(0);
+	m_brg->control_w(0);
 }
 
 INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
@@ -244,7 +241,7 @@ WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
 	//execute().set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(poly88_state::poly88_keyboard_r)
+uint8_t poly88_state::keyboard_r()
 {
 	uint8_t retVal = m_last_code;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -252,7 +249,7 @@ READ8_MEMBER(poly88_state::poly88_keyboard_r)
 	return retVal;
 }
 
-WRITE8_MEMBER(poly88_state::poly88_intr_w)
+void poly88_state::intr_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -327,6 +324,6 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 		}
 		pos+=recordLen;
 	}
-	m_uart->reset();
+	m_usart->reset();
 	return image_init_result::PASS;
 }

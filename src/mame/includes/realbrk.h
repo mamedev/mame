@@ -35,18 +35,21 @@ public:
 	void realbrk(machine_config &config);
 	void pkgnshdx(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<tmp68301_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr_array<uint16_t, 3> m_vram;
-	required_shared_ptr<uint16_t> m_vregs;
-	optional_shared_ptr<uint16_t> m_dsw_select;
-	optional_shared_ptr<uint16_t> m_backup_ram;
-	optional_shared_ptr_array<uint16_t, 2> m_vram_ras;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr_array<u16, 3> m_vram;
+	required_shared_ptr<u16> m_vregs;
+	optional_shared_ptr<u16> m_dsw_select;
+	optional_shared_ptr<u16> m_backup_ram;
+	optional_shared_ptr_array<u16, 2> m_vram_ras;
 
 	optional_ioport_array<2> m_in_io;
 	optional_ioport_array<4> m_dsw_io;
@@ -59,30 +62,28 @@ private:
 	tilemap_t *m_tilemap[3];
 
 	// common
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(vram_2_w);
-	DECLARE_WRITE16_MEMBER(vregs_w);
+	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask);
+	void vram_2_w(offs_t offset, u16 data, u16 mem_mask);
+	void vregs_w(offs_t offset, u16 data, u16 mem_mask);
 
 	// realbrk and/or dai2kaku
-	DECLARE_READ16_MEMBER(realbrk_dsw_r);
-	DECLARE_WRITE16_MEMBER(realbrk_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(dai2kaku_flipscreen_w);
+	u16 realbrk_dsw_r();
+	void realbrk_flipscreen_w(offs_t offset, u16 data, u16 mem_mask);
+	void dai2kaku_flipscreen_w(u16 data);
 
 	// pkgnsh and/or pkgnshdx
-	DECLARE_READ16_MEMBER(pkgnsh_input_r);
-	DECLARE_READ16_MEMBER(pkgnshdx_input_r);
-	DECLARE_READ16_MEMBER(backup_ram_r);
-	DECLARE_READ16_MEMBER(backup_ram_dx_r);
-	DECLARE_WRITE16_MEMBER(backup_ram_w);
+	u16 pkgnsh_input_r(offs_t offset);
+	u16 pkgnshdx_input_r(offs_t offset);
+	u16 backup_ram_r(offs_t offset);
+	u16 backup_ram_dx_r(offs_t offset);
+	void backup_ram_w(offs_t offset, u16 data, u16 mem_mask);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 
-	virtual void video_start() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	template <bool Rotatable> void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	template <bool Rotatable> void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, bitmap_ind8 &priority);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void base_mem(address_map &map);

@@ -273,13 +273,6 @@ namespace devices
 
 		//m_params.m_max_timestep = std::max(m_params.m_max_timestep, m_params.m_max_timestep::)
 
-		// Override log statistics
-		pstring p = plib::util::environment("NL_STATS", "");
-		if (p != "")
-			m_params.m_log_stats = plib::pstonum<decltype(m_params.m_log_stats)>(p);
-		else
-			m_params.m_log_stats = m_log_stats();
-
 		log().verbose("Scanning net groups ...");
 		// determine net groups
 

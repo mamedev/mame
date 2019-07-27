@@ -507,7 +507,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pulses_w);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void map(address_map &map);
 	void palettebanks(address_map &map);
 	void portmap(address_map &map);
@@ -562,7 +562,7 @@ void majorpkr_state::video_start()
 }
 
 
-uint32_t majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0);
@@ -1021,7 +1021,6 @@ void majorpkr_state::majorpkr(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(CRTC_CLOCK*16, (47+1)*16, 0, (36*16)-16, (36+1)*8, 0, (28*8));  // from CRTC registers.
 	screen.set_screen_update(FUNC(majorpkr_state::screen_update_majorpkr));
-	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_majorpkr);
 

@@ -194,7 +194,7 @@ namespace netlist
 	void nlparse_t::register_link_fqn(const pstring &sin, const pstring &sout)
 	{
 		link_t temp = link_t(sin, sout);
-		log().debug("link {1} <== {2}\n", sin, sout);
+		log().debug("link {1} <== {2}", sin, sout);
 		m_links.push_back(temp);
 	}
 
@@ -230,6 +230,7 @@ setup_t::setup_t(netlist_state_t &nlstate)
 	, m_nlstate(nlstate)
 	, m_netlist_params(nullptr)
 	, m_proxy_cnt(0)
+	, m_validation(false)
 {
 }
 
@@ -296,17 +297,13 @@ void setup_t::remove_connections(const pstring &pin)
 		log().fatal(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
 }
 
-
-
 void setup_t::register_param_t(const pstring &name, param_t &param)
 {
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(name));
 }
 
-
-
-const pstring setup_t::resolve_alias(const pstring &name) const
+pstring setup_t::resolve_alias(const pstring &name) const
 {
 	pstring temp = name;
 	pstring ret;
@@ -322,7 +319,31 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 	return ret;
 }
 
-std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devname)
+pstring setup_t::de_alias(const pstring &alias) const
+{
+	pstring temp = alias;
+	pstring ret;
+
+	/* FIXME: Detect endless loop */
+	do {
+		ret = temp;
+		temp = "";
+		for (auto &e : m_alias)
+		{
+			// FIXME: this will resolve first one found
+			if (e.second == ret)
+			{
+				temp = e.first;
+				break;
+			}
+		}
+	} while (temp != "" && temp != ret);
+
+	log().debug("{1}==>{2}\n", alias, ret);
+	return ret;
+}
+
+std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devname) const
 {
 	std::vector<pstring> terms;
 	for (auto & t : m_terminals)
@@ -358,7 +379,7 @@ std::vector<pstring> setup_t::get_terminals_for_device_name(const pstring &devna
 	return terms;
 }
 
-detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
+detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required) const
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
@@ -379,7 +400,7 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 }
 
 detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
-		detail::terminal_type atype, bool required)
+		detail::terminal_type atype, bool required) const
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
@@ -712,7 +733,6 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	}
 	else
 		ret = false;
-		//netlist().error("Connecting {1} to {2} not supported!\n", t1.name(), t2.name());
 	return ret;
 }
 
@@ -724,7 +744,7 @@ void setup_t::resolve_inputs()
 	 * We therefore first park connecting inputs and retry
 	 * after all other terminals were connected.
 	 */
-	int tries = NL_MAX_LINK_RESOLVE_LOOPS;
+	unsigned tries = m_netlist_params->m_max_link_loops();
 	while (m_links.size() > 0 && tries >  0)
 	{
 
@@ -746,9 +766,9 @@ void setup_t::resolve_inputs()
 	if (tries == 0)
 	{
 		for (auto & link : m_links)
-			log().warning(MF_CONNECTING_1_TO_2(link.first, link.second));
+			log().warning(MF_CONNECTING_1_TO_2(setup().de_alias(link.first), setup().de_alias(link.second)));
 
-		log().fatal(MF_LINK_TRIES_EXCEEDED(NL_MAX_LINK_RESOLVE_LOOPS));
+		log().fatal(MF_LINK_TRIES_EXCEEDED(m_netlist_params->m_max_link_loops()));
 	}
 
 	log().verbose("deleting empty nets ...");
@@ -757,7 +777,7 @@ void setup_t::resolve_inputs()
 
 	delete_empty_nets();
 
-	pstring errstr("");
+	bool err(false);
 
 	log().verbose("looking for terminals not connected ...");
 	for (auto & i : m_terminals)
@@ -766,7 +786,10 @@ void setup_t::resolve_inputs()
 		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
 			log().info(MI_DUMMY_1_WITHOUT_CONNECTIONS(term->name()));
 		else if (!term->has_net())
-			errstr += plib::pfmt("Found terminal {1} without a net\n")(term->name());
+		{
+			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
+			err = true;
+		}
 		else if (term->net().num_cons() == 0)
 		{
 			if (term->is_logic_input())
@@ -779,9 +802,8 @@ void setup_t::resolve_inputs()
 				log().warning(MW_TERMINAL_1_WITHOUT_CONNECTIONS(term->name()));
 		}
 	}
-	//FIXME: error string handling
-	if (errstr != "")
-		log().fatal("{1}", errstr);
+	if (err)
+		log().fatal(MF_TERMINALS_WITHOUT_NET());
 
 }
 
@@ -818,7 +840,7 @@ const log_type &setup_t::log() const
 // Models
 // ----------------------------------------------------------------------------------------
 
-void models_t::register_model(pstring model_in)
+void models_t::register_model(const pstring &model_in)
 {
 	auto pos = model_in.find(" ");
 	if (pos == pstring::npos)
@@ -884,7 +906,7 @@ pstring models_t::model_string(model_map_t &map)
 	return ret + ")";
 }
 
-pstring models_t::value_str(pstring model, pstring entity)
+pstring models_t::value_str(const pstring &model, const pstring &entity)
 {
 	model_map_t &map = m_cache[model];
 
@@ -903,7 +925,7 @@ pstring models_t::value_str(pstring model, pstring entity)
 	return ret;
 }
 
-nl_double models_t::value(pstring model, pstring entity)
+nl_double models_t::value(const pstring &model, const pstring &entity)
 {
 	model_map_t &map = m_cache[model];
 
@@ -933,7 +955,11 @@ nl_double models_t::value(pstring model, pstring entity)
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
 	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_double>(tmp), factor);
-	return plib::pstonum<nl_double>(tmp) * factor;
+	bool err(false);
+	nl_double val = plib::pstonum_ne<nl_double, true>(tmp, err);
+	if (err)
+		throw nl_exception(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp, "double", model));
+	return val * factor;
 }
 
 class logic_family_std_proxy_t : public logic_family_desc_t
@@ -964,9 +990,9 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 	if (m_models.value_str(model, "TYPE") == "CD4XXX")
 		return family_CD4XXX();
 
-	for (auto & e : m_nlstate.m_family_cache)
-		if (e.first == model)
-			return e.second.get();
+	auto it = m_nlstate.m_family_cache.find(model);
+	if (it != m_nlstate.m_family_cache.end())
+		return it->second.get();
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t>();
 
@@ -980,7 +1006,7 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto retp = ret.get();
 
-	m_nlstate.m_family_cache.emplace_back(model, std::move(ret));
+	m_nlstate.m_family_cache.emplace(model, std::move(ret));
 
 	return retp;
 }
@@ -1074,12 +1100,15 @@ void setup_t::prepare_to_run()
 		auto f = m_params.find(p.first);
 		if (f == m_params.end())
 		{
-			if (plib::endsWith(p.first, pstring(".HINT_NO_DEACTIVATE")))
+			if (plib::endsWith(p.first, sHINT_NO_DEACTIVATE))
 			{
 				// FIXME: get device name, check for device
+				auto *dev = m_nlstate.find_device(plib::replace_all(p.first, sHINT_NO_DEACTIVATE, ""));
+				if (dev == nullptr)
+					log().warning(MW_DEVICE_NOT_FOUND_FOR_HINT(p.first));
 			}
 			else
-				log().warning("Unknown parameter: {}", p.first);
+				log().warning(MW_UNKNOWN_PARAMETER(p.first));
 		}
 	}
 
@@ -1089,12 +1118,13 @@ void setup_t::prepare_to_run()
 	{
 		if (use_deactivate)
 		{
-			auto p = m_param_values.find(d.second->name() + ".HINT_NO_DEACTIVATE");
+			auto p = m_param_values.find(d.second->name() + sHINT_NO_DEACTIVATE);
 			if (p != m_param_values.end())
 			{
 				//FIXME: check for errors ...
-				auto v = plib::pstonum<double>(p->second);
-				if (std::abs(v - std::floor(v)) > 1e-6 )
+				bool err(false);
+				auto v = plib::pstonum_ne<double, true>(p->second, err);
+				if (err || std::abs(v - std::floor(v)) > 1e-6 )
 					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
 				d.second->set_hint_deactivate(v == 0.0);
 			}
@@ -1111,11 +1141,19 @@ void setup_t::prepare_to_run()
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 		{
-			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
-				t->name(), t->m_N.net().name(), t->m_P.net().name()));
+			// We are not interested in power terminals - This is intended behaviour
+			if (!plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
+				log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
+					t->name(), t->m_N.net().name(), t->m_P.net().name()));
 			t->m_N.net().remove_terminal(t->m_N);
 			t->m_P.net().remove_terminal(t->m_P);
 			m_nlstate.remove_dev(t);
+		}
+		else
+		{
+			if (plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
+				log().info(MI_POWER_TERMINALS_1_CONNECTED_ANALOG_2_3(
+					t->name(), t->m_N.net().name(), t->m_P.net().name()));
 		}
 	}
 

@@ -678,34 +678,6 @@ static INPUT_PORTS_START( aircomb )
 INPUT_PORTS_END
 
 
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,4),  /* number of tiles */
-	8,      /* bits per pixel */
-	{       /* plane offsets */
-		0,1,2,3,4,5,6,7
-	},
-	{ /* x offsets */
-		0*8,RGN_FRAC(1,4)+0*8,RGN_FRAC(2,4)+0*8,RGN_FRAC(3,4)+0*8,
-		1*8,RGN_FRAC(1,4)+1*8,RGN_FRAC(2,4)+1*8,RGN_FRAC(3,4)+1*8,
-		2*8,RGN_FRAC(1,4)+2*8,RGN_FRAC(2,4)+2*8,RGN_FRAC(3,4)+2*8,
-		3*8,RGN_FRAC(1,4)+3*8,RGN_FRAC(2,4)+3*8,RGN_FRAC(3,4)+3*8
-	},
-	{ /* y offsets */
-		0*32,1*32,2*32,3*32,
-		4*32,5*32,6*32,7*32,
-		8*32,9*32,10*32,11*32,
-		12*32,13*32,14*32,15*32
-	},
-	8*64 /* sprite offset */
-};
-
-static GFXDECODE_START( gfx_namcos21 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
-GFXDECODE_END
-
-
 WRITE8_MEMBER( namcos21_c67_state::sound_bankselect_w )
 {
 	m_audiobank->set_entry(data>>4);
@@ -843,16 +815,15 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	configure_c148_standard(config);
 	NAMCO_C139(config, m_sci, 0);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_namcos21);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
-	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_palxor(0xf); // reverse mapping
-	m_c355spr->set_gfxregion(0);
+	m_c355spr->set_color_base(0x1000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -911,11 +882,11 @@ ROM_START( starblad )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
-	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
-	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
-	ROM_LOAD( "st1-obj2.bin", 0x100000, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
-	ROM_LOAD( "st1-obj3.bin", 0x180000, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
+	ROM_REGION( 0x200000, "c355spr", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
+	ROM_LOAD32_BYTE( "st1-obj1.bin", 0x000001, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
+	ROM_LOAD32_BYTE( "st1-obj2.bin", 0x000002, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
+	ROM_LOAD32_BYTE( "st1-obj3.bin", 0x000003, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_BYTE( "st1-data-u.bin", 0x000000, 0x20000, CRC(2433e911) SHA1(95f5f00d3bacda4996e055a443311fb9f9a5fe2f) )
@@ -956,11 +927,11 @@ ROM_START( starbladj )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
-	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
-	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
-	ROM_LOAD( "st1-obj2.bin", 0x100000, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
-	ROM_LOAD( "st1-obj3.bin", 0x180000, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
+	ROM_REGION( 0x200000, "c355spr", 0 ) /* sprites */
+	ROM_LOAD32_BYTE( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
+	ROM_LOAD32_BYTE( "st1-obj1.bin", 0x000001, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
+	ROM_LOAD32_BYTE( "st1-obj2.bin", 0x000002, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
+	ROM_LOAD32_BYTE( "st1-obj3.bin", 0x000003, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_BYTE( "st1-data-u.bin", 0x000000, 0x20000, CRC(2433e911) SHA1(95f5f00d3bacda4996e055a443311fb9f9a5fe2f) )
@@ -1001,15 +972,15 @@ ROM_START( solvalou )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "sv1-obj0.bin", 0x000000, 0x80000, CRC(773798bb) SHA1(51ab76c95030bab834f1a74ae677b2f0afc18c52) )
-	ROM_LOAD( "sv1-obj4.bin", 0x080000, 0x80000, CRC(33a008a7) SHA1(4959a0ac24ad64f1367e2d8d63d39a0273c60f3e) )
-	ROM_LOAD( "sv1-obj1.bin", 0x100000, 0x80000, CRC(a36d9e79) SHA1(928d9995e97ee7509e23e6cc64f5e7bfb5c02d42) )
-	ROM_LOAD( "sv1-obj5.bin", 0x180000, 0x80000, CRC(31551245) SHA1(385452ea4830c466263ad5241313ac850dfef756) )
-	ROM_LOAD( "sv1-obj2.bin", 0x200000, 0x80000, CRC(c8672b8a) SHA1(8da037b27d2c2b178aab202781f162371458f788) )
-	ROM_LOAD( "sv1-obj6.bin", 0x280000, 0x80000, CRC(fe319530) SHA1(8f7e46c8f0b86c7515f6d763b795ce07d11c77bc) )
-	ROM_LOAD( "sv1-obj3.bin", 0x300000, 0x80000, CRC(293ef1c5) SHA1(f677883bfec16bbaeb0a01ac565d0e6cac679174) )
-	ROM_LOAD( "sv1-obj7.bin", 0x380000, 0x80000, CRC(95ed6dcb) SHA1(931706ce3fea630823ce0c79febec5eec0cc623d) )
+	ROM_REGION( 0x400000, "c355spr", 0 )
+	ROM_LOAD32_BYTE( "sv1-obj0.bin", 0x000000, 0x80000, CRC(773798bb) SHA1(51ab76c95030bab834f1a74ae677b2f0afc18c52) )
+	ROM_LOAD32_BYTE( "sv1-obj1.bin", 0x000001, 0x80000, CRC(a36d9e79) SHA1(928d9995e97ee7509e23e6cc64f5e7bfb5c02d42) )
+	ROM_LOAD32_BYTE( "sv1-obj2.bin", 0x000002, 0x80000, CRC(c8672b8a) SHA1(8da037b27d2c2b178aab202781f162371458f788) )
+	ROM_LOAD32_BYTE( "sv1-obj3.bin", 0x000003, 0x80000, CRC(293ef1c5) SHA1(f677883bfec16bbaeb0a01ac565d0e6cac679174) )
+	ROM_LOAD32_BYTE( "sv1-obj4.bin", 0x200000, 0x80000, CRC(33a008a7) SHA1(4959a0ac24ad64f1367e2d8d63d39a0273c60f3e) )
+	ROM_LOAD32_BYTE( "sv1-obj5.bin", 0x200001, 0x80000, CRC(31551245) SHA1(385452ea4830c466263ad5241313ac850dfef756) )
+	ROM_LOAD32_BYTE( "sv1-obj6.bin", 0x200002, 0x80000, CRC(fe319530) SHA1(8f7e46c8f0b86c7515f6d763b795ce07d11c77bc) )
+	ROM_LOAD32_BYTE( "sv1-obj7.bin", 0x200003, 0x80000, CRC(95ed6dcb) SHA1(931706ce3fea630823ce0c79febec5eec0cc623d) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_BYTE( "sv1-data-u.bin", 0x000000, 0x80000, CRC(2e561996) SHA1(982158481e5649f21d5c2816fdc80cb725ed1419) )
@@ -1045,15 +1016,15 @@ ROM_START( aircomb )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "ac2-obj0.5s", 0x000000, 0x80000, CRC(8327ff22) SHA1(16f6022dedb7a74590898bc8ed3e8a97993c4635) )
-	ROM_LOAD( "ac2-obj4.4s", 0x080000, 0x80000, CRC(e433e344) SHA1(98ade550cf066fcb5c09fa905f441a1464d4d625) )
-	ROM_LOAD( "ac2-obj1.5x", 0x100000, 0x80000, CRC(43af566d) SHA1(99f0d9f005e28040f5cc10de2198893946a31d09) )
-	ROM_LOAD( "ac2-obj5.4x", 0x180000, 0x80000, CRC(ecb19199) SHA1(8e0aa1bc1141c4b09576ab08970d0c7629560643) )
-	ROM_LOAD( "ac2-obj2.3s", 0x200000, 0x80000, CRC(dafbf489) SHA1(c53ccb3e1b4a6a660bd28c8abe52ccc3f85d111f) )
-	ROM_LOAD( "ac2-obj6.2s", 0x280000, 0x80000, CRC(24cc3f36) SHA1(e50af176eb3034c9cab7613ca614f5cc2c62f95e) )
-	ROM_LOAD( "ac2-obj3.3x", 0x300000, 0x80000, CRC(bd555a1d) SHA1(96e432b30da6f5f7ccb768c516b1f7186bc0d4c9) )
-	ROM_LOAD( "ac2-obj7.2x", 0x380000, 0x80000, CRC(d561fbe3) SHA1(a23976e10bddf74d4a6b292f044dfd0affbab101) )
+	ROM_REGION( 0x400000, "c355spr", 0 )
+	ROM_LOAD32_BYTE( "ac2-obj0.5s", 0x000000, 0x80000, CRC(8327ff22) SHA1(16f6022dedb7a74590898bc8ed3e8a97993c4635) )
+	ROM_LOAD32_BYTE( "ac2-obj1.5x", 0x000001, 0x80000, CRC(43af566d) SHA1(99f0d9f005e28040f5cc10de2198893946a31d09) )
+	ROM_LOAD32_BYTE( "ac2-obj2.3s", 0x000002, 0x80000, CRC(dafbf489) SHA1(c53ccb3e1b4a6a660bd28c8abe52ccc3f85d111f) )
+	ROM_LOAD32_BYTE( "ac2-obj3.3x", 0x000003, 0x80000, CRC(bd555a1d) SHA1(96e432b30da6f5f7ccb768c516b1f7186bc0d4c9) )
+	ROM_LOAD32_BYTE( "ac2-obj4.4s", 0x200000, 0x80000, CRC(e433e344) SHA1(98ade550cf066fcb5c09fa905f441a1464d4d625) )
+	ROM_LOAD32_BYTE( "ac2-obj5.4x", 0x200001, 0x80000, CRC(ecb19199) SHA1(8e0aa1bc1141c4b09576ab08970d0c7629560643) )
+	ROM_LOAD32_BYTE( "ac2-obj6.2s", 0x200002, 0x80000, CRC(24cc3f36) SHA1(e50af176eb3034c9cab7613ca614f5cc2c62f95e) )
+	ROM_LOAD32_BYTE( "ac2-obj7.2x", 0x200003, 0x80000, CRC(d561fbe3) SHA1(a23976e10bddf74d4a6b292f044dfd0affbab101) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 ) /* collision */
 	ROM_LOAD16_BYTE( "ac1-data-u.3a",   0x000000, 0x80000, CRC(82320c71) SHA1(2be98d46853febb46e1cc728af2735c0e00ce303) )
@@ -1098,15 +1069,15 @@ ROM_START( aircombj )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "ac1-obj0.5s", 0x000000, 0x80000, CRC(d2310c6a) SHA1(9bb8fdfc2c232574777248f4959975f9a20e3105) )
-	ROM_LOAD( "ac1-obj4.4s", 0x080000, 0x80000, CRC(0c93b478) SHA1(a92ffbcf04b64e0eee5bcf37008e247700641b25) )
-	ROM_LOAD( "ac1-obj1.5x", 0x100000, 0x80000, CRC(f5783a77) SHA1(0be1815ceb4ce4fa7ab75ba588e090f20ee0cac9) )
-	ROM_LOAD( "ac1-obj5.4x", 0x180000, 0x80000, CRC(476aed15) SHA1(0e53fdf02e8ffe7852a1fa8bd2f64d0e58f3dc09) )
-	ROM_LOAD( "ac1-obj2.3s", 0x200000, 0x80000, CRC(01343d5c) SHA1(64171fed1d1f8682b3d70d3233ea017719f4cc63) )
-	ROM_LOAD( "ac1-obj6.2s", 0x280000, 0x80000, CRC(c67607b1) SHA1(df64ea7920cf64271fe742d3d0a57f842ee61e8d) )
-	ROM_LOAD( "ac1-obj3.3x", 0x300000, 0x80000, CRC(7717f52e) SHA1(be1df3f4d0fdcaa5d3c81a724e5eb9d14136c6f5) )
-	ROM_LOAD( "ac1-obj7.2x", 0x380000, 0x80000, CRC(cfa9fe5f) SHA1(0da25663b89d653c87ed32d15f7c82f3035702ab) )
+	ROM_REGION( 0x400000, "c355spr", 0 )
+	ROM_LOAD32_BYTE( "ac1-obj0.5s", 0x000000, 0x80000, CRC(d2310c6a) SHA1(9bb8fdfc2c232574777248f4959975f9a20e3105) )
+	ROM_LOAD32_BYTE( "ac1-obj1.5x", 0x000001, 0x80000, CRC(f5783a77) SHA1(0be1815ceb4ce4fa7ab75ba588e090f20ee0cac9) )
+	ROM_LOAD32_BYTE( "ac1-obj2.3s", 0x000002, 0x80000, CRC(01343d5c) SHA1(64171fed1d1f8682b3d70d3233ea017719f4cc63) )
+	ROM_LOAD32_BYTE( "ac1-obj3.3x", 0x000003, 0x80000, CRC(7717f52e) SHA1(be1df3f4d0fdcaa5d3c81a724e5eb9d14136c6f5) )
+	ROM_LOAD32_BYTE( "ac1-obj4.4s", 0x200000, 0x80000, CRC(0c93b478) SHA1(a92ffbcf04b64e0eee5bcf37008e247700641b25) )
+	ROM_LOAD32_BYTE( "ac1-obj5.4x", 0x200001, 0x80000, CRC(476aed15) SHA1(0e53fdf02e8ffe7852a1fa8bd2f64d0e58f3dc09) )
+	ROM_LOAD32_BYTE( "ac1-obj6.2s", 0x200002, 0x80000, CRC(c67607b1) SHA1(df64ea7920cf64271fe742d3d0a57f842ee61e8d) )
+	ROM_LOAD32_BYTE( "ac1-obj7.2x", 0x200003, 0x80000, CRC(cfa9fe5f) SHA1(0da25663b89d653c87ed32d15f7c82f3035702ab) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_BYTE( "ac1-data-u.3a",   0x000000, 0x80000, CRC(82320c71) SHA1(2be98d46853febb46e1cc728af2735c0e00ce303) )
@@ -1151,15 +1122,15 @@ ROM_START( cybsled )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "cy1-obj0.5s", 0x000000, 0x80000, CRC(5ae542d5) SHA1(99b1a3ed476da4a97cb864538909d7b831f0fd3b) )
-	ROM_LOAD( "cy1-obj4.4s", 0x080000, 0x80000, CRC(57904076) SHA1(b1dc0d99543bc4b9584b37ffc12c6ebc59e30e3b) )
-	ROM_LOAD( "cy1-obj1.5x", 0x100000, 0x80000, CRC(4aae3eff) SHA1(c80240bd2f4228a0261a14adb6b10560b31b5aa0) )
-	ROM_LOAD( "cy1-obj5.4x", 0x180000, 0x80000, CRC(0e11ca47) SHA1(076a9a4cfddbee2d8aaa06110333090d8fdbefeb) )
-	ROM_LOAD( "cy1-obj2.3s", 0x200000, 0x80000, CRC(d64ec4c3) SHA1(0bed1cafc21ed8cef3850fb81e30076977086eb0) )
-	ROM_LOAD( "cy1-obj6.2s", 0x280000, 0x80000, CRC(7748b485) SHA1(adb4da419a6cdbefd0fef182d866a3479be379af) )
-	ROM_LOAD( "cy1-obj3.3x", 0x300000, 0x80000, CRC(3d1f7168) SHA1(392dddcc79fe61dcc6514a91ac27b5e36825d8b7) )
-	ROM_LOAD( "cy1-obj7.2x", 0x380000, 0x80000, CRC(b6eb6ad2) SHA1(85a660c5e44012491be7d4e783cce6ba12c135cb) )
+	ROM_REGION( 0x400000, "c355spr", 0 )
+	ROM_LOAD32_BYTE( "cy1-obj0.5s", 0x000000, 0x80000, CRC(5ae542d5) SHA1(99b1a3ed476da4a97cb864538909d7b831f0fd3b) )
+	ROM_LOAD32_BYTE( "cy1-obj1.5x", 0x000001, 0x80000, CRC(4aae3eff) SHA1(c80240bd2f4228a0261a14adb6b10560b31b5aa0) )
+	ROM_LOAD32_BYTE( "cy1-obj2.3s", 0x000002, 0x80000, CRC(d64ec4c3) SHA1(0bed1cafc21ed8cef3850fb81e30076977086eb0) )
+	ROM_LOAD32_BYTE( "cy1-obj3.3x", 0x000003, 0x80000, CRC(3d1f7168) SHA1(392dddcc79fe61dcc6514a91ac27b5e36825d8b7) )
+	ROM_LOAD32_BYTE( "cy1-obj4.4s", 0x200000, 0x80000, CRC(57904076) SHA1(b1dc0d99543bc4b9584b37ffc12c6ebc59e30e3b) )
+	ROM_LOAD32_BYTE( "cy1-obj5.4x", 0x200001, 0x80000, CRC(0e11ca47) SHA1(076a9a4cfddbee2d8aaa06110333090d8fdbefeb) )
+	ROM_LOAD32_BYTE( "cy1-obj6.2s", 0x200002, 0x80000, CRC(7748b485) SHA1(adb4da419a6cdbefd0fef182d866a3479be379af) )
+	ROM_LOAD32_BYTE( "cy1-obj7.2x", 0x200003, 0x80000, CRC(b6eb6ad2) SHA1(85a660c5e44012491be7d4e783cce6ba12c135cb) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_BYTE( "cy1-data-u.3a",   0x000000, 0x80000, CRC(570da15d) SHA1(9ebe756f10756c079a92fb522332e9e52ff715c3) )
@@ -1202,15 +1173,15 @@ ROM_START( cybsleda )
 	ROM_REGION( 0x8000, "c68mcu:external", ROMREGION_ERASE00 ) /* C68 (M37450) I/O MCU program */
 	/* external ROM not populated, unclear how it would map */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "cy1-obj0.5s", 0x000000, 0x80000, CRC(5ae542d5) SHA1(99b1a3ed476da4a97cb864538909d7b831f0fd3b) )
-	ROM_LOAD( "cy1-obj4.4s", 0x080000, 0x80000, CRC(57904076) SHA1(b1dc0d99543bc4b9584b37ffc12c6ebc59e30e3b) )
-	ROM_LOAD( "cy1-obj1.5x", 0x100000, 0x80000, CRC(4aae3eff) SHA1(c80240bd2f4228a0261a14adb6b10560b31b5aa0) )
-	ROM_LOAD( "cy1-obj5.4x", 0x180000, 0x80000, CRC(0e11ca47) SHA1(076a9a4cfddbee2d8aaa06110333090d8fdbefeb) )
-	ROM_LOAD( "cy1-obj2.3s", 0x200000, 0x80000, CRC(d64ec4c3) SHA1(0bed1cafc21ed8cef3850fb81e30076977086eb0) )
-	ROM_LOAD( "cy1-obj6.2s", 0x280000, 0x80000, CRC(7748b485) SHA1(adb4da419a6cdbefd0fef182d866a3479be379af) )
-	ROM_LOAD( "cy1-obj3.3x", 0x300000, 0x80000, CRC(3d1f7168) SHA1(392dddcc79fe61dcc6514a91ac27b5e36825d8b7) )
-	ROM_LOAD( "cy1-obj7.2x", 0x380000, 0x80000, CRC(b6eb6ad2) SHA1(85a660c5e44012491be7d4e783cce6ba12c135cb) )
+	ROM_REGION( 0x400000, "c355spr", 0 )
+	ROM_LOAD32_BYTE( "cy1-obj0.5s", 0x000000, 0x80000, CRC(5ae542d5) SHA1(99b1a3ed476da4a97cb864538909d7b831f0fd3b) )
+	ROM_LOAD32_BYTE( "cy1-obj1.5x", 0x000001, 0x80000, CRC(4aae3eff) SHA1(c80240bd2f4228a0261a14adb6b10560b31b5aa0) )
+	ROM_LOAD32_BYTE( "cy1-obj2.3s", 0x000002, 0x80000, CRC(d64ec4c3) SHA1(0bed1cafc21ed8cef3850fb81e30076977086eb0) )
+	ROM_LOAD32_BYTE( "cy1-obj3.3x", 0x000003, 0x80000, CRC(3d1f7168) SHA1(392dddcc79fe61dcc6514a91ac27b5e36825d8b7) )
+	ROM_LOAD32_BYTE( "cy1-obj4.4s", 0x200000, 0x80000, CRC(57904076) SHA1(b1dc0d99543bc4b9584b37ffc12c6ebc59e30e3b) )
+	ROM_LOAD32_BYTE( "cy1-obj5.4x", 0x200001, 0x80000, CRC(0e11ca47) SHA1(076a9a4cfddbee2d8aaa06110333090d8fdbefeb) )
+	ROM_LOAD32_BYTE( "cy1-obj6.2s", 0x200002, 0x80000, CRC(7748b485) SHA1(adb4da419a6cdbefd0fef182d866a3479be379af) )
+	ROM_LOAD32_BYTE( "cy1-obj7.2x", 0x200003, 0x80000, CRC(b6eb6ad2) SHA1(85a660c5e44012491be7d4e783cce6ba12c135cb) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_BYTE( "cy1-data-u.3a",   0x000000, 0x80000, CRC(570da15d) SHA1(9ebe756f10756c079a92fb522332e9e52ff715c3) )

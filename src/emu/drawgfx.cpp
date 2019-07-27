@@ -1520,20 +1520,7 @@ do                                                                              
 	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
-		{                                                                           \
-			u32 srcdata2 = paldata[srcdata];                                        \
-																					\
-			u32 add;                                                                \
-			add = (srcdata2 & 0x00ff0000) + (DEST & 0x00ff0000);                    \
-			if (add & 0x01000000) DEST = (DEST & 0xff00ffff) | (0x00ff0000);        \
-			else DEST = (DEST & 0xff00ffff) | (add & 0x00ff0000);                   \
-			add = (srcdata2 & 0x000000ff) + (DEST & 0x000000ff);                    \
-			if (add & 0x00000100) DEST = (DEST & 0xffffff00) | (0x000000ff);        \
-			else DEST = (DEST & 0xffffff00) | (add & 0x000000ff);                   \
-			add = (srcdata2 & 0x0000ff00) + (DEST & 0x0000ff00);                    \
-			if (add & 0x00010000) DEST = (DEST & 0xffff00ff) | (0x0000ff00);        \
-			else DEST = (DEST & 0xffff00ff) | (add & 0x0000ff00);                   \
-		}                                                                           \
+			(DEST) = add_blend_r32((DEST), paldata[srcdata]);                       \
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \
@@ -1689,7 +1676,7 @@ void gfx_element::alphastore(bitmap_rgb32 &dest, const rectangle &cliprect,
  -------------------------------------------------*/
 void gfx_element::alphatable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		int fixedalpha ,u8 *alphatable)
+		int fixedalpha, u8 *alphatable)
 {
 	DECLARE_NO_PRIORITY;
 
@@ -1753,6 +1740,62 @@ void draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, cons
 		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
 }
 
+void prio_draw_scanline8(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void prio_draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void primask_draw_scanline8(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		return draw_scanline8(bitmap, destx, desty, length, srcptr, paldata);
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
+void primask_draw_scanline8(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u8 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		return draw_scanline8(bitmap, destx, desty, length, srcptr, paldata);
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
 
 /*-------------------------------------------------
     draw_scanline16 - copy pixels from a 16bpp
@@ -1785,6 +1828,62 @@ void draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, con
 		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
 }
 
+void prio_draw_scanline16(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void prio_draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void primask_draw_scanline16(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		return draw_scanline16(bitmap, destx, desty, length, srcptr, paldata);
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
+void primask_draw_scanline16(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u16 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		return draw_scanline16(bitmap, destx, desty, length, srcptr, paldata);
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
 
 /*-------------------------------------------------
     draw_scanline32 - copy pixels from a 32bpp
@@ -1815,6 +1914,62 @@ void draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, con
 	// raw copy case
 	else
 		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
+}
+
+void prio_draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void prio_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIORITY, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void primask_draw_scanline32(bitmap_ind16 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		return draw_scanline32(bitmap, destx, desty, length, srcptr, paldata);
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
+void primask_draw_scanline32(bitmap_rgb32 &bitmap, s32 destx, s32 desty, s32 length, const u32 *srcptr, const pen_t *paldata, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		return draw_scanline32(bitmap, destx, desty, length, srcptr, paldata);
+
+	// palette lookup case
+	if (paldata != nullptr)
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_REMAP_OPAQUE_PRIMASK, u8);
+
+	// raw copy case
+	else
+		DRAWSCANLINE_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
 }
 
 
@@ -1893,6 +2048,38 @@ void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flip
 	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
 }
 
+void prio_copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	COPYBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void prio_copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void primask_copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copybitmap(dest, src, flipx, flipy, destx, desty, cliprect);
+	else
+		COPYBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
+void primask_copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copybitmap(dest, src, flipx, flipy, destx, desty, cliprect);
+	else
+		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
 
 /*-------------------------------------------------
     copybitmap_trans - copy from one bitmap to
@@ -1918,6 +2105,48 @@ void copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, in
 		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
 }
 
+void prio_copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	if (trans_pen > 0xffff)
+		prio_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pmask);
+	else
+		COPYBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+}
+
+void prio_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	if (trans_pen == 0xffffffff)
+		prio_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pmask);
+	else
+		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+}
+
+void primask_copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copybitmap_trans(dest, src, flipx, flipy, destx, desty, cliprect, trans_pen);
+	else if (trans_pen > 0xffff)
+		primask_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pcode, pmask);
+	else
+		COPYBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
+}
+
+void primask_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copybitmap_trans(dest, src, flipx, flipy, destx, desty, cliprect, trans_pen);
+	else if (trans_pen == 0xffffffff)
+		primask_copybitmap(dest, src, flipx, flipy, destx, desty, cliprect, priority, pcode, pmask);
+	else
+		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
+}
+
 
 /*-------------------------------------------------
     copybitmap_transalphpa - copy from one bitmap
@@ -1929,6 +2158,22 @@ void copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flip
 {
 	DECLARE_NO_PRIORITY;
 	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSALPHA, NO_PRIORITY);
+}
+
+void prio_copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSALPHA_PRIORITY, u8);
+}
+
+void primask_copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copybitmap_transalpha(dest, src, flipx, flipy, destx, desty, cliprect);
+	else
+		COPYBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSALPHA_PRIMASK, u8);
 }
 
 
@@ -1954,6 +2199,40 @@ void copyscrollbitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, 
 	// just call through to the transparent case as the underlying copybitmap will
 	// optimize for pen == 0xffffffff
 	copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, 0xffffffff);
+}
+
+void prio_copyscrollbitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
+{
+	// just call through to the transparent case as the underlying copybitmap will
+	// optimize for pen == 0xffffffff
+	prio_copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, priority, pmask, 0xffffffff);
+}
+
+void prio_copyscrollbitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask)
+{
+	// just call through to the transparent case as the underlying copybitmap will
+	// optimize for pen == 0xffffffff
+	prio_copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, priority, pmask, 0xffffffff);
+}
+
+void primask_copyscrollbitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	// just call through to the transparent case as the underlying copybitmap will
+	// optimize for pen == 0xffffffff
+	if (pcode == 0 && pmask == 0xff)
+		copyscrollbitmap(dest, src, numrows, rowscroll, numcols, colscroll, cliprect);
+	else
+		primask_copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, 0xffffffff, priority, pcode, pmask);
+}
+
+void primask_copyscrollbitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	// just call through to the transparent case as the underlying copybitmap will
+	// optimize for pen == 0xffffffff
+	if (pcode == 0 && pmask == 0xff)
+		copyscrollbitmap(dest, src, numrows, rowscroll, numcols, colscroll, cliprect);
+	else
+		primask_copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, 0xffffffff, priority, pcode, pmask);
 }
 
 
@@ -2067,6 +2346,214 @@ void copyscrollbitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, u32 num
 void copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen)
 { copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, trans_pen); }
 
+template<class _BitmapClass>
+static inline void prio_copyscrollbitmap_trans_common(_BitmapClass &dest, const _BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+{
+	// no rowscroll and no colscroll means no scroll
+	if (numrows == 0 && numcols == 0)
+		return prio_copybitmap_trans(dest, src, 0, 0, 0, 0, cliprect, priority, pmask, trans_pen);
+
+	assert(numrows != 0 || rowscroll == nullptr);
+	assert(numrows == 0 || rowscroll != nullptr);
+	assert(numcols != 0 || colscroll == nullptr);
+	assert(numcols == 0 || colscroll != nullptr);
+
+	// fully scrolling X,Y playfield
+	if (numrows <= 1 && numcols <= 1)
+	{
+		s32 xscroll = normalize_xscroll(src, (numrows == 0) ? 0 : rowscroll[0]);
+		s32 yscroll = normalize_yscroll(src, (numcols == 0) ? 0 : colscroll[0]);
+
+		// iterate over all portions of the scroll that overlap the destination
+		for (s32 sx = xscroll - src.width(); sx < dest.width(); sx += src.width())
+			for (s32 sy = yscroll - src.height(); sy < dest.height(); sy += src.height())
+				prio_copybitmap_trans(dest, src, 0, 0, sx, sy, cliprect, priority, pmask, trans_pen);
+	}
+
+	// scrolling columns plus horizontal scroll
+	else if (numrows <= 1)
+	{
+		s32 xscroll = normalize_xscroll(src, (numrows == 0) ? 0 : rowscroll[0]);
+		rectangle subclip = cliprect;
+
+		// determine width of each column
+		int colwidth = src.width() / numcols;
+		assert(src.width() % colwidth == 0);
+
+		// iterate over each column
+		int groupcols;
+		for (int col = 0; col < numcols; col += groupcols)
+		{
+			s32 yscroll = colscroll[col];
+
+			// count consecutive columns scrolled by the same amount
+			for (groupcols = 1; col + groupcols < numcols; groupcols++)
+					if (colscroll[col + groupcols] != yscroll)
+					break;
+
+			// iterate over reps of the columns in question
+			yscroll = normalize_yscroll(src, yscroll);
+			for (s32 sx = xscroll - src.width(); sx < dest.width(); sx += src.width())
+			{
+				// compute the cliprect for this group
+				subclip.setx(col * colwidth + sx, (col + groupcols) * colwidth - 1 + sx);
+				subclip &= cliprect;
+
+				// iterate over all portions of the scroll that overlap the destination
+				for (s32 sy = yscroll - src.height(); sy < dest.height(); sy += src.height())
+					prio_copybitmap_trans(dest, src, 0, 0, sx, sy, subclip, priority, pmask, trans_pen);
+			}
+		}
+	}
+
+	// scrolling rows plus vertical scroll
+	else if (numcols <= 1)
+	{
+		s32 yscroll = normalize_yscroll(src, (numcols == 0) ? 0 : colscroll[0]);
+		rectangle subclip = cliprect;
+
+		// determine width of each rows
+		int rowheight = src.height() / numrows;
+		assert(src.height() % rowheight == 0);
+
+		// iterate over each row
+		int grouprows;
+		for (int row = 0; row < numrows; row += grouprows)
+		{
+			s32 xscroll = rowscroll[row];
+
+			// count consecutive rows scrolled by the same amount
+			for (grouprows = 1; row + grouprows < numrows; grouprows++)
+					if (rowscroll[row + grouprows] != xscroll)
+					break;
+
+			// iterate over reps of the rows in question
+			xscroll = normalize_xscroll(src, xscroll);
+			for (s32 sy = yscroll - src.height(); sy < dest.height(); sy += src.height())
+			{
+				// compute the cliprect for this group
+				subclip.sety(row * rowheight + sy, (row + grouprows) * rowheight - 1 + sy);
+				subclip &= cliprect;
+
+				// iterate over all portions of the scroll that overlap the destination
+				for (s32 sx = xscroll - src.width(); sx < dest.width(); sx += src.width())
+					prio_copybitmap_trans(dest, src, 0, 0, sx, sy, subclip, priority, pmask, trans_pen);
+			}
+		}
+	}
+}
+
+void prio_copyscrollbitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+{ prio_copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, priority, pmask, trans_pen); }
+
+void prio_copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+{ prio_copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, priority, pmask, trans_pen); }
+
+template<class _BitmapClass>
+static inline void primask_copyscrollbitmap_trans_common(_BitmapClass &dest, const _BitmapClass &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode = 0, u8 pmask = 0xff)
+{
+	// no rowscroll and no colscroll means no scroll
+	if (pcode == 0 && pmask == 0xff)
+		return copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, trans_pen);
+
+	if (numrows == 0 && numcols == 0)
+		return primask_copybitmap_trans(dest, src, 0, 0, 0, 0, cliprect, trans_pen, priority, pcode, pmask);
+
+	assert(numrows != 0 || rowscroll == nullptr);
+	assert(numrows == 0 || rowscroll != nullptr);
+	assert(numcols != 0 || colscroll == nullptr);
+	assert(numcols == 0 || colscroll != nullptr);
+
+	// fully scrolling X,Y playfield
+	if (numrows <= 1 && numcols <= 1)
+	{
+		s32 xscroll = normalize_xscroll(src, (numrows == 0) ? 0 : rowscroll[0]);
+		s32 yscroll = normalize_yscroll(src, (numcols == 0) ? 0 : colscroll[0]);
+
+		// iterate over all portions of the scroll that overlap the destination
+		for (s32 sx = xscroll - src.width(); sx < dest.width(); sx += src.width())
+			for (s32 sy = yscroll - src.height(); sy < dest.height(); sy += src.height())
+				primask_copybitmap_trans(dest, src, 0, 0, sx, sy, cliprect, trans_pen, priority, pcode, pmask);
+	}
+
+	// scrolling columns plus horizontal scroll
+	else if (numrows <= 1)
+	{
+		s32 xscroll = normalize_xscroll(src, (numrows == 0) ? 0 : rowscroll[0]);
+		rectangle subclip = cliprect;
+
+		// determine width of each column
+		int colwidth = src.width() / numcols;
+		assert(src.width() % colwidth == 0);
+
+		// iterate over each column
+		int groupcols;
+		for (int col = 0; col < numcols; col += groupcols)
+		{
+			s32 yscroll = colscroll[col];
+
+			// count consecutive columns scrolled by the same amount
+			for (groupcols = 1; col + groupcols < numcols; groupcols++)
+					if (colscroll[col + groupcols] != yscroll)
+					break;
+
+			// iterate over reps of the columns in question
+			yscroll = normalize_yscroll(src, yscroll);
+			for (s32 sx = xscroll - src.width(); sx < dest.width(); sx += src.width())
+			{
+				// compute the cliprect for this group
+				subclip.setx(col * colwidth + sx, (col + groupcols) * colwidth - 1 + sx);
+				subclip &= cliprect;
+
+				// iterate over all portions of the scroll that overlap the destination
+				for (s32 sy = yscroll - src.height(); sy < dest.height(); sy += src.height())
+					primask_copybitmap_trans(dest, src, 0, 0, sx, sy, subclip, trans_pen, priority, pcode, pmask);
+			}
+		}
+	}
+
+	// scrolling rows plus vertical scroll
+	else if (numcols <= 1)
+	{
+		s32 yscroll = normalize_yscroll(src, (numcols == 0) ? 0 : colscroll[0]);
+		rectangle subclip = cliprect;
+
+		// determine width of each rows
+		int rowheight = src.height() / numrows;
+		assert(src.height() % rowheight == 0);
+
+		// iterate over each row
+		int grouprows;
+		for (int row = 0; row < numrows; row += grouprows)
+		{
+			s32 xscroll = rowscroll[row];
+
+			// count consecutive rows scrolled by the same amount
+			for (grouprows = 1; row + grouprows < numrows; grouprows++)
+					if (rowscroll[row + grouprows] != xscroll)
+					break;
+
+			// iterate over reps of the rows in question
+			xscroll = normalize_xscroll(src, xscroll);
+			for (s32 sy = yscroll - src.height(); sy < dest.height(); sy += src.height())
+			{
+				// compute the cliprect for this group
+				subclip.sety(row * rowheight + sy, (row + grouprows) * rowheight - 1 + sy);
+				subclip &= cliprect;
+
+				// iterate over all portions of the scroll that overlap the destination
+				for (s32 sx = xscroll - src.width(); sx < dest.width(); sx += src.width())
+					primask_copybitmap_trans(dest, src, 0, 0, sx, sy, subclip, trans_pen, priority, pcode, pmask);
+			}
+		}
+	}
+}
+
+void primask_copyscrollbitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{ primask_copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, trans_pen, priority, pcode, pmask); }
+
+void primask_copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, u32 numrows, const s32 *rowscroll, u32 numcols, const s32 *colscroll, const rectangle &cliprect, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{ primask_copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, trans_pen, priority, pcode, pmask); }
 
 
 /***************************************************************************
@@ -2091,6 +2578,38 @@ void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_r
 	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
 }
 
+void prio_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void prio_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIORITY, u8);
+}
+
+void primask_copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copyrozbitmap(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound);
+	else
+		COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
+void primask_copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copyrozbitmap(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound);
+	else
+		COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_OPAQUE_PRIMASK, u8);
+}
+
 
 /*-------------------------------------------------
     copyrozbitmap_trans - copy from one bitmap to
@@ -2109,4 +2628,36 @@ void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bi
 {
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
+}
+
+void prio_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+}
+
+void prio_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
+{
+	// high bit of the mask is implicitly on
+	pmask |= 1 << 31;
+
+	COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIORITY, u8);
+}
+
+void primask_copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copyrozbitmap_trans(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, trans_pen);
+	else
+		COPYROZBITMAP_CORE(u16, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
+}
+
+void primask_copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, s32 startx, s32 starty, s32 incxx, s32 incxy, s32 incyx, s32 incyy, int wraparound, u32 trans_pen, bitmap_ind8 &priority, u8 pcode, u8 pmask)
+{
+	if (pcode == 0 && pmask == 0xff)
+		copyrozbitmap_trans(dest, cliprect, src, startx, starty, incxx, incxy, incyx, incyy, wraparound, trans_pen);
+	else
+		COPYROZBITMAP_CORE(u32, PIXEL_OP_COPY_TRANSPEN_PRIMASK, u8);
 }

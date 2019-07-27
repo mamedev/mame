@@ -126,6 +126,7 @@ bfmsys85.cpp
 bgt.cpp
 big10.cpp
 bigevglf.cpp
+bigkarnk_ms.cpp
 bigstrkb.cpp
 bingo.cpp
 bingoc.cpp
@@ -435,6 +436,7 @@ galivan.cpp
 galpani2.cpp
 galpani3.cpp
 galpanic.cpp
+galpanic_ms.cpp
 galspnbl.cpp
 gambl186.cpp
 gamecstl.cpp
@@ -464,6 +466,7 @@ go2000.cpp
 goal92.cpp
 goindol.cpp
 gokidetor.cpp
+goldart.cpp
 goldngam.cpp
 goldnpkr.cpp
 goldstar.cpp
@@ -1044,6 +1047,7 @@ sderby2.cpp
 seabattl.cpp
 sealy.cpp
 seattle.cpp
+segaatom.cpp
 segac2.cpp
 segacoin.cpp
 segae.cpp
@@ -1167,6 +1171,7 @@ stadhero.cpp
 starcrus.cpp
 starfire.cpp
 stargame.cpp
+starrider.cpp
 starshp1.cpp
 starwars.cpp
 statriv2.cpp
@@ -1267,6 +1272,7 @@ tnzs.cpp
 toaplan1.cpp
 toaplan2.cpp
 toki.cpp
+toki_ms.cpp
 tomcat.cpp
 tonton.cpp
 toobin.cpp

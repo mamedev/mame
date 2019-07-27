@@ -1451,8 +1451,8 @@ public:
 	void set_screen(screen_device &screen) { assert(!m_screen); m_screen = &screen; }
 	void set_cpu(cpu_device &cpu) { assert(!m_cpu); m_cpu = &cpu; }
 
-	DECLARE_READ32_MEMBER( voodoo_r );
-	DECLARE_WRITE32_MEMBER( voodoo_w );
+	u32 voodoo_r(offs_t offset);
+	void voodoo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	uint8_t             m_fbmem;
 	uint8_t             m_tmumem0;
@@ -1911,22 +1911,22 @@ class voodoo_banshee_device : public voodoo_device
 public:
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( banshee_r );
-	DECLARE_WRITE32_MEMBER( banshee_w );
-	DECLARE_READ32_MEMBER( banshee_fb_r );
-	DECLARE_WRITE32_MEMBER( banshee_fb_w );
-	DECLARE_READ32_MEMBER( banshee_io_r );
-	DECLARE_WRITE32_MEMBER( banshee_io_w );
-	DECLARE_READ32_MEMBER( banshee_rom_r );
-	DECLARE_READ8_MEMBER(banshee_vga_r);
-	DECLARE_WRITE8_MEMBER(banshee_vga_w);
+	u32 banshee_r(offs_t offset, u32 mem_mask = ~0);
+	void banshee_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 banshee_fb_r(offs_t offset);
+	void banshee_fb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 banshee_io_r(offs_t offset, u32 mem_mask = ~0);
+	void banshee_io_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 banshee_rom_r(offs_t offset);
+	u8 banshee_vga_r(offs_t offset);
+	void banshee_vga_w(offs_t offset, u8 data);
 
 protected:
 	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
 
 	// device-level overrides
-	DECLARE_READ32_MEMBER( banshee_agp_r );
-	DECLARE_WRITE32_MEMBER( banshee_agp_w );
+	u32 banshee_agp_r(offs_t offset);
+	void banshee_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
 
 
