@@ -548,6 +548,7 @@ ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
 novag_cforte.cpp
+novag_const.cpp
 novag_diablo.cpp
 novag_presto.cpp
 novag_savant.cpp

@@ -31018,6 +31018,9 @@ raiders5t                       // UPL-85004 (c) 1985 Taito license
 cfortea                         //
 cforteb                         //
 
+@source:novag_const.cpp
+const                           //
+
 @source:novag_diablo.cpp
 diablo68                        //
 scorpio68                       //

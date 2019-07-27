@@ -1,17 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Berger
 /******************************************************************************
 
-Novag Super Constellation (model 844)
+Novag Constellation (model 831)
+It's the 1st Novag chess computer with David Kittinger's chess engine.
 
 Hardware notes:
-- UMC UM6502C @ 4 MHz (8MHz XTAL)
-- 2*2KB RAM TC5516APL-2 battery-backed, 2*32KB ROM custom label
+- MOS MPS6502A @ 2MHz
+- 2KB RAM (daughterboard with 4*2114) battery-backed, 2*8KB ROM
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
-- external ports for clock and printer, not emulated here
 
-I/O is nearly identical to Constellation (novag_const.cpp), the main difference
-is additional outputs to external ports.
+TODO:
+- add 3.6MHz version, roms are the same, or label 845x? XTAL is probably a 3.57MHz,
+  but how is IRQ/beeper freq derived from it?
 
 ******************************************************************************/
 
@@ -25,15 +27,15 @@ is additional outputs to external ports.
 #include "speaker.h"
 
 // internal artwork
-#include "novag_supercon.lh" // clickable
+#include "novag_const.lh" // clickable
 
 
 namespace {
 
-class sconst_state : public driver_device
+class const_state : public driver_device
 {
 public:
-	sconst_state(const machine_config &mconfig, device_type type, const char *tag) :
+	const_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
@@ -44,7 +46,7 @@ public:
 	{ }
 
 	// machine drivers
-	void sconst(machine_config &config);
+	void constellation(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -76,7 +78,7 @@ private:
 	u8 m_led_select;
 };
 
-void sconst_state::machine_start()
+void const_state::machine_start()
 {
 	// zerofill
 	m_inp_mux = 0;
@@ -95,19 +97,19 @@ void sconst_state::machine_start()
 
 // TTL
 
-void sconst_state::update_display()
+void const_state::update_display()
 {
 	m_display->matrix(m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(sconst_state::mux_w)
+WRITE8_MEMBER(const_state::mux_w)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(sconst_state::control_w)
+WRITE8_MEMBER(const_state::control_w)
 {
 	// d0-d3: ?
 	// d4-d6: select led row
@@ -118,7 +120,7 @@ WRITE8_MEMBER(sconst_state::control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(sconst_state::input1_r)
+READ8_MEMBER(const_state::input1_r)
 {
 	u8 data = 0;
 
@@ -130,7 +132,7 @@ READ8_MEMBER(sconst_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(sconst_state::input2_r)
+READ8_MEMBER(const_state::input2_r)
 {
 	u8 data = 0;
 
@@ -149,14 +151,15 @@ READ8_MEMBER(sconst_state::input2_r)
     Address Maps
 ******************************************************************************/
 
-void sconst_state::main_map(address_map &map)
+void const_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1c00, 0x1c00).nopw(); // printer/clock?
-	map(0x1d00, 0x1d00).nopw(); // printer/clock?
-	map(0x1e00, 0x1e00).rw(FUNC(sconst_state::input2_r), FUNC(sconst_state::mux_w));
-	map(0x1f00, 0x1f00).rw(FUNC(sconst_state::input1_r), FUNC(sconst_state::control_w));
-	map(0x2000, 0xffff).rom();
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x6000, 0x6000).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
+	map(0x8000, 0x8000).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
+	map(0xa000, 0xbfff).rom();
+	map(0xc000, 0xdfff).unmapr(); // checks for bookrom but doesn't have any
+	map(0xe000, 0xffff).rom();
 }
 
 
@@ -165,33 +168,33 @@ void sconst_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( sconst )
+static INPUT_PORTS_START( constellation )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Multi Move / Player/Player / King")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Verify / Set Up")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Best Move/Random / Training Level / Queen")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Best Move / Random / Queen")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Change Color")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Sound / Depth Search / Bishop")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Sound / Bishop")
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Clear Board")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Solve Mate / Knight")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Print Moves")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Print Board / Rook")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Rook")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Form Size")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Pawn")
 
 	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint / Show Moves")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Set Level")
 
 	PORT_START("IN.7")
@@ -205,30 +208,30 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-void sconst_state::sconst(machine_config &config)
+void const_state::constellation(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 8_MHz_XTAL/2); // UM6502C
-	m_maincpu->set_addrmap(AS_PROGRAM, &sconst_state::main_map);
+	M6502(config, m_maincpu, 2_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(8_MHz_XTAL/4 / 0x1000); // through 4020 IC, ~488Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(sconst_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1020)); // active for 10.2us
-	TIMER(config, "irq_off").configure_periodic(FUNC(sconst_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	const attotime irq_period = attotime::from_hz(2_MHz_XTAL / 0x2000); // through 4020 IC, ~244Hz
+	TIMER(config, m_irq_on).configure_periodic(FUNC(const_state::irq_on<M6502_IRQ_LINE>), irq_period);
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1020)); // active for ?us (assume same as supercon)
+	TIMER(config, "irq_off").configure_periodic(FUNC(const_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(200));
+	m_board->set_delay(attotime::from_msec(250));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
-	config.set_default_layout(layout_novag_supercon);
+	config.set_default_layout(layout_novag_const);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 8_MHz_XTAL/4 / 0x800); // ~976Hz
+	BEEP(config, m_beeper, 2_MHz_XTAL / 0x800); // ~976Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -238,10 +241,10 @@ void sconst_state::sconst(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( supercon )
+ROM_START( const )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("novag_8441", 0x0000, 0x8000, CRC(b853cf6e) SHA1(1a759072a5023b92c07f1fac01b7a21f7b5b45d0) ) // label obscured by Q.C. sticker
-	ROM_LOAD("novag_8442", 0x8000, 0x8000, CRC(c8f82331) SHA1(f7fd039f9a3344db9749931490ded9e9e309cfbe) )
+	ROM_LOAD("8315_white",  0xa000, 0x2000, CRC(76e6c97b) SHA1(55645e08f9f1258366c29a4ea2033bb86d860227) ) // TMM2364P
+	ROM_LOAD("8314_orange", 0xe000, 0x2000, CRC(89395a86) SHA1(4807f196fec70abdaabff5bfc479a64d5cf2b0ad) ) // "
 ROM_END
 
 } // anonymous namespace
@@ -252,5 +255,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1984, supercon, 0,      0, sconst,  sconst, sconst_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME   PARENT CMP MACHINE        INPUT          STATE        INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1983, const, 0,      0, constellation, constellation, const_state, empty_init, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
