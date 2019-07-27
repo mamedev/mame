@@ -4,7 +4,6 @@
 /******************************************************************************
 
 Novag Constellation (model 831)
-It's the 1st Novag chess computer with David Kittinger's chess engine.
 
 Hardware notes:
 - MOS MPS6502A @ 2MHz
