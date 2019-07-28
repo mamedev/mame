@@ -4616,7 +4616,7 @@
 	</software>
 
 	<software name="saadland">
-		<description>Adventureland (Version 2.0/416)</description>
+		<description>Scott Adams Graphic Adventure 1: Adventureland (Version 2.0/416)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-23"/>
@@ -4638,7 +4638,7 @@
 	</software>
 
 	<software name="sapiradv">
-		<description>Pirate Adventure (Version 2.1/408)</description>
+		<description>Scott Adams Graphic Adventure 2: Pirate Adventure (Version 2.1/408)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-23"/>
@@ -4682,7 +4682,7 @@
 	</software>
 
 	<software name="savoodoo">
-		<description>Voodoo Castle (Version 2.1/119)</description>
+		<description>Scott Adams Graphic Adventure 4: Voodoo Castle (Version 2.1/119)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-24"/>
@@ -4704,7 +4704,7 @@
 	</software>
 
 	<software name="satcount">
-		<description>The Count (Version 2.1/115)</description>
+		<description>Scott Adams Graphic Adventure 5: The Count (Version 2.1/115)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-25"/>
@@ -4726,7 +4726,7 @@
 	</software>
 
 	<software name="sastodys">
-		<description>Strange Odyssey (Version 2.1/119)</description>
+		<description>Scott Adams Graphic Adventure 6: Strange Odyssey (Version 2.1/119)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2019-04-26"/>
@@ -6076,6 +6076,117 @@
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="235610">
 				<rom name="lewis and clark stayed home side b.woz" size="235610" crc="48db922e" sha1="159fa2ee942baba72588da95005d227ad62fe17d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drruth">
+		<description>Dr. Ruth's Computer Game of Good Sex</description>
+		<year>1986</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="release" value="2019-07-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="242243">
+				<rom name="dr. ruth's computer game of good sex side a.woz" size="242243" crc="9b662ec1" sha1="a6908713329d52da4a094d0d0e984c77e5b8e3cb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="242243">
+				<rom name="dr. ruth's computer game of good sex side b.woz" size="242243" crc="a6a76aae" sha1="85b9a22ddfa8f5b61c5261cc15f84456a43e16de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv2">
+		<description>Copy II Plus (Version 2.0)</description>
+		<year>1981</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2019-07-22"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple ][ with 48K.
+		(Attempting to run with less than 48K will appear to work,
+		but copies will fail with an UNABLE TO WRITE error.) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="15140">
+				<rom name="copy ii plus v2.0.woz" size="15140" crc="ae1aaf91" sha1="643ea0b293754108be3a7e58e403e4cf958baa18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfreedm">
+		<description>MECC-A315 Freedom! (Version 1.0)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2019-07-22"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235530">
+				<rom name="mecc-a315 freedom v1.0 side a.woz" size="235530" crc="cc037101" sha1="84efd7438e3cf9db9464471ead746f18a2b1413e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235530">
+				<rom name="mecc-a315 freedom v1.0 side b.woz" size="235530" crc="30903ce8" sha1="afe40e67a58444bb0e91af2fb4bf375533ee491a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alicwndr">
+		<description>Alice in Wonderland</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="release" value="2019-07-23"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234827">
+				<rom name="alice in wonderland side a.woz" size="234827" crc="3823bdc3" sha1="722352b5ed1426975ac1518e8c3d378bb581f57f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234827">
+				<rom name="alice in wonderland side b.woz" size="234827" crc="2d0642e8" sha1="55df9c5e6b1aa3e8233783bf3a5ee65605760919" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ardungn">
+		<description>Alternate Reality: The Dungeon (Version 2.1)</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2019-07-23"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234799">
+				<rom name="alternate reality- the dungeon disk 1a.woz" size="234799" crc="04fcfcd2" sha1="a5eeef2f58587f933d0ee4bea455bc49d96e1895" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="235507">
+				<rom name="alternate reality- the dungeon disk 1b.woz" size="235507" crc="6a8d91ba" sha1="d979a65ddb9d6f2fd3c4ce799e0700e7d82c9207" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="235507">
+				<rom name="alternate reality- the dungeon disk 2.woz" size="235507" crc="b3bcca3a" sha1="0c11f3697794eaa24ad3c450f852445135e88c3b" />
 			</dataarea>
 		</part>
 	</software>
