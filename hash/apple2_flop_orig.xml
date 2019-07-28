@@ -6191,4 +6191,131 @@
 		</part>
 	</software>
 
+	<software name="moptown">
+		<description>Moptown</description>
+		<year>1981</year>
+		<publisher>Advanced Learning Technology</publisher>
+		<info name="release" value="2019-07-27"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235421">
+				<rom name="moptown.woz" size="235421" crc="228f8de0" sha1="7c20f871e47b76ed12b647fc5adffcaa93f7036f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcqst2a">
+		<description>Space Quest II: Vohaul's Revenge (Version 2.0A, interpreter 0.089)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2019-07-27"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234888">
+				<rom name="space quest ii v2.0a disk 1a.woz" size="234888" crc="711e8349" sha1="86455e96a2695259399f59798bea24813e80db07" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="235596">
+				<rom name="space quest ii v2.0a disk 1b.woz" size="235596" crc="8374b722" sha1="3da1f035dc7eb1920969d1e10a3e47287163cf05" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="235596">
+				<rom name="space quest ii v2.0a disk 2a.woz" size="235596" crc="a29da317" sha1="ab590eb95460e713b09f5746994807cbacd8ef3a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="235596">
+				<rom name="space quest ii v2.0a disk 2b.woz" size="235596" crc="a98b53fc" sha1="a19a8dcf9ea45b127939733215a045cad8f3c2e2" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="235596">
+				<rom name="space quest ii v2.0a disk 3a.woz" size="235596" crc="4bbcd458" sha1="2469aeac61f548284111d0a5335c8982303948e4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="235596">
+				<rom name="space quest ii v2.0a disk 3b.woz" size="235596" crc="09126b5b" sha1="97f71dc5cb6c2618aa7de7a03d67ba8246beb494" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side A"/>
+			<dataarea name="flop" size="235596">
+				<rom name="space quest ii v2.0a disk 4a.woz" size="235596" crc="72c6e40f" sha1="57b232ae44f97a6b65fb7f401bdc2d9eb898bbca" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side B"/>
+			<dataarea name="flop" size="235596">
+				<rom name="space quest ii v2.0a disk 4b.woz" size="235596" crc="494cbd18" sha1="fd13223056eed412739c2400b1d19c6291ca05e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algpls1">
+		<description>Alge-Blaster Plus! (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2019-07-27"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="235558">
+				<rom name="alge-blaster plus! disk 1a - program.woz" size="235558" crc="8949439c" sha1="324a964cdc85587b58406e681b53ff6f4a34c6b5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Program"/>
+			<dataarea name="flop" size="235558">
+				<rom name="alge-blaster plus! disk 1b - program.woz" size="235558" crc="fe90af41" sha1="99c0687e3528fa68051819525d853f3364987112" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Data"/>
+			<dataarea name="flop" size="242211">
+				<rom name="alge-blaster plus! disk 2a - data.woz" size="242211" crc="9f5c5a16" sha1="90df326dae57a73c6e0026a266d4c9ea4b36d883" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Data"/>
+			<dataarea name="flop" size="235555">
+				<rom name="alge-blaster plus! disk 2b - data.woz" size="235555" crc="5ec77a0c" sha1="9e927f169102d39a1c882ca1c41755f0527ef08d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hnkypnky">
+		<description>Hinky Pinky (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Learning Well</publisher>
+		<info name="release" value="2019-07-28"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hinky pinky (4am crack) side a.dsk" size="143360" crc="47fde18f" sha1="c5657e390a038b4ea7f143515a082b3f95fc34a5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="hinky pinky (4am crack) side b.dsk" size="143360" crc="2d9c6bcf" sha1="feddf5e96668c81e9e0a65aac613db1d55516250" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

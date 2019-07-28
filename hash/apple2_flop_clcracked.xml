@@ -26107,7 +26107,7 @@
 		programs; 4AM released each as such.. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="143360">
 				<rom name="verb usage (4am crack) disk 3.dsk" size="143360" crc="1e2bcc51" sha1="f4ef92c44698473f8ba7e1157cd8d42ff9c00a1d" />
 			</dataarea>
@@ -34258,6 +34258,284 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="zoom grafix 05-oct-83 (4am crack).dsk" size="143360" crc="72cd3138" sha1="66a6fa3e0cee04fcc222ad61de3e8d22668b6ebd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trlspmth">
+		<description>Troll Sports Math (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2019-05-27"/>
+		<!--"Troll Sports Math" is a 1991 educational game distributed by Troll Associates. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="troll sports math (4am and san inc crack).po" size="819200" crc="468174b2" sha1="0589b0531d1982e78c229bc0a294ae9513901ec9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdeyemi">
+		<description>A Bird's Eye View of The Main Idea (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Frontier Software</publisher>
+		<info name="release" value="2019-07-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="a bird's eye view of the main idea (4am crack).dsk" size="143360" crc="0a597712" sha1="2be2a278d22b148cce1549b1434f00fae1215ee0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drwowncn">
+		<description>Draw Your Own Conclusions (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Frontier Software</publisher>
+		<info name="release" value="2019-07-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="draw your own conclusions (4am crack).dsk" size="143360" crc="0b0d3331" sha1="f732f99465de9b538417382dadf6d44d32785953" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wtbigdtl">
+		<description>What's The Big Detail (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Frontier Software</publisher>
+		<info name="release" value="2019-07-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="what's the big detail (4am crack).dsk" size="143360" crc="f042ff91" sha1="3f16a7170be398d602144722a9dad29ae9ba7599" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unrepasf">
+		<description>Un Repas Francais (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2019-07-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="un repas francais (4am crack) disk 1.dsk" size="143360" crc="7ec00da2" sha1="a7ad9653c688901e85fcbe1d910b4431bbdb5957" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="un repas francais (4am crack) disk 2.dsk" size="143360" crc="81ca9f7d" sha1="44e86afd80f82788646365689d39a028deb4c1f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drruth">
+		<description>Dr. Ruth's Computer Game of Good Sex (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="release" value="2019-07-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dr. ruth's computer game of good sex (4am crack) side a.dsk" size="143360" crc="0588985e" sha1="aa835e6fef87ad5797da417bb57beb11f71c8234" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dr. ruth's computer game of good sex (4am crack) side b.dsk" size="143360" crc="8d326a3c" sha1="8ce56ef0b8a7e1d3faa304d312b92f46805c6953" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vrbusg3b">
+		<description>Verb Usage 3 (Version 01.31.89) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2019-07-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verb usage 3 v01.31.89 (4am crack).dsk" size="143360" crc="d4b8667d" sha1="d2ac36fdf5a5b3146df206a5086d40adce656dd6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtsafx1">
+		<description>Roots/Affixes 1 (Version 09.14.87) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2019-07-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="roots-affixes 1 v09.14.87 (4am crack).dsk" size="143360" crc="07ef6108" sha1="e63386e64c11f3e99f88f95ec257369ba2d1e533" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewalg3v3">
+		<description>Algebra Volume 3 (Version 1.0, 10 June 1982) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2019-07-22"/>
+		<!-- This is version 1.0, dated 10 June 1982. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 3 v1.0 (4am crack).dsk" size="143360" crc="77c7dabb" sha1="cc9a9096098ccf3ee6b490c329981ef5cde88e7b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zandar">
+		<description>Zandar The Wizard (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2019-07-22"/>
+		<!--"Zandar The Wizard" is a 1983 educational program designed by Janis Morariu, Ph.D. and Judie Brunsen; implemented by Educational SoftArt; and distributed by Society for Visual Education. It is preserved here for the first time.-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Level 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="zandar the wizard (4am crack) level 1.dsk" size="143360" crc="245bc625" sha1="ae1ad7407a8341298b625611051f0b1163b39545" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Level 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="zandar the wizard (4am crack) level 2.dsk" size="143360" crc="087bb50d" sha1="efff5ee6a8fba715faf296dc5755f689f7b7ff88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pclc2v2">
+		<description>Practicalc II XC (Version 2.00) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Practicorp</publisher>
+		<info name="release" value="2019-07-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="practicalc ii xc v2.00 (4am crack).dsk" size="143360" crc="ddbe88cd" sha1="0ae3b6933fdb1f34470fc9a50d96cc3edf2a6cd6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calfunld">
+		<description>Calendar Fun with the Lollipop Dragon (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2019-07-22"/>
+		<!-- It requires a 128K Apple //e, //c, or IIgs. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="calendar fun with the lollipop dragon (4am crack) program disk.dsk" size="143360" crc="90799a37" sha1="c21c3d56ffc88c8ab5f8fcab7a4b4f8e9988b1f5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Student disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="calendar fun with the lollipop dragon (4am crack) student disk 1.dsk" size="143360" crc="6b347810" sha1="9be1860c8aaf731b021806fef5209779dde01c49" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Student disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="calendar fun with the lollipop dragon (4am crack) student disk 2.dsk" size="143360" crc="b91ab261" sha1="b3f49e5f21ca94a0c63dd5333dc4531fe3137f00" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flshcrds">
+		<description>Flashcards (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2019-07-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="flashcards (4am crack).dsk" size="143360" crc="3863a298" sha1="79430b353b6a30a79089c946b61feaa846579a03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fopsrc11">
+		<description>Focus on Physical Science: Chapter Review (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Merrill Publishing</publisher>
+		<info name="release" value="2019-07-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Chapters 1-6"/>
+			<dataarea name="flop" size="143360">
+				<rom name="focus on physical science v1.1 (4am crack) - chapters 1-6.dsk" size="143360" crc="0df7a60a" sha1="f88b9270f6e0bcdcbd2fa4c993239d223252f596" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Chapters 7-12"/>
+			<dataarea name="flop" size="143360">
+				<rom name="focus on physical science v1.1 (4am crack) - chapters 7-12.dsk" size="143360" crc="144fe871" sha1="c4df1d5c16cf703638ec26051b31e1f7234ed2bb" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Chapters 13-18"/>
+			<dataarea name="flop" size="143360">
+				<rom name="focus on physical science v1.1 (4am crack) - chapters 13-18.dsk" size="143360" crc="dc86aba0" sha1="3bb785c6fb6a097a544ee22c0bf998300e749f2e" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Chapters 19-24"/>
+			<dataarea name="flop" size="143360">
+				<rom name="focus on physical science v1.1 (4am crack) - chapters 19-24.dsk" size="143360" crc="64bb12d6" sha1="035be882202870ca236165331f509fd301a78406" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrtrchoi">
+		<description>Writer's Choice (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-07-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer's choice (4am crack) side a.dsk" size="143360" crc="1138795c" sha1="708115611ba89612cd70362e29ced07c117380b3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer's choice (4am crack) side b.dsk" size="143360" crc="8e1fc112" sha1="c8e788f9c50c877403e1c46ed2fa7daa0e2ddb5a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wlywrdwk">
+		<description>Wally's Word Works (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-07-27"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wally's word works (4am crack) disk 1 - teacher disk.dsk" size="143360" crc="eebd4e30" sha1="fabadee8ec857c2651fee5e20eebdb25f6cfca80" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wally's word works (4am crack) disk 2 - student disk.dsk" size="143360" crc="b3b9115f" sha1="56de7705ae6447cf8cc976fbf70c9286e771aac8" />
 			</dataarea>
 		</part>
 	</software>
