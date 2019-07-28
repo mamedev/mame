@@ -45,9 +45,15 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	
+	//required_shared_ptr<uint32_t> m_vram;
+	std::unique_ptr<uint32_t[]> m_vram;
+
 	DECLARE_READ32_MEMBER(a7000_iomd_r);
 	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
 	DECLARE_WRITE32_MEMBER(a7000_vidc20_w);
+	DECLARE_READ32_MEMBER(vram_r);
+	DECLARE_WRITE32_MEMBER(vram_w);
 
 	uint8_t m_vidc20_pal_index;
 	uint16_t m_vidc20_horz_reg[0x10];
@@ -64,6 +70,7 @@ private:
 	uint8_t m_IOMD_keyb_ctrl;
 	uint16_t m_io_id;
 	uint8_t m_viddma_status;
+	uint32_t m_viddma_addr_init;
 	uint32_t m_viddma_addr_start;
 	uint32_t m_viddma_addr_end;
 	uint8_t m_t0readinc;
@@ -71,6 +78,7 @@ private:
 	void fire_iomd_timer(int timer);
 	void viddma_transfer_start();
 	void vidc20_dynamic_screen_change();
+	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -78,6 +86,7 @@ private:
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
+	TIMER_CALLBACK_MEMBER(videodma_timer_callback);
 
 	void a7000_mem(address_map &map);
 };
@@ -88,6 +97,13 @@ private:
  * VIDC20 chip emulation
  *
  */
+
+void riscpc_state::video_start()
+{
+	const uint32_t vram_size = 0x1000000/4;
+	m_vram = std::make_unique<uint32_t[]>(vram_size);
+	save_pointer(NAME(m_vram), vram_size);
+}
 
 
 static const char *const vidc20_regnames[] =
@@ -293,7 +309,6 @@ uint32_t riscpc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
 	uint32_t count;
-	uint8_t *vram = memregion("vram")->base();
 
 	bitmap.fill(m_palette->pen(0x100), cliprect);
 
@@ -316,16 +331,31 @@ uint32_t riscpc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		{
 			for(y=0;y<y_size;y++)
 			{
-				for(x=0;x<x_size;x+=8)
+				for(x=0;x<x_size;x+=32)
 				{
-					for(xi=0;xi<8;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi))&1);
+					for(xi=0;xi<32;xi++)
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((m_vram[count]>>(xi))&1);
 
 					count++;
 				}
 			}
+			break;
 		}
-		break;
+		case 2: /* 4 bpp */
+		{
+			for(y=0;y<y_size;y++)
+			{
+				for(x=0;x<x_size;x+=8)
+				{
+					for(xi=0;xi<8;xi++)
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((m_vram[count]>>(xi*4))&0xf);
+
+					count++;
+				}
+			}
+			break;
+		}
+		#if 0
 		case 1: /* 2 bpp */
 		{
 			for(y=0;y<y_size;y++)
@@ -340,20 +370,7 @@ uint32_t riscpc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			}
 		}
 		break;
-		case 2: /* 4 bpp */
-		{
-			for(y=0;y<y_size;y++)
-			{
-				for(x=0;x<x_size;x+=2)
-				{
-					for(xi=0;xi<2;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi*4))&0xf);
 
-					count++;
-				}
-			}
-		}
-		break;
 		case 3: /* 8 bpp */
 		{
 			for(y=0;y<y_size;y++)
@@ -410,8 +427,9 @@ uint32_t riscpc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			}
 		}
 		break;
+		#endif
 		default:
-			//fatalerror("VIDC20 %08x BPP mode not supported\n",m_vidc20_bpp_mode);
+			fatalerror("VIDC20 %08x BPP mode not supported\n",m_vidc20_bpp_mode);
 			break;
 	}
 
@@ -585,7 +603,7 @@ static const char *const iomd_regnames[] =
 #define IOMD_VIDINIT    0x1dc/4
 #define IOMD_VIDCR      0x1e0/4
 
-
+#define IOMD_DMARQ      0x1f4/4
 
 void riscpc_state::fire_iomd_timer(int timer)
 {
@@ -624,6 +642,11 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 
+	// for convenience lets just implement the video DMA transfer here
+	// the actual transfer probably works per scanline once enabled.
+	if(m_viddma_status & 0x20) 
+		viddma_transfer_start();
+
 	m_flyback_timer->adjust(m_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
 }
 
@@ -634,14 +657,13 @@ void riscpc_state::viddma_transfer_start()
 	uint32_t dst = 0;
 	uint32_t size = m_viddma_addr_end;
 	uint32_t dma_index;
-	uint8_t *vram = memregion("vram")->base();
 
 	/* TODO: this should actually be a qword transfer */
-	for(dma_index = 0;dma_index < size;dma_index++)
+	for(dma_index = 0;dma_index < size;dma_index+=4)
 	{
-		vram[dst] = mem.read_byte(src);
+		m_vram[dst] = mem.read_dword(src);
 
-		src++;
+		src+=4;
 		dst++;
 	}
 }
@@ -692,6 +714,7 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 
 		case IOMD_VIDEND:   return m_viddma_addr_end & 0x00fffff8; //bits 31:24 undefined
 		case IOMD_VIDSTART: return m_viddma_addr_start & 0x1ffffff8; //bits 31, 30, 29 undefined
+		case IOMD_VIDINIT:  return m_viddma_addr_init & 0xfffffff8;
 		case IOMD_VIDCR:    return (m_viddma_status & 0xa0) | 0x50; //bit 6 = DRAM mode, bit 4 = QWORD transfer
 
 		default:    logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
@@ -755,7 +778,11 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 			break;
 
 		case IOMD_VIDEND:   m_viddma_addr_end = data & 0x00fffff8; //bits 31:24 unused
+			break;
 		case IOMD_VIDSTART: m_viddma_addr_start = data & 0x1ffffff8; //bits 31, 30, 29 unused
+			break;
+		case IOMD_VIDINIT:  m_viddma_addr_init = data & 0xfffffff0;
+			break;
 		case IOMD_VIDCR:
 			m_viddma_status = data & 0xa0; if(data & 0x20) { viddma_transfer_start(); }
 			break;
@@ -765,11 +792,22 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 	}
 }
 
+READ32_MEMBER(riscpc_state::vram_r)
+{
+	return m_vram[offset];
+}
+
+WRITE32_MEMBER(riscpc_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[offset]);
+}
+
 void riscpc_state::a7000_mem(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
-//  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
+	// TODO: fatalerrors with pendingUnd in ARM7 core with this enabled
+//	map(0x02000000, 0x02ffffff).rw(FUNC(riscpc_state::vram_r), FUNC(riscpc_state::vram_w));
 //  I/O 03000000 - 033fffff
 //  AM_RANGE(0x03010000, 0x03011fff) //Super IO
 //  AM_RANGE(0x03012000, 0x03029fff) //FDC
@@ -833,7 +871,7 @@ void riscpc_state::rpc600(machine_config &config)
 void riscpc_state::rpc700(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7(config, m_maincpu, 80_MHz_XTAL/2); // ARM710
+	ARM710A(config, m_maincpu, 80_MHz_XTAL/2); // ARM710
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
 
 	/* video hardware */
@@ -906,7 +944,6 @@ ROM_START(rpc600)
 	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
 	ROMX_LOAD("0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(0))
 	ROMX_LOAD("0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(0))
-	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START(rpc700)
@@ -915,7 +952,6 @@ ROM_START(rpc700)
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
 	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START(a7000)
@@ -924,7 +960,6 @@ ROM_START(a7000)
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
 	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START(a7000p)
@@ -941,7 +976,6 @@ ROM_START(a7000p)
 	ROM_SYSTEM_BIOS( 2, "439", "RiscOS 4.39" )
 	ROMX_LOAD("riscos439_1.bin", 0x000000, 0x200000, CRC(dab94cb8) SHA1(a81fb7f1a8117f85e82764675445092d769aa9af), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
 	ROMX_LOAD("riscos439_2.bin", 0x000002, 0x200000, CRC(22e6a5d4) SHA1(b73b73c87824045130840a19ce16fa12e388c039), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
-	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START(sarpc)
@@ -950,7 +984,6 @@ ROM_START(sarpc)
 	ROM_SYSTEM_BIOS( 0, "370", "RiscOS 3.70" )
 	ROMX_LOAD("1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START(sarpc_j233)
@@ -959,7 +992,6 @@ ROM_START(sarpc_j233)
 	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
 	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 /***************************************************************************
