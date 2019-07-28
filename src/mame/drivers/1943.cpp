@@ -106,7 +106,7 @@ void _1943_state::c1943b_map(address_map &map)
 
 	// the bootleg expects 0x00 to be returned from the protection reads
 	// because the protection has been patched out
-	map(0xc007, 0xc007).lr8("mcu_r", [this]() -> u8 { return 0x00; });
+	map(0xc007, 0xc007).lr8("mcu_r", []() -> u8 { return 0x00; });
 	map(0xc807, 0xc807).noprw();
 }
 
