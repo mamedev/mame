@@ -46,14 +46,11 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	//required_shared_ptr<uint32_t> m_vram;
 	std::unique_ptr<uint32_t[]> m_vram;
 
 	DECLARE_READ32_MEMBER(a7000_iomd_r);
 	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
 	DECLARE_WRITE32_MEMBER(a7000_vidc20_w);
-	DECLARE_READ32_MEMBER(vram_r);
-	DECLARE_WRITE32_MEMBER(vram_w);
 
 	uint8_t m_vidc20_pal_index;
 	uint16_t m_vidc20_horz_reg[0x10];
@@ -88,7 +85,9 @@ private:
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
 	TIMER_CALLBACK_MEMBER(videodma_timer_callback);
 
-	void a7000_mem(address_map &map);
+	void a7000_map(address_map &map);
+	void riscpc_map(address_map &map);
+
 };
 
 
@@ -792,22 +791,12 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 	}
 }
 
-READ32_MEMBER(riscpc_state::vram_r)
-{
-	return m_vram[offset];
-}
-
-WRITE32_MEMBER(riscpc_state::vram_w)
-{
-	COMBINE_DATA(&m_vram[offset]);
-}
-
-void riscpc_state::a7000_mem(address_map &map)
+void riscpc_state::a7000_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
-	// TODO: fatalerrors with pendingUnd in ARM7 core with this enabled
-//  map(0x02000000, 0x02ffffff).rw(FUNC(riscpc_state::vram_r), FUNC(riscpc_state::vram_w));
+	// 
+//	map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
 //  I/O 03000000 - 033fffff
 //  AM_RANGE(0x03010000, 0x03011fff) //Super IO
 //  AM_RANGE(0x03012000, 0x03029fff) //FDC
@@ -823,6 +812,12 @@ void riscpc_state::a7000_mem(address_map &map)
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
 //  AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
 //  AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
+}
+
+void riscpc_state::riscpc_map(address_map &map)
+{
+	a7000_map(map);
+	map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM
 }
 
 
@@ -842,6 +837,7 @@ void riscpc_state::machine_start()
 void riscpc_state::machine_reset()
 {
 	m_IOMD_IO_ctrl = 0x0b | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
+	// TODO: jumps to EASI space at $0c0016xx with this on!?
 //  m_IRQ_status_A = 0x10; // set POR bit ON
 	m_IRQ_mask_A = 0x00;
 
@@ -856,7 +852,7 @@ void riscpc_state::rpc600(machine_config &config)
 {
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, 60_MHz_XTAL/2); // ARM610
-	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -872,7 +868,7 @@ void riscpc_state::rpc700(machine_config &config)
 {
 	/* Basic machine hardware */
 	ARM710A(config, m_maincpu, 80_MHz_XTAL/2); // ARM710
-	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -888,7 +884,7 @@ void riscpc_state::a7000(machine_config &config)
 {
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, XTAL(32'000'000)); // ARM7500
-	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -910,7 +906,7 @@ void riscpc_state::sarpc(machine_config &config)
 {
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, 202000000); // StrongARM
-	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -926,7 +922,7 @@ void riscpc_state::sarpc_j233(machine_config &config)
 {
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, 233000000); // StrongARM
-	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
