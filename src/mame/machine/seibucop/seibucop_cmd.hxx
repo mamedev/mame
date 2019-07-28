@@ -582,7 +582,10 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 		sprite_pri |= 0x8000;
 		m_host_space->write_word(cop_regs[4] + offs + 2, sprite_pri);
 	}
-	m_host_space->write_word(cop_regs[4] + offs + 4, sprite_x);
+
+	// save into internal clip register, cfr. increment DMA register $410
+	m_sprite_dma_x_clip = sprite_x;
+	m_host_space->write_word(cop_regs[4] + offs + 4, m_sprite_dma_x_clip);
 	m_host_space->write_word(cop_regs[4] + offs + 6, sprite_y);
 }
 
