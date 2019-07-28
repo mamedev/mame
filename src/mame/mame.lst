@@ -2494,6 +2494,7 @@ xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
 lion3500                        // 1993 Lion 3500C/T notebook
+o286foxii						// Octek Fox II 286 motherboard
 
 @source:atari_s1.cpp
 aavenger                        //
