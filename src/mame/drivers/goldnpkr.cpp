@@ -59,6 +59,7 @@
   * Falcons Wild - World Wide Poker (VK set 1),       1990, Video Klein.
   * Falcons Wild - World Wide Poker (VK set 2),       1990, Video Klein.
   * Falcons Wild - Wild Card 1991,                    1991, TVG.
+  * Super 21,                                         1987, Public MNG.
   * Witch Card (Video Klein CPU box, set 1),          1991, Video Klein.
   * Witch Card (Video Klein CPU box, set 2),          1991, Video Klein.
   * Witch Card (Spanish, witch game, set 1),          1991, Unknown.
@@ -116,6 +117,7 @@
   * PlayMan Poker (German),                           1981, PM / Beck Elektronik.
   * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
   * Casino Poker (Ver PM86-35-1, German),             1986, PM / Beck Elektronik.
+  * Casino Poker (Ver PM88-01-21, German),            1988, PM / Beck Elektronik.
   * Royale (set 1),                                   198?, Unknown.
   * Royale (set 2),                                   198?, Unknown.
   * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
