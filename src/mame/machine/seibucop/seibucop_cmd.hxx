@@ -545,7 +545,7 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 
 	offs = (offset & 3) * 4;
 
-	// TODO: upper bits of DMA params seems to go into sprite priority?
+	// TODO: bit 16 of sprite param may go there as well
 	sprite_info = m_host_space->read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f);
 	m_host_space->write_word(cop_regs[4] + offs + 0, sprite_info);
 
@@ -574,7 +574,14 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 	else
 		sprite_y = (m_sprite_dma_rel_y & 0x78) + (abs_y)-((m_sprite_dma_rel_y & 0x80) ? 0x80 : 0);
 
-	//m_host_space->write_word(cop_regs[4] + offs + 2,m_host_space->read_word(m_cop_sprite_dma_src+2 + offs));
+	// 3rd midboss enables this bit for the sections that should be covered by the ground layers, 
+	// effectively changing the priority value to 2
+	if (m_cop_sprite_dma_param & 0x00020000)
+	{
+		uint16_t sprite_pri = m_host_space->read_word(cop_regs[4] + offs + 2);
+		sprite_pri |= 0x8000;
+		m_host_space->write_word(cop_regs[4] + offs + 2, sprite_pri);
+	}
 	m_host_space->write_word(cop_regs[4] + offs + 4, sprite_x);
 	m_host_space->write_word(cop_regs[4] + offs + 6, sprite_y);
 }
