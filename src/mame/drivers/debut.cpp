@@ -234,7 +234,7 @@ void debut_state::debutm(machine_config &config)
 {
 	/* basic machine hardware */
 	I8086(config, m_maincpu, 16.2_MHz_XTAL / 3);
-	m_maincpu->set_periodic_int(FUNC(debut_state::interrupt), attotime::from_hz(400));
+	m_maincpu->set_periodic_int(FUNC(debut_state::interrupt), attotime::from_hz(380));
 	m_maincpu->set_addrmap(AS_PROGRAM, &debut_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &debut_state::main_io);
 

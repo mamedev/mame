@@ -272,7 +272,7 @@ void corona_state::corona(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 5_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(175));
+	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(183));
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&corona_state::rombank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
 
