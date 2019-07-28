@@ -673,8 +673,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( sapi_state::kansas_r )
 	}
 
 	// check for interrupts  (not needed)
-//	if ((m_uart->tbmt_r() && m_iet) || (m_uart->dav_r() && m_ier))
-//		m_maincpu->set_input_line(I8085_INTR_LINE, HOLD_LINE);
+//  if ((m_uart->tbmt_r() && m_iet) || (m_uart->dav_r() && m_ier))
+//      m_maincpu->set_input_line(I8085_INTR_LINE, HOLD_LINE);
 
 	if ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
 		return;

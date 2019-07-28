@@ -158,8 +158,8 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x10047c, 0x10047d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_dst_w));
 	map(0x10047e, 0x10047f).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_mode_r), FUNC(raiden2cop_device::cop_dma_mode_w));
 
-//	map(0x100488, 0x100489).nopw(); grainbow $0010
-//	map(0x10048a, 0x10048b).nopw(); grainbow $0000
+//  map(0x100488, 0x100489).nopw(); grainbow $0010
+//  map(0x10048a, 0x10048b).nopw(); grainbow $0000
 	map(0x10048c, 0x10048d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_y_w)); // 68k
 	map(0x10048e, 0x10048f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sprite_dma_abs_x_w)); // 68k
 

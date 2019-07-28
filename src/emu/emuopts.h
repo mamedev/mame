@@ -162,7 +162,7 @@
 #define OPTION_BIOS                 "bios"
 #define OPTION_CHEAT                "cheat"
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
-#define OPTION_SKIP_MANDATORY_FILEMAN	"skip_mandatory_fileman"
+#define OPTION_SKIP_MANDATORY_FILEMAN   "skip_mandatory_fileman"
 #define OPTION_UI_FONT              "uifont"
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"

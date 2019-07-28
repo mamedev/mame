@@ -3763,7 +3763,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	
+
 	<software name="emit2">
 		<!--
 		Origin: redump.org
@@ -8377,7 +8377,7 @@ User/save disks that can be created from the game itself are not included.
 		<description>Provvidenza - Legenda la Spada di Alfa</description>
 		<year>1991</year>
 		<publisher>Sofcom</publisher>
-		<info name="alt_title" value="プロビデンツァ Legenda la Spada di Alfa" />	
+		<info name="alt_title" value="プロビデンツァ Legenda la Spada di Alfa" />
 		<info name="release" value="199109xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
@@ -9441,7 +9441,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- 
+	<!--
 	The Master Disk contains data on track 81. This data isn't used by the game at all, in fact the manual
 	recommends making a copy of the disk with the standard TownsOS copy tools and using the copy to play.
 	The image included here is in HxC MFM format just for the purpose of preserving that track.

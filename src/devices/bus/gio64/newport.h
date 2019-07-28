@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*********************************************************************
 
-	newport.h
+    newport.h
 
     SGI "Newport" graphics board emulation
 
@@ -243,7 +243,7 @@ private:
 
 	uint32_t  m_global_mask;
 	uint32_t  m_write_mask;
-	bool	  m_blend;
+	bool      m_blend;
 	bool      m_fast_clear;
 	bool      m_rgbmode;
 	bool      m_dblsrc;

@@ -4,7 +4,7 @@
 
   The Boat
   1987(c) Hit Gun Co, LTD.
-  
+
   Gambling/Amusement game
   Selectable through DIP switches.
 
@@ -325,7 +325,7 @@ ROM_START(theboat)
 	ROM_LOAD("3.ic8",  0x0000, 0x4000, CRC(74b44e32) SHA1(b36c90a13511c5bf4aef079ac506605096e39067))
 	ROM_LOAD("4.ic11", 0x4000, 0x4000, CRC(4ea36fa3) SHA1(b020a478e8dd72154916c67d71255b5a6a822d6d))
 	ROM_LOAD("5.ic14", 0x8000, 0x4000, CRC(7899a587) SHA1(13cbb7e837e14bc49d8b34dbf876b666cdf48979))
-	// Empty socket for one more ROM (IC16), 
+	// Empty socket for one more ROM (IC16),
 ROM_END
 
 

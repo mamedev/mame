@@ -689,7 +689,7 @@ static INPUT_PORTS_START( jetwave )
 
 	PORT_START("ANALOG2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Accelerator") PORT_MINMAX(0x00,0x90) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-	
+
 	PORT_START("ANALOG3") //actually required else MAME will crash if this port is removed.
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END

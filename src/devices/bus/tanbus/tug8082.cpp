@@ -215,10 +215,10 @@ WRITE_LINE_MEMBER(tanbus_tug8082_device::bus_irq_w)
 	//{
 	//case 0x01:
 		m_tanbus->irq_w(state);
-	//	break;
+	//  break;
 	//case 0x02:
-	//	m_tanbus->nmi_w(state);
-	//	break;
+	//  m_tanbus->nmi_w(state);
+	//  break;
 	//}
 }
 

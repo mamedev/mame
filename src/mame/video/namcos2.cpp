@@ -91,7 +91,7 @@ uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	apply_clip(clip, cliprect);
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
-	// Phelios contradicts with this so disabled 
+	// Phelios contradicts with this so disabled
 	// (level 0 ROZ is actually used by stages 2, 3 and 4 at very least)
 	//bool roz_enable = ((m_gfx_ctrl & 0x7000) ? true : false);
 

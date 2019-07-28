@@ -44,7 +44,7 @@ MC6845_UPDATE_ROW(usgames_state::update_row)
 		int attr = m_videoram[tile_index*2+1];
 		uint8_t bg_color = attr & 0xf;
 		uint8_t fg_color = (attr & 0xf0) >> 4;
-		
+
 		const uint8_t plane = m_charram[(tile << 3) | ra];
 		for (int n = 7; n >= 0; n--)
 			*pix++ = m_palette->pen(BIT(plane, n) ? fg_color : bg_color);

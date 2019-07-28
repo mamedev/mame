@@ -225,7 +225,7 @@ uint8_t tasc_sb30_device::spawn_cb(offs_t offset)
 	if (piece_id >= 0)
 		return piece_id + 1;
 	else
-		return 0;	// not available
+		return 0;   // not available
 }
 
 uint8_t tasc_sb30_device::read()

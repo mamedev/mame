@@ -24,17 +24,17 @@ TODO:
 #include "emu.h"
 #include "machine/scc68070.h"
 
-#define LOG_I2C			(1 << 0)
-#define LOG_UART		(1 << 1)
-#define LOG_TIMERS		(1 << 2)
-#define LOG_TIMERS_HF	(1 << 3)
-#define LOG_DMA			(1 << 4)
-#define LOG_MMU			(1 << 5)
-#define LOG_IRQS		(1 << 6)
-#define LOG_UNKNOWN		(1 << 7)
-#define LOG_ALL			(LOG_I2C | LOG_UART | LOG_TIMERS | LOG_DMA | LOG_MMU | LOG_IRQS | LOG_UNKNOWN)
+#define LOG_I2C         (1 << 0)
+#define LOG_UART        (1 << 1)
+#define LOG_TIMERS      (1 << 2)
+#define LOG_TIMERS_HF   (1 << 3)
+#define LOG_DMA         (1 << 4)
+#define LOG_MMU         (1 << 5)
+#define LOG_IRQS        (1 << 6)
+#define LOG_UNKNOWN     (1 << 7)
+#define LOG_ALL         (LOG_I2C | LOG_UART | LOG_TIMERS | LOG_DMA | LOG_MMU | LOG_IRQS | LOG_UNKNOWN)
 
-#define VERBOSE			(LOG_UART)
+#define VERBOSE         (LOG_UART)
 
 #include "logmacro.h"
 

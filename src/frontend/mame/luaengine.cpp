@@ -1710,8 +1710,8 @@ void lua_engine::initialize()
 			"empty", sol::property(&natural_keyboard::empty),
 			"in_use", sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use),
 			"paste", &natural_keyboard::paste,
-			"post", [](natural_keyboard &nat, const std::string &text)			{ nat.post_utf8(text); },
-			"post_coded", [](natural_keyboard &nat, const std::string &text)	{ nat.post_coded(text); });
+			"post", [](natural_keyboard &nat, const std::string &text)          { nat.post_utf8(text); },
+			"post_coded", [](natural_keyboard &nat, const std::string &text)    { nat.post_coded(text); });
 
 /*  ioport_port library
  *
@@ -1819,12 +1819,12 @@ void lua_engine::initialize()
 			"type_class", sol::property([](ioport_field &f) {
 					switch (f.type_class())
 					{
-					case INPUT_CLASS_KEYBOARD:		return "keyboard";
-					case INPUT_CLASS_CONTROLLER:	return "controller";
-					case INPUT_CLASS_CONFIG:		return "config";
-					case INPUT_CLASS_DIPSWITCH:		return "dipswitch";
-					case INPUT_CLASS_MISC:			return "misc";
-					default:						break;
+					case INPUT_CLASS_KEYBOARD:      return "keyboard";
+					case INPUT_CLASS_CONTROLLER:    return "controller";
+					case INPUT_CLASS_CONFIG:        return "config";
+					case INPUT_CLASS_DIPSWITCH:     return "dipswitch";
+					case INPUT_CLASS_MISC:          return "misc";
+					default:                        break;
 					}
 					throw false;
 				}),

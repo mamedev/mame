@@ -62,9 +62,9 @@
           a production board.
 
     ToDo:
-	- Proper IRQ2 (should be LVBL) and IRQ4 (V256) hookup
+    - Proper IRQ2 (should be LVBL) and IRQ4 (V256) hookup
 
-	About IRQ:
+    About IRQ:
         IRQ4 seems to be control related.
         On each interrupt, it reads 0xFE4000 (coin/start), shift the bits around
         and move the resulting byte into a dword RAM location. The dword RAM location

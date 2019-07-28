@@ -98,11 +98,11 @@ enum class image_verify_result { PASS, FAIL };
 //  MACROS
 //**************************************************************************
 
-#define DEVICE_IMAGE_LOAD_MEMBER(_name)				image_init_result _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)		DEVICE_IMAGE_LOAD_MEMBER(_name)
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
 
-#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)        	void _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)	DEVICE_IMAGE_UNLOAD_MEMBER(_name)
+#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
 
 
 // ======================> device_image_interface

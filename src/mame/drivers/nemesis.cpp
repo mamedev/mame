@@ -98,7 +98,7 @@ but when they get close to top of the screen they go in front of them.
 To display score, priority of upper part is always lower.
 So this is the correct behavior of real hardware, not an emulation bug.
 - hcrash:
-The "overall ranking" sums up every play score by players, by looking up 
+The "overall ranking" sums up every play score by players, by looking up
 initials
 
 ***************************************************************************/
@@ -3031,16 +3031,16 @@ ROM_END
 void nemesis_state::bubsys_init()
 {
 	/*
-		The MCU is the master of the system and controls the /RESET and /BS lines of the 68000.
-		At boot the MCU asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
-		During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
-		countdown via the vlm5030. Once the bubble memory is ready, the MCU copies the 68000 boot program
-		to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
-		
-		As the MCU is not dumped we effectively start the simulation at the point the 68000
-		is released, and manually copy the boot program to 68000 address space.
-		
-		TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
+	    The MCU is the master of the system and controls the /RESET and /BS lines of the 68000.
+	    At boot the MCU asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
+	    During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
+	    countdown via the vlm5030. Once the bubble memory is ready, the MCU copies the 68000 boot program
+	    to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
+
+	    As the MCU is not dumped we effectively start the simulation at the point the 68000
+	    is released, and manually copy the boot program to 68000 address space.
+
+	    TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
 	*/
 
 	const uint8_t *src = memregion("maincpu")->base();

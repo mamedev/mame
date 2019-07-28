@@ -83,7 +83,7 @@
 
   Board silkscreened on top:
   be MVX-001-02  ('be' is a Bonanza Enterprises logo).
-  
+
  +------------------------------------------------------+
  |                                     *CN-HEX          |
  |      6  SW2        MSM2128-15   HD46505SP  JDX 3-92  |
@@ -126,7 +126,7 @@ VR1-VR6: variable resistor to handle B-G background color/intensity & sound
   - PRG ROMs:       5x 2764 (8Kb) - 3 for Joker Poker
   - GFX ROMs:       1x 2764 (8Kb) for text layer.
                     3x 2764 (8Kb) for gfx tiles.
-					
+
 NOTE: 10MHz XTAL verified for Joker Poker, Super Mini-Boy is stated as 12.4725MHz
 
 *******************************************************************************

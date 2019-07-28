@@ -2575,7 +2575,7 @@ void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286),
 		m_sreg[i].valid = (m_sreg[i].flags & 0x80) ? true : false;
 		m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
 	}
-	
+
 	dr7_changed(old_dr7, m_dr[7]);
 	CHANGE_PC(m_eip);
 }

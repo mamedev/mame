@@ -91,11 +91,11 @@ bool plugin_options::load_plugin(const std::string &path)
 		: ".";
 
 	plugin p;
-	p.m_name		= document["plugin"]["name"].GetString();
-	p.m_description	= document["plugin"]["description"].GetString();
-	p.m_type		= document["plugin"]["type"].GetString();
-	p.m_directory	= std::move(dir);
-	p.m_start		= false;
+	p.m_name        = document["plugin"]["name"].GetString();
+	p.m_description = document["plugin"]["description"].GetString();
+	p.m_type        = document["plugin"]["type"].GetString();
+	p.m_directory   = std::move(dir);
+	p.m_start       = false;
 	if (document["plugin"].HasMember("start") && (std::string(document["plugin"]["start"].GetString()) == "true"))
 		p.m_start = true;
 

@@ -147,8 +147,8 @@ f
     ----------------------------------------------------------------------------------------------------
     Gradius 4    837C01  -       -       837A09  837A10  -       778A12  837A04  837A05  -    -   837A08
     NBA P/Play   778A01  -       -       778A09  778A10  778A11  778A12  778A04  778A05  -    -   778A08
-    Teraburst    -       715l02  715l03  715A09  715A10  -       778A12  715A04  715A05  -    -   715A08 
-	S/Scope      830B01  -       -       830A09  830A10  -       -       -       -       -    -   830A08
+    Teraburst    -       715l02  715l03  715A09  715A10  -       778A12  715A04  715A05  -    -   715A08
+    S/Scope      830B01  -       -       830A09  830A10  -       -       -       -       -    -   830A08
     S/Scope 2    931D01  -       -       931A09  931A10  931A11  -       931A04  -       -    -   931A08
 
 
@@ -221,7 +221,7 @@ f
     Gradius 4    837A13  837A15  837A14  837A16
     NBA P/Play   778A13  778A15  778A14  778A16
     Teraburst    715A13  715A15  778A14  715A16
-    S/Scope      830A13  -       830A14  -          
+    S/Scope      830A13  -       830A14  -
     S/Scope 2    -       -       -       -          (no ROMs, not used)
 
 
@@ -271,10 +271,10 @@ f
     12B  CY7C199   Cypress 32kx8 SRAM
     8B   AT93C46   Atmel 1K serial EEPROM, 8 pin SOP
     16G  DS2401    Dallas Silicon Serial Number IC, 6 pin SOP
-	
+
     Note: This PCB does more than just networking. The serial eeprom is used as a means to prevent region change.
     The timekeeper region has to match the serial eeprom. The two mask roms serve as GFX roms as the game "downloads"
-	the data from those two roms.
+    the data from those two roms.
 
 
 
@@ -1009,26 +1009,26 @@ static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
 	PORT_DIPNAME(0x02, 0x02, "Cabinet Type") PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(0x02, "2 Player")
 	PORT_DIPSETTING(0x00, "4 Player")
-	
-/*	PORT_START("IN3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	
-	PORT_START("IN4")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) */
+
+/*  PORT_START("IN3")
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+
+    PORT_START("IN4")
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(terabrst)
@@ -1255,8 +1255,8 @@ void hornet_state::sscope(machine_config &config)
 	rscreen.set_visarea(0, 512 - 1, 0, 384 - 1);
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update_rscreen));
 
-/*	ADC12138(config, m_adc12138_2, 0);
-	m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::sscope_input_callback)); */
+/*  ADC12138(config, m_adc12138_2, 0);
+    m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::sscope_input_callback)); */
 
 	m_konppc->set_num_boards(2);
 }
@@ -1748,4 +1748,4 @@ GAMEL( 1999, sscopea,   sscope,   sscope,  sscope,    hornet_state, init_sscope,
 GAMEL( 2000, sscope2,   0,        sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
 //GAMEL( 2000, sscope2e, sscope2, sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Fatal Judgement (ver EAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
 //GAMEL( 2000, sscope2j, sscope2  sscope2, sscope2,   hornet_state, init_sscope2, ROT0, "Konami", "Silent Scope 2 : Innocent Sweeper (ver JAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_dualhsxs )
-	
+

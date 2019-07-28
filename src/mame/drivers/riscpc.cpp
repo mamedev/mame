@@ -45,7 +45,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	//required_shared_ptr<uint32_t> m_vram;
 	std::unique_ptr<uint32_t[]> m_vram;
 
@@ -644,7 +644,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 
 	// for convenience lets just implement the video DMA transfer here
 	// the actual transfer probably works per scanline once enabled.
-	if(m_viddma_status & 0x20) 
+	if(m_viddma_status & 0x20)
 		viddma_transfer_start();
 
 	m_flyback_timer->adjust(m_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
@@ -807,7 +807,7 @@ void riscpc_state::a7000_mem(address_map &map)
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
 	// TODO: fatalerrors with pendingUnd in ARM7 core with this enabled
-//	map(0x02000000, 0x02ffffff).rw(FUNC(riscpc_state::vram_r), FUNC(riscpc_state::vram_w));
+//  map(0x02000000, 0x02ffffff).rw(FUNC(riscpc_state::vram_r), FUNC(riscpc_state::vram_w));
 //  I/O 03000000 - 033fffff
 //  AM_RANGE(0x03010000, 0x03011fff) //Super IO
 //  AM_RANGE(0x03012000, 0x03029fff) //FDC

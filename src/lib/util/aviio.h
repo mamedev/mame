@@ -29,11 +29,11 @@
 #define FORMAT_VYUY             AVI_FOURCC('V','Y','U','Y')
 #define FORMAT_YUY2             AVI_FOURCC('Y','U','Y','2')
 #define FORMAT_HFYU             AVI_FOURCC('H','F','Y','U')
-#define FORMAT_I420				AVI_FOURCC('I','4','2','0')
+#define FORMAT_I420             AVI_FOURCC('I','4','2','0')
 #define FORMAT_DIB              AVI_FOURCC('D','I','B',' ')
 #define FORMAT_RGB              AVI_FOURCC('R','G','B',' ')
 #define FORMAT_RAW              AVI_FOURCC('R','A','W',' ')
-#define FORMAT_UNCOMPRESSED		0x00000000
+#define FORMAT_UNCOMPRESSED     0x00000000
 
 
 class avi_file

@@ -375,22 +375,22 @@
 		<bezel element="text_right"><bounds x="88.5" y="96" width="4" height="4" /></bezel>
 		<bezel element="text_down"> <bounds x="82.5" y="102" width="4" height="4" /></bezel>
 
-		<bezel element="keys" inputtag="KEY1" inputmask="0x01000000">	<!-- ENT -->
+		<bezel element="keys" inputtag="KEY1" inputmask="0x01000000">   <!-- ENT -->
 			<bounds x="76" y="89.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2" inputmask="0x01000000">	<!-- Up -->
+		<bezel element="keys" inputtag="KEY2" inputmask="0x01000000">   <!-- Up -->
 			<bounds x="82" y="89.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY3" inputmask="0x01000000">	<!-- CL -->
+		<bezel element="keys" inputtag="KEY3" inputmask="0x01000000">   <!-- CL -->
 			<bounds x="88" y="89.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1" inputmask="0x02000000">	<!-- Left -->
+		<bezel element="keys" inputtag="KEY1" inputmask="0x02000000">   <!-- Left -->
 			<bounds x="76" y="95.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY3" inputmask="0x02000000">	<!-- Right -->
+		<bezel element="keys" inputtag="KEY3" inputmask="0x02000000">   <!-- Right -->
 			<bounds x="88" y="95.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2" inputmask="0x02000000">	<!-- Down -->
+		<bezel element="keys" inputtag="KEY2" inputmask="0x02000000">   <!-- Down -->
 			<bounds x="82" y="101.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
 	</group>

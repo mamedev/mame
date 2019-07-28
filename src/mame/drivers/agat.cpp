@@ -632,14 +632,14 @@ READ8_MEMBER(agat_base_state::c100_r)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-//		u8 data;
+//      u8 data;
 
 		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
 
-//		logerror("%s: c100_r %04X (slot %d) == %02X\n", machine().describe_context(), offset+0xc100, slotnum, data);
+//      logerror("%s: c100_r %04X (slot %d) == %02X\n", machine().describe_context(), offset+0xc100, slotnum, data);
 
 		return m_slotdevice[slotnum]->read_cnxx(offset & 0xff);
 	}
@@ -1472,7 +1472,7 @@ static void agat7_cards(device_slot_interface &device)
 
 static void agat9_cards(device_slot_interface &device)
 {
-//	device.option_add("a9ram", A2BUS_AGAT9RAM); // Agat-9 128K RAM Card -- decimal 3.089.170
+//  device.option_add("a9ram", A2BUS_AGAT9RAM); // Agat-9 128K RAM Card -- decimal 3.089.170
 	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
 	device.option_add("a9fdc140", A2BUS_AGAT9_FDC); // Disk II clone -- decimal 3.089.173 (reworked for agat9)
 	device.option_add("a9fdchle", A2BUS_AGAT840K_HLE); // 840K floppy controller -- decimal 7.104.351 or 3.089.023?

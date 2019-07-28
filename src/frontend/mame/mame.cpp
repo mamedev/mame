@@ -135,7 +135,7 @@ void mame_machine_manager::start_luaengine()
 		{
 			// user may specify environment variables; subsitute them
 			osd_subst_env(pluginpath, pluginpath);
-			
+
 			// and then scan the directory recursively
 			m_plugins->scan_directory(pluginpath, true);
 		}

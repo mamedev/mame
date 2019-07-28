@@ -1530,7 +1530,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
 
 /*
   Color codes GFX bank 0 (chars)
- 
+
   00 = Black.
   10 = Red.
   20 = Green.
@@ -1543,7 +1543,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
   In test mode, the DIP switches status are assigned with code 00,
   so you can't see them since they are black on black background.
 
-*/  
+*/
 }
 
 void goldnpkr_state::video_start()
@@ -1688,7 +1688,7 @@ void goldnpkr_state::super21p_palette(palette_device &palette) const
 {
 /*
     Each graphics bank has its own palette. The first 3 are tied to
-	bipolar PROMs, and the las one is RGB direct.
+    bipolar PROMs, and the las one is RGB direct.
 
     GFX bank 0 ---> bipolar PROM 1
     GFX bank 1 ---> bipolar PROM 2
@@ -1710,7 +1710,7 @@ void goldnpkr_state::super21p_palette(palette_device &palette) const
 
 	for (int i = 0; i < (palette.entries() * 3) / 4; i++)
 	{
-//		last quarter of palette is RGB direct, for gfx bank 3 (title)
+//      last quarter of palette is RGB direct, for gfx bank 3 (title)
 //      todo: implement bit 3.
 
 		// red component
@@ -4294,7 +4294,7 @@ static INPUT_PORTS_START( super21p )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
@@ -4315,10 +4315,10 @@ static INPUT_PORTS_START( super21p )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x03, 0x03, "Limit" )        PORT_DIPLOCATION("SW1:8,7")
-	PORT_DIPSETTING(    0x03, "3000" )        
-	PORT_DIPSETTING(    0x02, "5000" )        
-	PORT_DIPSETTING(    0x01, "10000" )         
-	PORT_DIPSETTING(    0x00, "30000" )          
+	PORT_DIPSETTING(    0x03, "3000" )
+	PORT_DIPSETTING(    0x02, "5000" )
+	PORT_DIPSETTING(    0x01, "10000" )
+	PORT_DIPSETTING(    0x00, "30000" )
 	PORT_DIPNAME( 0x04, 0x04, "4 Of a Kind" )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -4337,7 +4337,7 @@ static INPUT_PORTS_START( super21p )
 	PORT_DIPNAME( 0x80, 0x80, "Game Mode" )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, "Play" )
 	PORT_DIPSETTING(    0x00, "Port Check" )
-	
+
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x07, 0x07, "Coin1-Coin2-NoteIn" ) PORT_DIPLOCATION("SW2:8,7,6")
 	PORT_DIPSETTING(    0x07, "10-100-50" )
@@ -11496,10 +11496,10 @@ ROM_START( super21p )
 	ROM_REGION( 0x1800, "gfx4", 0 )
 	ROM_COPY( "gfxpool", 0x1800, 0x1000, 0x0800 ) // src-dest-size
 	ROM_COPY( "gfxpool", 0x3800, 0x0800, 0x0800 ) // src-dest-size
-	ROM_COPY( "gfxpool", 0x5800, 0x0000, 0x0800 ) // src-dest-size	
+	ROM_COPY( "gfxpool", 0x5800, 0x0000, 0x0800 ) // src-dest-size
 
-//	ROM_FILL(            0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
-//	ROM_FILL(            0x2000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+//  ROM_FILL(            0x0000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
+//  ROM_FILL(            0x2000, 0x1000, 0x0000 ) /* filling the R-G bitplanes */
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "82s129_1.ic31", 0x0000, 0x0100, CRC(c3d777b4) SHA1(5a3c0325dcbddde3f8ae2ffbc1cb56cfccda308d) )

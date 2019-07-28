@@ -24,12 +24,12 @@
 #include "formats/dvk_mx_dsk.h"
 
 const floppy_image_format_t::desc_e dvk_mx_format::dvk_mx_new_desc[] = {
-	/* 01 */ { FM, 0x00, 8*2 },	// eight 0x0000 words
+	/* 01 */ { FM, 0x00, 8*2 }, // eight 0x0000 words
 	/* 03 */ { FM, 0x00, 1 },
-	/* 02 */ { FM, 0xf3, 1 },	// word 0x00f3
+	/* 02 */ { FM, 0xf3, 1 },   // word 0x00f3
 	/* 05 */ { FM, 0x00, 1 },
-	/* 04 */ { TRACK_ID_FM },	// track number word
-	/* 05 */ { SECTOR_LOOP_START, 0, 10 },	// 11 sectors
+	/* 04 */ { TRACK_ID_FM },   // track number word
+	/* 05 */ { SECTOR_LOOP_START, 0, 10 },  // 11 sectors
 	/* 07 */ {   SECTOR_DATA_MX, -1 },
 	/* 10 */ { SECTOR_LOOP_END },
 	/* 13 */ { FM, 0x83, 1 },
@@ -44,10 +44,10 @@ const floppy_image_format_t::desc_e dvk_mx_format::dvk_mx_new_desc[] = {
 const floppy_image_format_t::desc_e dvk_mx_format::dvk_mx_old_desc[] = {
 	/* 01 */ { FM, 0x00, 30*2 },
 	/* 03 */ { FM, 0x00, 1 },
-	/* 02 */ { FM, 0xf3, 1 },	// word 0x00f3
+	/* 02 */ { FM, 0xf3, 1 },   // word 0x00f3
 	/* 05 */ { FM, 0x00, 1 },
-	/* 04 */ { TRACK_ID_FM },	// track number word
-	/* 06 */ { SECTOR_LOOP_START, 0, 10 },	// 11 sectors
+	/* 04 */ { TRACK_ID_FM },   // track number word
+	/* 06 */ { SECTOR_LOOP_START, 0, 10 },  // 11 sectors
 	/* 07 */ {   SECTOR_DATA_MX, -1 },
 	/* 10 */ { SECTOR_LOOP_END },
 	/* 13 */ { FM, 0x83, 1 },

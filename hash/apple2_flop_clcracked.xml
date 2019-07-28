@@ -30936,9 +30936,9 @@
 		<publisher>Terrapin</publisher>
 		<info name="release" value="2017-10-21"/>
 		<!--(*) 4am crack no. 178 was labeled "Terrapin Logo 2.0". This disk is
-    "Terrapin Logo 2.00". The filenames are different, and the main program
-    has differences in multiple places. Also the copy protection on this
-    version is significantly stronger, suggesting a later revision.. -->
+	"Terrapin Logo 2.00". The filenames are different, and the main program
+	has differences in multiple places. Also the copy protection on this
+	version is significantly stronger, suggesting a later revision.. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">

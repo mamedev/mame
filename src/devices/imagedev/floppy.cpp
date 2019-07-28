@@ -758,13 +758,13 @@ void floppy_image_device::seek_phase_w(int phases)
 // From http://burtleburtle.net/bob/hash/integer.html
 uint32_t floppy_image_device::hash32(uint32_t a) const
 {
-    a = (a+0x7ed55d16) + (a<<12);
-    a = (a^0xc761c23c) ^ (a>>19);
-    a = (a+0x165667b1) + (a<<5);
-    a = (a+0xd3a2646c) ^ (a<<9);
-    a = (a+0xfd7046c5) + (a<<3);
-    a = (a^0xb55a4f09) ^ (a>>16);
-    return a;
+	a = (a+0x7ed55d16) + (a<<12);
+	a = (a^0xc761c23c) ^ (a>>19);
+	a = (a+0x165667b1) + (a<<5);
+	a = (a+0xd3a2646c) ^ (a<<9);
+	a = (a+0xfd7046c5) + (a<<3);
+	a = (a^0xb55a4f09) ^ (a>>16);
+	return a;
 }
 
 int floppy_image_device::find_index(uint32_t position, const std::vector<uint32_t> &buf)const

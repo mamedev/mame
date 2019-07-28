@@ -23,9 +23,9 @@ struct plugin
 {
 	std::string m_name;
 	std::string m_description;
-	std::string	m_type;
-	std::string	m_directory;
-	bool		m_start;
+	std::string m_type;
+	std::string m_directory;
+	bool        m_start;
 };
 
 

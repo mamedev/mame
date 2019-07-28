@@ -119,7 +119,7 @@ WRITE8_MEMBER(shaolins_state::nmi_w)
 		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
-	
+
 	machine().bookkeeping().coin_counter_w(0,data & 0x08);
 	machine().bookkeeping().coin_counter_w(1,data & 0x10);
 }
@@ -153,7 +153,7 @@ void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	// TODO: understand actual disabling conditions (either by schematics or by probing the real HW)
 	if (m_spriteram[0] == 0)
 		return;
-	
+
 	for (int offs = m_spriteram.bytes() - 32; offs >= 0x100; offs -= 32 ) /* max 24 sprites */
 	{
 		if (m_spriteram[offs] && m_spriteram[offs + 6]) /* stop rogue sprites on high score screen */

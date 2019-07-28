@@ -141,11 +141,11 @@ void falco5220_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(falco5220_state::rombank_w));
-//	map(0x50, 0x50).r // keyboard data
-//	map(0x51, 0x51).r // keyboard status
+//  map(0x50, 0x50).r // keyboard data
+//  map(0x51, 0x51).r // keyboard status
 	map(0x52, 0x52).w(FUNC(falco5220_state::rambank_w));
-//	map(0x54, 0x54).w // vram address (low)?
-//	map(0x55, 0x55).w // vram address (high)?
+//  map(0x54, 0x54).w // vram address (low)?
+//  map(0x55, 0x55).w // vram address (high)?
 	map(0x5a, 0x5a).w(FUNC(falco5220_state::unk5a_w)); // 5220s only?
 	map(0x60, 0x63).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x70, 0x73).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));

@@ -51,7 +51,7 @@ enum profile_type
 	PROFILER_INPUT,             // input.cpp and inptport.cpp
 	PROFILER_MOVIE_REC,         // movie recording
 	PROFILER_LOGERROR,          // logerror
-	PROFILER_LUA,				// LUA
+	PROFILER_LUA,               // LUA
 	PROFILER_EXTRA,             // everything else
 
 	// the USER types are available to driver writers to profile

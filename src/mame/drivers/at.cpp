@@ -11,7 +11,7 @@ Info: The PC 30-III and PC 40-III share the same mainboard. On a PC 30-III the o
 Form factor: Desktop PC
 CPU: Siemens SAB 80286-12 (PC 30-III), Intel 80286-12 (PC 40-III)
 RAM: 1MB on board
-Chipset: Faraday FE3020, MOS 5720 1788 41, Faraday FE3000, FE3010B, 
+Chipset: Faraday FE3020, MOS 5720 1788 41, Faraday FE3000, FE3010B,
 Bus: 3x16 bit ISA, 1x8 bit ISA
 Video: PC 30-III: ATI EGA Wonder 800+, PC 40-III: Onboard Paradise VGA, 256KB
 Mass storage: One HD disk drive standard, second drive optional; PC 30-III: 20MB, PC 40-III: 40MB AT-IDE HD standard, 80MB or 100MB optional
@@ -1102,7 +1102,7 @@ ROM_START( o286foxii)
 	ROM_REGION(0x20000, "bios", 0)
 	ROMX_LOAD( "286-fox2-even_32k.bin", 0x10000, 0x8000, CRC(54dc119f) SHA1(4bc543beef0d2201fa20eac90a0a6ca38ebf0dbf), ROM_SKIP(1))
 	ROMX_LOAD( "286-fox2-odd_32k.bin", 0x10001, 0x8000, CRC(e5db7775) SHA1(2bd0572b9f7c76eff51375b551586ca8484e2a74), ROM_SKIP(1))
-ROM_END	
+ROM_END
 
 
 ROM_START( atvga )

@@ -10,12 +10,12 @@
 	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 
 	<element name="ledr" defstate="0">
-		<disk state="0">	<color red="0.15" green="0.05" blue="0.05" />	</disk>
-		<disk state="1">	<color red="1" green="0.01" blue="0.15" />	</disk>
+		<disk state="0">    <color red="0.15" green="0.05" blue="0.05" />   </disk>
+		<disk state="1">    <color red="1" green="0.01" blue="0.15" />  </disk>
 	</element>
 	<element name="ledg" defstate="0">
-		<disk state="0">	<color red="0.05" green="0.15" blue="0.05" />	</disk>
-		<disk state="1">	<color red="0.1" green="1" blue="0.15" />	</disk>
+		<disk state="0">    <color red="0.05" green="0.15" blue="0.05" />   </disk>
+		<disk state="1">    <color red="0.1" green="1" blue="0.15" />   </disk>
 	</element>
 
 	<element name="hlb">

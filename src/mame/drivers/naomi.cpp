@@ -10838,7 +10838,7 @@ ROM_START( ggisuka )
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax1201f01.bin", 0, 4, CRC(325cf843) SHA1(c51d19a4fce37433f37e7ce23801a7fc4e09013d) )
 /*
-  Sammy AM3AHT/AWMPSYSTEM 
+  Sammy AM3AHT/AWMPSYSTEM
     4-cabinet splitter device, likely was used in GG Isuka, and maybe in 2-player AW-NET games too.
 
   Case contains 3x PCB stack:

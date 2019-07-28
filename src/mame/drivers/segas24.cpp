@@ -1587,8 +1587,8 @@ static INPUT_PORTS_START( sgmast )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Angle Right")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Stance")
 	/* For select the power shot rotate the stick from up-left (max power) to up (minimum power) and relese */
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_CUSTOM ) 
-	
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_CUSTOM )
+
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1625,8 +1625,8 @@ static INPUT_PORTS_START( sgmastj )
 	PORT_INCLUDE( sgmast )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
 	//"SW2:1" not divert from "sgmast"
@@ -2050,7 +2050,7 @@ void segas24_state::dcclubj(machine_config &config)
 	dcclub(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas24_state::dcclubj_cpu1_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::dcclubj_cpu2_map);
-	
+
 	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
 	upd4701.set_portx_tag("DIAL1");
 	upd4701.set_porty_tag("DIAL2");

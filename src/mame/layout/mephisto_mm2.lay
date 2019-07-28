@@ -484,54 +484,54 @@
 		<bezel element="black"><bounds x="89.5" y="105.1" width="1.3" height="1.3" /></bezel>
 		<bezel element="white"><bounds x="94.5" y="105.1" width="1.3" height="1.3" /></bezel>
 
-		<bezel element="keys" inputtag="KEY1_0" inputmask="0x80">	<!-- CL -->
+		<bezel element="keys" inputtag="KEY1_0" inputmask="0x80">   <!-- CL -->
 			<bounds x="69"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1_1" inputmask="0x80">	<!-- POS -->
+		<bezel element="keys" inputtag="KEY1_1" inputmask="0x80">   <!-- POS -->
 			<bounds x="74"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1_2" inputmask="0x80">	<!-- MEM -->
+		<bezel element="keys" inputtag="KEY1_2" inputmask="0x80">   <!-- MEM -->
 			<bounds x="79"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1_3" inputmask="0x80">	<!-- INFO -->
+		<bezel element="keys" inputtag="KEY1_3" inputmask="0x80">   <!-- INFO -->
 			<bounds x="84"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1_4" inputmask="0x80">	<!-- LEV -->
+		<bezel element="keys" inputtag="KEY1_4" inputmask="0x80">   <!-- LEV -->
 			<bounds x="89"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1_5" inputmask="0x80">	<!-- ENT -->
+		<bezel element="keys" inputtag="KEY1_5" inputmask="0x80">   <!-- ENT -->
 			<bounds x="94"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
 
-		<bezel element="keys" inputtag="KEY2_3" inputmask="0x80">	<!-- A1 -->
+		<bezel element="keys" inputtag="KEY2_3" inputmask="0x80">   <!-- A1 -->
 			<bounds x="69"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2_5" inputmask="0x80">	<!-- B2 -->
+		<bezel element="keys" inputtag="KEY2_5" inputmask="0x80">   <!-- B2 -->
 			<bounds x="74"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2_6" inputmask="0x80">	<!-- C3 -->
+		<bezel element="keys" inputtag="KEY2_6" inputmask="0x80">   <!-- C3 -->
 			<bounds x="79"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2_7" inputmask="0x80">	<!-- D4 -->
+		<bezel element="keys" inputtag="KEY2_7" inputmask="0x80">   <!-- D4 -->
 			<bounds x="84"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2_0" inputmask="0x80">	<!-- E5 -->
+		<bezel element="keys" inputtag="KEY2_0" inputmask="0x80">   <!-- E5 -->
 			<bounds x="89"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2_1" inputmask="0x80">	<!-- F6 -->
+		<bezel element="keys" inputtag="KEY2_1" inputmask="0x80">   <!-- F6 -->
 			<bounds x="94"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
 
-		<bezel element="keys" inputtag="KEY2_2" inputmask="0x80">	<!-- G7 -->
+		<bezel element="keys" inputtag="KEY2_2" inputmask="0x80">   <!-- G7 -->
 			<bounds x="79"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2_4" inputmask="0x80">	<!-- H8 -->
+		<bezel element="keys" inputtag="KEY2_4" inputmask="0x80">   <!-- H8 -->
 			<bounds x="84"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1_7" inputmask="0x80">	<!-- 9 -->
+		<bezel element="keys" inputtag="KEY1_7" inputmask="0x80">   <!-- 9 -->
 			<bounds x="89"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1_6" inputmask="0x80">	<!-- 0 -->
+		<bezel element="keys" inputtag="KEY1_6" inputmask="0x80">   <!-- 0 -->
 			<bounds x="94"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</bezel>
 	</group>

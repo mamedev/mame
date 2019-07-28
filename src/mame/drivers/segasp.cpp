@@ -598,7 +598,7 @@ ROM_START( dinoki4 )
 	DISK_IMAGE( "mda-c0061", 0, BAD_DUMP SHA1(d9e21aff3d33cc5d3d97decacf963cff23c60ff1) ) // BAD_DUMP note: actual game files is all good and genuine, but image itself was modified and not original.
 
 	ROM_PARAMETER( ":rom_board:id", "5502" )
-	
+
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, CRC(f77c49dc) SHA1(e10173bbbd5930ed159cec9a7dba308e2a3f3c43) )
 ROM_END

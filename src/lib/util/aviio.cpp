@@ -1731,9 +1731,9 @@ avi_file::error avi_file_impl::read_uncompressed_video_frame(std::uint32_t frame
 }
 
 /*-------------------------------------------------
-	read_video_frame - read video data for a
-	particular frame from the AVI file, converting
-	to YUY16 format
+    read_video_frame - read video data for a
+    particular frame from the AVI file, converting
+    to YUY16 format
 -------------------------------------------------*/
 
 avi_file::error avi_file_impl::read_video_frame(std::uint32_t framenum, bitmap_yuy16 &bitmap)

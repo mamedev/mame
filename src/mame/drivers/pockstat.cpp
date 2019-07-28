@@ -20,13 +20,13 @@
     Currently, a handful of games run, but some die due to odd hardware
     issues.
 
-	To start a game:
-	- Wait for the set-date screen to appear
-	- Press Down
-	- Set date with directional controls (optional)
-	- Press Button 1, wait, press Button 1, press Right, game starts
+    To start a game:
+    - Wait for the set-date screen to appear
+    - Press Down
+    - Set date with directional controls (optional)
+    - Press Button 1, wait, press Button 1, press Right, game starts
 
-	If you do nothing for about 20 secs, it turns itself off (screen goes white).
+    If you do nothing for about 20 secs, it turns itself off (screen goes white).
 
 ****************************************************************************/
 
@@ -41,19 +41,19 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_UNKNOWN	(1 << 0)
-#define LOG_FTLB	(1 << 1)
-#define LOG_IRQS	(1 << 2)
-#define LOG_INTC	(1 << 3)
-#define LOG_TIMER	(1 << 4)
-#define LOG_CLOCK	(1 << 5)
-#define LOG_RTC		(1 << 6)
-#define LOG_LCD		(1 << 7)
-#define LOG_AUDIO	(1 << 8)
-#define LOG_ALL		(LOG_UNKNOWN | LOG_FTLB | LOG_IRQS | LOG_INTC | LOG_TIMER | LOG_CLOCK | LOG_RTC | LOG_LCD | LOG_AUDIO)
-#define LOG_DEFAULT	LOG_ALL
+#define LOG_UNKNOWN (1 << 0)
+#define LOG_FTLB    (1 << 1)
+#define LOG_IRQS    (1 << 2)
+#define LOG_INTC    (1 << 3)
+#define LOG_TIMER   (1 << 4)
+#define LOG_CLOCK   (1 << 5)
+#define LOG_RTC     (1 << 6)
+#define LOG_LCD     (1 << 7)
+#define LOG_AUDIO   (1 << 8)
+#define LOG_ALL     (LOG_UNKNOWN | LOG_FTLB | LOG_IRQS | LOG_INTC | LOG_TIMER | LOG_CLOCK | LOG_RTC | LOG_LCD | LOG_AUDIO)
+#define LOG_DEFAULT LOG_ALL
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 class pockstat_state : public driver_device
