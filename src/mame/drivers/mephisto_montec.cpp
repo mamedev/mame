@@ -15,7 +15,6 @@
 
     TODO:
     - split driver into several files?
-    - verify mondial beeper frequency
     - why are megaiv/smondial2 beeps noisy?
 
 **************************************************************************************************/
@@ -575,7 +574,7 @@ void mephisto_montec_state::mondial(machine_config &config)
 
 	config.device_remove("dac");
 	config.device_remove("vref");
-	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	BEEP(config, m_beeper, 2048).add_route(ALL_OUTPUTS, "speaker", 0.25); // measured C7(2093Hz)
 }
 
 void mephisto_montec_state::smondial(machine_config &config)
