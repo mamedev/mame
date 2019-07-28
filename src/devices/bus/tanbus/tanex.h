@@ -75,7 +75,7 @@ private:
 	required_ioport m_config;
 
 	std::unique_ptr<uint8_t[]> m_ram;
-	emu_timer *m_read_cassette_timer;
+	//emu_timer *m_read_cassette_timer;
 };
 
 
