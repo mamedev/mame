@@ -17651,7 +17651,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Program"/>
-	<dataarea name="flop" size="143360">
+			<dataarea name="flop" size="143360">
 				<rom name="monstrous monsters (4am crack) disk 1 - program.dsk" size="143360" crc="4394ac67" sha1="b5a0303d21cd3a1ac4b9858e7bcdef0415e7d0ec" />
 			</dataarea>
 		</part>
