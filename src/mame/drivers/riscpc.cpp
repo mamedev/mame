@@ -8,8 +8,13 @@
     based on work by Tomasz Slanina and Tom Walker
 
     TODO:
-    - probably needs a full rewrite & merge with ssfindo.c
-
+	- Move device implementations into specific files;
+	- PS/2 keyboard doesn't work properly;
+	- i2c device should actually be a pcf8583 RTC with i2c as slave 
+	  (and indeed CMOS settings doesn't work);
+	- Fix pendingUnd fatalerror from ARM7 core
+	- Fix per-machine configurations;
+	
     ???
     bp (0382827C) (second trigger)
     do R13 = SR13
@@ -19,10 +24,14 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/i2cmem.h"
+#include "machine/at_keybc.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
+#include "debugger.h"
 
 class riscpc_state : public driver_device
 {
@@ -31,7 +40,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_i2cmem(*this, "i2cmem"),
+		m_kbdc(*this, "kbdc")
 	{ }
 
 	void rpc700(machine_config &config);
@@ -42,15 +53,21 @@ public:
 	void a7000p(machine_config &config);
 
 private:
+	void base_config(machine_config &config);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<i2cmem_device> m_i2cmem;
+	required_device<ps2_keyboard_controller_device> m_kbdc;
 
 	std::unique_ptr<uint32_t[]> m_vram;
 
 	DECLARE_READ32_MEMBER(a7000_iomd_r);
 	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
 	DECLARE_WRITE32_MEMBER(a7000_vidc20_w);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_reset);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_interrupt);
 
 	uint8_t m_vidc20_pal_index;
 	uint16_t m_vidc20_horz_reg[0x10];
@@ -61,8 +78,8 @@ private:
 	uint16_t m_timer_out[2];
 	int m_timer_counter[2];
 	emu_timer *m_IOMD_timer[2];
-	uint8_t m_IRQ_status_A;
-	uint8_t m_IRQ_mask_A;
+	uint8_t m_IRQ_status_A, m_IRQ_status_B;
+	uint8_t m_IRQ_mask_A, m_IRQ_mask_B;
 	uint8_t m_IOMD_IO_ctrl;
 	uint8_t m_IOMD_keyb_ctrl;
 	uint16_t m_io_id;
@@ -72,6 +89,7 @@ private:
 	uint32_t m_viddma_addr_end;
 	uint8_t m_t0readinc;
 	uint8_t m_t1readinc;
+	uint8_t m_i2c_clk;
 	void fire_iomd_timer(int timer);
 	void viddma_transfer_start();
 	void vidc20_dynamic_screen_change();
@@ -87,7 +105,7 @@ private:
 
 	void a7000_map(address_map &map);
 	void riscpc_map(address_map &map);
-
+	void update_irq();
 };
 
 
@@ -582,6 +600,10 @@ static const char *const iomd_regnames[] =
 #define IOMD_IRQRQA     0x014/4
 #define IOMD_IRQMSKA    0x018/4
 
+#define IOMD_IRQSTB     0x020/4
+#define IOMD_IRQRQB     0x024/4
+#define IOMD_IRQMSKB    0x028/4
+
 #define IOMD_T0LOW      0x040/4
 #define IOMD_T0HIGH     0x044/4
 #define IOMD_T0GO       0x048/4
@@ -604,6 +626,14 @@ static const char *const iomd_regnames[] =
 
 #define IOMD_DMARQ      0x1f4/4
 
+void riscpc_state::update_irq()
+{
+	if (m_IRQ_status_A & m_IRQ_mask_A)
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+	if (m_IRQ_status_B & m_IRQ_mask_B)
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
+}
+
 void riscpc_state::fire_iomd_timer(int timer)
 {
 	int timer_count = m_timer_counter[timer];
@@ -618,28 +648,19 @@ void riscpc_state::fire_iomd_timer(int timer)
 TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer0_callback)
 {
 	m_IRQ_status_A|=0x20;
-	if(m_IRQ_mask_A&0x20)
-	{
-		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
-	}
+	update_irq();
 }
 
 TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer1_callback)
 {
 	m_IRQ_status_A|=0x40;
-	if(m_IRQ_mask_A&0x40)
-	{
-		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
-	}
+	update_irq();
 }
 
 TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 {
 	m_IRQ_status_A|=0x08;
-	if(m_IRQ_mask_A&0x08)
-	{
-		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
-	}
+	update_irq();
 
 	// for convenience lets just implement the video DMA transfer here
 	// the actual transfer probably works per scanline once enabled.
@@ -652,7 +673,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 void riscpc_state::viddma_transfer_start()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	uint32_t src = m_viddma_addr_start;
+	uint32_t src = m_viddma_addr_init;
 	uint32_t dst = 0;
 	uint32_t size = m_viddma_addr_end;
 	uint32_t dma_index;
@@ -663,6 +684,7 @@ void riscpc_state::viddma_transfer_start()
 		m_vram[dst] = mem.read_dword(src);
 
 		src+=4;
+		// TODO: honor boundary
 		dst++;
 	}
 }
@@ -683,23 +705,28 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 			vert_pos = m_screen->vpos();
 			flyback = (vert_pos <= m_vidc20_vert_reg[VDSR] || vert_pos >= m_vidc20_vert_reg[VDER]) ? 0x80 : 0x00;
 
-			return m_IOMD_IO_ctrl | 0x34 | flyback;
+			return flyback | (m_IOMD_IO_ctrl & 0x7c) | 0x34 | (m_i2c_clk << 1) | (m_i2cmem->read_sda() ? 1 : 0);
 		}
-		case IOMD_KBDCR:    return m_IOMD_keyb_ctrl | 0x80; //IOMD Keyb status
+		case IOMD_KBDDAT:   return m_kbdc->data_r();
+		case IOMD_KBDCR:    return m_kbdc->status_r();
 
 		/*
-		1--- ---- always high
-		-x-- ---- Timer 1
-		--x- ---- Timer 0
-		---x ---- Power On Reset
-		---- x--- Flyback
-		---- -x-- nINT1
-		---- --0- always low
-		---- ---x INT2
+			1--- ---- always high (force)
+			-x-- ---- Timer 1
+			--x- ---- Timer 0
+			---x ---- Power On Reset
+			---- x--- Flyback
+			---- -x-- nINT1
+			---- --0- always low
+			---- ---x INT2
 		*/
-		case IOMD_IRQSTA:   return (m_IRQ_status_A & ~2) | 0x80;
-		case IOMD_IRQRQA:   return (m_IRQ_status_A & m_IRQ_mask_A) | 0x80;
+		case IOMD_IRQSTA:   return (m_IRQ_status_A & 0x7d) | 0x80;
+		case IOMD_IRQRQA:   return (m_IRQ_status_A & m_IRQ_mask_A);
 		case IOMD_IRQMSKA:  return m_IRQ_mask_A;
+
+		case IOMD_IRQSTB:   return m_IRQ_status_B;
+		case IOMD_IRQRQB:   return (m_IRQ_status_B & m_IRQ_mask_B);
+		case IOMD_IRQMSKB:  return m_IRQ_mask_B;
 
 		case IOMD_T0LOW:    return m_timer_out[0] & 0xff;
 		case IOMD_T0HIGH:   return (m_timer_out[0] >> 8) & 0xff;
@@ -713,7 +740,7 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 
 		case IOMD_VIDEND:   return m_viddma_addr_end & 0x00fffff8; //bits 31:24 undefined
 		case IOMD_VIDSTART: return m_viddma_addr_start & 0x1ffffff8; //bits 31, 30, 29 undefined
-		case IOMD_VIDINIT:  return m_viddma_addr_init & 0xfffffff8;
+		case IOMD_VIDINIT:  return m_viddma_addr_init & 0x1ffffff8;
 		case IOMD_VIDCR:    return (m_viddma_status & 0xa0) | 0x50; //bit 6 = DRAM mode, bit 4 = QWORD transfer
 
 		default:    logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4); break;
@@ -728,15 +755,40 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 
 	switch(offset)
 	{
-		case IOMD_IOCR:     m_IOMD_IO_ctrl = data & ~0xf4; break;
-
-		case IOMD_KBDCR:
-			m_IOMD_keyb_ctrl = data & ~0xf4;
-			//keyboard_ctrl_write(data & 0x08);
+		case IOMD_IOCR: 
+			m_IOMD_IO_ctrl = data & 0x7c;
+			m_i2cmem->write_sda(data & 0x01);
+			m_i2c_clk = (data & 2) >> 1;
+			m_i2cmem->write_scl(m_i2c_clk);
 			break;
 
-		case IOMD_IRQRQA:   m_IRQ_status_A &= ~data; break;
-		case IOMD_IRQMSKA:  m_IRQ_mask_A = (data & ~2) | 0x80; break;
+		case IOMD_KBDDAT: m_kbdc->data_w(data); break;
+		case IOMD_KBDCR:  m_kbdc->command_w(data); 
+			//m_IRQ_status_B |= 0x40;
+			//machine().debug_break();
+			//update_irq();
+			break;
+
+		case IOMD_IRQRQA:   
+			m_IRQ_status_A &= ~data;
+			m_IRQ_status_A |= 0x80;
+			update_irq();
+			break;
+			
+		case IOMD_IRQMSKA:  
+			m_IRQ_mask_A = data; 
+			update_irq();
+			break;
+
+		case IOMD_IRQRQB:
+			m_IRQ_status_B &= ~data;
+			update_irq();
+			break;
+			
+		case IOMD_IRQMSKB:  
+			m_IRQ_mask_B = data; 
+			update_irq();
+			break;
 
 		case IOMD_T0LOW:    m_timer_in[0] = (m_timer_in[0] & 0xff00) | (data & 0xff); break;
 		case IOMD_T0HIGH:   m_timer_in[0] = (m_timer_in[0] & 0x00ff) | ((data & 0xff) << 8); break;
@@ -780,7 +832,7 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 			break;
 		case IOMD_VIDSTART: m_viddma_addr_start = data & 0x1ffffff8; //bits 31, 30, 29 unused
 			break;
-		case IOMD_VIDINIT:  m_viddma_addr_init = data & 0xfffffff0;
+		case IOMD_VIDINIT:  m_viddma_addr_init = data & 0x1ffffff8;
 			break;
 		case IOMD_VIDCR:
 			m_viddma_status = data & 0xa0; if(data & 0x20) { viddma_transfer_start(); }
@@ -804,7 +856,7 @@ void riscpc_state::a7000_map(address_map &map)
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
 	map(0x03200000, 0x032001ff).rw(FUNC(riscpc_state::a7000_iomd_r), FUNC(riscpc_state::a7000_iomd_w)); //IOMD Registers //mirrored at 0x03000000-0x1ff?
-//  AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
+	map(0x03310000, 0x03310003).portr("MOUSE");
 
 	map(0x03400000, 0x037fffff).w(FUNC(riscpc_state::a7000_vidc20_w));
 //  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
@@ -823,6 +875,25 @@ void riscpc_state::riscpc_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( a7000 )
+//	PORT_INCLUDE( at_keyboard )
+
+	PORT_START("MOUSE")
+	// for debugging we leave video and sound HWs as options, eventually slotify them
+	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "VGA" )
+	PORT_CONFSETTING(    0x01, "TV Screen" )
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)
+	// TODO: understand condition where this occurs
+	PORT_CONFNAME( 0x80, 0x00, "CMOS Reset bit" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
+	PORT_CONFNAME( 0x100, 0x000, "Sound HW" )
+	PORT_CONFSETTING(    0x000, "16-bit" )
+	PORT_CONFSETTING(    0x100, "8-bit" )
+	PORT_BIT(0xfffffe00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 void riscpc_state::machine_start()
@@ -836,16 +907,73 @@ void riscpc_state::machine_start()
 
 void riscpc_state::machine_reset()
 {
-	m_IOMD_IO_ctrl = 0x0b | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
+	m_IOMD_IO_ctrl = 0x08 | 0x34; //bit 0,1 and 3 set high on reset plus 2,4,5 always high
 	// TODO: jumps to EASI space at $0c0016xx with this on!?
 //  m_IRQ_status_A = 0x10; // set POR bit ON
 	m_IRQ_mask_A = 0x00;
 
 	m_IOMD_keyb_ctrl = 0x00;
 
-	m_IOMD_timer[0]->adjust( attotime::never);
-	m_IOMD_timer[1]->adjust( attotime::never);
-	m_flyback_timer->adjust( attotime::never);
+	m_IOMD_timer[0]->adjust(attotime::never);
+	m_IOMD_timer[1]->adjust(attotime::never);
+	m_flyback_timer->adjust(attotime::never);
+}
+
+WRITE_LINE_MEMBER(riscpc_state::keyboard_reset)
+{
+	printf("RST %d\n",state);
+}
+
+WRITE_LINE_MEMBER(riscpc_state::keyboard_interrupt)
+{
+	printf("IRQ %d\n",state);
+	if (!state)
+		return;
+	
+//	machine().debug_break();
+	m_IRQ_status_B|=0x80;
+	update_irq();
+}
+
+
+void riscpc_state::base_config(machine_config &config)
+{
+	I2C_24C02(config, m_i2cmem);
+
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+
+	// TODO: verify type
+	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101));
+	kbd.set_pc_kbdc_slot(&kbd_con);
+
+	// auxiliary connector
+//	pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+//	aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+//	aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+
+	// auxiliary port
+//	pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
+//	aux.set_pc_kbdc_slot(&aux_con);
+
+	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
+	m_kbdc->hot_res().set(FUNC(riscpc_state::keyboard_reset));
+	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_irq().set(FUNC(riscpc_state::keyboard_interrupt));
+//	m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+//	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
+//	m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(1900, 1080); //max available size
+	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
+	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
+	PALETTE(config, m_palette).set_entries(0x200);
 }
 
 void riscpc_state::rpc600(machine_config &config)
@@ -853,15 +981,7 @@ void riscpc_state::rpc600(machine_config &config)
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, 60_MHz_XTAL/2); // ARM610
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(1900, 1080); //max available size
-	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
-	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
-	PALETTE(config, m_palette).set_entries(0x200);
+	base_config(config);
 }
 
 void riscpc_state::rpc700(machine_config &config)
@@ -869,15 +989,7 @@ void riscpc_state::rpc700(machine_config &config)
 	/* Basic machine hardware */
 	ARM710A(config, m_maincpu, 80_MHz_XTAL/2); // ARM710
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(1900, 1080); //max available size
-	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
-	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
-	PALETTE(config, m_palette).set_entries(0x200);
+	base_config(config);
 }
 
 void riscpc_state::a7000(machine_config &config)
@@ -885,15 +997,7 @@ void riscpc_state::a7000(machine_config &config)
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, XTAL(32'000'000)); // ARM7500
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::a7000_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(1900, 1080); //max available size
-	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
-	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
-	PALETTE(config, m_palette).set_entries(0x200);
+	base_config(config);
 }
 
 void riscpc_state::a7000p(machine_config &config)
@@ -907,15 +1011,7 @@ void riscpc_state::sarpc(machine_config &config)
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, 202000000); // StrongARM
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(1900, 1080); //max available size
-	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
-	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
-	PALETTE(config, m_palette).set_entries(0x200);
+	base_config(config);
 }
 
 void riscpc_state::sarpc_j233(machine_config &config)
@@ -923,15 +1019,7 @@ void riscpc_state::sarpc_j233(machine_config &config)
 	/* Basic machine hardware */
 	ARM7(config, m_maincpu, 233000000); // StrongARM
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(1900, 1080); //max available size
-	m_screen->set_visarea(0, 1900-1, 0, 1080-1);
-	m_screen->set_screen_update(FUNC(riscpc_state::screen_update));
-	PALETTE(config, m_palette).set_entries(0x200);
+	base_config(config);
 }
 
 ROM_START(rpc600)
