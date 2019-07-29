@@ -61,7 +61,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	{
 		for (int i = 0; i < length; i++)
 		{
-			address_space& mem = m_cpu->space(AS_PROGRAM);
+			address_space &mem = this->space(AS_PROGRAM);
 			uint16_t val = mem.read_word(source);
 			mem.write_word(dest, val);
 			dest += 1;
@@ -71,7 +71,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	{
 		for (int i = 0; i < length; i++)
 		{
-			address_space& mem = m_cpu->space(AS_PROGRAM);
+			address_space &mem = this->space(AS_PROGRAM);
 			uint16_t val = mem.read_word(source);
 			mem.write_word(dest, val);
 			dest += 1;
@@ -230,7 +230,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unk_w)
 	}
 }
 
-void sunplus_gcm394_base_device::map(address_map &map)
+void sunplus_gcm394_base_device::internal_map(address_map &map)
 {
 	map(0x000000, 0x006fff).ram();
 	map(0x007000, 0x007fff).rw(FUNC(sunplus_gcm394_base_device::unk_r), FUNC(sunplus_gcm394_base_device::unk_w)); // catch unhandled
@@ -389,6 +389,8 @@ void sunplus_gcm394_base_device::map(address_map &map)
 
 void sunplus_gcm394_base_device::device_start()
 {
+	unsp_20_device::device_start();
+
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 
@@ -398,6 +400,8 @@ void sunplus_gcm394_base_device::device_start()
 
 void sunplus_gcm394_base_device::device_reset()
 {
+	unsp_20_device::device_reset();
+
 	for (int i = 0; i < 7; i++)
 	{
 		m_dma_params[i] = 0x0000;
@@ -477,9 +481,9 @@ void sunplus_gcm394_base_device::device_reset()
 void sunplus_gcm394_base_device::checkirq6()
 {
 	if (m_7935 & 0x0100)
-		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 	else
-		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
 }
 
 void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -498,12 +502,12 @@ void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id 
 
 WRITE_LINE_MEMBER(sunplus_gcm394_base_device::audioirq_w)
 {
-	//m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, state);
+	//set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
 WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 {
-	m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, state);
+	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
@@ -522,7 +526,7 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 
-	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), m_cpu, m_screen);
+	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
 	m_spg_video->space_read_callback().set(FUNC(sunplus_gcm394_base_device::read_space));
 }

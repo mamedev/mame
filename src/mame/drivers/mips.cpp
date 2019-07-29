@@ -42,10 +42,6 @@
  *   http://www.prumpleffer.de/~miod/machineroom/machines/mips/magnum/index.html
  *   https://web.archive.org/web/20140518203135/http://no-l.org/pages/riscos.html
  *
- * TODO (rx2030)
- *   - keyboard controller and keyboard
- *   - buzzer
- *
  * TODO (rx3230)
  *   - verify/complete address maps
  *   - keyboard controller and interrupts
@@ -312,10 +308,17 @@ void rx2030_state::iop_io_map(address_map &map)
 
 	map(0x0080, 0x0083).rw(m_scsi, FUNC(aic6250_device::read), FUNC(aic6250_device::write)).umask16(0xff);
 
-	map(0x00c0, 0x00c1).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask16(0xff);
+	/*
+	 * HACK: Substitute the keyboard "set defaults" command for the "reset"
+	 * command to avoid an issue where the keyboard is still busy performing
+	 * the reset and does not accept commands being sent to it to change the
+	 * scan code set. Possibly caused by imperfect V50 timing and/or memory
+	 * wait states that make the IOP code execute more slowly than emulated.
+	 */
+	map(0x00c0, 0x00c1).lrw8("kbdc_data", [this]() { return m_kbdc->data_r(); }, [this](u8 data) { m_kbdc->data_w(data == 0xff ? 0xf6 : data); }).umask16(0xff);
 	map(0x00c4, 0x00c5).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask16(0xff);
 
-	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff);
+	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff);
 
 	map(0x0140, 0x0143).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
@@ -532,18 +535,20 @@ void rx2030_state::rx2030(machine_config &config)
 	Z8038(config, m_fio, 0);
 	m_fio->out_int_cb<1>().set_inputline(m_iop, INPUT_LINE_IRQ4);
 
-	// keyboard
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	kbd_con.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	kbd_con.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
+	// keyboard port
 	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
-	m_kbd->set_pc_kbdc_slot(&kbdc);
+	m_kbd->set_pc_kbdc_slot(&kbd_con);
 
+	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
 	//m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->set_default_bios_tag("award15");
 
 	SCC85C30(config, m_scc, 1.8432_MHz_XTAL);
@@ -672,7 +677,7 @@ void rx3230_state::rx3230_map(address_map &map)
 	map(0x19000004, 0x19000007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask32(0xff);
 	map(0x19800000, 0x19800003).lr8("int_reg", [this]() { return m_int_reg; }).umask32(0xff);
 	map(0x1a000000, 0x1a000007).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff);
-	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff); // TODO: order?
+	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff); // TODO: order?
 
 	map(0x1c000000, 0x1c000fff).m(m_rambo, FUNC(mips_rambo_device::map));
 
@@ -842,17 +847,19 @@ void rx3230_state::rx3230(machine_config &config)
 	//m_fdc->drq_wr_callback().set();
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
 
-	// keyboard
-	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
-	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+	// keyboard connector
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	kbd_con.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	kbd_con.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
+	// keyboard port
 	PC_KBDC_SLOT(config, m_kbd, pc_at_keyboards, nullptr);
-	m_kbd->set_pc_kbdc_slot(&kbdc);
+	m_kbd->set_pc_kbdc_slot(&kbd_con);
 
+	// keyboard controller
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
-	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	//m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
 
 	// buzzer
@@ -1024,7 +1031,7 @@ ROM_END
 #define rom_rs3230 rom_rx3230
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME       FLAGS */
-COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030",      MACHINE_NOT_WORKING)
-COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030",      MACHINE_NOT_WORKING)
+COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030",      0)
+COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030",      0)
 COMP(1990,  rc3230,    0,      0,      rc3230,    0,     rx3230_state, rx3230_init, "MIPS",  "RC3230",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP(1990,  rs3230,    0,      0,      rs3230,    0,     rx3230_state, rx3230_init, "MIPS",  "Magnum 3000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

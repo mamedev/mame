@@ -66,7 +66,7 @@ Place for 4 8 switch dips
 dips 1 & 3 are all connected via resistors
 dips 2 & 4 are standard 8 switch dips
 
-EEPROM       Label         Use
+EPROM        Label         Use
 ----------------------------------------
 ST M27C1001  bmc_8ex.bin - 68K code 0x00
 ST M27C1001  bmc_7ex.bin - 68K code 0x01
@@ -337,7 +337,7 @@ void bmcbowl_state::main_mem(address_map &map)
 	map(0x091000, 0x091001).nopw();
 	map(0x091800, 0x091801).w(FUNC(bmcbowl_state::scroll_w));
 
-	map(0x092000, 0x09201f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x092000, 0x09201f).m("via6522_0", FUNC(via6522_device::map)).umask16(0x00ff);
 
 	map(0x093000, 0x093003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x092800, 0x092803).w("aysnd", FUNC(ay8910_device::data_address_w)).umask16(0xff00);

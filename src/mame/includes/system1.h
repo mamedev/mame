@@ -104,7 +104,6 @@ public:
 	void init_tokisens();
 	void init_bootsys2();
 	void init_bootsys2d();
-	void init_choplift();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);

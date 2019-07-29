@@ -251,7 +251,7 @@ READ8_MEMBER(a2bus_mouse_device::mcu_port_a_r)
 
 WRITE8_MEMBER(a2bus_mouse_device::mcu_port_a_w)
 {
-	m_pia->set_a_input(data, ~mem_mask);
+	m_pia->set_a_input(data);
 }
 
 READ8_MEMBER(a2bus_mouse_device::mcu_port_b_r)

@@ -99,7 +99,8 @@ class LayoutChecker(Minifyer):
     SHAPES = frozenset(('disk', 'dotmatrix', 'dotmatrix5dot', 'dotmatrixdot', 'led14seg', 'led14segsc', 'led16seg', 'led16segsc', 'led7seg', 'led8seg_gts1', 'rect'))
     OBJECTS = frozenset(('backdrop', 'bezel', 'cpanel', 'marquee', 'overlay'))
     ORIENTATIONS = frozenset((0, 90, 180, 270))
-    YESNO = frozenset(("yes", "no"))
+    YESNO = frozenset(('yes', 'no'))
+    BLENDMODES = frozenset(('none', 'alpha', 'multiply', 'add'))
 
     def __init__(self, output, **kwargs):
         super(LayoutChecker, self).__init__(output=output, **kwargs)
@@ -445,11 +446,14 @@ class LayoutChecker(Minifyer):
         self.handlers.pop()
 
     def groupViewStartHandler(self, name, attrs):
-        if name in self.OBJECTS:
-            if 'element' not in attrs:
-                self.handleError('Element %s missing attribute element' % (name, ))
-            elif attrs['element'] not in self.referenced_elements:
-                self.referenced_elements[attrs['element']] = self.formatLocation()
+        if (name in self.OBJECTS) or ('element' == name):
+            refattr = 'ref' if 'element' == name else 'element'
+            if refattr not in attrs:
+                self.handleError('Element %s missing attribute %s' % (name, refattr))
+            elif attrs[refattr] not in self.referenced_elements:
+                self.referenced_elements[attrs[refattr]] = self.formatLocation()
+            if ('blend' in attrs) and (attrs['blend'] not in self.BLENDMODES) and not self.VARPATTERN.match(attrs['blend']):
+                self.handleError('Element %s attribute blend "%s" is unsupported' % (name, attrs['blend']))
             if 'inputtag' in attrs:
                 if 'inputmask' not in attrs:
                     self.handleError('Element %s has inputtag attribute without inputmask attribute' % (name, ))

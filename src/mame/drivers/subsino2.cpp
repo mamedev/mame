@@ -31,7 +31,7 @@ Year  Game                CPU         Sound            Custom                   
 
 To do:
 
-- Implement serial communication (used for protection).
+- Implement serial communication, remove patches (used for protection).
 - Add sound to SS9804/SS9904 games.
 - ptrain: missing scroll in race screens.
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
@@ -98,6 +98,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_hopper(*this, "hopper")
+		, m_ticket(*this, "ticket")
 		, m_keyb(*this, "KEYB_%u", 0U)
 		, m_dsw(*this, "DSW%u", 1U)
 		, m_system(*this, "SYSTEM")
@@ -112,6 +113,7 @@ public:
 	void expcard(machine_config &config);
 	void xplan(machine_config &config);
 	void xtrain(machine_config &config);
+	void ptrain(machine_config &config);
 
 	void init_bishjan();
 	void init_new2001();
@@ -119,13 +121,19 @@ public:
 	void init_queenbeeb();
 	void init_humlan();
 	void init_squeenb();
+	void init_qbeebing();
+	void init_treamary();
 	void init_xtrain();
 	void init_expcard();
 	void init_wtrnymph();
 	void init_mtrain();
+	void init_strain();
+	void init_tbonusal();
 	void init_saklove();
 	void init_xplan();
 	void init_ptrain();
+	void init_treacity();
+	void init_treacity202();
 
 private:
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
@@ -178,6 +186,7 @@ private:
 	DECLARE_WRITE8_MEMBER(saklove_outputs_w);
 	DECLARE_WRITE8_MEMBER(xplan_outputs_w);
 	DECLARE_WRITE8_MEMBER(xtrain_outputs_w);
+	DECLARE_READ8_MEMBER(xtrain_subsino_r);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit0_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
 
@@ -224,6 +233,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_ticket;
 	optional_ioport_array<5> m_keyb;
 	optional_ioport_array<4> m_dsw;
 	optional_ioport m_system;
@@ -1258,7 +1268,7 @@ READ8_MEMBER(subsino2_state::mtrain_prot_r)
 
 void subsino2_state::mtrain_map(address_map &map)
 {
-	map(0x00000, 0x06fff).rom();
+	map(0x00000, 0x077ff).rom();
 
 	map(0x07800, 0x07fff).ram().share("nvram");   // battery
 
@@ -1501,10 +1511,14 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 	switch (offset)
 	{
 		case 0: // D
+			m_hopper->motor_w(BIT(data, 2));
 			// 0x40 = serial out ? (at boot)
 			break;
 
 		case 1: // C
+			if (m_ticket.found())
+				m_ticket->motor_w(BIT(data, 0));
+
 			m_leds[0] = BIT(data, 1);   // re-double
 			m_leds[1] = BIT(data, 2);   // half double
 			break;
@@ -1518,14 +1532,22 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 
 		case 3: // A
-			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
-			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
+			machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // key in
+			machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // hopper out
+			machine().bookkeeping().coin_counter_w(3, BIT(data, 3)); // ticket out
 
 			m_leds[7] = BIT(data, 4);   // start
 			break;
 	}
 
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+}
+
+READ8_MEMBER(subsino2_state::xtrain_subsino_r)
+{
+	static const char data[] = { "SUBSINO" };
+	return data[offset];
 }
 
 void subsino2_state::expcard_io(address_map &map)
@@ -1542,6 +1564,7 @@ void subsino2_state::xtrain_io(address_map &map)
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	map(0x0306, 0x0309).w(FUNC(subsino2_state::xtrain_outputs_w)).share("outputs");
+	map(0x0313, 0x0319).r(FUNC(subsino2_state::xtrain_subsino_r));
 }
 
 
@@ -1555,9 +1578,9 @@ static const gfx_layout ss9601_8x8_layout =
 	RGN_FRAC(1,1),
 	8,
 	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
+	{ 0, 16, 8, 24, 32, 48, 40, 56 },
+	{ STEP8(0,8 * 8) },
+	8 * 8 * 8
 };
 
 static GFXDECODE_START( gfx_ss9601 )
@@ -1971,6 +1994,306 @@ static INPUT_PORTS_START( mtrain )
 INPUT_PORTS_END
 
 /***************************************************************************
+                          Super Train
+***************************************************************************/
+
+static INPUT_PORTS_START( strain ) // inputs need verifying
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )                  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )                  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )                  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4" )                  PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Show Demo" )      PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START      ) PORT_CODE(KEYCODE_N)    PORT_NAME("Start All")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Stop All")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER      ) PORT_CODE(KEYCODE_Z)    PORT_NAME("Info / Double?")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+
+	PORT_START("IN B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) PORT_IMPULSE(5)          // key in
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1         )                          // coin in
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   )  // stats
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE       )  // service mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout (hopper error)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
+
+	PORT_START("IN C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+
+	PORT_START("IN D")  // not shown in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
+INPUT_PORTS_END
+
+/***************************************************************************
+                          Treasure Bonus
+***************************************************************************/
+
+static INPUT_PORTS_START( tbonusal ) // inputs need verifying
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )                  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )                  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )                  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4" )                  PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START      ) PORT_CODE(KEYCODE_N)    PORT_NAME("Start All")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Stop All")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER      ) PORT_CODE(KEYCODE_Z)    PORT_NAME("Info / Double?")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+
+	PORT_START("IN B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) PORT_IMPULSE(5)          // key in
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1         )                          // coin in
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   )  // stats
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE       )  // service mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout (hopper error)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
+
+	PORT_START("IN C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+
+	PORT_START("IN D")  // not shown in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
+INPUT_PORTS_END
+
+/***************************************************************************
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
@@ -2059,6 +2382,156 @@ static INPUT_PORTS_START( saklove )
 	PORT_DIPNAME( 0x80, 0x00, "JAMMA" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Bet 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_NAME("Bet 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3  ) PORT_NAME("Bet 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1   ) PORT_NAME("Play")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5  ) PORT_NAME("Big or Small 1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4  ) PORT_NAME("Bet Amount")   // 1-5-10
+
+	PORT_START("IN B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2   )           // selects music in system test / exit
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )  // top 10? / double up?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6  ) PORT_NAME("Big or Small 2")   // plays sample or advances music in system test / big or small?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
+
+	PORT_START("IN C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Statistics")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    )   // key in
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_IMPULSE(2)   // service mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // used?
+
+	PORT_START("IN D")  // bits 3 and 4 shown in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // used?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+INPUT_PORTS_END
+
+/***************************************************************************
+                             Treasure City
+***************************************************************************/
+
+static INPUT_PORTS_START( treacity )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )                  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )                  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )                  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "DSW4" )                  PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Bet 1")
@@ -2195,45 +2668,53 @@ static INPUT_PORTS_START( xtrain )
 
 	// JAMMA inputs:
 	PORT_START("IN A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Re-Double") PORT_CODE(KEYCODE_N)  // re-double
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF   ) PORT_NAME("Half Double")             // half double
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")                   // start
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")          // hold 3 / small / decrease sample in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET    ) PORT_NAME("Bet")                     // bet
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)       PORT_NAME("Re-Double") PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HALF) PORT_NAME("Half Double")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1)      PORT_NAME("Start")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3) PORT_NAME("Hold 3 / Small")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET)  PORT_NAME("Bet")
 
 	PORT_START("IN B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take" )          // hold 1 / take
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")        // double up / help
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Big")            // hold 2 / big / increase sample in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1         )                                      // coin in
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1) PORT_NAME("Hold 1 / Take" )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP) PORT_NAME("Double Up / Help")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD2) PORT_NAME("Hold 2 / Big")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN1)       PORT_NAME("Coin In")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_START("IN C")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   )                                      // stats (keep pressed during boot for service mode)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )                                      // key in
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE       )  PORT_IMPULSE(1)                     // service mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                      // pay-out
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK) // keep pressed during boot for service mode
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
 
 	PORT_START("IN D")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) // reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM       )                                      // serial in?
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_CUSTOM)  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)   PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) // serial in?
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( ptrain )
+	PORT_INCLUDE(xtrain)
+
+	PORT_MODIFY("IN B")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                Water-Nymph
@@ -2553,6 +3034,15 @@ void subsino2_state::xtrain(machine_config &config)
 {
 	xplan(config);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xtrain_io);
+
+	HOPPER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+}
+
+void subsino2_state::ptrain(machine_config &config)
+{
+	xtrain(config);
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 
 void subsino2_state::expcard(machine_config &config)
@@ -2618,8 +3108,8 @@ ROM_START( bishjan )
 
 	ROM_REGION( 0x400000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "3-v201.u25", 0x000000, 0x100000, CRC(e013e647) SHA1(a5b0f82f3454393c1ea5e635b0d37735a25e2ea5) )
-	ROM_LOAD32_BYTE( "4-v201.u26", 0x000001, 0x100000, CRC(e0d40ef1) SHA1(95f80889103a7b93080b46387274cb1ffe0c8768) )
-	ROM_LOAD32_BYTE( "5-v201.u27", 0x000002, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) )
+	ROM_LOAD32_BYTE( "4-v201.u26", 0x000002, 0x100000, CRC(e0d40ef1) SHA1(95f80889103a7b93080b46387274cb1ffe0c8768) )
+	ROM_LOAD32_BYTE( "5-v201.u27", 0x000001, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) )
 	ROM_LOAD32_BYTE( "6-v201.u28", 0x000003, 0x100000, CRC(430bd9d7) SHA1(dadf5a7eb90cf2dc20f97dbf20a4b6c8e7734fb1) )
 
 	ROM_REGION( 0x100000, "samples", 0 )    // SS9904
@@ -2688,8 +3178,8 @@ ROM_START( new2001 )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "new_2001_italy_3_v200.0.u25", 0x00000, 0x40000, CRC(621452d6) SHA1(a9654bb98df16b13e8bbc6dd4dada2e63ee05dc9) )
-	ROM_LOAD32_BYTE( "new_2001_italy_4_v200.1.u26", 0x00001, 0x40000, CRC(3073e2d2) SHA1(fb257c625e177d7aa12f1b176a3d1b93d5891cab) )
-	ROM_LOAD32_BYTE( "new_2001_italy_5_v200.2.u27", 0x00002, 0x40000, CRC(d028696b) SHA1(ebb047e7cafaefbdeb479c3877aea4fce0c47ad2) )
+	ROM_LOAD32_BYTE( "new_2001_italy_4_v200.1.u26", 0x00002, 0x40000, CRC(3073e2d2) SHA1(fb257c625e177d7aa12f1b176a3d1b93d5891cab) )
+	ROM_LOAD32_BYTE( "new_2001_italy_5_v200.2.u27", 0x00001, 0x40000, CRC(d028696b) SHA1(ebb047e7cafaefbdeb479c3877aea4fce0c47ad2) )
 	ROM_LOAD32_BYTE( "new_2001_italy_6_v200.3.u28", 0x00003, 0x40000, CRC(085599e3) SHA1(afd4bed369a96ba12037e6b8cf3a4cab84d12b21) )
 
 	ROM_REGION( 0x80000, "samples", 0 )    // SS9904
@@ -2724,8 +3214,8 @@ ROM_START( queenbee )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "27c4001 u25.bin", 0x000000, 0x80000, CRC(628ed650) SHA1(dadbc5f73f6a5773303d834a44d2eab836874cfe) )
-	ROM_LOAD32_BYTE( "27c4001 u26.bin", 0x000001, 0x80000, CRC(27a169df) SHA1(d36989c300051a0c41752638ab5134a9b04c50a4) )
-	ROM_LOAD32_BYTE( "27c4001 u27.bin", 0x000002, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
+	ROM_LOAD32_BYTE( "27c4001 u26.bin", 0x000002, 0x80000, CRC(27a169df) SHA1(d36989c300051a0c41752638ab5134a9b04c50a4) )
+	ROM_LOAD32_BYTE( "27c4001 u27.bin", 0x000001, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
 	ROM_LOAD32_BYTE( "27c4001 u28.bin", 0x000003, 0x80000, CRC(7f139a04) SHA1(595a114806756e6f77a6fe20a13515b211ffdf2a) )
 
 	ROM_REGION( 0x80000, "samples", 0 )
@@ -2753,8 +3243,8 @@ ROM_START( queenbeeb )
 	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
 	// following ROMs are taken from humlan for testing, it doesn't seem to be a case of just differently split ROMs.
 	// ROM_LOAD32_BYTE( "hlj__truemax_3_v402.u25", 0x000000, 0x80000, CRC(dfc8d795) SHA1(93e0fe271c7390596f73092720befe11d8354838) )
-	// ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000001, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
-	// ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000002, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000002, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000001, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
 	// ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
 
 	ROM_REGION( 0x40000, "samples", 0 )
@@ -2821,8 +3311,8 @@ ROM_START( humlan )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "hlj__truemax_3_v402.u25", 0x000000, 0x80000, CRC(dfc8d795) SHA1(93e0fe271c7390596f73092720befe11d8354838) )
-	ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000001, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
-	ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000002, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
+	ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000002, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
+	ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000001, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
 	ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
 
 	ROM_REGION( 0x40000, "samples", 0 )    // SS9804
@@ -2858,8 +3348,8 @@ ROM_START( squeenb )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "u25", 0x000000, 0x80000, CRC(842c0a33) SHA1(defb79c158d5091ca8830e9f03dda382d03d51ef) )
-	ROM_LOAD32_BYTE( "u26", 0x000001, 0x80000, CRC(11b67abb) SHA1(e388e3aefbcceda1390c00e6590cbdd686982b2e) )
-	ROM_LOAD32_BYTE( "u27", 0x000002, 0x80000, CRC(d713131a) SHA1(74a95e1ef0d30da53a91a5232574687f816df2eb) )
+	ROM_LOAD32_BYTE( "u26", 0x000002, 0x80000, CRC(11b67abb) SHA1(e388e3aefbcceda1390c00e6590cbdd686982b2e) )
+	ROM_LOAD32_BYTE( "u27", 0x000001, 0x80000, CRC(d713131a) SHA1(74a95e1ef0d30da53a91a5232574687f816df2eb) )
 	ROM_LOAD32_BYTE( "u28", 0x000003, 0x80000, CRC(dfa39f39) SHA1(992f74c04cbf4af06a02812052ce701228d4e174) )
 
 	ROM_REGION( 0x80000, "samples", 0 )
@@ -2877,6 +3367,50 @@ void subsino2_state::init_squeenb()
 	rom[0x399a/2] = 0x5670; // IRQ 8
 	rom[0x3aa8/2] = 0x5670; // IRQ 0
 }
+
+ROM_START( qbeebing )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "rom 2    27c040", 0x00000, 0x80000, CRC(03ea15cd) SHA1(19d3c3dd9e0c57066a6bd854964fd6a9f43c989f) )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "rom 4   27c160  3374h", 0x000001, 0x200000, CRC(a01527a0) SHA1(41ea384dd9c15c58246856f104b7dce68be1737c) )
+	ROM_LOAD16_BYTE( "rom 3   27c160  08d7h", 0x000000, 0x200000, CRC(1fdf0fcb) SHA1(ed54172521f8d05bad37b670548106e4c4deb8af) )
+
+	ROM_REGION( 0x80000, "samples", ROMREGION_ERASE00 ) // no samples, missing?
+ROM_END
+
+void subsino2_state::init_qbeebing()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 093099 otherwise)
+	rom[0x25b6/2] = 0x4066;
+
+	// other patches?
+}
+
+ROM_START( treamary )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "27c040_u21.bin", 0x00000, 0x80000, CRC(b9163830) SHA1(853ccba636c4ee806602ca92a61d4c53ee3108b7) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "27c040_u25.bin", 0x000000, 0x80000, CRC(d17e5286) SHA1(a538a3b010eb0c7b5c16a4188f32f340fc890850) )
+	ROM_LOAD32_BYTE( "27c040_u26.bin", 0x000002, 0x80000, CRC(fdc6c45b) SHA1(bb37badeba975630fb09b98104fbc757bd39538c) )
+	ROM_LOAD32_BYTE( "27c040_u27.bin", 0x000001, 0x80000, CRC(dc3a477e) SHA1(6268872257f1b513b80a58a9e29861f3f2e2c177) )
+	ROM_LOAD32_BYTE( "27c040_u28.bin", 0x000003, 0x80000, CRC(58d88d8d) SHA1(4551121691e958d280dfd437e47c6e331b66ede6) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c040_u9.bin", 0x000000, 0x80000, CRC(5345ca39) SHA1(2b8f1dfeebb93a1d99c06912d89b268c642163df) )
+ROM_END
+
+
+void subsino2_state::init_treamary()
+{
+	// other patches?
+
+	// gets stuck on CHIP1 test, enters test mode if bypassed
+}
+
 
 /***************************************************************************
 
@@ -2922,8 +3456,8 @@ ROM_START( expcard )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "top_card_alpha_3_v1.4.u20", 0x00000, 0x80000, CRC(6e666d51) SHA1(924ac4fefa30cbe8bebe4f0d8ba6fff42fdd233e) )
-	ROM_LOAD32_BYTE( "top_card_alpha_4_v1.4.u19", 0x00001, 0x80000, CRC(1382fd45) SHA1(1d81b7e72e702f5a254e1ec5ec6adb5d8af5d467) )
-	ROM_LOAD32_BYTE( "top_card_alpha_5_v1.4.u18", 0x00002, 0x80000, CRC(bbe465ac) SHA1(7a5ee6f7696e5f768ac56ccfaf0914dd56a83339) )
+	ROM_LOAD32_BYTE( "top_card_alpha_4_v1.4.u19", 0x00002, 0x80000, CRC(1382fd45) SHA1(1d81b7e72e702f5a254e1ec5ec6adb5d8af5d467) )
+	ROM_LOAD32_BYTE( "top_card_alpha_5_v1.4.u18", 0x00001, 0x80000, CRC(bbe465ac) SHA1(7a5ee6f7696e5f768ac56ccfaf0914dd56a83339) )
 	ROM_LOAD32_BYTE( "top_card_alpha_6_v1.4.u17", 0x00003, 0x80000, CRC(315d7a81) SHA1(8dafa1d422d8fe306765413084e35f16e4c17d27) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -2992,8 +3526,8 @@ ROM_START( mtrain )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "rom_4.u02", 0x00000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
-	ROM_LOAD32_BYTE( "rom_3.u03", 0x00001, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
-	ROM_LOAD32_BYTE( "rom_2.u04", 0x00002, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
+	ROM_LOAD32_BYTE( "rom_3.u03", 0x00002, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
+	ROM_LOAD32_BYTE( "rom_2.u04", 0x00001, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
 	ROM_LOAD32_BYTE( "rom_1.u05", 0x00003, 0x40000, CRC(96067e95) SHA1(bec7dffaf6920ff2bd85a43fb001a997583e25ee) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3007,6 +3541,27 @@ ROM_START( mtrain )
 	ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
 ROM_END
+
+ROM_START( strain )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// code starts at 0x8100!
+	ROM_LOAD( "v1.9_27c512_u17.bin", 0x0000, 0x8100, CRC(36379ab2) SHA1(b48374f80ffa107a7ea3e08eb432259e443dc4a6) )
+	ROM_CONTINUE(              0x0000, 0x7f00 )
+	ROM_RELOAD(                0xa000, 0x6000 )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u2.bin", 0x00000, 0x80000, CRC(0b77b3be) SHA1(daf1180cabce3e1bbb9a8f91c02e0fe4f0fd811e) )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u3.bin", 0x00002, 0x80000, CRC(c003661d) SHA1(49d76a9273928c35dcd6a6ab114d798f5553d79a) )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u4.bin", 0x00001, 0x80000, CRC(6392f562) SHA1(83881ec85a3dff82f32214b2654ee79e5e9a2d2a) )
+	ROM_LOAD32_BYTE( "v1.0_mx27c4000_u5.bin", 0x00003, 0x80000, CRC(85abe66c) SHA1(32698faf75bd0c42ab99b0c53b3ffa0891eedaca) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "v1.0_mx27c4000_u27.bin", 0x00000, 0x80000, CRC(d5bbebc7) SHA1(59fa804caa991dc2ad7f735b7c171defd836140a) )
+
+	ROM_REGION( 0x117, "plds", ROMREGION_ERASE00 )
+	// TODO: list these
+ROM_END
+
 
 /***************************************************************************
 
@@ -3033,7 +3588,52 @@ void subsino2_state::init_mtrain()
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x0cec] = 0x18;
 	rom[0xb037] = 0x18;
+}
 
+void subsino2_state::init_strain()
+{
+	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
+
+	// patch 'version error' (not sure this is correct, there's no title logo?)
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x141c] = 0x20;
+}
+
+
+
+ROM_START( tbonusal )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// code starts at 0x8100
+	ROM_LOAD( "n-alpha 1.6-u17.bin", 0x0000, 0x8100, CRC(1bdc1c92) SHA1(2cd7ec5a89865b76df2cfe9d18b2ab42923f8def) )
+	ROM_CONTINUE(              0x0000, 0x7f00 )
+	ROM_RELOAD(                0xa000, 0x6000 )
+
+	// there is a clear HD647180X0FS6 on the PCB, but is it operating in external mode? there is a program rom above at least
+	// if the internal ROM is unused / irrelevant then this doesn't need to be marked
+	//ROM_REGION( 0x10000, "mcu", 0 )
+	//ROM_LOAD( "hd647180", 0x00000, 0x08000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u2.bin", 0x000000, 0x80000, CRC(392943be) SHA1(776d36a94b8a70ec2eaf88dfd2804517656b53a0) )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u3.bin", 0x000002, 0x80000, CRC(24c8f62e) SHA1(692a96f233d8576a6921bfe23c97502ff26c62db) )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u4.bin", 0x000001, 0x80000, CRC(bed035a9) SHA1(6b141bb8fb7969338faa702bd03970331bbbe6e1) )
+	ROM_LOAD32_BYTE( "n-alpha 1.6-u5.bin", 0x000003, 0x80000, CRC(d00d48c6) SHA1(28b505a3f07c5d5bb8e8609c6d6e883260594588) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
+	// not populated on 4 different PCBs
+
+	ROM_REGION( 0x117, "plds", ROMREGION_ERASEFF )
+	// TODO list of GALs
+ROM_END
+
+void subsino2_state::init_tbonusal()
+{
+	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0x8000);
+
+	// patch serial protection test (it always enters test mode on boot otherwise)
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x0ea7] = 0x18;
+	rom[0xbbbf] = 0x18;
 }
 
 /***************************************************************************
@@ -3074,8 +3674,8 @@ ROM_START( saklove )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "3.u27", 0x000000, 0x80000, CRC(01aa8fbd) SHA1(d1d19ef52c8077ccf17cc2fde96fd56c626e33db) )
-	ROM_LOAD32_BYTE( "4.u28", 0x000001, 0x80000, CRC(f8db7ab6) SHA1(3af4e92ab27edc980eccecdbbbb431e1d2101059) )
-	ROM_LOAD32_BYTE( "5.u29", 0x000002, 0x80000, CRC(c6ca1764) SHA1(92bfa19e116d358b03164f2448a28e7524e3cc62) )
+	ROM_LOAD32_BYTE( "4.u28", 0x000002, 0x80000, CRC(f8db7ab6) SHA1(3af4e92ab27edc980eccecdbbbb431e1d2101059) )
+	ROM_LOAD32_BYTE( "5.u29", 0x000001, 0x80000, CRC(c6ca1764) SHA1(92bfa19e116d358b03164f2448a28e7524e3cc62) )
 	ROM_LOAD32_BYTE( "6.u30", 0x000003, 0x80000, CRC(5823c39e) SHA1(257e862ac736ff403ce9c70bbdeed340dfe168af) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3134,8 +3734,8 @@ ROM_START( xplan )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "x-plan_rom_3_v102b.u20", 0x00000, 0x80000, CRC(a027cbd1) SHA1(dac4226014794ef5bff84ddafee7da6691c00ece) )
-	ROM_LOAD32_BYTE( "x-plan_rom_4_v102b.u19", 0x00001, 0x80000, CRC(744be318) SHA1(1c1f2a9e1da77d9bc1bf897072df44a681a53079) )
-	ROM_LOAD32_BYTE( "x-plan_rom_5_v102b.u18", 0x00002, 0x80000, CRC(7e89c9b3) SHA1(9e3fea0d74cac48c068a15595f2342a2b0b3f747) )
+	ROM_LOAD32_BYTE( "x-plan_rom_4_v102b.u19", 0x00002, 0x80000, CRC(744be318) SHA1(1c1f2a9e1da77d9bc1bf897072df44a681a53079) )
+	ROM_LOAD32_BYTE( "x-plan_rom_5_v102b.u18", 0x00001, 0x80000, CRC(7e89c9b3) SHA1(9e3fea0d74cac48c068a15595f2342a2b0b3f747) )
 	ROM_LOAD32_BYTE( "x-plan_rom_6_v102b.u17", 0x00003, 0x80000, CRC(a86ca3b9) SHA1(46aa86b9c62aa0a4e519eb06c72c2d540489afee) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3194,8 +3794,8 @@ ROM_START( xtrain )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "x-train_rom_3_v1.2.u20", 0x00000, 0x80000, CRC(0e18ca82) SHA1(8fbc62a16ab109994086f58c9b9915a92bda0448) )
-	ROM_LOAD32_BYTE( "x-train_rom_4_v1.2.u19", 0x00001, 0x80000, CRC(959fa749) SHA1(d39fcedd1d13d9f86c1915d7dcff7d024739a6fa) )
-	ROM_LOAD32_BYTE( "x-train_rom_5_v1.2.u18", 0x00002, 0x80000, CRC(d0e8279f) SHA1(174483871c9e98936b37cc6cede71b64e19cae90) )
+	ROM_LOAD32_BYTE( "x-train_rom_4_v1.2.u19", 0x00002, 0x80000, CRC(959fa749) SHA1(d39fcedd1d13d9f86c1915d7dcff7d024739a6fa) )
+	ROM_LOAD32_BYTE( "x-train_rom_5_v1.2.u18", 0x00001, 0x80000, CRC(d0e8279f) SHA1(174483871c9e98936b37cc6cede71b64e19cae90) )
 	ROM_LOAD32_BYTE( "x-train_rom_6_v1.2.u17", 0x00003, 0x80000, CRC(289ae881) SHA1(b3f8db43d86078688ad56a04d1e7d7a825df60d7) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3257,8 +3857,8 @@ ROM_START( ptrain )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "panda-novam_3-v1.4.0.u20", 0x00000, 0x80000, CRC(2d5ab471) SHA1(3df42b7f762d738a4409498984e90c80625fae1f) )
-	ROM_LOAD32_BYTE( "panda-novam_4-v1.4.1.u19", 0x00001, 0x80000, CRC(a4b6985c) SHA1(1d3d23f7c9e775439a2d1a4c68b703bf51b0350f) )
-	ROM_LOAD32_BYTE( "panda-novam_5-v1.4.2.u18", 0x00002, 0x80000, CRC(716f7500) SHA1(971589a2530a0d4152bb68dbc7794985525a837d) )
+	ROM_LOAD32_BYTE( "panda-novam_4-v1.4.1.u19", 0x00002, 0x80000, CRC(a4b6985c) SHA1(1d3d23f7c9e775439a2d1a4c68b703bf51b0350f) )
+	ROM_LOAD32_BYTE( "panda-novam_5-v1.4.2.u18", 0x00001, 0x80000, CRC(716f7500) SHA1(971589a2530a0d4152bb68dbc7794985525a837d) )
 	ROM_LOAD32_BYTE( "panda-novam_6-v1.4.3.u17", 0x00003, 0x80000, CRC(10f0c21a) SHA1(400e53bf3dd6fe6f2dd679ed5151fb4400a6ec9f) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3272,6 +3872,58 @@ void subsino2_state::init_ptrain()
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xe1b08-0xc0000] = 0xeb;
 }
+
+
+/***************************************************************************
+    Treasure City
+
+    unknown hardware
+***************************************************************************/
+
+ROM_START( treacity )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "alpha 208_27c1001_u33.bin", 0x00000, 0x20000, CRC(e743aac3) SHA1(762575000463a126df561c959dfa06180e955822) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u7.bin",  0x00000, 0x80000, CRC(88d4d1f2) SHA1(35bc70904ceadeb7b1ccc35bb92585419da50fe1) )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u8.bin",  0x00002, 0x80000, CRC(7140638f) SHA1(a6072286b453e1290b2fc46060a0d777ad4ae1a8) )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u9.bin",  0x00001, 0x80000, CRC(57241f44) SHA1(f055488710ae624c1c7e92b2adf6b497c72514ea) )
+	ROM_LOAD32_BYTE( "alpha 207_27c4001_u10.bin", 0x00003, 0x80000, CRC(338370f9) SHA1(0e06ed1b71fb44bfd617f4d5112f6d34f0b759bc) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+ROM_END
+
+void subsino2_state::init_treacity()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// patch protection test (it always enters test mode on boot otherwise)
+	rom[0xaff9] = 0x75;
+}
+
+ROM_START( treacity202 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "alpha 202_27c1001_u33.bin", 0x00000, 0x20000, CRC(1a698c3d) SHA1(c2107b67d86783b04d1ebdf78d1f358916c51219) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u7.bin",  0x00000, 0x80000, CRC(c8e4e4d3) SHA1(b5dabfe2e8e5a19d218e3d58bbebbe83803feb23) )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u8.bin",  0x00002, 0x80000, CRC(a8fb65b4) SHA1(047fa2ccd08ce5282c015239f0f22d0ba20ea67b) )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u9.bin",  0x00001, 0x80000, CRC(b0c50891) SHA1(66ebebc327e00d5e8e9eb0a427d34683c4cca8aa) )
+	ROM_LOAD32_BYTE( "alpha 142_27c4001_u10.bin", 0x00003, 0x80000, CRC(8545e8cd) SHA1(0d122a532df81fe2150c1eaf49b5a4e35c8134eb) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 ) // samples, missing or not used / other hardware here?
+ROM_END
+
+void subsino2_state::init_treacity202()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// patch protection test (it always enters test mode on boot otherwise)
+	rom[0xae30] = 0x75;
+}
+
+
+
 
 /***************************************************************************
 
@@ -3291,8 +3943,8 @@ ROM_START( wtrnymph )
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "ocean-n tetris_2 v1.21.u2", 0x00000, 0x40000, CRC(813aac90) SHA1(4555adf8dc363359b10f1d5cfae2dcebed411679) )
-	ROM_LOAD32_BYTE( "ocean-n tetris_3 v1.21.u3", 0x00001, 0x40000, CRC(83c39379) SHA1(e7f9315d19370c18b664b759e433052a88f8c146) )
-	ROM_LOAD32_BYTE( "ocean-n tetris_4 v1.21.u4", 0x00002, 0x40000, CRC(6fc64b42) SHA1(80110d7dae28cca5e39c8a7c2ceebf589116ae23) )
+	ROM_LOAD32_BYTE( "ocean-n tetris_3 v1.21.u3", 0x00002, 0x40000, CRC(83c39379) SHA1(e7f9315d19370c18b664b759e433052a88f8c146) )
+	ROM_LOAD32_BYTE( "ocean-n tetris_4 v1.21.u4", 0x00001, 0x40000, CRC(6fc64b42) SHA1(80110d7dae28cca5e39c8a7c2ceebf589116ae23) )
 	ROM_LOAD32_BYTE( "ocean-n tetris_5 v1.21.u5", 0x00003, 0x40000, CRC(8c7515ee) SHA1(a67b21c1e8ca8a098fe558c73561bca13962893e) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3321,6 +3973,10 @@ void subsino2_state::init_wtrnymph()
 
 GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
 
+GAME( 1996, strain,   0,        mtrain,   strain,   subsino2_state, init_strain,   ROT0, "Subsino",                          "Super Train (Ver. 1.9)",               MACHINE_NOT_WORKING )
+
+GAME( 1995, tbonusal, 0,        mtrain,   tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
+
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 
 GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, init_expcard,  ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
@@ -3329,7 +3985,10 @@ GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, init_saklove
 
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, init_xtrain,   ROT0, "Subsino",                          "X-Train (Ver. 1.3)",                    0 )
 
-GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ptrain,   0,        ptrain,   ptrain,   subsino2_state, init_ptrain,   ROT0, "Subsino",                          "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1997, treacity,    0,       saklove, treacity, subsino2_state, init_treacity,    ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 208)",              MACHINE_NOT_WORKING )
+GAME( 1997, treacity202, treacity,saklove, treacity, subsino2_state, init_treacity202, ROT0, "Subsino (American Alpha license)", "Treasure City (Ver. 202)",              MACHINE_NOT_WORKING )
 
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 
@@ -3345,3 +4004,7 @@ GAME( 2001, queenbeesa,queenbee,humlan,   humlan,   subsino2_state, empty_init, 
 GAME( 2001, humlan,   queenbee, humlan,   humlan,   subsino2_state, init_humlan,   ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
 GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb,  ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+
+GAME( 2003, qbeebing, 0,        humlan,   humlan,   subsino2_state, init_qbeebing, ROT0, "Subsino",                          "Queen Bee Bingo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 200?, treamary, 0,        humlan,   humlan,   subsino2_state, init_treamary, ROT0, "Subsino",                          "Treasure Mary",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

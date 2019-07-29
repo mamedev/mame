@@ -206,6 +206,7 @@ const double XTAL::known_xtals[] = {
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'728'000, /* 14.728_MHz_XTAL        ADM 36 */
 	 14'742'800, /* 14.7428_MHz_XTAL       ADM 23 */
+	 14'745'000, /* 14.745_MHz_XTAL        Synertek KTM-3 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
 	 14'784'000, /* 14.784_MHz_XTAL        Zenith Z-29 */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
@@ -220,7 +221,7 @@ const double XTAL::known_xtals[] = {
 	 15'468'480, /* 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80 */
 	 15'582'000, /* 15.582_MHz_XTAL        Zentec Zephyr */
 	 15'667'200, /* 15.6672_MHz_XTAL       Apple Macintosh */
-	 15'700'000, /* 15.700_MHz_XTAL        Motogonki */
+	 15'700'000, /* 15.7_MHz_XTAL          Motogonki */
 	 15'897'600, /* 15.8976_MHz_XTAL       IAI Swyft */
 	 15'920'000, /* 15.92_MHz_XTAL         HP Integral PC */
 	 15'974'400, /* 15.9744_MHz_XTAL       Osborne 1 (9600 * 52 * 32) */
@@ -242,6 +243,7 @@ const double XTAL::known_xtals[] = {
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
 	 17'350'000, /* 17.35_MHz_XTAL         ITT Courier 1700 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
+	 17'430'000, /* 17.43_MHz_XTAL         Videx Videoterm */
 	 17'550'000, /* 17.55_MHz_XTAL         HP 264x display clock (50 Hz configuration) */
 	 17'600'000, /* 17.6_MHz_XTAL          LSI Octopus */
 	 17'734'470, /* 17.73447_MHz_XTAL      (~4x PAL subcarrier) */
@@ -253,6 +255,7 @@ const double XTAL::known_xtals[] = {
 	 18'480'000, /* 18.48_MHz_XTAL         Wyse WY-100 video */
 	 18'575'000, /* 18.575_MHz_XTAL        Visual 102, Visual 220 */
 	 18'720'000, /* 18.72_MHz_XTAL         Nokia MikroMikko 1 */
+	 18'867'000, /* 18.867_MHz_XTAL        Decision Data IS-482 */
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */
 	 19'339'600, /* 19.3396_MHz_XTAL       TeleVideo TVI-955 80-column display clock */
 	 19'584'000, /* 19.584_MHz_XTAL        ADM-42 */
@@ -279,6 +282,7 @@ const double XTAL::known_xtals[] = {
 	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
 	 22'118'400, /* 22.1184_MHz_XTAL       Amusco Poker */
+	 22'248'000, /* 22.248_MHz_XTAL        Quantel DPB-7000 */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
@@ -367,7 +371,7 @@ const double XTAL::known_xtals[] = {
 	 45'158'400, /* 45.1584_MHz_XTAL       Philips CD-i CDIC, Sega Model 2A video, Sega Model 3 CPU */
 	 45'619'200, /* 45.6192_MHz_XTAL       DEC VK100 */
 	 45'830'400, /* 45.8304_MHz_XTAL       Microterm 5510 */
-	 46'615'120, /* 46.61512_Mhz_XTAL      Soundblaster 16 PCM base clock */
+	 46'615'120, /* 46.61512_MHz_XTAL      Soundblaster 16 PCM base clock */
 	 47'736'000, /* 47.736_MHz_XTAL        Visual 100 */
 	 48'000'000, /* 48_MHz_XTAL            Williams/Midway Y/Z-unit system / SSV board */
 	 48'384'000, /* 48.384_MHz_XTAL        Namco NB-1 */
@@ -393,7 +397,7 @@ const double XTAL::known_xtals[] = {
 	 60'000'000, /* 60_MHz_XTAL            ARM610 */
 	 61'440'000, /* 61.44_MHz_XTAL         Donkey Kong */
 	 64'000'000, /* 64_MHz_XTAL            BattleToads */
-	 64'108'800, /* 64.108.800_Mhz_XTAL    HP Topcat high-res */
+	 64'108'800, /* 64.1088_MHz_XTAL       HP Topcat high-res */
 	 66'666'700, /* 66.6667_MHz_XTAL       Later Midway games */
 	 67'737'600, /* 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based */
 	 68'850'000, /* 68.85_MHz_XTAL         Wyse WY-50 */

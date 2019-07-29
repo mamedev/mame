@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "machine/ram.h"
 #include "video/apple2.h"
+#include "screen.h"
 
 /***************************************************************************/
 
@@ -39,6 +40,7 @@ DEFINE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device, "a2video", "Apple II video")
 a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APPLE2_VIDEO, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 {
 }
 
@@ -134,6 +136,50 @@ void a2_video_device::device_reset()
 	m_80store = false;
 	m_monohgr = false;
 	m_newvideo = 0x01;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::txt_w)
+{
+	if (m_graphics == state) // avoid flickering from II+ refresh polling
+	{
+		// select graphics or text mode
+		screen().update_now();
+		m_graphics = !state;
+	}
+}
+
+WRITE_LINE_MEMBER(a2_video_device::mix_w)
+{
+	// select mixed mode or nomix
+	screen().update_now();
+	m_mix = state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::scr_w)
+{
+	// select primary or secondary page
+	if (!m_80col)
+		screen().update_now();
+	m_page2 = state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::res_w)
+{
+	// select lo-res or hi-res
+	screen().update_now();
+	m_hires = state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::dhires_w)
+{
+	// select double hi-res
+	screen().update_now();
+	m_dhires = !state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::an2_w)
+{
+	m_an2 = state;
 }
 
 void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,

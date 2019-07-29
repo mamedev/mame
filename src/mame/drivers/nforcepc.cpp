@@ -26,6 +26,8 @@
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/intelfsh.h"
+#include "machine/atapicdr.h"
+#include "machine/idehd.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
@@ -53,6 +55,12 @@ static const uint8_t test_spd_data[] = {
 };
 #endif
 
+void nforcepc_ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
+
 /*
   Pci devices
 */
@@ -64,8 +72,14 @@ DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "crush11", "NVIDIA Corporation 
 void crush11_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
+	map(0x10, 0x27).rw(FUNC(pci_device::address_base_r), FUNC(pci_device::address_base_w));
 	map(0x84, 0x87).rw(FUNC(crush11_host_device::ram_size_r), FUNC(crush11_host_device::ram_size_w));
 	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::unknown_r), FUNC(crush11_host_device::unknown_w));
+}
+
+READ8_MEMBER(crush11_host_device::header_type_r)
+{
+	return 0x80; // from lspci dump
 }
 
 crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -79,6 +93,7 @@ crush11_host_device::crush11_host_device(const machine_config &mconfig, const ch
 void crush11_host_device::device_start()
 {
 	pci_host_device::device_start();
+	set_multifunction_device(true);
 	memory_space = &cpu->space(AS_DATA);
 	io_space = &cpu->space(AS_IO);
 
@@ -88,7 +103,7 @@ void crush11_host_device::device_start()
 	io_window_start = 0;
 	io_window_end = 0xffff;
 	io_offset = 0;
-	status = 0x0010;
+	status = 0x00b0;
 }
 
 void crush11_host_device::reset_all_mappings()
@@ -172,9 +187,11 @@ void crush11_memory_device::device_start()
 	device_t *r = owner()->subdevice("00.0");
 
 	pci_device::device_start();
+	set_multifunction_device(true);
 	ram.resize(ddr_ram_size * 1024 * 1024 / 4);
 	host = dynamic_cast<crush11_host_device *>(r);
 	ram_space = host->get_cpu_space(AS_PROGRAM);
+	status = 0x0020;
 }
 
 void crush11_memory_device::device_reset()
@@ -703,13 +720,13 @@ void nforcepc_state::nforcepc(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &nforcepc_state::nforce_map);
 	maincpu.set_addrmap(AS_IO, &nforcepc_state::nforce_map_io);
 	maincpu.set_irq_acknowledge_callback(FUNC(nforcepc_state::irq_callback));
-	//maincpu.smiact().set("pci:01.0", FUNC(i82439hx_host_device::smi_act_w));
+	//maincpu.smiact().set("pci:01.0", FUNC(???_host_device::smi_act_w));
 
 	PCI_ROOT(config, ":pci", 0);
 	CRUSH11(config, ":pci:00.0", 0, "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
-	CRUSH11_MEMORY(config, ":pci:00.1", 0, 2); /* 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
-	10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
-	10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)*/
+	CRUSH11_MEMORY(config, ":pci:00.1", 0, 2); // 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
+	// 10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
+	// 10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)
 	mcpx_isalpc_device &isa(MCPX_ISALPC(config, ":pci:01.0", 0, 0x10430c11)); // 10de:01b2 NVIDIA Corporation nForce ISA Bridge (LPC bus)
 	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
@@ -725,20 +742,21 @@ void nforcepc_state::nforcepc(machine_config &config)
 	AS99127F(config, ":pci:01.1:12d", 0);
 	AS99127F_SENSOR2(config, ":pci:01.1:148", 0);
 	AS99127F_SENSOR3(config, ":pci:01.1:149", 0);
+	MCPX_OHCI(config, ":pci:02.0", 0); // 10de:01c2 NVIDIA Corporation nForce USB Controller
+	// .interrupt_handler().set(FUNC(nforcepc_state::ohci_usb_interrupt_changed));
+	MCPX_OHCI(config, ":pci:03.0", 0); // 10de:01c2 NVIDIA Corporation nForce USB Controller
+	MCPX_ETH(config, ":pci:04.0", 0); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
+	MCPX_APU(config, ":pci:05.0", 0, m_maincpu); // 10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
+	MCPX_AC97_AUDIO(config, ":pci:06.0", 0); // 10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
+	PCI_BRIDGE(config, ":pci:08.0", 0, 0x10de01b8, 0); // 10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
+	// 10ec:8139 Realtek Semiconductor Co., Ltd. RTL-8139/8139C/8139C+ (behind bridge)
+	MCPX_IDE(config, ":pci:09.0", 0); // 10de:01bc NVIDIA Corporation nForce IDE
+	/*  subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);
+	    .interrupt_handler().set(FUNC(nforcepc_state::ide_interrupt_changed));
+	    ide.irq_pri().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq14_w));
+	    ide.irq_sec().set(":pci:01.0", FUNC(mcpx_isalpc_device::pc_irq15_w));*/
+	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
 	SST_49LF020(config, "bios", 0);
-	/*10de:01c2 NVIDIA Corporation nForce USB Controller
-	10de:01c2 NVIDIA Corporation nForce USB Controller
-	10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
-	10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
-	10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
-	10de:01bc NVIDIA Corporation nForce IDE
-	10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
-	*/
-	/* maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
-
-	i82371sb_ide_device &ide(I82371SB_IDE(config, ":pci:07.1", 0));
-	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
-	ide.irq_sec().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq15_w));*/
 }
 
 ROM_START(nforcepc)

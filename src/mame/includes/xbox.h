@@ -72,6 +72,40 @@ private:
 DECLARE_DEVICE_TYPE(XBOX_EEPROM, xbox_eeprom_device)
 
 /*
+ * Super-io connected to lpc bus used as a rs232 debug port
+ */
+
+class xbox_superio_device : public device_t, public lpcbus_device_interface
+{
+public:
+	xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
+	virtual void set_host(int index, lpcbus_host_interface *host) override;
+
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8_MEMBER(read_rs232);
+	DECLARE_WRITE8_MEMBER(write_rs232);
+
+protected:
+	virtual void device_start() override;
+
+private:
+	void internal_io_map(address_map &map);
+
+	lpcbus_host_interface *lpchost;
+	int lpcindex;
+	address_space *memspace;
+	address_space *iospace;
+	bool configuration_mode;
+	int index;
+	int selected;
+	uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
+};
+
+DECLARE_DEVICE_TYPE(XBOX_SUPERIO, xbox_superio_device)
+
+/*
  * Base
  */
 
@@ -85,20 +119,12 @@ public:
 		debug_irq_number(0),
 		m_maincpu(*this, "maincpu"),
 		mcpxlpc(*this, ":pci:01.0"),
-		ide(*this, ":pci:09.0:ide"),
+		ide(*this, ":pci:09.0:ide1"),
 		debugc_bios(nullptr) { }
 
 	void xbox_base(machine_config &config);
 
 protected:
-	DECLARE_READ8_MEMBER(superio_read);
-	DECLARE_WRITE8_MEMBER(superio_write);
-	DECLARE_READ8_MEMBER(superiors232_read);
-	DECLARE_WRITE8_MEMBER(superiors232_write);
-
-	int smbus_pic16lc(int command, int rw, int data);
-	int smbus_cx25871(int command, int rw, int data);
-	int smbus_eeprom(int command, int rw, int data);
 	void debug_generate_irq(int irq, bool active);
 	virtual void hack_eeprom() {};
 	virtual void hack_usb() {};
@@ -114,13 +140,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(nv2a_interrupt_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	struct superio_state
-	{
-		bool configuration_mode;
-		int index;
-		int selected;
-		uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
-	} superiost;
 	nv2a_renderer *nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;
@@ -133,9 +152,6 @@ protected:
 		uint32_t parameter[8]; // c c c ? ? ? x x
 	} debugp[];
 	const debugger_constants *debugc_bios;
-
-	void xbox_base_map(address_map &map);
-	void xbox_base_map_io(address_map &map);
 
 private:
 	void dump_string_command(int ref, const std::vector<std::string> &params);

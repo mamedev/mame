@@ -85,7 +85,6 @@ To Do:
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -455,11 +454,12 @@ void bcs3_state::bcs3a(machine_config &config)
 	m_screen->set_visarea(0, 29*8-1, 0, 12*10-1);
 	m_screen->set_screen_update(FUNC(bcs3_state::screen_update_bcs3a));
 
-	CASSETTE(config, m_cass);
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void bcs3_state::bcs3b(machine_config &config)
@@ -486,11 +486,12 @@ void bcs3_state::bcs3b(machine_config &config)
 	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
-	CASSETTE(config, m_cass);
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

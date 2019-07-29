@@ -36,7 +36,7 @@ known issues:
     Suzuka 8 Hours II
     - some sprite cropping issues
 
-    Valkyrie No Densetsu
+    Valkyrie no Densetsu
     - gives ADSMISS error on startup
        Does a checksum on area 0x181000 - 0x183fff, in 0x20 bytes block chunks. Game doesn't init it properly so you either have to go into service menu and do
        an "all data clear" or play once to get rid of the message.
@@ -5847,7 +5847,7 @@ GAMEL( 1989, fourtrax,   0,        finallap, fourtrax, namcos2_state, init_fourt
 GAMEL( 1989, fourtraxj,  fourtrax, finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco", "Four Trax (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 GAMEL( 1989, fourtraxa,  fourtrax, finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco (Atari license?)", "Four Trax (US?, censored banners)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap ) // boards using the ROM code FX4 were produced for Atari? there's no US region warning or Atari copyright tho, modded version of the World code
 
-GAME(  1989, valkyrie,   0,        base3,    base,     namcos2_state, init_valkyrie, ROT90,  "Namco", "Valkyrie No Densetsu (Japan)", 0 )
+GAME(  1989, valkyrie,   0,        base3,    base,     namcos2_state, init_valkyrie, ROT90,  "Namco", "Valkyrie no Densetsu (Japan)", 0 )
 
 GAME(  1989, finehour,   0,        base2,    base,     namcos2_state, init_finehour, ROT0,   "Namco", "Finest Hour (Japan)", 0)
 

@@ -3,8 +3,6 @@
 // thanks-to:Berger, Sean Riddle
 /******************************************************************************
 
-* fidel_cc1.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
-
 Fidelity's 1st generation chess computers:
 - *Chess Challenger
 - Chess Challenger 3
@@ -43,10 +41,10 @@ offered as an upgrade to CC1, or CC3.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
+#include "video/pwm.h"
 
 // internal artwork
 #include "fidel_cc1.lh" // clickable
@@ -55,60 +53,83 @@ offered as an upgrade to CC1, or CC3.
 
 namespace {
 
-class cc1_state : public fidelbase_state
+class cc1_state : public driver_device
 {
 public:
 	cc1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_ppi8255(*this, "ppi8255"),
-		m_delay(*this, "delay")
+		m_display(*this, "display"),
+		m_delay(*this, "delay"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
+
+	// RE button is tied to 8224 RESIN pin
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 	// machine drivers
 	void cc1(machine_config &config);
 	void cc3(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
+	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_delay;
+	required_ioport_array<2> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	// I/O handlers
-	void prepare_display();
+	void update_display();
 	DECLARE_READ8_MEMBER(ppi_porta_r);
 	DECLARE_WRITE8_MEMBER(ppi_portb_w);
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+
+	u8 m_led_select;
+	u8 m_7seg_data;
 };
 
-
-/******************************************************************************
-    Devices, I/O
-******************************************************************************/
-
-// misc handlers
-
-void cc1_state::prepare_display()
+void cc1_state::machine_start()
 {
-	// 4 7segs + 2 leds
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 6, m_7seg_data, m_led_select);
+	// zerofill
+	m_led_select = 0;
+	m_7seg_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_led_select));
+	save_item(NAME(m_7seg_data));
 }
 
 
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
 // I8255 PPI
+
+void cc1_state::update_display()
+{
+	// 4 7segs + 2 leds
+	m_display->matrix(m_led_select, m_7seg_data);
+}
 
 READ8_MEMBER(cc1_state::ppi_porta_r)
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
-	u8 data = count_leading_zeros(m_inp_matrix[0]->read()) - 24;
+	u8 data = count_leading_zeros(m_inputs[0]->read()) - 24;
 
 	// d5-d7: more inputs (direct)
-	data |= ~m_inp_matrix[1]->read() << 5 & 0xe0;
+	data |= ~m_inputs[1]->read() << 5 & 0xe0;
 
 	// d4: 555 Q
 	return data | ((m_delay->enabled()) ? 0x10 : 0);
@@ -118,7 +139,7 @@ WRITE8_MEMBER(cc1_state::ppi_portb_w)
 {
 	// d0-d6: digit segment data
 	m_7seg_data = bitswap<7>(data,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(cc1_state::ppi_portc_w)
@@ -130,7 +151,7 @@ WRITE8_MEMBER(cc1_state::ppi_portc_w)
 	// d0-d3: digit select
 	// d4: check led, d5: lose led
 	m_led_select = data;
-	prepare_display();
+	update_display();
 }
 
 
@@ -214,7 +235,9 @@ void cc1_state::cc1(machine_config &config)
 
 	TIMER(config, "delay").configure_generic(timer_device::expired_delegate());
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(cc1_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 7);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_cc1);
 }
 

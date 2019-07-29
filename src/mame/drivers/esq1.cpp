@@ -55,9 +55,8 @@ NMI is from the IRQ line on the FDC (again, SQ-80 only).
 TODO:
     - VFD display
     - Keyboard
-    - Analog filters and VCA on the back end of the 5503
-    - SQ-80 support (additional banking, FDC)
-      SQ-80 is totally broken now, jumping into unmapped memory
+]    - Analog filters and VCA on the back end of the 5503 (inaccurate)
+     - duart seems to keep interrupting even after MIDI xmit buffer becomes empty
 
 NOTES:
     Commands from KPC are all 2 bytes
@@ -184,6 +183,7 @@ NOTES:
 #include "emu.h"
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 #include "machine/esqpanel.h"
@@ -393,7 +393,9 @@ public:
 		m_filters(*this, "filters"),
 		m_fdc(*this, WD1772_TAG),
 		m_panel(*this, "panel"),
-		m_mdout(*this, "mdout")
+		m_mdout(*this, "mdout"),
+		m_es5503(*this, "es5503"),
+		m_es5503_rom(*this, "es5503")
 	{ }
 
 	void sq80(machine_config &config);
@@ -409,6 +411,8 @@ private:
 	optional_device<wd1772_device> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
 	optional_device<midi_port_device> m_mdout;
+	required_device<es5503_device> m_es5503;
+	required_region_ptr<uint8_t> m_es5503_rom;
 
 	DECLARE_READ8_MEMBER(wd1772_r);
 	DECLARE_WRITE8_MEMBER(wd1772_w);
@@ -417,12 +421,11 @@ private:
 	DECLARE_WRITE8_MEMBER(mapper_w);
 	DECLARE_WRITE8_MEMBER(analog_w);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
-	DECLARE_WRITE_LINE_MEMBER(esq1_doc_irq);
 	DECLARE_READ8_MEMBER(esq1_adc_read);
+
+	DECLARE_READ8_MEMBER(es5503_sample_r);
 
 	int m_mapper_state;
 	int m_seq_bank;
@@ -433,16 +436,26 @@ private:
 	void send_through_panel(uint8_t data);
 	void esq1_map(address_map &map);
 	void sq80_map(address_map &map);
+	void sq80_es5503_map(address_map &map);
+
+	bool kpc_calibrated;  // sq80 requires keyboard calibration acknowledgement
+	int m_adc_target;     // adc poll target (index into the table below)
+	uint8_t m_adc_value[6] = { 0,0,128,0,0,0 }; // VALV,PEDV,PITV,MODV,FILV,BATV
 };
 
-
-WRITE_LINE_MEMBER(esq1_state::esq1_doc_irq)
+READ8_MEMBER( esq1_state::es5503_sample_r )
 {
+	return m_es5503_rom[offset + (((m_es5503->get_channel_strobe() & 8)>>3) * 0x20000)];
+}
+
+void esq1_state::sq80_es5503_map(address_map &map)
+{
+	map(0x000000, 0x1ffff).r(FUNC(esq1_state::es5503_sample_r));
 }
 
 READ8_MEMBER(esq1_state::esq1_adc_read)
 {
-	return 0x00;
+	return m_adc_value[m_adc_target];
 }
 
 void esq1_state::machine_reset()
@@ -450,8 +463,9 @@ void esq1_state::machine_reset()
 	// set default OSROM banking
 	membank("osbank")->set_base(memregion("osrom")->base() );
 
-	m_mapper_state = 0;
+	m_mapper_state = 1;
 	m_seq_bank = 0;
+	kpc_calibrated = false;
 }
 
 READ8_MEMBER(esq1_state::wd1772_r)
@@ -466,7 +480,7 @@ WRITE8_MEMBER(esq1_state::wd1772_w)
 
 WRITE8_MEMBER(esq1_state::mapper_w)
 {
-	m_mapper_state = (data & 1) ^ 1;
+	m_mapper_state = (data & 1);
 
 //    printf("mapper_state = %d\n", data ^ 1);
 }
@@ -521,8 +535,7 @@ void esq1_state::esq1_map(address_map &map)
 void esq1_state::sq80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();                 // OSRAM
-	map(0x4000, 0x5fff).ram();                 // SEQRAM
-//  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
+	map(0x4000, 0x5fff).rw(FUNC(esq1_state::seqdosram_r), FUNC(esq1_state::seqdosram_w));
 	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
 	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
@@ -549,7 +562,7 @@ void esq1_state::sq80_map(address_map &map)
 
 WRITE8_MEMBER(esq1_state::duart_output)
 {
-	int bank = ((data >> 1) & 0x7);
+	int bank = m_adc_target = ((data >> 1) & 0x7);
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
 //  printf("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
 	membank("osbank")->set_base(memregion("osrom")->base() + (bank * 0x1000) );
@@ -559,17 +572,6 @@ WRITE8_MEMBER(esq1_state::duart_output)
 //    printf("seqram_bank = %x\n", state->m_seq_bank);
 }
 
-// MIDI send
-WRITE_LINE_MEMBER(esq1_state::duart_tx_a)
-{
-	m_mdout->write_txd(state);
-}
-
-WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
-{
-	m_panel->rx_w(state);
-}
-
 void esq1_state::send_through_panel(uint8_t data)
 {
 	m_panel->xmit_char(data);
@@ -577,28 +579,43 @@ void esq1_state::send_through_panel(uint8_t data)
 
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
+	u8 offset = 0;
+	if (strncmp(machine().basename(), "sq80", 4) == 0)
+	 {
+		if (!kpc_calibrated)
+		 { // ack SQ80 keyboard calibration
+			send_through_panel((u8)(uintptr_t)0xff);
+			kpc_calibrated = true;
+		}
+		offset = 2; // SQ80 keycodes are offset by -2
+	}
+
 	if (oldval == 0 && newval == 1)
 	{
-		send_through_panel((uint8_t)(uintptr_t)param);
-		send_through_panel((uint8_t)(uintptr_t)0x00);
+		send_through_panel((u8)(uintptr_t)param - offset);
+		send_through_panel((u8)(uintptr_t)0x00);
 	}
 	else if (oldval == 1 && newval == 0)
 	{
-		send_through_panel((uint8_t)(uintptr_t)param&0x7f);
-		send_through_panel((uint8_t)(uintptr_t)0x00);
+		send_through_panel(((u8)(uintptr_t)param - offset)&0x7f);
+		send_through_panel((u8)(uintptr_t)0x00);
 	}
 }
 
 void esq1_state::esq1(machine_config &config)
 {
-	MC6809(config, m_maincpu, XTAL(8'000'000)); // XTAL not directly attached to CPU
+	MC6809E(config, m_maincpu, 8_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::esq1_map);
 
-	SCN2681(config, m_duart, XTAL(8'000'000) / 2);
-	m_duart->set_clocks(XTAL(8'000'000) / 16, XTAL(8'000'000) / 16, XTAL(8'000'000) / 8, XTAL(8'000'000) / 8);
-	m_duart->irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	m_duart->a_tx_cb().set(FUNC(esq1_state::duart_tx_a));
-	m_duart->b_tx_cb().set(FUNC(esq1_state::duart_tx_b));
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
+	mainirq.output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	mainirq.output_handler().append_inputline(m_maincpu, M6809_FIRQ_LINE); // IRQ and FIRQ are tied together
+
+	SCN2681(config, m_duart, 8_MHz_XTAL / 2);
+	m_duart->set_clocks(8_MHz_XTAL / 16, 8_MHz_XTAL / 16, 8_MHz_XTAL / 8, 8_MHz_XTAL / 8);
+	m_duart->irq_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
+	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel2x40_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq1_state::duart_output));
 
 	ESQPANEL2X40(config, m_panel);
@@ -617,18 +634,18 @@ void esq1_state::esq1(machine_config &config)
 	m_filters->add_route(0, "lspeaker", 1.0);
 	m_filters->add_route(1, "rspeaker", 1.0);
 
-	auto &es5503(ES5503(config, "es5503", XTAL(8'000'000)));
-	es5503.set_channels(8);
-	es5503.irq_func().set(FUNC(esq1_state::esq1_doc_irq));
-	es5503.adc_func().set(FUNC(esq1_state::esq1_adc_read));
-	es5503.add_route(0, "filters", 1.0, 0);
-	es5503.add_route(1, "filters", 1.0, 1);
-	es5503.add_route(2, "filters", 1.0, 2);
-	es5503.add_route(3, "filters", 1.0, 3);
-	es5503.add_route(4, "filters", 1.0, 4);
-	es5503.add_route(5, "filters", 1.0, 5);
-	es5503.add_route(6, "filters", 1.0, 6);
-	es5503.add_route(7, "filters", 1.0, 7);
+	ES5503(config, m_es5503, 8_MHz_XTAL);
+	m_es5503->set_channels(8);
+	m_es5503->irq_func().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_es5503->adc_func().set(FUNC(esq1_state::esq1_adc_read));
+	m_es5503->add_route(0, "filters", 1.0, 0);
+	m_es5503->add_route(1, "filters", 1.0, 1);
+	m_es5503->add_route(2, "filters", 1.0, 2);
+	m_es5503->add_route(3, "filters", 1.0, 3);
+	m_es5503->add_route(4, "filters", 1.0, 4);
+	m_es5503->add_route(5, "filters", 1.0, 5);
+	m_es5503->add_route(6, "filters", 1.0, 6);
+	m_es5503->add_route(7, "filters", 1.0, 7);
 }
 
 void esq1_state::sq80(machine_config &config)
@@ -636,7 +653,12 @@ void esq1_state::sq80(machine_config &config)
 	esq1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::sq80_map);
 
-	WD1772(config, m_fdc, 4000000);
+	m_es5503->set_addrmap(0, &esq1_state::sq80_es5503_map);
+	m_es5503->irq_func().set_nop(); // not connected here
+
+	WD1772(config, m_fdc, 8_MHz_XTAL);
+	m_fdc->drq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 static INPUT_PORTS_START( esq1 )
@@ -685,10 +707,10 @@ ROM_START( sq80 )
 	ROM_LOAD( "sq80rom.hig",  0x8000, 0x008000, CRC(f83962b1) SHA1(e3e5cf41f15a37f8bf29b88fb1c85c0fca9ea912) )
 
 	ROM_REGION(0x40000, "es5503", 0)
-	ROM_LOAD( "2202.bin",     0x0000, 0x010000, CRC(dffd538c) SHA1(e90f6ff3a7804b54c8a3b1b574ec9c223a6c2bf9) )
-	ROM_LOAD( "2203.bin",     0x0000, 0x010000, CRC(9be8cceb) SHA1(1ee4d7e6d2171b44e88e464071bdc4b800b69c4a) )
-	ROM_LOAD( "2204.bin",     0x0000, 0x010000, CRC(4937c6f7) SHA1(4505efb9b28fe6d4bcc1f79e81a70bb215c399cb) )
-	ROM_LOAD( "2205.bin",     0x0000, 0x010000, CRC(0f917d40) SHA1(1cfae9c80088f4c90b3c9e0b284c3b91f7ff61b9) )
+	ROM_LOAD( "2202.bin",     0x00000, 0x010000, CRC(dffd538c) SHA1(e90f6ff3a7804b54c8a3b1b574ec9c223a6c2bf9) )
+	ROM_LOAD( "2203.bin",     0x20000, 0x010000, CRC(9be8cceb) SHA1(1ee4d7e6d2171b44e88e464071bdc4b800b69c4a) )
+	ROM_LOAD( "2204.bin",     0x10000, 0x010000, CRC(4937c6f7) SHA1(4505efb9b28fe6d4bcc1f79e81a70bb215c399cb) )
+	ROM_LOAD( "2205.bin",     0x30000, 0x010000, CRC(0f917d40) SHA1(1cfae9c80088f4c90b3c9e0b284c3b91f7ff61b9) )
 
 	ROM_REGION(0x8000, "kpc", 0)    // 68HC11 keyboard/front panel processor
 	ROM_LOAD( "sq80_kpc_150.bin", 0x000000, 0x008000, CRC(8170b728) SHA1(3ad68bb03948e51b20d2e54309baa5c02a468f7c) )
@@ -696,7 +718,7 @@ ROM_END
 
 ROM_START( esqm )
 	ROM_REGION(0x10000, "osrom", 0)
-		ROM_LOAD( "1355500157_d640_esq-m_oshi.u14", 0x8000, 0x008000, CRC(ea6a7bae) SHA1(2830f8c52dc443b4ca469dc190b33e2ff15b78e1) )
+	ROM_LOAD( "1355500157_d640_esq-m_oshi.u14", 0x8000, 0x008000, CRC(ea6a7bae) SHA1(2830f8c52dc443b4ca469dc190b33e2ff15b78e1) )
 
 	ROM_REGION(0x20000, "es5503", 0)
 	ROM_LOAD( "esq1wavlo.bin", 0x0000, 0x8000, CRC(4d04ac87) SHA1(867b51229b0a82c886bf3b216aa8893748236d8b) )

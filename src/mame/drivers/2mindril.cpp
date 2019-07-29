@@ -55,26 +55,27 @@ public:
 
 	void init_drill();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	/* input-related */
 	required_ioport m_in0;
-	uint8_t         m_defender_sensor;
-	uint8_t         m_shutter_sensor;
-	uint16_t        m_irq_reg;
+	u8         m_defender_sensor;
+	u8         m_shutter_sensor;
+	u16        m_irq_reg;
 
 	/* devices */
-	DECLARE_READ8_MEMBER(arm_pwr_r);
-	DECLARE_READ8_MEMBER(sensors_r);
-	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE16_MEMBER(sensors_w);
-	DECLARE_READ16_MEMBER(drill_irq_r);
-	DECLARE_WRITE16_MEMBER(drill_irq_w);
+	u8 arm_pwr_r();
+	u8 sensors_r();
+	void coins_w(u8 data);
+	void sensors_w(u16 data);
+	u16 irq_r();
+	void irq_w(offs_t offset, u16 data, u16 mem_mask);
 
-	DECLARE_MACHINE_START(drill);
-	DECLARE_MACHINE_RESET(drill);
-	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
-	void tile_decode();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 	void drill_map(address_map &map);
@@ -92,23 +93,23 @@ protected:
 };
 
 
-READ8_MEMBER(_2mindril_state::arm_pwr_r)
+u8 _2mindril_state::arm_pwr_r()
 {
 	int arm_pwr = m_in0->read();//throw
 
-	if(arm_pwr > 0xe0) return ~0x18;
-	if(arm_pwr > 0xc0) return ~0x14;
-	if(arm_pwr > 0x80) return ~0x12;
-	if(arm_pwr > 0x40) return ~0x10;
+	if (arm_pwr > 0xe0) return ~0x18;
+	if (arm_pwr > 0xc0) return ~0x14;
+	if (arm_pwr > 0x80) return ~0x12;
+	if (arm_pwr > 0x40) return ~0x10;
 	else return ~0x00;
 }
 
-READ8_MEMBER(_2mindril_state::sensors_r)
+u8 _2mindril_state::sensors_r()
 {
 	return (m_defender_sensor) | (m_shutter_sensor);
 }
 
-WRITE8_MEMBER(_2mindril_state::coins_w)
+void _2mindril_state::coins_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
@@ -147,7 +148,7 @@ void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 #endif
 
-WRITE16_MEMBER(_2mindril_state::sensors_w)
+void _2mindril_state::sensors_w(u16 data)
 {
 	/*---- xxxx ---- ---- select "lamps" (guess)*/
 	/*---- ---- ---- -x-- lamp*/
@@ -174,12 +175,12 @@ WRITE16_MEMBER(_2mindril_state::sensors_w)
 	}
 }
 
-READ16_MEMBER(_2mindril_state::drill_irq_r)
+u16 _2mindril_state::irq_r()
 {
 	return m_irq_reg;
 }
 
-WRITE16_MEMBER(_2mindril_state::drill_irq_w)
+void _2mindril_state::irq_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*
 	(note: could rather be irq mask)
@@ -187,13 +188,13 @@ WRITE16_MEMBER(_2mindril_state::drill_irq_w)
 	---- ---- ---- x--- irq lv 4 ack, 0->1 latch
 	---- ---- -??- -??? connected to the other levels?
 	*/
-	if(((m_irq_reg & 8) == 0) && data & 8)
+	if (((m_irq_reg & 8) == 0) && data & 8)
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 
-	if(((m_irq_reg & 0x10) == 0) && data & 0x10)
+	if (((m_irq_reg & 0x10) == 0) && data & 0x10)
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 
-	if(data & 0xffe7)
+	if (data & 0xffe7)
 		printf("%04x\n",data);
 
 	COMBINE_DATA(&m_irq_reg);
@@ -204,18 +205,18 @@ void _2mindril_state::drill_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x3000ff).ram();
-	map(0x400000, 0x40ffff).rw(FUNC(_2mindril_state::f3_spriteram_r), FUNC(_2mindril_state::f3_spriteram_w));
-	map(0x410000, 0x41bfff).rw(FUNC(_2mindril_state::f3_pf_data_r), FUNC(_2mindril_state::f3_pf_data_w));
-	map(0x41c000, 0x41dfff).rw(FUNC(_2mindril_state::f3_videoram_r), FUNC(_2mindril_state::f3_videoram_w));
-	map(0x41e000, 0x41ffff).rw(FUNC(_2mindril_state::f3_vram_r), FUNC(_2mindril_state::f3_vram_w));
-	map(0x420000, 0x42ffff).rw(FUNC(_2mindril_state::f3_lineram_r), FUNC(_2mindril_state::f3_lineram_w));
-	map(0x430000, 0x43ffff).rw(FUNC(_2mindril_state::f3_pivot_r), FUNC(_2mindril_state::f3_pivot_w));
-	map(0x460000, 0x46000f).w(FUNC(_2mindril_state::f3_control_0_w));
-	map(0x460010, 0x46001f).w(FUNC(_2mindril_state::f3_control_1_w));
+	map(0x400000, 0x40ffff).ram().share("spriteram");
+	map(0x410000, 0x41bfff).ram().w(FUNC(_2mindril_state::pf_ram_w)).share("pf_ram");
+	map(0x41c000, 0x41dfff).ram().w(FUNC(_2mindril_state::textram_w)).share("textram");
+	map(0x41e000, 0x41ffff).ram().w(FUNC(_2mindril_state::charram_w)).share("charram");
+	map(0x420000, 0x42ffff).ram().share("line_ram");
+	map(0x430000, 0x43ffff).ram().w(FUNC(_2mindril_state::pivot_w)).share("pivot_ram");
+	map(0x460000, 0x46000f).w(FUNC(_2mindril_state::control_0_w));
+	map(0x460010, 0x46001f).w(FUNC(_2mindril_state::control_1_w));
 	map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x502022, 0x502023).nopw(); //countinously switches between 0 and 2
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
-	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::drill_irq_r), FUNC(_2mindril_state::drill_irq_w));
+	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::irq_r), FUNC(_2mindril_state::irq_w));
 	map(0x60000e, 0x60000f).ram(); // unknown purpose, zeroed at start-up and nothing else
 	map(0x700000, 0x70000f).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0xff00);
 	map(0x800000, 0x800001).w(FUNC(_2mindril_state::sensors_w));
@@ -269,7 +270,7 @@ static const gfx_layout charlayout =
 	4,
 	{ 0,1,2,3 },
 	{ 20, 16, 28, 24, 4, 0, 12, 8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
@@ -280,52 +281,43 @@ static const gfx_layout pivotlayout =
 	4,
 	{ 0,1,2,3 },
 	{ 20, 16, 28, 24, 4, 0, 12, 8 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
-static const gfx_layout spriteram_layout =
+static const gfx_layout layout_6bpp_sprite_hi =
 {
 	16,16,
-	RGN_FRAC(1,2),
-	6,  /* Palettes have 4 bpp indexes despite up to 6 bpp data */
-	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, 0, 1, 2, 3 },
-	{
-	4, 0, 12, 8,
-	16+4, 16+0, 16+12, 16+8,
-	32+4, 32+0, 32+12, 32+8,
-	48+4, 48+0, 48+12, 48+8 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	RGN_FRAC(1,1),
+	6,
+	{ STEP2(0,1)/**/,0,0,0,0/**/ },
+	{ STEP4(3*2,-2), STEP4(7*2,-2), STEP4(11*2,-2), STEP4(15*2,-2) },
+	{ STEP16(0,16*2) },
+	16*16*2
 };
 
-static const gfx_layout tile_layout =
+static const gfx_layout layout_6bpp_tile_hi =
 {
 	16,16,
-	RGN_FRAC(1,2),
-	6,  /* Palettes have 4 bpp indexes despite up to 6 bpp data */
-	{ RGN_FRAC(1,2)+2, RGN_FRAC(1,2)+3, 0, 1, 2, 3 },
-	{
-	4, 0, 16+4, 16+0,
-	8+4, 8+0, 24+4, 24+0,
-	32+4, 32+0, 48+4, 48+0,
-	40+4, 40+0, 56+4, 56+0,
-	},
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	RGN_FRAC(1,1),
+	6,
+	{ 8,0/**/,0,0,0,0/**/ },
+	{ STEP8(7,-1), STEP8(8*2+7,-1) },
+	{ STEP16(0,8*2*2) },
+	16*16*2
 };
 
 static GFXDECODE_START( gfx_2mindril )
-	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
-	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
-	GFXDECODE_ENTRY( nullptr,   0x000000, pivotlayout,      0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
+	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
+	GFXDECODE_ENTRY( "tilemap_hi", 0, layout_6bpp_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
+	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_sprite_hi,  0x1000, 0x1000>>4 ) // hi 2bpp of 6bpp sprite data
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(_2mindril_state::drill_vblank_irq)
+INTERRUPT_GEN_MEMBER(_2mindril_state::vblank_irq)
 {
 	device.execute().set_input_line(4, ASSERT_LINE);
 }
@@ -344,14 +336,14 @@ WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
 }
 
 
-MACHINE_START_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_start()
 {
 	save_item(NAME(m_defender_sensor));
 	save_item(NAME(m_shutter_sensor));
 	save_item(NAME(m_irq_reg));
 }
 
-MACHINE_RESET_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_reset()
 {
 	m_defender_sensor = 0;
 	m_shutter_sensor = 0;
@@ -362,8 +354,7 @@ void _2mindril_state::drill(machine_config &config)
 {
 	M68000(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_2mindril_state::drill_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_2mindril_state::drill_vblank_irq));
-	//MCFG_DEVICE_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
+	m_maincpu->set_vblank_int("screen", FUNC(_2mindril_state::vblank_irq));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2mindril);
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
@@ -373,16 +364,13 @@ void _2mindril_state::drill(machine_config &config)
 	tc0510nio.write_4_callback().set(FUNC(_2mindril_state::coins_w));
 	tc0510nio.read_7_callback().set_ioport("COINS");
 
-	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
-	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
 	m_screen->set_size(40*8+48*2, 32*8);
 	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
-	m_screen->set_screen_update(FUNC(_2mindril_state::screen_update_f3));
-	m_screen->screen_vblank().set(FUNC(_2mindril_state::screen_vblank_f3));
+	m_screen->set_screen_update(FUNC(_2mindril_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(_2mindril_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
 
@@ -400,85 +388,27 @@ void _2mindril_state::drill(machine_config &config)
 
 ROM_START( 2mindril )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "d58-38.ic11", 0x00000, 0x40000, CRC(c58e8e4f) SHA1(648db679c3bfb5de1cd6c1b1217773a2fe56f11b) )
+	ROM_LOAD16_BYTE( "d58-38.ic11", 0x00000, 0x40000, CRC(c58e8e4f) SHA1(648db679c3bfb5de1cd6c1b1217773a2fe56f11b) ) // Ver 2.93A 1994/02/16 09:45:00
 	ROM_LOAD16_BYTE( "d58-37.ic9",  0x00001, 0x40000, CRC(19e5cc3c) SHA1(04ac0eef893c579fe90d91d7fd55c5741a2b7460) )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
 
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "sprites_hi", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x800000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "d58-09.ic28", 0x000001, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
-	ROM_LOAD16_BYTE( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
-	ROM_LOAD( "d58-10.ic29", 0x400000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
-	ROM_RELOAD(              0x600000, 0x200000 )
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD32_WORD( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
+	ROM_LOAD32_WORD( "d58-09.ic28", 0x000002, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
+
+	ROM_REGION( 0x200000, "tilemap_hi", 0 )
+	ROM_LOAD       ( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
 ROM_END
-
-void _2mindril_state::tile_decode()
-{
-	uint8_t lsb,msb;
-	uint32_t offset,i;
-	uint8_t *gfx = memregion("gfx2")->base();
-	int size=memregion("gfx2")->bytes();
-	int data;
-
-	/* Setup ROM formats:
-
-	    Some games will only use 4 or 5 bpp sprites, and some only use 4 bpp tiles,
-	    I don't believe this is software or prom controlled but simply the unused data lines
-	    are tied low on the game board if unused.  This is backed up by the fact the palette
-	    indices are always related to 4 bpp data, even in 6 bpp games.
-
-	    Most (all?) games with 5bpp tiles have the sixth bit set. Also, in Arabian Magic
-	    sprites 1200-120f contain 6bpp data which is probably bogus.
-	    video_start clears the fifth and sixth bit of the decoded graphics according
-	    to the bit depth specified in f3_config_table.
-
-	*/
-
-	offset = size/2;
-	for (i = size/2+size/4; i<size; i+=2)
-	{
-		/* Expand 2bits into 4bits format */
-		lsb = gfx[i+1];
-		msb = gfx[i];
-
-		gfx[offset+0]=((msb&0x02)<<3) | ((msb&0x01)>>0) | ((lsb&0x02)<<4) | ((lsb&0x01)<<1);
-		gfx[offset+2]=((msb&0x08)<<1) | ((msb&0x04)>>2) | ((lsb&0x08)<<2) | ((lsb&0x04)>>1);
-		gfx[offset+1]=((msb&0x20)>>1) | ((msb&0x10)>>4) | ((lsb&0x20)<<0) | ((lsb&0x10)>>3);
-		gfx[offset+3]=((msb&0x80)>>3) | ((msb&0x40)>>6) | ((lsb&0x80)>>2) | ((lsb&0x40)>>5);
-
-		offset+=4;
-	}
-
-	gfx = memregion("gfx1")->base();
-	size=memregion("gfx1")->bytes();
-
-	offset = size/2;
-	for (i = size/2+size/4; i<size; i++)
-	{
-		int d1,d2,d3,d4;
-
-		/* Expand 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data>>0) & 3;
-		d2 = (data>>2) & 3;
-		d3 = (data>>4) & 3;
-		d4 = (data>>6) & 3;
-
-		gfx[offset] = (d1<<2) | (d2<<6);
-		offset++;
-
-		gfx[offset] = (d3<<2) | (d4<<6);
-		offset++;
-	}
-}
 
 void _2mindril_state::init_drill()
 {
-	m_f3_game = TMDRILL;
+	m_game = TMDRILL;
 	tile_decode();
 }
 
-GAME( 1993, 2mindril, 0, drill, drill, _2mindril_state, init_drill, ROT0, "Taito", "Two Minute Drill", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+GAME( 1993, 2mindril, 0, drill, drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

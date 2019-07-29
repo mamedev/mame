@@ -2437,6 +2437,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0xfb: // i_sti
 			m_IF = 1;
+			m_no_interrupt = 1;
 			CLK(FLAG_OPS);
 			break;
 

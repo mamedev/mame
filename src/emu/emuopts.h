@@ -97,11 +97,6 @@
 
 // core artwork options
 #define OPTION_ARTWORK_CROP         "artwork_crop"
-#define OPTION_USE_BACKDROPS        "use_backdrops"
-#define OPTION_USE_OVERLAYS         "use_overlays"
-#define OPTION_USE_BEZELS           "use_bezels"
-#define OPTION_USE_CPANELS          "use_cpanels"
-#define OPTION_USE_MARQUEES         "use_marquees"
 #define OPTION_FALLBACK_ARTWORK     "fallback_artwork"
 #define OPTION_OVERRIDE_ARTWORK     "override_artwork"
 
@@ -167,6 +162,7 @@
 #define OPTION_BIOS                 "bios"
 #define OPTION_CHEAT                "cheat"
 #define OPTION_SKIP_GAMEINFO        "skip_gameinfo"
+#define OPTION_SKIP_MANDATORY_FILEMAN   "skip_mandatory_fileman"
 #define OPTION_UI_FONT              "uifont"
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
@@ -379,11 +375,6 @@ public:
 
 	// core artwork options
 	bool artwork_crop() const { return bool_value(OPTION_ARTWORK_CROP); }
-	bool use_backdrops() const { return bool_value(OPTION_USE_BACKDROPS); }
-	bool use_overlays() const { return bool_value(OPTION_USE_OVERLAYS); }
-	bool use_bezels() const { return bool_value(OPTION_USE_BEZELS); }
-	bool use_cpanels() const { return bool_value(OPTION_USE_CPANELS); }
-	bool use_marquees() const { return bool_value(OPTION_USE_MARQUEES); }
 	const char *fallback_artwork() const { return value(OPTION_FALLBACK_ARTWORK); }
 	const char *override_artwork() const { return value(OPTION_OVERRIDE_ARTWORK); }
 
@@ -447,6 +438,7 @@ public:
 	const char *bios() const { return value(OPTION_BIOS); }
 	bool cheat() const { return bool_value(OPTION_CHEAT); }
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
+	bool skip_mandatory_fileman() const { return bool_value(OPTION_SKIP_MANDATORY_FILEMAN); }
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
@@ -490,6 +482,7 @@ public:
 	bool has_slot_option(const std::string &device_name) const { return find_slot_option(device_name) ? true : false; }
 	const ::image_option &image_option(const std::string &device_name) const;
 	::image_option &image_option(const std::string &device_name);
+	bool has_image_option(const std::string &device_name) const { return m_image_options.find(device_name) != m_image_options.end(); }
 
 protected:
 	virtual void command_argument_processed() override;

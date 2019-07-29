@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***********************************************************************************************************************************
 
-Skeleton driver for ITT Courier 9216 IBM-compatible color display terminal.
+Skeleton driver for ITT Courier 9216 IBM 3179-compatible color display terminal.
 
 ************************************************************************************************************************************/
 
@@ -16,23 +16,63 @@ public:
 	itt9216_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_program(*this, "program")
 		, m_chargen(*this, "chargen")
 	{
 	}
 
 	void itt9216(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
+	u8 ram_rom_r(offs_t offset);
+	void ram_w(offs_t offset, u8 data);
+
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_program;
 	required_region_ptr<u8> m_chargen;
+
+	std::unique_ptr<u8[]> m_mainram;
+	bool m_rom_enabled;
 };
+
+void itt9216_state::machine_start()
+{
+	m_mainram = make_unique_clear<u8[]>(0x10000);
+
+	save_item(NAME(m_rom_enabled));
+	save_pointer(NAME(m_mainram), 0x10000);
+}
+
+void itt9216_state::machine_reset()
+{
+	m_rom_enabled = true;
+}
+
+u8 itt9216_state::ram_rom_r(offs_t offset)
+{
+	if (m_rom_enabled)
+		return m_program[offset & 0x1fff];
+	else
+		return m_mainram[offset];
+}
+
+void itt9216_state::ram_w(offs_t offset, u8 data)
+{
+	m_mainram[offset] = data;
+	if (!machine().side_effects_disabled())
+		m_rom_enabled = false;
+}
 
 void itt9216_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x00007).rom().region("program", 0);
-	map(0x00008, 0x0ffff).ram();
+	map(0x00000, 0x0ffff).rw(FUNC(itt9216_state::ram_rom_r), FUNC(itt9216_state::ram_w));
+	map(0x10000, 0x11fff).ram();
 	map(0x58000, 0x59fff).rom().region("program", 0);
 	map(0x62000, 0x62fff).ram();
 }
@@ -45,7 +85,7 @@ void itt9216_state::itt9216(machine_config &config)
 	M68008(config, m_maincpu, 8000000); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &itt9216_state::mem_map);
 
-	I8741(config, "upi", 6000000).set_disable(); // clock unknown
+	I8741A(config, "upi", 6000000).set_disable(); // clock unknown
 }
 
 // XTALs: 38.080 MHz (U7), 11.250(?) MHz (U1)

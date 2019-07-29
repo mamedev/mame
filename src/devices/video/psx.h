@@ -27,7 +27,6 @@ class psxgpu_device : public device_t, public device_video_interface, public dev
 {
 public:
 	// configuration helpers
-	template <class Object> devcb_base &set_vblank_handler(Object &&cb) { return m_vblank_handler.set_callback(std::forward<Object>(cb)); }
 	auto vblank_callback() { return m_vblank_handler.bind(); }
 	void set_vram_size(int size) { vramSize = size; }
 

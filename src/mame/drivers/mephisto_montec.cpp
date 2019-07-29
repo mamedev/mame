@@ -10,6 +10,13 @@
     Mephisto Super Mondial
     Mephisto Super Mondial II
 
+    smondialb notes:
+    - holding CL+INFO+BOOK on boot load the test mode
+
+    TODO:
+    - split driver into several files?
+    - why are megaiv/smondial2 beeps noisy?
+
 **************************************************************************************************/
 
 
@@ -18,6 +25,9 @@
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "machine/timer.h"
+#include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
@@ -38,6 +48,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
+		, m_dac(*this, "dac")
 		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
@@ -45,6 +56,7 @@ public:
 		, m_high_leds(*this, "led%u", 100U)
 	{ }
 
+	void mondial(machine_config &config);
 	void smondial(machine_config &config);
 	void mondial2(machine_config &config);
 	void smondial2(machine_config &config);
@@ -70,10 +82,13 @@ private:
 	DECLARE_WRITE8_MEMBER(smondial_board_mux_w);
 	DECLARE_WRITE8_MEMBER(smondial_led_data_w);
 
+	DECLARE_WRITE8_MEMBER(mondial_input_mux_w);
+	DECLARE_READ8_MEMBER(mondial_input_r);
 	DECLARE_WRITE8_MEMBER(mondial2_input_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
 
 	void megaiv_mem(address_map &map);
+	void mondial_mem(address_map &map);
 	void mondial2_mem(address_map &map);
 	void montec_mem(address_map &map);
 	void smondial2_mem(address_map &map);
@@ -84,7 +99,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
-	required_device<beep_device> m_beeper;
+	optional_device<dac_bit_interface> m_dac;
+	optional_device<beep_device> m_beeper;
 	optional_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 	output_finder<16> m_low_leds, m_high_leds;
@@ -221,7 +237,7 @@ WRITE8_MEMBER(mephisto_montec_state::montec_nmi_ack_w)
 
 WRITE8_MEMBER(mephisto_montec_state::montec_beeper_w)
 {
-	m_beeper->set_state(BIT(data, 7) ? 0 : 1);
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
@@ -240,7 +256,7 @@ WRITE8_MEMBER(mephisto_montec_state::megaiv_led_w)
 		}
 	}
 
-	m_beeper->set_state(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 }
 
 READ8_MEMBER(mephisto_montec_state::megaiv_input_r)
@@ -317,7 +333,7 @@ WRITE8_MEMBER(mephisto_montec_state::smondial_led_data_w)
 	else
 		m_leds_mux |= (1 << offset);
 
-	m_beeper->set_state(BIT(m_leds_mux, 7));
+	m_dac->write(BIT(m_leds_mux, 7));
 }
 
 void mephisto_montec_state::smondial_mem(address_map &map)
@@ -348,7 +364,8 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 	}
 
 	m_input_mux = data ^ 0xff;
-	m_beeper->set_state(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
+	m_maincpu->set_input_line(M65C02_NMI_LINE, CLEAR_LINE);
 }
 
 
@@ -359,6 +376,47 @@ void mephisto_montec_state::mondial2_mem(address_map &map)
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0x3000, 0x3007).r(FUNC(mephisto_montec_state::megaiv_input_r));
 	map(0x8000, 0xffff).rom();
+}
+
+READ8_MEMBER(mephisto_montec_state::mondial_input_r)
+{
+	uint8_t data;
+	if (m_input_mux & 0x08)
+		data = m_keys[BIT(~m_input_mux, 0)]->read();
+	else
+		data = m_board->input_r(space, 0);
+
+	return BIT(data, offset) << 7;
+}
+
+WRITE8_MEMBER(mephisto_montec_state::mondial_input_mux_w)
+{
+	uint8_t leds_data = ~(1 << (data & 0x07));
+	m_board->mux_w(space, offset, leds_data);
+
+	for (int i=0; i<8; i++)
+	{
+		if (!BIT(leds_data, i))
+		{
+			if (!(data & 0x10)) m_high_leds[i] = 1;
+			if (!(data & 0x20)) m_low_leds[8 + i] = 1;
+			if (!(data & 0x40)) m_low_leds[0 + i] = 1;
+		}
+	}
+
+	m_input_mux = data;
+	m_beeper->set_state(BIT(data, 7));
+	m_maincpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+}
+
+
+void mephisto_montec_state::mondial_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x1000, 0x1000).w(FUNC(mephisto_montec_state::mondial_input_mux_w));
+	map(0x2000, 0x2000).r(m_board, FUNC(mephisto_board_device::input_r));
+	map(0x1800, 0x1807).r(FUNC(mephisto_montec_state::mondial_input_r));
+	map(0xc000, 0xffff).rom();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_montec_state::refresh_leds)
@@ -467,10 +525,12 @@ void mephisto_montec_state::montec(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3250).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
+	MEPHISTO_SENSORS_BOARD(config, m_board);
+	m_board->set_delay(attotime::from_msec(300));
 
 	config.set_default_layout(layout_mephisto_montec);
 }
@@ -479,6 +539,7 @@ void mephisto_montec_state::monteciv(machine_config &config)
 {
 	montec(config);
 	m_maincpu->set_clock(XTAL(8'000'000));
+	m_board->set_delay(attotime::from_msec(150));
 }
 
 void mephisto_montec_state::megaiv(machine_config &config)
@@ -488,7 +549,8 @@ void mephisto_montec_state::megaiv(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::megaiv_mem);
 	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
 
-	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
+	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);
+	m_board->set_delay(attotime::from_msec(250));
 	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_megaiv);
 }
@@ -498,10 +560,21 @@ void mephisto_montec_state::mondial2(machine_config &config)
 	megaiv(config);
 	m_maincpu->set_clock(XTAL(2'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::mondial2_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_pulse), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::nmi_line_assert), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
 
-	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(10));
+	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(2));
 	config.set_default_layout(layout_mephisto_mondial2);
+}
+
+void mephisto_montec_state::mondial(machine_config &config)
+{
+	mondial2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_montec_state::mondial_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_montec_state::irq0_line_assert), attotime::from_hz(XTAL(2'000'000) / (1 << 12)));
+
+	config.device_remove("dac");
+	config.device_remove("vref");
+	BEEP(config, m_beeper, 2048).add_route(ALL_OUTPUTS, "speaker", 0.25); // measured C7(2093Hz)
 }
 
 void mephisto_montec_state::smondial(machine_config &config)
@@ -536,17 +609,35 @@ ROM_END
 
 ROM_START(montec)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("mc.bin", 0x08000, 0x08000, CRC(05524da9) SHA1(bee2ffe09a27095f733584e0fb1203b95c23e17e))
+	ROM_DEFAULT_BIOS("v2")
+	ROM_SYSTEM_BIOS( 0, "v1", "v1" )
+	ROM_SYSTEM_BIOS( 1, "v2", "v2" )
+	ROMX_LOAD("mc.bin", 0x8000, 0x8000, CRC(05524da9) SHA1(bee2ffe09a27095f733584e0fb1203b95c23e17e), ROM_BIOS(0))
+	ROMX_LOAD("mc2.bin", 0x8000, 0x8000, CRC(8eb26043) SHA1(26454a37eea29283bbb2762a3a68e95e4be6aa1c), ROM_BIOS(1))
 ROM_END
 
 ROM_START(smondial)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("mephisto super mondial i.bin", 0x8000, 0x8000, CRC(c1d7d0a5) SHA1(d7f0da6938458c06925f0936e63915319144d7e0))
+	ROM_DEFAULT_BIOS("ab")
+	ROM_SYSTEM_BIOS( 0, "a",  "Ver A" )
+	ROM_SYSTEM_BIOS( 1, "ab", "Ver AB" )
+	ROMX_LOAD("supermondial_a.bin", 0x8000, 0x8000, CRC(c1d7d0a5) SHA1(d7f0da6938458c06925f0936e63915319144d7e0), ROM_BIOS(0))
+	ROMX_LOAD("supermondial_ab.bin", 0x8000, 0x8000, CRC(a8781685) SHA1(fd4c97e13bd398dc4c85e3e1778bf7e59fccd71e), ROM_BIOS(1))
+ROM_END
+
+ROM_START(smondialb)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("supermondial_b.bin", 0x8000, 0x8000, CRC(6fb89e97) SHA1(b001e657b4fdc097322b28a25c31814f3da7b124))
 ROM_END
 
 ROM_START(smondial2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("supermondial_ii.bin", 0x8000, 0x8000, CRC(cd73df4a) SHA1(bad786074be613d7f48bf98b6fdf8178a4a85f5b))
+ROM_END
+
+ROM_START(mondial)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mondial_1.bin", 0xc000, 0x4000, CRC(5cde2e26) SHA1(337be35d5120ca12143ca17f8aa0642b313b3851))
 ROM_END
 
 ROM_START(mondial2)
@@ -555,10 +646,12 @@ ROM_START(mondial2)
 ROM_END
 
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                      FLAGS */
-CONS( 1986, smondial,  0,      0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, montec,    0,      0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mondial2,  0,      0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, smondial2, 0,      0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, megaiv,    0,      0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, monteciv,  montec, 0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS                  INIT        COMPANY             FULLNAME                      FLAGS */
+CONS( 1985, mondial,   0,        0,      mondial,   mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondial,  0,        0,      smondial,  megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver A)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, smondialb, smondial, 0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial (Ver B)",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, montec,    0,        0,      montec,    montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo",       MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mondial2,  0,        0,      mondial2,  mondial2,  mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mondial II",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, smondial2, 0,        0,      smondial2, smondial2, mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Super Mondial II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, megaiv,    0,        0,      megaiv,    megaiv,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Mega IV",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, monteciv,  montec,   0,      monteciv,  montec,    mephisto_montec_state, empty_init, "Hegener & Glaser", "Mephisto Monte Carlo IV LE", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -440,7 +440,7 @@ const tiny_rom_entry *ti99_cartridge_device::device_rom_region() const
     ROM space
     6000          7000        7fff
     |             |              |
-    |========== ROM1 ============|
+    |========== ROM1 ============|   (or RAM, e.g. in Myarc XB II)
 
 ***************************************************************************/
 
@@ -501,6 +501,12 @@ READ8Z_MEMBER(ti99_cartridge_pcb::readz)
 		{
 			*value = m_rom_ptr[offset & 0x1fff];
 		}
+		else
+		{
+			// Check if we have RAM in the ROM socket
+			if ((offset & 0x1fff) < m_ram_size)
+				*value = m_ram_ptr[offset & 0x1fff];
+		}
 	}
 	else
 	{
@@ -513,7 +519,15 @@ void ti99_cartridge_pcb::write(offs_t offset, uint8_t data)
 {
 	if (m_romspace_selected)
 	{
-		LOGMASKED(LOG_WARN, "Cannot write to ROM space at %04x\n", offset);
+		if (m_ram_ptr == nullptr) LOGMASKED(LOG_WARN, "Cannot write to cartridge ROM space at %04x\n", offset | 0x6000);
+		else
+		{
+			// Check if we have RAM in the ROM socket
+			if ((offset & 0x1fff) < m_ram_size)
+				m_ram_ptr[offset & 0x1fff] = data;
+			else
+				LOGMASKED(LOG_WARN, "Cannot write to cartridge RAM space at %04x\n", offset | 0x6000);
+		}
 	}
 	else
 	{

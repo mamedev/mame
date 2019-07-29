@@ -326,24 +326,28 @@ uint8_t a2bus_agat840k_hle_device::read_cnxx(uint8_t offset)
 
 legacy_floppy_image_device *a2bus_agat840k_hle_device::floppy_image(int drive)
 {
-	const char *floppy_name = nullptr;
-
-	switch (drive)
-	{
-	case 0:
-		floppy_name = FLOPPY_0;
-		break;
-	case 1:
-		floppy_name = FLOPPY_1;
-		break;
+	switch(drive) {
+		case 0 : return subdevice<legacy_floppy_image_device>(FLOPPY_0);
+		case 1 : return subdevice<legacy_floppy_image_device>(FLOPPY_1);
 	}
-	return subdevice<legacy_floppy_image_device>(floppy_name);
+	return nullptr;
 }
 
-// all signals active low.  write support not implemented; WPT is always active.
+/*
+ * all signals active low.  write support not implemented; WPT is always active.
+ *
+ * b0-b1    type of drive 2: 00 - ES 5323.01 "1000 KB", 01 - "500 KB", 10 - "250 KB", 11 - not present
+ * b2-b3    type of drive 1: -""-
+ * b4       INDEX/SECTOR
+ * b5       WRITE PROTECT
+ * b6       TRACK 0
+ * b7       READY
+ *
+ * C0x1
+ */
 READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
 {
-	u8 data = 0x03; // one drive present, because drive select is broken
+	u8 data = 0x3;
 
 	m_floppy->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 1);
 
@@ -373,7 +377,6 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
  */
 WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 {
-	// drive select is broken in legacy flopdrv.cpp -- floppy_get_drive
 	m_unit = BIT(data, 3);
 	m_floppy = floppy_image(m_unit);
 	if (m_unit)
@@ -402,6 +405,8 @@ WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 		data, m_unit, m_side, !BIT(data, 2), !BIT(data, 6), !BIT(data, 7));
 }
 
+// C0x4
+//
 // data are latched in by write to PC4
 READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
 {

@@ -56,7 +56,6 @@ TODO:
 #include "machine/6522via.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -94,8 +93,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE_LINE_MEMBER(cb2_w);
 	uint32_t readByLittleEndian(uint8_t *buf,int pos);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
-
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void mem_map(address_map &map);
 
@@ -122,7 +120,7 @@ void jr100_state::mem_map(address_map &map)
 	//map(0x8000, 0xbfff).rom();   expansion rom
 	map(0xc000, 0xc0ff).ram().share("pcg").region("maincpu", 0xc000);
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(m_via, FUNC(via6522_device::write));
+	map(0xc800, 0xc80f).m(m_via, FUNC(via6522_device::map));
 	//map(0xcc00, 0xcfff).;   expansion i/o
 	//map(0xd000, 0xd7ff).rom();   expansion rom for printer control
 	//map(0xd800, 0xdfff).rom();   expansion rom
@@ -321,7 +319,7 @@ uint32_t jr100_state::readByLittleEndian(uint8_t *buf,int pos)
 	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24);
 }
 
-QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
+QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 {
 	int quick_length;
 	uint8_t buf[0x10000];
@@ -396,15 +394,14 @@ void jr100_state::jr100(machine_config &config)
 	m_via->irq_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	CASSETTE(config, m_cassette, 0);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jr100_state, jr100), this), "prg", attotime::from_seconds(2));
+	QUICKLOAD(config, "quickload", "prg", attotime::from_seconds(2)).set_load_callback(FUNC(jr100_state::quickload_cb), this);
 }
 
 

@@ -13,8 +13,9 @@
 	<element name="text_l3"><text string="HOME" align="2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.2" green="0.04" blue="0.05" /></disk>
-		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+		<disk state="0"><color red="0.14" green="0.02" blue="0.03" /></disk>
+		<disk state="1"><color red="0.5" green="0.1" blue="0.11" /></disk>
+		<disk state="2"><color red="1.0" green="0.20" blue="0.23" /></disk>
 	</element>
 
 	<element name="digit" defstate="0">

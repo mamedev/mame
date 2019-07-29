@@ -61,6 +61,7 @@ private:
 	void sound_bankswitch_w(u8 data);
 	void msm5205_start_w(u8 data);
 	void msm5205_stop_w(u8 data);
+	void rastan_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_vck);
 	void main_map(address_map &map);

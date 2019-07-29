@@ -48,6 +48,7 @@ Dinosaur King - Operation: Dinosaur Rescue  837-14434-91              ROM  US/EX
 - // -                                      834-14662-01    MDA-C0021 CF                          AAFE-01B87574811
 Dinosaur King 2                             ???-?????                 no          253-5508-0408   AAFE-xxxxxxxxxxx
 Dinosaur King 2 Ver 2.5                     834-14792-02 F  MDA-C0047 CF   EXP    253-5508-0408   AAFE-01D73384904
+Dinosaur King Ver 4.000                     ???-?????       MDA-C0061 CF   JP     253-5508-0408   AAFE-xxxxxxxxxxx
 Disney: Magical Dream Dance on Stage        ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Future Police Patrol Chase                  ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Issyouni Turbo Drive                        ???-?????                 no          ???-????-????   AAFE-01E91305101
@@ -581,6 +582,27 @@ ROM_START( dinoki25 )
 	ROM_LOAD( "dino_type3.bin", 0, 0x80, CRC(1b6c9ea7) SHA1(2e56a1969c49c347f7facda187e5bf787c74328c) )
 ROM_END
 
+// This version does not use RFID readers and Management chips.
+ROM_START( dinoki4 )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v200" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	// 古代王者 恐竜キング
+	// 目覚めよ！ 新たなる力！！
+	// MDA-C0061
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0061", 0, BAD_DUMP SHA1(d9e21aff3d33cc5d3d97decacf963cff23c60ff1) ) // BAD_DUMP note: actual game files is all good and genuine, but image itself was modified and not original.
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, CRC(f77c49dc) SHA1(e10173bbbd5930ed159cec9a7dba308e2a3f3c43) )
+ROM_END
+
 ROM_START( loveber3 )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v200" )
@@ -656,6 +678,7 @@ GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 // These use a CF card
 GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
+GAME( 2008, dinoki4,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)", GAME_FLAGS ) // Ancient Ruler Dinosaur King - Wake up! New Power!!
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
 GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )

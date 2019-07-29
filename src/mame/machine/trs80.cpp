@@ -394,7 +394,7 @@ MACHINE_RESET_MEMBER(trs80_state,lnw80)
     IMPLEMENTATION
 ***************************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( trs80_state, trs80_cmd )
+QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

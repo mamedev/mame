@@ -711,6 +711,7 @@ GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bo
 GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "Worldcup '90 (hack)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, twcup90bb, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bootleg", "World Cup '90 (European hack, different title)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
- // not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho
+// not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho
+// Gaelco requested the registry of the "Euro League" trademark on 1990, and it was a Gaelco protected trademark (in Spain) until 1999 (they paid a 5-year renew in 1994): https://www.patentes-y-marcas.com/marca/euro-league-m1546246
 GAME( 1989, eurogael,  twcup90, eurogael, wc90b, eurogael_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_IMPERFECT_SOUND )
 

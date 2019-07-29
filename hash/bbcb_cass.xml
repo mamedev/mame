@@ -9694,7 +9694,7 @@
 
 	<software name="psycast2at" cloneof="psycast2">
 		<description>Psycastria 2 (Atlantis)</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>Atlantis</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="21424">
@@ -15249,8 +15249,8 @@
 
 	<software name="educsp1">
 		<description>Educational Special No.1</description>
-		<year>198?</year>
-		<publisher>Database</publisher>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="50217">
 				<rom name="educationalspecialno1(database).uef" size="50217" crc="5d08b9e7" sha1="29daa7cc880d71082b3bca07df87241b3949d98d" />
@@ -17478,7 +17478,7 @@
 	</software>
 
 	<software name="mu39">
-		<description>Micro User Vol.3, No.9</description>
+		<description>Micro User Vol.3, No.9: Whodunnit</description>
 		<year>1985</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="bbc_cass">

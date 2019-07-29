@@ -29,39 +29,26 @@ void cbuster_state::video_start()
     I suspect this setup is actually software compensating for a hardware
     design problem.
 */
-
-void cbuster_state::update_palette(int offset)
+rgb_t cbuster_state::cbuster_XBGR_888(u32 raw)
 {
-	int r = m_paletteram[offset]&0xff;
-	int g = m_paletteram[offset]>>8;
-	int b = m_paletteram_ext[offset]&0xff;
+	int r = (raw >>  0) & 0xff;
+	int g = (raw >>  8) & 0xff;
+	int b = (raw >> 16) & 0xff;
 
-	if (r>0x8e) r=0x8e;
-	if (g>0x8e) g=0x8e;
-	if (b>0x8e) b=0x8e;
+	if (r > 0x8e) r = 0x8e;
+	if (g > 0x8e) g = 0x8e;
+	if (b > 0x8e) b = 0x8e;
 
 	r = (r * 255) / 0x8e;
 	g = (g * 255) / 0x8e;
 	b = (b * 255) / 0x8e;
 
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
+	return rgb_t(r, g, b);
 }
 
-WRITE16_MEMBER(cbuster_state::palette_w)
+u32 cbuster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	COMBINE_DATA(&m_paletteram[offset]);
-	update_palette(offset);
-}
-
-WRITE16_MEMBER(cbuster_state::palette_ext_w)
-{
-	COMBINE_DATA(&m_paletteram_ext[offset]);
-	update_palette(offset);
-}
-
-uint32_t cbuster_state::screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
+	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
 
 	flip_screen_set(!BIT(flip, 7));
 	m_sprgen->set_flip_screen(!BIT(flip, 7));

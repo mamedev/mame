@@ -77,7 +77,6 @@ JMON ToDo:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "tec1.lh"
@@ -91,7 +90,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_wave(*this, "wave")
 		, m_key_pressed(0)
 		, m_io_line0(*this, "LINE0")
 		, m_io_line1(*this, "LINE1")
@@ -110,7 +108,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cass;
-	optional_device<wave_device> m_wave;
 	bool m_key_pressed;
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
@@ -458,10 +455,10 @@ void tec1_state::tecjmon(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 }
 
 

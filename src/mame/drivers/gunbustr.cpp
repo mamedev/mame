@@ -202,26 +202,14 @@ static const gfx_layout tile16x16_layout =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ STEP4(0,8) },
-	{ STEP8(8*4,1), STEP8(0,1) },
-	{ STEP16(0,8*4*2) },
+	{ STEP4(0,16) },
+	{ STEP16(0,1) },
+	{ STEP16(0,16*4) },
 	16*16*4   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout charlayout =
-{
-	16,16,    /* 16*16 characters */
-	RGN_FRAC(1,1),
-	4,        /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(7*4,-4), STEP8(15*4,-4) },
-	{ STEP16(0,16*4) },
-	16*16*4     /* every sprite takes 128 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_gunbustr )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 256 )
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout,  0, 256 )
 GFXDECODE_END
 
 
@@ -261,12 +249,10 @@ void gunbustr_state::gunbustr(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x20, 0x07);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(-1, 0);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);
@@ -285,15 +271,15 @@ ROM_START( gunbustr )
 	ROM_LOAD16_BYTE( "d27-25.bin", 0x100000, 0x20000, CRC(c88203cf) SHA1(a918d395b471acdce56dacabd7a1e1e023948365) )
 	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "d27-01.bin", 0x00002, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
-	ROM_LOAD32_WORD_SWAP( "d27-02.bin", 0x00000, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+	ROM_REGION( 0x100000, "tc0480scp", 0 )
+	ROM_LOAD32_WORD( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
+	ROM_LOAD32_WORD( "d27-02.bin", 0x00002, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
-	ROM_LOAD32_BYTE( "d27-05.bin", 0x000002, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
-	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
-	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "d27-04.bin", 0x000006, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
+	ROM_LOAD64_WORD_SWAP( "d27-05.bin", 0x000004, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
+	ROM_LOAD64_WORD_SWAP( "d27-06.bin", 0x000002, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
+	ROM_LOAD64_WORD_SWAP( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
@@ -319,15 +305,15 @@ ROM_START( gunbustru )
 	ROM_LOAD16_BYTE( "d27-25.bin", 0x100000, 0x20000, CRC(c88203cf) SHA1(a918d395b471acdce56dacabd7a1e1e023948365) )
 	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "d27-01.bin", 0x00002, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
-	ROM_LOAD32_WORD_SWAP( "d27-02.bin", 0x00000, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+	ROM_REGION( 0x100000, "tc0480scp", 0 )
+	ROM_LOAD32_WORD( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
+	ROM_LOAD32_WORD( "d27-02.bin", 0x00002, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
-	ROM_LOAD32_BYTE( "d27-05.bin", 0x000002, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
-	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
-	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "d27-04.bin", 0x000006, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
+	ROM_LOAD64_WORD_SWAP( "d27-05.bin", 0x000004, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
+	ROM_LOAD64_WORD_SWAP( "d27-06.bin", 0x000002, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
+	ROM_LOAD64_WORD_SWAP( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */
@@ -353,15 +339,15 @@ ROM_START( gunbustrj )
 	ROM_LOAD16_BYTE( "d27-25.bin", 0x100000, 0x20000, CRC(c88203cf) SHA1(a918d395b471acdce56dacabd7a1e1e023948365) )
 	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "d27-01.bin", 0x00002, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
-	ROM_LOAD32_WORD_SWAP( "d27-02.bin", 0x00000, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
+	ROM_REGION( 0x100000, "tc0480scp", 0 )
+	ROM_LOAD32_WORD( "d27-01.bin", 0x00000, 0x80000, CRC(f41759ce) SHA1(30789f43dd09b56399e1dfdb8c6a1e01a21562bd) ) /* SCR 16x16 tiles */
+	ROM_LOAD32_WORD( "d27-02.bin", 0x00002, 0x80000, CRC(92ab6430) SHA1(28ed80391c732b09d10c74ed6b78ac76cb62e083) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "d27-04.bin", 0x000003, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
-	ROM_LOAD32_BYTE( "d27-05.bin", 0x000002, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
-	ROM_LOAD32_BYTE( "d27-06.bin", 0x000001, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
-	ROM_LOAD32_BYTE( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "d27-04.bin", 0x000006, 0x100000, CRC(ff8b9234) SHA1(6095b7daf9b7e9a22b0d44d9d6a642ddecb2bd29) )   /* OBJ 16x16 tiles: each rom has 1 bitplane */
+	ROM_LOAD64_WORD_SWAP( "d27-05.bin", 0x000004, 0x100000, CRC(96d7c1a5) SHA1(93b6a7aea397280a5a778e736d433a85cb7da52c) )
+	ROM_LOAD64_WORD_SWAP( "d27-06.bin", 0x000002, 0x100000, CRC(bbb934db) SHA1(9e9b5cf05b9275f1182f5b499b8ee897c4f25b96) )
+	ROM_LOAD64_WORD_SWAP( "d27-07.bin", 0x000000, 0x100000, CRC(8ab4854e) SHA1(bd2750cdaa2918e56f8aef3732875952a1eeafea) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d27-03.bin", 0x00000, 0x80000, CRC(23bf2000) SHA1(49b29e771a47fcd7e6cd4e2704b217f9727f8299) ) /* STY, used to create big sprites on the fly */

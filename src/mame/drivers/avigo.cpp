@@ -694,7 +694,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_1hz_timer)
 	refresh_ints();
 }
 
-QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
+QUICKLOAD_LOAD_MEMBER(avigo_state::quickload_cb)
 {
 	const char *systemname = machine().system().name;
 	uint32_t first_app_page = (0x50000>>14);
@@ -749,7 +749,8 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
-MACHINE_CONFIG_START(avigo_state::avigo)
+void avigo_state::avigo(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &avigo_state::avigo_mem);
@@ -811,8 +812,8 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	TIMER(config, "1hz_timer").configure_periodic(FUNC(avigo_state::avigo_1hz_timer), attotime::from_hz(1));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app")
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "app").set_load_callback(FUNC(avigo_state::quickload_cb), this);
+}
 
 
 /***************************************************************************

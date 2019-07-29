@@ -27,8 +27,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_fuukivid(*this, "fuukivid")
+		, m_spriteram(*this, "spriteram", 32U)
 		, m_vram(*this, "vram.%u", 0)
-		, m_vregs(*this, "vregs")
+		, m_vregs(*this, "vregs", 32U)
 		, m_priority(*this, "priority")
 		, m_tilebank(*this, "tilebank")
 		, m_shared_ram(*this, "shared_ram")
@@ -57,13 +58,13 @@ private:
 	required_device<fuukivid_device> m_fuukivid;
 
 	/* memory pointers */
-	required_shared_ptr_array<uint32_t,4> m_vram;
-	required_shared_ptr<uint32_t> m_vregs;
-	required_shared_ptr<uint32_t> m_priority;
-	required_shared_ptr<uint32_t> m_tilebank;
-	required_shared_ptr<uint8_t> m_shared_ram;
-	//uint32_t *    m_buf_spriteram;
-	//uint32_t *    m_buf_spriteram2;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr_array<u32, 4> m_vram;
+	required_shared_ptr<u16> m_vregs;
+	required_shared_ptr<u32> m_priority;
+	required_shared_ptr<u32> m_tilebank;
+	required_shared_ptr<u8> m_shared_ram;
+	std::unique_ptr<u16[]> m_buf_spriteram[2];
 
 	required_memory_bank m_soundbank;
 
@@ -73,20 +74,23 @@ private:
 	required_ioport m_dsw2;
 
 	/* video-related */
-	tilemap_t     *m_tilemap[4];
-	uint32_t      m_spr_buffered_tilebank[2];
+	tilemap_t     *m_tilemap[3];
+	u32      m_spr_buffered_tilebank[2];
 
 	/* misc */
 	emu_timer   *m_level_1_interrupt_timer;
 	emu_timer   *m_vblank_interrupt_timer;
 	emu_timer   *m_raster_interrupt_timer;
 
-	DECLARE_READ8_MEMBER(snd_020_r);
-	DECLARE_WRITE8_MEMBER(snd_020_w);
-	DECLARE_WRITE32_MEMBER(vregs_w);
-	DECLARE_WRITE8_MEMBER(sound_bw_w);
-	DECLARE_WRITE8_MEMBER(snd_ymf278b_w);
-	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
+	u8 snd_020_r(offs_t offset);
+	void snd_020_w(offs_t offset, u8 data, u8 mem_mask = ~0);
+	void sprram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 sprram_r(offs_t offset);
+	u16 vregs_r(offs_t offset);
+	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sound_bw_w(u8 data);
+	template<int Layer> void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template<int Layer> void vram_buffered_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	template<int Layer, int ColShift> TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -94,9 +98,11 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void fuuki32_tile_cb(u32 &code);
+	void fuuki32_colpri_cb(u32 &colour, u32 &pri_mask);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
+	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
 
 	void fuuki32_map(address_map &map);
 	void fuuki32_sound_io_map(address_map &map);

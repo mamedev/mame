@@ -85,43 +85,59 @@ Coin B is not used
 #include "speaker.h"
 
 
-READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
+u16 ashnojoe_state::fake_4a00a_r()
 {
 	/* If it returns 1 there's no sound. Is it used to sync the game and sound?
 	or just a debug enable/disable register? */
 	return 0;
 }
 
+template<unsigned Which>
+void ashnojoe_state::tileram_8x8_w(offs_t offset, u16 data)
+{
+	m_tileram[Which][offset] = data;
+	m_tilemap[Which]->mark_tile_dirty(offset);
+}
+
+template<unsigned Which>
+void ashnojoe_state::tileram_16x16_w(offs_t offset, u16 data)
+{
+	const int buffer = (m_tilemap_reg[0] & 0x02);
+	m_tileram[Which][offset] = data;
+	if (((Which == 5 && !buffer) || (Which == 6 && buffer)) || (Which < 5))
+		m_tilemap[(Which < 5) ? Which : 5]->mark_tile_dirty(offset / 2);
+}
+
 void ashnojoe_state::ashnojoe_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x040000, 0x041fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram3_w)).share("tileram_3");
-	map(0x042000, 0x043fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram4_w)).share("tileram_4");
-	map(0x044000, 0x044fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram5_w)).share("tileram_5");
-	map(0x045000, 0x045fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram2_w)).share("tileram_2");
-	map(0x046000, 0x046fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram6_w)).share("tileram_6");
-	map(0x047000, 0x047fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram7_w)).share("tileram_7");
-	map(0x048000, 0x048fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram_w)).share("tileram");
+	map(0x040000, 0x041fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<2>)).share("tileram_3");
+	map(0x042000, 0x043fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<3>)).share("tileram_4");
+	map(0x044000, 0x044fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<4>)).share("tileram_5");
+	map(0x045000, 0x045fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<1>)).share("tileram_2");
+	map(0x046000, 0x046fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<5>)).share("tileram_6");
+	map(0x047000, 0x047fff).ram().w(FUNC(ashnojoe_state::tileram_16x16_w<6>)).share("tileram_7");
+	map(0x048000, 0x048fff).ram().w(FUNC(ashnojoe_state::tileram_8x8_w<0>)).share("tileram_1");
 	map(0x049000, 0x049fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x04a000, 0x04a001).portr("P1");
 	map(0x04a002, 0x04a003).portr("P2");
 	map(0x04a004, 0x04a005).portr("DSW");
-	map(0x04a006, 0x04a007).writeonly().share("tilemap_reg");
+	map(0x04a006, 0x04a007).w(FUNC(ashnojoe_state::tilemap_regs_w)).share("tilemap_reg");
 	map(0x04a009, 0x04a009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x04a00a, 0x04a00b).r(FUNC(ashnojoe_state::fake_4a00a_r));  // ??
-	map(0x04a010, 0x04a019).w(FUNC(ashnojoe_state::joe_tilemaps_xscroll_w));
-	map(0x04a020, 0x04a029).w(FUNC(ashnojoe_state::joe_tilemaps_yscroll_w));
+	map(0x04a010, 0x04a019).w(FUNC(ashnojoe_state::tilemaps_xscroll_w));
+	map(0x04a020, 0x04a029).w(FUNC(ashnojoe_state::tilemaps_yscroll_w));
 	map(0x04c000, 0x04ffff).ram();
 	map(0x080000, 0x0bffff).rom();
 }
 
 
-WRITE8_MEMBER(ashnojoe_state::adpcm_w)
+void ashnojoe_state::adpcm_w(u8 data)
 {
 	m_adpcm_byte = data;
 }
 
-READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
+u8 ashnojoe_state::sound_latch_status_r()
 {
 	return m_soundlatch->pending_r();
 }
@@ -130,7 +146,7 @@ void ashnojoe_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("bank4");
+	map(0x8000, 0xffff).bankr("audiobank");
 }
 
 void ashnojoe_state::sound_portmap(address_map &map)
@@ -231,39 +247,15 @@ static INPUT_PORTS_START( ashnojoe )
 INPUT_PORTS_END
 
 
-static const gfx_layout tiles8x8_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tiles16x16_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-		32,36,40, 44, 48, 52, 56, 60 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
-	16*64
-};
-
 static GFXDECODE_START( gfx_ashnojoe )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx4", 0, tiles16x16_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,   0, 0x100 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb,   0, 0x100 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb,   0, 0x100 )
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x4_packed_msb, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx5", 0, gfx_16x16x4_packed_msb, 0, 0x100 )
 GFXDECODE_END
 
-WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
+void ashnojoe_state::ym2203_write_a(u8 data)
 {
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
 	if (data == 0xff)
@@ -272,9 +264,9 @@ WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 	m_msm->reset_w(!(data & 0x01));
 }
 
-WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
+void ashnojoe_state::ym2203_write_b(u8 data)
 {
-	membank("bank4")->set_entry(data & 0x0f);
+	m_audiobank->set_entry(data & 0x0f);
 }
 
 WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
@@ -322,7 +314,7 @@ void ashnojoe_state::ashnojoe(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(14*8, 50*8-1, 3*8, 29*8-1);
-	screen.set_screen_update(FUNC(ashnojoe_state::screen_update_ashnojoe));
+	screen.set_screen_update(FUNC(ashnojoe_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ashnojoe);
@@ -351,8 +343,9 @@ ROM_START( scessjoe )
 	ROM_LOAD16_BYTE( "6.4s", 0x00001, 0x10000, CRC(eda7a537) SHA1(3bb19fbdfb6c8af4e2078958fa445ac1f4434d0d) )
 	ROM_LOAD16_WORD_SWAP( "sj201-nw.6m", 0x80000, 0x40000, CRC(5a64ca42) SHA1(660b8bca21ef3c2230adce7cb7e7d1f018714f23) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 32k for Z80 code */
-	ROM_LOAD( "9.8q", 0x0000, 0x8000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
+	ROM_REGION( 0x90000, "audiocpu", 0 )     /* 32k for Z80 code */
+	ROM_LOAD( "9.8q",         0x00000, 0x08000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
+	ROM_LOAD( "sj401-nw.10r", 0x10000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "8.5e", 0x00000, 0x10000, CRC(9bcb160e) SHA1(1677048e5ce26562ff7ba36fcc2d0ed5a652b91e) )
@@ -377,9 +370,6 @@ ROM_START( scessjoe )
 	ROM_LOAD16_WORD_SWAP( "sj407-nw.7f", 0x180000, 0x80000, CRC(5c66ff06) SHA1(9923ba00679e1b47b5da63c1a13e0f8dd4c78bb5) )
 	ROM_LOAD16_WORD_SWAP( "sj408-nw.7g", 0x200000, 0x80000, CRC(6a3b1ea1) SHA1(e39a6e52d930f291bf237cf9db3d4b3d2fad53e0) )
 	ROM_LOAD16_WORD_SWAP( "sj409-nw.7j", 0x280000, 0x80000, CRC(d8764213) SHA1(89eadefb956863216c8e3d0380394aba35e8c856) )
-
-	ROM_REGION( 0x80000, "adpcm", 0 )
-	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
 ROM_START( ashnojoe )
@@ -388,8 +378,9 @@ ROM_START( ashnojoe )
 	ROM_LOAD16_BYTE( "6.bin", 0x00001, 0x10000, CRC(c0a16338) SHA1(fb127b9d38f2c9807b6e23ff71935fc8a22a2e8f) )
 	ROM_LOAD16_WORD_SWAP( "sj201-nw.6m", 0x80000, 0x40000, CRC(5a64ca42) SHA1(660b8bca21ef3c2230adce7cb7e7d1f018714f23) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 32k for Z80 code */
-	ROM_LOAD( "9.8q", 0x0000, 0x8000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
+	ROM_REGION( 0x90000, "audiocpu", 0 )     /* 32k for Z80 code */
+	ROM_LOAD( "9.8q",         0x00000, 0x08000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
+	ROM_LOAD( "sj401-nw.10r", 0x10000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "8.5e",  0x00000, 0x10000, CRC(9bcb160e) SHA1(1677048e5ce26562ff7ba36fcc2d0ed5a652b91e) )
@@ -414,17 +405,13 @@ ROM_START( ashnojoe )
 	ROM_LOAD16_WORD_SWAP( "sj407-nw.7f", 0x180000, 0x80000, CRC(5c66ff06) SHA1(9923ba00679e1b47b5da63c1a13e0f8dd4c78bb5) )
 	ROM_LOAD16_WORD_SWAP( "sj408-nw.7g", 0x200000, 0x80000, CRC(6a3b1ea1) SHA1(e39a6e52d930f291bf237cf9db3d4b3d2fad53e0) )
 	ROM_LOAD16_WORD_SWAP( "sj409-nw.7j", 0x280000, 0x80000, CRC(d8764213) SHA1(89eadefb956863216c8e3d0380394aba35e8c856) )
-
-	ROM_REGION( 0x80000, "adpcm", 0 )
-	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
 void ashnojoe_state::init_ashnojoe()
 {
-	uint8_t *ROM = memregion("adpcm")->base();
-	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
-
-	membank("bank4")->set_entry(0);
+	u8 *ROM = memregion("audiocpu")->base();
+	m_audiobank->configure_entries(0, 16, &ROM[0x10000], 0x8000);
+	m_audiobank->set_entry(0);
 }
 
 GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )

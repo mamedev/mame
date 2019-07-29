@@ -22,8 +22,7 @@ public:
 	void i2c_scl_w(bool line);
 	void i2c_sda_w(bool line);
 
-	void reset_sample_count() { total_sample_count = 0; }
-	u32 get_sample_count() const { return total_sample_count; }
+	u32 get_frame_count() const { return total_frame_count - buffered_frame_count; }
 
 protected:
 	virtual void device_start() override;
@@ -36,13 +35,13 @@ private:
 	enum { IDLE, STARTED, NAK, ACK, ACK2 } i2c_bus_state;
 	enum { UNKNOWN, VALIDATED, WRONG } i2c_bus_address;
 
-	std::array<u8, 8000> mp3data;
+	std::array<u8, 0xe00> mp3data;
 	std::array<mp3d_sample_t, MINIMP3_MAX_SAMPLES_PER_FRAME> samples;
 	bool i2c_scli, i2c_sclo, i2c_sdai, i2c_sdao;
 	int i2c_bus_curbit;
 	uint8_t i2c_bus_curval;
 	int mp3_count, sample_count, current_rate;
-	u32 total_sample_count;
+	u32 total_frame_count, buffered_frame_count;
 
 	mp3dec_t mp3_dec;
 	mp3dec_frame_info_t mp3_info;
@@ -53,7 +52,6 @@ private:
 	bool i2c_device_got_address(uint8_t address);
 	void i2c_device_got_byte(uint8_t byte);
 	void i2c_device_got_stop();
-
 
 	enum { UNDEFINED, CONTROL, DATA_READ, DATA_WRITE, BAD } i2c_subdest;
 	enum { CMD_BAD, CMD_RUN, CMD_READ_CTRL, CMD_WRITE_REG, CMD_WRITE_MEM, CMD_READ_REG, CMD_READ_MEM } i2c_command;

@@ -502,7 +502,8 @@ void voyager_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base());
 }
 
-MACHINE_CONFIG_START(voyager_state::voyager)
+void voyager_state::voyager(machine_config &config)
+{
 	PENTIUM3(config, m_maincpu, 133000000); // actually AMD Duron CPU of unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &voyager_state::voyager_map);
 	m_maincpu->set_addrmap(AS_IO, &voyager_state::voyager_io);
@@ -513,9 +514,11 @@ MACHINE_CONFIG_START(voyager_state::voyager)
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, voyager_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, voyager_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (0, FUNC(voyager_state::intel82439tx_pci_r), this);
+	pcibus.set_device_write(0, FUNC(voyager_state::intel82439tx_pci_w), this);
+	pcibus.set_device_read (7, FUNC(voyager_state::intel82371ab_pci_r), this);
+	pcibus.set_device_write(7, FUNC(voyager_state::intel82371ab_pci_w), this);
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -523,7 +526,7 @@ MACHINE_CONFIG_START(voyager_state::voyager)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 void voyager_state::init_voyager()
 {

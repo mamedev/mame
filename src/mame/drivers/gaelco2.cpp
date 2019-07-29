@@ -8,19 +8,21 @@
 
     Known games that run on this hardware:
     ======================================
-    Game           | Year | Chip      | Ref      |Protected
-    ---------------+------+-----------+----------+--------------------
-    Alligator Hunt | 1994 | GAE1 449  | 940411   | DS5002FP (unprotected version available)
-    World Rally 2  | 1995 | GAE1 449  | 950510   | DS5002FP
-    World Rally 2  | 1995 | GAE1 506  | 950510-1 | DS5002FP
-    Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP (unprotected version available)
-    Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
-    Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
-    Maniac Square  | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
-    Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
-    Cardioline     | 1997 | GAE1 501  | 970410   | IO board MCU (not really protection)
-    Bang!          | 1998 | CG-1V 388 | 980921/1 | No
-    Play 2000      | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
+    Game               | Year | Chip      | Ref      |Protected
+    -------------------+------+-----------+----------+--------------------------------------------------
+    Alligator Hunt     | 1994 | GAE1 449  | 940411   | DS5002FP (unprotected version available)
+    World Rally 2      | 1995 | GAE1 449  | 950510   | DS5002FP
+    World Rally 2      | 1995 | GAE1 506  | 950510-1 | DS5002FP
+    Touch & Go         | 1995 | GAE1 501  | 950906   | DS5002FP (unprotected version available)
+    Touch & Go         | 1995 | GAE1 501  | 950510-1 | DS5002FP
+    Maniac Square      | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
+    Maniac Square      | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
+    Snow Board         | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
+    Cardioline Cycle   | 1997 | GAE1 501  | 970410   | IO board MCU (not really protection)
+    Cardioline Stepper | 1997 | CG-1V 288 | 970410   | IO board MCU (not really protection)
+    Bang!              | 1998 | CG-1V 388 | 980921/1 | No
+    Play 2000          | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
+    -------------------+------+-----------+----------+--------------------------------------------------
 
     Notes:
     touchgo:
@@ -400,7 +402,7 @@ ROM_START( maniacsqs ) // REF 960419/1
 ROM_END
 
 /*============================================================================
-                            Salter Cardioline
+                            Salter Cardioline Series
   ============================================================================*/
 
 static INPUT_PORTS_START( saltcrdi ) // dipswitches are on the REVERSE side of the PCB (!)
@@ -488,7 +490,48 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	gaelco.add_route(1, "rspeaker", 1.0);
 }
 
-ROM_START( saltcrdi ) // REF 970410
+/*============================================================================
+                  Salter Cardioline Pro Cycle / Pro Reclimber
+  ============================================================================
+  _________________________________________________________________________________
+ | GAELCO REF. 970410                           U24                                |
+ |                                                       MC74HCT373AN ____________ |
+ |__                               SN74LS08N  KM428C256J-6            | BI 37     ||
+    |                                                    MC74HCT373AN |___________||
+  __|                                  XTAL2  KM428C256J-6            ____________ |
+ |__                                                     MC74HCT373AN | BI 38     ||
+ |__     74LS259BN                                                    |___________||
+ |__                   CD74HCT273E          71256      _________      ____________ |
+ |__     TD62064AP                                     |        |     | BI 39     ||
+ |__                   CD74HCT273E          71256      | GAE1   |     |___________||
+ |__                                                   |  501   |     ____________ |
+ |__                   XTAL1           SN74LS374N      |________|     | BI 40     ||
+ |__     CNY74-4                                                      |___________||
+ |__                   MC74F74N        SN74LS374N                     ____________ |
+ |__     CNY74-4                                                      | BI 41     ||
+ |__                   SN74F04N          SN74F32N      71256          |___________||
+ |__     SN74LS245N                                                   ____________ |
+ |__     ________      TIBPAL16L8           71256      71256          | BI 42     ||
+ |__     |__SW1__|                    ____________                    |___________||
+ |__                   __________     |  BI N21   |   MC74HCT373AN    ____________ |
+ |__     SN74LS245N    | U13     |    |___________|                   | BI 43     ||
+    |                  |         |          71256     MC74HCT373AN    |___________||
+  __|    SN74LS132N    | 02AB    |    ____________                    ____________ |
+ |                     |_________|    |  BI N23   |   SN74LS245N      | BI 44     ||
+ |  JP1  SN74LS32N                    |___________|                   |___________||
+ |                                                    SN74LS245N                   |
+ |_________________________________________________________________________________|
+
+  XTAL1 = 24.0000 MHz
+  XTAL2 = 34.0000 MHz
+  02AB = MC68HC000FN12
+  SW1 = 8 dipswitches (soldered on the back side of the PCB, all off by default)
+  U24 = Unpopulated socket for 424C257
+
+  There is also a Salter I/O PCB with a MCU (undumped) labeled as "2".
+  The I/O PCB layout is slightly different than the one found on the Pro Stepper machine.
+*/
+ROM_START( sltpcycl ) // REF 970410
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "bi-n-21-27c512.u21",   0x000000, 0x010000, CRC(1d2e9a68) SHA1(b9bb4eeefe90850b648dc45689a08f3c28147856) )
 	ROM_LOAD16_BYTE( "bi-n-23-27c512.u23",   0x000001, 0x010000, CRC(5865351d) SHA1(a62b8ec88ef41d96b65a03ccaeadbec21803df34) )
@@ -506,7 +549,90 @@ ROM_START( saltcrdi ) // REF 970410
 	ROM_FILL(                              0x0220000, 0x0020000, 0x00 )         /* to decode GFX as 5bpp */
 
 	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
-	ROM_LOAD( "st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
+	ROM_LOAD( "2-st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
+
+	ROM_REGION( 0x0104, "pals", 0 )
+	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
+ROM_END
+
+/*============================================================================
+                           Salter Cardioline Pro Steper
+  ============================================================================
+  _________________________________________________________________________________
+ | GAELCO REF. 970410                           U24                                |
+ |                                                       MC74HCT373AN ____________ |
+ |__                               SN74LS08N  KM428C256J-6            | ST U 37   ||
+    |                                                    MC74HCT373AN |___________||
+  __|                                  XTAL2  KM428C256J-6            ____________ |
+ |__                                                     MC74HCT373AN | ST U 38   ||
+ |__     74LS259BN                                                    |___________||
+ |__                   CD74HCT273E          71256      _________      ____________ |
+ |__     TD62064AP                                     |        |     | ST U 39   ||
+ |__                   CD74HCT273E          71256      | CG-1V  |     |___________||
+ |__                                                   |  288   |     ____________ |
+ |__                   XTAL1           SN74LS374N      |________|     | ST U 40   ||
+ |__     CNY74-4                                                      |___________||
+ |__                   MC74F74N        SN74LS374N                     ____________ |
+ |__     CNY74-4                                                      | EMPTY     ||
+ |__                   SN74F04N          SN74F32N      71256          |___________||
+ |__     SN74LS245N                                                   ____________ |
+ |__     ________      TIBPAL16L8           71256      71256          | EMPTY     ||
+ |__     |__SW1__|                    ____________                    |___________||
+ |__                   __________     |  ST U 21  |   MC74HCT373AN    ____________ |
+ |__     SN74LS245N    | U13     |    |___________|                   | EMPTY     ||
+    |                  |         |          71256     MC74HCT373AN    |___________||
+  __|    SN74LS132N    | E208    |    ____________                    ____________ |
+ |                     |_________|    |  ST U 23  |   SN74LS245N      | EMPTY     ||
+ |  JP1  SN74LS32N                    |___________|                   |___________||
+ |                                                    SN74LS245N                   |
+ |_________________________________________________________________________________|
+
+  XTAL1 = 24.0000 MHz
+  XTAL2 = 34.0000 MHz
+  E208 = MC68HC000FN16
+  SW1 = 8 dipswitches (soldered on the back side of the PCB, all off by default)
+  U24 = Unpopulated socket for 424C257
+
+  There is also a Salter I/O PCB with a MCU (undumped):
+
+  Salter PCB "CPU 6022" manufactured by "APEL Electronica"
+    ______________________________________________
+    |       ___________                __________ |
+    |       | JW1FSN  |  Cap 10000uF   |__FUSE__| |
+    |                                             --
+    | ________    ___            Power LED -> o   -- VAC (3 pin)
+    | |AD7424JN  |LM356P       VDC Out LED -> o   --
+    | __________________                          -- +/- OUT (2 pin)
+    | |_____PC817______|          M338K           --
+    |  o o o o o o o o  <- LEDS                   --
+    |  __________  _____                          -- CONTROL (9 pin)
+    |  |TD62083AP  |SW1|                          --
+    |     ______________   ________    __________ --
+    | XT1 |   MCU-1    |   |74HC14AP   |__FUSE__| -- +/- TURNS (3 pin)
+    |     |____________|                |J6|      --
+    |                                   | J5 |    |
+    |_____________________________________________|
+
+  XT1 = 8.000MHz
+  SW1 = 4 dipswitches (default all open)
+  J6 = 12V out for fan
+  J5 = 6 pin connector (unused)
+  MCU-1 = ST62T15B6-HWD labeled as "1"
+*/
+ROM_START( sltpstep )
+	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "st_u_21.u21",   0x000000, 0x010000, CRC(2274f931) SHA1(c7b32bbb46e349769376bfaffe663170873bd083) ) // 27C512
+	ROM_LOAD16_BYTE( "st_u_23.u23",   0x000001, 0x010000, CRC(07c69f55) SHA1(886bef76b2aff046fd1c9a4837f359cb59095125) ) // 27C512
+
+	ROM_REGION( 0x0280000, "gfx1", ROMREGION_ERASEFF ) /* GFX, no sound, machine has none? */
+	ROM_LOAD( "st_u_40.u40",   0x0000000, 0x0080000, CRC(813270de) SHA1(9a6ce7679bd5c6ecf0c3328d6ff9dc2240a95328) ) // 27C4000DC
+	ROM_LOAD( "st_u_39.u39",   0x0080000, 0x0080000, CRC(1d42e124) SHA1(add866310511f4f406b80ed0d3983b79b80c701c) ) // 27C4000DC
+	ROM_LOAD( "st_u_38.u38",   0x0100000, 0x0080000, CRC(9d0d795c) SHA1(ef7cf61f8c687ecc68678a634f65386cc25d8a8f) ) // 27C4000DC
+	ROM_LOAD( "st_u_37.u37",   0x0180000, 0x0080000, CRC(5543d4d1) SHA1(1f9f358dfb252412468ddd68331bda5acbe99329) ) // 27C4000DC
+	ROM_FILL(                              0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_LOAD( "cpu_6022-1-st62t15b6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
 	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
@@ -2321,7 +2447,6 @@ GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state, e
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state, init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
 
 // Gym equipment
-GAME( 1997, saltcrdi,   0,          saltcrdi,         saltcrdi, gaelco2_state, empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", MACHINE_NOT_WORKING )
-// Pro Reclimber Tele
-// Pro Stepper Tele
-// there are other devices in Cardioline series that don't use displays
+GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state, init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", 0 ) // Same board and ROM as Pro Reclimber
+GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state, init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter Fitness Stepper V.1.0, Checksum F208)", 0 )
+// there are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware

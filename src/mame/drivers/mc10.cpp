@@ -528,6 +528,7 @@ void mc10_state::mc10(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("mc10_cass");
 
 	/* printer */
@@ -570,6 +571,7 @@ void mc10_state::alice32(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(alice32_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("mc10_cass");
 
 	/* printer */

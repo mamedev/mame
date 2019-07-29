@@ -283,31 +283,9 @@ Notes:
 #include "speaker.h"
 
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{STEP4(0,1)},
-	{STEP16(0,4)},
-	{STEP16(0,16*4)},
-	16*16*4
-};
-
-static const gfx_layout layout_16x16x8 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{STEP8(0,1)},
-	{STEP16(0,8)},
-	{STEP16(0,16*8)},
-	16*16*8
-};
-
 static GFXDECODE_START( gfx_psikyosh )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x100 ) // 4bpp tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_msb, 0x000, 0x100 ) // 4bpp tiles
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x8_raw,        0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
 void psikyosh_state::eeprom_w(u8 data)

@@ -40,8 +40,7 @@
 
 #include "emu.h"
 #include "a2hsscsi.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/devices.h"
 
 /***************************************************************************
     PARAMETERS
@@ -56,13 +55,6 @@ DEFINE_DEVICE_TYPE(A2BUS_HSSCSI, a2bus_hsscsi_device, "a2hsscsi", "Apple II High
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
-
-static void hsscsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5380", NCR53C80);
-}
 
 ROM_START( hsscsi )
 	ROM_REGION(0x8000, SCSI_ROM_REGION, 0)
@@ -80,14 +72,14 @@ ROM_END
 void a2bus_hsscsi_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsibus:0", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:1", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:2", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:3", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:4", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:5", hsscsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:6", hsscsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:7", hsscsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this](device_t *device) {
+	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
 		downcast<ncr53c80_device &>(*device).drq_handler().set(*this, FUNC(a2bus_hsscsi_device::drq_w));
 	});
 }

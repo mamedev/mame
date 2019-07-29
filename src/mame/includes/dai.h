@@ -16,7 +16,6 @@
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 

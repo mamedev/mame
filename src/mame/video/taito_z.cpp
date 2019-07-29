@@ -222,7 +222,8 @@ void taitoz_state::contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,screen.priority(),primasks[priority],0);
+					zx << 12,zy << 13,
+					screen.priority(),primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -312,7 +313,7 @@ void taitoz_state::chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind1
 						color,
 						flipx,flipy,
 						curx,cury,
-						zx<<12,zy<<12,
+						zx << 12,zy << 12,
 						screen.priority(),primasks[priority],0);
 			}
 		}
@@ -350,12 +351,12 @@ void taitoz_state::chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind1
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(2)->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_zoom_transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
 						curx,cury,
-						zx<<12,zy<<12,
+						zx << 12,zy << 12,
 						screen.priority(),primasks[priority],0);
 			}
 		}
@@ -393,12 +394,12 @@ void taitoz_state::chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind1
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(2)->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_zoom_transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
 						curx,cury,
-						zx<<12,zy<<12,
+						zx << 12,zy << 12,
 						screen.priority(),primasks[priority],0);
 			}
 		}
@@ -487,7 +488,7 @@ void taitoz_state::bshark_draw_sprites_16x8(screen_device &screen, bitmap_ind16 
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 
@@ -584,7 +585,7 @@ void taitoz_state::sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bi
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 
@@ -671,7 +672,7 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 
@@ -758,7 +759,7 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 

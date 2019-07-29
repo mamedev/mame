@@ -221,7 +221,6 @@ void dai_state::dai(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
@@ -229,6 +228,7 @@ void dai_state::dai(machine_config &config)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("dai_cass");
 
 	/* tms5501 */

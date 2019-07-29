@@ -193,12 +193,11 @@ u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	u8 layer[5];
 	u8 scclayer[3];
-	u16 priority;
 
-	m_tc0100scn->tilemap_update();
+	m_tc0620scc->tilemap_update();
 	m_tc0480scp->tilemap_update();
 
-	priority = m_tc0480scp->get_bg_priority();
+	const u16 priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -206,15 +205,15 @@ u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	scclayer[0] = m_tc0100scn->bottomlayer();
+	scclayer[0] = m_tc0620scc->bottomlayer();
 	scclayer[1] = scclayer[0]^1;
 	scclayer[2] = 2;
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 
 	/*  BIG HACK!
 
@@ -232,14 +231,14 @@ u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	    it's contents the usual way.
 
 	*/
-	if (m_tc0100scn->ram_r(0x4090 / 2) || m_tc0100scn->ram_r(0x4092 / 2) ||
+	if (m_tc0620scc->ram_r(0x4090 / 2) || m_tc0620scc->ram_r(0x4092 / 2) ||
 			((m_tc0480scp->ram_r(0x20 / 2) == 0x24) && (m_tc0480scp->ram_r(0x22 / 2) == 0x0866)))  /* Anything in text layer - really stupid hack */
 	{
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
-		//m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 0, scclayer[2], 0, 0);
+		//m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, 0, scclayer[2], 0, 0);
 
 		if ((m_tc0480scp->ram_r(0x20 / 2) != 0x24) && (m_tc0480scp->ram_r(0x22 / 2) != 0x0866)) /* Stupid hack for start of race */
 			m_tc0480scp->tilemap_draw(screen, bitmap, m_hack_cliprect, layer[0], 0, 0);
@@ -252,7 +251,7 @@ u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
-		m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0);
+		m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0);
 
 		draw_sprites(screen, bitmap, cliprect, 0, 44, -574);
 	}

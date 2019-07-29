@@ -25,8 +25,8 @@ public:
 
 	hal2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE32_MEMBER(write);
-	DECLARE_READ32_MEMBER(read);
+	void write(offs_t offset, uint16_t data);
+	uint16_t read(offs_t offset);
 
 	attotime get_rate(const uint32_t channel);
 
@@ -44,14 +44,14 @@ protected:
 
 	enum
 	{
-		IAR_TYPE			= 0xf000,
-		IAR_TYPE_SHIFT		= 12,
-		IAR_NUM				= 0x0f00,
-		IAR_NUM_SHIFT		= 8,
-		IAR_ACCESS_SEL		= 0x0080,
-		IAR_PARAM			= 0x000c,
-		IAR_PARAM_SHIFT		= 2,
-		IAR_RB_INDEX		= 0x0003
+		IAR_TYPE            = 0xf000,
+		IAR_TYPE_SHIFT      = 12,
+		IAR_NUM             = 0x0f00,
+		IAR_NUM_SHIFT       = 8,
+		IAR_ACCESS_SEL      = 0x0080,
+		IAR_PARAM           = 0x000c,
+		IAR_PARAM_SHIFT     = 2,
+		IAR_RB_INDEX        = 0x0003
 	};
 
 	enum
@@ -83,27 +83,27 @@ protected:
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 
-	uint32_t m_isr;
-	uint32_t m_iar;
-	uint32_t m_idr[4];
+	uint16_t m_isr;
+	uint16_t m_iar;
+	uint16_t m_idr[4];
 
-	uint32_t m_codeca_ctrl[2];
-	uint32_t m_codeca_channel;
-	uint32_t m_codeca_clock;
-	uint32_t m_codeca_channel_count;
+	uint16_t m_codeca_ctrl[2];
+	uint16_t m_codeca_channel;
+	uint16_t m_codeca_clock;
+	uint16_t m_codeca_channel_count;
 
-	uint32_t m_codecb_ctrl[2];
-	uint32_t m_codecb_channel;
-	uint32_t m_codecb_clock;
-	uint32_t m_codecb_channel_count;
+	uint16_t m_codecb_ctrl[2];
+	uint16_t m_codecb_channel;
+	uint16_t m_codecb_clock;
+	uint16_t m_codecb_channel_count;
 
-	uint32_t m_bres_clock_sel[3];
-	uint32_t m_bres_clock_inc[3];
-	uint32_t m_bres_clock_modctrl[3];
-	uint32_t m_bres_clock_freq[3];
+	uint16_t m_bres_clock_sel[3];
+	uint16_t m_bres_clock_inc[3];
+	uint16_t m_bres_clock_modctrl[3];
+	uint16_t m_bres_clock_freq[3];
 	attotime m_bres_clock_rate[3];
 
-	uint32_t m_curr_dac;
+	uint16_t m_curr_dac;
 
 	static const uint32_t s_channel_pair[4];
 };

@@ -14,7 +14,6 @@
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "sound/cdp1869.h"
-#include "sound/wave.h"
 
 #define SCREEN_TAG          "screen"
 
@@ -81,7 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( comx );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
 	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);

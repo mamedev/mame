@@ -10,7 +10,7 @@
 
     Game                                     ID        Year    Notes
     -----------------------------------------------------------------------
-    Fighting Bujutsu / Fighting Wu-Shu     | G?645   | 1997  |
+    Fighting Bujutsu / Fighting Wu-Shu     | GN645   | 1997  |
     Racing Jam DX                          | GY676   | 1997  | GY676-PWB(F) LAN board
 
 
@@ -3280,8 +3280,8 @@ void cobra_state::machine_reset()
 	m_dmadac[1]->set_frequency(44100);
 }
 
-MACHINE_CONFIG_START(cobra_state::cobra)
-
+void cobra_state::cobra(machine_config &config)
+{
 	/* basic machine hardware */
 	PPC603(config, m_maincpu, 100000000);      /* 603EV, 100? MHz */
 	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
@@ -3297,8 +3297,9 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 
 	config.m_minimum_quantum = attotime::from_hz(15005);
 
-	MCFG_PCI_BUS_LEGACY_ADD(m_legacy_pci, 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, cobra_state, mpc106_pci_r, mpc106_pci_w)
+	PCI_BUS_LEGACY(config, m_legacy_pci, 0, 0);
+	m_legacy_pci->set_device_read(0, FUNC(cobra_state::mpc106_pci_r), this);
+	m_legacy_pci->set_device_write(0, FUNC(cobra_state::mpc106_pci_w), this);
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(cobra_state::ide_interrupt));
@@ -3336,7 +3337,7 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	COBRA_JVS(config, m_jvs1, 0, m_jvs_host, true);
 	COBRA_JVS(config, m_jvs2, 0, m_jvs_host, true);
 	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
-MACHINE_CONFIG_END
+}
 
 /*****************************************************************************/
 
@@ -3612,5 +3613,5 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )

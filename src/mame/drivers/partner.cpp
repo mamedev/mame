@@ -14,7 +14,6 @@
 
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -192,7 +191,6 @@ void partner_state::partner(machine_config &config)
 	PALETTE(config, m_palette, FUNC(partner_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	auto &dma8257(I8257(config, "dma8257", 16_MHz_XTAL / 9));
 	dma8257.out_hrq_cb().set(FUNC(partner_state::hrq_w));
@@ -206,6 +204,7 @@ void partner_state::partner(machine_config &config)
 	auto &cassette(CASSETTE(config, "cassette"));
 	cassette.set_formats(rkp_cassette_formats);
 	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
 	cassette.set_interface("partner_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_type("partner_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);

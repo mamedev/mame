@@ -36,17 +36,17 @@ class supduck_state : public driver_device
 {
 public:
 	supduck_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_spriteram(*this, "spriteram") ,
-			m_text_videoram(*this, "textvideoram"),
-			m_fore_videoram(*this, "forevideoram"),
-			m_back_videoram(*this, "backvideoram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_spritegen(*this, "spritegen"),
-			m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_spriteram(*this, "spriteram")
+		, m_text_videoram(*this, "textvideoram")
+		, m_fore_videoram(*this, "forevideoram")
+		, m_back_videoram(*this, "backvideoram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
+		, m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void supduck(machine_config &config);
@@ -139,7 +139,7 @@ uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fore_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), true);
 
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -369,32 +369,14 @@ static INPUT_PORTS_START( supduck )
 INPUT_PORTS_END
 
 
-static const gfx_layout spritelayout_bionicc=
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,4),   /* 2048 sprites */
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		0,1,2,3,4,5,6,7,
-		(16*8)+0,(16*8)+1,(16*8)+2,(16*8)+3,
-		(16*8)+4,(16*8)+5,(16*8)+6,(16*8)+7
-	},
-	{
-		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
-	},
-	256   /* every sprite takes 256 consecutive bytes */
-};
-
-static const gfx_layout vramlayout_bionicc=
+static const gfx_layout vramlayout=
 {
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),   /* 1024 character */
 	2,      /* 2 bitplanes */
 	{ 4,0 },
-	{ 0,1,2,3,8,9,10,11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	128   /* every character takes 128 consecutive bytes */
 };
 
@@ -405,30 +387,18 @@ static const gfx_layout tile_layout =
 	RGN_FRAC(1, 2),
 	4,
 	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
-	{
-		0, 1, 2, 3, 8 + 0, 8 + 1, 8 + 2, 8 + 3,
-		64 * 8 + 0, 64 * 8 + 1, 64 * 8 + 2, 64 * 8 + 3, 64 * 8 + 8 + 0, 64 * 8 + 8 + 1, 64 * 8 + 8 + 2, 64 * 8 + 8 + 3,
-		2 * 64 * 8 + 0, 2 * 64 * 8 + 1, 2 * 64 * 8 + 2, 2 * 64 * 8 + 3, 2 * 64 * 8 + 8 + 0, 2 * 64 * 8 + 8 + 1, 2 * 64 * 8 + 8 + 2, 2 * 64 * 8 + 8 + 3,
-		3 * 64 * 8 + 0, 3 * 64 * 8 + 1, 3 * 64 * 8 + 2, 3 * 64 * 8 + 3, 3 * 64 * 8 + 8 + 0, 3 * 64 * 8 + 8 + 1, 3 * 64 * 8 + 8 + 2, 3 * 64 * 8 + 8 + 3,
-	},
-	{
-		0 * 16, 1 * 16, 2 * 16, 3 * 16, 4 * 16, 5 * 16, 6 * 16, 7 * 16,
-		8 * 16, 9 * 16, 10 * 16, 11 * 16, 12 * 16, 13 * 16, 14 * 16, 15 * 16,
-		16 * 16, 17 * 16, 18 * 16, 19 * 16, 20 * 16, 21 * 16, 22 * 16, 23 * 16,
-		24 * 16, 25 * 16, 26 * 16, 27 * 16, 28 * 16, 29 * 16, 30 * 16, 31 * 16
-	},
+	{ STEP4(0,1),        STEP4(4*2,1),          STEP4(4*2*2*32,1), STEP4(4*2*2*32+4*2,1),
+	  STEP4(4*2*2*64,1), STEP4(4*2*2*64+4*2,1), STEP4(4*2*2*96,1), STEP4(4*2*2*96+4*2,1) },
+	{ STEP32(0,4*2*2) },
 	256 * 8
 };
 
 
-
 static GFXDECODE_START( gfx_supduck )
-	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  16 )    /* colors   0-  63 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  16 )    /* colors 256- 319 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_bionicc,  512, 16 )    /* colors 512- 767 */
+	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,  768, 64 )    /* colors 768-1023 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0, 16 )    /* colors   0-  63 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256, 16 )    /* colors 256- 319 */
 GFXDECODE_END
-
 
 
 void supduck_state::machine_start()
@@ -467,6 +437,8 @@ void supduck_state::supduck(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
 	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_color_base(512);    /* colors 512- 767 */
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGBRRRRGGGGBBBB_bit4, 0x800/2);
 
@@ -510,11 +482,11 @@ ROM_START( supduck )
 	ROM_LOAD( "13.ul31",   0x40000, 0x20000, CRC(bff7b7cd) SHA1(2f65cadcfcc02fe31ba721eea9f45d4a729e4374) )
 	ROM_LOAD( "14.ul32",   0x60000, 0x20000, CRC(97a7310b) SHA1(76b82bfea64b59890c0ba2e1688b7321507a4da7) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "15.u1d",   0x60000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
-	ROM_LOAD( "16.u2d",   0x40000, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
-	ROM_LOAD( "17.u1c",   0x20000, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
-	ROM_LOAD( "18.u2c",   0x00000, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
+	ROM_REGION( 0x80000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "15.u1d",   0x00000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
+	ROM_LOAD32_BYTE( "16.u2d",   0x00001, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
+	ROM_LOAD32_BYTE( "17.u1c",   0x00002, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
+	ROM_LOAD32_BYTE( "18.u2c",   0x00003, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "2.su12",   0x00000, 0x20000, CRC(745d42fb) SHA1(f9aee3ddbad3cc2f3a7002ee0d762eb041967e1e) ) // static sample data

@@ -14,6 +14,7 @@ public:
 
 	// input lines
 	template <unsigned Coprocessor> auto in_brcond() { return m_in_brcond[Coprocessor].bind(); }
+	void berr_w(int state) { m_bus_error = bool(state); }
 
 protected:
 	mips1core_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
@@ -130,6 +131,8 @@ protected:
 	{
 		EH_VPN  = 0xfffff000, // virtual page number
 		EH_ASID = 0x00000fc0, // address space identifier
+
+		EH_WM   = 0xffffffc0, // write mask
 	};
 	enum entrylo_mask : u32
 	{
@@ -138,6 +141,8 @@ protected:
 		EL_D   = 0x00000400, // dirty
 		EL_V   = 0x00000200, // valid
 		EL_G   = 0x00000100, // global
+
+		EL_WM  = 0xffffff00, // write mask
 	};
 	enum context_mask : u32
 	{
@@ -235,6 +240,7 @@ protected:
 
 	// I/O
 	devcb_read_line m_in_brcond[4];
+	bool m_bus_error;
 };
 
 class mips1_device_base : public mips1core_device_base
@@ -296,6 +302,7 @@ protected:
 
 	virtual void handle_cop0(u32 const op) override;
 	virtual u32 get_cop0_reg(unsigned const reg) override;
+	virtual void set_cop0_reg(unsigned const reg, u32 const data) override;
 
 	virtual void handle_cop1(u32 const op) override;
 	template <typename T> void set_cop1_reg(unsigned const reg, T const data);

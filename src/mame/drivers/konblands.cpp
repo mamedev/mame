@@ -45,7 +45,7 @@ public:
 
 private:
 	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void konblands_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(ldp_r);
 	DECLARE_WRITE8_MEMBER(ldp_w);
@@ -102,19 +102,18 @@ void konblands_state::video_start()
 {
 }
 
-uint32_t konblands_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t konblands_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int y,x;
 	int count = 0;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<64;x++)
+		for (int x = 0; x < 64; x++)
 		{
 			uint8_t tile = m_vram[count];
 
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			gfx->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;
 		}
@@ -276,8 +275,8 @@ WRITE_LINE_MEMBER(konblands_state::ld_command_strobe_cb)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(konblands_state::konblands)
-
+void konblands_state::konblands(machine_config &config)
+{
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_CLOCK/12);
 	m_maincpu->set_addrmap(AS_PROGRAM, &konblands_state::konblands_map);
@@ -289,10 +288,9 @@ MACHINE_CONFIG_START(konblands_state::konblands)
 	m_laserdisc->command_strobe_callback().set(FUNC(konblands_state::ld_command_strobe_cb));
 	// TODO: might be different
 	m_laserdisc->set_overlay(512, 256, FUNC(konblands_state::screen_update));
-	m_laserdisc->set_overlay_palette("palette");
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_konblands);
 

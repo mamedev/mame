@@ -15,13 +15,11 @@ class ti990_hdc_device : public device_t
 public:
 	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_interrupt_callback.set_callback(std::forward<Object>(cb)); }
-
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ti990_hd );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_hd );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_hd );
 
 	template <typename T> void set_memory_space(T &&tag, int spacenum) { m_memory_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto int_cb() { return m_interrupt_callback.bind(); }

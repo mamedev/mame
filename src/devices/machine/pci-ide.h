@@ -31,7 +31,6 @@ public:
 	}
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	// This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.

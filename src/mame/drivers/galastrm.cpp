@@ -158,26 +158,14 @@ static const gfx_layout tile16x16_layout =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ STEP4(0,8) },
-	{ STEP8(8*4,1), STEP8(0,1) },
-	{ STEP16(0,8*4*2) },
+	{ STEP4(0,16) },
+	{ STEP16(0,1) },
+	{ STEP16(0,16*4) },
 	64*16   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout charlayout =
-{
-	16,16,    /* 16*16 characters */
-	RGN_FRAC(1,1),
-	4,        /* 4 bits per pixel */
-	{ STEP4(0,1) },
-	{ STEP8(7*4,-4), STEP8(15*4,-4) },
-	{ STEP16(0,16*4) },
-	128*8     /* every sprite takes 128 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_galastrm )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout, 0, 4096 )
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,       0, 4096 )
+	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout, 0, 4096/16 )
 GFXDECODE_END
 
 
@@ -222,16 +210,12 @@ void galastrm_state::galastrm(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_galastrm);
 
 	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(0); // TODO : no ROMs?
 	m_tc0100scn->set_offsets(-48, -56);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
 	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
 	m_tc0480scp->set_palette(m_tc0110pcr);
 	m_tc0480scp->set_offsets(-40, -3);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	TC0110PCR(config, m_tc0110pcr, 0);
 
@@ -252,15 +236,17 @@ ROM_START( galastrm )
 	ROM_LOAD16_BYTE( "c99_23.ic8",  0x100000, 0x20000,  CRC(5718ee92) SHA1(33cfa60c5bceb1525498f27b598067d2dc620431) )
 	ROM_LOAD16_BYTE( "c99_22.ic7",  0x100001, 0x20000,  CRC(b90f7c42) SHA1(e2fa9ee10ad61ae1a672c3357c0072b79ec7fbcb) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD_SWAP( "c99-05.ic1",  0x000002, 0x100000, CRC(a91ffba4) SHA1(467af9646ddad5fbb520b6bc13517ed4deacf479) )  /* SCR 16x16 tiles */
-	ROM_LOAD32_WORD_SWAP( "c99-06.ic2",  0x000000, 0x100000, CRC(812ed3ae) SHA1(775904dd42643d0e3a30890590d5f8eac1fe78db) )
+	ROM_REGION( 0x100, "tc0100scn", ROMREGION_ERASE00 ) // no roms for tc0100scn, dummy
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c99-02.ic50", 0x000000, 0x100000, CRC(81e9fc6f) SHA1(4495a7d130b755b5a48eaa814d884d6bb8243bcb) )  /* OBJ 16x16 tiles */
-	ROM_LOAD32_BYTE( "c99-01.ic51", 0x000001, 0x100000, CRC(9dda1267) SHA1(c639ba064496dcadf5f1e55332a12bb442e9dc86) )
-	ROM_LOAD32_BYTE( "c99-04.ic66", 0x000002, 0x100000, CRC(a681760f) SHA1(23d4fc7eb778c8a25c4bc7cee1d0c8cdd828a996) )
-	ROM_LOAD32_BYTE( "c99-03.ic67", 0x000003, 0x100000, CRC(a2807a27) SHA1(977e395ea2ab2fb82807d3cf5fe5f1dbbde99da0) )
+	ROM_REGION( 0x200000, "tc0480scp", 0 )
+	ROM_LOAD32_WORD( "c99-05.ic1",  0x000000, 0x100000, CRC(a91ffba4) SHA1(467af9646ddad5fbb520b6bc13517ed4deacf479) )  /* SCR 16x16 tiles */
+	ROM_LOAD32_WORD( "c99-06.ic2",  0x000002, 0x100000, CRC(812ed3ae) SHA1(775904dd42643d0e3a30890590d5f8eac1fe78db) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "c99-02.ic50", 0x000000, 0x100000, CRC(81e9fc6f) SHA1(4495a7d130b755b5a48eaa814d884d6bb8243bcb) )  /* OBJ 16x16 tiles */
+	ROM_LOAD64_WORD_SWAP( "c99-01.ic51", 0x000002, 0x100000, CRC(9dda1267) SHA1(c639ba064496dcadf5f1e55332a12bb442e9dc86) )
+	ROM_LOAD64_WORD_SWAP( "c99-04.ic66", 0x000004, 0x100000, CRC(a681760f) SHA1(23d4fc7eb778c8a25c4bc7cee1d0c8cdd828a996) )
+	ROM_LOAD64_WORD_SWAP( "c99-03.ic67", 0x000006, 0x100000, CRC(a2807a27) SHA1(977e395ea2ab2fb82807d3cf5fe5f1dbbde99da0) )
 
 	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "c99-11.ic90",  0x00000,  0x80000, CRC(26a6926c) SHA1(918860e2829131e9ecfe983b2ae3e49e1c9ecd72) )  /* STY, spritemap */

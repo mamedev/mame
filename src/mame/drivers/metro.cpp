@@ -239,6 +239,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 		m_requested_int[m_vblank_bit] = 1;
 		m_requested_int[4] = 1; // ???
 		update_irq_state();
+		if (m_vdp) m_vdp->screen_eof(ASSERT_LINE);
+		if (m_vdp2) m_vdp2->screen_eof(ASSERT_LINE);
+		if (m_vdp3) m_vdp3->screen_eof(ASSERT_LINE);
 	}
 	else if(scanline < 224 && (*m_irq_enable & 2) == 0)
 	{
@@ -3009,7 +3012,6 @@ void metro_state::i4100_config(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));
-	m_screen->set_palette("vdp:palette");
 }
 
 void metro_state::i4220_config(machine_config &config)
@@ -3023,7 +3025,6 @@ void metro_state::i4220_config(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp2", FUNC(imagetek_i4100_device::screen_update));
-	m_screen->set_palette("vdp2:palette");
 }
 
 void metro_state::i4300_config(machine_config &config)
@@ -3037,7 +3038,6 @@ void metro_state::i4300_config(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp3", FUNC(imagetek_i4100_device::screen_update));
-	m_screen->set_palette("vdp3:palette");
 }
 
 // TODO: these comes from the CRTC inside the i4100
@@ -3098,7 +3098,7 @@ void metro_state::msgogo(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", YMF278B_STD_CLOCK));
+	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
 	ymf.set_addrmap(0, &metro_state::ymf278_map);
 	ymf.irq_handler().set_inputline("maincpu", 2);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -3648,7 +3648,6 @@ void metro_state::blzntrnd(machine_config &config)
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 304-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(metro_state::screen_update_psac_vdp2_mix));
-	m_screen->set_palette("vdp2:palette");
 	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)

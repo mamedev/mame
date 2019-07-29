@@ -121,7 +121,6 @@
 #include "includes/jedi.h"
 
 
-
 /*************************************
  *
  *  Interrupt handling
@@ -144,11 +143,10 @@ TIMER_CALLBACK_MEMBER(jedi_state::generate_interrupt)
 }
 
 
-WRITE8_MEMBER(jedi_state::main_irq_ack_w)
+void jedi_state::main_irq_ack_w(u8 data)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
-
 
 
 /*************************************
@@ -164,9 +162,8 @@ void jedi_state::machine_start()
 	m_interrupt_timer->adjust(m_screen->time_until_pos(32), 32);
 
 	/* configure the banks */
-	membank("bank1")->configure_entries(0, 3, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_mainbank->configure_entries(0, 3, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
-
 
 
 /*************************************
@@ -182,20 +179,18 @@ void jedi_state::machine_reset()
 }
 
 
-
 /*************************************
  *
  *  Main program ROM banking
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::rom_banksel_w)
+void jedi_state::rom_banksel_w(u8 data)
 {
-	if (data & 0x01) membank("bank1")->set_entry(0);
-	if (data & 0x02) membank("bank1")->set_entry(1);
-	if (data & 0x04) membank("bank1")->set_entry(2);
+	if (data & 0x01) m_mainbank->set_entry(0);
+	if (data & 0x02) m_mainbank->set_entry(1);
+	if (data & 0x04) m_mainbank->set_entry(2);
 }
-
 
 
 /*************************************
@@ -214,7 +209,6 @@ WRITE_LINE_MEMBER(jedi_state::coin_counter_right_w)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
-
 
 
 /*************************************
@@ -236,21 +230,20 @@ WRITE8_MEMBER(jedi_state::novram_data_w)
 }
 
 
-WRITE8_MEMBER(jedi_state::novram_recall_w)
+void jedi_state::novram_recall_w(offs_t offset, u8 data)
 {
 	m_novram[0]->recall(BIT(offset, 0));
 	m_novram[1]->recall(BIT(offset, 0));
 }
 
 
-WRITE8_MEMBER(jedi_state::novram_store_w)
+void jedi_state::novram_store_w(u8 data)
 {
 	m_novram[0]->store(1);
 	m_novram[1]->store(1);
 	m_novram[0]->store(0);
 	m_novram[1]->store(0);
 }
-
 
 
 /*************************************
@@ -277,16 +270,16 @@ void jedi_state::main_map(address_map &map)
 	map(0x1f00, 0x1f00).mirror(0x007f).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1f80, 0x1f80).mirror(0x007f).nopr().w(FUNC(jedi_state::rom_banksel_w));
 	map(0x2000, 0x27ff).ram().share("backgroundram");
-	map(0x2800, 0x2fff).ram().share("paletteram");
+	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3000, 0x37bf).ram().share("foregroundram");
 	map(0x37c0, 0x3bff).ram().share("spriteram");
-	map(0x3c00, 0x3c01).mirror(0x00fe).nopr().w(FUNC(jedi_state::jedi_vscroll_w));
-	map(0x3d00, 0x3d01).mirror(0x00fe).nopr().w(FUNC(jedi_state::jedi_hscroll_w));
+	map(0x3c00, 0x3c01).mirror(0x00fe).nopr().w(FUNC(jedi_state::vscroll_w));
+	map(0x3d00, 0x3d01).mirror(0x00fe).nopr().w(FUNC(jedi_state::hscroll_w));
 	map(0x3e00, 0x3e00).mirror(0x01ff).writeonly().share("smoothing_table");
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }
-
 
 
 /*************************************
@@ -319,7 +312,6 @@ static INPUT_PORTS_START( jedi )
 	PORT_START("STICKX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
-
 
 
 /*************************************
@@ -364,7 +356,6 @@ void jedi_state::jedi(machine_config &config)
 }
 
 
-
 /*************************************
  *
  *  ROM definitions
@@ -383,14 +374,14 @@ ROM_START( jedi )
 	ROM_LOAD( "136030-133.01c",  0x8000, 0x4000, CRC(6c601c69) SHA1(618b77800bbbb4db34a53ca974a71bdaf89b5930) )
 	ROM_LOAD( "136030-134.01a",  0xC000, 0x4000, CRC(5e36c564) SHA1(4b0afceb9a1d912f1d5c1f26928d244d5b14ea4a) )
 
-	ROM_REGION( 0x02000, "gfx1",0 )
+	ROM_REGION( 0x02000, "tx_gfx",0 )
 	ROM_LOAD( "136030-215.11t",  0x00000, 0x2000, CRC(3e49491f) SHA1(ade5e846069c2fa6edf667469d13ce5a6a45c06d) ) /* Alphanumeric */
 
-	ROM_REGION( 0x10000, "gfx2",0 )
+	ROM_REGION( 0x10000, "bg_gfx",0 )
 	ROM_LOAD( "136030-126.06r",  0x00000, 0x8000, CRC(9c55ece8) SHA1(b8faa23314bb0d199ef46199bfabd9cb17510dd3) ) /* Playfield */
 	ROM_LOAD( "136030-127.06n",  0x08000, 0x8000, CRC(4b09dcc5) SHA1(d46b5f4fb69c4b8d823dd9c4d92f8713badfa44a) )
 
-	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_REGION( 0x20000, "spr_gfx", 0 )
 	ROM_LOAD( "136030-130.01h",  0x00000, 0x8000, CRC(2646a793) SHA1(dcb5fd50eafbb27565bce099a884be83a9d82285) ) /* Sprites */
 	ROM_LOAD( "136030-131.01f",  0x08000, 0x8000, CRC(60107350) SHA1(ded03a46996d3f2349df7f59fd435a7ad6ed465e) )
 	ROM_LOAD( "136030-128.01m",  0x10000, 0x8000, CRC(24663184) SHA1(5eba142ed926671ee131430944e59f21a55a5c57) )
@@ -408,7 +399,6 @@ ROM_START( jedi )
 	ROM_FILL( 0x00, 0x100, 0x0f )
 	ROM_FILL( 0x50, 0x010, 0x00 )
 ROM_END
-
 
 
 /*************************************

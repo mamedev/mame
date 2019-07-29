@@ -5,6 +5,7 @@
 
 Applied Concepts Boris Diplomat
 
+Hardware notes:
 - F3870 MCU (Motorola SC80265P or Fairchild SL90259)
 - 256 bytes RAM(2*2112-1)
 - 8-digit 7seg led panel
@@ -19,7 +20,8 @@ as SL90259.
 #include "emu.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
+#include "video/pwm.h"
 
 // internal artwork
 #include "aci_borisdpl.lh" // clickable
@@ -33,9 +35,8 @@ public:
 	borisdpl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_keypad(*this, "LINE%u", 1U),
-		m_delay_display(*this, "delay_display_%u", 0),
-		m_out_digit(*this, "digit%u", 0U)
+		m_display(*this, "display"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void borisdpl(machine_config &config);
@@ -49,15 +50,13 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<4> m_keypad;
-	required_device_array<timer_device, 8> m_delay_display;
-	output_finder<8> m_out_digit;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<4> m_inputs;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_display);
-
+	void update_display();
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(matrix_w);
@@ -71,53 +70,49 @@ private:
 	std::unique_ptr<u8[]> m_ram;
 	u8 m_ram_address;
 	u8 m_matrix;
+	u8 m_digit_data;
 };
 
 void borisdpl_state::machine_start()
 {
-	// resolve handlers
-	m_out_digit.resolve();
-
 	// zerofill
 	m_ram = make_unique_clear<u8[]>(0x100);
 	m_ram_address = 0;
 	m_matrix = 0;
+	m_digit_data = 0;
 
 	// register for savestates
 	save_pointer(NAME(m_ram), 0x100);
 	save_item(NAME(m_ram_address));
 	save_item(NAME(m_matrix));
+	save_item(NAME(m_digit_data));
 }
 
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // F3870 ports
 
-TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_state::delay_display)
+void borisdpl_state::update_display()
 {
-	// clear digits if inactive
-	if (param != (m_matrix & 7))
-		m_out_digit[param] = 0;
+	m_display->matrix(1 << (m_matrix & 7), m_digit_data);
 }
 
 WRITE8_MEMBER(borisdpl_state::digit_w)
 {
-	// digit segments, update display here
-	m_out_digit[m_matrix & 7] = ~data & 0x7f;
+	// digit segments
+	m_digit_data = ~data & 0x7f;
+	update_display();
 }
 
 WRITE8_MEMBER(borisdpl_state::matrix_w)
 {
 	// d0-d2: MC14028B to input/digit select
-	// digits are strobed, so on falling edge, delay them going off to prevent flicker or stuck display
-	if ((data & 7) != (m_matrix & 7))
-		m_delay_display[m_matrix & 7]->adjust(attotime::from_msec(20), m_matrix & 7);
-
 	m_matrix = data;
+	update_display();
 }
 
 READ8_MEMBER(borisdpl_state::input_r)
@@ -125,7 +120,7 @@ READ8_MEMBER(borisdpl_state::input_r)
 	// d4-d7: multiplexed inputs (only one lane can be selected at the same time)
 	u8 data = m_matrix;
 	if ((m_matrix & 7) < 4)
-		data |= m_keypad[m_matrix & 3]->read() << 4;
+		data |= m_inputs[m_matrix & 3]->read() << 4;
 
 	return data;
 }
@@ -156,25 +151,25 @@ void borisdpl_state::main_io(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( borisdpl )
-	PORT_START("LINE1")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_CODE(KEYCODE_MINUS) PORT_NAME("-")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("B/W") // black/white
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
-	PORT_START("LINE2")
+	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A.1 / Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B.2 / Knight")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C.3 / Bishop")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Rank")
 
-	PORT_START("LINE3")
+	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D.4 / Rook")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E.5 / Queen")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("F.6 / King")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Time")
 
-	PORT_START("LINE4")
+	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G.7")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H.8")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / Set")
@@ -206,10 +201,13 @@ void borisdpl_state::borisdpl(machine_config &config)
 	psu.read_b().set(FUNC(borisdpl_state::ram_address_r));
 	psu.write_b().set(FUNC(borisdpl_state::ram_address_w));
 
-	/* video hardware */
-	for (int i = 0; i < 8; i++)
-		TIMER(config, m_delay_display[i]).configure_generic(FUNC(borisdpl_state::delay_display));
+	// built-in chessboard is not electronic
+	sensorboard_device &board(SENSORBOARD(config, "board").set_type(sensorboard_device::NOSENSORS));
+	board.init_cb().set("board", FUNC(sensorboard_device::preset_chess));
 
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 7);
+	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_aci_borisdpl);
 }
 

@@ -94,28 +94,15 @@ private:
 enum class image_init_result { PASS, FAIL };
 enum class image_verify_result { PASS, FAIL };
 
-// device image interface function types
-typedef delegate<image_init_result (device_image_interface &)> device_image_load_delegate;
-typedef delegate<void (device_image_interface &)> device_image_func_delegate;
-
 //**************************************************************************
 //  MACROS
 //**************************************************************************
 
-#define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
-#define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        image_init_result DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         image_init_result DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_DELEGATE(_class,_name)       device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
 
-#define DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)          device_image_unload_##_name
-#define DEVICE_IMAGE_UNLOAD_NAME(_class,_name)          _class::DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)       void DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_UNLOAD_MEMBER(_class,_name)        void DEVICE_IMAGE_UNLOAD_NAME(_class,_name)(device_image_interface &image)
-#define DEVICE_IMAGE_UNLOAD_DELEGATE(_class,_name)      device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
-
-#define MCFG_SET_IMAGE_LOADABLE(_usrload) \
-	dynamic_cast<device_image_interface &>(*device).set_user_loadable(_usrload);
+#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
 
 
 // ======================> device_image_interface
@@ -124,6 +111,9 @@ typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 class device_image_interface : public device_interface
 {
 public:
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<void (device_image_interface &)> unload_delegate;
+
 	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
 
 	// construction/destruction

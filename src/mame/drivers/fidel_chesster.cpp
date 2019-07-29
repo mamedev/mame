@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard, Berger
 /******************************************************************************
 
-* fidel_chesster.cpp, subdriver of machine/fidelbase.cpp, machine/chessbase.cpp
+Fidelity Chesster Challenger
 
 These were made after Hegener & Glaser took over Fidelity(design phase started
 before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
@@ -27,10 +27,12 @@ the S14001A in the 70s), this time a 65C02 software solution.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelbase.h"
-
 #include "cpu/m6502/r65c02.h"
+#include "machine/sensorboard.h"
+#include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -39,11 +41,17 @@ the S14001A in the 70s), this time a 65C02 software solution.
 
 namespace {
 
-class chesster_state : public fidelbase_state
+class chesster_state : public driver_device
 {
 public:
 	chesster_state(const machine_config &mconfig, device_type type, const char *tag) :
-		fidelbase_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
+		m_rombank(*this, "rombank"),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_inputs(*this, "IN.0")
 	{ }
 
 	// machine drivers
@@ -52,15 +60,32 @@ public:
 
 	void init_chesster();
 
+protected:
+	virtual void machine_start() override;
+
 private:
+	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
+	required_memory_bank m_rombank;
+	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_display;
+	required_ioport m_inputs;
+
 	// address maps
 	void main_map(address_map &map);
 
-	int m_numbanks;
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	int m_numbanks;
+	u8 m_speech_bank;
+	u8 m_select;
 };
 
 void chesster_state::init_chesster()
@@ -69,9 +94,21 @@ void chesster_state::init_chesster()
 	m_rombank->configure_entries(0, m_numbanks, memregion("rombank")->base(), 0x4000);
 }
 
+void chesster_state::machine_start()
+{
+	// zerofill
+	m_speech_bank = 0;
+	m_select = 0;
+
+	// register for savestates
+	save_item(NAME(m_speech_bank));
+	save_item(NAME(m_select));
+}
+
+
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // TTL/generic
@@ -80,27 +117,37 @@ WRITE8_MEMBER(chesster_state::control_w)
 {
 	// a0-a2,d7: 74259(1)
 	u8 mask = 1 << offset;
-	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
+	m_select = (m_select & ~mask) | ((data & 0x80) ? mask : 0);
 
 	// 74259 Q4-Q7: 7442 a0-a3
 	// 7442 0-8: led data, input mux
-	u16 sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
-	m_inp_mux = sel & 0x1ff;
+	u16 led_data = 1 << (m_select >> 4 & 0xf) & 0x1ff;
 
 	// 74259 Q0,Q1: led select (active low)
-	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3);
+	m_display->matrix(~m_select & 3, led_data);
 
 	// 74259 Q2,Q3: speechrom A14,A15
 	// a0-a2,d0: 74259(2) Q3,Q2,Q0 to A16,A17,A18
 	m_speech_bank = (m_speech_bank & ~mask) | ((data & 1) ? mask : 0);
-	u8 bank = (m_led_select >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
+	u8 bank = (m_select >> 2 & 3) | bitswap<3>(m_speech_bank, 0,2,3) << 2;
 	m_rombank->set_entry(bank & (m_numbanks - 1));
 }
 
 READ8_MEMBER(chesster_state::input_r)
 {
+	u8 sel = m_select >> 4 & 0xf;
+	u8 data = 0;
+
 	// a0-a2,d7: multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+	// read chessboard sensors
+	if (sel < 8)
+		data = m_board->read_rank(sel ^ 7, true);
+
+	// read button panel
+	else if (sel == 8)
+		data = m_inputs->read();
+
+	return (data >> offset & 1) ? 0 : 0x80;
 }
 
 
@@ -114,7 +161,7 @@ void chesster_state::main_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).mirror(0x1ff8).rw(FUNC(chesster_state::input_r), FUNC(chesster_state::control_w));
 	map(0x4000, 0x7fff).bankr("rombank");
-	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::data_w));
+	map(0x6000, 0x6000).mirror(0x1fff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -125,9 +172,7 @@ void chesster_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( chesster )
-	PORT_INCLUDE( generic_cb_buttons )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / No")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Yes")
@@ -135,7 +180,7 @@ static INPUT_PORTS_START( chesster )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Replay")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Shift")
 INPUT_PORTS_END
 
 
@@ -155,15 +200,20 @@ void chesster_state::chesster(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(2600)); // active for 2.6us
 	TIMER(config, "irq_off").configure_periodic(FUNC(chesster_state::irq_off<M6502_IRQ_LINE>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(chesster_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	config.set_default_layout(layout_fidel_chesster);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac8").add_route(ALL_OUTPUTS, "speaker", 0.5); // m74hc374b1.ic1 + 8l513_02.z2
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // m74hc374b1.ic1 + 8l513_02.z2
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac8", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void chesster_state::kishon(machine_config &config)
@@ -196,20 +246,20 @@ ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
 	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
 ROM_END
 
-ROM_START( kishon ) // possibly Mephisto brand?, PCB label 510.1141C01
+ROM_START( kishon ) // model 6120G or 6127(same), PCB label 510.1141C01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("gc_2.3.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256, GC 2.3 on sticker, also seen without label
+
+	ROM_REGION( 0x80000, "rombank", 0 )
+	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, 1-14-91, aka 101-1094A01 on 6127
+ROM_END
+
+ROM_START( kishona ) // possibly Mephisto brand?, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("german_chesster_v2.2.ic9", 0x8000, 0x8000, CRC(43e0cfcd) SHA1(961c7335f562b19fa96324c429ab70e8ab4d7647) ) // 27C256, 15.1.91
 
 	ROM_REGION( 0x80000, "rombank", 0 )
 	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12
-ROM_END
-
-ROM_START( kishona ) // model 6120G or 6127(same), PCB label 510.1141C01
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("kishon.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256, no label
-
-	ROM_REGION( 0x80000, "rombank", 0 )
-	ROM_LOAD("kishon_chesster_v2.6.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, 1-14-91, aka 101-1094A01 on 6127
 ROM_END
 
 } // anonymous namespace
@@ -221,7 +271,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE           INIT           COMPANY, FULLNAME, FLAGS
-CONS( 1990, chesster,  0,        0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, chesstera, chesster, 0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishon,    chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishona,   chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, chesster,  0,        0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, chesstera, chesster, 0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishon,    chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishona,   chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

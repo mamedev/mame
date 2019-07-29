@@ -67,6 +67,7 @@ void i8x9x_device::device_start()
 	state_add(I8X9X_SBUF_TX,     "SBUF_TX",     serial_send_buf);
 	state_add(I8X9X_SP_CON,      "SP_CON",      sp_con).mask(0x1f);
 	state_add(I8X9X_SP_STAT,     "SP_STAT",     sp_stat).mask(0xe0);
+	state_add(I8X9X_BAUD_RATE,   "BAUD_RATE",   baud_reg);
 	state_add(I8X9X_IOC0,        "IOC0",        ioc0).mask(0xfd);
 	state_add(I8X9X_IOC1,        "IOC1",        ioc1);
 	state_add(I8X9X_IOS0,        "IOS0",        ios0);
@@ -99,6 +100,8 @@ void i8x9x_device::device_start()
 	save_item(NAME(sp_stat));
 	save_item(NAME(serial_send_buf));
 	save_item(NAME(serial_send_timer));
+	save_item(NAME(baud_reg));
+	save_item(NAME(brh));
 }
 
 void i8x9x_device::device_reset()
@@ -119,6 +122,7 @@ void i8x9x_device::device_reset()
 	sp_con &= 0x17;
 	sp_stat &= 0x80;
 	serial_send_timer = 0;
+	brh = false;
 	m_hso_cb(0);
 }
 
@@ -267,7 +271,12 @@ u16 i8x9x_device::timer2_r()
 
 void i8x9x_device::baud_rate_w(u8 data)
 {
-	logerror("baud rate %02x (%04x)\n", data, PPC);
+	if (brh)
+		baud_reg = (baud_reg & 0x00ff) | u16(data) << 8;
+	else
+		baud_reg = (baud_reg & 0xff00) | data;
+	if (!machine().side_effects_disabled())
+		brh = !brh;
 }
 
 u8 i8x9x_device::port0_r()

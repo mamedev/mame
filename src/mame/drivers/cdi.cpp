@@ -178,7 +178,7 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 	if(send)
 	{
 		uint8_t data = (uint8_t)((uintptr_t)param & 0x000000ff);
-		m_maincpu->quizard_rx(data);
+		quizard_rx(data);
 	}
 }
 
@@ -264,10 +264,9 @@ static INPUT_PORTS_START( quizard )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
-{
-	m_maincpu->mcu_frame();
-}
+/***************************
+*  Machine Initialization  *
+***************************/
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 {
@@ -276,6 +275,12 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 	memcpy(dst, src, 0x8);
 	memset(m_servo_io_regs, 0, 0x20);
 	memset(m_slave_io_regs, 0, 0x20);
+
+	// Quizard Protection HLE data
+	memset(m_seeds, 0, 10 * sizeof(uint16_t));
+	memset(m_state, 0, 8 * sizeof(uint8_t));
+	m_mcu_value = 0;
+	m_mcu_ack = 0;
 }
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
@@ -291,8 +296,8 @@ MACHINE_RESET_MEMBER( cdi_state, quizard1 )
 {
 	MACHINE_RESET_CALL_MEMBER( cdimono1 );
 
-	m_maincpu->set_quizard_mcu_value(0x021f);
-	m_maincpu->set_quizard_mcu_ack(0x5a);
+	set_quizard_mcu_value(0x021f);
+	set_quizard_mcu_ack(0x5a);
 }
 
 MACHINE_RESET_MEMBER( cdi_state, quizard2 )
@@ -303,29 +308,193 @@ MACHINE_RESET_MEMBER( cdi_state, quizard2 )
 	// 0x001: French
 	// 0x188: German
 
-	m_maincpu->set_quizard_mcu_value(0x188);
-	m_maincpu->set_quizard_mcu_ack(0x59);
+	set_quizard_mcu_value(0x188);
+	set_quizard_mcu_ack(0x59);
 }
-
-
 
 MACHINE_RESET_MEMBER( cdi_state, quizard3 )
 {
 	MACHINE_RESET_CALL_MEMBER( cdimono1 );
 
-	m_maincpu->set_quizard_mcu_value(0x00ae);
-	m_maincpu->set_quizard_mcu_ack(0x58);
+	set_quizard_mcu_value(0x00ae);
+	set_quizard_mcu_ack(0x58);
 }
 
 MACHINE_RESET_MEMBER( cdi_state, quizard4 )
 {
 	MACHINE_RESET_CALL_MEMBER( cdimono1 );
 
-	//m_maincpu->set_quizard_mcu_value(0x0139);
-	m_maincpu->set_quizard_mcu_value(0x011f);
-	m_maincpu->set_quizard_mcu_ack(0x57);
+	set_quizard_mcu_value(0x011f);
+	set_quizard_mcu_ack(0x57);
 }
 
+
+/***************************
+*  Quizard Protection HLE  *
+***************************/
+
+void cdi_state::set_quizard_mcu_ack(uint8_t ack)
+{
+	m_mcu_ack = ack;
+}
+
+void cdi_state::set_quizard_mcu_value(uint16_t value)
+{
+	m_mcu_value = value;
+}
+
+void cdi_state::quizard_rx(uint8_t data)
+{
+	m_maincpu->uart_rx(0x5a);
+	m_maincpu->uart_rx(data);
+}
+
+void cdi_state::quizard_set_seeds(uint8_t *rx)
+{
+	m_seeds[0] = (rx[1] << 8) | rx[0];
+	m_seeds[1] = (rx[3] << 8) | rx[2];
+	m_seeds[2] = (rx[5] << 8) | rx[4];
+	m_seeds[3] = (rx[7] << 8) | rx[6];
+	m_seeds[4] = (rx[9] << 8) | rx[8];
+	m_seeds[5] = (rx[11] << 8) | rx[10];
+	m_seeds[6] = (rx[13] << 8) | rx[12];
+	m_seeds[7] = (rx[15] << 8) | rx[14];
+	m_seeds[8] = (rx[17] << 8) | rx[16];
+	m_seeds[9] = (rx[19] << 8) | rx[18];
+}
+
+void cdi_state::quizard_calculate_state()
+{
+	//const uint16_t desired_bitfield = mcu_value;
+	const uint16_t field0 = 0x00ff;
+	const uint16_t field1 = m_mcu_value ^ 0x00ff;
+
+	uint16_t total0 = 0;
+	uint16_t total1 = 0;
+
+	for(int index = 0; index < 10; index++)
+	{
+		if (field0 & (1 << index))
+		{
+			total0 += m_seeds[index];
+		}
+		if (field1 & (1 << index))
+		{
+			total1 += m_seeds[index];
+		}
+	}
+
+	uint16_t hi0 = (total0 >> 8) + 0x40;
+	m_state[2] = hi0 / 2;
+	m_state[3] = hi0 - m_state[2];
+
+	uint16_t lo0 = (total0 & 0x00ff) + 0x40;
+	m_state[0] = lo0 / 2;
+	m_state[1] = lo0 - m_state[0];
+
+	uint16_t hi1 = (total1 >> 8) + 0x40;
+	m_state[6] = hi1 / 2;
+	m_state[7] = hi1 - m_state[6];
+
+	uint16_t lo1 = (total1 & 0x00ff) + 0x40;
+	m_state[4] = lo1 / 2;
+	m_state[5] = lo1 - m_state[4];
+}
+
+void cdi_state::quizard_handle_byte_tx(uint8_t data)
+{
+	static int state = 0;
+	static uint8_t rx[0x100];
+	static uint8_t rx_ptr = 0xff;
+
+	switch (state)
+	{
+		case 0: // Waiting for a leadoff byte
+			if (data == m_mcu_ack) // Sequence end
+			{
+				//scc68070_uart_rx(machine, scc68070, 0x5a);
+				//scc68070_uart_rx(machine, scc68070, 0x42);
+			}
+			else
+			{
+				switch (data)
+				{
+					case 0x44: // DATABASEPATH = **_DATABASE/
+						rx[0] = 0x44;
+						rx_ptr = 1;
+						state = 3;
+						break;
+					case 0x2e: // Unknown; ignored
+						break;
+					case 0x56: // Seed start
+						rx_ptr = 0;
+						state = 1;
+						break;
+					default:
+						//printf("Unknown leadoff byte: %02x\n", data);
+						break;
+				}
+			}
+			break;
+
+		case 1: // Receiving the seed
+			rx[rx_ptr] = data;
+			rx_ptr++;
+			if (rx_ptr == 20)
+			{
+				//printf("Calculating seeds\n");
+				quizard_set_seeds(rx);
+				quizard_calculate_state();
+				state = 2;
+			}
+			break;
+
+		case 2: // Receiving the seed acknowledge
+		case 4:
+			if (data == m_mcu_ack)
+			{
+				if (state == 2)
+				{
+					state = 4;
+				}
+				else
+				{
+					state = 0;
+				}
+				//printf("Sending seed ack\n");
+				m_maincpu->uart_rx(0x5a);
+				m_maincpu->uart_rx(m_state[0]);
+				m_maincpu->uart_rx(m_state[1]);
+				m_maincpu->uart_rx(m_state[2]);
+				m_maincpu->uart_rx(m_state[3]);
+				m_maincpu->uart_rx(m_state[4]);
+				m_maincpu->uart_rx(m_state[5]);
+				m_maincpu->uart_rx(m_state[6]);
+				m_maincpu->uart_rx(m_state[7]);
+			}
+			break;
+
+		case 3: // Receiving the database path
+			rx[rx_ptr] = data;
+			rx_ptr++;
+			if (data == 0x0a)
+			{
+				/*rx[rx_ptr] = 0;
+				//printf("Database path: %s\n", rx);
+				scc68070_uart_rx(machine, scc68070, 0x5a);
+				scc68070_uart_rx(machine, scc68070, g_state[0]);
+				scc68070_uart_rx(machine, scc68070, g_state[1]);
+				scc68070_uart_rx(machine, scc68070, g_state[2]);
+				scc68070_uart_rx(machine, scc68070, g_state[3]);
+				scc68070_uart_rx(machine, scc68070, g_state[4]);
+				scc68070_uart_rx(machine, scc68070, g_state[5]);
+				scc68070_uart_rx(machine, scc68070, g_state[6]);
+				scc68070_uart_rx(machine, scc68070, g_state[7]);*/
+				state = 0;
+			}
+			break;
+	}
+}
 
 
 /**************************
@@ -981,13 +1150,14 @@ void cdi_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(cdi_state::mcu_frame));
+	m_maincpu->uart_tx_callback().set(FUNC(cdi_state::quizard_handle_byte_tx));
 }
 
 
 READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 {
-	return machine().rand();
+	LOG("%s: MCU Port 1 Read\n", machine().describe_context());
+	return 0;
 }
 
 void cdi_state::quizard1(machine_config &config)

@@ -18,7 +18,6 @@ For 512, 256 or 128KB ROMs, just a simple split is needed.
 
 Armed-F
 Dragon Spirit
-F1 Triple Battle (reverse-engineered to be ID=100)
 Power League IV
 Violent Soldier
 Xevious
@@ -35,7 +34,6 @@ Cyber Cross
 Deep Blue
 Eternal City
 F1 Circus
-F1 Triple Battle
 Hatris
 Heavy Unit
 Hanii in the Sky
@@ -52,11 +50,9 @@ New Zealand Story
 Okinawa
 Overhaulet Man
 P-47
-Paranoia
 Populous
 Power Golf
 Rabio Lepus
-Racing Spirit
 Rock-On
 R-Type I
 SG Darius
@@ -543,7 +539,7 @@ Parasol Stars
 		<publisher>bootleg (TourVision) / Human</publisher>
 		<info name="alt_title" value="F1トリプルバトル"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="0x64"/> <!-- ID = 100. It was not actually read from the cart, but reversed-engineered -->
+			<feature name="id" value="0x64"/> <!-- ID = 100d. It was not actually read from the cart, but reversed-engineered -->
 			<dataarea name="rom" size="393216">
 				<rom name="f1 triple battle (japan).pce" size="393216" crc="13bf0409" sha1="0a219b433529b3214f42734c2a144d238cb3c99c" />
 			</dataarea>
@@ -948,6 +944,20 @@ Parasol Stars
 		</part>
 	</software>
 
+	<!-- Confirmed to exist, but not dumped from actual TourVisión cart -->
+	<software name="paranoia">
+		<description>Paranoia (TourVision PCE bootleg)</description>
+		<year>1990</year>
+		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<info name="alt_title" value="パラノイア"/>
+		<part name="cart" interface="tourvision_cart">
+			<feature name="id" value="0x12"/> <!-- 18d, readed from the riser (without the cart) -->
+			<dataarea name="rom" size="262144">
+				<rom name="paranoia (japan).pce" size="262144" offset="000000" sha1="b3097e7f163e4a067cf32f290e59657a8b5e271b" crc="9893e0e6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdenj">
 		<description>PC Denjin - Punkic Cyborg (TourVision PCE bootleg)</description>
 		<year>1992</year>
@@ -1105,6 +1115,21 @@ Parasol Stars
 		</part>
 	</software>
 
+	<!-- Confirmed to exist, but not dumped from actual TourVisión cart -->
+	<!-- Racing Spirit -->
+	<software name="racindam">
+		<description>Racing Damashii (TourVision PCE bootleg)</description>
+		<year>1991</year>
+		<publisher>bootleg (TourVision) / Irem</publisher>
+		<info name="alt_title" value="レーシング魂"/>
+		<part name="cart" interface="tourvision_cart">
+			<feature name="id" value="0x5B"/> <!-- ID = 91d. It was not actually read from the cart, but reversed-engineered -->
+			<dataarea name="rom" size="524288">
+				<rom name="racing damashii (japan).pce" size="524288" offset="000000" sha1="8e558b47599a36d78d319e0dcd2e5136564df074" crc="3e79734c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="raiden">
 		<description>Raiden (TourVision PCE bootleg)</description>
 		<year>1991</year>
@@ -1236,7 +1261,7 @@ Parasol Stars
 	</software>
 
 	<software name="soldblad">
-		<description>Soldier Blade  (TourVision PCE bootleg)</description>
+		<description>Soldier Blade (TourVision PCE bootleg)</description>
 		<year>1992</year>
 		<publisher>bootleg (TourVision) / Hudson</publisher>
 		<info name="alt_title" value="ソルジャーブレイド"/>

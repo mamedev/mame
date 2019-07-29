@@ -79,11 +79,7 @@
     upper-left power pill: mcu cycle/interrupt timing related
   - Though very uncommon when compared to games with LED/lamp display, some
     games may manipulate VFD plate brightness by strobing it longer/shorter,
-    eg. cgalaxn when the player ship explodes.
-  - Related to the above issue: bultrman sometimes strobes D0/D1/D2 for a very
-    short duration, causing (unwanted) dimly lit segments on the real machine.
-    On MAME they will show with full brightness, see eg. building explosions.
-    Currently there's a workaround in place.
+    eg. cgalaxn when a ship explodes.
   - bzaxxon 3D effect is difficult to simulate
   - improve/redo SVGs of: bzaxxon, bpengo, bbtime
 
@@ -92,6 +88,7 @@
 #include "emu.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
+#include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
@@ -118,23 +115,16 @@ public:
 	hh_hmcs40_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_x(*this, "%u.%u", 0U, 0U),
-		m_out_a(*this, "%u.a", 0U),
-		m_out_digit(*this, "digit%u", 0U),
+		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// devices
 	required_device<hmcs40_cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
-	output_finder<0x20, 0x40> m_out_x;
-	output_finder<0x20> m_out_a;
-	output_finder<0x20> m_out_digit;
+	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<7> m_inputs; // max 7
 
 	// misc common
 	u8 m_r[8];                      // MCU R ports write data (optional)
@@ -142,28 +132,13 @@ public:
 	u8 m_int[2];                    // MCU INT0/1 pins state
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
+	u32 m_grid;                     // VFD current row data
+	u64 m_plate;                    // VFD current column data
+
 	u16 read_inputs(int columns);
 	void refresh_interrupts(void);
 	void set_interrupt(int line, int state);
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
-
-	// display common
-	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
-	int m_display_maxy;             // display matrix number of rows
-	int m_display_maxx;             // display matrix number of columns (max 47 for now)
-
-	u32 m_grid;                     // VFD current row data
-	u64 m_plate;                    // VFD current column data
-
-	u64 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
-	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
-	u8 m_display_decay[0x20][0x40]; // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(u32 digits, u32 mask);
-	void display_matrix(int maxx, int maxy, u64 setx, u32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -175,16 +150,7 @@ protected:
 
 void hh_hmcs40_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-	m_out_a.resolve();
-	m_out_digit.resolve();
-
 	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-
 	memset(m_r, 0, sizeof(m_r));
 	memset(m_int, 0, sizeof(m_int));
 	m_d = 0;
@@ -193,14 +159,6 @@ void hh_hmcs40_state::machine_start()
 	m_plate = 0;
 
 	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
 	save_item(NAME(m_r));
 	save_item(NAME(m_int));
 	save_item(NAME(m_d));
@@ -222,80 +180,6 @@ void hh_hmcs40_state::machine_reset()
 
 ***************************************************************************/
 
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void hh_hmcs40_state::display_update()
-{
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		u64 active_state = 0;
-
-		for (int x = 0; x <= m_display_maxx; x++)
-		{
-			// turn on powered segments
-			if (m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
-
-			// determine active state
-			u64 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state |= (ds << x);
-
-			// output to y.x, or y.a when always-on
-			if (x != m_display_maxx)
-				m_out_x[y][x] = ds;
-			else
-				m_out_a[y] = ds;
-		}
-
-		// output to digity
-		if (m_display_segmask[y] != 0)
-			m_out_digit[y] = active_state & m_display_segmask[y];
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x <= m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-
-	display_update();
-}
-
-void hh_hmcs40_state::set_display_size(int maxx, int maxy)
-{
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-}
-
-void hh_hmcs40_state::set_display_segmask(u32 digits, u32 mask)
-{
-	// set a segment mask per selected digit, but leave unselected ones alone
-	for (int i = 0; i < 0x20; i++)
-	{
-		if (digits & 1)
-			m_display_segmask[i] = mask;
-		digits >>= 1;
-	}
-}
-
-void hh_hmcs40_state::display_matrix(int maxx, int maxy, u64 setx, u32 sety, bool update)
-{
-	set_display_size(maxx, maxy);
-
-	// update current state
-	u64 mask = (u64(1) << maxx) - 1;
-	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (u64(1) << maxx)) : 0;
-
-	if (update)
-		display_update();
-}
-
-
 // generic input handlers
 
 u16 hh_hmcs40_state::read_inputs(int columns)
@@ -305,7 +189,7 @@ u16 hh_hmcs40_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -374,12 +258,12 @@ public:
 WRITE8_MEMBER(bambball_state::plate_w)
 {
 	// R1x-R3x(,D0-D3): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
 	u16 plate = bitswap<16>(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(bambball_state::grid_w)
@@ -394,7 +278,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data & 0xf);
+	plate_w(space, 3 + 1, data & 0xf);
 }
 
 READ8_MEMBER(bambball_state::input_r)
@@ -444,12 +328,11 @@ void bambball_state::bambball(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 478);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_bambball);
 
 	/* sound hardware */
@@ -464,7 +347,7 @@ ROM_START( bambball )
 	ROM_LOAD( "hd38750a08", 0x0000, 0x0800, CRC(907fef18) SHA1(73fe7ca7c6332268a3a9abc5ac88ada2991012fb) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 
-	ROM_REGION( 281988, "svg", 0)
+	ROM_REGION( 281988, "screen", 0)
 	ROM_LOAD( "bambball.svg", 0, 281988, CRC(63019194) SHA1(cbfb5b051d8f57f6b4d698796030850b3631ed56) )
 ROM_END
 
@@ -488,7 +371,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -497,19 +380,19 @@ public:
 
 // handlers
 
-void bmboxing_state::prepare_display()
+void bmboxing_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u32 plate = bitswap<16>(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
-	display_matrix(12, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bmboxing_state::plate_w)
 {
 	// R1x-R3x: vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bmboxing_state::grid_w)
@@ -522,7 +405,7 @@ WRITE16_MEMBER(bmboxing_state::grid_w)
 
 	// D4-D12: vfd grid
 	m_grid = data >> 4 & 0x1ff;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(bmboxing_state::input_r)
@@ -593,12 +476,11 @@ void bmboxing_state::bmboxing(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 529);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -612,7 +494,7 @@ ROM_START( bmboxing )
 	ROM_LOAD( "hd38750a07", 0x0000, 0x0800, CRC(7f33e259) SHA1(c5fcdd6bf060c96666354f09f0570c754f6ed4e0) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 
-	ROM_REGION( 257144, "svg", 0)
+	ROM_REGION( 257144, "screen", 0)
 	ROM_LOAD( "bmboxing.svg", 0, 257144, CRC(dab81477) SHA1(28b0c844a311e2023ffa71d754e799059b7d050f) )
 ROM_END
 
@@ -636,7 +518,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -647,11 +529,11 @@ public:
 
 // handlers
 
-void bfriskyt_state::prepare_display()
+void bfriskyt_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
-	display_matrix(22, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bfriskyt_state::plate_w)
@@ -659,7 +541,7 @@ WRITE8_MEMBER(bfriskyt_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bfriskyt_state::grid_w)
@@ -680,7 +562,7 @@ WRITE16_MEMBER(bfriskyt_state::grid_w)
 
 	// D0-D5: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x3f0000);
-	prepare_display();
+	update_display();
 }
 
 void bfriskyt_state::update_int1()
@@ -723,12 +605,11 @@ void bfriskyt_state::bfriskyt(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 675);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 22);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -742,7 +623,7 @@ ROM_START( bfriskyt )
 	ROM_LOAD( "hd38800a77", 0x0000, 0x1000, CRC(a2445c4f) SHA1(0aaccfec90b66d27dae194d4462d88e654c41578) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 413577, "svg", 0)
+	ROM_REGION( 413577, "screen", 0)
 	ROM_LOAD( "bfriskyt.svg", 0, 413577, CRC(17090264) SHA1(4512a8a91a459f2ddc258641c6d38c2f48f4160f) )
 ROM_END
 
@@ -789,7 +670,7 @@ WRITE8_MEMBER(packmon_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
-	display_matrix(20, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(packmon_state::grid_w)
@@ -845,12 +726,11 @@ void packmon_state::packmon(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 680);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 20);
 	config.set_default_layout(layout_packmon);
 
 	/* sound hardware */
@@ -865,7 +745,7 @@ ROM_START( packmon )
 	ROM_LOAD( "hd38800a27", 0x0000, 0x1000, CRC(86e09e84) SHA1(ac7d3c43667d5720ca513f8ff51d146d9f2af124) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 224386, "svg", 0)
+	ROM_REGION( 224386, "screen", 0)
 	ROM_LOAD( "packmon.svg", 0, 224386, CRC(b2ee5b6b) SHA1(e53b4d5a4118cc5fbec4656580c2aab76af8f8d7) )
 ROM_END
 
@@ -909,7 +789,7 @@ WRITE8_MEMBER(bzaxxon_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
-	display_matrix(20, 11, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(bzaxxon_state::grid_w)
@@ -974,12 +854,11 @@ void bzaxxon_state::bzaxxon(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(613, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(11, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -993,7 +872,7 @@ ROM_START( bzaxxon )
 	ROM_LOAD( "hd38800b19", 0x0000, 0x1000, CRC(4fecb80d) SHA1(7adf079480ffd3825ad5ae1eaa4d892eecbcc42d) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 521080, "svg", 0)
+	ROM_REGION( 521080, "screen", 0)
 	ROM_LOAD( "bzaxxon.svg", 0, 521080, BAD_DUMP CRC(f4fbb2de) SHA1(83db400e67d91ae4bfee3e8568ae9df94ebede19) )
 ROM_END
 
@@ -1035,7 +914,7 @@ WRITE8_MEMBER(zackman_state::plate_w)
 	// update display
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<32>(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
-	display_matrix(29, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(zackman_state::grid_w)
@@ -1098,12 +977,11 @@ void zackman_state::zackman(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(487, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 29);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1117,7 +995,7 @@ ROM_START( zackman )
 	ROM_LOAD( "hd38820a49", 0x0000, 0x1000, CRC(b97f5ef6) SHA1(7fe20e8107361caf9ea657e504be1f8b10b8b03f) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 910689, "svg", 0)
+	ROM_REGION( 910689, "screen", 0)
 	ROM_LOAD( "zackman.svg", 0, 910689, CRC(5f322820) SHA1(4210aff160e5de9a409aba8b915aaebff2a92647) )
 ROM_END
 
@@ -1141,7 +1019,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -1152,11 +1030,11 @@ public:
 
 // handlers
 
-void bpengo_state::prepare_display()
+void bpengo_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(25, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bpengo_state::plate_w)
@@ -1164,7 +1042,7 @@ WRITE8_MEMBER(bpengo_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bpengo_state::grid_w)
@@ -1182,7 +1060,7 @@ WRITE16_MEMBER(bpengo_state::grid_w)
 
 	// D0-D7: vfd grid
 	m_grid = data & 0xff;
-	prepare_display();
+	update_display();
 }
 
 void bpengo_state::update_int0()
@@ -1232,12 +1110,11 @@ void bpengo_state::bpengo(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 759);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1251,7 +1128,7 @@ ROM_START( bpengo )
 	ROM_LOAD( "hd38820a63", 0x0000, 0x1000, CRC(ebd6bc64) SHA1(0a322c47b9553a2739a85908ce64b9650cf93d49) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 744461, "svg", 0)
+	ROM_REGION( 744461, "screen", 0)
 	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
 ROM_END
 
@@ -1275,7 +1152,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -1286,11 +1163,11 @@ public:
 
 // handlers
 
-void bbtime_state::prepare_display()
+void bbtime_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
-	display_matrix(28, 6, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bbtime_state::plate_w)
@@ -1298,7 +1175,7 @@ WRITE8_MEMBER(bbtime_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bbtime_state::grid_w)
@@ -1316,7 +1193,7 @@ WRITE16_MEMBER(bbtime_state::grid_w)
 
 	// D4-D9: vfd grid
 	m_grid = data >> 4 & 0x3f;
-	prepare_display();
+	update_display();
 }
 
 void bbtime_state::update_int0()
@@ -1362,12 +1239,11 @@ void bbtime_state::bbtime(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(379, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(6, 28);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1381,7 +1257,7 @@ ROM_START( bbtime )
 	ROM_LOAD( "hd38820a65", 0x0000, 0x1000, CRC(33611faf) SHA1(29b6a30ed543688d31ec2aa18f7938fa4eef30b0) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 461605, "svg", 0)
+	ROM_REGION( 461605, "screen", 0)
 	ROM_LOAD( "bbtime.svg", 0, 461605, BAD_DUMP CRC(5b335271) SHA1(46c45b711358e8397ae707668aecead9e341ab8a) )
 ROM_END
 
@@ -1421,7 +1297,7 @@ WRITE8_MEMBER(bdoramon_state::plate_w)
 	// update display
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,7,6);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(19, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(bdoramon_state::grid_w)
@@ -1472,12 +1348,11 @@ void bdoramon_state::bdoramon(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 668);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1491,7 +1366,7 @@ ROM_START( bdoramon )
 	ROM_LOAD( "hd38800b43", 0x0000, 0x1000, CRC(9387ca42) SHA1(8937e208934b34bd9f49700aa50287dfc8bda76c) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 624751, "svg", 0)
+	ROM_REGION( 624751, "screen", 0)
 	ROM_LOAD( "bdoramon.svg", 0, 624751, CRC(5dc4017c) SHA1(2091765de401969651b8eb22067572be72d12398) )
 ROM_END
 
@@ -1531,7 +1406,7 @@ WRITE8_MEMBER(bultrman_state::plate_w)
 	// update display
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
-	display_matrix(18, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(bultrman_state::grid_w)
@@ -1543,8 +1418,7 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
-	//plate_w(space, 4, data & 7);
-	plate_w(space, 4, data & (1 << offset) & 7);
+	plate_w(space, 4, data & 7);
 }
 
 // config
@@ -1575,12 +1449,11 @@ void bultrman_state::bultrman(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 673);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1594,7 +1467,7 @@ ROM_START( bultrman )
 	ROM_LOAD( "hd38800b52", 0x0000, 0x1000, CRC(88d372dc) SHA1(f2ac3b89be8afe6fb65914ccebe1a56316b9472a) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 405717, "svg", 0)
+	ROM_REGION( 405717, "screen", 0)
 	ROM_LOAD( "bultrman.svg", 0, 405717, CRC(13367971) SHA1(f294898712d1e146ff267bb1e3cfd059f972b248) )
 ROM_END
 
@@ -1618,7 +1491,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	void machiman(machine_config &config);
@@ -1626,18 +1499,18 @@ public:
 
 // handlers
 
-void machiman_state::prepare_display()
+void machiman_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
-	display_matrix(19, 5, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(machiman_state::plate_w)
 {
 	// R0x-R3x,R6012: vfd plate
-	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 16 : offset * 4;
+	int shift = (offset == 6) ? 16 : offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(machiman_state::grid_w)
@@ -1647,7 +1520,7 @@ WRITE16_MEMBER(machiman_state::grid_w)
 
 	// D0-D4: vfd grid
 	m_grid = data & 0x1f;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1676,12 +1549,11 @@ void machiman_state::machiman(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1534, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(5, 19);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1695,7 +1567,7 @@ ROM_START( machiman )
 	ROM_LOAD( "hd38820a85", 0x0000, 0x1000, CRC(894b4954) SHA1(cab49638a326b031aa548301beb16f818759ef62) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 374097, "svg", 0)
+	ROM_REGION( 374097, "screen", 0)
 	ROM_LOAD( "machiman.svg", 0, 374097, CRC(78af02ac) SHA1(1b4bbea3e46e1bf33149727d9725bc9b18652b9c) )
 ROM_END
 
@@ -1729,6 +1601,7 @@ public:
 	required_device<hmcs40_cpu_device> m_audiocpu;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -1741,12 +1614,17 @@ public:
 
 // handlers: maincpu side
 
+void pairmtch_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
 WRITE8_MEMBER(pairmtch_state::plate_w)
 {
 	// R2x,R3x,R6x: vfd plate
-	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 8 : (offset-2) * 4;
+	int shift = (offset == 6) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	display_matrix(12, 6, m_plate, m_grid);
+	update_display();
 }
 
 WRITE16_MEMBER(pairmtch_state::grid_w)
@@ -1762,7 +1640,7 @@ WRITE16_MEMBER(pairmtch_state::grid_w)
 
 	// D0-D5: vfd grid
 	m_grid = data & 0x3f;
-	display_matrix(12, 6, m_plate, m_grid);
+	update_display();
 }
 
 READ8_MEMBER(pairmtch_state::input_r)
@@ -1845,7 +1723,8 @@ void pairmtch_state::pairmtch(machine_config &config)
 
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 12);
 	config.set_default_layout(layout_pairmtch);
 
 	/* sound hardware */
@@ -1906,7 +1785,7 @@ WRITE8_MEMBER(alnattck_state::plate_w)
 
 	// update display
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
-	display_matrix(20, 10, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(alnattck_state::grid_w)
@@ -1970,12 +1849,11 @@ void alnattck_state::alnattck(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 700);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1989,7 +1867,7 @@ ROM_START( alnattck )
 	ROM_LOAD( "hd38800a25", 0x0000, 0x1000, CRC(18b50869) SHA1(11e9d5f7b4ae818b077b0ee14a3b43190e20bff3) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 564271, "svg", 0)
+	ROM_REGION( 564271, "screen", 0)
 	ROM_LOAD( "alnattck.svg", 0, 564271, CRC(5466d1d4) SHA1(3295272015969e58fddc53272769e1fc1bd4b355) )
 ROM_END
 
@@ -2014,7 +1892,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -2054,10 +1932,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 	m_speaker_volume /= 1.02;
 }
 
-void cdkong_state::prepare_display()
+void cdkong_state::update_display()
 {
 	u32 plate = bitswap<32>(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
-	display_matrix(29, 11, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(cdkong_state::plate_w)
@@ -2069,7 +1947,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cdkong_state::grid_w)
@@ -2080,7 +1958,7 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 
 	// D4-D14: vfd grid
 	m_grid = data >> 4 & 0x7ff;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2096,8 +1974,6 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
-
-static s16 cdkong_speaker_levels[0x8000];
 
 void cdkong_state::cdkong(machine_config &config)
 {
@@ -2115,12 +1991,11 @@ void cdkong_state::cdkong(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(605, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(11, 29);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2129,9 +2004,10 @@ void cdkong_state::cdkong(machine_config &config)
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	static s16 speaker_levels[0x8000];
 	for (int i = 0; i < 0x8000; i++)
-		cdkong_speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, cdkong_speaker_levels);
+		speaker_levels[i] = i;
+	m_speaker->set_levels(0x8000, speaker_levels);
 }
 
 // roms
@@ -2141,7 +2017,7 @@ ROM_START( cdkong )
 	ROM_LOAD( "hd38820a45", 0x0000, 0x1000, CRC(196b8070) SHA1(da85d1eb4b048b77f3168630662ab94ec9baa262) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 359199, "svg", 0)
+	ROM_REGION( 359199, "screen", 0)
 	ROM_LOAD( "cdkong.svg", 0, 359199, CRC(ba159fd5) SHA1(3188e2ed3234f39ac9ee93a485a7e73314bc3457) )
 ROM_END
 
@@ -2172,7 +2048,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE16_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -2183,30 +2059,30 @@ public:
 
 // handlers
 
-void cgalaxn_state::prepare_display()
+void cgalaxn_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
 	u16 plate = bitswap<16>(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
-	display_matrix(15, 12, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 {
 	// 2-player switch directly enables plate 14
 	m_plate = (m_plate & 0x3fff) | (newval ? 0 : 0x4000);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(cgalaxn_state::grid_w)
 {
 	// R10,R11: input mux
-	if (offset == hmcs40_cpu_device::PORT_R1X)
+	if (offset == 1)
 		m_inp_mux = data & 3;
 
 	// R1x-R3x: vfd grid
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cgalaxn_state::plate_w)
@@ -2218,7 +2094,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 
 	// D2-D15: vfd plate
 	m_plate = (m_plate & 0x4000) | (data >> 2 & 0x3fff);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(cgalaxn_state::input_r)
@@ -2261,12 +2137,11 @@ void cgalaxn_state::cgalaxn(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(526, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(12, 15);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2280,7 +2155,7 @@ ROM_START( cgalaxn )
 	ROM_LOAD( "hd38800a70", 0x0000, 0x1000, CRC(a4c5ed1d) SHA1(0f647cb78437d7e62411febf7c9ce3c5b6753a80) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 712204, "svg", 0)
+	ROM_REGION( 712204, "screen", 0)
 	ROM_LOAD( "cgalaxn.svg", 0, 712204, CRC(67ec57bf) SHA1(195c9867b321da9768ce287d1060ceae50345dd4) )
 ROM_END
 
@@ -2327,13 +2202,13 @@ public:
 WRITE8_MEMBER(cpacman_state::plate_w)
 {
 	// R1x-R6x(,D1,D2): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
-	display_matrix(27, 11, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(cpacman_state::grid_w)
@@ -2348,7 +2223,7 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
-	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data >> 1 & 3);
+	plate_w(space, 6 + 1, data >> 1 & 3);
 }
 
 READ8_MEMBER(cpacman_state::input_r)
@@ -2394,12 +2269,11 @@ void cpacman_state::cpacman(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(484, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(11, 27);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2413,7 +2287,7 @@ ROM_START( cpacman )
 	ROM_LOAD( "hd38820a29", 0x0000, 0x1000, CRC(1082d577) SHA1(0ef73132bd41f6ca1e4c001ae19f7f7c97eaa8d1) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 359765, "svg", 0)
+	ROM_REGION( 359765, "screen", 0)
 	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) )
 ROM_END
 
@@ -2422,7 +2296,7 @@ ROM_START( cpacmanr1 )
 	ROM_LOAD( "hd38820a28", 0x0000, 0x1000, CRC(d2ed57e5) SHA1(f56f1341485ac28ea9e6cc4d162fab18d8a4c977) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 359765, "svg", 0)
+	ROM_REGION( 359765, "screen", 0)
 	ROM_LOAD( "cpacman.svg", 0, 359765, CRC(e3810a46) SHA1(d0994edd71a6adc8f238c71e360a8606ce397a14) )
 ROM_END
 
@@ -2464,13 +2338,13 @@ public:
 WRITE8_MEMBER(cmspacmn_state::plate_w)
 {
 	// R1x-R6x(,D0,D1): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
-	u64 plate = BIT(m_plate,15)<<32 | bitswap<32>(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
-	display_matrix(33, 12, plate, grid);
+	u32 plate = bitswap<32>(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
+	m_display->matrix(grid, u64(BIT(m_plate,15)) << 32 | plate);
 }
 
 WRITE16_MEMBER(cmspacmn_state::grid_w)
@@ -2485,7 +2359,7 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data & 3);
+	plate_w(space, 6 + 1, data & 3);
 }
 
 READ8_MEMBER(cmspacmn_state::input_r)
@@ -2531,12 +2405,11 @@ void cmspacmn_state::cmspacmn(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(12, 33);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2550,7 +2423,7 @@ ROM_START( cmspacmn )
 	ROM_LOAD( "hd38820a61", 0x0000, 0x1000, CRC(76276318) SHA1(9d6ff3f49b4cdaee5c9e238c1ed638bfb9b99aa7) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 849327, "svg", 0)
+	ROM_REGION( 849327, "screen", 0)
 	ROM_LOAD( "cmspacmn.svg", 0, 849327, CRC(4110ad07) SHA1(76113a2ce0fb1c6dab4e26fd59a13dc89d950d75) )
 ROM_END
 
@@ -2578,7 +2451,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ16_MEMBER(input_r);
@@ -2587,20 +2460,14 @@ public:
 
 // handlers
 
-void sag_state::prepare_display()
+void sag_state::update_display()
 {
 	// grid 0-7 are the 'pixels'
-	for (int y = 0; y < 8; y++)
-		m_display_state[y] = (m_grid >> y & 1) ? m_plate : 0;
+	m_display->matrix_partial(0, 8, m_grid, m_plate, false);
 
 	// grid 8-11 are 7segs
-	set_display_segmask(0xf00, 0x7f);
 	u8 seg = bitswap<8>(m_plate,3,4,5,6,7,8,9,10);
-	for (int y = 8; y < 12; y++)
-		m_display_state[y] = (m_grid >> y & 1) ? seg : 0;
-
-	set_display_size(14, 12);
-	display_update();
+	m_display->matrix_partial(8, 4, m_grid >> 8, seg);
 }
 
 WRITE8_MEMBER(sag_state::plate_w)
@@ -2608,7 +2475,7 @@ WRITE8_MEMBER(sag_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(sag_state::grid_w)
@@ -2621,7 +2488,7 @@ WRITE16_MEMBER(sag_state::grid_w)
 
 	// D1-D12: vfd grid
 	m_grid = data >> 1 & 0xfff;
-	prepare_display();
+	update_display();
 }
 
 READ16_MEMBER(sag_state::input_r)
@@ -2685,7 +2552,9 @@ void sag_state::sag(machine_config &config)
 	m_maincpu->write_d().set(FUNC(sag_state::grid_w));
 	m_maincpu->read_d().set(FUNC(sag_state::input_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8+4, 14);
+	m_display->set_segmask(0xf00, 0x7f);
 	config.set_default_layout(layout_sag);
 
 	/* sound hardware */
@@ -2733,7 +2602,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -2742,11 +2611,11 @@ public:
 
 // handlers
 
-void egalaxn2_state::prepare_display()
+void egalaxn2_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
-	display_matrix(24, 15, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(egalaxn2_state::grid_w)
@@ -2759,15 +2628,15 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 
 	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(egalaxn2_state::plate_w)
 {
 	// R1x-R6x: vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(egalaxn2_state::input_r)
@@ -2823,12 +2692,11 @@ void egalaxn2_state::egalaxn2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(505, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(15, 24);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2842,7 +2710,7 @@ ROM_START( egalaxn2 )
 	ROM_LOAD( "hd38820a13", 0x0000, 0x1000, CRC(112b721b) SHA1(4a185bc57ea03fe64f61f7db4da37b16eeb0cb54) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 507945, "svg", 0)
+	ROM_REGION( 507945, "screen", 0)
 	ROM_LOAD( "egalaxn2.svg", 0, 507945, CRC(b72a8721) SHA1(2d90fca6ce962710525b631e5bc8f75d79332b9d) )
 ROM_END
 
@@ -2922,7 +2790,7 @@ ROM_START( epacman2 )
 	ROM_LOAD( "hd38820a23", 0x0000, 0x1000, CRC(6eab640f) SHA1(509bdd02be915089e13769f22a08e03509f03af4) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 262480, "svg", 0)
+	ROM_REGION( 262480, "screen", 0)
 	ROM_LOAD( "epacman2.svg", 0, 262480, CRC(73bd9671) SHA1(a3ac754c0e060da50b65f3d0f9630d9c3d871650) )
 ROM_END
 
@@ -2931,7 +2799,7 @@ ROM_START( epacman2r )
 	ROM_LOAD( "hd38820a23", 0x0000, 0x1000, CRC(6eab640f) SHA1(509bdd02be915089e13769f22a08e03509f03af4) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 262483, "svg", 0)
+	ROM_REGION( 262483, "screen", 0)
 	ROM_LOAD( "epacman2r.svg", 0, 262483, CRC(279b629a) SHA1(4c499fb143aadf4f6722b994a22a0d0d3c5150b6) )
 ROM_END
 
@@ -2960,7 +2828,7 @@ public:
 
 	required_device<cop411_cpu_device> m_audiocpu;
 
-	virtual void prepare_display();
+	virtual void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -2988,11 +2856,11 @@ void eturtles_state::machine_start()
 
 // handlers: maincpu side
 
-void eturtles_state::prepare_display()
+void eturtles_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
 	u32 plate = bitswap<32>(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
-	display_matrix(30, 15, plate | (grid >> 5 & 8), grid); // grid 8 also forces plate 3 high
+	m_display->matrix(grid, plate | (grid >> 5 & 8)); // grid 8 also forces plate 3 high
 }
 
 WRITE8_MEMBER(eturtles_state::plate_w)
@@ -3002,7 +2870,7 @@ WRITE8_MEMBER(eturtles_state::plate_w)
 	// R0x-R6x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(eturtles_state::grid_w)
@@ -3019,7 +2887,7 @@ WRITE16_MEMBER(eturtles_state::grid_w)
 
 	// D1-D15: vfd grid
 	m_grid = data >> 1 & 0x7fff;
-	prepare_display();
+	update_display();
 }
 
 void eturtles_state::update_int()
@@ -3113,12 +2981,11 @@ void eturtles_state::eturtles(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(484, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(15, 30);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3135,7 +3002,7 @@ ROM_START( eturtles )
 	ROM_REGION( 0x0200, "audiocpu", 0 )
 	ROM_LOAD( "cop411l-ked_n", 0x0000, 0x0200, CRC(503d26e9) SHA1(a53d24d62195bfbceff2e4a43199846e0950aef6) )
 
-	ROM_REGION( 1027626, "svg", 0)
+	ROM_REGION( 1027626, "screen", 0)
 	ROM_LOAD( "eturtles.svg", 0, 1027626, CRC(b4f7abff) SHA1(e9b065a3a3fef3c71495002945724a86c2a68eb4) )
 ROM_END
 
@@ -3160,18 +3027,18 @@ public:
 		eturtles_state(mconfig, type, tag)
 	{ }
 
-	virtual void prepare_display() override;
+	virtual void update_display() override;
 	DECLARE_READ8_MEMBER(cop_data_r);
 	void estargte(machine_config &config);
 };
 
 // handlers (most of it is in eturtles_state above)
 
-void estargte_state::prepare_display()
+void estargte_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
 	u32 plate = bitswap<32>(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
-	display_matrix(29, 14, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 READ8_MEMBER(estargte_state::cop_data_r)
@@ -3236,12 +3103,11 @@ void estargte_state::estargte(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 854);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(14, 29);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3258,7 +3124,7 @@ ROM_START( estargte )
 	ROM_REGION( 0x0200, "audiocpu", 0 )
 	ROM_LOAD( "cop411l-kec_n", 0x0000, 0x0200, CRC(fbd3c2d3) SHA1(65b8b24d38678c3fa970bfd639e9449a75a28927) )
 
-	ROM_REGION( 462214, "svg", 0)
+	ROM_REGION( 462214, "screen", 0)
 	ROM_LOAD( "estargte.svg", 0, 462214, CRC(282cc090) SHA1(b0f3c21e9a529e5f1e33b90ca25ce3a097fb75a0) )
 ROM_END
 
@@ -3302,7 +3168,7 @@ WRITE8_MEMBER(ghalien_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
-	display_matrix(20, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(ghalien_state::grid_w)
@@ -3366,12 +3232,11 @@ void ghalien_state::ghalien(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 699);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3385,7 +3250,7 @@ ROM_START( ghalien )
 	ROM_LOAD( "hd38800a04", 0x0000, 0x1000, CRC(019c3328) SHA1(9f1029c5c479f78350952c4f18747341ba5ea7a0) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 462749, "svg", 0)
+	ROM_REGION( 462749, "screen", 0)
 	ROM_LOAD( "ghalien.svg", 0, 462749, CRC(1acbb1e8) SHA1(7bdeb840bc9080792e24812eba923bf84f7865a6) )
 ROM_END
 
@@ -3432,7 +3297,7 @@ WRITE8_MEMBER(gckong_state::plate_w)
 	// update display
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
 	u32 plate = bitswap<32>(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
-	display_matrix(32, 11, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(gckong_state::grid_w)
@@ -3499,12 +3364,11 @@ void gckong_state::gckong(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(479, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(11, 32);
 	config.set_default_layout(layout_gckong);
 
 	/* sound hardware */
@@ -3519,7 +3383,7 @@ ROM_START( gckong )
 	ROM_LOAD( "hd38800b01", 0x0000, 0x1000, CRC(d5a2cca3) SHA1(37bb5784383daab672ed1e0e2362c7a40d8d9b3f) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 346588, "svg", 0)
+	ROM_REGION( 346588, "screen", 0)
 	ROM_LOAD( "gckong.svg", 0, 346588, CRC(317af984) SHA1(ff6323526d1f5e46eccf8fa8d979175895be75de) )
 ROM_END
 
@@ -3561,7 +3425,7 @@ WRITE8_MEMBER(gdigdug_state::plate_w)
 
 	// update display
 	u32 plate = bitswap<32>(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
-	display_matrix(32, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(gdigdug_state::grid_w)
@@ -3627,12 +3491,11 @@ void gdigdug_state::gdigdug(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(476, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(9, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3646,7 +3509,7 @@ ROM_START( gdigdug )
 	ROM_LOAD( "hd38820a69", 0x0000, 0x1000, CRC(501165a9) SHA1(8a15d00c4aa66e870cadde33148426463560d2e6) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 807990, "svg", 0)
+	ROM_REGION( 807990, "screen", 0)
 	ROM_LOAD( "gdigdug.svg", 0, 807990, CRC(a5b8392d) SHA1(3503829bb1a626a9e70115fb60b656dff8908144) )
 ROM_END
 
@@ -3674,7 +3537,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -3684,18 +3547,18 @@ public:
 
 // handlers
 
-void mwcbaseb_state::prepare_display()
+void mwcbaseb_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
-	display_matrix(16, 8, m_plate, grid);
+	m_display->matrix(grid, m_plate);
 }
 
 WRITE8_MEMBER(mwcbaseb_state::plate_w)
 {
 	// R1x-R3x,R6x: vfd plate
-	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 12 : (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset == 6) ? 12 : (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(mwcbaseb_state::grid_w)
@@ -3705,7 +3568,7 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 
 	// D0-D7: vfd grid
 	m_grid = data & 0xff;
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(mwcbaseb_state::speaker_w)
@@ -3783,8 +3646,6 @@ static INPUT_PORTS_START( mwcbaseb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
 INPUT_PORTS_END
 
-static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
-
 void mwcbaseb_state::mwcbaseb(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3799,18 +3660,19 @@ void mwcbaseb_state::mwcbaseb(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 478);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_bri_levels(0.001); // cyan elements strobed very briefly?
 	config.set_default_layout(layout_mwcbaseb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	m_speaker->set_levels(8, mwcbaseb_speaker_levels);
+	static const s16 speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
+	m_speaker->set_levels(8, speaker_levels);
 }
 
 // roms
@@ -3820,7 +3682,7 @@ ROM_START( mwcbaseb )
 	ROM_LOAD( "hd38820a09", 0x0000, 0x1000, CRC(25ba7dc0) SHA1(69e0a867fdcf07b454b1faf835e576ae782432c0) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 178441, "svg", 0)
+	ROM_REGION( 178441, "screen", 0)
 	ROM_LOAD( "mwcbaseb.svg", 0, 178441, CRC(0f631190) SHA1(74a10ad0630af5516f76d5bf5628483d21f6b7be) )
 ROM_END
 
@@ -3849,7 +3711,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -3860,11 +3722,11 @@ public:
 
 // handlers
 
-void msthawk_state::prepare_display()
+void msthawk_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u32 plate = bitswap<24>(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(21, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(msthawk_state::plate_w)
@@ -3872,7 +3734,7 @@ WRITE8_MEMBER(msthawk_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(msthawk_state::grid_w)
@@ -3893,7 +3755,7 @@ WRITE16_MEMBER(msthawk_state::grid_w)
 
 	// D0-D4: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	prepare_display();
+	update_display();
 }
 
 void msthawk_state::update_int0()
@@ -3939,12 +3801,11 @@ void msthawk_state::msthawk(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 696);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 21);
 	config.set_default_layout(layout_msthawk);
 
 	/* sound hardware */
@@ -3959,7 +3820,7 @@ ROM_START( msthawk )
 	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 191888, "svg", 0)
+	ROM_REGION( 191888, "screen", 0)
 	ROM_LOAD( "msthawk.svg", 0, 191888, CRC(a607fc0f) SHA1(282a412f6462128e09ee8bd18d682dda01297611) )
 ROM_END
 
@@ -3998,7 +3859,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 
 	// update display
 	u32 plate = bitswap<32>(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
-	display_matrix(30, 8, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(pbqbert_state::grid_w)
@@ -4040,12 +3901,11 @@ void pbqbert_state::pbqbert(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(603, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 30);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4059,7 +3919,7 @@ ROM_START( pbqbert )
 	ROM_LOAD( "hd38820a70", 0x0000, 0x1000, CRC(be7c80b4) SHA1(0617a80ef7fe188ea221de32e760d45fd4318c67) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 456567, "svg", 0)
+	ROM_REGION( 456567, "screen", 0)
 	ROM_LOAD( "pbqbert.svg", 0, 456567, CRC(49853a62) SHA1(869377109fb7163e5ef5efadb26ce3955231f6ca) )
 ROM_END
 
@@ -4083,7 +3943,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -4094,11 +3954,11 @@ public:
 
 // handlers
 
-void kingman_state::prepare_display()
+void kingman_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u32 plate = bitswap<24>(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
-	display_matrix(23, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(kingman_state::plate_w)
@@ -4106,7 +3966,7 @@ WRITE8_MEMBER(kingman_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(kingman_state::grid_w)
@@ -4127,7 +3987,7 @@ WRITE16_MEMBER(kingman_state::grid_w)
 
 	// D0-D4: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	prepare_display();
+	update_display();
 }
 
 void kingman_state::update_int0()
@@ -4167,12 +4027,11 @@ void kingman_state::kingman(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(374, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(9, 23);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4186,7 +4045,7 @@ ROM_START( kingman )
 	ROM_LOAD( "hd38800b23", 0x0000, 0x1000, CRC(f8dfe14f) SHA1(660610d92ae7e5f92bddf5a3bcc2296b2ec3946b) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 396320, "svg", 0)
+	ROM_REGION( 396320, "screen", 0)
 	ROM_LOAD( "kingman.svg", 0, 396320, CRC(3f52d2a9) SHA1(9291f1a1da3d19c3d6dedb995de0a5feba75b442) )
 ROM_END
 
@@ -4210,7 +4069,7 @@ public:
 		hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -4221,11 +4080,11 @@ public:
 
 // handlers
 
-void tmtron_state::prepare_display()
+void tmtron_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
 	u32 plate = bitswap<24>(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
-	display_matrix(23, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tmtron_state::plate_w)
@@ -4233,7 +4092,7 @@ WRITE8_MEMBER(tmtron_state::plate_w)
 	// R0x-R3x: vfd plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tmtron_state::grid_w)
@@ -4254,7 +4113,7 @@ WRITE16_MEMBER(tmtron_state::grid_w)
 
 	// D0-D3,D5: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x2f0000);
-	prepare_display();
+	update_display();
 }
 
 void tmtron_state::update_int1()
@@ -4294,12 +4153,11 @@ void tmtron_state::tmtron(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(1920, 662);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 23);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4313,7 +4171,7 @@ ROM_START( tmtron )
 	ROM_LOAD( "hd38800a88", 0x0000, 0x1000, CRC(33db9670) SHA1(d6f747a59356526698784047bcfdbb59e79b9a23) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 384174, "svg", 0)
+	ROM_REGION( 384174, "screen", 0)
 	ROM_LOAD( "tmtron.svg", 0, 384174, CRC(06bd9e63) SHA1(fb93013ec42dc05f7029ef3c3073c84867f0d077) )
 ROM_END
 
@@ -4351,12 +4209,12 @@ public:
 WRITE8_MEMBER(vinvader_state::plate_w)
 {
 	// R1x-R3x(,D4-D6): vfd plate
-	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
+	int shift = (offset - 1) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
 	u16 plate = bitswap<16>(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
-	display_matrix(12, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE16_MEMBER(vinvader_state::grid_w)
@@ -4368,7 +4226,7 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
-	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data >> 4 & 7);
+	plate_w(space, 3 + 1, data >> 4 & 7);
 }
 
 // config
@@ -4390,7 +4248,7 @@ INPUT_PORTS_END
 void vinvader_state::vinvader(machine_config &config)
 {
 	/* basic machine hardware */
-	HD38750(config, m_maincpu, 400000); // approximation
+	HD38750(config, m_maincpu, 300000); // approximation
 	m_maincpu->read_r<0>().set_ioport("IN.0");
 	m_maincpu->write_r<1>().set(FUNC(vinvader_state::plate_w));
 	m_maincpu->write_r<2>().set(FUNC(vinvader_state::plate_w));
@@ -4400,12 +4258,11 @@ void vinvader_state::vinvader(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(233, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_hmcs40_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4419,7 +4276,7 @@ ROM_START( vinvader )
 	ROM_LOAD( "hd38750a45", 0x0000, 0x0800, CRC(32de6056) SHA1(70238c6c40c3d513f8eced1cb81bdd4dbe12f16c) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 
-	ROM_REGION( 166379, "svg", 0)
+	ROM_REGION( 166379, "screen", 0)
 	ROM_LOAD( "vinvader.svg", 0, 166379, CRC(b75c448e) SHA1(40d546f9fbdb446883e3ab0e3f678f1be8105159) )
 ROM_END
 

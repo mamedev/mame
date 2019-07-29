@@ -673,18 +673,18 @@ void playch10_state::playch10(machine_config &config)
 	PALETTE(config, "palette", FUNC(playch10_state::playch10_palette), 256);
 	config.set_default_layout(layout_playch10);
 
+	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	bottom.set_refresh_hz(60);
+	bottom.set_size(32*8, 262);
+	bottom.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	bottom.set_screen_update(FUNC(playch10_state::screen_update_playch10_bottom));
+
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
 	top.set_refresh_hz(60);
 	top.set_size(32*8, 262);
 	top.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	top.set_screen_update(FUNC(playch10_state::screen_update_playch10_top));
 	top.screen_vblank().set(FUNC(playch10_state::vblank_irq));
-
-	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
-	bottom.set_refresh_hz(60);
-	bottom.set_size(32*8, 262);
-	bottom.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	bottom.set_screen_update(FUNC(playch10_state::screen_update_playch10_bottom));
 
 	PPU_2C03B(config, m_ppu, 0);
 	m_ppu->set_screen("bottom");

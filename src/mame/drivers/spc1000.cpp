@@ -127,7 +127,6 @@ small ics.
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "bus/centronics/ctronics.h"
@@ -222,11 +221,14 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (BIT(data, 1) && (time - m_time).as_attoseconds()/ATTOSECONDS_PER_MICROSECOND > 100)
+	if (BIT(data, 1) || (((time - m_time).as_attoseconds()/ATTOSECONDS_PER_MILLISECOND) < 1000))
 	{
-		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;
 	}
+	else
+		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
 	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 
@@ -484,7 +486,6 @@ void spc1000_state::spc1000(machine_config &config)
 	ay8910.port_a_read_callback().set(FUNC(spc1000_state::porta_r));
 	ay8910.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SPC1000_EXP_SLOT(config, "ext1", spc1000_exp);
 
@@ -499,6 +500,7 @@ void spc1000_state::spc1000(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_formats(spc1000_cassette_formats);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_interface("spc1000_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spc1000_cass");

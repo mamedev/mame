@@ -11886,7 +11886,7 @@ GAME( 1993, wh2h,       wh2,      neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1994, wh2j,       neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "World Heroes 2 Jet (ADM-007 ~ ADH-007)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, aodk,       neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "Aggressors of Dark Kombat / Tsuukai GANGAN Koushinkyoku (ADM-008 ~ ADH-008)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, whp,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "World Heroes Perfect", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, moshougi,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "Shougi No Tatsujin - Master of Shougi", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, moshougi,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "Shougi no Tatsujin - Master of Shougi", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, overtop,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK",              "Over Top", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ninjamas,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "Ninja Master's - Haoh-ninpo-cho", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, twinspri,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "ADK / SNK",        "Twinkle Star Sprites", MACHINE_SUPPORTS_SAVE )

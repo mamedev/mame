@@ -1823,7 +1823,7 @@ void aerofgt_state::spinlbrk(machine_config &config)
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback), this); // rom lookup
-	m_spr_old[0]->set_pritype(1);
+	m_spr_old[1]->set_pritype(1);
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 

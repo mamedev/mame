@@ -541,7 +541,7 @@ void md_cons_state::init_md_jpn()
 
 /****************************************** 32X emulation ****************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
+DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 {
 	uint32_t length;
 	std::vector<uint8_t> temp_copy;
@@ -583,22 +583,23 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 void md_cons_state::_32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr)
 {
 	if (m_32x)
-		m_32x->_32x_render_videobuffer_to_screenbuffer(x, priority, lineptr);
+		m_32x->render_videobuffer_to_screenbuffer(x, priority, lineptr);
 }
 
 void md_cons_state::_32x_interrupt_callback(int scanline, int irq6)
 {
 	if (m_32x)
-		m_32x->_32x_interrupt_cb(scanline, irq6);
+		m_32x->interrupt_cb(scanline, irq6);
 }
 
 void md_cons_state::_32x_scanline_helper_callback(int scanline)
 {
 	if (m_32x)
-		m_32x->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
+		m_32x->render_videobuffer_to_screenbuffer_helper(scanline);
 }
 
-MACHINE_CONFIG_START(md_cons_state::genesis_32x)
+void md_cons_state::genesis_32x(machine_config &config)
+{
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
@@ -623,16 +624,16 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
-	MCFG_GENERIC_EXTENSIONS("32x,bin")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("NTSC-U");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(md_cons_state::mdj_32x)
+void md_cons_state::mdj_32x(machine_config &config)
+{
 	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
@@ -657,16 +658,16 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
-	MCFG_GENERIC_EXTENSIONS("32x,bin")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("NTSC-J");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(md_cons_state::md_32x)
+void md_cons_state::md_32x(machine_config &config)
+{
 	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
@@ -691,13 +692,12 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
-	MCFG_GENERIC_EXTENSIONS("32x,bin")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
+	cartslot.set_must_be_loaded(true);
+	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("PAL");
-MACHINE_CONFIG_END
+}
 
 
 
@@ -788,7 +788,8 @@ void md_cons_state::mdj_scd(machine_config &config)
 
 /******************SEGA CD + 32X****************************/
 
-MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
+void md_cons_state::genesis_32x_scd(machine_config &config)
+{
 	genesis_32x(config);
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
@@ -800,15 +801,14 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
-	MCFG_GENERIC_EXTENSIONS("32x,bin")
-	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart), this);
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
+void md_cons_state::md_32x_scd(machine_config &config)
+{
 	md_32x(config);
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
@@ -820,15 +820,14 @@ MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
-	MCFG_GENERIC_EXTENSIONS("32x,bin")
-	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart), this);
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
+void md_cons_state::mdj_32x_scd(machine_config &config)
+{
 	mdj_32x(config);
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
@@ -840,13 +839,11 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
-	MCFG_GENERIC_EXTENSIONS("32x,bin")
-	MCFG_GENERIC_LOAD(md_cons_state, _32x_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart), this);
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
-MACHINE_CONFIG_END
+}
 
 /* We need proper names for most of these BIOS ROMs! */
 ROM_START( segacd )
@@ -878,6 +875,9 @@ ROM_START( megacdj )
 	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
 	ROM_SYSTEM_BIOS(4, "v100p", "v1.00P")   // CRC: e2e70bc8 when byteswapped
 	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(4) )
+	// EEPROM had no SEGA's label, might be 14088(no rev) or 14088A
+	ROM_SYSTEM_BIOS(5, "v100c", "v1.00C")   // CRC: c3b60c13 when byteswapped
+	ROMX_LOAD( "100c.bin",       0x000000,  0x020000, CRC(41af44c4) SHA1(f30d109d1c2f7c9feaf38600c65834261db73d1f), ROM_BIOS(5) )
 ROM_END
 
 /* Asia bios, when run in USA region will show :

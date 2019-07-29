@@ -480,7 +480,7 @@ public:
 	offs_t                          m_globalmask;   // global mask
 	simple_list<address_map_entry>  m_entrylist;    // list of entries
 
-	void import_submaps(running_machine &machine, device_t &owner, int data_width, endianness_t endian);
+	void import_submaps(running_machine &machine, device_t &owner, int data_width, endianness_t endian, int addr_shift);
 	void map_validity_check(validity_checker &valid, int spacenum) const;
 };
 

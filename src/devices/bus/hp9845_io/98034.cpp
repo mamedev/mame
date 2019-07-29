@@ -41,7 +41,7 @@ hp98034_io_card_device::~hp98034_io_card_device()
 }
 
 static INPUT_PORTS_START(hp98034_port)
-	MCFG_HP9845_IO_SC(7)
+	PORT_HP9845_IO_SC(7)
 	PORT_START("sw1")
 	PORT_DIPNAME(0x1f , 0x15 , "HPIB address")
 	PORT_DIPLOCATION("S1:1,2,3,4,5")

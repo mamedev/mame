@@ -51,7 +51,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -73,7 +73,7 @@ void leapfrog_leappad_state::machine_reset()
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(leapfrog_leappad_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(leapfrog_leappad_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -97,7 +97,7 @@ void leapfrog_leappad_state::leapfrog_leappad(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_leappad_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&leapfrog_leappad_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_leappad_cart");
 }
@@ -111,7 +111,7 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_mfleappad_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&leapfrog_leappad_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(leapfrog_leappad_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_mfleappad_cart");
 }

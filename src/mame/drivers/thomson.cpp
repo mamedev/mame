@@ -619,8 +619,8 @@ static void cd90_640_floppies(device_slot_interface &device)
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::to7_base)
-
+void thomson_state::to7_base(machine_config &config)
+{
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
@@ -730,9 +730,7 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	acia_clock.signal_handler().set(FUNC(thomson_state::write_acia_clock));
 
 /* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to_cart")
-	MCFG_GENERIC_EXTENSIONS("m7,rom")
-	MCFG_GENERIC_LOAD(thomson_state, to7_cartridge)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "to_cart", "m7,rom").set_device_load(FUNC(thomson_state::to7_cartridge), this);
 
 /* internal ram */
 	RAM(config, m_ram).set_default_size("40K").set_extra_options("24K,48K");
@@ -742,7 +740,7 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	SOFTWARE_LIST(config, "to7_cass_list").set_original("to7_cass");
 	SOFTWARE_LIST(config, "to_flop_list").set_original("to_flop");
 	SOFTWARE_LIST(config, "to7_qd_list").set_original("to7_qd");
-MACHINE_CONFIG_END
+}
 
 void thomson_state::to7(machine_config &config)
 {
@@ -1111,7 +1109,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::mo5)
+void thomson_state::mo5(machine_config &config)
+{
 	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
@@ -1131,10 +1130,7 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>)); // WARNING: differs from TO7 !
 
-	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
-	MCFG_GENERIC_EXTENSIONS("m5,rom")
-	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
+	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(thomson_state::mo5_cartridge), this);
 
 	config.device_remove("to7_cart_list");
 	config.device_remove("to7_cass_list");
@@ -1148,7 +1144,7 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 
 	/* internal ram */
 	m_ram->set_default_size("112K");
-MACHINE_CONFIG_END
+}
 
 void thomson_state::mo5e(machine_config &config)
 {
@@ -2194,7 +2190,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::mo6)
+void thomson_state::mo6(machine_config &config)
+{
 	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
@@ -2221,10 +2218,7 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
-	MCFG_GENERIC_EXTENSIONS("m5,rom")
-	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
+	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(thomson_state::mo5_cartridge), this);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
@@ -2241,7 +2235,7 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
 	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
 	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
-MACHINE_CONFIG_END
+}
 
 void thomson_state::pro128(machine_config &config)
 {
@@ -2459,7 +2453,8 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-MACHINE_CONFIG_START(thomson_state::mo5nr)
+void thomson_state::mo5nr(machine_config &config)
+{
 	to7_base(config);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
@@ -2488,10 +2483,7 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	config.device_remove("cartslot");
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
-	MCFG_GENERIC_EXTENSIONS("m5,rom")
-	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
+	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(thomson_state::mo5_cartridge), this);
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
@@ -2508,6 +2500,6 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	SOFTWARE_LIST(config, "mo5_cass_list").set_compatible("mo5_cass");
 	SOFTWARE_LIST(config, "mo5_flop_list").set_compatible("mo5_flop");
 	SOFTWARE_LIST(config, "mo5_qd_list").set_compatible("mo5_qd");
-MACHINE_CONFIG_END
+}
 
 COMP( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, empty_init, "Thomson", "MO5 NR", 0 )

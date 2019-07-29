@@ -60,6 +60,7 @@ public:
 	void rescueb(machine_config &config);
 	void minefldfe(machine_config &config);
 	void hustlerb4(machine_config &config);
+	void hustlerb6(machine_config &config);
 	void minefld(machine_config &config);
 	void hustler(machine_config &config);
 	void rescue(machine_config &config);
@@ -88,6 +89,7 @@ private:
 	void hustlerb_map(address_map &map);
 	void hustlerb_sound_io_map(address_map &map);
 	void hustlerb_sound_map(address_map &map);
+	void hustlerb6_map(address_map &map);
 	void mimonkey_map(address_map &map);
 	void minefldfe_map(address_map &map);
 	void rescuefe_map(address_map &map);
@@ -237,6 +239,24 @@ void scobra_state::hustlerb_map(address_map &map)
 	map(0xc200, 0xc203).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
+void scobra_state::hustlerb6_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4800, 0x4800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	// map(0x4803, 0x4803).r();
+	map(0x5000, 0x5000).w(FUNC(scramble_state::scramble_sh_irqtrigger_w));
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).ram().w(FUNC(scobra_state::galaxold_videoram_w)).share("videoram");
+	map(0x9000, 0x903f).ram().w(FUNC(scobra_state::galaxold_attributesram_w)).share("attributesram");
+	map(0x9040, 0x905f).ram().share("spriteram");
+	map(0x9060, 0x907f).ram().share("bulletsram");
+	map(0x9080, 0x90ff).ram();
+	map(0xa801, 0xa801).w(FUNC(scobra_state::galaxold_nmi_enable_w));
+	map(0xa802, 0xa802).w(FUNC(scobra_state::galaxold_flip_screen_x_w));
+	map(0xa806, 0xa806).w(FUNC(scobra_state::galaxold_flip_screen_y_w));
+	map(0xa808, 0xa808).nopw();    /* coin counters */
+	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
 
 void scobra_state::mimonkey_map(address_map &map)
 {
@@ -1114,7 +1134,16 @@ void scobra_state::hustlerb4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::hustlerb_map);
 }
 
+// this bootleg has no 8255s and it redirects reads and writes to other addresses
+void scobra_state::hustlerb6(machine_config &config)
+{
+	hustler(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &scobra_state::hustlerb6_map);
+
+	config.device_remove("ppi8255_0");
+	config.device_remove("ppi8255_1");
+}
 
 /***************************************************************************
 
@@ -1708,6 +1737,24 @@ ROM_START( hustlerb5 )
 	ROM_LOAD( "mni6331.e6",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
 
+ROM_START( hustlerb6 ) // dump confirmed from two different PCBs, seems most similar to hustlerb, but for the absence of 8255s
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h0.10l",  0x0000, 0x1000, CRC(15748377) SHA1(9f4a88cbef0b3860bb35cc8d208c47db16924837) )
+	ROM_LOAD( "h1.9l",   0x1000, 0x1000, CRC(dc6752ec) SHA1(b103021079646286156e4141fe34dd92ccfd34bd) )
+	ROM_LOAD( "h2.8l",   0x2000, 0x1000, CRC(58268f2b) SHA1(96e3f95c93f1199afaeffc6bbb1cc65e1c0b3de1) )
+	/* 3000-3fff space for diagnostics ROM */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "h5.3b",  0x0000, 0x1000, CRC(7d4085eb) SHA1(4f7a7860223ab823cf5b697e17c2e83783442697) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "h3.5h",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
+	ROM_LOAD( "h4.3h",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6331-1j.1k",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+ROM_END
+
 ROM_START( mimonkey )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mm1.2e",       0x0000, 0x1000, CRC(9019f1b1) SHA1(0c45f64e39b9a182f6162ab520ced6ef0686466c) )
@@ -1782,6 +1829,7 @@ GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   scobra_state,  empty_init
 GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scobra_state,  init_hustlerd, ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb5, hustler,  hustlerb,  hustler,   scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb6, hustler,  hustlerb6, hustler,   scobra_state,  empty_init,    ROT90,  "bootleg",                            "Video Hustler (bootleg, set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // stuck on boot, dump verified good
 
 GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scobra_state,  init_mimonkey, ROT90,  "Universal Video Games",              "Mighty Monkey", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scobra_state,  init_mimonsco, ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", MACHINE_SUPPORTS_SAVE )

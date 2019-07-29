@@ -30,6 +30,7 @@
 #include "ui/state.h"
 #include "ui/viewgfx.h"
 #include "imagedev/cassette.h"
+#include "../osd/modules/lib/osdobj_common.h"
 
 
 /***************************************************************************
@@ -90,25 +91,6 @@ static input_item_id const non_char_keys[] =
 	ITEM_ID_RIGHT,
 	ITEM_ID_PAUSE,
 	ITEM_ID_CANCEL
-};
-
-static char const *const s_color_list[] = {
-	OPTION_UI_BORDER_COLOR,
-	OPTION_UI_BACKGROUND_COLOR,
-	OPTION_UI_GFXVIEWER_BG_COLOR,
-	OPTION_UI_UNAVAILABLE_COLOR,
-	OPTION_UI_TEXT_COLOR,
-	OPTION_UI_TEXT_BG_COLOR,
-	OPTION_UI_SUBITEM_COLOR,
-	OPTION_UI_CLONE_COLOR,
-	OPTION_UI_SELECTED_COLOR,
-	OPTION_UI_SELECTED_BG_COLOR,
-	OPTION_UI_MOUSEOVER_COLOR,
-	OPTION_UI_MOUSEOVER_BG_COLOR,
-	OPTION_UI_MOUSEDOWN_COLOR,
-	OPTION_UI_MOUSEDOWN_BG_COLOR,
-	OPTION_UI_DIPSW_COLOR,
-	OPTION_UI_SLIDER_COLOR
 };
 
 /***************************************************************************
@@ -183,7 +165,8 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_popup_text_end(0)
 	, m_mouse_bitmap(32, 32)
 	, m_mouse_arrow_texture(nullptr)
-	, m_mouse_show(false) {}
+	, m_mouse_show(false)
+	, m_target_font_height(0) {}
 
 mame_ui_manager::~mame_ui_manager()
 {
@@ -196,8 +179,10 @@ void mame_ui_manager::init()
 	ui::menu::init(machine(), options());
 	ui_gfx_init(machine());
 
-	get_font_rows(&machine());
-	decode_ui_color(0, &machine());
+	m_ui_colors.refresh(options());
+
+	// update font row info from setting
+	update_target_font_height();
 
 	// more initialization
 	using namespace std::placeholders;
@@ -213,6 +198,16 @@ void mame_ui_manager::init()
 	memcpy(dst,mouse_bitmap,32*32*sizeof(uint32_t));
 	m_mouse_arrow_texture = machine().render().texture_alloc();
 	m_mouse_arrow_texture->set_bitmap(m_mouse_bitmap, m_mouse_bitmap.cliprect(), TEXFORMAT_ARGB32);
+}
+
+
+//-------------------------------------------------
+//  update_target_font_height
+//-------------------------------------------------
+
+void mame_ui_manager::update_target_font_height()
+{
+	m_target_font_height = 1.0f / options().font_rows();
 }
 
 
@@ -288,11 +283,12 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	const int maxstate = 3;
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
-	bool show_warnings = true, show_mandatory_fileman = true;
+	bool show_warnings = true, show_mandatory_fileman = !machine().options().skip_mandatory_fileman();
+	bool video_none = strcmp(downcast<osd_options &>(machine().options()).video(), "none") == 0;
 
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
-	// or if we are debugging
-	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	// or if we are debugging, or if there's no mame window to send inputs to
+	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 || video_none)
 		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
 #if defined(EMSCRIPTEN)
@@ -306,7 +302,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
 	{
 		// default to standard colors
-		messagebox_backcolor = UI_BACKGROUND_COLOR;
+		messagebox_backcolor = colors().background_color();
 		messagebox_text.clear();
 
 		// pick the next state
@@ -373,7 +369,7 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 
 	// copy in the new text
 	messagebox_text.assign(text);
-	messagebox_backcolor = UI_BACKGROUND_COLOR;
+	messagebox_backcolor = colors().background_color();
 
 	// don't update more than 4 times/second
 	if (force || (curtime - lastupdatetime) > osd_ticks_per_second() / 4)
@@ -432,7 +428,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y))
 			{
 				const float cursor_size = 0.6 * get_line_height();
-				container.add_quad(mouse_x, mouse_y, mouse_x + cursor_size * container.manager().ui_aspect(&container), mouse_y + cursor_size, UI_TEXT_COLOR, m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container.add_quad(mouse_x, mouse_y, mouse_x + cursor_size * container.manager().ui_aspect(&container), mouse_y + cursor_size, colors().text_color(), m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 		}
 	}
@@ -476,7 +472,7 @@ float mame_ui_manager::get_line_height()
 	one_to_one_line_height = (float)raw_font_pixel_height / (float)target_pixel_height;
 
 	// determine the scale factor
-	scale_factor = UI_TARGET_FONT_HEIGHT / one_to_one_line_height;
+	scale_factor = target_font_height() / one_to_one_line_height;
 
 	// if our font is small-ish, do integral scaling
 	if (raw_font_pixel_height < 24)
@@ -534,7 +530,7 @@ float mame_ui_manager::get_string_width(const char *s, float text_size)
 
 void mame_ui_manager::draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
-	draw_outlined_box(container, x0, y0, x1, y1, UI_BORDER_COLOR, backcolor);
+	draw_outlined_box(container, x0, y0, x1, y1, colors().border_color(), backcolor);
 }
 
 
@@ -560,7 +556,7 @@ void mame_ui_manager::draw_outlined_box(render_container &container, float x0, f
 
 void mame_ui_manager::draw_text(render_container &container, const char *buf, float x, float y)
 {
-	draw_text_full(container, buf, x, y, 1.0f - x, ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+	draw_text_full(container, buf, x, y, 1.0f - x, ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, colors().text_color(), colors().text_bg_color(), nullptr, nullptr);
 }
 
 
@@ -602,7 +598,7 @@ void mame_ui_manager::draw_text_full(render_container &container, const char *or
 void mame_ui_manager::draw_text_box(render_container &container, const char *text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
 	// cap the maximum width
-	float maximum_width = 1.0f - UI_BOX_LR_BORDER * 2;
+	float maximum_width = 1.0f - box_lr_border() * 2;
 
 	// create a layout
 	ui::text_layout layout = create_layout(container, maximum_width, justify);
@@ -626,15 +622,15 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 	auto actual_left = layout.actual_left();
 	auto actual_width = layout.actual_width();
 	auto actual_height = layout.actual_height();
-	auto x = std::min(std::max(xpos - actual_width / 2, UI_BOX_LR_BORDER), 1.0f - actual_width - UI_BOX_LR_BORDER);
-	auto y = std::min(std::max(ypos - actual_height / 2, UI_BOX_TB_BORDER), 1.0f - actual_height - UI_BOX_TB_BORDER);
+	auto x = std::min(std::max(xpos - actual_width / 2, box_lr_border()), 1.0f - actual_width - box_lr_border());
+	auto y = std::min(std::max(ypos - actual_height / 2, box_tb_border()), 1.0f - actual_height - box_tb_border());
 
 	// add a box around that
 	draw_outlined_box(container,
-			x - UI_BOX_LR_BORDER,
-			y - UI_BOX_TB_BORDER,
-			x + actual_width + UI_BOX_LR_BORDER,
-			y + actual_height + UI_BOX_TB_BORDER, backcolor);
+			x - box_lr_border(),
+			y - box_tb_border(),
+			x + actual_width + box_lr_border(),
+			y + actual_height + box_tb_border(), backcolor);
 
 	// emit the text
 	layout.emit(container, x - actual_left, y);
@@ -648,7 +644,7 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 
 void mame_ui_manager::draw_message_window(render_container &container, const char *text)
 {
-	draw_text_box(container, text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR);
+	draw_text_box(container, text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
 }
 
 
@@ -909,27 +905,6 @@ bool mame_ui_manager::can_paste()
 
 
 //-------------------------------------------------
-//  paste - does a paste from the keyboard
-//-------------------------------------------------
-
-void mame_ui_manager::paste()
-{
-	// retrieve the clipboard text
-	char *text = osd_get_clipboard_text();
-
-	// was a result returned?
-	if (text != nullptr)
-	{
-		// post the text
-		machine().ioport().natkeyboard().post_utf8(text);
-
-		// free the string
-		free(text);
-	}
-}
-
-
-//-------------------------------------------------
 //  draw_fps_counter
 //-------------------------------------------------
 
@@ -1026,8 +1001,8 @@ void mame_ui_manager::image_handler_ingame()
 		if (!layout.empty())
 		{
 			float x = 0.2f;
-			float y = 0.5f * get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-			draw_text_box(machine().render().ui_container(), layout, x, y, UI_BACKGROUND_COLOR);
+			float y = 0.5f * get_line_height() + 2.0f * box_tb_border();
+			draw_text_box(machine().render().ui_container(), layout, x, y, colors().background_color());
 		}
 	}
 }
@@ -1109,7 +1084,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	{
 		// paste command
 		if (machine().ui_input().pressed(IPT_UI_PASTE))
-			paste();
+			machine().ioport().natkeyboard().paste();
 	}
 
 	image_handler_ingame();
@@ -2077,45 +2052,11 @@ void mame_ui_manager::draw_textured_box(render_container &container, float x0, f
 	container.add_line(x0, y1, x0, y0, UI_LINE_WIDTH, linecolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
-//-------------------------------------------------
-//  decode UI color options
-//-------------------------------------------------
-
-rgb_t decode_ui_color(int id, running_machine *machine)
-{
-	static rgb_t color[ARRAY_LENGTH(s_color_list)];
-
-	if (machine != nullptr) {
-		ui_options option;
-		for (int x = 0; x < ARRAY_LENGTH(s_color_list); ++x) {
-			const char *o_default = option.value(s_color_list[x]);
-			const char *s_option = mame_machine_manager::instance()->ui().options().value(s_color_list[x]);
-			int len = strlen(s_option);
-			if (len != 8)
-				color[x] = rgb_t((uint32_t)strtoul(o_default, nullptr, 16));
-			else
-				color[x] = rgb_t((uint32_t)strtoul(s_option, nullptr, 16));
-		}
-	}
-	return color[id];
-}
-
-//-------------------------------------------------
-//  get font rows from options
-//-------------------------------------------------
-
-int get_font_rows(running_machine *machine)
-{
-	static int value;
-
-	return ((machine != nullptr) ? value = mame_machine_manager::instance()->ui().options().font_rows() : value);
-}
-
 void mame_ui_manager::popup_time_string(int seconds, std::string message)
 {
 	// extract the text
 	messagebox_poptext = message;
-	messagebox_backcolor = UI_BACKGROUND_COLOR;
+	messagebox_backcolor = colors().background_color();
 
 	// set a timer
 	m_popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;
@@ -2233,4 +2174,24 @@ void mame_ui_manager::save_main_option()
 void mame_ui_manager::menu_reset()
 {
 	ui::menu::stack_reset(machine());
+}
+
+void ui_colors::refresh(const ui_options &options)
+{
+	m_border_color = options.border_color();
+	m_background_color = options.background_color();
+	m_gfxviewer_bg_color = options.gfxviewer_bg_color();
+	m_unavailable_color = options.unavailable_color();
+	m_text_color = options.text_color();
+	m_text_bg_color = options.text_bg_color();
+	m_subitem_color = options.subitem_color();
+	m_clone_color = options.clone_color();
+	m_selected_color = options.selected_color();
+	m_selected_bg_color = options.selected_bg_color();
+	m_mouseover_color = options.mouseover_color();
+	m_mouseover_bg_color = options.mouseover_bg_color();
+	m_mousedown_color = options.mousedown_color();
+	m_mousedown_bg_color = options.mousedown_bg_color();
+	m_dipsw_color = options.dipsw_color();
+	m_slider_color = options.slider_color();
 }

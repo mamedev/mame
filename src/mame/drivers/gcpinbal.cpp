@@ -94,13 +94,12 @@ NOTE: Mask ROMs from Power Flipper Pinball Shooting have not been dumped, but as
 
 TIMER_DEVICE_CALLBACK_MEMBER(gcpinbal_state::scanline_cb)
 {
+	if (param >= 16)
+		m_screen->update_partial(m_screen->vpos() - 1);
 
-	if (param>=16)
-		m_screen->update_partial(m_screen->vpos()-1);
-
-	if (param==240)
+	if (param == 240)
 		m_maincpu->set_input_line(1, HOLD_LINE); // V-blank
-	else if ((param>=16) && (param<240))
+	else if ((param >= 16) && (param < 240))
 		m_maincpu->set_input_line(4, HOLD_LINE); // H-blank? (or programmable, used for raster effects)
 
 	// IRQ level 3 is sound related, hooked up to MSM6585
@@ -110,24 +109,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(gcpinbal_state::scanline_cb)
                           IOC
 ***********************************************************/
 
-WRITE16_MEMBER(gcpinbal_state::d80010_w)
+void gcpinbal_state::d80010_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", m_maincpu->pc(), offset, data);
 	COMBINE_DATA(&m_d80010_ram[offset]);
 }
 
-WRITE8_MEMBER(gcpinbal_state::d80040_w)
+void gcpinbal_state::d80040_w(offs_t offset, u8 data)
 {
 	logerror("Writing byte value %02X to offset %X\n", data, offset);
 }
 
-WRITE16_MEMBER(gcpinbal_state::d80060_w)
+void gcpinbal_state::d80060_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", m_maincpu->pc(), offset, data);
 	COMBINE_DATA(&m_d80060_ram[offset]);
 }
 
-WRITE8_MEMBER(gcpinbal_state::bank_w)
+void gcpinbal_state::bank_w(u8 data)
 {
 	// MSM6585 bank, coin LEDs, maybe others?
 	if (m_msm_bank != ((data & 0x10) >> 4))
@@ -138,8 +137,21 @@ WRITE8_MEMBER(gcpinbal_state::bank_w)
 	}
 	m_oki->set_rom_bank((data & 0x20) >> 5);
 
-	m_bg0_gfxset = (data & 0x04) ? 0x1000 : 0;
-	m_bg1_gfxset = (data & 0x08) ? 0x1000 : 0;
+	u32 old = m_bg0_gfxset;
+	u32 newbank = (data & 0x04) ? 0x1000 : 0;
+	if (old != newbank)
+	{
+		m_bg0_gfxset = (data & 0x04) ? 0x1000 : 0;
+		m_tilemap[0]->mark_all_dirty();
+	}
+
+	old = m_bg1_gfxset;
+	newbank = (data & 0x08) ? 0x1000 : 0;
+	if (old != newbank)
+	{
+		m_bg1_gfxset = (data & 0x04) ? 0x1000 : 0;
+		m_tilemap[1]->mark_all_dirty();
+	}
 
 	m_watchdog->write_line_ck(BIT(data, 7));
 
@@ -147,7 +159,7 @@ WRITE8_MEMBER(gcpinbal_state::bank_w)
 //          machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 }
 
-WRITE8_MEMBER(gcpinbal_state::eeprom_w)
+void gcpinbal_state::eeprom_w(u8 data)
 {
 	// 93C46 serial EEPROM (status read at D80087)
 	m_eeprom->di_write(BIT(data, 2));
@@ -155,7 +167,7 @@ WRITE8_MEMBER(gcpinbal_state::eeprom_w)
 	m_eeprom->cs_write(BIT(data, 0));
 }
 
-WRITE8_MEMBER(gcpinbal_state::es8712_reset_w)
+void gcpinbal_state::es8712_reset_w(u8 data)
 {
 	// This probably works by resetting the ES-8712
 	m_essnd->reset();
@@ -169,7 +181,7 @@ WRITE8_MEMBER(gcpinbal_state::es8712_reset_w)
 void gcpinbal_state::gcpinbal_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0xc00000, 0xc03fff).rw(FUNC(gcpinbal_state::gcpinbal_tilemaps_word_r), FUNC(gcpinbal_state::gcpinbal_tilemaps_word_w)).share("tilemapram");
+	map(0xc00000, 0xc03fff).ram().w(FUNC(gcpinbal_state::tilemaps_word_w)).share("tilemapram");
 	map(0xc80000, 0xc81fff).rw(m_sprgen, FUNC(excellent_spr_device::read), FUNC(excellent_spr_device::write)).umask16(0x00ff);
 	map(0xd00000, 0xd00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80010, 0xd8002f).ram().w(FUNC(gcpinbal_state::d80010_w)).share("d80010");
@@ -305,22 +317,9 @@ static const gfx_layout char_8x8_layout =
 	8*8*4    /* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-//  { 16, 48, 0, 32 },
-	{ 48, 16, 32, 0 },
-	{ STEP16(0,1) },
-	{ STEP16(0,16*4) },
-	16*16*4   /* every sprite takes 128 consecutive bytes */
-};
-
 static GFXDECODE_START( gfx_gcpinbal )
-	GFXDECODE_ENTRY( "sprite", 0, tilelayout,       0, 256 )  // sprites & playfield
-	GFXDECODE_ENTRY( "bg0",    0, charlayout,       0, 256 )  // sprites & playfield
-	GFXDECODE_ENTRY( "fg0",    0, char_8x8_layout,  0, 256 )  // sprites & playfield
+	GFXDECODE_ENTRY( "bg0", 0, charlayout,          0, 0x60 )  // playfield
+	GFXDECODE_ENTRY( "fg0", 0, char_8x8_layout, 0x700, 0x10 )  // playfield
 GFXDECODE_END
 
 
@@ -339,9 +338,7 @@ void gcpinbal_state::machine_start()
 
 void gcpinbal_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_scrollx[i] = 0;
 		m_scrolly[i] = 0;
@@ -370,13 +367,16 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */);
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(gcpinbal_state::screen_update_gcpinbal));
+	m_screen->set_screen_update(FUNC(gcpinbal_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gcpinbal);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000/2);
 
 	EXCELLENT_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_palette(m_palette);
+	m_sprgen->set_color_base(0x600);
+	m_sprgen->set_colpri_callback(FUNC(gcpinbal_state::gcpinbal_colpri_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -414,7 +414,7 @@ ROM_START( pwrflip ) /* Updated version of Grand Cross Pinball or semi-sequel? *
 	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
 	ROM_LOAD16_WORD_SWAP( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
 
-	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
+	ROM_REGION( 0x200000, "spritegen", 0 )  /* Sprites (16 x 16) */
 	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
@@ -442,7 +442,7 @@ ROM_START( gcpinbal )
 	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
 	ROM_LOAD16_WORD_SWAP( "1_excellent.u10",   0x000000, 0x020000, CRC(79321550) SHA1(61f1b772ed8cf95bfee9df8394b0c3ff727e8702) )
 
-	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
+	ROM_REGION( 0x200000, "spritegen", 0 )  /* Sprites (16 x 16) */
 	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */

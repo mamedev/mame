@@ -33,8 +33,8 @@ public:
 	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~harddisk_image_device();
 
-	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }
-	template <typename Object> void set_device_unload(Object &&cb) { m_device_image_unload = std::forward<Object>(cb); }
+	template <typename... T> void set_device_load(T &&... args) { m_device_image_load = load_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload = unload_delegate(std::forward<T>(args)...); }
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
@@ -73,28 +73,12 @@ protected:
 	chd_file        m_diffchd;              /* handle to the diff CHD */
 	hard_disk_file  *m_hard_disk_handle;
 
-	device_image_load_delegate      m_device_image_load;
-	device_image_func_delegate      m_device_image_unload;
-	const char *                    m_interface;
+	load_delegate   m_device_image_load;
+	unload_delegate m_device_image_unload;
+	const char *    m_interface;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(HARDDISK, harddisk_image_device)
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_HARDDISK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, HARDDISK, 0)
-
-#define MCFG_HARDDISK_LOAD(_class,_method)                                \
-	downcast<harddisk_image_device &>(*device).set_device_load(device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
-
-#define MCFG_HARDDISK_UNLOAD(_class,_method)                            \
-	downcast<harddisk_image_device &>(*device).set_device_unload(device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
-
-#define MCFG_HARDDISK_INTERFACE(_interface)                         \
-	downcast<harddisk_image_device &>(*device).set_interface(_interface);
 
 #endif // MAME_DEVICES_IMAGEDEV_HARDDRIV_H

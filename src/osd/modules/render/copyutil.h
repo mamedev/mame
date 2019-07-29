@@ -24,15 +24,6 @@ public:
 		}
 	}
 
-	static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			rgb_t srcpixel = palette[*src++];
-			*dst++ = (srcpixel.a() << 24) | (srcpixel.b() << 16) | (srcpixel.g() << 8) | srcpixel.r();
-		}
-	}
-
 	static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
 	{
 		int x;

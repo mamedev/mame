@@ -53,8 +53,8 @@
 #include "machine/terminal.h"
 
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 
 #include "machine/wd33c9x.h"
 

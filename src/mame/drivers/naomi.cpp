@@ -327,7 +327,7 @@ Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?  
 Ferrari F355 Challenge (twin/deluxe, preview)   no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * other ROM board we've seen had 2x flashroms PCB instead of IC22 EEPROM, contents is the same.
 /Ferrari F355 Challenge 2 - International
 \Course Edition (twin/deluxe, prototype)        no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
-Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
+Inu no Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 /Mushiking The King Of Beetle
 \(MUSHIUSA '04 1ST, Prototype)              not present  none    11*(64Mb)   present  315-6206  not present   * only first 7 flash roms contain game data, PCB have label 840-0150B-FLS.
 Samba de Amigo (prototype)                      no cart  **      21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, ** instead of EPROM have tiny PCB with 2 flashroms on it
@@ -10837,6 +10837,28 @@ ROM_START( ggisuka )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "ax1201f01.bin", 0, 4, CRC(325cf843) SHA1(c51d19a4fce37433f37e7ce23801a7fc4e09013d) )
+/*
+  Sammy AM3AHT/AWMPSYSTEM
+    4-cabinet splitter device, likely was used in GG Isuka, and maybe in 2-player AW-NET games too.
+
+  Case contains 3x PCB stack:
+    AM3AHT-01:
+      Renesas 12363VTE33 H8S/2363 MCU
+      ROM
+      HM62V8512CLFP-5 512K x8bit SRAM
+      33MHz OSC
+      LEDs 4x
+      DIPSW 4x
+    AM3AHW-01: 1-to-4 Video-splitter
+      DSUB connectors 4x
+    AM3AHU-01:
+      Card reader connectors 4x
+*/
+	ROM_REGION( 0x80000, "awmpsystem", 0 )
+	// AM3AHT AWMPSYSTEM
+	// WA0101E03
+	// U1 SUM:A17C Sammy
+	ROM_LOAD("am3aht.u1", 0, 0x80000, CRC(c4a21dbf) SHA1(3200fdf209f8a6c8c9acdb60a2bc1d70af28fc5b) ) // H8S/2363 code
 ROM_END
 
 ROM_START( maxspeed )
@@ -11222,7 +11244,7 @@ ROM_END
 /* 0064    */ GAME( 2001, wrungpo,   wrungp,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
 /* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, init_naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
-/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu No Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
+/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
 /* 0078    */ GAME( 2002, shors2k1,  naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse 2001 (satellite, Rev B)", GAME_FLAGS )
 /* 0083    */ GAME( 2001, derbyoc2,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan, Rev B)", GAME_FLAGS )
 /* 0084    */ GAME( 2001, vtenis2c,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A)", GAME_FLAGS )
@@ -11451,7 +11473,7 @@ ROM_END
 /* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
 /* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
 /* 0020  */ GAME( 2004, tetkiwam,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Success",      "Tetris Kiwamemichi (Japan) (GDL-0020)", GAME_FLAGS )
-/* 0021  */ GAME( 2003, shikgam2,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Alfa System",  "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_FLAGS )
+/* 0021  */ GAME( 2003, shikgam2,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Alfa System",  "Shikigami no Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_FLAGS )
 /* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND  )
 // 0023  Border Down (GDL-0023)
 /* 0023A */ GAME( 2003, bdrdown,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Border Down (Rev A) (GDL-0023A)", GAME_FLAGS )
@@ -11464,8 +11486,8 @@ ROM_END
 // 0028B Melty Blood Act Cadenza (Rev B) (GDL-0028B)
 /* 0028C */ GAME( 2005, meltybld,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza Ver. A (Japan) (GDL-0028C)", GAME_FLAGS )
 // 0029  ExZeus - game was planned as GD-ROM release but was canceled, no GD discs was manufactured, only few prototype cartridges owned by game developer(s) known to exists
-/* 0030  */ GAME( 2005, senkoo,    senko,   naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko No Ronde (Japan) (GDL-0030)", GAME_FLAGS )
-/* 0030A */ GAME( 2005, senko,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko No Ronde (Japan, Rev A) (GDL-0030A)", GAME_FLAGS )
+/* 0030  */ GAME( 2005, senkoo,    senko,   naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko no Ronde (Japan) (GDL-0030)", GAME_FLAGS )
+/* 0030A */ GAME( 2005, senko,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko no Ronde (Japan, Rev A) (GDL-0030A)", GAME_FLAGS )
 /* 0031  */ GAME( 2005, ss2005o,   ss2005,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Starfish",     "Super Shanghai 2005 (Japan) (GDL-0031)", GAME_FLAGS )
 /* 0031A */ GAME( 2005, ss2005,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Starfish",     "Super Shanghai 2005 (Japan, Rev A) (GDL-0031A)", GAME_FLAGS )
 /* 0032  */ GAME( 2005, radirgyo,  radirgy, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",    "Radirgy (Japan) (GDL-0032)", GAME_FLAGS )
@@ -11477,7 +11499,7 @@ ROM_END
 /* 0036  */ GAME( 2006, trghearto, trgheart,naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Warashi",      "Trigger Heart Exelica (Japan) (GDL-0036)", GAME_FLAGS )
 /* 0036A */ GAME( 2006, trgheart,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Warashi",      "Trigger Heart Exelica Ver.A (Japan) (GDL-0036A)", GAME_FLAGS )
 /* 0037  */ GAME( 2006, jingystm,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Atrativa Japan", "Jingi Storm - The Arcade (Japan) (GDL-0037)", GAME_FLAGS )
-/* 0038  */ GAME( 2006, senkosp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko No Ronde Special (Export, Japan) (GDL-0038)", GAME_FLAGS )
+/* 0038  */ GAME( 2006, senkosp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Senko no Ronde Special (Export, Japan) (GDL-0038)", GAME_FLAGS )
 /* 0039  */ GAME( 2006, meltybo,   meltyb,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza Version B (Japan) (GDL-0039)", GAME_FLAGS )
 /* 0039A */ GAME( 2006, meltyb,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Melty Blood Act Cadenza Version B2 (Japan) (GDL-0039A)", GAME_FLAGS )
 /* 0040  */ GAME( 2006, karous,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",    "Karous (Japan) (GDL-0040)", GAME_FLAGS )

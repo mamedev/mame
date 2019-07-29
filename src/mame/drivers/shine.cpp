@@ -38,6 +38,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_centronics(*this, "centronics")
 		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
 		, m_irqs(*this, "irqs")
 		, m_y(*this, "Y%u", 0)
 		, m_video_ram(*this, "video_ram")
@@ -46,14 +47,14 @@ public:
 	virtual void machine_start() override;
 	void shine_mem(address_map &map);
 
+	void shine(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(via0_pa_r);
 	DECLARE_WRITE8_MEMBER(via0_pb_w);
 	DECLARE_WRITE8_MEMBER(floppy_w);
 	DECLARE_READ8_MEMBER(vdg_videoram_r);
 
-	void shine(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<ram_device> m_ram;
@@ -63,6 +64,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cass;
 	required_device<input_merger_device> m_irqs;
 	required_ioport_array<8> m_y;
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -78,8 +80,8 @@ void shine_state::shine_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x67ff).ram();
 	map(0x6800, 0x7fff).ram().share(m_video_ram);
-	map(0x9400, 0x940f).rw(m_via[0], FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x9800, 0x980f).rw(m_via[1], FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x9400, 0x940f).m(m_via[0], FUNC(via6522_device::map));
+	map(0x9800, 0x980f).m(m_via[1], FUNC(via6522_device::map));
 	map(0x9c00, 0x9c03).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
 	map(0x9d00, 0x9d00).w(FUNC(shine_state::floppy_w));
 	map(0xb000, 0xffff).rom();
@@ -267,8 +269,9 @@ void shine_state::shine(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[0], "525qd", FLOPPY_525_QD, true, floppy_image_device::default_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	auto &cassette(CASSETTE(config, "cassette"));
-	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 

@@ -6682,7 +6682,7 @@
 		</part>
 	</software>
 
-	<software name="fccg">
+	<software name="fccg" cloneof="fcc">
 		<description>The Final ChessCard (Ger, v1.3/v1.5)</description>
 		<year>1990</year>
 		<publisher>Tasc</publisher>
@@ -6703,7 +6703,7 @@
 		</part>
 	</software>
 
-	<software name="fccgo">
+	<software name="fccgo" cloneof="fcc">
 		<description>The Final ChessCard (Ger, v0.9/v1.0)</description>
 		<year>1989</year>
 		<publisher>Tasc</publisher>

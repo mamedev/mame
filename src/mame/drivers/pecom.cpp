@@ -6,12 +6,13 @@
 
         08/11/2008 Preliminary driver.
 
+        Need to press capslock twice to get caps to engage - bug?
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "includes/pecom.h"
 
-#include "sound/wave.h"
 #include "softlist.h"
 #include "speaker.h"
 

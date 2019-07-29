@@ -13,6 +13,8 @@ TODO:
 - verify cartridge pinout, right now assume A0-A14 (max known cart size is 24KB).
   Boris/Sargon cartridge is A0-A11 and 2 CS lines.
 - auto-switch keypad overlays? no need for it yet
+- (probably won't) add chesspieces to artwork? this machine supports more board
+  games than just chess: checkers, reversi, and even a blackjack game
 
 *******************************************************************************
 
@@ -51,6 +53,7 @@ Other games:
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "video/pwm.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -71,12 +74,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via"),
+		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_ca1_off(*this, "ca1_off"),
-		m_delay_update(*this, "delay_update"),
-		m_inp_matrix(*this, "IN.%u", 0),
-		m_out_digit(*this, "digit%u", 0U)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void ggm(machine_config &config);
@@ -91,25 +93,17 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_device<timer_device> m_ca1_off;
-	required_device<timer_device> m_delay_update;
-	required_ioport_array<6> m_inp_matrix;
-	output_finder<8> m_out_digit;
+	required_ioport_array<6> m_inputs;
 
 	void main_map(address_map &map);
 
 	void update_reset(ioport_value state);
 	void update_display();
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_update) { update_display(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
-
-	u8 m_digit_select;
-	u16 m_digit_data;
-	u8 m_shift_data;
-	u8 m_shift_clock;
-	u32 m_cart_mask;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 	DECLARE_READ8_MEMBER(cartridge_r);
@@ -120,21 +114,24 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(shift_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(shift_data_w);
+
+	u8 m_inp_mux;
+	u16 m_digit_data;
+	u8 m_shift_data;
+	u8 m_shift_clock;
+	u32 m_cart_mask;
 };
 
 void ggm_state::machine_start()
 {
-	// resolve handlers
-	m_out_digit.resolve();
-
 	// zerofill
-	m_digit_select = 0;
+	m_inp_mux = 0;
 	m_digit_data = 0;
 	m_shift_data = 0;
 	m_shift_clock = 0;
 
 	// register for savestates
-	save_item(NAME(m_digit_select));
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_digit_data));
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_shift_clock));
@@ -143,7 +140,7 @@ void ggm_state::machine_start()
 void ggm_state::machine_reset()
 {
 	// it determines whether it's a cold boot or warm boot ("MEM" switch), with CA1
-	if (~m_inp_matrix[4]->read() & 2)
+	if (~m_inputs[4]->read() & 2)
 	{
 		m_via->write_ca1(1);
 		m_ca1_off->adjust(attotime::from_msec(10));
@@ -160,24 +157,19 @@ void ggm_state::update_reset(ioport_value state)
 	if (state)
 	{
 		m_via->reset();
-
-		// clear display
-		m_digit_data = 0;
-		m_digit_select = 0xff;
-		update_display();
-		m_digit_select = 0;
+		m_display->clear();
 	}
 }
 
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(ggm_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 {
 	u32 size = m_cart->common_get_size("rom");
 	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0x7fff;
@@ -199,17 +191,17 @@ READ8_MEMBER(ggm_state::cartridge_r)
 void ggm_state::update_display()
 {
 	u16 data = bitswap<16>(m_digit_data,15,7,2,11,10,3,1,9,6,14,12,5,0,4,13,8);
-
-	for (int i = 0; i < 8; i++)
-		if (BIT(m_digit_select, i))
-			m_out_digit[i] = data & 0x3fff;
+	m_display->matrix(m_inp_mux, data);
 }
 
 WRITE_LINE_MEMBER(ggm_state::shift_clock_w)
 {
 	// shift display segment data on rising edge
 	if (state && !m_shift_clock)
+	{
 		m_digit_data = m_digit_data << 1 | (m_shift_data & 1);
+		update_display();
+	}
 
 	m_shift_clock = state;
 }
@@ -221,12 +213,9 @@ WRITE_LINE_MEMBER(ggm_state::shift_data_w)
 
 WRITE8_MEMBER(ggm_state::select_w)
 {
-	// update display on rising edge, but delay a bit until shifter is ready
-	if (~m_digit_select & data && !m_delay_update->enabled())
-		m_delay_update->adjust(attotime::from_usec(50));
-
-	// input mux, digit select
-	m_digit_select = data;
+	// PA0-PA7: input mux, digit select
+	m_inp_mux = data;
+	update_display();
 }
 
 WRITE8_MEMBER(ggm_state::control_w)
@@ -243,13 +232,13 @@ READ8_MEMBER(ggm_state::input_r)
 
 	// PB1-PB5: multiplexed inputs
 	for (int i = 0; i < 4; i++)
-		if (BIT(m_digit_select, i))
-			data |= m_inp_matrix[i]->read();
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
 
 	data = ~data << 1 & 0x3e;
 
 	// PB6: hardware version
-	return 0x81 | data | (m_inp_matrix[4]->read() << 6 & 0x40);
+	return 0x81 | data | (m_inputs[4]->read() << 6 & 0x40);
 }
 
 
@@ -263,7 +252,7 @@ void ggm_state::main_map(address_map &map)
 	// external slot has potential bus conflict with RAM/VIA
 	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(ggm_state::cartridge_r));
 	map(0x0000, 0x07ff).ram().share("nvram");
-	map(0x8000, 0x800f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x800f).m(m_via, FUNC(via6522_device::map));
 }
 
 
@@ -299,7 +288,7 @@ static INPUT_PORTS_START( overlay_boris ) // actually most of the Chess games ha
 
 	PORT_MODIFY("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x01) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x01) PORT_CODE(KEYCODE_H) PORT_NAME("Halt / Hint")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x01) PORT_CODE(KEYCODE_I) PORT_NAME("Halt / Hint")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x01) PORT_CODE(KEYCODE_S) PORT_NAME("Best")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x01) PORT_CODE(KEYCODE_R) PORT_NAME("Restore")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x01) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
@@ -372,7 +361,9 @@ void ggm_state::ggm(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	TIMER(config, m_delay_update).configure_generic(FUNC(ggm_state::delay_update));
+	PWM_DISPLAY(config, m_display).set_size(8, 16);
+	m_display->set_segmask(0xff, 0x3fff);
+	m_display->set_bri_levels(0.05);
 	config.set_default_layout(layout_aci_ggm);
 
 	/* sound hardware */
@@ -382,7 +373,7 @@ void ggm_state::ggm(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ggm", "bin");
-	m_cart->set_device_load(device_image_load_delegate(&ggm_state::device_image_load_cartridge, this));
+	m_cart->set_device_load(FUNC(ggm_state::cartridge), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ggm");

@@ -6,7 +6,7 @@
     The 7700 series is based on the WDC 65C816 core, with the following
     notable changes:
 
-    - Second accumulator called "B" (on the 65816, "A" and "B" were the
+    - Second 16-bit accumulator called "B" (on the 65816, "A" and "B" were the
       two 8-bit halves of the 16-bit "C" accumulator).
     - 6502 emulation mode and XCE instruction are not present.
     - No NMI line.  BRK and the watchdog interrupt are non-maskable, but there
@@ -28,6 +28,9 @@
       not the upper 8 bits of X or Y when in 8-bit X.  The 7700 preserves
       the top bits of all registers in all modes (code in the C74 BIOS
       starting at d881 requires this!).
+    - Unlike the 65C816, the program bank register (known here as PG) is
+      incremented when PC overflows from 0xFFFF, and may be incremented or
+      decremented when the address for a relative branch is calculated.
 
     The various 7700 series models differ primarily by their on board
     peripherals.  The 7750 and later models do include some additional
@@ -59,7 +62,15 @@
 #include "m37710cm.h"
 #include "m37710il.h"
 
-#define M37710_DEBUG    (0) // enables verbose logging for peripherals, etc.
+// verbose logging for peripherals, etc.
+#define LOG_GENERAL (1U << 0)
+#define LOG_PORTS (1U << 1)
+#define LOG_AD (1U << 2)
+#define LOG_UART (1U << 3)
+#define LOG_TIMER (1U << 4)
+#define LOG_INT (1U << 5)
+//#define VERBOSE (LOG_GENERAL | LOG_PORTS | LOG_AD | LOG_UART | LOG_TIMER | LOG_INT)
+#include "logmacro.h"
 
 
 DEFINE_DEVICE_TYPE(M37702M2, m37702m2_device, "m37702m2", "Mitsubishi M37702M2")
@@ -74,7 +85,31 @@ DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "Mitsubishi M37720S1")
 // (M37702E2: same with EPROM instead of mask ROM)
 void m37702m2_device::map(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(FUNC(m37702m2_device::m37710_internal_r), FUNC(m37702m2_device::m37710_internal_w));
+	map(0x000002, 0x000015).rw(FUNC(m37702m2_device::port_r), FUNC(m37702m2_device::port_w));
+	map(0x00001e, 0x00001e).rw(FUNC(m37702m2_device::ad_control_r), FUNC(m37702m2_device::ad_control_w));
+	map(0x00001f, 0x00001f).rw(FUNC(m37702m2_device::ad_sweep_r), FUNC(m37702m2_device::ad_sweep_w));
+	map(0x000020, 0x00002f).r(FUNC(m37702m2_device::ad_result_r));
+	map(0x000030, 0x000030).rw(FUNC(m37702m2_device::uart0_mode_r), FUNC(m37702m2_device::uart0_mode_w));
+	map(0x000031, 0x000031).w(FUNC(m37702m2_device::uart0_baud_w));
+	map(0x000032, 0x000033).w(FUNC(m37702m2_device::uart0_tbuf_w));
+	map(0x000034, 0x000034).rw(FUNC(m37702m2_device::uart0_ctrl_reg0_r), FUNC(m37702m2_device::uart0_ctrl_reg0_w));
+	map(0x000035, 0x000035).rw(FUNC(m37702m2_device::uart0_ctrl_reg1_r), FUNC(m37702m2_device::uart0_ctrl_reg1_w));
+	map(0x000036, 0x000037).r(FUNC(m37702m2_device::uart0_rbuf_r));
+	map(0x000038, 0x000038).rw(FUNC(m37702m2_device::uart1_mode_r), FUNC(m37702m2_device::uart1_mode_w));
+	map(0x000039, 0x000039).w(FUNC(m37702m2_device::uart1_baud_w));
+	map(0x00003a, 0x00003b).w(FUNC(m37702m2_device::uart1_tbuf_w));
+	map(0x00003c, 0x00003c).rw(FUNC(m37702m2_device::uart1_ctrl_reg0_r), FUNC(m37702m2_device::uart1_ctrl_reg0_w));
+	map(0x00003d, 0x00003d).rw(FUNC(m37702m2_device::uart1_ctrl_reg1_r), FUNC(m37702m2_device::uart1_ctrl_reg1_w));
+	map(0x00003e, 0x00003f).r(FUNC(m37702m2_device::uart1_rbuf_r));
+	map(0x000040, 0x000040).rw(FUNC(m37702m2_device::count_start_r), FUNC(m37702m2_device::count_start_w));
+	map(0x000042, 0x000042).w(FUNC(m37702m2_device::one_shot_start_w));
+	map(0x000044, 0x000044).rw(FUNC(m37702m2_device::up_down_r), FUNC(m37702m2_device::up_down_w));
+	map(0x000046, 0x000055).rw(FUNC(m37702m2_device::timer_reg_r), FUNC(m37702m2_device::timer_reg_w));
+	map(0x000056, 0x00005d).rw(FUNC(m37702m2_device::timer_mode_r), FUNC(m37702m2_device::timer_mode_w));
+	map(0x00005e, 0x00005e).rw(FUNC(m37702m2_device::proc_mode_r), FUNC(m37702m2_device::proc_mode_w));
+	map(0x000060, 0x000060).w(FUNC(m37702m2_device::watchdog_timer_w));
+	map(0x000061, 0x000061).rw(FUNC(m37702m2_device::watchdog_freq_r), FUNC(m37702m2_device::watchdog_freq_w));
+	map(0x00006c, 0x00007f).rw(FUNC(m37702m2_device::int_control_r), FUNC(m37702m2_device::int_control_w));
 	map(0x000080, 0x00027f).ram();
 	map(0x00c000, 0x00ffff).rom().region(M37710_INTERNAL_ROM_REGION, 0);
 }
@@ -83,7 +118,31 @@ void m37702m2_device::map(address_map &map)
 // M37702S1: 512 bytes internal RAM, no internal ROM
 void m37702s1_device::map(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(FUNC(m37702s1_device::m37710_internal_r), FUNC(m37702s1_device::m37710_internal_w));
+	map(0x000002, 0x000015).rw(FUNC(m37702s1_device::port_r), FUNC(m37702s1_device::port_w));
+	map(0x00001e, 0x00001e).rw(FUNC(m37702s1_device::ad_control_r), FUNC(m37702s1_device::ad_control_w));
+	map(0x00001f, 0x00001f).rw(FUNC(m37702s1_device::ad_sweep_r), FUNC(m37702s1_device::ad_sweep_w));
+	map(0x000020, 0x00002f).r(FUNC(m37702s1_device::ad_result_r));
+	map(0x000030, 0x000030).rw(FUNC(m37702s1_device::uart0_mode_r), FUNC(m37702s1_device::uart0_mode_w));
+	map(0x000031, 0x000031).w(FUNC(m37702s1_device::uart0_baud_w));
+	map(0x000032, 0x000033).w(FUNC(m37702s1_device::uart0_tbuf_w));
+	map(0x000034, 0x000034).rw(FUNC(m37702s1_device::uart0_ctrl_reg0_r), FUNC(m37702s1_device::uart0_ctrl_reg0_w));
+	map(0x000035, 0x000035).rw(FUNC(m37702s1_device::uart0_ctrl_reg1_r), FUNC(m37702s1_device::uart0_ctrl_reg1_w));
+	map(0x000036, 0x000037).r(FUNC(m37702s1_device::uart0_rbuf_r));
+	map(0x000038, 0x000038).rw(FUNC(m37702s1_device::uart1_mode_r), FUNC(m37702s1_device::uart1_mode_w));
+	map(0x000039, 0x000039).w(FUNC(m37702s1_device::uart1_baud_w));
+	map(0x00003a, 0x00003b).w(FUNC(m37702s1_device::uart1_tbuf_w));
+	map(0x00003c, 0x00003c).rw(FUNC(m37702s1_device::uart1_ctrl_reg0_r), FUNC(m37702s1_device::uart1_ctrl_reg0_w));
+	map(0x00003d, 0x00003d).rw(FUNC(m37702s1_device::uart1_ctrl_reg1_r), FUNC(m37702s1_device::uart1_ctrl_reg1_w));
+	map(0x00003e, 0x00003f).r(FUNC(m37702s1_device::uart1_rbuf_r));
+	map(0x000040, 0x000040).rw(FUNC(m37702s1_device::count_start_r), FUNC(m37702s1_device::count_start_w));
+	map(0x000042, 0x000042).w(FUNC(m37702s1_device::one_shot_start_w));
+	map(0x000044, 0x000044).rw(FUNC(m37702s1_device::up_down_r), FUNC(m37702s1_device::up_down_w));
+	map(0x000046, 0x000055).rw(FUNC(m37702s1_device::timer_reg_r), FUNC(m37702s1_device::timer_reg_w));
+	map(0x000056, 0x00005d).rw(FUNC(m37702s1_device::timer_mode_r), FUNC(m37702s1_device::timer_mode_w));
+	map(0x00005e, 0x00005e).rw(FUNC(m37702s1_device::proc_mode_r), FUNC(m37702s1_device::proc_mode_w));
+	map(0x000060, 0x000060).w(FUNC(m37702s1_device::watchdog_timer_w));
+	map(0x000061, 0x000061).rw(FUNC(m37702s1_device::watchdog_freq_r), FUNC(m37702s1_device::watchdog_freq_w));
+	map(0x00006c, 0x00007f).rw(FUNC(m37702s1_device::int_control_r), FUNC(m37702s1_device::int_control_w));
 	map(0x000080, 0x00027f).ram();
 }
 
@@ -91,14 +150,70 @@ void m37702s1_device::map(address_map &map)
 // M37710S4: 2048 bytes internal RAM, no internal ROM
 void m37710s4_device::map(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(FUNC(m37710s4_device::m37710_internal_r), FUNC(m37710s4_device::m37710_internal_w));
+	map(0x000002, 0x000015).rw(FUNC(m37710s4_device::port_r), FUNC(m37710s4_device::port_w)); // FIXME: P4-P8 only
+	map(0x00001a, 0x00001d).w(FUNC(m37710s4_device::da_reg_w)).umask16(0x00ff);
+	map(0x00001e, 0x00001e).rw(FUNC(m37710s4_device::ad_control_r), FUNC(m37710s4_device::ad_control_w));
+	map(0x00001f, 0x00001f).rw(FUNC(m37710s4_device::ad_sweep_r), FUNC(m37710s4_device::ad_sweep_w));
+	map(0x000020, 0x00002f).r(FUNC(m37710s4_device::ad_result_r));
+	map(0x000030, 0x000030).rw(FUNC(m37710s4_device::uart0_mode_r), FUNC(m37710s4_device::uart0_mode_w));
+	map(0x000031, 0x000031).w(FUNC(m37710s4_device::uart0_baud_w));
+	map(0x000032, 0x000033).w(FUNC(m37710s4_device::uart0_tbuf_w));
+	map(0x000034, 0x000034).rw(FUNC(m37710s4_device::uart0_ctrl_reg0_r), FUNC(m37710s4_device::uart0_ctrl_reg0_w));
+	map(0x000035, 0x000035).rw(FUNC(m37710s4_device::uart0_ctrl_reg1_r), FUNC(m37710s4_device::uart0_ctrl_reg1_w));
+	map(0x000036, 0x000037).r(FUNC(m37710s4_device::uart0_rbuf_r));
+	map(0x000038, 0x000038).rw(FUNC(m37710s4_device::uart1_mode_r), FUNC(m37710s4_device::uart1_mode_w));
+	map(0x000039, 0x000039).w(FUNC(m37710s4_device::uart1_baud_w));
+	map(0x00003a, 0x00003b).w(FUNC(m37710s4_device::uart1_tbuf_w));
+	map(0x00003c, 0x00003c).rw(FUNC(m37710s4_device::uart1_ctrl_reg0_r), FUNC(m37710s4_device::uart1_ctrl_reg0_w));
+	map(0x00003d, 0x00003d).rw(FUNC(m37710s4_device::uart1_ctrl_reg1_r), FUNC(m37710s4_device::uart1_ctrl_reg1_w));
+	map(0x00003e, 0x00003f).r(FUNC(m37710s4_device::uart1_rbuf_r));
+	map(0x000040, 0x000040).rw(FUNC(m37710s4_device::count_start_r), FUNC(m37710s4_device::count_start_w));
+	map(0x000042, 0x000042).w(FUNC(m37710s4_device::one_shot_start_w));
+	map(0x000044, 0x000044).rw(FUNC(m37710s4_device::up_down_r), FUNC(m37710s4_device::up_down_w));
+	map(0x000046, 0x000055).rw(FUNC(m37710s4_device::timer_reg_r), FUNC(m37710s4_device::timer_reg_w));
+	map(0x000056, 0x00005d).rw(FUNC(m37710s4_device::timer_mode_r), FUNC(m37710s4_device::timer_mode_w));
+	map(0x00005e, 0x00005e).rw(FUNC(m37710s4_device::proc_mode_r), FUNC(m37710s4_device::proc_mode_w));
+	map(0x000060, 0x000060).w(FUNC(m37710s4_device::watchdog_timer_w));
+	map(0x000061, 0x000061).rw(FUNC(m37710s4_device::watchdog_freq_r), FUNC(m37710s4_device::watchdog_freq_w));
+	map(0x000062, 0x000062).rw(FUNC(m37710s4_device::waveform_mode_r), FUNC(m37710s4_device::waveform_mode_w));
+	map(0x000064, 0x000065).w(FUNC(m37710s4_device::pulse_output_w));
+	map(0x00006c, 0x00007f).rw(FUNC(m37710s4_device::int_control_r), FUNC(m37710s4_device::int_control_w));
 	map(0x000080, 0x00087f).ram();
 }
 
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
 void m37720s1_device::map(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(FUNC(m37720s1_device::m37710_internal_r), FUNC(m37720s1_device::m37710_internal_w));
+	map(0x000002, 0x000019).rw(FUNC(m37720s1_device::port_r), FUNC(m37720s1_device::port_w)); // FIXME: P4-P10 only
+	map(0x00001a, 0x00001d).w(FUNC(m37720s1_device::pulse_output_w)).umask16(0x00ff);
+	map(0x00001e, 0x00001e).rw(FUNC(m37720s1_device::ad_control_r), FUNC(m37720s1_device::ad_control_w));
+	map(0x00001f, 0x00001f).rw(FUNC(m37720s1_device::ad_sweep_r), FUNC(m37720s1_device::ad_sweep_w));
+	map(0x000020, 0x00002f).r(FUNC(m37720s1_device::ad_result_r));
+	map(0x000030, 0x000030).rw(FUNC(m37720s1_device::uart0_mode_r), FUNC(m37720s1_device::uart0_mode_w));
+	map(0x000031, 0x000031).w(FUNC(m37720s1_device::uart0_baud_w));
+	map(0x000032, 0x000033).w(FUNC(m37720s1_device::uart0_tbuf_w));
+	map(0x000034, 0x000034).rw(FUNC(m37720s1_device::uart0_ctrl_reg0_r), FUNC(m37720s1_device::uart0_ctrl_reg0_w));
+	map(0x000035, 0x000035).rw(FUNC(m37720s1_device::uart0_ctrl_reg1_r), FUNC(m37720s1_device::uart0_ctrl_reg1_w));
+	map(0x000036, 0x000037).r(FUNC(m37720s1_device::uart0_rbuf_r));
+	map(0x000038, 0x000038).rw(FUNC(m37720s1_device::uart1_mode_r), FUNC(m37720s1_device::uart1_mode_w));
+	map(0x000039, 0x000039).w(FUNC(m37720s1_device::uart1_baud_w));
+	map(0x00003a, 0x00003b).w(FUNC(m37720s1_device::uart1_tbuf_w));
+	map(0x00003c, 0x00003c).rw(FUNC(m37720s1_device::uart1_ctrl_reg0_r), FUNC(m37720s1_device::uart1_ctrl_reg0_w));
+	map(0x00003d, 0x00003d).rw(FUNC(m37720s1_device::uart1_ctrl_reg1_r), FUNC(m37720s1_device::uart1_ctrl_reg1_w));
+	map(0x00003e, 0x00003f).r(FUNC(m37720s1_device::uart1_rbuf_r));
+	map(0x000040, 0x000040).rw(FUNC(m37720s1_device::count_start_r), FUNC(m37720s1_device::count_start_w));
+	map(0x000042, 0x000042).w(FUNC(m37720s1_device::one_shot_start_w));
+	map(0x000044, 0x000044).rw(FUNC(m37720s1_device::up_down_r), FUNC(m37720s1_device::up_down_w));
+	map(0x000046, 0x000055).rw(FUNC(m37720s1_device::timer_reg_r), FUNC(m37720s1_device::timer_reg_w));
+	map(0x000056, 0x00005d).rw(FUNC(m37720s1_device::timer_mode_r), FUNC(m37720s1_device::timer_mode_w));
+	map(0x00005e, 0x00005e).rw(FUNC(m37720s1_device::proc_mode_r), FUNC(m37720s1_device::proc_mode_w));
+	map(0x000060, 0x000060).w(FUNC(m37720s1_device::watchdog_timer_w));
+	map(0x000061, 0x000061).rw(FUNC(m37720s1_device::watchdog_freq_r), FUNC(m37720s1_device::watchdog_freq_w));
+	map(0x000062, 0x000062).rw(FUNC(m37720s1_device::rto_control_r), FUNC(m37720s1_device::rto_control_w));
+	map(0x000064, 0x000064).rw(FUNC(m37720s1_device::dram_control_r), FUNC(m37720s1_device::dram_control_w));
+	map(0x000066, 0x000066).w(FUNC(m37720s1_device::refresh_timer_w));
+	map(0x000068, 0x000069).rw(FUNC(m37720s1_device::dmac_control_r), FUNC(m37720s1_device::dmac_control_w));
+	map(0x00006c, 0x00007f).rw(FUNC(m37720s1_device::int_control_r), FUNC(m37720s1_device::int_control_w));
 	map(0x000080, 0x00027f).ram();
 }
 
@@ -152,36 +267,28 @@ std::vector<std::pair<int, const address_space_config *>> m37710_cpu_device::mem
 
 /* interrupt control mapping */
 
-const int m37710_cpu_device::m37710_irq_levels[M37710_INTERRUPT_MAX] =
+const int m37710_cpu_device::m37710_int_reg_map[M37710_MASKABLE_INTERRUPTS] =
 {
-	// maskable
-	0x6f,   // DMA3          0
-	0x6e,   // DMA2          1
-	0x6d,   // DMA1          2
-	0x6c,   // DMA0          3
-	0x70,   // ADC           4
-	0x73,   // UART 1 XMIT   5
-	0x74,   // UART 1 RECV   6
-	0x71,   // UART 0 XMIT   7
-	0x72,   // UART 0 RECV   8
-	0x7c,   // Timer B2      9
-	0x7b,   // Timer B1     10
-	0x7a,   // Timer B0     11
-	0x79,   // Timer A4     12
-	0x78,   // Timer A3     13
-	0x77,   // Timer A2     14
-	0x76,   // Timer A1     15
-	0x75,   // Timer A0     16
-	0x7f,   // IRQ 2        13
-	0x7e,   // IRQ 1        18
-	0x7d,   // IRQ 0        19
-
-	// non-maskable
-	0,  // watchdog
-	0,  // debugger control
-	0,  // BRK
-	0,  // divide by zero
-	0,  // reset
+	M37710_LINE_DMA0,       // level 3  (0x6c)
+	M37710_LINE_DMA1,       // level 2  (0x6d)
+	M37710_LINE_DMA2,       // level 1  (0x6e)
+	M37710_LINE_DMA3,       // level 0  (0x6f)
+	M37710_LINE_ADC,        // level 4  (0x70)
+	M37710_LINE_UART0XMIT,  // level 7  (0x71)
+	M37710_LINE_UART0RECV,  // level 8  (0x72)
+	M37710_LINE_UART1XMIT,  // level 5  (0x73)
+	M37710_LINE_UART1RECV,  // level 6  (0x74)
+	M37710_LINE_TIMERA0,    // level 16 (0x75)
+	M37710_LINE_TIMERA1,    // level 15 (0x76)
+	M37710_LINE_TIMERA2,    // level 14 (0x77)
+	M37710_LINE_TIMERA3,    // level 13 (0x78)
+	M37710_LINE_TIMERA4,    // level 12 (0x79)
+	M37710_LINE_TIMERB0,    // level 11 (0x7a)
+	M37710_LINE_TIMERB1,    // level 10 (0x7b)
+	M37710_LINE_TIMERB2,    // level 9  (0x7c)
+	M37710_LINE_IRQ0,       // level 19 (0x7d)
+	M37710_LINE_IRQ1,       // level 18 (0x7e)
+	M37710_LINE_IRQ2,       // level 17 (0x7f)
 };
 
 const int m37710_cpu_device::m37710_irq_vectors[M37710_INTERRUPT_MAX] =
@@ -218,141 +325,21 @@ const int m37710_cpu_device::m37710_irq_vectors[M37710_INTERRUPT_MAX] =
 
 // M37710 internal peripherals
 
-const char *const m37710_cpu_device::m37710_rnames[128] =
-{
-	"",
-	"",
-	"Port P0 reg",
-	"Port P1 reg",
-	"Port P0 dir reg",
-	"Port P1 dir reg",
-	"Port P2 reg",
-	"Port P3 reg",
-	"Port P2 dir reg",
-	"Port P3 dir reg",
-	"Port P4 reg",      // 10 (0x0A) - ports 0, 1, 2, 3 don't exist on 37720
-	"Port P5 reg",
-	"Port P4 dir reg",
-	"Port P5 dir reg",
-	"Port P6 reg",
-	"Port P7 reg",
-	"Port P6 dir reg",  // 16 (0x10)
-	"Port P7 dir reg",
-	"Port P8 reg",
-	"",
-	"Port P8 dir reg",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"A/D control reg",
-	"A/D sweep pin select",
-	"A/D 0",        // 32 (0x20)
-	"",
-	"A/D 1",
-	"",
-	"A/D 2",
-	"",
-	"A/D 3",
-	"",
-	"A/D 4",
-	"",
-	"A/D 5",
-	"",
-	"A/D 6",
-	"",
-	"A/D 7",
-	"",
-	"UART0 transmit/recv mode",     // 48 (0x30)
-	"UART0 baud rate",          // 0x31
-	"UART0 transmit buf L",     // 0x32
-	"UART0 transmit buf H",     // 0x33
-	"UART0 transmit/recv ctrl 0",   // 0x34
-	"UART0 transmit/recv ctrl 1",   // 0x35
-	"UART0 recv buf L",     // 0x36
-	"UART0 recv buf H",     // 0x37
-	"UART1 transmit/recv mode", // 0x38
-	"UART1 baud rate",
-	"UART1 transmit buf L",
-	"UART1 transmit buf H",
-	"UART1 transmit/recv ctrl 0",
-	"UART1 transmit/recv ctrl 1",
-	"UART1 recv buf L",
-	"UART1 recv buf H",
-	"Count start",          // 0x40
-	"",
-	"One-shot start",
-	"",
-	"Up-down register",
-	"",
-	"Timer A0 L",       // 0x46
-	"Timer A0 H",
-	"Timer A1 L",
-	"Timer A1 H",
-	"Timer A2 L",
-	"Timer A2 H",
-	"Timer A3 L",
-	"Timer A3 H",
-	"Timer A4 L",
-	"Timer A4 H",
-	"Timer B0 L",
-	"Timer B0 H",       // 0x50
-	"Timer B1 L",
-	"Timer B1 H",
-	"Timer B2 L",
-	"Timer B2 H",
-	"Timer A0 mode",
-	"Timer A1 mode",
-	"Timer A2 mode",
-	"Timer A3 mode",
-	"Timer A4 mode",
-	"Timer B0 mode",
-	"Timer B1 mode",
-	"Timer B2 mode",
-	"Processor mode",
-	"",
-	"Watchdog reset",       // 0x60
-	"Watchdog frequency",   // 0x61
-	"Real-time output control",
-	"",
-	"DRAM control",
-	"",
-	"Refresh timer",
-	"",
-	"DMAC control L",
-	"DMAC control H",
-	"",
-	"",
-	"DMA0 IRQ ctrl",
-	"DMA1 IRQ ctrl",
-	"DMA2 IRQ ctrl",
-	"DMA3 IRQ ctrl",
-	"A/D IRQ ctrl",
-	"UART0 xmit IRQ ctrl",      // 0x70
-	"UART0 recv IRQ ctrl",
-	"UART1 xmit IRQ ctrl",
-	"UART1 recv IRQ ctrl",
-	"Timer A0 IRQ ctrl",        // 0x74
-	"Timer A1 IRQ ctrl",        // 0x75
-	"Timer A2 IRQ ctrl",        // 0x76
-	"Timer A3 IRQ ctrl",
-	"Timer A4 IRQ ctrl",        // 0x78
-	"Timer B0 IRQ ctrl",
-	"Timer B1 IRQ ctrl",
-	"Timer B2 IRQ ctrl",
-	"INT0 IRQ ctrl",
-	"INT1 IRQ ctrl",
-	"INT2 IRQ ctrl",
-};
-
 const char *const m37710_cpu_device::m37710_tnames[8] =
 {
 	"A0", "A1", "A2", "A3", "A4", "B0", "B1", "B2"
+};
+
+const char *const m37710_cpu_device::m37710_intnames[M37710_INTERRUPT_MAX] =
+{
+	"DMA3", "DMA2", "DMA1", "DMA0",
+	"A/D",
+	"UART1 xmit", "UART1 recv",
+	"UART0 xmit", "UART0 recv",
+	"Timer B2", "Timer B1", "Timer B0",
+	"Timer A4", "Timer A3", "Timer A2", "Timer A1", "Timer A0",
+	"INT2", "INT1", "INT0",
+	"Watchdog timer", "DBC", "BRK", "Zero division", "RESET" // nonmaskable
 };
 
 TIMER_CALLBACK_MEMBER( m37710_cpu_device::m37710_timer_cb )
@@ -377,30 +364,28 @@ void m37710_cpu_device::m37710_external_tick(int timer, int state)
 	}
 
 	// check if enabled and in event counter mode
-	if (m_m37710_regs[0x40] & (1<<timer))
+	if (BIT(m_count_start, timer))
 	{
-		if ((m_m37710_regs[0x56+timer] & 0x3) == 1)
+		if ((m_timer_mode[timer] & 0x3) == 1)
 		{
 			int upcount = 0;
 
 			// timer b always counts down
 			if (timer <= 4)
 			{
-				if (m_m37710_regs[0x56+timer] & 0x10)
+				if (BIT(m_timer_mode[timer], 4))
 				{
 					// up/down determined by timer out pin
 					upcount = m_timer_out[timer];
 				}
 				else
-					upcount = m_m37710_regs[0x44] >> timer & 1;
+					upcount = m_up_down_reg >> timer & 1;
 			}
 
-			int incval = (upcount) ? 1 : -1;
-			int edgeval = (upcount) ? 0xff : 0x00;
-
-			if (m_m37710_regs[0x46+(timer*2)] == edgeval)
-				m_m37710_regs[0x46+(timer*2)+1] += incval;
-			m_m37710_regs[0x46+(timer*2)] += incval;
+			if (upcount)
+				m_timer_reg[timer]++;
+			else
+				m_timer_reg[timer]--;
 		}
 		else
 		{
@@ -416,292 +401,474 @@ void m37710_cpu_device::m37710_recalc_timer(int timer)
 	static const int tscales[4] = { 2, 16, 64, 512 };
 
 	// check if enabled
-	if (m_m37710_regs[0x40] & (1<<timer))
+	if (BIT(m_count_start, timer))
 	{
-		#if M37710_DEBUG
-		logerror("Timer %d (%s) is enabled\n", timer, m37710_tnames[timer]);
-		#endif
+		LOGMASKED(LOG_TIMER, "Timer %d (%s) is enabled\n", timer, m37710_tnames[timer]);
 
 		// set the timer's value
-		tval = m_m37710_regs[0x46+(timer*2)] | (m_m37710_regs[0x47+(timer*2)]<<8);
+		tval = m_timer_reg[timer];
 
 		// HACK: ignore if timer is 8MHz (MAME slows down to a crawl)
-		if (tval == 0 && (m_m37710_regs[0x56+timer]&0xc0) == 0) return;
+		if (tval == 0 && (m_timer_mode[timer]&0xc0) == 0) return;
 
 		// check timer's mode
 		// modes are slightly different between timer groups A and B
 		if (timer < 5)
 		{
-			switch (m_m37710_regs[0x56+timer] & 0x3)
+			switch (m_timer_mode[timer] & 0x3)
 			{
 				case 0:         // timer mode
-					time = attotime::from_hz(unscaled_clock()) * tscales[m_m37710_regs[0x56+timer]>>6];
+					time = attotime::from_hz(unscaled_clock()) * tscales[m_timer_mode[timer]>>6];
 					time *= (tval + 1);
 
-					#if M37710_DEBUG
-					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 
 					m_timers[timer]->adjust(time, timer);
 					m_reload[timer] = time;
 					break;
 
 				case 1:         // event counter mode
-					#if M37710_DEBUG
-					logerror("Timer %d in event counter mode\n", timer);
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in event counter mode\n", timer);
 					break;
 
 				case 2:     // one-shot pulse mode
-					#if M37710_DEBUG
-					logerror("Timer %d in one-shot mode\n", timer);
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in one-shot mode\n", timer);
 					break;
 
 				case 3:         // PWM mode
-					#if M37710_DEBUG
-					logerror("Timer %d in PWM mode\n", timer);
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in PWM mode\n", timer);
 					break;
 			}
 		}
 		else
 		{
-			switch (m_m37710_regs[0x56+timer] & 0x3)
+			switch (m_timer_mode[timer] & 0x3)
 			{
 				case 0:         // timer mode
-					time = attotime::from_hz(unscaled_clock()) * tscales[m_m37710_regs[0x56+timer]>>6];
+					time = attotime::from_hz(unscaled_clock()) * tscales[m_timer_mode[timer]>>6];
 					time *= (tval + 1);
 
-					#if M37710_DEBUG
-					logerror("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 
 					m_timers[timer]->adjust(time, timer);
 					m_reload[timer] = time;
 					break;
 
 				case 1:         // event counter mode
-					#if M37710_DEBUG
-					logerror("Timer %d in event counter mode\n", timer);
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in event counter mode\n", timer);
 					break;
 
 				case 2:     // pulse period/pulse width measurement mode
-					#if M37710_DEBUG
-					logerror("Timer %d in pulse period/width measurement mode\n", timer);
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in pulse period/width measurement mode\n", timer);
 					break;
 
 				case 3:
-					#if M37710_DEBUG
-					logerror("Timer %d in unknown mode!\n", timer);
-					#endif
+					LOGMASKED(LOG_TIMER, "Timer %d in unknown mode!\n", timer);
 					break;
 			}
 		}
 	}
 }
 
-READ8_MEMBER(m37710_cpu_device::m37710_internal_r)
+uint8_t m37710_cpu_device::port_r(offs_t offset)
 {
-	uint8_t d;
+	int p = (offset & 0x1c) >> 1 | (offset & 0x01);
 
-	#if M37710_DEBUG
-	if (offset > 1)
-	logerror("m37710_internal_r from %02x: %s (PC=%x)\n", (int)offset, m37710_rnames[(int)offset], REG_PB<<16 | REG_PC);
-	#endif
-
-	switch (offset)
+	uint8_t result = 0;
+	if (p < 11)
 	{
-		// ports
-		case 0x02: // p0
-			d = m_m37710_regs[0x04];
+		if (BIT(offset, 1))
+			result = m_port_dir[p];
+		else
+		{
+			uint8_t d = m_port_dir[p];
 			if (d != 0xff)
-				return (m_port_in_cb[0](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x03: // p1
-			d = m_m37710_regs[0x05];
-			if (d != 0xff)
-				return (m_port_in_cb[1](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x06: // p2
-			d = m_m37710_regs[0x08];
-			if (d != 0xff)
-				return (m_port_in_cb[2](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x07: // p3
-			d = m_m37710_regs[0x09];
-			if (d != 0xff)
-				return (m_port_in_cb[3](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x0a: // p4
-			d = m_m37710_regs[0x0c];
-			if (d != 0xff)
-				return (m_port_in_cb[4](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x0b: // p5
-			d = m_m37710_regs[0x0d];
-			if (d != 0xff)
-				return (m_port_in_cb[5](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x0e: // p6
-			d = m_m37710_regs[0x10];
-			if (d != 0xff)
-				return (m_port_in_cb[6](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x0f: // p7
-			d = m_m37710_regs[0x11];
-			if (d != 0xff)
-				return (m_port_in_cb[7](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-		case 0x12: // p8
-			d = m_m37710_regs[0x14];
-			if (d != 0xff)
-				return (m_port_in_cb[8](0,~d)&~d) | (m_m37710_regs[offset]&d);
-			break;
-
-		// A-D regs
-		case 0x20:
-			return m_analog_cb[0]() & 0xff;
-		case 0x21:
-			return m_analog_cb[0]() >> 8;
-		case 0x22:
-			return m_analog_cb[1]() & 0xff;
-		case 0x23:
-			return m_analog_cb[1]() >> 8;
-		case 0x24:
-			return m_analog_cb[2]() & 0xff;
-		case 0x25:
-			return m_analog_cb[2]() >> 8;
-		case 0x26:
-			return m_analog_cb[3]() & 0xff;
-		case 0x27:
-			return m_analog_cb[3]() >> 8;
-		case 0x28:
-			return m_analog_cb[4]() & 0xff;
-		case 0x29:
-			return m_analog_cb[4]() >> 8;
-		case 0x2a:
-			return m_analog_cb[5]() & 0xff;
-		case 0x2b:
-			return m_analog_cb[5]() >> 8;
-		case 0x2c:
-			return m_analog_cb[6]() & 0xff;
-		case 0x2d:
-			return m_analog_cb[6]() >> 8;
-		case 0x2e:
-			return m_analog_cb[7]() & 0xff;
-		case 0x2f:
-			return m_analog_cb[7]() >> 8;
-
-		// UART control (not hooked up yet)
-		case 0x34: case 0x3c:
-			return 0x08;
-		case 0x35: case 0x3d:
-			return 0xff;
-
-		// A-D IRQ control (also not properly hooked up yet)
-		case 0x70:
-			return m_m37710_regs[offset] | 8;
-
-		default:
-			return m_m37710_regs[offset];
+				result = (m_port_in_cb[p](0, ~d) & ~d) | (m_port_regs[p] & d);
+			else
+				result = m_port_regs[p];
+		}
 	}
 
-	return m_m37710_regs[offset];
+	LOGMASKED(LOG_PORTS, "port_r from %02x: Port P%d %s = %x\n", (int)offset + 0x02, p, BIT(offset, 1) ? "dir reg" : "reg", result);
+
+	return result;
 }
 
-WRITE8_MEMBER(m37710_cpu_device::m37710_internal_w)
+void m37710_cpu_device::port_w(offs_t offset, uint8_t data)
 {
-	int i;
-	uint8_t prevdata;
-	uint8_t d;
+	int p = (offset & 0x1c) >> 1 | (offset & 0x01);
 
-	#if M37710_DEBUG
-	if (offset != 0x60) // filter out watchdog
-	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], m_m37710_regs[offset]);
-	#endif
-
-	prevdata = m_m37710_regs[offset];
-	m_m37710_regs[offset] = data;
-
-	switch(offset)
+	if (p < 11)
 	{
-		// ports
-		case 0x02: // p0
-			d = m_m37710_regs[0x04];
-			if (d != 0)
-				m_port_out_cb[0](0,data&d,d);
-			break;
-		case 0x03: // p1
-			d = m_m37710_regs[0x05];
-			if (d != 0)
-				m_port_out_cb[1](0,data&d,d);
-			break;
-		case 0x06: // p2
-			d = m_m37710_regs[0x08];
-			if (d != 0)
-				m_port_out_cb[2](0,data&d,d);
-			break;
-		case 0x07: // p3
-			d = m_m37710_regs[0x09];
-			if (d != 0)
-				m_port_out_cb[3](0,data&d,d);
-			break;
-		case 0x0a: // p4
-			d = m_m37710_regs[0x0c];
-			if (d != 0)
-				m_port_out_cb[4](0,data&d,d);
-			break;
-		case 0x0b: // p5
-			d = m_m37710_regs[0x0d];
-			if (d != 0)
-				m_port_out_cb[5](0,data&d,d);
-			break;
-		case 0x0e: // p6
-			d = m_m37710_regs[0x10];
-			if (d != 0)
-				m_port_out_cb[6](0,data&d,d);
-			break;
-		case 0x0f: // p7
-			d = m_m37710_regs[0x11];
-			if (d != 0)
-				m_port_out_cb[7](0,data&d,d);
-			break;
-		case 0x12: // p8
-			d = m_m37710_regs[0x14];
-			if (d != 0)
-				m_port_out_cb[8](0,data&d,d);
-			break;
+		LOGMASKED(LOG_PORTS, "port_w %x to %02x: Port P%d %s = %x\n", data, (int)offset + 0x02, p,
+			BIT(offset, 1) ? "dir reg" : "reg",
+			BIT(offset, 1) ? m_port_dir[p] : m_port_regs[p]);
 
-		case 0x40:  // count start
-			for (i = 0; i < 8; i++)
-			{
-				if ((data & (1<<i)) && !(prevdata & (1<<i)))
-					m37710_recalc_timer(i);
-			}
-			break;
-
-		// internal interrupt control
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75:
-		case 0x76: case 0x77: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c:
-			m37710_set_irq_line(offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
-			m37710i_update_irqs();
-			break;
-
-		// external interrupt control
-		case 0x7d: case 0x7e: case 0x7f:
-			m37710_set_irq_line(offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
-			m37710i_update_irqs();
-
-			// level-sense interrupts are not implemented yet
-			if (data & 0x20) logerror("error M37710: INT%d level-sense\n",offset-0x7d);
-			break;
-
-		default:
-			break;
+		if (BIT(offset, 1))
+			m_port_dir[p] = data;
+		else
+		{
+			uint8_t d = m_port_dir[p];
+			if (d != 0)
+				m_port_out_cb[p](0, data & d, d);
+			m_port_regs[p] = data;
+		}
 	}
+}
+
+void m37710_cpu_device::da_reg_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "da_reg_w %x to %02X: D/A %d\n", data, (int)(offset * 2) + 0x1a, offset);
+}
+
+void m37710_cpu_device::pulse_output_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "pulse_output_w %x: Pulse output data register %d\n", data, offset);
+}
+
+uint8_t m37710_cpu_device::ad_control_r()
+{
+	return m_ad_control;
+}
+
+void m37710_cpu_device::ad_control_w(uint8_t data)
+{
+	LOGMASKED(LOG_AD, "ad_control_w %x: A/D control reg = %x\n", data, m_ad_control);
+
+	m_ad_control = data;
+}
+
+uint8_t m37710_cpu_device::ad_sweep_r()
+{
+	return m_ad_sweep;
+}
+
+void m37710_cpu_device::ad_sweep_w(uint8_t data)
+{
+	LOGMASKED(LOG_AD, "ad_sweep_w %x: A/D sweep pin select = %x\n", data, m_ad_sweep);
+
+	m_ad_sweep = data;
+}
+
+uint16_t m37710_cpu_device::ad_result_r(offs_t offset)
+{
+	uint16_t result = m_analog_cb[offset]();
+
+	LOGMASKED(LOG_AD, "ad_result_r from %02x: A/D %d = %x (PC=%x)\n", (int)(offset * 2) + 0x20, offset, result, REG_PB<<16 | REG_PC);
+
+	return result;
+}
+
+uint8_t m37710_cpu_device::uart0_mode_r()
+{
+	LOGMASKED(LOG_UART, "uart0_mode_r: UART0 transmit/recv mode = %x (PC=%x)\n", m_uart_mode[0], REG_PB<<16 | REG_PC);
+
+	return m_uart_mode[0];
+}
+
+void m37710_cpu_device::uart0_mode_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart0_mode_w %x: UART0 transmit/recv mode = %x\n", data, m_uart_mode[0]);
+
+	m_uart_mode[0] = data;
+}
+
+uint8_t m37710_cpu_device::uart1_mode_r()
+{
+	LOGMASKED(LOG_UART, "uart1_mode_r: UART1 transmit/recv mode = %x (PC=%x)\n", m_uart_mode[1], REG_PB<<16 | REG_PC);
+
+	return m_uart_mode[1];
+}
+
+void m37710_cpu_device::uart1_mode_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart1_mode_w %x: UART1 transmit/recv mode = %x\n", data, m_uart_mode[1]);
+
+	m_uart_mode[1] = data;
+}
+
+void m37710_cpu_device::uart0_baud_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart0_baud_w %x: UART0 baud rate = %x\n", data, m_uart_baud[0]);
+
+	m_uart_baud[0] = data;
+}
+
+void m37710_cpu_device::uart1_baud_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart1_baud_w %x: UART1 baud rate = %x\n", data, m_uart_baud[1]);
+
+	m_uart_baud[1] = data;
+}
+
+void m37710_cpu_device::uart0_tbuf_w(uint16_t data)
+{
+	LOGMASKED(LOG_UART, "uart0_tbuf_w %x: UART0 transmit buf\n", data);
+}
+
+void m37710_cpu_device::uart1_tbuf_w(uint16_t data)
+{
+	LOGMASKED(LOG_UART, "uart1_tbuf_w %x: UART1 transmit buf\n", data);
+}
+
+uint8_t m37710_cpu_device::uart0_ctrl_reg0_r()
+{
+	LOGMASKED(LOG_UART, "uart0_ctrl_reg0_r: UART0 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[0], REG_PB<<16 | REG_PC);
+
+	return m_uart_ctrl_reg0[0];
+}
+
+void m37710_cpu_device::uart0_ctrl_reg0_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart0_ctrl_reg0_w %x: UART0 transmit/recv ctrl 0 = %x\n", data, m_uart_ctrl_reg0[0]);
+
+	// Tx empty flag is read-only
+	m_uart_ctrl_reg0[0] = (data & ~8) | (m_uart_ctrl_reg0[0] & 8);
+}
+
+uint8_t m37710_cpu_device::uart1_ctrl_reg0_r()
+{
+	LOGMASKED(LOG_UART, "uart1_ctrl_reg0_r: UART1 transmit/recv ctrl 0 = %x (PC=%x)\n", m_uart_ctrl_reg0[1], REG_PB<<16 | REG_PC);
+
+	return m_uart_ctrl_reg0[1];
+}
+
+void m37710_cpu_device::uart1_ctrl_reg0_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart1_ctrl_reg0_w %x: UART1 transmit/recv ctrl 0 = %x\n", data, m_uart_ctrl_reg0[1]);
+
+	// Tx empty flag is read-only
+	m_uart_ctrl_reg0[1] = (data & ~8) | (m_uart_ctrl_reg0[1] & 8);
+}
+
+uint8_t m37710_cpu_device::uart0_ctrl_reg1_r()
+{
+	LOGMASKED(LOG_UART, "uart0_ctrl_reg1_r: UART0 transmit/recv ctrl 1 = %x (PC=%x)\n", m_uart_ctrl_reg1[0], REG_PB<<16 | REG_PC);
+
+	return m_uart_ctrl_reg1[0];
+}
+
+void m37710_cpu_device::uart0_ctrl_reg1_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart0_ctrl_reg1_w %x: UART0 transmit/recv ctrl 1 = %x\n", data, m_uart_ctrl_reg1[0]);
+
+	m_uart_ctrl_reg1[0] = (m_uart_ctrl_reg1[0] & (BIT(data, 2) ? 0xfa : 0x0a)) | (data & 0x05);
+}
+
+uint8_t m37710_cpu_device::uart1_ctrl_reg1_r()
+{
+	LOGMASKED(LOG_UART, "uart1_ctrl_reg1_r: UART1 transmit/recv ctrl 1 = %x (PC=%x)\n", m_uart_ctrl_reg1[1], REG_PB<<16 | REG_PC);
+
+	return m_uart_ctrl_reg1[1];
+}
+
+void m37710_cpu_device::uart1_ctrl_reg1_w(uint8_t data)
+{
+	LOGMASKED(LOG_UART, "uart1_ctrl_reg1_w %x: UART1 transmit/recv ctrl 1 = %x\n", data, m_uart_ctrl_reg1[1]);
+
+	m_uart_ctrl_reg1[1] = (m_uart_ctrl_reg1[1] & (BIT(data, 2) ? 0xfa : 0x0a)) | (data & 0x05);
+}
+
+uint16_t m37710_cpu_device::uart0_rbuf_r()
+{
+	LOGMASKED(LOG_UART, "uart0_rbuf_r: UART0 recv buf (PC=%x)\n", REG_PB<<16 | REG_PC);
+
+	return 0;
+}
+
+uint16_t m37710_cpu_device::uart1_rbuf_r()
+{
+	LOGMASKED(LOG_UART, "uart1_rbuf_r: UART1 recv buf (PC=%x)\n", REG_PB<<16 | REG_PC);
+
+	return 0;
+}
+
+uint8_t m37710_cpu_device::count_start_r()
+{
+	LOGMASKED(LOG_TIMER, "count_start_r: Count start = %x (PC=%x)\n", m_count_start, REG_PB<<16 | REG_PC);
+
+	return m_count_start;
+}
+
+void m37710_cpu_device::count_start_w(uint8_t data)
+{
+	uint8_t prevdata = m_count_start;
+	m_count_start = data;
+
+	LOGMASKED(LOG_TIMER, "count_start_w %x: Count start = %x\n", data, prevdata);
+
+	for (int i = 0; i < 8; i++)
+		if (BIT(data, i) && !BIT(prevdata, i))
+			m37710_recalc_timer(i);
+}
+
+void m37710_cpu_device::one_shot_start_w(uint8_t data)
+{
+	LOGMASKED(LOG_TIMER, "one_shot_start_w %x: One-shot start = %x\n", data, m_one_shot_start);
+
+	m_one_shot_start = data;
+}
+
+uint8_t m37710_cpu_device::up_down_r()
+{
+	LOGMASKED(LOG_TIMER, "up_down_r: Up-down register = %x (PC=%x)\n", m_up_down_reg, REG_PB<<16 | REG_PC);
+
+	// bits 7-5 read back as 0
+	return m_up_down_reg & 0x1f;
+}
+
+void m37710_cpu_device::up_down_w(uint8_t data)
+{
+	LOGMASKED(LOG_TIMER, "up_down_w %x: Up-down register = %x\n", data, m_up_down_reg);
+
+	m_up_down_reg = data;
+}
+
+uint16_t m37710_cpu_device::timer_reg_r(offs_t offset, uint16_t mem_mask)
+{
+	return m_timer_reg[offset] & mem_mask;
+}
+
+void m37710_cpu_device::timer_reg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_TIMER, "timer_reg_w %04x & %04x to %02x: Timer %s = %04x\n", data, mem_mask, (int)(offset * 2) + 0x46, m37710_tnames[offset], m_timer_reg[offset]);
+
+	m_timer_reg[offset] = (data & mem_mask) | (m_timer_reg[offset] & ~mem_mask);
+}
+
+uint8_t m37710_cpu_device::timer_mode_r(offs_t offset)
+{
+	LOGMASKED(LOG_TIMER, "timer_mode_r from %02x: Timer %s mode = %x (PC=%x)\n", (int)offset + 0x56, m37710_tnames[offset], m_timer_mode[offset], REG_PB<<16 | REG_PC);
+
+	return m_timer_mode[offset];
+}
+
+void m37710_cpu_device::timer_mode_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_TIMER, "timer_mode_w %x to %02x: Timer %s mode = %x\n", data, (int)offset + 0x56, m37710_tnames[offset], m_timer_mode[offset]);
+
+	m_timer_mode[offset] = data;
+}
+
+uint8_t m37710_cpu_device::proc_mode_r(offs_t offset)
+{
+	LOGMASKED(LOG_GENERAL, "proc_mode_r: Processor mode = %x (PC=%x)\n", m_proc_mode, REG_PB<<16 | REG_PC);
+
+	return m_proc_mode & 0xf7;
+}
+
+void m37710_cpu_device::proc_mode_w(uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "proc_mode_w %x: Processor mode = %x\n", data, m_proc_mode);
+
+	m_proc_mode = data;
+}
+
+void m37710_cpu_device::watchdog_timer_w(uint8_t data)
+{
+	// TODO: reset watchdog timer (data is irrelevant)
+}
+
+uint8_t m37710_cpu_device::watchdog_freq_r()
+{
+	return m_watchdog_freq;
+}
+
+void m37710_cpu_device::watchdog_freq_w(uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "watchdog_freq_w %x: Watchdog timer frequency = %x\n", data, m_watchdog_freq);
+
+	m_watchdog_freq = data;
+}
+
+uint8_t m37710_cpu_device::waveform_mode_r()
+{
+	LOGMASKED(LOG_GENERAL, "waveform_mode_r: Waveform output mode (PC=%x)\n", REG_PB<<16 | REG_PC);
+
+	return 0;
+}
+
+void m37710_cpu_device::waveform_mode_w(uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "waveform_mode_w %x: Waveform output mode\n", data);
+}
+
+uint8_t m37710_cpu_device::rto_control_r()
+{
+	LOGMASKED(LOG_GENERAL, "rto_control_r: Real-time output control = %x (PC=%x)\n", m_rto_control, REG_PB<<16 | REG_PC);
+
+	return m_rto_control;
+}
+
+void m37710_cpu_device::rto_control_w(uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "rto_control_w %x: Real-time output control = %x\n", data, m_rto_control);
+
+	m_rto_control = data;
+}
+
+uint8_t m37710_cpu_device::dram_control_r()
+{
+	LOGMASKED(LOG_GENERAL, "dram_control_r: DRAM control = %x (PC=%x)\n", m_dram_control, REG_PB<<16 | REG_PC);
+
+	return m_dram_control;
+}
+
+void m37710_cpu_device::dram_control_w(uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "dram_control_w %x: DRAM control = %x\n", data, m_dram_control);
+
+	m_dram_control = data;
+}
+
+void m37710_cpu_device::refresh_timer_w(uint8_t data)
+{
+	LOGMASKED(LOG_GENERAL, "refresh_timer_w %x: Set refresh timer\n", data);
+}
+
+uint16_t m37710_cpu_device::dmac_control_r(offs_t offset, uint16_t mem_mask)
+{
+	return m_dmac_control & mem_mask;
+}
+
+void m37710_cpu_device::dmac_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_GENERAL, "dmac_control_w %04x & %04x: DMAC control = %04x\n", data, mem_mask, m_dmac_control);
+
+	m_dmac_control = (data & mem_mask) | (m_timer_reg[offset] & ~mem_mask);
+}
+
+uint8_t m37710_cpu_device::int_control_r(offs_t offset)
+{
+	assert(offset < M37710_MASKABLE_INTERRUPTS);
+	int level = m37710_int_reg_map[offset];
+
+	//LOGMASKED(LOG_INT, "int_control_r from %02x: %s IRQ ctrl = %x (PC=%x)\n", (int)offset + 0x6c, m37710_intnames[level], m_int_control[level], REG_PB<<16 | REG_PC);
+
+	uint8_t result = m_int_control[level];
+
+	// A-D IRQ not properly hooked up yet
+	if (level == M37710_LINE_ADC)
+		result |= 8;
+
+	return result;
+}
+
+void m37710_cpu_device::int_control_w(offs_t offset, uint8_t data)
+{
+	assert(offset < M37710_MASKABLE_INTERRUPTS);
+	int level = m37710_int_reg_map[offset];
+
+	LOGMASKED(LOG_INT, "int_control_w %x to %02x: %s IRQ ctrl = %x\n", data, (int)offset + 0x6c, m37710_intnames[level], m_int_control[level]);
+
+	m_int_control[level] = data;
+
+	//m37710_set_irq_line(offset, (data & 8) ? HOLD_LINE : CLEAR_LINE);
+	m37710i_update_irqs();
+
+	// level-sense interrupts are not implemented yet
+	if ((level == M37710_LINE_IRQ0 || level == M37710_LINE_IRQ1 || level == M37710_LINE_IRQ2) && BIT(data, 5))
+		logerror("error M37710: INT%d level-sense\n", M37710_LINE_IRQ0 - level);
 }
 
 const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes[4] =
@@ -744,14 +911,6 @@ const m37710_cpu_device::set_reg_func m37710_cpu_device::m37710i_set_reg[4] =
 	&m37710_cpu_device::m37710i_set_reg_M1X1,
 };
 
-const m37710_cpu_device::set_line_func m37710_cpu_device::m37710i_set_line[4] =
-{
-	&m37710_cpu_device::m37710i_set_line_M0X0,
-	&m37710_cpu_device::m37710i_set_line_M0X1,
-	&m37710_cpu_device::m37710i_set_line_M1X0,
-	&m37710_cpu_device::m37710i_set_line_M1X1,
-};
-
 const m37710_cpu_device::execute_func m37710_cpu_device::m37710i_execute[4] =
 {
 	&m37710_cpu_device::m37710i_execute_M0X0,
@@ -773,15 +932,16 @@ void m37710_cpu_device::m37710i_update_irqs()
 		if ((pending & (1 << curirq)))
 		{
 			// this IRQ is set
-			if (m37710_irq_levels[curirq])
+			if (curirq < M37710_MASKABLE_INTERRUPTS)
 			{
-				int control = m_m37710_regs[m37710_irq_levels[curirq]];
+				int control = m_int_control[curirq];
 				int thispri = control & 7;
 				// logerror("line %d set, level %x curpri %x IPL %x\n", curirq, thispri, curpri, m_ipl);
 				// it's maskable, check if the level works, also make sure it's acceptable for the current CPU level
 				if (!FLAG_I && thispri > curpri && thispri > m_ipl)
 				{
 					// mark us as the best candidate
+					LOGMASKED(LOG_INT, "%s interrupt active with priority %d (PC=%x)\n", m37710_intnames[curirq], thispri, REG_PB<<16 | REG_PC);
 					wantedIRQ = curirq;
 					curpri = thispri;
 				}
@@ -789,6 +949,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 			else
 			{
 				// non-maskable
+				LOGMASKED(LOG_INT, "%s interrupt active (PC=%x)\n", m37710_intnames[curirq], REG_PB<<16 | REG_PC);
 				wantedIRQ = curirq;
 				curpri = 7;
 				break;  // no more processing, NMIs always win
@@ -841,45 +1002,37 @@ void m37710_cpu_device::device_reset()
 
 	/* Reset internal registers */
 	// port direction
-	m_m37710_regs[0x04] = 0;
-	m_m37710_regs[0x05] = 0;
-	m_m37710_regs[0x08] = 0;
-	m_m37710_regs[0x09] = 0;
-	m_m37710_regs[0x0c] = 0;
-	m_m37710_regs[0x0d] = 0;
-	m_m37710_regs[0x10] = 0;
-	m_m37710_regs[0x11] = 0;
-	m_m37710_regs[0x14] = 0;
+	std::fill(std::begin(m_port_dir), std::end(m_port_dir), 0);
 
-	m_m37710_regs[0x1e] &= 7; // A-D control
-	m_m37710_regs[0x1f] |= 3; // A-D sweep
+	// A-D
+	m_ad_control &= 7;
+	m_ad_sweep = (m_ad_sweep & ~0xdc) | 3;
 
-	// UART
-	m_m37710_regs[0x30] = 0;
-	m_m37710_regs[0x38] = 0;
-	m_m37710_regs[0x34] = (m_m37710_regs[0x34] & 0xf0) | 8;
-	m_m37710_regs[0x3c] = (m_m37710_regs[0x3c] & 0xf0) | 8;
-	m_m37710_regs[0x35] = 2;
-	m_m37710_regs[0x3d] = 2;
-	m_m37710_regs[0x37]&= 1;
-	m_m37710_regs[0x3f]&= 1;
+	// UARTs
+	for (i = 0; i < 2; i++)
+	{
+		m_uart_mode[i] = 0;
+		m_uart_ctrl_reg0[i] = (m_uart_ctrl_reg0[i] & 0xe0) | 8;
+		m_uart_ctrl_reg1[i] = 2;
+	}
 
-	// timer
-	m_m37710_regs[0x40] = 0;
-	m_m37710_regs[0x42]&= 0x1f;
-	m_m37710_regs[0x44] = 0;
-	for (i = 0x56; i < 0x5e; i++)
-		m_m37710_regs[i] = 0;
+	// timers
+	m_count_start = 0;
+	m_one_shot_start &= ~0x1f;
+	m_up_down_reg = 0;
+	for (i = 0; i < 8; i++)
+		m_timer_mode[i] = 0;
 
-	m_m37710_regs[0x5e] = 0; // processor mode
-	m_m37710_regs[0x61]&= 1; // watchdog frequency
+	m_proc_mode = 0; // processor mode
+	m_watchdog_freq &= ~1; // watchdog timer frequency
+	m_rto_control &= ~3;
+	m_dram_control &= ~0x8f;
 
 	// interrupt control
-	m_m37710_regs[0x7d] &= 0x3f;
-	m_m37710_regs[0x7e] &= 0x3f;
-	m_m37710_regs[0x7f] &= 0x3f;
-	for (i = 0x70; i < 0x7d; i++)
-		m_m37710_regs[i] &= 0xf;
+	for (i = 0; i <= M37710_LINE_TIMERA0; i++)
+		m_int_control[i] &= ~0xf;
+	for (i = M37710_LINE_IRQ2; i <= M37710_LINE_IRQ0; i++)
+		m_int_control[i] &= ~0x3f;
 
 	/* Clear IPL, m, x, D and set I */
 	m_ipl = 0;
@@ -952,7 +1105,48 @@ void m37710_cpu_device::m37710_set_reg(int regnum, unsigned value)
 /* Set an interrupt line */
 void m37710_cpu_device::m37710_set_irq_line(int line, int state)
 {
-	(this->*m_set_line)(line, state);
+	switch(line)
+	{
+		// maskable interrupts
+		case M37710_LINE_ADC:
+		case M37710_LINE_UART1XMIT:
+		case M37710_LINE_UART1RECV:
+		case M37710_LINE_UART0XMIT:
+		case M37710_LINE_UART0RECV:
+		case M37710_LINE_TIMERB2:
+		case M37710_LINE_TIMERB1:
+		case M37710_LINE_TIMERB0:
+		case M37710_LINE_TIMERA4:
+		case M37710_LINE_TIMERA3:
+		case M37710_LINE_TIMERA2:
+		case M37710_LINE_TIMERA1:
+		case M37710_LINE_TIMERA0:
+		case M37710_LINE_IRQ2:
+		case M37710_LINE_IRQ1:
+		case M37710_LINE_IRQ0:
+		case M37710_LINE_DMA0:
+		case M37710_LINE_DMA1:
+		case M37710_LINE_DMA2:
+		case M37710_LINE_DMA3:
+			switch(state)
+			{
+				case CLEAR_LINE:
+					LINE_IRQ &= ~(1 << line);
+					m_int_control[line] &= ~8;
+					break;
+
+				case ASSERT_LINE:
+				case HOLD_LINE:
+					LINE_IRQ |= (1 << line);
+					m_int_control[line] |= 8;
+					break;
+
+				default: break;
+			}
+			break;
+
+		default: break;
+	}
 }
 
 bool m37710_cpu_device::get_m_flag() const
@@ -1009,9 +1203,23 @@ void m37710_cpu_device::device_start()
 	m_im3 = 0;
 	m_im4 = 0;
 	m_irq_delay = 0;
-	m_irq_level = 0;
 	m_stopped = 0;
-	memset(m_m37710_regs, 0, sizeof(m_m37710_regs));
+	std::fill(std::begin(m_port_regs), std::end(m_port_regs), 0);
+	std::fill(std::begin(m_port_dir), std::end(m_port_dir), 0);
+	m_ad_control = 0;
+	m_ad_sweep = 0;
+	std::fill(std::begin(m_uart_mode), std::end(m_uart_mode), 0);
+	std::fill(std::begin(m_uart_baud), std::end(m_uart_baud), 0);
+	std::fill(std::begin(m_uart_ctrl_reg0), std::end(m_uart_ctrl_reg0), 0);
+	std::fill(std::begin(m_uart_ctrl_reg1), std::end(m_uart_ctrl_reg1), 0);
+	m_count_start = 0;
+	m_one_shot_start = 0;
+	m_up_down_reg = 0;
+	std::fill(std::begin(m_timer_reg), std::end(m_timer_reg), 0);
+	std::fill(std::begin(m_timer_mode), std::end(m_timer_mode), 0);
+	m_proc_mode = 0;
+	m_watchdog_freq = 0;
+	std::fill(std::begin(m_int_control), std::end(m_int_control), 0);
 
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
@@ -1066,9 +1274,20 @@ void m37710_cpu_device::device_start()
 	save_item(NAME(m_im3));
 	save_item(NAME(m_im4));
 	save_item(NAME(m_irq_delay));
-	save_item(NAME(m_irq_level));
 	save_item(NAME(m_stopped));
-	save_item(NAME(m_m37710_regs));
+	save_item(NAME(m_port_regs));
+	save_item(NAME(m_port_dir));
+	save_item(NAME(m_ad_control));
+	save_item(NAME(m_ad_sweep));
+	save_item(NAME(m_uart_mode));
+	save_item(NAME(m_uart_baud));
+	save_item(NAME(m_uart_ctrl_reg0));
+	save_item(NAME(m_uart_ctrl_reg1));
+	save_item(NAME(m_count_start));
+	save_item(NAME(m_one_shot_start));
+	save_item(NAME(m_up_down_reg));
+	save_item(NAME(m_timer_reg));
+	save_item(NAME(m_timer_mode));
 	save_item(NAME(m_reload[0]));
 	save_item(NAME(m_reload[1]));
 	save_item(NAME(m_reload[2]));
@@ -1078,6 +1297,9 @@ void m37710_cpu_device::device_start()
 	save_item(NAME(m_reload[6]));
 	save_item(NAME(m_reload[7]));
 	save_item(NAME(m_timer_out));
+	save_item(NAME(m_proc_mode));
+	save_item(NAME(m_watchdog_freq));
+	save_item(NAME(m_int_control));
 
 	machine().save().register_postload(save_prepost_delegate(save_prepost_delegate(FUNC(m37710_cpu_device::m37710_restore_state), this)));
 
@@ -1230,7 +1452,6 @@ void m37710_cpu_device::m37710i_set_execution_mode(uint32_t mode)
 	m_opcodes89 = m37710i_opcodes3[mode];
 	FTABLE_GET_REG = m37710i_get_reg[mode];
 	FTABLE_SET_REG = m37710i_set_reg[mode];
-	FTABLE_SET_LINE = m37710i_set_line[mode];
 	m_execute = m37710i_execute[mode];
 }
 

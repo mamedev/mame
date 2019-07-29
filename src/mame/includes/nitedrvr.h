@@ -46,24 +46,19 @@ private:
 	DECLARE_READ8_MEMBER(nitedrvr_in1_r);
 	DECLARE_WRITE8_MEMBER(nitedrvr_out0_w);
 	DECLARE_WRITE8_MEMBER(nitedrvr_out1_w);
-	DECLARE_WRITE8_MEMBER(nitedrvr_videoram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_crash_toggle_callback);
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey);
 	void draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nitedrvr_steering();
 	void nitedrvr_map(address_map &map);
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_hvc;
-
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
 
 	/* input */
 	uint8_t m_gear;

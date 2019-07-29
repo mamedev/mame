@@ -6,12 +6,13 @@
 
 */
 
-#ifndef MAME_MACHINE_CHESSM_H
-#define MAME_MACHINE_CHESSM_H
+#ifndef MAME_MACHINE_CHESSMACHINE_H
+#define MAME_MACHINE_CHESSMACHINE_H
 
 #pragma once
 
 #include "cpu/arm/arm.h"
+#include "machine/timer.h"
 
 
 class chessmachine_device : public device_t
@@ -31,14 +32,16 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset_after_children() override { m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); }
+	virtual void device_reset_after_children() override { reset_w(1); }
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	required_device<arm_cpu_device> m_maincpu;
-	required_region_ptr<u8> m_bootstrap;
+	required_region_ptr<u32> m_bootstrap;
+	required_shared_ptr<u32> m_ram;
+	required_device<timer_device> m_disable_bootstrap;
 
 	devcb_write_line m_data_out;
 
@@ -46,8 +49,13 @@ private:
 	void sync0_callback(void *ptr, s32 param);
 	void sync1_callback(void *ptr, s32 param);
 
-	DECLARE_READ8_MEMBER(internal_r) { return m_latch[0]; }
-	DECLARE_WRITE8_MEMBER(internal_w) { m_latch[1] = data & 1; m_data_out(m_latch[1]); }
+	bool m_bootstrap_enabled;
+	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootstrap) { m_bootstrap_enabled = false; }
+	u32 disable_bootstrap_r();
+	u32 bootstrap_r(offs_t offset);
+
+	u8 internal_r() { return m_latch[0]; }
+	void internal_w(u8 data) { m_latch[1] = data & 1; m_data_out(m_latch[1]); }
 
 	void main_map(address_map &map);
 };
@@ -55,4 +63,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CHESSMACHINE, chessmachine_device)
 
-#endif // MAME_MACHINE_CHESSM_H
+#endif // MAME_MACHINE_CHESSMACHINE_H

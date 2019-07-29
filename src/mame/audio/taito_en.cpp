@@ -129,11 +129,11 @@ WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
 	if (offset > 1)
 	{
 		// TODO : ES5505 Volume control is correct?
-		m_ensoniq->set_output_gain(offset & 1, data / 100.0);
-		m_ensoniq->set_output_gain(2|(offset & 1), data / 100.0);
-		m_ensoniq->set_output_gain(4|(offset & 1), data / 100.0);
-		m_ensoniq->set_output_gain(6|(offset & 1), data / 100.0);
-		m_pump->set_output_gain(offset & 1, data / 100.0);
+		m_ensoniq->set_output_gain(offset & 1, data / 32.0);
+		m_ensoniq->set_output_gain(2|(offset & 1), data / 32.0);
+		m_ensoniq->set_output_gain(4|(offset & 1), data / 32.0);
+		m_ensoniq->set_output_gain(6|(offset & 1), data / 32.0);
+		m_pump->set_output_gain(offset & 1, data / 32.0);
 	}
 }
 

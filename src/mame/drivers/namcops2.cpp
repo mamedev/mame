@@ -69,14 +69,14 @@ Sukusuku Inufuku 2 / The Dog Luck 2............. 123456X  HM-IN2               C
 Super Dragon Ball Z / Chou Dragon Ball Z........ XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
 Taiko no Tatsujin 7............................. ------X  TK71 DVD0            DVD          NM00023   TK71 Ver.A             Namco 2005
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
-Taiko No Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
-Taiko No Tatsujin 10............................ XXXX56X  TK10100-1-NA-DVD0-A  DVD          NM00041   TK101001-NA-A          Namco 2007
-Taiko No Tatsujin 11............................ ------X *TK11100-1-NA-DVD0-A *DVD         *NM00044  *TK111001-NA-A          Namco 2008
-Taiko No Tatsujin 12............................ ------X *TK12-HA             *HDD         *NM00051  *TK121001-NA-A          Namco 2008
-Taiko No Tatsujin 12 More....................... ------X *TK12200-1-NA-HDD-A  *HDD         *NM00051  *TK121001-NA-A          Namco 2008
-Taiko No Tatsujin 13............................ ------X *TK1301-NA-HDD0-A1   *HDD         *NM00056  *TK1301-NA-A            Namco 2009
-Taiko No Tatsujin 14............................ ------X *T141001-NA-HDD0-A   *HDD         *NM00057  *TK141001-NA-A          Namco 2010
-Taiko No Tatsujin 14 More....................... ------X *T141002-NA-HDD0-A   *HDD         *NM00057  *TK141002-NA-A          Namco 2010
+Taiko no Tatsujin 9............................. XXXX56X  TK9100-1-NA-DVD0-A   DVD          NM00038   TK91001-NA-A           Namco 2006
+Taiko no Tatsujin 10............................ XXXX56X  TK10100-1-NA-DVD0-A  DVD          NM00041   TK101001-NA-A          Namco 2007
+Taiko no Tatsujin 11............................ ------X *TK11100-1-NA-DVD0-A *DVD         *NM00044  *TK111001-NA-A          Namco 2008
+Taiko no Tatsujin 12............................ ------X *TK12-HA             *HDD         *NM00051  *TK121001-NA-A          Namco 2008
+Taiko no Tatsujin 12 More....................... ------X *TK12200-1-NA-HDD-A  *HDD         *NM00051  *TK121001-NA-A          Namco 2008
+Taiko no Tatsujin 13............................ ------X *TK1301-NA-HDD0-A1   *HDD         *NM00056  *TK1301-NA-A            Namco 2009
+Taiko no Tatsujin 14............................ ------X *T141001-NA-HDD0-A   *HDD         *NM00057  *TK141001-NA-A          Namco 2010
+Taiko no Tatsujin 14 More....................... ------X *T141002-NA-HDD0-A   *HDD         *NM00057  *TK141002-NA-A          Namco 2010
 Technic Beat.................................... ------X *TNB1 DVD0           *DVD         *NM000??  *TNB1 Ver.A             Arika 2002
 Tekken 4........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.A             Namco 2001                    \
    "    ........................................ 1234XXX  TEF1 DVD0            DVD          NM00004   TEF1 Ver.C             Namco 2001                    |
@@ -1627,8 +1627,8 @@ GAME(2005, gundzaft,   sys246, system246, system246, namcops2_state, empty_init,
 GAME(2005, soulclb3,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
 GAME(2005, soulclb3a,soulclb3, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-B disc)", MACHINE_IS_SKELETON)
 GAME(2005, soulclb3b,soulclb3, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A key, NA-A disc)", MACHINE_IS_SKELETON)
-GAME(2005, taiko7,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 7 (TK71-NA-A)", MACHINE_IS_SKELETON)
-GAME(2006, taiko8,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
+GAME(2005, taiko7,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 7 (TK71-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, taiko8,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 8 (TK8100-1-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, qgundam,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2008, fateulc,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", MACHINE_IS_SKELETON)
 GAME(2008, fateulcb,  fateulc, system246, system246, namcops2_state, empty_init, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", MACHINE_IS_SKELETON)
@@ -1641,11 +1641,11 @@ GAME(2005, tekken51b,tekken51, system256, system246, namcops2_state, empty_init,
 GAME(2005, tekken5d,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 5 Dark Resurrection (TED1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2005, superdbz,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Banpresto / Spike", "Super Dragon Ball Z (DB1 Ver. B)", MACHINE_IS_SKELETON)
 GAME(2006, kinniku,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2006, taiko9,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2006, taiko9,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 9 (TK91001-NA-A)", MACHINE_IS_SKELETON)
 GAME(2006, yuyuhaku,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", MACHINE_IS_SKELETON)
 GAME(2006, zoidiexp,   sys246, system246, system246, namcops2_state, empty_init, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", MACHINE_IS_SKELETON)
 GAME(2007, kinniku2,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2007, taiko10,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
+GAME(2007, taiko10,    sys256, system256, system246, namcops2_state, empty_init, ROT0, "Namco", "Taiko no Tatsujin 10 (T101001-NA-A)", MACHINE_IS_SKELETON)
 GAME(2008, gdvsgd,     sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2009, gdvsgdnx,   sys256, system256, system246, namcops2_state, empty_init, ROT0, "Capcom / Bandai", "Gundam vs. Gundam Next", MACHINE_IS_SKELETON)
 

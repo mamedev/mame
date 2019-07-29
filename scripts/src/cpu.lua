@@ -2880,3 +2880,73 @@ if (CPUS["NS32000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ns32000/ns32000dasm.h")
 end
+
+--------------------------------------------------
+-- Elan RISC II series
+--@src/devices/cpu/rii/riscii.h,CPUS["RII"] = true
+--------------------------------------------------
+
+if (CPUS["RII"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/rii/riscii.cpp",
+		MAME_DIR .. "src/devices/cpu/rii/riscii.h",
+	}
+end
+
+if (CPUS["RII"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rii/riidasm.h")
+end
+
+--------------------------------------------------
+-- National Semiconductor BCP
+--@src/devices/cpu/bcp/dp8344.h,CPUS["BCP"] = true
+--------------------------------------------------
+
+if (CPUS["BCP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/bcp/dp8344.cpp",
+		MAME_DIR .. "src/devices/cpu/bcp/dp8344.h",
+	}
+end
+
+if (CPUS["BCP"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/bcp/bcpdasm.h")
+end
+
+--------------------------------------------------
+-- Fujitsu F2MC-16 series
+--@src/devices/cpu/f2mc16/f2mc16.h,CPUS["F2MC16"] = true
+--------------------------------------------------
+
+if (CPUS["F2MC16"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.h",
+	}
+end
+
+if (CPUS["F2MC16"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.h")
+end
+
+--------------------------------------------------
+-- National Semiconductor CR16B
+--@src/devices/cpu/cr16b/cr16bdasm.h,CPUS["CR16B"] = true
+--------------------------------------------------
+
+if (CPUS["CR16B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/cr16b/cr16b.cpp",
+		MAME_DIR .. "src/devices/cpu/cr16b/cr16b.h",
+	}
+end
+
+if (CPUS["CR16B"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.h")
+end

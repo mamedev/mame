@@ -230,7 +230,6 @@ TODO:
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -375,7 +374,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 		m_ipl = ((data>>1)&1);
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
 	}
-	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
+	//m_cass->change_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 	if (m_motor && !BIT(data, 7) && (elapsed_time > 100))
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -920,7 +919,6 @@ void spc1500_state::spc1500(machine_config &config)
 	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
 	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(spc1500_state::centronics_busy_w));
@@ -931,8 +929,9 @@ void spc1500_state::spc1500(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cass->set_formats(spc1000_cassette_formats);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED);
 	m_cass->set_interface("spc1500_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("spc1500_cass");

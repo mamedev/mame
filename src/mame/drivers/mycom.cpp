@@ -57,7 +57,6 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -549,15 +548,13 @@ void mycom_state::mycom(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
 
 	SPEAKER(config, "mono").front_center();
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-
 	SN76489(config, m_audio, 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	FLOPPY_CONNECTOR(config, "fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats).enable_sound(true);

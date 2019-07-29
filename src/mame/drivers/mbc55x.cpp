@@ -15,7 +15,6 @@
 #include "includes/mbc55x.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-//#include "bus/pc_joy/pc_joy.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "machine/i8087.h"
@@ -81,11 +80,16 @@ void mbc55x_state::iodecode_w(offs_t offset, uint8_t data)
 
 uint8_t mbc55x_state::game_io_r()
 {
-	return 0xff;
-}
+	u8 result = m_gameio->sw3_r();
+	result |= m_gameio->sw2_r() << 1;
+	result |= m_gameio->sw1_r() << 2;
+	result |= m_gameio->sw0_r() << 3;
 
-void mbc55x_state::game_io_w(uint8_t data)
-{
+	for (int i = 0; i < 4; i++)
+		if (machine().time().as_double() < m_ls123_clear_time[i])
+			result |= 1 << (4 + i);
+
+	return result;
 }
 
 uint8_t mbc55x_state::printer_status_r()
@@ -103,6 +107,26 @@ void mbc55x_state::printer_data_w(uint8_t data)
 	m_printer->write_data2(!BIT(data, 2));
 	m_printer->write_data1(!BIT(data, 1));
 	m_printer->write_data0(!BIT(data, 0));
+
+	m_gameio->an0_w(!BIT(data, 0));
+	m_gameio->an1_w(!BIT(data, 1));
+	m_gameio->an2_w(!BIT(data, 2));
+	m_gameio->an3_w(!BIT(data, 3));
+	m_gameio->an4_w(!BIT(data, 4));
+	m_gameio->strobe_w(!BIT(data, 5));
+
+	if (m_ls123_strobe != BIT(data, 7))
+	{
+		if (BIT(data, 7))
+		{
+			m_ls123_clear_time[0] = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
+			m_ls123_clear_time[1] = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
+			m_ls123_clear_time[2] = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
+			m_ls123_clear_time[3] = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
+		}
+
+		m_ls123_strobe = BIT(data, 7);
+	}
 }
 
 void mbc55x_state::disk_select_w(uint8_t data)
@@ -194,7 +218,14 @@ void mbc55x_state::machine_reset()
 
 void mbc55x_state::machine_start()
 {
+	// FIXME: values copied from apple2.cpp
+	m_x_calibration = attotime::from_nsec(10800).as_double();
+	m_y_calibration = attotime::from_nsec(10800).as_double();
+
 	m_printer_status = 0xff;
+
+	m_ls123_strobe = true;
+	std::fill(std::begin(m_ls123_clear_time), std::end(m_ls123_clear_time), 0.0);
 
 	m_kb_uart->write_cts(0);
 }
@@ -284,7 +315,6 @@ void mbc55x_state::mbc55x(machine_config &config)
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(mbc55x_state::game_io_r));
-	m_ppi->out_pa_callback().set(FUNC(mbc55x_state::game_io_w));
 	m_ppi->out_pb_callback().set(FUNC(mbc55x_state::printer_data_w));
 	m_ppi->in_pc_callback().set(FUNC(mbc55x_state::printer_status_r));
 	m_ppi->out_pc_callback().set(FUNC(mbc55x_state::disk_select_w));
@@ -330,6 +360,9 @@ void mbc55x_state::mbc55x(machine_config &config)
 	serial.cts_handler().set("sio", FUNC(i8251_device::write_cts));
 
 	INPUT_MERGER_ANY_HIGH(config, "sioint").output_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
+
+	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
+	m_gameio->set_sw_pullups(true); // 3300 ohm pullups to 5.0V on pins 2-4 and 16
 
 	CENTRONICS(config, m_printer, centronics_devices, nullptr);
 	m_printer->busy_handler().set(FUNC(mbc55x_state::printer_busy_w)).invert(); // LS14 Schmitt trigger

@@ -58,18 +58,19 @@ constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
 //  machine_static_info - constructors
 //-------------------------------------------------
 
-machine_static_info::machine_static_info(machine_config const &config)
-	: machine_static_info(config, nullptr)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config)
+	: machine_static_info(options, config, nullptr)
 {
 }
 
-machine_static_info::machine_static_info(machine_config const &config, ioport_list const &ports)
-	: machine_static_info(config, &ports)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const &ports)
+	: machine_static_info(options, config, &ports)
 {
 }
 
-machine_static_info::machine_static_info(machine_config const &config, ioport_list const *ports)
-	: m_flags(config.gamedrv().flags)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports)
+	: m_options(options)
+	, m_flags(config.gamedrv().flags)
 	, m_unemulated_features(config.gamedrv().type.unemulated_features())
 	, m_imperfect_features(config.gamedrv().type.imperfect_features())
 	, m_has_bioses(false)
@@ -154,7 +155,7 @@ rgb_t machine_static_info::warnings_color() const
 	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
 	else
-		return UI_BACKGROUND_COLOR;
+		return m_options.background_color();
 }
 
 
@@ -164,7 +165,7 @@ rgb_t machine_static_info::warnings_color() const
 //-------------------------------------------------
 
 machine_info::machine_info(running_machine &machine)
-	: machine_static_info(machine.config(), machine.ioport().ports())
+	: machine_static_info(dynamic_cast<mame_ui_manager *>(&machine.ui())->options(), machine.config(), machine.ioport().ports())
 	, m_machine(machine)
 {
 }

@@ -80,7 +80,6 @@ TODO
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mekd2.lh"
@@ -113,7 +112,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
 	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(mekd2_quik);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
@@ -303,7 +302,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
+QUICKLOAD_LOAD_MEMBER(mekd2_state::quickload_cb)
 {
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
@@ -379,9 +378,9 @@ void mekd2_state::mekd2(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	PIA6821(config, m_pia_s, 0);
@@ -409,7 +408,7 @@ void mekd2_state::mekd2(machine_config &config)
 	TIMER(config, "kansas_w").configure_periodic(FUNC(mekd2_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(mekd2_state::kansas_r), attotime::from_hz(40000));
 
-	QUICKLOAD(config, "quickload").set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(mekd2_state, mekd2_quik), this), "d2", attotime::from_seconds(1));
+	QUICKLOAD(config, "quickload", "d2", attotime::from_seconds(1)).set_load_callback(FUNC(mekd2_state::quickload_cb), this);
 }
 
 /***********************************************************

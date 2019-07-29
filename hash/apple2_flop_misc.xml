@@ -45,6 +45,75 @@
 		</part>
 	</software>
 
+	<software name="apwrks12">
+		<description>AppleWorks (Version 1.2, USA)</description>
+		<year>1983</year>
+		<publisher>Apple Computer, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Startup"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks 1.2 startup.dsk" size="143360" crc="0cdc2045" sha1="a0505b4af4502d2de421f1d5aaa3968582f19dad" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks 1.2 program.dsk" size="143360" crc="ee501dac" sha1="f0b9b7dcec03d88c82b6a8de69f6d4fdee8ebc07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apwrks13">
+		<description>AppleWorks (Version 1.3, USA)</description>
+		<year>1985</year>
+		<publisher>Apple Computer, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks_v13boot.dsk" size="143360" crc="535eef61" sha1="bdebfc3adfb1e5341fd77826040f2155e246ef5b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks_v13programdisk.dsk" size="143360" crc="29748ff9" sha1="7f9e86ea50343082ad6d2bb608e5da4befd48a9c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apwrks20">
+		<description>AppleWorks (Version 2.0, USA)</description>
+		<year>1986</year>
+		<publisher>Apple Computer, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks 2.0 boot disk.po" size="143360" crc="a1a7d2c4" sha1="f45a436399f83d5213604ab395978e7cc726aa91" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks 2.0 program disk.po" size="143360" crc="4142bffd" sha1="088e69ddb3e9821fc7d20c7cfcd241636467bc89" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Sample disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks 2.0 sample disk 1.po" size="143360" crc="f20d113e" sha1="d057ad439f0e33e035194b08df1ce62832f15bef" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Sample disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="appleworks 2.0 sample disk 2.po" size="143360" crc="ae3e43a7" sha1="1014aed563546747844702216bed53bb958d69da" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amdos35">
 		<description>AmDOS (v3.5)</description>
 		<year>1986</year>
@@ -750,6 +819,32 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="anti-m-v1.3-2019-04-12.dsk" size="143360" crc="50a6e8dc" sha1="ebf0ac03e0a1bb9da51403140dc0613a08e2efd3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antim14">
+		<description>Anti-M (version 1.4)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-05-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.4-2019-05-24.dsk" size="143360" crc="8be87f85" sha1="e99d94d7b59f45aede9794089702e1d52f329394" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antim15">
+		<description>Anti-M (version 1.5)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-05-24"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.5-2019-06-11.dsk" size="143360" crc="bacef478" sha1="826df7cb304ce5286cd1c2805fac888356898185" />
 			</dataarea>
 		</part>
 	</software>

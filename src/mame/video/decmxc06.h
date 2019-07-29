@@ -26,8 +26,17 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	struct sprite_t
+	{
+		int height;
+		u32 code[8], colour;
+		int x[8], y[8];
+		bool flipx, flipy;
+		u32 pri_mask;
+	};
 	decmxc06_colpri_cb_delegate m_colpri_cb;
 	bool m_flip_screen;
+	std::unique_ptr<struct sprite_t[]> m_spritelist;
 };
 
 DECLARE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device)

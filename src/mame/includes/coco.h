@@ -23,7 +23,6 @@
 #include "machine/ram.h"
 #include "machine/bankdev.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
 #include "screen.h"
 
 
@@ -159,7 +158,7 @@ protected:
 	ram_device &ram() { return *m_ram; }
 
 	// miscellaneous
-	virtual void update_keyboard_input(uint8_t value, uint8_t z);
+	virtual void update_keyboard_input(uint8_t value);
 	virtual void cart_w(bool state);
 	virtual void update_cart_base(uint8_t *cart_base) { };
 
@@ -236,7 +235,6 @@ protected:
 	required_device<pia6821_device> m_pia_1;
 	required_device<dac_byte_interface> m_dac;
 	required_device<dac_1bit_device> m_sbs;
-	required_device<wave_device> m_wave;
 	optional_device<screen_device> m_screen;
 	required_device<cococart_slot_device> m_cococart;
 	required_device<ram_device> m_ram;

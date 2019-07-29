@@ -9,41 +9,6 @@
 #ifndef MAME_EMU_DISLOT_H
 #define MAME_EMU_DISLOT_H
 
-//**************************************************************************
-//  LEGACY MACROS
-//**************************************************************************
-
-#define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_option, _fixed) MCFG_SLOT_OPTION_RESET _slot_intf(dynamic_cast<device_slot_interface &>(*device)); MCFG_SLOT_DEFAULT_OPTION(_def_option) MCFG_SLOT_FIXED(_fixed)
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define MCFG_SLOT_FIXED(_fixed) \
-	dynamic_cast<device_slot_interface &>(*device).set_fixed(_fixed);
-
-#define MCFG_SLOT_DEFAULT_OPTION(_option) \
-	dynamic_cast<device_slot_interface &>(*device).set_default_option(_option);
-
-#define MCFG_SLOT_OPTION_RESET \
-	dynamic_cast<device_slot_interface &>(*device).option_reset();
-
-#define MCFG_SLOT_OPTION_ADD(_option, _devtype) \
-	dynamic_cast<device_slot_interface &>(*device).option_add(_option, _devtype);
-
-#define MCFG_SLOT_OPTION_DEFAULT_BIOS(_option, _default_bios) \
-	dynamic_cast<device_slot_interface &>(*device).set_option_default_bios(_option, _default_bios);
-
-#define MCFG_SLOT_OPTION_MACHINE_CONFIG(_option, _machine_config_name) \
-	dynamic_cast<device_slot_interface &>(*device).set_option_machine_config(_option, _machine_config_name);
-
-#define MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS(_option, _dev_inp_def) \
-	dynamic_cast<device_slot_interface &>(*device).set_option_device_input_defaults(_option, DEVICE_INPUT_DEFAULTS_NAME(_dev_inp_def));
-
-#define MCFG_SLOT_OPTION_CLOCK(_option, _clock) \
-	dynamic_cast<device_slot_interface &>(*device).set_option_clock(_option, _clock);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

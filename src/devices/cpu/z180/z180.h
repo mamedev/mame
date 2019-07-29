@@ -39,70 +39,47 @@ enum
 	Z180_DC1,
 	Z180_DC2,
 	Z180_DC3,
-	Z180_CNTLA0,    /* 00 ASCI control register A ch 0 */
-	Z180_CNTLA1,    /* 01 ASCI control register A ch 1 */
-	Z180_CNTLB0,    /* 02 ASCI control register B ch 0 */
-	Z180_CNTLB1,    /* 03 ASCI control register B ch 1 */
-	Z180_STAT0,     /* 04 ASCI status register 0 */
-	Z180_STAT1,     /* 05 ASCI status register 1 */
-	Z180_TDR0,      /* 06 ASCI transmit data register 0 */
-	Z180_TDR1,      /* 07 ASCI transmit data register 1 */
-	Z180_RDR0,      /* 08 ASCI receive data register 0 */
-	Z180_RDR1,      /* 09 ASCI receive data register 1 */
-	Z180_CNTR,      /* 0a CSI/O control/status register */
-	Z180_TRDR,      /* 0b CSI/O transmit/receive register */
-	Z180_TMDR0L,    /* 0c TIMER data register ch 0 L */
-	Z180_TMDR0H,    /* 0d TIMER data register ch 0 H */
-	Z180_RLDR0L,    /* 0e TIMER reload register ch 0 L */
-	Z180_RLDR0H,    /* 0f TIMER reload register ch 0 H */
-	Z180_TCR,       /* 10 TIMER control register */
-	Z180_IO11,      /* 11 reserved */
-	Z180_ASEXT0,    /* 12 (Z8S180/Z8L180) ASCI extension control register 0 */
-	Z180_ASEXT1,    /* 13 (Z8S180/Z8L180) ASCI extension control register 0 */
-	Z180_TMDR1L,    /* 14 TIMER data register ch 1 L */
-	Z180_TMDR1H,    /* 15 TIMER data register ch 1 H */
-	Z180_RLDR1L,    /* 16 TIMER reload register ch 1 L */
-	Z180_RLDR1H,    /* 17 TIMER reload register ch 1 H */
-	Z180_FRC,       /* 18 free running counter */
-	Z180_IO19,      /* 19 reserved */
-	Z180_ASTC0L,    /* 1a ASCI time constant ch 0 L */
-	Z180_ASTC0H,    /* 1b ASCI time constant ch 0 H */
-	Z180_ASTC1L,    /* 1c ASCI time constant ch 1 L */
-	Z180_ASTC1H,    /* 1d ASCI time constant ch 1 H */
-	Z180_CMR,       /* 1e clock multiplier */
-	Z180_CCR,       /* 1f chip control register */
-	Z180_SAR0L,     /* 20 DMA source address register ch 0 L */
-	Z180_SAR0H,     /* 21 DMA source address register ch 0 H */
-	Z180_SAR0B,     /* 22 DMA source address register ch 0 B */
-	Z180_DAR0L,     /* 23 DMA destination address register ch 0 L */
-	Z180_DAR0H,     /* 24 DMA destination address register ch 0 H */
-	Z180_DAR0B,     /* 25 DMA destination address register ch 0 B */
-	Z180_BCR0L,     /* 26 DMA byte count register ch 0 L */
-	Z180_BCR0H,     /* 27 DMA byte count register ch 0 H */
-	Z180_MAR1L,     /* 28 DMA memory address register ch 1 L */
-	Z180_MAR1H,     /* 29 DMA memory address register ch 1 H */
-	Z180_MAR1B,     /* 2a DMA memory address register ch 1 B */
-	Z180_IAR1L,     /* 2b DMA I/O address register ch 1 L */
-	Z180_IAR1H,     /* 2c DMA I/O address register ch 1 H */
-	Z180_IAR1B,     /* 2d (Z8S180/Z8L180) DMA I/O address register ch 1 B */
-	Z180_BCR1L,     /* 2e DMA byte count register ch 1 L */
-	Z180_BCR1H,     /* 2f DMA byte count register ch 1 H */
-	Z180_DSTAT,     /* 30 DMA status register */
-	Z180_DMODE,     /* 31 DMA mode register */
-	Z180_DCNTL,     /* 32 DMA/WAIT control register */
-	Z180_IL,        /* 33 INT vector low register */
-	Z180_ITC,       /* 34 INT/TRAP control register */
-	Z180_IO35,      /* 35 reserved */
-	Z180_RCR,       /* 36 refresh control register */
-	Z180_IO37,      /* 37 reserved */
-	Z180_CBR,       /* 38 MMU common base register */
-	Z180_BBR,       /* 39 MMU bank base register */
-	Z180_CBAR,      /* 3a MMU common/bank area register */
-	Z180_IO3B,      /* 3b reserved */
-	Z180_IO3C,      /* 3c reserved */
-	Z180_IO3D,      /* 3d reserved */
-	Z180_OMCR,      /* 3e operation mode control register */
-	Z180_IOCR,      /* 3f I/O control register */
+	Z180_CNTLA0,
+	Z180_CNTLA1,
+	Z180_CNTLB0,
+	Z180_CNTLB1,
+	Z180_STAT0,
+	Z180_STAT1,
+	Z180_TDR0,
+	Z180_TDR1,
+	Z180_RDR0,
+	Z180_RDR1,
+	Z180_CNTR,
+	Z180_TRDR,
+	Z180_TMDR0,
+	Z180_TMDR1,
+	Z180_RLDR0,
+	Z180_RLDR1,
+	Z180_TCR,
+	Z180_ASEXT0,
+	Z180_ASEXT1,
+	Z180_FRC,
+	Z180_ASTC0,
+	Z180_ASTC1,
+	Z180_CMR,
+	Z180_CCR,
+	Z180_SAR0,
+	Z180_DAR0,
+	Z180_BCR0,
+	Z180_MAR1,
+	Z180_IAR1,
+	Z180_BCR1,
+	Z180_DSTAT,
+	Z180_DMODE,
+	Z180_DCNTL,
+	Z180_IL,
+	Z180_ITC,
+	Z180_RCR,
+	Z180_CBR,
+	Z180_BBR,
+	Z180_CBAR,
+	Z180_OMCR,
+	Z180_IOCR,
 	Z180_IOLINES    /* read/write I/O lines */
 };
 
@@ -162,30 +139,63 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	int memory_wait_states() const { return (m_dcntl & 0xc0) >> 6; }
+	int io_wait_states() const { return (m_dcntl & 0x30) == 0 ? 0 : ((m_dcntl & 0x30) >> 4) + 1; }
+	bool is_internal_io_address(uint16_t port) const { return ((port ^ m_iocr) & 0xffc0) == 0; }
+
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 	address_space_config m_decrypted_opcodes_config;
 
-	PAIR    m_PREPC,m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_IX,m_IY;
-	PAIR    m_AF2,m_BC2,m_DE2,m_HL2;
+	PAIR      m_PREPC,m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_IX,m_IY;
+	PAIR      m_AF2,m_BC2,m_DE2,m_HL2;
 	uint8_t   m_R,m_R2,m_IFF1,m_IFF2,m_HALT,m_IM,m_I;
-	uint8_t   m_tmdr_latch;                     /* flag latched TMDR0H, TMDR1H values */
-	uint8_t   m_read_tcr_tmdr[2];               /* flag to indicate that TCR or TMDR was read */
-	uint32_t  m_iol;                            /* I/O line status bits */
-	uint8_t   m_io[64];                         /* 64 internal 8 bit registers */
-	offs_t  m_mmu[16];                        /* MMU address translation */
-	uint8_t   m_tmdrh[2];                       /* latched TMDR0H and TMDR1H values */
-	uint16_t  m_tmdr_value[2];                  /* TMDR values used byt PRT0 and PRT1 as down counter */
-	uint8_t   m_tif[2];                         /* TIF0 and TIF1 values */
-	uint8_t   m_nmi_state;                      /* nmi line state */
-	uint8_t   m_nmi_pending;                    /* nmi pending */
-	uint8_t   m_irq_state[3];                   /* irq line states (INT0,INT1,INT2) */
-	uint8_t   m_int_pending[11 + 1];  /* interrupt pending */
-	uint8_t   m_after_EI;                       /* are we in the EI shadow? */
+	uint8_t   m_tmdr_latch;                     // flag latched TMDR0H, TMDR1H values
+	uint8_t   m_read_tcr_tmdr[2];               // flag to indicate that TCR or TMDR was read
+	uint32_t  m_iol;                            // I/O line status bits
+	uint8_t   m_asci_cntla[2];                  // ASCI control register A ch 0-1
+	uint8_t   m_asci_cntlb[2];                  // ASCI control register B ch 0-1
+	uint8_t   m_asci_stat[2];                   // ASCI status register 0-1
+	uint8_t   m_asci_tdr[2];                    // ASCI transmit data register 0-1
+	uint8_t   m_asci_rdr[2];                    // ASCI receive data register 0-1
+	uint8_t   m_asci_ext[2];                    // (Z8S180/Z8L180) ASCI extension control register 0-1
+	PAIR16    m_asci_tc[2];                     // (Z8S180/Z8L180) ASCI time constant ch 0-1
+	uint8_t   m_csio_cntr;                      // CSI/O control/status register
+	uint8_t   m_csio_trdr;                      // CSI/O transmit/receive register
+	PAIR16    m_tmdr[2];                        // TIMER data register ch 0-1
+	PAIR16    m_rldr[2];                        // TIMER reload register ch 0-1
+	uint8_t   m_tcr;                            // TIMER control register
+	uint8_t   m_frc;                            // free running counter
+	uint8_t   m_cmr;                            // (Z8S180/Z8L180) clock multiplier
+	uint8_t   m_ccr;                            // (Z8S180/Z8L180) chip control register
+	PAIR      m_dma_sar0;                       // DMA source address register ch 0
+	PAIR      m_dma_dar0;                       // DMA destination address register ch 0
+	PAIR16    m_dma_bcr[2];                     // DMA byte register ch 0-1
+	PAIR      m_dma_mar1;                       // DMA memory address register ch 1
+	PAIR      m_dma_iar1;                       // DMA I/O address register ch 1
+	uint8_t   m_dstat;                          // DMA status register
+	uint8_t   m_dmode;                          // DMA mode register
+	uint8_t   m_dcntl;                          // DMA/WAIT control register
+	uint8_t   m_il;                             // INT vector low register
+	uint8_t   m_itc;                            // INT/TRAP control register
+	uint8_t   m_rcr;                            // refresh control register
+	uint8_t   m_mmu_cbr;                        // MMU common base register
+	uint8_t   m_mmu_bbr;                        // MMU bank base register
+	uint8_t   m_mmu_cbar;                       // MMU common/bank area register
+	uint8_t   m_omcr;                           // operation mode control register
+	uint8_t   m_iocr;                           // I/O control register
+	offs_t    m_mmu[16];                        // MMU address translation
+	uint8_t   m_tmdrh[2];                       // latched TMDR0H and TMDR1H values
+	uint16_t  m_tmdr_value[2];                  // TMDR values used byt PRT0 and PRT1 as down counter
+	uint8_t   m_nmi_state;                      // NMI line state
+	uint8_t   m_nmi_pending;                    // NMI pending
+	uint8_t   m_irq_state[3];                   // IRQ line states (INT0,INT1,INT2)
+	uint8_t   m_int_pending[11 + 1];            // interrupt pending
+	uint8_t   m_after_EI;                       // are we in the EI shadow?
 	uint32_t  m_ea;
-	uint8_t   m_timer_cnt;                      /* timer counter / divide by 20 */
-	uint8_t   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
-	uint8_t   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
+	uint8_t   m_timer_cnt;                      // timer counter / divide by 20
+	uint8_t   m_dma0_cnt;                       // DMA0 counter / divide by 20
+	uint8_t   m_dma1_cnt;                       // DMA1 counter / divide by 20
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_oprogram;

@@ -6,11 +6,11 @@
     Core implementation for the portable Jaguar DSP emulator.
     Written by Aaron Giles
 
-	TODO:
-	- Implement pipeline, actually instruction cycles;
-	  Currently implementation is similar to single stepping
-	  with single cycle
-	- Implement and acknowlodge remain registers
+    TODO:
+    - Implement pipeline, actually instruction cycles;
+      Currently implementation is similar to single stepping
+      with single cycle
+    - Implement and acknowlodge remain registers
 
 ***************************************************************************/
 
@@ -29,26 +29,29 @@
     CONSTANTS
 ***************************************************************************/
 
-static constexpr u32 ZFLAG       = 0x00001;
-static constexpr u32 CFLAG       = 0x00002;
-static constexpr u32 NFLAG       = 0x00004;
-static constexpr u32 IFLAG       = 0x00008;
-static constexpr u32 EINT0FLAG   = 0x00010;
-static constexpr u32 EINT1FLAG   = 0x00020;
-static constexpr u32 EINT2FLAG   = 0x00040;
-static constexpr u32 EINT3FLAG   = 0x00080;
-static constexpr u32 EINT4FLAG   = 0x00100;
-static constexpr u32 EINT04FLAGS = EINT0FLAG | EINT1FLAG | EINT2FLAG | EINT3FLAG | EINT4FLAG;
-static constexpr u32 CINT0FLAG   = 0x00200;
-static constexpr u32 CINT1FLAG   = 0x00400;
-static constexpr u32 CINT2FLAG   = 0x00800;
-static constexpr u32 CINT3FLAG   = 0x01000;
-static constexpr u32 CINT4FLAG   = 0x02000;
-static constexpr u32 CINT04FLAGS = CINT0FLAG | CINT1FLAG | CINT2FLAG | CINT3FLAG | CINT4FLAG;
-static constexpr u32 RPAGEFLAG   = 0x04000;
-static constexpr u32 DMAFLAG     = 0x08000;
-static constexpr u32 EINT5FLAG   = 0x10000;     /* DSP only */
-static constexpr u32 CINT5FLAG   = 0x20000;     /* DSP only */
+enum : u32
+{
+	ZFLAG       = 0x00001,
+	CFLAG       = 0x00002,
+	NFLAG       = 0x00004,
+	IFLAG       = 0x00008,
+	EINT0FLAG   = 0x00010,
+	EINT1FLAG   = 0x00020,
+	EINT2FLAG   = 0x00040,
+	EINT3FLAG   = 0x00080,
+	EINT4FLAG   = 0x00100,
+	EINT04FLAGS = EINT0FLAG | EINT1FLAG | EINT2FLAG | EINT3FLAG | EINT4FLAG,
+	CINT0FLAG   = 0x00200,
+	CINT1FLAG   = 0x00400,
+	CINT2FLAG   = 0x00800,
+	CINT3FLAG   = 0x01000,
+	CINT4FLAG   = 0x02000,
+	CINT04FLAGS = CINT0FLAG | CINT1FLAG | CINT2FLAG | CINT3FLAG | CINT4FLAG,
+	RPAGEFLAG   = 0x04000,
+	DMAFLAG     = 0x08000,
+	EINT5FLAG   = 0x10000,      // DSP only
+	CINT5FLAG   = 0x20000       // DSP only
+};
 
 inline void jaguar_cpu_device::CLR_Z()                          { m_ctrl[G_FLAGS] &= ~ZFLAG; }
 inline void jaguar_cpu_device::CLR_ZN()                         { m_ctrl[G_FLAGS] &= ~(ZFLAG | NFLAG); }

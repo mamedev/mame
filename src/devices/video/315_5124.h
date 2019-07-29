@@ -36,7 +36,7 @@ public:
 	static constexpr unsigned WIDTH                      = 342;    /* 342 pixels */
 	static constexpr unsigned HEIGHT_NTSC                = 262;    /* 262 lines */
 	static constexpr unsigned HEIGHT_PAL                 = 313;    /* 313 lines */
-	static constexpr unsigned LBORDER_START              = 9 + 2 + 14 + 8;
+	static constexpr unsigned LBORDER_START              = 26 + 2 + 14 + 8;
 	static constexpr unsigned LBORDER_WIDTH              = 13;     /* 13 pixels */
 	static constexpr unsigned RBORDER_WIDTH              = 15;     /* 15 pixels */
 	static constexpr unsigned TBORDER_START              = 3 + 13;
@@ -57,12 +57,14 @@ public:
 
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
-	auto irq() { return m_int_cb.bind(); }
-	auto csync() { return m_csync_cb.bind(); }
-	auto pause() { return m_pause_cb.bind(); }
+	auto vblank() { return m_vblank_cb.bind(); }
+	auto n_csync() { return m_n_csync_cb.bind(); }
+	auto n_int() { return m_n_int_cb.bind(); }
+	auto n_nmi() { return m_n_nmi_cb.bind(); }
 
 	void psg_w(u8 data) { m_snsnd->write(data); }
 	void psg_stereo_w(u8 data) { m_snsnd->stereo_w(data); }
+	void n_nmi_in_write(int state) { m_n_nmi_in_state = state; } /* /NMI-IN line input, controls the /NMI state */
 	u8 data_read();
 	void data_write(u8 data);
 	u8 control_read();
@@ -70,8 +72,8 @@ public:
 	u8 vcount_read();
 	u8 hcount_read();
 
-	void hcount_latch() { hcount_latch_at_hpos(screen().hpos()); };
-	void hcount_latch_at_hpos(int hpos);
+	void hcount_latch();
+	bool hcount_latched() { return m_hcounter_latched; }
 
 	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; };
 	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
@@ -102,6 +104,7 @@ protected:
 
 	void set_display_settings();
 	void set_frame_timing();
+	virtual void vblank_end(int vpos);
 	virtual void update_palette();
 	virtual void write_memory(u8 data);
 	virtual void cram_write(u8 data);
@@ -137,6 +140,7 @@ protected:
 	const u8         m_cram_size;                /* CRAM size */
 	u8               m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
 	bool             m_cram_dirty;               /* Have there been any changes to the CRAM area */
+	bool             m_hcounter_latched;
 	bool             m_hint_occurred;
 	bool             m_pending_hint;
 	bool             m_pending_control_write;
@@ -144,7 +148,9 @@ protected:
 	u8               m_buffer;
 	u8               m_control_write_data_latch;
 	bool             m_sega315_5124_compatibility_mode;    /* when true, GG VDP behaves as SMS VDP */
-	int              m_irq_state;                /* The status of the IRQ line of the VDP */
+	int              m_n_int_state;                /* The status of the /INT line of the VDP */
+	int              m_n_nmi_state;                /* The status of the /NMI line of the VDP */
+	int              m_n_nmi_in_state;             /* The status of the /NMI-IN line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	int              m_draw_time;
@@ -170,9 +176,10 @@ protected:
 	int              m_max_sprite_zoom_vcount;
 	int              m_current_palette[32];
 	bool             m_is_pal;             /* false = NTSC, true = PAL */
-	devcb_write_line m_int_cb;       /* Interrupt callback function */
-	devcb_write_line m_csync_cb;     /* C-Sync callback function */
-	devcb_write_line m_pause_cb;     /* Pause callback function */
+	devcb_write_line m_vblank_cb;      /* VBlank line callback function */
+	devcb_write_line m_n_csync_cb;     /* /C-SYNC line callback function */
+	devcb_write_line m_n_int_cb;       /* /INT (Interrupt) line callback function */
+	devcb_write_line m_n_nmi_cb;       /* /NMI (Non-Maskable Interrupt) line callback function */
 	emu_timer        *m_display_timer;
 	emu_timer        *m_hint_timer;
 	emu_timer        *m_vint_timer;
@@ -227,6 +234,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void vblank_end(int vpos) override;
 	virtual void update_palette() override;
 	virtual void cram_write(u8 data) override;
 	virtual void blit_scanline(int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line) override;

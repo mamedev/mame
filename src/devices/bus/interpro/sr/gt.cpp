@@ -224,7 +224,7 @@ void gtdb_device::map(address_map &map)
 
 	// Note: FDMDISK GTII register ODT gives a different serial mapping, but does
 	// not seem to be correct; the mapping here matches software usage elsewhere.
-	map(0x210, 0x21f).rw(m_scc, FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
+	map(0x210, 0x21f).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask32(0x000000ff);
 
 	map(0x300, 0x303).r(FUNC(gtdb_device::fifo_control_r));
 

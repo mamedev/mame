@@ -16,7 +16,7 @@
 #include "machine/nscsi_bus.h"
 
 
-class ncr5380n_device : public nscsi_device
+class ncr5380n_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

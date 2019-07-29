@@ -1635,7 +1635,7 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 	{
 		case 0x11:
 			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X\n", m_pc, data);
-			handle_eoi(0x8000);
+			handle_eoi(data);
 			update_interrupt_state();
 			break;
 

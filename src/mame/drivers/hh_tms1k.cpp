@@ -10,12 +10,13 @@
   - microvsn: Milton Bradley MicroVision
 
   (contd.) hh_tms1k child drivers:
-  - ticalc1x: TI TMS1K-based calculators
   - tispellb: TI Spelling B series gen. 1
   - tispeak: TI Speak & Spell series gen. 1
 
   Let's use this driver for a list of known devices and their serials,
   excluding most of TI's own products(they normally didn't use "MP" codes).
+  For TI's calculators, a comprehensive list of MCU serials is available
+  on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -107,7 +108,7 @@
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
  @MP4486A  TMS1000C  1983, Vulcan XL 25
- *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat
+ *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
@@ -136,13 +137,14 @@
     electronically (mpla is usually the default, opla is often custom)
   - unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
-  - some of the games rely on the fact that faster/longer strobed leds appear brighter,
-    eg. tc4/h2hfootb(offense), bankshot(cue ball), f3in1(ball), ...
+  - fake-press ON button when emulation starts for machines that have it on the button matrix
+    (doesn't look like any relies on it though)
   - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
     Possibly BTANB, players are expected to quickly press the "First Up" button after the alarm sound.
   - bship discrete sound, netlist is documented
   - finish bshipb SN76477 sound
   - improve elecbowl driver
+  - tithermos temperature sensor comparator (right now just the digital clock works)
   - is alphie(patent) the same as the final version?
 
 ***************************************************************************/
@@ -151,6 +153,8 @@
 #include "includes/hh_tms1k.h"
 
 #include "machine/tms1024.h"
+#include "machine/clock.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
@@ -173,6 +177,7 @@
 #include "bigtrak.lh"
 #include "bship.lh" // clickable
 #include "cmsport.lh"
+#include "cmulti8.lh"
 #include "cnbaskb.lh"
 #include "cnfball.lh"
 #include "cnfball2.lh"
@@ -180,6 +185,7 @@
 #include "comp4.lh" // clickable
 #include "copycat.lh" // clickable
 #include "copycatm2.lh" // clickable
+#include "dataman.lh"
 #include "ditto.lh" // clickable
 #include "cqback.lh"
 #include "ebball.lh"
@@ -207,6 +213,7 @@
 #include "lostreas.lh" // clickable
 #include "matchnum.lh" // clickable
 #include "mathmagi.lh"
+#include "mathmarv.lh"
 #include "mbdtower.lh" // clickable
 #include "mdndclab.lh" // clickable
 #include "merlin.lh" // clickable
@@ -227,7 +234,14 @@
 #include "tc4.lh"
 #include "tcfball.lh"
 #include "tcfballa.lh"
+#include "ti1250.lh"
+#include "ti1270.lh"
+#include "ti25503.lh"
+#include "ti30.lh"
 #include "timaze.lh"
+#include "tisr16.lh"
+#include "tithermos.lh"
+#include "wizatron.lh"
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
@@ -239,33 +253,17 @@
 void hh_tms1k_state::machine_start()
 {
 	// resolve handlers
-	m_out_x.resolve();
-	m_out_a.resolve();
-	m_out_digit.resolve();
+	m_out_power.resolve();
 
 	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-
 	m_o = 0;
 	m_r = 0;
 	m_inp_mux = 0;
-	m_power_led = false;
 	m_power_on = false;
 	m_grid = 0;
 	m_plate = 0;
 
 	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	/* save_item(NAME(m_power_led)); */ // don't save!
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
 	save_item(NAME(m_inp_mux));
@@ -276,7 +274,7 @@ void hh_tms1k_state::machine_start()
 
 void hh_tms1k_state::machine_reset()
 {
-	m_power_on = true;
+	set_power(true);
 }
 
 
@@ -287,87 +285,6 @@ void hh_tms1k_state::machine_reset()
 
 ***************************************************************************/
 
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void hh_tms1k_state::display_update()
-{
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		u32 active_state = 0;
-
-		for (int x = 0; x <= m_display_maxx; x++)
-		{
-			// turn on powered segments
-			if (m_power_on && m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
-
-			// determine active state
-			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state |= (ds << x);
-
-			// output to y.x, or y.a when always-on
-			if (x != m_display_maxx)
-				m_out_x[y][x] = ds;
-			else
-				m_out_a[y] = ds;
-		}
-
-		// output to digity
-		if (m_display_segmask[y] != 0)
-			m_out_digit[y] = active_state & m_display_segmask[y];
-	}
-
-	// output optional power led
-	if (m_power_led != m_power_on)
-	{
-		m_power_led = m_power_on;
-		output().set_value("power_led", m_power_led ? 1 : 0);
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x <= m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-
-	display_update();
-}
-
-void hh_tms1k_state::set_display_size(int maxx, int maxy)
-{
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-}
-
-void hh_tms1k_state::set_display_segmask(u32 digits, u32 mask)
-{
-	// set a segment mask per selected digit, but leave unselected ones alone
-	for (int i = 0; i < 0x20; i++)
-	{
-		if (digits & 1)
-			m_display_segmask[i] = mask;
-		digits >>= 1;
-	}
-}
-
-void hh_tms1k_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
-{
-	set_display_size(maxx, maxy);
-
-	// update current state
-	u32 mask = (1 << maxx) - 1;
-	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
-
-	if (update)
-		display_update();
-}
-
-
 // generic input handlers
 
 u8 hh_tms1k_state::read_inputs(int columns)
@@ -377,7 +294,7 @@ u8 hh_tms1k_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -389,7 +306,7 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 
 	// read selected input columns
 	for (int i = 0; i < 8; i++)
-		if (1 << i & rowmask && m_inp_matrix[i]->read() & m_inp_mux & colmask)
+		if (1 << i & rowmask && m_inputs[i]->read() & m_inp_mux & colmask)
 			ret |= 1 << i;
 
 	return ret;
@@ -398,7 +315,7 @@ u8 hh_tms1k_state::read_rotated_inputs(int columns, u8 rowmask)
 void hh_tms1k_state::switch_change(int sel, u32 mask, bool next)
 {
 	// config switches (for direct control)
-	ioport_field *inp = m_inp_matrix[sel]->field(mask);
+	ioport_field *inp = m_inputs[sel]->field(mask);
 
 	if (next && inp->has_next_setting())
 		inp->select_next_setting();
@@ -414,7 +331,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::reset_button)
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
-	m_power_on = (bool)(uintptr_t)param;
+	set_power((bool)(uintptr_t)param);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -427,8 +344,14 @@ WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
 
 void hh_tms1k_state::power_off()
 {
-	m_power_on = false;
+	set_power(false);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
+void hh_tms1k_state::set_power(bool state)
+{
+	m_power_on = state;
+	m_out_power = state ? 1 : 0;
 }
 
 
@@ -465,7 +388,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -474,10 +397,9 @@ public:
 
 // handlers
 
-void matchnum_state::prepare_display()
+void matchnum_state::update_display()
 {
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 4, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(matchnum_state::write_r)
@@ -490,7 +412,7 @@ WRITE16_MEMBER(matchnum_state::write_r)
 
 	// R0-R3: digit/led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(matchnum_state::write_o)
@@ -498,7 +420,7 @@ WRITE16_MEMBER(matchnum_state::write_o)
 	// O0-O6: digit segments A-G
 	// O7: led data
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(matchnum_state::read_k)
@@ -548,8 +470,6 @@ static INPUT_PORTS_START( matchnum )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 1")
 INPUT_PORTS_END
 
-static const s16 matchnum_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
-
 void matchnum_state::matchnum(machine_config &config)
 {
 	/* basic machine hardware */
@@ -558,13 +478,16 @@ void matchnum_state::matchnum(machine_config &config)
 	m_maincpu->r().set(FUNC(matchnum_state::write_r));
 	m_maincpu->o().set(FUNC(matchnum_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 8);
+	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_matchnum);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, matchnum_speaker_levels);
+	static const s16 speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -606,7 +529,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -615,11 +538,9 @@ public:
 
 // handlers
 
-void arrball_state::prepare_display()
+void arrball_state::update_display()
 {
-	set_display_segmask(0x10, 0x7f);
-	set_display_segmask(0x20, 0x06); // left digit only segments B and C
-	display_matrix(7, 7, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(arrball_state::write_r)
@@ -632,14 +553,14 @@ WRITE16_MEMBER(arrball_state::write_r)
 
 	// R0-R6: digit/led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(arrball_state::write_o)
 {
 	// O0-O6: digit segments/led data
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(arrball_state::read_k)
@@ -660,8 +581,6 @@ static INPUT_PORTS_START( arrball )
 	PORT_CONFSETTING(    0x08, "Fast" )
 INPUT_PORTS_END
 
-static const s16 arrball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
-
 void arrball_state::arrball(machine_config &config)
 {
 	/* basic machine hardware */
@@ -670,13 +589,17 @@ void arrball_state::arrball(machine_config &config)
 	m_maincpu->r().set(FUNC(arrball_state::write_r));
 	m_maincpu->o().set(FUNC(arrball_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 7);
+	m_display->set_segmask(0x10, 0x7f);
+	m_display->set_segmask(0x20, 0x06); // left digit only segments B and C
 	config.set_default_layout(layout_arrball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, arrball_speaker_levels);
+	static const s16 speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -726,7 +649,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -735,10 +658,9 @@ public:
 
 // handlers
 
-void mathmagi_state::prepare_display()
+void mathmagi_state::update_display()
 {
-	set_display_segmask(0xff, 0x7f);
-	display_matrix(7, 11, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(mathmagi_state::write_r)
@@ -751,7 +673,7 @@ WRITE16_MEMBER(mathmagi_state::write_r)
 	// R9: custom equals digit
 	// R10: misc lamps
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(mathmagi_state::write_o)
@@ -759,7 +681,7 @@ WRITE16_MEMBER(mathmagi_state::write_o)
 	// O1-O7: led/digit segment data
 	// O0: N/C
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(mathmagi_state::read_k)
@@ -835,7 +757,9 @@ void mathmagi_state::mathmagi(machine_config &config)
 	m_maincpu->r().set(FUNC(mathmagi_state::write_r));
 	m_maincpu->o().set(FUNC(mathmagi_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 7);
+	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_mathmagi);
 
 	/* no sound! */
@@ -952,6 +876,7 @@ void bcheetah_state::bcheetah(machine_config &config)
 	m_maincpu->r().set(FUNC(bcheetah_state::write_r));
 	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
 
+	/* no visual feedback! */
 	config.set_default_layout(layout_bcheetah);
 
 	/* no sound! */
@@ -967,6 +892,171 @@ ROM_START( bcheetah )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bcheetah_output.pla", 0, 365, CRC(cc6d1ecd) SHA1(b0635a841d8850c36c1f414abe0571b81884b972) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Canon Multi 8 (Palmtronic MD-8) / Canon Canola MD 810
+  * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
+  * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * PCB label Canon EHI-0115-03
+
+***************************************************************************/
+
+class cmulti8_state : public hh_tms1k_state
+{
+public:
+	cmulti8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void cmulti8(machine_config &config);
+
+private:
+	void update_display();
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void cmulti8_state::update_display()
+{
+	// M-digit is on in memory mode, upper row is off in single mode
+	u32 m = (m_inputs[10]->read() & 0x10) ? 0x100000 : 0;
+	u32 mask = (m_inputs[10]->read() & 0x20) ? 0xfffff : 0xffc00;
+
+	// R10 selects display row
+	u32 sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
+	m_display->matrix((sel & mask) | m, m_o);
+}
+
+WRITE16_MEMBER(cmulti8_state::write_r)
+{
+	// R0-R10: input mux, select digit
+	m_r = m_inp_mux = data;
+	update_display();
+}
+
+WRITE16_MEMBER(cmulti8_state::write_o)
+{
+	// O0-O7: digit segments
+	m_o = bitswap<8>(data,0,4,5,6,7,1,2,3);
+	update_display();
+}
+
+READ8_MEMBER(cmulti8_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(11);
+}
+
+// config
+
+static INPUT_PORTS_START( cmulti8 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("% +/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("RM") // recall memory
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("SC") // sign change
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("CM") // clear memory
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("M+") // add to memory
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV") // reverse
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CI/C")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.10") // R10
+	PORT_CONFNAME( 0x31, 0x20, "Mode" ) // bit 4 indicates M-digit on/off, bit 5 indicates upper row filament on/off
+	PORT_CONFSETTING(    0x31, "Memory" )
+	PORT_CONFSETTING(    0x01, "Single" )
+	PORT_CONFSETTING(    0x20, "Process" )
+	PORT_CONFNAME( 0x02, 0x00, "AM" ) // accumulate memory
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void cmulti8_state::cmulti8(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
+	m_maincpu->k().set(FUNC(cmulti8_state::read_k));
+	m_maincpu->o().set(FUNC(cmulti8_state::write_o));
+	m_maincpu->r().set(FUNC(cmulti8_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(21, 8);
+	m_display->set_segmask(0xfffff, 0xff);
+	config.set_default_layout(layout_cmulti8);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( cmulti8 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1079nl", 0x0000, 0x0400, CRC(202c5ed8) SHA1(0143975cac20cb4a4e9f659ca0535e8a9056f5bb) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cmulti8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
 ROM_END
 
 
@@ -992,7 +1082,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1001,10 +1091,9 @@ public:
 
 // handlers
 
-void amaztron_state::prepare_display()
+void amaztron_state::update_display()
 {
-	set_display_segmask(0xc, 0x7f);
-	display_matrix(7, 4, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(amaztron_state::write_r)
@@ -1018,7 +1107,7 @@ WRITE16_MEMBER(amaztron_state::write_r)
 	// R6,R7: leds
 	// R8,R9: select digit
 	m_r = data >> 6 & 0xf;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(amaztron_state::write_o)
@@ -1026,7 +1115,7 @@ WRITE16_MEMBER(amaztron_state::write_o)
 	// O0-O6: digit segments A-G
 	// O7: N/C
 	m_o = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(amaztron_state::read_k)
@@ -1091,7 +1180,9 @@ void amaztron_state::amaztron(machine_config &config)
 	m_maincpu->r().set(FUNC(amaztron_state::write_r));
 	m_maincpu->o().set(FUNC(amaztron_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	m_display->set_segmask(0xc, 0x7f);
 	config.set_default_layout(layout_amaztron);
 
 	/* sound hardware */
@@ -1134,7 +1225,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1143,10 +1234,9 @@ public:
 
 // handlers
 
-void zodiac_state::prepare_display()
+void zodiac_state::update_display()
 {
-	set_display_segmask(0xff, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(zodiac_state::write_r)
@@ -1160,14 +1250,14 @@ WRITE16_MEMBER(zodiac_state::write_r)
 	// R0-R7: digit select
 	// R8,R9: led select
 	m_r = data & 0x3ff;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(zodiac_state::write_o)
 {
 	// O0-O7: digit segment/led data
 	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(zodiac_state::read_k)
@@ -1251,7 +1341,9 @@ void zodiac_state::zodiac(machine_config &config)
 	m_maincpu->r().set(FUNC(zodiac_state::write_r));
 	m_maincpu->o().set(FUNC(zodiac_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0xff, 0x7f);
 	config.set_default_layout(layout_zodiac);
 
 	/* sound hardware */
@@ -1295,7 +1387,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1304,15 +1396,14 @@ public:
 
 // handlers
 
-void cqback_state::prepare_display()
+void cqback_state::update_display()
 {
 	// R9 selects between segments B/C or A'/D'
 	u16 seg = m_o;
 	if (m_r & 0x200)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
 
-	set_display_segmask(0x1ff, 0xff);
-	display_matrix(11, 9, seg, m_r & 0x1ff);
+	m_display->matrix(m_r & 0x1ff, seg);
 }
 
 WRITE16_MEMBER(cqback_state::write_r)
@@ -1325,14 +1416,14 @@ WRITE16_MEMBER(cqback_state::write_r)
 
 	// R0-R9: select digit/segment
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cqback_state::write_o)
 {
 	// O0-O7: digit segments
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(cqback_state::read_k)
@@ -1366,8 +1457,8 @@ static INPUT_PORTS_START( cqback )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) ) // TP1-TP2
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void cqback_state::cqback(machine_config &config)
@@ -1378,7 +1469,10 @@ void cqback_state::cqback(machine_config &config)
 	m_maincpu->r().set(FUNC(cqback_state::write_r));
 	m_maincpu->o().set(FUNC(cqback_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 11);
+	m_display->set_segmask(0x1ff, 0xff);
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_cqback);
 
 	/* sound hardware */
@@ -1410,7 +1504,7 @@ ROM_END
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1-bit sound
 
   LED electronic football game. To distinguish between offense and defense,
-  offense blips (should) appear brighter. The hardware is similar to cqback.
+  offense blips appear brighter. The hardware is similar to cqback.
 
   known releases:
   - USA(1): Head to Head: Electronic Football
@@ -1425,7 +1519,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1434,10 +1528,9 @@ public:
 
 // handlers
 
-void h2hfootb_state::prepare_display()
+void h2hfootb_state::update_display()
 {
-	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(9, 9, m_o | (m_r >> 1 & 0x100), m_r & 0x1ff);
+	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 1 & 0x100));
 }
 
 WRITE16_MEMBER(h2hfootb_state::write_r)
@@ -1451,14 +1544,14 @@ WRITE16_MEMBER(h2hfootb_state::write_r)
 	// R0-R8: select led
 	// R9: led between digits
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(h2hfootb_state::write_o)
 {
 	// O0-O7: digit segments A-G,A'
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(h2hfootb_state::read_k)
@@ -1496,8 +1589,8 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
 void h2hfootb_state::h2hfootb(machine_config &config)
@@ -1508,7 +1601,10 @@ void h2hfootb_state::h2hfootb(machine_config &config)
 	m_maincpu->r().set(FUNC(h2hfootb_state::write_r));
 	m_maincpu->o().set(FUNC(h2hfootb_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+	m_display->set_segmask(0x1ff, 0x7f);
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_h2hfootb);
 
 	/* sound hardware */
@@ -1544,6 +1640,7 @@ ROM_END
   * same PCB/hardware as above
 
   Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
+  To begin play, press start while holding left/right.
 
 ***************************************************************************/
 
@@ -1560,7 +1657,7 @@ public:
 	bool m_cap_state;
 	attotime m_cap_charge;
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1591,15 +1688,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(h2hbaskb_state::cap_empty_callback)
 		m_cap_state = false;
 }
 
-void h2hbaskb_state::prepare_display()
+void h2hbaskb_state::update_display()
 {
 	// R6,R7 are commons for R0-R5
 	u16 sel = 0;
 	if (m_r & 0x40) sel |= (m_r & 0x3f);
 	if (m_r & 0x80) sel |= (m_r & 0x3f) << 6;
 
-	set_display_segmask(0xc0, 0x7f);
-	display_matrix(7, 6+6, m_o, sel);
+	m_display->matrix(sel, m_o);
 }
 
 WRITE16_MEMBER(h2hbaskb_state::write_r)
@@ -1632,14 +1728,14 @@ WRITE16_MEMBER(h2hbaskb_state::write_r)
 
 	// R0-R7: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(h2hbaskb_state::write_o)
 {
 	// O1-O7: led data
 	m_o = data >> 1 & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(h2hbaskb_state::read_k)
@@ -1694,7 +1790,9 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 
 	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6+6, 7);
+	m_display->set_segmask(0xc0, 0x7f);
 	config.set_default_layout(layout_h2hbaskb);
 
 	/* sound hardware */
@@ -1755,7 +1853,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1780,13 +1878,12 @@ void h2hbaseb_state::set_clock()
 {
 	// MCU clock is from an RC circuit with C=47pF, and R value is depending on
 	// skill switch: R=51K(1) or 43K(2)
-	m_maincpu->set_unscaled_clock((m_inp_matrix[5]->read() & 1) ? 400000 : 350000);
+	m_maincpu->set_unscaled_clock((m_inputs[5]->read() & 1) ? 400000 : 350000);
 }
 
-void h2hbaseb_state::prepare_display()
+void h2hbaseb_state::update_display()
 {
-	set_display_segmask(0x1ff, 0x7f);
-	display_matrix(9, 9, (m_r & 0x100) | m_o, (m_r & 0xff) | (m_r >> 1 & 0x100));
+	m_display->matrix((m_r & 0xff) | (m_r >> 1 & 0x100), (m_r & 0x100) | m_o);
 }
 
 WRITE16_MEMBER(h2hbaseb_state::write_r)
@@ -1800,7 +1897,7 @@ WRITE16_MEMBER(h2hbaseb_state::write_r)
 	// R0-R7,R9: select vfd digit/led
 	// R8: led state
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(h2hbaseb_state::write_o)
@@ -1808,13 +1905,13 @@ WRITE16_MEMBER(h2hbaseb_state::write_o)
 	// O0-O6: digit segments A-G
 	// O7: N/C
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(h2hbaseb_state::read_k)
 {
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
-	return m_inp_matrix[4]->read() | read_inputs(4);
+	return m_inputs[4]->read() | read_inputs(4);
 }
 
 // config
@@ -1856,7 +1953,9 @@ void h2hbaseb_state::h2hbaseb(machine_config &config)
 	m_maincpu->r().set(FUNC(h2hbaseb_state::write_r));
 	m_maincpu->o().set(FUNC(h2hbaseb_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+	m_display->set_segmask(0x1ff, 0x7f);
 	config.set_default_layout(layout_h2hbaseb);
 
 	/* sound hardware */
@@ -1898,7 +1997,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1907,10 +2006,9 @@ public:
 
 // handlers
 
-void h2hboxing_state::prepare_display()
+void h2hboxing_state::update_display()
 {
-	set_display_segmask(0x600, 0x7f);
-	display_matrix(8, 11, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(h2hboxing_state::write_r)
@@ -1924,14 +2022,14 @@ WRITE16_MEMBER(h2hboxing_state::write_r)
 	// R0-R7: select led
 	// R9,R10: select digit
 	m_r = data & ~0x100;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(h2hboxing_state::write_o)
 {
 	// O0-O7: digit segments/led data
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(h2hboxing_state::read_k)
@@ -1980,7 +2078,9 @@ void h2hboxing_state::h2hboxing(machine_config &config)
 	m_maincpu->r().set(FUNC(h2hboxing_state::write_r));
 	m_maincpu->o().set(FUNC(h2hboxing_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 8);
+	m_display->set_segmask(0x600, 0x7f);
 	config.set_default_layout(layout_h2hboxing);
 
 	/* sound hardware */
@@ -2038,10 +2138,10 @@ public:
 		m_pinout(0)
 	{ }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u16 m_pinout; // cartridge R pins
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -2061,7 +2161,7 @@ void quizwizc_state::machine_start()
 
 // handlers
 
-DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
@@ -2077,13 +2177,10 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state, cartridge)
 	return image_init_result::PASS;
 }
 
-void quizwizc_state::prepare_display()
+void quizwizc_state::update_display()
 {
-	// R6-R9 are 7segs
-	set_display_segmask(0x3c0, 0x7f);
-
 	// note: O7 is on VSS
-	display_matrix(8, 11, m_o, m_r | 0x400);
+	m_display->matrix(m_r | 0x400, m_o);
 }
 
 WRITE16_MEMBER(quizwizc_state::write_r)
@@ -2098,14 +2195,14 @@ WRITE16_MEMBER(quizwizc_state::write_r)
 	// R0-R3: led select
 	// R6-R9: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(quizwizc_state::write_o)
 {
 	// O0-O7: led/digit segment data
 	m_o = bitswap<8>(data,7,0,1,2,3,4,5,6);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(quizwizc_state::read_k)
@@ -2163,7 +2260,9 @@ void quizwizc_state::quizwizc(machine_config &config)
 	m_maincpu->r().set(FUNC(quizwizc_state::write_r));
 	m_maincpu->o().set(FUNC(quizwizc_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10+1, 8);
+	m_display->set_segmask(0x3c0, 0x7f);
 	config.set_default_layout(layout_quizwizc);
 
 	/* sound hardware */
@@ -2174,7 +2273,7 @@ void quizwizc_state::quizwizc(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "quizwiz_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(device_image_load_delegate(&quizwizc_state::device_image_load_cartridge, this));
+	cartslot.set_device_load(FUNC(quizwizc_state::cart_load), this);
 	SOFTWARE_LIST(config, "cart_list").set_original("quizwiz");
 }
 
@@ -2227,10 +2326,10 @@ public:
 		m_pinout(0)
 	{ }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	u8 m_pinout; // cartridge K pins
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -2250,7 +2349,7 @@ void tc4_state::machine_start()
 
 // handlers
 
-DEVICE_IMAGE_LOAD_MEMBER(tc4_state, cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
@@ -2265,13 +2364,10 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state, cartridge)
 	return image_init_result::PASS;
 }
 
-void tc4_state::prepare_display()
+void tc4_state::update_display()
 {
-	// R5,R7-R9 are 7segs
-	set_display_segmask(0x3a0, 0x7f);
-
 	// note: R6 is an extra column
-	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
+	m_display->matrix(m_r, (m_o | (m_r << 2 & 0x100)));
 }
 
 WRITE16_MEMBER(tc4_state::write_r)
@@ -2287,14 +2383,14 @@ WRITE16_MEMBER(tc4_state::write_r)
 	// R6: led 8 state
 	// R5,R7-R9: select digit
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tc4_state::write_o)
 {
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tc4_state::read_k)
@@ -2351,7 +2447,10 @@ void tc4_state::tc4(machine_config &config)
 	m_maincpu->r().set(FUNC(tc4_state::write_r));
 	m_maincpu->o().set(FUNC(tc4_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 9);
+	m_display->set_segmask(0x3a0, 0x7f);
+	m_display->set_bri_levels(0.005, 0.05); // offense leds are brighter
 	config.set_default_layout(layout_tc4);
 
 	/* sound hardware */
@@ -2362,7 +2461,7 @@ void tc4_state::tc4(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tc4_cart"));
 	cartslot.set_must_be_loaded(true); // system won't power on without cartridge
-	cartslot.set_device_load(device_image_load_delegate(&tc4_state::device_image_load_cartridge, this));
+	cartslot.set_device_load(FUNC(tc4_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tc4");
 }
@@ -2406,7 +2505,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -2415,11 +2514,9 @@ public:
 
 // handlers
 
-void cnbaskb_state::prepare_display()
+void cnbaskb_state::update_display()
 {
-	// R7,R8 are 7segs
-	set_display_segmask(0x180, 0x7f);
-	display_matrix(7, 9, m_o, m_r & 0x1fc);
+	m_display->matrix(m_r & 0x1fc, m_o);
 }
 
 WRITE16_MEMBER(cnbaskb_state::write_r)
@@ -2431,9 +2528,10 @@ WRITE16_MEMBER(cnbaskb_state::write_r)
 	// R10 is also tied to K1 (locks up at boot if it's not handled)
 	m_inp_mux = (data >> 8 & 4) | (data & 3);
 
-	// R2-R8: led select
+	// R2-R6: led select
+	// R7,R8: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cnbaskb_state::write_o)
@@ -2441,7 +2539,7 @@ WRITE16_MEMBER(cnbaskb_state::write_o)
 	// O0-O6: led/digit segment data
 	// O7: N/C
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(cnbaskb_state::read_k)
@@ -2474,12 +2572,15 @@ INPUT_PORTS_END
 void cnbaskb_state::cnbaskb(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(cnbaskb_state::read_k));
 	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
 	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x180, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cnbaskb);
 
 	/* sound hardware */
@@ -2529,7 +2630,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -2538,11 +2639,9 @@ public:
 
 // handlers
 
-void cmsport_state::prepare_display()
+void cmsport_state::update_display()
 {
-	// R5,R6 are 7segs
-	set_display_segmask(0x60, 0x7f);
-	display_matrix(8, 9, m_o, m_r & ~0x80);
+	m_display->matrix(m_r & ~0x80, m_o);
 }
 
 WRITE16_MEMBER(cmsport_state::write_r)
@@ -2553,16 +2652,17 @@ WRITE16_MEMBER(cmsport_state::write_r)
 	// R0,R9,R10: input mux
 	m_inp_mux = (data & 1) | (data >> 8 & 6);
 
-	// R0-R6,R8: led select
+	// R0-R4,R8: led select
+	// R5,R6: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cmsport_state::write_o)
 {
 	// O0-O7: led/digit segment data
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(cmsport_state::read_k)
@@ -2599,12 +2699,15 @@ INPUT_PORTS_END
 void cmsport_state::cmsport(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(cmsport_state::read_k));
 	m_maincpu->r().set(FUNC(cmsport_state::write_r));
 	m_maincpu->o().set(FUNC(cmsport_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x60, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cmsport);
 
 	/* sound hardware */
@@ -2656,7 +2759,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -2665,13 +2768,9 @@ public:
 
 // handlers
 
-void cnfball_state::prepare_display()
+void cnfball_state::update_display()
 {
-	// declare 7segs, middle ones have DP
-	set_display_segmask(0xc3, 0x7f);
-	set_display_segmask(0x38, 0xff);
-
-	display_matrix(8+3, 10, m_o | (m_r << 6 & 0x700), m_grid);
+	m_display->matrix(m_grid, m_o | (m_r << 6 & 0x700));
 }
 
 WRITE16_MEMBER(cnfball_state::write_r)
@@ -2694,14 +2793,14 @@ WRITE16_MEMBER(cnfball_state::write_r)
 
 	// R2-R4: led data
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cnfball_state::write_o)
 {
 	// O0-O7: digit segments
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(cnfball_state::read_k)
@@ -2728,27 +2827,30 @@ static INPUT_PORTS_START( cnfball )
 	PORT_CONFSETTING(    0x00, "2" ) // professional
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
-
-static const s16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
 void cnfball_state::cnfball(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=47pF
 	m_maincpu->k().set(FUNC(cnfball_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8+3);
+	m_display->set_segmask(0xc3, 0x7f);
+	m_display->set_segmask(0x38, 0xff); // only the middle 3 7segs have DP
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_cnfball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, cnfball_speaker_levels);
+	static const s16 speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -2775,6 +2877,8 @@ ROM_END
   * 9-digit LED grid, 1-bit sound
 
   This is a clone of Coleco's Quarterback, similar at hardware-level too.
+  Unlike the other LED Football games, this one looks like it doesn't make
+  the offense(player) leds brighter.
 
   known releases:
   - Hong Kong: Electronic Football II, Conic
@@ -2789,7 +2893,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -2798,15 +2902,14 @@ public:
 
 // handlers
 
-void cnfball2_state::prepare_display()
+void cnfball2_state::update_display()
 {
 	// R1 selects between segments B/C or A'/D'
 	u16 seg = m_o;
 	if (~m_r & 2)
 		seg = (m_o << 7 & 0x300) | (m_o & 0xf9);
 
-	set_display_segmask(0x1ff, 0xff);
-	display_matrix(11, 9, seg, m_r >> 1 & 0x1ff);
+	m_display->matrix(m_r >> 2 & 0x1ff, seg);
 }
 
 WRITE16_MEMBER(cnfball2_state::write_r)
@@ -2819,14 +2922,14 @@ WRITE16_MEMBER(cnfball2_state::write_r)
 
 	// R1-R10: select digit/segment
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(cnfball2_state::write_o)
 {
 	// O0-O7: digit segments
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(cnfball2_state::read_k)
@@ -2875,13 +2978,15 @@ static const u16 cnfball2_output_pla[0x20] =
 void cnfball2_state::cnfball2(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
+	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->set_output_pla(cnfball2_output_pla);
 	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
 	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
 	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 11);
+	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_cnfball2);
 
 	/* sound hardware */
@@ -2929,7 +3034,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -2938,11 +3043,9 @@ public:
 
 // handlers
 
-void eleciq_state::prepare_display()
+void eleciq_state::update_display()
 {
-	// R7,R8 are 7segs
-	set_display_segmask(0x180, 0x7f);
-	display_matrix(7, 9, m_o, m_r & ~1);
+	m_display->matrix(m_r & ~1, m_o);
 }
 
 WRITE16_MEMBER(eleciq_state::write_r)
@@ -2953,9 +3056,10 @@ WRITE16_MEMBER(eleciq_state::write_r)
 	// R1-R6,R9: input mux
 	m_inp_mux = (data >> 1 & 0x3f) | (data >> 3 & 0x40);
 
-	// R1-R8: led select
+	// R1-R6: led select
+	// R7,R8: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(eleciq_state::write_o)
@@ -2963,7 +3067,7 @@ WRITE16_MEMBER(eleciq_state::write_o)
 	// O0-O6: led/digit segment data
 	// O7: N/C
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(eleciq_state::read_k)
@@ -3026,7 +3130,9 @@ void eleciq_state::eleciq(machine_config &config)
 	m_maincpu->r().set(FUNC(eleciq_state::write_r));
 	m_maincpu->o().set(FUNC(eleciq_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x180, 0x7f);
 	config.set_default_layout(layout_eleciq);
 
 	/* sound hardware */
@@ -3070,7 +3176,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -3079,11 +3185,9 @@ public:
 
 // handlers
 
-void esoccer_state::prepare_display()
+void esoccer_state::update_display()
 {
-	// R8,R9 are 7segs
-	set_display_segmask(0x300, 0x7f);
-	display_matrix(7, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(esoccer_state::write_r)
@@ -3094,16 +3198,17 @@ WRITE16_MEMBER(esoccer_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R7: led select
+	// R8,R9: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(esoccer_state::write_o)
 {
 	// O0-O6: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(esoccer_state::read_k)
@@ -3143,7 +3248,10 @@ void esoccer_state::esoccer(machine_config &config)
 	m_maincpu->r().set(FUNC(esoccer_state::write_r));
 	m_maincpu->o().set(FUNC(esoccer_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0x300, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
 	config.set_default_layout(layout_esoccer);
 
 	/* sound hardware */
@@ -3206,7 +3314,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -3215,11 +3323,9 @@ public:
 
 // handlers
 
-void ebball_state::prepare_display()
+void ebball_state::update_display()
 {
-	// R8 is a 7seg
-	set_display_segmask(0x100, 0x7f);
-	display_matrix(7, 9, ~m_o, m_r);
+	m_display->matrix(m_r, ~m_o);
 }
 
 WRITE16_MEMBER(ebball_state::write_r)
@@ -3230,9 +3336,10 @@ WRITE16_MEMBER(ebball_state::write_r)
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
 
-	// R0-R8: led select
+	// R0-R7: led select
+	// R8: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ebball_state::write_o)
@@ -3240,13 +3347,13 @@ WRITE16_MEMBER(ebball_state::write_o)
 	// O0-O6: led state
 	// O7: N/C
 	m_o = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ebball_state::read_k)
 {
 	// K: multiplexed inputs (note: K8(Vss row) is always on)
-	return m_inp_matrix[5]->read() | read_inputs(5);
+	return m_inputs[5]->read() | read_inputs(5);
 }
 
 // config
@@ -3289,7 +3396,9 @@ void ebball_state::ebball(machine_config &config)
 	m_maincpu->r().set(FUNC(ebball_state::write_r));
 	m_maincpu->o().set(FUNC(ebball_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x100, 0x7f);
 	config.set_default_layout(layout_ebball);
 
 	/* sound hardware */
@@ -3348,7 +3457,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -3357,11 +3466,9 @@ public:
 
 // handlers
 
-void ebball2_state::prepare_display()
+void ebball2_state::update_display()
 {
-	// R0-R2 are 7segs
-	set_display_segmask(7, 0x7f);
-	display_matrix(8, 10, ~m_o, m_r ^ 0x7f);
+	m_display->matrix(m_r ^ 0x7f, ~m_o);
 }
 
 WRITE16_MEMBER(ebball2_state::write_r)
@@ -3372,16 +3479,17 @@ WRITE16_MEMBER(ebball2_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R2: digit select
+	// R3-R9: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ebball2_state::write_o)
 {
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ebball2_state::read_k)
@@ -3424,7 +3532,9 @@ void ebball2_state::ebball2(machine_config &config)
 	m_maincpu->r().set(FUNC(ebball2_state::write_r));
 	m_maincpu->o().set(FUNC(ebball2_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_ebball2);
 
 	/* sound hardware */
@@ -3488,7 +3598,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -3514,25 +3624,18 @@ void ebball3_state::set_clock()
 	// MCU clock is from an RC circuit(R=47K, C=33pF) oscillating by default at ~340kHz,
 	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
 	// it up to around ~440kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 440000 : 340000);
+	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 440000 : 340000);
 }
 
-void ebball3_state::prepare_display()
+void ebball3_state::update_display()
 {
-	// update current state
-	for (int y = 0; y < 10; y++)
-		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+	m_display->matrix_partial(0, 10, m_r, m_o, false);
 
 	// R0,R1 are normal 7segs
-	set_display_segmask(3, 0x7f);
-
 	// R4,R7 contain segments(only F and B) for the two other digits
-	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
-	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
-	m_display_segmask[10] = m_display_segmask[11] = 0x22;
-
-	set_display_size(7, 10+2);
-	display_update();
+	m_display->write_row(10, (m_display->read_row(4) & 0x20) | (m_display->read_row(7) & 0x02));
+	m_display->write_row(11, ((m_display->read_row(4) & 0x10) | (m_display->read_row(7) & 0x01)) << 1);
+	m_display->update();
 }
 
 WRITE16_MEMBER(ebball3_state::write_r)
@@ -3543,9 +3646,10 @@ WRITE16_MEMBER(ebball3_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0,R1, digit select
+	// R2-R9: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ebball3_state::write_o)
@@ -3553,7 +3657,7 @@ WRITE16_MEMBER(ebball3_state::write_o)
 	// O0-O6: led state
 	// O7: N/C
 	m_o = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ebball3_state::read_k)
@@ -3611,7 +3715,10 @@ void ebball3_state::ebball3(machine_config &config)
 	m_maincpu->r().set(FUNC(ebball3_state::write_r));
 	m_maincpu->o().set(FUNC(ebball3_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10+2, 7);
+	m_display->set_segmask(3, 0x7f);
+	m_display->set_segmask(0xc00, 0x22);
 	config.set_default_layout(layout_ebball3);
 
 	/* sound hardware */
@@ -3666,7 +3773,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -3675,11 +3782,9 @@ public:
 
 // handlers
 
-void esbattle_state::prepare_display()
+void esbattle_state::update_display()
 {
-	// R8,R9 are 7segs
-	set_display_segmask(0x300, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(esbattle_state::write_r)
@@ -3690,16 +3795,17 @@ WRITE16_MEMBER(esbattle_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R7: led select
+	// R8,R9: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(esbattle_state::write_o)
 {
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(esbattle_state::read_k)
@@ -3734,7 +3840,9 @@ void esbattle_state::esbattle(machine_config &config)
 	m_maincpu->r().set(FUNC(esbattle_state::write_r));
 	m_maincpu->o().set(FUNC(esbattle_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x300, 0x7f);
 	config.set_default_layout(layout_esbattle);
 
 	/* sound hardware */
@@ -3778,7 +3886,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 
@@ -3803,14 +3911,12 @@ void einvader_state::set_clock()
 	// MCU clock is from an RC circuit(R=47K, C=56pF) oscillating by default at ~320kHz,
 	// but on PRO, the difficulty switch adds an extra 180K resistor to Vdd to speed
 	// it up to around ~400kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[0]->read() & 8) ? 400000 : 320000);
+	m_maincpu->set_unscaled_clock((m_inputs[0]->read() & 8) ? 400000 : 320000);
 }
 
-void einvader_state::prepare_display()
+void einvader_state::update_display()
 {
-	// R7-R9 are 7segs
-	set_display_segmask(0x380, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(einvader_state::write_r)
@@ -3818,16 +3924,17 @@ WRITE16_MEMBER(einvader_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led select
+	// R0-R6: led select
+	// R7-R9: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(einvader_state::write_o)
 {
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -3851,13 +3958,14 @@ void einvader_state::einvader(machine_config &config)
 	m_maincpu->o().set(FUNC(einvader_state::write_o));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(939, 1080);
-	screen.set_visarea_full();
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(945, 1080);
+	mask.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x380, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // ufo/player explosion is brighter
 	config.set_default_layout(layout_einvader);
 
 	/* sound hardware */
@@ -3877,8 +3985,8 @@ ROM_START( einvader )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_einvader_output.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
 
-	ROM_REGION( 44398, "svg", 0)
-	ROM_LOAD( "einvader.svg", 0, 44398, CRC(48de88fd) SHA1(56a2b9c997a447277b45902ab542eda54e7d5a2f) )
+	ROM_REGION( 45196, "mask", 0)
+	ROM_LOAD( "einvader.svg", 0, 45196, CRC(35a1c744) SHA1(6beb9767454b9bc8f2ccf9fee25e7be209eefd22) )
 ROM_END
 
 
@@ -3889,7 +3997,9 @@ ROM_END
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die label MP7551)
-  * 9-digit cyan VFD display, 60 red and green LEDs behind bezel, 1-bit sound
+  * 9-digit cyan VFD display, 60 red and green LEDs behind mask, 1-bit sound
+
+  Another version exist, one with a LED(red) 7seg display.
 
 ***************************************************************************/
 
@@ -3900,7 +4010,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -3909,11 +4019,9 @@ public:
 
 // handlers
 
-void efootb4_state::prepare_display()
+void efootb4_state::update_display()
 {
-	// R10-R15 are 7segs
-	set_display_segmask(0xfc00, 0x7f);
-	display_matrix(7, 16, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(efootb4_state::write_r)
@@ -3922,8 +4030,9 @@ WRITE16_MEMBER(efootb4_state::write_r)
 	m_inp_mux = data & 0x1f;
 
 	// R0-R9: led select
+	// R10-R15: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(efootb4_state::write_o)
@@ -3933,7 +4042,7 @@ WRITE16_MEMBER(efootb4_state::write_o)
 
 	// O0-O6: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(efootb4_state::read_k)
@@ -3982,12 +4091,19 @@ INPUT_PORTS_END
 void efootb4_state::efootb4(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1670(config, m_maincpu, 475000); // approximation - RC osc. R=42K, C=47pF
+	TMS1670(config, m_maincpu, 400000); // approximation - RC osc. R=42K, C=47pF
 	m_maincpu->k().set(FUNC(efootb4_state::read_k));
 	m_maincpu->r().set(FUNC(efootb4_state::write_r));
 	m_maincpu->o().set(FUNC(efootb4_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	mask.set_refresh_hz(60);
+	mask.set_size(1920, 904);
+	mask.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(16, 7);
+	m_display->set_segmask(0xfc00, 0x7f);
 	config.set_default_layout(layout_efootb4);
 
 	/* sound hardware */
@@ -4006,6 +4122,9 @@ ROM_START( efootb4 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_efootb4_output.pla", 0, 557, CRC(5c87c753) SHA1(bde9d4aa1e57a718affd969475c0a1edcf60f444) )
+
+	ROM_REGION( 67472, "mask", 0)
+	ROM_LOAD( "efootb4.svg", 0, 67472, CRC(ba0abcda) SHA1(6066e4cbae5404e4db17fae0153808b044adc823) )
 ROM_END
 
 
@@ -4039,7 +4158,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -4048,11 +4167,9 @@ public:
 
 // handlers
 
-void ebaskb2_state::prepare_display()
+void ebaskb2_state::update_display()
 {
-	// R0-R3 are 7segs
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(7, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(ebaskb2_state::write_r)
@@ -4063,9 +4180,10 @@ WRITE16_MEMBER(ebaskb2_state::write_r)
 	// R6-R9: input mux
 	m_inp_mux = data >> 6 & 0xf;
 
-	// R0-R9: led select
+	// R0-R3: digit select
+	// R4-R9: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ebaskb2_state::write_o)
@@ -4073,7 +4191,7 @@ WRITE16_MEMBER(ebaskb2_state::write_o)
 	// O0-O6: led state
 	// O7: N/C
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ebaskb2_state::read_k)
@@ -4120,7 +4238,10 @@ void ebaskb2_state::ebaskb2(machine_config &config)
 	m_maincpu->r().set(FUNC(ebaskb2_state::write_r));
 	m_maincpu->o().set(FUNC(ebaskb2_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_bri_levels(0.01, 0.1); // ball carrier led is brighter
 	config.set_default_layout(layout_ebaskb2);
 
 	/* sound hardware */
@@ -4175,7 +4296,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -4203,15 +4324,13 @@ void raisedvl_state::set_clock()
 	// 0:   R=47K  -> ~350kHz
 	// 2,3: R=35K8 -> ~425kHz (combined)
 	// 4:   R=32K  -> ~465kHz (combined)
-	u8 inp = m_inp_matrix[1]->read();
+	u8 inp = m_inputs[1]->read();
 	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
 }
 
-void raisedvl_state::prepare_display()
+void raisedvl_state::update_display()
 {
-	// R0-R2 are 7segs
-	set_display_segmask(7, 0x7f);
-	display_matrix(7, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(raisedvl_state::write_r)
@@ -4222,9 +4341,10 @@ WRITE16_MEMBER(raisedvl_state::write_r)
 	// R0,R1: input mux
 	m_inp_mux = data & 3;
 
-	// R0-R9: led select
+	// R0-R2: digit select
+	// R3-R9: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(raisedvl_state::write_o)
@@ -4232,7 +4352,7 @@ WRITE16_MEMBER(raisedvl_state::write_o)
 	// O0-O6: led state
 	// O7: N/C
 	m_o = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(raisedvl_state::read_k)
@@ -4266,7 +4386,10 @@ void raisedvl_state::raisedvl(machine_config &config)
 	m_maincpu->r().set(FUNC(raisedvl_state::write_r));
 	m_maincpu->o().set(FUNC(raisedvl_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 7);
+	m_display->set_segmask(7, 0x7f);
+	m_display->set_bri_levels(0.01, 0.125); // ball is brighter
 	config.set_default_layout(layout_raisedvl);
 
 	/* sound hardware */
@@ -4324,7 +4447,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -4333,11 +4456,9 @@ public:
 
 // handlers
 
-void f2pbball_state::prepare_display()
+void f2pbball_state::update_display()
 {
-	// R5-R8 are 7segs
-	set_display_segmask(0x1e0, 0x7f);
-	display_matrix(8, 9, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(f2pbball_state::write_r)
@@ -4348,16 +4469,17 @@ WRITE16_MEMBER(f2pbball_state::write_r)
 	// R9,R10(ANDed together): speaker out
 	m_speaker->level_w(data >> 10 & data >> 9 & 1);
 
-	// R0-R8: led select
+	// R0-R4: led select
+	// R5-R8: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(f2pbball_state::write_o)
 {
 	// O0-O7: led state
 	m_o = bitswap<8>(data,0,7,6,5,4,3,2,1);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(f2pbball_state::read_k)
@@ -4401,7 +4523,9 @@ void f2pbball_state::f2pbball(machine_config &config)
 	m_maincpu->r().set(FUNC(f2pbball_state::write_r));
 	m_maincpu->o().set(FUNC(f2pbball_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1e0, 0x7f);
 	config.set_default_layout(layout_f2pbball);
 
 	/* sound hardware */
@@ -4445,7 +4569,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -4469,14 +4593,12 @@ void f3in1_state::machine_reset()
 void f3in1_state::set_clock()
 {
 	// MCU clock is from an RC circuit where C=47pF, R=39K(PROF) or 56K(REG)
-	m_maincpu->set_unscaled_clock((m_inp_matrix[4]->read() & 1) ? 400000 : 300000);
+	m_maincpu->set_unscaled_clock((m_inputs[4]->read() & 1) ? 400000 : 300000);
 }
 
-void f3in1_state::prepare_display()
+void f3in1_state::update_display()
 {
-	// R6-R9 are 7segs
-	set_display_segmask(0x3c0, 0x7f);
-	display_matrix(8, 10, m_o, m_r & ~0x20);
+	m_display->matrix(m_r & ~0x20, m_o);
 }
 
 WRITE16_MEMBER(f3in1_state::write_r)
@@ -4487,16 +4609,17 @@ WRITE16_MEMBER(f3in1_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R4,R6-R9: led select
+	// R0-R4: led select
+	// R6-R9: digit select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(f3in1_state::write_o)
 {
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(f3in1_state::read_k)
@@ -4545,7 +4668,10 @@ void f3in1_state::f3in1(machine_config &config)
 	m_maincpu->r().set(FUNC(f3in1_state::write_r));
 	m_maincpu->o().set(FUNC(f3in1_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3c0, 0x7f);
+	m_display->set_bri_levels(0.003, 0.05); // player led is brighter
 	config.set_default_layout(layout_f3in1);
 
 	/* sound hardware */
@@ -4593,7 +4719,7 @@ public:
 
 	required_device<beep_device> m_beeper;
 
-	void prepare_display();
+	void update_display();
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
@@ -4611,11 +4737,10 @@ void gpoker_state::machine_reset()
 
 // handlers
 
-void gpoker_state::prepare_display()
+void gpoker_state::update_display()
 {
-	set_display_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
 	u16 segs = bitswap<16>(m_o, 15,14,7,12,11,10,9,8,6,6,5,4,3,2,1,0) & 0x20ff;
-	display_matrix(14, 11, segs | (m_r >> 3 & 0xf00), m_r & 0x7ff);
+	m_display->matrix(m_r & 0x7ff, segs | (m_r >> 3 & 0xf00));
 }
 
 WRITE16_MEMBER(gpoker_state::write_r)
@@ -4629,14 +4754,14 @@ WRITE16_MEMBER(gpoker_state::write_r)
 	// R0-R10: select digit
 	// R11-R14: card symbols
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(gpoker_state::write_o)
 {
 	// O0-O7: digit segments A-G,H
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(gpoker_state::read_k)
@@ -4701,12 +4826,14 @@ INPUT_PORTS_END
 void gpoker_state::gpoker(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	TMS1370(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(gpoker_state::read_k));
 	m_maincpu->r().set(FUNC(gpoker_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 14);
+	m_display->set_segmask(0x7ff, 0x20ff); // 7seg + bottom-right diagonal
 	config.set_default_layout(layout_gpoker);
 
 	/* sound hardware */
@@ -4825,19 +4952,15 @@ INPUT_PORTS_END
 
 void gjackpot_state::gjackpot(machine_config &config)
 {
+	gpoker(config);
+
 	/* basic machine hardware */
-	TMS1670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
+	TMS1670(config.replace(), m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
 	m_maincpu->k().set(FUNC(gpoker_state::read_k));
 	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
 	m_maincpu->o().set(FUNC(gpoker_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_gjackpot);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2405); // see gpoker
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -4881,7 +5004,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
@@ -4890,9 +5013,9 @@ public:
 
 // handlers
 
-void ginv_state::prepare_display()
+void ginv_state::update_display()
 {
-	display_matrix(12, 9, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE16_MEMBER(ginv_state::write_r)
@@ -4907,20 +5030,20 @@ WRITE16_MEMBER(ginv_state::write_r)
 	// R11-R14: VFD plate
 	m_grid = data & 0x1ff;
 	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ginv_state::write_o)
 {
 	// O0-O7: VFD plate
 	m_plate = (m_plate & ~0xff) | data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ginv_state::read_k)
 {
 	// K1-K4: multiplexed inputs (K8 is fire button)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -4953,12 +5076,11 @@ void ginv_state::ginv(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(236, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(9, 12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4977,7 +5099,7 @@ ROM_START( ginv )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv_output.pla", 0, 365, CRC(6e33a24e) SHA1(cdf7ecf12ddd3863e6301e20fe80f9737db429e5) )
 
-	ROM_REGION( 142959, "svg", 0)
+	ROM_REGION( 142959, "screen", 0)
 	ROM_LOAD( "ginv.svg", 0, 142959, CRC(b0dc9bac) SHA1(18f8cc51a432d14f08fdf766275222f3ed184d89) )
 ROM_END
 
@@ -5006,7 +5128,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
@@ -5015,11 +5137,11 @@ public:
 
 // handlers
 
-void ginv1000_state::prepare_display()
+void ginv1000_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,9,8,7);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,3,4,7,8,9,10,11,2,6,5,1,0);
-	display_matrix(12, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE16_MEMBER(ginv1000_state::write_r)
@@ -5034,20 +5156,20 @@ WRITE16_MEMBER(ginv1000_state::write_r)
 	// R11-R14: VFD plate
 	m_grid = data >> 1 & 0x3ff;
 	m_plate = (m_plate & 0xff) | (data >> 3 & 0xf00);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ginv1000_state::write_o)
 {
 	// O0-O7: VFD plate
 	m_plate = (m_plate & ~0xff) | data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ginv1000_state::read_k)
 {
 	// K1,K2: multiplexed inputs (K8 is fire button)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -5079,12 +5201,11 @@ void ginv1000_state::ginv1000(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(226, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 12);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5103,7 +5224,7 @@ ROM_START( ginv1000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv1000_output.pla", 0, 365, CRC(b0a5dc41) SHA1(d94746ec48661998173e7f60ccc7c96e56b3484e) )
 
-	ROM_REGION( 226185, "svg", 0)
+	ROM_REGION( 226185, "screen", 0)
 	ROM_LOAD( "ginv1000.svg", 0, 226185, CRC(1e1bafd1) SHA1(15868ef0c9dadbf537fed0e2d846451ba99fab7b) )
 ROM_END
 
@@ -5136,7 +5257,7 @@ public:
 	required_device<tms1024_device> m_expander;
 	DECLARE_WRITE8_MEMBER(expander_w);
 
-	void prepare_display();
+	void update_display();
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
@@ -5154,9 +5275,9 @@ void ginv2000_state::machine_reset()
 
 // handlers
 
-void ginv2000_state::prepare_display()
+void ginv2000_state::update_display()
 {
-	display_matrix(16, 10, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 WRITE8_MEMBER(ginv2000_state::expander_w)
@@ -5164,7 +5285,7 @@ WRITE8_MEMBER(ginv2000_state::expander_w)
 	// TMS1024 port 4-7: VFD plate
 	int shift = (offset - tms1024_device::PORT4) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ginv2000_state::write_r)
@@ -5182,7 +5303,7 @@ WRITE16_MEMBER(ginv2000_state::write_r)
 
 	// R1-R10: VFD grid
 	m_grid = data >> 1 & 0x3ff;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ginv2000_state::write_o)
@@ -5194,7 +5315,7 @@ WRITE16_MEMBER(ginv2000_state::write_o)
 READ8_MEMBER(ginv2000_state::read_k)
 {
 	// K1,K2: multiplexed inputs (K8 is fire button)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -5231,12 +5352,11 @@ void ginv2000_state::ginv2000(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
+	screen.set_refresh_hz(60);
 	screen.set_size(364, 1080);
 	screen.set_visarea_full();
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5255,7 +5375,7 @@ ROM_START( ginv2000 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ginv2000_output.pla", 0, 365, CRC(520bb003) SHA1(1640ae54f8dcc257e0ad0cbe0281b38fcbd8da35) )
 
-	ROM_REGION( 374443, "svg", 0)
+	ROM_REGION( 374443, "screen", 0)
 	ROM_LOAD( "ginv2000.svg", 0, 374443, CRC(a4ce1e6d) SHA1(57d9ff05d634a8d495b9d544a2a959790cd10b6b) )
 ROM_END
 
@@ -5288,7 +5408,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -5297,16 +5417,14 @@ public:
 
 // handlers
 
-void fxmcr165_state::prepare_display()
+void fxmcr165_state::update_display()
 {
 	// 7seg digit from O0-O6
-	m_display_segmask[0] = 0x7f;
-	m_display_state[0] = bitswap<8>(m_o,7,2,6,5,4,3,1,0) & 0x7f;
+	m_display->write_row(0, bitswap<8>(m_o,7,2,6,5,4,3,1,0) & 0x7f);
 
 	// leds from R4-R10
-	m_display_state[1] = m_r >> 4 & 0x7f;
-	set_display_size(7, 2);
-	display_update();
+	m_display->write_row(1, m_r >> 4 & 0x7f);
+	m_display->update();
 }
 
 WRITE16_MEMBER(fxmcr165_state::write_r)
@@ -5319,7 +5437,7 @@ WRITE16_MEMBER(fxmcr165_state::write_r)
 
 	// R4-R10: led data (direct)
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(fxmcr165_state::write_o)
@@ -5329,7 +5447,7 @@ WRITE16_MEMBER(fxmcr165_state::write_o)
 
 	// O0-O6: digit segments (direct)
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(fxmcr165_state::read_k)
@@ -5388,7 +5506,9 @@ void fxmcr165_state::fxmcr165(machine_config &config)
 	m_maincpu->r().set(FUNC(fxmcr165_state::write_r));
 	m_maincpu->o().set(FUNC(fxmcr165_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1+1, 7);
+	m_display->set_segmask(1, 0x7f);
 	config.set_default_layout(layout_fxmcr165);
 
 	/* sound hardware */
@@ -5449,8 +5569,7 @@ WRITE16_MEMBER(elecdet_state::write_r)
 	m_speaker->level_w((m_o & 0x80) ? (data >> 7 & 3) : 0);
 
 	// R0-R6: select digit
-	set_display_segmask(0x7f, 0x7f);
-	display_matrix(7, 7, bitswap<8>(m_o,7,5,2,1,4,0,6,3), data);
+	m_display->matrix(data, bitswap<8>(m_o,7,5,2,1,4,0,6,3));
 }
 
 WRITE16_MEMBER(elecdet_state::write_o)
@@ -5466,7 +5585,7 @@ WRITE16_MEMBER(elecdet_state::write_o)
 READ8_MEMBER(elecdet_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[4]->read() | read_inputs(4);
+	return m_inputs[4]->read() | read_inputs(4);
 }
 
 // config
@@ -5518,8 +5637,6 @@ static INPUT_PORTS_START( elecdet )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
-static const s16 elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
-
 void elecdet_state::elecdet(machine_config &config)
 {
 	/* basic machine hardware */
@@ -5529,13 +5646,16 @@ void elecdet_state::elecdet(machine_config &config)
 	m_maincpu->o().set(FUNC(elecdet_state::write_o));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 7);
+	m_display->set_segmask(0x7f, 0x7f);
 	config.set_default_layout(layout_elecdet);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, elecdet_speaker_levels);
+	static const s16 speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -5578,7 +5698,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -5587,11 +5707,9 @@ public:
 
 // handlers
 
-void starwbc_state::prepare_display()
+void starwbc_state::update_display()
 {
-	// R6,R8 are 7segs
-	set_display_segmask(0x140, 0x7f);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(starwbc_state::write_r)
@@ -5602,16 +5720,17 @@ WRITE16_MEMBER(starwbc_state::write_r)
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
 
-	// R0,R2,R4,R6,R8: led select
+	// R0,R2,R4: led select
+	// R6,R8: digit select
 	m_r = data & 0x155;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(starwbc_state::write_o)
 {
 	// O0-O7: led state
 	m_o = (data << 4 & 0xf0) | (data >> 4 & 0x0f);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(starwbc_state::read_k)
@@ -5672,7 +5791,9 @@ void starwbc_state::starwbc(machine_config &config)
 	m_maincpu->r().set(FUNC(starwbc_state::write_r));
 	m_maincpu->o().set(FUNC(starwbc_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x140, 0x7f);
 	config.set_default_layout(layout_starwbc);
 
 	/* sound hardware */
@@ -5725,7 +5846,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -5734,10 +5855,9 @@ public:
 
 // handlers
 
-void astro_state::prepare_display()
+void astro_state::update_display()
 {
-	set_display_segmask(0x3ff, 0xff);
-	display_matrix(8, 10, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(astro_state::write_r)
@@ -5747,14 +5867,14 @@ WRITE16_MEMBER(astro_state::write_r)
 
 	// R0-R9: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(astro_state::write_o)
 {
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(astro_state::read_k)
@@ -5821,7 +5941,9 @@ void astro_state::astro(machine_config &config)
 	m_maincpu->r().set(FUNC(astro_state::write_r));
 	m_maincpu->o().set(FUNC(astro_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3ff, 0xff);
 	config.set_default_layout(layout_astro);
 
 	/* no sound! */
@@ -5876,7 +5998,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -5885,29 +6007,22 @@ public:
 
 // handlers
 
-void elecbowl_state::prepare_display()
+void elecbowl_state::update_display()
 {
 	// standard 7segs
-	for (int y = 0; y < 4; y++)
-	{
-		m_display_segmask[y] = 0x7f;
-		m_display_state[y] = (m_r >> (y + 4) & 1) ? m_o : 0;
-	}
+	m_display->matrix_partial(0, 4, m_r >> 4, m_o, false);
 
 	// lamp muxes
-	u8 mask = 1 << (m_o & 7);
-	u8 d = (m_r & 2) ? mask : 0;
+	u8 sel = m_o & 7;
+	u8 state = m_r >> 1 & 1;
 	if (~m_r & 1)
-		m_display_state[5] = (m_display_state[5] & ~mask) | d;
+		m_display->write_element(5, sel, state);
 	if (~m_r & 4)
-		m_display_state[6] = (m_display_state[6] & ~mask) | d;
+		m_display->write_element(6, sel, state);
 
 	// digit 4 is from mux2 Q7
-	m_display_segmask[4] = 6;
-	m_display_state[4] = (m_display_state[6] & 0x80) ? 6 : 0;
-
-	set_display_size(8, 7);
-	display_update();
+	m_display->write_row(4, m_display->read_element(6, 7) ? 6 : 0);
+	m_display->update();
 }
 
 WRITE16_MEMBER(elecbowl_state::write_r)
@@ -5923,7 +6038,7 @@ WRITE16_MEMBER(elecbowl_state::write_r)
 	// R0,R2: lamp mux1,2 _enable
 	// R1: lamp muxes state
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(elecbowl_state::write_o)
@@ -5934,7 +6049,7 @@ WRITE16_MEMBER(elecbowl_state::write_o)
 	// O0-O6: digit segments A-G
 	// O7: N/C
 	m_o = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(elecbowl_state::read_k)
@@ -5989,7 +6104,10 @@ void elecbowl_state::elecbowl(machine_config &config)
 	m_maincpu->r().set(FUNC(elecbowl_state::write_r));
 	m_maincpu->o().set(FUNC(elecbowl_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 8);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_segmask(0x10, 0x06); // 1
 	config.set_default_layout(layout_elecbowl);
 
 	/* sound hardware */
@@ -6022,7 +6140,7 @@ ROM_END
   * HLCD0569, 67-segment LCD panel, no sound
 
   This handheld is not a toy, read the manual for more information. In short,
-  it is a device for prediciting the winning chance of a gambling horserace.
+  it is a device for predicting the winning chance of a gambling horserace.
 
   known releases:
   - USA: Thoroughbred Horse Race Analyzer
@@ -6056,15 +6174,13 @@ WRITE32_MEMBER(horseran_state::lcd_output_w)
 		return;
 
 	// update lcd segments
-	display_matrix(24, 3, data, 1 << offset, false);
+	m_display->matrix_partial(0, 3, 1 << offset, data, false);
 
 	// col5-11 and col13-19 are 7segs
 	for (int i = 0; i < 2; i++)
-		m_display_state[3 + (offset << 1 | i)] = bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f;
+		m_display->write_row(3 + (offset << 1 | i), bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
 
-	set_display_segmask(0x3f<<3, 0x7f);
-	set_display_size(24, 3+6);
-	display_update();
+	m_display->update();
 }
 
 WRITE16_MEMBER(horseran_state::write_r)
@@ -6159,7 +6275,9 @@ void horseran_state::horseran(machine_config &config)
 	/* video hardware */
 	HLCD0569(config, m_lcd, 1100); // C=0.022uF
 	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+
+	PWM_DISPLAY(config, m_display).set_size(3+6, 24);
+	m_display->set_segmask(0x3f<<3, 0x7f);
 	config.set_default_layout(layout_horseran);
 
 	/* no sound! */
@@ -6414,8 +6532,7 @@ WRITE16_MEMBER(comp4_state::write_r)
 	// R2    R7
 	// R1    R6
 	// R0    R5
-	m_r = data;
-	display_matrix(11, 1, m_r, m_o);
+	m_display->matrix(m_o, data);
 }
 
 WRITE16_MEMBER(comp4_state::write_o)
@@ -6464,7 +6581,8 @@ void comp4_state::comp4(machine_config &config)
 	m_maincpu->r().set(FUNC(comp4_state::write_r));
 	m_maincpu->o().set(FUNC(comp4_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_comp4);
 
 	/* no sound! */
@@ -6535,7 +6653,7 @@ WRITE16_MEMBER(bship_state::write_r)
 WRITE16_MEMBER(bship_state::write_o)
 {
 	// O4: explosion light bulb
-	display_matrix(1, 1, data >> 4 & 1, 1);
+	m_display->matrix(1, data >> 4 & 1);
 
 	// other: sound
 }
@@ -6543,7 +6661,7 @@ WRITE16_MEMBER(bship_state::write_o)
 READ8_MEMBER(bship_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[11]->read() | read_inputs(11);
+	return m_inputs[11]->read() | read_inputs(11);
 }
 
 // config
@@ -6630,7 +6748,8 @@ void bship_state::bship(machine_config &config)
 	m_maincpu->r().set(FUNC(bship_state::write_r));
 	m_maincpu->o().set(FUNC(bship_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
@@ -6724,13 +6843,13 @@ WRITE16_MEMBER(bshipb_state::write_o)
 	m_sn->mixer_b_w(data >> 6 & 1);
 
 	// O7: 75494 to light bulb
-	display_matrix(1, 1, data >> 7 & 1, 1);
+	m_display->matrix(1, data >> 7 & 1);
 }
 
 READ8_MEMBER(bshipb_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[11]->read() | read_inputs(11);
+	return m_inputs[11]->read() | read_inputs(11);
 }
 
 // config
@@ -6745,7 +6864,8 @@ void bshipb_state::bshipb(machine_config &config)
 	m_maincpu->r().set(FUNC(bshipb_state::write_r));
 	m_maincpu->o().set(FUNC(bshipb_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 1);
 	config.set_default_layout(layout_bship);
 
 	/* sound hardware */
@@ -6820,7 +6940,7 @@ WRITE16_MEMBER(simon_state::write_r)
 	// R5 -> 75494 IN3 -> red lamp
 	// R6 -> 75494 IN5 -> yellow lamp
 	// R7 -> 75494 IN2 -> blue lamp
-	display_matrix(4, 1, data >> 4, 1);
+	m_display->matrix(1, data >> 4);
 
 	// R8 -> 75494 IN0 -> speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -6880,7 +7000,8 @@ void simon_state::simon(machine_config &config)
 	m_maincpu->k().set(FUNC(simon_state::read_k));
 	m_maincpu->r().set(FUNC(simon_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_simon);
 
 	/* sound hardware */
@@ -6958,7 +7079,7 @@ void ssimon_state::set_clock()
 	// 0 Simple: R=51K -> ~200kHz
 	// 1 Normal: R=37K -> ~275kHz
 	// 2 Super:  R=22K -> ~400kHz
-	u8 inp = m_inp_matrix[6]->read();
+	u8 inp = m_inputs[6]->read();
 	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
 }
 
@@ -6971,7 +7092,7 @@ WRITE16_MEMBER(ssimon_state::write_r)
 	// R5: green lamps
 	// R6: blue lamps
 	// R7: red lamps
-	display_matrix(4, 1, data >> 4, 1);
+	m_display->matrix(1, data >> 4);
 
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -7046,7 +7167,8 @@ void ssimon_state::ssimon(machine_config &config)
 	m_maincpu->k().set(FUNC(ssimon_state::read_k));
 	m_maincpu->r().set(FUNC(ssimon_state::write_r));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ssimon);
 
 	/* sound hardware */
@@ -7100,7 +7222,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 	int m_gearbox_pos;
-	bool sensor_state() { return m_gearbox_pos < 0 && m_display_decay[0][0] != 0; }
+	bool sensor_state() { return m_gearbox_pos < 0 && m_display->element_on(0, 0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
 	void bigtrak(machine_config &config);
 
@@ -7139,7 +7261,7 @@ WRITE16_MEMBER(bigtrak_state::write_r)
 	// R6: N/C
 	// R7: IR led on
 	// R9: lamp on
-	display_matrix(2, 1, (data >> 7 & 1) | (data >> 8 & 2), 1);
+	m_display->matrix(1, (data >> 7 & 1) | (data >> 8 & 2));
 
 	// (O0,O7,)R10(tied together): speaker out
 	m_speaker->level_w((m_o & 1) | (m_o >> 6 & 2) | (data >> 8 & 4));
@@ -7229,8 +7351,6 @@ static INPUT_PORTS_START( bigtrak )
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
-
 void bigtrak_state::bigtrak(machine_config &config)
 {
 	/* basic machine hardware */
@@ -7240,13 +7360,16 @@ void bigtrak_state::bigtrak(machine_config &config)
 	m_maincpu->o().set(FUNC(bigtrak_state::write_o));
 
 	TIMER(config, "gearbox").configure_periodic(FUNC(bigtrak_state::gearbox_sim_tick), attotime::from_msec(1));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 2);
 	config.set_default_layout(layout_bigtrak);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, bigtrak_speaker_levels);
+	static const s16 speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
+	m_speaker->set_levels(8, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -7292,8 +7415,8 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
-	bool sensor_led_on() { return m_display_decay[0][0] != 0; }
+	void update_display();
+	bool sensor_led_on() { return m_display->element_on(0, 0); }
 
 	int m_motor_pos;
 	int m_motor_pos_prev;
@@ -7375,27 +7498,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 	m_motor_pos_prev = m_motor_pos;
 }
 
-
-void mbdtower_state::prepare_display()
+void mbdtower_state::update_display()
 {
-	// declare display matrix size and the 2 7segs
-	set_display_size(7, 3);
-	set_display_segmask(6, 0x7f);
-
 	// update current state
 	if (~m_r & 0x10)
 	{
 		u8 o = bitswap<8>(m_o,7,0,4,3,2,1,6,5) & 0x7f;
-		m_display_state[2] = (m_o & 0x80) ? o : 0;
-		m_display_state[1] = (m_o & 0x80) ? 0 : o;
-		m_display_state[0] = (m_r >> 8 & 1) | (m_r >> 4 & 0xe);
+		m_display->write_row(2, (m_o & 0x80) ? o : 0);
+		m_display->write_row(1, (m_o & 0x80) ? 0 : o);
+		m_display->write_row(0, (m_r >> 8 & 1) | (m_r >> 4 & 0xe));
 
-		display_update();
+		m_display->update();
 	}
 	else
 	{
 		// display items turned off
-		display_matrix(7, 3, 0, 0);
+		m_display->matrix(0, 0);
 	}
 }
 
@@ -7415,7 +7533,7 @@ WRITE16_MEMBER(mbdtower_state::write_r)
 	// R5-R7: tower lamps
 	// R8: rotation sensor led
 	m_r = data;
-	prepare_display();
+	update_display();
 
 	// R10: speaker out
 	m_speaker->level_w(~data >> 4 & data >> 10 & 1);
@@ -7426,7 +7544,7 @@ WRITE16_MEMBER(mbdtower_state::write_o)
 	// O0-O6: led segments A-G
 	// O7: digit select
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(mbdtower_state::read_k)
@@ -7485,7 +7603,10 @@ void mbdtower_state::mbdtower(machine_config &config)
 	m_maincpu->o().set(FUNC(mbdtower_state::write_o));
 
 	TIMER(config, "tower_motor").configure_periodic(FUNC(mbdtower_state::motor_sim_tick), attotime::from_msec(3500/0x80)); // ~3.5sec for a full rotation
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 7);
+	m_display->set_segmask(6, 0x7f);
 	config.set_default_layout(layout_mbdtower);
 
 	/* sound hardware */
@@ -7539,7 +7660,7 @@ public:
 WRITE16_MEMBER(arcmania_state::write_r)
 {
 	// R1-R9: leds
-	display_matrix(9, 1, data >> 1, 1);
+	m_display->matrix(1, data >> 1);
 }
 
 WRITE16_MEMBER(arcmania_state::write_o)
@@ -7597,8 +7718,6 @@ static INPUT_PORTS_START( arcmania )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 arcmania_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
-
 void arcmania_state::arcmania(machine_config &config)
 {
 	/* basic machine hardware */
@@ -7607,13 +7726,15 @@ void arcmania_state::arcmania(machine_config &config)
 	m_maincpu->r().set(FUNC(arcmania_state::write_r));
 	m_maincpu->o().set(FUNC(arcmania_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 9);
 	config.set_default_layout(layout_arcmania);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, arcmania_speaker_levels);
+	static const s16 speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
+	m_speaker->set_levels(8, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -7664,8 +7785,7 @@ WRITE16_MEMBER(cnsector_state::write_r)
 {
 	// R0-R5: select digit
 	// R6-R9: direction leds
-	set_display_segmask(0x3f, 0xff);
-	display_matrix(8, 10, m_o, data);
+	m_display->matrix(data, m_o);
 }
 
 WRITE16_MEMBER(cnsector_state::write_o)
@@ -7738,7 +7858,9 @@ void cnsector_state::cnsector(machine_config &config)
 	m_maincpu->r().set(FUNC(cnsector_state::write_r));
 	m_maincpu->o().set(FUNC(cnsector_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
+	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_cnsector);
 
 	/* no sound! */
@@ -7811,7 +7933,7 @@ WRITE16_MEMBER(merlin_state::write_r)
 	R7   R8   R9
 	     R10
 	*/
-	display_matrix(11, 1, data, 1);
+	m_display->matrix(1, data);
 }
 
 WRITE16_MEMBER(merlin_state::write_o)
@@ -7858,8 +7980,6 @@ static INPUT_PORTS_START( merlin )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("New Game")
 INPUT_PORTS_END
 
-static const s16 merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
-
 void merlin_state::merlin(machine_config &config)
 {
 	/* basic machine hardware */
@@ -7868,13 +7988,15 @@ void merlin_state::merlin(machine_config &config)
 	m_maincpu->r().set(FUNC(merlin_state::write_r));
 	m_maincpu->o().set(FUNC(merlin_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_merlin);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, merlin_speaker_levels);
+	static const s16 speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
+	m_speaker->set_levels(8, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -7939,20 +8061,15 @@ INPUT_PORTS_END
 
 void mmerlin_state::mmerlin(machine_config &config)
 {
+	merlin(config);
+
 	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
+	TMS1400(config.replace(), m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
 	m_maincpu->k().set(FUNC(mmerlin_state::read_k));
 	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
 	m_maincpu->o().set(FUNC(mmerlin_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_mmerlin);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, merlin_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -8002,8 +8119,7 @@ public:
 WRITE16_MEMBER(stopthief_state::write_r)
 {
 	// R0-R2: select digit
-	set_display_segmask(7, 0x7f);
-	display_matrix(7, 3, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f, data & 7);
+	m_display->matrix(data & 7, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f);
 
 	// R3-R8(tied together): speaker out
 	int level = 0;
@@ -8025,7 +8141,7 @@ WRITE16_MEMBER(stopthief_state::write_o)
 READ8_MEMBER(stopthief_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -8063,8 +8179,6 @@ static INPUT_PORTS_START( stopthief )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
-static const s16 stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
-
 void stopthief_state::stopthief(machine_config &config)
 {
 	/* basic machine hardware */
@@ -8074,13 +8188,16 @@ void stopthief_state::stopthief(machine_config &config)
 	m_maincpu->o().set(FUNC(stopthief_state::write_o));
 	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(3, 7);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_stopthief);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(7, stopthief_speaker_levels);
+	static const s16 speaker_levels[7] = { 0x7fff/7, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff/1 };
+	m_speaker->set_levels(7, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -8132,6 +8249,9 @@ ROM_END
   3: Poison Pool
   4: Trick Shots
 
+  BTANB: Some of the other (not cue) balls temporarily flash brighter sometimes,
+  eg. the bottom one when they're placed. This happens on the real device.
+
 ***************************************************************************/
 
 class bankshot_state : public hh_tms1k_state
@@ -8141,7 +8261,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -8150,9 +8270,9 @@ public:
 
 // handlers
 
-void bankshot_state::prepare_display()
+void bankshot_state::update_display()
 {
-	display_matrix(8, 11, m_o, m_r & ~3);
+	m_display->matrix(m_r & ~3, m_o);
 }
 
 WRITE16_MEMBER(bankshot_state::write_r)
@@ -8165,14 +8285,14 @@ WRITE16_MEMBER(bankshot_state::write_r)
 
 	// R2-R10: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(bankshot_state::write_o)
 {
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(bankshot_state::read_k)
@@ -8217,7 +8337,9 @@ void bankshot_state::bankshot(machine_config &config)
 	m_maincpu->r().set(FUNC(bankshot_state::write_r));
 	m_maincpu->o().set(FUNC(bankshot_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 8);
+	m_display->set_bri_levels(0.01, 0.08); // cue ball is brigher
 	config.set_default_layout(layout_bankshot);
 
 	/* sound hardware */
@@ -8281,7 +8403,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -8290,9 +8412,9 @@ public:
 
 // handlers
 
-void splitsec_state::prepare_display()
+void splitsec_state::update_display()
 {
-	display_matrix(7, 8, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(splitsec_state::write_r)
@@ -8305,7 +8427,7 @@ WRITE16_MEMBER(splitsec_state::write_r)
 
 	// R0-R7: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(splitsec_state::write_o)
@@ -8313,7 +8435,7 @@ WRITE16_MEMBER(splitsec_state::write_o)
 	// O0-O6: led state
 	// O7: N/C
 	m_o = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(splitsec_state::read_k)
@@ -8346,7 +8468,8 @@ void splitsec_state::splitsec(machine_config &config)
 	m_maincpu->r().set(FUNC(splitsec_state::write_r));
 	m_maincpu->o().set(FUNC(splitsec_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 7);
 	config.set_default_layout(layout_splitsec);
 
 	/* sound hardware */
@@ -8400,7 +8523,7 @@ public:
 WRITE16_MEMBER(lostreas_state::write_r)
 {
 	// R0-R10: leds
-	display_matrix(11, 1, data, 1);
+	m_display->matrix(1, data);
 }
 
 WRITE16_MEMBER(lostreas_state::write_o)
@@ -8462,12 +8585,6 @@ static INPUT_PORTS_START( lostreas )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Up")
 INPUT_PORTS_END
 
-static const s16 lostreas_speaker_levels[16] =
-{
-	0, 0x7fff/15, 0x7fff/14, 0x7fff/13, 0x7fff/12, 0x7fff/11, 0x7fff/10, 0x7fff/9,
-	0x7fff/8, 0x7fff/7, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff/1
-};
-
 void lostreas_state::lostreas(machine_config &config)
 {
 	/* basic machine hardware */
@@ -8476,14 +8593,20 @@ void lostreas_state::lostreas(machine_config &config)
 	m_maincpu->r().set(FUNC(lostreas_state::write_r));
 	m_maincpu->o().set(FUNC(lostreas_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 11);
 	config.set_default_layout(layout_lostreas);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(16, lostreas_speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	// set volume levels
+	static s16 speaker_levels[0x10];
+	for (int i = 0; i < 0x10; i++)
+		speaker_levels[i] = 0x7fff / (0x10 - i);
+	m_speaker->set_levels(16, speaker_levels);
 }
 
 // roms
@@ -8542,7 +8665,7 @@ WRITE16_MEMBER(alphie_state::write_r)
 	m_inp_mux = (data >> 1 & 0x1f) | 0x20;
 
 	// R6-R10: leds
-	display_matrix(5, 1, data >> 6, 1);
+	m_display->matrix(1, data >> 6);
 
 	// R0: power off on falling edge (turn back on with button)
 	if (~data & m_r & 1)
@@ -8617,7 +8740,8 @@ void alphie_state::alphie(machine_config &config)
 	m_maincpu->r().set(FUNC(alphie_state::write_r));
 	m_maincpu->o().set(FUNC(alphie_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 5);
 	config.set_default_layout(layout_alphie);
 
 	/* sound hardware */
@@ -8661,7 +8785,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
@@ -8670,15 +8794,13 @@ public:
 
 // handlers
 
-void tcfball_state::prepare_display()
+void tcfball_state::update_display()
 {
 	// R8 enables leds, R9 enables digits
 	u16 mask = ((m_r >> 9 & 1) * 0x7f) | ((m_r >> 8 & 1) * 0x780);
 	u16 sel = ((m_r & 0x7f) | (m_r << 7 & 0x780)) & mask;
 
-	set_display_segmask(0x77, 0x7f);
-	set_display_segmask(0x08, 0xff); // R3 has DP
-	display_matrix(8, 11, m_o, sel);
+	m_display->matrix(sel, m_o);
 }
 
 WRITE16_MEMBER(tcfball_state::write_r)
@@ -8692,14 +8814,14 @@ WRITE16_MEMBER(tcfball_state::write_r)
 	// R8+R0-R3: select led
 	// R9+R0-R6: select digit
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tcfball_state::write_o)
 {
 	// O0-O7: digit segments/led data
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tcfball_state::read_k)
@@ -8738,7 +8860,11 @@ void tcfball_state::tcfball(machine_config &config)
 	m_maincpu->r().set(FUNC(tcfball_state::write_r));
 	m_maincpu->o().set(FUNC(tcfball_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 8);
+	m_display->set_segmask(0x77, 0x7f);
+	m_display->set_segmask(0x08, 0xff); // R3 has DP
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_tcfball);
 
 	/* sound hardware */
@@ -8809,20 +8935,13 @@ static const u16 tcfballa_output_pla[0x20] =
 
 void tcfballa_state::tcfballa(machine_config &config)
 {
+	tcfball(config);
+
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=50pF
+	m_maincpu->set_clock(375000); // approximation - RC osc. R=47K, C=50pF
 	m_maincpu->set_output_pla(tcfballa_output_pla);
-	m_maincpu->k().set(FUNC(tcfballa_state::read_k));
-	m_maincpu->r().set(FUNC(tcfballa_state::write_r));
-	m_maincpu->o().set(FUNC(tcfballa_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_tcfballa);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -8875,7 +8994,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -8884,10 +9003,9 @@ public:
 
 // handlers
 
-void tandy12_state::prepare_display()
+void tandy12_state::update_display()
 {
-	// O0-O7: button lamps 1-8, R0-R3: button lamps 9-12
-	display_matrix(13, 1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00), 1);
+	m_display->matrix(1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00));
 }
 
 WRITE16_MEMBER(tandy12_state::write_r)
@@ -8898,15 +9016,16 @@ WRITE16_MEMBER(tandy12_state::write_r)
 	// R5-R9: input mux
 	m_inp_mux = data >> 5 & 0x1f;
 
-	// other bits:
+	// R0-R3: button lamps 9-12
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tandy12_state::write_o)
 {
+	// O0-O7: button lamps 1-8
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tandy12_state::read_k)
@@ -8992,7 +9111,8 @@ void tandy12_state::tandy12(machine_config &config)
 	m_maincpu->r().set(FUNC(tandy12_state::write_r));
 	m_maincpu->o().set(FUNC(tandy12_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 13);
 	config.set_default_layout(layout_tandy12);
 
 	/* sound hardware */
@@ -9061,7 +9181,7 @@ WRITE16_MEMBER(monkeysee_state::write_o)
 {
 	// O6,O7: leds
 	// other: N/C
-	display_matrix(2, 1, data >> 6, 1);
+	m_display->matrix(1, data >> 6);
 }
 
 READ8_MEMBER(monkeysee_state::read_k)
@@ -9112,7 +9232,8 @@ void monkeysee_state::monkeysee(machine_config &config)
 	m_maincpu->r().set(FUNC(monkeysee_state::write_r));
 	m_maincpu->o().set(FUNC(monkeysee_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 2);
 	config.set_default_layout(layout_monkeysee);
 
 	/* sound hardware */
@@ -9160,7 +9281,7 @@ public:
 
 	required_device<s14001a_device> m_speech;
 
-	void prepare_display();
+	void update_display();
 	virtual DECLARE_WRITE16_MEMBER(write_r);
 	virtual DECLARE_WRITE16_MEMBER(write_o);
 	virtual DECLARE_READ8_MEMBER(read_k);
@@ -9169,10 +9290,9 @@ public:
 
 // handlers
 
-void speechp_state::prepare_display()
+void speechp_state::update_display()
 {
-	set_display_segmask(0x1ff, 0xff);
-	display_matrix(8, 9, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(speechp_state::write_r)
@@ -9188,20 +9308,20 @@ WRITE16_MEMBER(speechp_state::write_r)
 
 	// R0-R8: select digit
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(speechp_state::write_o)
 {
 	// O0-O7: digit segments
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(speechp_state::read_k)
 {
 	// K: multiplexed inputs
-	return m_inp_matrix[10]->read() | (read_inputs(10) & 7);
+	return m_inputs[10]->read() | (read_inputs(10) & 7);
 }
 
 // config
@@ -9273,7 +9393,9 @@ void speechp_state::speechp(machine_config &config)
 	m_maincpu->r().set(FUNC(speechp_state::write_r));
 	m_maincpu->o().set(FUNC(speechp_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
 	config.set_default_layout(layout_speechp);
 
 	/* sound hardware */
@@ -9295,6 +9417,1540 @@ ROM_START( speechp )
 
 	ROM_REGION( 0x0800, "speech", 0 )
 	ROM_LOAD("s14007-a", 0x0000, 0x0800, CRC(543b46d4) SHA1(99daf7fe3354c378b4bd883840c9bbd22b22ebe7) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI SR-16 (1974, first consumer product with TMS1000 series MCU)
+  * TMS1000 MCU label TMS1001NL (die label 1000, 1001A)
+  * 12-digit 7seg LED display
+
+  TI SR-16 II (1975 version)
+  * TMS1000 MCU label TMS1016NL (die label 1000B, 1016A)
+  * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
+
+***************************************************************************/
+
+class tisr16_state : public hh_tms1k_state
+{
+public:
+	tisr16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+	void tisr16(machine_config &config);
+};
+
+// handlers
+
+void tisr16_state::update_display()
+{
+	m_display->matrix(m_r, m_o, false);
+
+	// exponent sign is from R10 O1, and R10 itself only uses segment G
+	u8 r10 = m_display->read_row(10);
+	m_display->write_row(11, r10 << 5 & 0x40);
+	m_display->write_row(10, r10 & 0x40);
+	m_display->update();
+}
+
+WRITE16_MEMBER(tisr16_state::write_r)
+{
+	// R0-R10: input mux, select digit
+	m_r = m_inp_mux = data;
+	update_display();
+}
+
+WRITE16_MEMBER(tisr16_state::write_o)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	update_display();
+}
+
+READ8_MEMBER(tisr16_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(11);
+}
+
+// config
+
+static INPUT_PORTS_START( tisr16 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("EE")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(UTF8_CAPITAL_SIGMA)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("10" UTF8_POW_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("e" UTF8_POW_X)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("log")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tisr16ii )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CD")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("log")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("EE")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("e" UTF8_POW_X)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(UTF8_CAPITAL_SIGMA)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+INPUT_PORTS_END
+
+void tisr16_state::tisr16(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
+	m_maincpu->k().set(FUNC(tisr16_state::read_k));
+	m_maincpu->o().set(FUNC(tisr16_state::write_o));
+	m_maincpu->r().set(FUNC(tisr16_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(12, 8);
+	m_display->set_segmask(0xfff, 0xff);
+	config.set_default_layout(layout_tisr16);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( tisr16 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1001nl", 0x0000, 0x0400, CRC(b7ce3c1d) SHA1(95cdb0c6be31043f4fe06314ed41c0ca1337bc46) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_sr16_micro.pla", 0, 867, CRC(5b35019c) SHA1(730d3b9041ed76d57fbedd73b009477fe432b386) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_sr16_output.pla", 0, 365, CRC(29b08739) SHA1(d55f01e40a2d493d45ea422f12e63b01bcde08fb) )
+ROM_END
+
+ROM_START( tisr16ii )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1016nl", 0x0000, 0x0400, CRC(c07a7b27) SHA1(34ea4d3b59871e08db74f8c5bfb7ff00d1f0adc7) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_sr16ii_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_sr16ii_output.pla", 0, 365, CRC(c45dfbd0) SHA1(5d588c1abc317134b51eb08ac3953f1009d80056) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-1250/TI-1200 (1975 version), Spirit of '76
+  * TMS0950 MCU label TMC0952NL, K0952 (die label 0950A 0952)
+  * 9-digit 7seg LED display
+
+  TI-1250/TI-1200 (1976 version), TI-1400, TI-1450, TI-1205, TI-1255, LADY 1200, ABLE
+  * TMS0970 MCU label TMS0972NL ZA0348, JP0972A (die label 0970D-72A)
+  * 8-digit 7seg LED display, or 9 digits with leftmost unused
+
+  As seen listed above, the basic 4-function TMS0972 calculator MCU was used
+  in many calculators. It was licensed to other manufacturers too, one funny
+  example being a Mattel Barbie handheld calculator.
+
+  Some cheaper models lacked the memory buttons (the function itself still works).
+  The ABLE series was for educational purposes, with each having a small subset of
+  available buttons.
+
+  TI-1270
+  * TMS0970 MCU label TMC0974NL ZA0355, DP0974A (die label 0970D-74A)
+  * 8-digit 7seg LED display
+  * notes: almost same hardware as TMS0972 TI-1250, minor scientific functions
+
+***************************************************************************/
+
+class ti1250_state : public hh_tms1k_state
+{
+public:
+	ti1250_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti1270(machine_config &config);
+	void ti1250(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(ti1250_state::write_r)
+{
+	// R0-R8: select digit
+	m_display->matrix(data, m_o);
+}
+
+WRITE16_MEMBER(ti1250_state::write_o)
+{
+	// O1-O5,O7: input mux
+	// O0-O7: digit segments
+	m_inp_mux = (data >> 1 & 0x1f) | (data >> 2 & 0x20);
+	m_o = data;
+}
+
+READ8_MEMBER(ti1250_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( ti1250 )
+	PORT_START("IN.0") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+
+	PORT_START("IN.1") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.2") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("CS") // named either CS(Change Sign) or +/-
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.5") // O7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("MC")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ti1270 )
+	PORT_INCLUDE( ti1250 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+INPUT_PORTS_END
+
+void ti1250_state::ti1250(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS0950(config, m_maincpu, 200000); // approximation - RC osc. R=68K, C=68pf
+	m_maincpu->k().set(FUNC(ti1250_state::read_k));
+	m_maincpu->o().set(FUNC(ti1250_state::write_o));
+	m_maincpu->r().set(FUNC(ti1250_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0xff, 0xff);
+	m_display->set_segmask(0x100, 0x40); // R8 only has segment G connected
+	config.set_default_layout(layout_ti1250);
+
+	/* no sound! */
+}
+
+void ti1250_state::ti1270(machine_config &config)
+{
+	ti1250(config);
+
+	/* basic machine hardware */
+	TMS0970(config.replace(), m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(ti1250_state::read_k));
+	m_maincpu->o().set(FUNC(ti1250_state::write_o));
+	m_maincpu->r().set(FUNC(ti1250_state::write_r));
+
+	config.set_default_layout(layout_ti1270);
+}
+
+// roms
+
+ROM_START( ti1250 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0952nl", 0x0000, 0x0400, CRC(fc0cee65) SHA1(1480e4553181f081281d3b78457721b9ecb20173) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti1250_micro.pla", 0, 867, CRC(cb3fd2d6) SHA1(82cf36a65dfc3ccb9dd08e48f45ac4d90f693238) )
+	ROM_REGION( 195, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0950_ti1250_output.pla", 0, 195, CRC(31570eb8) SHA1(c1cb17c31367b65aa777925459515c3d5c565508) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+ROM_START( ti125076 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0972nl_za0348", 0x0000, 0x0400, CRC(6e3f8add) SHA1(a249209e2a92f5016e33b7ad2c6c2660df1df959) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+ROM_START( ti1270 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0974nl_za0355", 0x0000, 0x0400, CRC(48e09b4b) SHA1(17f27167164df223f9f06082ece4c3fc3900eda3) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-2550 III/TI-1265 (both have same chip)
+  * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
+  * 9-digit cyan VFD display
+
+***************************************************************************/
+
+class ti25503_state : public hh_tms1k_state
+{
+public:
+	ti25503_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti25503(machine_config &config);
+
+private:
+	void update_display();
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void ti25503_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+WRITE16_MEMBER(ti25503_state::write_r)
+{
+	// R0-R6: input mux
+	// R0-R8: select digit
+	m_r = m_inp_mux = data;
+	update_display();
+}
+
+WRITE16_MEMBER(ti25503_state::write_o)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	update_display();
+}
+
+READ8_MEMBER(ti25503_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(7);
+}
+
+// config
+
+static INPUT_PORTS_START( ti25503 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+INPUT_PORTS_END
+
+void ti25503_state::ti25503(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1000(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(ti25503_state::read_k));
+	m_maincpu->o().set(FUNC(ti25503_state::write_o));
+	m_maincpu->r().set(FUNC(ti25503_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_ti25503);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( ti25503 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1043nl_za0352", 0x0000, 0x0400, CRC(434c2684) SHA1(ff566f1991f63cfe057879674e6bc7ccd580a919) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti25503_micro.pla", 0, 867, CRC(65d274ae) SHA1(33d77efe38f8b067096c643d71263bb5adde0ca9) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ti25503_output.pla", 0, 365, CRC(ac43b768) SHA1(5eb19b493328c73edab73e44591afda0fbe4965f) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TMC098x series Majestic-line calculators
+
+  TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
+  * TMS0980 MCU label TMC0981NL (die label 0980B-81F)
+  * 9-digit 7seg LED display
+
+  Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
+  a docking station to the TI-30, with an additional display made of magnetic
+  refreshable Braille cells. The TI-30 itself is slightly modified to wire
+  the original LED display to a 25-pin D-Sub connector.
+
+  TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
+  * TMS0980 MCU label TMC0982NL (die label 0980B-82F)
+
+  TI Programmer
+  * TMS0980 MCU label ZA0675NL, JP0983AT (die label 0980B-83)
+
+***************************************************************************/
+
+class ti30_state : public hh_tms1k_state
+{
+public:
+	ti30_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti30(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(ti30_state::write_r)
+{
+	// R0-R8: select digit
+	m_display->matrix(data, m_o);
+}
+
+WRITE16_MEMBER(ti30_state::write_o)
+{
+	// O0-O2,O4-O7: input mux
+	// O0-O7: digit segments
+	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
+	m_o = bitswap<8>(data,7,5,2,1,4,0,6,3);
+}
+
+READ8_MEMBER(ti30_state::read_k)
+{
+	// K: multiplexed inputs (note: the Vss row is always on)
+	return m_inputs[7]->read() | read_inputs(7);
+}
+
+// config
+
+static INPUT_PORTS_START( ti30 )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("log")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("EE" UTF8_DOWN)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.3") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")")
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("SUM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.5") // O6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_NAME("DRG")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_NAME("INV")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("cos")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME("sin")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("tan")
+
+	PORT_START("IN.6") // O7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("EXC")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.7") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tiprog )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("SHF")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("E")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_NAME("d")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("F")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("OR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("AND")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.3") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("1'sC")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("b")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("C")
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("XOR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.5") // O6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("SUM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(")
+
+	PORT_START("IN.6") // O7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.7") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tibusan )
+	// PORT_NAME lists functions under [2nd] as secondaries.
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X"  " UTF8_POW_X"" UTF8_SQUAREROOT"y") // 2nd one implies xth root of y
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%  " UTF8_CAPITAL_DELTA"%")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME("SEL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("CST")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("MAR")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO  m")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL  b")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.3") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(UTF8_CAPITAL_SIGMA"+  " UTF8_CAPITAL_SIGMA"-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(  AN-CI\"")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("x<>y  L.R.")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")  1/x")
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("SUM  x" UTF8_PRIME)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.5") // O6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("FV")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("N")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME("PMT")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_NAME("%i")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_NAME("PV")
+
+	PORT_START("IN.6") // O7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("EXC  x" UTF8_PRIME)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.7") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2"  " UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e" UTF8_POW_X)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+INPUT_PORTS_END
+
+void ti30_state::ti30(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS0980(config, m_maincpu, 400000); // guessed
+	m_maincpu->k().set(FUNC(ti30_state::read_k));
+	m_maincpu->o().set(FUNC(ti30_state::write_o));
+	m_maincpu->r().set(FUNC(ti30_state::write_r));
+	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1fe, 0xff);
+	m_display->set_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
+	config.set_default_layout(layout_ti30);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( ti30 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc0981nl", 0x0000, 0x1000, CRC(41298a14) SHA1(06f654c70add4044a612d3a38b0c2831c188fd0c) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(00475f99) SHA1(70e04c1472639bd35d4adaab0b9f1ae4a0e394be) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+ROM_START( tibusan )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc0982nl", 0x0000, 0x1000, CRC(6954560a) SHA1(6c153a0c9239a811e3514a43d809964c06f8f88e) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(00475f99) SHA1(70e04c1472639bd35d4adaab0b9f1ae4a0e394be) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+ROM_START( tiprog )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) ) // tmc0983
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_tiprog_micro.pla", 0, 1982, CRC(57043284) SHA1(0fa06d5865830ecdb3d870271cb92ac917bed3ca) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, BAD_DUMP CRC(125c4ee6) SHA1(b8d865c42fd37c3d9b92c5edbecfc831be558597) ) // corrected by hand
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-1000 (1977 version)
+  * TMS1990 MCU label TMC1991NL (die label 1991-91A)
+  * 8-digit 7seg LED display
+
+  TI-1000 (1978 version)
+  * TMS1990 MCU label TMC1992-4NL **not dumped yet
+
+***************************************************************************/
+
+class ti1000_state : public hh_tms1k_state
+{
+public:
+	ti1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti1000(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(ti1000_state::write_r)
+{
+	// R0-R7: select digit
+	m_display->matrix(data, m_o);
+}
+
+WRITE16_MEMBER(ti1000_state::write_o)
+{
+	// O0-O3,O5(?): input mux
+	// O0-O7: digit segments
+	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
+	m_o = bitswap<8>(data,7,4,3,2,1,0,6,5);
+}
+
+READ8_MEMBER(ti1000_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( ti1000 )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.3") // O3 or O4?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+INPUT_PORTS_END
+
+void ti1000_state::ti1000(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1990(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(ti1000_state::read_k));
+	m_maincpu->o().set(FUNC(ti1000_state::write_o));
+	m_maincpu->r().set(FUNC(ti1000_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
+	config.set_default_layout(layout_ti1270);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( ti1000 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1991nl", 0x0000, 0x0400, CRC(2da5381d) SHA1(b5dc14553db2068ed48e130e5ec9109930d8cda9) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti1000_output.pla", 0, 352, CRC(a936631e) SHA1(1f900b12a41419d6e1ffbddd5cf72be3adaa4435) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI WIZ-A-TRON
+  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label 0970F-07B)
+  * 9-digit 7seg LED display(one custom digit)
+
+***************************************************************************/
+
+class wizatron_state : public hh_tms1k_state
+{
+public:
+	wizatron_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void wizatron(machine_config &config);
+
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(wizatron_state::write_r)
+{
+	// R0-R8: select digit
+
+	// 3rd digit only has A and G for =, though some newer hardware revisions
+	// (goes for both wizatron and lilprof) use a custom equals-sign digit here
+
+	// 6th digit is custom(not 7seg), for math symbols, like this:
+	//   \./    GAB
+	//   ---     F
+	//   /.\    EDC
+	m_display->matrix(data, m_o);
+}
+
+WRITE16_MEMBER(wizatron_state::write_o)
+{
+	// O1-O4: input mux
+	// O0-O6: digit segments A-G
+	// O7: N/C
+	m_inp_mux = data >> 1 & 0xf;
+	m_o = data & 0x7f;
+}
+
+READ8_MEMBER(wizatron_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(4);
+}
+
+// config
+
+static INPUT_PORTS_START( wizatron )
+	PORT_START("IN.0") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.1") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.2") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.3") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+INPUT_PORTS_END
+
+void wizatron_state::wizatron(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS0970(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(wizatron_state::read_k));
+	m_maincpu->o().set(FUNC(wizatron_state::write_o));
+	m_maincpu->r().set(FUNC(wizatron_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x1ff^8, 0x7f);
+	m_display->set_segmask(8, 0x41); // equals sign
+	config.set_default_layout(layout_wizatron);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( wizatron )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0907nl_za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_wizatron_output.pla", 0, 352, CRC(c0ee5c04) SHA1(e9fadcef688309adbe6c1c0545aac6883ce4a1ac) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI Little Professor (1976 version)
+  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label 0970D-75C)
+  * 9-digit 7seg LED display(one custom digit)
+
+  The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
+  one is older).
+
+***************************************************************************/
+
+class lilprof_state : public wizatron_state
+{
+public:
+	lilprof_state(const machine_config &mconfig, device_type type, const char *tag) :
+		wizatron_state(mconfig, type, tag)
+	{ }
+
+	void lilprof(machine_config &config);
+
+private:
+	virtual DECLARE_WRITE16_MEMBER(write_o) override;
+	virtual DECLARE_READ8_MEMBER(read_k) override;
+};
+
+// handlers
+
+WRITE16_MEMBER(lilprof_state::write_o)
+{
+	// O1-O4,O7: input mux
+	// O0-O6: digit segments A-G
+	m_inp_mux = (data >> 1 & 0xf) | (data >> 3 & 0x10);
+	m_o = data;
+}
+
+READ8_MEMBER(lilprof_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( lilprof )
+	PORT_INCLUDE( wizatron )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_DEL) PORT_NAME("Set")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
+
+	PORT_START("IN.4") // O7
+	PORT_CONFNAME( 0x0f, 0x01, "Level")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+INPUT_PORTS_END
+
+void lilprof_state::lilprof(machine_config &config)
+{
+	wizatron(config);
+
+	/* basic machine hardware */
+	m_maincpu->k().set(FUNC(lilprof_state::read_k));
+	m_maincpu->o().set(FUNC(lilprof_state::write_o));
+}
+
+// roms
+
+ROM_START( lilprof )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0975nl_za0356", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_lilprof_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI Little Professor (1978 version)
+  * TMS1990 MCU label TMC1993NL (die label 1990C-c3C)
+  * 9-digit 7seg LED display(one custom digit)
+
+  1978 re-release, with on/off and level select on buttons instead of
+  switches. The casing was slightly revised in 1980 again, but same rom.
+
+***************************************************************************/
+
+class lilprof78_state : public hh_tms1k_state
+{
+public:
+	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void lilprof78(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(lilprof78_state::write_r)
+{
+	// update leds state
+	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	u16 r = (data & 7) | (data << 1 & 0x1f0);
+	m_display->matrix(r, seg, false);
+
+	// 3rd digit A/G(equals sign) is from O7
+	m_display->write_row(3, (r != 0 && m_o & 0x80) ? 0x41 : 0);
+
+	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
+	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
+	m_display->update();
+}
+
+WRITE16_MEMBER(lilprof78_state::write_o)
+{
+	// O0-O3,O5(?): input mux
+	// O0-O6: digit segments A-G
+	// O7: 6th digit
+	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
+	m_o = data;
+}
+
+READ8_MEMBER(lilprof78_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( lilprof78 )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.3") // O3 or O4?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+INPUT_PORTS_END
+
+void lilprof78_state::lilprof78(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1990(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(lilprof78_state::read_k));
+	m_maincpu->o().set(FUNC(lilprof78_state::write_o));
+	m_maincpu->r().set(FUNC(lilprof78_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x1ff, 0x7f);
+	config.set_default_layout(layout_wizatron);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( lilprof78 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_lilprof78_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI DataMan
+  * TMS1980 MCU label TMC1982NL (die label 1980A 82B)
+  * 10-digit cyan VFD display(3 digits are custom)
+
+***************************************************************************/
+
+class dataman_state : public hh_tms1k_state
+{
+public:
+	dataman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void dataman(machine_config &config);
+
+	virtual void update_display();
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void dataman_state::update_display()
+{
+	// note the extra segment on R9
+	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 2 & 0x80));
+}
+
+WRITE16_MEMBER(dataman_state::write_r)
+{
+	// R0-R4: input mux
+	// R0-R8: select digit
+	// R9: =(equals sign) segment
+	m_r = m_inp_mux = data;
+	update_display();
+}
+
+WRITE16_MEMBER(dataman_state::write_o)
+{
+	// O0-O6: digit segments A-G
+	m_o = bitswap<8>(data,7,1,6,5,4,3,2,0) & 0x7f;
+	update_display();
+}
+
+READ8_MEMBER(dataman_state::read_k)
+{
+	// K: multiplexed inputs (note: the Vss row is always on)
+	return m_inputs[5]->read() | read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( dataman )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Memory Bank")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Force Out")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Number Guesser")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Wipe Out")
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.5") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_U) PORT_NAME("On/User Entry") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("?")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
+INPUT_PORTS_END
+
+void dataman_state::dataman(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1980(config, m_maincpu, 300000); // patent says 300kHz
+	m_maincpu->k().set(FUNC(dataman_state::read_k));
+	m_maincpu->o().set(FUNC(dataman_state::write_o));
+	m_maincpu->r().set(FUNC(dataman_state::write_r));
+	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0x7f);
+	config.set_default_layout(layout_dataman);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( dataman )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc1982nl", 0x0000, 0x1000, CRC(3521f53f) SHA1(c46fe7fe20715fdf5aed65833fb867cfd3938062) ) // matches patent US4340374
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 525, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1980_dataman_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI Math Marvel
+  * TMS1980 MCU label TMC1986A-NL (die label 1980A 86A)
+  * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
+
+  This is the same hardware as DataMan, with R8 connected to a piezo.
+
+***************************************************************************/
+
+class mathmarv_state : public dataman_state
+{
+public:
+	mathmarv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		dataman_state(mconfig, type, tag)
+	{ }
+
+	void mathmarv(machine_config &config);
+
+private:
+	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+};
+
+// handlers
+
+WRITE16_MEMBER(mathmarv_state::write_r)
+{
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
+
+	// rest is same as dataman
+	dataman_state::write_r(space, offset, data);
+}
+
+// config
+
+static INPUT_PORTS_START( mathmarv )
+	PORT_INCLUDE( dataman )
+
+	PORT_MODIFY("IN.4") // R4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Quest")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Checker")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Review")
+
+	PORT_MODIFY("IN.5") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Zap")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
+INPUT_PORTS_END
+
+void mathmarv_state::mathmarv(machine_config &config)
+{
+	dataman(config);
+
+	/* basic machine hardware */
+	m_maincpu->r().set(FUNC(mathmarv_state::write_r));
+
+	config.set_default_layout(layout_mathmarv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mathmarv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc1986anl", 0x0000, 0x1000, CRC(79fda72d) SHA1(137852b29d9136459f78e29e7810195a956a5903) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 525, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1980_mathmarv_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
 ROM_END
 
 
@@ -9342,8 +10998,7 @@ WRITE16_MEMBER(timaze_state::write_r)
 WRITE16_MEMBER(timaze_state::write_o)
 {
 	// O3210: 7seg EGCD?
-	set_display_segmask(1, 0x5c);
-	display_matrix(8, 1, bitswap<8>(data, 7,1,6,0,3,2,5,4), 1);
+	m_display->matrix(1, bitswap<8>(data, 7,1,6,0,3,2,5,4));
 }
 
 READ8_MEMBER(timaze_state::read_k)
@@ -9370,7 +11025,9 @@ void timaze_state::timaze(machine_config &config)
 	m_maincpu->r().set(FUNC(timaze_state::write_r));
 	m_maincpu->o().set(FUNC(timaze_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 8);
+	m_display->set_segmask(1, 0x5c);
 	config.set_default_layout(layout_timaze);
 
 	/* no sound! */
@@ -9386,6 +11043,167 @@ ROM_START( timaze )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // not in patent, use default one
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_timaze_output.pla", 0, 365, BAD_DUMP CRC(f0f36970) SHA1(a6ad1f5e804ac98e5e1a1d07466b3db3a8d6c256) ) // described in patent, but unsure about pin order
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Texas Instruments Electronic Digital Thermostat
+  * TMS0970 MCU, label TMS0970NLL TMC0910B (die label 0970F-10E)
+  * 9-digit 7seg LED display, only 4 used
+  * temperature sensor, heat/cool/fan outputs
+
+  This is a thermostat and digital clock. It's the 2nd one described in
+  patents US4388692 and US4298946.
+
+***************************************************************************/
+
+class tithermos_state : public hh_tms1k_state
+{
+public:
+	tithermos_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_60hz(*this, "ac_line")
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+	void tithermos(machine_config &config);
+
+private:
+	required_device<clock_device> m_60hz;
+};
+
+// handlers
+
+WRITE16_MEMBER(tithermos_state::write_r)
+{
+	// D1-D4: select digit
+	m_display->matrix(data, m_o);
+
+	// D6: heat/cool
+	// D8: A/D reset
+	m_r = data;
+}
+
+WRITE16_MEMBER(tithermos_state::write_o)
+{
+	// SA-SP: input mux
+	// SA-SG: digit segments
+	m_o = m_inp_mux = data;
+}
+
+READ8_MEMBER(tithermos_state::read_k)
+{
+	// K: multiplexed inputs
+	u8 data = read_inputs(8);
+
+	// when SB/SD/SP is high:
+	if (m_inp_mux & 0x8a)
+	{
+		// K1: 60hz from AC line
+		// K2: battery low?
+		// K8: A/D output (TODO)
+		data |= (m_60hz->signal_r()) ? 1 : 0;
+	}
+
+	return data;
+}
+
+// config
+
+static INPUT_PORTS_START( tithermos )
+	PORT_START("IN.0") // SA
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Temp Row PM 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Time Row PM 2")
+
+	PORT_START("IN.1") // SB
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // SC
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Temp Row PM 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Time Row PM 1")
+
+	PORT_START("IN.3") // SD
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_CONFNAME( 0x06, 0x04, "System")
+	PORT_CONFSETTING(    0x04, "Heat" )
+	PORT_CONFSETTING(    0x00, "Off" )
+	PORT_CONFSETTING(    0x02, "Cool" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // A/D output
+
+	PORT_START("IN.4") // SE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Temp Row AM 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Time Row AM 2")
+
+	PORT_START("IN.5") // SF
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Temp Row AM 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Time Row AM 1")
+
+	PORT_START("IN.6") // SG
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Temp / Actual")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Time / Clock")
+
+	PORT_START("IN.7") // SP
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_CONFNAME( 0x06, 0x04, "Mode")
+	PORT_CONFSETTING(    0x04, "Constant" )
+	PORT_CONFSETTING(    0x00, "Day/Night" )
+	PORT_CONFSETTING(    0x02, "Night" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // A/D output
+
+	PORT_START("IN.8")
+	PORT_CONFNAME( 0x01, 0x00, "Fan")
+	PORT_CONFSETTING(    0x00, "On" )
+	PORT_CONFSETTING(    0x01, "Auto" ) // same output as heat/cool
+INPUT_PORTS_END
+
+void tithermos_state::tithermos(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS0970(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(tithermos_state::read_k));
+	m_maincpu->r().set(FUNC(tithermos_state::write_r));
+	m_maincpu->o().set(FUNC(tithermos_state::write_o));
+
+	CLOCK(config, "ac_line", 60).signal_handler().set_nop();
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 7);
+	m_display->set_segmask(0xf, 0x7f);
+	config.set_default_layout(layout_tithermos);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( tithermos )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0910b", 0x0000, 0x0400, CRC(232011cf) SHA1(598ae8cecd98226fb5056c99ce9f47fd23785fd7) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common2_instr.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_tithermos_micro.pla", 0, 860, CRC(a3bb8ca5) SHA1(006ea733440001c37a77d4ffbc4bd2a8fee212ac) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_tithermos_output.pla", 0, 352, CRC(eb3598fd) SHA1(2372ae17fb982cae2710bf8c348bf02b767daabd) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
 ROM_END
 
 
@@ -9424,7 +11242,7 @@ public:
 WRITE16_MEMBER(copycat_state::write_r)
 {
 	// R0-R3: leds
-	display_matrix(4, 1, data & 0xf, 1);
+	m_display->matrix(1, data & 0xf);
 
 	// R4-R7: input mux
 	// R8-R10: N/C
@@ -9474,8 +11292,6 @@ static INPUT_PORTS_START( copycat )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 copycat_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
-
 void copycat_state::copycat(machine_config &config)
 {
 	/* basic machine hardware */
@@ -9484,13 +11300,15 @@ void copycat_state::copycat(machine_config &config)
 	m_maincpu->r().set(FUNC(copycat_state::write_r));
 	m_maincpu->o().set(FUNC(copycat_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_copycat);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, copycat_speaker_levels);
+	static const s16 speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -9545,7 +11363,7 @@ public:
 WRITE16_MEMBER(copycatm2_state::write_r)
 {
 	// R1-R4: leds
-	display_matrix(4, 1, data >> 1 & 0xf, 1);
+	m_display->matrix(1, data >> 1 & 0xf);
 }
 
 WRITE16_MEMBER(copycatm2_state::write_o)
@@ -9572,13 +11390,15 @@ void copycatm2_state::copycatm2(machine_config &config)
 	m_maincpu->r().set(FUNC(copycatm2_state::write_r));
 	m_maincpu->o().set(FUNC(copycatm2_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_copycatm2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, copycat_speaker_levels);
+	static const s16 speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -9628,7 +11448,7 @@ public:
 WRITE16_MEMBER(ditto_state::write_r)
 {
 	// R0-R3: leds
-	display_matrix(4, 1, data & 0xf, 1);
+	m_display->matrix(1, data & 0xf);
 }
 
 WRITE16_MEMBER(ditto_state::write_o)
@@ -9655,13 +11475,15 @@ void ditto_state::ditto(machine_config &config)
 	m_maincpu->r().set(FUNC(ditto_state::write_r));
 	m_maincpu->o().set(FUNC(ditto_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 4);
 	config.set_default_layout(layout_ditto);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, copycat_speaker_levels);
+	static const s16 speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -9704,7 +11526,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -9713,11 +11535,9 @@ public:
 
 // handlers
 
-void ss7in1_state::prepare_display()
+void ss7in1_state::update_display()
 {
-	// R0-R3 are 7segs
-	set_display_segmask(0xf, 0x7f);
-	display_matrix(8, 9, m_o, m_r);
+	m_display->matrix(m_r, m_o);
 }
 
 WRITE16_MEMBER(ss7in1_state::write_r)
@@ -9728,16 +11548,17 @@ WRITE16_MEMBER(ss7in1_state::write_r)
 	// R0-R2,R10: input mux
 	m_inp_mux = (data & 7) | (data >> 7 & 8);
 
-	// R0-R9: digit/led select
+	// R0-R3: digit select
+	// R4-R9: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ss7in1_state::write_o)
 {
 	// O0-O7: led data
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ss7in1_state::read_k)
@@ -9783,7 +11604,10 @@ void ss7in1_state::ss7in1(machine_config &config)
 	m_maincpu->r().set(FUNC(ss7in1_state::write_r));
 	m_maincpu->o().set(FUNC(ss7in1_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_bri_levels(0.005, 0.05); // player led is brighter
 	config.set_default_layout(layout_7in1ss);
 
 	/* sound hardware */
@@ -9855,7 +11679,7 @@ public:
 	u8 m_exp_port[7];
 	DECLARE_WRITE8_MEMBER(expander_w);
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -9890,24 +11714,22 @@ void tbreakup_state::machine_reset()
 void tbreakup_state::set_clock()
 {
 	// MCU clock is from an analog circuit with resistor of 73K, PRO2 adds 100K
-	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 500000 : 325000);
+	m_maincpu->set_unscaled_clock((m_inputs[3]->read() & 1) ? 500000 : 325000);
 }
 
-void tbreakup_state::prepare_display()
+void tbreakup_state::update_display()
 {
 	// 7seg leds from R0,R1 and O0-O6
-	for (int y = 0; y < 2; y++)
-	{
-		m_display_segmask[y] = 0x7f;
-		m_display_state[y] = (m_r >> y & 1) ? (m_o & 0x7f) : 0;
-	}
+	m_display->matrix_partial(0, 2, m_r, m_o & 0x7f, false);
+
+	// 22 round leds from O2-O7 and expander port 7
+	m_display->matrix_partial(2, 6, m_o >> 2, m_exp_port[6], false);
 
 	// 24 rectangular leds from expander ports 1-6 (not strobed)
 	for (int y = 0; y < 6; y++)
-		m_display_state[y+8] = m_exp_port[y];
+		m_display->write_row(y+8, m_exp_port[y]);
 
-	set_display_size(8, 14);
-	display_update();
+	m_display->update();
 }
 
 WRITE8_MEMBER(tbreakup_state::expander_w)
@@ -9931,7 +11753,7 @@ WRITE16_MEMBER(tbreakup_state::write_r)
 
 	// R0,R1: select digit
 	m_r = ~data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tbreakup_state::write_o)
@@ -9939,20 +11761,16 @@ WRITE16_MEMBER(tbreakup_state::write_o)
 	// O0-O3: TMS1025 port H
 	m_expander->write_h(space, 0, data & 0xf);
 
-	// 22 round leds from O2-O7 and expander port 7 (update here)
-	for (int y = 2; y < 8; y++)
-		m_display_state[y] = (data >> y & 1) ? m_exp_port[6] : 0;
-
 	// O0-O7: led state
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tbreakup_state::read_k)
 {
 	// K4: fixed input
 	// K8: multiplexed inputs
-	return (m_inp_matrix[2]->read() & 4) | (read_inputs(2) & 8);
+	return (m_inputs[2]->read() & 4) | (read_inputs(2) & 8);
 }
 
 // config
@@ -9992,7 +11810,9 @@ void tbreakup_state::tbreakup(machine_config &config)
 	m_expander->write_port6_callback().set(FUNC(tbreakup_state::expander_w));
 	m_expander->write_port7_callback().set(FUNC(tbreakup_state::expander_w));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2+6+6, 8);
+	m_display->set_segmask(3, 0x7f);
 	config.set_default_layout(layout_tbreakup);
 
 	/* sound hardware */
@@ -10053,25 +11873,23 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
 
-	DECLARE_INPUT_CHANGED_MEMBER(flipper_button) { prepare_display(); }
+	DECLARE_INPUT_CHANGED_MEMBER(flipper_button) { update_display(); }
 	void phpball(machine_config &config);
 };
 
 // handlers
 
-void phpball_state::prepare_display()
+void phpball_state::update_display()
 {
 	// rectangular LEDs under LEDs D,F and E,G are directly connected
 	// to the left and right flipper buttons - output them to 10.a and 9.a
-	u16 in1 = m_inp_matrix[1]->read() << 7 & 0x600;
-
-	set_display_segmask(7, 0x7f);
-	display_matrix(7, 11, m_o, (m_r & 0x1ff) | in1);
+	u16 in1 = m_inputs[1]->read() << 7 & 0x600;
+	m_display->matrix((m_r & 0x1ff) | in1, m_o);
 }
 
 WRITE16_MEMBER(phpball_state::write_r)
@@ -10085,7 +11903,7 @@ WRITE16_MEMBER(phpball_state::write_r)
 	// R0-R2: digit select
 	// R0-R8: led select
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(phpball_state::write_o)
@@ -10093,13 +11911,13 @@ WRITE16_MEMBER(phpball_state::write_o)
 	// O0-O6: digit segment/led data
 	// O7: N/C
 	m_o = data & 0x7f;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(phpball_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[1]->read() | read_inputs(1);
+	return m_inputs[1]->read() | read_inputs(1);
 }
 
 // config
@@ -10123,7 +11941,9 @@ void phpball_state::phpball(machine_config &config)
 	m_maincpu->r().set(FUNC(phpball_state::write_r));
 	m_maincpu->o().set(FUNC(phpball_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 7);
+	m_display->set_segmask(7, 0x7f);
 	config.set_default_layout(layout_phpball);
 
 	/* sound hardware */
@@ -10168,7 +11988,7 @@ public:
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -10177,13 +11997,10 @@ public:
 
 // handlers
 
-void ssports4_state::prepare_display()
+void ssports4_state::update_display()
 {
-	// R0,R1 and R8,R9 are 7segs
-	set_display_segmask(0x303, 0x7f);
-
 	// note: R2 is an extra column
-	display_matrix(9, 10, m_o | (m_r << 6 & 0x100), m_r);
+	m_display->matrix(m_r, m_o | (m_r << 6 & 0x100));
 }
 
 WRITE16_MEMBER(ssports4_state::write_r)
@@ -10192,15 +12009,16 @@ WRITE16_MEMBER(ssports4_state::write_r)
 	m_speaker->level_w(data >> 10 & 1);
 
 	// R0-R9: led select/data
+	// R0,R1 and R8,R9 are 7segs
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(ssports4_state::write_o)
 {
 	// O0-O7: led data
 	m_o = data;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(ssports4_state::read_k)
@@ -10271,7 +12089,10 @@ void ssports4_state::ssports4(machine_config &config)
 	m_maincpu->r().set(FUNC(ssports4_state::write_r));
 	m_maincpu->o().set(FUNC(ssports4_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 9);
+	m_display->set_segmask(0x303, 0x7f);
+	m_display->set_bri_levels(0.003, 0.03); // offense leds are brighter
 	config.set_default_layout(layout_ssports4);
 
 	/* sound hardware */
@@ -10317,7 +12138,7 @@ public:
 	void update_halt();
 	DECLARE_INPUT_CHANGED_MEMBER(k4_button) { update_halt(); }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -10342,9 +12163,9 @@ void xl25_state::update_halt()
 	m_maincpu->set_input_line(INPUT_LINE_HALT, halt ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void xl25_state::prepare_display()
+void xl25_state::update_display()
 {
-	display_matrix(3, 10, m_o >> 1, m_r);
+	m_display->matrix(m_r, m_o >> 1);
 }
 
 WRITE16_MEMBER(xl25_state::write_r)
@@ -10352,14 +12173,14 @@ WRITE16_MEMBER(xl25_state::write_r)
 	// R0-R9: input mux, led select
 	m_inp_mux = data;
 	m_r = data;
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(xl25_state::write_o)
 {
 	// O1-O3: led data
 	m_o = data;
-	prepare_display();
+	update_display();
 
 	// O6: speaker out
 	m_speaker->level_w(data >> 6 & 1);
@@ -10447,7 +12268,8 @@ void xl25_state::xl25(machine_config &config)
 	m_maincpu->r().set(FUNC(xl25_state::write_r));
 	m_maincpu->o().set(FUNC(xl25_state::write_o));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 3);
 	config.set_default_layout(layout_xl25);
 
 	/* sound hardware */
@@ -10485,6 +12307,8 @@ CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   emp
 COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+
+COMP( 1977, cmulti8,    0,         0, cmulti8,   cmulti8,   cmulti8_state,   empty_init, "Canon", "Multi 8 (Canon)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -10563,7 +12387,23 @@ CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, emp
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
+COMP( 1974, tisr16,     0,         0, tisr16,    tisr16,    tisr16_state,    empty_init, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, tisr16ii,   0,         0, tisr16,    tisr16ii,  tisr16_state,    empty_init, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, ti1250,     0,         0, ti1250,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti125076,   ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti30,       0,         0, ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, tibusan,    0,         0, ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, tiprog,     0,         0, ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, ti1000,     0,         0, ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, wizatron,   0,         0, wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, lilprof,    0,         0, lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1978, lilprof78,  lilprof,   0, lilprof78, lilprof78, lilprof78_state, empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, dataman,    0,         0, dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, mathmarv,   0,         0, mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

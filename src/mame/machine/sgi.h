@@ -48,11 +48,11 @@ protected:
 private:
 	enum
 	{
-		MODE_TO_HOST	= (1 << 1),
-		MODE_SYNC		= (1 << 2),
-		MODE_FILL		= (1 << 3),
-		MODE_DIR		= (1 << 4),
-		MODE_SNOOP		= (1 << 5)
+		MODE_TO_HOST    = (1 << 1),
+		MODE_SYNC       = (1 << 2),
+		MODE_FILL       = (1 << 3),
+		MODE_DIR        = (1 << 4),
+		MODE_SNOOP      = (1 << 5)
 	};
 
 	uint32_t dma_translate(uint32_t address);

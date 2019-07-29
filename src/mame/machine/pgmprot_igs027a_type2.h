@@ -18,6 +18,7 @@ public:
 	void init_dwpc();
 
 	void pgm_arm_type2(machine_config &config);
+	void pgm_arm_type2_22m(machine_config &config);
 
 private:
 	// kov2

@@ -1,8 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/*
-    SGI "Newport" graphics board used in the Indy and some Indigo2s
-*/
+/*********************************************************************
+
+    newport.h
+
+    SGI "Newport" graphics board emulation
+
+*********************************************************************/
 
 #ifndef MAME_BUS_GIO_NEWPORT_H
 #define MAME_BUS_GIO_NEWPORT_H
@@ -14,12 +18,263 @@
 
 #define ENABLE_NEWVIEW_LOG      (0)
 
+
+/*************************************
+ *
+ *  XMAP9 Device
+ *
+ *************************************/
+
+class xmap9_device : public device_t
+{
+public:
+	xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t revision)
+		: xmap9_device(mconfig, tag, owner, clock)
+	{
+		set_revision(revision);
+	}
+
+	xmap9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint32_t read(uint32_t offset);
+	void write(uint32_t offset, uint32_t data);
+
+	// Getters
+	uint32_t cursor_cmap() const { return m_cursor_cmap; }
+	uint32_t popup_cmap() const { return m_popup_cmap; }
+	uint32_t mode_entry(uint32_t entry) const { return m_mode_table[entry]; }
+	bool is_8bpp() const { return BIT(m_config, 2); }
+
+private:
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// Initializers
+	void set_revision(uint32_t revision) { m_revision = revision; }
+
+	uint32_t m_config;
+	uint32_t m_revision;
+	uint32_t m_fifo_available;
+	//uint32_t m_entries;
+	uint32_t m_cursor_cmap;
+	uint32_t m_popup_cmap;
+	uint32_t m_mode_table_idx;
+	uint32_t m_mode_table[0x20];
+};
+
+DECLARE_DEVICE_TYPE(XMAP9, xmap9_device)
+
+
+/*************************************
+ *
+ *  CMAP Device
+ *
+ *************************************/
+
+class cmap_device : public device_t
+				  , public device_palette_interface
+{
+public:
+	cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t revision)
+		: cmap_device(mconfig, tag, owner, clock)
+	{
+		set_revision(revision);
+	}
+
+	cmap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint32_t read(uint32_t offset);
+	void write(uint32_t offset, uint32_t data);
+
+	// Getters
+	const uint32_t *palette_base() const { return m_palette; }
+
+private:
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 0x2000; }
+
+	// Initializers
+	void set_revision(uint32_t revision) { m_revision = revision; }
+
+	uint32_t m_status;
+	uint32_t m_revision;
+	uint16_t m_palette_idx;
+	uint32_t m_palette[0x10000];
+};
+
+DECLARE_DEVICE_TYPE(CMAP, cmap_device)
+
+
+/*************************************
+ *
+ *  VC2 Device
+ *
+ *************************************/
+
+class vc2_device : public device_t
+{
+public:
+	vc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint32_t read(uint32_t offset);
+	void write(uint32_t offset, uint32_t data, uint32_t mem_mask);
+
+	// Getters
+	int readout_x0() const { return m_readout_x0; }
+	int readout_y0() const { return m_readout_y0; }
+	int readout_x1() const { return m_readout_x1; }
+	int readout_y1() const { return m_readout_y1; }
+	uint16_t begin_did_line(int y);
+	uint16_t next_did_line_entry();
+	uint8_t get_cursor_pixel(int x, int y);
+
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+
+	auto vert_int() { return m_vert_int.bind(); }
+	auto screen_timing_changed() { return m_screen_timing_changed.bind(); } // Hack. TODO: Figure out a better way
+
+private:
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	enum
+	{
+		CURSOR_FUNC_ENABLE_BIT = 4,
+		CURSOR_ENABLE_BIT = 7,
+
+		CURSOR_MODE_BIT = 8,
+		CURSOR_MODE_GLYPH = 0,
+		CURSOR_MODE_CROSSHAIR = 1,
+
+		CURSOR_SIZE_BIT = 9,
+		CURSOR_SIZE_32 = 0,
+		CURSOR_SIZE_64 = 1
+	};
+
+	void decode_vt_line(uint32_t line, uint32_t line_seq_ptr);
+	void decode_vt_table();
+	void update_screen_size();
+
+	bool is_cursor_active(int x, int y);
+
+	uint16_t m_vid_entry;
+	uint16_t m_cursor_entry;
+	uint16_t m_cursor_x;
+	uint16_t m_cursor_y;
+	uint16_t m_cur_cursor_x;
+	uint16_t m_did_entry;
+	uint16_t m_scanline_len;
+	uint16_t m_ram_addr;
+	uint16_t m_vt_frame_ptr;
+	uint16_t m_vt_line_ptr;
+	uint16_t m_vt_line_run;
+	uint16_t m_vt_line_count;
+	uint16_t m_cursor_table_ptr;
+	uint16_t m_work_cursor_y;
+	uint16_t m_did_frame_ptr;
+	uint16_t m_did_line_ptr;
+	uint16_t m_display_ctrl;
+	uint16_t m_config;
+	uint8_t m_reg_idx;
+	uint16_t m_reg_data;
+	std::unique_ptr<uint16_t[]> m_ram;
+
+	std::unique_ptr<uint32_t[]> m_vt_table;
+
+	int m_readout_x0;
+	int m_readout_y0;
+	int m_readout_x1;
+	int m_readout_y1;
+
+	bool m_enable_cursor;
+
+	devcb_write_line m_vert_int;
+	devcb_write_line m_screen_timing_changed;
+
+	static const size_t RAM_SIZE;
+};
+
+DECLARE_DEVICE_TYPE(VC2, vc2_device)
+
+
+/*************************************
+ *
+ *  RB2 Device
+ *
+ *************************************/
+
+class rb2_device : public device_t
+{
+public:
+	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask)
+		: rb2_device(mconfig, tag, owner, clock)
+	{
+		set_global_mask(global_mask);
+	}
+
+	rb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// Getters
+	const uint32_t *rgbci(int y) const { return &m_rgbci[1344 * y]; }
+	const uint32_t *cidaux(int y) const { return &m_cidaux[1344 * y]; }
+
+	// devcb callbacks
+	void set_write_mask(uint32_t data);
+	void set_flags(uint16_t data);
+	void set_address(uint32_t address);
+	uint32_t read_pixel();
+	void write_pixel(uint32_t data);
+
+private:
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	void logic_pixel(uint32_t src);
+	void store_pixel(uint32_t value);
+
+	void set_global_mask(uint32_t global_mask) { m_global_mask = global_mask; }
+
+	uint32_t  m_global_mask;
+	uint32_t  m_write_mask;
+	bool      m_blend;
+	bool      m_fast_clear;
+	bool      m_rgbmode;
+	bool      m_dblsrc;
+	uint8_t   m_plane_enable;
+	uint8_t   m_draw_depth;
+	uint8_t   m_logicop;
+	uint8_t   m_store_shift;
+
+	uint32_t *m_dest_buf;
+	uint32_t *m_buf_ptr;
+
+	std::unique_ptr<uint32_t[]> m_rgbci;
+	std::unique_ptr<uint32_t[]> m_cidaux;
+
+	static const size_t BUFFER_SIZE;
+};
+
+DECLARE_DEVICE_TYPE(RB2, rb2_device)
+
+
+/*************************************
+ *
+ *  Newport Device
+ *
+ *************************************/
+
 class newport_base_device : public device_t
-						  , public device_palette_interface
 						  , public device_gio64_card_interface
 {
 public:
-	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t global_mask);
+	newport_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_gio_slot_interface overrides
 	virtual void install_device() override;
@@ -29,32 +284,26 @@ public:
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
+	DECLARE_WRITE_LINE_MEMBER(vrint_w);
+	DECLARE_WRITE_LINE_MEMBER(update_screen_size);
+
+	auto write_mask() { return m_write_mask_w.bind(); }
+	auto draw_flags() { return m_draw_flags_w.bind(); }
+	auto pixel_address() { return m_set_address.bind(); }
+	auto pixel_write() { return m_write_pixel.bind(); }
+	auto pixel_read() { return m_read_pixel.bind(); }
 
 protected:
+	// device_t overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual uint32_t palette_entries() const override { return 0x2000; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	void device_add_mconfig(machine_config &config, uint32_t xmap_revision, uint32_t cmap_revision, uint32_t global_mask);
 	void mem_map(address_map &map) override;
 
 	static constexpr device_timer_id DCB_TIMEOUT = 0;
-
-	enum
-	{
-		DCR_CURSOR_FUNC_ENABLE_BIT = 4,
-		DCR_CURSOR_ENABLE_BIT = 7,
-
-		DCR_CURSOR_MODE_BIT = 8,
-		DCR_CURSOR_MODE_GLYPH = 0,
-		DCR_CURSOR_MODE_CROSSHAIR = 1,
-
-		DCR_CURSOR_SIZE_BIT = 9,
-		DCR_CURSOR_SIZE_32 = 0,
-		DCR_CURSOR_SIZE_64 = 1
-	};
 
 	enum
 	{
@@ -73,53 +322,16 @@ protected:
 
 	enum
 	{
-		STATUS_GFXBUSY			= (1 << 3),
-		STATUS_BACKBUSY			= (1 << 4),
-		STATUS_VRINT			= (1 << 5),
-		STATUS_VIDEOINT			= (1 << 6),
-		STATUS_GFIFOLEVEL_SHIFT	= 7,
-		STATUS_GFIFOLEVEL_MASK	= (0x3f << STATUS_GFIFOLEVEL_SHIFT),
-		STATUS_BFIFOLEVEL_SHIFT	= 13,
-		STATUS_BFIFOLEVEL_MASK	= (0x1f << STATUS_BFIFOLEVEL_SHIFT),
-		STATUS_BFIFO_INT		= 18,
-		STATUS_GFIFO_INT		= 19
-	};
-
-	struct vc2_t
-	{
-		uint16_t m_vid_entry;
-		uint16_t m_cursor_entry;
-		uint16_t m_cursor_x;
-		uint16_t m_cursor_y;
-		uint16_t m_cur_cursor_x;
-		uint16_t m_did_entry;
-		uint16_t m_scanline_len;
-		uint16_t m_ram_addr;
-		uint16_t m_vt_frame_ptr;
-		uint16_t m_vt_line_ptr;
-		uint16_t m_vt_line_run;
-		uint16_t m_vt_line_count;
-		uint16_t m_cursor_table_ptr;
-		uint16_t m_work_cursor_y;
-		uint16_t m_did_frame_ptr;
-		uint16_t m_did_line_ptr;
-		uint16_t m_display_ctrl;
-		uint16_t m_config;
-		uint16_t m_ram[0x8000];
-		uint8_t m_reg_idx;
-		uint16_t m_reg_data;
-	};
-
-
-	struct xmap_t
-	{
-		uint32_t m_config;
-		uint32_t m_revision;
-		uint32_t m_entries;
-		uint32_t m_cursor_cmap;
-		uint32_t m_popup_cmap;
-		uint32_t m_mode_table_idx;
-		uint32_t m_mode_table[0x20];
+		STATUS_GFXBUSY          = (1 << 3),
+		STATUS_BACKBUSY         = (1 << 4),
+		STATUS_VRINT            = (1 << 5),
+		STATUS_VIDEOINT         = (1 << 6),
+		STATUS_GFIFOLEVEL_SHIFT = 7,
+		STATUS_GFIFOLEVEL_MASK  = (0x3f << STATUS_GFIFOLEVEL_SHIFT),
+		STATUS_BFIFOLEVEL_SHIFT = 13,
+		STATUS_BFIFOLEVEL_MASK  = (0x1f << STATUS_BFIFOLEVEL_SHIFT),
+		STATUS_BFIFO_INT        = 18,
+		STATUS_GFIFO_INT        = 19
 	};
 
 	struct rex3_t
@@ -134,7 +346,6 @@ protected:
 		uint8_t m_hostdepth;
 		uint8_t m_sfactor;
 		uint8_t m_dfactor;
-		uint8_t m_logicop;
 
 		uint32_t m_store_shift;
 		uint32_t m_host_shift;
@@ -184,10 +395,14 @@ protected:
 		uint32_t m_color_alpha;
 		uint32_t m_color_green;
 		uint32_t m_color_blue;
-		uint32_t m_slope_red;
-		uint32_t m_slope_alpha;
-		uint32_t m_slope_green;
-		uint32_t m_slope_blue;
+		uint32_t m_curr_color_red;
+		uint32_t m_curr_color_alpha;
+		uint32_t m_curr_color_green;
+		uint32_t m_curr_color_blue;
+		int32_t m_slope_red;
+		int32_t m_slope_alpha;
+		int32_t m_slope_green;
+		int32_t m_slope_blue;
 		uint32_t m_write_mask;
 		uint32_t m_color_i;
 		uint32_t m_zero_overflow;
@@ -206,28 +421,10 @@ protected:
 		uint32_t m_clip_mode;
 		uint32_t m_config;
 		uint32_t m_status;
-		uint8_t m_xfer_width;
+		uint32_t m_dcb_mask;
+		bool m_blend_back;
 	};
 
-	struct cmap_t
-	{
-		uint16_t m_palette_idx;
-		uint32_t m_palette[0x10000];
-	};
-
-	uint8_t get_cursor_pixel(int x, int y);
-
-	// internal state
-
-	uint32_t cmap0_read();
-	void cmap0_write(uint32_t data);
-	uint32_t cmap1_read();
-	uint32_t xmap0_read();
-	void xmap0_write(uint32_t data);
-	uint32_t xmap1_read();
-	void xmap1_write(uint32_t data);
-	uint32_t vc2_read();
-	void vc2_write(uint32_t data);
 	void ramdac_write(uint32_t data);
 
 	void write_x_start(int32_t val);
@@ -236,16 +433,11 @@ protected:
 	void write_y_end(int32_t val);
 
 	bool pixel_clip_pass(int16_t x, int16_t y);
-	void write_pixel(uint32_t color);
-	void write_pixel(int16_t x, int16_t y, uint32_t color);
-	void blend_pixel(uint32_t *dest_buf, uint32_t src);
-	void logic_pixel(uint32_t *dest_buf, uint32_t src);
-	void store_pixel(uint32_t *dest_buf, uint32_t src);
+	void output_pixel(uint32_t color);
+	void output_pixel(int16_t x, int16_t y, uint32_t color);
+	void blend_pixel(uint32_t src);
 
 	void iterate_shade();
-
-	virtual uint32_t get_cmap_revision() = 0;
-	virtual uint32_t get_xmap_revision() = 0;
 
 	uint32_t get_host_color();
 	uint32_t get_rgb_color(int16_t x, int16_t y);
@@ -267,6 +459,8 @@ protected:
 	uint32_t convert_8bpp_bgr_to_24bpp_rgb(uint8_t pix_in);
 	uint32_t convert_12bpp_bgr_to_24bpp_rgb(uint16_t pix_in);
 
+	uint32_t do_endian_swap(uint32_t color);
+
 	struct bresenham_octant_info_t
 	{
 		int16_t incrx1;
@@ -275,7 +469,7 @@ protected:
 		int16_t incry2;
 		uint8_t loop;
 	};
-	uint8_t get_octant(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t dx, uint16_t dy);
+	uint8_t get_octant(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dx, int32_t dy);
 	void do_fline(uint32_t color);
 	void do_iline(uint32_t color);
 
@@ -284,36 +478,28 @@ protected:
 
 	void do_rex3_command();
 
-	void decode_vt_line(uint32_t line, uint32_t line_seq_ptr);
-	void decode_vt_table();
-	void update_screen_size();
-
 	void ramdac_remap(uint32_t *dest);
 
 	required_device<screen_device> m_screen;
+	required_device_array<xmap9_device, 2> m_xmap;
+	required_device_array<cmap_device, 2> m_cmap;
+	required_device<vc2_device> m_vc2;
+	required_device<rb2_device> m_rb2;
 
 	uint32_t m_ramdac_lut_r[256];
 	uint32_t m_ramdac_lut_g[256];
 	uint32_t m_ramdac_lut_b[256];
 	uint8_t m_ramdac_lut_index;
 
-	vc2_t  m_vc2;
-	xmap_t m_xmap0;
-	xmap_t m_xmap1;
 	rex3_t m_rex3;
-	std::unique_ptr<uint32_t[]> m_rgbci;
-	std::unique_ptr<uint32_t[]> m_olay;
-	std::unique_ptr<uint32_t[]> m_pup;
-	std::unique_ptr<uint32_t[]> m_cid;
-	std::unique_ptr<uint32_t[]> m_vt_table;
-	cmap_t m_cmap0;
 	uint32_t m_global_mask;
 	emu_timer *m_dcb_timeout_timer;
 
-	int m_readout_x0;
-	int m_readout_y0;
-	int m_readout_x1;
-	int m_readout_y1;
+	devcb_write32 m_write_mask_w;
+	devcb_write16 m_draw_flags_w;
+	devcb_write32 m_set_address;
+	devcb_write32 m_write_pixel;
+	devcb_read32 m_read_pixel;
 
 #if ENABLE_NEWVIEW_LOG
 	void start_logging();
@@ -331,8 +517,7 @@ public:
 	gio64_xl8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 protected:
-	virtual uint32_t get_cmap_revision() override;
-	virtual uint32_t get_xmap_revision() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class gio64_xl24_device : public newport_base_device
@@ -341,8 +526,7 @@ public:
 	gio64_xl24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
 protected:
-	virtual uint32_t get_cmap_revision() override;
-	virtual uint32_t get_xmap_revision() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 DECLARE_DEVICE_TYPE(GIO64_XL8,  gio64_xl8_device)

@@ -3,14 +3,9 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* novag_sexpert.cpp, subdriver of machine/novagbase.cpp, machine/chessbase.cpp
+Novag Super Expert (model 878/887/902) / Novag Super Forte
 
-TODO:
-- led handling is correct? The core issue is probably led strobe timing.
-
-*******************************************************************************
-
-Novag Super Expert (model 878/887/902) overview:
+Hardware notes (Super Expert)
 - 65C02 @ 5MHz or 6MHz (10MHz or 12MHz XTAL)
 - 8KB RAM battery-backed, 3*32KB ROM
 - HD44780 LCD controller (16x1)
@@ -26,12 +21,17 @@ instead of magnet sensors.
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/novagbase.h"
-
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
+#include "machine/sensorboard.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "sound/beep.h"
+#include "video/hd44780.h"
+#include "video/pwm.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,14 +42,24 @@ instead of magnet sensors.
 
 namespace {
 
-class sexpert_state : public novagbase_state
+// Super Expert / shared
+
+class sexpert_state : public driver_device
 {
 public:
 	sexpert_state(const machine_config &mconfig, device_type type, const char *tag) :
-		novagbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_irq_on(*this, "irq_on"),
+		m_rombank(*this, "rombank"),
 		m_screen(*this, "screen"),
+		m_display(*this, "display"),
+		m_lcd(*this, "hd44780"),
+		m_board(*this, "board"),
 		m_acia(*this, "acia"),
-		m_rs232(*this, "rs232")
+		m_rs232(*this, "rs232"),
+		m_beeper(*this, "beeper"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
@@ -60,26 +70,82 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq) { sexpert_set_cpu_freq(); }
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices/pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_irq_on;
+	required_memory_bank m_rombank;
 	required_device<screen_device> m_screen;
+	required_device<pwm_display_device> m_display;
+	required_device<hd44780_device> m_lcd;
+	required_device<sensorboard_device> m_board;
 	required_device<mos6551_device> m_acia;
 	required_device<rs232_port_device> m_rs232;
-
-	virtual void machine_reset() override;
+	required_device<beep_device> m_beeper;
+	required_ioport_array<8> m_inputs;
 
 	void sexpert_set_cpu_freq();
 
 	// address maps
 	void sexpert_map(address_map &map);
 
+	// periodic interrupts
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
+	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
+
 	// I/O handlers
+	void update_display();
 	virtual DECLARE_WRITE8_MEMBER(lcd_control_w);
 	virtual DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(input1_r);
 	DECLARE_READ8_MEMBER(input2_r);
+
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+	void lcd_palette(palette_device &palette) const;
+
+	u8 m_inp_mux;
+	u8 m_led_data;
+	u8 m_lcd_control;
+	u8 m_lcd_data;
 };
+
+void sexpert_state::machine_start()
+{
+	// zerofill
+	m_inp_mux = 0;
+	m_led_data = 0;
+	m_lcd_control = 0;
+	m_lcd_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_lcd_control));
+	save_item(NAME(m_lcd_data));
+}
+
+void sexpert_state::sexpert_set_cpu_freq()
+{
+	// machines were released with either 5MHz or 6MHz CPU
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
+}
+
+void sexpert_state::machine_reset()
+{
+	sexpert_set_cpu_freq();
+	m_rombank->set_entry(0);
+}
+
+void sexpert_state::init_sexpert()
+{
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
+}
+
+// Super Forte
 
 class sforte_state : public sexpert_state
 {
@@ -91,6 +157,9 @@ public:
 	// machine drivers
 	void sforte(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// address maps
 	void sforte_map(address_map &map);
@@ -98,33 +167,53 @@ private:
 	// I/O handlers
 	virtual DECLARE_WRITE8_MEMBER(lcd_control_w) override;
 	virtual DECLARE_WRITE8_MEMBER(lcd_data_w) override;
+
+	TIMER_CALLBACK_MEMBER(beep) { m_beeper->set_state(param); }
+	emu_timer *m_beeptimer;
 };
 
-void sexpert_state::sexpert_set_cpu_freq()
+void sforte_state::machine_start()
 {
-	// machines were released with either 5MHz or 6MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
+	sexpert_state::machine_start();
+	m_beeptimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sforte_state::beep),this));
 }
 
-void sexpert_state::machine_reset()
-{
-	novagbase_state::machine_reset();
-
-	sexpert_set_cpu_freq();
-	m_rombank->set_entry(0);
-}
-
-void sexpert_state::init_sexpert()
-{
-	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
-}
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
+// LCD
+
+void sexpert_state::lcd_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
+	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+}
+
+HD44780_PIXEL_UPDATE(sexpert_state::lcd_pixel_update)
+{
+	// char size is 5x8
+	if (x > 4 || y > 7)
+		return;
+
+	if (line < 2 && pos < 8)
+	{
+		// internal: (8+8)*1, external: 1*16
+		bitmap.pix16(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
+	}
+}
+
+
 // TTL/generic
+
+void sexpert_state::update_display()
+{
+	// update leds (lcd is done separately)
+	m_display->matrix(m_inp_mux, m_led_data);
+}
 
 WRITE8_MEMBER(sexpert_state::lcd_control_w)
 {
@@ -146,6 +235,7 @@ WRITE8_MEMBER(sexpert_state::leds_w)
 {
 	// d0-d7: chessboard leds
 	m_led_data = data;
+	update_display();
 }
 
 WRITE8_MEMBER(sexpert_state::mux_w)
@@ -158,21 +248,33 @@ WRITE8_MEMBER(sexpert_state::mux_w)
 
 	// d4-d7: 74145 to input mux/led select
 	m_inp_mux = 1 << (data >> 4 & 0xf) & 0xff;
-	display_matrix(8, 8, m_led_data, m_inp_mux);
-	m_led_data = 0; // ?
+	update_display();
 }
 
 READ8_MEMBER(sexpert_state::input1_r)
 {
+	u8 data = 0;
+
 	// d0-d7: multiplexed inputs (chessboard squares)
-	return ~read_inputs(8) & 0xff;
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_board->read_rank(i, true);
+
+	return ~data;
 }
 
 READ8_MEMBER(sexpert_state::input2_r)
 {
+	u8 data = 0;
+
 	// d0-d2: printer port
+
 	// d5-d7: multiplexed inputs (side panel)
-	return ~read_inputs(8) >> 3 & 0xe0;
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read() << 5;
+
+	return ~data & 0xe0;
 }
 
 
@@ -183,27 +285,28 @@ WRITE8_MEMBER(sforte_state::lcd_control_w)
 	// d3: rom bankswitch
 	m_rombank->set_entry(data >> 3 & 1);
 
-	// assume same as sexpert
+	// LCD pins: same as sexpert
 	sexpert_state::lcd_control_w(space, offset, data);
+	lcd_data_w(space, 0, m_lcd_data); // refresh inp mux
 }
 
 WRITE8_MEMBER(sforte_state::lcd_data_w)
 {
-	// d0-d2: input mux/led select
-	m_inp_mux = 1 << (data & 7);
+	// d0-d2: 74145 to input mux/led select
+	// 74145 D from lcd control d2 (HD44780 E)
+	m_inp_mux = 1 << ((m_lcd_control << 1 & 8) | (data & 7));
 
-	// if lcd is disabled, misc control
-	if (~m_lcd_control & 4)
-	{
-		// d5,d6: led data, but not both at same time?
-		if ((data & 0x60) != 0x60)
-			display_matrix(2, 8, data >> 5 & 3, m_inp_mux);
+	// d5,d6: led data
+	m_led_data = ~data >> 5 & 3;
+	update_display();
 
-		// d7: enable beeper
-		m_beeper->set_state(data >> 7 & 1);
-	}
+	// d7: enable beeper
+	// capacitor for noise filter (sound glitches otherwise)
+	u8 param = data >> 7 & 1;
+	if (param != m_beeptimer->param())
+		m_beeptimer->adjust(attotime::from_msec(1), param);
 
-	// assume same as sexpert
+	// LCD pins: same as sexpert
 	sexpert_state::lcd_data_w(space, offset, data);
 }
 
@@ -244,61 +347,51 @@ void sforte_state::sforte_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( sexy_shared )
-	PORT_MODIFY("IN.0")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("->")
+static INPUT_PORTS_START( sexpert )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("->")
 
-	PORT_MODIFY("IN.1")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Level")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Flip Display / Time Control")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("<-")
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Level")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Flip Display / Time Control")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("<-")
 
-	PORT_MODIFY("IN.2")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Hint / Next Best")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Priority / Tournament Book / Pawn")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Yes/Start / Start of Game")
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Hint / Next Best")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Priority / Tournament Book / Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Yes/Start / Start of Game")
 
-	PORT_MODIFY("IN.3")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Trace Forward / AutoPlay")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Pro-Op / Restore Game / Rook")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("No/End / End of Game")
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Trace Forward / AutoPlay")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Pro-Op / Restore Game / Rook")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("No/End / End of Game")
 
-	PORT_MODIFY("IN.4")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Clear Board / Delete Pro-Op")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Best Move/Random / Review / Knight")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Print Book / Store Game")
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Clear Board / Delete Pro-Op")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Best Move/Random / Review / Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Print Book / Store Game")
 
-	PORT_MODIFY("IN.5")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Change Color")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Sound / Info / Bishop")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Print Moves / Print Evaluations")
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Change Color")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Sound / Info / Bishop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Print Moves / Print Evaluations")
 
-	PORT_MODIFY("IN.6")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Verify/Set Up / Pro-Op Book/Both Books")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Solve Mate / Infinite / Queen")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Print List / Acc. Time")
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Verify/Set Up / Pro-Op Book/Both Books")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Solve Mate / Infinite / Queen")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Print List / Acc. Time")
 
-	PORT_MODIFY("IN.7")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("New Game")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("New Game")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
 
 	PORT_START("FAKE")
 	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sexpert_state, sexpert_cpu_freq, nullptr) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "6MHz" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sexpert )
-	PORT_INCLUDE( generic_cb_magnets )
-	PORT_INCLUDE( sexy_shared )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sforte )
-	PORT_INCLUDE( generic_cb_buttons )
-	PORT_INCLUDE( sexy_shared )
 INPUT_PORTS_END
 
 
@@ -330,6 +423,10 @@ void sexpert_state::sexpert(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(200));
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60); // arbitrary
@@ -339,13 +436,13 @@ void sexpert_state::sexpert(machine_config &config)
 	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(sexpert_state::novag_lcd_palette), 3);
+	PALETTE(config, "palette", FUNC(sexpert_state::lcd_palette), 3);
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
-	m_lcd->set_pixel_update_cb(FUNC(sexpert_state::novag_lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(sexpert_state::lcd_pixel_update), this);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(sexpert_state::display_decay_tick), attotime::from_msec(1));
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	config.set_default_layout(layout_novag_sexpert);
 
 	/* sound hardware */
@@ -360,8 +457,8 @@ void sforte_state::sforte(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sforte_state::sforte_map);
-
 	m_irq_on->set_start_delay(m_irq_on->period() - attotime::from_usec(10)); // tlow measured between 8us and 12us (unstable)
+	m_board->set_type(sensorboard_device::BUTTONS);
 
 	config.set_default_layout(layout_novag_sforte);
 }
@@ -452,14 +549,14 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT   CMP MACHINE  INPUT    STATE          INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1987, sexperta,  0,        0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, sexpertb,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B, model 887)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, sexpertb1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B, model 886)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sexpertc,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sexpertc1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sexperta,  0,        0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sexpertb,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B, model 887)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sexpertb1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version B, model 886)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sexpertc,  sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sexpertc1, sexperta, 0, sexpert, sexpert, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, V1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, sfortea,   0,        0, sforte,  sforte,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, sfortea1,  sfortea,  0, sforte,  sforte,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, sfortea2,  sfortea,  0, sforte,  sforte,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, sforteb,   sfortea,  0, sforte,  sforte,  sforte_state,  init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, sfortec,   sfortea,  0, sforte,  sforte,  sforte_state,  init_sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, sfortea,   0,        0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sfortea1,  sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, sfortea2,  sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sforteb,   sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, sfortec,   sfortea,  0, sforte,  sexpert, sforte_state,  init_sexpert, "Novag", "Super Forte (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

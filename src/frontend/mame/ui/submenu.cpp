@@ -55,11 +55,6 @@ std::vector<submenu::option> const submenu::advanced_options = {
 
 	{ submenu::option_type::HEAD, __("Artwork Options") },
 	{ submenu::option_type::EMU,  __("Artwork Crop"),                            OPTION_ARTWORK_CROP },
-	{ submenu::option_type::EMU,  __("Use Backdrops"),                           OPTION_USE_BACKDROPS },
-	{ submenu::option_type::EMU,  __("Use Overlays"),                            OPTION_USE_OVERLAYS },
-	{ submenu::option_type::EMU,  __("Use Bezels"),                              OPTION_USE_BEZELS },
-	{ submenu::option_type::EMU,  __("Use Control Panels"),                      OPTION_USE_CPANELS },
-	{ submenu::option_type::EMU,  __("Use Marquees"),                            OPTION_USE_MARQUEES },
 
 	{ submenu::option_type::HEAD, __("State/Playback Options") },
 	{ submenu::option_type::EMU,  __("Automatic save/restore"),                  OPTION_AUTOSAVE },
@@ -415,7 +410,7 @@ void submenu::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	custombottom = customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -427,9 +422,9 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	char const *const toptext[] = { _(m_options[0].description) };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	if (selectedref)
 	{
@@ -439,9 +434,9 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			char const *const bottomtext[] = { selected_sm_option.entry->description() };
 			draw_text_box(
 					std::begin(bottomtext), std::end(bottomtext),
-					origx1, origx2, origy2 + UI_BOX_TB_BORDER, origy2 + bottom,
+					origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-					UI_TEXT_COLOR, UI_RED_COLOR, 1.0f);
+					ui().colors().text_color(), UI_RED_COLOR, 1.0f);
 		}
 	}
 }

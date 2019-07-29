@@ -21,6 +21,7 @@ This device may be related to the Intel 8251, but it is definitely not a SCN2651
 #include "machine/itt1700_kbd.h"
 #include "video/mc6845.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class itt1700_state : public driver_device
@@ -29,6 +30,7 @@ public:
 	itt1700_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_videoram(*this, "videoram")
 		, m_chargen(*this, "chargen")
 	{
 	}
@@ -42,18 +44,33 @@ private:
 	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u8> m_videoram;
 	required_region_ptr<u8> m_chargen;
 };
 
 
 MC6845_UPDATE_ROW(itt1700_state::update_row)
 {
+	u32 *px = &bitmap.pix32(y);
+	u16 page = 0x800;
+
+	for (int i = 0; i < x_count; i++)
+	{
+		u8 chr = m_videoram[((ma + i) & 0x7ff) | page];
+		u16 dots = m_chargen[u16(chr) << 4 | ra] << 1;
+		rgb_t fg = rgb_t::white();
+		rgb_t bg = rgb_t::black();
+
+		for (int n = 9; n > 0; n--, dots <<= 1)
+			*px++ = BIT(dots, 8) ? fg : bg;
+	}
 }
 
 void itt1700_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("maincpu", 0);
-	map(0x2000, 0x7fff).ram();
+	map(0x2000, 0x3fff).ram().share("videoram");
+	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x8000).nopr();
 }
 
@@ -62,7 +79,7 @@ void itt1700_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x10).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0x11, 0x11).w("crtc", FUNC(hd6845s_device::register_w));
-	map(0x20, 0x21).rw("upi", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x20, 0x21).rw("upi", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
 }
 
 static INPUT_PORTS_START(itt1700)
@@ -74,10 +91,11 @@ void itt1700_state::itt1700(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itt1700_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &itt1700_state::io_map);
 
-	upi41_cpu_device &upi(I8741(config, "upi", 16.6698_MHz_XTAL / 3)); // clock guessed
+	upi41_cpu_device &upi(I8741A(config, "upi", 16.6698_MHz_XTAL / 3)); // clock guessed
 	upi.p1_out_cb().set("keyboard", FUNC(itt1700_keyboard_device::clock_w)).bit(0);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line1_w)).bit(1);
 	upi.p1_out_cb().append("keyboard", FUNC(itt1700_keyboard_device::line2_w)).bit(2);
+	// P20-P22 = PWM LEDs? (too high-frequency to be speaker output)
 	upi.t0_in_cb().set("keyboard", FUNC(itt1700_keyboard_device::sense_r));
 
 	ITT1700_KEYBOARD(config, "keyboard");

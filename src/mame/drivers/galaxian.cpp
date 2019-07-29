@@ -4062,6 +4062,9 @@ static INPUT_PORTS_START( skybase )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
@@ -9784,7 +9787,7 @@ ROM_START( mooncrs5 )
 	ROM_LOAD( "f_r_d.bin", 0x2000, 0x0800, CRC(06d378a6) SHA1(99dbe9fc7f95f8fdce86eb5c32bd1ca1bea0ca3c) )
 	ROM_LOAD( "f_f_e.bin", 0x2800, 0x0800, CRC(6e84a927) SHA1(82e8e825d157c3c947a3a222bca059a735169c7d) )
 	ROM_LOAD( "f_f_f.bin", 0x3000, 0x0800, CRC(b45af1e8) SHA1(d7020774707234acdaef5c655f667d5ee9e54a13) )
-	ROM_LOAD( "f_r_f.bin", 0x3800, 0x0800, CRC(2d36a3e6) SHA1(9b7b5203dd421a4d9bb310594edd30f5111e9e40) ) // 1st and 2nd half identical
+	ROM_LOAD( "f_r_f.bin", 0x3800, 0x0800, BAD_DUMP CRC(2d36a3e6) SHA1(9b7b5203dd421a4d9bb310594edd30f5111e9e40) ) // 1st and 2nd half identical, misses the second half of code
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "r_r_a.bin", 0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )
@@ -12738,10 +12741,10 @@ GAME( 19??, omni,        pisces,   galaxian,   piscesb,    galaxian_state, init_
 GAME( 1980, uniwars,     0,        galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "UniWar S", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, uniwarsa,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Karateco)", "UniWar S (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mltiwars,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Gayton Games)", "Multi Wars (bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikoku,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "Gingateikoku No Gyakushu", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub,   uniwars,  galaxian,   gteikokub,  galaxian_state, init_pisces,     ROT270, "bootleg", "Gingateikoku No Gyakushu (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub2,  uniwars,  galaxian,   gteikokub2, galaxian_state, init_pisces,     ROT90,  "bootleg", "Gingateikoku No Gyakushu (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokub3,  uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Honly)", "Gingateikoku No Gyakushu (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikoku,    uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "Irem", "Gingateikoku no Gyakushu", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub,   uniwars,  galaxian,   gteikokub,  galaxian_state, init_pisces,     ROT270, "bootleg", "Gingateikoku no Gyakushu (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub2,  uniwars,  galaxian,   gteikokub2, galaxian_state, init_pisces,     ROT90,  "bootleg", "Gingateikoku no Gyakushu (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub3,  uniwars,  galaxian,   superg,     galaxian_state, init_pisces,     ROT90,  "bootleg (Honly)", "Gingateikoku no Gyakushu (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbatt,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbat2,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacempr,    uniwars,  galaxian,   spacbatt,   galaxian_state, init_pisces,     ROT90,  "bootleg", "Space Empire (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -12804,7 +12807,7 @@ GAME( 1980, mooncrsb,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_
 GAME( 1980, mooncrs2,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mooncrs3,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", MACHINE_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
 GAME( 1980, mooncrs4,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (SG-Florence)", "Moon Crest (Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncrs5,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncrs5,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg", "Moon Cresta (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, fantazia,    mooncrst, mooncrst,   fantazia,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Subelectro)", "Fantazia (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981?,spctbird,    mooncrst, mooncrst,   eagle2,     galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Fortrek)", "Space Thunderbird", MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Gremlin)", "Super Moon Cresta (Gremlin, bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a bootleg, still has the 'POR' text in the bottom right corner that the Sonic version has?!

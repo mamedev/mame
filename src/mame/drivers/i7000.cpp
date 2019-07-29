@@ -87,7 +87,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	void i7000_palette(palette_device &palette) const;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
 
 	DECLARE_READ8_MEMBER(i7000_kbd_r);
 	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
@@ -287,7 +287,7 @@ void i7000_state::i7000_io(address_map &map)
 //  AM_RANGE(0xbb, 0xbb) AM_WRITE(i7000_io_?_w) //may be related to page-swapping...
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
+DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
 {
 	uint32_t size = m_card->common_get_size("rom");
 
@@ -341,8 +341,8 @@ MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
 }
 
 
-MACHINE_CONFIG_START(i7000_state::i7000)
-
+void i7000_state::i7000(machine_config &config)
+{
 	/* basic machine hardware */
 	NSC800(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &i7000_state::i7000_mem);
@@ -386,13 +386,11 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	kbdc.in_ctrl_callback().set_constant(1);                            // TODO: Ctrl key
 
 	/* Cartridge slot */
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "i7000_card")
-	MCFG_GENERIC_EXTENSIONS("rom")
-	MCFG_GENERIC_LOAD(i7000_state, i7000_card)
+	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "i7000_card", "rom").set_device_load(FUNC(i7000_state::card_load), this);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");
-MACHINE_CONFIG_END
+}
 
 ROM_START( i7000 )
 	ROM_REGION( 0x1000, "boot", 0 )

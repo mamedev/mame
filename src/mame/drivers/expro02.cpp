@@ -1785,24 +1785,46 @@ ROM_START( zipzap )
 	ROM_LOAD16_BYTE( "ud17.bin", 0x000001, 0x40000, BAD_DUMP CRC(2901fae1) SHA1(0d6ca6d48c5586c05f3c02aee51a95da38b3751f) )
 	ROM_LOAD16_BYTE( "ue17.bin", 0x000000, 0x40000, BAD_DUMP CRC(da6c3fc8) SHA1(4bc01bc6f62553f6ac4f7252f7d9bf0d639f6935) )
 	/* gfx bitmaps */
-	ROM_LOAD16_BYTE( "938.bin",  0x400000, 0x80000, CRC(61c06b60) SHA1(b3abae020009a48b99862766e0981e1118159a47) ) // good title background
-	ROM_LOAD16_BYTE( "942.bin",  0x400001, 0x80000, CRC(282413b8) SHA1(e2ecaaa3c5b2355eadc016b73d7d658f25e1e0db) ) // (and corrupt gfx on select mode screen)
-
-	ROM_LOAD16_BYTE( "934.bin",  0x300000, 0x80000, CRC(1e65988a) SHA1(64d6f8cbdb28755515d9bbf52f589ce1176fed58) ) // good, girls
-	ROM_LOAD16_BYTE( "939.bin",  0x300001, 0x80000, CRC(8790a6a3) SHA1(94f39e48b75144cab191e2de4284c28d18b8f1c7))
-
-	ROM_LOAD16_BYTE( "936.bin",  0x200000, 0x80000, CRC(596543cc) SHA1(10a0eab4ca4a8749f1703ff6fcc80d731d07d087) ) // good, girls
-	ROM_LOAD16_BYTE( "940.bin",  0x200001, 0x80000, CRC(0c9dfb53) SHA1(541bd8c79408b7415713b517eacdd565d0ac5cb8) )
-
 	ROM_LOAD16_BYTE( "937.bin",  0x100000, 0x80000, CRC(61dd653f) SHA1(68b5ae3423363cc64d933836bf6881431dad021a) ) // good, girls
 	ROM_LOAD16_BYTE( "941.bin",  0x100001, 0x80000, CRC(320321ed) SHA1(00b52cd34cd86c105ff6dbd0248ff239de31c851) )
+	ROM_LOAD16_BYTE( "936.bin",  0x200000, 0x80000, CRC(596543cc) SHA1(10a0eab4ca4a8749f1703ff6fcc80d731d07d087) ) // good, girls
+	ROM_LOAD16_BYTE( "940.bin",  0x200001, 0x80000, CRC(0c9dfb53) SHA1(541bd8c79408b7415713b517eacdd565d0ac5cb8) )
+	ROM_LOAD16_BYTE( "934.bin",  0x300000, 0x80000, CRC(1e65988a) SHA1(64d6f8cbdb28755515d9bbf52f589ce1176fed58) ) // good, girls
+	ROM_LOAD16_BYTE( "939.bin",  0x300001, 0x80000, CRC(8790a6a3) SHA1(94f39e48b75144cab191e2de4284c28d18b8f1c7) )
+	ROM_LOAD16_BYTE( "938.bin",  0x400000, 0x80000, CRC(61c06b60) SHA1(b3abae020009a48b99862766e0981e1118159a47) ) // good title background
+	ROM_LOAD16_BYTE( "942.bin",  0x400001, 0x80000, CRC(282413b8) SHA1(e2ecaaa3c5b2355eadc016b73d7d658f25e1e0db) ) // (and corrupt gfx on select mode screen)
 
 	ROM_REGION( 0x100000, "kan_spr", 0 ) // sprites
 	ROM_LOAD( "u5.bin",  0x000000, 0x80000,  CRC(c274d8b5) SHA1(2c45961aaf8311f027a734df7e33fe085dfdd099) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "snd.bin", 0x00000, 0x80000,  CRC(bc20423e) SHA1(1f4bd52ec4f9b3b3e6b10ac2b3afaadf76a2c7c9) )
+	ROM_LOAD( "snd.bin", 0x00000, 0x80000,  CRC(bc20423e) SHA1(1f4bd52ec4f9b3b3e6b10ac2b3afaadf76a2c7c9) ) // Missing a sound ROM??
 	ROM_RELOAD(          0x80000, 0x80000 )
+ROM_END
+
+ROM_START( zipzapa )
+	ROM_REGION( 0x500000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "30.ud17", 0x000001, 0x20000, CRC(769ec252) SHA1(abb0e91036d0643146d81b652defb8f6fb0b5a58) )
+	ROM_LOAD16_BYTE( "31.ue17", 0x000000, 0x20000, CRC(e098ef98) SHA1(d08db27e4c6ae9a3f46c40d3c816c2efe23ac92b) )
+	/* gfx bitmaps */
+	ROM_LOAD16_BYTE( "37.rd2b",  0x100000, 0x80000, CRC(0b59d718) SHA1(9e7a9bff55396953f7ccfeb1d968e3e814cd3990) )
+	ROM_LOAD16_BYTE( "33.rd2a",  0x100001, 0x80000, CRC(df35c8f5) SHA1(69b7aeea9af03611bae12a899ece53068df62eec) )
+	ROM_LOAD16_BYTE( "38.rd3b",  0x200000, 0x80000, CRC(575dfc8c) SHA1(4400d5f0f6d63bfc10894c28de3fe8aa83ee49a9) )
+	ROM_LOAD16_BYTE( "34.rd3a",  0x200001, 0x80000, CRC(f8bd156b) SHA1(6c95c597898b0dca1b3ccece0e46d67333fdc6ea) )
+	ROM_LOAD16_BYTE( "39",       0x300000, 0x80000, CRC(302375c0) SHA1(1618bafab0bec265db9f2414f65fef7e3467e13c) )
+	ROM_LOAD16_BYTE( "35",       0x300001, 0x80000, CRC(9b6409a6) SHA1(aa0c38a149bd33e287f2ada5960429352bd63a23) )
+	ROM_LOAD16_BYTE( "36.rd1b",  0x400000, 0x80000, CRC(f3256bbb) SHA1(0ca9a02f1824b72fc903bc78d83392297b076094) )
+	ROM_LOAD16_BYTE( "32.rd1a",  0x400001, 0x80000, CRC(1dd511a9) SHA1(c8c96ad9e56e1990bdaee5ba8e1942c1de180ef2) )
+
+	ROM_REGION( 0x100000, "kan_spr", 0 ) // sprites
+	ROM_LOAD( "40.u5",  0x000000, 0x80000,  CRC(c274d8b5) SHA1(2c45961aaf8311f027a734df7e33fe085dfdd099) ) // == u5.bin above
+
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "29.ub6", 0x00000, 0x20000,  CRC(2cf3b8ea) SHA1(84a306a1afdc04c9828e5fbda2c050183d9006a3) ) // Correct loading??
+	ROM_RELOAD(         0x20000, 0x20000 )
+	ROM_RELOAD(         0x40000, 0x20000 )
+	ROM_RELOAD(         0x60000, 0x20000 )
+	ROM_LOAD( "28.uc6", 0x80000, 0x80000,  CRC(e5d026c7) SHA1(7e011d14ec8da493250ec7506909417e64690e73) ) // bad dump or loading / banking issue??
 ROM_END
 
 
@@ -1888,4 +1910,5 @@ GAME( 1996, pgalvip,   0,        galhustl, galhustl,  expro02_state, empty_init,
 GAME( 1997, pgalvipa,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, galhustl,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International",        "Gals Hustler", MACHINE_SUPPORTS_SAVE ) // hack of the above?
 
-GAME( 1995, zipzap,    0,        zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, zipzap,    0,        zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap (Explicit)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1995, zipzapa,   zipzap,   zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap (Less Explicit)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "B" nudity level

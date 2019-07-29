@@ -112,7 +112,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_vc20 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_vc20);
 	// keyboard state
 	int m_key_col;
 	int m_light_pen;
@@ -162,7 +162,7 @@ private:
 };
 
 
-QUICKLOAD_LOAD_MEMBER( vic20_state, cbm_vc20 )
+QUICKLOAD_LOAD_MEMBER(vic20_state::quickload_vc20)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -844,8 +844,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	m_user->pl_handler().set(m_via1, FUNC(via6522_device::write_pb7));
 	m_user->pm_handler().set(m_via1, FUNC(via6522_device::write_cb2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload"));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(vic20_state, cbm_vc20), this), "p00,prg", CBM_QUICKLOAD_DELAY);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(vic20_state::quickload_vc20), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_type("vic1001_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
 	SOFTWARE_LIST(config, "cass_list").set_type("vic1001_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);

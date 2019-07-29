@@ -113,6 +113,7 @@ public:
 
 	void draw_lcd(int y);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void cdimono1(machine_config &config);
 	void cdimono2(machine_config &config);
 	void quizard4(machine_config &config);
@@ -122,12 +123,27 @@ public:
 	void quizard3(machine_config &config);
 	void quizard1(machine_config &config);
 	void quizard(machine_config &config);
+
 	void cdi910_mem(address_map &map);
 	void cdimono1_mem(address_map &map);
 	void cdimono2_mem(address_map &map);
 	void cdimono2_servo_mem(address_map &map);
 	void cdimono2_slave_mem(address_map &map);
 	void cdi070_cpuspace(address_map &map);
+
+	// Quizard Protection HLE
+	void set_quizard_mcu_value(uint16_t value);
+	void set_quizard_mcu_ack(uint8_t ack);
+	void quizard_rx(uint8_t data);
+	void quizard_calculate_state();
+	void quizard_set_seeds(uint8_t *rx);
+	void quizard_handle_byte_tx(uint8_t data);
+
+	uint16_t m_seeds[10];
+	uint8_t m_state[8];
+
+	uint16_t m_mcu_value;
+	uint8_t m_mcu_ack;
 };
 
 #endif // MAME_INCLUDES_CDI_H

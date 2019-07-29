@@ -25,7 +25,9 @@ CPU speed. It should be around 14-16MHz. The ARM CPU is rated 12MHz, they
 probably went for this solution to get optimum possible speed for each module.
 
 TODO:
+- PC version still gives a sync error on boot sometimes, probably related to quantum
 - is interrupt handling correct?
+- timer shouldn't be needed for disabling bootstrap, real ARM has already read the next opcode
 
 */
 
@@ -43,6 +45,8 @@ chessmachine_device::chessmachine_device(const machine_config &mconfig, const ch
 	device_t(mconfig, CHESSMACHINE, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
 	m_bootstrap(*this, "bootstrap"),
+	m_ram(*this, "ram"),
+	m_disable_bootstrap(*this, "disable_bootstrap"),
 	m_data_out(*this)
 { }
 
@@ -57,8 +61,12 @@ void chessmachine_device::device_start()
 	// resolve callbacks
 	m_data_out.resolve_safe();
 
-	// zerofill, register for savestates
+	// zerofill
+	m_bootstrap_enabled = false;
 	m_latch[0] = m_latch[1] = 0;
+
+	// register for savestates
+	save_item(NAME(m_bootstrap_enabled));
 	save_item(NAME(m_latch));
 }
 
@@ -96,11 +104,7 @@ void chessmachine_device::reset_w(int state)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (state)
-	{
-		// send bootstrap
-		for (int i = 0; i < 0x80; i++)
-			m_maincpu->space(AS_PROGRAM).write_byte(i, m_bootstrap[i]);
-	}
+		m_bootstrap_enabled = true;
 }
 
 
@@ -109,11 +113,26 @@ void chessmachine_device::reset_w(int state)
 //  internal
 //-------------------------------------------------
 
+u32 chessmachine_device::bootstrap_r(offs_t offset)
+{
+	return (m_bootstrap_enabled) ? m_bootstrap[offset] : m_ram[offset];
+}
+
+u32 chessmachine_device::disable_bootstrap_r()
+{
+	// disconnect bootstrap rom from the bus after next opcode
+	if (m_bootstrap_enabled && !m_disable_bootstrap->enabled() && !machine().side_effects_disabled())
+		m_disable_bootstrap->adjust(m_maincpu->cycles_to_attotime(5));
+
+	return 0;
+}
+
 void chessmachine_device::main_map(address_map &map)
 {
-	map(0x00000000, 0x000fffff).ram();
+	map(0x00000000, 0x000fffff).ram().share("ram");
+	map(0x00000000, 0x0000007f).r(FUNC(chessmachine_device::bootstrap_r));
 	map(0x00400000, 0x00400000).mirror(0x003ffffc).rw(FUNC(chessmachine_device::internal_r), FUNC(chessmachine_device::internal_w));
-	//map(0x01800000, 0x01800003).nopr(); // disconnect bootstrap?
+	map(0x01800000, 0x01800003).r(FUNC(chessmachine_device::disable_bootstrap_r));
 }
 
 void chessmachine_device::device_add_mconfig(machine_config &config)
@@ -121,6 +140,8 @@ void chessmachine_device::device_add_mconfig(machine_config &config)
 	ARM(config, m_maincpu, DERIVED_CLOCK(1,1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &chessmachine_device::main_map);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
+
+	TIMER(config, "disable_bootstrap").configure_generic(FUNC(chessmachine_device::disable_bootstrap));
 }
 
 
@@ -130,7 +151,7 @@ void chessmachine_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 ROM_START( chessmachine )
-	ROM_REGION( 0x80, "bootstrap", 0 )
+	ROM_REGION32_LE( 0x80, "bootstrap", 0 )
 	ROM_LOAD32_BYTE( "74s288.1", 0x00, 0x20, CRC(284114e2) SHA1(df4037536d505d7240bb1d70dc58f59a34ab77b4) )
 	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, CRC(9f239c75) SHA1(aafaf30dac90f36b01f9ee89903649fc4ea0480d) )
 	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, CRC(0455360b) SHA1(f1486142330f2c39a4d6c479646030d31443d1c8) )

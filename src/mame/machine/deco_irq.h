@@ -81,7 +81,7 @@ private:
 	bool m_raster_irq_masked;
 	u8 m_raster_irq_scanline;
 
-	u8 m_lightgun_latch;
+	int m_lightgun_latch;
 };
 
 

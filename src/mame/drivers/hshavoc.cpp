@@ -31,7 +31,8 @@ PCB markings:"DE-0407-2 MADE IN JAPAN"
 -----------------------------------
 
 Thanks to DOX, the "mystery chip" has been identified (and verified) as a PIC.
-Unfortunately it's read protected.
+It's read protected, but has been decapped and read out. Unfortunately it doesn't
+help with figuring out the encryption on the coin-op parts of the program.
 
 */
 

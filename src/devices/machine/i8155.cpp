@@ -443,6 +443,80 @@ uint8_t i8155_device::io_r(offs_t offset)
 	return data;
 }
 
+//-------------------------------------------------
+//  write_command - set port modes and start/stop
+//  timer
+//-------------------------------------------------
+
+void i8155_device::write_command(uint8_t data)
+{
+	uint8_t old_command = std::exchange(m_command, data);
+
+	LOGMASKED(LOG_PORT, "Port A Mode: %s\n", (data & COMMAND_PA) ? "output" : "input");
+	LOGMASKED(LOG_PORT, "Port B Mode: %s\n", (data & COMMAND_PB) ? "output" : "input");
+
+	LOGMASKED(LOG_PORT, "Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
+	LOGMASKED(LOG_PORT, "Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
+
+	if ((data & COMMAND_PA) && (~old_command & COMMAND_PA))
+		m_out_pa_cb((offs_t)0, m_output[PORT_A]);
+	if ((data & COMMAND_PB) && (~old_command & COMMAND_PB))
+		m_out_pb_cb((offs_t)0, m_output[PORT_B]);
+
+	switch (data & COMMAND_PC_MASK)
+	{
+	case COMMAND_PC_ALT_1:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 1 (PC0-PC5 input)\n");
+		break;
+
+	case COMMAND_PC_ALT_2:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 2 (PC0-PC5 output)\n");
+		if ((old_command & COMMAND_PC_MASK) != COMMAND_PC_ALT_2)
+			m_out_pc_cb((offs_t)0, m_output[PORT_C]);
+		break;
+
+	case COMMAND_PC_ALT_3:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 3 (PC0-PC2 A handshake, PC3-PC5 output)\n");
+		break;
+
+	case COMMAND_PC_ALT_4:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 4 (PC0-PC2 A handshake, PC3-PC5 B handshake)\n");
+		break;
+	}
+
+	switch (data & COMMAND_TM_MASK)
+	{
+	case COMMAND_TM_NOP:
+		// do not affect counter operation
+		break;
+
+	case COMMAND_TM_STOP:
+		// NOP if timer has not started, stop counting if the timer is running
+		LOGMASKED(LOG_PORT, "Timer Command: Stop\n");
+		timer_stop_count();
+		break;
+
+	case COMMAND_TM_STOP_AFTER_TC:
+		// stop immediately after present TC is reached (NOP if timer has not started)
+		LOGMASKED(LOG_PORT, "Timer Command: Stop after TC\n");
+		break;
+
+	case COMMAND_TM_START:
+		LOGMASKED(LOG_PORT, "Timer Command: Start\n");
+
+		if (m_timer->enabled())
+		{
+			// if timer is running, start the new mode and CNT length immediately after present TC is reached
+		}
+		else
+		{
+			// load mode and CNT length and start immediately after loading (if timer is not running)
+			timer_reload_count();
+		}
+		break;
+	}
+}
+
 
 //-------------------------------------------------
 //  register_w - register write
@@ -453,64 +527,7 @@ void i8155_device::register_w(int offset, uint8_t data)
 	switch (offset & 0x07)
 	{
 	case REGISTER_COMMAND:
-		m_command = data;
-
-		LOGMASKED(LOG_PORT, "Port A Mode: %s\n", (data & COMMAND_PA) ? "output" : "input");
-		LOGMASKED(LOG_PORT, "Port B Mode: %s\n", (data & COMMAND_PB) ? "output" : "input");
-
-		LOGMASKED(LOG_PORT, "Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
-		LOGMASKED(LOG_PORT, "Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
-
-		switch (data & COMMAND_PC_MASK)
-		{
-		case COMMAND_PC_ALT_1:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 1\n");
-			break;
-
-		case COMMAND_PC_ALT_2:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 2\n");
-			break;
-
-		case COMMAND_PC_ALT_3:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 3\n");
-			break;
-
-		case COMMAND_PC_ALT_4:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 4\n");
-			break;
-		}
-
-		switch (data & COMMAND_TM_MASK)
-		{
-		case COMMAND_TM_NOP:
-			// do not affect counter operation
-			break;
-
-		case COMMAND_TM_STOP:
-			// NOP if timer has not started, stop counting if the timer is running
-			LOGMASKED(LOG_PORT, "Timer Command: Stop\n");
-			timer_stop_count();
-			break;
-
-		case COMMAND_TM_STOP_AFTER_TC:
-			// stop immediately after present TC is reached (NOP if timer has not started)
-			LOGMASKED(LOG_PORT, "Timer Command: Stop after TC\n");
-			break;
-
-		case COMMAND_TM_START:
-			LOGMASKED(LOG_PORT, "Timer Command: Start\n");
-
-			if (m_timer->enabled())
-			{
-				// if timer is running, start the new mode and CNT length immediately after present TC is reached
-			}
-			else
-			{
-				// load mode and CNT length and start immediately after loading (if timer is not running)
-				timer_reload_count();
-			}
-			break;
-		}
+		write_command(data);
 		break;
 
 	case REGISTER_PORT_A:

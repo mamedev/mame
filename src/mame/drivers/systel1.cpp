@@ -46,7 +46,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	u8 memory_r(offs_t offset);
 	void memory_w(offs_t offset, u8 data);
-	u8 m1_r(offs_t offset);
 	void floppy_control_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(rts_w);
 	DECLARE_WRITE_LINE_MEMBER(dtr_w);
@@ -54,7 +53,6 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void mem_map(address_map &map);
-	void m1_map(address_map &map);
 	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -67,7 +65,6 @@ private:
 	std::unique_ptr<u8[]> m_ram;
 
 	bool m_boot_read;
-	bool m_boot_execute;
 };
 
 void systel1_state::machine_start()
@@ -76,14 +73,12 @@ void systel1_state::machine_start()
 	m_fdc->set_floppy(m_floppy->get_device());
 
 	save_item(NAME(m_boot_read));
-	save_item(NAME(m_boot_execute));
 	save_pointer(NAME(m_ram), 0x10000);
 }
 
 void systel1_state::machine_reset()
 {
 	m_boot_read = true;
-	m_boot_execute = true;
 }
 
 WRITE_LINE_MEMBER(systel1_state::hrq_w)
@@ -105,20 +100,6 @@ void systel1_state::memory_w(offs_t offset, u8 data)
 	m_ram[offset] = data;
 }
 
-u8 systel1_state::m1_r(offs_t offset)
-{
-	if (offset < 0x4000)
-	{
-		if (!m_boot_execute && !machine().side_effects_disabled())
-			m_boot_read = false;
-		if (m_boot_read)
-			return m_rom[offset & 0x7ff];
-	}
-	else if (!machine().side_effects_disabled())
-		m_boot_execute = false;
-	return m_ram[offset];
-}
-
 I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 {
 	u8 dots = lten ? 0xff : vsp ? 0 : m_chargen[(charcode << 4) | linecount];
@@ -136,6 +117,8 @@ void systel1_state::floppy_control_w(u8 data)
 {
 	if (m_floppy->get_device() != nullptr)
 		m_floppy->get_device()->ss_w(!BIT(data, 0));
+
+	m_boot_read = false;
 }
 
 WRITE_LINE_MEMBER(systel1_state::rts_w)
@@ -153,11 +136,6 @@ WRITE_LINE_MEMBER(systel1_state::dtr_w)
 void systel1_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(systel1_state::memory_r), FUNC(systel1_state::memory_w));
-}
-
-void systel1_state::m1_map(address_map &map)
-{
-	map(0x0000, 0xffff).r(FUNC(systel1_state::m1_r));
 }
 
 void systel1_state::io_map(address_map &map)
@@ -194,7 +172,6 @@ void systel1_state::systel1(machine_config &config)
 {
 	Z80(config, m_maincpu, 10.8864_MHz_XTAL / 4); // Z8400A; clock verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &systel1_state::mem_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &systel1_state::m1_map);
 	m_maincpu->set_addrmap(AS_IO, &systel1_state::io_map);
 
 	input_merger_device &mainint(INPUT_MERGER_ANY_HIGH(config, "mainint"));

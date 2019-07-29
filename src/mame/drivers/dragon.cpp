@@ -20,6 +20,7 @@
 #include "formats/sdf_dsk.h"
 #include "imagedev/floppy.h"
 
+#include "bus/coco/dragon_amtor.h"
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"
 #include "bus/coco/dragon_sprites.h"
@@ -176,6 +177,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("pak", COCO_PAK);
+	device.option_add_internal("amtor", DRAGON_AMTOR);
 }
 
 FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
@@ -188,6 +190,26 @@ static void dragon_alpha_floppies(device_slot_interface &device)
 {
 	device.option_add("dd", FLOPPY_35_DD);
 }
+
+
+// F4 Character Displayer
+static const gfx_layout d64plus_charlayout =
+{
+	8, 12,                  // 8 x 12 characters
+	256,                    // 256 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	// y offsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	8 * 16                  // every char takes 16 bytes
+};
+
+static GFXDECODE_START(gfx_d64plus)
+	GFXDECODE_ENTRY("chargen", 0, d64plus_charlayout, 0, 1)
+GFXDECODE_END
+
 
 void dragon_state::dragon_base(machine_config &config)
 {
@@ -220,7 +242,7 @@ void dragon_state::dragon_base(machine_config &config)
 	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(coco_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("dragon_cass");
 
 	PRINTER(config, m_printer, 0);
@@ -302,11 +324,11 @@ void d64plus_state::d64plus(machine_config &config)
 	dragon64(config);
 	// video hardware
 	screen_device &plus_screen(SCREEN(config, "plus_screen", SCREEN_TYPE_RASTER));
-	plus_screen.set_refresh_hz(50);
-	plus_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	plus_screen.set_size(640, 264);
-	plus_screen.set_visarea_full();
+	plus_screen.set_raw(14.218_MHz_XTAL, 912, 0, 640, 316, 0, 264);
 	plus_screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_d64plus);
+
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// crtc

@@ -159,8 +159,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void pcat_dyn_state::pcat_dyn_sb_conf(device_t *device)
 {
-	device = device->subdevice("pc_joy");
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // remove joystick
 }
 
 void pcat_dyn_state::pcat_dyn(machine_config &config)

@@ -166,8 +166,8 @@ protected:
 	virtual void plus3_update_memory() { }
 	virtual void ts2068_update_memory() { }
 
-	DECLARE_SNAPSHOT_LOAD_MEMBER(spectrum);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(spectrum);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

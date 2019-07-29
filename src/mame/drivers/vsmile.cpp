@@ -67,14 +67,14 @@ void vsmile_state::machine_reset()
 WRITE8_MEMBER(vsmile_state::ctrl_tx_w)
 {
 	//printf("Ctrl Tx: %02x\n", data);
-	m_spg->uart_rx(data);
+	m_maincpu->uart_rx(data);
 }
 
 template <int Which> WRITE_LINE_MEMBER(vsmile_state::ctrl_rts_w)
 {
 	//printf("Ctrl%d RTS: %d\n", Which, state);
 	m_ctrl_rts[Which] = state;
-	m_spg->extint_w(Which, state);
+	m_maincpu->extint_w(Which, state);
 }
 
 WRITE8_MEMBER(vsmile_state::uart_rx)
@@ -149,7 +149,6 @@ READ16_MEMBER(vsmilem_state::porta_r)
 void vsmile_base_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rw(m_bankdev, FUNC(address_map_bank_device::read16), FUNC(address_map_bank_device::write16));
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 void vsmile_state::banked_map(address_map &map)
@@ -216,24 +215,15 @@ static void vsmile_cart(device_slot_interface &device)
 
 void vsmile_base_state::vsmile_base(machine_config &config)
 {
-	UNSP(config, m_maincpu, XTAL(27'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &vsmile_base_state::mem_map);
-	m_maincpu->set_force_no_drc(true);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
-	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->chip_select().set(FUNC(vsmile_base_state::chip_sel_w));
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_endianness(ENDIANNESS_LITTLE);
@@ -246,14 +236,20 @@ void vsmile_base_state::vsmile_base(machine_config &config)
 
 void vsmile_state::vsmile(machine_config &config)
 {
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsmile_state::mem_map);
+	m_maincpu->set_force_no_drc(true);
+	m_maincpu->chip_select().set(FUNC(vsmile_state::chip_sel_w));
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->portb_in().set(FUNC(vsmile_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(vsmile_state::portc_r));
+	m_maincpu->portc_out().set(FUNC(vsmile_state::portc_w));
+	m_maincpu->uart_tx().set(FUNC(vsmile_state::uart_rx));
+
 	vsmile_base(config);
 
 	m_bankdev->set_addrmap(AS_PROGRAM, &vsmile_state::banked_map);
-
-	m_spg->portb_in().set(FUNC(vsmile_state::portb_r));
-	m_spg->portc_in().set(FUNC(vsmile_state::portc_r));
-	m_spg->portc_out().set(FUNC(vsmile_state::portc_w));
-	m_spg->uart_tx().set(FUNC(vsmile_state::uart_rx));
 
 	VSMILE_CTRL_PORT(config, m_ctrl[0], vsmile_controllers, "joy");
 	m_ctrl[0]->rts_cb().set(FUNC(vsmile_state::ctrl_rts_w<0>));
@@ -270,14 +266,14 @@ void vsmile_state::vsmile(machine_config &config)
 void vsmile_state::vsmilep(machine_config &config)
 {
 	vsmile(config);
-	m_spg->set_pal(true);
+	m_maincpu->set_pal(true);
 }
 
 void vsmilem_state::vsmilem(machine_config &config)
 {
 	vsmile(config);
-	m_spg->porta_out().set(FUNC(vsmilem_state::porta_w));
-	m_spg->porta_in().set(FUNC(vsmilem_state::porta_r));
+	m_maincpu->porta_out().set(FUNC(vsmilem_state::porta_w));
+	m_maincpu->porta_in().set(FUNC(vsmilem_state::porta_r));
 }
 
 /************************************

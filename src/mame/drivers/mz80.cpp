@@ -300,7 +300,6 @@ void mz80_state::mz80k(machine_config &config)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
@@ -322,6 +321,7 @@ void mz80_state::mz80k(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(mz700_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void mz80_state::mz80kj(machine_config &config)

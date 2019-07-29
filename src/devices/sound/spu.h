@@ -204,7 +204,6 @@ public:
 	spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );

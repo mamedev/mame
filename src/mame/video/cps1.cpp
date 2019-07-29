@@ -2256,8 +2256,6 @@ void cps_state::cps1_update_transmasks()
 
 void cps_state::video_start()
 {
-	int i;
-
 	MACHINE_RESET_CALL_MEMBER(cps);
 
 	/* Put in some const */
@@ -2278,9 +2276,6 @@ void cps_state::video_start()
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();
-
-	for (i = 0; i < cps1_palette_entries * 16; i++)
-		m_palette->set_pen_color(i, rgb_t(0,0,0));
 
 	m_buffered_obj = make_unique_clear<uint16_t[]>(m_obj_size / 2);
 
@@ -2387,7 +2382,7 @@ void cps_state::cps1_build_palette( const uint16_t* const palette_base )
 				g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 				b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-				m_palette->set_pen_color (0x200 * page + offset, rgb_t(r, g, b));
+				m_palette->set_pen_color(0x200 * page + offset, rgb_t(r, g, b));
 			}
 		}
 		else

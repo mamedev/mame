@@ -300,7 +300,8 @@ static GFXDECODE_START( gfx_photoply )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 
-MACHINE_CONFIG_START(photoply_state::photoply)
+void photoply_state::photoply(machine_config &config)
+{
 	/* basic machine hardware */
 	I486DX4(config, m_maincpu, 75000000); /* I486DX4, 75 or 100 Mhz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &photoply_state::photoply_map);
@@ -317,8 +318,9 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
 	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(5, DEVICE_SELF, photoply_state, sis_pcm_r, sis_pcm_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (5, FUNC(photoply_state::sis_pcm_r), this);
+	pcibus.set_device_write(5, FUNC(photoply_state::sis_pcm_w), this);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
@@ -329,7 +331,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	EEPROM_93C46_16BIT(config, "eeprom")
 		.write_time(attotime::from_usec(1))
 		.erase_all_time(attotime::from_usec(10));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(photoply)

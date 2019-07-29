@@ -159,10 +159,6 @@ void isa8_pgc_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_irq_acknowledge_callback(FUNC(isa8_pgc_device::irq_callback));
 #endif
 
-	timer_device &scantimer(TIMER(config, "scantimer"));
-	scantimer.configure_periodic(FUNC(isa8_pgc_device::scanline_callback), attotime::from_hz(60*PGC_TOTAL_VERT));
-	scantimer.set_start_delay(attotime::from_hz(XTAL(50'000'000)/(2*PGC_HORZ_START)));
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(50'000'000)/2,
 		PGC_TOTAL_HORZ, PGC_HORZ_START, PGC_HORZ_START+PGC_DISP_HORZ,
@@ -214,15 +210,12 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type
 	m_cpu(*this, "maincpu"),
 	m_screen(*this, PGC_SCREEN_NAME),
 	m_palette(*this, "palette"),
-	m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr), m_bitmap(nullptr)
+	m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr)
 {
 }
 
 void isa8_pgc_device::device_start()
 {
-	int width = PGC_DISP_HORZ;
-	int height = PGC_DISP_VERT;
-
 	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
@@ -232,9 +225,6 @@ void isa8_pgc_device::device_start()
 	{
 		m_palette->set_pen_color(i, 0, 0, 0);
 	}
-
-	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
-	m_bitmap->fill(0);
 
 	m_vram = std::make_unique<uint8_t[]>(0x78000);
 	m_eram = std::make_unique<uint8_t[]>(0x8000);
@@ -405,32 +395,21 @@ READ8_MEMBER(isa8_pgc_device::init_r)
 	return 0; // XXX ignored
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
+uint32_t isa8_pgc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t x, y = m_screen->vpos();
 	uint16_t *p;
 	uint8_t *v;
 
-	// XXX hpos shifts every frame -- fix
-	if (y == 0) LOGCMD("scanline_cb frame %d x %.4d y %.3d\n",
-		(int) m_screen->frame_number(), m_screen->hpos(), y);
-
-	if (y < PGC_VERT_START) return;
-	y -= PGC_VERT_START;
-	if (y >= PGC_DISP_VERT) return;
-
-	// XXX address translation happens in hardware
-	v = &m_vram[y * 1024];
-	p = &m_bitmap->pix16(y, 0);
-
-	for (x = 0; x < PGC_DISP_HORZ; x++)
+	for (int y = 0; y < PGC_DISP_VERT; y++)
 	{
-		*p++ = *v++;
-	}
-}
+		// XXX address translation happens in hardware
+		v = &m_vram[y * 1024];
+		p = &bitmap.pix16(y + PGC_VERT_START, PGC_HORZ_START);
 
-uint32_t isa8_pgc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	copybitmap(bitmap, *m_bitmap, 0, 0, PGC_HORZ_START, PGC_VERT_START, cliprect);
+		for (int x = 0; x < PGC_DISP_HORZ; x++)
+		{
+			*p++ = *v++;
+		}
+	}
 	return 0;
 }

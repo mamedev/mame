@@ -406,7 +406,8 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(sorcerer_state::sorcerer)
+void sorcerer_state::sorcerer(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, ES_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sorcerer_state::sorcerer_mem);
@@ -426,8 +427,6 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
-	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	AY31015(config, m_uart);
 	m_uart->set_auto_rdav(true);
@@ -447,17 +446,19 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", attotime::from_seconds(2))
-	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", attotime::from_seconds(3))
+	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(2)).set_load_callback(FUNC(sorcerer_state::snapshot_cb), this);
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(sorcerer_state::quickload_cb), this);
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);
 	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	m_cassette1->set_interface("sorcerer_cass");
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_formats(sorcerer_cassette_formats);
 	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 	m_cassette2->set_interface("sorcerer_cass");
 
 	/* cartridge */
@@ -469,7 +470,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("8K,16K,32K");
-MACHINE_CONFIG_END
+}
 
 static void floppies(device_slot_interface &device)
 {

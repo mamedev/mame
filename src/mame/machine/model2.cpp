@@ -21,7 +21,7 @@ void model2_state::debug_init()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 0, 1, 2, std::bind(&model2_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("m2", CMDFLAG_CUSTOM_HELP, 0, 1, 2, std::bind(&model2_state::debug_commands, this, _1, _2));
 	}
 }
 

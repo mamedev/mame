@@ -399,7 +399,7 @@ WRITE8_MEMBER(mtx_state::hrx_attr_w)
     EXTENSION BOARD ROMS
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( mtx_state, extrom_load )
+DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 {
 	uint32_t size = m_extrom->common_get_size("rom");
 
@@ -419,7 +419,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state, extrom_load )
     ROMPAK ROMS
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( mtx_state, rompak_load )
+DEVICE_IMAGE_LOAD_MEMBER( mtx_state::rompak_load )
 {
 	uint32_t size = m_rompak->common_get_size("rom");
 
@@ -441,7 +441,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state, rompak_load )
 
 // this only works for some of the files, nothing which tries to load
 // more data from tape. todo: tapes which autorun after loading
-SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
+SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	uint8_t *data = (uint8_t*)image.ptr();
@@ -489,7 +489,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
     QUICKLOAD
 ***************************************************************************/
 
-QUICKLOAD_LOAD_MEMBER(mtx_state, mtx)
+QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	uint8_t *data = (uint8_t*)image.ptr();

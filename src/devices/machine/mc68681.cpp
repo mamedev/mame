@@ -214,7 +214,9 @@ void duart_base_device::device_start()
 	save_item(NAME(IMR));
 	save_item(NAME(ISR));
 	save_item(NAME(OPCR));
+	save_item(NAME(OPR));
 	save_item(NAME(CTR));
+	save_item(NAME(IPCR));
 	save_item(NAME(IP_last_state));
 	save_item(NAME(half_period));
 }

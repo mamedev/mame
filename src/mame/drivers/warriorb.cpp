@@ -197,7 +197,7 @@ void warriorb_state::pancontrol_w(offs_t offset, u8 data)
 }
 
 
-WRITE16_MEMBER(warriorb_state::tc0100scn_dual_screen_w)
+void warriorb_state::tc0100scn_dual_screen_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_tc0100scn[0]->ram_w(offset, data, mem_mask);
 	m_tc0100scn[1]->ram_w(offset, data, mem_mask);
@@ -376,36 +376,8 @@ INPUT_PORTS_END
                         GFX DECODING
 ***********************************************************/
 
-static const gfx_layout tilelayout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 3*4, 2*4, 11*4, 10*4, 1*4, 0*4, 9*4, 8*4, 7*4, 6*4, 15*4, 14*4, 5*4, 4*4, 13*4, 12*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
-};
-
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
-static GFXDECODE_START( gfx_warriorb_1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles (screen 1) */
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_warriorb_2 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* scr tiles (screen 2) */
+static GFXDECODE_START( gfx_warriorb )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0, 256 )   /* sprites */
 GFXDECODE_END
 
 /***********************************************************
@@ -428,11 +400,11 @@ void warriorb_state::machine_reset()
 void warriorb_state::darius2d(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? (Might well be 16!) */
+	M68000(config, m_maincpu, 16_MHz_XTAL);    /* MC68000P12F 16 MHz, 16 MHz XTAL */
 	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::darius2d_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));  /* 4 MHz (16 MHz XTAL / 4) */
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
@@ -444,8 +416,8 @@ void warriorb_state::darius2d(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb_2);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -458,9 +430,7 @@ void warriorb_state::darius2d(machine_config &config)
 	lscreen.set_palette(m_tc0110pcr[0]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(4, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
@@ -474,10 +444,8 @@ void warriorb_state::darius2d(machine_config &config)
 	rscreen.set_palette(m_tc0110pcr[1]);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);
@@ -486,7 +454,7 @@ void warriorb_state::darius2d(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -508,11 +476,11 @@ void warriorb_state::darius2d(machine_config &config)
 void warriorb_state::warriorb(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);    /* 16 MHz ? */
+	M68000(config, m_maincpu, 16_MHz_XTAL);    /* MC68000P12F 16 MHz, 16 MHz XTAL */
 	m_maincpu->set_addrmap(AS_PROGRAM, &warriorb_state::warriorb_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(warriorb_state::irq4_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 16000000/4));  /* 4 MHz ? */
+	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));  /* 4 MHz (16 MHz XTAL / 4) */
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
 	TC0510NIO(config, m_tc0510nio, 0);
@@ -524,8 +492,8 @@ void warriorb_state::warriorb(machine_config &config)
 	m_tc0510nio->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb_1);
-	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb_2);
+	GFXDECODE(config, m_gfxdecode[0], m_tc0110pcr[0], gfx_warriorb);
+	GFXDECODE(config, m_gfxdecode[1], m_tc0110pcr[1], gfx_warriorb);
 
 	config.set_default_layout(layout_dualhsxs);
 
@@ -538,9 +506,7 @@ void warriorb_state::warriorb(machine_config &config)
 	lscreen.set_palette(m_tc0110pcr[0]);
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
-	m_tc0100scn[0]->set_gfx_region(1);
 	m_tc0100scn[0]->set_offsets(4, 0);
-	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode[0]);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
@@ -554,11 +520,9 @@ void warriorb_state::warriorb(machine_config &config)
 	rscreen.set_palette(m_tc0110pcr[1]);
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
-	m_tc0100scn[1]->set_gfx_region(1);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(1);
 	m_tc0100scn[1]->set_multiscr_hack(1);
-	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode[1]);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);
@@ -567,7 +531,7 @@ void warriorb_state::warriorb(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -603,22 +567,19 @@ ROM_START( sagaia )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c07_41.69", 0x00000, 0x20000, CRC(b50256ea) SHA1(6ed271e4dafd1c759adaa55d5b2343d7374c721a) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
-	ROM_LOAD( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD( "c07-05.24", 0x00000, 0x80000, CRC(fb6d0550) SHA1(2d570ff5ef262cb4cb52e8584a7f167263194d37) )  /* OBJ */
+	ROM_LOAD64_WORD( "c07-06.27", 0x00002, 0x80000, CRC(5eebbcd6) SHA1(d4d860bf6b099956c45c7273ad77b1d35deba4c1) )
+	ROM_LOAD64_WORD( "c07-07.26", 0x00004, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
+	ROM_LOAD64_WORD( "c07-08.25", 0x00006, 0x80000, CRC(a07dc846) SHA1(7199a604fcd693215ddb7670bfb2daf150145fd7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c07-06.27", 0x00000, 0x80000, CRC(5eebbcd6) SHA1(d4d860bf6b099956c45c7273ad77b1d35deba4c1) )  /* OBJ */
-	ROM_LOAD32_BYTE( "c07-05.24", 0x00001, 0x80000, CRC(fb6d0550) SHA1(2d570ff5ef262cb4cb52e8584a7f167263194d37) )
-	ROM_LOAD32_BYTE( "c07-08.25", 0x00002, 0x80000, CRC(a07dc846) SHA1(7199a604fcd693215ddb7670bfb2daf150145fd7) )
-	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
+	ROM_REGION( 0x100000, "tc0100scn_1", 0 )
+	ROM_LOAD16_WORD_SWAP( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
+	ROM_LOAD16_WORD_SWAP( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x00000, 0x000000, 0x100000 )    /* SCr(screen 2) */
-
-/* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
-//  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )
-//  ROM_LOAD( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
+	ROM_REGION( 0x100000, "tc0100scn_2", 0 )
+	ROM_LOAD16_WORD_SWAP( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 2) */
+	ROM_LOAD16_WORD_SWAP( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
@@ -648,22 +609,19 @@ ROM_START( darius2d )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c07_17.69", 0x00000, 0x20000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
-	ROM_LOAD( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD( "c07-05.24", 0x00000, 0x80000, CRC(fb6d0550) SHA1(2d570ff5ef262cb4cb52e8584a7f167263194d37) )  /* OBJ */
+	ROM_LOAD64_WORD( "c07-06.27", 0x00002, 0x80000, CRC(5eebbcd6) SHA1(d4d860bf6b099956c45c7273ad77b1d35deba4c1) )
+	ROM_LOAD64_WORD( "c07-07.26", 0x00004, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
+	ROM_LOAD64_WORD( "c07-08.25", 0x00006, 0x80000, CRC(a07dc846) SHA1(7199a604fcd693215ddb7670bfb2daf150145fd7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c07-06.27", 0x00000, 0x80000, CRC(5eebbcd6) SHA1(d4d860bf6b099956c45c7273ad77b1d35deba4c1) )  /* OBJ */
-	ROM_LOAD32_BYTE( "c07-05.24", 0x00001, 0x80000, CRC(fb6d0550) SHA1(2d570ff5ef262cb4cb52e8584a7f167263194d37) )
-	ROM_LOAD32_BYTE( "c07-08.25", 0x00002, 0x80000, CRC(a07dc846) SHA1(7199a604fcd693215ddb7670bfb2daf150145fd7) )
-	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
+	ROM_REGION( 0x100000, "tc0100scn_1", 0 )
+	ROM_LOAD16_WORD_SWAP( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
+	ROM_LOAD16_WORD_SWAP( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x00000, 0x000000, 0x100000 )    /* SCr(screen 2) */
-
-/* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
-//  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )
-//  ROM_LOAD( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
+	ROM_REGION( 0x100000, "tc0100scn_2", 0 )
+	ROM_LOAD16_WORD_SWAP( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 2) */
+	ROM_LOAD16_WORD_SWAP( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
@@ -693,22 +651,19 @@ ROM_START( darius2do )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c07_17.69", 0x00000, 0x20000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
-	ROM_LOAD( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD64_WORD( "c07-05.24", 0x00000, 0x80000, CRC(fb6d0550) SHA1(2d570ff5ef262cb4cb52e8584a7f167263194d37) )  /* OBJ */
+	ROM_LOAD64_WORD( "c07-06.27", 0x00002, 0x80000, CRC(5eebbcd6) SHA1(d4d860bf6b099956c45c7273ad77b1d35deba4c1) )
+	ROM_LOAD64_WORD( "c07-07.26", 0x00004, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
+	ROM_LOAD64_WORD( "c07-08.25", 0x00006, 0x80000, CRC(a07dc846) SHA1(7199a604fcd693215ddb7670bfb2daf150145fd7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c07-06.27", 0x00000, 0x80000, CRC(5eebbcd6) SHA1(d4d860bf6b099956c45c7273ad77b1d35deba4c1) )  /* OBJ */
-	ROM_LOAD32_BYTE( "c07-05.24", 0x00001, 0x80000, CRC(fb6d0550) SHA1(2d570ff5ef262cb4cb52e8584a7f167263194d37) )
-	ROM_LOAD32_BYTE( "c07-08.25", 0x00002, 0x80000, CRC(a07dc846) SHA1(7199a604fcd693215ddb7670bfb2daf150145fd7) )
-	ROM_LOAD32_BYTE( "c07-07.26", 0x00003, 0x80000, CRC(fd9f9e74) SHA1(e89beb5cac844fe16662465b0c76337692591aae) )
+	ROM_REGION( 0x100000, "tc0100scn_1", 0 )
+	ROM_LOAD16_WORD_SWAP( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
+	ROM_LOAD16_WORD_SWAP( "c07-04.11", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", 0x00000, 0x000000, 0x100000 )    /* SCr(screen 2) */
-
-/* The actual board duplicates the SCR gfx roms for the 2nd TC0100SCN */
-//  ROM_LOAD( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) )
-//  ROM_LOAD( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
+	ROM_REGION( 0x100000, "tc0100scn_2", 0 )
+	ROM_LOAD16_WORD_SWAP( "c07-03.47", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 2) */
+	ROM_LOAD16_WORD_SWAP( "c07-04.48", 0x80000, 0x80000, CRC(50421e81) SHA1(27ac420602f1dac00dc32903543a518e6f47fb2f) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
@@ -735,19 +690,19 @@ ROM_START( warriorb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d24_17.69",  0x00000, 0x20000, CRC(e41e4aae) SHA1(9bf40b6e8aa5c6ec62c5d21edbb2214f6550c94f) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "d24-02.12", 0x000000, 0x100000, CRC(9f50c271) SHA1(1a1b2ae7cb7785e7f66aa26258a6cd2921a29545) )   /* SCR A, screen 1 */
-	ROM_LOAD( "d24-01.11", 0x100000, 0x100000, CRC(326dcca9) SHA1(1993776d71bca7d6dfc6f84dd9262d0dcae87f69) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD( "d24-03.24", 0x000000, 0x100000, CRC(46db9fd7) SHA1(f08f3c9833d80ce161b06f4ae484c5c79539639c) )    /* OBJ */
+	ROM_LOAD64_WORD( "d24-06.27", 0x000002, 0x100000, CRC(918486fe) SHA1(cc9e287221ef33dba77a22975e23b250ba50b758) )
+	ROM_LOAD64_WORD( "d24-05.26", 0x000004, 0x100000, CRC(9f414317) SHA1(204cf47404e5e1085c1108abacd2b79a6cd0f74a) )
+	ROM_LOAD64_WORD( "d24-04.25", 0x000006, 0x100000, CRC(148e0493) SHA1(f1cb819830e5bd544b11762784e228b5cb62b7e4) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "d24-06.27", 0x000000, 0x100000, CRC(918486fe) SHA1(cc9e287221ef33dba77a22975e23b250ba50b758) )    /* OBJ */
-	ROM_LOAD32_BYTE( "d24-03.24", 0x000001, 0x100000, CRC(46db9fd7) SHA1(f08f3c9833d80ce161b06f4ae484c5c79539639c) )
-	ROM_LOAD32_BYTE( "d24-04.25", 0x000002, 0x100000, CRC(148e0493) SHA1(f1cb819830e5bd544b11762784e228b5cb62b7e4) )
-	ROM_LOAD32_BYTE( "d24-05.26", 0x000003, 0x100000, CRC(9f414317) SHA1(204cf47404e5e1085c1108abacd2b79a6cd0f74a) )
+	ROM_REGION( 0x200000, "tc0100scn_1", 0 )
+	ROM_LOAD16_WORD_SWAP( "d24-02.12", 0x000000, 0x100000, CRC(9f50c271) SHA1(1a1b2ae7cb7785e7f66aa26258a6cd2921a29545) )   /* SCR A, screen 1 */
+	ROM_LOAD16_WORD_SWAP( "d24-01.11", 0x100000, 0x100000, CRC(326dcca9) SHA1(1993776d71bca7d6dfc6f84dd9262d0dcae87f69) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD( "d24-07.47", 0x000000, 0x100000, CRC(9f50c271) SHA1(1a1b2ae7cb7785e7f66aa26258a6cd2921a29545) )   /* SCR B, screen 2 */
-	ROM_LOAD( "d24-08.48", 0x100000, 0x100000, CRC(1e6d1528) SHA1(d6843aa67befd7db44f468be16ba2f0efb85d40f) )
+	ROM_REGION( 0x200000, "tc0100scn_2", 0 )
+	ROM_LOAD16_WORD_SWAP( "d24-07.47", 0x000000, 0x100000, CRC(9f50c271) SHA1(1a1b2ae7cb7785e7f66aa26258a6cd2921a29545) )   /* SCR B, screen 2 */
+	ROM_LOAD16_WORD_SWAP( "d24-08.48", 0x100000, 0x100000, CRC(1e6d1528) SHA1(d6843aa67befd7db44f468be16ba2f0efb85d40f) )
 
 	ROM_REGION( 0x300000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d24-12.107", 0x000000, 0x100000, CRC(279203a1) SHA1(ed75e811a1f0863c134034457ce2e97372726bdb) )

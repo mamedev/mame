@@ -134,6 +134,9 @@ CPUS["HMCS40"] = true
 CPUS["ST62XX"] = true
 CPUS["DSPP"] = true
 CPUS["HPC"] = true
+--CPUS["RII"] = true
+--CPUS["BCP"] = true
+--CPUS["CR16B"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -336,6 +339,7 @@ VIDEOS["RAMDAC"] = true
 VIDEOS["SAA5050"] = true
 --VIDEOS["SDA5708"] = true
 VIDEOS["SCN2674"] = true
+--VIDEOS["PWM_DISPLAY"] = true
 --VIDEOS["SED1200"] = true
 --VIDEOS["SED1330"] = true
 --VIDEOS["SED1520"] = true
@@ -397,6 +401,7 @@ MACHINES["TTL74166"] = true
 --MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL74259"] = true
+--MACHINES["TTL74381"] = true
 MACHINES["TTL7474"] = true
 MACHINES["KBDC8042"] = true
 MACHINES["I8257"] = true
@@ -407,7 +412,9 @@ MACHINES["ADC083X"] = true
 MACHINES["ADC1038"] = true
 MACHINES["ADC1213X"] = true
 MACHINES["AICARTC"] = true
+--MACHINES["AM25S55X"] = true
 --MACHINES["AM2847"] = true
+--MACHINES["AM2910"] = true
 MACHINES["AM53CF96"] = true
 MACHINES["AM79C90"] = true
 --MACHINES["AM9513"] = true
@@ -519,6 +526,7 @@ MACHINES["MCF5206E"] = true
 MACHINES["METERS"] = true
 MACHINES["MICROTOUCH"] = true
 --MACHINES["MIOT6530"] = true
+--MACHINES["MM5307"] = true
 --MACHINES["MM58167"] = true
 MACHINES["MM58274C"] = true
 MACHINES["MM74C922"] = true
@@ -581,8 +589,9 @@ MACHINES["SATURN"] = true
 MACHINES["SCC68070"] = true
 MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
---MACHINES["SECFLASH"] = true
 MACHINES["SDA2006"] = true
+--MACHINES["SECFLASH"] = true
+--MACHINES["SENSORBOARD"] = true
 MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SEGA_SCU"] = true
@@ -591,9 +600,11 @@ MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 --MACHINES["SUN4C_MMU"] = true
 MACHINES["TC0091LVC"] = true
+--MACHINES["TDC1008"] = true
 MACHINES["TE7750"] = true
 MACHINES["TICKET"] = true
 MACHINES["TIMEKPR"] = true
+--MACHINES["TMC208K"] = true
 MACHINES["TMP68301"] = true
 --MACHINES["TMS5501"] = true
 MACHINES["TMS6100"] = true
@@ -721,6 +732,7 @@ BUSES["MIDI"] = true
 BUSES["NEOGEO"] = true
 BUSES["NEOGEO_CTRL"] = true
 --BUSES["NES"] = true
+BUSES["NSCSI"] = true
 --BUSES["NUBUS"] = true
 --BUSES["O2"] = true
 --BUSES["ORICEXT"] = true
@@ -1426,6 +1438,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/blktiger.cpp",
 	MAME_DIR .. "src/mame/includes/blktiger.h",
 	MAME_DIR .. "src/mame/video/blktiger.cpp",
+	MAME_DIR .. "src/mame/drivers/blktiger_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/cbasebal.cpp",
 	MAME_DIR .. "src/mame/includes/cbasebal.h",
 	MAME_DIR .. "src/mame/video/cbasebal.cpp",
@@ -1943,6 +1956,7 @@ files {
 	MAME_DIR .. "src/mame/video/xorworld.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.h",
+	MAME_DIR .. "src/mame/drivers/bigkarnk_ms.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "gameplan")
@@ -2225,6 +2239,7 @@ files {
 	MAME_DIR .. "src/mame/video/djboy.cpp",
 	MAME_DIR .. "src/mame/drivers/expro02.cpp",
 	MAME_DIR .. "src/mame/drivers/galpanic.cpp",
+	MAME_DIR .. "src/mame/drivers/galpanic_ms.cpp",
 	MAME_DIR .. "src/mame/includes/galpnipt.h",
 	MAME_DIR .. "src/mame/includes/galpanic.h",
 	MAME_DIR .. "src/mame/video/galpanic.cpp",
@@ -3572,6 +3587,7 @@ files {
 	MAME_DIR .. "src/mame/machine/stfight.cpp",
 	MAME_DIR .. "src/mame/drivers/toki.cpp",
 	MAME_DIR .. "src/mame/includes/toki.h",
+	MAME_DIR .. "src/mame/drivers/toki_ms.cpp",
 	MAME_DIR .. "src/mame/video/toki.cpp",
 	MAME_DIR .. "src/mame/drivers/wiz.cpp",
 	MAME_DIR .. "src/mame/includes/wiz.h",
@@ -4360,6 +4376,7 @@ files {
 
 createMAMEProjects(_target, _subtarget, "wing")
 files {
+	MAME_DIR .. "src/mame/drivers/lucky37.cpp",
 	MAME_DIR .. "src/mame/drivers/lucky74.cpp",
 	MAME_DIR .. "src/mame/includes/lucky74.h",
 	MAME_DIR .. "src/mame/video/lucky74.cpp",
@@ -4605,6 +4622,7 @@ files {
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
 	MAME_DIR .. "src/mame/drivers/chance32.cpp",
+	MAME_DIR .. "src/mame/drivers/changyu.cpp",
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",
 	MAME_DIR .. "src/mame/drivers/chicago.cpp",
 	MAME_DIR .. "src/mame/drivers/chsuper.cpp",
@@ -4886,6 +4904,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/trvquest.cpp",
 	MAME_DIR .. "src/mame/drivers/ttchamp.cpp",
 	MAME_DIR .. "src/mame/drivers/tugboat.cpp",
+	MAME_DIR .. "src/mame/drivers/tvg01.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_bozopail.cpp",
 	MAME_DIR .. "src/mame/drivers/ice_tbd.cpp",
 	MAME_DIR .. "src/mame/drivers/umipoker.cpp",

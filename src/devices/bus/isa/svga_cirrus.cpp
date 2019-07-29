@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_CIRRUS_GD542X, isa16_svga_cirrus_gd542x_device, "c
 void isa16_svga_cirrus_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
 
 	CIRRUS_GD5430(config, "vga", 0).set_screen("screen");
@@ -113,7 +113,7 @@ ROM_END
 void isa16_svga_cirrus_gd542x_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
 	CIRRUS_GD5428(config, "vga", 0).set_screen("screen");

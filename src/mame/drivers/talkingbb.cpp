@@ -106,7 +106,7 @@ Substitutes:
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/timer.h"
+#include "video/pwm.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -124,8 +124,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu"),
-		m_delay_display(*this, "delay_display_%u", 0),
-		m_out_led(*this, "led%u", 0U),
+		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -133,25 +132,19 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void device_post_load() override;
 
 private:
 	// devices/pointers
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
-	required_device_array<timer_device, 12> m_delay_display;
-	output_finder<12> m_out_led;
+	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_inputs;
 
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
 	u8 m_bank;
-	u8 m_led_select;
-	u8 m_led_cache[12];
-
-	void set_led(int i, int value) { m_led_cache[i] = m_out_led[i] = value; }
-	TIMER_DEVICE_CALLBACK_MEMBER(delay_display) { set_led(param, 0); }
+	u8 m_inp_mux;
 
 	// I/O handlers
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -163,24 +156,13 @@ private:
 
 void talkingbb_state::machine_start()
 {
-	// resolve handlers
-	m_out_led.resolve();
-
 	// zerofill
 	m_bank = 0;
-	m_led_select = 0;
-	memset(m_led_cache, 0, sizeof(m_led_cache));
+	m_inp_mux = 0;
 
 	// register for savestates
 	save_item(NAME(m_bank));
-	save_item(NAME(m_led_select));
-	save_item(NAME(m_led_cache));
-}
-
-void talkingbb_state::device_post_load()
-{
-	for (int i = 0; i < 4; i++)
-		m_out_led[i] = m_led_cache[i];
+	save_item(NAME(m_inp_mux));
 }
 
 
@@ -215,19 +197,8 @@ WRITE8_MEMBER(talkingbb_state::input_w)
 
 	// d4-d7: led select (also input mux)
 	// d0-d2: led data
-	for (int i = 0; i < 12; i++)
-	{
-		u8 prev = BIT(m_led_select >> 4, i & 3) & BIT(~m_led_select, i >> 2);
-		u8 cur = BIT(data >> 4, i & 3) & BIT(~data, i >> 2);
-
-		// they're strobed, so on falling edge, delay them going off to prevent flicker or stuck display
-		if (prev & ~cur)
-			m_delay_display[i]->adjust(attotime::from_msec(50), i);
-		else if (cur)
-			set_led(i, 1);
-	}
-
-	m_led_select = data;
+	m_inp_mux = data >> 4;
+	m_display->matrix(m_inp_mux, ~data & 7);
 }
 
 READ8_MEMBER(talkingbb_state::input_r)
@@ -240,7 +211,7 @@ READ8_MEMBER(talkingbb_state::input_r)
 
 	// multiplexed inputs
 	for (int i = 0; i < 4; i++)
-		if (BIT(m_led_select >> 4, i))
+		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
 	return ~data;
@@ -355,9 +326,7 @@ void talkingbb_state::talkingbb(machine_config &config)
 	m_maincpu->port_in_cb<3>().set(FUNC(talkingbb_state::switch_r));
 
 	/* video hardware */
-	for (int i = 0; i < 12; i++)
-		TIMER(config, m_delay_display[i]).configure_generic(FUNC(talkingbb_state::delay_display));
-
+	PWM_DISPLAY(config, m_display).set_size(4, 3);
 	config.set_default_layout(layout_talkingbb);
 
 	/* sound hardware */

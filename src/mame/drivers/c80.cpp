@@ -55,7 +55,6 @@ data of next byte, and so on.
 #include "emu.h"
 #include "includes/c80.h"
 
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "c80.lh"
@@ -276,11 +275,11 @@ void c80_state::c80(machine_config &config)
 	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(2500000)));
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1K");

@@ -331,6 +331,35 @@ void segas1x_bootleg_state::wb3bbl_map(address_map &map)
 	map(0xff0000, 0xffffff).ram(); // work ram
 }
 
+void segas1x_bootleg_state::wb3bble_map(address_map &map) // TODO: everything needs to be checked / fixed
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x400000, 0x407fff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x440000, 0x440fff).ram().share("sprites");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc40002, 0xc40003).w(FUNC(segas1x_bootleg_state::wb3bble_refreshenable_w));
+	map(0xc41000, 0xc41001).portr("SERVICE");
+	map(0xc41002, 0xc41003).portr("P1");
+	map(0xc41004, 0xc41005).portr("P2");
+	map(0xc42000, 0xc42001).portr("DSW2");
+	map(0xc42002, 0xc42003).portr("DSW1");
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc44000, 0xc44001).nopw();
+	map(0xc46000, 0xc46001).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0xc46002, 0xc46003).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0xc46004, 0xc46005).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0xc46006, 0xc46007).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
+	map(0xc46008, 0xc46009).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
+	map(0xc60000, 0xc60001).nopr();
+	map(0xff0000, 0xffffff).ram(); // work ram
+}
+
+void segas1x_bootleg_state::wb3bble_decrypted_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().share("decrypted_opcodes");
+}
+
 /***************************************************************************
 
     Tough Turf (Datsu bootleg) sound emulation
@@ -989,6 +1018,14 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_refreshenable_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_refreshenable = data & 0x02;
+	}
+}
+
+WRITE16_MEMBER(segas1x_bootleg_state::wb3bble_refreshenable_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_refreshenable = data & 0x10;
 	}
 }
 
@@ -2243,6 +2280,17 @@ void segas1x_bootleg_state::wb3bb(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_s16a_bootleg));
 
 	z80_ym2151(config);
+}
+
+void segas1x_bootleg_state::wb3bble(machine_config &config)
+{
+	wb3bb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::wb3bble_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas1x_bootleg_state::wb3bble_decrypted_opcodes_map);
+
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, system16)
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system16));
 }
 
 void segas1x_bootleg_state::goldnaxeb_base(machine_config &config)
@@ -3821,6 +3869,43 @@ void segas1x_bootleg_state::init_wb3bbl()
 	m_fore_yscroll = 2;
 }
 
+void segas1x_bootleg_state::init_wb3bble()
+{
+	init_common();
+
+	static const uint16_t opcode_xortable[0x80] = // table possibly provided by the undumped d8749h MCU?
+	{
+		0x1414, 0x5041, 0x4541, 0x1414, 0x5150, 0x5011, 0x5555, 0x0000,
+		0x1150, 0x5415, 0x5500, 0x0000, 0x5511, 0x0040, 0x0000, 0x1550,
+		0x1401, 0x5555, 0x1015, 0x1014, 0x0015, 0x1455, 0x0114, 0x5150,
+		0x5011, 0x1414, 0x1514, 0x1550, 0x4555, 0x5155, 0x5555, 0x0015,
+		0x1455, 0x0114, 0x4145, 0x1015, 0x0545, 0x1015, 0x0545, 0x1015,
+		0x0545, 0x1015, 0x0545, 0x1015, 0x0545, 0x1014, 0x0054, 0x0405,
+		0x0410, 0x0450, 0x5451, 0x0405, 0x5040, 0x0114, 0x5101, 0x4405,
+		0x0140, 0x5105, 0x5000, 0x5111, 0x5000, 0x1014, 0x5155, 0x1014,
+		0x5155, 0x1014, 0x0541, 0x4500, 0x5154, 0x4405, 0x4405, 0x4101,
+		0x4101, 0x1045, 0x0105, 0x0104, 0x1505, 0x0005, 0x0101, 0x4015,
+		0x5004, 0x4114, 0x4110, 0x0505, 0x5140, 0x0505, 0x1014, 0x4504,
+		0x4401, 0x4554, 0x4554, 0x1115, 0x4501, 0x4554, 0x4014, 0x5011,
+		0x0104, 0x0450, 0x5100, 0x4050, 0x1014, 0x0544, 0x1515, 0x0005,
+		0x1100, 0x4101, 0x1144, 0x0405, 0x5541, 0x5100, 0x4100, 0x5150,
+		0x1014, 0x0541, 0x4415, 0x4511, 0x5050, 0x4044, 0x5105, 0x4101,
+		0x1144, 0x0405, 0x0405, 0x5511, 0x0555, 0x0004, 0x5104, 0x1104
+	};
+
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		m_decrypted_opcodes[i] = ROM[i] ^ opcode_xortable[i & 0x7f];
+	}
+
+	for (int i = 0x10000; i < 0x20000; i++)
+	{
+		m_decrypted_opcodes[i] = ROM[i];
+	}
+}
+
 
 /* Sys16B */
 void segas1x_bootleg_state::init_goldnaxeb1()
@@ -4057,8 +4142,8 @@ GAME( 1987, shinobld,    shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_sta
 GAME( 1987, shinoblda,   shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_state,  init_shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, passshtb,    passsht,   passshtb,      passsht,  segas1x_bootleg_state,  init_passsht,    ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, passht4b,    passsht,   passsht4b,     passht4b, segas1x_bootleg_state,  init_shinobl,    ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, wb3bbl,      wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  init_wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1988, wb3bble,     wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  init_wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (encrypted bootleg)", MACHINE_NOT_WORKING )
+GAME( 1988, wb3bbl,      wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  init_wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, wb3bble,     wb3,       wb3bble,       wb3b,     segas1x_bootleg_state,  init_wb3bble,    ROT0,   "bootleg", "Wonder Boy III - Monster Lair (encrypted bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* System 16B based bootlegs */
 GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,    bayroute, segas1x_bootleg_state,  init_bayrouteb1, ROT0,   "bootleg (Datsu)", "Bay Route (encrypted, protected bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)

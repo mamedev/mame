@@ -138,7 +138,7 @@ void bbc_state::bbca_mem(address_map &map)
 	map(0xfe10, 0xfe17).w(FUNC(bbc_state::serial_ula_w));                                                             //    fe10-fe17  Serial ULA     Serial system chip
 	map(0xfe20, 0xfe2f).w(FUNC(bbc_state::video_ula_w));                                                              // W: fe20-fe2f  Video ULA      Video system chip
 	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::bbc_romsel_w));                                                             // W: fe30-fe3f  74LS161        Paged ROM selector
-	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe40-fe5f  6522 VIA       SYSTEM VIA
+	map(0xfe40, 0xfe5f).m(m_via6522_0, FUNC(via6522_device::map));                                                    //    fe40-fe5f  6522 VIA       SYSTEM VIA
 }
 
 
@@ -155,8 +155,8 @@ void bbc_state::bbc_base(address_map &map)
 	map(0xfe10, 0xfe17).w(FUNC(bbc_state::serial_ula_w));                                                             //    fe10-fe17  Serial ULA     Serial system chip
 	map(0xfe18, 0xfe1f).portr("STATID");                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
 	map(0xfe20, 0xfe2f).w(FUNC(bbc_state::video_ula_w));                                                              // W: fe20-fe2f  Video ULA      Video system chip
-	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe40-fe5f  6522 VIA       SYSTEM VIA
-	map(0xfe60, 0xfe7f).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe60-fe7f  6522 VIA       USER VIA
+	map(0xfe40, 0xfe5f).m(m_via6522_0, FUNC(via6522_device::map));                                                    //    fe40-fe5f  6522 VIA       SYSTEM VIA
+	map(0xfe60, 0xfe7f).m(m_via6522_1, FUNC(via6522_device::map));                                                    //    fe60-fe7f  6522 VIA       USER VIA
 	map(0xfea0, 0xfebf).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));                            //    fea0-febf  68B54 ADLC     ECONET controller
 	map(0xfec0, 0xfedf).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                       //    fec0-fedf  uPD7002        Analogue to digital converter
 	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           //    fee0-feff  Tube ULA       Tube system interface
@@ -251,8 +251,8 @@ void bbcm_state::bbcm_bankdev(address_map &map)
 	map(0x0234, 0x0237).mirror(0x400).rw(FUNC(bbc_state::bbcm_acccon_r), FUNC(bbc_state::bbcm_acccon_w));                             //    fe34-fe37  ACCCON         ACCCON select register
 	map(0x0238, 0x023b).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe38-fe3b  INTOFF
 	map(0x023c, 0x023f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe3c-fe3f  INTON
-	map(0x0240, 0x025f).mirror(0x400).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                       //    fe40-fe5f  6522 VIA       SYSTEM VIA
-	map(0x0260, 0x027f).mirror(0x400).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                       //    fe60-fe7f  6522 VIA       USER VIA
+	map(0x0240, 0x025f).mirror(0x400).m(m_via6522_0, FUNC(via6522_device::map));                                                      //    fe40-fe5f  6522 VIA       SYSTEM VIA
+	map(0x0260, 0x027f).mirror(0x400).m(m_via6522_1, FUNC(via6522_device::map));                                                      //    fe60-fe7f  6522 VIA       USER VIA
 	map(0x0280, 0x029f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe80-fe9f  Int. Modem     Int. Modem
 	map(0x02a0, 0x02bf).mirror(0x400).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));                              //    fea0-febf  68B54 ADLC     ECONET controller
 	map(0x02e0, 0x02ff).mirror(0x400).rw(FUNC(bbc_state::bbcm_tube_r), FUNC(bbc_state::bbcm_tube_w));                                 //    fee0-feff  Tube ULA       Tube system interface
@@ -281,7 +281,7 @@ void bbcm_state::bbcmet_bankdev(address_map &map)
 	map(0x0234, 0x0237).mirror(0x400).rw(FUNC(bbc_state::bbcm_acccon_r), FUNC(bbc_state::bbcm_acccon_w));                             //    fe34-fe37  ACCCON         ACCCON select register
 	map(0x0238, 0x023b).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe38-fe3b  INTOFF
 	map(0x023c, 0x023f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe3c-fe3f  INTON
-	map(0x0240, 0x025f).mirror(0x400).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                       //    fe40-fe5f  6522 VIA       SYSTEM VIA
+	map(0x0240, 0x025f).mirror(0x400).m(m_via6522_0, FUNC(via6522_device::map));                                                      //    fe40-fe5f  6522 VIA       SYSTEM VIA
 	map(0x0260, 0x027f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe60-fe7f  6522 VIA       USER VIA
 	map(0x0280, 0x029f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe80-fe9f  Int. Modem     Int. Modem
 	map(0x02a0, 0x02bf).mirror(0x400).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));                              //    fea0-febf  68B54 ADLC     ECONET controller
@@ -310,8 +310,8 @@ void bbcm_state::bbcmc_bankdev(address_map &map)
 	map(0x0234, 0x0237).mirror(0x400).rw(FUNC(bbc_state::bbcm_acccon_r), FUNC(bbc_state::bbcm_acccon_w));                             //    fe34-fe37  ACCCON         ACCCON select register
 	map(0x0238, 0x023b).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe38-fe3b  INTOFF
 	map(0x023c, 0x023f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe3c-fe3f  INTON
-	map(0x0240, 0x025f).mirror(0x400).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                       //    fe40-fe5f  6522 VIA       SYSTEM VIA
-	map(0x0260, 0x027f).mirror(0x400).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                       //    fe60-fe7f  6522 VIA       USER VIA
+	map(0x0240, 0x025f).mirror(0x400).m(m_via6522_0, FUNC(via6522_device::map));                                                      //    fe40-fe5f  6522 VIA       SYSTEM VIA
+	map(0x0260, 0x027f).mirror(0x400).m(m_via6522_1, FUNC(via6522_device::map));                                                      //    fe60-fe7f  6522 VIA       USER VIA
 	map(0x0280, 0x029f).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fe80-fe9f  Int. Modem     Int. Modem
 	map(0x02a0, 0x02bf).mirror(0x400).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));                              //    fea0-febf  68B54 ADLC     ECONET controller
 	map(0x02e0, 0x02ff).mirror(0x400).r(FUNC(bbc_state::bbc_fe_r));                                                                   //    fee0-feff  Tube ULA       Tube system interface
@@ -1465,9 +1465,9 @@ void bbcm_state::bbcm(machine_config &config)
 
 	/* cartridge slots */
 	GENERIC_CARTSLOT(config, m_cart[0], generic_linear_slot, "bbcm_cart", "bin,rom");
-	m_cart[0]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_cart1, this));
+	m_cart[0]->set_device_load(FUNC(bbc_state::cart1_load), this);
 	GENERIC_CARTSLOT(config, m_cart[1], generic_linear_slot, "bbcm_cart", "bin,rom");
-	m_cart[1]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_cart2, this));
+	m_cart[1]->set_device_load(FUNC(bbc_state::cart2_load), this);
 
 	/* eprom sockets */
 	BBC_ROMSLOT16(config, m_rom[0x08], bbc_rom_devices, nullptr); /* ic27 */

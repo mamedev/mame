@@ -113,11 +113,6 @@ const options_entry emu_options::s_option_entries[] =
 	// artwork options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE ARTWORK OPTIONS" },
 	{ OPTION_ARTWORK_CROP ";artcrop",                    "0",         OPTION_BOOLEAN,    "crop artwork so emulated screen image fills output screen/window in one axis" },
-	{ OPTION_USE_BACKDROPS ";backdrop",                  "1",         OPTION_BOOLEAN,    "enable backdrops if artwork is enabled and available" },
-	{ OPTION_USE_OVERLAYS ";overlay",                    "1",         OPTION_BOOLEAN,    "enable overlays if artwork is enabled and available" },
-	{ OPTION_USE_BEZELS ";bezel",                        "1",         OPTION_BOOLEAN,    "enable bezels if artwork is enabled and available" },
-	{ OPTION_USE_CPANELS ";cpanel",                      "1",         OPTION_BOOLEAN,    "enable cpanels if artwork is enabled and available" },
-	{ OPTION_USE_MARQUEES ";marquee",                    "1",         OPTION_BOOLEAN,    "enable marquees if artwork is enabled and available" },
 	{ OPTION_FALLBACK_ARTWORK,                           nullptr,     OPTION_STRING,     "fallback artwork if no external artwork or internal driver layout defined" },
 	{ OPTION_OVERRIDE_ARTWORK,                           nullptr,     OPTION_STRING,     "override artwork for external artwork and internal driver layout" },
 
@@ -198,6 +193,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_BIOS,                                       nullptr,     OPTION_STRING,     "select the system BIOS to use" },
 	{ OPTION_CHEAT ";c",                                 "0",         OPTION_BOOLEAN,    "enable cheat subsystem" },
 	{ OPTION_SKIP_GAMEINFO,                              "0",         OPTION_BOOLEAN,    "skip displaying the system information screen at startup" },
+	{ OPTION_SKIP_MANDATORY_FILEMAN,                     "0",         OPTION_BOOLEAN,    "skip prompting the user for any mandatory images with the file manager at startup" },
 	{ OPTION_UI_FONT,                                    "default",   OPTION_STRING,     "specify a font to use" },
 	{ OPTION_UI,                                         "cabinet",   OPTION_STRING,     "type of UI (simple|cabinet)" },
 	{ OPTION_RAMSIZE ";ram",                             nullptr,     OPTION_STRING,     "size of RAM (if supported by driver)" },

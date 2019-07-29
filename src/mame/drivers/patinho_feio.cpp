@@ -173,7 +173,7 @@ void patinho_feio_state::load_raw_data(const char* name, unsigned int start_addr
 	memcpy(&RAM[start_address], data, data_length);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
+DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state::tape_load )
 {
 	if (image.loaded_through_softlist())
 	{
@@ -282,8 +282,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 	m_tty->set_keyboard_callback(FUNC(patinho_feio_state::teletype_kbd_input));
 
 	/* punched tape */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "patinho_tape", "bin"));
-	cartslot.set_device_load(device_image_load_delegate(&patinho_feio_state::device_image_load_patinho_tape, this));
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "patinho_tape", "bin").set_device_load(FUNC(patinho_feio_state::tape_load), this);
 
 	config.set_default_layout(layout_patinho);
 

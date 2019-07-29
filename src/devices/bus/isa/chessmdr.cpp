@@ -63,7 +63,7 @@ void isa8_chessmdr_device::device_reset()
 
 static INPUT_PORTS_START( chessmdr )
 	PORT_START("DSW") // DIP switch on the ISA card PCB, installer shows range 0x110-0x3D0
-	PORT_DIPNAME( 0x0f, 0x08, "I/O Port Address" ) PORT_DIPLOCATION("CM_SW1:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x09, "I/O Port Address" ) PORT_DIPLOCATION("CMDR_SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "0x010 (Invalid)" )
 	PORT_DIPSETTING(    0x01, "0x050 (Invalid)" )
 	PORT_DIPSETTING(    0x02, "0x090 (Invalid)" )

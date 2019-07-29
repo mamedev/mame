@@ -135,7 +135,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( pcw_fdc_interrupt );
 	required_device<cpu_device> m_maincpu;
-	required_device<i8041_device> m_printer_mcu;
+	required_device<upi41_cpu_device> m_printer_mcu;
 	required_device<i8048_device> m_keyboard_mcu;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

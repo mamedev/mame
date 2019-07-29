@@ -464,7 +464,7 @@ hardware modification to the security cart.....
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "includes/cps3.h"
-#include "machine/nscsi_cd.h"
+#include "bus/nscsi/cd.h"
 #include "machine/wd33c9x.h"
 #include "screen.h"
 #include "speaker.h"

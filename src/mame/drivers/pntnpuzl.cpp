@@ -292,7 +292,7 @@ void pntnpuzl_state::pntnpuzl_map(address_map &map)
 	map(0x100000, 0x100001).r(FUNC(pntnpuzl_state::irq2_ack_r));
 	map(0x180000, 0x180001).r(FUNC(pntnpuzl_state::irq4_ack_r));
 	map(0x200000, 0x200001).w(FUNC(pntnpuzl_state::pntnpuzl_200000_w));
-	map(0x280000, 0x28001f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0xff00);
+	map(0x280000, 0x28001f).m(m_via, FUNC(via6522_device::map)).umask16(0xff00);
 	map(0x280014, 0x280015).r(FUNC(pntnpuzl_state::pntnpuzl_280014_r));
 	map(0x280018, 0x280019).w(FUNC(pntnpuzl_state::pntnpuzl_280018_w));
 	map(0x28001a, 0x28001b).r(FUNC(pntnpuzl_state::pntnpuzl_28001a_r));

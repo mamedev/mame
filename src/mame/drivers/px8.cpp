@@ -769,7 +769,6 @@ void px8_state::px8(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "capsule1", generic_plain_slot, "px8_cart", "bin,rom");
@@ -781,6 +780,7 @@ void px8_state::px8(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(0, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

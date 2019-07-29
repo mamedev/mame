@@ -222,19 +222,20 @@ enum
 };
 
 
-DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel I8031")
-DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel I8032")
-DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel I8051")
-DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel I8751")
+DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel 8031")
+DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel 8032")
+DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel 8051")
+DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel 8751")
 DEFINE_DEVICE_TYPE(AM8753, am8753_device, "am8753", "AMD Am8753")
-DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel I8052")
-DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel I8752")
-DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel I80C31")
-DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "Intel I80C51")
-DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel I87C51")
-DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel I80C32")
-DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel I80C52")
-DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel I87C52")
+DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel 8052")
+DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel 8752")
+DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel 80C31")
+DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "Intel 80C51")
+DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel 87C51")
+DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel 80C32")
+DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel 80C52")
+DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel 87C52")
+DEFINE_DEVICE_TYPE(I80C51GB, i80c51gb_device, "i80c51gb", "Intel 80C51GB")
 DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
 DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
 DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
@@ -368,6 +369,11 @@ i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, dev
 
 i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c52_device(mconfig, I87C52, tag, owner, clock, 13, 8)
+{
+}
+
+i80c51gb_device::i80c51gb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, I80C51GB, tag, owner, clock, 0, 8)
 {
 }
 
@@ -2519,6 +2525,11 @@ std::unique_ptr<util::disasm_interface> i80c51_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> i80c52_device::create_disassembler()
 {
 	return std::make_unique<i80c52_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> i80c51gb_device::create_disassembler()
+{
+	return std::make_unique<i8xc51gb_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()

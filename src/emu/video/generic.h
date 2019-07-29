@@ -28,4 +28,12 @@ extern const gfx_layout gfx_8x8x6_planar;
 
 extern const gfx_layout gfx_16x16x4_planar;
 
+extern const gfx_layout gfx_8x8x4_packed_msb;
+extern const gfx_layout gfx_8x8x4_packed_lsb;
+extern const gfx_layout gfx_8x8x8_raw;
+
+extern const gfx_layout gfx_16x16x4_packed_msb;
+extern const gfx_layout gfx_16x16x4_packed_lsb;
+extern const gfx_layout gfx_16x16x8_raw;
+
 #endif  /* MAME_EMU_VIDEO_GENERIC_H */

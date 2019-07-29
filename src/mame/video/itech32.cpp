@@ -367,7 +367,7 @@ TIMER_CALLBACK_MEMBER(itech32_state::scanline_interrupt)
 	m_scanline_timer->adjust(m_screen->time_until_pos(VIDEO_INTSCANLINE));
 
 	/* set the interrupt bit in the status reg */
-	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", m_screen->vpos());
+	//logerror("-------------- (DISPLAY INT @ %d) ----------------\n", m_screen->vpos());
 	VIDEO_INTSTATE |= VIDEOINT_SCANLINE;
 
 	/* update the interrupt state */

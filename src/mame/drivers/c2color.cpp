@@ -54,7 +54,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
@@ -84,7 +84,7 @@ void c2_color_state::machine_reset()
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(c2_color_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(c2_color_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -113,7 +113,7 @@ void c2_color_state::c2_color(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "c2color_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&c2_color_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(c2_color_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("c2color_cart");
 }

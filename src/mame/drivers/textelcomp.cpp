@@ -71,10 +71,10 @@ void textelcomp_state::rtc_w(u8 data)
 void textelcomp_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x1eff).ram(); // MB8464A-10L (battery backed?)
-	map(0x1f00, 0x1f0f).rw("via0", FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x1f10, 0x1f1f).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x1f20, 0x1f2f).rw("via2", FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x1f30, 0x1f3f).rw("via3", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1f00, 0x1f0f).m("via0", FUNC(via6522_device::map));
+	map(0x1f10, 0x1f1f).m("via1", FUNC(via6522_device::map));
+	map(0x1f20, 0x1f2f).m("via2", FUNC(via6522_device::map));
+	map(0x1f30, 0x1f3f).m("via3", FUNC(via6522_device::map));
 	map(0x1f40, 0x1f43).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x1f70, 0x1f70).noprw();//rw("lcdc", FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
 	map(0x1f71, 0x1f71).noprw();//rw("lcdc", FUNC(sed1330_device::data_r), FUNC(sed1330_device::command_w));

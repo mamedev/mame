@@ -89,8 +89,8 @@ void k573dio_device::amap(address_map &map)
 	map(0xb4, 0xb5).rw(FUNC(k573dio_device::ram_r), FUNC(k573dio_device::ram_w));
 	map(0xb6, 0xb7).w(FUNC(k573dio_device::ram_read_adr_high_w));
 	map(0xb8, 0xb9).w(FUNC(k573dio_device::ram_read_adr_low_w));
-	map(0xca, 0xcb).rw(FUNC(k573dio_device::mp3_playback_high_r), FUNC(k573dio_device::mp3_playback_high_w));
-	map(0xcc, 0xcd).rw(FUNC(k573dio_device::mp3_playback_low_r), FUNC(k573dio_device::mp3_playback_low_w));
+	map(0xca, 0xcb).r(FUNC(k573dio_device::mp3_frame_count_high_r));
+	map(0xcc, 0xcd).r(FUNC(k573dio_device::mp3_frame_count_low_r));
 	map(0xce, 0xcf).r(FUNC(k573dio_device::mp3_unk_r));
 	map(0xe0, 0xe1).w(FUNC(k573dio_device::output_1_w));
 	map(0xe2, 0xe3).w(FUNC(k573dio_device::output_0_w));
@@ -216,9 +216,9 @@ WRITE16_MEMBER(k573dio_device::mpeg_start_adr_low_w)
 {
 	logerror("FPGA MPEG start address low %04x\n", data);
 	k573fpga->set_mp3_cur_adr((k573fpga->get_mp3_cur_adr() & 0xffff0000) | data); // low
+
 	if(is_ddrsbm_fpga)
 		k573fpga->set_crypto_key3(0);
-	mas3507d->reset_sample_count();
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_end_adr_high_w)
@@ -235,12 +235,14 @@ WRITE16_MEMBER(k573dio_device::mpeg_end_adr_low_w)
 
 READ16_MEMBER(k573dio_device::mpeg_key_1_r)
 {
-	return k573fpga->get_crypto_key1();
+	// Dance Dance Revolution Solo Bass Mix reads this key before starting songs
+	return crypto_key1;
 }
 
 WRITE16_MEMBER(k573dio_device::mpeg_key_1_w)
 {
 	logerror("FPGA MPEG key 1/3 %04x\n", data);
+	crypto_key1 = data;
 	k573fpga->set_crypto_key1(data);
 }
 
@@ -260,6 +262,11 @@ WRITE16_MEMBER(k573dio_device::mas_i2c_w)
 
 READ16_MEMBER(k573dio_device::mpeg_ctrl_r)
 {
+	if (k573fpga->get_mpeg_ctrl() == 0x1000 && !k573fpga->is_playing()) {
+		// Set the FPGA to stop mode so that data won't be sent anymore
+		k573fpga->set_mpeg_ctrl(0xa000);
+	}
+
 	return k573fpga->get_mpeg_ctrl();
 }
 
@@ -271,18 +278,18 @@ WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
 WRITE16_MEMBER(k573dio_device::ram_write_adr_high_w)
 {
 	// read and write address are shared
-	ram_adr = (ram_adr & 0x0000ffff) | (data << 16);
+	ram_adr = ((ram_adr & 0x0000ffff) | (data << 16)) & 0x1ffffff;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_write_adr_low_w)
 {
 	// read and write address are shared
-	ram_adr = (ram_adr & 0xffff0000) | data;
+	ram_adr = ((ram_adr & 0xffff0000) | data) & 0x1ffffff;
 }
 
 READ16_MEMBER(k573dio_device::ram_r)
 {
-	uint16_t res = ram[(ram_read_adr & 0x7fffff) >> 1];
+	uint16_t res = ram[(ram_read_adr & 0x1ffffff) >> 1];
 	ram_read_adr += 2;
 	return res;
 }
@@ -296,37 +303,23 @@ WRITE16_MEMBER(k573dio_device::ram_w)
 WRITE16_MEMBER(k573dio_device::ram_read_adr_high_w)
 {
 	// read and write address are shared
-	ram_read_adr = (ram_read_adr & 0x001fffff) | (data << 16);
+	ram_read_adr = ((ram_read_adr & 0x0000ffff) | (data << 16)) & 0x1ffffff;
 }
 
 WRITE16_MEMBER(k573dio_device::ram_read_adr_low_w)
 {
 	// read and write address are shared
-	ram_read_adr = (ram_read_adr & 0xffff0000) | data;
+	ram_read_adr = ((ram_read_adr & 0xffff0000) | data) & 0x1ffffff;
 }
 
-READ16_MEMBER(k573dio_device::mp3_playback_high_r)
+READ16_MEMBER(k573dio_device::mp3_frame_count_high_r)
 {
-	//logerror("mp3_playback_high_r: %08x (%08x)\n", mp3_playback & 0xffff0000, mp3_playback);
-	return (mas3507d->get_sample_count() & 0xffff0000) >> 16;
+	return (mas3507d->get_frame_count() & 0xffff0000) >> 16;
 }
 
-WRITE16_MEMBER(k573dio_device::mp3_playback_high_w)
+READ16_MEMBER(k573dio_device::mp3_frame_count_low_r)
 {
-	//mp3_playback = (mp3_playback & 0x0000ffff) | (data << 16);
-	//logerror("mp3_playback_low_w: %08x\n", mp3_playback);
-}
-
-READ16_MEMBER(k573dio_device::mp3_playback_low_r)
-{
-	//logerror("mp3_playback_low_r: %08x (%08x) %08x %08x\n", mp3_playback & 0x0000ffff, mp3_playback, m_samples->get_position(0), m_samples->get_position(1));
-	return mas3507d->get_sample_count() & 0x0000ffff;
-}
-
-WRITE16_MEMBER(k573dio_device::mp3_playback_low_w)
-{
-	//mp3_playback = (mp3_playback & 0xffff0000) | data;
-	//logerror("mp3_playback_low_w: %08x\n", mp3_playback & 0x0000ffff);
+	return mas3507d->get_frame_count() & 0x0000ffff;
 }
 
 WRITE16_MEMBER(k573dio_device::output_1_w)

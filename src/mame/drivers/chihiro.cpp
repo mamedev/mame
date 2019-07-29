@@ -622,7 +622,7 @@ class chihiro_state : public xbox_base_state
 public:
 	chihiro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xbox_base_state(mconfig, type, tag)
-		, m_ide(*this, "ide")
+		, m_ide(*this, "ide1")
 		, m_dimmboard(*this, "rom_board")
 		, m_hack_index(-1)
 		, m_hack_counter(0)
@@ -1763,13 +1763,11 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 
 void chihiro_state::chihiro_map(address_map &map)
 {
-	xbox_base_map(map);
 	map(0xff000000, 0xff07ffff).rom().region("bios", 0).mirror(0x00f80000);
 }
 
 void chihiro_state::chihiro_map_io(address_map &map)
 {
-	xbox_base_map_io(map);
 	map(0x4000, 0x40ff).rw(FUNC(chihiro_state::mediaboard_r), FUNC(chihiro_state::mediaboard_w));
 }
 
@@ -1915,7 +1913,7 @@ void chihiro_state::chihiro_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chihiro_state::chihiro_map);
 	m_maincpu->set_addrmap(AS_IO, &chihiro_state::chihiro_map_io);
 
-	subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(ide_baseboard, nullptr, "bb", true);
+	subdevice<ide_controller_32_device>(":pci:09.0:ide1")->options(ide_baseboard, nullptr, "bb", true);
 
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_baseboard, "an2131qc", true).set_option_machine_config("an2131qc", an2131qc_configuration);
 	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_baseboard, "an2131sc", true).set_option_machine_config("an2131sc", an2131sc_configuration);

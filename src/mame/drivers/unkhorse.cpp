@@ -35,7 +35,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_inp_matrix(*this, "IN.%u", 0),
+		m_inputs(*this, "IN.%u", 0),
 		m_vram(*this, "vram")
 	{ }
 
@@ -44,7 +44,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_ioport_array<4> m_inp_matrix;
+	required_ioport_array<4> m_inputs;
 	required_shared_ptr<uint8_t> m_vram;
 
 	std::unique_ptr<uint8_t[]> m_colorram;
@@ -117,7 +117,7 @@ void horse_state::horse_io_map(address_map &map)
 
 READ8_MEMBER(horse_state::input_r)
 {
-	return m_inp_matrix[m_output >> 6 & 3]->read();
+	return m_inputs[m_output >> 6 & 3]->read();
 }
 
 WRITE8_MEMBER(horse_state::output_w)

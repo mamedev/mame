@@ -177,6 +177,15 @@
 
 **************************************************************************
 
+  Known games on this or similar hardware:
+
+  - [DUMPED]  4 en Línea (Compumatic)
+  - [DUMPED]  Olympic Darts (K7 Kursaal. At least three different hardware revisions)
+  - [MISSING] Sport Dart TV (Compumatic)
+  - [MISSING] Dart Queen (Compumatic / Daryde)
+
+**************************************************************************
+
   TODO:
 
   - Proper UM487F device emulation.
@@ -190,6 +199,8 @@
 #include "bus/isa/cga.h"
 #include "bus/isa/isa.h"
 #include "cpu/z80/z80.h"
+#include "machine/i2cmem.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/cgapal.h"
 #include "video/mc6845.h"
@@ -211,10 +222,12 @@ public:
 	_4enlinea_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ay(*this, "aysnd"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	void _4enlinea(machine_config &config);
+	void k7_olym(machine_config &config);
 
 private:
 	required_device<ay8910_device> m_ay;
@@ -227,6 +240,15 @@ private:
 	INTERRUPT_GEN_MEMBER(_4enlinea_irq);
 	INTERRUPT_GEN_MEMBER(_4enlinea_audio_irq);
 
+	uint8_t eeprom_data_r();
+	void eeprom_data_w(uint8_t data);
+	void eeprom_control_w(uint8_t data);
+	void eeprom_clock_w(uint8_t data);
+
+	uint8_t k7_in_r();
+	void k7_out0_w(uint8_t data);
+	void k7_out1_w(uint8_t data);
+
 	uint8_t m_irq_count;
 	uint8_t m_serial_flags;
 	uint8_t m_serial_data[2];
@@ -234,11 +256,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_device<i2cmem_device> m_eeprom;
 
 	void audio_map(address_map &map);
-	void audio_portmap(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
+
+	void k7_mem_map(address_map &map);
+	void k7_io_map(address_map &map);
 };
 
 
@@ -386,6 +411,27 @@ WRITE8_MEMBER(_4enlinea_state::serial_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
 }
 
+uint8_t _4enlinea_state::eeprom_data_r()
+{
+	return m_eeprom->read_sda();
+}
+
+void _4enlinea_state::eeprom_data_w(uint8_t data)
+{
+	m_eeprom->write_sda(BIT(data, 0));
+}
+
+void _4enlinea_state::eeprom_control_w(uint8_t data)
+{
+	if (BIT(data, 0))
+		m_eeprom->write_sda(1);
+}
+
+void _4enlinea_state::eeprom_clock_w(uint8_t data)
+{
+	m_eeprom->write_scl(BIT(data, 6));
+}
+
 READ8_MEMBER(_4enlinea_state::hack_r)
 {
 	return machine().rand();
@@ -395,18 +441,47 @@ void _4enlinea_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xf800, 0xfbff).ram();
-	map(0xfc24, 0xfc24).r(FUNC(_4enlinea_state::hack_r));
+	map(0xfc24, 0xfc24).rw(FUNC(_4enlinea_state::eeprom_data_r), FUNC(_4enlinea_state::eeprom_data_w));
+	map(0xfc25, 0xfc25).w(FUNC(_4enlinea_state::eeprom_control_w));
+	map(0xfc26, 0xfc26).w(FUNC(_4enlinea_state::eeprom_clock_w));
 	map(0xfc28, 0xfc28).r(FUNC(_4enlinea_state::hack_r));
 	map(0xfc30, 0xfc31).w(FUNC(_4enlinea_state::serial_w));
 	map(0xfc32, 0xfc32).rw(FUNC(_4enlinea_state::serial_status_r), FUNC(_4enlinea_state::serial_status_w));
-	map(0xfc48, 0xfc49).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-
+	map(0xfc48, 0xfc48).w(m_ay, FUNC(ay8910_device::address_w));
+	map(0xfc49, 0xfc49).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0xfc4a, 0xfc4a).w(m_ay, FUNC(ay8910_device::data_w));
 }
 
-
-void _4enlinea_state::audio_portmap(address_map &map)
+uint8_t _4enlinea_state::k7_in_r()
 {
-	map.global_mask(0xff);
+	return m_eeprom->read_sda() << 4;
+}
+
+void _4enlinea_state::k7_out0_w(uint8_t data)
+{
+	m_eeprom->write_sda(!BIT(data, 3));
+	m_eeprom->write_scl(BIT(data, 2));
+}
+
+void _4enlinea_state::k7_out1_w(uint8_t data)
+{
+}
+
+void _4enlinea_state::k7_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xc000, 0xdfff).rom().region("maincpu", 0x8000);
+	map(0xe000, 0xffff).ram().share("nvram");
+}
+
+void _4enlinea_state::k7_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).mirror(0xfc00).w(FUNC(_4enlinea_state::k7_out0_w));
+	map(0x0001, 0x0001).mirror(0xfc00).rw(FUNC(_4enlinea_state::k7_in_r), FUNC(_4enlinea_state::k7_out1_w));
+	map(0x0100, 0x0100).w(m_ay, FUNC(ay8910_device::address_w));
+	map(0x0101, 0x0101).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x0102, 0x0102).w(m_ay, FUNC(ay8910_device::data_w));
+//  0x03bf W (0x40)
 }
 
 
@@ -440,6 +515,32 @@ static INPUT_PORTS_START( 4enlinea )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                   PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
+
+	PORT_START( "pcvideo_cga_config" )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( k7_olym )
+	PORT_START("IN-P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN-P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "pcvideo_cga_config" )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -511,8 +612,9 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 
 	z80_device &audiocpu(Z80(config, "audiocpu", SND_CPU_CLOCK));
 	audiocpu.set_addrmap(AS_PROGRAM, &_4enlinea_state::audio_map);
-	audiocpu.set_addrmap(AS_IO, &_4enlinea_state::audio_portmap);
 	audiocpu.set_periodic_int(FUNC(_4enlinea_state::_4enlinea_audio_irq), attotime::from_hz(60)); //TODO
+
+	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800); // X24C16P
 
 	// FIXME: determine ISA bus clock
 	isa8_device &isa(ISA8(config, "isa", 0));
@@ -540,6 +642,30 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 }
 
 
+void _4enlinea_state::k7_olym(machine_config &config)
+{
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 2); // Z84C00BB6
+	m_maincpu->set_addrmap(AS_PROGRAM, &_4enlinea_state::k7_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &_4enlinea_state::k7_io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // D4464C-15L (6264) + battery
+
+	I2CMEM(config, m_eeprom).set_page_size(16).set_data_size(0x800); // X24C16P
+
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_memspace("maincpu", AS_PROGRAM);
+	isa.set_iospace("maincpu", AS_IO);
+
+	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
+
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay, 14.318181_MHz_XTAL / 8); // Winbond WF19054
+	m_ay->port_a_read_callback().set_ioport("IN-P2");
+	m_ay->port_b_read_callback().set_ioport("IN-P1");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+
 /***********************************
 *             Rom Load             *
 ***********************************/
@@ -552,10 +678,24 @@ ROM_START( 4enlinea )
 	ROM_LOAD( "cuatro_en_linea_27c256__cicplay-1.ic19", 0x0000, 0x8000, CRC(307a57a3) SHA1(241329d919ec43d0eeb1dad0a4db6cf6de06e7e1) )
 
 	ROM_REGION( 0x0800, "eeprom", 0 )   /* default serial EEPROM */
-	ROM_LOAD( "cuatro_en_linea_x24c16p__nosticker.ic17", 0x000, 0x800, CRC(21f81f5a) SHA1(00b10eee5af1ca79ced2878f4be4cac2bb8d26a0) )
+	ROM_LOAD( "cuatro_en_linea_x24c16p__nosticker.ic17", 0x0000, 0x0800, CRC(21f81f5a) SHA1(00b10eee5af1ca79ced2878f4be4cac2bb8d26a0) )
 
-	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "cuatro_en_linea_gal16v8as__nosticker.ic04", 0x000, 0x117, CRC(094edf29) SHA1(428a2f6568ac1032833ee0c65fa8304967a58607) )
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "cuatro_en_linea_gal16v8as__nosticker.ic04", 0x0000, 0x0117, CRC(094edf29) SHA1(428a2f6568ac1032833ee0c65fa8304967a58607) )
+ROM_END
+
+ROM_START( k7_olym )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "odk7_v3.11_27c512.ic18", 0x00000, 0x10000, CRC(063d24fe) SHA1(ad4509438d2028ede779f5aa9a918d1020c1db41) )
+
+	// The EEPROM contains a custom message (operators can set on-screen messages).
+	// A clean one for default need to be created...
+	ROM_REGION( 0x0800, "eeprom", 0 )
+	ROM_LOAD( "x24c16p.bin", 0x0000, 0x0800, CRC(4c6685b2) SHA1(38c4f64f038d7ce185d6fd0b6eec4c9818f64e8e) )
+
+	ROM_REGION( 0x0300, "plds", 0 )
+	ROM_LOAD( "a1_gal16v8a.ic11", 0x0000, 0x0117, NO_DUMP ) // protected
+	ROM_LOAD( "b1_gal16v8a.ic4",  0x0117, 0x0117, NO_DUMP ) // protected
 ROM_END
 
 
@@ -563,5 +703,6 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME           FLAGS  */
-GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME              FLAGS  */
+GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea",    MACHINE_NOT_WORKING )
+GAME( 1994, k7_olym,  0,      k7_olym,   k7_olym,  _4enlinea_state, empty_init, ROT0, "K7 Kursaal", "Olympic Darts (K7)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

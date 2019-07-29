@@ -74,6 +74,7 @@ public:
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	void opcode_fetch(offs_t offset);
+	void opcode_fetch_post(offs_t offset);
 	uint8_t mreq_r(offs_t offset);
 	void mreq_w(offs_t offset, uint8_t data);
 	uint8_t iorq_r(offs_t offset);
@@ -107,6 +108,7 @@ public:
 
 	// reading and writing
 	virtual void opcode_fetch(offs_t offset) { };
+	virtual void opcode_fetch_post(offs_t offset) { };
 	virtual uint8_t mreq_r(offs_t offset) { return 0xff; }
 	virtual void mreq_w(offs_t offset, uint8_t data) { }
 	virtual uint8_t iorq_r(offs_t offset) { return 0xff; }

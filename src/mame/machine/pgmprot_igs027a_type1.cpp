@@ -218,34 +218,35 @@ void pgm_arm_type1_state::machine_start()
 	save_item(NAME(m_slots));
 }
 
-void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
+void pgm_arm_type1_state::pgm_arm_type1(machine_config &config) // ARM7 Shared motherboard XTAL
 {
 	pgmbase(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::cavepgm_mem);
-
-	subdevice<screen_device>("screen")->set_refresh_hz(59.17); // verified on pcb
-}
-
-void pgm_arm_type1_state::pgm_arm_type1_sim(machine_config &config)
-{
-	pgm_arm_type1_cave(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::kov_sim_map);
-
-	/* protection CPU */
-	ARM7(config, m_prot, 20000000);   // 55857E?
-	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
-	m_prot->set_disable();
-}
-
-void pgm_arm_type1_state::pgm_arm_type1(machine_config &config)
-{
-	pgm_arm_type1_cave(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::kov_map);
 
 	/* protection CPU */
 	ARM7(config, m_prot, 20000000);   // 55857E?
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
+
+//  subdevice<screen_device>("screen")->set_refresh_hz(59.17); // Correct?
+}
+
+void pgm_arm_type1_state::pgm_arm_type1_sim(machine_config &config) // When simulated
+{
+	pgm_arm_type1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::kov_sim_map);
+
+	/* protection CPU */
+	m_prot->set_disable();
+}
+
+void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
+{
+	pgm_arm_type1_sim(config);
+//  pgm_arm_type1(config); // When ARM7 ROM is dumped and hooked up
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::cavepgm_mem);
+
+	subdevice<screen_device>("screen")->set_refresh_hz(59.17); // verified on pcb
 }
 
 void pgm_arm_type1_state::arm7_type1_latch_init()
@@ -2312,7 +2313,19 @@ INPUT_PORTS_START( photoy2k )
 	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
 INPUT_PORTS_END
 
+INPUT_PORTS_START( photoy2kj )
+	PORT_INCLUDE ( pgm )
 
+	PORT_START("RegionHack")    /* Region - supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x0002, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0005, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
+INPUT_PORTS_END
 
 INPUT_PORTS_START( kovsh )
 	PORT_INCLUDE ( pgm )

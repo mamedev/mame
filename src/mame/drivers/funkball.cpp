@@ -763,7 +763,8 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_CONF", 0x080, 0x080 ) // Auto LF on CR
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(funkball_state::funkball)
+void funkball_state::funkball(machine_config &config)
+{
 	MEDIAGX(config, m_maincpu, 66666666*3.5); // 66,6 MHz x 3.5
 	m_maincpu->set_addrmap(AS_PROGRAM, &funkball_state::funkball_map);
 	m_maincpu->set_addrmap(AS_IO, &funkball_state::funkball_io);
@@ -771,9 +772,11 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, funkball_state, voodoo_0_pci_r, voodoo_0_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (7, FUNC(funkball_state::voodoo_0_pci_r), this);
+	pcibus.set_device_write(7, FUNC(funkball_state::voodoo_0_pci_w), this);
+	pcibus.set_device_read (18, FUNC(funkball_state::cx5510_pci_r), this);
+	pcibus.set_device_write(18, FUNC(funkball_state::cx5510_pci_w), this);
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -809,7 +812,7 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	INTEL_28F320J5(config, "u29");
 	INTEL_28F320J5(config, "u30");
 	INTEL_28F320J5(config, "u3");
-MACHINE_CONFIG_END
+}
 
 ROM_START( funkball )
 	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)

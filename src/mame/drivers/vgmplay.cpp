@@ -2639,7 +2639,7 @@ static const c140_device::C140_TYPE c140_bank_type(uint8_t vgm_type)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(vgmplay_state, load_file)
+QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 {
 	m_vgmplay->stop();
 
@@ -3289,7 +3289,7 @@ void vgmplay_state::soundchips_map(address_map &map)
 
 void vgmplay_state::soundchips16_map(address_map &map)
 {
-	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::_32x_pwm_w));
+	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::pwm_w));
 	map(vgmplay_device::A_SCSP_0, vgmplay_device::A_SCSP_0 + 0xfff).w(m_scsp[0], FUNC(scsp_device::write));
 	map(vgmplay_device::A_SCSP_1, vgmplay_device::A_SCSP_1 + 0xfff).w(m_scsp[1], FUNC(scsp_device::write));
 	map(vgmplay_device::A_SCSP_RAM_0, vgmplay_device::A_SCSP_RAM_0 + 0xfffff).ram().share("scsp_ram.0");
@@ -3448,14 +3448,16 @@ void vgmplay_state::rf5c164_map(address_map &map)
 	map(0, 0xffff).ram().share("rf5c164_ram");
 }
 
-MACHINE_CONFIG_START(vgmplay_state::vgmplay)
+void vgmplay_state::vgmplay(machine_config &config)
+{
 	VGMPLAY(config, m_vgmplay, 44100);
 	m_vgmplay->set_addrmap(AS_PROGRAM, &vgmplay_state::file_map);
 	m_vgmplay->set_addrmap(AS_IO, &vgmplay_state::soundchips_map);
 	m_vgmplay->set_addrmap(AS_IO16, &vgmplay_state::soundchips16_map);
 
-	MCFG_QUICKLOAD_ADD("quickload", vgmplay_state, load_file, "vgm,vgz")
-	MCFG_QUICKLOAD_INTERFACE("vgm_quik")
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "vgm,vgz"));
+	quickload.set_load_callback(FUNC(vgmplay_state::load_file), this);
+	quickload.set_interface("vgm_quik");
 
 	SOFTWARE_LIST(config, "vgm_list").set_original("vgmplay");
 
@@ -3878,7 +3880,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
-MACHINE_CONFIG_END
+}
 
 ROM_START( vgmplay )
 	// TODO: split up 32x to remove dependencies

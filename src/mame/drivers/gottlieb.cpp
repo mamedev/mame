@@ -584,7 +584,7 @@ void gottlieb_state::audio_handle_zero_crossing(const attotime &zerotime, bool l
 }
 
 
-void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)
+void gottlieb_state::laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)
 {
 	bool logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
@@ -1799,10 +1799,9 @@ void gottlieb_state::g2laser(machine_config &config)
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	PIONEER_PR8210(config, m_laserdisc, 0);
-	m_laserdisc->set_audio(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this));
+	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process), this);
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
-	m_laserdisc->set_overlay_palette("palette");
 	m_laserdisc->add_route(0, "speaker", 1.0);
 	m_laserdisc->set_screen(m_screen);
 	/* right channel is processed as data */
@@ -1865,10 +1864,9 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_r2_sound->enable_cobram3_mods();
 
 	PIONEER_PR8210(config, m_laserdisc, 0);
-	m_laserdisc->set_audio(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this));
+	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process), this);
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
-	m_laserdisc->set_overlay_palette("palette");
 	m_laserdisc->add_route(0, "speaker", 1.0);
 	m_laserdisc->set_screen(m_screen);
 	/* right channel is processed as data */

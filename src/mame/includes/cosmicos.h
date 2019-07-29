@@ -92,7 +92,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
 	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void init_cosmicos();
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);

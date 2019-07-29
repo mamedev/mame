@@ -735,6 +735,17 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pwm.h,VIDEOS["PWM_DISPLAY"] = true
+--------------------------------------------------
+if (VIDEOS["PWM_DISPLAY"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/pwm.cpp",
+		MAME_DIR .. "src/devices/video/pwm.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/sed1200.h,VIDEOS["SED1200"] = true
 --------------------------------------------------
 if (VIDEOS["SED1200"]~=null) then
@@ -1196,3 +1207,26 @@ if (VIDEOS["DECSFB"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/video/bt47x.h,VIDEOS["BT47X"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT47X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt47x.cpp",
+		MAME_DIR .. "src/devices/video/bt47x.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/bt431.h,VIDEOS["BT431"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT431"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt431.cpp",
+		MAME_DIR .. "src/devices/video/bt431.h",
+	}
+end

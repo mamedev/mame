@@ -912,7 +912,7 @@ void running_machine::handle_saveload()
 			u32 const openflags = (m_saveload_schedule == saveload_schedule::LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
-			emu_file file(m_saveload_searchpath, openflags);
+			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (filerr == osd_file::error::NONE)
 			{

@@ -1281,12 +1281,15 @@ INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
 static INPUT_PORTS_START( aristmk5_usa )
 	/* This simulates the ROM swap */
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x07, 0x04, "System Mode" )
+	PORT_CONFNAME( 0x07, 0x07, "System Mode" )
 	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
 	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.08 Mode" )
-	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.00 Mode" )
-	PORT_CONFSETTING(    0x03, "USA Set Chip v4.02.04 Mode" )
-	PORT_CONFSETTING(    0x04, "Game Mode" )
+	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.05 Mode" )
+	PORT_CONFSETTING(    0x03, "USA Set Chip v4.04.00 Mode" )
+	PORT_CONFSETTING(    0x04, "USA Set Chip v4.03.07 Mode" )
+	PORT_CONFSETTING(    0x05, "USA Set Chip v4.02.04 Mode" )
+	PORT_CONFSETTING(    0x06, "USA Set Chip v1.0 Mode" )
+	PORT_CONFSETTING(    0x07, "Game Mode" )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(0x0f, 0x0f, "Bank 1 - Denomination Values: Coin Value")
@@ -2257,7 +2260,7 @@ void aristmk5_state::machine_reset()
 
 		if (ioport("ROM_LOAD") != nullptr)
 		{
-			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.00", "set_4.02.04", "game_prg" };
+			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.00", "set_4.03.07", "set_4.02.04", "set_1.0", "game_prg" };
 
 			uint8_t op_mode = ioport("ROM_LOAD")->read();
 
@@ -2380,15 +2383,24 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
-	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg */ \
+	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg (27c4096) */ \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
+	ROM_REGION( 0x400000, "set_4.04.05", ROMREGION_ERASEFF ) /* setchip v4.04.05 4meg */ \
+	ROM_LOAD32_WORD( "setchip v4.04.05.u7",  0x000000, 0x80000, CRC(e7b39a73) SHA1(e826d717a0871383394e15634896fcb2e2bdeb75) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.05.u11", 0x000002, 0x80000, CRC(2fc9b2a0) SHA1(89191f02c4ec8089e26989430806650d14e13e5a) ) \
 	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
+	ROM_REGION( 0x400000, "set_4.03.07", ROMREGION_ERASEFF ) /* setchip v4.03.07 4meg */ \
+	ROM_LOAD32_WORD( "setchip v4.03.07.u7",  0x000000, 0x80000, CRC(5cf56036) SHA1(ff11deb6f76627f4fb5a7ec789e4071887e3eae9) ) \
+	ROM_LOAD32_WORD( "setchip v4.03.07.u11", 0x000002, 0x80000, CRC(637de9b9) SHA1(4b5c974fd4c1d1a21f83bdc03d8bc5013d4a40ea) ) \
 	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) )
+	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
+	ROM_REGION( 0x400000, "set_1.0",     ROMREGION_ERASEFF ) /* setchip v1.0 4meg */ \
+	ROM_LOAD32_WORD( "setchip v1.0.u7",      0x000000, 0x80000, CRC(16c2828d) SHA1(87218a76bb2791bce27b4b8ab341ba73cbbf6ffe) ) \
+	ROM_LOAD32_WORD( "setchip v1.0.u11",     0x000002, 0x80000, CRC(a969f12b) SHA1(fc6d234ce1f5c6b5aceb97b73aad60144352023b) )
 
 #define ARISTOCRAT_MK5_GALS \
 	ROM_REGION( 0x600, "gals", 0 ) \

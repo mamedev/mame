@@ -43,7 +43,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_spg(*this, "spg")
 		, m_cart(*this, "cartslot")
 		, m_system_region(*this, "maincpu")
 		, m_io_mouse_x(*this, "MOUSEX")
@@ -75,7 +74,7 @@ private:
 
 	void mem_map(address_map &map);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	DECLARE_READ16_MEMBER(rom_r);
 
@@ -93,9 +92,8 @@ private:
 
 	void update_mouse_buffer();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<spg2xx_device> m_spg;
 	required_device<generic_slot_device> m_cart;
 	required_memory_region m_system_region;
 	required_ioport m_io_mouse_x;
@@ -157,7 +155,7 @@ void clickstart_state::machine_reset()
 	m_unk_portc_toggle = 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(clickstart_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -180,7 +178,7 @@ void clickstart_state::handle_uart_tx()
 	if (m_uart_tx_fifo_count == 0)
 		return;
 
-	m_spg->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
+	m_maincpu->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
 	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
 	m_uart_tx_fifo_count--;
 }
@@ -341,7 +339,6 @@ WRITE8_MEMBER(clickstart_state::chip_sel_w)
 void clickstart_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).r(FUNC(clickstart_state::rom_r));
-	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
 static INPUT_PORTS_START( clickstart )
@@ -401,34 +398,32 @@ INPUT_PORTS_END
 
 void clickstart_state::clickstart(machine_config &config)
 {
-	UNSP(config, m_maincpu, XTAL(27'000'000));
+	SPG28X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &clickstart_state::mem_map);
+	m_maincpu->porta_out().set(FUNC(clickstart_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(clickstart_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(clickstart_state::portc_w));
+	m_maincpu->porta_in().set(FUNC(clickstart_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(clickstart_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(clickstart_state::portc_r));
+	m_maincpu->adc_in<0>().set_constant(0x0fff);
+	m_maincpu->chip_select().set(FUNC(clickstart_state::chip_sel_w));
+	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update("spg", FUNC(spg2xx_device::screen_update));
-	m_screen->screen_vblank().set(m_spg, FUNC(spg2xx_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
-	m_spg->porta_out().set(FUNC(clickstart_state::porta_w));
-	m_spg->portb_out().set(FUNC(clickstart_state::portb_w));
-	m_spg->portc_out().set(FUNC(clickstart_state::portc_w));
-	m_spg->porta_in().set(FUNC(clickstart_state::porta_r));
-	m_spg->portb_in().set(FUNC(clickstart_state::portb_r));
-	m_spg->portc_in().set(FUNC(clickstart_state::portc_r));
-	m_spg->adc_in<0>().set_constant(0x0fff);
-	m_spg->chip_select().set(FUNC(clickstart_state::chip_sel_w));
-	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "clickstart_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&clickstart_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(clickstart_state::cart_load), this);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("clickstart_cart");
 }

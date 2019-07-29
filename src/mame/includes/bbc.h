@@ -188,8 +188,8 @@ public:
 	void setup_device_roms();
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1) { return load_cart(image, m_cart[0]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2) { return load_cart(image, m_cart[1]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart[1]); }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

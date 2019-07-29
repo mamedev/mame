@@ -21,8 +21,8 @@
 *  1f400000 - 1f5fffff      GIO64 - EXP0
 *  1f600000 - 1f9fffff      GIO64 - EXP1 - Unused
 *  1fa00000 - 1fa1ffff      Memory Controller
-*  1fb00000 - 1fb1a7ff      HPC3 CHIP1
-*  1fb80000 - 1fb9a7ff      HPC3 CHIP0
+*  1fb00000 - 1fb7ffff      HPC3 CHIP1
+*  1fb80000 - 1fbfffff      HPC3 CHIP0
 *  1fc00000 - 1fffffff      BIOS
 *  20000000 - 2fffffff      High System Memory
 *  30000000 - 7fffffff      Reserved
@@ -59,11 +59,13 @@
 #include "cpu/mips/r4000.h"
 
 #include "machine/ds1386.h"
+#include "machine/edlc.h"
 #include "machine/eepromser.h"
 #include "machine/hpc3.h"
+#include "machine/ioc2.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "machine/sgi.h"
 #include "machine/vino.h"
 #include "machine/wd33c9x.h"
@@ -82,6 +84,7 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
+		, m_edlc(*this, "edlc")
 		, m_eeprom(*this, "eeprom")
 		, m_hal2(*this, "hal2")
 		, m_hpc3(*this, "hpc3")
@@ -102,13 +105,23 @@ public:
 	void indy_4610(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE64_MEMBER(write_ram);
 	DECLARE_READ32_MEMBER(bus_error);
 
+	uint8_t volume_r(offs_t offset);
+	void volume_w(offs_t offset, uint8_t data);
+
 	void ip24_map(address_map &map);
 	void ip24_base_map(address_map &map);
+	void pio0_map(address_map &map);
+	void pio1_map(address_map &map);
+	void pio2_map(address_map &map);
+	void pio3_map(address_map &map);
+	void pio5_map(address_map &map);
+	void pio6_map(address_map &map);
 
 	void wd33c93(device_t *device);
 
@@ -118,6 +131,7 @@ protected:
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93b_device> m_scsi_ctrl;
+	required_device<seeq8003_device> m_edlc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<hal2_device> m_hal2;
 	required_device<hpc3_device> m_hpc3;
@@ -128,6 +142,9 @@ protected:
 	optional_device<gio64_slot_device> m_gio64_gfx;
 	optional_device<gio64_slot_device> m_gio64_exp0;
 	optional_device<gio64_slot_device> m_gio64_exp1;
+
+	uint8_t m_volume_l;
+	uint8_t m_volume_r;
 };
 
 class ip22_state : public ip24_state
@@ -147,6 +164,8 @@ private:
 	void wd33c93_2(device_t *device);
 
 	void ip22_map(address_map &map);
+	void pio4_map(address_map &map);
+	void pio6_map(address_map &map);
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
@@ -181,6 +200,28 @@ WRITE64_MEMBER(ip24_state::write_ram)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
+uint8_t ip24_state::volume_r(offs_t offset)
+{
+	if (offset == 0)
+		return m_volume_r;
+	else
+		return m_volume_l;
+}
+
+void ip24_state::volume_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0)
+	{
+		m_volume_r = data;
+		m_hal2->set_right_volume(data);
+	}
+	else
+	{
+		m_volume_l = data;
+		m_hal2->set_left_volume(data);
+	}
+}
+
 void ip24_state::ip24_base_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
@@ -199,10 +240,46 @@ void ip24_state::ip24_map(address_map &map)
 	map(0x00080000, 0x0009ffff).rw(m_vino, FUNC(vino_device::read), FUNC(vino_device::write));
 }
 
+void ip24_state::pio0_map(address_map &map)
+{
+	map(0x00, 0xff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
+}
+
+void ip24_state::pio1_map(address_map &map)
+{
+	map(0x00, 0xff).ram(); // hack
+}
+
+void ip24_state::pio2_map(address_map &map)
+{
+	map(0x00, 0x01).rw(FUNC(ip24_state::volume_r), FUNC(ip24_state::volume_w)).umask16(0x00ff);
+}
+
+void ip24_state::pio6_map(address_map &map)
+{
+	map(0x00, 0x2f).m("ioc2", FUNC(ioc2_guinness_device::map)).umask16(0x00ff);
+}
+
 void ip22_state::ip22_map(address_map &map)
 {
 	ip22_state::ip24_base_map(map);
 	map(0x00080000, 0x0009ffff).r(FUNC(ip22_state::eisa_io_r));
+}
+
+void ip22_state::pio4_map(address_map &map)
+{
+	map(0x00, 0x0f).m("ioc2", FUNC(ioc2_full_house_device::int2_map)).umask16(0x00ff);
+}
+
+void ip22_state::pio6_map(address_map &map)
+{
+	map(0x00, 0x1f).m("ioc2", FUNC(ioc2_full_house_device::map)).umask16(0x00ff);
+}
+
+void ip24_state::machine_start()
+{
+	save_item(NAME(m_volume_l));
+	save_item(NAME(m_volume_r));
 }
 
 void ip24_state::machine_reset()
@@ -220,7 +297,7 @@ INPUT_PORTS_END
 void ip24_state::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_ioc2, FUNC(ioc2_device::scsi0_int_w));
 	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
 }
 
@@ -256,8 +333,19 @@ void ip24_state::ip24_base(machine_config &config)
 	GIO64_SLOT(config, m_gio64_exp0, m_gio64, gio64_slot_device::GIO64_SLOT_EXP0, gio64_cards, nullptr);
 	GIO64_SLOT(config, m_gio64_exp1, m_gio64, gio64_slot_device::GIO64_SLOT_EXP1, gio64_cards, nullptr);
 
-	SGI_HPC3(config, m_hpc3, m_ioc2, m_hal2);
+	SGI_HPC3(config, m_hpc3, m_hal2);
 	m_hpc3->set_gio64_space(m_maincpu, AS_PROGRAM);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO0, &ip24_state::pio0_map);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO1, &ip24_state::pio1_map);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO2, &ip24_state::pio2_map);
+	m_hpc3->enet_rd_cb().set(m_edlc, FUNC(seeq8003_device::read));
+	m_hpc3->enet_wr_cb().set(m_edlc, FUNC(seeq8003_device::write));
+	m_hpc3->enet_rxrd_cb().set(m_edlc, FUNC(seeq8003_device::fifo_r));
+	m_hpc3->enet_txwr_cb().set(m_edlc, FUNC(seeq8003_device::fifo_w));
+	m_hpc3->enet_d8_rd_cb().set(m_edlc, FUNC(seeq8003_device::rxeof_r));
+	m_hpc3->enet_d8_wr_cb().set(m_edlc, FUNC(seeq8003_device::txeof_w));
+	m_hpc3->enet_reset_cb().set(m_edlc, FUNC(seeq8003_device::reset_w));
+	m_hpc3->enet_intr_out_cb().set(m_ioc2, FUNC(ioc2_device::enet_int_w));
 	m_hpc3->hd_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::indir_w));
 	m_hpc3->hd_dma_rd_cb<0>().set(m_scsi_ctrl, FUNC(wd33c93b_device::dma_r));
@@ -272,17 +360,26 @@ void ip24_state::ip24_base(machine_config &config)
 	//m_hpc3->eeprom_pre_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::pre_write));
 	m_hpc3->dma_complete_int_cb().set(m_ioc2, FUNC(ioc2_device::hpc_dma_done_w));
 
+	SEEQ8003(config, m_edlc);
+	m_edlc->out_int_cb().set(m_hpc3, FUNC(hpc3_device::enet_intr_in_w));
+	m_edlc->out_rxrdy_cb().set(m_hpc3, FUNC(hpc3_device::enet_rxrdy_w));
+	m_edlc->out_txrdy_cb().set(m_hpc3, FUNC(hpc3_device::enet_txrdy_w));
+	//m_edlc->out_rxdc_cb().set(m_hpc3, FUNC(hpc3_device::enet_rxdc_w));
+	//m_edlc->out_txret_cb().set(m_hpc3, FUNC(hpc3_device::enet_txret_w));
+
 	SGI_HAL2(config, m_hal2);
 	EEPROM_93C56_16BIT(config, m_eeprom);
-	DS1386_8K(config, m_rtc, 32768);
 }
 
 void ip24_state::ip24(machine_config &config)
 {
 	ip24_base(config);
 
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip24_state::pio6_map);
+
 	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
 	VINO(config, m_vino);
+	DS1386_8K(config, m_rtc, 32768);
 }
 
 void ip24_state::indy_5015(machine_config &config)
@@ -318,7 +415,7 @@ void ip24_state::indy_4610(machine_config &config)
 void ip22_state::wd33c93_2(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
+	downcast<wd33c93b_device *>(device)->irq_cb().set(m_ioc2, FUNC(ioc2_device::scsi1_int_w));
 	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
 }
 
@@ -342,6 +439,8 @@ void ip22_state::indigo2_4415(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus2:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
 
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO4, &ip22_state::pio4_map);
+	m_hpc3->set_addrmap(hpc3_device::AS_PIO6, &ip22_state::pio6_map);
 	m_hpc3->hd_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_r));
 	m_hpc3->hd_wr_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::indir_w));
 	m_hpc3->hd_dma_rd_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::dma_r));
@@ -349,6 +448,7 @@ void ip22_state::indigo2_4415(machine_config &config)
 	m_hpc3->hd_reset_cb<1>().set(m_scsi_ctrl2, FUNC(wd33c93b_device::reset_w));
 
 	SGI_IOC2_FULL_HOUSE(config, m_ioc2, m_maincpu);
+	DS1286(config, m_rtc, 32768);
 }
 
 #define INDY_BIOS_FLAGS(bios) ROM_GROUPDWORD | ROM_BIOS(bios)
@@ -418,7 +518,7 @@ ROM_START( indigo2_4415 )
 ROM_END
 
 //    YEAR  NAME          PARENT     COMPAT  MACHINE       INPUT CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
-COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_NOT_WORKING )
-COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
+COMP( 1993, indy_4610,    0,         0,      indy_4610,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 100MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
+COMP( 1993, indy_4613,    indy_4610, 0,      indy_4613,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_NODEVICE_MICROPHONE )
 COMP( 1996, indy_5015,    indy_4610, 0,      indy_5015,    ip24, ip24_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
 COMP( 1993, indigo2_4415, 0,         0,      indigo2_4415, ip24, ip22_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )

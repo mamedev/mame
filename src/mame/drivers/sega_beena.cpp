@@ -51,7 +51,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void beena_arm7_map(address_map &map);
 
@@ -87,7 +87,7 @@ void sega_beena_state::machine_reset()
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(sega_beena_state, cart)
+DEVICE_IMAGE_LOAD_MEMBER(sega_beena_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -124,7 +124,7 @@ void sega_beena_state::sega_beena(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "sega_beena_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&sega_beena_state::device_image_load_cart, this));
+	m_cart->set_device_load(FUNC(sega_beena_state::cart_load), this);
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("sega_beena_cart");

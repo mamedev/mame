@@ -286,7 +286,6 @@ Timings:
 #include "includes/lviv.h"
 
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -421,7 +420,8 @@ INPUT_PORTS_END
 
 
 /* machine definition */
-MACHINE_CONFIG_START(lviv_state::lviv)
+void lviv_state::lviv(machine_config &config)
+{
 	/* basic machine hardware */
 	I8080(config, m_maincpu, 2500000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lviv_state::mem_map);
@@ -457,22 +457,22 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav")
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(lviv_state::snapshot_cb), this);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(lviv_lvt_format);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("lviv_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("lviv");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(lviv)

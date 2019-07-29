@@ -20,7 +20,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/kb_7007_3.h"
-#include "sound/wave.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -291,7 +290,6 @@ void mc1502_state::mc1502(machine_config &config)
 	ISA8_SLOT(config, "isa2", 0, "isa", mc1502_isa8_cards, "rom", false);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette); // FIXME: really no output routes for the cassette sound?
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -307,6 +305,7 @@ void mc1502_state::mc1502(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mc1502_flop");
 //  SOFTWARE_LIST(config, "cass_list").set_original("mc1502_cass");

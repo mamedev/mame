@@ -12,10 +12,10 @@
 #include "emu.h"
 #include "aha1542b.h"
 
+#include "bus/nscsi/devices.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/gen_latch.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_hd.h"
 
 
 DEFINE_DEVICE_TYPE(AHA1542A, aha1542a_device, "aha1542a", "AHA-1542A SCSI Controller")
@@ -450,12 +450,6 @@ ioport_constructor aha1542b_device::device_input_ports() const
 	return INPUT_PORTS_NAME(aha1542b);
 }
 
-static void aha154x_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("scsic", AIC6250);
-}
-
 void aha154x_device::scsic_config(device_t *device)
 {
 	device->set_clock(20'000'000);
@@ -468,15 +462,15 @@ void aha154x_device::scsic_config(device_t *device)
 void aha154x_device::scsi_add(machine_config &config)
 {
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", aha154x_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", aha154x_scsi_devices, "scsic", true)
-		.set_option_machine_config("scsic", [this] (device_t *device) { scsic_config(device); });
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6250)
+		.machine_config([this] (device_t *device) { scsic_config(device); });
 }
 
 void aha1542a_device::device_add_mconfig(machine_config &config)

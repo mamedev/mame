@@ -24,7 +24,6 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/z80pio.h"
-#include "sound/wave.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -156,9 +155,10 @@ void ac1_state::ac1(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void ac1_state::ac1_32(machine_config &config)

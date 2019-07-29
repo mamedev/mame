@@ -19,6 +19,7 @@ aceex.cpp
 aci_boris.cpp
 aci_borisdpl.cpp
 aci_ggm.cpp
+aci_prodigy.cpp
 acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
@@ -102,6 +103,7 @@ besta.cpp
 beta.cpp
 bigbord2.cpp
 binbug.cpp
+bitel.cpp
 bitgraph.cpp
 bk.cpp
 blw700i.cpp
@@ -139,6 +141,7 @@ cgc7900.cpp
 cgenie.cpp
 channelf.cpp
 chaos.cpp
+chessmate.cpp
 chessmst.cpp
 cit101.cpp
 cit220.cpp
@@ -154,6 +157,7 @@ codata.cpp
 coleco.cpp
 compc.cpp
 compis.cpp
+compuchess.cpp
 compucolor.cpp
 comquest.cpp
 comx35.cpp
@@ -181,9 +185,11 @@ datum.cpp
 dbox.cpp
 dccons.cpp
 dct11em.cpp
+debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+dg680.cpp
 dgn_beta.cpp
 diablo1300.cpp
 didact.cpp
@@ -196,6 +202,7 @@ dms5000.cpp
 dms86.cpp
 dmv.cpp
 dolphunk.cpp
+dpb7000.cpp
 dps1.cpp
 dragon.cpp
 dsb46.cpp
@@ -210,6 +217,8 @@ ec184x.cpp
 ec65.cpp
 ec7915.cpp
 einstein.cpp
+elan_eu3a05.cpp
+elan_eu3a14.cpp
 electron.cpp
 elekscmp.cpp
 elektronmono.cpp
@@ -285,10 +294,11 @@ gb.cpp
 gba.cpp
 geneve.cpp
 geniusiq.cpp
+geniusjr.cpp
 genpc.cpp
 gimix.cpp
 gizmondo.cpp
-glasgow.cpp
+glcx.cpp
 gmaster.cpp
 goupil.cpp
 gp2x.cpp
@@ -302,6 +312,7 @@ harriet.cpp
 hazeltin.cpp
 hazl1420.cpp
 hec2hrp.cpp
+hektor.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
 hh_hmcs40.cpp
@@ -310,6 +321,7 @@ hh_pic16.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
+hhtiger.cpp
 hk68v10.cpp
 homelab.cpp
 homez80.cpp
@@ -400,6 +412,7 @@ kramermc.cpp
 krokha.cpp
 kron.cpp
 krz2000.cpp
+ktm3.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
@@ -444,8 +457,12 @@ mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd2.cpp
-mephisto.cpp
+mephisto_glasgow.cpp
+mephisto_mm2.cpp
+mephisto_modena.cpp
+mephisto_modular.cpp
 mephisto_montec.cpp
+mephisto_polgar.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
@@ -466,6 +483,7 @@ mikrosha.cpp
 mightyframe.cpp
 milton6805.cpp
 milwaukee.cpp
+mindset.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
@@ -478,10 +496,8 @@ mk85.cpp
 mk90.cpp
 mkit09.cpp
 mmd1.cpp
-mmodular.cpp
 mod8.cpp
 modellot.cpp
-modena.cpp
 molecular.cpp
 monon_color.cpp
 monty.cpp
@@ -518,7 +534,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
-ncd17c.cpp
+ncd68k.cpp
 ncdmips.cpp
 ncdppc.cpp
 nds.cpp
@@ -533,12 +549,11 @@ ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
 novag_cforte.cpp
-novag_delta1.cpp
+novag_const.cpp
 novag_diablo.cpp
-novag_mk1.cpp
-novag_mk2.cpp
 novag_presto.cpp
-novag_scon.cpp
+novag_savant.cpp
+novag_sconst.cpp
 novag_sexpert.cpp
 o2.cpp
 ob68k1a.cpp
@@ -606,7 +621,6 @@ phunsy.cpp
 pimps.cpp
 pipbug.cpp
 picno.cpp
-pitagjr.cpp
 pk8000.cpp
 pk8020.cpp
 plan80.cpp
@@ -620,7 +634,6 @@ pockstat.cpp
 pofo.cpp
 poisk1.cpp
 pokemini.cpp
-polgar.cpp
 poly.cpp
 poly88.cpp
 poly880.cpp
@@ -629,7 +642,6 @@ pp01.cpp
 prestige.cpp
 primo.cpp
 pro80.cpp
-prodigy.cpp
 prof180x.cpp
 prof80.cpp
 prophet600.cpp
@@ -655,8 +667,8 @@ qtsbc.cpp
 qvt70.cpp
 qvt102.cpp
 qvt103.cpp
+qvt190.cpp
 qvt201.cpp
-qvt6800.cpp
 qx10.cpp
 r9751.cpp
 rad_eu3a05.cpp
@@ -671,7 +683,6 @@ rd100.cpp
 rd110.cpp
 replicator.cpp
 rex6000.cpp
-risc2500.cpp
 riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
@@ -684,17 +695,22 @@ rz1.cpp
 rzone.cpp
 sacstate.cpp
 sage2.cpp
+saitek_chesstrv.cpp
+saitek_corona.cpp
+saitek_cp2000.cpp
+saitek_delta1.cpp
+saitek_risc2500.cpp
+saitek_stratos.cpp
 samcoupe.cpp
 sansa_fuze.cpp
 sapi1.cpp
 sartorius.cpp
 saturn.cpp
 savia84.cpp
+sb8085.cpp
 sbc6510.cpp
 sbrain.cpp
 sc2.cpp
-scisys_chesstrv.cpp
-scisys_cp2000.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
@@ -714,6 +730,7 @@ shine.cpp
 si5500.cpp
 sitcom.cpp
 sk1.cpp
+sk101bl.cpp
 slc1.cpp
 slc1a.cpp
 slicer.cpp
@@ -738,7 +755,6 @@ ssem.cpp
 ssystem3.cpp
 st17xx.cpp
 storio.cpp
-stratos.cpp
 studio2.cpp
 sun1.cpp
 sun2.cpp
@@ -769,6 +785,7 @@ talkingfb.cpp
 tamag1.cpp
 tandy1t.cpp
 tandy2k.cpp
+tasc.cpp
 tavernie.cpp
 tb303.cpp
 tdv2324.cpp
@@ -778,7 +795,9 @@ tek405x.cpp
 tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
+telex1192.cpp
 telex274.cpp
+telex277d.cpp
 terak.cpp
 terco.cpp
 terminal.cpp
@@ -799,7 +818,6 @@ ti99_4x.cpp
 ti99_8.cpp
 ti990_10.cpp
 ti990_4.cpp
-ticalc1x.cpp
 tiki100.cpp
 titan_soc.cpp
 tim011.cpp
@@ -815,6 +833,7 @@ tmc1800.cpp
 tmc2000e.cpp
 tmc600.cpp
 tosh1000.cpp
+tomy_princ.cpp
 tr175.cpp
 tr606.cpp
 tranz330.cpp
@@ -889,10 +908,9 @@ vta2000.cpp
 vtech1.cpp
 vtech2.cpp
 vtech_eu3a12.cpp
-vtech_unk1.cpp
-vtech_unk2.cpp
 wangpc.cpp
 wicat.cpp
+wrinkles.cpp
 wswan.cpp
 wy100.cpp
 wy150.cpp

@@ -663,7 +663,7 @@ void vip_state::machine_reset()
 //  QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //-------------------------------------------------
 
-QUICKLOAD_LOAD_MEMBER( vip_state, vip )
+QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 {
 	uint8_t *ram = m_ram->pointer();
 	uint8_t *chip8_ptr = nullptr;
@@ -710,7 +710,8 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //  machine_config( vip )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vip_state::vip)
+void vip_state::vip(machine_config &config)
+{
 	// basic machine hardware
 	CDP1802(config, m_maincpu, 3.52128_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vip_state::vip_mem);
@@ -751,17 +752,18 @@ MACHINE_CONFIG_START(vip_state::vip)
 	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x")
+	QUICKLOAD(config, "quickload", "bin,c8,c8x").set_load_callback(FUNC(vip_state::quickload_cb), this);
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("vip_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// software lists
 	SOFTWARE_LIST(config, "cass_list").set_original("vip");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

@@ -3,30 +3,29 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* cking_master.cpp, subdriver of machine/chessbase.cpp
+Chess King Master (yes, it's plainly named "Master")
+
+Hardware notes:
+- Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
+- 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
+- simple I/O via 2*74373 and a 74145
+- 8*8 chessboard buttons, 32+1 border leds, piezo
 
 TODO:
 - 1 WAIT CLK per M1, workaround with z80_set_cycle_tables is possible
   (wait state is similar to MSX) but I can't be bothered, better solution
   is to add M1 pin to the z80 core. Until then, it'll run ~20% too fast.
 
-*******************************************************************************
-
-Chess King Master overview (yes, it's plainly named "Master"):
-- Z80 CPU(NEC D780C-1) @ 4MHz(8MHz XTAL), IRQ from 555 timer
-- 8KB ROM(NEC D2764C-3), 2KB RAM(NEC D4016C), ROM is scrambled for easy PCB placement
-- simple I/O via 2*74373 and a 74145
-- 8*8 chessboard buttons, 32+1 border leds, piezo
-
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/chessbase.h"
-
 #include "cpu/z80/z80.h"
+#include "machine/sensorboard.h"
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -35,15 +34,18 @@ Chess King Master overview (yes, it's plainly named "Master"):
 
 namespace {
 
-class master_state : public chessbase_state
+class master_state : public driver_device
 {
 public:
 	master_state(const machine_config &mconfig, device_type type, const char *tag) :
-		chessbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
+		m_display(*this, "display"),
+		m_board(*this, "board"),
 		m_dac(*this, "dac"),
-		m_mainmap(*this, "mainmap")
+		m_mainmap(*this, "mainmap"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
@@ -51,12 +53,18 @@ public:
 
 	void init_master();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
+	required_device<pwm_display_device> m_display;
+	required_device<sensorboard_device> m_board;
 	required_device<dac_2bit_binary_weighted_ones_complement_device> m_dac;
 	required_device<address_map_bank_device> m_mainmap;
+	required_ioport_array<2> m_inputs;
 
 	// periodic interrupts
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
@@ -71,12 +79,21 @@ private:
 	// I/O handlers
 	u8 input_r();
 	void control_w(u8 data);
+
+	u16 m_inp_mux;
 };
+
+void master_state::machine_start()
+{
+	// zerofill, register for savestates
+	m_inp_mux = 0;
+	save_item(NAME(m_inp_mux));
+}
 
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // TTL/generic
@@ -85,11 +102,11 @@ void master_state::control_w(u8 data)
 {
 	// d0-d3: 74145 A-D
 	// 74145 0-9: input mux, led select
-	u16 sel = 1 << (data & 0xf) & 0x3ff;
-	m_inp_mux = sel;
+	m_inp_mux = data & 0xf;
+	u16 sel = 1 << m_inp_mux & 0x3ff;
 
 	// d4,d5: led data
-	display_matrix(2, 9, data >> 4 & 3, sel & 0x1ff);
+	m_display->matrix(sel & 0x1ff, data >> 4 & 3);
 
 	// d6,d7: speaker +/-
 	m_dac->write(data >> 6 & 3);
@@ -97,8 +114,18 @@ void master_state::control_w(u8 data)
 
 u8 master_state::input_r()
 {
-	// d0-d7: multiplexed inputs (active low)
-	return ~read_inputs(10);
+	u8 data = 0;
+
+	// d0-d7: multiplexed inputs
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_board->read_file(m_inp_mux, true);
+
+	// read other buttons
+	else if (m_inp_mux < 10)
+		data = m_inputs[m_inp_mux - 8]->read();
+
+	return ~data;
 }
 
 void master_state::init_master()
@@ -164,9 +191,7 @@ void master_state::main_trampoline(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( master )
-	PORT_INCLUDE( generic_cb_buttons )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Change Position")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Clear Board")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("New Game")
@@ -176,7 +201,7 @@ static INPUT_PORTS_START( master )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Rook")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("IN.9")
+	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Bishop")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_NAME("Knight")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_NAME("Pawn")
@@ -205,12 +230,17 @@ void master_state::master(machine_config &config)
 	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(22870)); // active for 22.87us
 	TIMER(config, "irq_off").configure_periodic(FUNC(master_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(master_state::display_decay_tick), attotime::from_msec(1));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 2);
 	config.set_default_layout(layout_ck_master);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
@@ -236,4 +266,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY       FULLNAME               FLAGS */
-CONS( 1984, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, ckmaster, 0,      0,      master,  master, master_state, init_master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -222,7 +222,7 @@ protected:
 					0.0f, 0.0f, 1.0f, justify, wrap,
 					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
 					&width, nullptr, text_size);
-			width += 2.0f * UI_BOX_LR_BORDER;
+			width += 2.0f * ui().box_lr_border();
 			maxwidth = (std::max)(maxwidth, width);
 		}
 		if (scale && ((origx2 - origx1) < maxwidth))
@@ -237,16 +237,16 @@ protected:
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, bgcolor);
 
 		// inset box and draw content
-		x1 += UI_BOX_LR_BORDER;
-		x2 -= UI_BOX_LR_BORDER;
-		y1 += UI_BOX_TB_BORDER;
-		y2 -= UI_BOX_TB_BORDER;
+		x1 += ui().box_lr_border();
+		x2 -= ui().box_lr_border();
+		y1 += ui().box_tb_border();
+		y2 -= ui().box_tb_border();
 		for (Iter it = begin; it != end; ++it)
 		{
 			ui().draw_text_full(
 					container(), get_c_str(*it),
 					x1, y1, x2 - x1, justify, wrap,
-					mame_ui_manager::NORMAL, fgcolor, UI_TEXT_BG_COLOR,
+					mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color(),
 					nullptr, nullptr, text_size);
 			y1 += ui().get_line_height();
 		}

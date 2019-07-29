@@ -3,11 +3,10 @@
 // thanks-to:Berger
 /******************************************************************************
 
-* cxg_ch2001.cpp, subdriver of machine/chessbase.cpp
+CXG Chess 2001, also sold by Hanimex as HCG 1900 and by CGL as Computachess Champion.
+CXG Chess 3000 is assumed to be on similar hardware as this.
 
-*******************************************************************************
-
-CXG Chess 2001 overview:
+Hardware notes:
 - Zilog Z8400APS @ 4 MHz (8MHz XTAL)
 - 2KB RAM HM6116, 16KB ROM D27128D
 - TTL, piezo, 8*8+9 LEDs, magnetic sensors
@@ -15,11 +14,12 @@ CXG Chess 2001 overview:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/chessbase.h"
-
 #include "cpu/z80/z80.h"
+#include "machine/sensorboard.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
 // internal artwork
@@ -28,32 +28,37 @@ CXG Chess 2001 overview:
 
 namespace {
 
-class ch2001_state : public chessbase_state
+class ch2001_state : public driver_device
 {
 public:
 	ch2001_state(const machine_config &mconfig, device_type type, const char *tag) :
-		chessbase_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irq_on(*this, "irq_on"),
+		m_display(*this, "display"),
+		m_board(*this, "board"),
 		m_dac(*this, "dac"),
-		m_speaker_off(*this, "speaker_off")
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine drivers
 	void ch2001(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_irq_on;
+	required_device<pwm_display_device> m_display;
+	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
-	required_device<timer_device> m_speaker_off;
+	required_ioport_array<2> m_inputs;
 
 	// periodic interrupts
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
 	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
-	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
 
 	// address maps
 	void main_map(address_map &map);
@@ -62,21 +67,35 @@ private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	u16 m_inp_mux;
+	int m_dac_data;
 };
+
+void ch2001_state::machine_start()
+{
+	// zerofill
+	m_inp_mux = 0;
+	m_dac_data = 0;
+
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_dac_data));
+}
 
 
 
 /******************************************************************************
-    Devices, I/O
+    I/O
 ******************************************************************************/
 
 // TTL
 
 WRITE8_MEMBER(ch2001_state::speaker_w)
 {
-	// 74ls109 clock pulse to speaker
-	m_dac->write(1);
-	m_speaker_off->adjust(attotime::from_usec(200)); // not accurate
+	// 74ls109 toggle to speaker
+	m_dac_data ^= 1;
+	m_dac->write(m_dac_data);
 }
 
 WRITE8_MEMBER(ch2001_state::leds_w)
@@ -84,18 +103,29 @@ WRITE8_MEMBER(ch2001_state::leds_w)
 	// d0-d7: 74ls273 (WR to CLK)
 	// 74ls273 Q1-Q4: 74ls145 A-D
 	// 74ls145 0-9: input mux/led select
-	m_inp_mux = 1 << (data & 0xf) & 0x3ff;
+	m_inp_mux = data & 0xf;
+	u16 sel = 1 << m_inp_mux & 0x3ff;
 
 	// 74ls273 Q5-Q8: MC14028 A-D
 	// MC14028 Q0-Q7: led data, Q8,Q9: N/C
 	u8 led_data = 1 << (data >> 4 & 0xf) & 0xff;
-	display_matrix(8, 10, led_data, m_inp_mux);
+	m_display->matrix(sel, led_data);
 }
 
 READ8_MEMBER(ch2001_state::input_r)
 {
+	u8 data = 0;
+
 	// d0-d7: multiplexed inputs
-	return ~read_inputs(10);
+	// read chessboard sensors
+	if (m_inp_mux < 8)
+		data = m_board->read_file(m_inp_mux, true);
+
+	// read other buttons
+	else if (m_inp_mux < 10)
+		data = m_inputs[m_inp_mux - 8]->read();
+
+	return ~data;
 }
 
 
@@ -119,9 +149,7 @@ void ch2001_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( ch2001 )
-	PORT_INCLUDE( generic_cb_magnets )
-
-	PORT_START("IN.8")
+	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Black")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("King")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Queen")
@@ -131,7 +159,7 @@ static INPUT_PORTS_START( ch2001 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Pawn")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("White")
 
-	PORT_START("IN.9")
+	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Set up")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("New Game")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Take Back")
@@ -154,14 +182,17 @@ void ch2001_state::ch2001(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ch2001_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(484); // theoretical frequency from 555 timer (22nF, 100K+33K, 1K2), measurement was 568Hz
+	const attotime irq_period = attotime::from_hz(533); // theoretical frequency from 555 timer (20nF, 100K+33K, 1K2), measurement was 568Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(ch2001_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(18300)); // active for 18.3us
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(16600)); // active for 16.6us
 	TIMER(config, "irq_off").configure_periodic(FUNC(ch2001_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
 
-	TIMER(config, m_speaker_off).configure_generic(FUNC(ch2001_state::speaker_off));
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(150));
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(ch2001_state::display_decay_tick), attotime::from_msec(1));
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	config.set_default_layout(layout_cxg_ch2001);
 
 	/* sound hardware */
@@ -190,4 +221,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME      FLAGS */
-CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG",   "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, ch2001, 0,      0,      ch2001,  ch2001, ch2001_state, empty_init, "CXG",   "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

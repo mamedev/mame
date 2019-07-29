@@ -411,6 +411,8 @@
 
 #include "emu.h"
 
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
 #include "bus/sunmouse/sunmouse.h"
@@ -422,8 +424,6 @@
 #include "machine/bankdev.h"
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/sun4c_mmu.h"
@@ -1145,8 +1145,8 @@ void sun4_state::type0space_map(address_map &map)
 
 void sun4_state::type1space_map(address_map &map)
 {
-	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x02000000, 0x020007ff).rw(m_timekpr, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 	map(0x03000000, 0x0300000f).rw(FUNC(sun4_state::timer_r), FUNC(sun4_state::timer_w)).mirror(0xfffff0);
 	map(0x05000000, 0x05000003).rw(FUNC(sun4_state::irq_r), FUNC(sun4_state::irq_w));
@@ -1167,8 +1167,8 @@ void sun4_state::type1space_sbus_map(address_map &map)
 
 void sun4_state::type1space_s4_map(address_map &map)
 {
-	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
-	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
+	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 }
 
 /* Input ports */
@@ -2007,12 +2007,12 @@ void sun4_state::sun4c(machine_config &config)
 
 	NSCSI_BUS(config, "scsibus");
 	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:3", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90a", true).set_option_machine_config("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); });
 
 	// SBus

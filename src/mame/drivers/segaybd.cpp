@@ -22,11 +22,11 @@
 ****************************************************************************
 
     Known bugs:
-        * still seems to be some glitchiness in the games in general
+        * pdriftl's comms doesn't work
 
 ****************************************************************************
 
-Network Board (used for Power Drift)
+Network Board (used for Power Drift: Link Version)
 -------------
 
 Board: 834-6740
@@ -2260,6 +2260,7 @@ ROM_END
 //  CPU: 68000 (317-????)
 //   CPU BD POWER DRIFT   837-6695-08 (or 837-6695-09)
 //   VIDEO BD POWER DRIFT 837-6696-01 (or 837-6696-02)
+//                GAME BD 834-6697-02 POWER DRIFT
 //
 ROM_START( pdriftj )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
@@ -2790,7 +2791,7 @@ GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pd
 GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN , layout_pdrift)
 
 GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )

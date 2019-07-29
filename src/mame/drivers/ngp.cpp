@@ -205,8 +205,8 @@ private:
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ngp_cart);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(ngp_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_ngp_cart);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_ngp_cart);
 
 	void ngp_mem(address_map &map);
 	void z80_io(address_map &map);
@@ -751,7 +751,7 @@ uint32_t ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(ngp_state, ngp_cart)
+DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -798,7 +798,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state, ngp_cart)
 }
 
 
-DEVICE_IMAGE_UNLOAD_MEMBER(ngp_state, ngp_cart)
+DEVICE_IMAGE_UNLOAD_MEMBER(ngp_state::unload_ngp_cart)
 {
 	m_flash_chip[0].present = 0;
 	m_flash_chip[0].state = F_READ;
@@ -857,7 +857,8 @@ void ngp_state::ngp_common(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(ngp_state::ngp)
+void ngp_state::ngp(machine_config &config)
+{
 	ngp_common(config);
 
 	K1GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
@@ -866,18 +867,18 @@ MACHINE_CONFIG_START(ngp_state::ngp)
 
 	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ngp_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,ngp,npc,ngc")
-	MCFG_GENERIC_LOAD(ngp_state, ngp_cart)
-	MCFG_GENERIC_UNLOAD(ngp_state, ngp_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
+	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart), this);
+	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart), this);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngp");
 	SOFTWARE_LIST(config, "ngpc_list").set_compatible("ngpc");
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(ngp_state::ngpc)
+void ngp_state::ngpc(machine_config &config)
+{
 	ngp_common(config);
 	K2GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
 	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
@@ -885,15 +886,14 @@ MACHINE_CONFIG_START(ngp_state::ngpc)
 
 	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ngp_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,ngp,npc,ngc")
-	MCFG_GENERIC_LOAD(ngp_state, ngp_cart)
-	MCFG_GENERIC_UNLOAD(ngp_state, ngp_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
+	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart), this);
+	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart), this);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngpc");
 	SOFTWARE_LIST(config, "ngp_list").set_compatible("ngp");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(ngp)

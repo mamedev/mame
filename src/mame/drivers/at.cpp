@@ -9,9 +9,9 @@ Commodore PC 30-III and PC 40-III
 Links: http://www.richardlagendijk.nl/cip/computer/item/pc30iii/en , ftp://ftp.zimmers.net/pub/cbm-pc/firmware/pc30/
 Info: The PC 30-III and PC 40-III share the same mainboard. On a PC 30-III the onboard Paradise VGA is not populated.
 Form factor: Desktop PC
-CPU: Intel 80286-12
+CPU: Siemens SAB 80286-12 (PC 30-III), Intel 80286-12 (PC 40-III)
 RAM: 1MB on board
-Chipset: Faraday
+Chipset: Faraday FE3020, MOS 5720 1788 41, Faraday FE3000, FE3010B,
 Bus: 3x16 bit ISA, 1x8 bit ISA
 Video: PC 30-III: ATI EGA Wonder 800+, PC 40-III: Onboard Paradise VGA, 256KB
 Mass storage: One HD disk drive standard, second drive optional; PC 30-III: 20MB, PC 40-III: 40MB AT-IDE HD standard, 80MB or 100MB optional
@@ -84,6 +84,21 @@ RAM: 512K on CPU card, 128K on a piggyback card and a memory expansion board
 Bus: Passive backplane, ISA
 Video: Paradise EGA on another piggyback board
 Mass storage: Floppy: 5.25" 1.2MB, MFM HDD
+
+Lion 3500C/T
+==========
+Info: BIOS saved according to http://mess.redump.net/dumping/dump_bios_using_debug from a 3560C machine
+Form factor: notebook
+CPU: Intel 486DX2-66
+RAM: 2MB, 4MB, 8MB or 16MB
+Chipset: ETEQ ET/486H (ET82C491 & ET82C492), 82C206, 82C712
+ROM: 128K Video (E0000-EFFFF) & BIOS ROM  (F0000-FFFFF)
+Video: Cirrus Logic GD-6420BF/6430 6342 internal VGA, 640x480 256 color display
+Mass storage: Floppy 3.5" 1.44MB, 3.5" HDD, 120MB
+Input: Trackball connected as a PS/2 mouse
+Options: 100 pin expansion port for 3305 Docking station (2xISA16 slots), external keypad
+Ports: External VGA, external keyboard, COM1, external keypad, COM2, LPT1, buzzer
+Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560T/C (486DX2-66), 3530T/C(486DX2-50), 3500T/C (486DX-33), 3500SXT/SXC(486SX-25)
 
 ***************************************************************************/
 
@@ -485,7 +500,7 @@ void at_state::ibm5170(machine_config &config)
 	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
+	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,1024K,2M,4M,8M,15M");
 }
 
 void at_state::ibm5170a(machine_config &config)
@@ -1069,6 +1084,24 @@ ROM_START( at )
 	ROMX_LOAD( "precise 860407_low.bin", 0x10000, 0x8000, CRC(d839c074) SHA1(473ca7b42914ce12f2d6c91afb0b2c2e65194489), ROM_SKIP(1) | ROM_BIOS(25) )
 	ROMX_LOAD( "precise 860407_high.bin", 0x10001, 0x8000, CRC(b5e13c54) SHA1(07f5806fb53d0cb7ef7b54312fd6aa163d58b9a5), ROM_SKIP(1) | ROM_BIOS(25) )
 	// ROM_LOAD( "precise_860407_keyboard_mcu.bin", 0x0000, 0x800, CRC(d1faad5c) SHA1(cb315a3da632c969012c298bb8e1cf8883b70501))
+	// Access Methods Inc. for Flying Triumph (AMI before they became American Megatrends) - BIOS String: Ref. no. 1406-061296
+	// complains about "Channel-2 timer not funcional but boots
+	ROM_SYSTEM_BIOS(26, "ami_ft", "AMI Flying Triumph")
+	ROMX_LOAD( "286_access_methods_rom2_32k.bin", 0x10000, 0x8000, CRC(749c65af) SHA1(7c6e9e217afe020b7b36785549fdbfb89de8f872), ROM_SKIP(1) | ROM_BIOS(26) )
+	ROMX_LOAD( "286_access_methods_rom4_32k.bin", 0x10001, 0x8000, CRC(0f15581a) SHA1(2a22635f30388ca371f0f1f31652cfa647bb322d), ROM_SKIP(1) | ROM_BIOS(26) )
+	// BIOS ROMs are marked TCI, Award 286 Modular BIOS Version 3.03HLS
+	// complains about "refresh timing error, but works
+	ROM_SYSTEM_BIOS(27, "tci_suntac", "tci_suntac")
+	ROMX_LOAD( "suntac_80286_lo.bin", 0x18000, 0x4000, CRC(f7bf6c49) SHA1(d8e813c264008f096006f46b90769c0927e44da9), ROM_SKIP(1) | ROM_BIOS(27) )
+	ROMX_LOAD( "suntac_80286_hi.bin", 0x18001, 0x4000, CRC(5f382e78) SHA1(8ba222df9d7028513e37978598d8139906e8834c), ROM_SKIP(1) | ROM_BIOS(27) )
+ROM_END
+
+
+// Octek Fox II - Chipset: Headland HT12/A - BIOS String:
+ROM_START( o286foxii)
+	ROM_REGION(0x20000, "bios", 0)
+	ROMX_LOAD( "286-fox2-even_32k.bin", 0x10000, 0x8000, CRC(54dc119f) SHA1(4bc543beef0d2201fa20eac90a0a6ca38ebf0dbf), ROM_SKIP(1))
+	ROMX_LOAD( "286-fox2-odd_32k.bin", 0x10001, 0x8000, CRC(e5db7775) SHA1(2bd0572b9f7c76eff51375b551586ca8484e2a74), ROM_SKIP(1))
 ROM_END
 
 
@@ -1178,6 +1211,10 @@ ROM_START( neat )
 	ROM_SYSTEM_BIOS(2, "ptm1632c", "UNIT PTM1632C DTK V.3.26")
 	ROMX_LOAD( "ptm1632c_l.bin", 0x10000, 0x8000, CRC(df0bc27c) SHA1(f94e2decd13c285c23b6a61c035cab88fa00ba6e), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "ptm1632c_h.bin", 0x10001, 0x8000, CRC(a80136e0) SHA1(5edc2d387efb42cf70361197de808ce1b06d8aec), ROM_SKIP(1) | ROM_BIOS(2))
+	// 3: BIOS-String: DTK Corp. 286 COMPUTER - (C) DTK NEAT BIOS Ver 3.25N2 06/06/89 - DTK PTM-1233C - Chipset: P82C211; P82C212B; P82C215 - BIOS: dtk 286E 8864 - IS8: 3 - ISA16: 5
+	ROM_SYSTEM_BIOS(3, "ptm1233c", "DTK PTM-1233C")
+	ROMX_LOAD( "286-dtk ptm-1233c-low_32k.bin", 0x10000, 0x8000, CRC(8909164c) SHA1(51978929a690746c1956ca6b1f0412777dc5d35b), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "286-dtk ptm-1233c-high_32k.bin", 0x10001, 0x8000, CRC(9105968c) SHA1(737d4df8040655315a648fed8a8d574f39e7dc35), ROM_SKIP(1) | ROM_BIOS(3) )
 ROM_END
 
 ROM_START( at386sx )
@@ -2215,6 +2252,12 @@ ROM_END
 //  ROM_LOAD16_BYTE( "rys_103_1003_r8a_8600_ic-pos_69.bin", 0x18001, 0x4000, NO_DUMP)
 //ROM_END
 
+// LION 3500C notebook
+ROM_START( lion3500 )
+	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_LOAD( "lion3500.bin", 0x00000, 0x20000, CRC(fc409ac3) SHA1(9a7aa08b981dedffff31fda5d3496469ae2ec3a5) )
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -2293,16 +2336,16 @@ COMP( 199?, ficvipio2, ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, hot409,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
-COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING ) // Complains about missing mouse hardware
+COMP( 1992, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING ) // Complains about missing mouse hardware
 COMP( 199?, sarcpc,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<unknown>",   "80286 Standard System (SARC RC2015 chipset)", MACHINE_NOT_WORKING )
 COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
 COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
-COMP( 199?, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
-COMP( 199?, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
+COMP( 1995, pcd4nl,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
+COMP( 1993, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
 COMP( 19??, toptek286, ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Toptek Micro Computer", "286 Turbo", MACHINE_NOT_WORKING )
-COMP( 199?, walk386sx, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386 SX", MACHINE_NOT_WORKING ) // screen remains blank
-COMP( 199?, walk386dx, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386DX", MACHINE_NOT_WORKING ) // screen remains blank
+COMP( 1992, walk386sx, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386 SX", MACHINE_NOT_WORKING ) // screen remains blank
+COMP( 1992, walk386dx, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386DX", MACHINE_NOT_WORKING ) // screen remains blank
 COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )
 COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
 COMP( 1988, comslt286, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
@@ -2314,10 +2357,12 @@ COMP( 198?, lm103s,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at
 COMP( 198?, magb233,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Magitronic Technology", "Magitronic B233", MACHINE_NOT_WORKING )
 COMP( 19??, mat286,    ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "unknown",     "MAT286 Rev.D", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
-COMP( 198?, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
-COMP( 198?, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
-COMP( 198?, n8810m16v, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 VGA version", MACHINE_NOT_WORKING )
-COMP( 198?, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
+COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
+COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
+COMP( 1990, n8810m16v, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 VGA version", MACHINE_NOT_WORKING )
+COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
-COMP( 198?, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
+COMP( 1987, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
+COMP( 1993, lion3500,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Lion",        "3500", MACHINE_NOT_WORKING )
+COMP( 198?, o286foxii, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Octek",       "Fox II", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )

@@ -31,7 +31,6 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -200,7 +199,7 @@ protected:
 void oric_state::oric_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).mirror(0xf0);
+	map(0x0300, 0x030f).m(m_via, FUNC(via6522_device::map)).mirror(0xf0);
 	map(0xc000, 0xdfff).bankr("bank_c000_r").bankw("bank_c000_w");
 	map(0xe000, 0xf7ff).bankr("bank_e000_r").bankw("bank_e000_w");
 	map(0xf800, 0xffff).bankr("bank_f800_r").bankw("bank_f800_w");
@@ -212,12 +211,12 @@ Memory region &c000-&ffff can be ram or rom. */
 void telestrat_state::telestrat_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0300, 0x030f).m(m_via, FUNC(via6522_device::map));
 	map(0x0310, 0x0313).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x0314, 0x0314).rw(FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
 	map(0x0318, 0x0318).r(FUNC(telestrat_state::port_318_r));
 	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x0320, 0x032f).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0320, 0x032f).m(m_via2, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).bankr("bank_c000_r").bankw("bank_c000_w");
 }
 
@@ -802,7 +801,6 @@ void oric_state::oric(machine_config &config, bool add_ext)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8912(config, m_psg, 12_MHz_XTAL / 12);
 	m_psg->set_flags(AY8910_DISCRETE_OUTPUT);
@@ -820,7 +818,8 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	/* cassette */
 	CASSETTE(config, m_cassette, 0);
 	m_cassette->set_formats(oric_cassette_formats);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED));
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* via */
 	VIA6522(config, m_via, 12_MHz_XTAL / 12);

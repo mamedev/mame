@@ -12,25 +12,45 @@
 #pragma once
 
 #include "machine/hal2.h"
-#include "machine/ioc2.h"
 
-class hpc3_device : public device_t
+class hpc3_device : public device_t, public device_memory_interface
 {
 public:
+	enum pbus_space
+	{
+		AS_PIO0 = 0,
+		AS_PIO1,
+		AS_PIO2,
+		AS_PIO3,
+		AS_PIO4,
+		AS_PIO5,
+		AS_PIO6,
+		AS_PIO7,
+		AS_PIO8,
+		AS_PIO9
+	};
+
 	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T, typename U>
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&ioc2_tag, U &&hal2_tag)
+	template <typename T>
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&hal2_tag)
 		: hpc3_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		set_ioc2_tag(std::forward<T>(ioc2_tag));
-		set_hal2_tag(std::forward<U>(hal2_tag));
+		set_hal2_tag(std::forward<T>(hal2_tag));
 	}
 
 	template <typename T> void set_gio64_space(T &&tag, int spacenum) { m_gio64_space.set_tag(std::forward<T>(tag), spacenum); }
-	template <typename T> void set_ioc2_tag(T &&tag) { m_ioc2.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_hal2_tag(T &&tag) { m_hal2.set_tag(std::forward<T>(tag)); }
 
+	auto enet_rd_cb() { return m_enet_rd_cb.bind(); }
+	auto enet_wr_cb() { return m_enet_wr_cb.bind(); }
+	auto enet_rxrd_cb() { return m_enet_rxrd_cb.bind(); }
+	auto enet_txwr_cb() { return m_enet_txwr_cb.bind(); }
+	auto enet_d8_rd_cb() { return m_enet_d8_rd_cb.bind(); }
+	auto enet_d8_wr_cb() { return m_enet_d8_wr_cb.bind(); }
+	auto enet_reset_cb() { return m_enet_reset_cb.bind(); }
+	auto enet_loopback_cb() { return m_enet_loopback_cb.bind(); }
+	auto enet_intr_out_cb() { return m_enet_intr_out_cb.bind(); }
 	template <int N> auto hd_rd_cb() { return m_hd_rd_cb[N].bind(); }
 	template <int N> auto hd_wr_cb() { return m_hd_wr_cb[N].bind(); }
 	template <int N> auto hd_dma_rd_cb() { return m_hd_dma_rd_cb[N].bind(); }
@@ -47,9 +67,13 @@ public:
 
 	void map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi0_irq);
+	DECLARE_WRITE_LINE_MEMBER(enet_txrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_rxrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_rxdc_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_txret_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_intr_in_w);
+
 	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
-	DECLARE_WRITE_LINE_MEMBER(scsi1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
 
 protected:
@@ -57,6 +81,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual space_config_vector memory_space_config() const override;
 
 	enum fifo_type_t : uint32_t
 	{
@@ -76,16 +102,14 @@ protected:
 	template <fifo_type_t Type> DECLARE_READ32_MEMBER(fifo_r);
 	template <fifo_type_t Type> DECLARE_WRITE32_MEMBER(fifo_w);
 	DECLARE_READ32_MEMBER(intstat_r);
+	uint32_t misc_r();
+	void misc_w(uint32_t data);
 	uint32_t eeprom_r();
 	void eeprom_w(uint32_t data);
-	DECLARE_READ32_MEMBER(volume_r);
-	DECLARE_WRITE32_MEMBER(volume_w);
-	DECLARE_READ32_MEMBER(pbus4_r);
-	DECLARE_WRITE32_MEMBER(pbus4_w);
+	uint32_t pio_data_r(offs_t offset);
+	void pio_data_w(offs_t offset, uint32_t data);
 	DECLARE_READ32_MEMBER(pbusdma_r);
 	DECLARE_WRITE32_MEMBER(pbusdma_w);
-	DECLARE_READ32_MEMBER(unkpbus0_r);
-	DECLARE_WRITE32_MEMBER(unkpbus0_w);
 
 	DECLARE_READ32_MEMBER(dma_config_r);
 	DECLARE_WRITE32_MEMBER(dma_config_w);
@@ -100,6 +124,7 @@ protected:
 	void dump_chain(uint32_t base);
 	void fetch_chain(int channel);
 	void decrement_chain(int channel);
+	void scsi_fifo_flush(int channel);
 	void scsi_drq(bool state, int channel);
 	//void scsi_dma(int channel);
 
@@ -146,7 +171,9 @@ protected:
 		HPC3_DMACTRL_IRQ    = 0x01,
 		HPC3_DMACTRL_ENDIAN = 0x02,
 		HPC3_DMACTRL_DIR    = 0x04,
+		HPC3_DMACTRL_FLUSH  = 0x08,
 		HPC3_DMACTRL_ENABLE = 0x10,
+		HPC3_DMACTRL_WRMASK = 0x20,
 	};
 
 	enum
@@ -155,10 +182,21 @@ protected:
 		ENET_XMIT = 1
 	};
 
+	const address_space_config m_pio_space_config[10];
+
 	required_address_space m_gio64_space;
-	required_device<ioc2_device> m_ioc2;
+	address_space *m_pio_space[10];
 	required_device<hal2_device> m_hal2;
 
+	devcb_read8 m_enet_rd_cb;
+	devcb_write8 m_enet_wr_cb;
+	devcb_read8 m_enet_rxrd_cb;
+	devcb_write8 m_enet_txwr_cb;
+	devcb_read_line m_enet_d8_rd_cb;
+	devcb_write_line m_enet_d8_wr_cb;
+	devcb_write_line m_enet_reset_cb;
+	devcb_write_line m_enet_loopback_cb;
+	devcb_write_line m_enet_intr_out_cb;
 	devcb_read8 m_hd_rd_cb[2];
 	devcb_write8 m_hd_wr_cb[2];
 	devcb_read8 m_hd_dma_rd_cb[2];
@@ -174,19 +212,18 @@ protected:
 	devcb_write_line m_dma_complete_int_cb;
 
 	uint32_t m_intstat;
+	uint32_t m_misc;
 	uint32_t m_cpu_aux_ctrl;
-	uint8_t m_volume_l;
-	uint8_t m_volume_r;
 
 	struct scsi_dma_t
 	{
 		uint32_t m_cbp;
 		uint32_t m_nbdp;
-		uint32_t m_ctrl;
+		uint8_t m_ctrl;
 		uint32_t m_bc;
+		uint16_t m_count;
 		uint32_t m_dmacfg;
 		uint32_t m_piocfg;
-		bool m_irq;
 		bool m_drq;
 		bool m_big_endian;
 		bool m_to_device;

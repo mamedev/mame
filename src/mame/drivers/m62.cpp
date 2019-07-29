@@ -2427,10 +2427,10 @@ GAME( 1984, battroad,  0,        battroad, battroad, m62_state, init_battroad, R
 GAME( 1984, ldrun,     0,        ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1984, ldruna,    ldrun,    ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, ldrun2,    0,        ldrun2,   ldrun2,   m62_state, init_ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Japanese version is called Bangeringu Teikoku No Gyakushuu */
+GAME( 1984, ldrun2,    0,        ldrun2,   ldrun2,   m62_state, init_ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Japanese version is called Bangeringu Teikoku no Gyakushuu */
 
 GAME( 1985, ldrun3,    0,        ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, ldrun3j,   ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3j,   ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin no Fukkatsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1986, ldrun4,    0,        ldrun4,   ldrun4,   m62_state, init_ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 

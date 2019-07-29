@@ -1433,6 +1433,7 @@ void m5_state::m5(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(sordm5_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("m5_cass");
 
 	I8255(config, m_ppi);
@@ -1525,7 +1526,7 @@ void brno_state::brno(machine_config &config)
 	// only one floppy drive
 	//config.device_remove(WD2797_TAG":1");
 
-	//MCFG_SNAPSHOT_ADD("snapshot", brno_state, brno, "rmd", 0)
+	//SNAPSHOT(config, "snapshot", "rmd", 0).set_load_callback(brno_state::snapshot_cb), this);
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("m5_flop");

@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "tgui9680", 
 void isa16_svga_tgui9680_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(trident_vga_device::screen_update));
 
 	TRIDENT_VGA(config, "vga", 0).set_screen("screen");

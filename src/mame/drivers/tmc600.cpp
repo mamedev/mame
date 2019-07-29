@@ -295,7 +295,7 @@ void tmc600_state::tmc600(machine_config &config)
 
 	// cassette
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// expansion bus connector
 	TMC600_EURO_BUS_SLOT(config, m_bus, tmc600_euro_bus_cards, nullptr);

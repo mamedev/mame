@@ -106,9 +106,9 @@ void aim65_40_state::mem_map(address_map &map)
 	map(0x0000, 0x3fff).ram();
 	map(0xa000, 0xcfff).rom().region("roms", 0);
 	map(0xf000, 0xffff).rom().region("roms", 0x3000);
-	map(0xffa0, 0xffaf).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xffb0, 0xffbf).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xffc0, 0xffcf).rw(M6522_2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xffa0, 0xffaf).m(M6522_0_TAG, FUNC(via6522_device::map));
+	map(0xffb0, 0xffbf).m(M6522_1_TAG, FUNC(via6522_device::map));
+	map(0xffc0, 0xffcf).m(M6522_2_TAG, FUNC(via6522_device::map));
 	map(0xffd0, 0xffd3).rw(M6551_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 }
 

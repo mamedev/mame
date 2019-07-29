@@ -47,7 +47,7 @@ protected:
 	virtual void machine_reset() override;
 
 	// callback hook
-	chd_file *get_disc(laserdisc_device &device);
+	chd_file *get_disc();
 
 	// internal helpers
 	void process_commands();
@@ -164,7 +164,7 @@ protected:
  *
  *************************************/
 
-chd_file *ldplayer_state::get_disc(laserdisc_device &device)
+chd_file *ldplayer_state::get_disc()
 {
 	bool found = false;
 	// open a path to the ROMs and find the first CHD file
@@ -632,32 +632,32 @@ void ldplayer_state::ldplayer_ntsc(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(ldv1000_state::ldv1000)
+void ldv1000_state::ldv1000(machine_config &config)
+{
 	ldplayer_ntsc(config);
-	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldv1000_state::get_disc, this))
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	pioneer_ldv1000_device &laserdisc(PIONEER_LDV1000(config, "laserdisc"));
+	laserdisc.set_get_disc(FUNC(ldv1000_state::get_disc), this);
+	laserdisc.add_ntsc_screen(config, "screen");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	laserdisc.add_route(0, "lspeaker", 1.0);
+	laserdisc.add_route(1, "rspeaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(pr8210_state::pr8210)
+void pr8210_state::pr8210(machine_config &config)
+{
 	ldplayer_ntsc(config);
-	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&pr8210_state::get_disc, this))
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	pioneer_pr8210_device &laserdisc(PIONEER_PR8210(config, "laserdisc"));
+	laserdisc.set_get_disc(FUNC(pr8210_state::get_disc), this);
+	laserdisc.add_ntsc_screen(config, "screen");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	laserdisc.add_route(0, "lspeaker", 1.0);
+	laserdisc.add_route(1, "rspeaker", 1.0);
+}
 
 
 

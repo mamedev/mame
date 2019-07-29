@@ -23,11 +23,11 @@ void serial_printer_device::device_add_mconfig(machine_config &config)
 }
 
 static INPUT_PORTS_START(serial_printer)
-	MCFG_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_printer_device, update_serial)
-	MCFG_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_printer_device, update_serial)
-	MCFG_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_printer_device, update_serial)
-	MCFG_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_printer_device, update_serial)
-	MCFG_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_printer_device, update_serial)
+	PORT_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_printer_device, update_serial)
+	PORT_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_printer_device, update_serial)
+	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_printer_device, update_serial)
+	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_printer_device, update_serial)
+	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_printer_device, update_serial)
 INPUT_PORTS_END
 
 ioport_constructor serial_printer_device::device_input_ports() const

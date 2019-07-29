@@ -594,12 +594,12 @@ void menu::draw(uint32_t flags)
 	visible_main_menu_height += 0.01f;
 
 	// if we are too wide or too tall, clamp it down
-	if (visible_width + 2.0f * UI_BOX_LR_BORDER > 1.0f)
-		visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
+	if (visible_width + 2.0f * ui().box_lr_border() > 1.0f)
+		visible_width = 1.0f - 2.0f * ui().box_lr_border();
 
 	// if the menu and extra menu won't fit, take away part of the regular menu, it will scroll
-	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * UI_BOX_TB_BORDER > 1.0f)
-		visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
+	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * ui().box_tb_border() > 1.0f)
+		visible_main_menu_height = 1.0f - 2.0f * ui().box_tb_border() - visible_extra_menu_height;
 
 	m_visible_lines = std::min(int(std::floor(visible_main_menu_height / line_height)), int(unsigned(m_items.size())));
 	visible_main_menu_height = float(m_visible_lines) * line_height;
@@ -609,12 +609,12 @@ void menu::draw(uint32_t flags)
 	float const visible_top = ((1.0f - visible_main_menu_height - visible_extra_menu_height) * 0.5f) + m_customtop;
 
 	// first add us a box
-	float const x1 = visible_left - UI_BOX_LR_BORDER;
-	float const y1 = visible_top - UI_BOX_TB_BORDER;
-	float const x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
-	float const y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
+	float const x1 = visible_left - ui().box_lr_border();
+	float const y1 = visible_top - ui().box_tb_border();
+	float const x2 = visible_left + visible_width + ui().box_lr_border();
+	float const y2 = visible_top + visible_main_menu_height + ui().box_tb_border();
 	if (!customonly)
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	if (top_line < 0 || is_first_selected())
 		top_line = 0;
@@ -652,10 +652,10 @@ void menu::draw(uint32_t flags)
 			auto const itemnum = top_line + linenum;
 			menu_item const &pitem = m_items[itemnum];
 			char const *const itemtext = pitem.text.c_str();
-			rgb_t fgcolor = UI_TEXT_COLOR;
-			rgb_t bgcolor = UI_TEXT_BG_COLOR;
-			rgb_t fgcolor2 = UI_SUBITEM_COLOR;
-			rgb_t fgcolor3 = UI_CLONE_COLOR;
+			rgb_t fgcolor = ui().colors().text_color();
+			rgb_t bgcolor = ui().colors().text_bg_color();
+			rgb_t fgcolor2 = ui().colors().subitem_color();
+			rgb_t fgcolor3 = ui().colors().clone_color();
 			float const line_y0 = visible_top + (float)linenum * line_height;
 			float const line_y1 = line_y0 + line_height;
 
@@ -666,19 +666,19 @@ void menu::draw(uint32_t flags)
 			// if we're selected, draw with a different background
 			if (is_selected(itemnum))
 			{
-				fgcolor = fgcolor2 = fgcolor3 = UI_SELECTED_COLOR;
-				bgcolor = UI_SELECTED_BG_COLOR;
+				fgcolor = fgcolor2 = fgcolor3 = ui().colors().selected_color();
+				bgcolor = ui().colors().selected_bg_color();
 			}
 
 			// else if the mouse is over this item, draw with a different background
 			else if (itemnum == m_hover)
 			{
-				fgcolor = fgcolor2 = fgcolor3 = UI_MOUSEOVER_COLOR;
-				bgcolor = UI_MOUSEOVER_BG_COLOR;
+				fgcolor = fgcolor2 = fgcolor3 = ui().colors().mouseover_color();
+				bgcolor = ui().colors().mouseover_bg_color();
 			}
 
 			// if we have some background hilighting to do, add a quad behind everything else
-			if (bgcolor != UI_TEXT_BG_COLOR)
+			if (bgcolor != ui().colors().text_bg_color())
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 
 			if (linenum == 0 && show_top_arrow)
@@ -710,7 +710,7 @@ void menu::draw(uint32_t flags)
 			else if (pitem.type == menu_item_type::SEPARATOR)
 			{
 				// if we're just a divider, draw a line
-				container().add_line(visible_left, line_y0 + 0.5f * line_height, visible_left + visible_width, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container().add_line(visible_left, line_y0 + 0.5f * line_height, visible_left + visible_width, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 			else if (pitem.subtext.empty())
 			{
@@ -718,8 +718,8 @@ void menu::draw(uint32_t flags)
 				if (pitem.flags & FLAG_UI_HEADING)
 				{
 					float heading_width = ui().get_string_width(itemtext);
-					container().add_line(visible_left, line_y0 + 0.5f * line_height, visible_left + ((visible_width - heading_width) / 2) - UI_BOX_LR_BORDER, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-					container().add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + UI_BOX_LR_BORDER, line_y0 + 0.5f * line_height, visible_left + visible_width, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					container().add_line(visible_left, line_y0 + 0.5f * line_height, visible_left + ((visible_width - heading_width) / 2) - ui().box_lr_border(), line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					container().add_line(visible_left + visible_width - ((visible_width - heading_width) / 2) + ui().box_lr_border(), line_y0 + 0.5f * line_height, visible_left + visible_width, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 				ui().draw_text_full(container(), itemtext, effective_left, line_y0, effective_width,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
@@ -812,20 +812,20 @@ void menu::draw(uint32_t flags)
 			ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &target_width, &target_height);
 
 		// determine the target location
-		float const target_x = visible_left + visible_width - target_width - UI_BOX_LR_BORDER;
-		float target_y = line_y + line_height + UI_BOX_TB_BORDER;
-		if (target_y + target_height + UI_BOX_TB_BORDER > visible_main_menu_height)
-			target_y = line_y - target_height - UI_BOX_TB_BORDER;
+		float const target_x = visible_left + visible_width - target_width - ui().box_lr_border();
+		float target_y = line_y + line_height + ui().box_tb_border();
+		if (target_y + target_height + ui().box_tb_border() > visible_main_menu_height)
+			target_y = line_y - target_height - ui().box_tb_border();
 
 		// add a box around that
-		ui().draw_outlined_box(container(), target_x - UI_BOX_LR_BORDER,
-				target_y - UI_BOX_TB_BORDER,
-				target_x + target_width + UI_BOX_LR_BORDER,
-				target_y + target_height + UI_BOX_TB_BORDER,
-				subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container(), target_x - ui().box_lr_border(),
+				target_y - ui().box_tb_border(),
+				target_x + target_width + ui().box_lr_border(),
+				target_y + target_height + ui().box_tb_border(),
+				subitem_invert ? ui().colors().selected_bg_color() : ui().colors().background_color());
 
 		ui().draw_text_full(container(), pitem.subtext.c_str(), target_x, target_y, target_width,
-				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().selected_color(), ui().colors().selected_bg_color(), nullptr, nullptr);
 	}
 
 	// if there is something special to add, do it by calling the virtual method
@@ -853,11 +853,11 @@ void menu::draw_text_box()
 	float target_x, target_y;
 
 	// compute the multi-line target width/height
-	ui().draw_text_full(container(), text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
+	ui().draw_text_full(container(), text, 0, 0, 1.0f - 2.0f * ui().box_lr_border() - 2.0f * gutter_width,
 		ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &target_width, &target_height);
 	target_height += 2.0f * line_height;
-	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
-		target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
+	if (target_height > 1.0f - 2.0f * ui().box_tb_border())
+		target_height = floorf((1.0f - 2.0f * ui().box_tb_border()) / line_height) * line_height;
 
 	// maximum against "return to prior menu" text
 	prior_width = ui().get_string_width(backtext) + 2.0f * gutter_width;
@@ -868,23 +868,23 @@ void menu::draw_text_box()
 	target_y = 0.5f - 0.5f * target_height;
 
 	// make sure we stay on-screen
-	if (target_x < UI_BOX_LR_BORDER + gutter_width)
-		target_x = UI_BOX_LR_BORDER + gutter_width;
-	if (target_x + target_width + gutter_width + UI_BOX_LR_BORDER > 1.0f)
-		target_x = 1.0f - UI_BOX_LR_BORDER - gutter_width - target_width;
-	if (target_y < UI_BOX_TB_BORDER)
-		target_y = UI_BOX_TB_BORDER;
-	if (target_y + target_height + UI_BOX_TB_BORDER > 1.0f)
-		target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
+	if (target_x < ui().box_lr_border() + gutter_width)
+		target_x = ui().box_lr_border() + gutter_width;
+	if (target_x + target_width + gutter_width + ui().box_lr_border() > 1.0f)
+		target_x = 1.0f - ui().box_lr_border() - gutter_width - target_width;
+	if (target_y < ui().box_tb_border())
+		target_y = ui().box_tb_border();
+	if (target_y + target_height + ui().box_tb_border() > 1.0f)
+		target_y = 1.0f - ui().box_tb_border() - target_height;
 
 	// add a box around that
-	ui().draw_outlined_box(container(), target_x - UI_BOX_LR_BORDER - gutter_width,
-							target_y - UI_BOX_TB_BORDER,
-							target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
-							target_y + target_height + UI_BOX_TB_BORDER,
-							(m_items[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), target_x - ui().box_lr_border() - gutter_width,
+							target_y - ui().box_tb_border(),
+							target_x + target_width + gutter_width + ui().box_lr_border(),
+							target_y + target_height + ui().box_tb_border(),
+							(m_items[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : ui().colors().background_color());
 	ui().draw_text_full(container(), text, target_x, target_y, target_width,
-			ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
+			ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
 
 	// draw the "return to prior menu" text with a hilight behind it
 	highlight(
@@ -892,9 +892,9 @@ void menu::draw_text_box()
 				target_y + target_height - line_height,
 				target_x + target_width - 0.5f * UI_LINE_WIDTH,
 				target_y + target_height,
-				UI_SELECTED_BG_COLOR);
+				ui().colors().selected_bg_color());
 	ui().draw_text_full(container(), backtext, target_x, target_y + target_height - line_height, target_width,
-		ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
+		ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, ui().colors().selected_color(), ui().colors().selected_bg_color(), nullptr, nullptr);
 
 	// artificially set the hover to the last item so a double-click exits
 	m_hover = m_items.size() - 1;
@@ -1334,11 +1334,11 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 	extra_text_position(origx1, origx2, origy, yspan, layout, direction, x1, y1, x2, y2);
 
 	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	x1 += UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
+	x1 += ui().box_lr_border();
+	y1 += ui().box_tb_border();
 
 	// draw the text within it
 	layout.emit(container(), x1, y1);
@@ -1361,14 +1361,14 @@ void menu::draw_background()
 void menu::extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
 	int direction, float &x1, float &y1, float &x2, float &y2)
 {
-	float width = layout.actual_width() + (2 * UI_BOX_LR_BORDER);
+	float width = layout.actual_width() + (2 * ui().box_lr_border());
 	float maxwidth = std::max(width, origx2 - origx1);
 
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;
 	x2 = x1 + maxwidth;
 	y1 = origy + (yspan * direction);
-	y2 = origy + (UI_BOX_TB_BORDER * direction);
+	y2 = origy + (ui().box_tb_border() * direction);
 
 	if (y1 > y2)
 		std::swap(y1, y2);

@@ -17,6 +17,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/watchdog.h"
+#include "audio/bally.h"
 #include "audio/midway.h"
 #include "audio/csd.h"
 #include "sound/samples.h"
@@ -126,7 +127,7 @@ protected:
 	optional_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
-	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
+	optional_device<bally_squawk_n_talk_device> m_squawk_n_talk;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

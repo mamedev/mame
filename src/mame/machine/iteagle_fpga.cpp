@@ -87,6 +87,10 @@ void iteagle_fpga_device::device_start()
 	status = 0x5555;
 	command = 0x5555;
 
+	// always keep this device memory ranges active
+	command |= 3;
+	command_mask &= ~3;
+
 	add_map(sizeof(m_fpga_regs), M_IO, FUNC(iteagle_fpga_device::fpga_map));
 	// fpga defaults to base address 0x00000300
 	bank_infos[0].adr = 0x00000300 & (~(bank_infos[0].size - 1));
@@ -721,6 +725,10 @@ void iteagle_eeprom_device::device_start()
 	pci_device::device_start();
 	skip_map_regs(1);
 	add_map(0x10, M_IO, FUNC(iteagle_eeprom_device::eeprom_map));
+
+	// always keep this device memory ranges active
+	command |= 3;
+	command_mask &= ~3;
 }
 
 void iteagle_eeprom_device::device_reset()
@@ -818,6 +826,10 @@ void iteagle_periph_device::device_start()
 	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
 	m_rtc_regs[0xb] = 0x02; // 24-hour format
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
+
+	// always keep this device memory ranges active
+	command |= 3;
+	command_mask &= ~3;
 
 	// Save states
 	save_item(NAME(m_ctrl_regs));

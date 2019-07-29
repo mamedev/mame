@@ -26,7 +26,7 @@
  *
  *************************************/
 // HMC20
-// MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
+// set_raw(XTAL(12'000'000)/2, 384, 0, 256, 272, 8, 248)
 #define PIXEL_CLOCK     (XTAL(12'000'000) / 2)
 #define HTOTAL          (384)
 #define HBEND           (0)

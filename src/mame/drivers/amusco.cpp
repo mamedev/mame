@@ -601,7 +601,7 @@ void amusco_state::amusco(machine_config &config)
 void amusco_state::draw88pkr(machine_config &config)
 {
 	amusco(config);
-	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
+	// TODO: Some bits of ppi_outputs are definitely different
 }
 
 /*************************

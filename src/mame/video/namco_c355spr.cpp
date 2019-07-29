@@ -49,7 +49,8 @@ void namco_c355spr_device::zdrawgfxzoom(
 		if (gfx)
 		{
 			device_palette_interface &palette = gfx->palette();
-			int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
+			const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
+			const pen_t black = palette.black_pen();
 			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const u8 *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
@@ -159,7 +160,8 @@ void namco_c355spr_device::zdrawgfxzoom(
 										{
 											if (color == 0xf && c == 0xfe && shadow_offset)
 											{
-												dest[x] |= shadow_offset;
+												if (dest[x] != black)
+													dest[x] |= shadow_offset;
 											}
 											else
 											{

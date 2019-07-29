@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(COMX_PL80, comx_pl80_device, "comx_pl80", "COMX PL-80")
 //-------------------------------------------------
 
 ROM_START( comxpl80 )
-	ROM_REGION( 0x1000, CX005_TAG, 0 )
+	ROM_REGION( 0x1000, CX005_TAG, 0 ) // TODO: what is this? (not 6805 code)
 	ROM_LOAD( "pl80.pt6",       0x0080, 0x0e00, CRC(ae059e5b) SHA1(f25812606b0082d32eb603d0a702a2187089d332) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASEFF ) // Plotter fonts
@@ -59,38 +59,15 @@ const tiny_rom_entry *comx_pl80_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( comxpl80_mem )
-//-------------------------------------------------
-
-void comx_pl80_device::comxpl80_mem(address_map &map)
-{
-/*  AM_RANGE(0x000, 0x000) AM_READWRITE(cx005_port_a_r, cx005_port_a_w)
-    AM_RANGE(0x001, 0x001) AM_READWRITE(cx005_port_b_r, cx005_port_b_w)
-    AM_RANGE(0x002, 0x002) AM_READWRITE(cx005_port_c_r, cx005_port_c_w)
-    AM_RANGE(0x003, 0x003) AM_READ(cx005_port_d_digital_r)
-    AM_RANGE(0x004, 0x004) AM_WRITE(cx005_port_a_ddr_w)
-    AM_RANGE(0x005, 0x005) AM_WRITE(cx005_port_b_ddr_w)
-    AM_RANGE(0x006, 0x006) AM_WRITE(cx005_port_c_ddr_w)
-    AM_RANGE(0x007, 0x007) AM_READ(cx005_port_d_analog_r)
-    AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_data_r, cx005_timer_data_w)
-    AM_RANGE(0x008, 0x008) AM_READWRITE(cx005_timer_ctrl_r, cx005_timer_ctrl_w)*/
-	map(0x00a, 0x01f).noprw(); // Not Used
-	map(0x020, 0x07f).ram(); // Internal RAM
-	map(0x080, 0xf7f).rom().region(CX005_TAG, 0); // Internal ROM
-	map(0xf80, 0xff7).rom().region(CX005_TAG, 0xf00);  // Self-Test
-	map(0xff8, 0xfff).rom().region(CX005_TAG, 0xf78);  // Interrupt Vectors
-}
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void comx_pl80_device::device_add_mconfig(machine_config &config)
 {
+#if 0
 	m6805_device &cx005(M6805(config, CX005_TAG, 4000000)); // CX005: some kind of MC6805/MC68HC05 clone
-	cx005.set_addrmap(AS_PROGRAM, &comx_pl80_device::comxpl80_mem);
 	cx005.set_disable();
+#endif
 }
 
 

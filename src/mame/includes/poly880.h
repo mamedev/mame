@@ -13,7 +13,6 @@
 #include "machine/z80ctc.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #define SCREEN_TAG      "screen"

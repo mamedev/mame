@@ -23,11 +23,11 @@
       We currently have slave CPU irq hooked up to vblank, might or might not be correct.
     - invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
     - understand why background mirroring causes wrong gfxs on title screen_device.
-	  Probably area 0x2000-0x2fff enables tile bank bit 8 and write addresses have same mapping as reading.
-	  A preliminary decoding is in tilelayout_swap;
-	- tilemap flashing when gameplay timer is running out;
-	- tilemap scrolling, correct only for title screen.
-	  Maybe upper scroll bits also controls startdx/dy?
+      Probably area 0x2000-0x2fff enables tile bank bit 8 and write addresses have same mapping as reading.
+      A preliminary decoding is in tilelayout_swap;
+    - tilemap flashing when gameplay timer is running out;
+    - tilemap scrolling, correct only for title screen.
+      Maybe upper scroll bits also controls startdx/dy?
     cleanup
         - split into driver/video;
 
@@ -308,8 +308,8 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		multi = m_spriteram[offs + 0] & 0x10;
 		magnify =  (m_spriteram[offs + 0] & 0x20) >> 5;
 		region = magnify ? 3 : 1;
-		tile_size = magnify ? 32 : 16; 
-		
+		tile_size = magnify ? 32 : 16;
+
 		if (m_flipscreen)
 		{
 			sy = 240 - sy;
@@ -874,8 +874,8 @@ static const gfx_layout sprites_magnify =
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
 		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8, 
-	  4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8, 
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8,
+	  4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8,
 	  8*8, 8*8, 9*8, 9*8, 10*8,10*8,11*8,11*8,
 	  12*8,12*8,13*8,13*8,14*8,14*8,15*8,15*8 },
 	16*16
