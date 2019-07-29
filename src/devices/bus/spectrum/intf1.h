@@ -37,6 +37,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void opcode_fetch(offs_t offset) override;
+	virtual void opcode_fetch_post(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t iorq_r(offs_t offset) override;

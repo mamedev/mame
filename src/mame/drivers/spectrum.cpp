@@ -293,10 +293,14 @@ SamRam
 
 READ8_MEMBER(spectrum_state::opcode_fetch_r)
 {
-	/* this allows expansion devices to act upon opcode fetches from MEM addresses */
+	/* this allows expansion devices to act upon opcode fetches from MEM addresses
+	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
+	   enable paged ROM and then fetches at 0700 to disable it
+	*/
 	m_exp->opcode_fetch(offset);
-
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	m_exp->opcode_fetch_post(offset);
+	return retval;
 }
 
 WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
