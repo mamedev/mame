@@ -26,7 +26,7 @@ Language:
 |   XX   | 80-084000(US)     | Action Mania (Rev, 4?)                                                                    |
 |   XX   | 80-084000(US)     | Action Mania (Rev, 6?)                                                                    |
 |        |          (IT)     | ?????                                                                                     |
-|        | 80-084002(NL)     | Sports Games                                                                              |
+|   XX   | 80-084002(NL)     | Sports Games (pink sticker: "P ○○○○")                                                     |
 |        | 80-084003(UK)     | Action Mania                                                                              |
 |   XX   | 80-084004(GE)     | Sportskanone (blue sticker: "P ○○○○")                                                     |
 |        | 80-084005(FR)     | Sporti Folies                                                                             |
@@ -35,7 +35,7 @@ Language:
 +========+===================+===========================================================================================+
 |   XX   | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   **   | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version, same ROM as 80-084020(US))    |
-|        | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                                           |
+|   XX   | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                                           |
 |        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                                           |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer (Rev. 2)                                                  |
@@ -100,7 +100,7 @@ Language:
 |        | 80-084245(FR)     | Ni Hao Kai Lan                                                                            |
 +========+===================+===========================================================================================+
 |        | 80-084260(US)     | My Pet Puppy (unreleased in USA? UK version plays OK on NTSC console)                     |
-|        | 80-084262(NL)     | Mijn Puppy!                                                                               |
+|   XX   | 80-084262(NL)     | Mijn Puppy!                                                                               |
 |        | 80-084263(UK)     | My Pet Puppy                                                                              |
 |   XX   | 80-084264(GE)     | Mein erster Hund                                                                          |
 |        | 80-084265(FR)     | Mon Youtou Tout Fou!                                                                      |
@@ -270,6 +270,21 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
+	<software name="actnmniamnl" cloneof="actnmniam" supported="no">
+		<description>Sport Games (Netherlands)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084002(NL)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-6" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084002 - Sport Games (NL) (Motion).bin" size="8388608" crc="d7e6412b" sha1="01296d41ce277573688bec470241ca75449ba61a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="actnmniamg" cloneof="actnmniam" supported="no">
 		<description>Sportskanone (Germany)</description>
 		<year>201?</year>
@@ -382,6 +397,21 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile84020-3.bin" size="8388608" crc="73a3c852" sha1="8ca7255ab3e45ef670d09cfb4959bc8769415dc2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doramnl" cloneof="doram" supported="no">
+		<description>Nick Jr Dora - Dora's Reparatie Avontuur (Netherlands)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084022(NL)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084022 - Dora's Reparatie Avontuur (NL) (Motion).bin" size="8388608" crc="0ed6ba5e" sha1="48adad64724a57ee231d01129099e8419b75c083" />
 			</dataarea>
 		</part>
 	</software>
@@ -518,7 +548,22 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="mypuppymg" supported="no">
+	<software name="mypuppymnl" supported="no">
+		<description>Mijn Puppy! (Netherlands)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084262(NL)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084262 - Mijn Puppy (NL) (Motion).bin" size="8388608" crc="1a2b6da1" sha1="ca346f0b8e9d4cdea83b57e66b86ddc4c0eca88a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppymg" cloneof="mypuppymnl" supported="no">
 		<description>Mein erster Hund (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
