@@ -25,9 +25,10 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 
   Both low and high words of 32-bit offset from start of EPR-ROM area. Used for
   reading header and program code data, cannot be used for reading MPR-ROMs data.
-  During program code DMA transfer Romeo MCU perform data checksuming (decrypted data, in 8bit units),
-  result must match some CPLD / encryption key-specific value, otherwise MPR-ROM access
-  described below will not work correctly.
+  During program code DMA transfer Romeo ASIC perform data checksum - 8bit sum of
+  decrypted data bytes with swapped 4bit nibbles. Result must be equal to 8bit
+  decryption key provided by cartridge CPLD, otherwise MPR-ROM access described
+  below will not work.
   Game header (first 256 bytes of ROM) is not checksum protected.
 
  AW_MPR_RECORD_INDEX                                     Register addres: 0x5f700c
@@ -189,6 +190,9 @@ These subfields could be differing from the "real" ones in the following ways:
 - Of course, the way in which we are mixing 3 subfields in one only key is arbitrary too.
 
 The keys are stored as 32-bits big-endian values in a file.
+
+Real keys provided by cartridge CPLD is only 8bit, bits 4-5 is sbox table index, bits 6-7 is permutation table index.
+But it is not clear how 16-bit XOR value derived from 8bit key.
 */
 
 
