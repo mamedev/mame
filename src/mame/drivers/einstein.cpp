@@ -170,9 +170,7 @@ private:
 
 	uint8_t m_keyboard_line;
 	uint8_t m_keyboard_data;
-	uint8_t m_porta_out;
 	uint8_t m_porta_int;
-	uint8_t m_portb_out;
 	uint8_t m_pseudo_adc;
 
 	int m_centronics_ack;
