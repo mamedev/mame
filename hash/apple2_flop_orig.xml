@@ -6318,4 +6318,34 @@
 		</part>
 	</software>
 
+	<software name="iscnwtng">
+		<description>Sir Isaac Newton's Games</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-07-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233765">
+				<rom name="sir isaac newton's games.woz" size="233765" crc="0caba2c1" sha1="96222cfa1bdc14cc6c2c7fe3eecbde1d93cdba9f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzltnks">
+		<description>Puzzle Tanks</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-07-29"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="puzzle tanks.woz" size="234788" crc="75132200" sha1="d5436bc29ac35bf66f6f637e5efbd26f83f52c2b" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

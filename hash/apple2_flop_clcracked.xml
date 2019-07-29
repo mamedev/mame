@@ -34540,4 +34540,50 @@
 		</part>
 	</software>
 
+	<software name="puncpon">
+		<description>Punctuation Put-On (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-07-28"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Teacher disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="punctuation put-on (4am crack) disk 1 - teacher disk.dsk" size="143360" crc="a786b53a" sha1="c04e5cdb23e03b3b20e7cf216b834fe1d0e8e212" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="punctuation put-on (4am crack) disk 2 - student disk.dsk" size="143360" crc="f9f1a8c3" sha1="09933bbead765a267571ff4a06b24cb95fb67232" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nkotb">
+		<description>New Kid on the Block (Version 02.09.89) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2019-07-28"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="new kid on the block (4am crack) disk 1.dsk" size="143360" crc="5f7feea4" sha1="32bd143f480259dd6796db73c59e10c5482e0f7c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="new kid on the block (4am crack) disk 2.dsk" size="143360" crc="2c0eaee1" sha1="7c7c4f082599ac471a19f49b3c363ab021f97363" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="new kid on the block (4am crack) disk 3.dsk" size="143360" crc="c7cf3f91" sha1="fb6931142c9f9259cb35340803275b9cb69396e6" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
