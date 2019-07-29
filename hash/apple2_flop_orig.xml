@@ -6298,26 +6298,6 @@
 		</part>
 	</software>
 
-	<software name="hnkypnky">
-		<description>Hinky Pinky (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Well</publisher>
-		<info name="release" value="2019-07-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="hinky pinky (4am crack) side a.dsk" size="143360" crc="47fde18f" sha1="c5657e390a038b4ea7f143515a082b3f95fc34a5" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="hinky pinky (4am crack) side b.dsk" size="143360" crc="2d9c6bcf" sha1="feddf5e96668c81e9e0a65aac613db1d55516250" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="iscnwtng">
 		<description>Sir Isaac Newton's Games</description>
 		<year>1985</year>
