@@ -204,7 +204,7 @@ Game cartridges
 +========+===================+================================================================================================+
 |        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                                                  |
 |   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                                      |
-|        | 80-092122(NL)     | De Kleine Zeemeermin - De Wunderwereld von Ariel                                               |
+|        | 80-092122(NL)     | De Kleine Zeemeermin - De wonderwereld von Ariel                                               |
 |   XX   | 80-092123(UK)     | The Little Mermaid - Ariel's Majestic Journey                                                  |
 |   XX   | 80-092124(GE)     | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer                                      |
 |   XX   | 80-092125(FR)     | La Petite Sirene - Ariel devient une princesse                                                 |
@@ -258,7 +258,7 @@ Game cartridges
 +========+===================+================================================================================================+
 |        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                           |
-|   XX   | 80-092202(NL)     | Aladdin - De Wunderwereld van Aladdin                                                          |
+|   XX   | 80-092202(NL)     | Aladdin - De wonderwereld van Aladdin                                                          |
 |        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                             |
 |        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
@@ -570,7 +570,7 @@ Game cartridges
 	</software>
 
 	<software name="aladdinnl" cloneof="aladdini" supported="yes">
-		<description>Disney's Aladdin - De winderwereld van Aladdin (Netherlands)</description>
+		<description>Disney's Aladdin - De wonderwereld van Aladdin (Netherlands)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092202(NL)" />
@@ -581,7 +581,7 @@ Game cartridges
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="80-092202 - Aladdin - De winderwereld van Aladdin (NL).bin" size="8388608" crc="44fb6eea" sha1="8a05cadf0ecf6e47c13137ac99dacdf9ee8b0810" />
+				<rom name="80-092202 - Aladdin - De wonderwereld van Aladdin (NL).bin" size="8388608" crc="44fb6eea" sha1="8a05cadf0ecf6e47c13137ac99dacdf9ee8b0810" />
 			</dataarea>
 		</part>
 	</software>
@@ -1510,7 +1510,7 @@ Game cartridges
 	</software>
 
 	<software name="findnemonl" cloneof="findnemo" supported="yes">
-		<description>Disney/Pixar Finding Nemo - De Wonderwereld Van Nemo (Netherlands)</description>
+		<description>Disney/Pixar Finding Nemo - De wonderwereld van Nemo (Netherlands)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092422(NL)" />
