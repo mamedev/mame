@@ -106,6 +106,9 @@ READ_LINE_MEMBER(spectrum_intf1_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
+// the Interface 1 looks for specific bus conditions to enable / disable the expansion overlay ROM
+
+// the enable must occur BEFORE the opcode is fetched, as the opcode must be fetched from the expansion ROM
 void spectrum_intf1_device::opcode_fetch(offs_t offset)
 {
 	m_exp->opcode_fetch(offset);
@@ -117,12 +120,26 @@ void spectrum_intf1_device::opcode_fetch(offs_t offset)
 		case 0x0008: case 0x1708:
 			m_romcs = 1;
 			break;
+		}
+	}
+}
+
+// the disable must occur AFTER the opcode fetch, or the incorrect opcode is fetched for 0x0700
+void spectrum_intf1_device::opcode_fetch_post(offs_t offset)
+{
+	m_exp->opcode_fetch_post(offset);
+
+	if (!machine().side_effects_disabled())
+	{
+		switch (offset)
+		{
 		case 0x0700:
 			m_romcs = 0;
 			break;
 		}
 	}
 }
+
 
 uint8_t spectrum_intf1_device::mreq_r(offs_t offset)
 {
