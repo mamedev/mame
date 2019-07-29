@@ -1966,38 +1966,36 @@ ROM_START( ad5rsrra )
 	ad5plds
 ROM_END
 
+// The following two sets are recent dumps and the maincpu ROMs are swapped wrt to the old available dumps (!)
+
+ROM_START( ad5lluck )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "v-41_cvb-0209a_10623_hi_ll3-02_bell_fruit.ic1", 0x0000, 0x1000000, CRC(0a592352) SHA1(4a9fcb1a3d91a4a77fb70e538ff2c1f3bbc19abf) )
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "bfg_lady_luck_sound_1_95_009_114.ic6", 0x000000, 0x100000, CRC(55061923) SHA1(653158e8dc3e464b9b9be91086db79eea594368f) )
+	ROM_LOAD( "bfg_lady_luck_sound_2_95_009_115.ic7", 0x100000, 0x100000, CRC(b16ea185) SHA1(621f58e1d3bd01a486218ed7e9cd7b8313a8e366) )
+
+	ROM_REGION( 0x2000, "other", ROMREGION_ERASE00 )
+	ROM_LOAD( "ic-1_cvb-0209a_10-623_bell_fruit_24c65.ic8.u1", 0x0000, 0x2000, CRC(c34536c2) SHA1(56df4a209c6c7a9bdd014a5585262b3755ed9b29) )
+
+	ad5plds
+ROM_END
 
 
+ROM_START( ad5etdls )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "v-41_cvb-0076_08-283_hi_3s.tr-02_bell_fruit.ic1", 0x0000, 0x1000000, CRC(7ac2a670) SHA1(aa3f899eff1b6027528b6f9a196cc9dba6689d72) )
 
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "bfg_el_trebol_de_la_suerte_sound_1_95008717.ic6", 0x000000, 0x100000, CRC(fbd2ce9f) SHA1(67c192fefd44f0ac0a112aba9d96293140317128) )
+	// 2nd socket empty
 
+	ROM_REGION( 0x2000, "other", ROMREGION_ERASE00 )
+	ROM_LOAD( "ic-1_cvb-0076_08-283_bell_fruit_24c65.ic8.u1", 0x0000, 0x2000, CRC(d7991f43) SHA1(2b68d54e3744953f21615626d2a25cb7356a96cc) )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	ad5plds
+ROM_END
 
 
 
@@ -2351,3 +2349,9 @@ GAME( 200?, ad5rsrm,   0,        bfm_ad5, bfm_ad5, adder5_state, init_ad5, ROT0,
 GAME( 200?, ad5rsrma,  ad5rsrm,  bfm_ad5, bfm_ad5, adder5_state, init_ad5, ROT0,  "BFM","Ronnie O'Sullivan's Rocket Money (Bellfruit) (Adder 5) (set 2)", MACHINE_IS_SKELETON )
 GAME( 200?, ad5rsrr,   ad5rsrm,  bfm_ad5, bfm_ad5, adder5_state, init_ad5, ROT0,  "BFM","Ronnie O'Sullivan's Rocket Money (Bellfruit) (Adder 5) (set 3)", MACHINE_IS_SKELETON )
 GAME( 200?, ad5rsrra,  ad5rsrm,  bfm_ad5, bfm_ad5, adder5_state, init_ad5, ROT0,  "BFM","Ronnie O'Sullivan's Rocket Money (Bellfruit) (Adder 5) (set 4)", MACHINE_IS_SKELETON )
+
+// PR0573 LADY LUCK (3 stake) 2.00        ` BFGNLL34       PR0573 LADY LUCK SOUNDS11
+GAME( 200?, ad5lluck,  0,        bfm_ad5, bfm_ad5, adder5_state, init_ad5, ROT0,  "BFM", "Lady Luck (Bellfruit) (Adder 5)", MACHINE_IS_SKELETON )
+
+// PR0551 EL TREBOL DE LA SUERTE ARAGON/CATALAN 1.00   RCLVIT12
+GAME( 200?, ad5etdls,  0,        bfm_ad5, bfm_ad5, adder5_state, init_ad5, ROT0,  "BFM", "El Trebol de la Suerte (Bellfruit) (Adder 5)", MACHINE_IS_SKELETON )
