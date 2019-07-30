@@ -1260,7 +1260,7 @@
 		<description>B.C. Kid (Euro)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="DMG-GK-(NOE/UKV)"/>
+		<info name="serial" value="DMG-GK-NOE, DMG-GK-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -1400,11 +1400,14 @@
 		<description>Balloon Kid (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-BT-USA, DMG-BT-UKV"/>
+		<info name="serial" value="DMG-BT-USA, DMG-BT-UKV, DMG-BT-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="balloon kid (usa, europe).bin" size="131072" crc="d4b655ec" sha1="0cb5adc9bdef5320f3f156efed0d47a618e2299f"/>
+				<rom name="dmg-bte-0.u1" size="131072" crc="d4b655ec" sha1="0cb5adc9bdef5320f3f156efed0d47a618e2299f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1415,9 +1418,12 @@
 		<publisher>Laser Beam Entertainment</publisher>
 		<info name="serial" value="DMG-A6-SCN"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bamse (sweden).bin" size="131072" crc="1b713de0" sha1="92c042a1b3b9704736b6d8b19259efc5110c267d"/>
+				<rom name="dmg-a6w-0.u1" size="131072" crc="1b713de0" sha1="92c042a1b3b9704736b6d8b19259efc5110c267d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1471,7 +1477,7 @@
 		<description>Bart Simpson's Escape from Camp Deadly (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-TS-USA, DMG-TS-(NOE/UKV)"/>
+		<info name="serial" value="DMG-TS-USA, DMG-TS-NOE, DMG-TS-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -1488,7 +1494,7 @@
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-BSA, DMG-BS-USA, DMG-BS-UKV"/>
-		<info name="release" value="19890421 (JPN)"/>
+		<info name="release" value="19890421"/>
 		<info name="alt_title" value="ベースボール"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN(K)-02" />   <!-- UKV cart -->
@@ -1509,9 +1515,12 @@
 		<info name="release" value="19900315"/>
 		<info name="alt_title" value="ベースボールキッズ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BCA-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="baseball kids (japan).bin" size="131072" crc="a503cb07" sha1="e4a49a9ecd7a9ce8bb552981e90903f21c741428"/>
+				<rom name="dmg-bkj-0.u1" size="131072" crc="a503cb07" sha1="e4a49a9ecd7a9ce8bb552981e90903f21c741428"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1699,9 +1708,12 @@
 		<publisher>Seta</publisher>
 		<info name="serial" value="DMG-BR-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="battle bull (usa).bin" size="131072" crc="d4d1aea2" sha1="a553b2cf2a5d223b6ac8aca4e9fd65b65087a1f4"/>
+				<rom name="dmg-bre-0.u1" size="131072" crc="d4d1aea2" sha1="a553b2cf2a5d223b6ac8aca4e9fd65b65087a1f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1729,9 +1741,15 @@
 		<info name="release" value="19921016"/>
 		<info name="alt_title" value="バトルドッジボール"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
+			<feature name="u3" value="U3 RAM [LH5168NFB-10L]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="battle dodge ball (japan).bin" size="131072" crc="a99242c0" sha1="ed63709af2dd22d2abaa7e99b9dd5373b6cc91c4"/>
+				<rom name="dmg-d6j-0.u1" size="131072" crc="a99242c0" sha1="ed63709af2dd22d2abaa7e99b9dd5373b6cc91c4"/>
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -1831,9 +1849,12 @@
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="DMG-BZ-USA, DMG-BZ-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="battle unit zeoth (usa, europe).bin" size="131072" crc="e67a92b3" sha1="eba09c60cd60feba0a7a9e82597dad080ce78d22"/>
+				<rom name="dmg-bze-0.u1" size="131072" crc="e67a92b3" sha1="eba09c60cd60feba0a7a9e82597dad080ce78d22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1952,11 +1973,14 @@
 		<description>Battletoads in Ragnarok's World (Euro)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
-		<info name="serial" value="DMG-R7-ESP-1"/>
+		<info name="serial" value="DMG-R7-ESP-1, DMG-R7-NOE"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="battletoads in ragnarok's world (europe).bin" size="131072" crc="7ffc34ea" sha1="1852bd23644e28109b66fa937053c689a63f7729"/>
+				<rom name="dmg-r7x-0.u1" size="131072" crc="7ffc34ea" sha1="1852bd23644e28109b66fa937053c689a63f7729"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2094,9 +2118,12 @@
 		<publisher>Electro Brain</publisher>
 		<info name="serial" value="DMG-VS-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="bionic battler (usa).bin" size="65536" crc="a1e55dc2" sha1="9eca6a5fd1e537085598e8b2903ad75fe9c0b785"/>
+				<rom name="dmg-vse-0.u1" size="65536" crc="a1e55dc2" sha1="9eca6a5fd1e537085598e8b2903ad75fe9c0b785"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2105,11 +2132,17 @@
 		<description>Bionic Commando (Euro, Chi)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="DMG-BO-(FAH, UKV), DMG-202 CHN"/>
+		<info name="serial" value="DMG-BO-FAH, DMG-BO-UKV, DMG-202 CHN"/>
+		<info name="alt_title" value="BIONIC COMMANDO 电子突击队·電子突擊隊"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" />  <!-- DMG-BEAN-M11 for the Chinese cart -->
+			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1 [DMG MBC1B]" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M11" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-box-0.u1" size="262144" crc="4c5b4547" sha1="a8ab419b049aef5a04800efd6df58e4b3c3abbe3"/>
@@ -2238,9 +2271,12 @@
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-115 CHN"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M11" />
+			<feature name="u1" value="U1 MBC1 [DMG MBC1B]" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="blaster master jr. (europe).bin" size="131072" crc="e9f9016f" sha1="6a6deae1942e7cf048ce35d18e9540363c226727"/>
+				<rom name="u2" size="131072" crc="e9f9016f" sha1="6a6deae1942e7cf048ce35d18e9540363c226727"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2283,7 +2319,7 @@
 		<description>The Blues Brothers (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Titus</publisher>
-		<info name="serial" value="DMG-BQ-USA, DMG-BQ-ESP"/>
+		<info name="serial" value="DMG-BQ-USA, DMG-BQ-ESP, DMG-BQ-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -2296,12 +2332,15 @@
 		<description>Blues Brothers - Jukebox Adventure (Euro)</description>
 		<year>1994</year>
 		<publisher>Titus</publisher>
-		<info name="serial" value="DMG-J6-UKV"/>
+		<info name="serial" value="DMG-J6-UKV, DMG-J6-FRG"/>
 		<info name="alt_title" value="The Blues Brothers - Jukebox Adventure (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="blues brothers, the - jukebox adventure (europe).bin" size="131072" crc="f1c0fb1d" sha1="2005e94222a1f0edd30903411343f9570a91d4f3"/>
+				<rom name="dmg-j6e-0.u1" size="131072" crc="f1c0fb1d" sha1="2005e94222a1f0edd30903411343f9570a91d4f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2342,7 +2381,7 @@
 		<info name="release" value="19971219"/>
 		<info name="alt_title" value="牧場物語GB"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-KECN-10" />
+			<feature name="pcb" value="DMG-KECN-10" /> <!-- Also with DMG-KECN-01 -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC3A [MBC3 A]" />
 			<feature name="u3" value="U3 RAM" />
@@ -2395,11 +2434,16 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-HBA, DMG-113 CHN"/>
 		<info name="release" value="19900831"/>
-		<info name="alt_title" value="ボンバーボーイ"/>
+		<info name="alt_title" value="ボンバーボーイ (Japan), Bomber Boy 爆爆人 (China)"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-BEAN-02" /> <!-- CHN cart on DMG-BEAN-M13 pcb, with PRG on u2 and MBC1 on u1 -->
+			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [MBC1B]" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M13" />
+			<feature name="u1" value="U1 MBC1 [MBC1-B]" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="dmg-hba-0.u1" size="131072" crc="ef9595ac" sha1="a9baddfb693f20057b17c084422d7bfac590f2ba"/>
@@ -2431,9 +2475,12 @@
 		<info name="release" value="19960721"/>
 		<info name="alt_title" value="ボンバーマンコレクション"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-M-BFAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bomberman collection (japan).bin" size="1048576" crc="509a6b73" sha1="385f8fafa53a83f8f65e1e619fe124bbf7db4a98"/>
+				<rom name="dmg-abcj-0.u1" size="1048576" crc="509a6b73" sha1="385f8fafa53a83f8f65e1e619fe124bbf7db4a98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2476,16 +2523,19 @@
 
 	<software name="bombman2" cloneof="bombman">
 		<!-- Notes: SGB enhanced -->
-		<description>Bomberman GB 2 (Jpn)</description>
+		<description>Bomberman GB 2 (Jpn, Chi)</description>
 		<year>1995</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="serial" value="DMG-AB2J-JPN"/>
+		<info name="serial" value="DMG-AB2J-JPN, DMG-217 CHN"/>
 		<info name="release" value="19950810"/>
-		<info name="alt_title" value="ボンバーマンGB2"/>
+		<info name="alt_title" value="ボンバーマンGB2 (Japan), BOMBER MAN GB2 爆爆人GB2 (China)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M14" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
-				<rom name="bomberman gb 2 (japan).bin" size="262144" crc="6157443b" sha1="004e540e8aed59e5aee1c88ef84975000a6efe6c"/>
+				<rom name="u2" size="262144" crc="6157443b" sha1="004e540e8aed59e5aee1c88ef84975000a6efe6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2581,7 +2631,7 @@
 		<description>Boulder Dash (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-BD-(UKV/NOE)"/>
+		<info name="serial" value="DMG-BD-UKV, DMG-BD-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -2773,14 +2823,18 @@
 	</software>
 
 	<software name="bublbobl">
-		<description>Bubble Bobble (Euro, USA)</description>
+		<description>Bubble Bobble (Euro, USA, Chi)</description>
 		<year>1991</year>
 		<publisher>Taito ~ Natsume</publisher>
-		<info name="serial" value="DMG-B2-USA, DMG-B2-NOE"/>
+		<info name="serial" value="DMG-B2-USA, DMG-B2-NOE, DMG-118 CHN"/>
+		<info name="alt_title" value="BUBBLE BOBBLE 泡泡龙·泡泡龍"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-M13" /> <!-- Also with DMG-BEAN-M11 -->
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bubble bobble (usa, europe).bin" size="131072" crc="d516841d" sha1="569881bea21cf5fd542ff3dfc40e1626c6748ceb"/>
+				<rom name="u2" size="131072" crc="d516841d" sha1="569881bea21cf5fd542ff3dfc40e1626c6748ceb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2927,7 +2981,7 @@
 		<description>The Bugs Bunny - Crazy Castle (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="DMG-BB-USA, DMG-BB-(FAH/UKV)"/>
+		<info name="serial" value="DMG-BB-USA, DMG-BB-FAH, DMG-BB-UKV, DMG-BB-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRA cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -2943,11 +2997,14 @@
 		<description>The Bugs Bunny - Crazy Castle II (USA)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
-		<info name="serial" value="DMG-BY-USA"/>
+		<info name="serial" value="DMG-BY-USA, DMG-BY-USA-1"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1B/1B1 [MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="bugs bunny, the - crazy castle ii (usa).bin" size="131072" crc="a973e604" sha1="1e4c8c8fe8b6c34f76cd0da876442f14299da725"/>
+				<rom name="dmg-bye-0.u1" size="131072" crc="a973e604" sha1="1e4c8c8fe8b6c34f76cd0da876442f14299da725"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2956,7 +3013,7 @@
 		<description>Burai Fighter Deluxe (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Taxan</publisher>
-		<info name="serial" value="DMG-BU-USA, DMG-BU-(FAH/NOE/UKV/ESP-1)"/>
+		<info name="serial" value="DMG-BU-USA, DMG-BU-FAH, DMG-BU-NOE, DMG-BU-UKV, DMG-BU-ESP-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
 			<feature name="u1" value="U1 PRG" />
@@ -2990,13 +3047,18 @@
 		<description>BurgerTime Deluxe (World)</description>
 		<year>1991</year>
 		<publisher>Data East</publisher>
-		<info name="serial" value="DMG-GMA, DMG-GM-USA, DMG-GM-UKV"/>
+		<info name="serial" value="DMG-GMA, DMG-GM-USA, DMG-GM-UKV, DMG-129 CHN"/>
 		<info name="release" value="19910215 (JPN)"/>
-		<info name="alt_title" value="バーガータイム・デラックス"/>
+		<info name="alt_title" value="バーガータイム・デラックス (Japan), BugerTime DELUXE 汉堡包大王·漢堡包大王 (China)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- UKV cart -->
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<!-- Chinese cart
+			<feature name="pcb" value="DMG-BEAN-M13" />
+			<feature name="u1" value="U1 MBC1" />
+			<feature name="u2" value="U2 PRG-ROM [epoxy]" />
+			-->
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dmg-gma-0.u1" size="65536" crc="88219a49" sha1="1aafcef0dd5fbb8e95188631e0b2decdf84e9aed"/>
@@ -3051,9 +3113,12 @@
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AG-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="buster brothers (usa).bin" size="131072" crc="b4245ca3" sha1="0d1692ff60ef1f6a97bbfd2bf8c1548f1f7439ed"/>
+				<rom name="dmg-age-0.u1" size="131072" crc="b4245ca3" sha1="0d1692ff60ef1f6a97bbfd2bf8c1548f1f7439ed"/>
 			</dataarea>
 		</part>
 	</software>
