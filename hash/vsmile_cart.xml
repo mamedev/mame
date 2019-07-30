@@ -375,7 +375,7 @@ Game cartridges
 |   XX   | 80-092420(US)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
 |   XX   | 80-092422(NL)     | Finding Nemo - De wonderwereld van Nemo                                                        |
 |        | 80-092423(UK)     | Finding Nemo - Nemo's Ocean Discoveries                                                        |
-|   XX   | 50-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GE) on back label, blue sticker: "P ○○○○", "VT8321" silscreened on the cart)
+|   XX   | 50-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer (52-92424(GER) on back label, blue sticker: "P ○○○○", "VT8321" silscreened on the cart)
 |        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                                             |
 |        | 80-092426(PT)     | Nemo - A descoberta do Oceano  (Cart#92436)                                                    |
 |   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label, green sticker: "542 ○○○●")
@@ -1275,7 +1275,7 @@ Game cartridges
 		<description>Disney's Princess Cinderella - Lernen im Märchenland (Germany, Rev. 204)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092244-104(GE)" />
+		<info name="serial" value="80-092244-104(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
@@ -1515,7 +1515,7 @@ Game cartridges
 		<description>Disney/Pixar Findet Nemo - Nemos Unterwasserabenteuer (Germany)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="50-092424(GE)" />
+		<info name="serial" value="50-092424(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
@@ -1814,7 +1814,7 @@ Game cartridges
 		<description>Kung Fu Panda - Der Weg des Panda (Germany)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="52-092964(GE)" />
+		<info name="serial" value="52-092964(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
@@ -2162,7 +2162,7 @@ Game cartridges
 		<description>V.Smile Mein erster Mausklick (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-036804(GE)" />
+		<info name="serial" value="80-036804(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
@@ -3424,7 +3424,7 @@ Game cartridges
 		<description>V.Smile Zeichenatelier (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-067004(GE)" />
+		<info name="serial" value="80-067004(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_nvram" />
 			<feature name="pcb" value="67000C" />
@@ -3464,7 +3464,7 @@ Game cartridges
 		<description>Flitzers Schlaue Städtetour (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092504(GE)" />
+		<info name="serial" value="80-092504(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_nvram" />
 			<feature name="pcb" value="708201" />
