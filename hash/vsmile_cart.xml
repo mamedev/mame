@@ -37,6 +37,7 @@ Addons (w/ yellow Smartridges)
 +========+===================+============================================================================+
 |   XX   | 80-036800(US)     | V.Smile PC Pal Island (cart serial)                                        |
 |        | 80-036822(SP)     | V.Smile PC Pal Island (cart serial)                                        |
+|   XX   | 80-036804(GE)     | V.Smile Mein erster Mausklick (52-036804 on back label, blue label "P ○○○○")
 +========+===================+============================================================================+
 |   XX   | 80-067000(US)     | V.Smile Art Studio                                                         |
 |        | 80-067003(UK)     | V.Smile Art Studio                                                         |
@@ -312,7 +313,7 @@ Game cartridges
 |   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT 2)                                            |
 |        | 80-092282(NL)     | Dora - Doras Reparatie Avontuur!                                                               |
 |   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                       |
-|        | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                                              |
+|   XX   | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (ALT, orange sticker: "723 ○●○○")                  |
 |        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                               |
 |   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer                                                               |
 |   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano                                   |
@@ -406,7 +407,7 @@ Game cartridges
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                                            |
 |        | 80-092503(UK)     | Whiz Kid Wheels                                                                                |
 |        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (diff color)                                                      |
-|        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (normal purple)                                                   |
+|   XX   | 80-092504(GE)     | Flitzers Schlaue Staedtetour (purple, 52-092504(GER) on back label, blue sticker: "P ○○○○")    |
 |        | 80-092505(FR)     | Mission Pilote                                                                                 |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                                               |
 |   XX   | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label, green sticker: "534 ○○○○")                   |
@@ -1274,7 +1275,7 @@ Game cartridges
 		<description>Disney's Princess Cinderella - Lernen im Märchenland (Germany, Rev. 204)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-092244-104(GE)" />
+		<info name="serial" value="80-092244-104(GER)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
@@ -1368,6 +1369,24 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No inputs -->
+	<software name="dorauk" cloneof="dorar201" supported="no">
+		<description>Nick Jr. Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092283-103(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092283-103 - Dora's Fix-it Adventure (UK).bin" size="8388608" crc="3a96b71d" sha1="1ad68250dab5be23b634c5528e28ab5198012ee9" />
 			</dataarea>
 		</part>
 	</software>
@@ -2135,6 +2154,23 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile36800-3.bin" size="8388608" crc="7e53c0a1" sha1="68b8d09c933b17e1342ef31cfb283dc5609e990a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcpalisg" cloneof="pcpalisr3" supported="yes">
+		<description>V.Smile Mein erster Mausklick (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-036804(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-036804 - Mein erster Mausklick (GER).bin" size="8388608" crc="df4474f0" sha1="d858eb61efe23643a45c10ee1c332344caaed0fd" />
 			</dataarea>
 		</part>
 	</software>
@@ -3424,7 +3460,26 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="wkwheels" supported="yes"> <!-- Will be clone of "wkwheel" once found and dumped. -->
+	<software name="wkwheelg" supported="yes"> <!-- Will be clone of "wkwheel" once found and dumped. -->
+		<description>Flitzers Schlaue Städtetour (Germany)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092504(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_nvram" />
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-092504 - Flitzers Schlaue Stadtetour (GER).bin" size="8388608" crc="1bdd6066" sha1="1e2a9090c0bfe08c31e750e263bad4a4a1fb2e73" />
+			</dataarea>
+			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wkwheels" cloneof="wkwheelg" supported="yes"> <!-- Will be clone of "wkwheel" once found and dumped. -->
 		<description>Conducción Divertida (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
