@@ -155,6 +155,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/transwarp.h"
 #include "bus/a2bus/a2vulcan.h"
+#include "bus/a2bus/4play.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4431,6 +4432,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
 	device.option_add("twarp", A2BUS_TRANSWARP);    /* AE TransWarp accelerator */
 	device.option_add("vulcan", A2BUS_VULCANIIE); /* Applied Engineering Vulcan IDE drive */
+	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)

@@ -86,6 +86,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/ssbapple.h"
+#include "bus/a2bus/4play.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1264,6 +1265,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
 	device.option_add("ssprite", A2BUS_SSPRITE);    /* Synetix SuperSprite Board */
 	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
+	device.option_add("4play", A2BUS_4PLAY); /* 4Play Joystick Card (Rev. B) */
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 }
 
