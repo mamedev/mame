@@ -1430,8 +1430,6 @@ files {
 	MAME_DIR .. "src/mame/video/1943.cpp",
 	MAME_DIR .. "src/mame/drivers/alien.cpp",
 	MAME_DIR .. "src/mame/drivers/bionicc.cpp",
-	MAME_DIR .. "src/mame/includes/bionicc.h",
-	MAME_DIR .. "src/mame/video/bionicc.cpp",
 	MAME_DIR .. "src/mame/drivers/supduck.cpp",
 	MAME_DIR .. "src/mame/video/tigeroad_spr.cpp",
 	MAME_DIR .. "src/mame/video/tigeroad_spr.h",
