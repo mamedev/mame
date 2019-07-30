@@ -60,7 +60,7 @@ Language:
 |        | 80-084087(SP)     | Wall-E                                                                                    |
 +========+===================+===========================================================================================+
 |        | 80-084100(US)     | Wonder Pets - Save the Animals!                                                           |
-|        | 80-084103(UK)     | Wonder Pets - Save the Animals!                                                           |
+|   XX   | 80-084103(UK)     | Wonder Pets - Save the Animals!                                                           |
 +========+===================+===========================================================================================+
 |        | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                                         |
 |        | 80-084123(UK)     | Kung Fu Panda - Path of the Panda                                                         |
@@ -183,7 +183,7 @@ Language:
 |        | 80-084480(US)     | The Princess and the Frog  (motion version)                                               |
 |        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                               |
 |        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                                   |
-|        | 80-084483(UK)     | The Princess and the Frog                                                                 |
+|   XX   | 80-084483(UK)     | The Princess and the Frog                                                                 |
 |   XX   | 80-084484(GE)     | Kuess den Frosch                                                                          |
 |        | 80-084485(FR)     | La Princesse Et La Grenouille                                                             |
 |        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                                  |
@@ -619,7 +619,22 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="prinfrogmg" supported="no">
+	<software name="prinfrogm" supported="no">
+		<description>Disney Princess - The Princess and the Frog - Tiana's Big Dream (UK)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084483(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084483 - Disney Princess - The Princess and the Frog (UK) (Motion).bin" size="8388608" crc="b4405317" sha1="9d016ece3cb62b2ca6c5fd7d2e3717fddf0d7034" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prinfrogmg" cloneof="prinfrogm" supported="no">
 		<description>Küss den Frosch - Tianas großer Traum (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -755,7 +770,8 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084424(GE)" />
 		<part name="cart" interface="vsmile_cart">
-			<feature name="pcb" value="710654-2" />
+			<feature name="pcb" value="710654" />
+			<feature name="pcb_model" value="710654" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x1000000">
@@ -788,6 +804,21 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wonderpetm" supported="no">
+		<description>Nickelodeon Wonder Pets! - Save the Animals! (UK)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084103(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="80-084103 - Wonder Pets - Save the Animals (UK) (Motion).bin" size="0x0800000" crc="29650608" sha1="66ec3ce1316265dec08f91dcca5709b57ee554cc" />
 			</dataarea>
 		</part>
 	</software>
