@@ -87,12 +87,20 @@ NOT BUGS:
 
 ----
 
+tharrier test mode:
+
+1)  Press player 2 buttons 1+2 during reset.  "Are you ready?" will appear
+2)  Press player 1 buttons in this sequence:
+    2,1,2,2,1,1,↓,↓
+
+Current emulation is stuck when try to access test mode.
+
 tdragon and hachamf test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 2 14 (!) times
 
-mustang test mode:
+mustang and blkheart test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 1 14 (!) times
