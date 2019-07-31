@@ -121,6 +121,8 @@ void neptunp2_state::neptunp2(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+
+	// OKIM6376(config, "oki", xxx).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 /***************************************************************************
@@ -144,5 +146,23 @@ ROM_START( neptunp2 )
 	ROM_LOAD( "flash_roms", 0x00000, 0x10000, NO_DUMP )
 ROM_END
 
+ROM_START( rockroll ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was found with most sockets unpopulated. This is mechanical, no GFX but a Samsung VFD.
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "u2",   0x000000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "prg_data", 0 )
+	ROM_LOAD( "u3",   0x000000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "c.rock_n_roll_b-2103_6219_otp_b-82_m27c801.u14",  0x000000, 0x100000, CRC(963d184b) SHA1(8ad8b3215d3fc513dfae27bea2ed2ae9939c0f02) )
+	ROM_LOAD( "u15",  0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16b.u10",  0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat_563_tibpal16l8-25cn.bin",  0x000, 0x104, NO_DUMP )
+ROM_END
 
 GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, rockroll,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Rock 'n' Roll", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // year taken from parts' manual and sticker on PCB

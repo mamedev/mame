@@ -17870,7 +17870,7 @@ jubileep                        //
 juicebox                        //
 
 @source:juku.cpp
-juku                        	//
+juku                            //
 
 @source:jungleyo.cpp
 jungleyo
@@ -30693,6 +30693,7 @@ npusagif                        //
 
 @source:neptunp2.cpp
 neptunp2                        //
+rockroll                        //
 
 @source:nes.cpp
 iq501                           // Micro Genius IQ-501
