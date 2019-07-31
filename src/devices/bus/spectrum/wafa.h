@@ -1,31 +1,33 @@
 // license:BSD-3-Clause
-// copyright-holders:Nigel Barnes
+// copyright-holders:David Haywood
 /**********************************************************************
 
-    ZX Interface 1
+    Rotronics Wafadrive
 
 **********************************************************************/
 
-
-#ifndef MAME_BUS_SPECTRUM_INTF1_H
-#define MAME_BUS_SPECTRUM_INTF1_H
+#ifndef MAME_BUS_SPECTRUM_WAFA_H
+#define MAME_BUS_SPECTRUM_WAFA_H
 
 #include "exp.h"
-#include "bus/rs232/rs232.h"
-#include "imagedev/microdrv.h"
+#include "imagedev/wafadrive.h"
+
 #include "softlist.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class spectrum_intf1_device:
+class spectrum_wafa_device:
 	public device_t,
 	public device_spectrum_expansion_interface
 {
 public:
 	// construction/destruction
-	spectrum_intf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_wafa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK | feature::LAN; }
 
@@ -47,17 +49,16 @@ protected:
 
 private:
 	required_device<spectrum_expansion_slot_device> m_exp;
-	required_device<rs232_port_device> m_rs232;
-	required_device<microdrive_image_device> m_mdv1;
-	required_device<microdrive_image_device> m_mdv2;
 	required_memory_region m_rom;
+	required_device<wafadrive_image_device> m_wafa1;
+	required_device<wafadrive_image_device> m_wafa2;
 
 	int m_romcs;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(SPECTRUM_INTF1, spectrum_intf1_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_WAFA, spectrum_wafa_device)
 
 
-#endif /* MAME_BUS_SPECTRUM_INTF1_H */
+#endif /* MAME_BUS_SPECTRUM_WAFA_H */

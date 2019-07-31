@@ -53,6 +53,8 @@ void spectrum_intf1_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+
+	SOFTWARE_LIST(config, "microdrive_list").set_original("spectrum_microdrive");
 }
 
 const tiny_rom_entry *spectrum_intf1_device::device_rom_region() const
@@ -162,10 +164,45 @@ void spectrum_intf1_device::mreq_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_intf1_device::iorq_r(offs_t offset)
 {
-	return m_exp->iorq_r(offset);
+	uint8_t data = 0xff;
+
+	if ((offset & 0x18) != 0x18)
+	{
+		switch (offset & 0x18)
+		{
+		case 0x00:
+			logerror("%s: iorq_r (microdrive) %04x\n", machine().describe_context(), offset);
+			break;
+		case 0x08:
+			logerror("%s: iorq_r (control) %04x\n", machine().describe_context(), offset);
+			break;
+		case 0x10:
+			logerror("%s: iorq_r (network) %04x\n", machine().describe_context(), offset);
+			break;
+		}
+	}
+
+	data &= m_exp->iorq_r(offset);
+	return data;
 }
 
 void spectrum_intf1_device::iorq_w(offs_t offset, uint8_t data)
 {
+	if ((offset & 0x18) != 0x18)
+	{
+		switch (offset & 0x18)
+		{
+		case 0x00:
+			logerror("%s: iorq_w (microdrive) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		case 0x08:
+			logerror("%s: iorq_w (control) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		case 0x10:
+			logerror("%s: iorq_w (network) %04x: %02x\n", machine().describe_context(), offset, data);
+			break;
+		}
+	}
+
 	m_exp->iorq_w(offset, data);
 }
