@@ -27,7 +27,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SPECTRUM_WAFA, spectrum_wafa_device, "wafadrive", "Rotronics Wafadrive")
+DEFINE_DEVICE_TYPE(SPECTRUM_WAFA, spectrum_wafa_device, "spectrum_wafa", "Rotronics Wafadrive")
 
 
 //-------------------------------------------------
