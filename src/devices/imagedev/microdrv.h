@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_MICRODRV_H
-#define MAME_MACHINE_MICRODRV_H
+#ifndef MAME_DEVICES_IMAGEDEV_MICRODRV_H
+#define MAME_DEVICES_IMAGEDEV_MICRODRV_H
 
 #pragma once
 
@@ -35,7 +35,7 @@ class microdrive_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~microdrive_image_device();
 
 	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }
@@ -45,7 +45,7 @@ public:
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CASSETTE; }
+	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
 
 	virtual bool is_readable()  const override { return 1; }
 	virtual bool is_writeable() const override { return 1; }
@@ -91,4 +91,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MICRODRIVE, microdrive_image_device)
 
-#endif // MAME_MACHINE_MICRODRV_H
+#endif // MAME_DEVICES_IMAGEDEV_MICRODRV_H

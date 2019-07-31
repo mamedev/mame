@@ -45,9 +45,9 @@ void spectrum_intf1_device::device_add_mconfig(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	/* microdrive */
-	MICRODRIVE(config, m_mdv1, 0);
+	MICRODRIVE(config, m_mdv1);
 	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
-	MICRODRIVE(config, m_mdv2, 0);
+	MICRODRIVE(config, m_mdv2);
 
 	/* passthru */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);

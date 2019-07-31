@@ -12,7 +12,7 @@
 
 #include "exp.h"
 #include "bus/rs232/rs232.h"
-#include "machine/microdrv.h"
+#include "imagedev/microdrv.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
