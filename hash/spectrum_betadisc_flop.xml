@@ -13,7 +13,7 @@
 		<publisher>SaNchez</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="MFF_v1.2.trd" size="655360" crc="d44fdace" sha1="97b5d14999e8a9372083e5f769e685c437f4caaf" />
+				<rom name="mff_v1.2.trd" size="655360" crc="d44fdace" sha1="97b5d14999e8a9372083e5f769e685c437f4caaf" />
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 		<publisher>SaNchez</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="MFF_v1.1.trd" size="655360" crc="71164ace" sha1="3bcd687d24551979567d6d4cd51e94490f4f86d0" />
+				<rom name="mff_v1.1.trd" size="655360" crc="71164ace" sha1="3bcd687d24551979567d6d4cd51e94490f4f86d0" />
 			</dataarea>
 		</part>
 	</software>
@@ -35,7 +35,7 @@
 		<publisher>SaNchez</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="MFF_v1.0.trd" size="655360" crc="6b8a67db" sha1="423a7777fd8f97584dccd55114d0e2284c2a84e8" />
+				<rom name="mff_v1.0.trd" size="655360" crc="6b8a67db" sha1="423a7777fd8f97584dccd55114d0e2284c2a84e8" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,10 +46,9 @@
 		<publisher>hack</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="MFFWALLY.trd" size="655360" crc="d8515942" sha1="2080ea5f529a0badc0208275fef0fd09aa0b9546" />
+				<rom name="mffwally.trd" size="655360" crc="d8515942" sha1="2080ea5f529a0badc0208275fef0fd09aa0b9546" />
 			</dataarea>
 		</part>
 	</software>
 
-	
 </softwarelist>
