@@ -4,8 +4,6 @@
 
 	Juku E5101
 
-	Skeleton driver
-
 	Hardware:
 	- КР580ВМ80A
 	- КР580ИР82
@@ -21,10 +19,12 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -37,7 +37,10 @@ public:
 	juku_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_bank(*this, "bank"),
 		m_pic(*this, "pic"),
+		m_pit(*this, "pit%u", 0U),
+		m_pio(*this, "pio%u", 0U),
 		m_sio(*this, "sio%u", 0U)
 	{ }
 
@@ -49,11 +52,21 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_bank;
 	required_device<pic8259_device> m_pic;
+	required_device_array<pit8253_device, 3> m_pit;
+	required_device_array<i8255_device, 2> m_pio;
 	required_device_array<i8251_device, 2> m_sio;
 
 	void mem_map(address_map &map);
+	void bank_map(address_map &map);
 	void io_map(address_map &map);
+
+	void pio0_portc_w(uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	std::unique_ptr<uint8_t[]> m_ram;
 };
 
 
@@ -63,19 +76,35 @@ private:
 
 void juku_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
-	map(0xd000, 0xffff).ram();
+	map(0x0000, 0xffff).m(m_bank, FUNC(address_map_bank_device::amap8));
+}
+
+void juku_state::bank_map(address_map &map)
+{
+	// memory mode 0
+	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x04000, 0x0ffff).bankrw("ram_4000");
+	// memory mode 1
+	map(0x10000, 0x1ffff).bankrw("ram_0000");
+	map(0x1d800, 0x1ffff).bankr("rom_d800");
+	// memory mode 2
+	map(0x20000, 0x23fff).bankrw("ram_0000");
+	map(0x24000, 0x2bfff).noprw(); // extension
+	map(0x2c000, 0x2ffff).bankrw("ram_c000");
+	map(0x2d800, 0x2ffff).bankr("rom_d800");
+	// memory mode 3
+	map(0x30000, 0x3ffff).bankrw("ram_0000");
 }
 
 void juku_state::io_map(address_map &map)
 {
-	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x04, 0x07).rw("pio0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x00, 0x01).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x04, 0x07).rw(m_pio[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw(m_sio[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x0c, 0x0f).rw("pio1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x10, 0x13).rw("pit0", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x14, 0x17).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x18, 0x1b).rw("pit2", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0c, 0x0f).rw(m_pio[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw(m_pit[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x14, 0x17).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x18, 0x1b).rw(m_pit[2], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x1c, 0x1f).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
@@ -89,15 +118,42 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
+//  VIDEO
+//**************************************************************************
+
+uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 240; y++)
+		for (int x = 0; x < 320; x++)
+			bitmap.pix32(y, x) = BIT(m_ram[0xd800 + (y * (320 / 8) + x / 8)], 7 - (x % 8)) ? rgb_t::white() : rgb_t::black();
+
+	return 0;
+}
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
+void juku_state::pio0_portc_w(uint8_t data)
+{
+	m_bank->set_bank(data & 0x03);
+}
+
 void juku_state::machine_start()
 {
+	m_ram = std::make_unique<uint8_t[]>(0x10000);
+
+	membank("rom_d800")->set_base(memregion("maincpu")->base() + 0x1800);
+
+	membank("ram_0000")->set_base(&m_ram[0x0000]);
+	membank("ram_4000")->set_base(&m_ram[0x4000]);
+	membank("ram_c000")->set_base(&m_ram[0xc000]);
 }
 
 void juku_state::machine_reset()
 {
+	m_bank->set_bank(0);
 }
 
 
@@ -111,25 +167,40 @@ void juku_state::juku(machine_config &config)
 	I8080A(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &juku_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &juku_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+
+	ADDRESS_MAP_BANK(config, m_bank);
+	m_bank->set_map(&juku_state::bank_map);
+	m_bank->set_data_width(8);
+	m_bank->set_addr_width(18);
+	m_bank->set_stride(0x10000);
 
 	// КР580ВН59
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// КР580ВИ53
-	PIT8253(config, "pit0", 0);
+	PIT8253(config, m_pit[0], 0);
+	m_pit[0]->set_clk<0>(16_MHz_XTAL/16);
+	m_pit[0]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_clk0));
+	m_pit[0]->set_clk<1>(16_MHz_XTAL/16);
+	m_pit[0]->set_clk<2>(16_MHz_XTAL/16);
+	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1));
+	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
 	// КР580ВИ53
-	PIT8253(config, "pit1", 0);
+	PIT8253(config, m_pit[1], 0);
+	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
 	// КР580ВИ53
-	PIT8253(config, "pit2", 0);
+	PIT8253(config, m_pit[2], 0);
 
 	// КР580ВВ55A
-	I8255A(config, "pio0");
+	I8255A(config, m_pio[0]);
+	m_pio[0]->out_pc_callback().set(FUNC(juku_state::pio0_portc_w));
 
 	// КР580ВВ55A
-	I8255A(config, "pio1");
+	I8255A(config, m_pio[1]);
 
 	// КР580ВВ51A
 	I8251(config, m_sio[0], 0);
@@ -140,6 +211,13 @@ void juku_state::juku(machine_config &config)
 	I8251(config, m_sio[1], 0);
 	m_sio[1]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir0_w));
 	m_sio[1]->txrdy_handler().set("pic", FUNC(pic8259_device::ir1_w));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 319, 0, 239);
+	screen.set_screen_update(FUNC(juku_state::screen_update));
 }
 
 
@@ -165,4 +243,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY   FULLNAME      FLAGS
-COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "Estron", "Juku E5101", MACHINE_IS_SKELETON )
+COMP( 1988, juku, 0,      0,      juku,    juku,  juku_state, empty_init, "Estron", "Juku E5101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
