@@ -227,8 +227,6 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_fdc_w )
 	// TODO Does access to the dmaf2 fdc also trigger the motor timer.
 	floppy_motor_trigger();
 
-	// TODO how does the DMAF2 use the FDC SSO output?
-
 	if (offset == 0) {
 		validate_floppy_side(data);
 		data = validate_fdc_sector_size(data);
@@ -237,24 +235,37 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_fdc_w )
 	m_fdc->fd1797_device::write(offset, data);
 }
 
-/* DMAF2 dma extended address register */
+/* DMAF2 dma extended address register latch. */
+
 READ8_MEMBER ( swtpc09_state::dmaf2_dma_address_reg_r )
 {
-	return m_fdc_dma_address_reg;
+	// This does not appear to be readable.
+	logerror("%s Unexpected read of DMAF2 DMA address reg\n", machine().describe_context());
+	return 0x00;
 }
 
 WRITE8_MEMBER ( swtpc09_state::dmaf2_dma_address_reg_w )
 {
-	m_fdc_dma_address_reg = data;
+	// This latch appears to be write-only, there is no reader function.
+	// The DMAF2 has a single latch for the high address bits, so it would
+	// appear to apply for all DMA channels. These outputs are inverted
+	// which cancels the inversion of the data lines.
+	m_dmaf_high_address[0] = data & 0x0f;
+	m_dmaf_high_address[1] = data & 0x0f;
+	m_dmaf_high_address[2] = data & 0x0f;
+	m_dmaf_high_address[3] = data & 0x0f;
 
 	// bit 4 controls a gate enable/disable for DMAF2 fdc irq line
-	if ((m_fdc_dma_address_reg & 0x10) && (m_system_type == UNIFLEX_DMAF2 || m_system_type == FLEX_DMAF2))
+	m_dmaf2_interrupt_enable = !BIT(data, 4);
+	if (!m_dmaf2_interrupt_enable)
 		swtpc09_irq_handler(FDC_IRQ, CLEAR_LINE); //then clear the irq to cpu
 }
 
 /* DMAF2 fdc control register */
 READ8_MEMBER ( swtpc09_state::dmaf2_control_reg_r )
 {
+	// TODO is this readable?
+	logerror("%s Unexpected read from DMAF2 control reg\n", machine().describe_context());
 	return m_fdc_status;
 }
 
@@ -262,69 +273,31 @@ WRITE8_MEMBER ( swtpc09_state::dmaf2_control_reg_w )
 {
 	floppy_image_device *floppy = nullptr;
 
-	// TODO what to do if multiple drives are selected?
-	if (!BIT(data, 0) + !BIT(data, 1) + !BIT(data, 2) + !BIT(data, 3) > 1)
-	{
-		logerror("%s Unexpected DMAF2 has multiple drives selected: %d %d %d %d\n", machine().describe_context(), !BIT(data, 0), !BIT(data, 1), !BIT(data, 2), !BIT(data, 3));
-	}
+	// The DMAF2 data lines are inverted.
+	data = ~data & 0xff;
 
-	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (!BIT(data, 2)) floppy = m_floppy2->get_device();
-	if (!BIT(data, 3)) floppy = m_floppy3->get_device();
+	// TODO what to do if multiple drives are selected?
+	if (BIT(data, 0) + BIT(data, 1) + BIT(data, 2) + BIT(data, 3) > 1)
+		logerror("%s Unexpected DMAF2 has multiple drives selected: %d %d %d %d\n", machine().describe_context(), BIT(data, 0), BIT(data, 1), BIT(data, 2), BIT(data, 3));
+
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
 
 	m_fdc->set_floppy(floppy);
 	m_fdc_floppy = floppy;
 
 	if (floppy)
 	{
-		uint8_t side = !BIT(data, 4);
+		uint8_t side = BIT(data, 4);
 		floppy->ss_w(side);
 		m_fdc_side = side;
 	}
 
-	uint8_t dden = !BIT(data, 5);
+	uint8_t dden = BIT(data, 5);
 	dden = validate_fdc_dden(dden);
 	m_fdc->dden_w(dden);
-}
-
-/* FDC controller dma transfer */
-void swtpc09_state::swtpc09_fdc_dma_transfer()
-{
-	uint32_t offset;
-	address_space &space = *m_banked_space;
-
-	offset = (m_fdc_dma_address_reg & 0x0f)<<16;
-
-	if (m_m6844_channel[0].active == 1)  //active dma transfer
-	{
-		if (!(m_m6844_channel[0].control & 0x01))  // dma write to memory
-		{
-			uint8_t data = m_fdc->data_r();
-
-			space.write_byte(m_m6844_channel[0].address + offset, data);
-		}
-		else
-		{
-			uint8_t data = space.read_byte(m_m6844_channel[0].address + offset);
-
-			m_fdc->data_w(data);
-		}
-
-		m_m6844_channel[0].address++;
-		m_m6844_channel[0].counter--;
-
-		if (m_m6844_channel[0].counter == 0)    // dma transfer has finished
-		{
-			m_m6844_channel[0].control |= 0x80; // set dend flag
-			if (m_m6844_interrupt & 0x01)       // interrupt for channel 0 is enabled?
-			{
-				m_m6844_interrupt   |= 0x80;      // set bit 7 to indicate active interrupt
-				swtpc09_irq_handler(DMAC_IRQ, ASSERT_LINE);
-			}
-		}
-	}
-
 }
 
 /* common interrupt handler */
@@ -356,22 +329,26 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 /* handlers for fdc */
 WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 {
-	if ( m_system_type == UNIFLEX_DMAF3 )  //IRQ from 1791 is connect into VIA ca2
+	if ( m_system_type == UNIFLEX_DMAF3 )
 	{
+		// IRQ from 1791 is connected into VIA CB2 inverted, and
+		// connected to VIA port B bit 2 without inversion.
 		if (state)
 		{
 			m_fdc_status |= 0x40;
-			m_via->write_cb2(0);     //fdc interrupt is connected to CA1
-			m_dmaf3_via_porta &= 0xfb; //clear pa3
-			//m_via->write_porta(m_dmaf3_via_porta);     //and connected to PA3
+			//m_via->write_cb2(0);
+			m_via_cb2->in_w<0>(0);
+			m_dmaf3_via_portb |= 0x04;
+			//m_via->write_portb(m_dmaf3_via_portb);
 			//swtpc09_irq_handler(FDC_IRQ, ASSERT_LINE);
 		}
 		else
 		{
 			m_fdc_status &= ~0x40;
-			m_via->write_cb2(1);
-			m_dmaf3_via_porta |= 0x04;  //and connected to PA3
-			//m_via->write_porta(m_dmaf3_via_porta);     //and connected to PA3
+			//m_via->write_cb2(1);
+			m_via_cb2->in_w<0>(1);
+			m_dmaf3_via_portb &= 0xfb;
+			//m_via->write_portb(m_dmaf3_via_portb);
 			//swtpc09_irq_handler(FDC_IRQ, CLEAR_LINE);
 		}
 	}
@@ -380,7 +357,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 		if (state)
 		{
 			m_fdc_status |= 0x40;
-			if (!(m_fdc_dma_address_reg & 0x10))  // is dmaf2 fdc irq enabled
+			if (m_dmaf2_interrupt_enable)
 			{
 				swtpc09_irq_handler(FDC_IRQ, ASSERT_LINE);
 			}
@@ -388,7 +365,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 		else
 		{
 			m_fdc_status &= ~0x40;
-			if (!(m_fdc_dma_address_reg & 0x10)) // is dmaf2 fdc irq enabled
+			if (m_dmaf2_interrupt_enable)
 			{
 				swtpc09_irq_handler(FDC_IRQ, CLEAR_LINE);
 			}
@@ -401,7 +378,9 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
 	if (state)
 	{
 		m_fdc_status |= 0x80;
-		swtpc09_fdc_dma_transfer();
+		// The DMAF2 schematic shows an input to two pins on the 6844,
+		// it might also trigger channel 1.
+		m6844_fdc_dma_transfer(0);
 	}
 	else
 		m_fdc_status &= 0x7f;
@@ -409,7 +388,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
 
 WRITE_LINE_MEMBER( swtpc09_state::fdc_sso_w )
 {
-	// Doese the DMAF2 or DMAF3 use the SSO output?
+	// The DMAF2 and DMAF3 do not appear to use a SSO output?
 }
 
 /*********************************************************************/
@@ -445,12 +424,28 @@ READ8_MEMBER( swtpc09_state::dmaf3_via_read_porta )
 
 READ8_MEMBER( swtpc09_state::dmaf3_via_read_portb )
 {
-	return 0xff;
+	// Bit 0 - output ?
+	// Bit 1 - output, tape drive request strobe.
+	// Bit 2 - input, WD1791 FDC interrupt.
+	// Bit 3 - input ?
+	// Bit 4 - input, tape drive ready
+	// Bit 5 - input, tape drive exception, timer 2.
+	// Bit 6 - input ?
+	// Bit 7 - output, UniFLEX configures a timer to toggle this output.
+
+	// Set the tape drive exception bit to avoid detection, otherwise
+	// UniFLEX gets stuck in a loop trying to open the archive driver.
+	return m_dmaf3_via_portb | 0x20;
 }
 
 WRITE8_MEMBER( swtpc09_state::dmaf3_via_write_porta )
 {
 	m_dmaf3_via_porta &= data;
+}
+
+WRITE8_MEMBER( swtpc09_state::dmaf3_via_write_portb )
+{
+	m_dmaf3_via_portb &= data;
 }
 
 //WRITE_LINE_MEMBER( swtpc09_state::dmaf3_via_write_ca1 )
@@ -471,17 +466,28 @@ WRITE_LINE_MEMBER( swtpc09_state::dmaf3_via_irq )
 /* DMAF3 dma extended address register */
 READ8_MEMBER ( swtpc09_state::dmaf3_dma_address_reg_r )
 {
-	return m_fdc_dma_address_reg;
+	// TODO is this readable?
+	logerror("%s Unexpected read of DMAF3 DMA address reg\n", machine().describe_context());
+	return 0x00;
 }
 
 WRITE8_MEMBER ( swtpc09_state::dmaf3_dma_address_reg_w )
 {
-	m_fdc_dma_address_reg = data;
+	// Based on source code comments it appears that there are four high
+	// address latches, one for each DMA channel. TODO check hardware or a
+	// schematic.
+	uint8_t channel = (data & 0x30) >> 4;
+	m_dmaf_high_address[channel] = data & 0x0f;
+
+	// Bit 6 controls the 'archive edge select'.
+	// Bit 7 controls the DMA halt versus bus-req mode.
 }
 
 /* DMAF3 fdc control register */
 READ8_MEMBER ( swtpc09_state::dmaf3_control_reg_r )
 {
+	// TODO is this readable?
+	logerror("%s Unexpected read from DMAF3 control reg\n", machine().describe_context());
 	return m_fdc_status;
 }
 
@@ -491,9 +497,7 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_control_reg_w )
 
 	// TODO multiple selected?
 	if (BIT(data, 0) + BIT(data, 1) + BIT(data, 2) + BIT(data, 3) > 1)
-	{
-		logerror("%s Unexpected DMAF3 has multiple drives selected: %d %d %d %d\n", machine().describe_context(), !BIT(data, 0), !BIT(data, 1), !BIT(data, 2), !BIT(data, 3));
-	}
+		logerror("%s Unexpected DMAF3 has multiple drives selected: %d %d %d %d\n", machine().describe_context(), BIT(data, 0), BIT(data, 1), BIT(data, 2), BIT(data, 3));
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -515,17 +519,74 @@ WRITE8_MEMBER ( swtpc09_state::dmaf3_control_reg_w )
 	m_fdc->dden_w(dden);
 }
 
-// DMAF3 WD1000
-// TODO. The following might help:
-// http://www.bitsavers.org/pdf/westernDigital/WD100x/WD1000_OEM_Manual.pdf
+// DMAF3 WD1000 hard disk controller.
 
-READ8_MEMBER( swtpc09_state::dmaf3_wd_r )
+WRITE_LINE_MEMBER( swtpc09_state::dmaf3_hdc_intrq_w )
 {
-	return 0x00;
+	// The IRQ from WD1000 is connected into VIA CB2 inverted, and perhaps
+	// connected to a VIA port B bit 3?
+	if (state)
+	{
+		m_via_cb2->in_w<1>(0);
+		//m_dmaf3_via_portb &= 0xf7;
+		//m_via->write_portb(m_dmaf3_via_portb);
+	}
+	else
+	{
+		m_via_cb2->in_w<1>(1);
+		//m_dmaf3_via_portb |= 0x08;
+		//m_via->write_portb(m_dmaf3_via_portb);
+	}
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmaf3_wd_w )
+WRITE_LINE_MEMBER( swtpc09_state::dmaf3_hdc_drq_w )
 {
+	if (state)
+		m6844_hdc_dma_transfer(1);
+}
+
+READ8_MEMBER( swtpc09_state::dmaf3_hdc_control_r )
+{
+	// TODO head load toggle?
+	return 0;
+}
+
+WRITE8_MEMBER ( swtpc09_state::dmaf3_hdc_control_w )
+{
+	// TODO head load toggle?
+}
+
+READ8_MEMBER( swtpc09_state::dmaf3_hdc_reset_r )
+{
+	// TODO reset?
+	return 0;
+}
+
+WRITE8_MEMBER ( swtpc09_state::dmaf3_hdc_reset_w )
+{
+	// TODO reset
+}
+
+READ8_MEMBER( swtpc09_state::dmaf3_archive_reset_r )
+{
+	// TODO
+	return 0;
+}
+
+WRITE8_MEMBER ( swtpc09_state::dmaf3_archive_reset_w )
+{
+	// TODO
+}
+
+READ8_MEMBER( swtpc09_state::dmaf3_archive_clear_r )
+{
+	// TODO
+	return 0;
+}
+
+WRITE8_MEMBER ( swtpc09_state::dmaf3_archive_clear_w )
+{
+	// TODO
 }
 
 
@@ -565,6 +626,110 @@ WRITE8_MEMBER(swtpc09_state::main_w)
 }
 
 /*  MC6844 DMA controller I/O */
+
+
+void swtpc09_state::m6844_update_interrupt()
+{
+	uint8_t interrupt = 0;
+
+	interrupt |= BIT(m_m6844_channel[0].control, 7) & BIT(m_m6844_interrupt, 0);
+	interrupt |= BIT(m_m6844_channel[1].control, 7) & BIT(m_m6844_interrupt, 1);
+	interrupt |= BIT(m_m6844_channel[2].control, 7) & BIT(m_m6844_interrupt, 2);
+	interrupt |= BIT(m_m6844_channel[3].control, 7) & BIT(m_m6844_interrupt, 3);
+
+	if (interrupt)
+	{
+		if (!(m_m6844_interrupt & 0x80))
+		{
+			// Set interrupt indication bit 7.
+			m_m6844_interrupt |= 0x80;
+			swtpc09_irq_handler(DMAC_IRQ, ASSERT_LINE);
+		}
+	}
+	else
+	{
+		if (m_m6844_interrupt & 0x80)
+		{
+			// Clear interrupt indication bit 7.
+			m_m6844_interrupt &= 0x7f;
+			swtpc09_irq_handler(DMAC_IRQ, CLEAR_LINE);
+		}
+	}
+}
+
+void swtpc09_state::m6844_fdc_dma_transfer(uint8_t channel)
+{
+	uint32_t offset;
+	address_space &space = *m_banked_space;
+
+	offset = m_dmaf_high_address[channel] << 16;
+
+	if (m_m6844_channel[channel].active == 1)  //active dma transfer
+	{
+		if (!(m_m6844_channel[channel].control & 0x01))  // dma write to memory
+		{
+			uint8_t data = m_fdc->data_r();
+
+			space.write_byte(m_m6844_channel[channel].address + offset, data);
+		}
+		else
+		{
+			uint8_t data = space.read_byte(m_m6844_channel[channel].address + offset);
+
+			m_fdc->data_w(data);
+		}
+
+		if (m_m6844_channel[channel].control & 0x08)
+			m_m6844_channel[channel].address--;
+		else
+			m_m6844_channel[channel].address++;
+
+		m_m6844_channel[channel].counter--;
+
+		if (m_m6844_channel[channel].counter == 0)    // dma transfer has finished
+		{
+			m_m6844_channel[channel].control |= 0x80; // set dend flag
+			m6844_update_interrupt();
+		}
+	}
+}
+
+void swtpc09_state::m6844_hdc_dma_transfer(uint8_t channel)
+{
+	uint32_t offset;
+	address_space &space = *m_banked_space;
+
+	offset = m_dmaf_high_address[channel] << 16;
+
+	if (m_m6844_channel[channel].active == 1)  //active dma transfer
+	{
+		if (!(m_m6844_channel[channel].control & 0x01))  // dma write to memory
+		{
+			uint8_t data = m_hdc->data_r();
+
+			space.write_byte(m_m6844_channel[channel].address + offset, data);
+		}
+		else
+		{
+			uint8_t data = space.read_byte(m_m6844_channel[channel].address + offset);
+
+			m_hdc->data_w(data);
+		}
+
+		if (m_m6844_channel[channel].control & 0x08)
+			m_m6844_channel[channel].address--;
+		else
+			m_m6844_channel[channel].address++;
+
+		m_m6844_channel[channel].counter--;
+
+		if (m_m6844_channel[channel].counter == 0)    // dma transfer has finished
+		{
+			m_m6844_channel[channel].control |= 0x80; // set dend flag
+			m6844_update_interrupt();
+		}
+	}
+}
 
 READ8_MEMBER( swtpc09_state::m6844_r )
 {
@@ -612,15 +777,13 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 		case 0x13:
 			result = m_m6844_channel[offset - 0x10].control;
 
-			/* a read here clears the DMA end flag */
+			// A read here clears the 'DMA end' flag of the
+			// associated channel.
 			if (!machine().side_effects_disabled())
 			{
 				m_m6844_channel[offset - 0x10].control &= ~0x80;
-				if (m_m6844_interrupt & 0x80) // if interrupt is active, then clear
-				{
-					swtpc09_irq_handler(0x01, CLEAR_LINE);
-					m_m6844_interrupt &= 0x7f;  // clear interrupt indication bit 7
-				}
+				if (m_m6844_interrupt & 0x80)
+					m6844_update_interrupt();
 			}
 			break;
 
@@ -742,6 +905,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 		/* interrupt control */
 		case 0x15:
 			m_m6844_interrupt = (m_m6844_interrupt & 0x80) | (data & 0x7f);
+			m6844_update_interrupt();
 			break;
 
 		/* chaining control */
@@ -774,6 +938,11 @@ void swtpc09_state::machine_reset()
 	uint8_t baud_rate_high = m_baud_rate_high->read();
 	m_brg->rsa_w(baud_rate_high);
 	m_brg->rsb_w(1);
+
+	m_pia->write_portb(0);
+	m_pia->cb1_w(0);
+	m_pia->ca2_w(0);
+	m_pia->cb2_w(0);
 
 	// Note UNIBUG has a smarter boot loader in ROM and will toggle the
 	// density on failure so this is not necessary for UniFLEX.
@@ -810,7 +979,12 @@ void swtpc09_state::machine_start()
 	m_fdc_side = 0;
 
 	// Start with the IRQ disabled?
-	m_fdc_dma_address_reg = 0x10;
+	m_dmaf2_interrupt_enable = 0;
+
+	m_dmaf_high_address[0] = 0;
+	m_dmaf_high_address[1] = 0;
+	m_dmaf_high_address[2] = 0;
+	m_dmaf_high_address[3] = 0;
 
 	m_floppy_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(swtpc09_state::floppy_motor_callback),this));
 	m_floppy_motor_on = 0;
@@ -845,6 +1019,7 @@ void swtpc09_state::init_swtpc09u()
 
 void swtpc09_state::init_swtpc09d3()
 {
-	m_via_ca1_input = 0;
 	m_system_type = UNIFLEX_DMAF3;
+	// UniFLEX numbers sectors from 1.
+	m_hdc->set_sector_base(1);
 }

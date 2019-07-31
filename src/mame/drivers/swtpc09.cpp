@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "includes/swtpc09.h"
 #include "bus/ss50/interface.h"
-#include "machine/input_merger.h"
 #include "formats/flex_dsk.h"
 #include "formats/uniflex_dsk.h"
 
@@ -49,7 +48,7 @@
  F000 - F01F  DMAF2 MC6844 DMAC
  F020 - F023  DMAF2 WD1791 FDC
  F024 - F03F  DMAF2 Drive select register
- F040 - F041  DMAF2 DMA Address register
+ F040 - F041  DMAF2 DMA Address register, and interrupt enable, latch.
 
  F800 - FFFF  ROM
  FFF0 - FFFF  DAT RAM (only for writes)
@@ -59,9 +58,17 @@
  F000 - F01F  DMAF3 MC6844 DMAC
  F020 - F023  DMAF3 WD1791 FDC
  F024 - F024  DMAF3 Drive select register
- F025 - F025  DMAF3 DMA Address register
- F030 - F03F  DMAF3 WD1000
- F040 - F04F  DMAF3 6522 VIA
+ F025 - F025  DMAF3 74LS374 latch for 4 extended address lines (bits 0-3), DMA.
+ F030 - F03F  DMAF3 HDC WD1000
+ F040 - F04F  DMAF3 VIA6522
+ F050 - F050  DMAF3 HDC head load toggle
+ F051 - F051  DMAF3 Winchester software reset
+ F052 - F052  DMAF3 Archive reset
+ F053 - F053  DMAF3 Archive clear
+ F060 - ????  DMAF3 archive DMA preset
+
+ F100 - ????  CDS disk 0 controller
+ F300 - ????  CDS disk 1 controller
 
 ***************************************************************************/
 
@@ -92,10 +99,12 @@ void swtpc09_state::flex_dmaf2_mem(address_map &map)
 	// MPID
 	map(0xfe080, 0xfe083).mirror(0xc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfe090, 0xfe097).mirror(0x8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+
 	// DMAF2
 	map(0xff000, 0xff01f).rw(FUNC(swtpc09_state::m6844_r), FUNC(swtpc09_state::m6844_w));
 	map(0xff020, 0xff023).rw(FUNC(swtpc09_state::dmaf2_fdc_r), FUNC(swtpc09_state::dmaf2_fdc_w));
 	map(0xff024, 0xff03f).rw(FUNC(swtpc09_state::dmaf2_control_reg_r), FUNC(swtpc09_state::dmaf2_control_reg_w));
+	map(0xff040, 0xff040).rw(FUNC(swtpc09_state::dmaf2_dma_address_reg_r), FUNC(swtpc09_state::dmaf2_dma_address_reg_w));
 
 	map(0xff800, 0xfffff).rom().region("bankdev", 0xff800);
 }
@@ -178,10 +187,12 @@ void swtpc09_state::uniflex_dmaf3_mem(address_map &map)
 	map(0xff020, 0xff023).rw(FUNC(swtpc09_state::dmaf3_fdc_r), FUNC(swtpc09_state::dmaf3_fdc_w));
 	map(0xff024, 0xff024).rw(FUNC(swtpc09_state::dmaf3_control_reg_r), FUNC(swtpc09_state::dmaf3_control_reg_w));
 	map(0xff025, 0xff025).rw(FUNC(swtpc09_state::dmaf3_dma_address_reg_r), FUNC(swtpc09_state::dmaf3_dma_address_reg_w));
+	map(0xff030, 0xff03f).rw(m_hdc, FUNC(wd1000_device::read), FUNC(wd1000_device::write));
 	map(0xff040, 0xff04f).m(m_via, FUNC(via6522_device::map));
-
-	// DMAF3 WD1000
-	map(0xff030, 0xff03f).rw(FUNC(swtpc09_state::dmaf3_wd_r), FUNC(swtpc09_state::dmaf3_wd_w));
+	map(0xff050, 0xff050).rw(FUNC(swtpc09_state::dmaf3_hdc_control_r), FUNC(swtpc09_state::dmaf3_hdc_control_w));
+	map(0xff051, 0xff051).rw(FUNC(swtpc09_state::dmaf3_hdc_reset_r), FUNC(swtpc09_state::dmaf3_hdc_reset_w));
+	map(0xff052, 0xff052).rw(FUNC(swtpc09_state::dmaf3_archive_reset_r), FUNC(swtpc09_state::dmaf3_archive_reset_w));
+	map(0xff053, 0xff053).rw(FUNC(swtpc09_state::dmaf3_archive_clear_r), FUNC(swtpc09_state::dmaf3_archive_clear_w));
 
 	map(0xff800, 0xfffff).rom().region("bankdev", 0xff800);
 }
@@ -506,12 +517,25 @@ void swtpc09_state::swtpc09d3(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(swtpc09_state::fdc_drq_w));
 	m_fdc->sso_wr_callback().set(FUNC(swtpc09_state::fdc_sso_w));
 
+	// Hard disk
+	WD1000(config, m_hdc, 5_MHz_XTAL);
+	m_hdc->intrq_wr_callback().set(FUNC(swtpc09_state::dmaf3_hdc_intrq_w));
+	m_hdc->drq_wr_callback().set(FUNC(swtpc09_state::dmaf3_hdc_drq_w));
+	HARDDISK(config, "hdc:0", 0);
+	HARDDISK(config, "hdc:1", 0);
+	HARDDISK(config, "hdc:2", 0);
+	HARDDISK(config, "hdc:3", 0);
+
 	via6522_device &via(VIA6522(config, "via", 4_MHz_XTAL / 4));
 	via.readpa_handler().set(FUNC(swtpc09_state::dmaf3_via_read_porta));
 	via.readpb_handler().set(FUNC(swtpc09_state::dmaf3_via_read_portb));
 	via.writepa_handler().set(FUNC(swtpc09_state::dmaf3_via_write_porta));
+	via.writepb_handler().set(FUNC(swtpc09_state::dmaf3_via_write_portb));
 	//via.ca1_handler().set(FUNC(swtpc09_state::dmaf3_via_write_ca1));
 	via.irq_handler().set(FUNC(swtpc09_state::dmaf3_via_irq));
+
+	INPUT_MERGER_ALL_HIGH(config, "via_cb2").output_handler().set(m_via, FUNC(via6522_device::write_cb2));
+
 }
 
 
