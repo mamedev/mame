@@ -53,7 +53,7 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return "ql_cass"; }
-	virtual const char *file_extensions() const override { return "mdv"; }
+	virtual const char *file_extensions() const override { return "mdv,mdr"; }
 
 	// specific implementation
 	DECLARE_WRITE_LINE_MEMBER( clk_w );

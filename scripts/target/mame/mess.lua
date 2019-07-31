@@ -3260,6 +3260,8 @@ files {
 	MAME_DIR .. "src/mame/video/zx8301.h",
 	MAME_DIR .. "src/mame/machine/zx8302.cpp",
 	MAME_DIR .. "src/mame/machine/zx8302.h",
+	MAME_DIR .. "src/mame/machine/wafadrive.cpp",
+	MAME_DIR .. "src/mame/machine/wafadrive.h",
 }
 
 createMESSProjects(_target, _subtarget, "siemens")
