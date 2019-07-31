@@ -79,6 +79,7 @@ using util::BIT;
 #include "cpu/m6502/m65c02d.h"
 #include "cpu/m6502/m65ce02d.h"
 #include "cpu/m6502/m740d.h"
+#include "cpu/m6502/r65c02d.h"
 #include "cpu/m6502/xavixd.h"
 #include "cpu/m6502/xavix2000d.h"
 #include "cpu/m6800/6800dasm.h"
@@ -443,6 +444,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
+	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "rii",             le, -1, []() -> util::disasm_interface * { return new riscii_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "s2650",           le,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
