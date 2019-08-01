@@ -88,7 +88,7 @@ Unidesa Cirsa Multi Points
  
 P4, P8, P13, P15, P16 and P19 are unused.
 
-Some service manuals contains the comlpete PCB schematics (e.g., see the "Manual Técnico Cirsa Vulcano" PDF).
+Some service manuals contains the complete PCB schematics (e.g., see the "Manual Técnico Cirsa Vulcano" PDF).
 
 */
 
