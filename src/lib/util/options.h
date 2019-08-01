@@ -148,9 +148,9 @@ public:
 	// construction/destruction
 	core_options();
 	core_options(const core_options &) = delete;
-	core_options(core_options &&) = delete;
+	core_options(core_options &&) = default;
 	core_options& operator=(const core_options &) = delete;
-	core_options& operator=(core_options &&) = delete;
+	core_options& operator=(core_options &&) = default;
 	virtual ~core_options();
 
 	// getters
