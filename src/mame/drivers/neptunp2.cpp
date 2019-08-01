@@ -6,8 +6,91 @@
 
     skeleton driver, can't do much without gfx roms anyway.
 
-***************************************************************************/
+****************************************************************************
 
+The "960606-5" PCB (found on the "rockroll" set) is used at least on the following games:
+
+Unidesa Cirsa Millenium
+Unidesa Cirsa Euro Lucky
+Unidesa Cirsa Rock 'n' Roll
+Unidesa Cirsa Max Money
+Unidesa Cirsa Vikingos
+Unidesa Cirsa Mini Joker
+Unidesa Cirsa Far West
+Unidesa Cirsa Saloon
+Unidesa Cirsa Blue Swamp Land
+Unidesa Cirsa Vulcano
+Unidesa Cirsa Euro Bingo 7 (1000)
+Unidesa Cirsa Euro Bingo 7
+Unidesa Cirsa Gladiadores
+Unidesa Cirsa Nevada
+Unidesa Cirsa Monsters Manía
+Unidesa Cirsa Mini Guay Plus
+Unidesa Cirsa Perla del Caribe
+Unidesa Cirsa Super Sevens
+Unidesa Cirsa Legend
+Unidesa Cirsa Dinopolis
+Unidesa Cirsa Megatron
+Unidesa Cirsa Megatron Salon
+Unidesa Cirsa Extra Cash
+Unidesa Cirsa Mini Genio
+Unidesa Cirsa Las Llaves del Tesoro
+Unidesa Cirsa Secreto de la Pirámide
+Unidesa Cirsa Filón
+Unidesa Cirsa Multi Points
+
+ CIRSA / UNIDESA 960606-5 CPU BOARD
+ _________________________________________________________________
+ |        ________                                                |
+ |__      |ULN2003|                                   ____        |
+ || |__ _  __________________                         X9313       |
+ ||P||P||| |OTP 27C8000 or  |   _______    ________               |
+ ||1||1||| |27C4001_-_SOUND_|   |OKI   |   |S1 DIPS|              |
+ || ||5|P9 __________________   |MSM6376   |_______|  _________   |
+ ||_||_|   |    27C8000 or  |   |______|   _________  PAT063/31 (PAL16L8)
+ |         |27C4001_-_SOUND_|              |S2 DIPS|              |
+ |__                                                              |
+ ||P|      __________________  __________________    ____    BATT |
+ ||7|      |27C801 or       |  |RAM MS62256-79  |    8583P   3V6  |
+ ||_|      |27C4001_________|  |________________|           179mAh|
+ |__       __________________  __________________                 |
+ ||P|__    |27C801 or       |  |MS628512        |    ____         |
+ ||1||P|   |27C4001_________|  |NOT_POPULATED___|   X24C16        |
+ ||1||18              _______                                     |
+ || |__               |CPLD |    ________    ____________         |
+ ||_||P|              |PD18 |    | 75189 |   | CIRSA     |     __ |
+ |   |17              |_____|  NOT POPULATED | 38302 or  |     |P||
+ |   |_|     XTAL 36.8640MHz     ________    | 38304     |     |2||
+ |__                             | 75188 |   |           |     | ||
+ ||P|      ___________         NOT POPULATED |___________|     | ||
+ ||3|      |CPU       |      ________          ________   ____ |_||
+ ||_|      |80C188XL  |      |7407___|         |7406___| LM393    |
+ |         |          |      ________          ________           |
+ |__       |          |      |74HC14_|         |74HC00_|          |
+ ||P|      |__________|      ________          ________           |
+ ||8|        ________        |74HC14_|         |74HC14_|          |
+ || |        |74HC14_|       ________                             |
+ || |      ____________      |74HCT08|       ____________         |
+ ||_| __   | CIRSA     |     ________        | CIRSA     |        |
+ |    |P|  | 38302 or  |     |74HCT14|       | 38302 or  |        |
+ |__  |1|  | 38304     |     ________        | 38304     |        |
+ ||P| |3|  | MASTER    |     |74HCT14|       |           |        |
+ ||5| __   |___________|                     |___________|        |
+ || | |P|                                                         |
+ || | |4|    ________        ________           ________          |
+ ||_| | |    |ULN2064        |ULN2064           |74LS145 <- NOT POPULATED
+ |    | |    ________        ________         __________          |
+ |    | |    |ULN2064        |ULN2064         |UDN2580A| <- NOT POPULATED
+ |    |_|   __________       ________         __________          |
+ |          |___P14___|      |ULN2064         |_ARRAY__| <- NOT POPULATED
+ |                          NOT POPULATED                 ______  |
+ |_________________________________________________________P19____|
+ 
+P4, P8, P13, P15, P16 and P19 are unused.
+
+Some service manuals contains the comlpete PCB schematics (e.g., see the "Manual Técnico Cirsa Vulcano" PDF).
+
+*/
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
@@ -161,7 +244,7 @@ ROM_START( rockroll ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was 
 	ROM_LOAD( "24lc16b.u10",  0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_563_tibpal16l8-25cn.bin",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pat_063_tibpal16l8-25cn.bin",  0x000, 0x104, NO_DUMP )
 ROM_END
 
 GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
