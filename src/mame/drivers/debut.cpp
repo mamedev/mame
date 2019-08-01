@@ -17,7 +17,7 @@ TODO:
 Hardware notes:
 - КР1810ВМ86 (i8086 clone), 16200K XTAL
 - КР1810ГФ84 (i8284 clock divider /3)
-- 2*КР537РУ10 (2KB*8 RAM), 2*8KB ROM
+- 2*КР537РУ10 (2KB*8 RAM), 2*КС573РФ4А or similar (8KB ROM)
 - lcd panel (4 7seg digits), 64 chessboard buttons, 16 leds
 
 A bit more detailed, list of other Soviet standard TTL chips used and their equivalents:
