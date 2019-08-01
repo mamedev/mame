@@ -474,5 +474,5 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY          FULLNAME        FLAGS
 COMP( 1979, mt65,     0,      0,      mt65,     microtan, microtan_state, init_microtan, "Tangerine",     "Microtan 65",            MACHINE_NO_SOUND_HW )
 COMP( 1980, micron,   mt65,   0,      micron,   microtan, microtan_state, init_microtan, "Tangerine",     "Micron",                 MACHINE_NO_SOUND_HW )
-COMP( 1980, spinveti, mt65,   0,      spinveti, spinveti, microtan_state, init_gfx2,     "Tangerine/ETI", "Space Invasion (ETI)",   MACHINE_NO_SOUND )
+COMP( 1980, spinveti, 0,      0,      spinveti, spinveti, microtan_state, init_gfx2,     "Tangerine/ETI", "Space Invasion (ETI)",   MACHINE_NO_SOUND )
 COMP( 1984, mt6809,   mt65,   0,      mt6809,   microtan, mt6809_state,   empty_init,    "Tangerine",     "Microtan 6809 System",   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
