@@ -98,8 +98,8 @@ void powerins_state::powerins_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-//  AM_RANGE(0xe000, 0xe000) AM_WRITENOP // ? written only once ?
-//  AM_RANGE(0xe001, 0xe001) AM_WRITENOP // ?
+//  map(0xe000, 0xe000).nopw(); // ? written only once ?
+//  map(0xe001, 0xe001).nopw(); // ?
 }
 
 void powerins_state::powerins_sound_io_map(address_map &map)
@@ -262,6 +262,11 @@ static GFXDECODE_START( gfx_powerins )
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4,       0x400, 0x40 ) // [2] Sprites
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_powerinsc )
+	GFXDECODE_ENTRY( "gfx1", 0,        layout_16x16x4,       0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( "gfx1", 0x280000, gfx_8x8x4_packed_msb, 0x200, 0x10 ) // [1] Tiles
+	GFXDECODE_ENTRY( "gfx3", 0,        layout_16x16x4,       0x400, 0x40 ) // [2] Sprites
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -272,6 +277,17 @@ GFXDECODE_END
 MACHINE_START_MEMBER(powerins_state, powerinsa)
 {
 	m_okibank->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
+}
+
+void powerins_state::init_powerinsc()
+{
+	uint8_t *gfx1 = memregion("gfx1")->base();
+
+	for (int i = 0; i < 0x300000; i++)
+	{
+		uint8_t x = gfx1[i];
+		gfx1[i] = bitswap(x, 3, 2, 1, 0, 7, 6, 5, 4);
+	}
 }
 
 void powerins_state::powerins(machine_config &config)
@@ -354,6 +370,12 @@ void powerins_state::powerinsb(machine_config &config)
 	config.device_remove("ym2203");    // Sound code talks to one, but it's not fitted on the board
 }
 
+void powerins_state::powerinsc(machine_config &config)
+{
+	powerinsb(config);
+
+	m_gfxdecode->set_info(gfx_powerinsc);
+}
 
 /***************************************************************************
 
@@ -707,6 +729,53 @@ ROM_START( powerinsb )
 	ROM_LOAD( "82s147.bin", 0x0020, 0x0200, CRC(d7818542) SHA1(e94f8004c804f260874a117d59dfa0637c5d3d73) )
 ROM_END
 
+ROM_START( powerinsc )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "10.040.u41", 0x000000, 0x80000, CRC(88e1244b) SHA1(595a560b807eab9576ed057a7e532c83860e9c40) )
+	ROM_LOAD16_BYTE( "11.040.u39", 0x000001, 0x80000, CRC(46cd506f) SHA1(4585824f65e2b7da9f815fee92bb5f6d250a286d) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "1.010.u2",  0x000000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
+
+	ROM_REGION( 0x300000, "gfx1", 0 )   /* Layer 0 */
+	ROM_LOAD16_BYTE( "33.040.u99",  0x000000, 0x80000, CRC(9b56a394) SHA1(f9451d8d5a911f4daa0f57af496dae08d320b3b2) )
+	ROM_LOAD16_BYTE( "22.040.u97",  0x000001, 0x80000, CRC(1e693f05) SHA1(049eeabd9b4f55f2f314f4f6871b1a0e1ec39517) )
+	ROM_LOAD16_BYTE( "32.040.u100", 0x100000, 0x80000, CRC(7749bc80) SHA1(ceee996e694865dfbc48b5365731f4903ca674f1) )
+	ROM_LOAD16_BYTE( "21.040.u98",  0x100001, 0x80000, CRC(e1586a71) SHA1(29df13a35a0c679bad0955961e7e0e70f93482c9) )
+	ROM_LOAD16_BYTE( "31.040.u102", 0x200000, 0x80000, CRC(ac5a2952) SHA1(1b15873045cd65aa823c81b293b20ef6c20c6aef) )
+	ROM_LOAD16_BYTE( "20.040.u101", 0x200001, 0x80000, CRC(e4b2823c) SHA1(1ef41ff625ad82dcc85994f87e1d82fc11e26dd8) )
+
+	// TODO: check sprites' ROM loading
+	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "30.040.u82", 0x000000, 0x80000,  CRC(6668d29d) SHA1(41b7ab49b72a1ffc7618c3fc45a1c1bbe1d84d21) )
+	ROM_LOAD16_BYTE( "19.040.u91", 0x000001, 0x80000,  CRC(17659d0c) SHA1(394b5dbb4461d0c05599d1ecd9fe92de999970fa) )
+	ROM_LOAD16_BYTE( "29.040.u85", 0x100000, 0x80000,  CRC(c349e556) SHA1(a89d4292a6f3b3cfd5b85f8db6de207831e779e6) )
+	ROM_LOAD16_BYTE( "18.040.u84", 0x100001, 0x80000,  CRC(8716f8d3) SHA1(469a967784b5ab44d91839ff0dd2b361f664ad7e) )
+	ROM_LOAD16_BYTE( "28.040.u88", 0x200000, 0x80000,  CRC(f93f10ce) SHA1(de254d7c904de95d676cd283276ef8a5cafde588) )
+	ROM_LOAD16_BYTE( "17.040.u87", 0x200001, 0x80000,  CRC(fa1ef844) SHA1(be11c84186f5e0a7990c005ed27b5f71e50bc450) )
+	ROM_LOAD16_BYTE( "27.040.u91", 0x300000, 0x80000,  CRC(962f3455) SHA1(3637cd6047f94bc4fc8dd8d7fbc1a48b99993b0b) )
+	ROM_LOAD16_BYTE( "16.040.u90", 0x300001, 0x80000,  CRC(e1a37b42) SHA1(37aa82ba166ff6549c9428e42bbad10f252d14f8) )
+	ROM_LOAD16_BYTE( "26.040.u93", 0x400000, 0x80000,  CRC(6e65099c) SHA1(5c261367f086d52ec5680a0a9c0f85992c4473b9) )
+	ROM_LOAD16_BYTE( "15.040.u81", 0x400001, 0x80000,  CRC(035316d3) SHA1(c1c6f243213f05a53f0fc4f3df530895c34355a9) )
+	ROM_LOAD16_BYTE( "25.040.u94", 0x500000, 0x80000,  CRC(a250dea8) SHA1(6b4c5ad35f4f4cdab516118a21c58617044c3208) )
+	ROM_LOAD16_BYTE( "14.040.u96", 0x500001, 0x80000,  CRC(dd976689) SHA1(ba7e80a94e6c6bb7a5b569fb5440e774cd89b79d) )
+	ROM_LOAD16_BYTE( "24.040.u95", 0x600000, 0x80000,  CRC(dd976689) SHA1(ba7e80a94e6c6bb7a5b569fb5440e774cd89b79d) )
+	ROM_LOAD16_BYTE( "13.040.u89", 0x600001, 0x80000,  CRC(867262d6) SHA1(bf0b13a5bb818741150d09be44968779c55c5b96) )
+	ROM_LOAD16_BYTE( "23.040.u96", 0x700000, 0x80000,  CRC(625c5b7b) SHA1(ddac164cd92459bdce5905b31eccded9b1c06086) )
+	ROM_LOAD16_BYTE( "12.040.u92", 0x700001, 0x80000,  CRC(08c4e478) SHA1(172dd9532a9240014afb4817b61a3e8122be8f0c) )
+
+	ROM_REGION( 0x240000, "oki1", 0 )   /* 8 bit adpcm (banked) */
+	ROM_LOAD( "9.040.u32", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
+	ROM_LOAD( "8.040.u30", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "7.040.u33", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "6.040.u31", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+
+	ROM_REGION( 0x240000, "oki2", 0 )   /* 8 bit adpcm (banked) */
+	ROM_LOAD( "5.040.u36", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
+	ROM_LOAD( "4.040.u34", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "3.040.u37", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "2.040.u35", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+ROM_END
 
 /* all supported sets give a 93.10.20 date */
 GAME( 1993, powerins,  0,        powerins,  powerins, powerins_state, empty_init, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
@@ -714,3 +783,4 @@ GAME( 1993, powerinsj, powerins, powerins,  powerinj, powerins_state, empty_init
 GAME( 1993, powerinsp, powerins, powerins,  powerinj, powerins_state, empty_init, ROT0, "Atlus", "Power Instinct (USA, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
 GAME( 1993, powerinsa, powerins, powerinsa, powerins, powerins_state, empty_init, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, powerinsb, powerins, powerinsb, powerins, powerins_state, empty_init, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsc, powerins, powerinsc, powerins, powerins_state, init_powerinsc, ROT0, "bootleg", "Power Instinct (USA, bootleg set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different sprites' format not implemented
