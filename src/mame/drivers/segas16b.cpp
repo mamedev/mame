@@ -1729,6 +1729,22 @@ void segas16b_state::system16b_bootleg_map(address_map &map)
 	map(0xffc000, 0xffffff).ram().share("workram");
 }
 
+void segas16b_state::dfjail_map(address_map &map)
+{
+	system16b_bootleg_map(map);
+	map(0x000000, 0x07ffff).rom();
+	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::philko_paletteram_w)).share("paletteram");
+
+	map(0xc40000, 0xc43fff).unmaprw();
+
+	map(0xc41000, 0xc41001).portr("P1");
+	map(0xc41002, 0xc41003).portr("P2");
+	map(0xc41004, 0xc41005).portr("SERVICE");
+
+	map(0xc42000, 0xc42001).portr("DSW1");
+	map(0xc42002, 0xc42003).portr("DSW2");
+}
+
 void segas16b_state::map_fpointbla(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
@@ -3709,7 +3725,6 @@ static INPUT_PORTS_START( lockonph )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-
 	PORT_START("DSW1")    // DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW0:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -3764,6 +3779,16 @@ static INPUT_PORTS_START( lockonph )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dfjail )
+	PORT_INCLUDE( lockonph )
+	
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -4047,6 +4072,14 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	config.device_remove("upd");
+}
+
+void segas16b_state::dfjail(machine_config &config)
+{
+	system16b_split(config);
+	M68000(config.replace(), m_maincpu, XTAL(16'000'000)/2); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::dfjail_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
 }
 
 
@@ -4875,6 +4908,55 @@ ROM_START( lockonph )
 	ROM_LOAD16_BYTE( "b11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
 	ROM_LOAD16_BYTE( "b13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
 ROM_END
+
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//*************************************************************************************************************************
+//  The Destroyer From Jail
+//  CPU: 68000
+//  Custom Korean Board
+//
+ROM_START( dfjail )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "1.b15", 0x000001, 0x020000, CRC(ee235fa5) SHA1(6f6e68628a3fbab83a3168419e921c10a9872367) )
+	ROM_LOAD16_BYTE( "3.c15", 0x000000, 0x020000, CRC(dc763979) SHA1(03d97790cd66961ecd1bae94bf6c6d1d1d756109) )
+	ROM_LOAD16_BYTE( "2.b16", 0x040001, 0x020000, CRC(49ff074d) SHA1(a44dfe46204976579265ba24fd99de75510f34ab) )
+	ROM_LOAD16_BYTE( "4.c16", 0x040000, 0x020000, CRC(cdcbf6b1) SHA1(a3491600e40de4ceb7e72d9ef4bf12fe5f15e30a) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // z80
+	ROM_LOAD( "29.f3",        0x000000, 0x008000, CRC(7f3ebb6a) SHA1(f265c6215ef457202686b31c9b503a0a371a1139) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // m6295
+	ROM_LOAD( "27.g1",        0x000000, 0x020000, CRC(7a88e1c1) SHA1(b238b451522819a5a8c1a9e82058b86d33ac2272) )
+	ROM_LOAD( "28.g3",        0x020000, 0x020000, CRC(ed96d6b9) SHA1(3ad096e466150d0ca36fec8dd649554e7fb9f654) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "9.f16",        0x000000, 0x020000, CRC(b2a49d12) SHA1(052b96109abc18c562c09042664738bac68f66b4) )
+	ROM_LOAD( "10.f17",       0x020000, 0x020000, CRC(7d9e8397) SHA1(7cb44cd3584ff9ee8fe1cd4fbbde1448ca27202c) )
+	ROM_LOAD( "7.f14",        0x040000, 0x020000, CRC(549af682) SHA1(cc130a265e01b1fd416f237caebdb1955dbfb30b) )
+	ROM_LOAD( "8.f15",        0x060000, 0x020000, CRC(625c118d) SHA1(d7554e4ec7a2ffc8a2081e0f2c7725a5a2c3ba1a) )
+	ROM_LOAD( "5.f12",        0x080000, 0x020000, CRC(9d00656d) SHA1(91aa96a4fce7f9df557fa8a1e776f82a1f0d57bd) )
+	ROM_LOAD( "6.f13",        0x0a0000, 0x020000, CRC(37b7bf90) SHA1(da184f5213269a68fbb36f3740cc7e32234d0fd2) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "19.h12", 0x000000, 0x020000, CRC(f84f472b) SHA1(0c513c53e41234a6c290387ef4fc27a9f9550cb4) )
+	ROM_LOAD16_BYTE( "11.g12", 0x000001, 0x020000, CRC(019662e6) SHA1(1106d3268a29c4ba001383cee5e69bdc963b8347) )
+	ROM_LOAD16_BYTE( "20.h13", 0x040000, 0x020000, CRC(f28bdf76) SHA1(51bf2383909e713aed143064d1e72681209f58e3) )
+	ROM_LOAD16_BYTE( "12.g13", 0x040001, 0x020000, CRC(d222e52b) SHA1(0319fe8387377bced4e6ae77745d88d64418d35b) )
+	ROM_LOAD16_BYTE( "21.h14", 0x080000, 0x020000, CRC(0508cb29) SHA1(ba71cca7da1f5fc6a8e346aee220be72cbd824a0) )
+	ROM_LOAD16_BYTE( "13.g14", 0x080001, 0x020000, CRC(f125b5b0) SHA1(52497e27b4cd8d7fd52f1f786d1f394a8e4c4e55) )
+	ROM_LOAD16_BYTE( "22.h15", 0x0c0000, 0x020000, CRC(7329f038) SHA1(794cc571a3efba7f0f87cf8b552a8e6fc1f3e669) )
+	ROM_LOAD16_BYTE( "14.g15", 0x0c0001, 0x020000, CRC(ca831a54) SHA1(ce4926a7713bfcf6191dafeb7684da21d0ee8f73) )
+    ROM_LOAD16_BYTE( "23.h16", 0x100000, 0x020000, CRC(94ca23e8) SHA1(16b98ec952ea89cc52d798bab715efb1d5dcb5dc) )
+    ROM_LOAD16_BYTE( "15.g16", 0x100001, 0x020000, CRC(db426709) SHA1(48c01388fc1c6c5fd2b2a1d6fc67bd6e79272053) )
+	ROM_LOAD16_BYTE( "24.h17", 0x140000, 0x020000, CRC(6628becc) SHA1(499b77cfaed861cdb2ec94160143cbb0baa7d5ad) )
+	ROM_LOAD16_BYTE( "16.g17", 0x140001, 0x020000, CRC(f7b2aad6) SHA1(595f5db13ca6e6bb7b000b8cf13654f92bff3d01) )
+    ROM_LOAD16_BYTE( "25.h19", 0x180000, 0x020000, CRC(26ca591f) SHA1(2dfc9be451df633e114b86961b304b0d9eaffec3) )
+	ROM_LOAD16_BYTE( "17.g19", 0x180001, 0x020000, CRC(9302cfc3) SHA1(6a63df5e4dbc11404b46a0a7ea90298adba56c14) )
+	ROM_LOAD16_BYTE( "26.h20", 0x1c0000, 0x020000, CRC(5828e0af) SHA1(41d3118eae0c43ad25ef96d1c526a52dc46703d8) )
+	ROM_LOAD16_BYTE( "18.g20", 0x1c0001, 0x020000, CRC(fc8aced0) SHA1(12ffd552228893f2093c2d5617fc00cae262e2ed) )
+ROM_END
+
 
 
 //*************************************************************************************************************************
@@ -9419,6 +9501,7 @@ GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_stat
 GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,             ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
 GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,            ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
+GAME( 199?, dfjail,   0,          dfjail,                dfjail,   segas16b_state, init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // dips, check sound, not extensively tested
 
 // decrypted bootleg / 'suicide repair' sets
 

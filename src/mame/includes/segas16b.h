@@ -89,6 +89,7 @@ public:
 	void system16b_fd1094(machine_config &config);
 	void fpointbl(machine_config &config);
 	void lockonph(machine_config &config);
+	void dfjail(machine_config &config);
 
 	// ROM board-specific driver init
 	void init_generic_5521();
@@ -167,6 +168,7 @@ protected:
 	void fpointbl_map(address_map &map);
 	void fpointbl_sound_map(address_map &map);
 	void lockonph_map(address_map &map);
+	void dfjail_map(address_map &map);
 	void lockonph_sound_iomap(address_map &map);
 	void lockonph_sound_map(address_map &map);
 	void map_fpointbla(address_map &map);
