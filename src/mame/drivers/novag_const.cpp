@@ -11,8 +11,9 @@ Hardware notes:
 - TTL, buzzer, 24 LEDs, 8*8 chessboard buttons
 
 TODO:
-- add 3.6MHz version: 7.2MHz XTAL, 65SC02 CPU, 1 maskrom(NOVAG-831A 6133-8316),
-  maybe 32KB? 1 RAM chip(TC5516AP) instead of silly daughterboard
+- add 3.6MHz version: 7.2MHz XTAL, 65SC02 CPU, 1 maskrom(NOVAG-831A 6133-8316) 16KB?
+  1 RAM chip(TC5516AP) instead of silly daughterboard
+- add Quattro version, another small update, this time 4MHz
 
 ******************************************************************************/
 
