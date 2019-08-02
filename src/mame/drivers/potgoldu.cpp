@@ -110,6 +110,8 @@ ROM_START( potgoldu )
 	// these two are definitely a pair
 	ROM_LOAD16_BYTE( "400x.u3",  0x1c0000, 0x20000, BAD_DUMP CRC(c0894db0) SHA1(d68321949250bfe0f14bd5ef8d115ba4b3786b8b) )
 	ROM_LOAD16_BYTE( "400x.u7",  0x1c0001, 0x20000, BAD_DUMP CRC(0953ecf7) SHA1(91cbe5d9aff171902dc3eb43a308a7a833c8fb71) )
+
+	// presumably missing an MCU dump, although nothing was documented for this set
 ROM_END
 
 ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAMDAC + SC28L198A1A UART + EPM7192SQC160-10 CPLD
@@ -121,9 +123,9 @@ ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAM
 	ROM_LOAD16_BYTE( "pog_580f.u5", 0x280000, 0x80000, CRC(64c3b488) SHA1(30564feee544f7b4d1d48c68dbfcd6ae0ae1b220) )
 	ROM_LOAD16_BYTE( "pog_580f.u8", 0x280001, 0x80000, CRC(cca108a4) SHA1(edd46df79bd8835ca61b5d48277de4a70a83e2a0) )
 
-	// Dumper's note: Not included is the "Security" chip needed to run the game. However from what I can tell the chip only collates the bins, dumps them to ram, and keeps settings.
-	ROM_REGION( 0x2000, "mcu", 0 )  /* 68H705 (68hc705??) microcontroller */
-	ROM_LOAD( "mc68h705",     0x0000, 0x2000, NO_DUMP ) // not sure which type of mcu this is, size is a guess
+	// Dumper's note: "Security" chip needed to run the game. However from what I can tell the chip only collates the bins, dumps them to ram, and keeps settings.
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "potgoldu_mc68hc705j1acp.bin", 0x000, 0x800, CRC(4130e596) SHA1(cd7e80a371abd4208a64c537fc84f1525be9203c) ) // 'Ver 1.00a' (assumed to be for this set)
 ROM_END
 
 GAME( 200?, potgoldu,    0,        potgold,   potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
