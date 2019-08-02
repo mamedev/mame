@@ -106,7 +106,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
 
 	<software name="dayfarmg" supported="no">
-		<description>Mein erster Bauernhof (Ger)</description>
+		<description>Mein erster Bauernhof (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099064(GE)" />
@@ -121,7 +121,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 	</software>
 
 	<software name="dayfarms" cloneof="dayfarmg" supported="no">
-		<description>Un Día en la Granja (Spa)</description>
+		<description>Un Día en la Granja (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099067(SP)" />
@@ -136,7 +136,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 	</software>
 
 	<software name="mktierf" supported="no">
-		<description>Meine kleinen Tierfreunde (Ger)</description>
+		<description>Meine kleinen Tierfreunde (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099004(GE)" />
@@ -163,7 +163,7 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 	</software>
 
 	<software name="poohhawasw" cloneof="poohhawa" supported="no">
-		<description>Nalle Puhs Äventyr i Sjumilaskogen (Swe)</description>
+		<description>Nalle Puhs Äventyr i Sjumilaskogen (Sweden)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099034(SE)" />
