@@ -46,7 +46,7 @@ enum iodevice_t
 	IO_QUICKLOAD,   /* 12 - Allow to load program/data into memory, without matching any actual device */
 	IO_MEMCARD,     /* 13 - Memory card */
 	IO_CDROM,       /* 14 - optical CD-ROM disc */
-	IO_MAGTAPE,     /* 15 - Magentic tape */
+	IO_MAGTAPE,     /* 15 - Magnetic tape */
 	IO_ROM,         /* 16 - Individual ROM image - the Amstrad CPC has a few applications that were sold on 16kB ROMs */
 	IO_MIDIIN,      /* 17 - MIDI In port */
 	IO_MIDIOUT,     /* 18 - MIDI Out port */
