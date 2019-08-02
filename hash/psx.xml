@@ -58746,6 +58746,103 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/19603/ -->
+	<software name="tenchude" cloneof="tenchu">
+		<description>Tenchu: Stealth Assassins (Euro, Demo)</description>
+		<year>1998</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="SLED-01467 (7005053)"/>
+		<info name="barcode" value="5 030917 005053">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tenchu - stealth assassins (europe) (en,fr,it) (demo)" sha1="3dce4b9b606f56e3d2e71031741e30e25643c040"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/7536/ -->
+	<software name="td6e" cloneof="td6">
+		<description>Test Drive 6 (Euro)</description>
+		<year>2000</year>
+		<publisher>Cryo Interactive Entertainment</publisher>
+		<info name="serial" value="SLES-02752"/>
+		<info name="ring_code" value="Sony DADC   A0100324125-0101   13">
+		<info name="barcode" value="3 554540 515090">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="test drive 6 (europe) (en,fr,de,es,it)" sha1="3825ba7492979b061a1bb8e38b590acdef8d7e62"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/4787/ -->
+	<software name="themehose" cloneof="themehos">
+		<description>Theme Hospital (Euro)</description>
+		<year>1998</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-00627"/>
+		<info name="release" value="199802xx" />
+		<info name="barcode" value="5 030930 022747">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="theme hospital (europe) (en,fr,de,es,it,sv)" sha1="d99a836739d3d153983f01380e04b59fa92f393b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/910/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="themepw" cloneof="simtprk">
+		<description>Theme Park World (Euro)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02688, SLES-02688/GER"/>
+		<info name="ring_code" value="DADC   A0100312300-0101   25">
+		<info name="barcode" value="5 030932 022233, 5 030935 022230, 5 030935 026290">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="theme park world (europe) (en,fr,de,es,it,nl,sv)" sha1="b18e4948997cd80453b9f50203ff0a45983058c3" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/615/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="tocawtc" cloneof="jlstock">
+		<description>TOCA World Touring Cars (Euro)</description>
+		<year>2000</year>
+		<publisher>The Codemasters Software Company</publisher>
+		<info name="serial" value="SLES-02572, SLES-02572/P"/>
+		<info name="release" value="20000825" />
+		<info name="barcode" value="5 024866 241297, 5 024866 241310, 5 024866 242256">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="toca world touring cars (europe) (en,fr,de)" sha1="c3b38d8dfe1c588d09dbbc1e14fd7c81043ac2c9" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/380/ -->
+	<software name="traid4e" cloneof="traid4">
+		<description>Tomb Raider: The Last Revelation (Euro, Aus)</description>
+		<year>1999</year>
+		<publisher>Eidos Interactive</publisher>
+		<info name="serial" value="SLES-02238, SLES-02238/ANZ"/>
+		<info name="release" value="199911xx" />
+		<info name="barcode" value="5 032921 008488">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tomb raider - the last revelation (europe, australia)" sha1="5e2cc704652b42edcb77c96576bc96dbb2bcb282"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Non-redump PAL (Europe) -->
 
 	<!-- corrupt text -->
