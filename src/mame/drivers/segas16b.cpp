@@ -1898,6 +1898,59 @@ void segas16b_state::bootleg_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
+WRITE8_MEMBER(segas16b_state::dfjail_sound_control_w)
+{
+	int size = memregion("soundcpu")->bytes() - 0x10000;
+
+	// NMI and presumably DAC output clear
+	// TODO: identify which is which
+	m_dfjail_nmi_enable = ((data & 0xc0) == 0);
+	if (m_dfjail_nmi_enable == false)
+		m_dac->write(0);
+	//m_upd7759->start_w(BIT(data, 7));
+	//m_upd7759->reset_w(BIT(data, 6));
+
+	int bankoffs = 0;
+	bankoffs = ((data & 0x08) >> 3) * 0x20000;
+	bankoffs += (data & 0x07) * 0x4000;
+
+	// set the final bank
+	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
+}
+
+WRITE8_MEMBER(segas16b_state::dfjail_dac_data_w)
+{
+	// TODO: understand how this is hooked up
+	#if 0
+	switch(offset)
+	{
+		case 0: 
+			m_dfjail_dac_data = (data & 0xf) << 0;
+			break;
+		case 1:
+			m_dfjail_dac_data |= (data & 0xf) << 4;
+			break;
+		case 2:
+			m_dfjail_dac_data |= (data & 0xf) << 8;
+			break;
+		case 3:
+			m_dfjail_dac_data |= (data & 0xf) << 12;
+			m_dac->write(m_dfjail_dac_data);
+			break;
+	}
+	#endif
+}
+
+void segas16b_state::dfjail_sound_iomap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).w(FUNC(segas16b_state::dfjail_sound_control_w));
+	map(0x80, 0x83).w(FUNC(segas16b_state::dfjail_dac_data_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
 // similar to whizz / other philko games in sidearms.cpp, but with the m6295
 void segas16b_state::lockonph_sound_map(address_map &map)
 {
@@ -4136,6 +4189,14 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 	config.device_remove("upd");
 }
 
+INTERRUPT_GEN_MEMBER(segas16b_state::dfjail_soundirq_cb)
+{
+	if (m_dfjail_nmi_enable == true)
+	{
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+}
+
 void segas16b_state::dfjail(machine_config &config)
 {
 	system16b_split(config);
@@ -4143,17 +4204,19 @@ void segas16b_state::dfjail(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::dfjail_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
 	
-	//Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/4); // ?
-	//m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::dfjail_sound_map);
-	//m_soundcpu->set_addrmap(AS_IO, &segas16b_state::dfjail_sound_iomap);
+	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/4); // ?
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::dfjail_sound_iomap);
+	// connected to a 74ls74 clock source
+	m_soundcpu->set_periodic_int(FUNC(segas16b_state::dfjail_soundirq_cb), attotime::from_hz(4*60)); // TODO: timing
 
 	//config.device_remove("ym2151");
-	//config.device_remove("upd");
-
-	//YM2151(config, m_ym2151, XTAL(16'000'000)/4); // ??
-	//m_ym2151->irq_handler().set_inputline(m_soundcpu, INPUT_LINE_NMI); 
-	//m_ym2151->add_route(0, "mono", 0.5);
-	//m_ym2151->add_route(1, "mono", 0.5);
+	config.device_remove("upd");
+	
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 1.0); // AD7533KN
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
