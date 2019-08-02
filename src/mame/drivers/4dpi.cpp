@@ -99,7 +99,7 @@ private:
 
 	required_device<dp8573_device> m_rtc;
 	required_device<pit8254_device> m_pit;
-	required_device<wd33c93_device> m_scsi;
+	required_device<wd33c9x_base_device> m_scsi;
 	required_device<am7990_device> m_enet;
 	required_device_array<scn2681_device, 2> m_duart;
 	required_device_array<rs232_port_device, 2> m_serial;
@@ -193,7 +193,7 @@ void pi4d2x_state::map(address_map &map)
 
 	//map(0x1df00000, 0x1df00003).umask32(0x0000ff00); // VME_IACK: vme interrupt acknowledge
 
-	map(0x1f800000, 0x1f800003).lw8("mem_cfg", [this](u8 data) { m_mem_cfg = data; }).umask32(0xff000000);
+	map(0x1f800000, 0x1f800003).lrw8("mem_cfg", [this]() { return m_mem_cfg; }, [this](u8 data) { m_mem_cfg = data; }).umask32(0xff000000);
 	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::ctl_sid_r)).umask32(0x00ff0000);
 
 	map(0x1f840000, 0x1f840003).lrw8("vme_isr", [this]() { return m_vme_isr; }, [this](u8 data) { m_vme_isr = data; }).umask32(0x000000ff);
@@ -263,12 +263,28 @@ void pi4d2x_state::map(address_map &map)
 	map(0x1f960000, 0x1f960007).lr8("enet_reset", [this](offs_t offset) { m_enet->reset_w(!offset); return 0; }).umask32(0xff000000);
 
 	map(0x1f980000, 0x1f980003).lr16("lio_isr", [this]() { return m_lio_isr; }).umask32(0x0000ffff);
-	map(0x1f980008, 0x1f98000b).lrw8("lio_imr", [this]() { return m_lio_imr; }, [this](u8 data) { m_lio_imr = data; }).umask32(0x000000ff);
+	map(0x1f980008, 0x1f98000b).lrw8("lio_imr",
+		[this]()
+		{
+			return m_lio_imr;
+		},
+		[this](u8 data)
+		{
+			m_lio_imr = data;
+
+			// update interrupt line
+			bool const lio_int = ~m_lio_isr & m_lio_imr;
+			if (m_lio_imr ^ lio_int)
+			{
+				m_lio_int = lio_int;
+				m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_int);
+			}
+		}).umask32(0x000000ff);
 
 	map(0x1fa00000, 0x1fa00003).lr8("timer1_ack", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ4, 0); return 0; }).umask32(0xff000000);
 	map(0x1fa20000, 0x1fa20003).lr8("timer0_ack", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ2, 0); return 0; }).umask32(0xff000000);
 
-	//map(0x1fa40000, 0x1fa40000); // system bus error address
+	//map(0x1fa40000, 0x1fa40003); // system bus error address
 	map(0x1fa40004, 0x1fa40007).lrw32("refresh_timer",
 		[this]()
 		{
@@ -281,10 +297,12 @@ void pi4d2x_state::map(address_map &map)
 
 	//map(0x1fa40008, 0x1fa4000b); // GDMA_DABR_PHYS descriptor array base register
 	//map(0x1fa4000c, 0x1fa4000f); // GDMA_BUFADR_PHYS buffer address register
-	//map(0x1fa40010, 0x1fa400013).umask32(0xffff0000); // GDMA_BURST_PHYS burst/delay register
-	//map(0x1fa40010, 0x1fa400013).umask32(0x0000ffff); // GDMA_BUFLEN_PHYS buffer length register
+	//map(0x1fa40010, 0x1fa40013).umask32(0xffff0000); // GDMA_BURST_PHYS burst/delay register
+	//map(0x1fa40010, 0x1fa40013).umask32(0x0000ffff); // GDMA_BUFLEN_PHYS buffer length register
 
-	//map(0x1fa60000, 0x1fa600003); // VMA_RMW_ADDR
+	//map(0x1fa60000, 0x1fa60003); // VMA_RMW_ADDR
+
+	//map(0x1fa60020, 0x1fa60023).nopr().umask32(0xff000000); // reload gfx dma burst/delay reg
 
 	map(0x1fa80000, 0x1fa80007).lr32("scsi_reset", [this](offs_t offset) { m_scsi->reset_w(!!offset); return 0; });
 
@@ -328,8 +346,8 @@ static void scsi_devices(device_slot_interface &device)
 
 void pi4d2x_state::pi4d20(machine_config &config)
 {
-	R2000A(config, m_cpu, 25_MHz_XTAL / 2, 16384, 8192);
-	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
+	R3000(config, m_cpu, 25_MHz_XTAL / 2, 16384, 8192);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010);
 
 	common(config);
 }
@@ -369,7 +387,7 @@ void pi4d2x_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93", WD33C93).machine_config(
 		[this](device_t *device)
 		{
-			wd33c93_device &wd33c93(downcast<wd33c93_device &>(*device));
+			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
 			wd33c93.set_clock(10000000);
 			wd33c93.irq_cb().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_SCSI>)).invert();
