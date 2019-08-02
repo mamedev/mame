@@ -259,8 +259,12 @@ void vsmile_state::vsmile(machine_config &config)
 	m_ctrl[1]->rts_cb().set(FUNC(vsmile_state::ctrl_rts_w<1>));
 	m_ctrl[1]->data_cb().set(FUNC(vsmile_state::ctrl_tx_w));
 
+	// Regular V.Smile carts
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
+	// V.Smile Motion carts
 	SOFTWARE_LIST(config, "cart_list2").set_original("vsmilem_cart");
+	// V.Smile Smartbook carts
+	SOFTWARE_LIST(config, "cart_list3").set_original("vsmilesb_cart");
 }
 
 void vsmile_state::vsmilep(machine_config &config)

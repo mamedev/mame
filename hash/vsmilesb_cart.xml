@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+V.Smile Motion:               80-08****  (Smartridges are orange)
+V.Smile Smartbook Software:   80-089***  (Smartridges are red)
+V.Smile:                      80-09****  (Smartridges are purple, some are gray because of plastic defects)
+V.Smile Baby                  80-099***  (Smartridges are yellow, incompatible with TV based V.Smile consoles)
+V.Baby                        80-22****  (Smartridges are orange, incompatible with other V.Smile consoles, including V.Smile Baby)
+
+Language:
+********0 = US                (White labels on back)
+********1 = Italy             Apparently distributed by company 'Giochi Preziosi'
+********2 = Netherlands       (Red or White labels on back)
+********3 = UK                (Red labels on back)
+********4 = Germany           (Blue labels on back)
+********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
+********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
+********7 = Spain             (Green labels on back)
+*******10 = Korea
+*******13 = Denmark           Distributed by the company 'Top Toy A/S'
+*******14 = Sweden            Distributed by the company 'Top Toy A/S'
+*******15 = Norway
+*******?? = Finland
+*******?? = China
+
+
+V.Smile Smartbook game cartridges
++========+===================+================================================================================================+
+| Dumped |      Serial       |                                    Name                                                        |
++========+===================+================================================================================================+
+|        | 80-089000(US)     | Spider-Man &amp; Friends - Where is Hulk?                                                      |
++========+===================+================================================================================================+
+|        | 80-089020(US)     | Toy Story 2                                                                                    |
++========+===================+================================================================================================+
+|        | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                                         |
+|        | 80-089045(FR)     | Dora's ??????                                                                                  |
++========+===================+================================================================================================+
+|   XX   | 80-089060(US)     | Scooby-Doo! - A Night Of Fright Is No Delight (52-089060(US) on back label, white sticker: "P ○●○○")                                            |
++========+===================+================================================================================================+
+
+
+-->
+
+<softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
+
+	<software name="scoobynsb" supported="no">
+		<description>Scooby-Doo! - A Night Of Fright Is No Delight (USA)</description>
+		<year>2007</year> <!-- (s07) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-089060(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180"/>
+			<feature name="pcb_model" value="707180-3"/>
+			<feature name="cart_type" value="red" />
+			<dataarea name="rom" size="8388608">
+				<rom name="80-089060 - Scooby-Doo! - A Night Of Fright Is No Delight (US).bin" size="8388608" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
