@@ -37275,6 +37275,23 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/7919/ -->
+	<software name="wares">
+		<description>Wares 1092: Souheiden (Jpn)</description>
+		<year>1997</year>
+		<publisher>Yutaka</publisher>
+		<info name="serial" value="SLPS 00596 (104017-0052421-9800), SLPS 00740 (104017-0051785-5800)"/>
+		<info name="alt_title" value="聖刻1092 操兵伝"/>
+		<info name="release" value="19971106" />
+		<info name="barcode" value="4 974229 517853, 4 974229 524219">
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wares 1092 - souheiden (japan)" sha1="e357b7e26f231ebbb69749321b0fb12cb1b43e6b"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="worldnev">
 		<!-- Original images (Redump)
 		<rom name="World Neverland - Olerud Oukoku Monogatari (Japan).cue" size="116" crc="c394ad2b" sha1="e4de98125779835c09b50dd36e93c1bbd5957b07"/>
@@ -58839,6 +58856,72 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tomb raider - the last revelation (europe, australia)" sha1="5e2cc704652b42edcb77c96576bc96dbb2bcb282"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/618/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="urbchaose" cloneof="urbchaos">
+		<description>Urban Chaos (Euro)</description>
+		<year>2000</year>
+		<publisher>Eidos Interactive</publisher>
+		<info name="serial" value="SLES-02071, SLES-02071#"/>
+		<info name="ring_code" value="DADC   A0100311973-0101   25">
+		<info name="barcode" value="5 032921 004695, 5 032921 007962, 5 032921 014175">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="urban chaos (europe) (en,es,it)" sha1="dc3bb0144dd5f89c1efbb73efdbbc9ac3bac38f7" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1313/ -->
+	<software name="vanishpte" cloneof="vanishpt">
+		<description>Vanishing Point (Euro)</description>
+		<year>2001</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="SLES-02534"/>
+		<info name="release" value="20010331" />
+		<info name="ring_code" value="Sony DADC   A0100355439-0101   23">
+		<info name="barcode" value="3 455192 121212, 3 455192 121236">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="vanishing point (europe) (en,fr,de,es)" sha1="eb0502d1e0350722fc2188c46a38147c6ad1e5ed"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/3328/ -->
+	<software name="warpathe" cloneof="warpath">
+		<description>Warpath: Jurassic Park (Euro)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02253"/>
+		<info name="release" value="19991216" />
+		<info name="barcode" value="5 030930 021191">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="warpath - jurassic park (europe) (en,fr,de)" sha1="70b267845836262b94c2018ca280692ed2a4d12d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/474/ -->
+	<software name="wcwmayhme" cloneof="wcwmayhm">
+		<description>WCW Mayhem (Euro)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02193 (EAX06102705D), SLES-02193#"/>
+		<info name="ring_code" value="DADC   A0100297310-0101   25">
+		<info name="barcode" value="5 030930 021627, 5 030935 025125">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wcw mayhem (europe)" sha1="6298ebe6c3d4e14b94d9e35c4abe544fa06b3553"/>
 			</diskarea>
 		</part>
 	</software>
