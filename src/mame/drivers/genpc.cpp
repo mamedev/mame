@@ -201,6 +201,8 @@ ROM_START(pc)
 	ROMX_LOAD( "fdaypc17.rom", 0x00000, 0x2000, CRC(26bb29ac) SHA1(5a58680b9193f4323db3e7894f853dc82d17f4ee),ROM_BIOS(41))
 	ROM_SYSTEM_BIOS(42, "tava238", "Tava DTK Erso V2.38")
 	ROMX_LOAD( "tava_dtk_erso_bios_2.38_u87.bin", 0x00000, 0x2000, CRC(34f5c0e5) SHA1(5a1590f948670a5ef85a1ee7cbb40387fced8a1f), ROM_BIOS(42))
+	ROM_SYSTEM_BIOS(43, "ecd", "ECD-Computer") // (c) E C D Computer GmbH 1985 - BIOS for ECD Professional Microcomputer - use pcherc
+	ROMX_LOAD( "ecd_computer.bin", 0x00000, 0x2000, CRC(caab05f5) SHA1(060aa6c17ff9405c256684cec8a5165227c7c522), ROM_BIOS(43))
 ROM_END
 
 #define rom_pcmda    rom_pc
