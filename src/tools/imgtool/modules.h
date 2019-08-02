@@ -13,6 +13,6 @@
 
 #include "library.h"
 
-imgtoolerr_t imgtool_create_cannonical_library(bool omit_untested, std::unique_ptr<imgtool::library> &library);
+imgtoolerr_t imgtool_create_canonical_library(bool omit_untested, std::unique_ptr<imgtool::library> &library);
 
 #endif /* MODULES_H */
