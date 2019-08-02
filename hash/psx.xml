@@ -58564,6 +58564,71 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/8760/ -->
+	<!-- A prototype version is also dumped but contains the same data as final version -->
+	<software name="rshot">
+		<description>Rescue Shot (Euro)</description>
+		<year>2000</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="SCES-02569 (9169024)"/>
+		<info name="release" value="20000407" />
+		<info name="ring_code" value="Sony DADC   A0100318110-0101   13, KODAK CD-R 74 9920 2404 1100">
+		<info name="barcode" value="7 11719 16832 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rescue shot (europe) (en,fr,de,es,it)" sha1="0dc439392f1134f5902383bae99a52d3f9c1a856"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/19602/ -->
+	<software name="revile" cloneof="revil">
+		<description>Resident Evil (Euro, EDC)</description>
+		<year>1996</year>
+		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
+		<info name="serial" value="SLES-00200"/>
+		<info name="release" value="199608xx" />
+		<info name="barcode" value="5 028587 083846">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="resident evil (europe) (edc)" sha1="3627fcab5d8003a25af901dfd8b5cbd71cb61332"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/496/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="revil3e" cloneof="revil3">
+		<description>Resident Evil 3: Nemesis (Euro)</description>
+		<year>1999</year>
+		<publisher>Eidos Interactive</publisher>
+		<info name="serial" value="SLES-02529"/>
+		<info name="barcode" value="5 032921 009263">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="resident evil 3 - nemesis (europe)" sha1="a67b4bb929ac662c0e62349f2e7e16fcfacd4fdf" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/801/ -->
+	<software name="revilsrve" cloneof="revilsrv">
+		<description>Resident Evil: Survivor (Euro)</description>
+		<year>2000</year>
+		<publisher>Eidos Interactive</publisher>
+		<info name="serial" value="SLES-02732"/>
+		<info name="barcode" value="5 032921 010221">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="resident evil - survivor (europe)" sha1="29693d01b07648ec88bede08e71252684fe121a7"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Non-redump PAL (Europe) -->
 
 	<!-- corrupt text -->
