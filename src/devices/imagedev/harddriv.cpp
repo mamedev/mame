@@ -75,7 +75,7 @@ harddisk_image_device::~harddisk_image_device()
 
 void harddisk_image_device::device_config_complete()
 {
-	add_format("chd", "CHD Hard drive", "chd,hd", hd_option_spec);
+	add_format("chd", "CHD Hard drive", "chd,hd,hdv,2mg", hd_option_spec);
 }
 
 const util::option_guide &harddisk_image_device::create_option_guide() const
@@ -176,8 +176,11 @@ void harddisk_image_device::call_unload()
 		m_hard_disk_handle = nullptr;
 	}
 
-	m_origchd.close();
-	m_diffchd.close();
+	if (m_chd)
+	{
+		m_origchd.close();
+		m_diffchd.close();
+	}
 	m_chd = nullptr;
 }
 
@@ -227,7 +230,6 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 image_init_result harddisk_image_device::internal_load_hd()
 {
 	chd_error err = CHDERR_NONE;
-
 	m_chd = nullptr;
 
 	if (m_hard_disk_handle != nullptr)
@@ -243,20 +245,24 @@ image_init_result harddisk_image_device::internal_load_hd()
 	}
 	else
 	{
-		err = m_origchd.open(image_core_file(), true);
-		if (err == CHDERR_NONE)
+		if (is_filetype("chd"))
 		{
-			m_chd = &m_origchd;
-		}
-		else if (err == CHDERR_FILE_NOT_WRITEABLE)
-		{
-			err = m_origchd.open(image_core_file(), false);
+			err = m_origchd.open(image_core_file(), true);
+
 			if (err == CHDERR_NONE)
 			{
-				err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);
+				m_chd = &m_origchd;
+			}
+			else if (err == CHDERR_FILE_NOT_WRITEABLE)
+			{
+				err = m_origchd.open(image_core_file(), false);
 				if (err == CHDERR_NONE)
 				{
-					m_chd = &m_diffchd;
+					err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);
+					if (err == CHDERR_NONE)
+					{
+						m_chd = &m_diffchd;
+					}
 				}
 			}
 		}
@@ -268,6 +274,30 @@ image_init_result harddisk_image_device::internal_load_hd()
 		m_hard_disk_handle = hard_disk_open(m_chd);
 		if (m_hard_disk_handle != nullptr)
 			return image_init_result::PASS;
+	}
+	else
+	{
+		if (is_open())
+		{
+			uint32_t skip = 0;
+			char header[64];
+
+			fseek(0, SEEK_SET);
+			fread(header, 64);
+
+			// check for 2MG format
+			if (!memcmp(header, "2IMG", 4))
+			{
+				skip = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
+				osd_printf_verbose("harddriv: found 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
+			}
+
+			m_hard_disk_handle = hard_disk_open(image_core_file(), skip);
+			if (m_hard_disk_handle != nullptr)
+				return image_init_result::PASS;
+		}
+
+		return image_init_result::FAIL;
 	}
 
 	/* if we had an error, close out the CHD */
