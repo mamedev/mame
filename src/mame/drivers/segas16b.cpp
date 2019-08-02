@@ -4213,7 +4213,7 @@ void segas16b_state::dfjail(machine_config &config)
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
 	
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 1.0); // AD7533KN
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
