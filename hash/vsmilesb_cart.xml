@@ -37,13 +37,13 @@ V.Smile Smartbook game cartridges
 |        | 80-089040(US)     | Dora the Explorer - Dora's Got a Puppy                                                         |
 |        | 80-089045(FR)     | Dora's ??????                                                                                  |
 +========+===================+================================================================================================+
-|   XX   | 80-089060(US)     | Scooby-Doo! - A Night Of Fright Is No Delight (52-089060(US) on back label, white sticker: "P ○●○○")                                            |
+|   XX   | 80-089060(US)     | Scooby-Doo! - A Night Of Fright Is No Delight (52-089060(US) on back label, white sticker: "P ○●○○")
 +========+===================+================================================================================================+
 
 
 -->
 
-<softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
+<softwarelist name="vsmilesb_cart" description="VTech V.Smile Smartbook cartridges">
 
 	<software name="scoobynsb" supported="no">
 		<description>Scooby-Doo! - A Night Of Fright Is No Delight (USA)</description>
