@@ -186,7 +186,7 @@ u8 gaelco2_state::shareram_r(offs_t offset)
 
 void gaelco2_state::wrally2_latch_w(offs_t offset, u16 data)
 {
-	m_mainlatch->write_bit(offset >> 2, BIT(data, 0));
+	m_mainlatch->write_bit(offset >> 3, BIT(data, 0));
 }
 
 WRITE_LINE_MEMBER(gaelco2_state::coin1_counter_w)
