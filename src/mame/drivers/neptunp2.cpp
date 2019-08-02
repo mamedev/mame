@@ -185,7 +185,7 @@ GFXDECODE_END
 void neptunp2_state::neptunp2(machine_config &config)
 {
 	/* basic machine hardware */
-	I80188(config, m_maincpu, 20000000); // N80C188-20 AMD
+	I80188(config, m_maincpu, 36.864_MHz_XTAL); // N80C188-20 AMD
 	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::neptunp2_map);
 	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::neptunp2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_state::irq0_line_hold));
