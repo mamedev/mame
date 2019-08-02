@@ -37093,8 +37093,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<info name="serial" value="SLPS-00120~SLPS-00121" />
 		<info name="release" value="19960823" />
 		<info name="alt_title" value="クリーチャーショック"/>
-		<info name="ring_code" value="SLPS-00120   1 (Disc 1), SLPS-00121   1 (Disc 2)">
-		<info name="barcode" value="4 961082 300081">
+		<info name="ring_code" value="SLPS-00120   1 (Disc 1), SLPS-00121   1 (Disc 2)"/>
+		<info name="barcode" value="4 961082 300081"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Disc 1"/>
@@ -37117,7 +37117,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment</publisher>
 		<info name="serial" value="SCPS 18003"/>
 		<info name="release" value="19961206" />
-		<info name="barcode" value="4 948872 180030">
+		<info name="barcode" value="4 948872 180030"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -37172,7 +37172,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<info name="serial" value="SLPS-01866"/>
 		<info name="alt_title" value="Piとメール"/>
 		<info name="release" value="19990211" />
-		<info name="barcode" value="4 988607 050252">
+		<info name="barcode" value="4 988607 050252"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -37247,7 +37247,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<info name="serial" value="SCPS 10015, SCPS 91008"/>
 		<info name="alt_title" value="戦闘国家 AIR LAND BATTLE"/>
 		<info name="release" value="19951201" />
-		<info name="barcode" value="4 948872 100151, 4 948872 910088">
+		<info name="barcode" value="4 948872 100151, 4 948872 910088"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -37283,7 +37283,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<info name="serial" value="SLPS 00596 (104017-0052421-9800), SLPS 00740 (104017-0051785-5800)"/>
 		<info name="alt_title" value="聖刻1092 操兵伝"/>
 		<info name="release" value="19971106" />
-		<info name="barcode" value="4 974229 517853, 4 974229 524219">
+		<info name="barcode" value="4 974229 517853, 4 974229 524219"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57643,8 +57643,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<description>Action Replay 2 Version 2.23 - Bonus PSone Codes! (Euro)</description>
 		<year>2002</year>
 		<publisher>&lt;unlicensed&gt;</publisher> <!-- Datel -->
-		<info name="ring_code" value="ACTION REPLAY 2 - VERSION 2 EUROPEAN CODE ARCHIVE DISC 01110501 THIN ICE MEDIA">
-		<info name="barcode" value="7 19480 10843 52">
+		<info name="ring_code" value="ACTION REPLAY 2 - VERSION 2 EUROPEAN CODE ARCHIVE DISC 01110501 THIN ICE MEDIA"/>
+		<info name="barcode" value="7 19480 10843 52"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57661,7 +57661,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-01564"/>
 		<info name="release" value="19990701" />
-		<info name="barcode" value="7 11719 78752 5">
+		<info name="barcode" value="7 11719 78752 5"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57678,7 +57678,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-00273 (9636229)"/>
 		<info name="release" value="199610xx" />
-		<info name="ring_code" value="DADC AUSTRIA   A0100197331-0101   15, DADC AUSTRIA   A0100197331-0101   35">
+		<info name="ring_code" value="DADC AUSTRIA   A0100197331-0101   15, DADC AUSTRIA   A0100197331-0101   35"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57693,8 +57693,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Konami of Europe</publisher>
 		<info name="serial" value="SLES-02096"/>
-		<info name="ring_code" value="Sony DADC   A0100317486-0101   13">
-		<info name="barcode" value="4 988602 759334">
+		<info name="ring_code" value="Sony DADC   A0100317486-0101   13"/>
+		<info name="barcode" value="4 988602 759334"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57710,8 +57710,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-02812 (9184829)"/>
 		<info name="release" value="200009xx" />
-		<info name="ring_code" value="Sony DADC   A0100327637-0102   13 (Disc 1), Sony DADC   A0100327637-0202   23 (Disc 2)">
-		<info name="barcode" value="7 11719 18442 3, 7 11719 18432 4">
+		<info name="ring_code" value="Sony DADC   A0100327637-0102   13 (Disc 1), Sony DADC   A0100327637-0202   23 (Disc 2)"/>
+		<info name="barcode" value="7 11719 18442 3, 7 11719 18432 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Disc 1 of 2"/>
@@ -57735,7 +57735,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-02834, SCES-02834-P"/>
 		<info name="release" value="200012xx" />
-		<info name="barcode" value="7 11719 23282 7, 7 11719 28422 2, 7 11719 28472 7">
+		<info name="barcode" value="7 11719 23282 7, 7 11719 28422 2, 7 11719 28472 7"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57750,7 +57750,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1995?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-00048"/>
-		<info name="ring_code" value="DADC AUSTRIA   A0000171157-0101   25">
+		<info name="ring_code" value="DADC AUSTRIA   A0000171157-0101   25"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57779,8 +57779,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1996?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-00457 (9644224)"/>
-		<info name="barcode" value="7 11719 64422 4">
-		<info name="ring_code" value="DADC AUSTRIA   A0100201111-0101   25">
+		<info name="barcode" value="7 11719 64422 4"/>
+		<info name="ring_code" value="DADC AUSTRIA   A0100201111-0101   25"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57810,8 +57810,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Microïds</publisher>
 		<info name="serial" value="SLES-02757"/>
 		<info name="release" value="20000206" />
-		<info name="ring_code" value="Sony DADC   A0100320928-0102   45 (Disc 1), Sony DADC   A0100320928-0202   15 (Disc 2)">
-		<info name="barcode" value="3 342185 276601">
+		<info name="ring_code" value="Sony DADC   A0100320928-0102   45 (Disc 1), Sony DADC   A0100320928-0202   15 (Disc 2)"/>
+		<info name="barcode" value="3 342185 276601"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Disc 1 of 2"/>
@@ -57834,8 +57834,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Infogrames Europe</publisher>
 		<info name="serial" value="SLES-02993#, SLES-02993-P"/>
 		<info name="release" value="20001117" />
-		<info name="ring_code" value="Sony DADC   A0100343709-0102   65 (Disc 1), Sony DADC   A0100343709-0202   33 (Disc 2)">
-		<info name="barcode" value="3 546430 012703, 3 546430 021552">
+		<info name="ring_code" value="Sony DADC   A0100343709-0102   65 (Disc 1), Sony DADC   A0100343709-0202   33 (Disc 2)"/>
+		<info name="barcode" value="3 546430 012703, 3 546430 021552"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Disc 1 of 2"/>
@@ -57858,7 +57858,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-00817 (9668626)"/>
 		<info name="alt_title" value="Italian demo issue n° 11 - Luglio 1997 (Ita Box), Edición Oficial Española PlayStation Magazine Disco 8 (Spa Box), Official UK PlayStation Magazine CD 04 Vol. 2 (UK Box)"/>
-		<info name="ring_code" value="DADC AUSTRIA   A0100218411-0101   15">
+		<info name="ring_code" value="DADC AUSTRIA   A0100218411-0101   15"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57874,8 +57874,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-00818 (9678823)"/>
 		<info name="alt_title" value="Italian demo issue n° 12 - Agosto 1997 (Ita Box), Edición Oficial Española PlayStation Magazine Disco 9 (Spa Box), Official UK PlayStation Magazine CD 05 Vol. 2 (UK Box)"/>
-		<info name="ring_code" value="DADC AUSTRIA   A0100221271-0101   15">
-		<info name="barcode" value="7 11719 66822 0, 7 11719 67882 3">
+		<info name="ring_code" value="DADC AUSTRIA   A0100221271-0101   15"/>
+		<info name="barcode" value="7 11719 66822 0, 7 11719 67882 3"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57891,7 +57891,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-00824 (9680420)"/>
 		<info name="alt_title" value="Italian demo issue n° 18 - Febbraio 1998 (Ita Box), Edición Oficial Española PlayStation Magazine Disco 15 (Spa Box), Official UK PlayStation Magazine CD 11 Vol. 2 (UK Box)"/>
-		<info name="ring_code" value="DADC AUSTRIA   A0100233103-0101   25">
+		<info name="ring_code" value="DADC AUSTRIA   A0100233103-0101   25"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57907,7 +57907,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-02632 (9151425)"/>
 		<info name="alt_title" value="Edición Oficial Española PlayStation Magazine Disco 43 (Spa Box), Official UK PlayStation Magazine Disc 58 (UK Box)"/>
-		<info name="ring_code" value="Sony DADC   A0100315421-0101   15">
+		<info name="ring_code" value="Sony DADC   A0100315421-0101   15"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57938,7 +57938,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-02636 (9151821)"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 62 (UK Box)"/>
-		<info name="ring_code" value="Sony DADC   A0100327000-0101   15">
+		<info name="ring_code" value="Sony DADC   A0100327000-0101   15"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57954,7 +57954,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-02637 (9151920)"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 63 (UK Box)"/>
-		<info name="ring_code" value="Sony DADC   A0100331338-0101   13">
+		<info name="ring_code" value="Sony DADC   A0100331338-0101   13"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57970,7 +57970,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-02638 (9152026)"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 64 (UK Box)"/>
-		<info name="ring_code" value="Sony DADC   A0100335156-0101   43">
+		<info name="ring_code" value="Sony DADC   A0100335156-0101   43"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57986,7 +57986,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-02639"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 65 (UK Box)"/>
-		<info name="ring_code" value="Sony DADC   A0100339028-0101   23">
+		<info name="ring_code" value="Sony DADC   A0100339028-0101   23"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58017,7 +58017,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-02641"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 67 (UK Box)"/>
-		<info name="barcode" value="7 11719 15082 4">
+		<info name="barcode" value="7 11719 15082 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58048,7 +58048,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-02643"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 69 (UK Box)"/>
-		<info name="barcode" value="7 11719 15102 9">
+		<info name="barcode" value="7 11719 15102 9"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58109,7 +58109,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-03450"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 73 (UK Box)"/>
-		<info name="barcode" value="7 11719 26652 5">
+		<info name="barcode" value="7 11719 26652 5"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58125,7 +58125,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-03451"/>
 		<info name="alt_title" value="Official UK PlayStation Magazine Disc 74 (UK Box)"/>
-		<info name="barcode" value="7 11719 26662 4">
+		<info name="barcode" value="7 11719 26662 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58141,8 +58141,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-02146"/>
 		<info name="release" value="20000419" />
-		<info name="ring_code" value="Sony DADC   A0100316368-0101   13">
-		<info name="barcode" value="7 11719 16572 9, 7 11719 16612 2">
+		<info name="ring_code" value="Sony DADC   A0100316368-0101   13"/>
+		<info name="barcode" value="7 11719 16572 9, 7 11719 16612 2"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58158,8 +58158,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-03119, SLES-03119-P"/>
 		<info name="release" value="20000929" />
-		<info name="ring_code" value="Sony DADC   A0100333924-0101   33">
-		<info name="barcode" value="5 030930 025366, 5 030945 029045">
+		<info name="ring_code" value="Sony DADC   A0100333924-0101   33"/>
+		<info name="barcode" value="5 030930 025366, 5 030945 029045"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58176,8 +58176,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-02080 ANZ-P, SLES-02080"/>
 		<info name="release" value="19991001" />
-		<info name="ring_code" value="DADC   A0100288304-0104   15, Sony DADC   A0100288304-0104   45 (Disc 1), DADC   A0100288304-0204   15, Sony DADC   A0100288304-0204   65 (Disc 2), DADC   A0100288304-0304   25, Sony DADC   A0100288304-0304   85 (Disc 3), DADC   A0100288304-0404   15 (Disc 4)">
-		<info name="barcode" value="7 11719 19392 0, 7 11719 85842 3, 7 11719 85902 4">
+		<info name="ring_code" value="DADC   A0100288304-0104   15, Sony DADC   A0100288304-0104   45 (Disc 1), DADC   A0100288304-0204   15, Sony DADC   A0100288304-0204   65 (Disc 2), DADC   A0100288304-0304   25, Sony DADC   A0100288304-0304   85 (Disc 3), DADC   A0100288304-0404   15 (Disc 4)"/>
+		<info name="barcode" value="7 11719 19392 0, 7 11719 85842 3, 7 11719 85902 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Disc 1 of 4"/>
@@ -58211,7 +58211,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Square Europe</publisher>
 		<info name="release" value="20000616" />
-		<info name="ring_code" value="R012-3848-2968">
+		<info name="ring_code" value="R012-3848-2968"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58227,7 +58227,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-02543"/>
 		<info name="release" value="20000420" />
-		<info name="barcode" value="7 11719 16332 9, 7 11719 16402 9">
+		<info name="barcode" value="7 11719 16332 9, 7 11719 16402 9"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58243,8 +58243,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-00984, SCES-00984#"/>
 		<info name="release" value="19980505" />
-		<info name="ring_code" value="DADC   A0100242488-0101   35, DADC   A0100242488-0101   45, DADC AUSTRIA   A0100242488-0101   25">
-		<info name="barcode" value="7 11719 72352 3, 7 11719 72392 9, 7 11719 74232 6, 7 11719 74252 4">
+		<info name="ring_code" value="DADC   A0100242488-0101   35, DADC   A0100242488-0101   45, DADC AUSTRIA   A0100242488-0101   25"/>
+		<info name="barcode" value="7 11719 72352 3, 7 11719 72392 9, 7 11719 74232 6, 7 11719 74252 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58260,8 +58260,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-02380"/>
 		<info name="release" value="20000128" />
-		<info name="ring_code" value="DADC   A0100306121-0102   15, DADC   A0100306121-0102   25 (Disc 1), DADC   A0100306121-0202   15, DADC   A0100306121-0202   25, DADC   A0100306121-0202   35 (Disc 2)">
-		<info name="barcode" value="7 11719 22012 1, 7 11719 22192 0, 7 11719 87822 3, 7 11719 87832 2, 7 11719 87842 1">
+		<info name="ring_code" value="DADC   A0100306121-0102   15, DADC   A0100306121-0102   25 (Disc 1), DADC   A0100306121-0202   15, DADC   A0100306121-0202   25, DADC   A0100306121-0202   35 (Disc 2)"/>
+		<info name="barcode" value="7 11719 22012 1, 7 11719 22192 0, 7 11719 87822 3, 7 11719 87832 2, 7 11719 87842 1"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Arcade Mode"/>
@@ -58284,8 +58284,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Rockstar Games</publisher>
 		<info name="serial" value="SLES-01404#"/>
 		<info name="release" value="199910xx" />
-		<info name="ring_code" value="DADC   A0100294705-0101   15">
-		<info name="barcode" value="5 026555 190206, 5 026555 190794">
+		<info name="ring_code" value="DADC   A0100294705-0101   15"/>
+		<info name="barcode" value="5 026555 190206, 5 026555 190794"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58302,8 +58302,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Infogrames Europe</publisher>
 		<info name="serial" value="SLES-01362 (0006672), SLES-01362#"/>
 		<info name="release" value="19991126" />
-		<info name="ring_code" value="DADC   A0100300873-0101   15">
-		<info name="barcode" value="3 546430 011850, 3 546430 013830, 5 013156 900518, 5 013156 900563">
+		<info name="ring_code" value="DADC   A0100300873-0101   15"/>
+		<info name="barcode" value="3 546430 011850, 3 546430 013830, 5 013156 900518, 5 013156 900563"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58319,8 +58319,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-03124, SLES-03124/P"/>
 		<info name="release" value="20001201" />
-		<info name="ring_code" value="Sony DADC   A0100343956-0101   15">
-		<info name="barcode" value="5 030930 024659, 5 030930 028152, 5 030935 024654 >">
+		<info name="ring_code" value="Sony DADC   A0100343956-0101   15"/>
+		<info name="barcode" value="5 030930 024659, 5 030930 028152, 5 030935 024654 >"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58336,8 +58336,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Konami</publisher>
 		<info name="serial" value="SLES-01370"/>
 		<info name="release" value="19990226" />
-		<info name="ring_code" value="DADC   A0100267025-0102   15, DADC   A0100267025-0102   35 (Disc 1), DADC   A0100267025-0202   25, Sony DADC   A0100267025-0202   55 (Disc 2)">
-		<info name="barcode" value="4 012927 020067, 4 988602 749786">
+		<info name="ring_code" value="DADC   A0100267025-0102   15, DADC   A0100267025-0102   35 (Disc 1), DADC   A0100267025-0202   25, Sony DADC   A0100267025-0202   55 (Disc 2)"/>
+		<info name="barcode" value="4 012927 020067, 4 988602 749786"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom1" interface="psx_cdrom">
 			<feature name="part_id" value="Disc 1 of 2"/>
@@ -58360,7 +58360,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Konami of Europe</publisher>
 		<info name="serial" value="SLES-02136"/>
 		<info name="release" value="199910xx" />
-		<info name="barcode" value="4 988602 676297">
+		<info name="barcode" value="4 988602 676297"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58376,7 +58376,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>The Codemasters Software Company</publisher>
 		<info name="serial" value="SLES-00016#"/>
 		<info name="release" value="199703xx" />
-		<info name="barcode" value="5 024866 241532, 5 024866 241563">
+		<info name="barcode" value="5 024866 241532, 5 024866 241563"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58392,8 +58392,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-00469"/>
 		<info name="release" value="19971103" />
-		<info name="ring_code" value="DADC AUSTRIA   A0100228657-0101   25, DADC AUSTRIA   A0100228657-0101   35">
-		<info name="barcode" value="5 030930 013257 >, 5 030935 013252 >">
+		<info name="ring_code" value="DADC AUSTRIA   A0100228657-0101   25, DADC AUSTRIA   A0100228657-0101   35"/>
+		<info name="barcode" value="5 030930 013257 >, 5 030935 013252 >"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58409,8 +58409,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="SCES-03037"/>
 		<info name="release" value="200011xx" />
-		<info name="ring_code" value="Sony DADC   A0100333381-0101   15">
-		<info name="barcode" value="7 11719 19482 8">
+		<info name="ring_code" value="Sony DADC   A0100333381-0101   15"/>
+		<info name="barcode" value="7 11719 19482 8"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58426,8 +58426,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="SLES-01356"/>
 		<info name="release" value="199811xx" />
-		<info name="ring_code" value="DADC   A0100261573-0101   15">
-		<info name="barcode" value="5 024866 240504, 5 024866 240511, 5 024866 240542">
+		<info name="ring_code" value="DADC   A0100261573-0101   15"/>
+		<info name="barcode" value="5 024866 240504, 5 024866 240511, 5 024866 240542"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58443,7 +58443,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-00658"/>
 		<info name="release" value="199705xx" />
-		<info name="barcode" value="5 030945 012634">
+		<info name="barcode" value="5 030945 012634"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58459,7 +58459,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-01154"/>
 		<info name="release" value="199804xx" />
-		<info name="barcode" value="5 030930 022723">
+		<info name="barcode" value="5 030930 022723"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58474,8 +58474,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1999</year>
 		<publisher>The Codemasters Software Company</publisher>
 		<info name="serial" value="SLES-00849, SLES-00849#"/>
-		<info name="ring_code" value="DADC   A0100299348-0101   25">
-		<info name="barcode" value="5 024866 241839">
+		<info name="ring_code" value="DADC   A0100299348-0101   25"/>
+		<info name="barcode" value="5 024866 241839"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58491,8 +58491,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>GT Interactive Software Europe / Infogrames</publisher>
 		<info name="serial" value="SLES-00664, SLES-00664#"/>
 		<info name="release" value="199709xx" />
-		<info name="ring_code" value="DADC   A0100225498-0101   15, DADC   A0100225498-0101   35">
-		<info name="barcode" value="3 546430 010112 >, 5 029988 004676 >">
+		<info name="ring_code" value="DADC   A0100225498-0101   15, DADC   A0100225498-0101   35"/>
+		<info name="barcode" value="3 546430 010112 >, 5 029988 004676 >"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58508,7 +58508,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCED-00287 (9721925)"/>
-		<info name="ring_code" value="DADC AUSTRIA   A0100238994-0101   15">
+		<info name="ring_code" value="DADC AUSTRIA   A0100238994-0101   15"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58524,7 +58524,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-00886#"/>
 		<info name="release" value="19971101" />
-		<info name="barcode" value="7 11719 73022 4">
+		<info name="barcode" value="7 11719 73022 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58539,8 +58539,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1999?</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SCES-02180"/>
-		<info name="ring_code" value="DADC   A0100288551-0101   25">
-		<info name="barcode" value="7 11719 84102 9, 7 11719 84812 7">
+		<info name="ring_code" value="DADC   A0100288551-0101   25"/>
+		<info name="barcode" value="7 11719 84102 9, 7 11719 84812 7"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58556,8 +58556,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-00409, SCES-00409#"/>
 		<info name="release" value="19970701" />
-		<info name="ring_code" value="DADC AUSTRIA   A0100212393-0101   15, DADC AUSTRIA   A0100212393-0101   25, DADC AUSTRIA   A0100212393-0101   35">
-		<info name="barcode" value="7 11719 18722 6, 7 11719 18732 5, 7 11719 65932 7, 7 11719 65942 6, 7 11719 71082 0">
+		<info name="ring_code" value="DADC AUSTRIA   A0100212393-0101   15, DADC AUSTRIA   A0100212393-0101   25, DADC AUSTRIA   A0100212393-0101   35"/>
+		<info name="barcode" value="7 11719 18722 6, 7 11719 18732 5, 7 11719 65932 7, 7 11719 65942 6, 7 11719 71082 0"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58572,8 +58572,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1997?</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-00667"/>
-		<info name="ring_code" value="DADC AUSTRIA   A0100220841-0101   15">
-		<info name="barcode" value="7 11719 65922 8">
+		<info name="ring_code" value="DADC AUSTRIA   A0100220841-0101   15"/>
+		<info name="barcode" value="7 11719 65922 8"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58588,8 +58588,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1998</year>
 		<publisher>Empire Interactive Entertainment</publisher>
 		<info name="serial" value="SLES-01211"/>
-		<info name="ring_code" value="DADC   A0100266896-0101   15">
-		<info name="barcode" value="5 017783 401530, 5 017783 401547">
+		<info name="ring_code" value="DADC   A0100266896-0101   15"/>
+		<info name="barcode" value="5 017783 401530, 5 017783 401547"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58606,8 +58606,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Namco</publisher>
 		<info name="serial" value="SCES-02569 (9169024)"/>
 		<info name="release" value="20000407" />
-		<info name="ring_code" value="Sony DADC   A0100318110-0101   13, KODAK CD-R 74 9920 2404 1100">
-		<info name="barcode" value="7 11719 16832 4">
+		<info name="ring_code" value="Sony DADC   A0100318110-0101   13, KODAK CD-R 74 9920 2404 1100"/>
+		<info name="barcode" value="7 11719 16832 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58623,7 +58623,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
 		<info name="serial" value="SLES-00200"/>
 		<info name="release" value="199608xx" />
-		<info name="barcode" value="5 028587 083846">
+		<info name="barcode" value="5 028587 083846"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58639,7 +58639,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="SLES-02529"/>
-		<info name="barcode" value="5 032921 009263">
+		<info name="barcode" value="5 032921 009263"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58654,7 +58654,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="SLES-02732"/>
-		<info name="barcode" value="5 032921 010221">
+		<info name="barcode" value="5 032921 010221"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58670,8 +58670,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Konami Digital Entertainment</publisher>
 		<info name="serial" value="SLES-01514, SLES-01514 - P"/>
 		<info name="release" value="199908xx" />
-		<info name="ring_code" value="DADC   A0100284653-0101   15, Sony DADC   A0100284653-0101   63">
-		<info name="barcode" value="4 988602 068597, 4 988602 555660">
+		<info name="ring_code" value="DADC   A0100284653-0101   15, Sony DADC   A0100284653-0101   63"/>
+		<info name="barcode" value="4 988602 068597, 4 988602 555660"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58687,7 +58687,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1999?</year>
 		<publisher>ASCII Entertainment Europe</publisher>
 		<info name="serial" value="SLED-01711 (2083014)"/>
-		<info name="barcode" value="0 93992 08300 7, 0 93992 08301 4">
+		<info name="barcode" value="0 93992 08300 7, 0 93992 08301 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58702,8 +58702,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Activision Publishing</publisher>
 		<info name="serial" value="SLES-02886, SLES-02886/P"/>
-		<info name="ring_code" value="Sony DADC   A0100331760-0101   13">
-		<info name="barcode" value="5 030917 011405, 5 030917 013737">
+		<info name="ring_code" value="Sony DADC   A0100331760-0101   13"/>
+		<info name="barcode" value="5 030917 011405, 5 030917 013737"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58719,8 +58719,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-01438 (9750925)"/>
 		<info name="release" value="19981001" />
-		<info name="ring_code" value="DADC AUSTRIA   A0100257302-0101   15, DADC AUSTRIA   A0100257302-0101   35, Sony DADC   A0100257302-0101   75">
-		<info name="barcode" value="7 11719 75022 2, 7 11719 75072 7, 7 11719 88542 9, 7 11719 88972 4">
+		<info name="ring_code" value="DADC AUSTRIA   A0100257302-0101   15, DADC AUSTRIA   A0100257302-0101   35, Sony DADC   A0100257302-0101   75"/>
+		<info name="barcode" value="7 11719 75022 2, 7 11719 75072 7, 7 11719 88542 9, 7 11719 88972 4"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58737,8 +58737,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="serial" value="SCES-02835"/>
 		<info name="release" value="20011210" /> <!-- Rev. 1 -->
-		<info name="ring_code" value="Sony DADC   A0100342055-0101   15">
-		<info name="barcode" value="7 11719 283621, 7 11719 28392 8">
+		<info name="ring_code" value="Sony DADC   A0100342055-0101   15"/>
+		<info name="barcode" value="7 11719 283621, 7 11719 28392 8"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58753,8 +58753,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-02703 (EAE06103049)"/>
-		<info name="ring_code" value="Sony DADC   A0100314423-0101   15, Sony DADC   A0100314423-0101   23">
-		<info name="barcode" value="5 030930 026400 >, 5 030936 022505">
+		<info name="ring_code" value="Sony DADC   A0100314423-0101   15, Sony DADC   A0100314423-0101   23"/>
+		<info name="barcode" value="5 030930 026400 >, 5 030936 022505"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58769,7 +58769,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1998</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="SLED-01467 (7005053)"/>
-		<info name="barcode" value="5 030917 005053">
+		<info name="barcode" value="5 030917 005053"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58784,8 +58784,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Cryo Interactive Entertainment</publisher>
 		<info name="serial" value="SLES-02752"/>
-		<info name="ring_code" value="Sony DADC   A0100324125-0101   13">
-		<info name="barcode" value="3 554540 515090">
+		<info name="ring_code" value="Sony DADC   A0100324125-0101   13"/>
+		<info name="barcode" value="3 554540 515090"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58801,7 +58801,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-00627"/>
 		<info name="release" value="199802xx" />
-		<info name="barcode" value="5 030930 022747">
+		<info name="barcode" value="5 030930 022747"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58817,8 +58817,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-02688, SLES-02688/GER"/>
-		<info name="ring_code" value="DADC   A0100312300-0101   25">
-		<info name="barcode" value="5 030932 022233, 5 030935 022230, 5 030935 026290">
+		<info name="ring_code" value="DADC   A0100312300-0101   25"/>
+		<info name="barcode" value="5 030932 022233, 5 030935 022230, 5 030935 026290"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58835,7 +58835,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>The Codemasters Software Company</publisher>
 		<info name="serial" value="SLES-02572, SLES-02572/P"/>
 		<info name="release" value="20000825" />
-		<info name="barcode" value="5 024866 241297, 5 024866 241310, 5 024866 242256">
+		<info name="barcode" value="5 024866 241297, 5 024866 241310, 5 024866 242256"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58851,7 +58851,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="SLES-02238, SLES-02238/ANZ"/>
 		<info name="release" value="199911xx" />
-		<info name="barcode" value="5 032921 008488">
+		<info name="barcode" value="5 032921 008488"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58867,8 +58867,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="SLES-02071, SLES-02071#"/>
-		<info name="ring_code" value="DADC   A0100311973-0101   25">
-		<info name="barcode" value="5 032921 004695, 5 032921 007962, 5 032921 014175">
+		<info name="ring_code" value="DADC   A0100311973-0101   25"/>
+		<info name="barcode" value="5 032921 004695, 5 032921 007962, 5 032921 014175"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58884,8 +58884,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SLES-02534"/>
 		<info name="release" value="20010331" />
-		<info name="ring_code" value="Sony DADC   A0100355439-0101   23">
-		<info name="barcode" value="3 455192 121212, 3 455192 121236">
+		<info name="ring_code" value="Sony DADC   A0100355439-0101   23"/>
+		<info name="barcode" value="3 455192 121212, 3 455192 121236"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58901,7 +58901,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-02253"/>
 		<info name="release" value="19991216" />
-		<info name="barcode" value="5 030930 021191">
+		<info name="barcode" value="5 030930 021191"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58916,8 +58916,8 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLES-02193 (EAX06102705D), SLES-02193#"/>
-		<info name="ring_code" value="DADC   A0100297310-0101   25">
-		<info name="barcode" value="5 030930 021627, 5 030935 025125">
+		<info name="ring_code" value="DADC   A0100297310-0101   25"/>
+		<info name="barcode" value="5 030930 021627, 5 030935 025125"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
