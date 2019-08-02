@@ -37239,6 +37239,23 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/14070/ -->
+	<software name="sentokka">
+		<description>Sentou Kokka: Air Land Battle (Jpn, Rev. 1)</description>
+		<year>1995</year>
+		<publisher>Sony Computer Entertainment</publisher>
+		<info name="serial" value="SCPS 10015, SCPS 91008"/>
+		<info name="alt_title" value="戦闘国家 AIR LAND BATTLE"/>
+		<info name="release" value="19951201" />
+		<info name="barcode" value="4 948872 100151, 4 948872 910088">
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sentou kokka - air land battle (japan) (rev 1)" sha1="f058f3987ade1e373c103efce5a2d0f91ad31844"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sidebs2k">
 		<!-- Original images (Redump)
 		<rom name="Side by Side Special 2000 (Japan).cue" size="99" crc="50c0782e" sha1="a59b4e21049aae2343a5c560df4850e50ba3def9"/>
@@ -58625,6 +58642,106 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="resident evil - survivor (europe)" sha1="29693d01b07648ec88bede08e71252684fe121a7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/135/ -->
+	<software name="silenthe" cloneof="silenth">
+		<description>Silent Hill (Euro)</description>
+		<year>1999</year>
+		<publisher>Konami Digital Entertainment</publisher>
+		<info name="serial" value="SLES-01514, SLES-01514 - P"/>
+		<info name="release" value="199908xx" />
+		<info name="ring_code" value="DADC   A0100284653-0101   15, Sony DADC   A0100284653-0101   63">
+		<info name="barcode" value="4 988602 068597, 4 988602 555660">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="silent hill (europe) (en,fr,de,es,it)" sha1="b1883e6008d96bd4caf102356d38475377127797"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/18437/ -->
+	<!-- Bundled with ASCII Sphere 360° Controller -->
+	<software name="sphere360">
+		<description>Sphere 360° (Euro)</description>
+		<year>1999?</year>
+		<publisher>ASCII Entertainment Europe</publisher>
+		<info name="serial" value="SLED-01711 (2083014)"/>
+		<info name="barcode" value="0 93992 08300 7, 0 93992 08301 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sphere 360 (europe) (en,fr,de,es,it) (demo)" sha1="4ff0c83718d706e5de919a642b9cc1251f474d80"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/907/ -->
+	<software name="spidermne" cloneof="spidermn">
+		<description>Spider-Man (Euro)</description>
+		<year>2000</year>
+		<publisher>Activision Publishing</publisher>
+		<info name="serial" value="SLES-02886, SLES-02886/P"/>
+		<info name="ring_code" value="Sony DADC   A0100331760-0101   13">
+		<info name="barcode" value="5 030917 011405, 5 030917 013737">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="spider-man (europe)" sha1="7533a7372dd4493d3ac6bb35990efb6a5fa0929f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/1184/ -->
+	<software name="spyroe" cloneof="spyro">
+		<description>Spyro the Dragon (Euro)</description>
+		<year>1998</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-01438 (9750925)"/>
+		<info name="release" value="19981001" />
+		<info name="ring_code" value="DADC AUSTRIA   A0100257302-0101   15, DADC AUSTRIA   A0100257302-0101   35, Sony DADC   A0100257302-0101   75">
+		<info name="barcode" value="7 11719 75022 2, 7 11719 75072 7, 7 11719 88542 9, 7 11719 88972 4">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="spyro the dragon (europe) (en,fr,de,es,it)" sha1="f07f371c80713a6ee8bd6a037a2948d748368638"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/19611/ -->
+	<!-- Uses LibCrypt protection which isn't included in the CHD. -->
+	<software name="spyro3e" cloneof="spyro3">
+		<description>Spyro: Year of the Dragon (Euro, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Sony Computer Entertainment Europe</publisher>
+		<info name="serial" value="SCES-02835"/>
+		<info name="release" value="20011210" /> <!-- Rev. 1 -->
+		<info name="ring_code" value="Sony DADC   A0100342055-0101   15">
+		<info name="barcode" value="7 11719 283621, 7 11719 28392 8">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="spyro - year of the dragon (europe) (en,fr,de,es,it) (rev 1)" sha1="1019a28219d8f6137bc92414d2764e41dfe6b5f4" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/26746/ -->
+	<software name="strskat2" cloneof="strsk8_2">
+		<description>Street Skater 2 (Euro)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02703 (EAE06103049)"/>
+		<info name="ring_code" value="Sony DADC   A0100314423-0101   15, Sony DADC   A0100314423-0101   23">
+		<info name="barcode" value="5 030930 026400 >, 5 030936 022505">
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="street skater 2 (europe) (en,fr,de)" sha1="254727844bae841e7287d3cb4b32f45cdd53de13"/>
 			</diskarea>
 		</part>
 	</software>
