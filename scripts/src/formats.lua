@@ -1015,6 +1015,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/juku_dsk.h,FORMATS["JUKU_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["JUKU_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/juku_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/juku_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/jvc_dsk.h,FORMATS["JVC_DSK"] = true
 --------------------------------------------------
 

@@ -15,6 +15,9 @@
 	- КР580ВВ51A x2
 	- КР580ВВ55A x2
 
+	Note:
+	- In the monitor, enter A to start BASIC and T to boot from disk/network
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -25,6 +28,9 @@
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
+#include "formats/juku_dsk.h"
 #include "screen.h"
 
 
@@ -43,6 +49,8 @@ public:
 		m_pit(*this, "pit%u", 0U),
 		m_pio(*this, "pio%u", 0U),
 		m_sio(*this, "sio%u", 0U),
+		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:%u", 0U),
 		m_key_encoder(*this, "keyenc"),
 		m_keys(*this, "COL.%u", 0U),
 		m_key_special(*this, "SPECIAL")
@@ -61,6 +69,8 @@ private:
 	required_device_array<pit8253_device, 3> m_pit;
 	required_device_array<i8255_device, 2> m_pio;
 	required_device_array<i8251_device, 2> m_sio;
+	required_device<fd1793_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<ttl74148_device> m_key_encoder;
 	required_ioport_array<16> m_keys;
 	required_ioport m_key_special;
@@ -74,6 +84,8 @@ private:
 	void pio0_portc_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	std::unique_ptr<uint8_t[]> m_ram;
 };
@@ -98,7 +110,7 @@ void juku_state::bank_map(address_map &map)
 	map(0x1d800, 0x1ffff).bankr("rom_d800");
 	// memory mode 2
 	map(0x20000, 0x23fff).bankrw("ram_0000");
-	map(0x24000, 0x2bfff).noprw(); // extension
+	map(0x24000, 0x2bfff).rom().region("basic", 0);
 	map(0x2c000, 0x2ffff).bankrw("ram_c000");
 	map(0x2d800, 0x2ffff).bankr("rom_d800");
 	// memory mode 3
@@ -114,7 +126,8 @@ void juku_state::io_map(address_map &map)
 	map(0x10, 0x13).rw(m_pit[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x14, 0x17).rw(m_pit[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x18, 0x1b).rw(m_pit[2], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x1c, 0x1f).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+//	map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 
@@ -283,6 +296,20 @@ uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 //**************************************************************************
+//  FLOPPY DISK
+//**************************************************************************
+
+FLOPPY_FORMATS_MEMBER(juku_state::floppy_formats)
+	FLOPPY_JUKU_FORMAT
+FLOPPY_FORMATS_END
+
+static void juku_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
@@ -324,11 +351,13 @@ void juku_state::pio0_portc_w(uint8_t data)
 {
 	// 7-------  (cas?) pof
 	// -6------  (cas?) stop
-	// --5-----  (cas?) rn
+	// --5-----  (cas?) rn / floppy
 	// ---4----  (cas?) ff
 	// ----3---  (cas?) play
-	// -----2--  (cas?) rec
+	// -----2--  (cas?) rec / floppy
 	// ------10  memory mode
+
+//	m_floppy[0]->get_device()->ss_w(BIT(data, 6));
 
 	m_bank->set_bank(data & 0x03);
 }
@@ -351,6 +380,10 @@ void juku_state::machine_reset()
 {
 	m_bank->set_bank(0);
 	m_key_encoder->enable_input_w(0);
+
+	// disk select and motor are probably at pio0 portc
+	m_floppy[0]->get_device()->mon_w(0);
+	m_fdc->set_floppy(m_floppy[0]->get_device());
 }
 
 
@@ -423,6 +456,10 @@ void juku_state::juku(machine_config &config)
 	screen.set_screen_update(FUNC(juku_state::screen_update));
 
 	TTL74148(config, m_key_encoder, 0);
+
+	FD1793(config, m_fdc, 1000000);
+	FLOPPY_CONNECTOR(config, "fdc:0", juku_floppies, "35dd", juku_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", juku_floppies, "35dd", juku_state::floppy_formats);
 }
 
 
@@ -435,7 +472,7 @@ ROM_START( juku )
 	ROM_LOAD("jukurom0.bin", 0x0000, 0x2000, CRC(b26f5080) SHA1(db8bab6ff7143be890d6aaa25d10386dfdac3fc7))
 	ROM_LOAD("jukurom1.bin", 0x2000, 0x2000, CRC(b184e253) SHA1(d169acde61f643d7d0780cca0eeaf33ebdf75b92))
 
-	ROM_REGION(0x2000, "basic", 0)
+	ROM_REGION(0x8000, "basic", 0)
 	ROM_LOAD("bas0.bin", 0x0000, 0x0800, CRC(c03996cd) SHA1(3c45537c2a1879998e5315b79eb44dcf7c007d69))
 	ROM_LOAD("bas1.bin", 0x0800, 0x0800, CRC(d8016869) SHA1(baef9e9c55171a9192bc13d48e3b45394c7780d9))
 	ROM_LOAD("bas2.bin", 0x1000, 0x0800, CRC(9a958621) SHA1(08baca27e1ccdb0a441706df267c1f82b82d56ab))
