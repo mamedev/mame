@@ -299,6 +299,7 @@ SOUNDS["SWP30"] = true
 
 VIDEOS["SEGA315_5124"] = true
 VIDEOS["SEGA315_5313"] = true
+VIDEOS["AM8052"] = true
 --VIDEOS["BUFSPRITE"] = true
 VIDEOS["BT45X"] = true
 VIDEOS["BT459"] = true
