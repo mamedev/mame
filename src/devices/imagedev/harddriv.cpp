@@ -75,7 +75,7 @@ harddisk_image_device::~harddisk_image_device()
 
 void harddisk_image_device::device_config_complete()
 {
-	add_format("chd", "CHD Hard drive", "chd,hd,hdv,2mg", hd_option_spec);
+	add_format("chd", "CHD Hard drive", "chd,hd,hdv,2mg,hdi", hd_option_spec);
 }
 
 const util::option_guide &harddisk_image_device::create_option_guide() const
@@ -280,7 +280,7 @@ image_init_result harddisk_image_device::internal_load_hd()
 		if (is_open())
 		{
 			uint32_t skip = 0;
-			char header[64];
+			uint8_t header[64];
 
 			fseek(0, SEEK_SET);
 			fread(header, 64);
@@ -290,6 +290,20 @@ image_init_result harddisk_image_device::internal_load_hd()
 			{
 				skip = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
 				osd_printf_verbose("harddriv: found 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
+			}
+			// check for HDI format
+			else if (is_filetype("hdi"))
+			{
+				skip = header[0x8] | (header[0x9] << 8) | (header[0xa] << 16) | (header[0xb] << 24);
+				uint32_t data_size = header[0xc] | (header[0xd] << 8) | (header[0xe] << 16) | (header[0xf] << 24);
+				if (data_size == image_core_file().size() - skip)
+				{
+					osd_printf_verbose("harddriv: detected Anex86 HDI, data at %08x\n", skip);
+				}
+				else
+				{
+					skip = 0;
+				}
 			}
 
 			m_hard_disk_handle = hard_disk_open(image_core_file(), skip);
