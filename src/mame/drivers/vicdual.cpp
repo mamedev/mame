@@ -3896,6 +3896,28 @@ ROM_START( alphaho )
 	ROM_LOAD( "alphaho.col",  0x0000, 0x0020, NO_DUMP )
 ROM_END
 
+ROM_START( wantsega )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",           0x0000, 0x0800, CRC(fc2ccf14) SHA1(345ed91ce74615a89b4ea0a5dc38489b36a4cc6e) )
+	ROM_LOAD( "2",           0x0800, 0x0800, CRC(c1c59576) SHA1(5174c769390438d05682a4999439b2f5659cbda8) )
+	ROM_LOAD( "3",           0x1000, 0x0800, CRC(862b7303) SHA1(8e89311ca23ca89d258744de393ecd88fc8d3bfb) )
+	ROM_LOAD( "4",           0x1800, 0x0800, CRC(0dfab42b) SHA1(723bda17dfaeec90545a0e8ef9ac83e5d92eec1e) )
+	ROM_LOAD( "5",           0x2000, 0x0800, CRC(530b9a43) SHA1(af07c2dbfe45c10ef3bd06efe56f780b6afbc9fc) )
+	ROM_LOAD( "6",           0x2800, 0x0800, CRC(d038b76e) SHA1(b72031b1a6010d70a1db66fc825cb9046fb98330) )
+	ROM_LOAD( "7",           0x3000, 0x0800, CRC(e1bf29bd) SHA1(541e9e83f05e764f9bb6026ba21e15627a9f3cb7) )
+	ROM_LOAD( "8",           0x3800, 0x0800, CRC(1b8a52cf) SHA1(59ecff36406191a5b92892147f6d84d9a501b697) )
+	ROM_LOAD( "9",           0x4000, 0x0800, CRC(bd84a06a) SHA1(c60f6c915f01f8f474bcb2f4ebb65be06c51b7f8) )
+	ROM_LOAD( "10",          0x4800, 0x0800, CRC(bd321dd9) SHA1(25e18f4a35ece041a20e5dc1cd6bc529d3ba2719) )
+	ROM_LOAD( "11",          0x5000, 0x0800, CRC(2cb222ca) SHA1(74717c194cdf07dd5b6d99552881a64ab7ef4886) )
+	ROM_LOAD( "12",          0x5800, 0x0800, CRC(390e3c32) SHA1(1fd219bf8c09472c337b2f33052092eb8c970f5d) )
+	ROM_LOAD( "13",          0x6000, 0x0800, CRC(3779e91c) SHA1(0b338ba1558d4b7b1faa7fb1354b39764b1a43cb) )
+	ROM_LOAD( "14",          0x6800, 0x0800, CRC(7e70b2f7) SHA1(d3986716e8447f258186fafd1a95ce9c52f61033) )
+	ROM_LOAD( "15",          0x7000, 0x0800, CRC(46b71a75) SHA1(a512ebee6020fd2ccbff9342a956131911177b08) )
+	ROM_LOAD( "16",          0x7800, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "alphaho.col",  0x0000, 0x0020, NO_DUMP )
+ROM_END
 
 /*************************************
  *
@@ -3950,3 +3972,4 @@ GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,  empty_in
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,  empty_init, ROT270, "Sega", "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,  empty_init, ROT270, "Denki Onkyo", "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,  empty_init, ROT270, "Data East Corporation", "Alpha Fighter / Head On", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wantsega,     0,      carhntds,  carhntds,  vicdual_state,  empty_init, ROT270, "Sega", "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
