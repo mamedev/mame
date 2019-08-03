@@ -34606,4 +34606,36 @@
 		</part>
 	</software>
 
+	<software name="dinodypl">
+		<description>Dinosaur Days Plus (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Pelican Software</publisher>
+		<info name="release" value="2019-08-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 1a - program.dsk" size="143360" crc="9c1f7a33" sha1="1db7919a4bc7faad7f4eee2d23b6cd06b0c87bb0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Artwork"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 1b - artwork.dsk" size="143360" crc="ce3f5c47" sha1="15328506f5ef39cc1abb39bcb0afa2593556d311" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Learning disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 2a - learning disk.dsk" size="143360" crc="33d43d67" sha1="76c0592075087b824191e4d9c98923f8dbf526d1" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Learning disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur days plus (4am crack) disk 2b - learning disk.dsk" size="143360" crc="153b4ea8" sha1="e6116d613bb0aed1491c6df9c0bdf34231ea42f2" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
