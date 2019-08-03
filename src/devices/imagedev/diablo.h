@@ -65,8 +65,8 @@ protected:
 	chd_file        m_diffchd;              /* handle to the diff CHD */
 	hard_disk_file  *m_hard_disk_handle;
 
-	load_delegate  	m_device_image_load;
-	unload_delegate	m_device_image_unload;
+	load_delegate   m_device_image_load;
+	unload_delegate m_device_image_unload;
 	const char *    m_interface;
 };
 

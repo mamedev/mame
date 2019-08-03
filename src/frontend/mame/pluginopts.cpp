@@ -91,11 +91,11 @@ bool plugin_options::load_plugin(const std::string &path)
 		: ".";
 
 	plugin p;
-	p.m_name		= document["plugin"]["name"].GetString();
-	p.m_description	= document["plugin"]["description"].GetString();
-	p.m_type		= document["plugin"]["type"].GetString();
-	p.m_directory	= std::move(dir);
-	p.m_start		= false;
+	p.m_name        = document["plugin"]["name"].GetString();
+	p.m_description = document["plugin"]["description"].GetString();
+	p.m_type        = document["plugin"]["type"].GetString();
+	p.m_directory   = std::move(dir);
+	p.m_start       = false;
 	if (document["plugin"].HasMember("start") && (std::string(document["plugin"]["start"].GetString()) == "true"))
 		p.m_start = true;
 
@@ -125,7 +125,7 @@ plugin *plugin_options::find(const std::string &name)
 //  create_core_options
 //-------------------------------------------------
 
-static void create_core_options(core_options &opts, const plugin_options &plugin_opts)
+static core_options create_core_options(const plugin_options &plugin_opts)
 {
 	// we're sort of abusing core_options to just get INI file parsing, so we'll build a
 	// core_options structure for the sole purpose of parsing an INI file, and then reflect
@@ -135,6 +135,8 @@ static void create_core_options(core_options &opts, const plugin_options &plugin
 		{ nullptr, nullptr, OPTION_HEADER, "PLUGINS OPTIONS" },
 		{ nullptr }
 	};
+
+	core_options opts;
 	opts.add_entries(s_option_entries);
 
 	// create an entry for each option
@@ -146,6 +148,8 @@ static void create_core_options(core_options &opts, const plugin_options &plugin
 			core_options::option_type::BOOLEAN,
 			p.m_start ? "1" : "0");
 	}
+
+	return opts;
 }
 
 
@@ -155,8 +159,7 @@ static void create_core_options(core_options &opts, const plugin_options &plugin
 
 void plugin_options::parse_ini_file(util::core_file &inifile)
 {
-	core_options opts;
-	create_core_options(opts, *this);
+	core_options opts = create_core_options(*this);
 
 	// parse the INI file
 	opts.parse_ini_file(inifile, OPTION_PRIORITY_NORMAL, true, true);
@@ -173,7 +176,6 @@ void plugin_options::parse_ini_file(util::core_file &inifile)
 
 std::string plugin_options::output_ini() const
 {
-	core_options opts;
-	create_core_options(opts, *this);
+	core_options opts = create_core_options(*this);
 	return opts.output_ini();
 }

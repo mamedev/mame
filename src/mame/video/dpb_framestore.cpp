@@ -5,11 +5,11 @@
     dpb_framestore.cpp
     DPB-7000/1 - Framestore Card
 
-	TODO:
-	- Code is currently a more or less direct translation of the board
-	  schematic. It is highly inefficient, but accurate. An equally-
-	  accurate, but faster, version can be made once better understanding
-	  of the overall DPB-7000 system is had.
+    TODO:
+    - Code is currently a more or less direct translation of the board
+      schematic. It is highly inefficient, but accurate. An equally-
+      accurate, but faster, version can be made once better understanding
+      of the overall DPB-7000 system is had.
 
 ***************************************************************************/
 

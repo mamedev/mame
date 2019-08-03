@@ -3,8 +3,10 @@
 
 <!-- define elements -->
 
+	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+
 	<element name="digit" defstate="0">
-		<led16seg><color red="0.5" green="0.5" blue="0.5" /></led16seg>
+		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
 	</element>
 
 
@@ -12,6 +14,8 @@
 
 	<view name="Internal Layout">
 		<bounds left="0" right="80" top="0" bottom="15" />
+
+		<bezel element="lcd_bg"><bounds x="0" y="0" width="80" height="15" /></bezel>
 
 		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="10" y="0" width="10" height="15" /></bezel>

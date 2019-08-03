@@ -2,9 +2,11 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-    microdrv.c
+    microdrv.cpp
 
-    MESS interface to the Sinclair Microdrive image abstraction code
+    MAME interface to the Sinclair Microdrive image abstraction code
+	(this seems to be QL format specific and hardcoded to a specific
+	 size, Spectrum might need a different implementation?)
 
 *********************************************************************/
 
@@ -83,6 +85,7 @@ image_init_result microdrive_image_device::call_load()
 	if (length() != MDV_IMAGE_LENGTH)
 		return image_init_result::FAIL;
 
+	// huh
 	for (int i = 0; i < MDV_IMAGE_LENGTH / 2; i++)
 	{
 		fread(m_left.get(), 1);
@@ -97,8 +100,11 @@ image_init_result microdrive_image_device::call_load()
 
 void microdrive_image_device::call_unload()
 {
-	memset(m_left.get(), 0, MDV_IMAGE_LENGTH / 2);
-	memset(m_right.get(), 0, MDV_IMAGE_LENGTH / 2);
+	if (m_left.get())
+		memset(m_left.get(), 0, MDV_IMAGE_LENGTH / 2);
+
+	if (m_right.get())
+		memset(m_right.get(), 0, MDV_IMAGE_LENGTH / 2);
 }
 
 void microdrive_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

@@ -145,7 +145,7 @@ public:
 
 private:
 	required_ioport_array<2> m_io_in;
-//	DECLARE_WRITE32_MEMBER(sound_w);
+//  DECLARE_WRITE32_MEMBER(sound_w);
 	u32 unk_status_r();
 
 	virtual void video_start() override;

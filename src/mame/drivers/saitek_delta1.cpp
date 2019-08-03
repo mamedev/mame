@@ -220,7 +220,7 @@ void delta1_state::delta1(machine_config &config)
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_saitek_delta1);
 
-	TIMER(config, "display_blink").configure_periodic(FUNC(delta1_state::blink), attotime::from_msec(250)); // approximation
+	TIMER(config, "display_blink").configure_periodic(FUNC(delta1_state::blink), attotime::from_msec(200)); // approximation
 }
 
 

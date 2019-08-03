@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /*********************************************************************
 
-	newport.cpp
+    newport.cpp
 
     SGI "Newport" graphics board emulation
 
@@ -23,14 +23,14 @@
     Known Issues:
     - Antialiased line drawing currently uses the fractional line
       drawing routine instead.
-	- Timing-wise, all draw commands complete instantly and all
-	  FIFOs are always empty. Thus the performance of an emulated
-	  Newport board is likely to be better than real life in scenes
-	  that would otherwise be drawing-bound.
-	- The REX3 emulation currently handles a bunch of functionality
-	  that should be the responsibility of RO1 and RB2. However,
-	  emulating it properly would bring down the emulation speed
-	  for not much practical benefit.
+    - Timing-wise, all draw commands complete instantly and all
+      FIFOs are always empty. Thus the performance of an emulated
+      Newport board is likely to be better than real life in scenes
+      that would otherwise be drawing-bound.
+    - The REX3 emulation currently handles a bunch of functionality
+      that should be the responsibility of RO1 and RB2. However,
+      emulating it properly would bring down the emulation speed
+      for not much practical benefit.
 
 *********************************************************************/
 

@@ -1192,7 +1192,7 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 				break;
 
 			case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
-				util::stream_format(stream, "ORW    A, @RW%d", (operand & 0x1));
+				util::stream_format(stream, "ORW    A, RW%d", (operand & 0x1));
 				bytes = 2;
 				break;
 

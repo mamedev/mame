@@ -46,7 +46,7 @@ enum iodevice_t
 	IO_QUICKLOAD,   /* 12 - Allow to load program/data into memory, without matching any actual device */
 	IO_MEMCARD,     /* 13 - Memory card */
 	IO_CDROM,       /* 14 - optical CD-ROM disc */
-	IO_MAGTAPE,     /* 15 - Magentic tape */
+	IO_MAGTAPE,     /* 15 - Magnetic tape */
 	IO_ROM,         /* 16 - Individual ROM image - the Amstrad CPC has a few applications that were sold on 16kB ROMs */
 	IO_MIDIIN,      /* 17 - MIDI In port */
 	IO_MIDIOUT,     /* 18 - MIDI Out port */
@@ -98,11 +98,11 @@ enum class image_verify_result { PASS, FAIL };
 //  MACROS
 //**************************************************************************
 
-#define DEVICE_IMAGE_LOAD_MEMBER(_name)				image_init_result _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)		DEVICE_IMAGE_LOAD_MEMBER(_name)
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
 
-#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)        	void _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)	DEVICE_IMAGE_UNLOAD_MEMBER(_name)
+#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
 
 
 // ======================> device_image_interface
@@ -203,7 +203,7 @@ public:
 
 	const std::string &instance_name() const { return m_instance_name; }
 	const std::string &brief_instance_name() const { return m_brief_instance_name; }
-	const std::string &cannonical_instance_name() const { return m_canonical_instance_name; }
+	const std::string &canonical_instance_name() const { return m_canonical_instance_name; }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 

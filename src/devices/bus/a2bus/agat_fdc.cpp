@@ -85,7 +85,7 @@ void a2bus_agat_fdc_device::device_add_mconfig (machine_config &config)
 
 	I8255(config, m_d15);
 	m_d15->in_pa_callback().set(FUNC(a2bus_agat_fdc_device::d15_i_a)); // read data
-//	m_d15->out_pb_callback().set(FUNC(a2bus_agat_fdc_device::d15_o_b)); // write data
+//  m_d15->out_pb_callback().set(FUNC(a2bus_agat_fdc_device::d15_o_b)); // write data
 	m_d15->in_pc_callback().set(FUNC(a2bus_agat_fdc_device::d15_i_c));
 	m_d15->out_pc_callback().set(FUNC(a2bus_agat_fdc_device::d15_o_c));
 }
@@ -373,12 +373,12 @@ uint8_t a2bus_agat_fdc_device::read_cnxx(uint8_t offset)
 /*
  * all signals active low.  write support not implemented; WPT is always active.
  *
- * b0-b1	type of drive 2: 00 - ES 5323.01 "1000 KB", 01 - "500 KB", 10 - "250 KB", 11 - not present
- * b2-b3	type of drive 1: -""-
- * b4		INDEX/SECTOR
- * b5		WRITE PROTECT
- * b6		TRACK 0
- * b7		READY
+ * b0-b1    type of drive 2: 00 - ES 5323.01 "1000 KB", 01 - "500 KB", 10 - "250 KB", 11 - not present
+ * b2-b3    type of drive 1: -""-
+ * b4       INDEX/SECTOR
+ * b5       WRITE PROTECT
+ * b6       TRACK 0
+ * b7       READY
  *
  * C0x1
  */
@@ -390,7 +390,7 @@ READ8_MEMBER(a2bus_agat_fdc_device::d14_i_b)
 	if (floppy)
 	{
 		data |= (floppy->idx_r() << 4) ^ 0x10;
-//		data |= floppy->wpt_r() << 5;
+//      data |= floppy->wpt_r() << 5;
 		data |= floppy->trk00_r() << 6;
 		data |= floppy->ready_r() << 7;
 	}
@@ -406,14 +406,14 @@ READ8_MEMBER(a2bus_agat_fdc_device::d14_i_b)
 }
 
 /*
- * b0	AH	strong write precomp
- * b1	--	NC
- * b2	--	step direction (1 - inward, 0 - outward)
- * b3	--	drive select (0 - drive 1, 1 - drive 2)
- * b4	--	head select (0 - bottom, 1 - top)
- * b5	AH	write precomp off
- * b6	AH	write enable
- * b7	AH	motor on
+ * b0   AH  strong write precomp
+ * b1   --  NC
+ * b2   --  step direction (1 - inward, 0 - outward)
+ * b3   --  drive select (0 - drive 1, 1 - drive 2)
+ * b4   --  head select (0 - bottom, 1 - top)
+ * b5   AH  write precomp off
+ * b6   AH  write enable
+ * b7   AH  motor on
  *
  * C0x2
  */
@@ -425,8 +425,8 @@ WRITE8_MEMBER(a2bus_agat_fdc_device::d14_o_c)
 	{
 		floppy->dir_w(!BIT(data, 2));
 		floppy->ss_w(BIT(data, 4));
-//		floppy->wtg_w(!BIT(data, 6));
-//		floppy->mon_w(!BIT(data, 7)); // tied to 'drive select', 'motor on' and 'head load'
+//      floppy->wtg_w(!BIT(data, 6));
+//      floppy->mon_w(!BIT(data, 7)); // tied to 'drive select', 'motor on' and 'head load'
 	}
 	if (BIT(data, 7))
 	{
@@ -458,8 +458,8 @@ READ8_MEMBER(a2bus_agat_fdc_device::d15_i_a)
 
 // C0x6
 //
-// b6	AL	desync detected
-// b7	AH	read or write data ready
+// b6   AL  desync detected
+// b7   AH  read or write data ready
 READ8_MEMBER(a2bus_agat_fdc_device::d15_i_c)
 {
 	LOG("status B:       @ %4d %s %s\n", 0,
@@ -470,10 +470,10 @@ READ8_MEMBER(a2bus_agat_fdc_device::d15_i_c)
 
 // C0x7
 //
-// b0	--	connected to b7, set if m_intr[PORT_B]
-// b2	AH	b7 = ready for write data
-// b3	--	connected to b7, set if m_intr[PORT_A]
-// b4	AH	b7 = read data ready
+// b0   --  connected to b7, set if m_intr[PORT_B]
+// b2   AH  b7 = ready for write data
+// b3   --  connected to b7, set if m_intr[PORT_A]
+// b4   AH  b7 = read data ready
 WRITE8_MEMBER(a2bus_agat_fdc_device::d15_o_c)
 {
 	if (BIT(data, 0) || BIT(data, 3))

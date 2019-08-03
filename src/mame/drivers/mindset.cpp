@@ -223,7 +223,7 @@ u8 mindset_state::sys_p2_r()
 
 void mindset_state::sys_p1_w(u8 data)
 {
-	//	m_maincpu->int0_w(!((data & 0x40) || m_fdc->get_irq()));
+	//  m_maincpu->int0_w(!((data & 0x40) || m_fdc->get_irq()));
 	logerror("SYS: fdc write p1 %02x irq %d\n", data, !!(data & 0x40));
 }
 
@@ -233,7 +233,7 @@ void mindset_state::sys_p2_w(u8 data)
 	m_red_led = !BIT(data, 2);
 	m_yellow_led = !BIT(data, 1);
 	m_green_led = !BIT(data, 0);
-	//	logerror("power %s\n", data & 0x40 ? 
+	//  logerror("power %s\n", data & 0x40 ?
 	//  logerror("SYS: write p2 %02x\n", data);
 }
 
@@ -267,7 +267,7 @@ void mindset_state::snd_p1_w(u8 data)
 
 void mindset_state::snd_p2_w(u8 data)
 {
-	//	logerror("snd p2 %02x\n", data);
+	//  logerror("snd p2 %02x\n", data);
 }
 
 u16 mindset_state::keyscan()
@@ -367,7 +367,7 @@ void mindset_state::dispreg_w(u16 data)
 		m_intaddr = 0;
 		bool bank = m_dispctrl & 0x4000;
 		bool ibm_mode = m_dispctrl & 0x2000;
-		//		bool interleave = m_dispctrl & 0x0800;
+		//      bool interleave = m_dispctrl & 0x0800;
 		int pixels_per_byte_order = (m_dispctrl & 0x0600) >> 9;
 		bool large_pixels = m_dispctrl & 0x0100;
 		if(ibm_mode)
@@ -377,7 +377,7 @@ void mindset_state::dispreg_w(u16 data)
 			if(pixels_per_byte_order == 2) stepy = 40;
 			if(pixels_per_byte_order == 1) stepy = 80;
 			if(pixels_per_byte_order == 0) stepy = 160;
-			
+
 			m_intaddr = inty * stepy + (intx >> (pixels_per_byte_order - large_pixels + 2));
 		}
 
@@ -838,7 +838,7 @@ u16 mindset_state::trap_clear_interrupt()
 
 u16 mindset_state::trap_r(offs_t offset)
 {
-	//	machine().debug_break();
+	//  machine().debug_break();
 	logerror("trap_r %04x\n", offset << 1);
 	m_trap_data[m_trap_len++] = (offset << 1) | 0x8000;
 	m_trap_data[m_trap_len++] = 0;
@@ -849,7 +849,7 @@ u16 mindset_state::trap_r(offs_t offset)
 
 void mindset_state::trap_w(offs_t offset, u16 data)
 {
-	//	machine().debug_break();
+	//  machine().debug_break();
 	logerror("trap_w %04x, %04x\n", offset << 1, data);
 	m_trap_data[m_trap_len++] = offset << 1;
 	m_trap_data[m_trap_len++] = data;

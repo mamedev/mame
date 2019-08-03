@@ -15,8 +15,6 @@
 
 #include "softlist_dev.h"
 
-typedef delegate<image_init_result (device_image_interface &,const char *, int)> snapquick_load_delegate;
-
 // ======================> snapshot_image_device
 class snapshot_image_device :   public device_t,
 								public device_image_interface
@@ -61,10 +59,10 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
 
-	load_delegate	m_load;				/* loading function */
-	const char *    m_file_extensions;	/* file extensions */
+	load_delegate   m_load;             /* loading function */
+	const char *    m_file_extensions;  /* file extensions */
 	const char *    m_interface;
-	attotime        m_delay;			/* loading delay */
+	attotime        m_delay;            /* loading delay */
 	emu_timer       *m_timer;
 };
 
@@ -94,10 +92,10 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define SNAPSHOT_LOAD_MEMBER(_name)      			image_init_result _name(device_image_interface &image, const char *file_type, int snapshot_size)
+#define SNAPSHOT_LOAD_MEMBER(_name)                 image_init_result _name(device_image_interface &image, const char *file_type, int snapshot_size)
 #define DECLARE_SNAPSHOT_LOAD_MEMBER(_name)         SNAPSHOT_LOAD_MEMBER(_name)
 
-#define QUICKLOAD_LOAD_MEMBER(_name)      			image_init_result _name(device_image_interface &image, const char *file_type, int quickload_size)
+#define QUICKLOAD_LOAD_MEMBER(_name)                image_init_result _name(device_image_interface &image, const char *file_type, int quickload_size)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        QUICKLOAD_LOAD_MEMBER(_name)
 
 #endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H

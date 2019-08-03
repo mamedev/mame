@@ -135,7 +135,7 @@ void mame_machine_manager::start_luaengine()
 		{
 			// user may specify environment variables; subsitute them
 			osd_subst_env(pluginpath, pluginpath);
-			
+
 			// and then scan the directory recursively
 			m_plugins->scan_directory(pluginpath, true);
 		}
@@ -162,7 +162,7 @@ void mame_machine_manager::start_luaengine()
 		{
 			plugin *p = m_plugins->find(incl);
 			if (!p)
-				fatalerror("Could not load plugin: %s\n", incl.c_str());
+				fatalerror("Fatal error: Could not load plugin: %s\n", incl.c_str());
 			p->m_start = true;
 		}
 
@@ -171,7 +171,7 @@ void mame_machine_manager::start_luaengine()
 		{
 			plugin *p = m_plugins->find(excl);
 			if (!p)
-				fatalerror("Unknown plugin: %s\n", excl.c_str());
+				fatalerror("Fatal error: Unknown plugin: %s\n", excl.c_str());
 			p->m_start = false;
 		}
 	}
@@ -181,7 +181,7 @@ void mame_machine_manager::start_luaengine()
 	{
 		plugin *p = m_plugins->find(OPTION_CONSOLE);
 		if (!p)
-			fatalerror("Console plugin not found.\n");
+			fatalerror("Fatal error: Console plugin not found.\n");
 
 		p->m_start = true;
 	}

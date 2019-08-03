@@ -2,11 +2,8 @@
 <mamelayout version="2">
 <!-- define elements -->
 
-	<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
 	<element name="digit" defstate="0">
-		<led7seg>
-			<color red="1" green="1" blue="1" />
-		</led7seg>
+		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
@@ -28,7 +25,7 @@
 		</disk>
 	</element>
 
-	<element name="led7seg_background"><rect><color red="0" green="0" blue="0" />      </rect></element>
+	<element name="led7seg_background"><rect><color red="0.54" green="0.57" blue="0.58" />      </rect></element>
 	<element name="background"> <rect><color red="0.90" green="0.91" blue="0.89" /></rect></element>
 	<element name="black">      <rect><color red="0" green="0" blue="0" />         </rect></element>
 	<element name="red">        <rect><color red="0.8" green="0" blue="0" />         </rect></element>
@@ -361,11 +358,11 @@
 		<bezel element="background"><bounds x="0" y="0" width="79" height="13" /></bezel>
 
 		<bezel element="text_lcd">          <bounds x="0.5"  y="0"  width="9" height="1.5" />   </bezel>
-		<bezel element="led7seg_background">        <bounds x="0.5" y="1.5" width="9" height="4" />     </bezel>
-		<bezel name="digit0" element="digit">       <bounds x="1"   y="2"   width="2" height="3" />     </bezel>
-		<bezel name="digit1" element="digit">       <bounds x="3"   y="2"   width="2" height="3" />     </bezel>
-		<bezel name="digit2" element="digit">       <bounds x="5"   y="2"   width="2" height="3" />     </bezel>
-		<bezel name="digit3" element="digit">       <bounds x="7"   y="2"   width="2" height="3" />     </bezel>
+		<bezel element="led7seg_background">        <bounds x="0.5" y="2"   width="9" height="4" />     </bezel>
+		<bezel name="digit0" element="digit">       <bounds x="1"   y="2.5" width="2" height="3" />     </bezel>
+		<bezel name="digit1" element="digit">       <bounds x="3"   y="2.5" width="2" height="3" />     </bezel>
+		<bezel name="digit2" element="digit">       <bounds x="5"   y="2.5" width="2" height="3" />     </bezel>
+		<bezel name="digit3" element="digit">       <bounds x="7"   y="2.5" width="2" height="3" />     </bezel>
 		<bezel element="led7seg_background">        <bounds x="0.5" y="7.5" width="9" height="4" />     </bezel>
 		<bezel name="digit4" element="digit">       <bounds x="1"   y="8"   width="2" height="3" />     </bezel>
 		<bezel name="digit5" element="digit">       <bounds x="3"   y="8"   width="2" height="3" />     </bezel>

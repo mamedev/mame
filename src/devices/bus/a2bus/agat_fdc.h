@@ -18,8 +18,8 @@
 #include "machine/i8255.h"
 
 
-#define MXCSR_SYNC		0x40
-#define MXCSR_TR		0x80
+#define MXCSR_SYNC      0x40
+#define MXCSR_TR        0x80
 
 
 //**************************************************************************

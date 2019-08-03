@@ -108,7 +108,7 @@ private:
 	running_machine &   m_machine;                  // reference to our machine
 
 	/* pressed states; retrieved with ui_input_pressed() */
-	bool						m_presses_enabled;
+	bool                        m_presses_enabled;
 	osd_ticks_t                 m_next_repeat[IPT_COUNT];
 	u8                          m_seqpressed[IPT_COUNT];
 

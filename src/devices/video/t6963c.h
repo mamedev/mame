@@ -40,8 +40,8 @@ public:
 	void write(offs_t offset, u8 data);
 
 	// Display configurations
-	void set_md(u8 data);	// MD0, MD1, MD2, MD3, MDS
-	void set_fs(u8 data);	// FS0, FS1
+	void set_md(u8 data);   // MD0, MD1, MD2, MD3, MDS
+	void set_fs(u8 data);   // FS0, FS1
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -48,7 +48,7 @@ protected:
 private:
 	machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports);
 
-	const ui_options &		m_options;
+	const ui_options &      m_options;
 
 	// overall feature status
 	::machine_flags::type   m_flags;

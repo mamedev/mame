@@ -21,6 +21,8 @@
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/upd7759.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 
@@ -40,6 +42,7 @@ public:
 		, m_ym2151(*this, "ym2151")
 		, m_ym2413(*this, "ym2413")
 		, m_upd7759(*this, "upd")
+		, m_dac(*this, "dac")
 		, m_multiplier(*this, "multiplier")
 		, m_cmptimer_1(*this, "cmptimer_1")
 		, m_cmptimer_2(*this, "cmptimer_2")
@@ -89,6 +92,7 @@ public:
 	void system16b_fd1094(machine_config &config);
 	void fpointbl(machine_config &config);
 	void lockonph(machine_config &config);
+	void dfjail(machine_config &config);
 
 	// ROM board-specific driver init
 	void init_generic_5521();
@@ -147,6 +151,13 @@ protected:
 	DECLARE_READ8_MEMBER( upd7759_status_r );
 	DECLARE_WRITE16_MEMBER( sound_w16 );
 
+	// dfjail
+	DECLARE_WRITE8_MEMBER( dfjail_sound_control_w );
+	DECLARE_WRITE8_MEMBER( dfjail_dac_data_w );
+	INTERRUPT_GEN_MEMBER( dfjail_soundirq_cb );
+	bool m_dfjail_nmi_enable;
+	uint16_t m_dfjail_dac_data;
+
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
@@ -167,6 +178,7 @@ protected:
 	void fpointbl_map(address_map &map);
 	void fpointbl_sound_map(address_map &map);
 	void lockonph_map(address_map &map);
+	void dfjail_map(address_map &map);
 	void lockonph_sound_iomap(address_map &map);
 	void lockonph_sound_map(address_map &map);
 	void map_fpointbla(address_map &map);
@@ -176,6 +188,7 @@ protected:
 	void sound_portmap(address_map &map);
 	void bootleg_sound_map(address_map &map);
 	void bootleg_sound_portmap(address_map &map);
+	void dfjail_sound_iomap(address_map &map);
 	void system16b_bootleg_map(address_map &map);
 	void system16b_map(address_map &map);
 	void system16c_map(address_map &map);
@@ -238,6 +251,7 @@ protected:
 	optional_device<ym2151_device> m_ym2151;
 	optional_device<ym2413_device> m_ym2413;
 	optional_device<upd7759_device> m_upd7759;
+	optional_device<dac_word_interface> m_dac; // dfjail
 	optional_device<sega_315_5248_multiplier_device> m_multiplier;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;

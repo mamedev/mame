@@ -27,15 +27,15 @@
 
     - use priority PROM for drawing sprites
     - find and dump an unmodified bme01.12d to correct the 1943 Euro set
-	- Accurate interrupt handling
-	- Screen raw parameters
+    - Accurate interrupt handling
+    - Screen raw parameters
 
-	Notes:
+    Notes:
 
-	- The MCU is actually hooked up to a lot more than it actually uses.
-	  It can potentially communicate with the audio CPU, read the current
-	  vertical line and has a vblank counter. All this isn't used by the MCU
-	  program, it only exchanges a value with the main CPU.
+    - The MCU is actually hooked up to a lot more than it actually uses.
+      It can potentially communicate with the audio CPU, read the current
+      vertical line and has a vblank counter. All this isn't used by the MCU
+      program, it only exchanges a value with the main CPU.
 
 
 */
@@ -106,7 +106,7 @@ void _1943_state::c1943b_map(address_map &map)
 
 	// the bootleg expects 0x00 to be returned from the protection reads
 	// because the protection has been patched out
-	map(0xc007, 0xc007).lr8("mcu_r", [this]() -> u8 { return 0x00; });
+	map(0xc007, 0xc007).lr8("mcu_r", []() -> u8 { return 0x00; });
 	map(0xc807, 0xc807).noprw();
 }
 

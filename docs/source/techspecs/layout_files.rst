@@ -650,9 +650,9 @@ flipy
 Screens (``screen`` elements) and layout elements (``element`` elements) may
 have a ``blend`` attribute to set the blending mode.  Supported values are
 ``none`` (no blending), ``alpha`` (alpha blending), ``multiply`` (RGB
-multiplication), and ``add`` (additive blending).  The default blending mode for
-screens is additive blending, and the default blending mode for layout elements
-is alpha blending.
+multiplication), and ``add`` (additive blending).  The default for screens is to
+allow the driver to specify blending per layer; the default blending mode for
+layout elements is alpha blending.
 
 Screens (``screen`` elements), layout elements (``element`` elements) and groups
 (``group`` elements) may be positioned and sized using a ``bounds`` child

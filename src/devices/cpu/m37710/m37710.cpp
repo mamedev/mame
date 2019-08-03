@@ -268,7 +268,7 @@ std::vector<std::pair<int, const address_space_config *>> m37710_cpu_device::mem
 /* interrupt control mapping */
 
 const int m37710_cpu_device::m37710_int_reg_map[M37710_MASKABLE_INTERRUPTS] =
-{				
+{
 	M37710_LINE_DMA0,       // level 3  (0x6c)
 	M37710_LINE_DMA1,       // level 2  (0x6d)
 	M37710_LINE_DMA2,       // level 1  (0x6e)

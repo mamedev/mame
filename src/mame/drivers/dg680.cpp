@@ -59,7 +59,7 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/keyboard.h"
+#include "machine/keyboard.h"
 #include "machine/z80daisy.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -81,7 +81,6 @@ public:
 		, m_cass(*this, "cassette")
 		, m_pio(*this, "pio")
 		, m_ctc(*this, "ctc")
-		, m_rs232(*this, "keyboard")
 		, m_clock(*this, "cass_clock")
 		, m_s100(*this, "s100")
 	{ }
@@ -113,9 +112,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	optional_device<z80pio_device> m_pio;
+	required_device<z80pio_device> m_pio;
 	required_device<z80ctc_device> m_ctc;
-	optional_device<rs232_port_device> m_rs232;
 	required_device<clock_device> m_clock;
 	required_device<s100_bus_device> m_s100;
 };

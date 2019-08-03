@@ -10,10 +10,13 @@ EEPROM (M68HC805) variants.  The suffix gives some indication of the
 memory sizes and on-board peripherals, but there's not a lot of
 consistency across the ROM/EPROM/EEPROM variants.
 
-All devices in this family have a 16-bit free-running counter fed from
+Most devices in this family have a 16-bit free-running counter fed from
 the internal clock.  The counter value can be captured on an input edge,
 and an output can be automatically set when the counter reaches a
-certain value.
+certain value.  The lower-end devices instead have a 15-bit multifunction
+ripple counter with a programmable selector for the last four stages that
+determines both the COP watchdog timeout and the real-time interrupt rate
+(this is not currently emulated).
 */
 #include "emu.h"
 #include "m68hc05.h"
@@ -63,6 +66,14 @@ std::pair<u16, char const *> const m68hc705c8a_syms[] = {
 	{ 0x001c, "PROG"   },
 	{ 0x001d, "COPRST" }, { 0x001e, "COPCR" } };
 
+std::pair<u16, char const *> const m68hc705j1a_syms[] = {
+	{ 0x0000, "PORTA"  }, { 0x0001, "PORTB" },
+	{ 0x0004, "DDRA"   }, { 0x0005, "DDRB"  },
+	{ 0x0008, "TSCR"   }, { 0x0009, "TCR"   }, { 0x000a, "ISCR"  },
+	{ 0x0010, "PDRA"   }, { 0x0011, "PDRB"  },
+	{ 0x0014, "EPROG"  },
+	{ 0x07f0, "COPR"   }, { 0x07f1, "MOR"   } };
+
 
 ROM_START( m68hc705c8a )
 	ROM_REGION(0x00f0, "bootstrap", 0)
@@ -93,6 +104,7 @@ constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
 DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "Motorola MC68HC05C4")
 DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "Motorola MC68HC05C8")
 DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "Motorola MC68HC705C8A")
+DEFINE_DEVICE_TYPE(M68HC705J1A, m68hc705j1a_device, "m68hc705j1a", "Motorola MC68HC705J1A")
 DEFINE_DEVICE_TYPE(M68HC05L9,   m68hc05l9_device,   "m68hc05l9",   "Motorola MC68HC05L9")
 DEFINE_DEVICE_TYPE(M68HC05L11,  m68hc05l11_device,  "m68hc05l11",  "Motorola MC68HC05L11")
 
@@ -938,6 +950,72 @@ void m68hc705c8a_device::device_reset()
 std::unique_ptr<util::disasm_interface> m68hc705c8a_device::create_disassembler()
 {
 	return std::make_unique<m68hc05_disassembler>(m68hc705c8a_syms);
+}
+
+
+
+/****************************************************************************
+ * MC68HC05J1A device
+ ****************************************************************************/
+
+void m68hc705j1a_device::j1a_map(address_map &map)
+{
+	map.global_mask(0x07ff);
+	map.unmap_value_high();
+
+	map(0x0000, 0x0001).rw(FUNC(m68hc705j1a_device::port_read), FUNC(m68hc705j1a_device::port_latch_w));
+	map(0x0004, 0x0005).rw(FUNC(m68hc705j1a_device::port_ddr_r), FUNC(m68hc705j1a_device::port_ddr_w));
+	// 0x0008 TSCR (bits 7 and 6 are read-only; bits 3 and 2 are write-only)
+	// 0x0009 TCR (read-only)
+	// 0x000a ISCR (bits 7 and 3 are readable; bits 7, 4 and 1 are writeable)
+	// 0x0010 PDRA (write-only)
+	// 0x0011 PDRB (write-only)
+	// 0x0014 EPROG
+	// 0x001f reserved
+	map(0x00c0, 0x00ff).ram();
+	map(0x0300, 0x07cf).rom(); // EPROM
+	map(0x07ee, 0x07ef).rom(); // test ROM
+	map(0x07f0, 0x07f0).w(FUNC(m68hc705j1a_device::copr_w));
+	map(0x07f1, 0x07f1).rom(); // MOR
+	// 0x07f2-0x07f7 reserved
+	map(0x07f8, 0x07ff).rom(); // user vectors
+}
+
+
+m68hc705j1a_device::m68hc705j1a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: m68hc705_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			M68HC705J1A,
+			11,
+			address_map_constructor(FUNC(m68hc705j1a_device::j1a_map), this))
+{
+	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0x3f, 0x00, 0x00 }});
+}
+
+
+void m68hc705j1a_device::device_start()
+{
+	m68hc705_device::device_start();
+
+	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, false, false }});
+	add_ncop_state();
+}
+
+void m68hc705j1a_device::device_reset()
+{
+	m68hc705_device::device_reset();
+
+	// latch MOR register on reset
+	set_ncope(BIT(rdmem(0x07f1), 0)); // FIXME: this is more like C8A's PCOP
+}
+
+
+std::unique_ptr<util::disasm_interface> m68hc705j1a_device::create_disassembler()
+{
+	return std::make_unique<m68hc05_disassembler>(m68hc705j1a_syms);
 }
 
 

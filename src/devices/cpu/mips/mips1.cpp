@@ -912,32 +912,31 @@ void mips1core_device_base::set_cop0_reg(unsigned const reg, u32 const data)
 {
 	switch (reg)
 	{
-	case COP0_Context:
-		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & ~PTE_BASE) | (data & PTE_BASE);
-		break;
 	case COP0_Status:
-	{
-		u32 const delta = SR ^ data;
+		{
+			u32 const delta = SR ^ data;
 
-		m_cop0[COP0_Status] = data;
+			m_cop0[COP0_Status] = data;
 
-		// handle cache isolation and swap
-		m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
+			// handle cache isolation and swap
+			m_data_spacenum = (data & SR_IsC) ? ((data & SR_SwC) ? 1 : 2) : 0;
 
-		// update interrupts
-		if (delta & (SR_IEc | SR_IM))
-			check_irqs();
+			// update interrupts
+			if (delta & (SR_IEc | SR_IM))
+				check_irqs();
 
-		if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
-			debugger_privilege_hook();
-	}
-	break;
+			if ((delta & SR_KUc) && (m_branch_state != EXCEPTION))
+				debugger_privilege_hook();
+		}
+		break;
+
 	case COP0_Cause:
 		CAUSE = (CAUSE & CAUSE_IPEX) | (data & ~CAUSE_IPEX);
 
 		// update interrupts -- software ints can occur this way
 		check_irqs();
 		break;
+
 	case COP0_PRId:
 		// read-only register
 		break;
@@ -1193,7 +1192,7 @@ void mips1_device_base::device_start()
 	{
 		state_add(MIPS1_FCR31, "FCSR", m_fcr31);
 		for (unsigned i = 0; i < ARRAY_LENGTH(m_f); i++)
-			state_add(MIPS1_F0 + i, util::string_format("F%d", i).c_str(), m_f[i]);
+			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2).c_str(), m_f[i]);
 	}
 
 	save_item(NAME(m_reset_time));
@@ -1303,6 +1302,28 @@ u32 mips1_device_base::get_cop0_reg(unsigned const reg)
 	return m_cop0[reg];
 }
 
+void mips1_device_base::set_cop0_reg(unsigned const reg, u32 const data)
+{
+	switch (reg)
+	{
+	case COP0_EntryHi:
+		m_cop0[COP0_EntryHi] = data & EH_WM;
+		break;
+
+	case COP0_EntryLo:
+		m_cop0[COP0_EntryLo] = data & EL_WM;
+		break;
+
+	case COP0_Context:
+		m_cop0[COP0_Context] = (m_cop0[COP0_Context] & ~PTE_BASE) | (data & PTE_BASE);
+		break;
+
+	default:
+		mips1core_device_base::set_cop0_reg(reg, data);
+		break;
+	}
+}
+
 void mips1_device_base::handle_cop1(u32 const op)
 {
 	if (!(SR & SR_COP1))
@@ -1371,8 +1392,10 @@ void mips1_device_base::handle_cop1(u32 const op)
 				}
 
 				// exception check
-				if ((m_fcr31 & FCR31_CE) || ((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM))
-					execute_set_input(m_fpu_irq, ASSERT_LINE);
+				{
+					bool const exception = (m_fcr31 & FCR31_CE) || (((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM));
+					execute_set_input(m_fpu_irq, exception ? ASSERT_LINE : CLEAR_LINE);
+				}
 				break;
 
 			default:
@@ -1847,15 +1870,15 @@ template <typename T> void mips1_device_base::set_cop1_reg(unsigned const reg, T
 		if (softfloat_exceptionFlags & softfloat_flag_invalid)
 			m_fcr31 |= FCR31_CV;
 
-		// check if exception is enabled
-		if (((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM))
-		{
-			execute_set_input(m_fpu_irq, ASSERT_LINE);
-			return;
-		}
-
 		// set flags
 		m_fcr31 |= ((m_fcr31 & FCR31_CM) >> 10);
+
+		// update exception state
+		bool const exception = (m_fcr31 & FCR31_CE) || ((m_fcr31 & FCR31_CM) >> 5) & (m_fcr31 & FCR31_EM);
+		execute_set_input(m_fpu_irq, exception ? ASSERT_LINE : CLEAR_LINE);
+
+		if (exception)
+			return;
 	}
 
 	if (sizeof(T) == 4)

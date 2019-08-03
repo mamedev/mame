@@ -75,7 +75,7 @@ void att630_state::mem_map(address_map &map)
 	map(0x200000, 0x20001f).rw("duart1", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x200020, 0x20003f).rw("duart2", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x400000, 0x6fffff).noprw(); // expansion i/o card
-//	map(0x700000, 0x75ffff).noprw(); // video controller
+//  map(0x700000, 0x75ffff).noprw(); // video controller
 	map(0x760000, 0x77ffff).ram().share("vram");
 	map(0x780000, 0x7fffff).ram(); // program ram
 	map(0xe00000, 0xe03fff).mirror(0x1fc000).rw(FUNC(att630_state::bram_r), FUNC(att630_state::bram_w)).umask16(0x00ff);

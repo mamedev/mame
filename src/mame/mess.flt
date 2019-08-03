@@ -298,7 +298,6 @@ geniusjr.cpp
 genpc.cpp
 gimix.cpp
 gizmondo.cpp
-glasgow.cpp
 glcx.cpp
 gmaster.cpp
 goupil.cpp
@@ -398,6 +397,7 @@ jr100.cpp
 jr200.cpp
 jtc.cpp
 juicebox.cpp
+juku.cpp
 junior.cpp
 jupace.cpp
 jupiter.cpp
@@ -458,8 +458,12 @@ mdisk.cpp
 megadriv.cpp
 megadriv_rad.cpp
 mekd2.cpp
-mephisto.cpp
+mephisto_glasgow.cpp
+mephisto_mm2.cpp
+mephisto_modena.cpp
+mephisto_modular.cpp
 mephisto_montec.cpp
+mephisto_polgar.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
@@ -493,10 +497,8 @@ mk85.cpp
 mk90.cpp
 mkit09.cpp
 mmd1.cpp
-mmodular.cpp
 mod8.cpp
 modellot.cpp
-modena.cpp
 molecular.cpp
 monon_color.cpp
 monty.cpp
@@ -548,10 +550,11 @@ ngp.cpp
 nokia_3310.cpp
 notetaker.cpp
 novag_cforte.cpp
+novag_const.cpp
 novag_diablo.cpp
 novag_presto.cpp
 novag_savant.cpp
-novag_scon.cpp
+novag_sconst.cpp
 novag_sexpert.cpp
 o2.cpp
 ob68k1a.cpp
@@ -632,7 +635,6 @@ pockstat.cpp
 pofo.cpp
 poisk1.cpp
 pokemini.cpp
-polgar.cpp
 poly.cpp
 poly88.cpp
 poly880.cpp

@@ -253,8 +253,12 @@ void namcoio_device::handle_coins( int swap )
 
 	IORAM_WRITE(0 ^ swap, m_credits / 10);   // BCD credits
 	IORAM_WRITE(1 ^ swap, m_credits % 10);   // BCD credits
-	IORAM_WRITE(2 ^ swap, credit_add);  // credit increment (coin inputs)
-	IORAM_WRITE(3 ^ swap, credit_sub);  // credit decrement (start buttons)
+	// these two are cleared by the host CPU in handshake fashion
+	// tower of druaga cares and won't give coin sound on 0->1 credit counter transition otherwise.
+	if (credit_add)
+		IORAM_WRITE(2 ^ swap, credit_add);  // credit increment (coin inputs)
+	if (credit_sub)
+		IORAM_WRITE(3 ^ swap, credit_sub);  // credit decrement (start buttons)
 	IORAM_WRITE(4, ~m_in_cb[1](0 & 0x0f));  // pins 22-25
 	button = ((val & 0x05) << 1) | (val & toggled & 0x05);
 	IORAM_WRITE(5, button); // pins 30 & 32 normal and impulse

@@ -55,7 +55,7 @@ protected:
 	virtual void device_post_load() override;
 
 private:
-	uint8_t           	m_busnum;
+	uint8_t             m_busnum;
 	pci_bus_legacy_read_delegate m_read_callback[32];
 	pci_bus_legacy_write_delegate m_write_callback[32];
 	const char *        m_father;

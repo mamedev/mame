@@ -336,12 +336,12 @@ legacy_floppy_image_device *a2bus_agat840k_hle_device::floppy_image(int drive)
 /*
  * all signals active low.  write support not implemented; WPT is always active.
  *
- * b0-b1	type of drive 2: 00 - ES 5323.01 "1000 KB", 01 - "500 KB", 10 - "250 KB", 11 - not present
- * b2-b3	type of drive 1: -""-
- * b4		INDEX/SECTOR
- * b5		WRITE PROTECT
- * b6		TRACK 0
- * b7		READY
+ * b0-b1    type of drive 2: 00 - ES 5323.01 "1000 KB", 01 - "500 KB", 10 - "250 KB", 11 - not present
+ * b2-b3    type of drive 1: -""-
+ * b4       INDEX/SECTOR
+ * b5       WRITE PROTECT
+ * b6       TRACK 0
+ * b7       READY
  *
  * C0x1
  */

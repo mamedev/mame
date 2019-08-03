@@ -2131,6 +2131,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.h",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.h",
+		MAME_DIR .. "src/devices/bus/a2bus/4play.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/4play.h",
 	}
 end
 
@@ -2145,6 +2147,8 @@ if (BUSES["A2GAMEIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2gameio/gameio.h",
 		MAME_DIR .. "src/devices/bus/a2gameio/joystick.cpp",
 		MAME_DIR .. "src/devices/bus/a2gameio/joystick.h",
+		MAME_DIR .. "src/devices/bus/a2gameio/joyport.cpp",
+		MAME_DIR .. "src/devices/bus/a2gameio/joyport.h",
 	}
 end
 
@@ -2827,6 +2831,42 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/tanbus/tanbus.h,BUSES["TANBUS"] = true
+---------------------------------------------------
+
+if (BUSES["TANBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/tanbus/bullsnd.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/bullsnd.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tanbus.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tanbus.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tanex.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tanex.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tandos.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tandos.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tanhrg.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tanhrg.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tanram.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tanram.h",
+		MAME_DIR .. "src/devices/bus/tanbus/mpvdu.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/mpvdu.h",
+		MAME_DIR .. "src/devices/bus/tanbus/ra32k.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/ra32k.h",
+		MAME_DIR .. "src/devices/bus/tanbus/radisc.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/radisc.h",
+		MAME_DIR .. "src/devices/bus/tanbus/ravdu.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/ravdu.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tug64k.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tug64k.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tug8082.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tug8082.h",
+		MAME_DIR .. "src/devices/bus/tanbus/tugpgm.cpp",
+		MAME_DIR .. "src/devices/bus/tanbus/tugpgm.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/ti8x/ti8x.h,BUSES["TI8X"] = true
 ---------------------------------------------------
 
@@ -3443,6 +3483,8 @@ if (BUSES["SPECTRUM"]~=null) then
 		MAME_DIR .. "src/devices/bus/spectrum/usource.h",
 		MAME_DIR .. "src/devices/bus/spectrum/uspeech.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/uspeech.h",
+		MAME_DIR .. "src/devices/bus/spectrum/wafa.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/wafa.h",
 	}
 end
 

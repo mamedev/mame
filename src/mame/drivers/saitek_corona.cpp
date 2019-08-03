@@ -70,6 +70,7 @@ private:
 	DECLARE_READ8_MEMBER(control1_r);
 	DECLARE_READ8_MEMBER(control2_r);
 	DECLARE_READ8_MEMBER(chessboard_r);
+	DECLARE_WRITE8_MEMBER(lcd_reset_w);
 
 	u8 m_control1;
 	u8 m_control2;
@@ -214,6 +215,13 @@ READ8_MEMBER(corona_state::chessboard_r)
 	return ~m_board->read_file(m_select2 & 0xf);
 }
 
+WRITE8_MEMBER(corona_state::lcd_reset_w)
+{
+	// reset lcd?
+	m_lcd_ready = true;
+	m_lcd_count = 0;
+}
+
 
 
 /******************************************************************************
@@ -264,7 +272,7 @@ void corona_state::corona(machine_config &config)
 	/* basic machine hardware */
 	M65C02(config, m_maincpu, 5_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(175));
+	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(183));
 
 	ADDRESS_MAP_BANK(config, "rombank").set_map(&corona_state::rombank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
 
@@ -317,5 +325,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1990, corona,   0,       0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
-CONS( 1988, coronaa,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, corona,   0,       0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
+CONS( 1988, coronaa,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

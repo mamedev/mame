@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cd32" description="Amiga CD-32 CD-ROMs">
 
-	<!-- 
+	<!--
 	UNDUMPED:
 
 	1001 Girl
@@ -1697,20 +1697,20 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- http://redump.org/disc/3366/ -->
-	<!-- 
+	<!--
 	<software name="suprfrog" supported="no">
-		<description>Superfrog (Rev 1)</description>
-		<year>1999</year>
-		<publisher>Islona</publisher>
-		<info name="barcode" value="5 022358 170384" />
-		<info name="disc_matrix" value="FD7989 THAMESDOWN 01793 421300 ZFS1" />
-		<part name="cdrom" interface="cd32_cdrom">
-			<diskarea name="cdrom">
-				<disk name="superfrog (europe) (rev 1)" sha1=""/>
-			</diskarea>
-		</part>
+	    <description>Superfrog (Rev 1)</description>
+	    <year>1999</year>
+	    <publisher>Islona</publisher>
+	    <info name="barcode" value="5 022358 170384" />
+	    <info name="disc_matrix" value="FD7989 THAMESDOWN 01793 421300 ZFS1" />
+	    <part name="cdrom" interface="cd32_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="superfrog (europe) (rev 1)" sha1=""/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 

@@ -339,7 +339,7 @@ const double XTAL::known_xtals[] = {
 	 32'220'000, /* 32.22_MHz_XTAL         Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz */
 	 32'256'000, /* 32.256_MHz_XTAL        Hitachi MB-6890 */
 	 32'317'400, /* 32.3174_MHz_XTAL       DEC VT330, VT340 */
-	 32'530'400, /* 32.5304_MHz_XTAL       Seta 2 */
+	 32'530'470, /* 32.53047_MHz_XTAL      Seta 2 */
 	 33'000'000, /* 33_MHz_XTAL            Sega Model 3 video board */
 	 33'264'000, /* 33.264_MHz_XTAL        Hazeltine 1500 terminal */
 	 33'330'000, /* 33.33_MHz_XTAL         Sharp X68000 XVI */
@@ -351,6 +351,7 @@ const double XTAL::known_xtals[] = {
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
+	 36'864'000, /* 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll */
 	 37'980'000, /* 37.98_MHz_XTAL         Falco 5220 */
 	 38'769'220, /* 38.76922_MHz_XTAL      Namco System 21 video board */
 	 38'863'630, /* 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video */

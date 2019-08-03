@@ -16636,7 +16636,7 @@ void cmaster_state::init_rp36c3()
 	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(cmaster_state::fixedval48_r), this));
 }
 
-void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs seem ok. need bitswap and handler.
+void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs and bitswaps seem ok. Stuck at Program Check screen. Unlike the other sets, there aren't unmapped reads where to put the handler.
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	for (int i = 0; i < 0x10000; i++)
@@ -16645,10 +16645,10 @@ void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs seem ok. 
 
 		switch (i & 5)
 		{
-			case 0: x = bitswap<8>(x ^ 0x6a, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 1: x = bitswap<8>(x ^ 0xcc, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 4: x = bitswap<8>(x ^ 0x8f, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 5: x = bitswap<8>(x ^ 0x93, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0: x = bitswap<8>(x ^ 0x6a, 2, 1, 0, 7, 6, 5, 4, 3); break;
+			case 1: x = bitswap<8>(x ^ 0xcc, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 4: x = bitswap<8>(x ^ 0x8f, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 5: x = bitswap<8>(x ^ 0x93, 4, 3, 2, 1, 0, 7, 6, 5); break;
 		}
 
 		ROM[i] = x;

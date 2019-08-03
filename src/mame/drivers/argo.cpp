@@ -19,7 +19,7 @@ Commands: same as UNIOR
 ToDo:
 - Add devices
 - There is no obvious evidence of sound.
-- Cassette 
+- Cassette
 -- no info available but seems to be much the same as Unior, so code copied over
 -- clock not hooked up, don't know where it comes from
 -- unable to test as the i8251 device needs work to support syndet

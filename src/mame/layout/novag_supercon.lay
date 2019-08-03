@@ -427,68 +427,68 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-20" right="118" top="-2" bottom="90" />
+		<bounds left="-19.5" right="116" top="-0.5" bottom="88.5" />
 
-		<bezel element="cblack"><bounds x="2" y="2" width="81" height="82" /></bezel>
+		<bezel element="cblack"><bounds x="2.5" y="2.5" width="80.5" height="81" /></bezel>
 		<group ref="sb_board"><bounds x="3" y="3" width="80" height="80" /></group>
-		<bezel element="cwhite"><bounds x="82.99" y="2" width="1" height="82" /></bezel>
+		<bezel element="cwhite"><bounds x="82.95" y="2.5" width="1" height="81" /></bezel>
 
 	<!-- left side labels -->
 
-		<bezel element="white"><bounds x="-6" y="9.833" width="2.2" height="30.333" /></bezel>
-		<bezel element="static_black"><bounds x="-5.666" y="10.166" width="2.2" height="29.666" /></bezel>
-		<bezel element="text_depth"><bounds x="-5" y="9.833" width="2" height="30.333" /><orientation rotate="90" /></bezel>
+		<bezel element="white"><bounds x="-5.5" y="5.833" width="2.2" height="30.333" /></bezel>
+		<bezel element="static_black"><bounds x="-5.166" y="6.166" width="2.2" height="29.666" /></bezel>
+		<bezel element="text_depth"><bounds x="-4.5" y="5.833" width="2" height="30.333" /><orientation rotate="90" /></bezel>
 
-		<bezel element="white"><bounds x="-6" y="47.833" width="4" height="30.333" /></bezel>
-		<bezel element="static_black"><bounds x="-5.666" y="48.166" width="4" height="29.666" /></bezel>
-		<bezel element="text_mate"><bounds x="-5" y="47.833" width="2" height="30.333" /><orientation rotate="90" /></bezel>
+		<bezel element="white"><bounds x="-5.5" y="47.833" width="4" height="30.333" /></bezel>
+		<bezel element="static_black"><bounds x="-5.166" y="48.166" width="4" height="29.666" /></bezel>
+		<bezel element="text_mate"><bounds x="-4.5" y="47.833" width="2" height="30.333" /><orientation rotate="90" /></bezel>
 
-		<group ref="sb_ui"><bounds x="-18" y="3" width="10" height="80" /></group>
+		<group ref="sb_ui"><bounds x="-17.5" y="3" width="10" height="80" /></group>
 
 	<!-- chessboard coords -->
 
-		<bezel element="text_8"><bounds x="-0.8" y="9" width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="-0.8" y="19" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="-0.8" y="29" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="-0.8" y="39" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="-0.8" y="49" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="-0.8" y="59" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="-0.8" y="69" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="-0.8" y="79" width="2" height="2" /></bezel>
+		<bezel element="text_8"><bounds x="-0.3" y="5" width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="-0.3" y="15" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="-0.3" y="25" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="-0.3" y="35" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="-0.3" y="45" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="-0.3" y="55" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="-0.3" y="65" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="-0.3" y="75" width="2" height="2" /></bezel>
 
-		<bezel element="text_l1"><bounds x="-2.8" y="9" width="2" height="2" /></bezel>
-		<bezel element="text_l2"><bounds x="-2.8" y="19" width="2" height="2" /></bezel>
-		<bezel element="text_l4"><bounds x="-2.8" y="29" width="2" height="2" /></bezel>
-		<bezel element="text_l8"><bounds x="-2.8" y="39" width="2" height="2" /></bezel>
+		<bezel element="text_l1"><bounds x="-2.3" y="5" width="2" height="2" /></bezel>
+		<bezel element="text_l2"><bounds x="-2.3" y="15" width="2" height="2" /></bezel>
+		<bezel element="text_l4"><bounds x="-2.3" y="25" width="2" height="2" /></bezel>
+		<bezel element="text_l8"><bounds x="-2.3" y="35" width="2" height="2" /></bezel>
 
-		<bezel element="text_a"><bounds x="5" y="85.5" width="2" height="2" /></bezel>
-		<bezel element="text_b"><bounds x="15" y="85.5" width="2" height="2" /></bezel>
-		<bezel element="text_c"><bounds x="25" y="85.5" width="2" height="2" /></bezel>
-		<bezel element="text_d"><bounds x="35" y="85.5" width="2" height="2" /></bezel>
-		<bezel element="text_e"><bounds x="45" y="85.5" width="2" height="2" /></bezel>
-		<bezel element="text_f"><bounds x="55" y="85.5" width="2" height="2" /></bezel>
-		<bezel element="text_g"><bounds x="65" y="85.5" width="2" height="2" /></bezel>
-		<bezel element="text_h"><bounds x="75" y="85.5" width="2" height="2" /></bezel>
+		<bezel element="text_a"><bounds x="5" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_b"><bounds x="15" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_c"><bounds x="25" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_d"><bounds x="35" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_e"><bounds x="45" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_f"><bounds x="55" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_g"><bounds x="65" y="84.75" width="2" height="2" /></bezel>
+		<bezel element="text_h"><bounds x="75" y="84.75" width="2" height="2" /></bezel>
 
 	<!-- chessboard leds -->
 
-		<bezel name="1.0" element="ledr"><bounds x="-1" y="7.5" width="2" height="1" /></bezel>
-		<bezel name="1.1" element="ledr"><bounds x="-1" y="17.5" width="2" height="1" /></bezel>
-		<bezel name="1.2" element="ledr"><bounds x="-1" y="27.5" width="2" height="1" /></bezel>
-		<bezel name="1.3" element="ledr"><bounds x="-1" y="37.5" width="2" height="1" /></bezel>
-		<bezel name="1.4" element="ledr"><bounds x="-1" y="47.5" width="2" height="1" /></bezel>
-		<bezel name="1.5" element="ledr"><bounds x="-1" y="57.5" width="2" height="1" /></bezel>
-		<bezel name="1.6" element="ledr"><bounds x="-1" y="67.5" width="2" height="1" /></bezel>
-		<bezel name="1.7" element="ledr"><bounds x="-1" y="77.5" width="2" height="1" /></bezel>
+		<bezel name="1.0" element="ledr"><bounds x="-0.5" y="7.5" width="2" height="1" /></bezel>
+		<bezel name="1.1" element="ledr"><bounds x="-0.5" y="17.5" width="2" height="1" /></bezel>
+		<bezel name="1.2" element="ledr"><bounds x="-0.5" y="27.5" width="2" height="1" /></bezel>
+		<bezel name="1.3" element="ledr"><bounds x="-0.5" y="37.5" width="2" height="1" /></bezel>
+		<bezel name="1.4" element="ledr"><bounds x="-0.5" y="47.5" width="2" height="1" /></bezel>
+		<bezel name="1.5" element="ledr"><bounds x="-0.5" y="57.5" width="2" height="1" /></bezel>
+		<bezel name="1.6" element="ledr"><bounds x="-0.5" y="67.5" width="2" height="1" /></bezel>
+		<bezel name="1.7" element="ledr"><bounds x="-0.5" y="77.5" width="2" height="1" /></bezel>
 
-		<bezel name="2.0" element="ledr"><bounds x="7.5" y="85" width="1" height="2" /></bezel>
-		<bezel name="2.1" element="ledr"><bounds x="17.5" y="85" width="1" height="2" /></bezel>
-		<bezel name="2.2" element="ledr"><bounds x="27.5" y="85" width="1" height="2" /></bezel>
-		<bezel name="2.3" element="ledr"><bounds x="37.5" y="85" width="1" height="2" /></bezel>
-		<bezel name="2.4" element="ledr"><bounds x="47.5" y="85" width="1" height="2" /></bezel>
-		<bezel name="2.5" element="ledr"><bounds x="57.5" y="85" width="1" height="2" /></bezel>
-		<bezel name="2.6" element="ledr"><bounds x="67.5" y="85" width="1" height="2" /></bezel>
-		<bezel name="2.7" element="ledr"><bounds x="77.5" y="85" width="1" height="2" /></bezel>
+		<bezel name="2.0" element="ledr"><bounds x="7.5" y="84.5" width="1" height="2" /></bezel>
+		<bezel name="2.1" element="ledr"><bounds x="17.5" y="84.5" width="1" height="2" /></bezel>
+		<bezel name="2.2" element="ledr"><bounds x="27.5" y="84.5" width="1" height="2" /></bezel>
+		<bezel name="2.3" element="ledr"><bounds x="37.5" y="84.5" width="1" height="2" /></bezel>
+		<bezel name="2.4" element="ledr"><bounds x="47.5" y="84.5" width="1" height="2" /></bezel>
+		<bezel name="2.5" element="ledr"><bounds x="57.5" y="84.5" width="1" height="2" /></bezel>
+		<bezel name="2.6" element="ledr"><bounds x="67.5" y="84.5" width="1" height="2" /></bezel>
+		<bezel name="2.7" element="ledr"><bounds x="77.5" y="84.5" width="1" height="2" /></bezel>
 
 	<!-- right side buttons -->
 
@@ -551,14 +551,16 @@
 		<bezel element="hlb" inputtag="IN.6" inputmask="0x02"><bounds x="88" y="66" width="6" height="4" /><color alpha="0.4" /></bezel>
 		<bezel element="hlb" inputtag="IN.7" inputmask="0x02"><bounds x="88" y="76" width="6" height="4" /><color alpha="0.4" /></bezel>
 
-		<bezel element="static_red"><bounds x="97" y="6" width="6" height="4" /></bezel>
+		<bezel element="white"><bounds x="97" y="6" width="6" height="4" /></bezel>
+		<bezel element="static_red"><bounds x="97.15" y="6.15" width="5.7" height="3.7" /></bezel>
 		<bezel element="white"><bounds x="97" y="16" width="6" height="4" /></bezel>
 		<bezel element="white"><bounds x="97" y="26" width="6" height="4" /></bezel>
 		<bezel element="white"><bounds x="97" y="36" width="6" height="4" /></bezel>
 		<bezel element="white"><bounds x="97" y="46" width="6" height="4" /></bezel>
 		<bezel element="white"><bounds x="97" y="56" width="6" height="4" /></bezel>
 		<bezel element="white"><bounds x="97" y="66" width="6" height="4" /></bezel>
-		<bezel element="static_red"><bounds x="97" y="76" width="6" height="4" /></bezel>
+		<bezel element="white"><bounds x="97" y="76" width="6" height="4" /></bezel>
+		<bezel element="static_red"><bounds x="97.15" y="76.15" width="5.7" height="3.7" /></bezel>
 
 		<bezel element="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="97" y="6" width="6" height="4" /><color alpha="0.25" /></bezel>
 		<bezel element="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="97" y="16" width="6" height="4" /><color alpha="0.4" /></bezel>
@@ -571,32 +573,32 @@
 
 	<!-- right side leds -->
 
-		<bezel element="black"><bounds x="107" y="2" width="1" height="82" /></bezel>
+		<bezel element="black"><bounds x="107" y="2.5" width="1" height="81" /></bezel>
 
-		<bezel element="text_rg0"><bounds x="108" y="5.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rg1"><bounds x="108" y="15.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rg2"><bounds x="108" y="25.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rg3"><bounds x="108" y="35.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rg4"><bounds x="108" y="45.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rg5"><bounds x="108" y="55.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rg6"><bounds x="108" y="65.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rg7"><bounds x="108" y="75.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg0"><bounds x="107" y="5.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg1"><bounds x="107" y="15.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg2"><bounds x="107" y="25.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg3"><bounds x="107" y="35.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg4"><bounds x="107" y="45.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg5"><bounds x="107" y="55.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg6"><bounds x="107" y="65.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rg7"><bounds x="107" y="75.7" width="10" height="1.5" /></bezel>
 
-		<bezel element="text_king1"><bounds x="108.2" y="8.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_queen1"><bounds x="108.2" y="18.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_bishop1"><bounds x="108.2" y="28.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_knight1"><bounds x="108.2" y="38.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_rook1"><bounds x="108.2" y="48.7" width="10" height="1.5" /></bezel>
-		<bezel element="text_pawn1"><bounds x="108.2" y="58.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_king1"><bounds x="107.2" y="8.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_queen1"><bounds x="107.2" y="18.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_bishop1"><bounds x="107.2" y="28.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_knight1"><bounds x="107.2" y="38.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_rook1"><bounds x="107.2" y="48.7" width="10" height="1.5" /></bezel>
+		<bezel element="text_pawn1"><bounds x="107.2" y="58.7" width="10" height="1.5" /></bezel>
 
-		<bezel name="0.0" element="ledg"><bounds x="112" y="7.5" width="2" height="1" /></bezel>
-		<bezel name="0.1" element="ledg"><bounds x="112" y="17.5" width="2" height="1" /></bezel>
-		<bezel name="0.2" element="ledg"><bounds x="112" y="27.5" width="2" height="1" /></bezel>
-		<bezel name="0.3" element="ledg"><bounds x="112" y="37.5" width="2" height="1" /></bezel>
-		<bezel name="0.4" element="ledg"><bounds x="112" y="47.5" width="2" height="1" /></bezel>
-		<bezel name="0.5" element="ledg"><bounds x="112" y="57.5" width="2" height="1" /></bezel>
-		<bezel name="0.6" element="ledg"><bounds x="112" y="67.5" width="2" height="1" /></bezel>
-		<bezel name="0.7" element="ledg"><bounds x="112" y="77.5" width="2" height="1" /></bezel>
+		<bezel name="0.0" element="ledg"><bounds x="111" y="7.5" width="2" height="1" /></bezel>
+		<bezel name="0.1" element="ledg"><bounds x="111" y="17.5" width="2" height="1" /></bezel>
+		<bezel name="0.2" element="ledg"><bounds x="111" y="27.5" width="2" height="1" /></bezel>
+		<bezel name="0.3" element="ledg"><bounds x="111" y="37.5" width="2" height="1" /></bezel>
+		<bezel name="0.4" element="ledg"><bounds x="111" y="47.5" width="2" height="1" /></bezel>
+		<bezel name="0.5" element="ledg"><bounds x="111" y="57.5" width="2" height="1" /></bezel>
+		<bezel name="0.6" element="ledg"><bounds x="111" y="67.5" width="2" height="1" /></bezel>
+		<bezel name="0.7" element="ledg"><bounds x="111" y="77.5" width="2" height="1" /></bezel>
 
 	</view>
 </mamelayout>

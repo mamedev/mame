@@ -75,7 +75,6 @@ TODO: others.
 TODO:
 - exact cycles/scanlines for VBLANK and 256V int assert/clear need to be figured out and implemented.
 - bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually plays before the simulated MCU releases the 68k and the load (and morning music) begins.
-- hcrash: coin insertion isn't always recognized.
 - hcrash: Konami GT-type inputs doesn't work properly.
 - gradiusb: still needs proper MCU emulation;
 
@@ -98,6 +97,9 @@ but when they get close to top of the screen they go in front of them.
 --
 To display score, priority of upper part is always lower.
 So this is the correct behavior of real hardware, not an emulation bug.
+- hcrash:
+The "overall ranking" sums up every play score by players, by looking up
+initials
 
 ***************************************************************************/
 
@@ -174,6 +176,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
+// irq enables in reverse order than Salamander according to the irq routine contents
+TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::hcrash_interrupt)
+{
+	int scanline = param;
+
+	if (scanline == 240 && m_irq2_on) //&& (m_screen->frame_number() & 1) == 0)
+		m_maincpu->set_input_line(1, HOLD_LINE);
+
+	if (scanline == 0 && m_irq_on)
+		m_maincpu->set_input_line(2, HOLD_LINE);
+}
+
+
 TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 {
 	int scanline = param;
@@ -231,7 +246,7 @@ WRITE_LINE_MEMBER(nemesis_state::sound_nmi_w)
 	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter. Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
 	// the ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
 	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work, since it requires a sequence of NMIs in order to function.
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state?ASSERT_LINE:CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_MEMBER(nemesis_state::bubsys_mcu_w)
@@ -1703,6 +1718,12 @@ void nemesis_state::machine_reset()
 	m_irq_port_last = 0;
 }
 
+void nemesis_state::set_screen_raw_params(machine_config &config)
+{
+	// 60.606060 Hz for 256x224
+	m_screen->set_raw(XTAL(18432000.0)/4,288,0,256,264,2*8,30*8);
+}
+
 void nemesis_state::nemesis(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1727,10 +1748,7 @@ void nemesis_state::nemesis(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264));      /* ??? */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -1794,10 +1812,7 @@ void nemesis_state::gx400(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
@@ -1864,10 +1879,7 @@ void nemesis_state::konamigt(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 
@@ -1930,10 +1942,7 @@ void nemesis_state::rf2_gx400(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
@@ -1989,10 +1998,7 @@ void nemesis_state::salamand(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((264-256)*125/2));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -2039,10 +2045,7 @@ void nemesis_state::blkpnthr(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::blkpnthr_vblank_irq));
@@ -2084,10 +2087,7 @@ void nemesis_state::citybomb(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -2133,10 +2133,7 @@ void nemesis_state::nyanpani(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(nemesis_state::nemesis_vblank_irq));
@@ -2173,7 +2170,7 @@ void nemesis_state::hcrash(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 18432000/3); /* 6.144MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nemesis_state::hcrash_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::konamigt_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(nemesis_state::hcrash_interrupt), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
@@ -2187,10 +2184,7 @@ void nemesis_state::hcrash(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 
@@ -2206,8 +2200,8 @@ void nemesis_state::hcrash(machine_config &config)
 
 	VLM5030(config, m_vlm, 3579545);
 	m_vlm->set_addrmap(0, &nemesis_state::salamand_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 2.00);
+	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 2.00);
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(nemesis_state::volume_callback));
@@ -2218,8 +2212,8 @@ void nemesis_state::hcrash(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(0, "lspeaker", 0.50);
+	ymsnd.add_route(1, "rspeaker", 0.50);
 }
 
 /***************************************************************************
@@ -2954,10 +2948,7 @@ void nemesis_state::bubsys(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz((18432000.0/4)/(288*264)); /* 60.606060 Hz */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(nemesis_state::screen_update_nemesis));
 	m_screen->set_palette(m_palette);
 	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI); // TODO: This is supposed to be gated by something on bubble system, unclear what. it should only be active while the bubble memory is warming up, and disabled after the bubble mcu 'releases' the 68k from reset.
@@ -3040,16 +3031,16 @@ ROM_END
 void nemesis_state::bubsys_init()
 {
 	/*
-		The MCU is the master of the system and controls the /RESET and /BS lines of the 68000.
-		At boot the MCU asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
-		During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
-		countdown via the vlm5030. Once the bubble memory is ready, the MCU copies the 68000 boot program
-		to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
-		
-		As the MCU is not dumped we effectively start the simulation at the point the 68000
-		is released, and manually copy the boot program to 68000 address space.
-		
-		TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
+	    The MCU is the master of the system and controls the /RESET and /BS lines of the 68000.
+	    At boot the MCU asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
+	    During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
+	    countdown via the vlm5030. Once the bubble memory is ready, the MCU copies the 68000 boot program
+	    to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
+
+	    As the MCU is not dumped we effectively start the simulation at the point the 68000
+	    is released, and manually copy the boot program to 68000 address space.
+
+	    TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
 	*/
 
 	const uint8_t *src = memregion("maincpu")->base();

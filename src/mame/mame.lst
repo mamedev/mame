@@ -2494,6 +2494,7 @@ xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17)
 lion3500                        // 1993 Lion 3500C/T notebook
+o286foxii                       // Octek Fox II 286 motherboard
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -3157,6 +3158,7 @@ ad5dndq                         //
 ad5dndr                         //
 ad5dndu                         //
 ad5dndv                         //
+ad5etdls                        // El Trebol de la Suerte (Bellfruit)
 ad5eyes                         // Eyes Down (Mazooma)
 ad5eyesa                        //
 ad5eyesb                        //
@@ -3192,6 +3194,7 @@ ad5jckmob                       //
 ad5jckmoc                       //
 ad5jckmod                       //
 ad5jckmoe                       //
+ad5lluck                        // Lady Luck (Bellfruit)
 ad5mcob                         // Monte Carlo Or Bust (Qps)
 ad5mcoba                        //
 ad5mcobb                        //
@@ -14292,15 +14295,6 @@ greatgur                        // QB  (c) 1986 Taito Corporation (Japan?)
 ogonsiro                        // QB  (c) 1986 Taito Corporation (Japan)
 ppking                          // QO  (c) 1985 Taito America Corporation (US)
 
-@source:glasgow.cpp
-amsterd                         // Amsterdam
-dallas                          // Dallas
-dallas16                        // Dallas
-dallas32                        // Dallas
-glasgow                         // Glasgow
-roma                            // Roma
-roma32                          // Roma
-
 @source:glass.cpp
 glass                           // (c) 1993 - Ref 931021
 glass10                         // (c) 1993 - Ref 931021
@@ -14426,9 +14420,9 @@ bsuertes                        // 1991, Unknown
 bsuertet                        // 1991, Unknown
 bsuerteu                        // 1991, Unknown
 bsuertev                        // 1991, Unknown
-caspoker                        // 1987, PM / Beck Elektronik.
-caspokera                       // 1986, PM / Beck Elektronik.
-caspokerb                       // 1988, PM / Beck Elektronik.
+caspoker                        // 1988, PM / Beck Elektronik.
+caspokera                       // 1987, PM / Beck Elektronik.
+caspokerb                       // 1986, PM / Beck Elektronik.
 falcnwld                        // 1991, TVG
 falcnwlda                       // (c) 1990, Video Klein
 falcnwldb                       // (c) 1990, Video Klein
@@ -14445,7 +14439,6 @@ megadpkrb                       // (c) 1990 Blitz System Inc
 ngold                           // 198? Unknown
 ngolda                          // 198? Unknown
 ngoldb                          // 198? Unknown
-paradiss                        // 1987 Paradise
 pmpoker                         // (c) 1981 PlayMan
 poker91                         // 1991, Unknown
 pokerdub                        // 198?, Unknown
@@ -14469,6 +14462,7 @@ royalea                         // Unknown
 silverga                        // 1983, Unknown
 sloco93                         // 1993, Unknown
 sloco93a                        // 1993, Unknown
+super21p                        // 1987, Public MNG
 super98                         // 199?, Unknown
 superdbl                        // 198? Karateco
 videtrna                        // Unknown
@@ -17875,6 +17869,9 @@ jubileep                        //
 @source:juicebox.cpp
 juicebox                        //
 
+@source:juku.cpp
+juku                            //
+
 @source:jungleyo.cpp
 jungleyo
 
@@ -19046,6 +19043,7 @@ magicard                        // (c) 199? Impera
 magicarda                       // (c) 199? Impera
 magicardb                       // (c) 199? Impera
 magicarde                       // (c) 1994 Impera
+magicardf                       // (c) 199? Impera
 magicardj                       // (c) 1998 Impera
 magicle                         // (c) 2001 Impera
 quingo                          // (c) 1999 Impera
@@ -21409,13 +21407,42 @@ meijinsn                        // (c) 1986 SNK
 @source:mekd2.cpp
 mekd2                           // 1977 Motorola Evaluation Kit
 
-@source:mephisto.cpp
+@source:mephisto_glasgow.cpp
+amsterd                         // Amsterdam
+dallas                          // Dallas
+dallas16                        // Dallas
+dallas32                        // Dallas
+glasgow                         // Glasgow
+roma                            // Roma
+roma32                          // Roma
+
+@source:mephisto_mm2.cpp
 mm2                             // Mephisto MM II
 bup                             // Mephisto B&P
 mm4tk                           // Mephisto MM IV (Turbo Kit)
 mm4                             // Mephisto MM IV
 mm5                             // Mephisto MM V
 rebel5                          // Mephisto Rebell 5.0
+
+@source:mephisto_modena.cpp
+modena                          // 1992 Mephisto Modena
+
+@source:mephisto_modular.cpp
+alm16                           // 1988 Mephisto Almeria 68000
+alm32                           // 1988 Mephisto Almeria 68020
+port16                          // 1989 Mephisto Portorose 68000
+port32                          // 1989 Mephisto Portorose 68020
+lyon16                          // 1990 Mephisto Lyon 68000
+lyon32                          // 1990 Mephisto Lyon 68020
+van16                           // 1991 Mephisto Vancouver 68000
+van32                           // 1991 Mephisto Vancouver 68020
+gen32                           // 1993 Mephisto Genius 68030
+lond020                         // 1996 Mephisto London 68020
+lond030                         // 1996 Mephisto Genius 68030 London Upgrade
+berl16                          // 1992 Mephisto Berlin 68000
+berlinp                         // 1994 Mephisto Berlin Pro 68020
+berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
+bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
 
 @source:mephisto_montec.cpp
 mondial                         // 1985 Mephisto Mondial
@@ -21426,6 +21453,15 @@ mondial2                        // 1987 Mephisto Mondial II
 smondial2                       // 1989 Mephisto Super Mondial II
 megaiv                          // 1989 Mephisto Mega IV
 monteciv                        // 1990 Mephisto Monte Carlo IV LE
+
+@source:mephisto_polgar.cpp
+polgar                          // 1989 Mephisto Polgar
+polgar10                        // 1990 Mephisto Polgar 10MHz
+mrisc                           // 1992 Mephisto RISC 1MB
+mrisc2                          // 1994 Mephisto RISC II
+academy                         // 1989 Mephisto Academy
+milano                          // 1991 Mephisto Milano
+nshort                          // 1993 Mephisto Nigel Short
 
 @source:mephistp.cpp
 mephistp                        //
@@ -21685,7 +21721,10 @@ pentacup                        //
 pentacup2                       //
 
 @source:microtan.cpp
-microtan                        // 1979 Microtan 65
+mt65                            // 1979 Microtan 65
+micron                          // 1980 Micron
+spinveti                        // 1980 Space Invasion (ETI)
+mt6809                          // 1984 Microtan 65 (6809 CPU)
 
 @source:microterm.cpp
 mt420                           //
@@ -22017,23 +22056,6 @@ mmd2                            //
 @source:mmm.cpp
 mmm_ldip                        // Lucky Dip
 
-@source:mmodular.cpp
-alm16                           // 1988 Mephisto Almeria 68000
-alm32                           // 1988 Mephisto Almeria 68020
-port16                          // 1989 Mephisto Portorose 68000
-port32                          // 1989 Mephisto Portorose 68020
-lyon16                          // 1990 Mephisto Lyon 68000
-lyon32                          // 1990 Mephisto Lyon 68020
-van16                           // 1991 Mephisto Vancouver 68000
-van32                           // 1991 Mephisto Vancouver 68020
-gen32                           // 1993 Mephisto Genius 68030
-lond020                         // 1996 Mephisto London 68020
-lond030                         // 1996 Mephisto Genius 68030 London Upgrade
-berl16                          // 1992 Mephisto Berlin 68000
-berlinp                         // 1994 Mephisto Berlin Pro 68020
-berl16l                         // 1996 Mephisto Berlin 68000 London Upgrade
-bpl32                           // 1996 Mephisto Berlin Pro London Upgrade
-
 @source:mod8.cpp
 mod8                            //
 
@@ -22189,9 +22211,6 @@ vs2v991                         // 1999.?? Virtual Striker 2 ver.99.1
 
 @source:modellot.cpp
 modellot                        //
-
-@source:modena.cpp
-modena                          // 1992 Mephisto Modena
 
 @source:mogura.cpp
 mogura                          // GX141 (c) 1991
@@ -30675,6 +30694,7 @@ npusagif                        //
 
 @source:neptunp2.cpp
 neptunp2                        //
+rockroll                        //
 
 @source:nes.cpp
 iq501                           // Micro Genius IQ-501
@@ -31015,6 +31035,9 @@ raiders5t                       // UPL-85004 (c) 1985 Taito license
 cfortea                         //
 cforteb                         //
 
+@source:novag_const.cpp
+const                           //
+
 @source:novag_diablo.cpp
 diablo68                        //
 scorpio68                       //
@@ -31026,7 +31049,7 @@ npresto                         //
 @source:novag_savant.cpp
 savant                          //
 
-@source:novag_scon.cpp
+@source:novag_sconst.cpp
 supercon                        //
 
 @source:novag_sexpert.cpp
@@ -32093,6 +32116,7 @@ pex0057pc                       // (c) 1995 IGT - International Game Technology
 pex0057pd                       // (c) 1995 IGT - International Game Technology
 pex0057pe                       // (c) 1995 IGT - International Game Technology
 pex0057pf                       // (c) 1995 IGT - International Game Technology
+pex0057pg                       // (c) 1995 IGT - International Game Technology
 pex0060p                        // (c) 1995 IGT - International Game Technology
 pex0124p                        // (c) 1995 IGT - International Game Technology
 pex0150p                        // (c) 1995 IGT - International Game Technology
@@ -32935,15 +32959,6 @@ topracer                        // bootleg
 topracera                       // bootleg
 topracern                       // bootleg
 
-@source:polgar.cpp
-polgar                          // 1989 Mephisto Polgar
-polgar10                        // 1990 Mephisto Polgar 10MHz
-mrisc                           // 1992 Mephisto RISC 1MB
-mrisc2                          // 1994 Mephisto RISC II
-academy                         // 1989 Mephisto Academy
-milano                          // 1991 Mephisto Milano
-nshort                          // 1993 Mephisto Nigel Short
-
 @source:policetr.cpp
 policetr                        // (c) 1996 P&P Marketing
 policetr10                      // (c) 1996 P&P Marketing
@@ -33024,6 +33039,7 @@ powerbal                        // (c) 1994
 powerins                        // (c) 1993 Atlus (USA)
 powerinsa                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
+powerinsc                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsj                       // (c) 1993 Atlus (Japan)
 powerinsp                       // prototype
 
@@ -34443,6 +34459,7 @@ hustlerb                        // bootleg
 hustlerb2                       // bootleg
 hustlerb4                       // bootleg
 hustlerb5                       // bootleg
+hustlerb6                       // bootleg
 hustlerd                        // GX343 (c) 1981 Konami + Dynamo Games license
 mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
 mimonsco                        // (c) 1982 bootleg
@@ -34829,6 +34846,7 @@ dduxd                           //
 dduxj                           // (c) 1989 (FD1094)
 dduxjd                          //
 defense                         // (c) 1987 (FD1094)
+dfjail                          //
 dunkshot                        // (c) 1986 (FD1089A)
 dunkshota                       // (c) 1986 (FD1089A)
 dunkshoto                       // (c) 1986 (FD1089A)
@@ -36709,6 +36727,7 @@ tisub                           // (c) 1992 Subsino
 tisuba                          // (c) 1992 Subsino
 victor21                        // (c) 1990 Subsino
 victor5                         // (c) 1990 Subsino
+victor5a                        // (c) 1990 Subsino
 victor6                         // (c) 1995 Subsino (Alpha license)
 victor6a                        // (c) 1995 Subsino (Alpha license)
 victor6b                        // (c) 1995 Subsino (Alpha license)
@@ -39047,6 +39066,7 @@ startrks                        // Sidam bootleg
 subhunt                         // ?   [1977 Taito]
 supcrash                        // bootleg
 tranqgun                        // 413-428 (c) 1980 Sega
+wantsega						// ? (c) 1982 Sega
 
 @source:victor9k.cpp
 victor9k                        //
@@ -40419,6 +40439,7 @@ mu80                            // 1994 MU-80
 @source:ymmu100.cpp
 mu100                           // 1997 MU-100
 mu100r                          // 1997 MU-100 Rackable version
+mu100b                          // 1998 MU-100B
 
 @source:ymvl70.cpp
 vl70                            // 1996 VL70-m

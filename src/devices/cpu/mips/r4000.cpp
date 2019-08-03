@@ -1372,26 +1372,41 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 {
 	switch (reg)
 	{
+	case CP0_Index:
+		m_cp0[CP0_Index] = data & 0x3f;
+		break;
+	case CP0_EntryLo0:
+		m_cp0[CP0_EntryLo0] = data & (EL_PFN | EL_C | EL_D | EL_V | EL_G);
+		break;
+	case CP0_EntryLo1:
+		m_cp0[CP0_EntryLo1] = data & (EL_PFN | EL_C | EL_D | EL_V | EL_G);
+		break;
+	case CP0_Context:
+		m_cp0[CP0_Context] = data & ~0xf;
+		break;
+	case CP0_PageMask:
+		m_cp0[CP0_PageMask] = data & PAGEMASK;
+		break;
+	case CP0_Wired:
+		m_cp0[CP0_Wired] = data & 0x3f;
+		break;
 	case CP0_Count:
 		m_cp0[CP0_Count] = u32(data);
 		m_cp0_timer_zero = total_cycles() - m_cp0[CP0_Count] * 2;
 
 		cp0_update_timer();
 		break;
-
 	case CP0_EntryHi:
 		m_cp0[CP0_EntryHi] = data & (EH_R | EH_VPN2_64 | EH_ASID);
 		break;
-
 	case CP0_Compare:
 		m_cp0[CP0_Compare] = u32(data);
 		CAUSE &= ~CAUSE_IPEX5;
 
 		cp0_update_timer(true);
 		break;
-
 	case CP0_Status:
-		m_cp0[CP0_Status] = u32(data);
+		m_cp0[CP0_Status] = u32(data) & ~u32(0x01a80000);
 
 		// FIXME: software interrupt check
 		if (CAUSE & SR & SR_IMSW)
@@ -1400,19 +1415,16 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 		if (data & SR_RE)
 			fatalerror("unimplemented reverse endian mode enabled (%s)\n", machine().describe_context().c_str());
 		break;
-
 	case CP0_Cause:
-		CAUSE = (CAUSE & ~CAUSE_IPSW) | (data & CAUSE_IPSW);
+		m_cp0[CP0_Cause] = (m_cp0[CP0_Cause] & ~CAUSE_IPSW) | (data & CAUSE_IPSW);
 
 		// FIXME: software interrupt check
 		if (CAUSE & SR & SR_IMSW)
 			m_icount = 0;
 		break;
-
-	case CP0_PRId:
-		// read-only register
+	case CP0_EPC:
+		m_cp0[CP0_EPC] = data;
 		break;
-
 	case CP0_Config:
 		m_cp0[CP0_Config] = (m_cp0[CP0_Config] & ~CONFIG_WM) | (data & CONFIG_WM);
 
@@ -1432,9 +1444,32 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 		LOGMASKED(LOG_CACHE, "icache/dcache line sizes %d/%d bytes\n",
 			m_icache_line_size, m_cp0[CP0_Config] & CONFIG_DB ? 32 : 16);
 		break;
-
+	case CP0_LLAddr:
+		m_cp0[CP0_LLAddr] = data;
+		break;
+	case CP0_WatchLo:
+		m_cp0[CP0_WatchLo] = data & ~0x4;
+		break;
+	case CP0_WatchHi:
+		m_cp0[CP0_WatchHi] = data & 0xf;
+		break;
+	case CP0_XContext:
+		m_cp0[CP0_XContext] = data & ~0xf;
+		break;
+	case CP0_ECC:
+		m_cp0[CP0_ECC] = data & 0xff;
+		break;
+	case CP0_TagLo:
+		m_cp0[CP0_TagLo] = data;
+		break;
+	case CP0_TagHi:
+		m_cp0[CP0_TagHi] = data;
+		break;
+	case CP0_ErrorEPC:
+		m_cp0[CP0_ErrorEPC] = data;
+		break;
 	default:
-		m_cp0[reg] = data;
+		logerror("write to read-only or undefined cp0 register %d\n data 0x%x", reg, data);
 		break;
 	}
 }

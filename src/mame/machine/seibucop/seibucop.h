@@ -187,6 +187,7 @@ public:
 
 	int m_cop_sprite_dma_abs_x,m_cop_sprite_dma_abs_y;
 	int m_sprite_dma_rel_x, m_sprite_dma_rel_y;
+	int m_sprite_dma_x_clip;
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_y_w);
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_abs_x_w);
 

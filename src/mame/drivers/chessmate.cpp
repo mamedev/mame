@@ -16,7 +16,6 @@ one jukebox shape, and one brick shape. The one in MAME came from the jukebox, b
 models have the same ROMs.
 
 TODO:
-- XTAL is unknown, result frequency of 1MHz is correct
 - is there an older version of chmate? chips on pcb photos are dated 1979, but
   the game is known to be released in 1978
 
@@ -267,10 +266,10 @@ INPUT_PORTS_END
 void chmate_state::chmate(machine_config &config)
 {
 	/* basic machine hardware */
-	M6504(config, m_maincpu, 1000000);
+	M6504(config, m_maincpu, 8_MHz_XTAL/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chmate_state::main_map);
 
-	MOS6530(config, m_miot, 1000000);
+	MOS6530(config, m_miot, 8_MHz_XTAL/8);
 	m_miot->in_pa_callback().set(FUNC(chmate_state::input_r));
 	m_miot->out_pa_callback().set(FUNC(chmate_state::digit_w));
 	m_miot->out_pb_callback().set(FUNC(chmate_state::control_w));

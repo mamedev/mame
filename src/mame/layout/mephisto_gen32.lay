@@ -375,22 +375,22 @@
 		<bezel element="text_right"><bounds x="88.5" y="96" width="4" height="4" /></bezel>
 		<bezel element="text_down"> <bounds x="82.5" y="102" width="4" height="4" /></bezel>
 
-		<bezel element="keys" inputtag="KEY1" inputmask="0x01000000">	<!-- ENT -->
+		<bezel element="keys" inputtag="KEY1" inputmask="0x01000000">   <!-- ENT -->
 			<bounds x="76" y="89.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2" inputmask="0x01000000">	<!-- Up -->
+		<bezel element="keys" inputtag="KEY2" inputmask="0x01000000">   <!-- Up -->
 			<bounds x="82" y="89.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY3" inputmask="0x01000000">	<!-- CL -->
+		<bezel element="keys" inputtag="KEY3" inputmask="0x01000000">   <!-- CL -->
 			<bounds x="88" y="89.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY1" inputmask="0x02000000">	<!-- Left -->
+		<bezel element="keys" inputtag="KEY1" inputmask="0x02000000">   <!-- Left -->
 			<bounds x="76" y="95.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY3" inputmask="0x02000000">	<!-- Right -->
+		<bezel element="keys" inputtag="KEY3" inputmask="0x02000000">   <!-- Right -->
 			<bounds x="88" y="95.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
-		<bezel element="keys" inputtag="KEY2" inputmask="0x02000000">	<!-- Down -->
+		<bezel element="keys" inputtag="KEY2" inputmask="0x02000000">   <!-- Down -->
 			<bounds x="82" y="101.5" width="5" height="5" /><color alpha="0.25" />
 		</bezel>
 	</group>
@@ -412,14 +412,14 @@
 
 	<!-- chessboard coords -->
 
-		<bezel element="text_8"><bounds x="14.7" y="7" width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="14.7" y="17" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="14.7" y="27" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="14.7" y="37" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="14.7" y="47" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="14.7" y="57" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="14.7" y="67" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="14.7" y="77" width="2" height="2" /></bezel>
+		<bezel element="text_8"><bounds x="14.7" y="6.5" width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="14.7" y="16.5" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="14.7" y="26.5" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="14.7" y="36.5" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="14.7" y="46.5" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="14.7" y="56.5" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="14.7" y="66.5" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="14.7" y="76.5" width="2" height="2" /></bezel>
 
 		<bezel element="text_a"><bounds x="21.5" y="84" width="2" height="2" /></bezel>
 		<bezel element="text_b"><bounds x="31.5" y="84" width="2" height="2" /></bezel>

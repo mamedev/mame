@@ -308,15 +308,15 @@ void t6963c_device::set_md(u8 data)
 	// MD0, MD1
 	m_number_lines = 8 - (data & 3) * 2;
 
-	if (BIT(data, 4))	// MDS
+	if (BIT(data, 4))   // MDS
 		m_number_lines += 8;
 
-	switch((data >> 2) & 3)	// MD2, MD3
+	switch((data >> 2) & 3) // MD2, MD3
 	{
-	case 0:	m_number_cols = 32; break;
-	case 1:	m_number_cols = 40; break;
-	case 2:	m_number_cols = 64; break;
-	case 3:	m_number_cols = 80; break;
+	case 0: m_number_cols = 32; break;
+	case 1: m_number_cols = 40; break;
+	case 2: m_number_cols = 64; break;
+	case 3: m_number_cols = 80; break;
 	}
 }
 
@@ -361,16 +361,16 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					int pix = BIT(data, m_font_size - 1 - i);
 					switch(m_mode & 7)
 					{
-					case 0:	// OR
+					case 0: // OR
 						bitmap.pix16(y, x * m_font_size + i) |= pix;
 						break;
-					case 1:	// EXOR
+					case 1: // EXOR
 						bitmap.pix16(y, x * m_font_size + i) ^= pix;
 						break;
-					case 3:	// AND
+					case 3: // AND
 						bitmap.pix16(y, x * m_font_size + i) &= pix;
 						break;
-					case 4:	// Text attribute
+					case 4: // Text attribute
 						logerror("%s: Unimplemented Text attribute\n", machine().describe_context());
 						break;
 					}
@@ -405,8 +405,8 @@ void lm24014h_device::device_start()
 {
 	save_item(NAME(m_fs));
 
-	m_lcdc->set_md(4);		// 8 lines x 40 columns
-	m_lcdc->set_fs(m_fs << 1);	// font size 6x8 or 8x8
+	m_lcdc->set_md(4);      // 8 lines x 40 columns
+	m_lcdc->set_fs(m_fs << 1);  // font size 6x8 or 8x8
 }
 
 

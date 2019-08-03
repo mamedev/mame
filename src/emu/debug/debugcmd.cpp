@@ -1849,7 +1849,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	switch (space->addr_shift())
 	{
 	case -3:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u64 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1858,7 +1858,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case -2:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u32 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1867,7 +1867,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case -1:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1876,7 +1876,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		}
 		break;
 	case  0:
-		for (offs_t i = offset; i != endoffset; i++)
+		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			u8 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1887,7 +1887,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	case  3:
 		offset &= ~15;
 		endoffset &= ~15;
-		for (offs_t i = offset; i != endoffset; i+=16)
+		for (u64 i = offset; i != endoffset; i+=16)
 		{
 			offs_t curaddr = i;
 			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
@@ -1944,7 +1944,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	// determine the addresses to read
 	endoffset = (offset + length - 1) & space->addrmask();
 	offset = offset & space->addrmask();
-	offs_t i = 0;
+	u64 i = 0;
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
 	switch (space->addr_shift())
 	{
@@ -2089,7 +2089,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	auto dis = space->device().machine().disable_side_effects();
 	bool be = space->endianness() == ENDIANNESS_BIG;
 
-	for (offs_t i = offset; i <= endoffset; i += rowsize)
+	for (u64 i = offset; i <= endoffset; i += rowsize)
 	{
 		output.clear();
 		output.rdbuf()->clear();

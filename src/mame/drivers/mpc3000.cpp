@@ -62,6 +62,7 @@ MPCs on other hardware:
 
 #include "emu.h"
 #include "cpu/nec/v5x.h"
+#include "cpu/upd7810/upd7810.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/hd61830.h"
 #include "bus/midi/midi.h"
@@ -79,6 +80,7 @@ public:
 	mpc3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
 		, m_lcdc(*this, "lcdc")
 		, m_dsp(*this, "dsp")
 		, m_mdout(*this, "mdout")
@@ -91,6 +93,7 @@ public:
 
 private:
 	required_device<v53a_device> m_maincpu;
+	required_device<upd7810_device> m_subcpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<midi_port_device> m_mdout;
@@ -100,6 +103,7 @@ private:
 
 	void mpc3000_map(address_map &map);
 	void mpc3000_io_map(address_map &map);
+	void mpc3000_sub_map(address_map &map);
 
 	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
 	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
@@ -168,6 +172,11 @@ WRITE16_MEMBER(mpc3000_state::dma_memw_cb)
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
 }
 
+void mpc3000_state::mpc3000_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("subcpu", 0);
+}
+
 void mpc3000_state::mpc3000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
@@ -204,6 +213,9 @@ void mpc3000_state::mpc3000(machine_config &config)
 	hiledlatch.q_out_cb<5>().set_output("led13").invert(); // Full Level
 	hiledlatch.q_out_cb<6>().set_output("led14").invert(); // 16 Levels
 	hiledlatch.q_out_cb<7>().set_output("led15").invert(); // After
+
+	UPD7810(config, m_subcpu, 12_MHz_XTAL);
+	m_subcpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_sub_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(80);
@@ -267,7 +279,7 @@ ROM_START( mpc3000 )
 	ROMX_LOAD( "mpc3000__ls__v3.10.am27c020__id0197.ic13_ls.bin", 0x000000, 0x040000, CRC(cbd1b3a6) SHA1(5464a57137549d9d9c47f9aafc2b89f4c0af8b31), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "mpc3000__ms__v3.10.am27c020__id0197.ic14_ms.bin", 0x000001, 0x040000, CRC(e2ba1904) SHA1(27a9f047c63964fac2b453f2317b77834490983d), ROM_SKIP(1) | ROM_BIOS(3) )
 
-	ROM_REGION(0x80000, "subcpu", 0)    // uPD78C10 panel controller code
+	ROM_REGION(0x8000, "subcpu", 0)    // uPD78C10 panel controller code
 	ROM_LOAD( "mp3000__op_v1.0.am27c256__id0110.ic602.bin", 0x000000, 0x008000, CRC(b0b783d3) SHA1(a60016184fc07ba00dcc19ba4da60e78aceff63c) )
 
 	ROM_REGION( 0x2000000, "dsp", ROMREGION_ERASE00 )   // sample RAM

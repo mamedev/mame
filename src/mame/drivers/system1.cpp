@@ -3952,7 +3952,7 @@ ROM_START( choplift )
 	ROM_LOAD( "epr-7130.ic126", 0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, BAD_DUMP CRC(7bd11a6c) SHA1(2d75a2276e572f97f269af062536c1c58e1c8eaf) )
+	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, CRC(1377a6ef) SHA1(b85acd7292e5480c98af1a0492b6b5d3f9b1716c) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "epr-7127.ic4",   0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
@@ -5521,19 +5521,6 @@ void system1_state::init_bootsys2d()
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x10000, 0x4000);
 }
 
-
-void system1_state::init_choplift()
-{
-	uint8_t *mcurom = memregion("mcu")->base();
-
-	/* the ROM dump we have is bad; the following patches make it work */
-	mcurom[0x100] = 0x55;       /* D5 in current dump */
-	mcurom[0x27b] = 0xfb;       /* F2 in current dump */
-	mcurom[0x2ff] = 0xff - 9;   /* fix up checksum; means there's still something incorrect */
-
-	init_bank0c();
-}
-
 void system1_state::init_shtngmst()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -5620,7 +5607,7 @@ GAME( 1986, gardia,     0,        sys1piox_317_0006, gardia,    system1_state, i
 GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, init_bank44,       ROT0,   "Coreland / Sega", "Brain", MACHINE_SUPPORTS_SAVE )
 
 /* System 2 */
-GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_choplift,     ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

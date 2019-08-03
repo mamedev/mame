@@ -1811,7 +1811,7 @@
 	</software>
 
 	<software name="tomahawk">
-	  <description>Tomahawk</description>
+		<description>Tomahawk</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">

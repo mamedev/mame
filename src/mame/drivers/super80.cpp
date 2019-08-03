@@ -211,7 +211,7 @@ Port(hex)  Role       Comment
 ToDo:
 - Fix Paste: Shift operates randomly (only super80m is suitable, the others drop characters because
        of the horrible inline editor they use)
-- Get disk system to work (no disk images available) only connected to super80r atm
+- Disk system works, only connected to super80r atm - is it needed for super80v?
 
 
 ***********************************************************************************************************/
@@ -692,7 +692,7 @@ void super80_state::machine_start()
 
 static void super80_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("s80flop", FLOPPY_525_QD);
 }
 
 
@@ -874,8 +874,8 @@ void super80_state::super80r(machine_config &config)
 
 	WD2793(config, m_fdc, 2_MHz_XTAL);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
 }
 
 /**************************** ROMS *****************************************************************/

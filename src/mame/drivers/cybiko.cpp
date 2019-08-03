@@ -497,7 +497,7 @@ void cybiko_state::cybikoxt(machine_config &config)
 	subdevice<h8_sci_device>("maincpu:sci2")->tx_handler().set("debug_serial", FUNC(rs232_port_device::write_txd));
 
 	// quickload
-	QUICKLOAD(config.replace(), "quickload", "bin,nb").set_load_callback(FUNC(cybiko_state::quickload_cybikoxt), this);
+	QUICKLOAD(config.replace(), "quickload", "bin,nv").set_load_callback(FUNC(cybiko_state::quickload_cybikoxt), this);
 }
 
 /////////

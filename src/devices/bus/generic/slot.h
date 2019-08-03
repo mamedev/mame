@@ -156,8 +156,8 @@ protected:
 	int         m_width;
 	endianness_t m_endianness;
 	device_generic_cart_interface  *m_cart;
-	load_delegate	m_device_image_load;
-	unload_delegate	m_device_image_unload;
+	load_delegate   m_device_image_load;
+	unload_delegate m_device_image_unload;
 };
 
 class generic_socket_device : public generic_slot_device

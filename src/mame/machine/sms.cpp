@@ -974,7 +974,7 @@ void sms_state::setup_media_slots()
 			m_lphaser_x_offs = m_smsexpslot->get_lphaser_xoffs();
 
 		if (m_lphaser_x_offs == -1)
-			m_lphaser_x_offs = 36;
+			m_lphaser_x_offs = 19;
 	}
 }
 

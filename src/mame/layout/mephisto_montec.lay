@@ -2,11 +2,8 @@
 <mamelayout version="2">
 <!-- define elements -->
 
-	<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
 	<element name="digit" defstate="0">
-		<led7seg>
-			<color red="1" green="1" blue="1" />
-		</led7seg>
+		<led7seg><color red="0.31" green="0.28" blue="0.29" /></led7seg>
 	</element>
 
 	<element name="led" defstate="0">
@@ -38,26 +35,26 @@
 		</rect>
 	</element>
 
-	<element name="led7seg_background"><rect><color red="0" green="0" blue="0" />      </rect></element>
+	<element name="led7seg_background"><rect><color red="0.54" green="0.57" blue="0.58" />      </rect></element>
 	<element name="background"><rect><color red="0.59" green="0.39" blue="0.20" /></rect></element>
 	<element name="white"><rect><color red="0.80" green="0.73" blue="0.63" /></rect></element>
 
-	<element name="text_1">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="1">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_2">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="2">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_3">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="3">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_4">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="4">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_5">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="5">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_6">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="6">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_7">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="7">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_8">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="8">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_a">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="A">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="B">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_c">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="C">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_d">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="D">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_e">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="E">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_f">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="F">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_g">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="G">                   <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_h">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="H">                   <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_1">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="1">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_2">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="2">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_3">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="3">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_4">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="4">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_5">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="5">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_6">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="6">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_7">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="7">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_8">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="8">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_a">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="A">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_b">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="B">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_c">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="C">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_d">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="D">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_e">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="E">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_f">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="F">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_g">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="G">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
+	<element name="text_h">     <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="H">                   <color red="0.87" green="0.87" blue="0.84" /></text> </element>
 
 	<element name="text_book">  <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="BOOK">                <color red="1" green="1" blue="1" /></text> </element>
 	<element name="text_pos">   <rect><color red="0.59" green="0.39" blue="0.20" /></rect>  <text string="POS">                 <color red="1" green="1" blue="1" /></text> </element>
@@ -457,30 +454,29 @@
 		<bezel element="background"><bounds x="13" y="0" width="87" height="102" /></bezel>
 
 	<!-- chessboard coords -->
-		<bezel element="white"><bounds x="16" y="2" width="82" height="82" /></bezel>
-		<bezel element="text_8"><bounds x="13.2" y="7" width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="13.2" y="17" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="13.2" y="27" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="13.2" y="37" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="13.2" y="47" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="13.2" y="57" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="13.2" y="67" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="13.2" y="77" width="2" height="2" /></bezel>
+		<bezel element="white"><bounds x="16.5" y="3" width="81" height="81" /></bezel>
+		<bezel element="text_8"><bounds x="13.7" y="7.5" width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="13.7" y="17.5" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="13.7" y="27.5" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="13.7" y="37.5" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="13.7" y="47.5" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="13.7" y="57.5" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="13.7" y="67.5" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="13.7" y="77.5" width="2" height="2" /></bezel>
 
-		<bezel element="text_a"><bounds x="21"  y="85" width="2" height="2" /></bezel>
-		<bezel element="text_b"><bounds x="31" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_c"><bounds x="41" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_d"><bounds x="51" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_e"><bounds x="61" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_f"><bounds x="71" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_g"><bounds x="81" y="85" width="2" height="2" /></bezel>
-		<bezel element="text_h"><bounds x="91" y="85" width="2" height="2" /></bezel>
-
+		<bezel element="text_a"><bounds x="20.5" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_b"><bounds x="30.5" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_c"><bounds x="40.5" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_d"><bounds x="50.5" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_e"><bounds x="60.5" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_f"><bounds x="70.5" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_g"><bounds x="80.5" y="85" width="2" height="2" /></bezel>
+		<bezel element="text_h"><bounds x="90.5" y="85" width="2" height="2" /></bezel>
 
 	<!-- LCD panel -->
 		<group ref="panel"><bounds x="17" y="88" width="80" height="13" /></group>
 
-		<group ref="sb_board"><bounds x="17" y="3" width="80" height="80" /></group>
+		<group ref="sb_board"><bounds x="17" y="3.5" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="1.5" y="3" width="10" height="80" /></group>
 	</view>
 </mamelayout>

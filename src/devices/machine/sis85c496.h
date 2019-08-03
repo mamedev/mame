@@ -25,7 +25,7 @@
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
 
-#define SIS85C496_HOST(_config, _tag, _cpu_tag, _ram_size)	\
+#define SIS85C496_HOST(_config, _tag, _cpu_tag, _ram_size)  \
 	pci_host_device &pcihost(PCI_HOST(_config, _tag, SIS85C496, 0x10390496, 0x03, 0x00000000)); \
 	pcihost.set_cpu_tag(_cpu_tag); \
 	pcihost.set_ram_size(_ram_size);

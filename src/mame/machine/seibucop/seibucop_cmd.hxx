@@ -381,14 +381,14 @@ void raiden2cop_device::LEGACY_execute_6200(int offset, uint16_t data) // this i
 void raiden2cop_device::LEGACY_execute_6980(int offset, uint16_t data)
 {
 	uint8_t offs;
-//	int abs_x, abs_y, rel_xy;
+//  int abs_x, abs_y, rel_xy;
 	int rel_xy;
 
 	offs = (offset & 3) * 4;
 
 	/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
-//	abs_x = m_host_space->read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
-//	abs_y = m_host_space->read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
+//  abs_x = m_host_space->read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
+//  abs_y = m_host_space->read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
 	rel_xy = m_host_space->read_word(m_cop_sprite_dma_src + 4 + offs);
 
 	//if(rel_xy & 0x0706)
@@ -396,15 +396,15 @@ void raiden2cop_device::LEGACY_execute_6980(int offset, uint16_t data)
 
 	m_sprite_dma_rel_x = (rel_xy & 0xff);
 	m_sprite_dma_rel_y = ((rel_xy & 0xff00) >> 8);
-//	m_sprite_dma_rel_x = (rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0);
-//	m_sprite_dma_rel_y = ((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0);
+//  m_sprite_dma_rel_x = (rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0);
+//  m_sprite_dma_rel_y = ((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0);
 
-//	if (rel_xy & 1)
-//		m_host_space->write_word(cop_regs[4] + offs + 4, 0xc0 + abs_x - (rel_xy & 0xf8));
-//	else
-//		m_host_space->write_word(cop_regs[4] + offs + 4, (((rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0))));
+//  if (rel_xy & 1)
+//      m_host_space->write_word(cop_regs[4] + offs + 4, 0xc0 + abs_x - (rel_xy & 0xf8));
+//  else
+//      m_host_space->write_word(cop_regs[4] + offs + 4, (((rel_xy & 0x78) + (abs_x)-((rel_xy & 0x80) ? 0x80 : 0))));
 
-//	m_host_space->write_word(cop_regs[4] + offs + 6, (((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0)));
+//  m_host_space->write_word(cop_regs[4] + offs + 6, (((rel_xy & 0x7800) >> 8) + (abs_y)-((rel_xy & 0x8000) ? 0x80 : 0)));
 }
 
 /*
@@ -545,18 +545,18 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 
 	offs = (offset & 3) * 4;
 
-	// TODO: upper bits of DMA params seems to go into sprite priority?
+	// TODO: bit 16 of sprite param may go there as well
 	sprite_info = m_host_space->read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f);
 	m_host_space->write_word(cop_regs[4] + offs + 0, sprite_info);
-	
+
 	abs_x = m_host_space->read_word(cop_regs[0] + 8) - m_cop_sprite_dma_abs_x;
 	abs_y = m_host_space->read_word(cop_regs[0] + 4) - m_cop_sprite_dma_abs_y;
-	
+
 	const u8 fx     =  (sprite_info & 0x4000) >> 14;
 	const u8 fy     =  (sprite_info & 0x2000) >> 13;
 	const u8 dx     = ((sprite_info & 0x1c00) >> 10) + 1;
 	//const u8 dy     = ((sprite_info & 0x0380) >> 7)  + 1;
-	
+
 	if (fx)
 	{
 		sprite_x = (0x100 - (dx*16));
@@ -573,9 +573,19 @@ void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 		sprite_y = (abs_y)+((m_sprite_dma_rel_y & 0x80) ? 0x80 : 0)-(m_sprite_dma_rel_y & 0x78);
 	else
 		sprite_y = (m_sprite_dma_rel_y & 0x78) + (abs_y)-((m_sprite_dma_rel_y & 0x80) ? 0x80 : 0);
-		
-	//m_host_space->write_word(cop_regs[4] + offs + 2,m_host_space->read_word(m_cop_sprite_dma_src+2 + offs));
-	m_host_space->write_word(cop_regs[4] + offs + 4, sprite_x);
+
+	// 3rd midboss enables this bit for the sections that should be covered by the ground layers, 
+	// effectively changing the priority value to 2
+	if (m_cop_sprite_dma_param & 0x00020000)
+	{
+		uint16_t sprite_pri = m_host_space->read_word(cop_regs[4] + offs + 2);
+		sprite_pri |= 0x8000;
+		m_host_space->write_word(cop_regs[4] + offs + 2, sprite_pri);
+	}
+
+	// save into internal clip register, cfr. increment DMA register $410
+	m_sprite_dma_x_clip = sprite_x;
+	m_host_space->write_word(cop_regs[4] + offs + 4, m_sprite_dma_x_clip);
 	m_host_space->write_word(cop_regs[4] + offs + 6, sprite_y);
 }
 

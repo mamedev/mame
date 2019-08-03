@@ -155,7 +155,7 @@ Afega Games
 Afega stands for "Art-Fiction Electronic Game"
 
 Reference of music tempo:
-	stagger1 - https://www.youtube.com/watch?v=xWszb2fP07M
+    stagger1 - https://www.youtube.com/watch?v=xWszb2fP07M
 
 ********************************************************************/
 

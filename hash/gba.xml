@@ -41014,18 +41014,18 @@
 
 	<!--
 	<software name="4nickmov">
-		<description>4 Games on One Game Pak (Nickelodeon Movies) (USA)</description>
-		<year>2004</year>
-		<publisher>THQ</publisher>
-		<info name="serial" value="AGB-BI6E-USA"/>
-		<part name="cart" interface="gba_cart">
-			<feature name="pcb" value="AGB-E01-41" />
-			<feature name="u1" value="U1 GPIO MASKROM" />
-			<feature name="slot" value="gba_sram" />
-			<dataarea name="rom" size="33554432">
-				<rom name="agb-bi6e-0.u1" size="33554432" crc="e2f8a189" sha1="a4c779a207e4b83d39e99d58796be1a3eec27c0b"/>
-			</dataarea>
-		</part>
+	    <description>4 Games on One Game Pak (Nickelodeon Movies) (USA)</description>
+	    <year>2004</year>
+	    <publisher>THQ</publisher>
+	    <info name="serial" value="AGB-BI6E-USA"/>
+	    <part name="cart" interface="gba_cart">
+	        <feature name="pcb" value="AGB-E01-41" />
+	        <feature name="u1" value="U1 GPIO MASKROM" />
+	        <feature name="slot" value="gba_sram" />
+	        <dataarea name="rom" size="33554432">
+	            <rom name="agb-bi6e-0.u1" size="33554432" crc="e2f8a189" sha1="a4c779a207e4b83d39e99d58796be1a3eec27c0b"/>
+	        </dataarea>
+	    </part>
 	</software>
 	-->
 

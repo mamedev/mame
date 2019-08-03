@@ -227,7 +227,7 @@ void pgm_arm_type1_state::pgm_arm_type1(machine_config &config) // ARM7 Shared m
 	ARM7(config, m_prot, 20000000);   // 55857E?
 	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::_55857E_arm7_map);
 
-//	subdevice<screen_device>("screen")->set_refresh_hz(59.17); // Correct?
+//  subdevice<screen_device>("screen")->set_refresh_hz(59.17); // Correct?
 }
 
 void pgm_arm_type1_state::pgm_arm_type1_sim(machine_config &config) // When simulated
@@ -242,7 +242,7 @@ void pgm_arm_type1_state::pgm_arm_type1_sim(machine_config &config) // When simu
 void pgm_arm_type1_state::pgm_arm_type1_cave(machine_config &config)
 {
 	pgm_arm_type1_sim(config);
-//	pgm_arm_type1(config); // When ARM7 ROM is dumped and hooked up
+//  pgm_arm_type1(config); // When ARM7 ROM is dumped and hooked up
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type1_state::cavepgm_mem);
 

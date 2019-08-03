@@ -56,24 +56,24 @@ LEGACY_FLOPPY_OPTIONS_END
 
 // exactly 6500 bytes
 const floppy_image_format_t::desc_e ds9_format::ds9_desc[] = {
-	/* 01 */ { MFM, 0xaa, 32 },				// GAP1
-	/* 02 */ { SECTOR_LOOP_START, 0, 20 },	// 21 sectors
-	/* 03 */ {   RAWBITS, 0x8924, 16 },		// sync mark: xA4, 2 us zero level interval, 0xFF
+	/* 01 */ { MFM, 0xaa, 32 },             // GAP1
+	/* 02 */ { SECTOR_LOOP_START, 0, 20 },  // 21 sectors
+	/* 03 */ {   RAWBITS, 0x8924, 16 },     // sync mark: xA4, 2 us zero level interval, 0xFF
 	/* 04 */ {   RAWBITS, 0x5555, 16 },
-	/* 05 */ {   MFM, 0x95, 1 },			// address field prologue
+	/* 05 */ {   MFM, 0x95, 1 },            // address field prologue
 	/* 06 */ {   MFM, 0x6a, 1 },
-	/* 07 */ {   MFM, 0xfe, 1 },			// volume number
+	/* 07 */ {   MFM, 0xfe, 1 },            // volume number
 	/* 08 */ {   OFFSET_ID },
 	/* 09 */ {   SECTOR_ID },
-	/* 10 */ {   MFM, 0x5a, 1 },			// address field epilogue
-	/* 11 */ {   MFM, 0xaa, 5 },			// GAP2 (min 4 bytes)
-	/* 12 */ {   RAWBITS, 0x8924, 16 },		// sync mark
+	/* 10 */ {   MFM, 0x5a, 1 },            // address field epilogue
+	/* 11 */ {   MFM, 0xaa, 5 },            // GAP2 (min 4 bytes)
+	/* 12 */ {   RAWBITS, 0x8924, 16 },     // sync mark
 	/* 13 */ {   RAWBITS, 0x5555, 16 },
-	/* 14 */ {   MFM, 0x6a, 1 },			// data field prologue
+	/* 14 */ {   MFM, 0x6a, 1 },            // data field prologue
 	/* 15 */ {   MFM, 0x95, 1 },
 	/* 16 */ {   SECTOR_DATA_DS9, -1 },
-	/* 17 */ {   MFM, 0x5a, 1 },			// data field epilogue
-	/* 18 */ {   MFM, 0xaa, 33 },			// GAP3
+	/* 17 */ {   MFM, 0x5a, 1 },            // data field epilogue
+	/* 18 */ {   MFM, 0xaa, 33 },           // GAP3
 	/* 19 */ { SECTOR_LOOP_END },
 	/* 20 */ { END }
 };

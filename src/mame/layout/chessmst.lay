@@ -377,14 +377,14 @@
 
 	<!-- chessboard coords -->
 
-		<bezel element="text_8"><bounds x="14.3" y="8" width="2" height="2" /></bezel>
-		<bezel element="text_7"><bounds x="14.3" y="18" width="2" height="2" /></bezel>
-		<bezel element="text_6"><bounds x="14.3" y="28" width="2" height="2" /></bezel>
-		<bezel element="text_5"><bounds x="14.3" y="38" width="2" height="2" /></bezel>
-		<bezel element="text_4"><bounds x="14.3" y="48" width="2" height="2" /></bezel>
-		<bezel element="text_3"><bounds x="14.3" y="58" width="2" height="2" /></bezel>
-		<bezel element="text_2"><bounds x="14.3" y="68" width="2" height="2" /></bezel>
-		<bezel element="text_1"><bounds x="14.3" y="78" width="2" height="2" /></bezel>
+		<bezel element="text_8"><bounds x="14.3" y="8.5" width="2" height="2" /></bezel>
+		<bezel element="text_7"><bounds x="14.3" y="18.5" width="2" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="14.3" y="28.5" width="2" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="14.3" y="38.5" width="2" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="14.3" y="48.5" width="2" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="14.3" y="58.5" width="2" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="14.3" y="68.5" width="2" height="2" /></bezel>
+		<bezel element="text_1"><bounds x="14.3" y="78.5" width="2" height="2" /></bezel>
 
 		<bezel element="text_a"><bounds x="21.5" y="86" width="2" height="2" /></bezel>
 		<bezel element="text_b"><bounds x="31.5" y="86" width="2" height="2" /></bezel>

@@ -532,7 +532,7 @@ void towns_state::towns_update_palette()
 	{
 		case 0x00:
 		case 0x20:
-			m_palette16[(m_video.towns_video_reg[1] & 0x20) >> 5]->set_pen_color(entry, r, g, b);
+			m_palette16[(m_video.towns_video_reg[1] & 0x20) >> 5]->set_pen_color(entry & 0x0f, r, g, b);
 			break;
 		case 0x10:
 		case 0x30:

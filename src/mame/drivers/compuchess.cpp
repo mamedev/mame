@@ -9,7 +9,7 @@ Driver largely rewritten over the years.
 
 TODO:
 - cncchess sound is wrong, it should be a long dual-tone alarm sound
-- verify CPU speed
+- verify CPU speed (cmpchess XTAL is not 100% certain)
 - dump/add cmpchess2
 
 BTANB:
@@ -360,7 +360,7 @@ void cmpchess_state::cmpchess(machine_config &config)
 	m_display->set_segmask(0xf, 0xff);
 	config.set_default_layout(layout_cmpchess);
 
-	TIMER(config, "blink_display").configure_periodic(FUNC(cmpchess_state::blink), attotime::from_msec(250)); // approximation
+	TIMER(config, "blink_display").configure_periodic(FUNC(cmpchess_state::blink), attotime::from_msec(200)); // approximation
 }
 
 void cmpchess_state::mk1(machine_config &config)
@@ -368,7 +368,7 @@ void cmpchess_state::mk1(machine_config &config)
 	cmpchess(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(2000000); // it's a bit faster than cmpchess
+	m_maincpu->set_clock(2000000); // JS&A version measured 2.18MHz on average
 	subdevice<f3853_device>("smi")->set_clock(2000000);
 
 	config.set_default_layout(layout_novag_mk1);

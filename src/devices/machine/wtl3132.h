@@ -17,6 +17,7 @@ public:
 	auto out_fpcn() { return m_fpcn_cb.bind(); }
 	auto out_fpex() { return m_fpex_cb.bind(); }
 	auto out_zero() { return m_zero_cb.bind(); }
+	auto out_port_x() { return m_port_x_cb.bind(); }
 
 	// code and data ports
 	void c_port_w(u64 data) { m_c_port = data; }
@@ -119,6 +120,7 @@ private:
 	devcb_write_line m_fpcn_cb;
 	devcb_write_line m_fpex_cb;
 	devcb_write_line m_zero_cb;
+	devcb_write32 m_port_x_cb;
 
 	// output line state
 	bool m_fpcn_state;
