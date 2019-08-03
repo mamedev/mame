@@ -10,10 +10,13 @@ EEPROM (M68HC805) variants.  The suffix gives some indication of the
 memory sizes and on-board peripherals, but there's not a lot of
 consistency across the ROM/EPROM/EEPROM variants.
 
-All devices in this family have a 16-bit free-running counter fed from
+Most devices in this family have a 16-bit free-running counter fed from
 the internal clock.  The counter value can be captured on an input edge,
 and an output can be automatically set when the counter reaches a
-certain value.
+certain value.  The lower-end devices instead have a 15-bit multifunction
+ripple counter with a programmable selector for the last four stages that
+determines both the COP watchdog timeout and the real-time interrupt rate
+(this is not currently emulated).
 */
 #include "emu.h"
 #include "m68hc05.h"
@@ -68,7 +71,7 @@ std::pair<u16, char const *> const m68hc705j1a_syms[] = {
 	{ 0x0004, "DDRA"   }, { 0x0005, "DDRB"  },
 	{ 0x0008, "TSCR"   }, { 0x0009, "TCR"   }, { 0x000a, "ISCR"  },
 	{ 0x0010, "PDRA"   }, { 0x0011, "PDRB"  },
-	{ 0x0018, "EPROG"  },
+	{ 0x0014, "EPROG"  },
 	{ 0x07f0, "COPR"   }, { 0x07f1, "MOR"   } };
 
 
@@ -998,7 +1001,6 @@ void m68hc705j1a_device::device_start()
 	m68hc705_device::device_start();
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, false, false }});
-	add_timer_state();
 	add_ncop_state();
 }
 
@@ -1006,7 +1008,8 @@ void m68hc705j1a_device::device_reset()
 {
 	m68hc705_device::device_reset();
 
-	// TODO: latch MOR registers on reset
+	// latch MOR register on reset
+	set_ncope(BIT(rdmem(0x07f1), 0)); // FIXME: this is more like C8A's PCOP
 }
 
 
