@@ -65,7 +65,7 @@ private:
 	address_space_config m_program_config;
 	address_space *m_program;
 
-	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmpea;
+	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmpea, m_tmp16aux;
 	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_prefix;
 	u32 m_acc, m_temp, m_tmp32;
 	s32 m_icount;
