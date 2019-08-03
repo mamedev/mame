@@ -590,14 +590,25 @@ void menu_export::handle()
 					file.close();
 					pfile = fopen(fullpath.c_str(), "w");
 
-					// create the XML and save to file
-					driver_enumerator drvlist(machine().options());
-					drvlist.exclude_all();
-					for (auto & elem : m_list)
-						drvlist.include(driver_list::find(*elem));
+					// prepare a filter for the drivers we want to show
+					std::unordered_set<const game_driver *> driver_list(m_list.begin(), m_list.end());
+					auto filter = [&driver_list](const char *shortname, bool &)
+					{
+						auto iter = std::find_if(
+							driver_list.begin(),
+							driver_list.end(),
+							[shortname](const game_driver *driver) { return !strcmp(shortname, driver->name); });
+						return iter != driver_list.end();
+					};
 
+					// do we want to show devices?
+					info_xml_creator::devices_disposition devdisp = (uintptr_t(menu_event->itemref) == 1)
+						? info_xml_creator::devices_disposition::FILTERED
+						: info_xml_creator::devices_disposition::NONE;
+
+					// and do the dirty work
 					info_xml_creator creator(machine().options());
-					creator.output(pfile, drvlist, (uintptr_t(menu_event->itemref) == 1) ? false : true);
+					creator.output(pfile, filter, devdisp);
 					fclose(pfile);
 					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 				}

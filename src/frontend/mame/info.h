@@ -31,12 +31,19 @@ class driver_enumerator;
 class info_xml_creator
 {
 public:
+	enum class devices_disposition
+	{
+		NONE,
+		FILTERED,
+		ALL
+	};
+
 	// construction/destruction
 	info_xml_creator(emu_options const &options, bool dtd = true);
 
 	// output
-	void output(FILE *out, std::vector<std::string> const &patterns);
-	void output(FILE *out, driver_enumerator &drivlist, bool nodevices);
+	void output(FILE *out, const std::vector<std::string> &patterns);
+	void output(FILE *out, const std::function<bool(const char *shortname, bool &done)> &filter, devices_disposition devdisp);
 
 private:
 	typedef std::unordered_set<std::add_pointer_t<device_type> > device_type_set;
@@ -48,7 +55,7 @@ private:
 	void output_one(driver_enumerator &drivlist, device_type_set *devtypes);
 	void output_sampleof(device_t &device);
 	void output_bios(device_t const &device);
-	void output_rom(driver_enumerator *drivlist, device_t &device);
+	void output_rom(driver_enumerator *drivlist, const game_driver *driver, device_t &device);
 	void output_device_refs(device_t &root);
 	void output_sample(device_t &device);
 	void output_chips(device_t &device, const char *root_tag);
@@ -69,7 +76,7 @@ private:
 	void output_one_device(machine_config &config, device_t &device, const char *devtag);
 	void output_devices(device_type_set const *filter);
 
-	const char *get_merge_name(driver_enumerator &drivlist, util::hash_collection const &romhashes);
+	const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes);
 
 	// internal state
 	FILE *          m_output; // FIXME: this is not reentrancy-safe
