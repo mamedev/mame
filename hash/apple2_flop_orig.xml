@@ -6407,7 +6407,7 @@
 	</software>
 
 	<software name="alabyrnt">
-		<description>Labyrinth (Activision)</description>
+		<description>Labyrinth: The Video Game (Lucasfilm Games)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2019-08-02"/>
@@ -6536,6 +6536,70 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="228079">
 				<rom name="escape.woz" size="228079" crc="27a73b52" sha1="e2af6129e23aad6fb6ff9025b0694c4c9a97007f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry5">
+		<description>Wizardry V: Heart of the Maelstrom</description>
+		<year>1988</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="release" value="2019-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requirs a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - a.woz" size="234780" crc="5c670ca8" sha1="93c05e54ea21596165fb158cfcceaa595ccd38e1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - b.woz" size="234780" crc="1df4b66f" sha1="5ceb0e45e976111ad9d93a3feb1261ecd207465b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - c.woz" size="234780" crc="60381a85" sha1="68ac614ea0bc52a690d35c9c6a64d425fe775202" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - d.woz" size="234780" crc="2219894f" sha1="793a5074867136cfee53877113dcfda0c8590b6b" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - e.woz" size="234780" crc="0e3d0d38" sha1="4a8a35ea50bf55da877ada12823971c7bb6779c4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - f.woz" size="234780" crc="f0b8294f" sha1="fbed529779a7f1dd70a416f83502dd4468c4d014" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk G"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - g.woz" size="234780" crc="90979c2d" sha1="a9a115d8f68eefadfe360bb006239fa1773633a8" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk H"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - h.woz" size="234780" crc="571539b6" sha1="5db3ef18a7a03c775b16577624af3c3ef0637b97" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - i.woz" size="234780" crc="690af2ea" sha1="99fc3ba766182e331f8729672711a27b2bfe1509" />
 			</dataarea>
 		</part>
 	</software>

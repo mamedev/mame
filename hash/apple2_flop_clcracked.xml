@@ -34638,4 +34638,70 @@
 		</part>
 	</software>
 
+	<software name="kdwrgr12">
+		<description>KidWriter (German Level I, II) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kidwriter (german level i, ii) (4am crack).dsk" size="143360" crc="122e4098" sha1="94a07dd053f198b02cd2dbf6b62964a64d806516" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="workfrc2">
+		<description>Work Force II (Version 2.10) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Core Concepts</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="work force ii (4am crack).dsk" size="143360" crc="5ec62699" sha1="ff2ae804cabb542eae0326bf8e31cf20e3775939" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hbcircrs">
+		<description>The Human Body: Circulation and Respiration (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Silver, Burdett and Ginn</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the human body- circulation and respiration (4am crack) side a.dsk" size="143360" crc="60c1eb9d" sha1="f9f8a4eb79fdea09905d44685dc261fcacd263b9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the human body- circulation and respiration (4am crack) side b.dsk" size="143360" crc="c8b5d5c2" sha1="174730396613bd87b0cf4bb423cfc1de3eb62aee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fltficcs">
+		<description>Flights Into Fiction: Classic Stories (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2019-08-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction - classic stories (4am crack) side a.dsk" size="143360" crc="cbbbe92d" sha1="90fa76a99753eb71e788d483aa3b477ffab0c203" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="flights into fiction - classic stories (4am crack) side b.dsk" size="143360" crc="93961a53" sha1="dfc757d24e7ff8aabd6554b61984ca6d80962a5d" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
