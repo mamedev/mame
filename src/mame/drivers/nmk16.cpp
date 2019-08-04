@@ -54,6 +54,8 @@ TODO:
   maybe it has a pre-NMK004 chip using the same communication protocol but used
   for protection instead.
 
+- tharrier: Current emulation is stuck when try to access test mode.
+
 - Protection is patched in several games.
 
 - Hacha Mecha Fighter: mcu simulation is wrong/incorrect (see notes).
@@ -74,6 +76,8 @@ TODO:
 - Verify sprite limits for games when resolution is 384x224
 
 NOT BUGS:
+- Black Heart: test mode text are buggy
+
 - Hacha Mecha Fighter: (BTANB) the bomb graphics are pretty weird when the game
   is in japanese mode, but it's like this on the original game.
 
@@ -87,12 +91,18 @@ NOT BUGS:
 
 ----
 
+tharrier test mode:
+
+1)  Press player 2 buttons 1+2 during reset.  "Are you ready?" will appear
+2)  Press player 1 buttons in this sequence:
+    2,1,2,2,1,1,↓,↓
+
 tdragon and hachamf test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 2 14 (!) times
 
-mustang test mode:
+mustang and blkheart test mode:
 
 1)  Press player 2 buttons 1+2 during reset.  "Ready?" will appear
 2)  Press player 1 button 1 14 (!) times
