@@ -6328,4 +6328,376 @@
 		</part>
 	</software>
 
+	<software name="tipnflip">
+		<description>Tip 'N Flip</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-07-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234782">
+				<rom name="tip 'n flip.woz" size="234782" crc="d51ac3ae" sha1="b5e542b1d3855f16168979d529e703e6fabacf8f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qsrtnhcl">
+		<description>Return of Heracles</description>
+		<year>1983</year>
+		<publisher>Quality Software</publisher>
+		<info name="release" value="2019-08-02"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235508">
+				<rom name="return of heracles.woz" size="235508" crc="50be7d16" sha1="24e16ab619a269e8cb47d0a3557aec1cf9c35d98" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racemdnt">
+		<description>Race For Midnight</description>
+		<year>1981</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2019-08-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235492">
+				<rom name="race for midnight.woz" size="235492" crc="3eae9c48" sha1="9d5c8f15c28880c9888b47d7b4682708a954c742" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blkmagic">
+		<description>Black Magic</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+		<info name="release" value="2019-08-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="252868">
+				<rom name="black magic.woz" size="252868" crc="9579ff50" sha1="50106741bfb8c7a78adb0b1c40b39d166509fcda" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mablmans">
+		<description>Mabel's Mansion</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2019-08-02"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- (Note: many emulators have difficulty booting this game properly.
+		Also, if you have a Z80 card or a Mockingboard in any slot,
+		try removing it.) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235468">
+				<rom name="mabel's mansion.woz" size="235468" crc="53e139cb" sha1="aa9d6189808697aa4381f899399ebddb5a1d988f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alabyrnt">
+		<description>Labyrinth: The Video Game (Lucasfilm Games)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-08-02"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235469">
+				<rom name="labyrinth (activision) side a.woz" size="235469" crc="03e2fcc7" sha1="7d490fd385ccb95e65b368e411a9ec2637ce4bf9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235469">
+				<rom name="labyrinth (activision) side b.woz" size="235469" crc="d33bac83" sha1="8741f5ebbbd2ba23eead49b09f7d611eca5d29f1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmsoflre">
+		<description>Times of Lore</description>
+		<year>1988</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2019-08-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="242144">
+				<rom name="times of lore side a.woz" size="242144" crc="5e91044b" sha1="66d28dff232f1e89d94a216c7a3392576f68db25" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="242144">
+				<rom name="times of lore side b.woz" size="242144" crc="37142802" sha1="59bbdacf4ead58dde5a04e0fa9ff4e8764aa86d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bchead">
+		<description>Beach-Head</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+		<info name="release" value="2019-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235525">
+				<rom name="beach-head.woz" size="235525" crc="45f55dbd" sha1="c805e8bd5463b15e7e7326620b5abc186bd4714e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arctfox">
+		<description>Arcticfox</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228133">
+				<rom name="arcticfox.woz" size="228133" crc="4e9db002" sha1="28e7f1d3546cdb9c78928eccbca41dfe0c4d10fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="injrengn">
+		<description>Injured Engine</description>
+		<year>1984</year>
+		<publisher>Imagic</publisher>
+		<info name="release" value="2019-08-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- The double hi-res version is automatically selected if you have a 128K Apple //e or later -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="228118">
+				<rom name="injured engine side a.woz" size="228118" crc="385434ce" sha1="ebcd33a62893628aa0f34dc6b6d183c9d1d0bb3e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234774">
+				<rom name="injured engine side b.woz" size="234774" crc="1af93fce" sha1="21ef7ddd64d3619fab61da8c44250da786eed8e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mndshadw">
+		<description>Mindshadow</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requirs a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235494">
+				<rom name="mindshadow side a.woz" size="235494" crc="afc91b40" sha1="b0923ec99cefd808d0624bf0e284d3f5370a47a6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235494">
+				<rom name="mindshadow side b.woz" size="235494" crc="f9dbda3c" sha1="75e3c303b8b2065565adb2641290120152564105" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bescape">
+		<description>Escape (Bantam Publishing)</description>
+		<year>1985</year>
+		<publisher>Bantam Electronic Publishing</publisher>
+		<info name="release" value="2019-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requirs a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228079">
+				<rom name="escape.woz" size="228079" crc="27a73b52" sha1="e2af6129e23aad6fb6ff9025b0694c4c9a97007f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizrdry5">
+		<description>Wizardry V: Heart of the Maelstrom</description>
+		<year>1988</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="release" value="2019-08-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requirs a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - a.woz" size="234780" crc="5c670ca8" sha1="93c05e54ea21596165fb158cfcceaa595ccd38e1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - b.woz" size="234780" crc="1df4b66f" sha1="5ceb0e45e976111ad9d93a3feb1261ecd207465b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - c.woz" size="234780" crc="60381a85" sha1="68ac614ea0bc52a690d35c9c6a64d425fe775202" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - d.woz" size="234780" crc="2219894f" sha1="793a5074867136cfee53877113dcfda0c8590b6b" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - e.woz" size="234780" crc="0e3d0d38" sha1="4a8a35ea50bf55da877ada12823971c7bb6779c4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - f.woz" size="234780" crc="f0b8294f" sha1="fbed529779a7f1dd70a416f83502dd4468c4d014" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk G"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - g.woz" size="234780" crc="90979c2d" sha1="a9a115d8f68eefadfe360bb006239fa1773633a8" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk H"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - h.woz" size="234780" crc="571539b6" sha1="5db3ef18a7a03c775b16577624af3c3ef0637b97" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I"/>
+			<dataarea name="flop" size="234780">
+				<rom name="wizardry v - heart of the maelstrom - i.woz" size="234780" crc="690af2ea" sha1="99fc3ba766182e331f8729672711a27b2bfe1509" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cstlwolf">
+		<description>Castle Wolfenstein (1981 Version)</description>
+		<year>1981</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="castle wolfenstein.woz" size="234776" crc="9ee71212" sha1="0abb3a2431eccfd83da01c40c4639e66aae6f9a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf0684">
+		<description>Castle Wolfenstein (Version 06/19/84)</description>
+		<year>1984</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- This is the 1984 re-release, dated 06/19/1984. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235492">
+				<rom name="castle wolfenstein 061984.woz" size="235492" crc="351b55c9" sha1="ad7da9d718c15ab820eed973be79515c41a4ff27" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="byndwolf">
+		<description>Beyond Castle Wolfenstein</description>
+		<year>1984</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234756">
+				<rom name="beyond castle wolfenstein.woz" size="234756" crc="5ef4f4a5" sha1="e2f48c957dda8117b8069a17e70b5a7b1465e141" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlches">
+		<description>Battle Chess</description>
+		<year>1990</year>
+		<publisher>Interplay Productions</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234739">
+				<rom name="battle chess side a.woz" size="234739" crc="2cca2ba1" sha1="091148e230f5a1a95b1195360dc852447d48951c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234739">
+				<rom name="battle chess side b.woz" size="234739" crc="ca593d39" sha1="051edd15eb032897d32543fd400c564347ebacb4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="essex">
+		<description>Essex</description>
+		<year>1985</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="235499">
+				<rom name="essex side 1.woz" size="235499" crc="d4371622" sha1="3dd75760252ac1e87f71e9294694c6afb1f10e9a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="235499">
+				<rom name="essex side 2.woz" size="235499" crc="f5d88e20" sha1="8e8fe1e8499dbe11ad228b68080f9973f6379978" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="235499">
+				<rom name="essex side 3.woz" size="235499" crc="8b57c044" sha1="031a2ce43a020c937447ddf1ee572d3b83dbeb36" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
