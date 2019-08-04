@@ -20,6 +20,7 @@
   WonderLeague '96      (c) 1996 SemiCom (Korea Only)
   SD Fighters           (c) 1996 SemiCom (Korea Only)
   Carket Ball           (c) 1996
+  Magic Purple          (c) 1996 Unico
   B.C. Story            (c) 1997 SemiCom
   MuHanSeungBu          (c) 1997 SemiCom (Korea Only)
   Date Quiz Go Go       (c) 1998 SemiCom (Korea Only)
