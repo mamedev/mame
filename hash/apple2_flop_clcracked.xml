@@ -34704,4 +34704,19 @@
 		</part>
 	</software>
 
+	<software name="wolf0684">
+		<description>Castle Wolfenstein (Version 061984) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+		<!-- This re-release, with updated graphics and different copy protection,
+		is dated 06/19/84. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="castle wolfenstein 061984 (4am crack).dsk" size="143360" crc="e2e2383f" sha1="c3cb5c2c2789d5931b66c1bcdbb528dc6294b7f4" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
