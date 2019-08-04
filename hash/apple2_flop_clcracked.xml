@@ -34705,7 +34705,7 @@
 	</software>
 
 	<software name="wolf0684">
-		<description>Castle Wolfenstein (Version 061984) (cleanly cracked)</description>
+		<description>Castle Wolfenstein (Version 06/19/84) (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>MUSE Software</publisher>
 		<info name="release" value="2019-08-04"/>
@@ -34715,6 +34715,57 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="castle wolfenstein 061984 (4am crack).dsk" size="143360" crc="e2e2383f" sha1="c3cb5c2c2789d5931b66c1bcdbb528dc6294b7f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="byndwolf">
+		<description>Beyond Castle Wolfenstein (Version 07/12/84) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="beyond castle wolfenstein (4am crack).dsk" size="143360" crc="71b196b1" sha1="f8ec7ba8717c92be4ecab59fba54f2fbbebc6541" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backaid">
+		<description>BackAid (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>BrainBank</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Start disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 1 - the start disk.dsk" size="143360" crc="e6a4b752" sha1="20d25220943529777b384e9a68b14a79066ca017" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Physical inventory"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 2 - physical inventory.dsk" size="143360" crc="af35c101" sha1="2a64f167d15f725d166b659345b8061d047420fa" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Stress inventory"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 3 - stress inventory.dsk" size="143360" crc="b4422575" sha1="1bdcfb52b5b31c5d654b5496b3614e81927ff29a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Wear and tear"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 4 - wear and tear.dsk" size="143360" crc="6198ed77" sha1="cd3004b105d2f1d7230816b7b54af4356ce6ccae" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="backaid (4am crack) disk 5 - data disk.dsk" size="143360" crc="99bcbe7a" sha1="4c65c0231bf7680af25d5bb96eb9717d487c3056" />
 			</dataarea>
 		</part>
 	</software>
