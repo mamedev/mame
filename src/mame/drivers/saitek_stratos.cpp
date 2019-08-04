@@ -456,7 +456,7 @@ INPUT_PORTS_START( saitek_stratos )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, acl_button, nullptr) PORT_NAME("ACL")
 
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, cpu_freq, nullptr) // factory set
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, saitek_stratos_state, switch_cpu_freq, nullptr) // factory set
 	PORT_CONFSETTING(    0x00, "5MHz" )
 	PORT_CONFSETTING(    0x01, "5.626MHz" )
 	PORT_CONFSETTING(    0x02, "5.67MHz" )

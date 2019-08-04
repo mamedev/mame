@@ -6,7 +6,7 @@ Saitek RISC 2500, Mephisto Montreux
 
 The chess engine is also compatible with Tasc's The ChessMachine software.
 The hardware+software appears to have been subcontracted to Tasc. It has similarities
-with Tasc R30, and the Montreux repair manual schematics footnotes say TASC23C.
+with Tasc R30, PCB label and Montreux repair manual schematics footnotes say TASC23C.
 
 notes:
 - holding LEFT+RIGHT on boot load the QC TestMode
@@ -323,4 +323,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME              FLAGS */
 CONS( 1992, risc2500, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Kasparov RISC 2500", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener & Glaser
+CONS( 1995, montreux, 0,      0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser

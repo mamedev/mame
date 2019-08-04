@@ -5,7 +5,7 @@
 
 Fidelity Chesster Challenger
 
-These were made after Hegener & Glaser took over Fidelity(design phase started
+These were made after Hegener + Glaser took over Fidelity(design phase started
 before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
 
 *******************************************************************************

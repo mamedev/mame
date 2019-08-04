@@ -32,7 +32,7 @@ public:
 		m_out_lcd(*this, "lcd%u.%u.%u", 0U, 0U, 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 	DECLARE_INPUT_CHANGED_MEMBER(acl_button) { if (newval) power_off(); }
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
