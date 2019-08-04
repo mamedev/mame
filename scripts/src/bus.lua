@@ -2125,6 +2125,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/agat840k_hle.h",
 		MAME_DIR .. "src/devices/bus/a2bus/agat_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/agat_fdc.h",
+		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",
