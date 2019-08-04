@@ -34770,4 +34770,57 @@
 		</part>
 	</software>
 
+	<software name="nlptl111">
+		<description>NLP Tools Vol. 1 (Version 1.1) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Behavioral Engineering</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="nlp tools vol. 1 (4am crack).dsk" size="143360" crc="55fb3eea" sha1="2891d54d1c0ad8c5f3204047490414f6ae698913" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grddsgnr">
+		<description>Grid Designer (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Channelmark Corporation</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="grid designer (4am crack) side a.dsk" size="143360" crc="cf6b0064" sha1="571bfb958b2b19fa6f85de7960429aff051de449" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="grid designer (4am crack) side b.dsk" size="143360" crc="e06d89a3" sha1="7d785d660d6d36830f9107c263d09e489aebde96" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbfiler">
+		<description>Phi Beta Filer (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Scarborough Systems</publisher>
+		<info name="release" value="2019-08-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="phi beta filer (4am crack) disk 1.dsk" size="143360" crc="e56552b6" sha1="73ef9577a5c536a4a46c926a5f7a7399beac8b5c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="phi beta filer (4am crack) disk 2.dsk" size="143360" crc="c8ab6a48" sha1="bbcb328abc59158c77d7220c90f3e1c1ed422acb" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
